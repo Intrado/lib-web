@@ -51,36 +51,36 @@
 				<fieldset>
 					<label for="auto_report">Auto Report</label>
 					<div class="controls cf">
-						<input type="checkbox" id="auto_report"/>
+						<input type="checkbox" id="auto_report" name="options_autoreport"/>
 					</div>
 				</fieldset>
 
 				<fieldset>
 				<label for="allow_reply">Allow Reply</label>
 					<div class="controls cf">
-						<input type="checkbox" id="allow_reply"/>
+						<input type="checkbox" id="allow_reply" name="options_allowreply"/>
 					</div>	
 				</fieldset>
 
 				<fieldset>
 					<label for="skip_phones">Skip Duplicate Phones</label>
 					<div class="controls cf">
-						<input type="checkbox" id="skip_phones"/>
+						<input type="checkbox" id="skip_phones" name="options_skipduplicates"/>
 					</div>
 				</fieldset>
 
 				<fieldset>				
 					<label for="save_later">Save for later</label>
 					<div class="controls cf">
-						<input type="checkbox" id="save_later" name="save_later" />
-						<input type="text" name="save_message_name" />
+						<input type="checkbox" id="save_later" name="save_later" name="options_savemessage" />
+						<input type="text" name="options_savemessagename" />
 					</div>
 				</fieldset>
 
 				<fieldset>
 					<label for="max_attempts">Max Attempts</label>
 					<div class="controls cf">
-						<select id="msgsndr_form_maxattempts" name="max_attempts"></select>
+						<select id="msgsndr_form_maxattempts" name="max_attempts" name="options_maxattempts"></select>
 					</div>
 				</fieldset>
 
@@ -99,16 +99,9 @@
 				</fieldset>
 				
 				<fieldset class="cf">
-					<label for="msgsndr_form_daystorun">Days to run</label>
+					<label for="msgsndr_form_days">Days to run</label>
 					<div class="controls">
-						<select id="msgsndr_form_daystorun" name="type">
-							<option>1</option>
-							<option>2</option>
-							<option>3</option>
-							<option>4</option>
-							<option>5</option>
-							<option>6</option>
-							<option>7</option>
+						<select id="msgsndr_form_days" name="broadcast_daystorun">
 						</select>
 					</div>
 				</fieldset>

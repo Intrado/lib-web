@@ -328,25 +328,154 @@ jQuery.noConflict();
     $('#send_new_broadcast').on('click', function(e) {
       e.preventDefault();
 
-      var formData = $('form[name=broadcast]').serializeArray();
-
+      //var formData = $('form[name=broadcast]').serializeArray();
+      var formData = mapPostData();
+/* // sample data from nickolas...
+      var formData = {
+        "name": "Test Notification Name",
+        "jobtype" : "3",
+        "addme": "true",
+        "addmephone":  "4172140239",
+        "addmeemail":  "nheckman@schoolmessenger.com",
+        "addmesms":  "4172140239",
+        "listids": "[41]",
+        "hasphone":  "true",
+        "phonemessagetype":  "callme",
+        "phonemessagepost":  "true",
+        "phonemessagecallme":  {"en":"346","es":"345"},
+        "hasemail":  "true",
+        "emailmessagefromname":  "Nickolas Heckman",
+        "emailmessagefromemail": "nheckman@schoolmessenger.com",
+        "emailmessagesubject": "Test Email Subject",
+        "emailmessageattachment":  {"297":{"name":"188570.gif","size":"87307"}},
+        "emailmessagetext":  '<p>   This is an <strong><em>html</em></strong> email message.</p> <p>  <img src="viewimage.php?id=296"></p> <p>  blah blah blah blah blah.</p> <p>   Thank you.</p>',
+        "emailmessagetexttranslate": "true",
+        "emailmessagetexttranslatecatext": {"enabled":true,"text":"\u8fd9\u662f\u4e00\u4e2a\u624b\u673a\u77ed\u4fe1\uff0c\u5c06\u4e0e\u6587\u672c\u5230\u8bed\u97f3\u5448\u73b0\u3002","override":false,"englishText":""},
+        "emailmessagetexttranslatefitext": {"enabled":true,"text":"\u8fd9\u662f\u4e00\u4e2a\u624b\u673a\u77ed\u4fe1\uff0c\u5c06\u4e0e\u6587\u672c\u5230\u8bed\u97f3\u5448\u73b0\u3002","override":false,"englishText":""},
+        "emailmessagetexttranslatefrtext": {"enabled":true,"text":"\u8fd9\u662f\u4e00\u4e2a\u624b\u673a\u77ed\u4fe1\uff0c\u5c06\u4e0e\u6587\u672c\u5230\u8bed\u97f3\u5448\u73b0\u3002","override":false,"englishText":""},
+        "emailmessagetexttranslatedetext": {"enabled":true,"text":"\u8fd9\u662f\u4e00\u4e2a\u624b\u673a\u77ed\u4fe1\uff0c\u5c06\u4e0e\u6587\u672c\u5230\u8bed\u97f3\u5448\u73b0\u3002","override":false,"englishText":""},
+        "emailmessagetexttranslateeltext": {"enabled":true,"text":"\u8fd9\u662f\u4e00\u4e2a\u624b\u673a\u77ed\u4fe1\uff0c\u5c06\u4e0e\u6587\u672c\u5230\u8bed\u97f3\u5448\u73b0\u3002","override":false,"englishText":""},
+        "emailmessagetexttranslateestext": {"enabled":true,"text":"\u8fd9\u662f\u4e00\u4e2a\u624b\u673a\u77ed\u4fe1\uff0c\u5c06\u4e0e\u6587\u672c\u5230\u8bed\u97f3\u5448\u73b0\u3002","override":false,"englishText":""},
+        "hassms":  "true",
+        "smsmessagetext":  "This is the SMS message.",
+        "hasfacebook": "true",
+        "socialmediafacebookmessage":  "We have sent out a new message, you can preview it here. (Facebook)",
+        "hastwitter":  "true",
+        "socialmediatwittermessage": "We have sent out a new message, you can preview it here. (Twitter)",
+        "hasfeed": "true",
+        "socialmediafeedmessage": {"subject": "The feed title goes here", "message": "We have sent out a new message, you can preview it here. (RSS Feed)"},        
+        "socialmediafacebookpage": ["119495234836474"],
+        "socialmediafeedcategory":["7"],
+        "optionmaxjobdays":  "1",
+        "optionleavemessage":  "true",
+        "optionmessageconfirmation": "true",
+        "optionskipduplicate": "true",
+        "optioncallerid":  "8316001090",
+        "optionsavemessage": "true",
+        "optionsavemessagename": "New Message Name",
+        "scheduledate":  "06/05/2012",
+        "schedulecallearly": "8:00 am",
+        "schedulecalllate":  "9:00 pm",
+        "submit" : "submit"
+      };
+*/
       $.ajax({
         type: 'POST',
-        url: '?form=broadcast&ajax=true',
+        url: '_messagesender.php?form=msgsndr&ajax=true',
         data: formData,
 
         success: function(response) {
           console.log(response);
             var res = response;
             if (res.vres != true) {
+              //console.log('false');
               console.log(res);
             } else {
+              //console.log('true');
               console.log(res);
             }
         }
       });
 
     });
+
+
+
+
+
+    // Postdata mapping
+    /////////////////////
+
+    function mapPostData(){
+      //The store for our new POST data
+      var sendData = {};
+
+      //The mapping between our keys and the server keys
+      var keyMap = {
+        "broadcast_formsnum": "msgsndr-formsnum",
+        "broadcast_subject":"msgsndr_name",
+        "broadcast_type":"msgsndr_jobtype",
+        //"":"msgsndr_addme",
+        "me_phone":"msgsndr_addmephone",
+        "me_email":"msgsndr_addmeemail",
+        "me_sms":"msgsndr_addmesms",
+        "broadcast_listids":"msgsndr_listids",
+        "has_phone":"msgsndr_hasphone", // true/false
+        "phone_type":"msgsndr_phonemessagetype", // callme or text
+        //"":"msgsndr_phonemessagepost", // true/false -- CHECK IF THIS IS THE SAME AS 'ADD A LINK TO AUDIO MESSAGE' IN SOCIAL
+        //"":"msgsndr_phonemessagecallme",
+        "phone_text":"msgsndr_phonemessagetext",
+        "phone_translate":"msgsndr_phonemessagetexttranslate", // true/false
+        "phone_translation_es":"msgsndr_phonemessagetexttranslateestext",
+        "has_email":"msgsndr_hasemail", // true/false
+        "email_name":"msgsndr_emailmessagefromname",
+        "email_address":"msgsndr_emailmessagefromemail",
+        "email_subject":"msgsndr_emailmessagesubject",
+        "email_attachment":"msgsndr_emailmessageattachment",
+        //"":"msgsndr_emailmessagetext", // data from CK editor panel
+        "email_translate":"msgsndr_emailmessagetexttranslate", // convert this from 1/0 to true/false
+        "email_translation_es":"msgsndr_emailmessagetexttranslateestext", // translations...
+        "has_sms":"msgsndr_hassms", // true/false
+        "sms_text":"msgsndr_smsmessagetext",
+        "has_facebook":"msgsndr_hasfacebook", // true/false
+        "facebook_message":"msgsndr_socialmediafacebookmessage",
+        "has_twitter":"msgsndr_hastwitter",
+        "twitter_message":"msgsndr_socialmediatwittermessage",
+        "has_feed":"msgsndr_hasfeed",
+        "feed_message":"msgsndr_socialmediafeedmessage", // should be passed an object {"subject": "The feed title goes here", "message": "We have sent out a new message, you can preview it here. (RSS Feed)"}
+        "feed_categories":"msgsndr_socialmediafeedcategory", // should be an array of feed category ids
+        //"":"msgsndr_socialmediafacebookpage", // facebook id -- NEED TO GET THIS FROM ORGANZATIONS
+        "broadcast_daystorun":"msgsndr_optionmaxjobdays",
+        "options_voiceresponse":"msgsndr_optionleavemessage",
+        "options_callconfirmation":"msgsndr_optionmessageconfirmation",
+        "options_skipduplicates":"msgsndr_optionskipduplicate",
+        "phone_callerid":"msgsndr_optioncallerid",
+        "options_savemessage":"msgsndr_optionsavemessage",
+        "options_savemessagename":"msgsndr_optionsavemessagename",
+        "broadcast_scheduledate":"msgsndr_scheduledate",
+        "broadcast_schedulecallearly":"msgsndr_schedulecallearly",
+        "broadcast_schedulecalllate":"msgsndr_schedulecalllate"
+      };
+
+      //process all inputs into POST data
+      $("input[name], textarea[name], select[name]").each(function() {
+        var thisKey = $(this).attr("name");
+        if(typeof(keyMap[thisKey]) != "undefined") {
+          thisKey = keyMap[thisKey];
+          if($(this).val() == 'on'){
+            sendData[thisKey] = true;
+          } else {
+            sendData[thisKey] = $(this).val();
+          }
+        }
+      });
+      // add in the submit ...
+      sendData['submit'] = 'submit';
+      return(sendData);
+    };
+
+    
+
 
 
 
@@ -439,6 +568,8 @@ jQuery.noConflict();
     console.log(getCallerIds());
     */
 
+// messages, message parts and message attachments...
+//////////////////////////////////////////////////////
 
     // get message group data ...
     function getMessageGroups() {
@@ -584,7 +715,8 @@ jQuery.noConflict();
 
 
 
-
+// CK Editor ...
+/////////////////
 
     // ckeditor for the email message body ...
     chooseCkButtons = function(type){ // pass in 'basic' or 'advanced'
@@ -655,7 +787,6 @@ jQuery.noConflict();
         });
       });
     }); 
-
 
 
 

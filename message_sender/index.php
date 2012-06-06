@@ -165,6 +165,7 @@ include("nav.inc.php");
 		<div class="window_body_wrap">
 
 		<form name="broadcast">
+		<input type="hidden" name="broadcast_formsnum" value="3c2390b24625ab63506a642ad6bf19bb" />
 
 			<? include("message_sender/section_one.inc.php"); ?>
 

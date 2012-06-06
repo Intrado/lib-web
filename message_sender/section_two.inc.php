@@ -31,6 +31,7 @@
 
 				<fieldset class="check">
 					<label for="msgsndr_form_type">Switch Audio Type</label>
+					<input type="hidden" id="msgsndr_phonetype" name="phone_type" value="call-me" />
 					<div id="switchaudio" class="controls">
 						<button class="audioleft active" data-type="call-me">Call Me to Record</button><button class="audioright" data-type="text-to-speech">Text-to-Speech</button>
 					</div>
@@ -63,23 +64,29 @@
 				<fieldset>
 					<label for="msgsndr_form_callid">Caller ID</label>
 					<div class="controls">
-					<select id="msgsndr_form_callid" name="type">
+					<select id="msgsndr_form_callid" name="phone_callerid">
 					<option value="general">(651) 323-2003</option>
 					</select>
 					</div>
 				</fieldset>
 				
-				<fieldset>
+				<!--fieldset>
 					<label for="msgsndr_form_days">Days to Run</label>
 					<div class="controls">
 						<select id="msgsndr_form_days" name="type">		</select>
 					</div>
-				</fieldset>
+				</fieldset-->
 				
 				<fieldset>
 					<div class="controls">
-					<div class="cf"><input class="addme" type="checkbox" /><label class="addme">Voice Response</label></div>
-					<div class="cf"><input class="addme" type="checkbox" /><label class="addme">Call Confirmation</label></div>
+					<div class="cf">
+						<input class="addme" type="checkbox" id="msgsndr_voice_response" name="phone_voiceresponse"/>
+						<label class="addme" for="msgsndr_voice_response">Voice Response</label>
+					</div>
+					<div class="cf">
+						<input class="addme" type="checkbox" id="msgsndr_call_confirmation" name="phone_callconfirmation"/>
+						<label class="addme">Call Confirmation</label>
+					</div>
 					</div>
 				</fieldset>
 			</div><!-- #advanced-opts -->
@@ -150,7 +157,7 @@
 
 				<fieldset>
 					<label for="msgsndr_form_attachment">Attachments</label>
-					<input id="msgsndr_form_attachment" name="msgsndr_form_attachment" type="hidden" value="{}">
+					<input id="msgsndr_form_attachment" name="email_attachment" type="hidden" value="{}">
 					<div class="controls" style="overflow: hidden;">
 						<div id="uploadedfiles" style="display: none; "></div>
 						<div id="upload_process" style="display: none; "><img src="img/ajax-loader.gif"></div>
@@ -168,7 +175,7 @@
 				
 				<fieldset>
 					<label for="msgsndr_form_translate">Translate</label>
-					<input type="checkbox" id="msgsndr_form_translate" value=""/>
+					<input type="checkbox" id="msgsndr_form_translate" name="email_translate" value=""/>
 					<a class="toggle-more" href="">Show Translations</a>
 				</fieldset>
 				
@@ -212,7 +219,7 @@
 				<div class="social_tab" id="audiolink">
 					<fieldset class="check">
 						<div class="controls">
-							<input class="addme" type="checkbox" id="msgsndr_form_audio" name="msgsndr_form_audio" />
+							<input class="addme" type="checkbox" id="msgsndr_form_audio" name="social_audio" />
 							<label class="addme" for="msgsndr_form_audio">Include a link to the audio message</label>
 						</div>
 					</fieldset>
@@ -221,7 +228,7 @@
 				<div class="social_tab hidden" data-social="facebook">
 					<fieldset class="check">
 						<div class="controls">
-							<input class="addme social" type="checkbox" id="msgsndr_form_facebook" name="msgsndr_form_facebook" />
+							<input class="addme social" type="checkbox" id="msgsndr_form_facebook" name="has_facebook" />
 							<label class="addme" for="msgsndr_form_facebook"><strong>Post to Facebook</strong></label>
 						</div>
 					</fieldset>
@@ -244,7 +251,7 @@
 				<div class="social_tab hidden" data-social="twitter">
 					<fieldset class="check">
 						<div class="controls">
-							<input class="addme social" type="checkbox" id="msgsndr_form_twitter" name="msgsndr_form_twitter" />
+							<input class="addme social" type="checkbox" id="msgsndr_form_twitter" name="has_twitter" />
 							<label class="addme" for="msgsndr_form_twitter"><strong>Post to Twitter</strong></label>
 						</div>
 					</fieldset>
@@ -267,7 +274,7 @@
 				<div class="social_tab hidden" data-social="feed">				
 					<fieldset class="check">
 						<div class="controls">
-							<input class="addme social" type="checkbox" id="msgsndr_form_feed" name="msgsndr_form_feed" />
+							<input class="addme social" type="checkbox" id="msgsndr_form_feed" name="has_feed" />
 							<label class="addme" for="msgsndr_form_feed"><strong>Post to Feeds</strong></label>
 						</div>
 					</fieldset>
@@ -284,7 +291,7 @@
 						<fieldset>
 							<label for="msgsndr_form_rssmsg">Message</label>
 							<div class="controls">
-							<textarea id="msgsndr_form_rssmsg" name="rss_message" class="required"></textarea> <span class="error"></span>
+							<textarea id="msgsndr_form_rssmsg" name="feed_message" class="required"></textarea> <span class="error"></span>
 							<p><a href="#">Spell Check</a></p>
 							</div>
 						</fieldset>

@@ -1,7 +1,5 @@
-/*
- * jQuery for newui message sender
- ***********************************
- */
+// jQuery for newui message sender
+////////////////////////////////////
 
 jQuery.noConflict();
 (function($) { 
@@ -73,6 +71,9 @@ jQuery.noConflict();
 			$('#'+type+'').show();
 			$('#switchaudio button').removeClass('active');
 			$(this).addClass('active');
+
+			// set the type value in a hidden input for the postdata
+			$('#msgsndr_phonetype').attr('value', type);
 
 			// Show paste from email button if text-to-speech is clicked and emailData is not empty
 			if (type == "text-to-speech" && emailData != "") {
@@ -169,9 +170,8 @@ jQuery.noConflict();
 
 
 
-/*                                       *\
-  lists -- to be replaced by listbuilder
-\*****************************************/
+// lists -- to be replaced by listbuilder
+//////////////////////////////////////////
 
 
     // list id populator ...
@@ -270,9 +270,8 @@ jQuery.noConflict();
 
 
 
-/*                                     *\
-  email attachment code (prototype.js)
-\***************************************/
+// email attachment code (prototype.js)
+///////////////////////////////////////
 
 function startUpload(){
 	$('upload_process').show();	

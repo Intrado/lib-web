@@ -17,7 +17,7 @@
 				<fieldset class="cf">
 					<label for="msgsndr_form_type">Type</label>
 					<div class="controls">
-						<select id="msgsndr_form_type" name="type"></select>
+						<select id="msgsndr_form_type" name="broadcast_type"></select>
 					</div>
 				</fieldset>
 			</div>
@@ -31,7 +31,7 @@
 					<button href="#msgsndr_build_list" data-toggle="modal">Build a List Using Rules</button>
 				</div>
 
-				<input type="hidden" id="list_ids" name="list_ids" value="" class="required" />
+				<input type="hidden" id="list_ids" name="broadcast_listids" value="" class="required" />
 
 				<fieldset id="msgsndr_list_choices"class="hidden">
 					<!-- hidden inputs for each selected list get appended here -->	
