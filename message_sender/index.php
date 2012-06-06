@@ -167,11 +167,11 @@ include("nav.inc.php");
 		<form name="broadcast">
 		<input type="hidden" name="broadcast_formsnum" value="3c2390b24625ab63506a642ad6bf19bb" />
 
-			<? include("message_sender/section_one.inc.php"); ?>
+<? include("message_sender/section_one.inc.php"); ?>
 
-			<? include("message_sender/section_two.inc.php"); ?>
+<? include("message_sender/section_two.inc.php"); ?>
 
-			<? include("message_sender/section_three.inc.php"); ?>
+<? include("message_sender/section_three.inc.php"); ?>
 
 		</form>
 		
@@ -231,3 +231,18 @@ var dpck_fieldname = new DatePicker({
 <script src="script/niftyplayer.js.php"></script>
 <script src="script/ckeditor/ckeditor_basic.js"></script>
 <script src="script/htmleditor.js"></script>
+
+<script src="script/message_sender_listbuilder.js"></script>
+
+<script>
+jQuery.noConflict();
+(function($) { 
+  $(function() {
+		// List Picker
+		$('.add-recipients').listPicker({
+			prepickedListIds: ["1", "2"]
+		});
+  });
+}) (jQuery);
+</script>
+
