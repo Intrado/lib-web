@@ -918,25 +918,25 @@ jQuery.noConflict();
 
     
 
-    CKEDITOR.on('instanceCreated', function(e) {  
-      e.editor.on('contentDom', function() {
-        $('#cke_msgsndr_form_body').addClass('required');
-        e.editor.document.on('keyup', function(event) {
+    // CKEDITOR.on('instanceCreated', function(e) {  
+    //   e.editor.on('contentDom', function() {
+    //     $('#cke_msgsndr_form_body').addClass('required');
+    //     e.editor.document.on('keyup', function(event) {
 
-          emailData = e.editor.document.$.body.innerText;
+    //       emailData = e.editor.document.$.body.innerText;
 
-          emailVal('email_body', emailData );
-          notVal.watchContent('msgsndr_tab_email');
+    //       emailVal('email_body', emailData );
+    //       notVal.watchContent('msgsndr_tab_email');
 
-          if (emailData != "" ) {
-            $('#paste_from_email').removeClass('hidden');
-          } else {
-            $('#paste_from_email').addClass('hidden');
-          }
+    //       if (emailData != "" ) {
+    //         $('#paste_from_email').removeClass('hidden');
+    //       } else {
+    //         $('#paste_from_email').addClass('hidden');
+    //       }
           
-        });
-      });
-    }); 
+    //     });
+    //   });
+    // }); 
 
 
 
