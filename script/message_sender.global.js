@@ -184,7 +184,7 @@
       var daysToRun = userPermissions.maxjobdays;
       j('#msgsndr_form_daystorun').empty();
       for(i=1;i<=daysToRun;i++) {
-        j('#msgsndr_form_daystorun').append('<option value="'+i+'">'+i+'</option>');
+        j('#msgsndr_form_days').append('<option value="'+i+'">'+i+'</option>');
       };
 
       afterGetPrefs = function() {
