@@ -155,7 +155,6 @@
 
     this.cancelBtn = function(ele) {
 
-      console.log(ele);
       var nav = j(ele).attr('data-nav');
       var el  = nav.substr(2);
 
