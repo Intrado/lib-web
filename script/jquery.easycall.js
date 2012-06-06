@@ -1,124 +1,107 @@
 (function($){
 	$.fn.attachEasyCall = function(options) {
-		var $this = this;
-		var easycalldata = $this.data('easyCall');
-
-		// NOTE: re-init with different options will ignore new options
-		if (!easycalldata) {
-			easycalldata = {
-				"element": this,
-				"maincontainer": false,
-				"subcontainer": {"en": false},
-				"language": {"en": "English"},
-				"recording": {"en": false},
-				"specialtaskid": false,
-				"timer": false,
-				"defaultcode": "en",
-				"phonemindigits": 10,
-				"phonemaxdigits": 10,
-				"defaultphone": "",
-				"emptyphonetext": "Number to Call"};
-			if (options.languages) {
-				$.each(options.languages, function(code) {
-					easycalldata.subcontainer[code] = false;
-					easycalldata.language[code] = options.languages[code];
-					easycalldata.recording[code] = false;
-					easycalldata.specialtaskid[code] = false;
-					easycalldata.timer[code] = false;
-				});
-			}
-			if (options.phonemindigits)
-				easycalldata.phonemindigits = options.phonemindigits;
-			if (options.phonemaxdigits)
-				easycalldata.phonemaxdigits = options.phonemaxdigits;
-			if (options.defaultphone)
-				easycalldata.defaultphone = options.defaultphone;
-		}
-		
-		// load existing values from attached input
-		var elementval = this.val();
-		if (elementval == "")
-			elementdata = {};
-		else
-			elementdata = $.secureEvalJSON(elementval);
-		$.each(elementdata, function (code) {
-			// do a sanity check, then stuff the value in the recordings list
-			if (easycalldata.language[code])
-				easycalldata.recording[code] = elementdata[code];
-		});
 
 		var method = {
 			//============================================================================================
 			// DOM rendering methods
 			// set up the easycall elements, hiding the intial input element
-			init: function () {
+			init: function (options, element) {
+				var $this = $(this);
 				$this.hide();
+				var easycalldata = $.extend({
+					"element": $(element),
+					"maincontainer": false,
+					"subcontainer": {"en": false},
+					"languages": {"en": "English"},
+					"recording": {"en": false},
+					"specialtaskid": false,
+					"timer": false,
+					"defaultcode": "en",
+					"phonemindigits": 10,
+					"phonemaxdigits": 10,
+					"defaultphone": "",
+					"emptyphonetext": "Number to Call"}, options);
+
+				$this.data('easyCall', easycalldata);
+				
+				// load existing values from attached input
+				var elementval = $(element).val();
+				if (elementval == "")
+					elementdata = {};
+				else
+					elementdata = $.secureEvalJSON(elementval);
+				$.each(elementdata, function (code) {
+					// do a sanity check, then stuff the value in the recordings list
+					if ($this.data('easyCall').languages[code])
+						$this.data('easyCall').recording[code] = elementdata[code];
+				});
 				// destroy all the easycall DOM containers (if there are any)
-				if (easycalldata.maincontainer !== false)
-					$("." + easycalldata.maincontainer).detach();
+				$(".easycallmaincontainer").remove();
 				
 				// remove all existing references to old DOM subcontainers
-				$.each(easycalldata.subcontainer, function (code) {
-					easycalldata.subcontainer[code] = false;
+				$.each($this.data('easyCall').subcontainer, function (code) {
+					$this.data('easyCall').subcontainer[code] = false;
 				});
 				
 				var initdiv = $('<div />', { "class": "easycallmaincontainer" });
-				easycalldata.maincontainer = initdiv;
+				$this.data('easyCall').maincontainer = initdiv;
 
 				// add sub-containers for the pre-recorded languages
 				var subcontainer = false;
 				var needscallmecontainer = true;
 				// always add the default first
-				if (easycalldata.recording[easycalldata.defaultcode] !== false) {
-					subcontainer = method.createPreviewContainer(easycalldata.defaultcode);
+				if ($this.data('easyCall').recording[$this.data('easyCall').defaultcode] !== false) {
+					subcontainer = method.createPreviewContainer($this.data('easyCall').defaultcode);
 				} else {
 					// add the default callme container
 					subcontainer = method.createCallMeContainer(false);
 					needscallmecontainer = false;
 				}
-				easycalldata.subcontainer[easycalldata.defaultcode] = subcontainer;
+				$this.data('easyCall').subcontainer[$this.data('easyCall').defaultcode] = subcontainer;
 				initdiv.prepend(subcontainer);
 				
 				// add all others which have recordings
-				$.each(easycalldata.recording, function (code) {
-					if (code != easycalldata.defaultcode && easycalldata.recording[code] !== false) {
+				$.each($this.data('easyCall').recording, function (code) {
+					if (code != $this.data('easyCall').defaultcode && $this.data('easyCall').recording[code] !== false) {
 						subcontainer = method.createPreviewContainer(code);
-						easycalldata.subcontainer[code] = subcontainer;
+						$this.data('easyCall').subcontainer[code] = subcontainer;
 						initdiv.append(subcontainer);
 					}
 				});
 
 				// add a new call me container with menu
 				if (needscallmecontainer) {
-				subcontainer = method.createCallMeContainer(true);
+					subcontainer = method.createCallMeContainer(true);
 					if (subcontainer !== false)
 						initdiv.append(subcontainer);
 				}
 				
-				initdiv.insertAfter(easycalldata.element);
+				initdiv.insertAfter($this.data('easyCall').element);
 			},
 			
 			// create a container for the passed language
 			createCallMeContainer: function(hasmenu) {
+				var $this = $(this);
+
 				var container = $('<div />', { "class": "easycallcallmecontainer"});
 				
 				// phone number input field
 				var phoneinput = $('<input />', { "class": "easycallphoneinput small", "type": "text" });
-				if (easycalldata.defaultphone) {
-					phoneinput.val(easycalldata.defaultphone);
+				if ($this.data('easyCall').defaultphone) {
+					phoneinput.val($this.data('easyCall').defaultphone);
 				} else {
 					phoneinput.addClass("blank");
-					phoneinput.val(easycalldata.emptyphonetext);
+					phoneinput.val($this.data('easyCall').emptyphonetext);
 				}
 				// populate the phone input area with some instructional text when empty
 				phoneinput.blur(function(e) {
 					if (phoneinput.val() == "") {
 						phoneinput.addClass("blank");
-						phoneinput.val(easycalldata.emptyphonetext);
+						phoneinput.val($this.data('easyCall').emptyphonetext);
 					}
 				});
 				phoneinput.focus(function(e) {
-					if (phoneinput.val() == easycalldata.emptyphonetext) {
+					if (phoneinput.val() == $this.data('easyCall').emptyphonetext) {
 						phoneinput.val("");
 						phoneinput.removeClass("blank");
 					}
@@ -128,10 +111,10 @@
 					// enter was pressed?
 					if (e.which == 13) {
 						e.preventDefault();
-						var code = easycalldata.defaultcode;
+						var code = $this.data('easyCall').defaultcode;
 						if (hasmenu)
 							code = selectmenu.val();
-						easycalldata.subcontainer[code] = container;
+						$this.data('easyCall').subcontainer[code] = container;
 						method.doCall(code);
 					}
 				});
@@ -144,10 +127,10 @@
 					// create a multiselect with remaining languages in it.
 					var selectmenu = $('<select />', { "class": "easycallselectmenu" })
 					var hasitems = false;
-					$.each(easycalldata.subcontainer, function (code) {
-						if (easycalldata.subcontainer[code] == false && code != easycalldata.defaultcode) {
+					$.each($this.data('easyCall').languages, function (code) {
+						if (!$this.data('easyCall').subcontainer[code] && code != $this.data('easyCall').defaultcode) {
 							// insert item into selector
-							var option = $('<option />', { "value": code, "text": easycalldata.language[code]});
+							var option = $('<option />', { "value": code, "text": $this.data('easyCall').languages[code]});
 							selectmenu.append(option);
 							hasitems = true;
 						}
@@ -159,27 +142,30 @@
 
 				callbutton.click(function(e){
 					e.preventDefault();
-					var code = easycalldata.defaultcode;
+					var code = $this.data('easyCall').defaultcode;
 					if (hasmenu)
 						code = selectmenu.val();
-					easycalldata.subcontainer[code] = container;
+					$this.data('easyCall').subcontainer[code] = container;
 					method.doCall(code);
 				});
 				
 				container.append(phoneinput).append(callbutton).append($('<div style="clear:both"/>'));
+				
 				return container;
 			},
 			
 			createPreviewContainer: function(code) {
+				var $this = $(this);
+				
 				var container = $('<div />', { "class": "easycallpreviewcontainer"});
-				var languagetitle = $('<div />', { "class": "easycalllanguagetitle", "text": easycalldata.language[code] });
+				var languagetitle = $('<div />', { "class": "easycalllanguagetitle", "text": $this.data('easyCall').languages[code] });
 				var previewbutton = $('<button />', { "class": "easycallpreviewbutton" });
 				previewbutton.append($('<span />', { "text": "Preview" }))
 				var removebutton = $('<button />', { "class": "easycallrerecordbutton" });
 				
-				var audiofileid = easycalldata.recording[code];
+				var audiofileid = $this.data('easyCall').recording[code];
 				
-				if (code == easycalldata.defaultcode)
+				if (code == $this.data('easyCall').defaultcode)
 					removebutton.append($('<span />', { "text": "Re-record" }));
 				else
 					removebutton.append($('<span />', { "text": "Remove" }));
@@ -194,7 +180,7 @@
 				removebutton.click(function(e){
 					e.preventDefault();
 					// Disallow message deletion if there is a call in progress
-					if (easycalldata.specialtaskid !== false) {
+					if ($this.data('easyCall').specialtaskid !== false) {
 						alert("Cannot remove a recording while a calling session is active.");
 						return;
 					}
@@ -205,13 +191,15 @@
 				});
 				
 				container.append(languagetitle).append(previewbutton).append(removebutton).append($('<div style="clear:both"/>'));
-				
+
 				return container;
 			},
 			
 			createProgressContainer: function(code) {
+				var $this = $(this);
+				
 				var container = $('<div />', { "class": "easycallprogresscontainer"});
-				var languagetitle = $('<div />', { "class": "easycalllanguagetitle", "text": easycalldata.language[code] });
+				var languagetitle = $('<div />', { "class": "easycalllanguagetitle", "text": $this.data('easyCall').languages[code] });
 				var progresstext = $('<div />', { "class": "call-progress" });
 				progresstext.append($('<span />', { "class": "icon" })).append($('<span />', { "class": "easycallprogresstext" }))
 				
@@ -222,8 +210,10 @@
 			
 			// create a container for error states with a reset button
 			createErrorContainer: function(code, errortext) {
+				var $this = $(this);
+				
 				var container = $('<div />', { "class": "easycallerrorcontainer"});
-				var languagetitle = $('<div />', { "class": "easycalllanguagetitle", "text": easycalldata.language[code] });
+				var languagetitle = $('<div />', { "class": "easycalllanguagetitle", "text": $this.data('easyCall').languages[code] });
 				var resetbutton = $('<button />', { "class": "easycallerrorbutton" });
 				resetbutton.append($('<span />', { "class": "icon" })).append($('<span />').append("Retry"));
 				container.append(languagetitle)
@@ -241,14 +231,16 @@
 			
 			// intelegently replace the current container with a callme container
 			resetToCallMeContainer: function(code) {
+				var $this = $(this);
+				
 				// clean up the old data for this code
-				easycalldata.subcontainer[code].remove();
-				easycalldata.subcontainer[code] = false;
-				easycalldata.recording[code] = false;
+				$this.data('easyCall').subcontainer[code].remove();
+				$this.data('easyCall').subcontainer[code] = false;
+				$this.data('easyCall').recording[code] = false;
 				method.updateParentElement();
 				
 				// remove existing call containers, we can only have one shown at a time
-				var callmecontainers = easycalldata.maincontainer.children(".easycallcallmecontainer");
+				var callmecontainers = $this.data('easyCall').maincontainer.children(".easycallcallmecontainer");
 				var hasdefaultcallmecontainer = false;
 				$.each(callmecontainers, function (index) {
 					// leave behind the default... remember that it exists
@@ -260,21 +252,23 @@
 				
 				// get a new callme container!
 				var callmecontainer = false;
-				if (code == easycalldata.defaultcode) {
+				if (code == $this.data('easyCall').defaultcode) {
 					callmecontainer = method.createCallMeContainer(false);
-					easycalldata.subcontainer[code] = callmecontainer;
-					easycalldata.maincontainer.prepend(callmecontainer);
+					$this.data('easyCall').subcontainer[code] = callmecontainer;
+					$this.data('easyCall').maincontainer.prepend(callmecontainer);
 				} else {
 					if (!hasdefaultcallmecontainer)
-						easycalldata.maincontainer.append(method.createCallMeContainer(true));
+						$this.data('easyCall').maincontainer.append(method.createCallMeContainer(true));
 				}
 			},
 			
 			// replace the existing container with the new one
 			replaceContainer: function(code, newcontainer) {
-				newcontainer.insertAfter(easycalldata.subcontainer[code]);
-				easycalldata.subcontainer[code].remove();
-				easycalldata.subcontainer[code] = newcontainer;
+				var $this = $(this);
+				
+				newcontainer.insertAfter($this.data('easyCall').subcontainer[code]);
+				$this.data('easyCall').subcontainer[code].remove();
+				$this.data('easyCall').subcontainer[code] = newcontainer;
 			},
 			
 			
@@ -282,22 +276,24 @@
 			// Application logic
 			// start the process by making a phone call to the provided number
 			doCall: function (code) {
+				var $this = $(this);
+				
 				// get the phone number
-				var phone = easycalldata.subcontainer[code].children(".easycallphoneinput").val();
+				var phone = $this.data('easyCall').subcontainer[code].children(".easycallphoneinput").val();
 				
 				// validate the phone
 				var valid = method.validatePhone(phone);
 				if (valid !== true) {
-					easycalldata.subcontainer[code].children(".easycallphoneinvalid").remove();
+					$this.data('easyCall').subcontainer[code].children(".easycallphoneinvalid").remove();
 					if (phone == "")
-						phone = easycalldata.emptyphonetext;
-					easycalldata.subcontainer[code].append($('<div />', { "class": "easycallphoneinvalid", "text": phone + " " + valid }));
+						phone = $this.data('easyCall').emptyphonetext;
+					$this.data('easyCall').subcontainer[code].append($('<div />', { "class": "easycallphoneinvalid", "text": phone + " " + valid }));
 					// if this isn't the record area for the default, clear the container association
-					if (code != easycalldata.defaultcode)
-						easycalldata.subcontainer[code] = false;
+					if (code != $this.data('easyCall').defaultcode)
+						$this.data('easyCall').subcontainer[code] = false;
 					return;
 				}
-				easycalldata.defaultphone = phone;
+				$this.data('easyCall').defaultphone = phone;
 				
 				var progresscontainer = method.createProgressContainer(code);
 				var progresstext = progresscontainer.find(".easycallprogresstext");
@@ -309,36 +305,36 @@
 				$.post("ajaxeasycall.php", {"action":"new","phone":phone}, function(data){
 					progresstext.empty().append("Initiated...");
 					
-					easycalldata.specialtaskid = data.id;
+					$this.data('easyCall').specialtaskid = data.id;
 					// on a timer, query the status
-					easycalldata.timer = $.timer(function(){
-						$.post("ajaxeasycall.php", {"action":"status","id":easycalldata.specialtaskid}, function(data){
+					$this.data('easyCall').timer = $.timer(function(){
+						$.post("ajaxeasycall.php", {"action":"status","id":$this.data('easyCall').specialtaskid}, function(data){
 							// get the status
 							var status = method.handleStatus(data);
 							progresstext.empty().append(status.message);
 							if (!status.error && status.complete) {
-								easycalldata.timer.stop();
+								$this.data('easyCall').timer.stop();
 								// save audiofile
 								method.doSaveAudioFile(code);
 							}
 							if (status.error) {
-								easycalldata.specialtaskid = false;
-								easycalldata.timer.stop();
+								$this.data('easyCall').specialtaskid = false;
+								$this.data('easyCall').timer.stop();
 								
 								// transition to error mode
 								method.replaceContainer(code, method.createErrorContainer(code, status.message));
 							}
 						},"json")
 						.error(function() {
-							easycalldata.specialtaskid = false;
-							easycalldata.timer.stop();
+							$this.data('easyCall').specialtaskid = false;
+							$this.data('easyCall').timer.stop();
 							// transition to error mode
 							method.replaceContainer(code, method.createErrorContainer(code, "An error occured while getting the status of a call."));
 						});
 					}).set({time: 2000, autostart: true});
 				},"json")
 				.error(function() {
-					easycalldata.specialtaskid = false;
+					$this.data('easyCall').specialtaskid = false;
 					// transition to error mode
 					method.replaceContainer(code, method.createErrorContainer(code, "An error occured while attempting a new call."));
 				});
@@ -346,14 +342,16 @@
 			
 			// save the audiofile and get the audiofileid
 			doSaveAudioFile: function (code) {
+				var $this = $(this);
+				
 				$.post("ajaxeasycall.php", {
 						"action": "getaudiofile",
-						"id": easycalldata.specialtaskid,
-						"name": easycalldata.language[code]},
+						"id": $this.data('easyCall').specialtaskid,
+						"name": $this.data('easyCall').languages[code]},
 						function(data){
 					
 					if (data.audiofileid) {
-						easycalldata.recording[code] = data.audiofileid;
+						$this.data('easyCall').recording[code] = data.audiofileid;
 						
 						// create and load the preview container
 						method.replaceContainer(code, method.createPreviewContainer(code));
@@ -361,7 +359,7 @@
 						// create a new call me container 
 						var callmecontainer = method.createCallMeContainer(true);
 						if (callmecontainer !== false)
-							easycalldata.maincontainer.append(callmecontainer);
+							$this.data('easyCall').maincontainer.append(callmecontainer);
 						
 						method.updateParentElement();
 					} else {
@@ -373,22 +371,24 @@
 					// transition to error mode
 					method.replaceContainer(code, method.createErrorContainer(code, "An error occured while requesting save audio."));
 				});
-				easycalldata.specialtaskid = false;
+				$this.data('easyCall').specialtaskid = false;
 			},
 			
 			// save the current recording data into the parent element
 			updateParentElement: function () {
+				var $this = $(this);
+				
 				// update json data in parent input field
 				var itemdata = {};
-				$.each(easycalldata.recording, function (code) {
-					if (easycalldata.recording[code] !== false)
-						itemdata[code] = easycalldata.recording[code]
+				$.each($this.data('easyCall').recording, function (code) {
+					if ($this.data('easyCall').recording[code] !== false)
+						itemdata[code] = $this.data('easyCall').recording[code]
 				});
-				easycalldata.element.val($.toJSON(itemdata));
+				$this.data('easyCall').element.val($.toJSON(itemdata));
 				
 				// data was changed. trigger a change event on the parent element
 				var updateevent = jQuery.Event("change");
-				easycalldata.element.trigger(updateevent);
+				$this.data('easyCall').element.trigger(updateevent);
 			},
 			
 			// read the return status and provide appropriate error handling messages
@@ -431,8 +431,10 @@
 	
 			// validate a phone number
 			validatePhone: function (value) {
+				var $this = $(this);
+				
 				var phone = value.replace(/[^0-9]/g,"");
-				if (easycalldata.phonemindigits == easycalldata.phonemaxdigits && easycalldata.phonemaxdigits == 10 && phone.length == 10) {
+				if ($this.data('easyCall').phonemindigits == $this.data('easyCall').phonemaxdigits && $this.data('easyCall').phonemaxdigits == 10 && phone.length == 10) {
 					var areacode = phone.substring(0, 3);
 					var prefix = phone.substring(3, 6);
 
@@ -474,10 +476,10 @@
 					}
 					return true;
 				} else {
-					if (easycalldata.phonemindigits != 10 || easycalldata.phonemaxdigits != 10) {
-						if (phone.length < easycalldata.phonemindigits)
+					if ($this.data('easyCall').phonemindigits != 10 || $this.data('easyCall').phonemaxdigits != 10) {
+						if (phone.length < $this.data('easyCall').phonemindigits)
 							return label + " is invalid. The phone number or extension must be at least " + minlength + " digits long.\nYou do not need to include a 1 for long distance.";
-						if (phone.length > easycalldata.phonemaxdigits)
+						if (phone.length > $this.data('easyCall').phonemaxdigits)
 							return "is invalid. The phone number or extension must be no more than " + maxlength + " digits long.\nYou do not need to include a 1 for long distance.";
 					} else {
 						return "is invalid. The phone number must be exactly 10 digits long (including area code).\nYou do not need to include a 1 for long distance.";
@@ -488,7 +490,7 @@
 		};
 		
 		return this.each(function() {
-			method.init();
+			method.init(options, this);
 		});
 	};
 })(jQuery);
