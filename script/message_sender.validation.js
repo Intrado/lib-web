@@ -83,7 +83,7 @@ jQuery.noConflict();
           jobTypes = data.jobTypes;
 
           $.each(jobTypes, function(index, jobType) {  
-            $('#msgsndr_form_type').append('<option value='+jobType.id+'>'+jobType.info+'</option');
+            $('#msgsndr_form_type').append('<option value='+jobType.id+'>'+jobType.name+'</option');
           });
 
           step1();
