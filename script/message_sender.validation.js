@@ -37,8 +37,20 @@ jQuery.noConflict();
        }
     });
 
-    
-
+	// WIP: api call for languages
+    function getLanguages(){
+      var languages = false;
+      $.ajax({
+          url: '/'+orgPath+'/api/2/organizations/'+orgid+'/languages',
+          type: "GET",
+          dataType: "json",
+          success: function(data) {
+           languages = data.languages;
+           console.log(languages);
+         }
+      });
+    };
+ 
     /* --
       The setUp function will do alot of the inital work, and call other functions based on users roles
     -- */
@@ -897,16 +909,10 @@ jQuery.noConflict();
       var toolbarBasic = [
           ['Bold', 'Italic','NumberedList','BulletedList','Link']
         ];
-
+        
       var toolbarAdvanced = [
-          ['Print','Source'],
-          ['Undo','Redo','-','PasteFromWord', 'SpellCheck'],
-          '/',
-          ['Styles','Format'],
-          ['NumberedList','BulletedList','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','Outdent','Indent'],
-          '/',
-          ['Font','FontSize','Bold', 'Italic', 'Underline','Strike','TextColor','BGColor', 'RemoveFormat'],
-          ['Link', 'Image','Table','HorizontalRule']
+          ['Print','Source','-','Undo','Redo','PasteFromWord','SpellCheck','-','NumberedList','BulletedList','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','Outdent','Indent','Styles'],
+          ['Bold', 'Italic', 'Underline','Strike','TextColor','BGColor', 'RemoveFormat','Link', 'Image','Table','HorizontalRule','Font','FontSize','Format']
         ];
 
       var choice = toolbarBasic;
@@ -924,7 +930,7 @@ jQuery.noConflict();
     };
     
     // set the toolbar choice variable before calling the ckeditor function
-    toolbarChoice = chooseCkButtons('basic');
+    toolbarChoice = chooseCkButtons('advanced');
 
     CKEDITOR.replace('msgsndr_form_body', {
       'customConfig': '', // Prevent ckeditor from trying to load an external configuration file, should improve startup time.
@@ -940,27 +946,27 @@ jQuery.noConflict();
     });
 
     
+    /*
+    CKEDITOR.on('instanceCreated', function(e) {  
+      e.editor.on('contentDom', function() {
+        $('#cke_msgsndr_form_body').addClass('required');
+        e.editor.document.on('keyup', function(event) {
 
-    // CKEDITOR.on('instanceCreated', function(e) {  
-    //   e.editor.on('contentDom', function() {
-    //     $('#cke_msgsndr_form_body').addClass('required');
-    //     e.editor.document.on('keyup', function(event) {
+          emailData = e.editor.document.$.body.innerText;
 
-    //       emailData = e.editor.document.$.body.innerText;
+          emailVal('email_body', emailData );
+          notVal.watchContent('msgsndr_tab_email');
 
-    //       emailVal('email_body', emailData );
-    //       notVal.watchContent('msgsndr_tab_email');
-
-    //       if (emailData != "" ) {
-    //         $('#paste_from_email').removeClass('hidden');
-    //       } else {
-    //         $('#paste_from_email').addClass('hidden');
-    //       }
+          if (emailData != "" ) {
+            $('#paste_from_email').removeClass('hidden');
+          } else {
+            $('#paste_from_email').addClass('hidden');
+          }
           
-    //     });
-    //   });
-    // }); 
-
+        });
+      });
+    }); 
+    */
 
 
 
