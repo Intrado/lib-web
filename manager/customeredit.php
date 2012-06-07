@@ -142,12 +142,12 @@ class LanguagesItem extends FormItem {
 			function updatelanguage(code,name) {
 				var langs = \$H($('$n').value.evalJSON(true));
 				langs.set(code.strip(),name.strip());
-				$('$n').value = langs.toJSON();		
+				$('$n').value = Object.toJSON(langs);	
 			}
 			function removelanguage(code) {
 				var langs = \$H($('$n').value.evalJSON(true));
 				langs.unset(code.strip());
-				$('$n').value = langs.toJSON();
+				$('$n').value = Object.toJSON(langs);
 				renderlanguages();
 			}
 			function renderlanguages() {
@@ -223,7 +223,7 @@ class LanguagesItem extends FormItem {
 				if (code && language) {
 					var langs = \$H($(formitemid).value.evalJSON(true));
 					langs.set(code.strip(),language.strip());
-					$(formitemid).value = langs.toJSON();
+					$(formitemid).value = Object.toJSON(langs);
 				}
 				$('newlanginputselect').selectedIndex = 0;
 				$('searchresult').update('');
