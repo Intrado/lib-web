@@ -76,7 +76,8 @@ jQuery.noConflict();
 			$('#msgsndr_phonetype').attr('value', type);
 
 			// Show paste from email button if text-to-speech is clicked and emailData is not empty
-			if (type == "text-to-speech" && emailData != "") {
+			var emailBody = $('iframe[name^=Ric]').contents().find('body').text();
+			if (type == "text-to-speech" && emailBody != '') {
 				$('#paste_from_email').removeClass('hidden');
 			}
 
