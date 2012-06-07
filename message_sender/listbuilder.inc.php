@@ -1,8 +1,4 @@
-							<section class="add-recipients panel panel-flat">
-
-								<header class="bar">
-									<h3><b>Recipient Lists</b></h3>									
-								</header>
+							<div class="add-recipients">
 
 								<div class="add-btns"> 
 									<a href="#add-recipients-existing_lists" class="btn disabled" data-toggle="modal">Pick from Existing Lists</a> or 
@@ -144,4 +140,4 @@
 
 				</div><!-- #addme -->
 <!-- end from section_one -->
-							</section>
+							</div>

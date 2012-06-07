@@ -22,7 +22,10 @@
 				</fieldset>
 			</div>
 			
+			<h3 class="flag">Recipient List</h3>
+			<div class="field_wrapper">
 <? require("message_sender/listbuilder.inc.php"); ?>
+			</div>
 			
 			<div class="msg_confirm">
 					<button class="btn_confirm" disabled="disabled" data-next="2">Continue <span class="icon"></span></button>

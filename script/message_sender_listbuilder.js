@@ -802,7 +802,7 @@
             $.each(base.pickedListIds, function(index, id) {
 
                 // Only do this if the list has stats
-                if (base.lists[id].stats !== undefined) {
+                if (base.lists[id] !== undefined && base.lists[id].stats !== undefined) {
 
                     // Recalc total recipients
                     sum += base.lists[id].stats.total;

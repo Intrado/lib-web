@@ -576,6 +576,159 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
 	background: url(img/icons/error.png) 0 center no-repeat;
 }
 
+/* list picker styles, taken from mockup */
+.add-recipients {
+	margin-left: 20px;
+	margin-right: 20px;
+}
+.add-recipients div.add-btns {
+	margin-bottom: 22px;
+}
+.btn-group:after {
+	clear: both;
+}
+.btn-group:before, .btn-group:after {
+	content: "";
+	display: table;
+}
+.btn-group:before, .btn-group:after {
+	content: "";
+	display: table;
+}
+.add-recipients .btn {
+	vertical-align: middle;
+}
+.add-recipients .add-btns .btn-group {
+	vertical-align: middle;
+	display: inline-block;
+	margin-left: 3px;
+}
+.btn-group {
+	position: relative;
+}
+.btn-group .dropdown-toggle {
+	box-shadow: 1px 0 0 rgba(255, 255, 255, 0.125) inset, 0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 1px 2px rgba(0, 0, 0, 0.05);
+	padding-left: 8px;
+	padding-right: 8px;
+}
+.btn-group .btn:first-child {
+	border-bottom-right-radius: 0px;
+	border-top-right-radius: 0px;
+}
+.btn-group .btn:last-child, .btn-group .dropdown-toggle {
+	border-bottom-left-radius: 0px;
+	border-top-left-radius: 0px;
+}
+.btn-group .btn {
+	float: left;
+	margin-left: -1px;
+	position: relative;
+}
+.btn-group.open .dropdown-toggle {
+	background-image: none;
+	box-shadow: 0 1px 6px rgba(0, 0, 0, 0.15) inset, 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+.btn-group .dropdown-toggle:active, .btn-group.open .dropdown-toggle {
+	outline: 0 none;
+}.btn-group.open .dropdown-menu {
+	border-radius: 5px 5px 5px 5px;
+	display: block;
+	margin-top: 1px;
+}
+.dropdown-menu {
+	background-clip: padding-box;
+	background-color: #FFFFFF;
+	border-color: rgba(0, 0, 0, 0.2);
+	border-radius: 0 0 5px 5px;
+	border-style: solid;
+	border-width: 1px;
+	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+	display: none;
+	float: left;
+	left: 0;
+	list-style: none outside none;
+	margin: 0;
+	min-width: 160px;
+	padding: 4px 0;
+	position: absolute;
+	top: 100%;
+	z-index: 1000;
+}
+.dropdown-menu a {
+	clear: both;
+	color: #555555;
+	display: block;
+	font-weight: normal;
+	line-height: 22px;
+	padding: 3px 15px;
+	white-space: nowrap;
+	cursor: pointer;
+}
+.add-recipients .add-btns .btn-group .caret {
+	margin-top: 9px;
+}
+.btn .caret {
+	margin-left: 0;
+	margin-top: 7px;
+}
+.caret {
+	border-left: 4px solid transparent;
+	border-right: 4px solid transparent;
+	border-top: 4px solid #000000;
+	content: "↓";
+	display: inline-block;
+	height: 0;
+	opacity: 0.3;
+	text-indent: -99999px;
+	vertical-align: top;
+	width: 0;
+}
+.add-recipients table.lists {
+	border-collapse: separate;
+	border-spacing: 0;
+}
+.add-recipients table.lists tr.new td {
+	-moz-transition: background 3s ease 0s;
+	background: none repeat scroll 0 0 #FFFF9C;
+	border-top: 1px solid #DDDDDD;
+	line-height: 22px;
+	text-align: left;
+}
+.add-recipients table.lists tr.new td.flashed {
+	background: none repeat scroll 0 0 #FFFFFF;
+}
+.add-recipients table.lists tr td:first-child {
+	padding-right: 0;
+	width: 55px;
+}
+.add-recipients table.lists tr td {
+	vertical-align: top;
+}
+.table-bordered {
+	border: 1px solid #DDDDDD;
+	border-collapse: separate;
+	border-radius: 4px 4px 4px 4px;
+	margin-bottom: 22px;
+	width: 100%;
+	border-spacing: 0;
+	max-width: 100%;
+	font-size: 16px;
+	line-height: 22px;
+}
+.table-bordered thead:first-child tr:first-child th:first-child, .table-bordered tbody:first-child tr:first-child td:first-child {
+	border-radius: 4px 0 0 0;
+}
+.table-bordered th {
+	font-weight: bold;
+	vertical-align: bottom;
+	line-height: 22px;
+	padding: 8px;
+	text-align: left;
+}
+.table-bordered th + th, .table-bordered td + td, .table-bordered th + td, .table-bordered td + th {
+	border-left: 1px solid #DDDDDD;
+}
+
 /*----- global/helper classes -----*/
 
 .light { color: #999; }
