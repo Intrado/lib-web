@@ -1,65 +1,5 @@
-/* http://meyerweb.com/eric/tools/css/reset/ 
-   v2.0 | 20110126
-   License: none (public domain)
-*/
-
-html, body, div, span, applet, object, iframe,
-h1, h2, h3, h4, h5, h6, p, blockquote, pre,
-a, abbr, acronym, address, big, cite, code,
-del, dfn, em, img, ins, kbd, q, s, samp,
-small, strike, strong, sub, sup, tt, var,
-b, u, i, center,
-dl, dt, dd, ol, ul, li,
-fieldset, form, label, legend,
-table, caption, tbody, tfoot, thead, tr, th, td,
-article, aside, canvas, details, embed, 
-figure, figcaption, footer, header, hgroup, 
-menu, nav, output, ruby, section, summary,
-time, mark, audio, video {
-	margin: 0;
-	padding: 0;
-	border: 0;
-	font-size: 100%;
-	font: inherit;
-	vertical-align: baseline;
-}
-
-/* redo image align center - this is used by all the actionlinks and icon buttons and set this way in the main css file */
-img {
-	vertical-align: middle;
-}
-
-/* HTML5 display-role reset for older browsers */
-article, aside, details, figcaption, figure, 
-footer, header, hgroup, menu, nav, section {
-	display: block;
-}
-body {
-	line-height: 1;
-}
-ol, ul {
-	list-style: none;
-}
-blockquote, q {
-	quotes: none;
-}
-blockquote:before, blockquote:after,
-q:before, q:after {
-	content: '';
-	content: none;
-}
-table {
-	border-collapse: collapse;
-	border-spacing: 0;
-}
-
 /* Padding is not added to width of elements, so you can set div etc to the size you want */
 * { -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
-
-.cf:before, .cf:after {content:"";display:table} /* For modern browsers */
-.cf:after {clear:both}
-.cf {zoom:1} /* For IE 6/7 (trigger hasLayout) */
-
 
 
 /*----- New IU theme, uses css.inc.php as basic layout example can be seen in example.css -----*/
@@ -83,7 +23,7 @@ h3 { line-height: 33px; }
 h4 { font-size: 12px; line-height: 22px; color: #235563; text-shadow: 0 1px 0 #fff; }
 
 .content_wrap { position: relative; margin: 0; padding: 25px 0 0; }
-.container { position: relative; max-width: 75em; margin: 0 auto; padding: 0 10px; }
+.container { position: relative; max-width: 95em; margin: 0 auto; padding: 0 10px; }
 .wrapper { position: relative; margin: 0 250px 0 0; }
 .main_activity { width: 100%; }
 .main_aside { position: absolute; top: 0; right: -250px; width: 225px; }
@@ -410,10 +350,20 @@ input[name=msgsndr_msggroup] {
 -webkit-box-shadow: inset 0px 1px 3px 0px #111; 
    -moz-box-shadow: inset 0px 1px 3px 0px #111; 
         box-shadow: inset 0px 1px 3px 0px #111; }
+
+.msg_content_nav li.oemail a span.icon   { background-image: url(themes/newui/phone.png) }
+.msg_content_nav li.ophone a span.icon   { background-image: url(themes/newui/email.png) }
+.msg_content_nav li.osms a span.icon     { background-image: url(themes/newui/sms.png) }
+.msg_content_nav li.osocial a span.icon  { background-image: url(themes/newui/social.png) }
+
 .msg_content_nav li.active a:after { content: ""; position: absolute; bottom: -12px; left: 50%; margin-left: -12px; display: block; width: 0; height: 0; 
 border-color: #222222 transparent transparent; border-style: solid; border-width: 12px 12px 0; }
 .msg_content_nav li.active a span { color: #f9f9f9; }
-.msg_content_nav li.active a span.icon { background: url(themes/newui/pencil.png) 0 center no-repeat; }
+.msg_content_nav li.active a span.icon, 
+.msg_content_nav li.oemail.active a span.icon,
+.msg_content_nav li.ophone.active a span.icon,
+.msg_content_nav li.osms.active a span.icon,
+.msg_content_nav li.osocial.active a span.icon { background: url(themes/newui/pencil.png) 0 center no-repeat; }
 
 .msg_content_nav li.complete a { background: #499122; color: #fbfbfb; text-shadow: 0 1px 1px #222; border-color: #3a7a17; 
 -webkit-box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.5); 
@@ -426,11 +376,10 @@ border-color: #222222 transparent transparent; border-style: solid; border-width
 .msg_content_nav li.complete.active a:after { 
   content: ""; position: absolute; bottom: -12px; left: 50%; margin-left: -12px; display: block; width: 0; height: 0; 
 border-color: #499122 transparent transparent; border-style: solid; border-width: 12px 12px 0;
-   
-
 }
 .msg_content_nav li.complete a span { color: #fbfbfb; }
-.msg_content_nav li.complete a span.icon { background: url(themes/newui/tick.png) 0 center no-repeat; }
+.msg_content_nav li.complete a span.icon { background-image: url(themes/newui/tick.png) }
+
 
 .tab_content { margin: 0 0 20px 0; }
 .tab_panel form { border-radius: 8px; }
@@ -555,7 +504,7 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
 .call-progress:hover {
   cursor: pointer;
 }
-
+/* !!! TODO: Change this to an animated gif for cross browser support !!! */
 @-webkit-keyframes progress-bar-stripes {
   from {
     background-position: 0 0;
@@ -581,7 +530,7 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
   }
 }
 
-// Easycall styles so it's less broken. TODO: these are not final!
+/* Easycall styles so it's less broken. TODO: these are not final! */
 .easycallmaincontainer {}
 .easycallmaincontainer div {
 	margin-bottom: 3px;
@@ -619,6 +568,7 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
 }
 
 
+.light { color: #999; }
 
 
 
