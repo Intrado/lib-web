@@ -118,7 +118,7 @@
 				<fieldset>
 					<label for="msgsndr_form_translate">Translate</label>
 					<input type="checkbox" id="msgsndr_form_translate" value=""/>
-					<a class="toggle-more" href="">Show Translations</a>
+					<a class="toggle-more" href="">Show 8 translations</a>
 				</fieldset>
 
 				<fieldset class="form_actions">
@@ -179,7 +179,7 @@
 				<fieldset>
 					<label for="msgsndr_form_translate">Translate</label>
 					<input type="checkbox" id="msgsndr_form_translate" name="email_translate" value=""/>
-					<a class="toggle-more" href="">Show Translations</a>
+					<a class="toggle-more" href="">Show 8 translations</a>
 				</fieldset>
 				
 				<fieldset class="form_actions">
