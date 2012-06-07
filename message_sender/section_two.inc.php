@@ -124,9 +124,22 @@
 
 				<fieldset>
 					<label for="msgsndr_form_translate">Translate</label>
-					<input type="checkbox" id="msgsndr_form_translate" value=""/>
-					<a class="toggle-more" href="">Show 8 translations</a>
+					<input type="checkbox" id="msgsndr_form_phonetranslate" value="" data-txt="#msgsndr_tts_message" data-display="#tts_translate" />
+					<a class="toggle-more hide" data-target="#tts_translate" href=""></a>
 				</fieldset>
+
+				<div id="tts_translate" class="close">
+
+<!-- 					<fieldset>
+							<label for="">Spanish</label>
+							<input type="checkbox" />
+						<div class="controls">
+							<textarea disabled>Translated Text here</textarea>
+						</div>
+					</fieldset>
+ -->
+				</div>
+
 
 				<fieldset class="form_actions">
 					<div class="controls">
@@ -134,6 +147,7 @@
 					<button class="btn_cancel" data-nav=".ophone">Cancel</button>
 					</div>
 				</fieldset>
+
 
 			</div><!-- #text-to-speech -->
 
@@ -185,7 +199,7 @@
 				
 				<fieldset>
 					<label for="msgsndr_form_translate">Translate</label>
-					<input type="checkbox" id="msgsndr_form_translate" name="email_translate" value=""/>
+					<input type="checkbox" id="msgsndr_form_emailtranslate" name="email_translate" value=""/>
 					<a class="toggle-more" href="">Show 8 translations</a>
 				</fieldset>
 				

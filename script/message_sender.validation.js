@@ -37,20 +37,6 @@ jQuery.noConflict();
        }
     });
 
-	// WIP: api call for languages
-    function getLanguages(){
-      languages = false;
-      $.ajax({
-          url: '/'+orgPath+'/api/2/organizations/'+orgid+'/languages',
-          type: "GET",
-          dataType: "json",
-          success: function(data) {
-           languages = data.languages;
-         }
-      });
-    };
-
-    getLanguages();
  
     /* --
       The setUp function will do alot of the inital work, and call other functions based on users roles
@@ -348,6 +334,108 @@ jQuery.noConflict();
 
 
     });
+
+
+
+    /*****
+
+      Translate 
+    
+    *****/
+
+    function getLanguages(){
+
+      langCodes = "";
+
+      nLangs = {};
+
+      $.ajax({
+          url: '/'+orgPath+'/api/2/organizations/'+orgid+'/languages',
+          type: "GET",
+          dataType: "json",
+          success: function(data) {
+           languages = data.languages;
+
+            $.each(languages, function(lIndex, lData) {
+
+              var lCodes = lData.code;
+
+              nLangs[lCodes] = lData.name;
+
+              var lCodes = lData.code;
+              if (lCodes != "en") {
+                if (langCodes == "") {
+                  langCodes = lCodes;
+                } else {
+                  langCodes = langCodes + '|' + lCodes;
+                }
+              }
+
+            });
+
+         }
+      });
+
+    };
+
+    getLanguages();
+
+
+    function doTranslate(langCodes,txtField,displayArea) {
+
+      var transTxt = $(txtField).val();
+      var transURL = 'translate.php?english='+transTxt+'&languages='+langCodes;
+
+      var splitlangCodes = langCodes.split('|');
+
+      var langCount = splitlangCodes.length;
+
+      $.ajax({
+        url: transURL,
+        type: 'GET',
+        dataType: 'json',
+        success: function(data) {
+
+          console.log(data);
+
+          if (langCount == 1) {
+            $('a[data-target='+displayArea+']').show().text('Show '+langCount+' translation');
+          } else {
+            $('a[data-target='+displayArea+']').show().text('Show '+langCount+' translations');
+          }
+
+          $.each(data.responseData, function(transIndex, transData) {
+
+            var langCode = splitlangCodes[transIndex];
+
+            // $(displayArea).append('<fieldset><label for="">'+languages[transIndex+1].name+'</label><input type="checkbox" /><div class="controls"><textarea disabled>'+transData.translatedText+'</textarea></div></fieldset>');
+            $(displayArea).append('<fieldset><label for="">'+nLangs[langCode]+'</label><input type="checkbox" /><div class="controls"><textarea disabled>'+transData.translatedText+'</textarea></div></fieldset>');
+          });
+
+        }
+
+      });
+
+    };
+
+
+    $('#msgsndr_form_phonetranslate').on('click', function() {
+      // Checked if checked then do translate, as do not want to hit API when deselected translate
+      if ($(this).is(':checked')) {
+
+        txtField      = $(this).attr('data-txt');
+        displayArea   = $(this).attr('data-display');
+
+        doTranslate(langCodes,txtField,displayArea);
+
+      }
+    });
+
+
+
+
+
+
 
 
 
@@ -779,6 +867,8 @@ jQuery.noConflict();
 
       var allDataInputs = $('#msg_section_2 input, textarea');
 
+      $('#cke_reusableckeditor iframe').contents().find('body').empty();
+
       $('.facebook, .twitter, .feed').hide();
 
       $.each(allDataInputs, function(aIndex, aData) {
@@ -818,7 +908,8 @@ jQuery.noConflict();
         $('#msgsndr_form_email').val(messages.email.fromEmail.replace("%40","@"));
         $('#msgsndr_form_mailsubject').val(emailSubject);
 
-        $('iframe[name^=Ric]').contents().find('body').append(unescape(messages.email.msgFormatted));
+        $('#cke_reusableckeditor iframe').contents().find('body').append(unescape(messages.email.msgFormatted));
+        // $('iframe[name^=Ric]').contents().find('body').append(unescape(messages.email.msgFormatted));
         // Message HTML content == messages.email.msgparts[0].txt
       }
 
