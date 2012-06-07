@@ -33,7 +33,7 @@ $NAVTREE = array (
 
 function navMainTab ($display, $hint, $accesskey, $link, $isselected) {
 	$theme = getBrandTheme();
-	return '<li '. ($isselected ? 'class="navtab_active"' : "") .'><a accesskey="'.$accesskey.'" onfocus="blur()" href="' . $link . '" title="'.$hint.'"><img alt="" src="img/themes/' . $theme . '/main_nav_tab' . ($isselected ? "_active" : "") . '.gif"><span>' . $display . '</span></a></li>';
+	return '<li '. ($isselected ? 'class="navtab_active"' : "") .'><a accesskey="'.$accesskey.'" onfocus="blur()" href="' . $link . '" title="'.$hint.'"><img alt="" src="themes/' . $theme . '/main_nav_tab' . ($isselected ? "_active" : "") . '.gif"><span>' . $display . '</span></a></li>';
 }
 
 function navSubTab ($title, $link, $isselected) {
@@ -150,5 +150,5 @@ header('Content-type: text/html; charset=UTF-8') ;
 
 <div class="content_wrap cf"><!-- starts main content section, tag is ended in navbottom.inc.php -->
 
-	<div class="pagetitle"><? if(isset($ICON)) print '<img alt="" src="img/themes/' .getBrandTheme() . '/icon_' . $ICON . '" align="absmiddle">'; ?> <?= $TITLE ?></div>
+	<div class="pagetitle"><?= (isset($TITLE) ? $TITLE : "") ?></div>
 	<div class="pagetitlesubtext"><?= (isset($DESCRIPTION) ? $DESCRIPTION : "") ?></div>
