@@ -27,7 +27,7 @@
 	<h3>Load a Saved Message <a href="" class="close" data-dismiss="modal">x</a></h3>
 	<div class="modal_content">
 	<input type="text"/><input class="btn" type="submit" value="Search"/>
-	<table class="messages">
+	<table class="messages head">
 		<thead>
 			<tr>
 			<th>Title</th>
@@ -38,6 +38,9 @@
 			<th><img src="themes/newui/social.png" alt=""/></th>
 			</tr>
 		</thead>
+	</table>
+	<div class="scroll">
+		<table class="messages">
 		<tbody id="messages_list">
 			<!--tr>
 				<td>Example</td>
@@ -49,6 +52,7 @@
 			</tr-->
 		</tbody>
 	</table>
+	</div>
 	</div>
 	
 	<div class="msg_confirm">

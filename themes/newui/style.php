@@ -324,14 +324,20 @@ table.info a.savelist { background: url(themes/newui/savelist.png) left 0 no-rep
 table.info a:hover { background-position: right -22px; }
 table.info tfoot { border-top: 1px solid #000; }
 
-table.messages { width: 100%; margin: 10px 0; font-size: 14px; line-height: 36px; border-bottom: 1px solid #ddd; border-left: 1px solid #ddd; border-right: 1px solid #ddd; }
-table.messages th { background: #eee; padding: 0 8px; }
+table.messages { width: 100%; margin: 0; font-size: 14px; line-height: 36px; border-bottom: 1px solid #ddd; border-left: 1px solid #ddd; border-right: 1px solid #ddd; }
+table.messages.head { margin: 10px 0 0 0;}
+table.messages th { background: #eee; padding: 0 8px;}
 table.messages th, table.messages td { font-size: 14px; text-align: left; border-top: 1px solid #ddd; cursor: pointer; }
 table.messages td { padding: 0 8px; border-bottom: 1px solid #ccc; }
 table.messages tr:hover td { background: #e1eaf4; border-top: 1px solid #8cb2e0; }
 tr.selected { background: rgb(228, 225, 153); }
 table.messages tr.selected:hover td { background: rgb(228, 224, 187);  }
 table.messages span.icon { background: url(themes/newui/dktick.png) 0 11px no-repeat; display: block; text-indent: -9999px; }
+
+.scroll {
+  max-height: 250px;
+  overflow: auto;
+}
 
 input[name=msgsndr_msggroup] { 
   display: none;
