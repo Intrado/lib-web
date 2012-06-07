@@ -16,6 +16,97 @@ if (!($USER->authorize('managesystem') || $USER->authorize('metadata') || $USER-
 	redirect('unauthorized.php');
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Data
+////////////////////////////////////////////////////////////////////////////////
+
+$headers = array();
+$systemLinks = array();
+$jobLinks = array();
+$labelLinks = array();
+$featureLinks = array();
+$linkLists = array();
+
+if ($USER->authorize('managesystem') || $USER->authorize('metadata')) {
+	$headers[] = _L("System");
+	
+	if ($USER->authorize('managesystem')) {
+		$systemLinks[] = "<a href='systemwidealertmessage.php'>Systemwide Alert Message</a>";
+		$systemLinks[] = "<a href='customerinfo.php'>Customer Information</a>";
+	}
+	if ($USER->authorize('metadata')) {
+		$systemLinks[] = "<a href='persondatamanager.php'>Field Definitions</a>";
+		$systemLinks[] = "<a href='groupdatamanager.php'>Group Field Definitions</a>";
+		if (getSystemSetting('_hasenrollment', false)) {
+			$systemLinks[] = "<a href='scheduledatamanager.php'>Section Field Definitions</a>";
+		}
+		$systemLinks[] = "<a href='organizationdatamanager.php'>Organization Manager</a>";
+	}
+	if ($USER->authorize('managesystem')) {
+		$systemLinks[] = "<a href='securitysettings.php'>Security</a>";
+		$systemLinks[] = "<a href='displaysettings.php'>Display</a>";
+	}
+		
+	$linkLists[] = $systemLinks;
+}
+if ($USER->authorize('managesystem')) {
+	$headers[] = getJobTitle();
+	$headers[] = _L("Destination Labels");
+	
+	$jobLinks[] = "<a href='disablerepeatingjobs.php'>" . _L("Enable/Disable Repeating %s",getJobsTitle()) . "</a>";
+	$jobLinks[] = "<a href='jobsettings.php'>" . _L("%s Settings",getJobTitle()) . "</a>";
+	$jobLinks[] = "<a href='jobtypemanagement.php'>" . _L("%s Types",getJobTitle()) . "</a>";
+	if (getSystemSetting("_amdtype","ivr") == "ivr") {
+		$jobLinks[] = "<a href='messageintro.php'>Message Intro</a>";
+	}
+	
+	$labelLinks[] = "<a href='destinationlabel.php?type=phone'>Phone Labels</a>";
+	$labelLinks[] = "<a href='destinationlabel.php?type=email'>Email Labels</a>";
+	if (getSystemSetting('_hassms', false)) {
+		$labelLinks[] = "<a href='destinationlabel.php?type=sms'>SMS Labels</a>";
+	}
+	
+	$linkLists[] = $jobLinks;
+	$linkLists[] = $labelLinks;
+}
+// features - if contact manager, or self-signup, or smartcall appliance, or classroom
+if ((getSystemSetting('_hasportal', false) && $USER->authorize('portalaccess') && $USER->authorize('managesystem')) ||
+	(getSystemSetting('_hasselfsignup', false) && ($USER->authorize('metadata') || $USER->authorize('managesystem'))) ||
+	($USER->authorize('managesystem') && getSystemSetting('_dmmethod', "")!='asp') ||
+	($USER->authorize('manageclassroommessaging') && getSystemSetting('_hastargetedmessage')) ||
+	($USER->authorize('managesystem') && getSystemSetting("_hasfacebook")) ||
+	($USER->authorize('managesystem') && getSystemSetting("_hasfeed"))) {
+
+	$headers[] = _L("Features");
+	
+	if (getSystemSetting('_hasportal', false) && $USER->authorize('portalaccess') && $USER->authorize('managesystem')) {
+		$featureLinks[] = "<a href='contactmanagersettings.php'>Contact Manager Settings</a>";
+	}
+	if (getSystemSetting('_hasselfsignup', false)) {
+		if ($USER->authorize('managesystem')) {
+			$featureLinks[] = "<a href='subscribersettings.php'>Self-Signup Settings</a>";
+		}
+		if ($USER->authorize('metadata')) {
+			$featureLinks[] = "<a href='subscriberfields.php'>Self-Signup Fields</a>";
+		}
+	}
+	if ($USER->authorize('managesystem') && getSystemSetting('_dmmethod', "")!='asp') {
+		$featureLinks[] = "<a href='dms.php'>" . _L("SmartCall Appliance") . "</a>";
+	}
+	if (getSystemSetting('_hastargetedmessage', false) && $USER->authorize('manageclassroommessaging')) {
+		$featureLinks[] = "<a href='classroommessagemanager.php'>Classroom Message Manager</a>";
+		$featureLinks[] = "<a href='classroommessagetemplate.php'>Classroom Messaging Template</a>";
+	}
+	if (getSystemSetting("_hasfacebook")) {
+		$featureLinks[] = "<a href='authfacebookpages.php'>Facebook Authorized Pages</a>";
+	}
+	if (getSystemSetting("_hasfeed")) {
+		$featureLinks[] = "<a href='editfeedcategory.php'>" . _L("Feed Categories") . "</a>";
+	}
+	
+	$linkLists[] = $featureLinks;
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
@@ -25,152 +116,8 @@ $TITLE= "Settings";
 
 include("nav.inc.php");
 
-startWindow("Options", 'padding: 3px;');
-?>
-	<table class="list" >
-		<tr class="listHeader">
-<?
-			if($USER->authorize('managesystem') || $USER->authorize('metadata')){
-?>
-				<th align="left" class="nosort">System</th>
-<?
-			}
-			if($USER->authorize('managesystem')){
-?>
-				<th align="left" class="nosort"><?= getJobTitle()?></th>
-				<th align="left" class="nosort">Destination Labels</th>
-<?
-			}
-			// features - if contact manager, or self-signup, or smartcall appliance, or classroom
-			if ((getSystemSetting('_hasportal', false) && $USER->authorize('portalaccess') && $USER->authorize('managesystem')) ||
-				(getSystemSetting('_hasselfsignup', false) && ($USER->authorize('metadata') || $USER->authorize('managesystem'))) ||
-				($USER->authorize('managesystem') && getSystemSetting('_dmmethod', "")!='asp') ||
-				($USER->authorize('manageclassroommessaging') && getSystemSetting('_hastargetedmessage')) ||
-				($USER->authorize('managesystem') && getSystemSetting("_hasfacebook")) ||
-				($USER->authorize('managesystem') && getSystemSetting("_hasfeed"))) {
-?>
-				<th align="left" class="nosort">Features</th>
-<?
-			}
-?>
-		</tr>
-		<tr align="left" valign="top">
-<?
-		if($USER->authorize('managesystem') || $USER->authorize('metadata')){
-?>
-			<td>
-				<ul>
-<?
-					if($USER->authorize('managesystem')){
-?>
-						<li><a href='systemwidealertmessage.php'>Systemwide Alert Message</a></li>
-						<li><a href='customerinfo.php'>Customer Information</a></li>
-<?
-					}
-					if($USER->authorize('metadata')){
-?>
-						<li><a href='persondatamanager.php'>Field Definitions</a></li>
-						<li><a href='groupdatamanager.php'>Group Field Definitions</a></li>
-<? if (getSystemSetting('_hasenrollment', false)) { ?>
-						<li><a href='scheduledatamanager.php'>Section Field Definitions</a></li>
-<? } ?>
-						<li><a href='organizationdatamanager.php'>Organization Manager</a></li>
-<?
-					}
-
-					if($USER->authorize('managesystem')){
-?>
-						<li><a href='securitysettings.php'>Security</a></li>
-						<li><a href='displaysettings.php'>Display</a></li>
-
-<?
-					}
-?>
-				</ul>
-			</td>
-<?
-		}
-		if($USER->authorize('managesystem')){
-?>
-			<td>
-				<ul>
-					<li><a href='disablerepeatingjobs.php'><?= _L("Enable/Disable Repeating %s",getJobsTitle())?></a></li>
-					<li><a href='jobsettings.php'><?= _L("%s Settings",getJobTitle())?></a></li>
-					<li><a href='jobtypemanagement.php'><?= _L("%s Types",getJobTitle())?></a></li>
-<?
-		if (getSystemSetting("_amdtype","ivr") == "ivr") {
-?>
-					<li><a href='messageintro.php'>Message Intro</a></li>
-<?
-		}
-?>
-				</ul>
-			</td>
-			<td>
-				<ul>
-					<li><a href='destinationlabel.php?type=phone'>Phone Labels</a></li>
-					<li><a href='destinationlabel.php?type=email'>Email Labels</a></li>
-<? if(getSystemSetting('_hassms', false)){ ?>
-					<li><a href='destinationlabel.php?type=sms'>SMS Labels</a></li>
-<? } ?>
-				</ul>
-			</td>
-<?
-		}
-		// features - if contact manager, or self-signup, or smartcall appliance, or Classroom
-		if ((getSystemSetting('_hasportal', false) && $USER->authorize('portalaccess') && $USER->authorize('managesystem')) ||
-			(getSystemSetting('_hasselfsignup', false) && ($USER->authorize('metadata') || $USER->authorize('managesystem'))) ||
-			($USER->authorize('managesystem') && getSystemSetting('_dmmethod', "")!='asp') ||
-			($USER->authorize('manageclassroommessaging') && getSystemSetting('_hastargetedmessage')) ||
-			($USER->authorize('managesystem') && getSystemSetting("_hasfacebook")) ||
-			($USER->authorize('managesystem') && getSystemSetting("_hasfeed"))) {
-?>
-			<td>
-				<ul>
-<?
-					if (getSystemSetting('_hasportal', false) && $USER->authorize('portalaccess') && $USER->authorize('managesystem')) {
-?>
-					<li><a href='contactmanagersettings.php'>Contact Manager Settings</a></li>
-<?
-					}
-					if (getSystemSetting('_hasselfsignup', false)) {
-						if ($USER->authorize('managesystem')) {
-?>
-					<li><a href='subscribersettings.php'>Self-Signup Settings</a></li>
-<?						}
-						if ($USER->authorize('metadata')) {
-?>
-					<li><a href='subscriberfields.php'>Self-Signup Fields</a></li>
-<?						}
-					}
-					if ($USER->authorize('managesystem') && getSystemSetting('_dmmethod', "")!='asp') {
-?>
-					<li><a href='dms.php'><?=_L("SmartCall Appliance")?></a></li>
-<?
-					}
-					if (getSystemSetting('_hastargetedmessage', false) && $USER->authorize('manageclassroommessaging')) {
-?>
-					<li><a href='classroommessagemanager.php'>Classroom Message Manager</a></li>
-					<li><a href='classroommessagetemplate.php'>Classroom Messaging Template</a></li>
-<?
-					}
-					if (getSystemSetting("_hasfacebook")) {
-?>
-					<li><a href='authfacebookpages.php'>Facebook Authorized Pages</a></li>
-<?					}
-					if (getSystemSetting("_hasfeed")) {
-?>
-					<li><a href='editfeedcategory.php'><?=_L("Feed Categories")?></a></li>
-<?					}
-?>
-				</ul>
-			</td>
-<?
-		}
-?>
-		</tr>
-	</table>
-<?
+startWindow(_L("Options"), 'padding: 3px;');
+drawTableOfLists($headers, $linkLists);
 endWindow();
 
 include("navbottom.inc.php");

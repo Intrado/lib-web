@@ -465,4 +465,44 @@ function ajax_table_show_menu ($containerID, $total, $start, $perpage) {
 	$selectbox .= "</select></div>";
 	return "<div class='pagenav cf'>" .  $selectbox . $info . "<div id='{$containerID}_tableprogressbar' class='tableprogressbar'>&nbsp</div>" . "</div>";
 }
+
+// table with headers and each column is a list (ex: admin-settings page)
+function drawTableOfLists($headers, $lists) {
+	// calculate longest list, other lists will need empty lines appended so they all appear to start with top alignment
+	$maxListCount = 0;
+	foreach ($lists as $list) {
+		$maxListCount = max($maxListCount, count($list));
+	}
+	
+?>
+	<table class="list">
+		<tr class="listHeader">
+<?			foreach ($headers as $header) {
+?>
+			<th align="left" class="nosort"><?=$header?></th>
+<?			}
+?>
+		</tr>
+		<tr align="left" valign="top">
+<?			foreach ($lists as $list) {
+?>
+			<td><ul>
+<?				foreach ($list as $li) {
+?>
+				<li><?=$li?></li>
+<?				}
+				// now fill the empty list items for all columns to have equal length and display consistent height
+				for ($i = count($list); $i < $maxListCount; $i++) {
+?>
+				<li>&nbsp;</li>
+<?				}
+?>
+			</ul></td>
+<?			}
+?>
+		</tr>
+	</table>
+<?
+}
+
 ?>
