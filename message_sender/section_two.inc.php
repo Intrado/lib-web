@@ -49,6 +49,7 @@
 				<fieldset>
 					<label for="msgsndr_form_scratch">Scratch Pad <span class="light">(optional)</span></label>
 					<div class="controls">
+					<button class="btn-small paste-from hidden" data-textarea="msgsndr_form_scratch">Paste text from email</button>
 					<textarea id="msgsndr_form_scratch" name="msgsndr_form_scratch"></textarea>
 					<p>You can use this to write notes about what you'd like to say. This information isn't saved anywhere.</p>
 					</div>
@@ -108,7 +109,7 @@
 				<fieldset>
 					<label for="msgsndr_tts_message">Message</label>
 					<div class="controls">
-						<button class="btn-small paste-from hidden" id="paste_from_email">Paste text from email</button>
+						<button class="btn-small paste-from hidden" data-textarea="msgsndr_tts_message">Paste text from email</button>
 						<textarea id="msgsndr_tts_message" name="phone_tts"></textarea><span class="error"></span>
 
 <div class="hide">

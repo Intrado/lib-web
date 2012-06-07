@@ -50,6 +50,27 @@ jQuery.noConflict();
 			$('#msgsndr_tab_'+elm[2]).show();
 			$(this).parent().removeClass('lighten').addClass('active');
 
+			if (elm[2] == "phone") {
+
+				// Show paste from email button if text-to-speech is clicked and emailData is not empty
+				var emailBody = $('td[title^=Ric] iframe').contents().find('body').text()
+				console.log(emailBody);
+				if (emailBody != '') {
+					$('button.paste-from').removeClass('hidden');
+				}
+
+				$('button.paste-from').on('click', function(e) {
+					e.preventDefault();
+
+					var pasteTo = $(this).attr('data-textarea');
+
+					$('#'+pasteTo).val(emailBody);
+
+
+				});
+
+			}
+
 			if (elm[2] == "email") {
 				emSubject();
 			}
@@ -74,12 +95,6 @@ jQuery.noConflict();
 
 			// set the type value in a hidden input for the postdata
 			$('#msgsndr_phonetype').attr('value', type);
-
-			// Show paste from email button if text-to-speech is clicked and emailData is not empty
-			var emailBody = $('iframe[name^=Ric]').contents().find('body').text();
-			if (type == "text-to-speech" && emailBody != '') {
-				$('#paste_from_email').removeClass('hidden');
-			}
 
 		});
 
