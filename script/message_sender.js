@@ -54,7 +54,6 @@ jQuery.noConflict();
 
 				// Show paste from email button if text-to-speech is clicked and emailData is not empty
 				var emailBody = $('#cke_reusableckeditor iframe').contents().find('body').text();
-				console.log(emailBody);
 				if (emailBody != '') {
 					$('button.paste-from').removeClass('hidden');
 				}
