@@ -420,6 +420,9 @@ table.list ul li { padding: 0; }
 
 /*----- Buttons, changes to the basic buttons featured across the site -----*/
 
+/* reset the buttons for newui theme so background images aren't loaded */
+.btn:hover .btn_middle { background-image: none; background: transparent;}
+
 button, .btn { margin: 0 5px 0 0; padding: 5px 10px; color: #333; font-size: 14px; line-height: 19px; font-weight: normal; text-shadow: 0 1px 0 0 #fff; border: 1px solid #ccc;
 	background-color: #f5f5f5;  
   background-image: -webkit-gradient(linear, left top, left bottom, from(#fbfbfb), to(#e4e4e4)); 
