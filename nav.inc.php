@@ -347,7 +347,7 @@ Event.observe(window, 'load', function() {
 	<div class="container cf">
 
 <div class="sectitle">
-	<div class="pagetitle"><? if(isset($ICON)) print '<img src="img/themes/' .getBrandTheme() . '/icon_' . $ICON . '" align="absmiddle">'; ?> <?= $TITLE ?></div>
+	<div class="pagetitle"><?= (isset($TITLE) ? $TITLE : "") ?></div>
 	<div class="pagetitlesubtext"><?= (isset($DESCRIPTION) ? $DESCRIPTION : "") ?></div>
 </div><!-- end sectitle -->
 
