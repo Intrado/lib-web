@@ -142,7 +142,7 @@
       var nav = j(ele).attr('data-nav');
       var el  = nav.substr(2);
 
-      j('.msg_content_nav li').removeClass('fade');
+      j('.msg_content_nav li').removeClass('lighten');
       j('.msg_content_nav '+nav).removeClass('active').addClass('complete');
       j('#msgsndr_tab_'+el).hide();
 

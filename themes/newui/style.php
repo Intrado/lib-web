@@ -573,7 +573,7 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
 /*----- global/helper classes -----*/
 
 .light { color: #999; }
-.fade { opacity: 0.5;}
+.lighten { opacity: 0.5;}
 
 /*----- Bootstrap modal styles -----*/
 
