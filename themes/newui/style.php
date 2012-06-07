@@ -567,10 +567,10 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
 	background: url(img/icons/error.png) 0 center no-repeat;
 }
 
+/*----- global/helper classes -----*/
 
 .light { color: #999; }
-
-
+.fade { opacity: 0.5;}
 
 /*----- Bootstrap modal styles -----*/
 

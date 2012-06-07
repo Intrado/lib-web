@@ -45,10 +45,10 @@ jQuery.noConflict();
 			var elm = $(this).attr('id');
 			var elm = elm.split('_');  			// I need number elm[2]
 
-			$('.msg_content_nav li').removeClass('active');
+			$('.msg_content_nav li').removeClass('active').addClass('fade');
 			$('.tab_panel').hide();
 			$('#msgsndr_tab_'+elm[2]).show();
-			$(this).parent().addClass('active');
+			$(this).parent().removeClass('fade').addClass('active');
 
 			if (elm[2] == "email") {
 				emSubject();
