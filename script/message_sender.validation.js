@@ -390,6 +390,9 @@ jQuery.noConflict();
 
       var langCount = splitlangCodes.length;
 
+      $('a[data-target='+displayArea+']').show().text('Fetching translations, please wait...');   
+      $(displayArea).empty();
+
       $.ajax({
         url: transURL,
         type: 'GET',
@@ -426,6 +429,7 @@ jQuery.noConflict();
         txtField      = $(this).attr('data-txt');
         displayArea   = $(this).attr('data-display');
 
+        $(this).attr('disabled','disabled');
         doTranslate(langCodes,txtField,displayArea);
 
       }
