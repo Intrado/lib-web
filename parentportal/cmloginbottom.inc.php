@@ -27,7 +27,7 @@ if(isset($_COOKIE['embeddedpage']) && $_COOKIE['embeddedpage']=="1"){
 <? } ?>
 		
 		<div style="float:right">
-			<p>&copy; <?=_L("1999-2011 Reliance Communications, Inc. All Rights Reserved.")?></p>
+			<p>&copy; <?=_L("1999-2012 Reliance Communications, Inc. All Rights Reserved.")?></p>
 		</div>
 
 </div>
