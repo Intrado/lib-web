@@ -187,15 +187,9 @@ function applyHtmlEditor(textarea, dontwait,target) {
 				'extraPlugins': 'aspell', //enable aspell port
 				'removePlugins': 'wsc,scayt,smiley,showblocks,flash,elementspath,save',
 				'toolbar': [
-					['Print','Source'],
-					['Undo','Redo','-','SelectAll','PasteFromWord','Find','Replace', 'SpellCheck'],
-					'/',
-					['Styles','Format'],
-					['NumberedList','BulletedList','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','Outdent','Indent'],
-					'/',
-					['Font','FontSize','Bold', 'Italic', 'Underline','Strike','Subscript','Superscript',  'TextColor','BGColor', 'RemoveFormat'],
-					['SpecialChar','Blockquote','Link', 'Image','Table','HorizontalRule','PageBreak']
-				],
+          ['Print','Source','-','Undo','Redo','PasteFromWord','SpellCheck','-','NumberedList','BulletedList','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','Outdent','Indent','Styles'],
+          ['Bold', 'Italic', 'Underline','Strike','TextColor','BGColor', 'RemoveFormat','Link', 'Image','Table','HorizontalRule','Font','FontSize','Format']
+        ],
 				'disableObjectResizing': true,
 				'resize_enabled': false,
 				'width': '100%',

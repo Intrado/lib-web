@@ -46,7 +46,6 @@ jQuery.noConflict();
           dataType: "json",
           success: function(data) {
            languages = data.languages;
-           console.log(languages);
          }
       });
     };
@@ -856,7 +855,9 @@ jQuery.noConflict();
 
 
 
-    // ckeditor for the email message body ...
+    // WIP: function to choose ckeditor toolbars for the email message body
+    // the idea is to pass this choice to the applyHtmlEditor() function in htmleditor.js
+    
     chooseCkButtons = function(type){ // pass in 'basic' or 'advanced'
 
       var toolbarBasic = [
@@ -883,44 +884,7 @@ jQuery.noConflict();
     };
     
     // set the toolbar choice variable before calling the ckeditor function
-    toolbarChoice = chooseCkButtons('advanced');
-
-    CKEDITOR.replace('msgsndr_form_body', {
-      'customConfig': '', // Prevent ckeditor from trying to load an external configuration file, should improve startup time.
-      'disableNativeSpellChecker': false,
-      'browserContextMenuOnCtrl': true,
-      'extraPlugins': 'aspell', //enable aspell port
-      'removePlugins': 'wsc,scayt,smiley,showblocks,flash,elementspath,save',
-      'toolbar': toolbarChoice,
-      'disableObjectResizing': true,
-      'resize_enabled': false,
-      'width': '100%',
-      'filebrowserImageUploadUrl' : 'uploadimage.php'
-    });
-
-    
-    /*
-    CKEDITOR.on('instanceCreated', function(e) {  
-      e.editor.on('contentDom', function() {
-        $('#cke_msgsndr_form_body').addClass('required');
-        e.editor.document.on('keyup', function(event) {
-
-          emailData = e.editor.document.$.body.innerText;
-
-          emailVal('email_body', emailData );
-          notVal.watchContent('msgsndr_tab_email');
-
-          if (emailData != "" ) {
-            $('#paste_from_email').removeClass('hidden');
-          } else {
-            $('#paste_from_email').addClass('hidden');
-          }
-          
-        });
-      });
-    }); 
-    */
-
+    // toolbarChoice = chooseCkButtons('advanced');
 
 
   });

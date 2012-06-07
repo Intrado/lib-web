@@ -231,6 +231,10 @@ var dpck_fieldname = new DatePicker({
 <script src="script/niftyplayer.js.php"></script>
 <script src="script/ckeditor/ckeditor_basic.js"></script>
 <script src="script/htmleditor.js"></script>
+<script>
+	// activate ck editor on email body
+   applyHtmlEditor('msgsndr_form_body');
+</script>
 
 <script src="script/message_sender_listbuilder.js"></script>
 

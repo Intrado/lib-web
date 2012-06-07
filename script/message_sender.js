@@ -361,7 +361,6 @@ function removeAttachment(id, formname, itemname) {
 		uploadedfiles.setStyle({"display":"block"}).update();
 	} else {
 		uploadedfiles.update().setStyle({"display":"none"});
-		console.log('hello');
 	}
 	Object.keys(values).each(function (contentid) {
 		var content = values[contentid];
