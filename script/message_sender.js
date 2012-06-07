@@ -83,11 +83,11 @@ jQuery.noConflict();
 		});
 
 
-		// Add myself toggle 
+		// Add myself toggle -- TODO: Synchronise with the listpicker plugin
 		$('#msgsndr_form_myself').on('click', function() {
 
 			// call the populate lists function to add the lists id's in
-			populateRecipientIdList();
+			// populateRecipientIdList();
 
 			$('#list_ids').val('[addme]').addClass('ok');
 
@@ -166,6 +166,14 @@ jQuery.noConflict();
 		});
 
 
+		$('#schedule_options').modal({
+			show: false
+		});
+
+
+
+
+
 
 
 
@@ -173,7 +181,7 @@ jQuery.noConflict();
 // lists -- to be replaced by listbuilder
 //////////////////////////////////////////
 
-
+/*  Commenting out these functions for now, to be removed once addme is integrated with new listpicker
     // list id populator ...
     function populateRecipientIdList() {
       var listContainer = [];
@@ -263,7 +271,7 @@ jQuery.noConflict();
     	$('#msg_section_1').show();
 
     });
-
+*/
 
   });
 }) (jQuery);
