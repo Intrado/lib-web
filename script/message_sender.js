@@ -10,7 +10,7 @@ jQuery.noConflict();
 		
 		// Hiding stuff which is not needed
 		$('#msg_section_2, #msg_section_3, .close, .facebook, .twitter, .feed, div[id^="msgsndr_tab"]').hide();
-		$('#audiolink').hide();
+		//$('#audiolink').hide();
 
 		// Email Flag
 		emailSubject 	= "";
@@ -55,7 +55,7 @@ jQuery.noConflict();
 			}
 
 			if (elm[2] == 'social' && $('#msgsndr_ctrl_phone').parent().hasClass('complete')) {
-				$('#audiolink').show();
+				$('#audiolink input').removeAttr('disabled');
 			}
 
 
