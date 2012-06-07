@@ -39,7 +39,7 @@ jQuery.noConflict();
 
 	// WIP: api call for languages
     function getLanguages(){
-      var languages = false;
+      languages = false;
       $.ajax({
           url: '/'+orgPath+'/api/2/organizations/'+orgid+'/languages',
           type: "GET",
@@ -50,6 +50,8 @@ jQuery.noConflict();
          }
       });
     };
+
+    getLanguages();
  
     /* --
       The setUp function will do alot of the inital work, and call other functions based on users roles
@@ -350,55 +352,6 @@ jQuery.noConflict();
 
       //var formData = $('form[name=broadcast]').serializeArray();
       var formData = mapPostData();
-/* // sample data from nickolas...
-      var formData = {
-        "name": "Test Notification Name",
-        "jobtype" : "3",
-        "addme": "true",
-        "addmephone":  "4172140239",
-        "addmeemail":  "nheckman@schoolmessenger.com",
-        "addmesms":  "4172140239",
-        "listids": "[41]",
-        "hasphone":  "true",
-        "phonemessagetype":  "callme",
-        "phonemessagepost":  "true",
-        "phonemessagecallme":  {"en":"346","es":"345"},
-        "hasemail":  "true",
-        "emailmessagefromname":  "Nickolas Heckman",
-        "emailmessagefromemail": "nheckman@schoolmessenger.com",
-        "emailmessagesubject": "Test Email Subject",
-        "emailmessageattachment":  {"297":{"name":"188570.gif","size":"87307"}},
-        "emailmessagetext":  '<p>   This is an <strong><em>html</em></strong> email message.</p> <p>  <img src="viewimage.php?id=296"></p> <p>  blah blah blah blah blah.</p> <p>   Thank you.</p>',
-        "emailmessagetexttranslate": "true",
-        "emailmessagetexttranslatecatext": {"enabled":true,"text":"\u8fd9\u662f\u4e00\u4e2a\u624b\u673a\u77ed\u4fe1\uff0c\u5c06\u4e0e\u6587\u672c\u5230\u8bed\u97f3\u5448\u73b0\u3002","override":false,"englishText":""},
-        "emailmessagetexttranslatefitext": {"enabled":true,"text":"\u8fd9\u662f\u4e00\u4e2a\u624b\u673a\u77ed\u4fe1\uff0c\u5c06\u4e0e\u6587\u672c\u5230\u8bed\u97f3\u5448\u73b0\u3002","override":false,"englishText":""},
-        "emailmessagetexttranslatefrtext": {"enabled":true,"text":"\u8fd9\u662f\u4e00\u4e2a\u624b\u673a\u77ed\u4fe1\uff0c\u5c06\u4e0e\u6587\u672c\u5230\u8bed\u97f3\u5448\u73b0\u3002","override":false,"englishText":""},
-        "emailmessagetexttranslatedetext": {"enabled":true,"text":"\u8fd9\u662f\u4e00\u4e2a\u624b\u673a\u77ed\u4fe1\uff0c\u5c06\u4e0e\u6587\u672c\u5230\u8bed\u97f3\u5448\u73b0\u3002","override":false,"englishText":""},
-        "emailmessagetexttranslateeltext": {"enabled":true,"text":"\u8fd9\u662f\u4e00\u4e2a\u624b\u673a\u77ed\u4fe1\uff0c\u5c06\u4e0e\u6587\u672c\u5230\u8bed\u97f3\u5448\u73b0\u3002","override":false,"englishText":""},
-        "emailmessagetexttranslateestext": {"enabled":true,"text":"\u8fd9\u662f\u4e00\u4e2a\u624b\u673a\u77ed\u4fe1\uff0c\u5c06\u4e0e\u6587\u672c\u5230\u8bed\u97f3\u5448\u73b0\u3002","override":false,"englishText":""},
-        "hassms":  "true",
-        "smsmessagetext":  "This is the SMS message.",
-        "hasfacebook": "true",
-        "socialmediafacebookmessage":  "We have sent out a new message, you can preview it here. (Facebook)",
-        "hastwitter":  "true",
-        "socialmediatwittermessage": "We have sent out a new message, you can preview it here. (Twitter)",
-        "hasfeed": "true",
-        "socialmediafeedmessage": {"subject": "The feed title goes here", "message": "We have sent out a new message, you can preview it here. (RSS Feed)"},        
-        "socialmediafacebookpage": ["119495234836474"],
-        "socialmediafeedcategory":["7"],
-        "optionmaxjobdays":  "1",
-        "optionleavemessage":  "true",
-        "optionmessageconfirmation": "true",
-        "optionskipduplicate": "true",
-        "optioncallerid":  "8316001090",
-        "optionsavemessage": "true",
-        "optionsavemessagename": "New Message Name",
-        "scheduledate":  "06/05/2012",
-        "schedulecallearly": "8:00 am",
-        "schedulecalllate":  "9:00 pm",
-        "submit" : "submit"
-      };
-*/
       $.ajax({
         type: 'POST',
         url: '_messagesender.php?form=msgsndr&ajax=true',
