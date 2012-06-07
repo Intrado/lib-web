@@ -110,7 +110,7 @@ class PhoneMessageEditor extends FormItem {
 		
 		// main containers
 		// NOTE: audio library and uploadaudio only work when a messagegroup id is provided
-		$str .= '
+		$str = '
 			<div class="phone">
 				<div class="maincontainerleft">
 					'.$textarea.'
