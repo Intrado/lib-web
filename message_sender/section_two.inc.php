@@ -30,7 +30,7 @@
 				<input type="hidden" name="has_phone" value="" />
 
 				<fieldset class="check">
-					<label for="msgsndr_form_type">Switch Audio Type</label>
+					<label for="msgsndr_form_type">Voice Type</label>
 					<input type="hidden" id="msgsndr_phonetype" name="phone_type" value="call-me" />
 					<div id="switchaudio" class="controls">
 						<button class="audioleft active" data-type="call-me">Call Me to Record</button><button class="audioright" data-type="text-to-speech">Text-to-Speech</button>
@@ -47,7 +47,7 @@
 				</fieldset>
 				
 				<fieldset>
-					<label for="msgsndr_form_scratch">Scratch Pad <span>(optional)</span></label>
+					<label for="msgsndr_form_scratch">Scratch Pad <span class="light">(optional)</span></label>
 					<div class="controls">
 					<textarea id="msgsndr_form_scratch" name="msgsndr_form_scratch"></textarea>
 					<p>You can use this to write notes about what you'd like to say. This information isn't saved anywhere.</p>
@@ -278,7 +278,7 @@
 					<fieldset class="check">
 						<div class="controls">
 							<input class="addme social" type="checkbox" id="msgsndr_form_feed" name="has_feed" />
-							<label class="addme" for="msgsndr_form_feed"><strong>Post to Feeds</strong></label>
+							<label class="addme" for="msgsndr_form_feed"><strong>Post to RSS</strong></label>
 						</div>
 					</fieldset>
 

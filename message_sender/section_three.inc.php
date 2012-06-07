@@ -90,9 +90,9 @@
 			</div><!-- field_wrapper -->
 			
 			
-			<div id="schedule_options" class="close">
-			<h3 class="flag">Schedule Message</h3>			
-			<div class="field_wrapper">
+			<div id="schedule_options" class="modal hide">
+			<h3>Schedule Message<a href="#" class="close" data-dismiss="modal">x</a></h3>			
+			<div class="modal_content">
 				<fieldset class="cf">
 					<label for="scheduledate">Start Date</label>
 					<div class="controls">
@@ -701,7 +701,7 @@
 
 			
 			<div class="msg_confirm">
-				<a href="#" class="toggle-more" data-target="#schedule_options">Schedule</a> or 
+				<a href="#schedule_options" data-toggle="modal">Schedule</a> or 
 				<button class="btn_confirm" id="send_new_broadcast">Send Now to 2,134 Recipients</button>
 			</div>
 			
