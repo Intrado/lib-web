@@ -351,8 +351,8 @@ input[name=msgsndr_msggroup] {
    -moz-box-shadow: inset 0px 1px 3px 0px #111; 
         box-shadow: inset 0px 1px 3px 0px #111; }
 
-.msg_content_nav li.oemail a span.icon   { background-image: url(themes/newui/phone.png) }
-.msg_content_nav li.ophone a span.icon   { background-image: url(themes/newui/email.png) }
+.msg_content_nav li.ophone a span.icon   { background-image: url(themes/newui/phone.png) }
+.msg_content_nav li.oemail a span.icon   { background-image: url(themes/newui/email.png) }
 .msg_content_nav li.osms a span.icon     { background-image: url(themes/newui/sms.png) }
 .msg_content_nav li.osocial a span.icon  { background-image: url(themes/newui/social.png) }
 
