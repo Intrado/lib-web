@@ -155,6 +155,13 @@ jQuery.noConflict();
 
       notVal.watchFields('#msgsndr_form_number');
 
+      // Build up select box based on the maxjobdays user permission
+      var daysToRun = userPermissions.maxjobdays;
+      j('#msgsndr_form_daystorun').empty();
+      for(i=1;i<=daysToRun;i++) {
+        j('#msgsndr_form_days').append('<option value="'+i+'">'+i+'</option>');
+      };
+
       // Easy Call jQuery Plugin
       $("#msgsndr_form_number").attachEasyCall({"languages": {"en":"English","es":"Spanish","ca":"Catalan"}});   
 
@@ -643,6 +650,14 @@ jQuery.noConflict();
 
           });
 
+          $.each(allMessages, function(mIndex, mData) {
+
+            var msgParts = getMessagePartsFormatted(msgGrpId,mData.id);
+            console.log(msgParts);
+            mData['msgFormatted'] = msgParts;
+
+          });
+
 
           $.each(allMessages, function(mIndex, mData) {
             if(typeof(mData.type) != "undefined" && mData.type.length > 0) { 
@@ -695,19 +710,27 @@ jQuery.noConflict();
 
 
     // get formatted message parts based on message id from message group
-    function getMessagePartsFormatted(msgGrpId){
-      var partsFormatted = false;
+    function getMessagePartsFormatted(msgGrpId,msgId){
+
+      var parts = {};
+
       $.ajax({
-        url: '/'+orgPath+'/api/2/users/'+userid+'/messagegroups/'+msgGrpId+'/messageparts/formatted',
+        url: '/'+orgPath+'/api/2/users/'+userid+'/messagegroups/'+msgGrpId+'/messages/'+msgId+'/messageparts/formatted',
+        async: false,
         type: "GET",
         dataType: "json",
         success: function(data) {
-          $.each(data.messageparts, function(mIndex, mData){
-            partsFormatted[mData.name] = mData.value;
-          });
+
+          // console.log(data.messageBody);
+          parts = data.messageBody;
+
+          // $.each(data.messageparts, function(mIndex, mData){
+          //   partsFormatted[mData.name] = mData.value;
+          // });
         }
       });
-      return partsFormatted;
+
+      return parts;
     };
 
 
@@ -820,7 +843,7 @@ jQuery.noConflict();
         $('#msgsndr_form_email').val(messages.email.fromEmail.replace("%40","@"));
         $('#msgsndr_form_mailsubject').val(emailSubject);
 
-        $('iframe[name^=Ric]').contents().find('body').append(messages.email.msgparts[0].txt);
+        $('iframe[name^=Ric]').contents().find('body').append(unescape(messages.email.msgFormatted));
         // Message HTML content == messages.email.msgparts[0].txt
       }
 

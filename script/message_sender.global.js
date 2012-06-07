@@ -179,13 +179,6 @@
       j('.review_type p').text(j('#msgsndr_form_type option:selected').text());
       j('.review_count p').text('Insert Number here from list builder');
 
-      // Build up select box based on the maxjobdays user permission
-      var daysToRun = userPermissions.maxjobdays;
-      j('#msgsndr_form_daystorun').empty();
-      for(i=1;i<=daysToRun;i++) {
-        j('#msgsndr_form_days').append('<option value="'+i+'">'+i+'</option>');
-      };
-
       afterGetPrefs = function() {
 
         document.formvars['broadcast']['schedulecallearly'] = [
@@ -213,8 +206,18 @@
           self.formVal(elem);
         });
 
-        j('#schedulecallearly option[value="'+userPrefs.callearly+'"]').attr('selected','selected');
-        j('#schedulecalllate option[value="'+userPrefs.calllate+'"]').attr('selected','selected');
+        if( typeof userPrefs.callearly == "undefined") {
+          var callearly = "9:00 am";
+        } else {
+          var callearly = userPrefs.callearly;
+        }
+        if ( typeof userPrefs.calllate == "undefined") {
+          var calllate = "5:00 pm";
+        } else {
+          var calllate = userPrefs.calllate;
+        }
+        j('#schedulecallearly option[value="'+callearly+'"]').attr('selected','selected');
+        j('#schedulecalllate option[value="'+calllate+'"]').attr('selected','selected');
 
         // Populate the max attempts select box
         var maxAttempts = userPrefs.callmax;
@@ -236,10 +239,17 @@
 
       var watch = watch + ', ' + fieldId;
 
-      j(watch).on('keyup', function() {
-        var elem  = j(this);
-        self.formVal(elem);
+      j(watch).on({
+        keypress: function() {
+          var elem  = j(this);
+          self.formVal(elem);
+        },
+        change: function() {
+          var elem  = j(this);
+          self.formVal(elem);
+         }
       });
+
 
     } // WatchFields
 

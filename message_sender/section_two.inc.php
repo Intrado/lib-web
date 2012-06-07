@@ -69,6 +69,15 @@
 					</select>
 					</div>
 				</fieldset>
+
+				<fieldset class="cf">
+					<label for="msgsndr_form_days">Days to run</label>
+					<div class="controls">
+						<select id="msgsndr_form_days" name="broadcast_daystorun">
+						</select>
+					</div>
+				</fieldset>
+				
 				
 				
 				<fieldset>
