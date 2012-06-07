@@ -57,6 +57,57 @@ if(isset($_GET['delete'])){
 	}
 }
 
+$headers = array();
+$jobLinks = array();
+$individualLinks = array();
+$otherLinks = array();
+$linkLists = array();
+
+// Job
+$headers[] = _L("%s and Date Range", getJobsTitle());
+
+$jobLinks[] = "<a href='reportjobsearch.php?clear=1' >" . _L("%s Summary", getJobTitle()) . "</a>";
+if ($USER->authorize('viewsystemreports') || $USER->authorize("sendphone")) {
+	$jobLinks[] = "<a href='reportjobdetailsearch.php?clear=1&type=phone' >Phone Log</a>";
+}
+if ($USER->authorize('viewsystemreports') || $USER->authorize("sendemail")) {
+	$jobLinks[] = "<a href='reportjobdetailsearch.php?clear=1&type=email' >Email Log</a>";
+}
+if (getSystemSetting('_hassms', false) && ($USER->authorize('viewsystemreports') || $USER->authorize("sendsms"))) {
+	$jobLinks[] = "<a href='reportjobdetailsearch.php?clear=1&type=sms' >SMS Log</a>";
+}
+if ((getSystemSetting('_hasfacebook', false) || getSystemSetting('_hastwitter', false) && ($USER->authorize('viewsystemreports') || $USER->authorize("facebookpost") || $USER->authorize("twitterpost")))) {
+	$jobLinks[] = "<a href='reportsocialmediasearch.php?clear=1' >Social Media Log</a>";
+}
+if (getSystemSetting('_hassurvey', true) && ($USER->authorize('viewsystemreports') || $USER->authorize("survey"))) {
+	$jobLinks[] = "<a href='reportsurvey.php?clear=1' >Survey Results</a>";
+}
+if (getSystemSetting('_hastargetedmessage', false) && $USER->authorize('viewsystemreports')) { // Top level permission only
+	$jobLinks[] = "<a href='reportclassroomsearch.php?clear=1&type=organization'>Classroom Messaging Summary</a>";
+}
+
+$linkLists[] = $jobLinks;
+
+// Individual
+$headers[] = _L("Individual");
+
+$individualLinks[] = "<a href='reportcallssearch.php?clear=1' >Contact History</a>";
+if (getSystemSetting('_hastargetedmessage', false) && $USER->authorize('viewsystemreports')) { // Top level permission only
+	$individualLinks[] = "<a href='reportclassroomsearch.php?clear=1&type=person' >Classroom Contact History</a>";
+}
+
+$linkLists[] = $individualLinks;
+
+// Other
+if ($USER->authorize('viewsystemreports')) {
+	$headers[] = _L("Other");
+	
+	$otherLinks[] = "<a href='reportarchive.php' >Systemwide Report Archive</a>";
+	$otherLinks[] = "<a href='reportcontactchange.php?clear=1' >Contact Information Changes</a>";
+	
+	$linkLists[] = $otherLinks;
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
@@ -67,87 +118,10 @@ $TITLE= "Report Builder";
 include("nav.inc.php");
 
 startWindow("Select a Template"  . help('Reports_SelectATemplate'), 'padding: 3px;');
-?>
-	<table class="list" >
-	<thead>
-		<tr class="listHeader">
-			<th align="left" class="nosort"><?= _L("%s and Date Range", getJobsTitle()) ?></th>
-			<th align="left" class="nosort"><?= _L("Individual")?></th>
-<? if ($USER->authorize('viewsystemreports')) { ?>
-			<th align="left" class="nosort"><?= _L("Other")?></th>
-<? } ?>
-		</tr>
-	</thead>
-	<tbody>
-		<tr align="left" valign="top">
-			<td>
-				<ul>
-					<li><a href='reportjobsearch.php?clear=1' ><?= _L("%s Summary", getJobTitle()) ?></a></li>
-<? if($USER->authorize('viewsystemreports') || $USER->authorize("sendphone")){ ?>
-					<li><a href='reportjobdetailsearch.php?clear=1&type=phone' >Phone Log</a></li>
-<?
-	}
-	if($USER->authorize('viewsystemreports') || $USER->authorize("sendemail")){
-?>
-					<li><a href='reportjobdetailsearch.php?clear=1&type=email' >Email Log</a></li>
-<?
-	}
-	if(getSystemSetting('_hassms', false) && ($USER->authorize('viewsystemreports') || $USER->authorize("sendsms"))) {
-?>
-					<li><a href='reportjobdetailsearch.php?clear=1&type=sms' >SMS Log</a></li>
-<?	}
-	if((getSystemSetting('_hasfacebook', false) || getSystemSetting('_hastwitter', false) && ($USER->authorize('viewsystemreports') || $USER->authorize("facebookpost") || $USER->authorize("twitterpost")))) {
-?>
-					<li><a href='reportsocialmediasearch.php?clear=1' >Social Media Log</a></li>
-<?	}
-	if(getSystemSetting('_hassurvey', true) && ($USER->authorize('viewsystemreports') || $USER->authorize("survey"))){ ?>
-					<li><a href='reportsurvey.php?clear=1' >Survey Results</a></li>
-<?	}
-	if(getSystemSetting('_hastargetedmessage', false) && $USER->authorize('viewsystemreports')){ // Top level permission only
-?>
-					<li><a href='reportclassroomsearch.php?clear=1&type=organization'>Classroom Messaging Summary</a></li>
-<? } ?>
-				</ul>
-			</td>
-			<td>
-				<ul>
-					<li><a href='reportcallssearch.php?clear=1' >Contact History</a></li>
-<?	
-	if(getSystemSetting('_hastargetedmessage', false) && $USER->authorize('viewsystemreports')){ // Top level permission only
-?>
-					<li><a href='reportclassroomsearch.php?clear=1&type=person' >Classroom Contact History</a></li>
-<?  } ?>
-					<li>&nbsp;</li>
-					<li>&nbsp;</li>
-					<li>&nbsp;</li>
-					<li>&nbsp;</li>
-					<li>&nbsp;</li>
-				</ul>
-			</td>
-<? if ($USER->authorize('viewsystemreports')) { ?>
-			<td>
-				<ul>
-					<li><a href='reportarchive.php' >Systemwide Report Archive</a></li>
-					<li><a href='reportcontactchange.php?clear=1' >Contact Information Changes</a></li>
-					<li>&nbsp;</li>
-					<li>&nbsp;</li>
-					<li>&nbsp;</li>
-					<li>&nbsp;</li>
-					<li>&nbsp;</li>
-				</ul>
-			</td>
-<? } ?>
-		</tr>
-	</tbody>
-	</table>
-<?
+drawTableOfLists($headers, $linkLists);
 endWindow();
 
-?>
-
-
-<?
-
+// table of saved reports
 $data = DBFindMany("ReportSubscription", "from reportsubscription where userid = ?", false, array($USER->id));
 
 $titles = array("name" => "Name",
