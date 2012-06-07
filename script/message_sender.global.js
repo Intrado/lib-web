@@ -177,7 +177,7 @@
 
       j('.review_subject p').text(j('#msgsndr_form_subject').val());
       j('.review_type p').text(j('#msgsndr_form_type option:selected').text());
-      j('.review_count p').text('Insert Number here from list builder');
+      j('.review_count p').text('2,134');
 
       afterGetPrefs = function() {
 

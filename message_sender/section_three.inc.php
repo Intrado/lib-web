@@ -20,8 +20,10 @@
 					<label>Recipients</label>
 					<p></p>
 				</fieldset>
+
+				<hr />
 				
-				<fieldset>
+				<fieldset class="review_message">
 					<label>Message</label>
 					<div class="controls">
 						<ul class="msg_complete cf">
@@ -63,7 +65,7 @@
 				</fieldset> -->
 
 				<fieldset>
-					<label for="skip_phones">Skip Duplicate Phones</label>
+					<label for="skip_phones">Skip Duplicates</label>
 					<div class="controls cf">
 						<input type="checkbox" id="skip_phones" name="options_skipduplicates"/>
 					</div>
@@ -700,7 +702,7 @@
 			
 			<div class="msg_confirm">
 				<a href="#" class="toggle-more" data-target="#schedule_options">Schedule</a> or 
-				<button class="btn_confirm" id="send_new_broadcast">Send Now <span class="icon"></span></button>
+				<button class="btn_confirm" id="send_new_broadcast">Send Now to 2,134 Recipients</button>
 			</div>
 			
 		</div><!-- end window_panel -->

@@ -356,6 +356,19 @@ h3.flag { padding: 5px 22px; font-size: 18px; color: #fff; border: 1px solid #22
 .social_tab:last-child { border: none; }
 .add_btn { margin: 0 0 20px 0; }
 
+.review_subject label, .review_type label, .review_count, .review_message label {
+  font-weight: bold;
+}
+.review_count {
+  color: rgb(232, 79, 31);
+}
+
+
+#msg_section_3 hr {
+  margin: 1em auto;
+  width: 95%;
+}
+
 
 /*----- Information tables -----*/
 
