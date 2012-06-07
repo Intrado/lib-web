@@ -11,9 +11,14 @@ require_once("inc/utils.inc.php");
 
 require_once("obj/Validator.obj.php");
 require_once("obj/ValSmsText.val.php");
+require_once("obj/ValTtsText.val.php");
 require_once("obj/ValTimeWindowCallEarly.val.php");
 require_once("obj/ValTimeWindowCallLate.val.php");
+require_once("obj/EmailAttach.val.php");
 
+
+require_once("obj/Email.obj.php");
+require_once("obj/MessageAttachment.obj.php");
 require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
 
@@ -57,6 +62,17 @@ $formdata = array(
 			array("ValLength","min" => 3, "max" => 30),
 			array("ValJobName","type"=> "job")
 		)
+	),
+
+		"emailmessagetext" => array(
+		"label" => "emailmessagetext",
+		"value" => "",
+		"validators" => array(
+			array("ValMessageBody"),
+			array("ValLength","max" => 256000)
+		),
+		"control" => array("TextField"),
+		"helpstep" => 1
 	),
 
 
@@ -193,7 +209,9 @@ include("nav.inc.php");
 <script type="text/javascript">
 <?
 // Some of these are defined in jobwizard.inc.php 
-Validator::load_validators(array("ValSmsText","ValTimeWindowCallEarly","ValTimeWindowCallLate","ValTimePassed"));
+Validator::load_validators(array(
+	"ValSmsText","ValTimeWindowCallEarly","ValTimeWindowCallLate","ValTimePassed","ValTtsText"
+));
 ?>
 </script>
 
@@ -224,6 +242,111 @@ var dpck_fieldname = new DatePicker({
 	zindex: 99999
 	,dateFilter:DatePickerUtils.noDatesBefore(0)
 });
+
+				$("tts_play").observe("click", function(e) {
+					var val = $("msgsndr_tts_message").value;
+					var gender = ($("messagePhoneText_message-female").checked?"female":"male");
+					if (val) {
+						showPreview({gender:gender,text:val,language:"en"});
+					}
+				});
+
+				$("msgsndr_tts_message").observe("change", textAreaPhone_storedata.curry("messagePhoneText_message"));
+				$("msgsndr_tts_message").observe("blur", textAreaPhone_storedata.curry("messagePhoneText_message"));
+				$("msgsndr_tts_message").observe("keyup", textAreaPhone_storedata.curry("messagePhoneText_message"));
+				$("msgsndr_tts_message").observe("focus", textAreaPhone_storedata.curry("messagePhoneText_message"));
+				$("msgsndr_tts_message").observe("click", textAreaPhone_storedata.curry("messagePhoneText_message"));
+				// $("messagePhoneText_message-female").observe("click", textAreaPhone_storedata.curry("messagePhoneText_message"));
+				// $("messagePhoneText_message-male").observe("click", textAreaPhone_storedata.curry("messagePhoneText_message"));
+
+				var textAreaPhone_keyupTimer = null;
+				function textAreaPhone_storedata(formitem, event) {
+					var form = event.findElement("form");
+					if (textAreaPhone_keyupTimer) {
+						window.clearTimeout(textAreaPhone_keyupTimer);
+					}
+					textAreaPhone_keyupTimer = window.setTimeout(function () {
+							var val = $(formitem).value.evalJSON();
+							val.text = $("msgsndr_tts_message").value;
+							val.gender = ($(formitem+"-female").checked?"female":"male");
+							$(formitem).value = Object.toJSON(val);
+							//form_do_validation(form, $(formitem));
+						},
+						event.type == "keyup" ? 500 : 100
+					);
+				}
+
+		var showPreview = function(post_parameters,get_parameters){
+			var modal = new ModalWrapper("Loading...",false,false);
+			modal.window_contents.update(new Element('img',{src: 'img/ajax-loader.gif'}));
+			modal.open();
+			
+			new Ajax.Request('/jwhigh/jobwizard.php?step=/message/phone/text&previewmodal=true' + (get_parameters?'&' + get_parameters:''), {
+				'method': 'post',
+				'parameters': post_parameters,
+				'onSuccess': function(response) {
+					modal.window_title.update("");
+					if (response.responseJSON) {
+						var result = response.responseJSON;
+						modal.window_title.update(result.title);
+						
+						if (result.errors != undefined && result.errors.size() > 0) {
+							modal.window_title.update('Unable to Preview');
+							
+							modal.window_contents.update("The following error(s) occured:");
+							var list = new Element('ul');
+							result.errors.each(function(error) {
+								list.insert(new Element('li').update(error));
+							});
+							modal.window_contents.insert(list);
+						} else if (result.playable == true) {
+							modal.window_contents.update(result.form);
+							
+							var player = new Element('div',{
+								id: 'player',
+								style: 'text-align:center;'
+							});
+							var download = new Element('div',{
+								id: 'download',
+								style: 'text-align:center;'
+							});
+							modal.window_contents.insert(player);
+							modal.window_contents.insert(download);
+							
+							
+							if (result.hasinserts ==  false) {
+								var downloadlink = new Element('a',{
+									href: 'previewaudio.mp3.php?download=true&uid=' + result.uid
+								}).update('Click here to download');
+								
+								$('download').update(downloadlink);
+								embedPlayer('previewaudio.mp3.php?uid=' + result.uid,'player',result.partscount);
+							} else {
+								$('previewmessagefields').observe('Form:Submitted',function(e){
+									embedPlayer('previewaudio.mp3.php?uid=' + e.memo,'player',result.partscount);
+									var download = new Element('a',{
+										href: 'previewaudio.mp3.php?download=true&uid=' + e.memo
+									}).update('Click here to download');
+									$('download').update(download);
+								});
+							}
+						} else {
+							modal.window_contents.update(result.form);
+						}
+					} else {
+						modal.window_title.update('Error');
+						modal.window_contents.update('Unable to preview this message');
+					}
+				},
+				
+				'onFailure': function() {
+					modal.window_title.update('Error');
+					modal.window_contents.update('Unable to preview this message');
+				}
+			});
+			
+		};
+
 </script>
 
 <script src="script/speller/spellChecker.js"></script>
