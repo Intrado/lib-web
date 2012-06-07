@@ -72,7 +72,7 @@
 				</fieldset>
 
 				<fieldset>				
-					<label for="save_later">Save for later</label>
+					<label for="save_later">Save Message</label>
 					<div class="controls cf">
 						<input type="checkbox" id="save_later" name="save_later" name="options_savemessage" />
 						<input type="text" name="options_savemessagename" />

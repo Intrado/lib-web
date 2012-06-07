@@ -109,9 +109,15 @@
 					<label for="msgsndr_tts_message">Message</label>
 					<div class="controls">
 						<button class="btn-small paste-from hidden" id="paste_from_email">Paste text from email</button>
-						<textarea id="msgsndr_tts_message"></textarea>
-						<button><span class="icon play"></span> Play Audio</button>
-						<span class="tts characters">160 Characters Left</span>
+						<textarea id="msgsndr_tts_message" name="phone_tts"></textarea><span class="error"></span>
+
+<div class="hide">
+<input id="messagePhoneText_message" name="messagePhoneText_message" type="hidden" value="{&quot;gender&quot;: &quot;female&quot;, &quot;text&quot;: &quot;&quot;}"/>
+<input id="messagePhoneText_message-female" name="messagePhoneText_message-gender" type="radio" value="female" checked/><label for="messagePhoneText_message-female">Female</label><br />
+				<input id="messagePhoneText_message-male" name="messagePhoneText_message-gender" type="radio" value="male" /><label for="messagePhoneText_message-male">Male</label><br />
+</div>
+						<button id="tts_play"><span class="icon play"></span> Play Audio</button>
+						<!-- <span class="tts characters">10000 Characters Left</span> -->
 					</div>
 				</fieldset>
 
@@ -123,7 +129,7 @@
 
 				<fieldset class="form_actions">
 					<div class="controls">
-					<button class="btn_save" disabled="disabled" data-nav=".ophone">Save TTS Message</button>
+					<button class="btn_save" disabled="disabled" data-nav=".ophone">Save Phone Message</button>
 					<button class="btn_cancel" data-nav=".ophone">Cancel</button>
 					</div>
 				</fieldset>
