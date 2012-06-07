@@ -55,12 +55,12 @@
 					</div>
 				</fieldset>
 
-				<fieldset>
+<!-- 				<fieldset>
 				<label for="allow_reply">Allow Reply</label>
 					<div class="controls cf">
 						<input type="checkbox" id="allow_reply" name="options_allowreply"/>
 					</div>	
-				</fieldset>
+				</fieldset> -->
 
 				<fieldset>
 					<label for="skip_phones">Skip Duplicate Phones</label>
@@ -77,12 +77,12 @@
 					</div>
 				</fieldset>
 
-				<fieldset>
+<!-- 				<fieldset>
 					<label for="max_attempts">Max Attempts</label>
 					<div class="controls cf">
 						<select id="msgsndr_form_maxattempts" name="max_attempts" name="options_maxattempts"></select>
 					</div>
-				</fieldset>
+				</fieldset> -->
 
 				</div><!-- adv_options -->
 			</div><!-- field_wrapper -->
