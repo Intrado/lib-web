@@ -165,8 +165,17 @@ jQuery.noConflict();
         new document.validators["ValRequired"]("content_phone","Number to Call",{}),
         new document.validators["ValPhone"]("content_phone","Number to Call",{})
       ];
+      document.formvars['phone']['tts'] = [
+        new document.validators["ValLength"]("phone_tts","Phone Message",{length:10000}),
+        new document.validators["ValTtsText"](),
+        // new document.validators["ValTextAreaPhone"]()
+      ];
 
-      notVal.watchFields('#msgsndr_form_number');
+      notVal.watchFields('#msgsndr_form_number, #msgsndr_tts_message');
+
+      // $('#msgsndr_tts_message').on('keyup', function() {
+      //   charCount(this, '10000', '.tts.characters');
+      // });
 
       // Build up select box based on the maxjobdays user permission
       var daysToRun = userPermissions.maxjobdays;
@@ -174,6 +183,8 @@ jQuery.noConflict();
       for(i=1;i<=daysToRun;i++) {
         j('#msgsndr_form_days').append('<option value="'+i+'">'+i+'</option>');
       };
+
+
 
       // Easy Call jQuery Plugin
       $("#msgsndr_form_number").attachEasyCall({"languages": {"en":"English","es":"Spanish","ca":"Catalan"}});   
