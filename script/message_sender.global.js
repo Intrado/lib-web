@@ -207,16 +207,45 @@
           self.formVal(elem);
         });
 
-        if( typeof userPrefs.callearly == "undefined") {
-          var callearly = "9:00 am";
+
+        // Callearly 
+        var earlyProfile  = userPermissions.callearly;
+        var earlyPref     = userPrefs.callearly;
+
+        if ( typeof earlyProfile == "undefined" && typeof earlyPref == "undefined") {
+          var callearly = "8:00 am";
+        } else if (typeof earlyPref != "undefined" && typeof earlyProfile != "undefined") {
+          if (Date(earlyPref) < Date(earlyProfile)) {
+            var callearly = earlyProfile;
+          } else {
+            var callearly = earlyPref;
+          }
+        } else if (typeof earlyPref != "undefined") {
+          var callearly = earlyPref;
         } else {
-          var callearly = userPrefs.callearly;
+          var callearly = earlyProfile;
         }
-        if ( typeof userPrefs.calllate == "undefined") {
-          var calllate = "5:00 pm";
+
+
+        // Calllate
+        var lateProfile   = userPermissions.calllate;
+        var latePref      = userPrefs.calllate;
+
+        if ( typeof lateProfile == "undefined" && typeof latePref == "undefined") {
+          var calllate = "8:00 am";
+        } else if (typeof latePref != "undefined" && typeof lateProfile != "undefined") {
+          if (Date(latePref) < Date(lateProfile)) {
+            var calllate = lateProfile;
+          } else {
+            var calllate = latePref;
+          }
+        } else if (typeof latePref != "undefined") {
+          var calllate = latePref;
         } else {
-          var calllate = userPrefs.calllate;
+          var calllate = lateProfile;
         }
+
+
         j('#schedulecallearly option[value="'+callearly+'"]').attr('selected','selected');
         j('#schedulecalllate option[value="'+calllate+'"]').attr('selected','selected');
 
@@ -240,15 +269,9 @@
 
       var watch = watch + ', ' + fieldId;
 
-      j(watch).on({
-        keypress: function() {
-          var elem  = j(this);
-          self.formVal(elem);
-        },
-        change: function() {
-          var elem  = j(this);
-          self.formVal(elem);
-         }
+      j(watch).on('keyup', function() {
+        var elem  = j(this);
+        self.formVal(elem);
       });
 
 
