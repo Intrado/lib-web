@@ -66,7 +66,7 @@
 					<label for="msgsndr_form_callid">Caller ID</label>
 					<div class="controls">
 					<select id="msgsndr_form_callid" name="phone_callerid">
-					<option value="general">(651) 323-2003</option>
+					<!--option value="general">(651) 323-2003</option-->
 					</select>
 					</div>
 				</fieldset>

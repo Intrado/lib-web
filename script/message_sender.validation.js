@@ -264,23 +264,95 @@ jQuery.noConflict();
 
 
 
-      // Caller id
 
+      // Caller ids
+      ////////////////////////////////////
+
+      // determine whether we show or hide the callerId
+      function callerIdDisplay(){
       
-/*
-      // check for hascallback in the system settings
-      callerIdPrefs = {};
-      if (typeof orgOptions._hascallback == 'undefined') {
-        
-        if (typeof orgOptions.requireapprovedcallerid == 'undefined'){
-          callerIdPrefs[] = 'select';
+        var callerIdnumber = false;
+
+        // If hascallback isn't enabled, 
+        // check for orgOptions.requiredapprovedcallerid, 
+        // then subsequently for userPermissions.setcallerid
+        if (orgOptions._hascallback == 0){
+          
+          if (typeof(orgOptions.requireapprovedcallerid) != 'undefined'){ // if requireapprovedcallerid is defined...
+            // get the users callerid's ...
+            var userCallerIds = getUserCallerIds();
+
+            // and append them as options to the select menu ...
+            $.each(userCallerIds, function(cIndex, cItem){
+              $('#msgsndr_form_callid').append('<option value="'+cItem+'" >'+cItem+'</option>');
+            });
+
+            // if the users setcallerid permission is defined, 
+            // add the 'other' option and create a text input for them to add arbitrary value, and validate it.
+            if (typeof(userPermissions.setcallerid) != 'undefined'){ 
+              $('#msgsndr_form_callid').append('<option value="other" >Other</option>');
+              $('#msgsndr_form_callid').closest('div.controls').append('<span id="callerid_other_wrapper" class="hidden"><input type="text" id="callerid_other" name="phone_callerid"  /><span class="error"></span></span>');
+              notVal.watchFields('#callerid_other');
+              document.formvars['phone']['callerid'] = [new document.validators["ValPhone"]("phone_callerid","Caller ID",{})];
+              $('#msgsndr_form_callid').on('change', function(){
+                if ($(this, 'option:selected').val() == 'other') {
+                  $('#callerid_other_wrapper').removeClass('hidden');
+                } else {
+                  $('#callerid_other_wrapper').addClass('hidden');
+                }
+              });
+            }
+            
+          } else { // not sure here, set the default callerid and display the select with that as the option?
+            var callerIdnumber = getDefaultCallerId();
+            $('#msgsndr_form_callid').append('<option value="'+callerIdnumber+'" selected >'+callerIdnumber+'</option>'); 
+          }
+
+        } else { // the user hascallback so we hide caller id select fieldset from view
+          $('#msgsndr_form_callid').closest('fieldset').addClass('hidden');
+          // get the default caller id and append it as the selected option in the hidden callerid select menu
+          var callerIdnumber = getDefaultCallerId();
+          $('#msgsndr_form_callid').append('<option value="'+callerIdnumber+'" selected >'+callerIdnumber+'</option>');
         }
+      };
 
-      } else {
-        
-      }
+      // call the callerIdDisplay function...
+      callerIdDisplay();
       
-*/
+      // get the default caller id depending on settings, check the user role permissions first,
+      // if that isn't set, then get the callerid from system options.
+      function getDefaultCallerId(){
+        var userCallerId = userPermissions.callerid;
+        var orgCallerId = orgOptions.callerid;
+
+        if (typeof(userCallerId) == 'undefined'){
+          return orgCallerId;
+        } else {
+          return userCallerId;
+        }
+      };
+
+      // get the users list of caller ids, if the list is empty, return the default caller id...
+      function getUserCallerIds(){
+        var callerIds = false;
+         $.ajax({
+          url: '/'+orgPath+'/api/2/users/'+userid+'/roles/'+userRoleId+'/settings/callerids/',
+          type: "GET",
+          dataType: "json",
+          async: false,
+          success: function(data) {
+            callerIds = data.callerids;
+            // if the ajax call returns no numbers or nothing, get the default callerid...
+            if (callerIds == false || callerIds.length == 0) {
+              callerIds = getDefaultCallerId();
+            }
+          }
+        });
+
+        return callerIds;
+        //return ["8316001090","8316001091","8043810293"]; // some test data...
+      };  
+     
 
 
 
@@ -712,25 +784,6 @@ jQuery.noConflict();
 
     
 
-    // get caller id's ... WIP -- userRoleId not defined outside the setUp function
-    /*
-    function getCallerIds(){
-      var callerIds = {};
-       $.ajax({
-        url: '/'+orgPath+'/api/2/users/'+userid+'/roles/'+userRoleId+'/settings/callerids/',
-        type: "GET",
-        dataType: "json",
-        success: function(data) {
-          $.each(data.callerids, function(cIndex, cIds){
-            callerIds[cIds.name] = cIds.value;
-          });
-        }
-      });
-      return callerIds;
-    };  
-
-    console.log(getCallerIds());
-    */
 
 // messages, message parts and message attachments...
 //////////////////////////////////////////////////////
