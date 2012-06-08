@@ -507,10 +507,21 @@ table.schedule { width: 218px; }
 table.schedule th, table.schedule td { width: 30px; padding: 5px 0; text-align: center; }
 
 table.info th:first-child {text-align: right;}
+table.jobprogress th:first-child {text-align: left;}
 table.info td:first-child {text-align: right; white-space: nowrap;}
 table.info td:last-child {width: 40px;}
 table.info td:nth-child(2) { white-space: nowrap;}
 table.info td:nth-child(3) { width: 100%; overflow: hidden;}
+table.info span.activejob {
+	display: inline-block; 
+	width: 180px;
+	color: white;
+	font-weight: bold;
+	text-align: center;
+	background: url('img/candybarcall.gif') no-repeat;
+	background-position: center;
+	background-size: 100% 70%;
+}
 
 .form_table { width: 100%; }
 

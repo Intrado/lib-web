@@ -156,8 +156,21 @@ $stats = gen2cache(60*60*24, $expect, null, "generateStats", $useridList, $start
 
 $jobtemplates = DBFindMany("Job", "from job where userid=? and status='template' and not deleted and type = 'notification' order by modifydate desc",false,array($USER->id));
 
-$userlinks = QuickQueryList("select subordinateuserid from userlink where userid=?",false,false,array($USER->id));
+$userlinks = QuickQuery("select count(*) from userlink where userid=?",false,array($USER->id));
 
+// List all possible request values and set their defaults
+$requestValues = array(
+			"showactivity" => 'me',
+			"daterange" => '7days',
+);
+
+
+// Update request values from what is passed in
+foreach($requestValues as $key => $values) {
+	if (isset($_REQUEST[$key])) {
+		$requestValues[$key] = $_REQUEST[$key];
+	}
+}
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
@@ -171,12 +184,12 @@ include("nav.inc.php");
 	<div class="wrapper">
 	
 	<div class="main_activity">
-<?if (count($userlinks)) {?>
+<?if ($userlinks > 0) {?>
 		<div class="users cf">
 			<p>Show activity for
-			<select onchange="window.location='start.php?showactivity=' + this.options[selectedIndex].value">
-				<option value="everyone">Everyone</option>
-				<option value="me">Me</option>
+			<select onchange="window.location='start.php?showactivity=' + this.options[selectedIndex].value + '&<?= http_build_query(array_diff_key($requestValues,array("showactivity" => ''))) ?>'">
+				<option value="me" <?= (isset($_GET["showactivity"]) && $_GET["showactivity"]=="me")?"selected":"";?>>Me</option>
+				<option value="everyone" <?= (isset($_GET["showactivity"]) && $_GET["showactivity"]=="everyone")?"selected":"";?>>Everyone</option>
 			</select></p>
 		</div>
 <?}?>
@@ -185,9 +198,13 @@ include("nav.inc.php");
 			<div class="window_title_wrap">
 			<h2>Activity Summary</h2>
 			<div class="btngroup">
-				<button class="active">7 Days</button>
-				<button>Month</button>
-				<button>Year</button>
+				<?
+				$urlQueryState = http_build_query(array_diff_key($requestValues,array("daterange" => '')));
+				$ranges = array("7days" => "7 Days","month" => "Month","year" => "Year");
+				foreach ($ranges as $range => $display) {
+					echo "<button " . ($requestValues["daterange"] == $range?"class=\"active\"":"") . " onclick=\"window.location='start.php?daterange=$range&$urlQueryState'\">$display</button>";
+				}
+				?>
 			</div>
 			</div>
 			
@@ -246,7 +263,7 @@ include("nav.inc.php");
 			
 			<div class="window_body_wrap">
 			<h3>In Progress <span>(Sending Now)</span></h3>
-			<table class="info" id="activejobs">
+			<table class="jobprogress info" id="activejobs">
 				<thead>
 				</thead>
 				<tbody>
@@ -305,8 +322,29 @@ include("nav.inc.php");
 
 
 <script type="text/javascript">
+<?
+$who = isset($_GET["showactivity"])?$_GET["showactivity"]:"me";
+?>
 
-function updateMoreLink(section, action, override, start, limit, count){
+
+function updateTableTools(section, action, override, start, limit, count){
+	// Remove previous tooltips if they exist add add new ones
+	$$('.jobtools').each(function(element) {
+		Tips.remove(element.id);
+		element.tip = new Tip(element.id, element.next().innerHTML, {
+			style: 'protogrey',
+			radius: 4,
+			border: 4,
+			hideOn: false,
+			hideAfter: 0.5,
+			stem: 'rightTop',
+			hook: {  target: 'leftMiddle', tip: 'topRight'  },
+			width: 'auto',
+			offset: { x: 0, y: 0 }
+		});
+	});
+	
+	//Update More link to with the correct show status and url
 	if (count >= limit) {
 		if (override) {
 			start = 0;
@@ -316,18 +354,17 @@ function updateMoreLink(section, action, override, start, limit, count){
 		}
 		
 		$("more" + section).update(new Element("a",{href: "#", 
-			onclick: "ajax_obj_table_update('" + section + "','ajaxjob.php?action=" + action + "&start=" + start + "&limit=" + limit + "'," + override + ",updateMoreLink.curry('" + section + "','" + action + "'," + override + "," + start + "," + limit + ")); return false;"
+			onclick: "ajax_obj_table_update('" + section + "','ajaxjob.php?action=" + action + "&who=<?=$who?>&start=" + start + "&limit=" + limit + "'," + override + ",updateTableTools.curry('" + section + "','" + action + "'," + override + "," + start + "," + limit + ")); return false;"
 			}).insert("<?= _L("Show More")?>"));
 	} else {
 		$("more" + section).update("");
 	}
 }
 
-
 document.observe('dom:loaded', function() {
-	ajax_obj_table_update('activejobs','ajaxjob.php?action=activejobs&start=0&limit=10',true,updateMoreLink.curry("activejobs","activejobs",true,0,10));
-	ajax_obj_table_update('scheduledjobs','ajaxjob.php?action=scheduledjobs&start=0&limit=10',false,updateMoreLink.curry("scheduledjobs","scheduledjobs",true,0,10));
-	ajax_obj_table_update('completedjobs','ajaxjob.php?action=completedjobs&start=0&limit=10',false,updateMoreLink.curry("completedjobs","completedjobs",false,0,10));
+	ajax_obj_table_update('activejobs','ajaxjob.php?action=activejobs&who=<?=$who?>&start=0&limit=10',true,updateTableTools.curry("activejobs","activejobs",true,0,10));
+	ajax_obj_table_update('scheduledjobs','ajaxjob.php?action=scheduledjobs&who=<?=$who?>&start=0&limit=10',false,updateTableTools.curry("scheduledjobs","scheduledjobs",false,0,10));
+	ajax_obj_table_update('completedjobs','ajaxjob.php?action=completedjobs&who=<?=$who?>&start=0&limit=5',false,updateTableTools.curry("completedjobs","completedjobs",false,0,5));
 });
 
 </script>

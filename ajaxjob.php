@@ -17,23 +17,28 @@ function calc_job_list_total ($listid) {
 	$renderedlist->initWithList($list);
 	return $renderedlist->getTotal();
 }
+function fmt_activestatus($obj, $name) {
+	$str = "";
+	$str .= "<span class=\"activejob\">Calling...</span>";
+
+	return $str;
+}
 
 function fmt_job_content($obj, $name) {
 	$str = "";
 	if ($obj->hasPhone()){
-		$str .= " <img src=\"themes/newui/phone-grey.png\"/>";
+		$str .= " <img src=\"themes/{$_SESSION['colorscheme']['_brandtheme']}/phone-grey.png\"/>";
 	}
 	if ($obj->hasEmail()){
-		$str .= " <img src=\"themes/newui/email-grey.png\"/>";
+		$str .= " <img src=\"themes/{$_SESSION['colorscheme']['_brandtheme']}/email-grey.png\"/>";
 	}
 	if ($obj->hasSMS()){
-		$str .= " <img src=\"themes/newui/sms-grey.png\"/>";
+		$str .= " <img src=\"themes/{$_SESSION['colorscheme']['_brandtheme']}/sms-grey.png\"/>";
 	}
 	if ($obj->hasPost()){
-		$str .= " <img src=\"themes/newui/social-grey.png\"/>";
+		$str .= " <img src=\"themes/{$_SESSION['colorscheme']['_brandtheme']}/social-grey.png\"/>";
 	}
 	return $str;
-	//return "<img src=\"themes/newui/phone-grey.png\"/> <img src=\"themes/newui/email-grey.png\"/> <img src=\"themes/newui/sms-grey.png\"/> <img src=\"themes/newui/social-grey.png\"/>";
 }
 
 function fmt_job_recipients($obj, $name) {
@@ -79,6 +84,12 @@ function fmt_job_default_action ($obj) {
 		return "window.location = 'job.php?id=$obj->id';";
 }
 
+
+function frm_job_tools($obj, $name) {
+	$actions = fmt_jobs_actions($obj,$name);
+	return "<img id=\"actionlink_{$obj->id}\" class=\"jobtools\" src='img/largeicons/tiny20x20/tools.jpg' /><div class=\"hidden\">{$actions}</div>";
+}
+
 // All actions require a valid messagegroupid; the user must own the messagegroup.
 function handleRequest() {
 	global $USER;
@@ -107,14 +118,16 @@ function handleRequest() {
 				"userid" => "Author",
 				"name" => "Subject",
 				"rcpts" => "Rcpts",
-				"content" => "Content"
+				"content" => "Content",
+				"tools" => ""
 			);
 			
 			$formatters = array(
-				'status' => 'fmt_status',
+				'status' => 'fmt_activestatus',
 				'userid' => 'fmt_job_ownername',
 				'rcpts' => 'fmt_job_recipients',
-				'content' => 'fmt_job_content'
+				'content' => 'fmt_job_content',
+				'tools' => 'frm_job_tools'
 			);
 			
 			$rowActionFormatter = 'fmt_job_default_action';
@@ -134,14 +147,16 @@ function handleRequest() {
 				"userid" => "Author",
 				"name" => "Subject",
 				"rcpts" => "Rcpts",
-				"content" => "Content"
+				"content" => "Content",
+				"tools" => ""
 			);
 				
 			$formatters = array(
 				'startdate' => 'fmt_obj_date_no_time',
 				'userid' => 'fmt_job_ownername',
 				'rcpts' => 'fmt_job_recipients',
-				'content' => 'fmt_job_content'
+				'content' => 'fmt_job_content',
+				'tools' => 'frm_job_tools'
 			);
 			
 			$rowActionFormatter = 'fmt_job_default_action';
@@ -161,16 +176,16 @@ function handleRequest() {
 				"userid" => "Author",
 				"name" => "Subject",
 				"rcpts" => "Rcpts",
-				"content" => "Content"
-				//,"tools" => "Tools"
+				"content" => "Content",
+				"tools" => ""
 			);
 			
 			$formatters = array(
 				'finishdate' => 'fmt_obj_date_no_time',
 				'userid' => 'fmt_job_ownername',
 				'rcpts' => 'fmt_job_recipients',
-				'content' => 'fmt_job_content'
-				//,'tools' => 'fmt_jobs_actions'
+				'content' => 'fmt_job_content',
+				'tools' => 'frm_job_tools'
 			);
 			
 			$rowActionFormatter = 'fmt_job_default_action';
