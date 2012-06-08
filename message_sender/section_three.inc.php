@@ -4,8 +4,6 @@
 
 			<div id="msg_section_3" class="window_panel">
 			
-			<h3 class="flag">Review Message</h3>			
-			<div class="field_wrapper">
 				<fieldset class="review_subject">
 					<label>Subject</label>
 					<p></p>
@@ -87,7 +85,6 @@
 				</fieldset> -->
 
 				</div><!-- adv_options -->
-			</div><!-- field_wrapper -->
 			
 			
 			<div id="schedule_options" class="modal hide">
