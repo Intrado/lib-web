@@ -117,7 +117,7 @@
 <input id="messagePhoneText_message-female" name="messagePhoneText_message-gender" type="radio" value="female" checked/><label for="messagePhoneText_message-female">Female</label><br />
 				<input id="messagePhoneText_message-male" name="messagePhoneText_message-gender" type="radio" value="male" /><label for="messagePhoneText_message-male">Male</label><br />
 </div>
-						<button id="tts_play"><span class="icon play"></span> Play Audio</button>
+						<button id="tts_play" class="playAudio" data-text="msgsndr_tts_message" data-code="en"><span class="icon play"></span> Play Audio</button>
 						<!-- <span class="tts characters">10000 Characters Left</span> -->
 					</div>
 				</fieldset>
@@ -128,7 +128,7 @@
 					<a class="toggle-more hide" data-target="#tts_translate" href=""></a>
 				</fieldset>
 
-				<div id="tts_translate" class="close">
+				<div id="tts_translate" class="close translations">
 
 <!-- 					<fieldset>
 							<label for="">Spanish</label>
@@ -199,9 +199,21 @@
 				
 				<fieldset>
 					<label for="msgsndr_form_translate">Translate</label>
-					<input type="checkbox" id="msgsndr_form_emailtranslate" name="email_translate" value=""/>
-					<a class="toggle-more" href="">Show 8 translations</a>
+					<input type="checkbox" id="msgsndr_form_emailtranslate" name="email_translate" value=""  data-display="#email_translate" />
+					<a class="toggle-more hide" data-target="#email_translate" href=""></a>
 				</fieldset>
+
+				<div id="email_translate" class="close translations">
+
+<!-- 					<fieldset>
+							<label for="">Spanish</label>
+							<input type="checkbox" />
+						<div class="controls">
+							<textarea disabled>Translated Text here</textarea>
+						</div>
+					</fieldset>
+ -->
+				</div>
 				
 				<fieldset class="form_actions">
 					<div class="controls">

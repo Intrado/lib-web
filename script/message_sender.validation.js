@@ -71,7 +71,6 @@ jQuery.noConflict();
       function getLanguages(){
 
         langCodes = "";
-
         nLangs = {};
 
         $.ajax({
@@ -230,6 +229,41 @@ jQuery.noConflict();
       };
 
 
+
+      // Translate Checkbox event
+      $('#msgsndr_form_phonetranslate').on('click', function() {
+        // Checked if checked then do translate, as do not want to hit API when deselected translate
+        if ($(this).is(':checked')) {
+
+          var txtField      = $('#msgsndr_tts_message').val();
+          var displayArea   = $(this).attr('data-display');
+          var msgType       = 'tts'
+
+          // $(this).attr('disabled','disabled');
+          doTranslate(langCodes,txtField,displayArea,msgType);
+
+        }
+      });
+
+
+      var splitlangCodes = langCodes.split('|');
+      var langCount = splitlangCodes.length;
+
+      if (langCount == 1) {
+        $('a[data-target=#tts_translate]').show().text('Show '+langCount+' translation');
+      } else {
+        $('a[data-target=#tts_translate]').show().text('Show '+langCount+' translations');
+      }
+
+      $.each(splitlangCodes, function(transIndex, transData) {
+
+        var langCode = splitlangCodes[transIndex];
+
+        $('#tts_translate').append('<fieldset><label for="tts_'+nLangs[langCode]+'">'+nLangs[langCode]+'</label><input type="checkbox" /><div class="controls hide"><textarea id="tts_'+nLangs[langCode]+'"></textarea><button class="playAudio" data-text="tts_'+nLangs[langCode]+'" data-code="'+langCode+'"><span class="icon play"></span> Play Audio</button></div></fieldset>');
+      });
+
+
+
       // Caller id
 
       
@@ -247,6 +281,7 @@ jQuery.noConflict();
       }
       
 */
+
 
 
       // Easy Call jQuery Plugin
@@ -278,6 +313,39 @@ jQuery.noConflict();
       }
 
       notVal.watchFields('#msgsndr_form_name, #msgsndr_form_email, #msgsndr_form_mailsubject, #msgsndr_form_body');
+
+
+      // Translate Checkbox event
+      $('#msgsndr_form_emailtranslate').on('click', function() {
+        // Checked if checked then do translate, as do not want to hit API when deselected translate
+        if ($(this).is(':checked')) {
+
+          var txtField      = $('#cke_reusableckeditor iframe').contents().find('body').text();
+          var displayArea   = $(this).attr('data-display');
+          var msgType       = 'email';
+
+          // $(this).attr('disabled','disabled');
+          doTranslate(langCodes,txtField,displayArea,msgType);
+
+        }
+      });
+
+      var splitlangCodes = langCodes.split('|');
+      var langCount = splitlangCodes.length;
+
+      if (langCount == 1) {
+        $('a[data-target=#email_translate]').show().text('Show '+langCount+' translation');
+      } else {
+        $('a[data-target=#email_translate]').show().text('Show '+langCount+' translations');
+      }
+
+      $.each(splitlangCodes, function(transIndex, transData) {
+
+        var langCode = splitlangCodes[transIndex];
+
+        $('#email_translate').append('<fieldset><label for="email_'+nLangs[langCode]+'">'+nLangs[langCode]+'</label><input type="checkbox" /><div class="controls hide"><textarea disabled id="email_'+nLangs[langCode]+'"></textarea></div></fieldset>');
+      });
+
 
     };
 
@@ -423,17 +491,16 @@ jQuery.noConflict();
 
 
 
-    function doTranslate(langCodes,txtField,displayArea) {
+    function doTranslate(langCodes,txtField,displayArea,msgType) {
 
-      var transTxt = $(txtField).val();
+      var transTxt = txtField;
       var transURL = 'translate.php?english='+transTxt+'&languages='+langCodes;
 
       var splitlangCodes = langCodes.split('|');
-
       var langCount = splitlangCodes.length;
 
-      $('a[data-target='+displayArea+']').show().text('Fetching translations, please wait...');   
-      $(displayArea).empty();
+      // $('a[data-target='+displayArea+']').show().text('Fetching translations, please wait...');   
+      // $(displayArea).empty();
 
       $.ajax({
         url: transURL,
@@ -441,20 +508,14 @@ jQuery.noConflict();
         dataType: 'json',
         success: function(data) {
 
-          console.log(data);
-
-          if (langCount == 1) {
-            $('a[data-target='+displayArea+']').show().text('Show '+langCount+' translation');
-          } else {
-            $('a[data-target='+displayArea+']').show().text('Show '+langCount+' translations');
-          }
-
           $.each(data.responseData, function(transIndex, transData) {
 
             var langCode = splitlangCodes[transIndex];
+            var textareaId = '#'+msgType+'_'+nLangs[langCode];
 
-            // $(displayArea).append('<fieldset><label for="">'+languages[transIndex+1].name+'</label><input type="checkbox" /><div class="controls"><textarea disabled>'+transData.translatedText+'</textarea></div></fieldset>');
-            $(displayArea).append('<fieldset><label for="">'+nLangs[langCode]+'</label><input type="checkbox" /><div class="controls"><textarea disabled>'+transData.translatedText+'</textarea></div></fieldset>');
+            transText = transData.translatedText;
+            $(textareaId).text(transText);
+
           });
 
         }
@@ -462,20 +523,6 @@ jQuery.noConflict();
       });
 
     };
-
-
-    $('#msgsndr_form_phonetranslate').on('click', function() {
-      // Checked if checked then do translate, as do not want to hit API when deselected translate
-      if ($(this).is(':checked')) {
-
-        txtField      = $(this).attr('data-txt');
-        displayArea   = $(this).attr('data-display');
-
-        $(this).attr('disabled','disabled');
-        doTranslate(langCodes,txtField,displayArea);
-
-      }
-    });
 
 
 
@@ -937,14 +984,14 @@ jQuery.noConflict();
     // This will contain the logic to populate message content from a loaded message
     function doLoadMessage() {
 
-      if (typeof messages.sms != "undefined") {
+      if (typeof(messages.sms) != "undefined") {
         $('li.osms').addClass('complete');
 
         $('input[name=has_sms]').val('1');
         $('#msgsndr_form_sms').val(messages.sms.msgparts[0].txt);
       }
 
-      if (typeof messages.email != "undefined") {
+      if (typeof(messages.email) != "undefined") {
         $('li.oemail').addClass('complete');
 
         emailSubject = messages.email.subject;
@@ -959,25 +1006,25 @@ jQuery.noConflict();
         // Message HTML content == messages.email.msgparts[0].txt
       }
 
-      if (typeof messages.post != "undefined") {
+      if (typeof(messages.post) != "undefined") {
         $('li.osocial').addClass('complete');
 
 
-        if (typeof messages.post.facebook  != "undefined") {
+        if (typeof(messages.post.facebook)  != "undefined") {
           $('#msgsndr_form_facebook').attr('checked','checked');
           $('div.facebook').show();
 
           $('#msgsndr_form_fbmsg').val(messages.post.facebook.msgparts[0].txt);
         }
 
-        if (typeof messages.post.twitter != "undefined") {
+        if (typeof(messages.post.twitter) != "undefined") {
           $('#msgsndr_form_twitter').attr('checked','checked');
           $('div.twitter').show();
 
           $('#msgsndr_form_tmsg').val(messages.post.twitter.msgparts[0].txt);
         }
 
-        if (typeof messages.post.feed != "undefined") {
+        if (typeof(messages.post.feed) != "undefined") {
           $('#msgsndr_form_feed').attr('checked','checked');
           $('div.feed').show();
 

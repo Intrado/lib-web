@@ -123,7 +123,36 @@ jQuery.noConflict();
 			$(etarget).slideToggle();
 
 			offset = $(this).offset();
-				$('html, body').animate({scrollTop: offset.top },2000);
+				$('html, body').animate({scrollTop: offset.top },500);
+
+		});
+
+
+		$('.playAudio').live('click', function(e) {
+			e.preventDefault();
+
+			if ($('#messagePhoneText_message-female').is(':checked')) {
+				var gender = "female";
+			} else {
+				var gender = "male";
+			}
+			var txtArea = $(this).attr('data-text');
+			var langC		= $(this).attr('data-code');
+			var val 		= $('#'+txtArea).val();
+		
+			showPreview({gender:gender,text:val,language:langC});
+		})
+
+
+		// Translations Toggle
+		$('.translations').on('click', "input", function() {
+
+			console.log('bo');
+
+			$(this).next('.controls').toggleClass('hide');
+
+			// $('#'+tArea).slideToggle();
+
 
 		});
 

@@ -243,13 +243,19 @@ var dpck_fieldname = new DatePicker({
 	,dateFilter:DatePickerUtils.noDatesBefore(0)
 });
 
-				$("tts_play").observe("click", function(e) {
-					var val = $("msgsndr_tts_message").value;
-					var gender = ($("messagePhoneText_message-female").checked?"female":"male");
-					if (val) {
-						showPreview({gender:gender,text:val,language:"en"});
-					}
-				});
+
+// $$('.play').each(function (el) {
+// 				return $(el).observe("click", function(e) {
+// 				//Event.observe($$('play'), 'click', function(e) {
+// 					var txtArea = this.readAttribute('data-text');
+// 					console.log(txtArea);
+// 					var val = $(txtArea).value;
+// 					var gender = ($("messagePhoneText_message-female").checked?"female":"male");
+// 					if (val) {
+// 						showPreview({gender:gender,text:val,language:"en"});
+// 					}
+// 				});
+// });
 
 				$("msgsndr_tts_message").observe("change", textAreaPhone_storedata.curry("messagePhoneText_message"));
 				$("msgsndr_tts_message").observe("blur", textAreaPhone_storedata.curry("messagePhoneText_message"));
