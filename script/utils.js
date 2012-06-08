@@ -403,6 +403,45 @@ function ajax_table_update(containerID, uri) {
 	}, null, false); // Do not cache this request.
 }
 
+function ajax_obj_table_update(tableid,url,overwrite,callback){
+	new Ajax.Request(url, {
+		method:'get',
+		onSuccess: function (response) {
+			var result = response.responseJSON;
+			if(result) {
+				var tr= new Element('tr');
+				for (var i = 0; i < result.titles.length; i++) {
+					tr.insert(new Element('th').insert(result.titles[i]));
+				}
+				var thead = new Element('thead').insert(tr);
+				$(tableid).down("thead").update(thead.innerHTML);
+				
+				var tbody = new Element('tbody');
+				for (var i = 0; i < result.rows.length; i++) {
+					var row = result.rows[i];
+					var tr = false;
+					if (row.action != undefined)
+						tr = new Element('tr',{onclick: row.action});
+					else
+						tr = new Element('tr');
+					
+					for (var j = 0; j < row.cols.length; j++) {
+						tr.insert(new Element('td').insert(row.cols[j]));
+					}
+					tbody.insert(tr);
+				}
+				
+				if (overwrite === undefined || overwrite === false)
+					$(tableid).down("tbody").insert(tbody.innerHTML);
+				else
+					$(tableid).down("tbody").update(tbody.innerHTML);
+				
+				callback(result.rows.length);
+			}
+		}
+	});
+}
+
 
 
 function do_ajax_listbox(checkbox, personid) {

@@ -47,6 +47,35 @@ function showObjects ($data, $titles, $formatters = array(), $scrolling = false,
 	return $tableid;
 }
 
+
+function prepareAjaxTableObjects ($data, $titles, $formatters = array(),$row_action_formatter = false) {
+	$tableData = array("titles" => array(),"rows" => array());
+	foreach ($titles as $index => $title) {
+		$tableData["titles"][] = escapehtml($title);
+	}
+	
+	foreach ($data as $obj) {
+		$row = array("cols" => array());
+		//only show cels with titles
+		foreach ($titles as $index => $title) {
+			if (isset($formatters[$index])) {
+				$fn = $formatters[$index];
+				$cel = $fn($obj,$index);
+			} else {
+				$cel = escapehtml($obj->$index);
+			}
+			$row["cols"][] = $cel;
+		}
+		if ($row_action_formatter) {
+			$row["action"]  = $row_action_formatter($obj);
+		}
+		
+		$tableData["rows"][] = $row;
+	}
+	return $tableData;
+}
+
+
 function showTable ($data, $titles, $formatters = array(), $repeatedColumns = array(), $groupby = null) {
 	//use sparse array to use isset later
 	$hiddencolumns = array();
