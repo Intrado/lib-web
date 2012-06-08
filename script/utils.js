@@ -255,8 +255,7 @@ function parse_theme_from_url (url) {
 }
 
 /*
- * commented the code within the btn_roll, btn_rollover and btn_rollout functions 
- * rather than removing the functions as they are called in many pages.
+ * FIXME: commented the code within the btn_roll, btn_rollover and btn_rollout functions rather than removing the functions as they are called in many pages.
  */
 function btn_roll(obj,over) {
 	//obj = $(obj);
