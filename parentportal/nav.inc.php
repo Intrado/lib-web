@@ -99,7 +99,6 @@ header('Content-type: text/html; charset=UTF-8') ;
 	<script src="script/form.js.php" type="text/javascript"></script>
 
 	<link href="css.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print">
-	<link href="theme.css" type="text/css" rel="stylesheet">
 	<link href="css/form.css.php" type="text/css" rel="stylesheet">
 	<link href="css/prototip.css.php" type="text/css" rel="stylesheet">
 	<link href='css/style_print.css' type='text/css' rel='stylesheet' media='print'>
@@ -121,10 +120,13 @@ header('Content-type: text/html; charset=UTF-8') ;
 <!-- ********************************************************************* -->
 
 <div id="top_banner" class="banner cf">
-
-			<div class="banner_logo"><? doLogo() ?></div>
+<?
+	if (isset($contactList) && $contactList) {
+?>
+			<div class="banner_logo"><? doLogo(); ?></div>
 
 <?
+	}
 		if (!isset($hidenav) || !$hidenav) {
 ?>
 			<div class="banner_custname"><?= isset($_SESSION['custname']) ? escapehtml($_SESSION['custname']) : ""; ?></div>
@@ -176,9 +178,9 @@ header('Content-type: text/html; charset=UTF-8') ;
 </div><!-- .primary_nav -->
 
 
-<? if ($SUBTABS != "") { ?>
+<? if (isset($contactList) && $contactList) { ?>
 <ul class="subnavtabs cf">
-	<? if (isset($contactList) && $contactList) echo $SUBTABS ?>
+	<?= $SUBTABS ?>
 </ul>
 <? } ?>
 
