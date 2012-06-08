@@ -120,7 +120,7 @@ $TITLE = _L("Create a New Account");
 include_once("cmlogintop.inc.php");
 if(!$success){
 ?>
-	<form method="POST" action="newportaluser.php<?echo $appendcustomerurl;?>" name="newaccount" onsubmit='if(!(new getObj("tos").obj.checked)){ window.alert("You must accept the Terms of Service."); return false;}'>
+	<form method="POST" action="newportaluser.php<?echo $appendcustomerurl;?>" name="newaccount" onsubmit='if(!document.newaccount.acceptterms.checked){ window.alert("You must accept the Terms of Service."); return false;}'>
 
 			<span class="language"> 
 			<?
