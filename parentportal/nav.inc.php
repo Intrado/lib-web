@@ -31,16 +31,12 @@ $NAVTREE = array (
 ////////////////////////////////////////////////////////////////////////////////
 
 function doLogo () {
-	$logohash = crc32("cid".getSystemSetting("_logocontentid"));
-	$clickurl = getSystemSetting("_logoclickurl");
-	if($clickurl != "" && $clickurl != "http://")
-	echo '<a href="' . $clickurl . '" target="_blank"><img src="../logo.img.php?hash=' . $logohash .'" alt="Logo"></a>';
-	else
-	echo '<img src="../logo.img.php?hash=' . $logohash .'" alt="">';
+	// there is no customized theme for contact manager, no customer logo
+	echo '<img src="img/sm_white.gif" alt="">';
 }
 
 function navMainTab ($display, $hint, $accesskey, $link, $isselected) {
-	$theme = getBrandTheme();
+	$theme = getBrandTheme(); // contact manager is hardcoded to 3dblue
 	return '<li '. ($isselected ? 'class="navtab_active"' : "") .'><a accesskey="'.$accesskey.'" onfocus="blur()" href="' . $link . '" title="'.$hint.'"><img alt="" src="themes/' . $theme . '/main_nav_tab' . ($isselected ? "_active" : "") . '.gif"><span>' . $display . '</span></a></li>';
 }
 
@@ -177,12 +173,6 @@ header('Content-type: text/html; charset=UTF-8') ;
 	
 </div><!-- .primary_nav -->
 
-
-<? if (isset($contactList) && $contactList) { ?>
-<ul class="subnavtabs cf">
-	<?= $SUBTABS ?>
-</ul>
-<? } ?>
 
 
 <div class="content_wrap cf"><!-- starts main content wrapper, tag ends in navbottom.inc.php -->
