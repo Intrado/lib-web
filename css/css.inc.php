@@ -506,6 +506,12 @@ table td.feed_preview { vertical-align: top; }
 table.schedule { width: 218px; }
 table.schedule th, table.schedule td { width: 30px; padding: 5px 0; text-align: center; }
 
+table.info th:first-child {text-align: right;}
+table.info td:first-child {text-align: right; white-space: nowrap;}
+table.info td:last-child {width: 40px;}
+table.info td:nth-child(2) { white-space: nowrap;}
+table.info td:nth-child(3) { width: 100%; overflow: hidden;}
+
 .form_table { width: 100%; }
 
 .tcol10		{ width: 10%; }

@@ -24,10 +24,11 @@ class Job extends DBMappedObject {
 
 	var $cancelleduserid;
 
-	var $sendinfo = false; // if $sendphone, $sendemail, $sendsms is correct. Refreash, Update and Create will reset this to false
+	var $sendinfo = false; // if $sendphone, $sendemail, $sendsms, $sendpost is correct. Refreash, Update and Create will reset this to false
 	var $sendphone;
 	var $sendemail;
 	var $sendsms;
+	var $sendpost;
 
 	var $optionsarray = null; //options to update
 
@@ -292,7 +293,7 @@ class Job extends DBMappedObject {
 		return $job;
 	}
 
-	// TODO Check where  sendphone,sendemail and sendsms is used and see if we eliminate them
+	// TODO Check where  sendphone,sendemail, sendsms and sendpost is used and see if we eliminate them
 	function refresh($specificfields = NULL, $refreshchildren = false) {
 		parent::refresh($specificfields, $refreshchildren);
 		$this->loadSettings();
@@ -377,11 +378,12 @@ class Job extends DBMappedObject {
 	function updatesendinfo() {
 		if(!$this->sendinfo) {
 			if($this->messagegroupid != null) {
-				$value = QuickQueryRow("select sum(type='phone') as phone, sum(type='email') as email, sum(type='sms') as sms from message where messagegroupid = ? group by messagegroupid",false,false,array($this->messagegroupid));
+				$value = QuickQueryRow("select sum(type='phone') as phone, sum(type='email') as email, sum(type='sms') as sms, sum(type='post') as post from message where messagegroupid = ? group by messagegroupid",false,false,array($this->messagegroupid));
 				if($value !== false) {
 					$this->sendphone = ($value[0] > 0);
 					$this->sendemail = ($value[1] > 0);
 					$this->sendsms = ($value[2] > 0);
+					$this->sendpost = ($value[3] > 0);
 					$this->sendinfo = true;
 				}
 			}
@@ -404,6 +406,12 @@ class Job extends DBMappedObject {
 	function hasSMS() {
 		$this->updatesendinfo();
 		return $this->sendinfo && $this->sendsms;
+	}
+	
+	// Update cache if necessary and return if this job has a message with post type
+	function hasPost() {
+		$this->updatesendinfo();
+		return $this->sendinfo && $this->sendpost;
 	}
 	
 	// update jobpost records with the new type and destinations specified

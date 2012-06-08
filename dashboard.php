@@ -111,6 +111,36 @@ function generateStats($useridList, $start_datetime, $end_datetime) {
 	return $stats;
 }
 
+//used in listcontacts as a callback for gen2cache
+function query_jobstats ($jobid) {
+	//FIXME this should use the slave
+	return QuickQueryRow("select
+		sum(rc.type='phone') as total_phone,
+		sum(rc.type='email') as total_email,
+		sum(rc.type='sms') as total_sms,
+		from reportperson rp
+		left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
+		where rp.jobid = ?", true, false, array($jobid));
+}
+
+
+function fmt_job_content($obj, $name) {
+	return "<img src=\"themes/newui/phone-grey.png\"/> <img src=\"themes/newui/email-grey.png\"/> <img src=\"themes/newui/sms-grey.png\"/> <img src=\"themes/newui/social-grey.png\"/>";
+}
+
+function fmt_job_recipients($obj, $name) {
+	$lists = QuickQueryList("select listid from joblist where jobid = ?", false, false, array($obj->id));
+	$total = 0;
+	foreach ($lists as $id) {
+		//expect the list mod date hasnt changed when using cache
+		$list = new PeopleList($id);
+		$expect = array("modifydate" => $list->modifydate);
+		$total += gen2cache(300, $expect, null, "calc_startpage_list_info", $id);
+	}
+	return $total;
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // Data
 ////////////////////////////////////////////////////////////////////////////////
@@ -124,6 +154,9 @@ $expect = QuickQuery($query, null, $useridList);
 $stats = gen2cache(60*60*24, $expect, null, "generateStats", $useridList, $start_datetime, $end_datetime);
 
 
+$jobtemplates = DBFindMany("Job", "from job where userid=? and status='template' and not deleted and type = 'notification' order by modifydate desc",false,array($USER->id));
+
+$userlinks = QuickQueryList("select subordinateuserid from userlink where userid=?",false,false,array($USER->id));
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
@@ -138,13 +171,15 @@ include("nav.inc.php");
 	<div class="wrapper">
 	
 	<div class="main_activity">
+<?if (count($userlinks)) {?>
 		<div class="users cf">
 			<p>Show activity for
-			<select>
-				<option value="">Everyone</option>
-				<option value="">Me</option>
+			<select onchange="window.location='start.php?showactivity=' + this.options[selectedIndex].value">
+				<option value="everyone">Everyone</option>
+				<option value="me">Me</option>
 			</select></p>
 		</div>
+<?}?>
 		
 		<div class="window summary">
 			<div class="window_title_wrap">
@@ -211,94 +246,32 @@ include("nav.inc.php");
 			
 			<div class="window_body_wrap">
 			<h3>In Progress <span>(Sending Now)</span></h3>
-			<table class="info">
+			<table class="info" id="activejobs">
 				<thead>
-					<tr>
-					<th>Status</th>
-					<th>Author</th>
-					<th>Subject</th>
-					<th>Rcpts.</th>
-					<th>Content</th>
-					</tr>
 				</thead>
 				<tbody>
-					<tr>
-					<td>Status</td>
-					<td>Gary Baldi</td>
-					<td>Harvest Festival Bake Sale</td>
-					<td>18659</td>
-					<td><img src="themes/newui/phone-grey.png"/> <img src="themes/newui/email-grey.png"/> <img src="themes/newui/sms-grey.png"/> <img src="themes/newui/social-grey.png"/></td>
-					</tr>
 				</tbody>
 			</table>
+			<div id="moreactivejobs"></div>
 			
 			<h3>On Deck <span>(Sending Soon)</span></h3>
-			<table class="info">
+			<table class="info" id="scheduledjobs">
 				<thead>
-					<tr>
-					<th>Scheduled For</th>
-					<th>Author</th>
-					<th>Subject</th>
-					<th>Rcpts.</th>
-					<th>Content</th>
-					</tr>
 				</thead>
 				<tbody>
-					<tr>
-					<td>Monday, 28/5/12</td>
-					<td>Davey Jones</td>
-					<td>Queens Jubilee Celebration</td>
-					<td>3761</td>
-					<td><img src="themes/newui/phone-grey.png"/> <img src="themes/newui/email-grey.png"/> <img src="themes/newui/social-grey.png"/></td>
-					</tr>
-
-					<tr>
-					<td>Friday, 1/6/12</td>
-					<td>Gary Baldi</td>
-					<td>July 4th Fundraiser</td>
-					<td>3761</td>
-					<td><img src="themes/newui/email-grey.png"/> <img src="themes/newui/sms-grey.png"/> <img src="themes/newui/social-grey.png"/></td>
-					</tr>
 				</tbody>
 			</table>
+			<div id="morescheduledjobs"></div>
 			
 			<h3>Completed <span>(Already Sent)</span></h3>
-			<table class="info">
+			<table class="info" id="completedjobs">
 				<thead>
-					<tr>
-					<th>Sent On</th>
-					<th>Author</th>
-					<th>Subject</th>
-					<th>Rcpts.</th>
-					<th>Content</th>
-					</tr>
 				</thead>
 				<tbody>
-					<tr>
-					<td>Monday, 7/6/12</td>
-					<td>Gary Baldi</td>
-					<td>Chinese Takeaway Day</td>
-					<td>1800</td>
-					<td><img src="themes/newui/phone-grey.png"/> <img src="themes/newui/email-grey.png"/> <img src="themes/newui/sms-grey.png"/> <img src="themes/newui/social-grey.png"/></td>
-					</tr>
-					
-					<tr>
-					<td>Thursday, 12/5/12</td>
-					<td>Davey Jones</td>
-					<td>May Day Bank Holiday</td>
-					<td>1800</td>
-					<td><img src="themes/newui/phone-grey.png"/> <img src="themes/newui/email-grey.png"/> <img src="themes/newui/sms-grey.png"/></td>
-					</tr>
-					
-					<tr>
-					<td>Friday, 6/4/12</td>
-					<td>Robyn Banks</td>
-					<td>April Bank Holiday dates</td>
-					<td>1800</td>
-					<td><img src="themes/newui/phone-grey.png"/> <img src="themes/newui/email-grey.png"/> <img src="themes/newui/sms-grey.png"/></td>
-					</tr>
 				</tbody>
 			</table>
+			<div id="morecompletedjobs"></div>
+			
 			</div><!-- /window_body_wrap -->
 		</div>
 	</div><!-- end main_activity -->
@@ -310,9 +283,15 @@ include("nav.inc.php");
 		<div class="templates">
 			<h3>Broadcast Templates</h3>
 			<ul>
-			<li><a href="">General Announcement</a></li>
-			<li><a href="">Snow Delay</a></li>
-			<li><a href="">School Closure</a></li>
+			<?
+			if (count($jobtemplates)) {
+				foreach($jobtemplates as $jobtemplate) {
+					echo "<li><a href=\"message_sender.php?templateid={$jobtemplate->id}\">{$jobtemplate->name}</a></li>";
+				}
+			} else {
+				echo "<li>" . _L("No Templates") . "</li>";
+			}
+			?>
 			</ul>
 		</div>
 	
@@ -323,6 +302,36 @@ include("nav.inc.php");
 	</div><!-- end main_aside -->
 	
 	</div><!-- end wrapper -->
+
+
+<script type="text/javascript">
+
+function updateMoreLink(section, action, override, start, limit, count){
+	if (count >= limit) {
+		if (override) {
+			start = 0;
+			limit += limit;
+		} else {
+			start += limit;
+		}
+		
+		$("more" + section).update(new Element("a",{href: "#", 
+			onclick: "ajax_obj_table_update('" + section + "','ajaxjob.php?action=" + action + "&start=" + start + "&limit=" + limit + "'," + override + ",updateMoreLink.curry('" + section + "','" + action + "'," + override + "," + start + "," + limit + ")); return false;"
+			}).insert("<?= _L("Show More")?>"));
+	} else {
+		$("more" + section).update("");
+	}
+}
+
+
+document.observe('dom:loaded', function() {
+	ajax_obj_table_update('activejobs','ajaxjob.php?action=activejobs&start=0&limit=10',true,updateMoreLink.curry("activejobs","activejobs",true,0,10));
+	ajax_obj_table_update('scheduledjobs','ajaxjob.php?action=scheduledjobs&start=0&limit=10',false,updateMoreLink.curry("scheduledjobs","scheduledjobs",true,0,10));
+	ajax_obj_table_update('completedjobs','ajaxjob.php?action=completedjobs&start=0&limit=10',false,updateMoreLink.curry("completedjobs","completedjobs",false,0,10));
+});
+
+</script>
+
 
 <?
 include("navbottom.inc.php");
