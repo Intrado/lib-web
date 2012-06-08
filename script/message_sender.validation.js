@@ -32,6 +32,7 @@ jQuery.noConflict();
         url: '/'+orgPath+'/api/2/users/'+userid+'/roles',
         type: "GET",
         dataType: "json",
+        async: false,
         success: function(data) {
           setUp(data.roles); // Send Data over to the function setUp();
        }
@@ -42,13 +43,71 @@ jQuery.noConflict();
       The setUp function will do alot of the inital work, and call other functions based on users roles
     -- */
 
-
-
     function setUp(roleData) {
       if(!$.isArray(roleData)) {
         alert("error");
         return false;
       }
+
+
+      // get the organization settings options
+      function getOptions(){
+        orgOptions = {};
+        $.ajax({
+          url: '/'+orgPath+'/api/2/organizations/'+orgid+'/settings/options',
+          type: "GET",
+          dataType: "json",
+          async: false,
+          success: function(data){
+            var options = data.options;
+            $.each(options, function(oIndex, oItem) {
+              orgOptions[oItem.name] = oItem.value;
+            });
+          }
+        });
+      };
+
+
+      function getLanguages(){
+
+        langCodes = "";
+
+        nLangs = {};
+
+        $.ajax({
+            url: '/'+orgPath+'/api/2/organizations/'+orgid+'/languages',
+            type: "GET",
+            dataType: "json",
+            async: false,
+            success: function(data) {
+             languages = data.languages;
+
+              $.each(languages, function(lIndex, lData) {
+
+                var lCodes = lData.code;
+
+                nLangs[lCodes] = lData.name;
+
+                var lCodes = lData.code;
+                if (lCodes != "en") {
+                  if (langCodes == "") {
+                    langCodes = lCodes;
+                  } else {
+                    langCodes = langCodes + '|' + lCodes;
+                  }
+                }
+
+              });
+
+           }
+        });
+
+      };
+
+
+      // call the functions
+      getOptions();
+      getLanguages();
 
 
       userPermissions = {};
@@ -170,6 +229,24 @@ jQuery.noConflict();
         j('#msgsndr_form_days').append('<option value="'+i+'">'+i+'</option>');
       };
 
+
+      // Caller id
+
+      
+/*
+      // check for hascallback in the system settings
+      callerIdPrefs = {};
+      if (typeof orgOptions._hascallback == 'undefined') {
+        
+        if (typeof orgOptions.requireapprovedcallerid == 'undefined'){
+          callerIdPrefs[] = 'select';
+        }
+
+      } else {
+        
+      }
+      
+*/
 
 
       // Easy Call jQuery Plugin
@@ -343,42 +420,7 @@ jQuery.noConflict();
     
     *****/
 
-    function getLanguages(){
 
-      langCodes = "";
-
-      nLangs = {};
-
-      $.ajax({
-          url: '/'+orgPath+'/api/2/organizations/'+orgid+'/languages',
-          type: "GET",
-          dataType: "json",
-          success: function(data) {
-           languages = data.languages;
-
-            $.each(languages, function(lIndex, lData) {
-
-              var lCodes = lData.code;
-
-              nLangs[lCodes] = lData.name;
-
-              var lCodes = lData.code;
-              if (lCodes != "en") {
-                if (langCodes == "") {
-                  langCodes = lCodes;
-                } else {
-                  langCodes = langCodes + '|' + lCodes;
-                }
-              }
-
-            });
-
-         }
-      });
-
-    };
-
-    getLanguages();
 
 
     function doTranslate(langCodes,txtField,displayArea) {
