@@ -147,12 +147,9 @@ jQuery.noConflict();
 		// Translations Toggle
 		$('.translations').on('click', "input", function() {
 
-			console.log('bo');
-
 			$(this).next('.controls').toggleClass('hide');
 
 			// $('#'+tArea).slideToggle();
-
 
 		});
 

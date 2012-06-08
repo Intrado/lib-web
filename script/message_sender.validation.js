@@ -862,7 +862,6 @@ jQuery.noConflict();
           $.each(allMessages, function(mIndex, mData) {
 
             var msgParts = getMessagePartsFormatted(msgGrpId,mData.id);
-            console.log(msgParts);
             mData['msgFormatted'] = msgParts;
 
           });
