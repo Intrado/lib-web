@@ -284,8 +284,7 @@ function show_user_table($containerID) {
 			var searchBox = $('{$containerID}_search');
 			searchBox.value = '".addslashes($filterValue)."'.unescapeHTML();
 			blankFieldValue('{$containerID}_search', searchLabel);
-			searchBox.focus();
-			searchBox.blur();
+
 
 			Event.observe(searchBox, 'keypress', function(event) {
 				if (Event.KEY_RETURN == event.keyCode)
