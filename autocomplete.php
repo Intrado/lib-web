@@ -2,10 +2,11 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
+
+$SESSION_READONLY = true;
+
 require_once("inc/common.inc.php");
 require_once("inc/utils.inc.php");
-
-session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 
 ?>
 <ul>
