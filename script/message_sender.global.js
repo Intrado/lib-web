@@ -180,7 +180,6 @@
       j('.review_type p').text(j('#msgsndr_form_type option:selected').text());
       j('.review_count p').text('2,134');
 
-      afterGetPrefs = function() {
 
         document.formvars['broadcast']['schedulecallearly'] = [
           new document.validators["ValTimeCheck"]("schedulecallearly","Early",{min:userPrefs.callearly,max:userPrefs.calllate}), 
@@ -212,15 +211,15 @@
         var earlyProfile  = userPermissions.callearly;
         var earlyPref     = userPrefs.callearly;
 
-        if ( typeof earlyProfile == "undefined" && typeof earlyPref == "undefined") {
+        if ( typeof(earlyProfile) == "undefined" && typeof(earlyPref) == "undefined") {
           var callearly = "8:00 am";
-        } else if (typeof earlyPref != "undefined" && typeof earlyProfile != "undefined") {
+        } else if (typeof(earlyPref) != "undefined" && typeof(earlyProfile) != "undefined") {
           if (Date(earlyPref) < Date(earlyProfile)) {
             var callearly = earlyProfile;
           } else {
             var callearly = earlyPref;
           }
-        } else if (typeof earlyPref != "undefined") {
+        } else if (typeof(earlyPref) != "undefined") {
           var callearly = earlyPref;
         } else {
           var callearly = earlyProfile;
@@ -231,20 +230,19 @@
         var lateProfile   = userPermissions.calllate;
         var latePref      = userPrefs.calllate;
 
-        if ( typeof lateProfile == "undefined" && typeof latePref == "undefined") {
-          var calllate = "8:00 am";
-        } else if (typeof latePref != "undefined" && typeof lateProfile != "undefined") {
+        if ( typeof(lateProfile) == "undefined" && typeof(latePref) == "undefined") {
+          var calllate = "5:00 pm";
+        } else if (typeof latePref != "undefined" && typeof(lateProfile) != "undefined") {
           if (Date(latePref) < Date(lateProfile)) {
             var calllate = lateProfile;
           } else {
             var calllate = latePref;
           }
-        } else if (typeof latePref != "undefined") {
+        } else if (typeof(latePref) != "undefined") {
           var calllate = latePref;
         } else {
           var calllate = lateProfile;
         }
-
 
         j('#schedulecallearly option[value="'+callearly+'"]').attr('selected','selected');
         j('#schedulecalllate option[value="'+calllate+'"]').attr('selected','selected');
@@ -255,10 +253,6 @@
         for(i=1;i<=maxAttempts;i++) {
           j('#msgsndr_form_maxattempts').append('<option value="'+i+'">'+i+'</option>');
         };
-
-      };
-
-      this.getUserPrefs(afterGetPrefs);
 
     }
 
@@ -378,33 +372,6 @@
       return j('#'+elemName).val();
 
     }
-
-
-
-
-    // get user preferences ...
-    this.getUserPrefs = function(callback){
-
-      userPrefs = {};
-      
-      j.ajax({
-        url: '/'+orgPath+'/api/2/users/'+userid+'/preferences',
-        type: "GET",
-        dataType: "json",
-        success: function(data) {
-
-          j.each(data.preferences, function(uIndex, uPrefs){
-            userPrefs[uPrefs.name] = uPrefs.value;
-          });
-
-          callback();
-        }
-      });
-  
-      //return userPrefs;
-  
-    };
-
 
 
 

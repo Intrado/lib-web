@@ -103,10 +103,34 @@ jQuery.noConflict();
 
       };
 
+    // get user preferences ...
+    function getUserPrefs() {
+
+      userPrefs = {};
+      
+      j.ajax({
+        url: '/'+orgPath+'/api/2/users/'+userid+'/preferences',
+        type: "GET",
+        dataType: "json",
+        success: function(data) {
+
+          j.each(data.preferences, function(uIndex, uPrefs){
+            userPrefs[uPrefs.name] = uPrefs.value;
+          });
+
+          // callback();
+        }
+      });
+  
+      //return userPrefs;
+  
+    };
+
 
       // call the functions
       getOptions();
       getLanguages();
+      getUserPrefs();
 
 
       userPermissions = {};
