@@ -691,8 +691,12 @@
 						</select>
 						<span class="error"></span>
 					</div>
-				</fieldset>				
+				</fieldset>
 			</div><!-- field_wrapper -->
+			<div class="msg_confirm">
+				<button data-dismiss="modal">Cancel</button>
+				<button class="btn_confirm" data-dismiss="modal" id="send_new_broadcast">Send to 2,134 Recipients</button>
+			</div>	
 			</div><!-- schedule_options -->
 
 
