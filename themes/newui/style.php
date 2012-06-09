@@ -16,11 +16,15 @@ body { background: #F5F3F0 url(themes/newui/bodybg.png) repeat; font-family: "He
 p { color: #333; font-size: 14px; line-height: 22px; margin: 0 0 11px 0; }
 a, a:visited { color: #0088CC; }
 a:hover { color: #005580; text-decoration: underline; }
-.hide { display: none; }
+
 h1, h2, h3, h4, h5, h6 { font-family: "Helvetica Neue",helvetica,Arial,sans-serif; color: #333333; font-weight: bold; margin: 0; text-rendering: optimizelegibility; }
 h2 { font-size: 24px; line-height: 44px; text-shadow: 0 1px 0 #fff; }
 h3 { line-height: 33px; }
 h4 { font-size: 12px; line-height: 22px; color: #235563; text-shadow: 0 1px 0 #fff; }
+
+.hide { display: none; }
+.light { color: #999; }
+.lighten { opacity: 0.5;}
 
 .content_wrap { position: relative; margin: 0; padding: 25px 0 0; }
 .container { position: relative; max-width: 95em; margin: 0 auto; padding: 0 10px; }
@@ -728,11 +732,6 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
 .table-bordered th + th, .table-bordered td + td, .table-bordered th + td, .table-bordered td + th {
 	border-left: 1px solid #DDDDDD;
 }
-
-/*----- global/helper classes -----*/
-
-.light { color: #999; }
-.lighten { opacity: 0.5;}
 
 /*----- Bootstrap modal styles -----*/
 

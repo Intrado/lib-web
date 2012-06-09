@@ -104,7 +104,7 @@ html { font-size: 100%; overflow-y: scroll; -webkit-text-size-adjust: 100%; -ms-
 body { margin: 0; font-size: 0.75em; line-height: 1.231; }
 body, input, select, textarea, button { font-family: Verdana, "Helvetica Neue", helvetica,  Arial, sans-serif; color: #444 /* <?=$primary?> */ ; }
 
-a { color: <?=$primary?>; text-decoration: none; }
+a, a:visited { color: <?=$primary?>; text-decoration: none; }
 a:hover { color: <?=$theme1?>; }
 a:focus { outline: thin dotted; }
 a:hover, a:active { outline: 0; }
