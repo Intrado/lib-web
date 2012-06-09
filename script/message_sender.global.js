@@ -233,7 +233,7 @@
         if ( typeof(lateProfile) == "undefined" && typeof(latePref) == "undefined") {
           var calllate = "5:00 pm";
         } else if (typeof latePref != "undefined" && typeof(lateProfile) != "undefined") {
-          if (Date(latePref) < Date(lateProfile)) {
+          if (Date(latePref) > Date(lateProfile)) {
             var calllate = lateProfile;
           } else {
             var calllate = latePref;
