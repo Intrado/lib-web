@@ -70,8 +70,9 @@ jQuery.noConflict();
 
       function getLanguages(){
 
-        langCodes = "";
-        nLangs = {};
+        ttslangCodes   = "";
+        elangCodes    = "";
+        nLangs        = {};
 
         $.ajax({
             url: '/'+orgPath+'/api/2/organizations/'+orgid+'/languages',
@@ -84,15 +85,35 @@ jQuery.noConflict();
               $.each(languages, function(lIndex, lData) {
 
                 var lCodes = lData.code;
-
                 nLangs[lCodes] = lData.name;
+                var voices = lData.voices;
 
-                var lCodes = lData.code;
+                /*
+                  If languages has voices then add code to ttlangcodes as well as elangcodes
+                  if voices is undefined only add code to elangcodes
+                */
+
                 if (lCodes != "en") {
-                  if (langCodes == "") {
-                    langCodes = lCodes;
+                  if (typeof (voices) != "undefined") {
+
+                    if (ttslangCodes == "") {
+                      ttslangCodes = lCodes;
+                      if (elangCodes == "") {
+                        elangCodes = lCodes;
+                      }
+                    } else {
+                      ttslangCodes = ttslangCodes + '|' + lCodes;
+                      elangCodes   = elangCodes + '|' + lCodes;
+                    }
+
                   } else {
-                    langCodes = langCodes + '|' + lCodes;
+
+                    if (elangCodes == "") {
+                      elangCodes = lCodes;
+                    } else {
+                      elangCodes = elangCodes + '|' + lCodes;
+                    }
+
                   }
                 }
 
@@ -263,14 +284,13 @@ jQuery.noConflict();
           var displayArea   = $(this).attr('data-display');
           var msgType       = 'tts'
 
-          // $(this).attr('disabled','disabled');
-          doTranslate(langCodes,txtField,displayArea,msgType);
+          doTranslate(ttslangCodes,txtField,displayArea,msgType);
 
         }
       });
 
 
-      var splitlangCodes = langCodes.split('|');
+      var splitlangCodes = ttslangCodes.split('|');
       var langCount = splitlangCodes.length;
 
       if (langCount == 1) {
@@ -283,7 +303,7 @@ jQuery.noConflict();
 
         var langCode = splitlangCodes[transIndex];
 
-        $('#tts_translate').append('<fieldset><label for="tts_'+nLangs[langCode]+'">'+nLangs[langCode]+'</label><input type="checkbox" /><div class="controls hide"><textarea id="tts_'+nLangs[langCode]+'"></textarea><button class="playAudio" data-text="tts_'+nLangs[langCode]+'" data-code="'+langCode+'"><span class="icon play"></span> Play Audio</button></div></fieldset>');
+        $('#tts_translate').append('<fieldset><input type="checkbox" checked="checked" /><label for="tts_'+nLangs[langCode]+'">'+nLangs[langCode]+'</label><div class="controls"><textarea id="tts_'+nLangs[langCode]+'"></textarea><button class="playAudio" data-text="tts_'+nLangs[langCode]+'" data-code="'+langCode+'"><span class="icon play"></span> Play Audio</button><button class="retranslate" data-code="'+langCode+'">Show In English</button><input type="checkbox" name="tts_override_'+langCode+'" id="tts_override_'+langCode+'" /><label for="tts_override_'+langCode+'">Override Translation</label></div></fieldset>');
       });
 
 
@@ -421,12 +441,12 @@ jQuery.noConflict();
           var msgType       = 'email';
 
           // $(this).attr('disabled','disabled');
-          doTranslate(langCodes,txtField,displayArea,msgType);
+          doTranslate(elangCodes,txtField,displayArea,msgType);
 
         }
       });
 
-      var splitlangCodes = langCodes.split('|');
+      var splitlangCodes = elangCodes.split('|');
       var langCount = splitlangCodes.length;
 
       if (langCount == 1) {
@@ -439,7 +459,7 @@ jQuery.noConflict();
 
         var langCode = splitlangCodes[transIndex];
 
-        $('#email_translate').append('<fieldset><label for="email_'+nLangs[langCode]+'">'+nLangs[langCode]+'</label><input type="checkbox" /><div class="controls hide"><textarea disabled id="email_'+nLangs[langCode]+'"></textarea></div></fieldset>');
+        $('#email_translate').append('<fieldset><input type="checkbox" checked="checked" /><label for="email_'+nLangs[langCode]+'">'+nLangs[langCode]+'</label><div class="controls"><textarea disabled id="email_'+nLangs[langCode]+'"></textarea></div></fieldset>');
       });
 
 
