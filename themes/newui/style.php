@@ -14,7 +14,7 @@
 /*----- basics -----*/
 body { background: #F5F3F0 url(themes/newui/bodybg.png) repeat; font-family: "Helvetica Neue",helvetica,Arial,sans-serif; }
 p { color: #333; font-size: 14px; line-height: 22px; margin: 0 0 11px 0; }
-a, a:visited { color: #0088CC; }
+a { color: #0088CC; }
 a:hover { color: #005580; text-decoration: underline; }
 
 h1, h2, h3, h4, h5, h6 { font-family: "Helvetica Neue",helvetica,Arial,sans-serif; color: #333333; font-weight: bold; margin: 0; text-rendering: optimizelegibility; }
