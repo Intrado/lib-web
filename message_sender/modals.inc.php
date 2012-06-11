@@ -31,11 +31,11 @@
 		<thead>
 			<tr>
 			<th>Title</th>
-			<th>Created</th>
-			<th><img src="themes/newui/phone.png" alt=""/></th>
-			<th><img src="themes/newui/email.png" alt=""/></th>
-			<th><img src="themes/newui/sms.png" alt=""/></th>
-			<th><img src="themes/newui/social.png" alt=""/></th>
+			<th class="created">Created</th>
+			<th class="ico"><img src="themes/newui/phone.png" alt=""/></th>
+			<th class="ico"><img src="themes/newui/email.png" alt=""/></th>
+			<th class="ico"><img src="themes/newui/sms.png" alt=""/></th>
+			<th class="ico"><img src="themes/newui/social.png" alt=""/></th>
 			</tr>
 		</thead>
 	</table>

@@ -231,6 +231,7 @@ border-color: transparent transparent transparent #2C5715; border-width: 26px; b
 border-color: transparent transparent transparent #3A5F27; border-width: 25px; border-style: solid; }
 .msg_steps li.complete + li a:before { content: ''; position: absolute; top: 50%; left: 0; display: block; margin-top: -26px; 
 border-color: transparent transparent transparent #111111; border-width: 26px; border-style: solid; }
+.msg_steps li.complete a:hover { color: #f2f2f2; }
 .msg_steps li.complete a:hover span.icon { background: #4B9523 url(themes/newui/pen.png) 7px 7px no-repeat; }
 
 .msg_steps li.active:after { content: ''; position: absolute; bottom: -16px; left: 50%; display: block; margin-left: -12px; 
@@ -330,13 +331,15 @@ table.info tfoot { border-top: 1px solid #000; }
 
 table.messages { width: 100%; margin: 0; font-size: 14px; line-height: 36px; border-bottom: 1px solid #ddd; border-left: 1px solid #ddd; border-right: 1px solid #ddd; }
 table.messages.head { margin: 10px 0 0 0;}
-table.messages th { background: #eee; padding: 0 8px;}
+table.messages th { background: #eee; padding: 0 8px; }
+table.messages .ico { width: 40px; text-align: center; }
+table.messages .created { width: 90px; }
 table.messages th, table.messages td { font-size: 14px; text-align: left; border-top: 1px solid #ddd; cursor: pointer; }
 table.messages td { padding: 0 8px; border-bottom: 1px solid #ccc; }
 table.messages tr:hover td { background: #e1eaf4; border-top: 1px solid #8cb2e0; }
 tr.selected { background: rgb(228, 225, 153); }
 table.messages tr.selected:hover td { background: rgb(228, 224, 187);  }
-table.messages span.icon { background: url(themes/newui/dktick.png) 0 11px no-repeat; display: block; text-indent: -9999px; }
+table.messages span.icon { background: url(themes/newui/dktick.png) 50% 11px no-repeat; display: block; text-indent: -9999px; }
 
 .scroll {
   max-height: 250px;
