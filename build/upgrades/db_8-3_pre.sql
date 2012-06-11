@@ -133,6 +133,3 @@ CREATE TABLE `reportemaildelivery` (
   KEY `user` (`timestamp`,`userid`)
 ) ENGINE=InnoDB AUTO_INCREMENT=17838 DEFAULT CHARSET=utf8
 $$$
-
-update setting set value='8.3/10' where name='_dbversion'
-$$$
