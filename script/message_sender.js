@@ -173,6 +173,13 @@ jQuery.noConflict();
       }
 
     });
+    
+    // new datepicker for scheduling
+    $(function() {
+		$( "#datepicker" ).datepicker({
+			minDate: 0 
+		});
+	});
   
 
 

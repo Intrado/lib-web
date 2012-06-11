@@ -93,7 +93,7 @@
 				<fieldset class="cf">
 					<label for="scheduledate">Start Date</label>
 					<div class="controls">
-						<input type="text" id="scheduledate" name="broadcast_scheduledate" data-ajax="true" />
+						<input type="text" id="datepicker" name="broadcast_scheduledate" data-ajax="true" />
 					</div>
 				</fieldset>
 				
