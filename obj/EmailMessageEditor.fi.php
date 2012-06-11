@@ -74,7 +74,7 @@ class EmailMessageEditor extends FormItem {
 			</div>';
 		
 		// main containers
-		$str .= '
+		$str = '
 			<div class="email">
 				<div class="maincontainerleft">
 					'.$textarea.'
