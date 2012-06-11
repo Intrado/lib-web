@@ -231,44 +231,33 @@ Validator::load_validators(array(
 
 <script src="script/bootstrap-modal.js"></script>
 
-
-<script src="script/datepicker.js"></script>
 <script type="text/javascript">
-var dpck_fieldname = new DatePicker({
-	relative:"scheduledate",
-	keepFieldEmpty:true,
-	language:"en",
-	enableCloseOnBlur:1,
-	topOffset:20,
-	zindex: 99999
-	,dateFilter:DatePickerUtils.noDatesBefore(0)
-});
 
 
-				$("msgsndr_tts_message").observe("change", textAreaPhone_storedata.curry("messagePhoneText_message"));
-				$("msgsndr_tts_message").observe("blur", textAreaPhone_storedata.curry("messagePhoneText_message"));
-				$("msgsndr_tts_message").observe("keyup", textAreaPhone_storedata.curry("messagePhoneText_message"));
-				$("msgsndr_tts_message").observe("focus", textAreaPhone_storedata.curry("messagePhoneText_message"));
-				$("msgsndr_tts_message").observe("click", textAreaPhone_storedata.curry("messagePhoneText_message"));
-				// $("messagePhoneText_message-female").observe("click", textAreaPhone_storedata.curry("messagePhoneText_message"));
-				// $("messagePhoneText_message-male").observe("click", textAreaPhone_storedata.curry("messagePhoneText_message"));
+		$("msgsndr_tts_message").observe("change", textAreaPhone_storedata.curry("messagePhoneText_message"));
+		$("msgsndr_tts_message").observe("blur", textAreaPhone_storedata.curry("messagePhoneText_message"));
+		$("msgsndr_tts_message").observe("keyup", textAreaPhone_storedata.curry("messagePhoneText_message"));
+		$("msgsndr_tts_message").observe("focus", textAreaPhone_storedata.curry("messagePhoneText_message"));
+		$("msgsndr_tts_message").observe("click", textAreaPhone_storedata.curry("messagePhoneText_message"));
+		// $("messagePhoneText_message-female").observe("click", textAreaPhone_storedata.curry("messagePhoneText_message"));
+		// $("messagePhoneText_message-male").observe("click", textAreaPhone_storedata.curry("messagePhoneText_message"));
 
-				var textAreaPhone_keyupTimer = null;
-				function textAreaPhone_storedata(formitem, event) {
-					var form = event.findElement("form");
-					if (textAreaPhone_keyupTimer) {
-						window.clearTimeout(textAreaPhone_keyupTimer);
-					}
-					textAreaPhone_keyupTimer = window.setTimeout(function () {
-							var val = $(formitem).value.evalJSON();
-							val.text = $("msgsndr_tts_message").value;
-							val.gender = ($(formitem+"-female").checked?"female":"male");
-							$(formitem).value = Object.toJSON(val);
-							//form_do_validation(form, $(formitem));
-						},
-						event.type == "keyup" ? 500 : 100
-					);
-				}
+		var textAreaPhone_keyupTimer = null;
+		function textAreaPhone_storedata(formitem, event) {
+			var form = event.findElement("form");
+			if (textAreaPhone_keyupTimer) {
+				window.clearTimeout(textAreaPhone_keyupTimer);
+			}
+			textAreaPhone_keyupTimer = window.setTimeout(function () {
+					var val = $(formitem).value.evalJSON();
+					val.text = $("msgsndr_tts_message").value;
+					val.gender = ($(formitem+"-female").checked?"female":"male");
+					$(formitem).value = Object.toJSON(val);
+					//form_do_validation(form, $(formitem));
+				},
+				event.type == "keyup" ? 500 : 100
+			);
+		}
 
 		var showPreview = function(post_parameters,get_parameters){
 			var modal = new ModalWrapper("Loading...",false,false);
