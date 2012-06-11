@@ -229,7 +229,7 @@ Validator::load_validators(array(
 
 
 <script src="script/bootstrap-modal.js"></script>
-<script src="script/bootstrap-tooltip.js"></script>
+<!-- <script src="script/bootstrap-tooltip.js"></script> -->
 <script src="script/bootstrap-dropdown.js"></script>
 
 <script type="text/javascript">
@@ -351,7 +351,7 @@ jQuery.noConflict();
   $(function() {
 		// List Picker
 		$('.add-recipients').listPicker({
-			prepickedListIds: ["1", "2"]
+			prepickedListIds: ["41"]
 		});
   });
 }) (jQuery);

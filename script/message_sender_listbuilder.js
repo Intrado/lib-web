@@ -785,7 +785,8 @@
                     base.modals.saveList.$el.modal('show');
                 };
 
-                $action.tooltip('hide');
+                // TODO: comment out tooltips for now. Have to find the issue with CSS causing positioning issues
+                //$action.tooltip('hide');
                 base.buildTable();
                 return false;
             });
@@ -809,9 +810,9 @@
 
                     // If this list is saved, no save icon, else, show save icon
                     if (base.lists[id].isSaved) {
-                        rows = rows + '<tr data-list-id="' + id + '"><td><a rel="tooltip" title="Remove List" class="action remove" href="#"><i class="icon-remove"></i></a></td><td>' + base.lists[id].stats.name + '</td><td>' + base.lists[id].stats.total + '</td></tr>';
+                        rows = rows + '<tr data-list-id="' + id + '"><td><a rel="tooltip" title="Remove List" class="action remove" href="#"><i class="icon-remove" title="Remove List"></i></a></td><td>' + base.lists[id].stats.name + '</td><td>' + base.lists[id].stats.total + '</td></tr>';
                     } else {
-                        rows = rows + '<tr data-list-id="' + id + '"><td><a rel="tooltip" title="Remove List" class="action remove" href="#"><i class="icon-remove"></i></a><a rel="tooltip" title="Save List" class="action save" data-toggle="modal" href="#modal-save-list"><i class="icon-folder-open"></i></a></td><td>' + base.lists[id].stats.name + '</td><td>' + base.lists[id].stats.total + '</td></tr>';
+                        rows = rows + '<tr data-list-id="' + id + '"><td><a rel="tooltip" title="Remove List" class="action remove" href="#"><i class="icon-remove" title="Remove List"></i></a><a rel="tooltip" title="Save List" class="action save" data-toggle="modal" href="#modal-save-list"><i class="icon-folder-open" title="Save List"></i></a></td><td>' + base.lists[id].stats.name + '</td><td>' + base.lists[id].stats.total + '</td></tr>';
                     };
                 };
             });
@@ -822,8 +823,9 @@
             // Add the rows to the table
             $listTable.find('tbody').html(rows);
 
+            // TODO: comment out tooltips for now. Have to find the issue with CSS causing positioning issues
             // Activate new tooltips
-            base.$el.find('[rel=tooltip]').tooltip();
+            //base.$el.find('[rel=tooltip]').tooltip();
 
             // Cache the sum
             base.numRecipients = sum;
