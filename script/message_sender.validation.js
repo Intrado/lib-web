@@ -730,8 +730,9 @@ jQuery.noConflict();
         "lists_listids":"msgsndr_listids", // check what this is in the new listpicker, currently passing in test data
         "has_phone":"msgsndr_hasphone", // true/false
         "phone_type":"msgsndr_phonemessagetype", // callme or text
-        "phone_voiceresponse":"msgsndr_phonemessagepost", // true/false
-        "phone_callconfirmation":"msgsndr_phonemessagecallme",
+        "phone_number":"msgsndr_phonemessagecallme", // callme messages object
+        //"phone_voiceresponse":"", // true/false
+        "phone_callconfirmation":"msgsndr_phonemessagepost",// true/false
         "phone_text":"msgsndr_phonemessagetext",
         "phone_translate":"msgsndr_phonemessagetexttranslate", // true/false
         "phone_translation_es":"msgsndr_phonemessagetexttranslateestext", //translations example
@@ -778,21 +779,11 @@ jQuery.noConflict();
           // make checkboxes true or false
           if(thisType == 'checkbox'){
             if($(this).attr('checked') == 'checked'){
-              sendData[thisKey] = 'true';
-            } else {
-              sendData[thisKey] = 'false';
-            }
+              sendData[thisKey] = 'checked';
+            } 
           } else {
             sendData[thisKey] = $(this).val();
           }
-
-          // check for tts messages ...
-          /*
-          if (thisKey = 'msgsndr_emailmessagesubject'){
-            sendData[thisKey] = saveHtmlEditorContent();
-          }
-          */
-         
         }
       });
       // add in the submit ...
