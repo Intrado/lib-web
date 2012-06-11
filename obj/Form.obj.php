@@ -40,6 +40,7 @@ class Form {
 		if (!isset($_REQUEST['form']) || $_REQUEST['form'] != $this->name)
 			return false; //nothing to do
 		
+		//single item ajax validation call
 		if (isset($_REQUEST['ajaxvalidator'])) {
 
 			// NOTE: maintaing previous behavior while removing errors from httpd log files. See bug:4606
@@ -119,6 +120,8 @@ class Form {
 					}
 				}
 			}
+			
+			$this->preValidation();
 
 			$errors = $this->validate();
 
@@ -136,6 +139,15 @@ class Form {
 		}
 
 		return false;
+	}
+	
+	
+	function markRequired($item) {
+		array_unshift($this->formdata[$item]['valiators'], array("ValRequired"));
+	}
+	
+	function preValidation() {
+		//do nothing
 	}
 
 	function renderJavascript() {
