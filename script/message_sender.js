@@ -122,8 +122,6 @@ jQuery.noConflict();
 			var etarget = $(this).attr('data-target');
 			$(etarget).slideToggle();
 
-			offset = $(this).offset();
-				$('html, body').animate({scrollTop: offset.top },500);
 
 		});
 
