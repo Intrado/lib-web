@@ -193,7 +193,7 @@ navshortcut is floated right and has default styles for all themes, links inside
 .navshortcut { float: right; display: inline;  }
 .shortcuts { font-size: 12px; background: #fff; }
 .shortcuttitle { background: #d9d9d9; color: #212121; font-size: 13px; margin: 0 1px; padding: 5px 10px; border-bottom: 1px solid #fff; }
-.shortcuts a, .shortcuts a:visited { background: #f1f1f1; margin: 0 1px; padding: 5px 10px; display: block; color: #333; border-bottom: 1px solid #fff; }
+.shortcuts a { background: #f1f1f1; margin: 0 1px; padding: 5px 10px; display: block; color: #333; border-bottom: 1px solid #fff; }
 .shortcuts a:hover { background: #b3b3b3; color: #333; text-decoration: none; }
 
 /*-----
@@ -279,7 +279,7 @@ table.window_body { width: 100%; }
 
 /*----- Buttons, for buttons within the windows and tables, further styling is in the specific theme file for each theme -----*/
    
-button { color: <?=$primary?>; }
+button { color: <?=$primary?>; background: none; border: none; margin: none; padding: none; }
 .btn { padding: 0; border: none;/* background: transparent;*/ font-weight: bold; cursor: pointer; }
 .btn_wrap { white-space: nowrap; position: relative; display: block; } 
 .btn_left, 
