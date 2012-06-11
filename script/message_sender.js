@@ -53,7 +53,7 @@ jQuery.noConflict();
 			if (elm[2] == "phone") {
 
 				// Show paste from email button if text-to-speech is clicked and emailData is not empty
-				var emailBody = $('#cke_reusableckeditor iframe').contents().find('body').text();
+				var emailBody = CKEDITOR.instances.reusableckeditor.document.$.body.innerText;
 				if (emailBody != '') {
 					$('button.paste-from').removeClass('hidden');
 				}
