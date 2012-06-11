@@ -107,3 +107,32 @@ CREATE TABLE `userlink` (
   PRIMARY KEY (`userid`,`subordinateuserid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
+
+
+-- $rev 10
+
+CREATE TABLE `reportemaildelivery` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `timestamp` bigint(20) NOT NULL,
+  `jobid` int(11) DEFAULT NULL,
+  `personid` int(11) DEFAULT NULL,
+  `userid` int(11) DEFAULT NULL,
+  `sequence` int(11) DEFAULT NULL,
+  `replytoname` varchar(100) NOT NULL,
+  `replytodomain` varchar(100) NOT NULL,
+  `recipientname` varchar(100) NOT NULL,
+  `recipientdomain` varchar(100) NOT NULL,
+  `statuscode` smallint(4) unsigned NOT NULL,
+  `responsetext` text NOT NULL,
+  `recordsource` enum('customer_job','contact_manager','password_reset','report_subscription','subscriber_expiration','cm_password_reset','job_monitor','internal_monitoring') DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `time` (`timestamp`),
+  KEY `recipient` (`timestamp`,`recipientname`,`recipientdomain`),
+  KEY `status` (`timestamp`,`statuscode`),
+  KEY `source` (`timestamp`,`recordsource`),
+  KEY `user` (`timestamp`,`userid`)
+) ENGINE=InnoDB AUTO_INCREMENT=17838 DEFAULT CHARSET=utf8
+$$$
+
+update setting set value='8.3/10' where name='_dbversion'
+$$$
