@@ -121,7 +121,7 @@ jQuery.noConflict();
 
 			var etarget = $(this).attr('data-target');
 			$(etarget).slideToggle();
-
+			$(this).toggleClass('active');
 
 		});
 
