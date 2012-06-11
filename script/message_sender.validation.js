@@ -623,7 +623,12 @@ jQuery.noConflict();
 
     function doTranslate(langCodes,txtField,displayArea,msgType) {
 
-      var transTxt = txtField;
+      var transTxt = makeTranslatableString(txtField);
+
+      function makeTranslatableString(str) {
+        return str.replace(/(<<.*?>>)/g, '<input value="$1"/>').replace(/({{.*?}})/g, '<input value="$1"/>').replace(/(\[\[.*?\]\])/g, '<input value="$1"/>');
+      }
+
       var transURL = 'translate.php?english='+transTxt+'&languages='+langCodes;
 
       var splitlangCodes = langCodes.split('|');
