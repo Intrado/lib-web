@@ -347,11 +347,11 @@ jQuery.noConflict();
         var checkedState  = $(this).attr('checked');
 
         // Attached current translated text to the jQuery data object, so we can revert back to it
-        $.data(this, 'translatedtext', $('#tts_translated_'+langCode).val());
 
-        var originalTranslated = 'This was the original translated text';
+
 
         if (typeof (checkedState) != "undefined" ) {
+          $(this).data('translatedtext', $('#tts_translated_'+langCode).val());
           $('#tts_translated_'+langCode).removeAttr('disabled');
         } else {
           
@@ -362,7 +362,8 @@ jQuery.noConflict();
           } else {
             //$('#tts_translated_'+langCode)
             $('#tts_translated_'+langCode).attr('disabled','disbaled');
-            $('#tts_translated_'+langCode).val($.data(this, 'translatedtext'));
+            $('#tts_translated_'+langCode).val($(this).data('translatedtext'));
+
           }
         }
 
