@@ -15,7 +15,7 @@ jQuery.noConflict();
 
 
     $('.error').hide();
-
+    // set the corresponding object here for any new validators
     document.formvars = {
       broadcast: {
         subject:    { }
@@ -30,12 +30,17 @@ jQuery.noConflict();
 
 
     // Initial Call
+    orgid = false;
+
     $.ajax({
         url: '/'+orgPath+'/api/2/users/'+userid+'/roles',
         type: "GET",
         dataType: "json",
         async: false,
         success: function(data) {
+          // set the orgid from the very first set of role permissions
+          orgid = data.roles[0].organization.id;
+
           setUp(data.roles); // Send Data over to the function setUp();
        }
     });
@@ -397,7 +402,7 @@ jQuery.noConflict();
             callerIds = data.callerids;
             // if the ajax call returns no numbers or nothing, get the default callerid...
             if (callerIds == false || callerIds.length == 0) {
-              callerIds = getDefaultCallerId();
+              callerIds = [getDefaultCallerId()];
             }
           }
         });
@@ -722,14 +727,14 @@ jQuery.noConflict();
         "addme_phone":"msgsndr_addmephone",
         "addme_email":"msgsndr_addmeemail",
         "addme_sms":"msgsndr_addmesms",
-        "":"msgsndr_listids", // check what this is in the new listpicker
+        "lists_listids":"msgsndr_listids", // check what this is in the new listpicker, currently passing in test data
         "has_phone":"msgsndr_hasphone", // true/false
         "phone_type":"msgsndr_phonemessagetype", // callme or text
         "phone_voiceresponse":"msgsndr_phonemessagepost", // true/false
         "phone_callconfirmation":"msgsndr_phonemessagecallme",
         "phone_text":"msgsndr_phonemessagetext",
         "phone_translate":"msgsndr_phonemessagetexttranslate", // true/false
-        "phone_translation_es":"msgsndr_phonemessagetexttranslateestext",
+        "phone_translation_es":"msgsndr_phonemessagetexttranslateestext", //translations example
         // need to account for at least all tts languages, if not all of them
         "has_email":"msgsndr_hasemail", // true/false
         "email_name":"msgsndr_emailmessagefromname",
@@ -738,8 +743,8 @@ jQuery.noConflict();
         "email_attachment":"msgsndr_emailmessageattachment",
         "email_message":"msgsndr_emailmessagetext", // data from CK editor panel
         "email_translate":"msgsndr_emailmessagetexttranslate", // convert this from 1/0 to true/false
-        "email_translation_es":"msgsndr_emailmessagetexttranslateestext", // translations...
-        // translations could get big, there's 50 languages!
+        "email_translation_es":"msgsndr_emailmessagetexttranslateestext", // translations example
+        // translations need to be added dynamically 
         "has_sms":"msgsndr_hassms", // true/false
         "sms_text":"msgsndr_smsmessagetext",
         "has_facebook":"msgsndr_hasfacebook", // true/false
@@ -764,14 +769,30 @@ jQuery.noConflict();
 
       //process all inputs into POST data
       $("input[name], textarea[name], select[name]").each(function() {
+        var thisType = $(this).attr("type");
         var thisKey = $(this).attr("name");
+
         if(typeof(keyMap[thisKey]) != "undefined") {
           thisKey = keyMap[thisKey];
-          if($(this).val() == 'on'){
-            sendData[thisKey] = true;
+          
+          // make checkboxes true or false
+          if(thisType == 'checkbox'){
+            if($(this).attr('checked') == 'checked'){
+              sendData[thisKey] = 'true';
+            } else {
+              sendData[thisKey] = 'false';
+            }
           } else {
             sendData[thisKey] = $(this).val();
           }
+
+          // check for tts messages ...
+          /*
+          if (thisKey = 'msgsndr_emailmessagesubject'){
+            sendData[thisKey] = saveHtmlEditorContent();
+          }
+          */
+         
         }
       });
       // add in the submit ...
@@ -780,17 +801,6 @@ jQuery.noConflict();
     };
 
     
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1161,8 +1171,6 @@ jQuery.noConflict();
       notVal.checkContent();
 
     }
-
-
 
 
 
