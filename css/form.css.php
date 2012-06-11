@@ -453,6 +453,26 @@ li.notactive { display: none; }
 .window_panel .controls { margin: 0 0 0 150px; }
 .window_panel .form_actions { background: #ededed; margin: 0; padding: 15px 0; border-radius: 0 0 8px 8px; border-top: 1px solid #ccc; }
 
+.window_panel .translations fieldset {
+	border-top: 1px solid rgb(204,204,204);
+}
+.window_panel .translations fieldset:first-child {
+	border-top: none;
+}
+
+.window_panel .translations input {
+	margin-left: 150px;
+}
+	.window_panel .translations input[name^=tts_override] {
+		margin-left: 10px;
+	}
+
+.window_panel .translations label {
+	float: none;
+	width: auto;	
+}
+
+
 #msgsndr_tab_social .form_actions { 
 	border: none;
 }

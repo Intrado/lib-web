@@ -8,7 +8,7 @@
 				<fieldset>
 				<label for="msgsndr_form_subject">Subject</label>
 					<div class="controls">
-						<input type="text" id="msgsndr_form_subject" name="broadcast_subject" data-ajax="true" class="required" /> 
+						<input type="text" id="msgsndr_form_subject" name="broadcast_subject" data-ajax="true" class="required" autocomplete="off" /> 
 						<span class="error"></span>
 						<p>e.g. "PTA Meeting Reminder"</p>
 					</div>

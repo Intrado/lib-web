@@ -112,12 +112,24 @@
 						<button class="btn-small paste-from hidden" data-textarea="msgsndr_tts_message">Paste text from email</button>
 						<textarea id="msgsndr_tts_message" name="phone_tts"></textarea><span class="error"></span>
 
-<div class="hide">
-<input id="messagePhoneText_message" name="messagePhoneText_message" type="hidden" value="{&quot;gender&quot;: &quot;female&quot;, &quot;text&quot;: &quot;&quot;}"/>
-<input id="messagePhoneText_message-female" name="messagePhoneText_message-gender" type="radio" value="female" checked/><label for="messagePhoneText_message-female">Female</label><br />
-				<input id="messagePhoneText_message-male" name="messagePhoneText_message-gender" type="radio" value="male" /><label for="messagePhoneText_message-male">Male</label><br />
-</div>
-						<button id="tts_play" class="playAudio" data-text="msgsndr_tts_message" data-code="en"><span class="icon play"></span> Play Audio</button>
+						<div class="hide">
+							<input id="messagePhoneText_message" name="messagePhoneText_message" type="hidden" value="{&quot;gender&quot;: &quot;female&quot;, &quot;text&quot;: &quot;&quot;}"/>
+						</div>
+
+						<div class="cf">
+							<input id="messagePhoneText_message-female" name="messagePhoneText_message-gender" type="radio" value="female" checked/>
+							<label for="messagePhoneText_message-female">Female</label>
+						</div>
+
+						<div class="cf">
+							<input id="messagePhoneText_message-male" name="messagePhoneText_message-gender" type="radio" value="male" />
+							<label for="messagePhoneText_message-male">Male</label>
+						</div>
+
+						<button id="tts_play" class="playAudio" data-text="msgsndr_tts_message" data-code="en">
+							<span class="icon play"></span> Play Audio
+						</button>
+
 						<!-- <span class="tts characters">10000 Characters Left</span> -->
 					</div>
 				</fieldset>
@@ -161,21 +173,21 @@
 				<fieldset class="check">
 					<label for="msgsndr_form_name">From Name</label>
 					<div class="controls">
-						<input type="text" id="msgsndr_form_name" name="email_name" class="required" /> <span class="error"></span>
+						<input type="text" id="msgsndr_form_name" name="email_name" class="required" autocomplete="off" /> <span class="error"></span>
 					</div>
 				</fieldset>
 				
 				<fieldset>
 					<label for="msgsndr_form_email">From Email</label>
 					<div class="controls">
-						<input type="text" id="msgsndr_form_email" name="email_address" class="required" /> <span class="error"></span>
+						<input type="text" id="msgsndr_form_email" name="email_address" class="required" autocomplete="off" /> <span class="error"></span>
 					</div>
 				</fieldset>
 				
 				<fieldset>
 					<label for="msgsndr_form_mailsubject">Subject</label>
 					<div class="controls">
-						<input type="text" id="msgsndr_form_mailsubject" name="email_subject" class="required" /> <span class="error"></span>
+						<input type="text" id="msgsndr_form_mailsubject" name="email_subject" class="required" autocomplete="off" /> <span class="error"></span>
 					</div>
 				</fieldset>
 
