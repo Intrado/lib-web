@@ -546,7 +546,7 @@ jQuery.noConflict();
         // Checked if checked then do translate, as do not want to hit API when deselected translate
         if ($(this).is(':checked')) {
 
-          var txtField      = CKEDITOR.instances.reusableckeditor.document.$.body.innerHTML;
+          var txtField      = CKEDITOR.instances.reusableckeditor.getData();//CKEDITOR.instances.reusableckeditor.document.$.body.innerHTML;
           // $('#cke_reusableckeditor iframe').contents().find('body').text();
           // CKEDITOR.instances.reusableckeditor.document.$.body.innerText;
           var displayArea   = $(this).attr('data-display');
@@ -1194,8 +1194,7 @@ jQuery.noConflict();
 
       var allDataInputs = $('#msg_section_2 input, textarea');
 
-      $('#cke_reusableckeditor iframe').contents().find('body').empty();
-      // CKEDITOR.instances.reusableckeditor.document.$.body.innerText;
+      CKEDITOR.instances.reusableckeditor.setData('');
 
       $('.facebook, .twitter, .feed').hide();
 
@@ -1236,7 +1235,7 @@ jQuery.noConflict();
         $('#msgsndr_form_email').val(messages.email.fromEmail.replace("%40","@"));
         $('#msgsndr_form_mailsubject').val(emailSubject);
 
-        $('#cke_reusableckeditor iframe').contents().find('body').append(unescape(messages.email.msgFormatted));
+        CKEDITOR.instances.reusableckeditor.setData(unescape(messages.email.msgFormatted));
         // CKEDITOR.instances.reusableckeditor.document.$.body.innerText;
 
         // $('iframe[name^=Ric]').contents().find('body').append(unescape(messages.email.msgFormatted));
