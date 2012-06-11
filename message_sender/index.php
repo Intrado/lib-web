@@ -155,7 +155,6 @@ include("nav.inc.php");
 ?>
 
 <script> 
-	orgid = 1;
 	userid = <? print_r($_SESSION['user']->id); ?>;
 	twitterReservedChars = <? print_r(mb_strlen(" http://". getSystemSetting("tinydomain"). "/") + 6); ?>;
 </script>

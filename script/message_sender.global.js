@@ -146,7 +146,7 @@
       j('.msg_content_nav '+nav).removeClass('active').addClass('complete');
       j('#msgsndr_tab_'+el).hide();
 
-      j('input[name=has_'+el+']').val('on');
+      j('input[name=has_'+el+']').attr('checked', 'checked');
 
 
       // Set Message tabs on review tab

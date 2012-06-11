@@ -27,19 +27,19 @@
 				<!-- Add the phone panel -->
 				<div id="msgsndr_tab_phone" class="tab_panel">
 
-				<input type="hidden" name="has_phone" value="" />
+				<input type="checkbox" class="hidden" name="has_phone" />
 
 				<fieldset class="check">
 					<label for="msgsndr_form_type">Voice Type</label>
-					<input type="hidden" id="msgsndr_phonetype" name="phone_type" value="call-me" />
+					<input type="hidden" id="msgsndr_phonetype" name="phone_type" value="callme" />
 					<div id="switchaudio" class="controls">
-						<button class="audioleft active" data-type="call-me">Call Me to Record</button><button class="audioright" data-type="text-to-speech">Text-to-Speech</button>
+						<button class="audioleft active" data-type="callme">Call Me to Record</button><button class="audioright" data-type="text">Text-to-Speech</button>
 					</div>
 				</fieldset>
 				
 				<hr />
 
-				<div id="call-me" class="audio">
+				<div id="callme" class="audio">
 				<fieldset>
 					<label for="msgsndr_form_number">Recording</label>
 					<div class="controls">
@@ -106,7 +106,7 @@
 
 			</div><!-- #call-me -->
 
-			<div id="text-to-speech" class="audio hide">
+			<div id="text" class="audio hide">
 
 				<fieldset>
 					<label for="msgsndr_tts_message">Message</label>
@@ -170,7 +170,7 @@
 			<!-- Add the email panel -->
 			<div id="msgsndr_tab_email" class="tab_panel">
 
-				<input type="hidden" name="has_email" value="" />
+				<input type="checkbox" class="hidden" name="has_email" />
 
 				<fieldset class="check">
 					<label for="msgsndr_form_name">From Name</label>
@@ -241,7 +241,7 @@
 			<!-- Add the sms panel -->
 			<div id="msgsndr_tab_sms" class="tab_panel">
 
-				<input type="hidden" name="has_sms" value="" />
+				<input type="checkbox" class="hidden" name="has_sms" />
 
 				<fieldset class="check">
 					<label for="msgsndr_form_sms">SMS Text</label>
