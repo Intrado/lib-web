@@ -785,6 +785,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		// ============================================================================================================================
 		// Phone Message (callme, text, translations)
 		// ============================================================================================================================
+		$jobpostmessage = array();
 		if (isset($postdata["hasphone"]) && $postdata["hasphone"]) {
 			switch ($postdata["phonemessagetype"]) {
 				case "callme":
