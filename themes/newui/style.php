@@ -561,10 +561,7 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
 	font-style: italic;
 }
 .easycalllanguagetitle { float: left; margin: 6px 0 0 20px; font-size: 1.1em; font-weight: bold; font-style: italic; }
-.easycallerrorcontainer {
-	padding: 2px;
-	background: pink;
-}
+.easycallerrorcontainer { /*padding: 2px; background: pink;*/ }
 .easycallerrorcontainer span.easycallerrortext {
 	margin-right: 5px;
 	margin-left: 2px;
@@ -737,7 +734,7 @@ border: 1px solid rgba(0, 0, 0, 0.3); -webkit-border-radius: 6px; border-radius:
 
 /*----- Prototip styles for shortcut menu, not actually used in this theme -----*/
 	
-.shortcuts a, .shortcuts a:visited { color: #26477d; }
+.shortcuts a { color: #26477d; }
 .shortcuts a:hover { background: #26477d; color: #fff; }
 
 
