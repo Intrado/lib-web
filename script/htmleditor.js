@@ -187,9 +187,9 @@ function applyHtmlEditor(textarea, dontwait,target) {
 				'extraPlugins': 'aspell', //enable aspell port
 				'removePlugins': 'wsc,scayt,smiley,showblocks,flash,elementspath,save',
 				'toolbar': [
-          ['Print','Source','-','Undo','Redo','PasteFromWord','SpellCheck','-','NumberedList','BulletedList','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','Outdent','Indent','Styles'],
+          ['Print','Source','Undo','Redo','PasteFromWord','SpellCheck','Font','FontSize','Format','Styles'],
           '/',
-          ['Bold', 'Italic', 'Underline','Strike','TextColor','BGColor', 'RemoveFormat','Link', 'Image','Table','HorizontalRule','Font','FontSize','Format']
+          ['Bold', 'Italic', 'Underline','Strike','TextColor','BGColor','NumberedList','BulletedList','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','Outdent','Indent','RemoveFormat','Link', 'Image','Table','HorizontalRule']
         ],
 				'disableObjectResizing': true,
 				'resize_enabled': false,
