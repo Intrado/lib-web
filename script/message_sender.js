@@ -174,14 +174,28 @@ jQuery.noConflict();
 
     });
     
-    // new datepicker for scheduling
-    $(function() {
-		$( "#datepicker" ).datepicker({
+    // datepicker for scheduling
+   	// TODO: add facebook token expiry date 
+		$( "#schedule_datepicker" ).datepicker({
 			minDate: 0 
 		});
-	});
-  
 
+    
+    // todays date in US date format
+    function todaysDate(){
+      var today = new Date();
+      var DD = today.getDate();
+      var MM = today.getMonth();
+      var YY = today.getFullYear();
+      var todaysDate = MM+1 + '/' + DD + '/' + YY;
+      return todaysDate;
+    };
+
+
+    // set the schedule options startdate to today's date by default
+ 		$('#schedule_datepicker').val(todaysDate());
+
+   
 
 
 
@@ -212,12 +226,11 @@ jQuery.noConflict();
 		$('#msgsndr_saved_message').modal({
 			show: false
 		});
-
-
+		
 		$('#schedule_options').modal({
 			show: false
 		});
-
+		
 
 
 

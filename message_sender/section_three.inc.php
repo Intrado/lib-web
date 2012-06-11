@@ -93,7 +93,7 @@
 				<fieldset class="cf">
 					<label for="scheduledate">Start Date</label>
 					<div class="controls">
-						<input type="text" id="datepicker" name="broadcast_scheduledate" data-ajax="true" />
+						<input type="text" id="schedule_datepicker" name="broadcast_scheduledate" data-ajax="true" />
 					</div>
 				</fieldset>
 				
@@ -695,7 +695,7 @@
 			</div><!-- field_wrapper -->
 			<div class="msg_confirm">
 				<button data-dismiss="modal">Cancel</button>
-				<button class="btn_confirm" data-dismiss="modal" id="send_new_broadcast">Send to 2,134 Recipients</button>
+				<button class="submit_broadcast btn_confirm" data-dismiss="modal" id="schedule_new_broadcast">Send to 2,134 Recipients</button>
 			</div>	
 			</div><!-- schedule_options -->
 
@@ -703,7 +703,7 @@
 			
 			<div class="msg_confirm">
 				<a href="#schedule_options" data-toggle="modal">Schedule</a> or 
-				<button class="btn_confirm" id="send_new_broadcast">Send Now to 2,134 Recipients</button>
+				<button class="submit_broadcast btn_confirm" id="send_new_broadcast">Send Now to 2,134 Recipients</button>
 			</div>
 			
 		</div><!-- end window_panel -->
