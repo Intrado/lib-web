@@ -205,7 +205,7 @@ background-image: -webkit-gradient(linear, left top, left bottom, from(#F5F3F0),
 .msg_steps { list-style-type: none; padding: 0; }
 .msg_steps li { position: relative; float: left; display: inline; width: 34%; cursor: pointer; }
 .msg_steps li:first-child { width: 32%; }
-.msg_steps li a { background: #f1f1f1; display: block; padding: 10px 11px 10px 40px; color: #777; font-size: 14px; line-height: 30px; font-weight: bold; text-transform: uppercase; text-shadow: 0 1px 0 #fdfdfd; 
+.msg_steps li a { background: #f1f1f1; display: block; padding: 10px 5px 10px 35px; color: #777; font-size: 14px; line-height: 30px; font-weight: bold; text-transform: uppercase; text-shadow: 0 1px 0 #fdfdfd; 
 border-bottom: 1px solid #2A6576; border-top: 1px solid #2A6576; outline: 0px; text-decoration: none; -webkit-box-shadow: 0 1px 0 0 rgba(255,255,255,0.4); box-shadow: 0 1px 0 0 rgba(255,255,255,0.4); }
 .msg_steps li span.icon { display: inline-block; background: #cbcbcb; height: 30px; width: 30px; font-size: 16px; text-align: center; border-radius: 50%; }
 .msg_steps li:first-child a { padding-left: 11px; border-left: 1px solid #2A6576; -webkit-border-radius: 8px 0 0 8px; border-radius: 8px 0 0 8px; }
