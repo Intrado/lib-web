@@ -208,7 +208,7 @@ background-image: -webkit-gradient(linear, left top, left bottom, from(#F5F3F0),
 .msg_steps li a { background: #f1f1f1; display: block; padding: 10px 11px 10px 40px; color: #777; font-size: 14px; line-height: 30px; font-weight: bold; text-transform: uppercase; text-shadow: 0 1px 0 #fdfdfd; 
 border-bottom: 1px solid #2A6576; border-top: 1px solid #2A6576; outline: 0px; text-decoration: none; -webkit-box-shadow: 0 1px 0 0 rgba(255,255,255,0.4); box-shadow: 0 1px 0 0 rgba(255,255,255,0.4); }
 .msg_steps li span.icon { display: inline-block; background: #cbcbcb; height: 30px; width: 30px; font-size: 16px; text-align: center; border-radius: 50%; }
-.msg_steps li:first-child a { padding-left: 11px; border-left: 1px solid #cbcbcb; -webkit-border-radius: 8px 0 0 8px; border-radius: 8px 0 0 8px; }
+.msg_steps li:first-child a { padding-left: 11px; border-left: 1px solid #2A6576; -webkit-border-radius: 8px 0 0 8px; border-radius: 8px 0 0 8px; }
 .msg_steps li:last-child a { border-right: 1px solid #2A6576; border-radius: 0 8px 8px 0; }
 .msg_steps li:first-child a:after,
 .msg_steps li:first-child a:before { display: none; }
@@ -304,9 +304,8 @@ h3.flag { padding: 5px 22px; font-size: 18px; color: #fff; border: 1px solid #22
 .review_subject label, .review_type label, .review_count, .review_message label {
   font-weight: bold;
 }
-.review_count {
-  color: rgb(232, 79, 31);
-}
+.review_count, 
+.window_panel .review_count p { color: #E84F1F; }
 
 
 #msg_section_3 hr {
@@ -515,6 +514,7 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
   padding: 5px 10px; 
   line-height: 19px;
   text-align: center;
+  -webkit-border-radius: 5px; border-radius: 5px;
 }
 
 .call-progress:hover {
@@ -546,7 +546,7 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
   }
 }
 
-/* Easycall styles so it's less broken. TODO: these are not final! */
+/*----- Easycall styles so it's less broken. TODO: these are not final! -----*/
 .easycallmaincontainer {}
 .easycallmaincontainer div {
 	margin-bottom: 3px;
@@ -560,15 +560,7 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
 	color: gray;
 	font-style: italic;
 }
-.easycalllanguagetitle {
-	float: left;
-	margin-right: 5px;
-	margin-top: 6px;
-	margin-left: 2px;
-	font-size: 1.5em;
-	font-weight: bold;
-	font-style: italic;
-}
+.easycalllanguagetitle { float: left; margin: 6px 0 0 20px; font-size: 1.1em; font-weight: bold; font-style: italic; }
 .easycallerrorcontainer {
 	padding: 2px;
 	background: pink;
@@ -583,14 +575,10 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
 	background: url(img/icons/error.png) 0 center no-repeat;
 }
 
-/* list picker styles, taken from mockup */
-.add-recipients {
-	margin-left: 20px;
-	margin-right: 20px;
-}
-.add-recipients div.add-btns {
-	margin-bottom: 22px;
-}
+/*----- list picker styles, taken from mockup -----*/
+
+.add-recipients { margin: 0 20px; }
+.add-recipients .add-btns { margin: 0 0 20px 0; }
 .btn-group:after {
 	clear: both;
 }
@@ -602,14 +590,9 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
 	content: "";
 	display: table;
 }
-.add-recipients .btn {
-	vertical-align: middle;
-}
-.add-recipients .add-btns .btn-group {
-	vertical-align: middle;
-	display: inline-block;
-	margin-left: 3px;
-}
+.add-recipients .btn { float: left; display: inline; }
+.add-recipients span { float: left; display: inline; padding: 5px 8px; line-height: 19px; }
+.add-recipients .add-btns .btn-group { float: left; display: inline; }
 .btn-group {
 	position: relative;
 }
@@ -671,13 +654,8 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
 	white-space: nowrap;
 	cursor: pointer;
 }
-.add-recipients .add-btns .btn-group .caret {
-	margin-top: 9px;
-}
-.btn .caret {
-	margin-left: 0;
-	margin-top: 7px;
-}
+
+.btn .caret { margin: 8px 0 0; padding: 5px 0 2px 0; }
 .caret {
 	border-left: 4px solid transparent;
 	border-right: 4px solid transparent;
@@ -740,9 +718,9 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
 
 .modal-backdrop { background-color: #000000; bottom: 0; left: 0; position: fixed; right: 0; top: 0; opacity: 0.8; z-index: 1040; }
 
-.modal { position: fixed; left: 50%; top: 25%; width: 700px; margin: 0 0 0 -350px; padding: 0; background-clip: padding-box;  background-color: #FFFFFF; 
+.modal { position: fixed; left: 50%; top: 50%; max-height: 500px; width: 700px; margin: -250px 0 0 -350px; padding: 0; background-clip: padding-box;  background-color: #FFFFFF; 
 border: 1px solid rgba(0, 0, 0, 0.3); -webkit-border-radius: 6px; border-radius: 6px; box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3); overflow: auto; z-index: 1050; }
-.modal h3 { position: relative; background: #fdfdfd; font-size: 21px; margin: 0; padding: 15px; border-bottom: 1px solid #ddd; -webkit-border-radius: 6px; border-radius: 6px; }
+.modal h3 { position: relative; background: #fdfdfd; font-size: 21px; margin: 0; padding: 15px; border-bottom: 1px solid #ddd; -webkit-border-radius: 6px 6px 0 0; border-radius: 6px 6px 0 0; }
 .modal .close { position: absolute; top: 18px; right: 15px; color: #999; font-size: 14px; }
 .modal .close:hover { color: #666; text-decoration: none; }
 .modal ul { list-style-type: none; margin: 0; padding: 15px; }
@@ -765,7 +743,13 @@ border: 1px solid rgba(0, 0, 0, 0.3); -webkit-border-radius: 6px; border-radius:
 
 /*----- Classes that need PIE -----*/
 
-.navshortcut, .navtabs a, .newjob a, .emrjob a, .banner_links, .banner_logo a, .subnavtabs a, .btn, .window, .window_title_wrap, .window_body
-{ behavior: url(PIE.php); position: relative;}
+.navshortcut, .navtabs a, .newjob a, .emrjob a, .banner_links, .banner_logo a, .subnavtabs a, .btn, .window, .window_title_wrap, .window_body, a.bigbtn, .templates, .help, .col,
+.msg_steps li span.icon, .msg_content_nav li a
+{ behavior: url(PIE.php); position: relative; }
+
+/*----- IE7 styling ----- */
+
+.ie7 .summary .col { width: 20%; }
+.ie7 .msg_steps li { width: 32%; }
 
 
