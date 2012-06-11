@@ -294,13 +294,92 @@ jQuery.noConflict();
 
           var txtField      = $('#msgsndr_tts_message').val();
           var displayArea   = $(this).attr('data-display');
-          var msgType       = 'tts'
+          var msgType       = 'tts';
 
+          var ttslangCodes  = '';
+
+          var checkTranslations = $('input[name^=tts_override]');
+          $.each(checkTranslations, function(tIndex, tData) {
+            lCode = $(tData).attr('name').split('_')[2];
+            if ($(tData).is(':checked')) {
+
+            } else {
+              if (ttslangCodes == '') {
+                ttslangCodes = lCode
+              } else {
+                ttslangCodes = ttslangCodes + '|' + lCode;
+              }
+            }
+          });
+
+          $(this).next('a').append(' <img src="img/ajax-loader.gif" class="loading" />');
           doTranslate(ttslangCodes,txtField,displayArea,msgType);
 
         }
       });
 
+
+      $('#tts_translate').on('click', '.show_hide_english', function(e) {
+        e.preventDefault();
+
+        var langCode        = $(this).attr('data-code');
+        $('#retranslate_'+langCode).slideToggle('fast');
+
+        if ($(this).text() == "Show In English") {
+          reTranslate(this);
+        }
+
+
+        $(this).text($(this).text() == 'Show In English' ? 'Hide English' : 'Show In English');
+
+      });
+
+
+      $('#tts_translate').on('click', '.retranslate', function(e) {
+        e.preventDefault();
+        reTranslate(this);
+      });
+
+      // Override Translation 
+      $('#tts_translate').on('click', 'input[name^=tts_override]', function() {
+
+        var langCode      = $(this).attr('name').split('_')[2];
+        var checkedState  = $(this).attr('checked');
+
+        // Attached current translated text to the jQuery data object, so we can revert back to it
+        $.data(this, 'translatedtext', $('#tts_translated_'+langCode).val());
+
+        var originalTranslated = 'This was the original translated text';
+
+        if (typeof (checkedState) != "undefined" ) {
+          $('#tts_translated_'+langCode).removeAttr('disabled');
+        } else {
+          
+          var revertTranslation = confirm('The translation will be put back to the previous translation');
+          if (!revertTranslation) {
+            $(this).attr('checked','checked');
+            $('#tts_translated_'+langCode).removeAttr('disabled');
+          } else {
+            //$('#tts_translated_'+langCode)
+            $('#tts_translated_'+langCode).attr('disabled','disbaled');
+            $('#tts_translated_'+langCode).val($.data(this, 'translatedtext'));
+          }
+        }
+
+      })
+
+      function reTranslate(elem) {
+
+        var langName        = $(elem).attr('data-text');
+        var langCode        = $(elem).attr('data-code');
+        var txt             = $('#tts_translated_'+langCode).val();
+        var displayArea     = $('#tts_'+langName+'_to_english');
+        var msgType         = 'tts';
+
+        $('#retranslate_'+langCode).removeClass('hide');
+        doreTranslate(langCode,txt,displayArea,msgType);
+        
+      }
 
       var splitlangCodes = ttslangCodes.split('|');
       var langCount = splitlangCodes.length;
@@ -315,7 +394,23 @@ jQuery.noConflict();
 
         var langCode = splitlangCodes[transIndex];
 
-        $('#tts_translate').append('<fieldset><input type="checkbox" checked="checked" /><label for="tts_'+nLangs[langCode]+'">'+nLangs[langCode]+'</label><div class="controls"><textarea id="tts_'+nLangs[langCode]+'"></textarea><button class="playAudio" data-text="tts_'+nLangs[langCode]+'" data-code="'+langCode+'"><span class="icon play"></span> Play Audio</button><button class="retranslate" data-code="'+langCode+'">Show In English</button><input type="checkbox" name="tts_override_'+langCode+'" id="tts_override_'+langCode+'" /><label for="tts_override_'+langCode+'">Override Translation</label></div></fieldset>');
+        var ttsTranslate = '<fieldset>';
+
+        ttsTranslate += '<input type="checkbox" checked="checked" id="tts_'+nLangs[langCode]+'" />';
+        ttsTranslate += '<label for="tts_'+nLangs[langCode]+'">'+nLangs[langCode]+'</label>';
+        ttsTranslate += '<div class="controls">';
+        ttsTranslate += '<textarea id="tts_translated_'+langCode+'" disabled="disabled"></textarea>';
+        ttsTranslate += '<button class="playAudio" data-text="tts_'+nLangs[langCode]+'" data-code="'+langCode+'"><span class="icon play"></span> Play Audio</button>';
+        ttsTranslate += '<button class="show_hide_english" data-text="'+nLangs[langCode]+'" data-code="'+langCode+'">Show In English</button>';
+        ttsTranslate += '<input type="checkbox" name="tts_override_'+langCode+'" id="tts_override_'+langCode+'" /><label for="tts_override_'+langCode+'">Override Translation</label>';
+        ttsTranslate += '</div>';
+        ttsTranslate += '<div class="controls hide" id="retranslate_'+langCode+'">';
+        ttsTranslate += '<button class="retranslate" data-text="'+nLangs[langCode]+'" data-code="'+langCode+'">Refresh '+nLangs[langCode]+' to English Translation</button>';
+        ttsTranslate += '<textarea id="tts_'+nLangs[langCode]+'_to_english" disabled="disabled"></textarea>';
+        ttsTranslate += '</fieldset>';
+
+        $('#tts_translate').append(ttsTranslate);
+
       });
 
 
@@ -478,7 +573,7 @@ jQuery.noConflict();
 
         var langCode = splitlangCodes[transIndex];
 
-        $('#email_translate').append('<fieldset><input type="checkbox" checked="checked" /><label for="email_'+nLangs[langCode]+'">'+nLangs[langCode]+'</label><div class="controls"><div class="html_translate" id="email_'+nLangs[langCode]+'"></div></div></fieldset>');
+        $('#email_translate').append('<fieldset><input type="checkbox" checked="checked" /><label for="email_'+nLangs[langCode]+'">'+nLangs[langCode]+'</label><div class="controls"><div class="html_translate" id="email_translated_'+langCode+'"></div></div></fieldset>');
       });
 
 
@@ -602,9 +697,6 @@ jQuery.noConflict();
           
        });
 
-       // This scrolls the page up to bring the element that has just opened into view
-       offset = $(this).offset();
-       $('html, body').animate({scrollTop: offset.top },2000);
 
       if ($(this).attr('checked')) {
         notVal.watchSocial(itemName);
@@ -630,10 +722,6 @@ jQuery.noConflict();
 
       var transTxt = makeTranslatableString(txtField);
 
-      function makeTranslatableString(str) {
-        return str.replace(/(<<.*?>>)/g, '<input value="$1"/>').replace(/({{.*?}})/g, '<input value="$1"/>').replace(/(\[\[.*?\]\])/g, '<input value="$1"/>');
-      }
-
       var transURL = 'translate.php?english='+transTxt+'&languages='+langCodes;
 
       var splitlangCodes = langCodes.split('|');
@@ -653,7 +741,7 @@ jQuery.noConflict();
           $.each(data.responseData, function(transIndex, transData) {
 
             var langCode = splitlangCodes[transIndex];
-            var textareaId = '#'+msgType+'_'+nLangs[langCode];
+            var textareaId = '#'+msgType+'_translated_'+langCode;
 
             transText = transData.translatedText;
             if ( msgType == "email" ) {
@@ -670,6 +758,29 @@ jQuery.noConflict();
 
     };
 
+
+    function doreTranslate(langCode,txt,displayArea,msgType) {
+
+      var transURL = 'translate.php?text='+txt+'&language='+langCode;
+
+      // $('a[data-target='+displayArea+']').show().text('Fetching translations, please wait...');   
+      // $(displayArea).empty();
+
+      $.ajax({
+        url: transURL,
+        type: 'GET',
+        dataType: 'json',
+        success: function(data) {
+
+          $('img.loading').remove();
+
+          $(displayArea).val(data.responseData.translatedText);
+
+        }
+
+      });     
+
+    };
 
 
 
@@ -1056,7 +1167,7 @@ jQuery.noConflict();
       // put the messageGroup id in the hidden input and display the message name
       $('#loaded_message_id').attr('value', grpId);
       $('#loaded_message_name').text(msgName);
-      $('#msgsndr_loaded_message').fadeIn(300).fadeOut(7000);
+      $('#msgsndr_loaded_message').fadeIn(300);
 
       // make sure the correct tab is shown
       $('#msgsndr_saved_message').modal('hide');
