@@ -36,6 +36,8 @@
 						<button class="audioleft active" data-type="call-me">Call Me to Record</button><button class="audioright" data-type="text-to-speech">Text-to-Speech</button>
 					</div>
 				</fieldset>
+				
+				<hr />
 
 				<div id="call-me" class="audio">
 				<fieldset>

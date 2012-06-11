@@ -436,6 +436,7 @@ li.notactive { display: none; }
 .window_panel {  }
 .window_panel fieldset { padding: 0 0 15px 0; }
 .window_panel fieldset.check { padding: 15px 0; }
+.window_panel hr { background: #CCCCCC; margin: 0 20px 15px; }
 /*.window_panel fieldset.checklast { margin: 0; padding: 6px 0 16px 0px; }*/
 .window_panel input[type="text"],
 .window_panel select,
