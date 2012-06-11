@@ -6,6 +6,7 @@ jQuery.noConflict();
     var notVal = new globalValidationFunctions();
 
     // Some Global variables
+    // userid, orgid, and twitterReservedChars are set in index.php
 
     orgPath     = window.location.pathname.split('/')[1]; // This gives us the the URL path needed for first part of AJAX call
 
@@ -22,7 +23,8 @@ jQuery.noConflict();
       phone: { },
       email: { },
       sms:   { },
-      social:{ }
+      social:{ },
+      addme: { }
     };
 
 
@@ -40,7 +42,7 @@ jQuery.noConflict();
 
  
     /* --
-      The setUp function will do alot of the inital work, and call other functions based on users roles
+      The setUp function will do a lot of the inital work, and call other functions based on users roles
     -- */
 
     function setUp(roleData) {
@@ -166,9 +168,6 @@ jQuery.noConflict();
         //}
       });
 
-      // console.log("userRoleID: " + userRoleId);
-      // console.log("userPermissions: " + userPermissions);
-
       if(userRoleId == false) {
         alert("error: user doesn't have permissions for current organization");
         return false;
@@ -231,8 +230,7 @@ jQuery.noConflict();
 
     }; 
 
-  
-
+ 
     function step1() {
       
       var formdata = document.formvars['broadcast'];
@@ -241,8 +239,17 @@ jQuery.noConflict();
         new document.validators["ValRequired"]("broadcast_subject","Subject",{}), 
         new document.validators["ValLength"]("broadcast_subject","Subject",{min:7,max:30})
       ];
-
       notVal.watchFields('#msgsndr_form_subject');
+
+      
+      document.formvars['addme']['phone'] = [new document.validators["ValPhone"]("addme_phone","My phone",{})];
+      document.formvars['addme']['email'] = [new document.validators["ValEmail"]("addme_email","My email",{})];
+      document.formvars['addme']['sms']   = [new document.validators["ValPhone"]("addme_sms","My SMS",{})];
+
+      notVal.watchFields('#msgsndr_form_mephone');
+      notVal.watchFields('#msgsndr_form_meemail');
+      notVal.watchFields('#msgsndr_form_mesms');
+      
 
     };
 
@@ -336,8 +343,10 @@ jQuery.noConflict();
             if (typeof(userPermissions.setcallerid) != 'undefined'){ 
               $('#msgsndr_form_callid').append('<option value="other" >Other</option>');
               $('#msgsndr_form_callid').closest('div.controls').append('<span id="callerid_other_wrapper" class="hidden"><input type="text" id="callerid_other" name="phone_callerid"  /><span class="error"></span></span>');
+              // set up the validation on the 'other' input
               notVal.watchFields('#callerid_other');
               document.formvars['phone']['callerid'] = [new document.validators["ValPhone"]("phone_callerid","Caller ID",{})];
+              // watch for the 'other' option being selected and act accordingly
               $('#msgsndr_form_callid').on('change', function(){
                 if ($(this, 'option:selected').val() == 'other') {
                   $('#callerid_other_wrapper').removeClass('hidden');
@@ -654,7 +663,7 @@ jQuery.noConflict();
 
 
     // Send Message Button
-    $('#send_new_broadcast').on('click', function(e) {
+    $('.submit_broadcast').on('click', function(e) {
       e.preventDefault();
 
       //var formData = $('form[name=broadcast]').serializeArray();
@@ -663,20 +672,18 @@ jQuery.noConflict();
         type: 'POST',
         url: '_messagesender.php?form=msgsndr&ajax=true',
         data: formData,
-
+        dataType: 'json',
         success: function(response) {
           console.log(response);
             var res = response;
             if (res.vres != true) {
-              //console.log('false');
               console.log(res);
             } else {
-              //console.log('true');
               console.log(res);
             }
         }
       });
-
+      //window.location = 'start.php';
     });
 
 
@@ -695,26 +702,28 @@ jQuery.noConflict();
         "broadcast_formsnum": "msgsndr-formsnum",
         "broadcast_subject":"msgsndr_name",
         "broadcast_type":"msgsndr_jobtype",
-        //"":"msgsndr_addme",
-        "me_phone":"msgsndr_addmephone",
-        "me_email":"msgsndr_addmeemail",
-        "me_sms":"msgsndr_addmesms",
-        "broadcast_listids":"msgsndr_listids",
+        "addme_check":"msgsndr_addme",
+        "addme_phone":"msgsndr_addmephone",
+        "addme_email":"msgsndr_addmeemail",
+        "addme_sms":"msgsndr_addmesms",
+        "":"msgsndr_listids", // check what this is in the new listpicker
         "has_phone":"msgsndr_hasphone", // true/false
         "phone_type":"msgsndr_phonemessagetype", // callme or text
-        //"":"msgsndr_phonemessagepost", // true/false -- CHECK IF THIS IS THE SAME AS 'ADD A LINK TO AUDIO MESSAGE' IN SOCIAL
-        //"":"msgsndr_phonemessagecallme",
+        "phone_voiceresponse":"msgsndr_phonemessagepost", // true/false
+        "phone_callconfirmation":"msgsndr_phonemessagecallme",
         "phone_text":"msgsndr_phonemessagetext",
         "phone_translate":"msgsndr_phonemessagetexttranslate", // true/false
         "phone_translation_es":"msgsndr_phonemessagetexttranslateestext",
+        // need to account for at least all tts languages, if not all of them
         "has_email":"msgsndr_hasemail", // true/false
         "email_name":"msgsndr_emailmessagefromname",
         "email_address":"msgsndr_emailmessagefromemail",
         "email_subject":"msgsndr_emailmessagesubject",
         "email_attachment":"msgsndr_emailmessageattachment",
-        //"":"msgsndr_emailmessagetext", // data from CK editor panel
+        "email_message":"msgsndr_emailmessagetext", // data from CK editor panel
         "email_translate":"msgsndr_emailmessagetexttranslate", // convert this from 1/0 to true/false
         "email_translation_es":"msgsndr_emailmessagetexttranslateestext", // translations...
+        // translations could get big, there's 50 languages!
         "has_sms":"msgsndr_hassms", // true/false
         "sms_text":"msgsndr_smsmessagetext",
         "has_facebook":"msgsndr_hasfacebook", // true/false
@@ -724,7 +733,7 @@ jQuery.noConflict();
         "has_feed":"msgsndr_hasfeed",
         "feed_message":"msgsndr_socialmediafeedmessage", // should be passed an object {"subject": "The feed title goes here", "message": "We have sent out a new message, you can preview it here. (RSS Feed)"}
         "feed_categories":"msgsndr_socialmediafeedcategory", // should be an array of feed category ids
-        //"":"msgsndr_socialmediafacebookpage", // facebook id -- NEED TO GET THIS FROM ORGANZATIONS
+        //"":"msgsndr_socialmediafacebookpage", // facebook id
         "broadcast_daystorun":"msgsndr_optionmaxjobdays",
         "options_voiceresponse":"msgsndr_optionleavemessage",
         "options_callconfirmation":"msgsndr_optionmessageconfirmation",

@@ -109,9 +109,10 @@
 								</div>
 
 								<!-- /hidden modals -->
+
 <!-- from section_one -->
 				<fieldset>
-					<input class="addme" type="checkbox" id="msgsndr_form_myself"/>
+					<input class="addme" type="checkbox" id="msgsndr_form_myself" name="addme_check"/>
 					<label class="addme" for="msgsndr_form_myself">Add Myself</label>
 				</fieldset>
 
@@ -120,24 +121,28 @@
 					<fieldset>
 						<label for="msgsndr_form_mephone">Phone</label>
 						<div class="controls">
-							<input type="text" id="msgsndr_form_mephone" name="me_phone" />
+							<input type="text" id="msgsndr_form_mephone" name="addme_phone" />
+							<span class="error"></span>
 						</div>
 					</fieldset>
 
 					<fieldset>
 						<label for="msgsndr_form_meemail">Email</label>
 						<div class="controls">
-							<input type="text" id="msgsndr_form_meemail" name="me_email" />
+							<input type="text" id="msgsndr_form_meemail" name="addme_email" />
+							<span class="error"></span>
 						</div>
 					</fieldset>
 
 					<fieldset>
 						<label for="msgsndr_form_mesms">SMS</label>
 						<div class="controls">
-							<input type="text" id="msgsndr_form_mesms" name="me_sms" />
+							<input type="text" id="msgsndr_form_mesms" name="addme_sms" />
+							<span class="error"></span>
 						</div>
 					</fieldset>
 
 				</div><!-- #addme -->
 <!-- end from section_one -->
+
 							</div>

@@ -354,12 +354,7 @@
             }
           } 
 
-        } // for
-
-          if (res == true && field == "number") {
-            j('#ctrecord').show();
-          } 
-          
+        } // for          
 
       } // if ajax
 
