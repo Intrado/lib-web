@@ -445,9 +445,14 @@ jQuery.noConflict();
         // Checked if checked then do translate, as do not want to hit API when deselected translate
         if ($(this).is(':checked')) {
 
-          var txtField      = $('#cke_reusableckeditor iframe').contents().find('body').text();
+          var txtField      = CKEDITOR.instances.reusableckeditor.document.$.body.innerHTML;
+          // $('#cke_reusableckeditor iframe').contents().find('body').text();
+          // CKEDITOR.instances.reusableckeditor.document.$.body.innerText;
           var displayArea   = $(this).attr('data-display');
           var msgType       = 'email';
+
+
+          $(this).next('a').append(' <img src="img/ajax-loader.gif" class="loading" />');
 
           // $(this).attr('disabled','disabled');
           doTranslate(elangCodes,txtField,displayArea,msgType);
@@ -468,7 +473,7 @@ jQuery.noConflict();
 
         var langCode = splitlangCodes[transIndex];
 
-        $('#email_translate').append('<fieldset><input type="checkbox" checked="checked" /><label for="email_'+nLangs[langCode]+'">'+nLangs[langCode]+'</label><div class="controls"><textarea disabled id="email_'+nLangs[langCode]+'"></textarea></div></fieldset>');
+        $('#email_translate').append('<fieldset><input type="checkbox" checked="checked" /><label for="email_'+nLangs[langCode]+'">'+nLangs[langCode]+'</label><div class="controls"><div class="html_translate" id="email_'+nLangs[langCode]+'"></div></div></fieldset>');
       });
 
 
@@ -633,13 +638,19 @@ jQuery.noConflict();
         dataType: 'json',
         success: function(data) {
 
+          $('img.loading').remove();
+
           $.each(data.responseData, function(transIndex, transData) {
 
             var langCode = splitlangCodes[transIndex];
             var textareaId = '#'+msgType+'_'+nLangs[langCode];
 
             transText = transData.translatedText;
-            $(textareaId).text(transText);
+            if ( msgType == "email" ) {
+              $(textareaId).html(transText);
+            } else {
+              $(textareaId).text(transText);
+            }
 
           });
 
@@ -1066,6 +1077,7 @@ jQuery.noConflict();
       var allDataInputs = $('#msg_section_2 input, textarea');
 
       $('#cke_reusableckeditor iframe').contents().find('body').empty();
+      // CKEDITOR.instances.reusableckeditor.document.$.body.innerText;
 
       $('.facebook, .twitter, .feed').hide();
 
@@ -1107,6 +1119,8 @@ jQuery.noConflict();
         $('#msgsndr_form_mailsubject').val(emailSubject);
 
         $('#cke_reusableckeditor iframe').contents().find('body').append(unescape(messages.email.msgFormatted));
+        // CKEDITOR.instances.reusableckeditor.document.$.body.innerText;
+
         // $('iframe[name^=Ric]').contents().find('body').append(unescape(messages.email.msgFormatted));
         // Message HTML content == messages.email.msgparts[0].txt
       }
