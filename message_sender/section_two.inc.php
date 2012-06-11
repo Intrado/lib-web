@@ -139,7 +139,7 @@
 				<fieldset>
 					<label for="msgsndr_form_translate">Translate</label>
 					<input type="checkbox" id="msgsndr_form_phonetranslate" value="" data-txt="#msgsndr_tts_message" data-display="#tts_translate" />
-					<a class="toggle-more hide" data-target="#tts_translate" href=""></a>
+					<a class="toggle-translations hide" data-target="#tts_translate" href=""></a>
 				</fieldset>
 
 				<div id="tts_translate" class="close translations">
@@ -214,7 +214,7 @@
 				<fieldset>
 					<label for="msgsndr_form_translate">Translate</label>
 					<input type="checkbox" id="msgsndr_form_emailtranslate" name="email_translate" value=""  data-display="#email_translate" />
-					<a class="toggle-more hide" data-target="#email_translate" href=""></a>
+					<a class="toggle-translations hide" data-target="#email_translate" href=""></a>
 				</fieldset>
 
 				<div id="email_translate" class="close translations">

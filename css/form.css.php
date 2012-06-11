@@ -340,6 +340,13 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 .email .maincontainerseperator { margin-top: 50px; }
 .email .maincontainerright {  }
 
+
+.html_translate {
+	background: rgb(255,255,255);
+	color: rgb(0,0,0);
+}
+
+
 /* phone messages 
 -------------------*/
 
