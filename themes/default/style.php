@@ -1,6 +1,6 @@
 /*----- Default theme for site, uses css.inc.php as basic layout example can be seen in example.css -----*/
 
-a, a:visited { color: <?=$theme1?>; }
+a { color: <?=$theme1?>; }
 a:hover { text-decoration: underline; }
 
 /*----- Banner, adds in the logo background and moves the client name to sit above the account navigation -----*/
@@ -86,7 +86,7 @@ table.list td { color: #444; }
 
 /*----- Prototip styles for shortcut menu, further styling for this is in the prototip.css.php file in the css folder -----*/
 	
-.shortcuts a, .shortcuts a:visited { color: #444444; }
+.shortcuts a { color: #444444; }
 .shortcuts a:hover { background: #92bde5; color: #fff; }
 
 /*----- IE7 classes -----*/
