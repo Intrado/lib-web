@@ -229,6 +229,8 @@ Validator::load_validators(array(
 
 
 <script src="script/bootstrap-modal.js"></script>
+<script src="script/bootstrap-tooltip.js"></script>
+<script src="script/bootstrap-dropdown.js"></script>
 
 <script type="text/javascript">
 
