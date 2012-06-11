@@ -1,7 +1,8 @@
 							<div class="add-recipients">
 
-								<div class="add-btns"> 
-									<a href="#add-recipients-existing_lists" class="btn disabled" data-toggle="modal">Pick from Existing Lists</a> or 
+								<div class="add-btns cf"> 
+									<a href="#add-recipients-existing_lists" class="btn disabled" data-toggle="modal">Pick from Existing Lists</a> 
+									<span>or</span>
 									<div class="btn-group">
 										<a href="#add-recipients-rules" class="btn" data-toggle="modal">Build a List Using Rules</a>
 										<a href="#" class="btn dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></a>
