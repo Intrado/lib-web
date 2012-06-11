@@ -223,6 +223,7 @@ Validator::load_validators(array(
 <script src="script/message_sender.js"></script>
 <script src="script/message_sender.validation.js"></script>
 <script src="script/message_sender.global.js"></script>
+<script src="script/jquery-datepicker.js"></script>
 
 <script src="script/jquery.timer.js"></script>
 <script src="script/jquery.easycall.js"></script>
