@@ -590,7 +590,13 @@ jQuery.noConflict();
         ]
       };
 
-      notVal.watchFields('#msgsndr_form_sms');
+      // notVal.watchFields('#msgsndr_form_sms');
+
+      $('#msgsndr_form_sms').on('change', function() {
+        var elem  = $(this);
+        notVal.formVal(elem);
+      });
+
 
       // Character Count
       $('#msgsndr_form_sms').on('keyup', function() {
