@@ -28,10 +28,10 @@ h4 { font-size: 12px; line-height: 22px; color: #235563; text-shadow: 0 1px 0 #f
 
 .content_wrap { position: relative; margin: 0; padding: 25px 0 0; }
 .container { position: relative; max-width: 95em; margin: 0 auto; padding: 0 10px; }
-.wrapper { position: relative; margin: 0 250px 0 0; }
+.wrapper { position: relative; margin: 0 240px 0 0; }
 .main_activity { width: 100%; }
-.main_aside { position: absolute; top: 0; right: -250px; width: 225px; }
-.window_body_wrap { padding: 20px 10px; }
+.main_aside { position: absolute; top: 0; right: -240px; width: 215px; }
+.window_body_wrap { padding: 20px 2%; }
 
 
 /*----- Banner -----*/
@@ -94,7 +94,7 @@ h4 { font-size: 12px; line-height: 22px; color: #235563; text-shadow: 0 1px 0 #f
 
 /*----- Activity summary -----*/
 
-.window_title_wrap { position: relative; padding: 5px 22px; border: 1px solid #2A6576; -webkit-border-radius: 5px 5px 0 0; border-radius: 5px 5px 0 0;
+.window_title_wrap { position: relative; padding: 5px 2%; border: 1px solid #2A6576; -webkit-border-radius: 5px 5px 0 0; border-radius: 5px 5px 0 0;
 -webkit-box-shadow: inset 0px 1px 1px 0 rgba(255,255,255,0.5); box-shadow: inset 0px 1px 1px 0 rgba(255,255,255,0.5);
 	background-color: #3F90A9;
 	background-image: -webkit-gradient(linear, left top, left bottom, from(#48A3BE), to(#317589)); 
@@ -127,7 +127,7 @@ border-top: 1px solid #bbb; border-right: 1px solid #bbb; border-bottom: 1px sol
 
 /*----- Broadcasts -----*/
 
-.broadcasts .window_title_wrap { padding: 5px 22px; border: 1px solid #222; -webkit-border-radius: 5px 5px 0 0; border-radius: 5px 5px 0 0;
+.broadcasts .window_title_wrap { border: 1px solid #222; -webkit-border-radius: 5px 5px 0 0; border-radius: 5px 5px 0 0;
 -webkit-box-shadow: inset 0px 1px 1px 0 rgba(255,255,255,0.5); box-shadow: inset 0px 1px 1px 0 rgba(255,255,255,0.5);
 	background-color: #363636;
 	background-image: -webkit-gradient(linear, left top, left bottom, from(#444), to(#222)); 
@@ -137,7 +137,7 @@ border-top: 1px solid #bbb; border-right: 1px solid #bbb; border-bottom: 1px sol
   background-image:      -o-linear-gradient(top, #444, #222); 
   background-image:         linear-gradient(top, #444, #222); }
 .broadcasts .window_title_wrap h2 { display: inline-block; color: #fff; text-shadow: 0 1px 1px rgba(0,0,0,0.7); }
-.broadcasts .window_body_wrap { background: #fff; padding: 15px 20px; border: 1px solid #eee; -webkit-border-radius: 0 0 5px 5px; border-radius: 0 0 5px 5px; }
+.broadcasts .window_body_wrap { background: #fff; padding: 15px 2%; border: 1px solid #eee; -webkit-border-radius: 0 0 5px 5px; border-radius: 0 0 5px 5px; }
 .broadcasts h3 span { font-weight: normal; color: #ccc; }
 
 
@@ -187,7 +187,7 @@ background-image: -webkit-gradient(linear, left top, left bottom, from(#F5F3F0),
 
 /*------ Message sender ----- */
 
-.newbroadcast .window_title_wrap { padding: 0 22px 15px 22px; border: 1px solid #2A6576; -webkit-border-radius: 5px 5px 0 0; border-radius: 5px 5px 0 0;
+.newbroadcast .window_title_wrap { border: 1px solid #2A6576; -webkit-border-radius: 5px 5px 0 0; border-radius: 5px 5px 0 0;
 -webkit-box-shadow: inset 0px 1px 1px 0 rgba(255,255,255,0.5); box-shadow: inset 0px 1px 1px 0 rgba(255,255,255,0.5); 
 	background-color: #3F90A9;
 	background-image: -webkit-gradient(linear, left top, left bottom, from(#48A3BE), to(#317589)); 
@@ -239,7 +239,7 @@ border-color: transparent transparent #FFFFFF transparent; border-width: 12px; b
 .msg_steps li.active:before { content: ''; position: absolute; bottom: -16px; left: 50%; display: block; margin-left: -13px; 
 border-color: transparent transparent #2A6576 transparent; border-width: 13px; border-style: solid; }
 
-.window_panel { padding: 0 15px; font-size: 14px; }
+.window_panel { font-size: 14px; }
 .window_panel a { color: #0088CC; }
 .window_panel a:hover { color: #005580; text-decoration: underline; }
 .window_panel .icon { display: inline-block; height: 14px; width: 14px; }
@@ -407,7 +407,7 @@ border-color: #499122 transparent transparent; border-style: solid; border-width
 .msg_complete li a span.icon { background: url(themes/newui/remove.png) 0 center no-repeat; width: 16px; display: inline-block; /* display: none; */ }
 .msg_complete li.complete a span.icon { background: url(themes/newui/tick.png) 0 center no-repeat; width: 16px; display: inline-block; }
 
-.msg_confirm { background: #F9F8F6; margin: 0 -25px -20px -25px; padding: 22px 21px; text-align: right; border-radius: 0 0 5px 5px; border-top: 1px solid #DDDDDD; }
+.msg_confirm { background: #F9F8F6; margin: 0 -2% -20px -2%; padding: 22px 21px; text-align: right; border-radius: 0 0 5px 5px; border-top: 1px solid #DDDDDD; }
 
 
 /*----- List page styles -----*/
