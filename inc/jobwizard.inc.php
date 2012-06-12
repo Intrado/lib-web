@@ -957,7 +957,7 @@ class JobWiz_messagePhoneTranslate extends WizStep {
 
 		$formdata["englishtext"] = array(
 			"label" => _L("English"),
-			"control" => array("FormHtml","html"=>'<div class="translate_text"><p>'.escapehtml($msgdata->text).'</p></div>'),
+			"control" => array("FormHtml","html"=>'<p class="translate_text">'.escapehtml($msgdata->text).'</p>'),
 			"helpstep" => 1
 		);
 
@@ -1248,7 +1248,7 @@ class JobWiz_messageEmailTranslate extends WizStep {
 		if(!$translations) {
 			$formdata["Translationinfo"] = array(
 				"label" => _L("Info"),
-				"control" => array("FormHtml","html"=>'<div class="translate_text"><p>'._L('No Translations Available').'</p></div>'),
+				"control" => array("FormHtml","html"=>'<p class="translate_text">'._L('No Translations Available').'</p>'),
 				"helpstep" => 1
 			);
 		} else {
@@ -1256,7 +1256,7 @@ class JobWiz_messageEmailTranslate extends WizStep {
 			
 			$formdata["englishversion"] = array(
 				"label" => _L("Default"),
-				"control" => array("FormHtml","html" => '<div class="translate_text"><p>'. $englishtext .'</p></div>'),
+				"control" => array("FormHtml","html" => '<p class="translate_text">'. $englishtext .'</p>'),
 				"helpstep" => 1
 			);
 			
