@@ -94,13 +94,13 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 .newform label { line-height: 16px; }
 
 .formfieldarea { padding: 8px 10px; }
-.formfieldarea .underneathmsg { float: left; display: inline; width: 100%; padding: 0 0 0 175px; font-weight: bold; color: #cc0000; line-height: 22px; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
+.formfieldarea .underneathmsg { float: left; display: inline; width: 100%; padding: 0 0 0 210px; font-weight: bold; color: #cc0000; line-height: 22px; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
 
-.newform .formtitle { float: left; display: inline; width: 165px; padding: 4px 0; text-align: right; }
-.newform .formtitle .formlabel { font-weight: bold; font-size: 1.1em; line-height: 16px; }
+.newform .formtitle { float: left; display: inline; width: 200px; text-align: right; }
+.newform .formtitle .formlabel { display: inline-block; font-weight: bold; font-size: 1.1em; line-height: 25px; }
 .newform .formtitle .formicon { margin: -3px 0 0; }
 
-.newform .formcontrol { margin: 0 0 0 175px; }
+.newform .formcontrol { margin: 0 0 0 210px; font-size: 1.1em; line-height: 25px; }
 .newform .formcontrol h3 { margin: 0 0 15px 0; }
 .newform .formcontrol input[type="text"] { width: 250px; padding: 4px 5px; border: 1px solid #E7E7E7; overflow: hidden; 
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
@@ -110,21 +110,22 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
 .newform .formcontrol input#account_brandthemecustomize { float: left; display: inline; margin: 0 5px 0 0; }
-.newform .formcontrol .social_note { width: 350px; margin: 4px 0; font-size: 1.1em; line-height: 16px; }
-.newform .formcontrol .confirm_note { width: 430px; margin: 4px 0; font-size: 1.1em; line-height: 16px; }
 .newform .formcontrol .feed_url { margin: 2px 0 10px 0; font-size: 1.1em; line-height: 16px; }
 
-.newform .formcontrol ul { margin: 0; padding: 3px 0 0 15px;  }
+.newform .formcontrol .social_note { width: 350px; font-size: 1.1em; }
+.newform .formcontrol .confirm_note { width: 430px; font-size: 1.1em;  }
+.newform .formcontrol .translate_text { font-size: 1.1em; }
 
-.newform .formcontrol .translate_text { padding: 4px; font-size: 1.2em; line-height: 16px; }
+.newform .formcontrol ul { margin: 0; padding: 0;  }
+
 .newform .formcontrol .translate { max-height: 150px; overflow: auto; }
 .newform .formcontrol .gBranding {}
 .newform .formcontrol .gBrandingText { font-size: 11px; }
 
-.newform .formcontrol .radiobox { float: left; display: inline; width: 250px; list-style-type: none; padding: 3px 0 0 0; margin: 0 20px 0 0; }
-.newform .formcontrol .radiobox li { padding: 4px 0; }
+.newform .formcontrol .radiobox { float: left; display: inline; width: 250px; list-style-type: none; padding: 1px 0 0 0; margin: 0 20px 0 0; }
+.newform .formcontrol .radiobox li { padding: 0; }
 .newform .formcontrol .radiobox input[type="radio"],
-.newform .formcontrol .radiobox input[type="checkbox"] { margin: 5px 5px 0 0; }
+.newform .formcontrol .radiobox input[type="checkbox"] { margin: 0 5px 0 0; }
 .newform .formcontrol #accessprofile_publish,
 .newform .formcontrol #accessprofile_subscribe,
 .newform .formcontrol #accessprofile_datafields { float: none; display: block; }
