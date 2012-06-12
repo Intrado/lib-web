@@ -592,15 +592,17 @@ jQuery.noConflict();
 
       // notVal.watchFields('#msgsndr_form_sms');
 
-      $('#msgsndr_form_sms').on('change', function() {
-        var elem  = $(this);
-        notVal.formVal(elem);
-      });
-
-
-      // Character Count
-      $('#msgsndr_form_sms').on('keyup', function() {
-        charCount(this, '160', '.sms.characters');
+      $("#msgsndr_form_sms").on({
+          keyup: function() {
+            var elem  = $(this);
+            notVal.formVal(elem);
+            charCount(this, '160', '.sms.characters');
+          },
+          change: function() {
+            var elem  = $(this);
+            notVal.formVal(elem);
+            charCount(this, '160', '.sms.characters');            
+          }
       });
 
     };
