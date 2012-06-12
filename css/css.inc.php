@@ -140,7 +140,7 @@ button, input, select, textarea { font-size: 100%; margin: 0; vertical-align: ba
 button, input { line-height: normal; *overflow: visible; }
 table button, table input { *overflow: auto; }
 button, input[type="button"], input[type="reset"], input[type="submit"] { cursor: pointer; -webkit-appearance: button; }
-input[type="checkbox"], input[type="radio"] { margin: 7px 5px 0 0; box-sizing: border-box; }
+input[type="checkbox"], input[type="radio"] { margin: 6px 5px 0 0; box-sizing: border-box; }
 input[type="search"] { -webkit-appearance: textfield; -moz-box-sizing: content-box; -webkit-box-sizing: content-box; box-sizing: content-box; }
 input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; }
 button::-moz-focus-inner, input::-moz-focus-inner { border: 0; padding: 0; }
@@ -491,6 +491,7 @@ table.list tr { background-color: #fbfbfb; }
 table.list tr.listHeader { background-color: #d4d4d4; vertical-align: top; }
 table.list tr.listAlt { background-color: #f1f1f1; }
 table.list th, table.list td { text-align: left; vertical-align: top; border-right: 1px solid #ccc; color: #484848; }
+table.list tr.listHeader td { color: #fff; border-top: 1px solid #ccc; }
 table.list td { padding: 5px; }
 table.list td.day { text-align: center; vertical-align: middle; }
 table.list ul { list-style: none; padding: 0; margin: 0; }
