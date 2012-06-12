@@ -337,6 +337,7 @@
               isValid = false;  
               // If SMS - add class er to textarea and disable save button
               if (name == 'sms_text') {
+                j('.sms.characters').text(res);
                 element.removeClass('ok').addClass('er'); 
                 j('#msgsndr_tab_sms .btn_save').attr('disabled','disabled');
               } else {

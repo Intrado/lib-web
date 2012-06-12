@@ -395,7 +395,7 @@ jQuery.noConflict();
 
         var ttsTranslate = '<fieldset>';
 
-        ttsTranslate += '<input type="checkbox" checked="checked" id="tts_'+nLangs[langCode]+'" />';
+        ttsTranslate += '<input type="checkbox" checked="checked" class="translations" id="tts_'+nLangs[langCode]+'" />';
         ttsTranslate += '<label for="tts_'+nLangs[langCode]+'">'+nLangs[langCode]+'</label>';
         ttsTranslate += '<div class="controls">';
         ttsTranslate += '<textarea id="tts_translated_'+langCode+'" disabled="disabled"></textarea>';
@@ -572,7 +572,7 @@ jQuery.noConflict();
 
         var langCode = splitlangCodes[transIndex];
 
-        $('#email_translate').append('<fieldset><input type="checkbox" checked="checked" /><label for="email_'+nLangs[langCode]+'">'+nLangs[langCode]+'</label><div class="controls"><div class="html_translate" id="email_translated_'+langCode+'"></div></div></fieldset>');
+        $('#email_translate').append('<fieldset><input type="checkbox" checked="checked" class="translations" /><label for="email_'+nLangs[langCode]+'">'+nLangs[langCode]+'</label><div class="controls"><div class="html_translate" id="email_translated_'+langCode+'"></div></div></fieldset>');
       });
 
 
@@ -586,26 +586,53 @@ jQuery.noConflict();
         text: [
           new document.validators["ValRequired"]("sms_text","SMS",{}),
           new document.validators["ValLength"]("sms_text","SMS",{max:160}),
-          new document.validators["ValSmsText"]("sms_text","sms_text")
+          new document.validators["ValSmsText"]("sms_text","SMS Text")
         ]
       };
 
-      // notVal.watchFields('#msgsndr_form_sms');
-
       $("#msgsndr_form_sms").on({
           keyup: function() {
+            charCount(this, '160', '.sms.characters');
+
             var elem  = $(this);
             notVal.formVal(elem);
-            charCount(this, '160', '.sms.characters');
+            smsChar('set');
+
           },
           change: function() {
+            
+            charCount(this, '160', '.sms.characters');  
+
             var elem  = $(this);
             notVal.formVal(elem);
-            charCount(this, '160', '.sms.characters');            
+          
           }
       });
 
+      $('#email_change').on('click', function() {
+        $('#msgsndr_form_sms').val('Testing BOOOOMM');
+      })
+
     };
+
+      // setInterval to check sms text and update character count
+      function smsChar(action) {
+
+        console.log(action);
+
+        function sInt() {
+          charCount($('#msgsndr_form_sms'), '160', '.sms.characters');
+          console.log('set');
+        }
+
+        if (typeof (action) != 'undefined') {
+          smsCharCount = setInterval(sInt,100);
+        } else {
+          clearInterval(smsCharCount);
+        }
+      };
+
+
 
     function socialFB() {
 
@@ -689,6 +716,10 @@ jQuery.noConflict();
     $('.btn_save').on('click', function(e) {
       e.preventDefault();
 
+      if ($(this).attr('data-nav') == '.osms' ) {
+        smsChar();
+      }
+
       notVal.saveBtn(this);
       notVal.checkContent();
 
@@ -696,6 +727,10 @@ jQuery.noConflict();
 
     $('.btn_cancel').on('click', function(e) {
       e.preventDefault();
+
+      if ($(this).attr('data-nav') == '.osms' ) {
+        smsChar();
+      }
 
       notVal.cancelBtn(this);
       notVal.checkContent();

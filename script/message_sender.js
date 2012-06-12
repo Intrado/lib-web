@@ -158,9 +158,9 @@ jQuery.noConflict();
 
 
 		// Translations Toggle
-		$('.translations').on('click', "input", function() {
-
-			$(this).next('.controls').toggleClass('hide');
+		$('#tts_translate').on('click', "input.translations", function() {
+			
+			$(this).next().next('.controls').toggleClass('hide');
 
 			// $('#'+tArea).slideToggle();
 
