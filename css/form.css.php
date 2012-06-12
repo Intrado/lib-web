@@ -110,12 +110,13 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
 .newform .formcontrol input#account_brandthemecustomize { float: left; display: inline; margin: 0 5px 0 0; }
-.newform .formcontrol .social_note { width: 350px; margin: 2px 0; font-size: 1.1em; line-height: 16px; }
-.newform .formcontrol .confirm_note { width: 430px; margin: 2px 0; font-size: 1.1em; line-height: 16px; }
+.newform .formcontrol .social_note { width: 350px; margin: 4px 0; font-size: 1.1em; line-height: 16px; }
+.newform .formcontrol .confirm_note { width: 430px; margin: 4px 0; font-size: 1.1em; line-height: 16px; }
 .newform .formcontrol .feed_url { margin: 2px 0 10px 0; font-size: 1.1em; line-height: 16px; }
 
 .newform .formcontrol ul { margin: 0; padding: 3px 0 0 15px;  }
 
+.newform .formcontrol .translate_text { padding: 4px; font-size: 1.2em; line-height: 16px; }
 .newform .formcontrol .translate { max-height: 150px; overflow: auto; }
 .newform .formcontrol .gBranding {}
 .newform .formcontrol .gBrandingText { font-size: 11px; }
