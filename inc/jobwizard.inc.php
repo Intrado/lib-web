@@ -951,13 +951,13 @@ class JobWiz_messagePhoneTranslate extends WizStep {
 		if ($warning)
 			$formdata["warning"] = array(
 				"label" => _L("Warning"),
-				"control" => array("FormHtml","html"=>'<div style="font-size: medium; color: red">'.escapehtml($warning).'</div><br>'),
+				"control" => array("FormHtml","html"=>'<div style="font-size: medium; color: red">'.escapehtml($warning).'</div>'),
 				"helpstep" => 1
 			);
 
 		$formdata["englishtext"] = array(
 			"label" => _L("English"),
-			"control" => array("FormHtml","html"=>'<div style="font-size: medium;">'.escapehtml($msgdata->text).'</div><br>'),
+			"control" => array("FormHtml","html"=>'<div class="translate_text"><p>'.escapehtml($msgdata->text).'</p></div>'),
 			"helpstep" => 1
 		);
 
@@ -965,7 +965,7 @@ class JobWiz_messagePhoneTranslate extends WizStep {
 		if(!$translations) {
 			$formdata["Translationinfo"] = array(
 				"label" => _L("Info"),
-				"control" => array("FormHtml","html"=>'<div style="font-size: medium;">'._L('No Translations Available').'</div><br>'),
+				"control" => array("FormHtml","html"=>'<div style="font-size: medium;">'._L('No Translations Available').'</div>'),
 				"helpstep" => 2
 			);
 		} else {
@@ -1248,7 +1248,7 @@ class JobWiz_messageEmailTranslate extends WizStep {
 		if(!$translations) {
 			$formdata["Translationinfo"] = array(
 				"label" => _L("Info"),
-				"control" => array("FormHtml","html"=>'<div class="translate">'._L('No Translations Available').'</div>'),
+				"control" => array("FormHtml","html"=>'<div class="translate_text"><p>'._L('No Translations Available').'</p></div>'),
 				"helpstep" => 1
 			);
 		} else {
@@ -1256,7 +1256,7 @@ class JobWiz_messageEmailTranslate extends WizStep {
 			
 			$formdata["englishversion"] = array(
 				"label" => _L("Default"),
-				"control" => array("FormHtml","html" => '<div class="translate">'. $englishtext .'</div>'),
+				"control" => array("FormHtml","html" => '<div class="translate_text"><p>'. $englishtext .'</p></div>'),
 				"helpstep" => 1
 			);
 			
