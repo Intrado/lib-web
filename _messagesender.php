@@ -69,6 +69,16 @@ if (!$USER->authorize('sendphone') && !$USER->authorize('sendemail') && !$USER->
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Action/Request Processing
+////////////////////////////////////////////////////////////////////////////////
+
+// if initialization requires new uuid...
+if (isset($_GET['new']) || !isset($_SESSION['_messagesender']['uuid'])) {
+	$_SESSION['_messagesender'] = array();
+	$_SESSION['_messagesender']['uuid'] = "ms".uniqid();
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Validators
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -186,6 +196,13 @@ foreach ($fcids as $fcid)
 	$feedcategoryids[$fcid] = $fcid;
 
 $formdata = array(
+	"uuid" => array(
+		"label" => "uuid",
+		"value" => $_SESSION['_messagesender']['uuid'],
+		"validators" => array(),
+		"control" => array("HiddenField"),
+		"helpstep" => 1
+	),
 	"name" => array(
 		"label" => "name",
 		"value" => "",
@@ -621,6 +638,13 @@ $buttons = array(submit_button(_L('Save'),"submit","tick"),
 		icon_button(_L('Cancel'),"cross",null,"start.php"));
 $form = new Form("msgsndr",$formdata,array(),$buttons, "vertical");
 
+// If the current form serialnumber is requested
+if (isset($_GET['snum'])) {
+	header("Content-Type: application/json");
+	echo json_encode(array("snum" => $form->serialnum));
+	exit;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data Handling
 ////////////////////////////////////////////////////////////////////////////////
@@ -639,6 +663,10 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$datachange = true;
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
+		
+		// invalidate the current messagesender so this form can't be re-submitted multiple times
+		unset($_SESSION['_messagesender']);
+		
 		Query("BEGIN");
 		
 		// ============================================================================================================================

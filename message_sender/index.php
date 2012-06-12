@@ -180,7 +180,7 @@ include("nav.inc.php");
 		<div class="window_body_wrap">
 
 		<form name="broadcast">
-		<input type="hidden" name="broadcast_formsnum" value="3c2390b24625ab63506a642ad6bf19bb" />
+		<input type="hidden" name="broadcast_formsnum" value="this should be overwritten with real serial number" />
 
 <? include("message_sender/section_one.inc.php"); ?>
 
@@ -349,6 +349,11 @@ Validator::load_validators(array(
 jQuery.noConflict();
 (function($) { 
   $(function() {
+		// retreive a new serialnumber for the postdata form
+		$.get('_messagesender.php?new&snum', function (data) {
+			$('[name|=broadcast_formsnum]').val(data.snum);
+		}, "json");
+		
 		// List Picker
 		$('.add-recipients').listPicker({
 			prepickedListIds: ["41"]
