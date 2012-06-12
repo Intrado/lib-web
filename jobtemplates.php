@@ -4,25 +4,32 @@
 ////////////////////////////////////////////////////////////////////////////////
 require_once("inc/common.inc.php");
 require_once("inc/securityhelper.inc.php");
-require_once("obj/MessageGroup.obj.php");
-require_once("obj/Message.obj.php");
-require_once("obj/AudioFile.obj.php");
-require_once("obj/FieldMap.obj.php");
-require_once("obj/SurveyQuestionnaire.obj.php");
-require_once("obj/SurveyQuestion.obj.php");
-require_once("obj/Publish.obj.php");
 require_once("inc/html.inc.php");
-require_once("inc/form.inc.php");
 require_once("inc/table.inc.php");
 require_once("inc/utils.inc.php");
 require_once("inc/formatters.inc.php");
 require_once("inc/feed.inc.php");
+require_once("obj/Job.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-if (!$USER->authorize('sendphone') && !$USER->authorize('sendemail') && !$USER->authorize('sendprint')  && !$USER->authorize('sendsms') && !$USER->authorize('managesystemjobs')) {
+if (!$USER->authorize('sendphone') && !$USER->authorize('sendemail') && !$USER->authorize('sendsms') && !$USER->authorize('managesystemjobs')) {
 	redirect('unauthorized.php');
+}
+
+if (isset($_GET['delete'])) {
+	$deleteid = DBSafe($_GET['delete']);
+	if (userOwns("job",$deleteid) || $USER->authorize('managesystemjobs')) {
+		$job = new Job($deleteid);
+		if ($job->status == "template" && $job->softDelete())
+			notice(_L("The %s Template, %s, is now deleted.", getJobTitle(), escapehtml($job->name)));
+		else
+			notice(_L("The %s Template, %s, Count not be deleted. %s", getJobTitle(), escapehtml($job->name),$job->status));
+	} else {
+		notice(_L("The %s Template, Count not be deleted.", getJobTitle()));
+	}
+	redirectToReferrer();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -60,7 +67,7 @@ if($isajax === true) {
 					j.name as name,
 					j.description as description,
 					(j.name +0) as digitsfirst
-				from job j where j.userid = ? and j.status='template'
+				from job j where j.userid = ? and j.status='template' and not j.deleted
 				order by $orderby, j.id
 				limit $start, $limit",true, false, array($USER->id));
 	
