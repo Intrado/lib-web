@@ -187,7 +187,7 @@ background-image: -webkit-gradient(linear, left top, left bottom, from(#F5F3F0),
 
 /*------ Message sender ----- */
 
-.newbroadcast .window_title_wrap { border: 1px solid #2A6576; -webkit-border-radius: 5px 5px 0 0; border-radius: 5px 5px 0 0;
+.newbroadcast .window_title_wrap { padding: 5px 2% 15px 2%; border: 1px solid #2A6576; -webkit-border-radius: 5px 5px 0 0; border-radius: 5px 5px 0 0;
 -webkit-box-shadow: inset 0px 1px 1px 0 rgba(255,255,255,0.5); box-shadow: inset 0px 1px 1px 0 rgba(255,255,255,0.5); 
 	background-color: #3F90A9;
 	background-image: -webkit-gradient(linear, left top, left bottom, from(#48A3BE), to(#317589)); 
