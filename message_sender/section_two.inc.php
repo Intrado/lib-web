@@ -43,7 +43,7 @@
 				<fieldset>
 					<label for="msgsndr_form_number">Recording</label>
 					<div class="controls">
-						<input class="small" type="hidden" id="msgsndr_form_number" name="phone_number" /> <span class="error"></span>
+						<input class="small required ok" type="hidden" id="msgsndr_form_number" name="phone_number" /> <span class="error"></span>
 						<!-- <button class="record" id="ctrecord"><span class="icon"></span> Call Now to Record</button> -->
 					</div>
 				</fieldset>
@@ -112,7 +112,7 @@
 					<label for="msgsndr_tts_message">Message</label>
 					<div class="controls">
 						<button class="btn-small paste-from hidden" data-textarea="msgsndr_tts_message">Paste text from email</button>
-						<textarea id="msgsndr_tts_message" name="phone_tts"></textarea><span class="error"></span>
+						<textarea id="msgsndr_tts_message" name="phone_tts" class="required"></textarea><span class="error"></span>
 
 						<div class="hide">
 							<input id="messagePhoneText_message" name="messagePhoneText_message" type="hidden" value="{&quot;gender&quot;: &quot;female&quot;, &quot;text&quot;: &quot;&quot;}"/>

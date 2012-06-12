@@ -267,6 +267,7 @@ jQuery.noConflict();
         new document.validators["ValPhone"]("content_phone","Number to Call",{})
       ];
       document.formvars['phone']['tts'] = [
+        new document.validators["ValRequired"]("phone_tts","Phone Message",{}),
         new document.validators["ValLength"]("phone_tts","Phone Message",{length:10000}),
         new document.validators["ValTtsText"](),
         // new document.validators["ValTextAreaPhone"]()
@@ -329,7 +330,6 @@ jQuery.noConflict();
           reTranslate(this);
         }
 
-
         $(this).text($(this).text() == 'Show In English' ? 'Hide English' : 'Show In English');
 
       });
@@ -347,8 +347,6 @@ jQuery.noConflict();
         var checkedState  = $(this).attr('checked');
 
         // Attached current translated text to the jQuery data object, so we can revert back to it
-
-
 
         if (typeof (checkedState) != "undefined" ) {
           $(this).data('translatedtext', $('#tts_translated_'+langCode).val());
@@ -653,16 +651,31 @@ jQuery.noConflict();
 
 
 
-    // Section 1 - Form Watch
+    // Watch form events to enable Save buttons
+
+    // Section 1 - Watch
     $('#msg_section_1').on('focusout', function() {
       notVal.watchSection('msg_section_1');
     });
 
 
-    // Watch Email Form
+    // Watch Phone Content
+    $('#callme .required').on('change', function() {
+      notVal.watchContent('callme');
+    });
+
+    // Watch TTS Content
+    $('#text .required').on('keyup', function() {
+      notVal.watchContent('text');
+    });
+
+
+    // Watch Email Content
     $('#msgsndr_tab_email .required').on('keyup', function() {
       notVal.watchContent('msgsndr_tab_email');
     });
+
+
 
     // Save Button for message content
     $('.btn_save').on('click', function(e) {
@@ -1181,6 +1194,7 @@ jQuery.noConflict();
 
     });
     
+
     /*
       function used to empty all form data in section 2 - Message content, this is used when loading a
       previous message, as can not assume a user will only load one
