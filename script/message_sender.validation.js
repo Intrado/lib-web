@@ -618,11 +618,8 @@ jQuery.noConflict();
       // setInterval to check sms text and update character count
       function smsChar(action) {
 
-        console.log(action);
-
         function sInt() {
           charCount($('#msgsndr_form_sms'), '160', '.sms.characters');
-          console.log('set');
         }
 
         if (typeof (action) != 'undefined') {
