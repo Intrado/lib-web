@@ -73,14 +73,7 @@ function output_pie_graph($data, $legend, $colors, $title, $w = 400, $h = 300) {
 function output_simple_pie_graph($data, $colors, $w = 300, $h = 300) {
 	//check for no data and display a message
 	if (count($data) == 0 || array_sum($data) == 0) {
-		$graph = new CanvasGraph(400,300,"auto");
-		$t1 = new Text("Sorry, there is no data to display");
-		$t1->SetPos(0.05,0.5);
-		$t1->SetOrientation("h");
-		$t1->SetFont(FF_FONT1,FS_NORMAL);
-		$t1->SetBox("white","black",'gray');
-		$t1->SetColor("black");
-		$graph->AddText($t1);
+		$graph = new CanvasGraph($w,$h,"auto");
 		$graph->Stroke();
 		exit();
 	}
