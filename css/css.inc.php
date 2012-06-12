@@ -308,6 +308,7 @@ button { color: <?=$primary?>; background: none; border: none; margin: none; pad
 .content_col_side { width: 15%; min-width: 180px;  }
 .content_col_main { width: 85%; }
 
+.dashboard_graph {float: left;}
 
 /*----- Timeline, effects the timeline on the homepage to try and keep it constant for all themes -----*/
 

@@ -15,6 +15,7 @@ require_once("inc/common.inc.php");
 ////////////////////////////////////////////////////////////////////////////////
 
 $useridList = array();
+$useridList = QuickQueryList("select subordinateuserid from userlink where userid=?",false,false,array($USER->id));
 $useridList[] = $USER->id;
 $start_datetime = "2012-05-01 00:00:00";
 $end_datetime = "2012-05-31 23:59:59";
@@ -218,12 +219,14 @@ include("nav.inc.php");
 			
 			<div class="col bloc">
 				<h4>Message Content</h4>
+				<img class="dashboard_graph" src="graph_dashboard.png.php?blue=<?=$stats["total_phones"]?>&red=<?=$stats["total_emails"]?>&organge=<?=$stats["total_sms"]?>&green=<?=$stats["total_posts"]?>" />
 				<ul>
 				<li><img src="themes/newui/phone-blue.png"/><?=$stats["total_phones"]?></li>
 				<li><img src="themes/newui/email-red.png"/><?=$stats["total_emails"]?></li>
 				<li><img src="themes/newui/sms-orange.png"/><?=$stats["total_sms"]?></li>
 				<li><img src="themes/newui/social-green.png"/><?=$stats["total_posts"]?></li>
 				</ul>
+				
 			</div>
 			
 			<div class="col bloc">
@@ -310,6 +313,8 @@ include("nav.inc.php");
 			}
 			?>
 			</ul>
+			<?= icon_button("Create Template", "add",false,"jobtemplate.php?id=new") ?>
+			
 		</div>
 	
 		<div class="help">
