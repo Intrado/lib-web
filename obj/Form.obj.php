@@ -143,7 +143,7 @@ class Form {
 	
 	
 	function markRequired($item) {
-		array_unshift($this->formdata[$item]['valiators'], array("ValRequired"));
+		array_unshift($this->formdata[$item]['validators'], array("ValRequired"));
 	}
 	
 	function preValidation() {
