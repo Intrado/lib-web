@@ -14,7 +14,7 @@ require_once("obj/Job.obj.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-if (!$USER->authorize('sendphone') && !$USER->authorize('sendemail') && !$USER->authorize('sendsms') && !$USER->authorize('managesystemjobs')) {
+if (!$USER->authorize('sendphone') && !$USER->authorize('sendemail') && !$USER->authorize('sendsms')) {
 	redirect('unauthorized.php');
 }
 
