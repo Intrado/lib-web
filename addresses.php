@@ -96,23 +96,15 @@ function dolistbox (img, init, id) {
 }
 </script>
 
-<table border="0" cellpadding="0" cellspacing="0" width="100%" style="padding-bottom: 5px;">
-	<tr>
-		<td align="left"><? buttons(button('Done', NULL, ($_SESSION['addressesorigin'] == "nav") ? 'start.php' : 'list.php')); ?></td>
-		<td align="right" valign="bottom">
-			<?= ($_SESSION['addressesorigin'] == "nav") ? '' : 'Select the individuals you want to add to your list.'?>
-		</td>
-	</tr>
-</table>
+<? buttons(button('Done', NULL, ($_SESSION['addressesorigin'] == "nav") ? 'start.php' : 'list.php')); ?>
+<?= ($_SESSION['addressesorigin'] == "nav") ? '' : 'Select the individuals you want to add to your list.'?>
+
 <?
 $help = (($_SESSION['addressesorigin'] == "nav") ? '' : help('AddressBook_MyAddressBook'));
 startWindow('Contacts ' . $help);
 ?>
-<table border="0" cellpadding="0" cellspacing="0" style="margin-top: 3px;">
-	<tr>
-		<td><? button_bar(button('Add Contact', NULL,"addressedit.php?id=new&origin=".($_SESSION['addressesorigin'] == "manualadd" ? "manualaddbook" : "nav"))); ?></td>
-	</tr>
-</table>
+
+<? button_bar(button('Add Contact', NULL,"addressedit.php?id=new&origin=".($_SESSION['addressesorigin'] == "manualadd" ? "manualaddbook" : "nav"))); ?>
 
 <?
 
