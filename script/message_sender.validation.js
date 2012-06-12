@@ -750,8 +750,6 @@ jQuery.noConflict();
         dataType: 'json',
         success: function(data) {
 
-          $('img.loading').remove();
-
           $.each(data.responseData, function(transIndex, transData) {
 
             var langCode = splitlangCodes[transIndex];
@@ -765,6 +763,8 @@ jQuery.noConflict();
             }
 
           });
+
+          $('img.loading').remove();
 
         }
 

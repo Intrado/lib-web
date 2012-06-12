@@ -51,9 +51,10 @@ jQuery.noConflict();
 			$(this).parent().removeClass('lighten').addClass('active');
 
 			if (elm[2] == "phone") {
+				$('button.paste-from').addClass('hidden');
 
 				// Show paste from email button if text-to-speech is clicked and emailData is not empty
-				var emailBody = CKEDITOR.instances.reusableckeditor.document.$.body.innerText;
+				var emailBody = CKEDITOR.instances.reusableckeditor.getData();
 				if (emailBody != '') {
 					$('button.paste-from').removeClass('hidden');
 				}
