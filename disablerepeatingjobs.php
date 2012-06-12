@@ -24,8 +24,8 @@ $helpstepnum = 1;
 
 $helpsteps = array(_L("Click this option to disable all repeating jobs in the system. This feature can be used to prevent the system from running scheduled jobs during vacations."));
 $formdata["disablerepeat"] = array(
-	"label" => _L("Disable Repeating Jobs"),
-	"fieldhelp" => _L("Use this to disable all repeating jobs in the system."),
+	"label" => _L("Disable Repeating %s", getJobsTitle()),
+	"fieldhelp" => _L("Use this to disable all repeating %s in the system.",getJobsTitle()),
 	"value" => getSystemSetting('disablerepeat'),
 	"validators" => array(),
 	"control" => array("CheckBox"),
@@ -68,14 +68,14 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = _L("admin").":"._L("settings");
-$TITLE = _L('Enable/Disable Repeating Jobs');
+$TITLE = _L('Enable/Disable Repeating %s',getJobsTitle());
 
 require_once("nav.inc.php");
 
 ?>
 <script>
 <? if ($datachange) { ?>
-	alert("<?=_L("The data on this form has changed. You're changes cannot be saved.")?>")";
+	alert("<?=_L("The data on this form has changed. You're changes cannot be saved.")?>");
 	window.location = '<?= addcslashes($_SERVER['REQUEST_URI']) ?>';
 <? } ?>
 </script>

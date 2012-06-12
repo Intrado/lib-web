@@ -77,23 +77,23 @@ if (count($multilistids) > 0) {
 $blocksubmit = false;
 if ($totalpersons == 0) {
 	$blocksubmit = true;
-	error("The list you've selected does not have any people in it","Click 'Modify Job Settings' to return to the Job configuration page");
+	error(_L("The list you've selected does not have any people in it","Click 'Modify %s Settings' to return to the %s configuration page",getJobTitle(),getJobTitle()));
 }
 $warnearly = $SETTINGS['feature']['warn_earliest'] ? $SETTINGS['feature']['warn_earliest'] : "7:00 am";
 $warnlate = $SETTINGS['feature']['warn_latest'] ? $SETTINGS['feature']['warn_latest'] : "9:00 pm";
 if( ( (strtotime($job->starttime) > strtotime($warnlate)) || (strtotime($job->endtime) < strtotime($warnearly))
 	|| (strtotime($job->starttime) < strtotime($warnearly)) || (strtotime($job->endtime) > strtotime($warnlate)) ) && $job->hasPhone())
 	{
-		error("WARNING: The call window for this job is set for: ". date("g:i a", strtotime($job->starttime)) . " - " . date("g:i a", strtotime($job->endtime)));
-		error("These times fall outside the range of typical calling hours");
+		error(_L("WARNING: The call window for this %s is set for: %s - %s",getJobTitle(),date("g:i a", strtotime($job->starttime)),date("g:i a", strtotime($job->endtime))));
+		error(_L("These times fall outside the range of typical calling hours"));
 	}
 if ((strtotime($job->enddate) <= strtotime("today")) && (strtotime($job->endtime) < strtotime("now"))) {
 	$blocksubmit = true;
-	error("The end time has passed","Click 'Modify Job Settings' to return to the Job configuration page");
+	error(_L("The end time has passed","Click 'Modify %s Settings' to return to the %s configuration page",getJobTitle()));
 }
 if($jobtype->systempriority == 1){
 	error("........................................");// Spacing for readability between error messages
-	error("WARNING:  Emergency Notifications are reserved for situations that are time-critical and require action such as school closures and temporary changes to transportation schedules or that have immediate, severe or likely impact on safety");
+	error(_L("WARNING:  Emergency %s are reserved for situations that are time-critical and require action such as school closures and temporary changes to transportation schedules or that have immediate, severe or likely impact on safety",getJobsTitle()));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -144,11 +144,11 @@ $s = "send";
 include_once("nav.inc.php");
 
 if (!$blocksubmit)
-	buttons(button('Save For Later', null, 'jobs.php'),
-			button('Modify Job Settings',null, 'job.php'),
-			button('Submit Job',null, 'jobsubmit.php?jobid=' . $_SESSION['jobid']));
+	buttons(button(_L('Save For Later'), null, 'jobs.php'),
+			button(_L('Modify %s Settings',getJobTitle()),null, 'job.php'),
+			button(_L('Submit %s',getJobTitle()),null, 'jobsubmit.php?jobid=' . $_SESSION['jobid']));
 else {
-	buttons(button('Modify Job Settings',null, 'job.php'));
+	buttons(button(_L('Modify %s Settings',getJobTitle()),null, 'job.php'));
 }
 
 startWindow("Confirmation &amp; Submit");
@@ -159,7 +159,7 @@ startWindow("Confirmation &amp; Submit");
 		<td class="bottomBorder">
 			<table border="0" cellpadding="2" cellspacing="0" width="100%">
 				<tr>
-					<td class="bottomBorder" width="30%" >Job Name</td>
+					<td class="bottomBorder" width="30%" ><?= _L("%s Name",getJobTitle()) ?></td>
 					<td class="bottomBorder" ><?= escapehtml($job->name); ?></td>
 				</tr>
 				<tr>
@@ -167,7 +167,7 @@ startWindow("Confirmation &amp; Submit");
 					<td class="bottomBorder" ><?= escapehtml($job->description); ?>&nbsp;</td>
 				</tr>
 				<tr>
-					<td class="bottomBorder" >Job Type</td>
+					<td class="bottomBorder" ><?= _L("%s Type",getJobTitle()) ?></td>
 					<td class="bottomBorder" >
 						<table>
 							<tr>
@@ -221,7 +221,7 @@ startWindow("Confirmation &amp; Submit");
 					<td class="bottomBorder" ><?= escapehtml(date("g:i a", strtotime($job->endtime))); ?></td>
 				</tr>
 				<tr>
-					<td>Email a report when the job completes</td>
+					<td><?= _L("Email a report when the %s completes",getJobTitle()) ?></td>
 					<td><input type="checkbox" disabled <?= $job->isOption("sendreport") ? "checked":"" ?>>Report</td>
 				</tr>
 			</table>

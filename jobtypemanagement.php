@@ -66,11 +66,11 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "add") || CheckFormSubmit($f, "
 		{
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else if(QuickQuery("select count(*) from jobtype where id != '" . DBSafe(CheckFormSubmit($f, "delete")) . "' and issurvey and not deleted") < 1){
-			error("You must have at least one survey job type");
+			error(_L("You must have at least one survey %s type",getJobTitle()));
 		} else if(QuickQuery("select count(*) from userjobtypes where jobtypeid = '" . DBSafe(CheckFormSubmit($f, 'delete')) . "'")){
-			error("A user is still restricted to that job type", "Please remove the restriction if you would like to delete that job type");
+			error(_L("A user is still restricted to that %s type",getJobTitle()), _L("Please remove the restriction if you would like to delete that job type",getJobTitle()));
 		} else if($error = checkNames($f, $s, $systemprioritynames, $types, $surveytypes)){
-			error("There are duplicate job type names", $error);
+			error(_L("There are duplicate %s type names",getJobTitle()), $error);
 		} else {
 
 			foreach($systemprioritynames as $index => $name){
@@ -119,11 +119,11 @@ if($reloadform){
 
 
 $PAGE = "admin:settings";
-$TITLE = "Job Type Manager";
+$TITLE = _L("%s Type Manager",getJobTitle());
 include_once("nav.inc.php");
 NewForm($f);
-buttons(submit($f, $s, "Done"), submit($f, "add", "Create New Job Type"));
-startWindow("Job Types" . help("JobType_Manager"));
+buttons(submit($f, $s, "Done"), submit($f, "add", _L("Create New %s Type",getJobTitle())));
+startWindow(_L("%s Types",getJobTitle()) . help("JobType_Manager"));
 ?>
 
 <table cellpadding="0" cellspacing="0" width="100%">
@@ -134,9 +134,9 @@ foreach($systemprioritynames as $index => $name){
 		<th align="left" colspan="4"><?=$name?><th>
 	</tr>
 	<tr>
-		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Name</th>
-		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Display Information</th>
-		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Default Notification Setting</th>
+		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;"><?= _L("Name") ?></th>
+		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;"><?= _L("Display Information") ?></th>
+		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;"><?= _L("Default % Setting",getJobTitle()) ?></th>
 		<th align="left" class="windowRowHeader bottomBorder" colspan=100 valign="top" style="padding-top: 6px;">&nbsp;</th>
 	</tr>
 
@@ -154,9 +154,9 @@ if (getSystemSetting('_hassurvey', true)) {
 		<th align="left" colspan="4">Surveys<th>
 	<tr>
 	<tr>
-		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Name</th>
-		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Display Information</th>
-		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Default Notification Setting</th>
+		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;"><?= _L("Name") ?></th>
+		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;"><?= _L("Display Information") ?></th>
+		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;"><?= _L("Default % Setting",getJobTitle()) ?></th>
 		<th align="left" class="windowRowHeader bottomBorder" colspan=100 valign="top" style="padding-top: 6px;">&nbsp;</th>
 	</tr>
 <?

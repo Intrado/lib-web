@@ -150,8 +150,8 @@ function fmt_actions ($import,$dummy) {
 	$associatedjobcount = QuickQuery("Select count(*) from importjob where importid = '$import->id'");
 	$confirm = "Are you sure you want to run this import now?";
 	if($associatedjobcount > 0){
-		$confirm = "Are you sure you want to run this import and the linked repeating job(s) now?";
-		$extra = 'W A R N I N G:\nThis import has ' . "$associatedjobcount" .' repeating job(s) linked to it that will automatically run if you click OK.\n';
+		$confirm = _L("Are you sure you want to run this import and the linked repeating %s now?", getJobTitle());
+		$extra = _L('W A R N I N G:\nThis import has %s repeating %s linked to it that will automatically run if you click OK.\n',$associatedjobcount, getJobsTitle());
 		$confirm = $extra. $confirm;
 	}
 

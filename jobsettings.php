@@ -69,7 +69,7 @@ if (getSystemSetting('_hascallback', false)) {
 		"control" => array("CheckBox"),
 		"helpstep" => $helpstepnum
 	);
-	$helpsteps[$helpstepnum++] = _L('Enter any Caller ID numbers users may choose for their jobs. Be sure to check the "Only allow approved Caller ID" checkbox if you enter numbers here.<br><br><b>Note:</b> <i>Users with Access Profiles that allow them to override their Caller ID will still have the option to do so.</i>');
+	$helpsteps[$helpstepnum++] = _L('Enter any Caller ID numbers users may choose for their %s. Be sure to check the "Only allow approved Caller ID" checkbox if you enter numbers here.<br><br><b>Note:</b> <i>Users with Access Profiles that allow them to override their Caller ID will still have the option to do so.</i>',getJobsTitle());
 	$approvedcallerids = QuickQueryList("select callerid from authorizedcallerid");
 	$formattedcallerids = array();
 	foreach($approvedcallerids as $callerid) {

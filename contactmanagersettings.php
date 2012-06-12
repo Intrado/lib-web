@@ -52,7 +52,7 @@ $formdata["portalphoneactivation"] = array(
 );
 $formdata["requireemergency"] = array(
 		"label" => _L("Require Emergency Phone"),
-        "fieldhelp" => _L("Require at least one phone number for every Emergency Job Type."),
+        "fieldhelp" => _L("Require at least one phone number for every Emergency %s Type.", getJobTitle()),
         "value" => in_array('1',explode('|',getSystemSetting('priorityenforcement', ''))),
         "validators" => array(
         ),
@@ -62,7 +62,7 @@ $formdata["requireemergency"] = array(
 
 $formdata["requirehighpriority"] = array(
 		"label" => _L("Require High Priority Phone"),
-		"fieldhelp" => _L("Require at least one phone number for every High Priority Job Type."),
+		"fieldhelp" => _L("Require at least one phone number for every High Priority %s Type.", getJobTitle()),
 		"value" => in_array('2',explode('|',getSystemSetting('priorityenforcement', ''))),
 		"validators" => array(),
 		"control" => array("CheckBox"),

@@ -95,10 +95,10 @@ $activeusers = QuickQueryList("select id, login from user where not deleted and 
 
 // Do job template form stuff
 $formdata = array(
-	_L("Job Template"),
+	_L("%s Template",getJobTitle()),
 	"name" => array(
 		"label" => _L('Template Name'),
-		"fieldhelp" => _L("Enter a name for Classroom Messaging jobs."),
+		"fieldhelp" => _L("Enter a name for Classroom Messaging %s.",getJobsTitle()),
 		"value" => ($job)?$job->name:"",
 		"validators" => array(
 			array("ValRequired"),
@@ -110,7 +110,7 @@ $formdata = array(
 	),
 	"jobtype" => array(
 		"label" => _L("Type/Category"),
-		"fieldhelp" => _L("Select the option that best describes the type of notification you are sending."),
+		"fieldhelp" => _L("Select the option that best describes the type of %s you are sending.",getJobTitle()),
 		"value" => ($job)?$job->jobtypeid:"",
 		"validators" => array(
 			array("ValRequired"),
@@ -236,9 +236,9 @@ foreach ($languagemap as $code => $language) {
 
 $helpsteps = array (
 	_L('The Template Name will be displayed in reports'),
-	_L('The Job Type determines where the system sends the message.'),
+	_L('The %s Type determines where the system sends the message.',getJobTitle()),
 	_L('Select which days Classroom Messages should be sent.'),
-	_L('Select the user account that Classroom Messaging jobs should be sent from.'),
+	_L('Select the user account that Classroom Messaging %s should be sent from.',getJobsTitle()),
 	_L('The From Name and From Email tell the recipient who the email came from.'),
 	_L('The Subject is the default subject for all Classroom Messages.<br><br>
 	In the Message Body section, enter a message which Classroom Messages will be appended to.')
