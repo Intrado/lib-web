@@ -19,12 +19,17 @@ class ValDuplicateNameCheck extends Validator {
 		} else if($type == "job") {
 			$existsid = QuickQuery("select id from job where not deleted and userid=? and name=? and status in ('new','scheduled','processing','procactive','active')",false,array($USER->id, $value));
 			if($existsid && $existsid != $_SESSION['jobid']) {
-				return "$this->label: ". _L('There is already an active notification with this name. Please choose another.');
+				return "$this->label: ". _L('There is already an active %s with this name. Please choose another.', getJobTitle());
+			}
+		} else if($type == "jobtemplate") {
+			$existsid = QuickQuery("select id from job where not deleted and userid=? and name=? and status = 'template'",false,array($USER->id, $value));
+			if($existsid && $existsid != $_SESSION['jobid']) {
+				return "$this->label: ". _L('There is already a %s template with this name. Please choose another.', getJobTitle());
 			}
 		} else if($type == "survey") {
 			$existsid = QuickQuery("select id from job where not deleted and userid=? and name=? and status in ('new','scheduled','processing','procactive','active')",false,array($USER->id, $value));
 			if($existsid && $existsid != $_SESSION['surveyid']) {
-				return "$this->label: ". _L('There is already an active notification with this name. Please choose another.');
+				return "$this->label: ". _L('There is already an active Survey with this name. Please choose another.');
 			}
 		} else if($type == "targetedmessagecategory") {
 			$existsid = QuickQuery("select id from targetedmessagecategory where name=? and deleted = 0",false,array($value));

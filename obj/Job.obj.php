@@ -231,7 +231,7 @@ class Job extends DBMappedObject {
 	function softDelete() {
 		$didDelete = false;
 		
-		if ($this->status == "cancelled" || $this->status == "cancelling" || $this->status == "complete") {
+		if ($this->status == "cancelled" || $this->status == "cancelling" || $this->status == "complete" || $this->status == "template") {
 			Query('BEGIN');
 			$this->deleted = 1;
 			$this->update();

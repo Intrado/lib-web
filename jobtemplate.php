@@ -131,11 +131,11 @@ $helpsteps[] = _L("Enter a name for your template. " .
 					"You may also optionally enter a description of the template.");
 $formdata["name"] = array(
 	"label" => _L('Name'),
-	"fieldhelp" => _L('Enter a name for your job.'),
+	"fieldhelp" => _L('Enter a name for your % template.', getJobTitle()),
 	"value" => isset($job->name)?$job->name:"",
 	"validators" => array(
 		array("ValRequired"),
-		array("ValDuplicateNameCheck","type" => "job"),
+		array("ValDuplicateNameCheck","type" => "jobtemplate"),
 		array("ValLength","max" => 30)
 	),
 	"control" => array("TextField","size" => 30, "maxlength" => 50),
@@ -143,7 +143,7 @@ $formdata["name"] = array(
 );
 $formdata["description"] = array(
 	"label" => _L('Description'),
-	"fieldhelp" => _L('Enter a description of the job. This is optional, but can help identify the job later.'),
+	"fieldhelp" => _L('Enter a description of the % template. This is optional, but can help identify the %s later.', getJobTitle(), getJobTitle()),
 	"value" => isset($job->description)?$job->description:"",
 	"validators" => array(
 		array("ValLength","min" => 0,"max" => 50)
