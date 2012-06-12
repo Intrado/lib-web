@@ -79,6 +79,83 @@ if (isset($_GET['new']) || !isset($_SESSION['_messagesender']['uuid'])) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Form
+////////////////////////////////////////////////////////////////////////////////
+class MessageSenderForm extends Form {
+	// Override
+	function preValidation() {
+		global $USER;
+		// These fields are ALWAYS required
+		$this->markRequired("name");
+		$this->markRequired("jobtype");
+		$this->markRequired("scheduledate");
+		$this->markRequired("schedulecallearly");
+		$this->markRequired("schedulecalllate");
+		
+		// people to contact
+		if (isset($this->formdata["addme"]["value"]) && $this->formdata["addme"]["value"]) {
+			// TODO: addme needs to require some data
+		} else {
+			// no addme, must have a list then
+			$this->markRequired("listids");
+		}
+		
+		// TODO: Must have one of phone, email or sms to be valid!
+		
+		// has phone message data?
+		if (isset($this->formdata["hasphone"]["value"]) && $this->formdata["hasphone"]["value"]) {
+			switch ($this->formdata["phonemessagetype"]["value"]) {
+				case "callme":
+					$this->markRequired("phonemessagecallme");
+					break;
+				default:
+					$this->markRequired("phonemessagetext");
+			}
+			// callerid required if using a phone message
+			if (!getSystemSetting('_hascallback', false) && (getSystemSetting("requireapprovedcallerid",false) || $USER->authorize('setcallerid'))) {
+				$this->markRequired("optioncallerid");
+			}
+			$this->markRequired("optionmaxjobdays");
+		}
+		
+		// has email message data?
+		if (isset($this->formdata["hasemail"]["value"]) && $this->formdata["hasemail"]["value"]) {
+			$this->markRequired("emailmessagefromname");
+			$this->markRequired("emailmessagefromemail");
+			$this->markRequired("emailmessagesubject");
+			$this->markRequired("emailmessagetext");
+		}
+		
+		// has sms message data?
+		if (isset($this->formdata["hasemail"]["value"]) && $this->formdata["hasemail"]["value"]) {
+			$this->markRequired("smsmessagetext");
+		}
+		
+		// has facebook message data?
+		if (isset($this->formdata["hasfacebook"]["value"]) && $this->formdata["hasfacebook"]["value"]) {
+			$this->markRequired("socialmediafacebookmessage");
+			$this->markRequired("socialmediafacebookpage");
+		}
+		
+		// has twitter message data?
+		if (isset($this->formdata["hastwitter"]["value"]) && $this->formdata["hastwitter"]["value"]) {
+			$this->markRequired("socialmediatwittermessage");
+		}
+		
+		// has feed message data?
+		if (isset($this->formdata["hasfeed"]["value"]) && $this->formdata["hasfeed"]["value"]) {
+			$this->markRequired("socialmediafeedmessage");
+			$this->markRequired("socialmediafeedcategory");
+		}
+		
+		// save this message?
+		if (isset($this->formdata["optionsavemessage"]["value"]) && $this->formdata["optionsavemessage"]["value"]) {
+			$this->markRequired("optionsavemessagename");
+		}
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Validators
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -199,7 +276,6 @@ $formdata = array(
 	"uuid" => array(
 		"label" => "uuid",
 		"value" => $_SESSION['_messagesender']['uuid'],
-		"validators" => array(),
 		"control" => array("HiddenField"),
 		"helpstep" => 1
 	),
@@ -636,7 +712,7 @@ $formdata = array_merge($formdata, array(
 
 $buttons = array(submit_button(_L('Save'),"submit","tick"),
 		icon_button(_L('Cancel'),"cross",null,"start.php"));
-$form = new Form("msgsndr",$formdata,array(),$buttons, "vertical");
+$form = new MessageSenderForm("msgsndr",$formdata,array(),$buttons);
 
 // If the current form serialnumber is requested
 if (isset($_GET['snum'])) {
@@ -684,7 +760,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		
 		$job->scheduleid = null;
 		$job->startdate = date("Y-m-d", strtotime($postdata['scheduledate']));
-		$job->enddate = date("Y-m-d", strtotime($job->startdate) + (($postdata["optionmaxjobdays"] - 1) * 86400));
+		$job->enddate = date("Y-m-d", 
+				strtotime($job->startdate) + 
+				(($postdata["optionmaxjobdays"]?($postdata["optionmaxjobdays"] - 1):0) * 86400));
 		$job->starttime = date("H:i", strtotime($postdata['schedulecallearly']));
 		$job->endtime = date("H:i", strtotime($postdata['schedulecalllate']));
 		$job->finishdate = null;
@@ -700,7 +778,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$job->setSetting("skipemailduplicates", (isset($postdata["optionskipduplicate"]) && $postdata["optionskipduplicate"])?1:0);
 		
 		// set jobsetting 'callerid'
-		$job->setSetting('callerid', $postdata["optioncallerid"]);
+		if ($postdata["optioncallerid"])
+			$job->setSetting('callerid', $postdata["optioncallerid"]);
 		
 		$job->update();
 		
