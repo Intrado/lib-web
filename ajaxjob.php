@@ -27,16 +27,19 @@ function fmt_activestatus($obj, $name) {
 function fmt_job_content($obj, $name) {
 	$str = "";
 	if ($obj->hasPhone()){
-		$str .= " <img src=\"themes/{$_SESSION['colorscheme']['_brandtheme']}/phone-grey.png\"/>";
+		$str .= " <img src=\"themes/{$_SESSION['colorscheme']['_brandtheme']}/phone-grey.png\" title=\"" . _L("Phone") . "\" />";
 	}
 	if ($obj->hasEmail()){
-		$str .= " <img src=\"themes/{$_SESSION['colorscheme']['_brandtheme']}/email-grey.png\"/>";
+		$str .= " <img src=\"themes/{$_SESSION['colorscheme']['_brandtheme']}/email-grey.png\" title=\"" . _L("Email") . "\" />";
 	}
 	if ($obj->hasSMS()){
-		$str .= " <img src=\"themes/{$_SESSION['colorscheme']['_brandtheme']}/sms-grey.png\"/>";
+		$str .= " <img src=\"themes/{$_SESSION['colorscheme']['_brandtheme']}/sms-grey.png\" title=\"" . _L("SMS") . "\" />";
 	}
 	if ($obj->hasPost()){
-		$str .= " <img src=\"themes/{$_SESSION['colorscheme']['_brandtheme']}/social-grey.png\"/>";
+		$str .= " <img src=\"themes/{$_SESSION['colorscheme']['_brandtheme']}/social-grey.png\" title=\"" . _L("Social") . "\" />";
+	}
+	if ($obj->type == "survey"){
+		$str .= " <img src=\"themes/{$_SESSION['colorscheme']['_brandtheme']}/survey-grey.png\" title=\"" . _L("Survey") . "\" />";
 	}
 	return $str;
 }
