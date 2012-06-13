@@ -134,20 +134,6 @@ Paste from email button: Low proirity:
 
 		});
 
-		$('.toggle-translations').on('click', function(event) {
-			event.preventDefault();
-
-			var text  	= $(this).text().split(" ");
-
-			$(this).text(text[0] == 'Show' ? 'Hide ' + text[1] + ' ' + text[2] : 'Show ' + text[1] + ' ' + text[2] );
-
-			var etarget = $(this).attr('data-target');
-			$(etarget).slideToggle();
-			$(this).toggleClass('active');
-
-		});
-
-
 
 		$('.playAudio').live('click', function(e) {
 			e.preventDefault();

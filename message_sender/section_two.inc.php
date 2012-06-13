@@ -137,21 +137,12 @@
 				</fieldset>
 
 				<fieldset>
-					<label for="msgsndr_form_translate">Translate</label>
+					<label for="msgsndr_form_phonetranslate">Translate</label>
 					<input type="checkbox" id="msgsndr_form_phonetranslate" value="" data-txt="#msgsndr_tts_message" data-display="#tts_translate" />
-					<a class="toggle-translations hide" data-target="#tts_translate" href=""></a>
+					<a class="toggle-translations hide" data-target="#tts_translate" data-txt="#msgsndr_tts_message" href=""></a>
 				</fieldset>
 
 				<div id="tts_translate" class="close translations">
-
-<!-- 					<fieldset>
-							<label for="">Spanish</label>
-							<input type="checkbox" />
-						<div class="controls">
-							<textarea disabled>Translated Text here</textarea>
-						</div>
-					</fieldset>
- -->
 				</div>
 
 

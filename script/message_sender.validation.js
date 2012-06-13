@@ -311,15 +311,41 @@ jQuery.noConflict();
 
 
       // Translate Checkbox event
-      $('#msgsndr_form_phonetranslate').on('click', function() {
-        // Checked if checked then do translate, as do not want to hit API when deselected translate
-        if ($(this).is(':checked')) {
+      $('#text').on('click', '.toggle-translations', function(event) {
 
-          var txtField      = $('#msgsndr_tts_message').val();
-          var displayArea   = $(this).attr('data-display');
-          var msgType       = 'tts';
+        event.preventDefault();
 
-          var ttslangCodes  = '';
+        var text          = $(this).text().split(" ");
+
+        $(this).text(text[0] == 'Show' ? 'Hide ' + text[1] + ' ' + text[2] : 'Show ' + text[1] + ' ' + text[2] );
+
+        var etarget = $(this).attr('data-target');
+        $(etarget).slideToggle();
+        $(this).toggleClass('active');
+
+        $('#tts_retranslate').remove();
+
+        if (text[0] == 'Show') {
+
+          ttsTranslate(this);
+
+          $(this).parent().append(' <button id="tts_retranslate" data-target="#tts_translate">Re Translate</button>');
+        }
+
+      });
+
+
+      $('#text').on('click', '#tts_retranslate', function() {
+        ttsTranslate(this);
+      });
+
+        function ttsTranslate(elem) {
+
+        var txtField      = $('#msgsndr_tts_message').val();
+        var displayArea   = $(elem).attr('data-target');
+        var msgType       = 'tts';
+
+        var ttslangCodes  = '';
 
           var checkTranslations = $('input[name^=tts_override]');
           $.each(checkTranslations, function(tIndex, tData) {
@@ -335,11 +361,11 @@ jQuery.noConflict();
             }
           });
 
-          $(this).parent().append(' <img src="img/ajax-loader.gif" class="loading" />');
+          $('#tts_translate fieldset > label[for^=tts_]').append(' <img src="img/ajax-loader.gif" class="loading" />');
+
           doTranslate(ttslangCodes,txtField,displayArea,msgType);
 
         }
-      });
 
 
       $('#tts_translate').on('click', '.show_hide_english', function(e) {
