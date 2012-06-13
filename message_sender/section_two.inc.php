@@ -290,14 +290,15 @@
 							<input id="msgsndr_fbpage" type="hidden" value="" name="social_fbpages">
 							<input id="msgsndr_fbpageauthpages" type="hidden" value="" name="social_fbpagesauthpages">
 								<div id="fb-root"></div>
-
-								<div id="msgsndr_fbpageauthpages" class="">
+								
+								<div id="msgsndr_fbpageconnect">
 									<button class="btn" onclick="popup('popupfacebookauth.php', 640, 400);" type="button">
 										<img class="btn_middle_icon" alt="" src="img/icons/custom/facebook.gif">
 										Add Facebook Account
 									</button>
 								</div>
 								
+								<div id="msgsndr_fbpagerenew">
 								<div id="msgsndr_fbpagerenew" class="">
 									<button class="btn" onclick="popup('popupfacebookauth.php', 640, 400);" type="button">
 										<img class="btn_middle_icon" alt="" src="img/icons/custom/facebook.gif">
@@ -305,10 +306,10 @@
 									</button>
 								</div>
 								
-								<div id="msgsndr_fbpageactionlinks" class="">
-									<a id="jobedit_fbpageall" class="actionlink">Select All</a>
+								<div id="msgsndr_fbpageactionlinks">
+									<a id="msgsndr_fbpageall" class="actionlink">Select All</a>
 									&nbsp;|&nbsp;
-									<a id="jobedit_fbpagenone" class="actionlink">Remove All</a>
+									<a id="msgsndr_fbpagenone" class="actionlink">Remove All</a>
 								</div>
 								<div id="msgsndr_fbpagefbpages"></div>
 								<div id="msgsndr_fbpagesmessage" class="underneathmsg cf"></div>
