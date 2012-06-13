@@ -177,6 +177,8 @@ jQuery.noConflict();
       $('.msg_steps li').removeClass('active');
       $('a#tab_'+tabn).parent().addClass('active');
       $('a#tab_'+tabp).parent().addClass('complete');
+      
+      $('a#tab_'+tabn).attr('data-active','true');
 
       $('.window_panel').hide();
       $('#msg_section_'+tabn).show();
