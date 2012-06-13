@@ -551,7 +551,7 @@ jQuery.noConflict();
           var msgType       = 'email';
 
 
-          $(this).next('a').append(' <img src="img/ajax-loader.gif" class="loading" />');
+          $(this).parent().append(' <img src="img/ajax-loader.gif" class="loading" />');
 
           // $(this).attr('disabled','disabled');
           doTranslate(elangCodes,txtField,displayArea,msgType);
