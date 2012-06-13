@@ -486,4 +486,9 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 	.newform .formcontrol textarea { width: 280px; margin: 0; }
 	.controlcontainer .datafields { float: none; }
 	.helper { width: 150px; }
+	
+	.newui .newform .formtitle,
+	.newui .newform .formcontrol { float: none; display: block; }
+	.newui .newform .formtitle .formlabel { padding: 0 10px 5px 0; text-align: left; }
+	.newui .formfieldarea .underneathmsg { font-size: 13px; padding: 0; }
 }
