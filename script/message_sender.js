@@ -51,10 +51,19 @@ jQuery.noConflict();
 			$(this).parent().removeClass('lighten').addClass('active');
 
 			if (elm[2] == "phone") {
+
+/*
+Paste from email button: Low proirity: 
+	Issues with getting text from CKEDITOR as comes through as HTML, need to strip this and 
+	take in consideration for HTML elements like images, etc
+
 				$('button.paste-from').addClass('hidden');
 
 				// Show paste from email button if text-to-speech is clicked and emailData is not empty
-				var emailBody = CKEDITOR.instances.reusableckeditor.getData();
+				var emailBody = CKEDITOR.dom.element.createFromHtml(CKEDITOR.instances.reusableckeditor.getData());
+				var emailBody = emailBody.getText();
+				var emailBody = $.trim(emailBody);
+
 				if (emailBody != '') {
 					$('button.paste-from').removeClass('hidden');
 				}
@@ -65,10 +74,9 @@ jQuery.noConflict();
 					var pasteTo = $(this).attr('data-textarea');
 
 					$('#'+pasteTo).val(emailBody);
-
-
 				});
 
+*/
 			}
 
 			if (elm[2] == "email") {
