@@ -3,7 +3,7 @@ showPreview = function(post_parameters,get_parameters){
 	modal.window_contents.update(new Element('img',{src: 'img/ajax-loader.gif'}));
 	modal.open();
 	
-	new Ajax.Request('jobwizard.php?step=/message/phone/text&previewmodal=true' + (get_parameters?'&' + get_parameters:''), {
+	new Ajax.Request('_previewmodal.php?previewmodal=true' + (get_parameters?'&' + get_parameters:''), {
 		'method': 'post',
 		'parameters': post_parameters,
 		'onSuccess': function(response) {
