@@ -290,22 +290,22 @@
 							<input id="msgsndr_fbpage" type="hidden" value="" name="social_fbpages">
 							<input id="msgsndr_fbpageauthpages" type="hidden" value="" name="social_fbpagesauthpages">
 								<div id="fb-root"></div>
-								
-								<div id="msgsndr_fbpageconnect" class="hidden">
+
+								<div id="msgsndr_fbpageauthpages" class="">
 									<button class="btn" onclick="popup('popupfacebookauth.php', 640, 400);" type="button">
 										<img class="btn_middle_icon" alt="" src="img/icons/custom/facebook.gif">
 										Add Facebook Account
 									</button>
 								</div>
 								
-								<div id="msgsndr_fbpagerenew" class="hidden">
+								<div id="msgsndr_fbpagerenew" class="">
 									<button class="btn" onclick="popup('popupfacebookauth.php', 640, 400);" type="button">
 										<img class="btn_middle_icon" alt="" src="img/icons/custom/facebook.gif">
 										Renew Facebook Authorization
 									</button>
 								</div>
 								
-								<div id="msgsndr_fbpageactionlinks" class="hidden">
+								<div id="msgsndr_fbpageactionlinks" class="">
 									<a id="jobedit_fbpageall" class="actionlink">Select All</a>
 									&nbsp;|&nbsp;
 									<a id="jobedit_fbpagenone" class="actionlink">Remove All</a>
