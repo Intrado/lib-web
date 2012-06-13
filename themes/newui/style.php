@@ -254,7 +254,7 @@ border-color: transparent transparent #2A6576 transparent; border-width: 13px; b
   background-image:      -o-linear-gradient(top, #E84F1F, #A93611); 
   background-image:         linear-gradient(top, #E84F1F, #A93611); }
 .window_panel .record:hover { background: #a93611; color: #fff; }
-.window_panel .record span.icon, .call-progress span.icon { background: url(themes/newui/record.png) 0 center no-repeat; }
+.window_panel .record span.icon, .call-progress span.icon { background: url(themes/newui/record.png) 0 center no-repeat; margin: 0 3px 0 0; }
 .window_panel .audioleft { border-radius: 5px 0 0 5px; margin: 0; }
 .window_panel .audioright { border-radius: 0 5px 5px 0; margin-left: -1px; }
 
@@ -737,11 +737,11 @@ li.notactive { display: none; }
 /*.window_panel fieldset.checklast { margin: 0; padding: 6px 0 16px 0px; }*/
 .window_panel input[type="text"],
 .window_panel select,
-.window_panel textarea { display: inline-block; width: 300px; padding: 5px; font-size: 14px; line-height: 18px; border: 1px solid #ccc; border-radius: 5px; }
+.window_panel textarea { display: inline-block; width: 300px; padding: 5px; font-size: 14px; line-height: 18px; border: 1px solid #ccc; -webkit-border-radius: 5px; border-radius: 5px; }
 .window_panel input[type="text"]:focus,
 .window_panel select:focus,
 .window_panel textarea:focus { border: 1px solid #58acef; outline: 0px; box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(82, 168, 236, 0.6); }
-.window_panel label { float: left; display: inline; width: 140px; margin: 0 10px 0 0; padding: 6px 0; font-size: 14px; line-height: 19px; text-align: right; }
+.window_panel label { float: left; display: inline; width: 140px; margin: 0 10px 0 0; padding: 6px 0; font-size: 14px; line-height: 18px; text-align: right; }
 .window_panel input.small { float: left; width: 135px; }
 .window_panel textarea { /*max-width: 300px; min-width: 300px;*/ width: 96%; min-height: 100px; }
 .window_panel select { font-size: 14px; padding: 5px; }
@@ -757,6 +757,9 @@ li.notactive { display: none; }
 .window_panel .translations input { margin-left: 150px; }
 .window_panel .translations input[name^=tts_override] { margin-left: 10px; }
 .window_panel .translations label { float: none; width: auto;	}
+
+.html_translate { background: #fff; width: 96%; }
+.html_translate p { padding: 5px; color: #222; font-size: 14px; line-height: 18px; border: 1px solid #ccc; -webkit-border-radius: 5px; border-radius: 5px; }
 
 #msgsndr_tab_social .form_actions { border: none; }
 
@@ -810,7 +813,7 @@ span.error { color: rgb(219,30,30); font-size: 0.9em; }
  .help h3 { font-size: 13px; }
  .help p { font-size: 12px; }
  
- .msg_steps li a { font-size: 11px; line-height: 20px; }
+ .msg_steps li a { font-size: 13px; line-height: 20px; }
  .msg_steps li span.icon { height: 20px; width: 20px; font-size: 12px; }
  .msg_steps li a:after { border-width: 19px; margin-top: -19px; }
  .msg_steps li a:before { border-width: 20px; margin-top: -20px; }
@@ -827,4 +830,13 @@ span.error { color: rgb(219,30,30); font-size: 0.9em; }
  .window_panel textarea { width: 96%; font-size: 13px; }
  .window_panel .controls { margin: 0 0 0 100px; }
  .easycallmaincontainer input.small { width: 135px; }
+ .window_panel .translations input { margin-left: 100px; }
+ 
+ button, .btn { font-size: 13px; }
+ .btn_left, .btn_middle, .btn_right { font-size: 11px; }
+}
+
+@media screen and (max-width: 850px) {
+ .msg_steps li a { font-size: 11px; }
+ .window_panel p, .window_panel a { font-size: 13px; }
 }
