@@ -134,6 +134,7 @@
                 // The "Add" button is clicked
                 modal.$el.on('click', '.btn-primary:not(.disabled,:disabled)', function(){
                     $.merge(base.pickedListIds, modal.selectedListIds);
+                    base.updateParentElement();
                     modal.$el.modal('hide');
                     base.buildTable();
                     $.each(modal.selectedListIds, function(index, id){
@@ -580,6 +581,7 @@
                     var $btn = $(this);
                     if (!$btn.hasClass('disabled')) {
                         base.pickedListIds.push(modal.newList.id);
+                        base.updateParentElement();
                         base.lists[modal.newList.id] = $.extend({}, modal.newList);
                         modal.$el.modal('hide');
                         base.buildTable();
@@ -706,6 +708,7 @@
                                     url: 'ajax.php?type=liststats&listids=["' + newListId + '"]',
                                 }).done(function(data){
                                     base.pickedListIds.push(newListId);
+                                    base.updateParentElement();
                                     // Truncate the name if there are a lot of sections
                                     var listName = 'School is ' + modal.orgs[modal.selectedOrg].name + '; Section is ' +  sectionNames.join('; ');
                                     data[newListId].name = listName.length > 60 ? (listName.substring(0, 59) + '...') : listName;
@@ -780,6 +783,7 @@
                 
                 if ($action.hasClass('remove')) {
                     base.pickedListIds.splice(base.pickedListIds.indexOf(listId), 1);
+                    base.updateParentElement();
                 } else if ($action.hasClass('save')) {
                     base.modals.saveList.listId = listId;
                     base.modals.saveList.$el.modal('show');
@@ -838,6 +842,10 @@
             setTimeout(function(){
                 $listTable.find('[data-list-id=' + listId + '] td').addClass('flashed');
             }, 1000);
+        };
+        
+        base.updateParentElement = function() {
+        	$("#msgsndr_lists").val($.toJSON(base.pickedListIds));
         };
 
         // Run initializer

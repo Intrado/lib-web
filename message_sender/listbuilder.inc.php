@@ -1,5 +1,5 @@
 							<div class="add-recipients">
-
+								<input type="hidden" id="msgsndr_lists" name="lists" />
 								<div class="add-btns cf"> 
 									<a href="#add-recipients-existing_lists" class="btn disabled" data-toggle="modal">Pick from Existing Lists</a> 
 									<span>or</span>
