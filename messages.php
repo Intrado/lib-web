@@ -130,7 +130,7 @@ if($isajax === true) {
 			join user u on
 				(mg.userid = u.id)
 			left join publish p on
-				(p.userid = ? and p.messagegroupid = m.messagegroupid)
+				(p.userid = ? and p.messagegroupid = mg.id)
 			where mg.id in (". implode(",", $msgGroupIds) .")
 			group by mg.id
 			order by $orderby, mg.id",
