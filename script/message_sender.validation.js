@@ -313,7 +313,7 @@ jQuery.noConflict();
             }
           });
 
-          $(this).next('a').append(' <img src="img/ajax-loader.gif" class="loading" />');
+          $(this).parent().append(' <img src="img/ajax-loader.gif" class="loading" />');
           doTranslate(ttslangCodes,txtField,displayArea,msgType);
 
         }
@@ -578,6 +578,8 @@ jQuery.noConflict();
 
     };
 
+
+
     function sendSMS() {
 
       $('li.osms').removeClass('notactive');
@@ -615,19 +617,24 @@ jQuery.noConflict();
 
     };
 
+
       // setInterval to check sms text and update character count
       function smsChar(action) {
 
         function sInt() {
-          charCount($('#msgsndr_form_sms'), '160', '.sms.characters');
+          //charCount($('#msgsndr_form_sms'), '160', '.sms.characters');
+          $('#msgsndr_form_sms').trigger('change');
         }
 
         if (typeof (action) != 'undefined') {
           smsCharCount = setInterval(sInt,100);
-        } else {
+        } else if (typeof (smsCharCount) != 'undefined') {
           clearInterval(smsCharCount);
         }
       };
+
+
+
 
 
 
@@ -722,12 +729,18 @@ jQuery.noConflict();
 
     });
 
+
+    // Cancel Button for message content areas
     $('.btn_cancel').on('click', function(e) {
       e.preventDefault();
 
-      if ($(this).attr('data-nav') == '.osms' ) {
+      var navItem = $(this).attr('data-nav');
+
+      if (navItem == '.osms' ) {
         smsChar();
       }
+
+      $('.msg_content_nav li').removeClass('lighten');
 
       notVal.cancelBtn(this);
       notVal.checkContent();
