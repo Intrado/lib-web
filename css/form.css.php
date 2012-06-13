@@ -168,7 +168,7 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 .newform .MultiCheckbox input[type="checkbox"] { float: left; display: inline; margin: 0 5px 0 0; }
 .newform .list th.MultiCheckbox label { float: left; display: inline; margin: 0 10px 0 0; }
 
-.newform .form_list_table { display: inline; width: 250px; margin: 0; padding: 0; }
+.newform .form_list_table { width: 250px; margin: 0; padding: 0; }
 .newform .list { margin: 0 0 5px 0; }
 .newform .repeatjob { width: 350px; }
 
