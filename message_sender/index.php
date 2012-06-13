@@ -268,8 +268,10 @@ Validator::load_validators(array(
 
 <script src="script/message_sender.previewmodal.js"></script>
 <script src="script/message_sender.emailattach.js"></script>
-<!--script src="script/message_sender.facebook.js"></script-->
+<script src="script/message_sender.facebook.js"></script>
 <script src="script/message_sender_listbuilder.js"></script>
+
+<script src="script/datepicker.js"></script>
 
 <script>
 jQuery.noConflict();
@@ -289,12 +291,12 @@ jQuery.noConflict();
 		applyHtmlEditor('msgsndr_form_body');
 
 		// facebook stuff (WIP - commented out during development)
-		/*renderFacebook();
+		renderFacebook();
 		$.when(tokenCheck).then(function() {
-			addFbPageElement('msgsndr_fbpagefbpages','msgsndr_fbpages', fbToken.userId );
+			//addFbPageElement('msgsndr_fbpagefbpages','msgsndr_fbpages', fbToken.userId );
 			//updateFbPages(access_token, formitem, container, showrenew)
 			//updateFbPages(fbToken.accessToken);
-		});*/
+		});
 
   });
 }) (jQuery);
