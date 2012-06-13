@@ -551,18 +551,9 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
 
 /*----- Easycall styles so it's less broken. TODO: these are not final! -----*/
 .easycallmaincontainer {}
-.easycallmaincontainer div {
-	margin-bottom: 3px;
-}
-.easycallmaincontainer select {
-	float: left;
-	margin-right: 5px;
-	width: auto !important;
-}
-.easycallmaincontainer input.blank {
-	color: gray;
-	font-style: italic;
-}
+.easycallmaincontainer div { }
+.easycallmaincontainer select { float: left; margin-right: 5px; width: auto !important; }
+.easycallmaincontainer input.blank { color: gray; font-style: italic; }
 .easycalllanguagetitle { float: left; margin: 6px 0 0 20px; font-size: 1.1em; font-weight: bold; font-style: italic; }
 .easycallerrorcontainer { /*padding: 2px; background: pink;*/ }
 .easycallerrorcontainer span.easycallerrortext {
@@ -758,6 +749,7 @@ li.notactive { display: none; }
 .window_panel .addme { float: left; display: inline; text-align: left; width: inherit; }
 .window_panel p { margin: 0; padding: 4px 0; color: #888; }
 .window_panel .controls { margin: 0 0 0 150px; }
+.window_panel .controls #cke_reusableckeditor { width: 96% !important; }
 .window_panel .form_actions { background: #ededed; margin: 0; padding: 15px 0; border-radius: 0 0 8px 8px; border-top: 1px solid #ccc; }
 
 .window_panel .translations fieldset { border-top: 1px solid rgb(204,204,204); }
@@ -828,4 +820,11 @@ span.error { color: rgb(219,30,30); font-size: 0.9em; }
  .msg_steps li.complete + li a:before { border-width: 20px; margin-top: -20px; }
  
  .msg_content_nav li a { padding: 6px 10px; font-size: 15px; }
+ 
+ .window_panel label { width: 90px; padding: 5px 0; font-size: 13px; }
+ .window_panel input[type="text"],
+ .window_panel select,
+ .window_panel textarea { width: 96%; font-size: 13px; }
+ .window_panel .controls { margin: 0 0 0 100px; }
+ .easycallmaincontainer input.small { width: 135px; }
 }
