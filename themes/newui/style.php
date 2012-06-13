@@ -861,6 +861,8 @@ li.notactive { display: none; }
 
 #msgsndr_tab_social .form_actions { border: none; }
 
+.twitter .twittername { margin: 0 0 10px 150px; font-size: 14px;}
+
 .window_panel iframe { height: 3em; padding-top: 3px; }
 
 .characters { float: right; margin: 0 4% 0 0; }

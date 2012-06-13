@@ -160,12 +160,18 @@ jQuery.noConflict();
         async: false,
         success: function(data) {
           userInfo = data;
-          var phone = userInfo.phone;
-          var phonePartOne = '(' + phone.substring(0,3) + ') ';
-          var phonePartTwo = phone.substring(3,10);
-          userInfo.phoneFormatted = phonePartOne + phonePartTwo;
+           // format the phone number and add the new formatted version to the userInfo object
+          userInfo.phoneFormatted =formatPhone(data.phone); 
         }
       });  
+    };
+
+    function formatPhone(number){ // must be a 10 digit number with no spaces passed in
+      var phone = number;
+      var phonePartOne = '(' + phone.substring(0,3) + ') ';
+      var phonePartTwo = phone.substring(3,6) + '-';
+      var phonePartThree = phone.substring(6,10);
+      return phonePartOne + phonePartTwo + phonePartThree;
     };
 
 
@@ -274,9 +280,16 @@ jQuery.noConflict();
       notVal.watchFields('#msgsndr_form_mesms');
 
       // set the addme values from the userInfo object...
-
-      $('#msgsndr_form_mephone').attr('value', userInfo.phoneFormatted);
-      $('#msgsndr_form_meemail').attr('value', userInfo.email);
+      if(typeof(userInfo) != 'undefined' && userInfo != false){
+        if(userInfo.phone != ''){
+        $('#msgsndr_form_mephone').attr('value', userInfo.phoneFormatted);
+        }
+        if(userInfo.email != ''){
+          $('#msgsndr_form_meemail').attr('value', userInfo.email);
+        }
+      };
+      
+      
       
     };
 
@@ -476,7 +489,7 @@ jQuery.noConflict();
         // then subsequently for userPermissions.setcallerid
         if (orgOptions._hascallback == 0){
           
-          if (typeof(orgOptions.requireapprovedcallerid) != 'undefined'){ // if requireapprovedcallerid is defined...
+          if (typeof(orgOptions.requireapprovedcallerid) != 'undefined' && orgOptions.requireapprovedcallerid == 1){ // if requireapprovedcallerid is defined...
             // get the users callerid's ...
             var userCallerIds = getUserCallerIds();
 
@@ -487,7 +500,7 @@ jQuery.noConflict();
 
             // if the users setcallerid permission is defined, 
             // add the 'other' option and create a text input for them to add arbitrary value, and validate it.
-            if (typeof(userPermissions.setcallerid) != 'undefined'){ 
+            if (typeof(userPermissions.setcallerid) != 'undefined' && userPermissions.setcallerid == 1){ 
               $('#msgsndr_form_callid').append('<option value="other" >Other</option>');
               $('#msgsndr_form_callid').closest('div.controls').append('<span id="callerid_other_wrapper" class="hidden"><input type="text" id="callerid_other" name="phone_callerid"  /><span class="error"></span></span>');
               // set up the validation on the 'other' input
@@ -724,8 +737,10 @@ jQuery.noConflict();
           } else {
             //$('#msgsndr_fbpage').attr('value', []);
           }
-          if (typeof(data.twitter) != 'undefined'){
+          if (typeof(data.twitter) != 'undefined' || data.twitter != ''){
             twToken = data.twitter;
+            console.log(twToken.screenName);
+            $('#msgsndr_twittername').append('Posting as <a class="" href="http://twitter.com/'+twToken.screenName+'">@'+twToken.screenName+'</a>');
           }
         }
       });

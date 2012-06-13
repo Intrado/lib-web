@@ -299,7 +299,6 @@
 								</div>
 								
 								<div id="msgsndr_fbpagerenew">
-								<div id="msgsndr_fbpagerenew" class="">
 									<button class="btn" onclick="popup('popupfacebookauth.php', 640, 400);" type="button">
 										<img class="btn_middle_icon" alt="" src="img/icons/custom/facebook.gif">
 										Renew Facebook Authorization
@@ -332,6 +331,7 @@
 					<div class="twitter">
 
 						<fieldset>
+							<p id="msgsndr_twittername" class="twittername"></p>
 							<label for="msgsndr_form_tmsg">Message</label>
 							<div class="controls">
 							<textarea id="msgsndr_form_tmsg" name="twitter_message" class="required"></textarea> <span class="error"></span>

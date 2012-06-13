@@ -295,7 +295,7 @@ jQuery.noConflict();
 		$.when(tokenCheck).then(function() {
 			//addFbPageElement('msgsndr_fbpagefbpages','msgsndr_fbpages', fbToken.userId );
 			//updateFbPages(access_token, formitem, container, showrenew)
-			//updateFbPages(fbToken.accessToken);
+			//updateFbPages(fbToken.accessToken, "msgsndr_fbpage", "msgsndr_fbpagefbpages", "msgsndr_fbpagerenew");
 		});
 
   });
