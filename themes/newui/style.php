@@ -735,6 +735,54 @@ border: 1px solid rgba(0, 0, 0, 0.3); -webkit-border-radius: 6px; border-radius:
 .modal_content input.btn { border-radius: 0 5px 5px 0; border-left: none; }
 
 
+/*---------- Message sender form ----------*/
+
+li.notactive { display: none; }
+.hidden { display: none;}
+
+.window_panel fieldset { padding: 0 0 15px 0; }
+.window_panel fieldset.check { padding: 15px 0; }
+.window_panel hr { background: #CCCCCC; margin: 0 20px 15px; }
+/*.window_panel fieldset.checklast { margin: 0; padding: 6px 0 16px 0px; }*/
+.window_panel input[type="text"],
+.window_panel select,
+.window_panel textarea { display: inline-block; width: 300px; padding: 5px; font-size: 14px; line-height: 18px; border: 1px solid #ccc; border-radius: 5px; }
+.window_panel input[type="text"]:focus,
+.window_panel select:focus,
+.window_panel textarea:focus { border: 1px solid #58acef; outline: 0px; box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(82, 168, 236, 0.6); }
+.window_panel label { float: left; display: inline; width: 140px; margin: 0 10px 0 0; padding: 6px 0; font-size: 14px; line-height: 19px; text-align: right; }
+.window_panel input.small { float: left; width: 135px; }
+.window_panel textarea { /*max-width: 300px; min-width: 300px;*/ width: 96%; min-height: 100px; }
+.window_panel select { font-size: 14px; padding: 5px; }
+.window_panel input[type="checkbox"] { margin: 9px 5px 0 0; }
+.window_panel .addme { float: left; display: inline; text-align: left; width: inherit; }
+.window_panel p { margin: 0; padding: 4px 0; color: #888; }
+.window_panel .controls { margin: 0 0 0 150px; }
+.window_panel .form_actions { background: #ededed; margin: 0; padding: 15px 0; border-radius: 0 0 8px 8px; border-top: 1px solid #ccc; }
+
+.window_panel .translations fieldset { border-top: 1px solid rgb(204,204,204); }
+.window_panel .translations fieldset:first-child { border-top: none; }
+.window_panel .translations input { margin-left: 150px; }
+.window_panel .translations input[name^=tts_override] { margin-left: 10px; }
+.window_panel .translations label { float: none; width: auto;	}
+
+#msgsndr_tab_social .form_actions { border: none; }
+
+.window_panel iframe { height: 3em; padding-top: 3px; }
+
+.characters { float: right; margin: 0 4% 0 0; }
+
+.window_panel input.ok, .window_panel textarea.ok, span.ok { border: 1px solid rgb(75,149,35); }
+.window_panel input.ok[type="text"]:focus, .window_panel textarea.ok:focus { border: 1px solid rgb(75,149,35);
+-webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(75,149,35, 0.6);	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(75,149,35, 0.6); }
+
+.window_panel input.er, .window_panel textarea.er, span.er { border: 1px solid rgb(219,30,30); }
+.window_panel input.er[type="text"]:focus, .window_panel textarea.er:focus { border: 1px solid rgb(219,30,30);
+-webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(219,30,30, 0.6);	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(219,30,30, 0.6); }
+
+span.error { color: rgb(219,30,30); font-size: 0.9em; }
+
+
 /*----- Prototip styles for shortcut menu, not actually used in this theme -----*/
 	
 .shortcuts a { color: #26477d; }
