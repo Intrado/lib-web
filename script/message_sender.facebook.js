@@ -162,9 +162,9 @@
 					var category = "";
 					var id = "me";
 				} else {
-					//var name = account.name.escapeHTML();
-					//var category = account.category.escapeHTML();
-					//var id = account.id;
+					var name = account.name.escapeHTML();
+					var category = account.category.escapeHTML();
+					var id = account.id;
 				}
 				
 				var checkbox = new Element("input", { "type": "checkbox", "value": id, "id": id, "name": id });
@@ -180,8 +180,8 @@
 							).insert(
 								new Element("div", { "class": "fbcategory" }).update(category))
 					));
-				//$(container).insert(accountitem);
-				//$(container).insert(new Element("div").setStyle({ "clear": "both"}));
+				$(container).insert(accountitem);
+				$(container).insert(new Element("div").setStyle({ "clear": "both"}));
 				// observe changes to the checkbox state
 				checkbox.observe(
 						"change",handleFbPageChange.curry(e)
