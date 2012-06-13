@@ -34,7 +34,6 @@
 				$("msgsndr_fbpagenone").observe("click", handleActionLink.curry("msgsndr_fbpages", false));
 				// Observe event indicating page loading has completed
 				$("msgsndr_fbpages").observe("FbPages:update", function (res) {
-					alert(res);
 					if (res.memo.pagesloaded == 0) {
 						$("msgsndr_fbpagefbpages").update("There were no authorized posting locations found!<br>Contact your system administrator for assistance.");
 						$("msgsndr_fbpageactionlinks").hide();
@@ -88,7 +87,7 @@
 					// get the authorized pages
 					var authpages = $(formitem + "authpages").value
 					if (!authpages)
-						authpages = [];
+						authpages = {"pages":[], "wall": true};
 					else
 						authpages = authpages.evalJSON();
 					
