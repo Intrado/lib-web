@@ -753,3 +753,31 @@ border: 1px solid rgba(0, 0, 0, 0.3); -webkit-border-radius: 6px; border-radius:
 .ie7 .msg_steps li { width: 32%; }
 
 
+
+
+@media screen and (max-width: 1000px) { 
+ .subnavtabs a { font-size: 13px; padding: 5px 8px; }
+ .wrapper { margin: 0 180px 0 0; }
+ .main_aside { width: 170px; right: -180px; }
+ 
+ a.bigbtn { margin: 0 0 15px 0; padding: 5px; font-size: 16px; }
+ 
+ .templates { margin: 0 0 15px 0; padding: 7px 12px; }
+ .templates h3 { font-size: 12px; }
+ .templates li { font-size: 13px; }
+ 
+ .help { padding: 7px 12px; }
+ .help h3 { font-size: 13px; }
+ .help p { font-size: 12px; }
+ 
+ .msg_steps li a { font-size: 11px; line-height: 20px; }
+ .msg_steps li span.icon { height: 20px; width: 20px; font-size: 12px; }
+ .msg_steps li a:after { border-width: 19px; margin-top: -19px; }
+ .msg_steps li a:before { border-width: 20px; margin-top: -20px; }
+ .msg_steps li.active + li a:after { border-width: 19px; margin-top: -19px; }
+ .msg_steps li.active + li a:before { border-width: 20px; margin-top: -20px; }
+ .msg_steps li.complete + li a:after { border-width: 19px; margin-top: -19px; }
+ .msg_steps li.complete + li a:before { border-width: 20px; margin-top: -20px; }
+ 
+ .msg_content_nav li a { padding: 6px 10px; font-size: 15px; }
+}
