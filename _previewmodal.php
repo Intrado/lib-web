@@ -13,6 +13,9 @@ require_once("obj/Phone.obj.php");
 require_once("inc/previewfields.inc.php");
 require_once("obj/PreviewModal.obj.php");
 
+require_once("obj/FormItem.obj.php");
+require_once("obj/Validator.obj.php");
+
 require_once("inc/appserver.inc.php");
 
 PreviewModal::HandleRequestWithPhoneText();
