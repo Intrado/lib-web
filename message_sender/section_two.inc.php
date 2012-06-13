@@ -285,19 +285,35 @@
 							</div>
 						</fieldset>
 						
-						<!-- facebook WIP ...
 						<fieldset> 
 							<div id="msgsndr_fbpages" class="controls fb_reset">
 							<input id="msgsndr_fbpage" type="hidden" value="" name="social_fbpages">
 							<input id="msgsndr_fbpageauthpages" type="hidden" value="" name="social_fbpagesauthpages">
 								<div id="fb-root"></div>
-								<div id="msgsndr_fbpageconnect"></div>
-								<div id="msgsndr_fbpagerenew"></div>
-								<div id="msgsndr_fbpageactionlinks"></div>
+								
+								<div id="msgsndr_fbpageconnect" class="hidden">
+									<button class="btn" onclick="popup('popupfacebookauth.php', 640, 400);" type="button">
+										<img class="btn_middle_icon" alt="" src="img/icons/custom/facebook.gif">
+										Add Facebook Account
+									</button>
+								</div>
+								
+								<div id="msgsndr_fbpagerenew" class="hidden">
+									<button class="btn" onclick="popup('popupfacebookauth.php', 640, 400);" type="button">
+										<img class="btn_middle_icon" alt="" src="img/icons/custom/facebook.gif">
+										Renew Facebook Authorization
+									</button>
+								</div>
+								
+								<div id="msgsndr_fbpageactionlinks" class="hidden">
+									<a id="jobedit_fbpageall" class="actionlink">Select All</a>
+									&nbsp;|&nbsp;
+									<a id="jobedit_fbpagenone" class="actionlink">Remove All</a>
+								</div>
 								<div id="msgsndr_fbpagefbpages"></div>
 								<div id="msgsndr_fbpagesmessage" class="underneathmsg cf"></div>
 							</div>
-						</fieldset> -->
+						</fieldset>
 					
 
 					</div><!-- facebook -->
