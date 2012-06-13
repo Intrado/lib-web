@@ -694,6 +694,12 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
 .table-bordered thead:first-child tr:first-child th:first-child, .table-bordered tbody:first-child tr:first-child td:first-child {
 	border-radius: 4px 0 0 0;
 }
+.table-bordered td {
+	border-top: 1px solid #DDDDDD;
+	line-height: 22px;
+	padding: 8px;
+	text-align: left;
+}
 .table-bordered th {
 	font-weight: bold;
 	vertical-align: bottom;
@@ -704,6 +710,98 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
 .table-bordered th + th, .table-bordered td + td, .table-bordered th + td, .table-bordered td + th {
 	border-left: 1px solid #DDDDDD;
 }
+.add-recipients table.lists tr td:first-child + td {
+	border-left: medium none;
+}
+a.remove:not(.btn), a.cancel:not(.btn) {
+	width: 14px;
+	color: #E84F1F;
+}
+.icon-remove {
+	background-position: -312px 0;
+	background-image: url("themes/newui/glyphicons-halflings.png");
+	background-repeat: no-repeat;
+	display: inline-block;
+	height: 14px;
+	line-height: 14px;
+	width: 14px;
+}
+.icon-folder-open {
+	background-position: -410px -120px;
+	background-image: url("themes/newui/glyphicons-halflings.png");
+	background-repeat: no-repeat;
+	display: inline-block;
+	height: 14px;
+	line-height: 14px;
+	width: 14px;
+}
+/*.icon-remove:hover {
+	background-image: url("themes/newui/glyphicons-halflings-white.png");
+}*/
+
+/* Add existing list(s) */
+.add-recipients .existing-lists {
+	background: none repeat scroll 0 0 #FFFFFF;
+	border: 1px solid #CCCCCC;
+	border-radius: 3px 3px 3px 3px;
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
+	display: block;
+	max-height: 200px;
+	overflow: auto;
+	margin: 12px;
+	padding: 5px;
+}
+.add-recipients .existing-lists label {
+	display: block !important;
+	float: none !important;
+	width: auto !important;
+	text-align: left !important;
+	color: #333333;
+	margin-bottom: 5px;
+	font-weight: normal;
+	padding-left: 18px;
+}
+.add-recipients .existing-lists label input {
+	margin: 2px 10px 0 0;
+	float: left;
+}
+.add-recipients .existing-lists label span {
+	float: none !important;
+}
+.add-recipients .btn {
+	padding 5px 10px;
+}
+
+/* Add recipients using rules */
+.add-recipients table.rules tr td {
+	vertical-align: top;
+}
+.add-recipients select {
+	width: auto !important;
+}
+.add-recipients .value-options {
+	background: none repeat scroll 0 0 #FFFFFF;
+	border: 1px solid #CCCCCC;
+	border-radius: 3px 3px 3px 3px;
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
+	display: block;
+	max-height: 150px;
+	overflow: auto;
+	overflow-x: hidden;
+	padding: 5px;
+}
+.add-recipients label {
+	display: block !important;
+	float: none !important;
+	width: auto !important;
+	text-align: left !important;
+	color: #333333;
+	font-weight: normal;
+	padding-top: 0px !important;
+	padding-bottom: 0px !important;
+	margin-right: 0px !important;
+}
+
 
 /*----- Bootstrap modal styles -----*/
 
