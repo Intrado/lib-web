@@ -14,15 +14,40 @@ require_once("inc/common.inc.php");
 // Action/Request Processing
 ////////////////////////////////////////////////////////////////////////////////
 
+// List all possible request values and set their defaults
+$ranges = array("7days" => "7 Days","month" => "Month","year" => "Year");
+$requestValues = array(
+			"showactivity" => 'me',
+			"daterange" => '7days',
+);
+
+
+// Update request values from what is passed in
+foreach($requestValues as $key => $values) {
+	if (isset($_REQUEST[$key])) {
+		$requestValues[$key] = $_REQUEST[$key];
+	}
+}
+
+
 $useridList = array();
 $useridList = QuickQueryList("select subordinateuserid from userlink where userid=?",false,false,array($USER->id));
 $useridList[] = $USER->id;
-$start_datetime = "2012-05-01 00:00:00";
-$end_datetime = "2012-05-31 23:59:59";
-
-if (isset($_GET['deleteid'])) {
-	//TODO get the userid list and date range for stats
+$start_datetime = time();
+switch($requestValues["daterange"]) {
+	case "7days":
+		$start_datetime -= 604800;
+		break;
+	case "month":
+		$start_datetime -= 2592000;
+		break;
+	case "year":
+		$start_datetime -= 31536000;
+		break;
 }
+
+$start_datetime = date("Y-m-d h:m:s",$start_datetime);
+$end_datetime = date("Y-m-d h:m:s",time());
 
 ////////////////////////////////////////////////////////////////////////////////
 // Stats functions
@@ -159,19 +184,7 @@ $jobtemplates = DBFindMany("Job", "from job where userid=? and status='template'
 
 $userlinks = QuickQuery("select count(*) from userlink where userid=?",false,array($USER->id));
 
-// List all possible request values and set their defaults
-$requestValues = array(
-			"showactivity" => 'me',
-			"daterange" => '7days',
-);
 
-
-// Update request values from what is passed in
-foreach($requestValues as $key => $values) {
-	if (isset($_REQUEST[$key])) {
-		$requestValues[$key] = $_REQUEST[$key];
-	}
-}
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
@@ -201,7 +214,7 @@ include("nav.inc.php");
 			<div class="btngroup">
 				<?
 				$urlQueryState = http_build_query(array_diff_key($requestValues,array("daterange" => '')));
-				$ranges = array("7days" => "7 Days","month" => "Month","year" => "Year");
+				
 				foreach ($ranges as $range => $display) {
 					echo "<button " . ($requestValues["daterange"] == $range?"class=\"active\"":"") . " onclick=\"window.location='start.php?daterange=$range&$urlQueryState'\">$display</button>";
 				}
