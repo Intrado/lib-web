@@ -190,8 +190,9 @@ if (count($data) > $scrollThreshold) {
 }
 startWindow('My ' . getJobsTitle() . ' ' . help('Jobs_MyActiveJobs'), 'padding: 3px;', true, true);
 
-button_bar(button(_L('Create New %s',getJobTitle()), NULL,"job.php?id=new") . help('Jobs_AddStandardJob'),button('Refresh', 'window.location.reload()'));
-
+?>
+<div class="feed_btn_wrap cf"><?= icon_button(_L('Create New %s',getJobTitle()),"add",null,"job.php?id=new") ?></div>
+<?
 showObjects($data, $titles, $formatters, $scroll, true);
 endWindow();
 
@@ -212,15 +213,15 @@ if ($USER->authorize('createrepeat')) {
 		$scroll = true;
 	}
 	startWindow(_L('My Repeating %s ', getJobsTitle()) . help('Jobs_MyRepeatingJobs'), 'padding: 3px;', true, true);
+	?>
+	<div class="feed_btn_wrap cf"><?= icon_button(_L('Create Repeating %s ', getJobTitle()),"add",null,"jobrepeating.php?id=new") ?></div>
+	<?	
+	
 	if (count($data) > 0 && getSystemSetting("disablerepeat") ) {
 ?>
 		<table width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td align=center><div class='alertmessage noprint'>The System Administrator has disabled all Repeating Jobs. <br>No Repeating Jobs can be run while this setting remains in effect.</div></td></tr></table>
 <?
 	}
-
-	button_bar(button(_L('Create Repeating %s ', getJobTitle()), NULL,"jobrepeating.php?id=new") . help('Jobs_AddRepeatingJob'));
-
-
 	showObjects($data, $titles, array("startdate" => "fmt_nextrun", "type" => "fmt_obj_delivery_type_list","finishdate" => "fmt_obj_date", "Actions" => "fmt_jobs_actions"), $scroll, true);
 	endWindow();
 }

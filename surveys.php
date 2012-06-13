@@ -57,7 +57,9 @@ include_once("nav.inc.php");
 
 
 startWindow('My Survey Templates '. help('Surveys_MySurveyTemplates'),'padding: 3px;', true, true);
-button_bar(button('Create New Survey Template', null,"surveytemplatewiz.php?id=new") . help('Surveys_CreateNewTemplateButton') );
+?>
+<div class="feed_btn_wrap cf"><?= icon_button(_L('Create New Survey Template'),"add",null,"surveytemplatewiz.php?id=new") ?></div>
+<?
 
 $questionnaires = DBFindMany("SurveyQuestionnaire", "from surveyquestionnaire where userid=$USER->id and deleted = 0 order by name");
 
@@ -78,7 +80,9 @@ endWindow();
 
 startWindow('My Surveys ' . help('SurveyBuilder_MyActiveAndPending'),'padding: 3px;',true, true);
 
-button_bar(button('Schedule Survey', null,"survey.php?id=new") );
+?>
+<div class="feed_btn_wrap cf"><?= icon_button(_L('Schedule Survey'),"add",null,"survey.php?id=new") ?></div>
+<?
 
 $data = DBFindMany("Job","from job where userid=$USER->id and type='survey' and (status='new' or status='scheduled' or status='processing' or status='procactive' or status='active' or status='cancelling') and deleted=0 order by id desc");
 
