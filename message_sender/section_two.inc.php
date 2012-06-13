@@ -187,7 +187,7 @@
 				</fieldset>
 				
 				<fieldset>
-					<label for="msgsndr_form_mailsubject">Subject</label>
+					<label for="msgsndr_form_mailsubject">Subject</label> 
 					<div class="controls">
 						<input type="text" id="msgsndr_form_mailsubject" name="email_subject" class="required" autocomplete="off" /> <span class="error"></span>
 					</div>
@@ -200,6 +200,7 @@
 						<div id="uploadedfiles" style="display: none; "></div>
 						<div id="upload_process" style="display: none; "><img src="img/ajax-loader.gif"></div>
 						<iframe id="msgsndr_form_attachment_my_attach" class="attach_file" src="_emailattachment.php?formname=broadcast&amp;itemname=msgsndr_form_attachment"></iframe>
+						<div class="underneathmsg cf"></div>
 					</div>
 				</fieldset>
 				
@@ -292,10 +293,24 @@
 								<p><a href="javascript:void(null);" id="sms_sc" onclick="(new spellChecker($('msgsndr_form_fbmsg')) ).openChecker();">Spell Check</a> <span class="fb characters">420 Characters left</span></p>
 							</div>
 						</fieldset>
+						
+						<!-- facebook WIP ...
+						<fieldset> 
+							<div id="msgsndr_fbpages" class="controls fb_reset">
+							<input id="msgsndr_fbpage" type="hidden" value="" name="social_fbpages">
+							<input id="msgsndr_fbpageauthpages" type="hidden" value="" name="social_fbpagesauthpages">
+								<div id="fb-root"></div>
+								<div id="msgsndr_fbpageconnect"></div>
+								<div id="msgsndr_fbpagerenew"></div>
+								<div id="msgsndr_fbpageactionlinks"></div>
+								<div id="msgsndr_fbpagefbpages"></div>
+								<div id="msgsndr_fbpagesmessage" class="underneathmsg cf"></div>
+							</div>
+						</fieldset> -->
+					
 
 					</div><!-- facebook -->
 				</div><!-- data-social= facebook -->
-
 
 
 				<div class="social_tab hidden" data-social="twitter">

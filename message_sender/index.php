@@ -16,7 +16,6 @@ require_once("obj/ValTimeWindowCallEarly.val.php");
 require_once("obj/ValTimeWindowCallLate.val.php");
 require_once("obj/EmailAttach.val.php");
 
-
 require_once("obj/Email.obj.php");
 require_once("obj/MessageAttachment.obj.php");
 require_once("obj/Form.obj.php");
@@ -154,12 +153,13 @@ include("nav.inc.php");
 
 ?>
 
+<link href="css/newui_datepicker.css" type="text/css" rel="stylesheet" />
+
 <script> 
 	userid = <? print_r($_SESSION['user']->id); ?>;
+	fbAppId = <? print_r($SETTINGS['facebook']['appid']); ?>;
 	twitterReservedChars = <? print_r(mb_strlen(" http://". getSystemSetting("tinydomain"). "/") + 6); ?>;
 </script>
-
-
 
 	<div class="wrapper">
 	
@@ -218,7 +218,6 @@ Validator::load_validators(array(
 <script src="script/jquery.1.7.2.min.js"></script>
 <script src="script/jquery.json-2.3.min.js"></script>
 
-
 <script src="script/message_sender.js"></script>
 <script src="script/message_sender.validation.js"></script>
 <script src="script/message_sender.global.js"></script>
@@ -227,14 +226,11 @@ Validator::load_validators(array(
 <script src="script/jquery.timer.js"></script>
 <script src="script/jquery.easycall.js"></script>
 
-
 <script src="script/bootstrap-modal.js"></script>
 <!-- <script src="script/bootstrap-tooltip.js"></script> -->
 <script src="script/bootstrap-dropdown.js"></script>
 
 <script type="text/javascript">
-
-
 		$("msgsndr_tts_message").observe("change", textAreaPhone_storedata.curry("messagePhoneText_message"));
 		$("msgsndr_tts_message").observe("blur", textAreaPhone_storedata.curry("messagePhoneText_message"));
 		$("msgsndr_tts_message").observe("keyup", textAreaPhone_storedata.curry("messagePhoneText_message"));
@@ -338,11 +334,8 @@ Validator::load_validators(array(
 <script src="script/niftyplayer.js.php"></script>
 <script src="script/ckeditor/ckeditor_basic.js"></script>
 <script src="script/htmleditor.js"></script>
-<script>
-	// activate ck editor on email body
-   applyHtmlEditor('msgsndr_form_body');
-</script>
-
+<script src="script/message_sender.emailattach.js"></script>
+<!--script src="script/message_sender.facebook.js"></script-->
 <script src="script/message_sender_listbuilder.js"></script>
 
 <script>
@@ -358,6 +351,18 @@ jQuery.noConflict();
 		$('.add-recipients').listPicker({
 			prepickedListIds: ["41"]
 		});
+
+		// ckeditor
+		applyHtmlEditor('msgsndr_form_body');
+
+		// facebook stuff (WIP - commented out during development)
+		/*renderFacebook();
+		$.when(tokenCheck).then(function() {
+			addFbPageElement('msgsndr_fbpagefbpages','msgsndr_fbpages', fbToken.userId );
+			//updateFbPages(access_token, formitem, container, showrenew)
+			//updateFbPages(fbToken.accessToken);
+		});*/
+
   });
 }) (jQuery);
 </script>
