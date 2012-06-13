@@ -581,11 +581,16 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
 	content: "";
 	display: table;
 }
-.add-recipients .btn { float: left; display: inline; }
+.add-recipients .btn {
+	display: inline-block;
+	vertical-align: middle;
+}
 .add-recipients span { float: left; display: inline; padding: 5px 8px; line-height: 19px; }
-.add-recipients .add-btns .btn-group { float: left; display: inline; }
-.btn-group {
-	position: relative;
+.add-recipients .add-btns .btn {
+	float: left;
+}
+.add-recipients .add-btns .btn-group {
+	float: left;
 }
 .btn-group .dropdown-toggle {
 	box-shadow: 1px 0 0 rgba(255, 255, 255, 0.125) inset, 0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 1px 2px rgba(0, 0, 0, 0.05);
@@ -773,8 +778,18 @@ a.remove:not(.btn), a.cancel:not(.btn) {
 }
 
 /* Add recipients using rules */
+.add-recipients p.instructions {
+	margin-left: 18px;
+}
 .add-recipients table.rules tr td {
 	vertical-align: top;
+}
+.add-recipients table.rules {
+	width: 100%;
+}
+.add-recipients table.rules td:last-child {
+	vertical-align: baseline;
+	text-align: right;
 }
 .add-recipients select {
 	width: auto !important;
@@ -788,9 +803,10 @@ a.remove:not(.btn), a.cancel:not(.btn) {
 	max-height: 150px;
 	overflow: auto;
 	overflow-x: hidden;
-	padding: 5px;
+	padding: 0 25px 0 5px;
+	white-space: nowrap;
 }
-.add-recipients label {
+.add-recipients .value-options label {
 	display: block !important;
 	float: none !important;
 	width: auto !important;
