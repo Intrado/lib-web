@@ -115,7 +115,7 @@ function form_do_validation (form, element) {
 
 		//set progress animation
 		//if radio button, get the id of the container div
-		var statusindicator = $((element.up(".radiobox") || element).id + "_icon");
+		var statusindicator = $((element.up(".radiobox") || element.up(".multicheckbox") || element).id + "_icon");
 		if (statusindicator)
 			statusindicator.src = "img/ajax-loader.gif";;
 
@@ -158,7 +158,7 @@ function form_do_validation (form, element) {
 			for (var i = 0; i < validators.length; i++) {
 				var v = validators[i];
 				var res;
-				if (value.length > 0 || v.isrequired || v.conditionalrequired) {
+				if (value.length > 0 || v.validator == "ValRequired" || v.validator == "ValConditionallyRequired") {
 					res = v.validate(v.name,v.label,value,v.args,requiredvalues);
 					if (res != true) {
 						form_validation_display(element,"error",res);
@@ -175,12 +175,8 @@ function form_do_validation (form, element) {
 function form_validation_display(element,style, msgtext) {
 	e = $(element);
 
-	//if radio button, get the id of the container div
-	var name;
-	if (e.up(".radiobox"))
-		name = e.up(".radiobox").id;
-	else
-		name = e.id;
+	//if radio button or multicheckbox, get the id of the container div
+	var name = $(e.up(".radiobox") || e.up(".multicheckbox") || e).id ;
 
 	var fieldarea = $(name + "_fieldarea");
 	
@@ -249,7 +245,7 @@ function form_make_validators(form, formvars) {
 			continue;
 		}
 
-		if (e.tagName.toLowerCase() == 'div' && e.hasClassName('radiobox')) {
+		if (e.tagName.toLowerCase() == 'div' && (e.hasClassName('radiobox') || e.hasClassName('multicheckbox'))) {
 			//attach event listeners to each of the radio boxes
 			var children = e.childElements();
 			for (var i = 0; i < children.length; i++) {
