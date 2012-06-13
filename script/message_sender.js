@@ -166,6 +166,15 @@ jQuery.noConflict();
 
 		});
 
+		// Translations Toggle
+		$('#email_translate').on('click', "input.translations", function() {
+			
+			$(this).next().next('.controls').toggleClass('hide');
+
+			// $('#'+tArea).slideToggle();
+
+		});
+
 
 
 		// Continue Buttons to move to next section
@@ -177,7 +186,7 @@ jQuery.noConflict();
       $('.msg_steps li').removeClass('active');
       $('a#tab_'+tabn).parent().addClass('active');
       $('a#tab_'+tabp).parent().addClass('complete');
-      
+
       $('a#tab_'+tabn).attr('data-active','true');
 
       $('.window_panel').hide();
