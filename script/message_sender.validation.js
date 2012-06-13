@@ -310,7 +310,7 @@ jQuery.noConflict();
 
 
 
-      // Translate Checkbox event
+      // Hide / Show Translations
       $('#text').on('click', '.toggle-translations', function(event) {
 
         event.preventDefault();
@@ -589,24 +589,48 @@ jQuery.noConflict();
       notVal.watchFields('#msgsndr_form_name, #msgsndr_form_email, #msgsndr_form_mailsubject, #msgsndr_form_body');
 
 
-      // Translate Checkbox event
-      $('#msgsndr_form_emailtranslate').on('click', function() {
-        // Checked if checked then do translate, as do not want to hit API when deselected translate
-        if ($(this).is(':checked')) {
 
-          var txtField      = CKEDITOR.instances.reusableckeditor.getData();//CKEDITOR.instances.reusableckeditor.document.$.body.innerHTML;
-          // $('#cke_reusableckeditor iframe').contents().find('body').text();
-          // CKEDITOR.instances.reusableckeditor.document.$.body.innerText;
+      // Hide / Show Translations
+      $('#msgsndr_tab_email').on('click', '.toggle-translations', function(event) {
+
+        event.preventDefault();
+
+        var text          = $(this).text().split(" ");
+
+        $(this).text(text[0] == 'Show' ? 'Hide ' + text[1] + ' ' + text[2] : 'Show ' + text[1] + ' ' + text[2] );
+
+        var etarget = $(this).attr('data-target');
+        $(etarget).slideToggle();
+        $(this).toggleClass('active');
+
+        $('#tts_retranslate').remove();
+
+        if (text[0] == 'Show') {
+
+          eTranslate(this);
+
+          $(this).parent().append(' <button id="email_retranslate" data-target="#email_translate">Re Translate</button>');
+        }
+
+      });
+
+
+      function eTranslate() {
+
+          var txtField      = CKEDITOR.instances.reusableckeditor.getData();
           var displayArea   = $(this).attr('data-display');
           var msgType       = 'email';
 
+          $(this).parent().append(' <button id="email_retranslate" data-target="#email_translate">Re Translate</button>');
 
-          $(this).parent().append(' <img src="img/ajax-loader.gif" class="loading" />');
+          $('#email_translate fieldset > label[for^=email_]').append(' <img src="img/ajax-loader.gif" class="loading" />');
 
-          // $(this).attr('disabled','disabled');
           doTranslate(elangCodes,txtField,displayArea,msgType);
 
-        }
+      }
+
+      $('#msgsndr_tab_email').on('click', '#email_retranslate', function() {
+        eTranslate(this);
       });
 
       var splitlangCodes = elangCodes.split('|');
