@@ -23,22 +23,25 @@
 					e.src = document.location.protocol + "//connect.facebook.net/en_US/all.js";
 					document.getElementById("fb-root").appendChild(e);
 				}());
+				
 				// Observe an authentication update on the document (the auth popup fires this event)
 				document.observe("FbAuth:update", function (res) {
-					updateFbPages(fbToken.accessToken, "msgsndr_fbpage", "msgsndr_fbpagefbpages", "msgsndr_fbpagerenew");
+					updateFbPages(res.memo.access_token, "msgsndr_fbpage", "msgsndr_fbpagefbpages", "msgsndr_fbpagerenew");
 				});
+				
 				// Observe a click on the action links
-				//$("msgsndr_fbpagesall").observe("click", handleActionLink.curry("msgsndr_fbpages", true));
-				//$("msgsndr_fbpagesnone").observe("click", handleActionLink.curry("msgsndr_fbpages", false));
+				$("msgsndr_fbpageall").observe("click", handleActionLink.curry("msgsndr_fbpages", true));
+				$("msgsndr_fbpagenone").observe("click", handleActionLink.curry("msgsndr_fbpages", false));
 				// Observe event indicating page loading has completed
-				/*$("msgsndr_fbpages").observe("FbPages:update", function (res) {
+				$("msgsndr_fbpages").observe("FbPages:update", function (res) {
+					alert(res);
 					if (res.memo.pagesloaded == 0) {
 						$("msgsndr_fbpagefbpages").update("There were no authorized posting locations found!<br>Contact your system administrator for assistance.");
 						$("msgsndr_fbpageactionlinks").hide();
 					} else {
 						$("msgsndr_fbpageactionlinks").show();
 					}
-				});*/
+				});
 		};
 
 			// action link all clicked
@@ -65,7 +68,11 @@
 			
 			function updateFbPages(access_token, formitem, container, showrenew) {
 				
-				var pages = $(formitem).value.evalJSON();
+				var pages = $(formitem).value;
+				if (!pages)
+					pages = [];
+				else
+					pages = pages.evalJSON();
 				container = $(container);
 				connectdiv = $(formitem + "connect");
 				renewdiv = $(formitem + "renew");
@@ -79,7 +86,11 @@
 					renewdiv.hide();
 					
 					// get the authorized pages
-					var authpages = $(formitem + "authpages").value.evalJSON();
+					var authpages = $(formitem + "authpages").value
+					if (!authpages)
+						authpages = [];
+					else
+						authpages = authpages.evalJSON();
 					
 					container.update();
 					
