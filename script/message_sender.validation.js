@@ -133,25 +133,38 @@ jQuery.noConflict();
 
     // get user preferences ...
     function getUserPrefs() {
-
       userPrefs = {};
       
-      j.ajax({
+      $.ajax({
         url: '/'+orgPath+'/api/2/users/'+userid+'/preferences',
         type: "GET",
         dataType: "json",
         success: function(data) {
 
-          j.each(data.preferences, function(uIndex, uPrefs){
+          $.each(data.preferences, function(uIndex, uPrefs){
             userPrefs[uPrefs.name] = uPrefs.value;
           });
-
-          // callback();
         }
-      });
-  
-      //return userPrefs;
-  
+      });  
+    };
+
+    // get user information ...
+    function getUserInfo() {
+      userInfo = false;
+      
+      $.ajax({
+        url: '/'+orgPath+'/api/2/users/'+userid,
+        type: "GET",
+        dataType: "json",
+        async: false,
+        success: function(data) {
+          userInfo = data;
+          var phone = userInfo.phone;
+          var phonePartOne = '(' + phone.substring(0,3) + ') ';
+          var phonePartTwo = phone.substring(3,10);
+          userInfo.phoneFormatted = phonePartOne + phonePartTwo;
+        }
+      });  
     };
 
 
@@ -159,6 +172,7 @@ jQuery.noConflict();
       getOptions();
       getLanguages();
       getUserPrefs();
+      getUserInfo();
 
 
       userPermissions = {};
@@ -254,8 +268,12 @@ jQuery.noConflict();
       notVal.watchFields('#msgsndr_form_mephone');
       notVal.watchFields('#msgsndr_form_meemail');
       notVal.watchFields('#msgsndr_form_mesms');
-      
 
+      // set the addme values from the userInfo object...
+
+      $('#msgsndr_form_mephone').attr('value', userInfo.phoneFormatted);
+      $('#msgsndr_form_meemail').attr('value', userInfo.email);
+      
     };
 
     function sendPhone() {
@@ -462,9 +480,11 @@ jQuery.noConflict();
 
         } else { // the user hascallback so we hide caller id select fieldset from view
           $('#msgsndr_form_callid').closest('fieldset').addClass('hidden');
-          // get the default caller id and append it as the selected option in the hidden callerid select menu
-          var callerIdnumber = getDefaultCallerId();
-          $('#msgsndr_form_callid').append('<option value="'+callerIdnumber+'" selected >'+callerIdnumber+'</option>');
+          // Commented out the following code, I believe there should be no callerid passed to postdata for users with 'hascallback'
+          
+          /* get the default caller id and append it as the selected option in the hidden callerid select menu
+          * var callerIdnumber = getDefaultCallerId();
+          * $('#msgsndr_form_callid').append('<option value="'+callerIdnumber+'" selected >'+callerIdnumber+'</option>'); */
         }
       };
 
@@ -633,6 +653,31 @@ jQuery.noConflict();
         }
       };
 
+    tokenCheck = true;
+    // social token ajax call
+    function getTokens(){
+      fbToken = false;
+      twToken = false;
+      tokenCheck = $.ajax({
+        url: '/'+orgPath+'/api/2/users/'+userid+'/tokens',
+        method: 'GET',
+        dataType: 'json',
+        async: true,
+        success: function(data){
+          if (typeof(data.facebook) != 'undefined'){
+            fbToken = data.facebook;
+            //$('#msgsndr_fbpage').attr('value', fbToken);
+          } else {
+            //$('#msgsndr_fbpage').attr('value', []);
+          }
+          if (typeof(data.twitter) != 'undefined'){
+            twToken = data.twitter;
+          }
+        }
+      });
+    };
+
+    getTokens();
 
 
 
