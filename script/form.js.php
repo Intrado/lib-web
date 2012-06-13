@@ -158,7 +158,7 @@ function form_do_validation (form, element) {
 			for (var i = 0; i < validators.length; i++) {
 				var v = validators[i];
 				var res;
-				if (value.length > 0 || v.validator == "ValRequired" || v.validator == "ValConditionallyRequired") {
+				if (value.length > 0 || v.isrequired || v.conditionalrequired) {
 					res = v.validate(v.name,v.label,value,v.args,requiredvalues);
 					if (res != true) {
 						form_validation_display(element,"error",res);
