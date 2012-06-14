@@ -616,7 +616,7 @@ jQuery.noConflict();
         $(etarget).slideToggle();
         $(this).toggleClass('active');
 
-        $('#tts_retranslate').remove();
+        $('#email_retranslate').remove();
 
         if (text[0] == 'Show') {
 
@@ -731,18 +731,22 @@ jQuery.noConflict();
         dataType: 'json',
         async: true,
         success: function(data){
+
+        if ($.isEmptyObject(data) != true) {
           if (typeof(data.facebook) != 'undefined'){
             fbToken = data.facebook;
             //$('#msgsndr_fbpage').attr('value', fbToken);
           } else {
             //$('#msgsndr_fbpage').attr('value', []);
           }
-          if (typeof(data.twitter) != 'undefined' || data.twitter != ''){
-            twToken = data.twitter;
-            console.log(twToken.screenName);
-            $('#msgsndr_twittername').append('Posting as <a class="" href="http://twitter.com/'+twToken.screenName+'">@'+twToken.screenName+'</a>');
+            if (typeof(data.twitter) != 'undefined' || data.twitter != ''){
+              twToken = data.twitter;
+              console.log(twToken.screenName);
+              $('#msgsndr_twittername').append('Posting as <a class="" href="http://twitter.com/'+twToken.screenName+'">@'+twToken.screenName+'</a>');
+            }
           }
         }
+
       });
     };
 
