@@ -32,10 +32,10 @@
 			<tr>
 			<th>Title</th>
 			<th class="created">Created</th>
-			<th class="ico"><img src="themes/newui/phone.png" alt=""/></th>
-			<th class="ico"><img src="themes/newui/email.png" alt=""/></th>
-			<th class="ico"><img src="themes/newui/sms.png" alt=""/></th>
-			<th class="ico"><img src="themes/newui/social.png" alt=""/></th>
+			<th class="ico"><img src="themes/newui/images/phone.png" alt=""/></th>
+			<th class="ico"><img src="themes/newui/images/email.png" alt=""/></th>
+			<th class="ico"><img src="themes/newui/images/sms.png" alt=""/></th>
+			<th class="ico"><img src="themes/newui/images/social.png" alt=""/></th>
 			</tr>
 		</thead>
 	</table>
