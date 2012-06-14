@@ -107,6 +107,8 @@ function generateStats($useridList, $start_datetime, $end_datetime) {
 			$stats['total_posts'] = $row['total'];
 	}
 	
+	$total_types = $stats['total_phones'] + $stats["total_emails"] + $stats["total_sms"] + $stats["total_posts"];
+	$stats["percentage_slice"] = $total_types != 0 ? 100/$total_types : 0;
 	
 	// top jobtypes
 	$query = "select jt.name as name, count(*) as total from job j " .
@@ -245,10 +247,10 @@ include("nav.inc.php");
 				<h4>Message Content</h4>
 				<img class="dashboard_graph" src="graph_dashboard.png.php?blue=<?=$stats["total_phones"]?>&red=<?=$stats["total_emails"]?>&organge=<?=$stats["total_sms"]?>&green=<?=$stats["total_posts"]?>" />
 				<ul>
-				<li><img src="themes/newui/images/phone-blue.png"/>&nbsp;<?=$stats["total_phones"]?></li>
-				<li><img src="themes/newui/images/email-red.png"/>&nbsp;<?=$stats["total_emails"]?></li>
-				<li><img src="themes/newui/images/sms-orange.png"/>&nbsp;<?=$stats["total_sms"]?></li>
-				<li><img src="themes/newui/images/social-green.png"/>&nbsp;<?=$stats["total_posts"]?></li>
+				<li><img src="themes/newui/images/phone-blue.png"/>&nbsp;<?= $stats["percentage_slice"] * $stats["total_phones"] ?>%</li>
+				<li><img src="themes/newui/images/email-red.png"/>&nbsp;<?= $stats["percentage_slice"] * $stats["total_emails"] ?>%</li>
+				<li><img src="themes/newui/images/sms-orange.png"/>&nbsp;<?= $stats["percentage_slice"] * $stats["total_sms"]?>%</li>
+				<li><img src="themes/newui/images/social-green.png"/>&nbsp;<?= $stats["percentage_slice"] * $stats["total_posts"]?>%</li>
 				</ul>
 				
 			</div>
