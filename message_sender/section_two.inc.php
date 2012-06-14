@@ -291,24 +291,23 @@
 							<input id="msgsndr_fbpageauthpages" type="hidden" value="" name="social_fbpagesauthpages">
 								<div id="fb-root"></div>
 								
-								<div id="msgsndr_fbpageconnect">
+								<div id="msgsndr_fbpageconnect" class="hidden">
 									<button class="btn" onclick="popup('popupfacebookauth.php', 640, 400);" type="button">
 										<img class="btn_middle_icon" alt="" src="img/icons/custom/facebook.gif">
 										Add Facebook Account
 									</button>
 								</div>
 								
-								<div id="msgsndr_fbpagerenew">
+								<div id="msgsndr_fbpagerenew" class="hidden">
 									<button class="btn" onclick="popup('popupfacebookauth.php', 640, 400);" type="button">
 										<img class="btn_middle_icon" alt="" src="img/icons/custom/facebook.gif">
 										Renew Facebook Authorization
 									</button>
 								</div>
 								
-								<div id="msgsndr_fbpageactionlinks">
-									<a id="msgsndr_fbpageall" class="actionlink">Select All</a>
-									&nbsp;|&nbsp;
-									<a id="msgsndr_fbpagenone" class="actionlink">Remove All</a>
+								<div id="msgsndr_fbpageactionlinks" class="hidden">
+									<a id="msgsndr_fbpageall" class="actionlink btn">Select All</a>
+									<a id="msgsndr_fbpagenone" class="actionlink btn">Remove All</a>
 								</div>
 								<div id="msgsndr_fbpagefbpages"></div>
 								<div id="msgsndr_fbpagesmessage" class="underneathmsg cf"></div>

@@ -290,14 +290,6 @@ jQuery.noConflict();
 		// ckeditor
 		applyHtmlEditor('msgsndr_form_body');
 
-		// facebook stuff (WIP - commented out during development)
-		renderFacebook();
-		$.when(tokenCheck).then(function() {
-			//addFbPageElement('msgsndr_fbpagefbpages','msgsndr_fbpages', fbToken.userId );
-			//updateFbPages(access_token, formitem, container, showrenew)
-			//updateFbPages(fbToken.accessToken, "msgsndr_fbpage", "msgsndr_fbpagefbpages", "msgsndr_fbpagerenew");
-		});
-
   });
 }) (jQuery);
 </script>

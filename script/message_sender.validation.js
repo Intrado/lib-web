@@ -741,7 +741,6 @@ jQuery.noConflict();
           }
             if (typeof(data.twitter) != 'undefined' || data.twitter != ''){
               twToken = data.twitter;
-              console.log(twToken.screenName);
               $('#msgsndr_twittername').append('Posting as <a class="" href="http://twitter.com/'+twToken.screenName+'">@'+twToken.screenName+'</a>');
             }
           }
@@ -759,6 +758,9 @@ jQuery.noConflict();
     function socialFB() {
 
       $('div[data-social=facebook]').removeClass('hidden');
+
+      // facebook api call
+      renderFacebook();
 
       // Character Count
       $('#msgsndr_form_fbmsg').on('keyup', function() {
