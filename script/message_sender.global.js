@@ -156,6 +156,9 @@
       if (tts == 'true') {
         self.ttsSave();
       }
+      if (el == 'email') {
+        self.emailSave();
+      }
 
     } // saveBtn
 
@@ -477,6 +480,37 @@
           }
 
           j('#post_data_translations').append('<input type="hidden" name="phone_translate_'+langCode+'" val="{"enabled":true,"text":"'+translatedText+'","override":'+overRide+',"gender":'+gender+',"englishText":""}">');
+
+        });
+
+      }
+
+    };
+
+
+    this.emailSave = function() {
+
+      var enText        = CKEDITOR.instances.reusableckeditor.getData();
+      var translate     = j('#msgsndr_form_emailtranslate').attr('checked');
+
+      j('#msgsndr_tab_email').append('<div id="post_data_email_translations"></div>');
+
+      j('#post_data_email_translations').empty().append('<input type="hidden" name="email_translate" val="'+escape(enText)+'">');
+
+
+      if ( translate == 'checked' ) {
+
+        var loopTranslations  = j('input[name=email_save_translation]:checked');
+        var translatedText    = '';
+
+        j(loopTranslations).each(function(transI, transD) {
+
+          var langCode = j(this).attr('id').split('_')[1]; // Gives me language code : en
+
+          enText = makeTranslatableString(enText);
+          translatedText = self.getTranslation(enText,langCode);
+
+          j('#post_data_email_translations').append('<input type="hidden" name="phone_translate_'+langCode+'" val="{"enabled":true,"text":"'+escape(translatedText)+'","override":"false","englishText":""}">');
 
         });
 

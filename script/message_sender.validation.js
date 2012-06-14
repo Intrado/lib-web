@@ -651,7 +651,7 @@ jQuery.noConflict();
 
         var langCode = splitlangCodes[transIndex];
 
-        $('#email_translate').append('<fieldset><input type="checkbox" checked="checked" class="translations" /><label for="email_'+nLangs[langCode]+'">'+nLangs[langCode]+'</label><div class="controls"><div class="html_translate" id="email_translated_'+langCode+'"></div></div></fieldset>');
+        $('#email_translate').append('<fieldset><input type="checkbox" checked="checked" id="email_'+langCode+'"  name="email_save_translation" class="translations" /><label for="email_'+nLangs[langCode]+'">'+nLangs[langCode]+'</label><div class="controls"><div class="html_translate" id="email_translated_'+langCode+'"></div></div></fieldset>');
       });
 
 
