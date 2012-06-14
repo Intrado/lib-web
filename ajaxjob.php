@@ -27,19 +27,19 @@ function fmt_activestatus($obj, $name) {
 function fmt_job_content($obj, $name) {
 	$str = "";
 	if ($obj->hasPhone()){
-		$str .= " <img src=\"themes/{$_SESSION['colorscheme']['_brandtheme']}/phone-grey.png\" title=\"" . _L("Phone") . "\" />";
+		$str .= " <img src=\"themes/{$_SESSION['colorscheme']['_brandtheme']}/images/phone-grey.png\" title=\"" . _L("Phone") . "\" />";
 	}
 	if ($obj->hasEmail()){
-		$str .= " <img src=\"themes/{$_SESSION['colorscheme']['_brandtheme']}/email-grey.png\" title=\"" . _L("Email") . "\" />";
+		$str .= " <img src=\"themes/{$_SESSION['colorscheme']['_brandtheme']}/images/email-grey.png\" title=\"" . _L("Email") . "\" />";
 	}
 	if ($obj->hasSMS()){
-		$str .= " <img src=\"themes/{$_SESSION['colorscheme']['_brandtheme']}/sms-grey.png\" title=\"" . _L("SMS") . "\" />";
+		$str .= " <img src=\"themes/{$_SESSION['colorscheme']['_brandtheme']}/images/sms-grey.png\" title=\"" . _L("SMS") . "\" />";
 	}
 	if ($obj->hasPost()){
-		$str .= " <img src=\"themes/{$_SESSION['colorscheme']['_brandtheme']}/social-grey.png\" title=\"" . _L("Social") . "\" />";
+		$str .= " <img src=\"themes/{$_SESSION['colorscheme']['_brandtheme']}/images/social-grey.png\" title=\"" . _L("Social") . "\" />";
 	}
 	if ($obj->type == "survey"){
-		$str .= " <img src=\"themes/{$_SESSION['colorscheme']['_brandtheme']}/survey-grey.png\" title=\"" . _L("Survey") . "\" />";
+		$str .= " <img src=\"themes/{$_SESSION['colorscheme']['_brandtheme']}/images/survey-grey.png\" title=\"" . _L("Survey") . "\" />";
 	}
 	return $str;
 }
@@ -72,7 +72,7 @@ function fmt_job_ownername ($obj, $name) {
 	} else {
 		$user = new User($obj->userid);
 		$users[$obj->userid] = $user->firstname . ' ' . $user->lastname;
-		return $user->login;
+		return $users[$obj->userid];
 	}
 }
 
@@ -107,14 +107,30 @@ function handleRequest() {
 		$limit = $_REQUEST['limit']+0;
 	}
 	
+	// Add User query part depending on who is requested, me, everyone or a specific user
+	$queryArgs = array($USER->id);
+	if (isset($_REQUEST['who'])) {
+		if ($_REQUEST["who"] == "me") {
+			$queryUsers = " j.userid = ?";
+		} else if ($_REQUEST["who"] == "everyone") {
+			$queryUsers = " (j.userid = ? or exists (select * from userlink ul where ul.userid = ? and j.userid = ul.subordinateuserid and j.userid = ul.subordinateuserid)) ";
+			$queryArgs[] = $USER->id;
+		} else {
+			$queryUsers = " exists (select * from userlink ul where ul.userid = ? and ul.subordinateuserid = ? and j.userid = ul.subordinateuserid) ";
+			$queryArgs[] = $_REQUEST['who'];
+		}
+	} else {
+		$queryUsers = " j.userid = ? ";
+	}
+	
 	switch($_REQUEST['action']) {
 		case 'activejobs':
 			$activejobs = DBFindMany("Job", "from job j
-				where (j.userid = ? or exists (select * from userlink ul where ul.userid = ? and j.userid = ul.subordinateuserid)) 
+				where $queryUsers 
 					and not j.deleted and j.finishdate is null and j.modifydate is not null and j.status in ('processing','procactive','active','cancelling') 
 					and j.type != 'alert' 
 				order by j.modifydate desc 
-				limit $start,$limit","j",array($USER->id,$USER->id));
+				limit $start,$limit","j",$queryArgs);
 			
 			$titles = array(
 				"status" => "Status",
@@ -139,11 +155,11 @@ function handleRequest() {
 			
 		case 'scheduledjobs':
 			$activejobs = DBFindMany("Job", "from job j
-				where (j.userid = ? or exists (select * from userlink ul where ul.userid = ? and j.userid = ul.subordinateuserid)) 
+				where $queryUsers 
 					and not j.deleted and j.modifydate is not null and j.status in ('scheduled') 
 					and j.type != 'alert' 
 				order by j.modifydate desc 
-				limit $start,$limit","j",array($USER->id,$USER->id));
+				limit $start,$limit","j",$queryArgs);
 		
 			$titles = array(
 				"startdate" => "Scheduled For",
@@ -168,11 +184,11 @@ function handleRequest() {
 				
 		case 'completedjobs':
 			$activejobs = DBFindMany("Job", "from job j
-				where (j.userid = ? or exists (select * from userlink ul where ul.userid = ? and j.userid = ul.subordinateuserid)) 
+				where $queryUsers 
 					and not j.deleted and j.modifydate is not null and j.status in ('complete','cancelled') 
 					and j.type != 'alert' 
 				order by j.modifydate desc 
-				limit $start,$limit","j",array($USER->id,$USER->id));
+				limit $start,$limit","j",$queryArgs);
 				
 			$titles = array(
 				"finishdate" => "Sent On",

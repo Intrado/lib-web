@@ -29,10 +29,9 @@ foreach($requestValues as $key => $values) {
 	}
 }
 
-
 $useridList = array();
-$useridList = QuickQueryList("select subordinateuserid from userlink where userid=?",false,false,array($USER->id));
-$useridList[] = $USER->id;
+$useridList = QuickQueryList("select u.id, concat_ws(' ', u.firstname, u.lastname) from userlink ul inner join user u on (ul.subordinateuserid = u.id) where ul.userid=?",true,false,array($USER->id));
+$useridList[$USER->id] = _L("Me");
 $start_datetime = time();
 switch($requestValues["daterange"]) {
 	case "7days":
@@ -133,7 +132,6 @@ function generateStats($useridList, $start_datetime, $end_datetime) {
 
 	$stats["total_users"] = count($stats["top_users"]);
 
-	error_log("STATS CALC"); // TODO remove
 	return $stats;
 }
 
@@ -171,19 +169,24 @@ function fmt_job_recipients($obj, $name) {
 // Data
 ////////////////////////////////////////////////////////////////////////////////
 
+if ($requestValues["showactivity"] == "me") {
+	$queryUsers = array($USER->id);
+} else if ($requestValues["showactivity"] == "everyone") {
+	$queryUsers = array_keys($useridList);
+} else {
+	$queryUsers = array($requestValues["showactivity"] + 0);
+}
+
 // sql explained key useraccess
 $query = "select max(j.activedate) from job j " .
-	"where j.userid in (" . repeatWithSeparator("?", ",", count($useridList)) . ")";
+	"where j.userid in (" . repeatWithSeparator("?", ",", count($queryUsers)) . ")";
 	
-$expect = QuickQuery($query, null, $useridList);
+$expect = QuickQuery($query, null, $queryUsers);
 // keep one day, key generated
-$stats = gen2cache(60*60*24, $expect, null, "generateStats", $useridList, $start_datetime, $end_datetime);
+$stats = gen2cache(60*60*24, $expect, null, "generateStats", $queryUsers, $start_datetime, $end_datetime);
 
 
 $jobtemplates = DBFindMany("Job", "from job where userid=? and status='template' and not deleted and type = 'notification' order by modifydate desc",false,array($USER->id));
-
-$userlinks = QuickQuery("select count(*) from userlink where userid=?",false,array($USER->id));
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
@@ -198,12 +201,20 @@ include("nav.inc.php");
 	<div class="wrapper">
 	
 	<div class="main_activity">
-<?if ($userlinks > 0) {?>
+<?if (count($useridList) > 0) {?>
 		<div class="users cf">
 			<p>Show activity for
 			<select onchange="window.location='start.php?showactivity=' + this.options[selectedIndex].value + '&<?= http_build_query(array_diff_key($requestValues,array("showactivity" => ''))) ?>'">
-				<option value="me" <?= (isset($_GET["showactivity"]) && $_GET["showactivity"]=="me")?"selected":"";?>>Me</option>
-				<option value="everyone" <?= (isset($_GET["showactivity"]) && $_GET["showactivity"]=="everyone")?"selected":"";?>>Everyone</option>
+				<option value="me" <?= ($requestValues["showactivity"]=="me")?"selected":"";?>><?= _L("Me")?></option>
+				<option value="everyone" <?= ($requestValues["showactivity"]=="everyone")?"selected":"";?>><?= _L("Everyone")?></option>
+				<optgroup label="<?= _L("Individual Users")?>">
+				<?
+				foreach ($useridList as $userid => $displayname) {
+					if ($userid != $USER->id)
+						echo "<option value=\"$userid\"" . ($requestValues["showactivity"]==$userid?"selected":"") . ">$displayname</option>";
+				}
+				?>
+				</optgroup>
 			</select></p>
 		</div>
 <?}?>
@@ -234,10 +245,10 @@ include("nav.inc.php");
 				<h4>Message Content</h4>
 				<img class="dashboard_graph" src="graph_dashboard.png.php?blue=<?=$stats["total_phones"]?>&red=<?=$stats["total_emails"]?>&organge=<?=$stats["total_sms"]?>&green=<?=$stats["total_posts"]?>" />
 				<ul>
-				<li><img src="themes/newui/images/phone-blue.png"/><?=$stats["total_phones"]?></li>
-				<li><img src="themes/newui/images/email-red.png"/><?=$stats["total_emails"]?></li>
-				<li><img src="themes/newui/images/sms-orange.png"/><?=$stats["total_sms"]?></li>
-				<li><img src="themes/newui/images/social-green.png"/><?=$stats["total_posts"]?></li>
+				<li><img src="themes/newui/images/phone-blue.png"/>&nbsp;<?=$stats["total_phones"]?></li>
+				<li><img src="themes/newui/images/email-red.png"/>&nbsp;<?=$stats["total_emails"]?></li>
+				<li><img src="themes/newui/images/sms-orange.png"/>&nbsp;<?=$stats["total_sms"]?></li>
+				<li><img src="themes/newui/images/social-green.png"/>&nbsp;<?=$stats["total_posts"]?></li>
 				</ul>
 				
 			</div>
