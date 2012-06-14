@@ -1,7 +1,7 @@
 // facebook page script
 /////////////////////////
 
-function renderFacebook(){
+function initFacebook(accesstoken){
 
 	// Facebook javascript API initialization, pulled from facebook documentation
 	window.fbAsyncInit = function() {
@@ -13,7 +13,11 @@ function renderFacebook(){
 			});
 			
 			// load the initial list of pages if possible
-			//'.($showrenewbutton?'':'updateFbPages("'.$this->args['access_token'].'", "'.$n.'", "'.$n.'fbpages", "'.$showrenewbutton.'");').'
+			//if (accesstoken) {
+			//	updateFbPages(accesstoken, "msgsndr_fbpage", "msgsndr_fbpagefbpages", false);
+			//} else {
+				$("msgsndr_fbpageconnect").removeClassName("hidden");
+			//}
 		};
 
 		(function() {
@@ -26,7 +30,7 @@ function renderFacebook(){
 		
 		// Observe an authentication update on the document (the auth popup fires this event)
 		document.observe("FbAuth:update", function (res) {
-			updateFbPages(res.memo.access_token, "msgsndr_fbpage", "msgsndr_fbpagefbpages", "msgsndr_fbpagerenew");
+			updateFbPages(res.memo.access_token, "msgsndr_fbpage", "msgsndr_fbpagefbpages", false);
 		});
 		
 		// Observe a click on the action links
@@ -36,15 +40,16 @@ function renderFacebook(){
 		$("msgsndr_fbpages").observe("FbPages:update", function (res) {
 			if (res.memo.pagesloaded == 0) {
 				$("msgsndr_fbpagefbpages").update("There were no authorized posting locations found!<br>Contact your system administrator for assistance.");
-				$("msgsndr_fbpageactionlinks").hide();
+				$("msgsndr_fbpageactionlinks").addClassName("hidden");
 			} else {
-				$("msgsndr_fbpageactionlinks").show();
+				$("msgsndr_fbpageactionlinks").removeClassName("hidden");
 			}
 		});
 };
 
 // action link all clicked
 function handleActionLink(formitem, checkval, event) {
+	alert(checkval);
 	$$("#" + formitem + "fbpage input").each(function (checkbox) {
 		checkbox.checked = checkval;
 	});
@@ -79,10 +84,10 @@ function updateFbPages(access_token, formitem, container, showrenew) {
 	
 	if (access_token) {
 	
-		container.show();
-		actionlinks.show();
-		connectdiv.hide();
-		renewdiv.hide();
+		container.removeClassName("hidden");
+		actionlinks.removeClassName("hidden");
+		connectdiv.addClassName("hidden");
+		renewdiv.addClassName("hidden");
 		
 		// get the authorized pages
 		var authpages = $(formitem + "authpages").value
@@ -149,9 +154,9 @@ function updateFbPages(access_token, formitem, container, showrenew) {
 			}
 		});
 	} else {
-		container.hide();
-		actionlinks.hide();
-		connectdiv.show();
+		container.addClassName("hidden");
+		actionlinks.addClassName("hidden");
+		connectdiv.removeClassName("hidden");
 	}
 }
 
@@ -204,28 +209,4 @@ function addFbPageElement(e, container, account, iswall) {
 	}
 	return checkbox;
 };
-
-
-jQuery.noConflict();
-(function($) { 
-  $(function() {
-
-  	$('#msgsndr_form_facebook').on('click', function(){
-  		// wait for the getTokens function to get the facebook/twitter data from the api
-  		$.when(tokenCheck).then(function() {
-  			// if there's a facebook accessToken, run the updateFbPages function
-  			if (typeof(fbToken.accessToken) == 'undefined' || fbToken.accessToken == ''){
-  				updateFbPages(fbToken.accessToken, "msgsndr_fbpage", "msgsndr_fbpagefbpages", "msgsndr_fbpagerenew");
-  				$('#msgsndr_fbpageactionlinks').removeClass('hidden');
-  			} else {
-  				$('#msgsndr_fbpageactionlinks').addClass('hidden');
-  				$('#msgsndr_fbpageconnect').removeClass('hidden');
-  			}
-			});
-  	});
-
-  });
-}) (jQuery);
-
-
 

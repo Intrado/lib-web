@@ -712,21 +712,19 @@ jQuery.noConflict();
         }
       };
 
-    tokenCheck = true;
     // social token ajax call
     function getTokens(){
       fbToken = false;
       twToken = false;
-      tokenCheck = $.ajax({
+      return $.ajax({
         url: '/'+orgPath+'/api/2/users/'+userid+'/tokens',
         method: 'GET',
         dataType: 'json',
         async: true,
         success: function(data){
-
         if ($.isEmptyObject(data) != true) {
-          if (typeof(data.facebook) != 'undefined'){
-            fbToken = data.facebook;
+          if (typeof(data.facebook) != 'undefined' && data.facebook.accessToken){
+            fbToken = data.facebook.accessToken;
             //$('#msgsndr_fbpage').attr('value', fbToken);
           } else {
             //$('#msgsndr_fbpage').attr('value', []);
@@ -737,29 +735,41 @@ jQuery.noConflict();
             }
           }
         }
-
       });
     };
 
-    getTokens();
+	var tokenCheck = getTokens();
+
+	// facebook authorized destinations ajax call
+	function getFbAuthorizedPages(){
+		return $.get('/'+orgPath+'/api/2/organizations/'+orgid+'/settings/facebookpages',
+			function(data) {
+				if ($.isEmptyObject(data) != true && typeof(data.facebookPages) != 'undefined')
+					facebookPages = data.facebookPages;
+			}, "json");
+	};
+	
 
 
 
 
+	function socialFB() {
+		$('div[data-social=facebook]').removeClass('hidden');
 
-    function socialFB() {
+		// set up the facebook api and any event listeners
+		$.when(tokenCheck, getFbAuthorizedPages()).done(function() {
+			// populate the authorized destinations hidden form item
+			$("#msgsndr_fbpageauthpages").val($.toJSON({"pages":facebookPages,"wall":(orgOptions.fbauthorizewall?true:false)}));
+			// intialize facebook with the current user's token
+			initFacebook(fbToken);
+		});
 
-      $('div[data-social=facebook]').removeClass('hidden');
+		// Character Count
+		$('#msgsndr_form_fbmsg').on('keyup', function() {
+			charCount(this, '420', '.fb.characters');
+		});
 
-      // facebook api call
-      renderFacebook();
-
-      // Character Count
-      $('#msgsndr_form_fbmsg').on('keyup', function() {
-        charCount(this, '420', '.fb.characters');
-      });
-
-    };
+	};
 
     function socialTwitter() {
 
