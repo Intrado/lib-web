@@ -280,24 +280,12 @@
 
     // This will contain the logic to populate message content from a loaded message
     this.doLoadMessage = function() {
-
+    	
     	// Phone
     	if (typeof(messages.phone) != "undefined") {
-	  		if(messages.phoneAudio != true) { // True is Call Me To Record
+	  		if(messages.phoneAudio == true) { // True is Call Me To Record
 
-	  			j('li.ophone').addClass('complete');
-	  			
-	  			j('#msgsndr_phonetype').val('text');
-	  			j('button.audioleft').removeClass('active'); 
-	  			j('button.audioright').addClass('active');
-	  			j('#callme').hide();
-	  			j('#text').show();
-
-	  			j('#msgsndr_tts_message').val(messages.phone.msgFormatted).addClass('ok');
-
-	  			notVal.watchContent('text');
-
-	  		} else {
+	  			console.log('CTR - TRUE');
 
 	  			j('#msgsndr_phonetype').val('callme');
 	  			j('button.audioleft').addClass('active'); 
@@ -326,6 +314,22 @@
 					j("#msgsndr_form_number").attachEasyCall({
 						"languages": ctrLang,
 						"defaultphone": notVal.formatPhone(orgOptions.callerid)});
+
+	  		} else {
+
+	  			console.log('TTS - FALSE');
+
+	  			j('li.ophone').addClass('complete');
+	  			
+	  			j('#msgsndr_phonetype').val('text');
+	  			j('button.audioleft').removeClass('active'); 
+	  			j('button.audioright').addClass('active');
+	  			j('#callme').hide();
+	  			j('#text').show();
+
+	  			j('#msgsndr_tts_message').val(messages.phone.msgFormatted).addClass('ok');
+
+	  			notVal.watchContent('text');
 
 	  		}
 	  	}
