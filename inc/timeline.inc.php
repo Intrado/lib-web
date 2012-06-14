@@ -192,7 +192,7 @@ $minhight = $minhight * $jobhight + $minhight*$jobspacing ;
 <div class="content_row cf" >
 
 		<div id="t_refresh">
-			<?=	icon_button(_L('Refresh'),"fugue/arrow_circle_double_135","window.location.reload()",null,'style="display:inline;"') ?>
+			<?=	icon_button(_L('Refresh'),"arrow_refresh","window.location.reload()",null,'style="display:inline;"') ?>
 		</div>
 		
 		<div id="t_zoom">

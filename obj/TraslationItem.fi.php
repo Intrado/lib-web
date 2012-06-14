@@ -90,7 +90,7 @@ class TranslationItem extends FormItem {
 			<div style="'.(!empty($this->args['editenglishtext']) ? '' : 'display:none').'">
 				<div class="MessageBodyContainer" style="'.((!$msgdata->enabled || $msgdata->override) ? 'display:none' : '').'">
 					<textarea '. (!empty($this->args['editenglishtext']) ? (' onChange="setTranslationValue(\''.$n.'\');" style="display:block; width:99%" ') : ' style="display:none" ') . '  rows="10" class="SourceTextarea" id="'.$n.'englishText">' . escapehtml($msgdata->englishText) . '</textarea>
-					' . icon_button(_L("Refresh Translation"),"fugue/arrow_circle_double_135", "getTranslation('$n','$language',$usehtmleditor, $escapehtml);", null, 'id="refreshtranslationbutton"') . '
+					' . icon_button(_L("Refresh Translation"),"arrow_refresh", "getTranslation('$n','$language',$usehtmleditor, $escapehtml);", null, 'id="refreshtranslationbutton"') . '
 					<div style="margin-top:20px;clear:both"></div>
 				</div>
 			</div>
@@ -134,7 +134,7 @@ class TranslationItem extends FormItem {
 							<span style="'.(!$allowoverride ? 'display:none' : '').'"><input id="'.$n.'override" name="'.$n.'checkbox" type="checkbox" '.(($msgdata->override)?"checked":"").' onclick="overrideTranslation(\''.$n.'\',\''.$language.'\', '.$usehtmleditor.', '.$escapehtml.');"/>' . _L('Override Translation') . '</span>
 
 							<div id="'.$n.'retranslation" style="width: 100%; display: none;margin-top: 15px; clear:both">
-								'. icon_button(_L('Refresh %s to English Translation', Language::getName($language)),"fugue/arrow_circle_double_135","submitRetranslation('$n','$language', $usehtmleditor, $escapehtml)", null, 'style="margin-bottom: 12px"') . '
+								'. icon_button(_L('Refresh %s to English Translation', Language::getName($language)),"arrow_refresh","submitRetranslation('$n','$language', $usehtmleditor, $escapehtml)", null, 'style="margin-bottom: 12px"') . '
 								<div id="'.$n.'retranslationtext" name="'.$n.'retranslation" style="width: 99%; '.($isphone ? "height: 100px;" : "height: 300px;").' border: 1px solid gray; color: gray; overflow:auto; clear:both"></div>
 							</div>
 						</div>
