@@ -47,7 +47,7 @@
               }
             });
 
-            j('#messages_list').append('<tr id="msgsndr_msggroup-'+msgGroup.id+'" class="msgsndr_msggroup"><td><input type="radio" name="msgsndr_msggroup" value="'+msgGroup.id+'"/>'+msgGroup.name+'</td><td class="created">'+msgDate+'</td><td class="ico">'+msgPhone+'</td><td class="ico">'+msgEmail+'</td><td class="ico">'+msgSms+'</td><td class="ico">'+msgPost+'</td></tr>');
+            j('#messages_list').append('<tr id="msgsndr_msggroup-'+msgGroup.id+'" class="msgsndr_msggroup"><td><input type="radio" data-audio="'+msgGroup.phoneIsAudioOnly+'" name="msgsndr_msggroup" value="'+msgGroup.id+'"/>'+msgGroup.name+'</td><td class="created">'+msgDate+'</td><td class="ico">'+msgPhone+'</td><td class="ico">'+msgEmail+'</td><td class="ico">'+msgSms+'</td><td class="ico">'+msgPost+'</td></tr>');
           });
         } 
       });   
@@ -60,7 +60,7 @@
 
 
     // get messages based on message id from message group
-    this.getMessages = function(msgGrpId, callback){
+    this.getMessages = function(msgGrpId, callback, audioOnly) {
 
       j.ajax({
         url: '/'+orgPath+'/api/2/users/'+userid+'/messagegroups/'+msgGrpId+'/messages',
@@ -69,13 +69,13 @@
         success: function(data) {
 
           allMessages = data.messages;
-          messages = {};
+          messages = { 'phoneAudio' : audioOnly};
 
           j.each(allMessages, function(mIndex, mData) {
 
             var msgParts = self.getMessageParts(msgGrpId,mData.id);
             
-            mData['msgparts'] = msgParts;
+            mData['msgParts'] = msgParts;
 
           });
 
@@ -85,6 +85,13 @@
             mData['msgFormatted'] = msgParts;
 
           });
+
+          j.each(allMessages, function(mIndex, mData) {
+
+            var msgParts = self.getMessageAttachments(msgGrpId,mData.id);
+            mData['msgAttachments'] = msgParts;
+
+          });      
 
 
           j.each(allMessages, function(mIndex, mData) {
@@ -163,18 +170,22 @@
 
 
     // get message attachments based on message group id and message id
-    this.getMessageAttachment = function(msgGrpId, msgId){
+    this.getMessageAttachments = function(msgGrpId, msgId){
       var attachments = {};
       j.ajax({
-        url: '/'+orgPath+'/api/2/users/'+userid+'/messagegroups/'+msgGrpId+'/message/'+msgId+'/messageattachments',
+        url: '/'+orgPath+'/api/2/users/'+userid+'/messagegroups/'+msgGrpId+'/messages/'+msgId+'/messageattachments',
+        async: false,
         type: "GET",
         dataType: "json",
         success: function(data) {
-          j.each(data.messageAttachments, function(mIndex, mData){
-            attachments[mData.name] = mData.value;
-          });
+
+        	attachments = data.messageAttachments;
+          // j.each(data.messageAttachments, function(mIndex, mData){
+          //   attachments[mData.name] = mData.value;
+          // });
         }
       });
+
       return attachments;
     };
 
@@ -201,6 +212,7 @@
     j('#msgsndr_load_saved_msg').on('click', function(){
       var msgGroup = j('.msgsndr_msggroup > td > input:radio[name=msgsndr_msggroup]:checked'); //input:checkbox[name=msgsndr_msggroup]:checked'
       var grpId = msgGroup.attr('value');
+      var audioOnly = msgGroup.attr('data-audio');
       var msgName = msgGroup.parent().text();
 
       // put the messageGroup id in the hidden input and display the message name
@@ -215,7 +227,7 @@
 
 
       self.clearForm(); 
-      self.getMessages(grpId, self.doLoadMessage);
+      self.getMessages(grpId, self.doLoadMessage, audioOnly);
 
     });
     
@@ -228,22 +240,26 @@
 
     this.clearForm = function() {
 
-      j('.msg_content_nav li').removeClass('complete');
-
+      j('.msg_content_nav li').removeClass('complete active lighten');
+      j('.tab_content .tab_panel').hide();
+      j('.facebook, .twitter, .feed').hide();      
 
       var allDataInputs = j('#msg_section_2 input, textarea');
-
-      CKEDITOR.instances.reusableckeditor.setData('');
-
-      j('.facebook, .twitter, .feed').hide();
 
       j.each(allDataInputs, function(aIndex, aData) {
 
         if (j(aData).attr('type') == 'checkbox') {
           j(aData).removeAttr('checked');
         }
-        j(aData).val('');
+        j(aData).val('').removeClass('ok');
 
+      });
+
+      // Recheck all translations checkboxes 
+      var translationsChecks = j('input.translations');
+
+      j.each(translationsChecks, function(aIndex, aData) {
+      	j(aData).attr('checked','checked');
       });
 
       var reviewTabs = j('.msg_complete li');
@@ -251,35 +267,124 @@
         j(tData).removeClass('complete');
       });
 
+      // Phone 
+      j("#msgsndr_form_number").empty();
+
+			// Email Message Content resets
+			CKEDITOR.instances.reusableckeditor.setData('');
+			j('#uploadedfiles').empty();
+
+
     }
 
 
     // This will contain the logic to populate message content from a loaded message
     this.doLoadMessage = function() {
 
-      if (typeof(messages.sms) != "undefined") {
-        j('li.osms').addClass('complete');
+    	// Phone
+    	if (typeof(messages.phone) != "undefined") {
+	  		if(messages.phoneIsAudioOnly != true) { // True is Call Me To Record
 
-        j('input[name=has_sms]').val('1');
-        j('#msgsndr_form_sms').val(messages.sms.msgparts[0].txt);
-      }
+	  			j('li.ophone').addClass('complete');
+	  			
+	  			j('#msgsndr_phonetype').val('text');
+	  			j('button.audioleft').removeClass('active'); 
+	  			j('button.audioright').addClass('active');
+	  			j('#callme').hide();
+	  			j('#text').show();
+
+	  			j('#msgsndr_tts_message').val(messages.phone.msgFormatted).addClass('ok');
+
+	  			notVal.watchContent('text');
+
+	  		} else {
+
+	  			j('#msgsndr_phonetype').val('callme');
+	  			j('button.audioleft').addClass('active'); 
+	  			j('button.audioright').removeClass('active');
+	  			j('#callme').show();
+	  			j('#text').hide();
+
+	  			notVal.watchContent('callme');
+
+	  			ctrIds = {};   // Used to store lang code and id = {"en":"987","es":"988","ca":"989"}
+	  			var ctrLangs = {}; // Used to store lang code and lang name = {"en":"Default","es":"Spanish"},"defaultphone":"4172140239"}
+
+					j(messages.phone).each(function(k, v) {
+				    if(typeof(v.languageCode) != "undefined" && j.isArray(v.msgParts) && v.msgParts.length > 0) {
+				    	ctrIds[v.languageCode] = v.msgParts[0].id;
+				    }
+					});
+
+					ctrLang = {};
+					j(languages).each(function(k, v) {
+						ctrLang[v.code] = v.name;
+					});
+
+					j("#msgsndr_form_number").val(j.toJSON(ctrIds));
+					// now, reattach the easycall
+					j("#msgsndr_form_number").attachEasyCall({
+						"languages": ctrLang,
+						"defaultphone": notVal.formatPhone(orgOptions.callerid)});
+
+	  		}
+	  	}
+
+
+    	// Email 
 
       if (typeof(messages.email) != "undefined") {
         j('li.oemail').addClass('complete');
 
-        emailSubject = messages.email.subject;
+        emailSubject = messages.email.subject.replace("+"," ");
 
-        j('input[name=has_email').val('1');
-        j('#msgsndr_form_name').val(messages.email.fromName.replace("+"," "));
-        j('#msgsndr_form_email').val(messages.email.fromEmail.replace("%40","@"));
-        j('#msgsndr_form_mailsubject').val(emailSubject);
+        j('input[name=has_email').attr('checked','checked');
+        j('#msgsndr_form_name').val(messages.email.fromName.replace(/\+/g," ")).addClass('ok');
+        j('#msgsndr_form_email').val(messages.email.fromEmail.replace("%40","@")).addClass('ok');
+        j('#msgsndr_form_mailsubject').val(emailSubject.replace(/\+/g," ")).addClass('ok');
+
+        // Email Attachements 
+        var eAttachments = messages.email.msgAttachments;
+        	
+        	if ( eAttachments.length != 0 ) {
+        		j('#uploadedfiles').show();
+        		
+        		j.each(eAttachments, function(eIndex,eData) {
+
+        			var filesize = Math.round(eData.size/1024);
+
+        			// https://sandbox/jwhigh/emailattachment.php?id=9&name=staff.csv
+
+        			var attach = '<a href="emailattachment.php?id='+eData.id+'&name='+eData.filename+'">'+eData.filename+'</a> ';
+        			attach 		+= '(Size: '+filesize+'k) ';
+        			attach 		+= '<a href="#">Remove</a>';
+
+							j('#uploadedfiles').append(attach);
+        		});
+        			
+        	
+        	}
 
         CKEDITOR.instances.reusableckeditor.setData(unescape(messages.email.msgFormatted));
-        // CKEDITOR.instances.reusableckeditor.document.j.body.innerText;
 
-        // j('iframe[name^=Ric]').contents().find('body').append(unescape(messages.email.msgFormatted));
-        // Message HTML content == messages.email.msgparts[0].txt
+        notVal.watchContent('msgsndr_tab_email');
+
       }
+
+
+      // SMS
+
+      if (typeof(messages.sms) != "undefined") {
+        j('li.osms').addClass('complete');
+
+        j('input[name=has_sms]').attr('checked','checked');
+        j('#msgsndr_form_sms').val(messages.sms.msgParts[0].txt).addClass('ok');
+
+        notVal.watchContent('msgsndr_tab_sms');
+      }
+
+
+      // Social 
 
       if (typeof(messages.post) != "undefined") {
         j('li.osocial').addClass('complete');
@@ -289,23 +394,28 @@
           j('#msgsndr_form_facebook').attr('checked','checked');
           j('div.facebook').show();
 
-          j('#msgsndr_form_fbmsg').val(messages.post.facebook.msgparts[0].txt);
+          j('#msgsndr_form_fbmsg').val(messages.post.facebook.msgParts[0].txt).addClass('ok');
         }
 
         if (typeof(messages.post.twitter) != "undefined") {
           j('#msgsndr_form_twitter').attr('checked','checked');
           j('div.twitter').show();
 
-          j('#msgsndr_form_tmsg').val(messages.post.twitter.msgparts[0].txt);
+          j('#msgsndr_form_tmsg').val(messages.post.twitter.msgParts[0].txt).addClass('ok');
         }
 
         if (typeof(messages.post.feed) != "undefined") {
           j('#msgsndr_form_feed').attr('checked','checked');
           j('div.feed').show();
 
-          j('#msgsndr_form_rsstitle').val(messages.post.feed.subject.replace("+"," "));
-          j('#msgsndr_form_rssmsg').val(messages.post.feed.msgparts[0].txt);
+         	var postTitle = unescape(messages.post.feed.subject);
+         	var postTitle = postTitle.replace(/\+/g," ");
+
+          j('#msgsndr_form_rsstitle').val(postTitle).addClass('ok');
+          j('#msgsndr_form_rssmsg').val(messages.post.feed.msgParts[0].txt).addClass('ok');
         }
+
+        notVal.watchSocial('msgsndr_tab_social');
 
       }
 
