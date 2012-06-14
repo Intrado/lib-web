@@ -234,10 +234,10 @@ include("nav.inc.php");
 				<h4>Message Content</h4>
 				<img class="dashboard_graph" src="graph_dashboard.png.php?blue=<?=$stats["total_phones"]?>&red=<?=$stats["total_emails"]?>&organge=<?=$stats["total_sms"]?>&green=<?=$stats["total_posts"]?>" />
 				<ul>
-				<li><img src="themes/newui/phone-blue.png"/><?=$stats["total_phones"]?></li>
-				<li><img src="themes/newui/email-red.png"/><?=$stats["total_emails"]?></li>
-				<li><img src="themes/newui/sms-orange.png"/><?=$stats["total_sms"]?></li>
-				<li><img src="themes/newui/social-green.png"/><?=$stats["total_posts"]?></li>
+				<li><img src="themes/newui/images/phone-blue.png"/><?=$stats["total_phones"]?></li>
+				<li><img src="themes/newui/images/email-red.png"/><?=$stats["total_emails"]?></li>
+				<li><img src="themes/newui/images/sms-orange.png"/><?=$stats["total_sms"]?></li>
+				<li><img src="themes/newui/images/social-green.png"/><?=$stats["total_posts"]?></li>
 				</ul>
 				
 			</div>
