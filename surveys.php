@@ -58,7 +58,7 @@ include_once("nav.inc.php");
 
 startWindow('My Survey Templates '. help('Surveys_MySurveyTemplates'),'padding: 3px;', true, true);
 ?>
-<div class="feed_btn_wrap cf"><?= icon_button(_L('Create New Survey Template'),"add",null,"surveytemplatewiz.php?id=new") ?></div>
+<div class="feed_btn_wrap cf"><?= icon_button(_L('Add New Survey Template'),"add",null,"surveytemplatewiz.php?id=new") ?></div>
 <?
 
 $questionnaires = DBFindMany("SurveyQuestionnaire", "from surveyquestionnaire where userid=$USER->id and deleted = 0 order by name");

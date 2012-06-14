@@ -280,7 +280,7 @@ function show_user_table($containerID) {
 	$html .= ajax_table_show_menu($containerID, $numUsers, $limitstart, $perpage) . ajax_show_table($containerID, $data, $titles, $formatters, $sorting);
 	$html .= "
 		<script type='text/javascript'>
-			var searchLabel = '".addslashes(_L('Search'))."';
+			var searchLabel = '".addslashes(_L('Search Users'))."';
 			var searchBox = $('{$containerID}_search');
 			searchBox.value = '".addslashes($filterValue)."'.unescapeHTML();
 			blankFieldValue('{$containerID}_search', searchLabel);
@@ -318,8 +318,9 @@ $DESCRIPTION .= ',&nbsp;&nbsp;<a href="users.php?download">'._L("user details cs
 include_once("nav.inc.php");
 
 startWindow('Active Users ' . help('Users_ActiveUsersList'),null, true);
-	button_bar(button('Add New User', NULL,"user.php?id=new") . help('Users_UserAdd'));
-
+	?>
+	<div class="feed_btn_wrap cf"><?= icon_button(_L('Add New User'),"add",null,"user.php?id=new") ?></div>
+	<?
 	echo '<div id="activeUsersContainer" class="cf">';
 		echo show_user_table('activeUsersContainer');
 	echo '</div>';

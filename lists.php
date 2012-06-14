@@ -219,9 +219,9 @@ startWindow('My Lists&nbsp;' . help('Lists_MyLists'));
 
 $feedButtons = array();
 if ($USER->authorize('createlist')) {
-	$feedButtons[] = icon_button(_L('Create a List'),"add","location.href='editlistrules.php?id=new'");
+	$feedButtons[] = icon_button(_L('Add New List'),"add",null,"editlistrules.php?id=new");
 	if (getSystemSetting('_hasenrollment')) {
-		$feedButtons[] = icon_button(_L('Create a List by Section'),"add","location.href='editlistsections.php?id=new'");
+		$feedButtons[] = icon_button(_L('Add New List by Section'),"add",null,"editlistsections.php?id=new");
 	}
 	if ($USER->authorize('subscribe') && userCanSubscribe('list')) {
 		$feedButtons[] = icon_button(_L('Subscribe to a List'),"fugue/star", "document.location='listsubscribe.php'");

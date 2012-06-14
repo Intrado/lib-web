@@ -269,7 +269,7 @@ $TITLE = "Message Builder";
 include_once("nav.inc.php");
 
 startWindow(_L('My Messages'), 'padding: 3px;', false, true);
-$feedButtons = array(icon_button(_L('Create a Message'),"add","location.href='mgeditor.php?id=new'"));
+$feedButtons = array(icon_button(_L('Add New Message'),"add",null,"mgeditor.php?id=new"));
 if ($USER->authorize('subscribe') && userCanSubscribe('messagegroup'))
 	$feedButtons[] = icon_button(_L('Subscribe to a Message'),"fugue/star", "document.location='messagegroupsubscribe.php'");
 

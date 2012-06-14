@@ -191,7 +191,7 @@ if (count($data) > $scrollThreshold) {
 startWindow('My ' . getJobsTitle() . ' ' . help('Jobs_MyActiveJobs'), 'padding: 3px;', true, true);
 
 ?>
-<div class="feed_btn_wrap cf"><?= icon_button(_L('Create New %s',getJobTitle()),"add",null,"job.php?id=new") ?></div>
+<div class="feed_btn_wrap cf"><?= icon_button(_L('Add New %s',getJobTitle()),"add",null,"job.php?id=new") ?></div>
 <?
 showObjects($data, $titles, $formatters, $scroll, true);
 endWindow();
@@ -214,7 +214,7 @@ if ($USER->authorize('createrepeat')) {
 	}
 	startWindow(_L('My Repeating %s ', getJobsTitle()) . help('Jobs_MyRepeatingJobs'), 'padding: 3px;', true, true);
 	?>
-	<div class="feed_btn_wrap cf"><?= icon_button(_L('Create Repeating %s ', getJobTitle()),"add",null,"jobrepeating.php?id=new") ?></div>
+	<div class="feed_btn_wrap cf"><?= icon_button(_L('Add New Repeating %s ', getJobTitle()),"add",null,"jobrepeating.php?id=new") ?></div>
 	<?	
 	
 	if (count($data) > 0 && getSystemSetting("disablerepeat") ) {

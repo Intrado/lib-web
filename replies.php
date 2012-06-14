@@ -161,11 +161,9 @@ include_once("nav.inc.php");
 
 NewForm($f);
 
-buttons(button('Refresh',"window.location.reload()"),
-		button('Delete All Played Responses', "if (confirm('$warning')) {window.location.href='replies.php?deleteplayed=true';}"));
-
 startWindow("Display Options" . help('Replies_DisplayOptions'), "padding: 3px;");
 ?>
+	<div class="feed_btn_wrap cf"><?= icon_button(_L('Delete All Played Responses'),"cross","if (confirm('$warning')) {window.location.href='replies.php?deleteplayed=true';}"). icon_button(_L('Refresh'),"fugue/arrow_circle_double_135","window.location.reload()") ?></div>
 
 <table class="usagelist">
 <tr>
@@ -260,7 +258,6 @@ showPageMenu($total,$pagestart,500);
 
 
 endWindow();
-buttons();
 EndForm();
 ////////////////////////////////////////////////////////////////////////////////
 // Scripts

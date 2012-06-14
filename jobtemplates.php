@@ -137,7 +137,7 @@ include_once("nav.inc.php");
 
 startWindow(_L('Templates'));
 
-$feedButtons = array(icon_button(_L('Add Template'),"add","location.href='jobtemplate.php?id=new'"));
+$feedButtons = array(icon_button(_L('Add New Template'),"add","location.href='jobtemplate.php?id=new'"));
 $feedFilters = array(
 	"name" => array("icon" => "img/largeicons/tiny20x20/pencil.jpg", "name" => "Name"),
 	"date" => array("icon" => "img/largeicons/tiny20x20/clock.jpg", "name" => "Date")
