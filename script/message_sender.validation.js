@@ -161,18 +161,11 @@ jQuery.noConflict();
         success: function(data) {
           userInfo = data;
            // format the phone number and add the new formatted version to the userInfo object
-          userInfo.phoneFormatted =formatPhone(data.phone); 
+          userInfo.phoneFormatted = notVal.formatPhone(data.phone); 
         }
       });  
     };
 
-    function formatPhone(number){ // must be a 10 digit number with no spaces passed in
-      var phone = number;
-      var phonePartOne = '(' + phone.substring(0,3) + ') ';
-      var phonePartTwo = phone.substring(3,6) + '-';
-      var phonePartThree = phone.substring(6,10);
-      return phonePartOne + phonePartTwo + phonePartThree;
-    };
 
 
       // call the functions
@@ -310,9 +303,7 @@ jQuery.noConflict();
 
       notVal.watchFields('#msgsndr_form_number, #msgsndr_tts_message');
 
-      // $('#msgsndr_tts_message').on('keyup', function() {
-      //   charCount(this, '10000', '.tts.characters');
-      // });
+
 
       // Build up select box based on the maxjobdays user permission
       var daysToRun = userPermissions.maxjobdays;
@@ -426,7 +417,7 @@ jQuery.noConflict();
           }
         }
 
-      })
+      });
 
       function reTranslate(elem) {
 
@@ -587,7 +578,8 @@ jQuery.noConflict();
         ],
         address: [
           new document.validators["ValRequired"]("email_address","Email Address",{}), 
-          new document.validators["ValEmail"]("email_address","Email Address",{min:7,max:60})
+          new document.validators["ValLength"]("email_address", "Email Address", {max:255}),
+          new document.validators["ValEmail"]("email_address","Email Address",{domain:orgOptions.emaildomain}),
         ],
         subject: [
           new document.validators["ValRequired"]("email_subject","Subject",{}), 
