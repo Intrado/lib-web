@@ -781,6 +781,7 @@ span.error { color: rgb(219,30,30); font-size: 0.9em; }
 
 
 @media screen and (max-width: 1000px) { 
+ .subnavtabs li { margin: 5px; }
  .subnavtabs a { font-size: 13px; padding: 5px 8px; }
  .wrapper { margin: 0 180px 0 0; }
  .main_aside { width: 170px; right: -180px; }
@@ -820,6 +821,12 @@ span.error { color: rgb(219,30,30); font-size: 0.9em; }
 }
 
 @media screen and (max-width: 850px) {
+ h2 { font-size: 18px; line-height: 34px; }
  .msg_steps li a { font-size: 11px; }
  .window_panel p, .window_panel a { font-size: 13px; }
+ 
+ .feed_btn_wrap { top: -58px; }
+ button, .btn { padding: 4px 8px; }
+ 
+ table th, table td { font-size: 13px; line-height: 28px; }
 }
