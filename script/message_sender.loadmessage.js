@@ -283,7 +283,7 @@
 
     	// Phone
     	if (typeof(messages.phone) != "undefined") {
-	  		if(messages.phoneIsAudioOnly != true) { // True is Call Me To Record
+	  		if(messages.AudioOnly != true) { // True is Call Me To Record
 
 	  			j('li.ophone').addClass('complete');
 	  			
