@@ -105,6 +105,13 @@
                 if(typeof(messages[mData.type][mData.subType]) == "undefined") {
                   messages[mData.type][mData.subType] = mData;
                 }
+              } else if (mData.type == "email") {
+              	if(typeof(messages[mData.type]) == "undefined") {
+              		messages[mData.type] = {};
+              	}
+              	if(typeof(messages[mData.type][mData.languageCode]) == "undefined") {
+              		messages[mData.type][mData.languageCode] = mData;
+              	}
               } else if(typeof(messages[mData.type]) == "undefined" && (mData.type != "email" || mData.subType != "plain")) {
                 messages[mData.type] = mData;
               }
@@ -280,12 +287,12 @@
 
     // This will contain the logic to populate message content from a loaded message
     this.doLoadMessage = function() {
-    	
+
     	// Phone
     	if (typeof(messages.phone) != "undefined") {
-	  		if(messages.phoneAudio == true) { // True is Call Me To Record
+	  		if(messages.phoneAudio != 'true') { // True is Call Me To Record
 
-	  			console.log('CTR - TRUE');
+	  			j('li.ophone').addClass('complete');
 
 	  			j('#msgsndr_phonetype').val('callme');
 	  			j('button.audioleft').addClass('active'); 
@@ -316,8 +323,6 @@
 						"defaultphone": notVal.formatPhone(orgOptions.callerid)});
 
 	  		} else {
-
-	  			console.log('TTS - FALSE');
 
 	  			j('li.ophone').addClass('complete');
 	  			
