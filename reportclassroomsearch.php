@@ -170,8 +170,8 @@ $helpsteps[] = _L('The Date Options menu contains date options that are relative
 $helpstepscount++;
 
 $buttons = array(
-	icon_button(_L('Back'), 'fugue/arrow_180', null, 'reports.php'),
-	submit_button(_L("View Report"),"view","arrow_refresh")
+	submit_button(_L("View Report"),"view","arrow_refresh"),
+	icon_button(_L('Cancel'),"cross", null, 'reports.php')
 );
 $form = new Form("classroomreport",$formdata,$helpsteps,$buttons);
 

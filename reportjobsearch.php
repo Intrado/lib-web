@@ -208,7 +208,6 @@ if(isset($_SESSION['reportid'])){
 include_once("nav.inc.php");
 NewForm($f);
 
-buttons( button('Back', null, "reports.php"), submit($f, "view", "View Report"),submit($f, "save", "Save/Schedule"));
 
 //--------------- Select window ---------------
 startWindow("Select ".help('ReportJobSearch_Select'), NULL, false);
@@ -295,8 +294,9 @@ startWindow("Select ".help('ReportJobSearch_Select'), NULL, false);
 </table>
 
 <?
+buttons(submit($f, "view", "View Report"),submit($f, "save", "Save/Schedule"),icon_button(_L('Cancel'),"cross", null, 'reports.php'));
+
 endWindow();
-buttons();
 EndForm();
 include_once("navbottom.inc.php");
 ?>

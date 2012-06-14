@@ -255,8 +255,8 @@ $formdata["displayoptions"] = array(
 );
 
 $buttons = array(
-	icon_button(_L('Back'), 'tick', null, 'reports.php'),
-	submit_button(_L("View Report"),"view","arrow_refresh")
+	submit_button(_L("View Report"),"view","arrow_refresh"),
+	icon_button(_L('Cancel'),"cross", null, 'reports.php')
 );
 
 $form = new Form('reportcallssearch',$formdata,array(),$buttons);

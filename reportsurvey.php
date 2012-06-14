@@ -129,7 +129,7 @@ $TITLE = "Survey Report" . ((isset($jobid) && $jobid) ? " - " . escapehtml($job-
 
 include_once("nav.inc.php");
 NewForm($f);
-buttons(button('Back', null, "reports.php"), submit($f, "run", "View Report"), submit($f, "save", "Save/Schedule"));
+
 
 
 //--------------- Select window ---------------
@@ -179,8 +179,8 @@ startWindow("Select ".help('ReportSurvey_Select'), NULL, false);
 </table>
 
 <?
+buttons(submit($f, "run", "View Report"), submit($f, "save", "Save/Schedule"),icon_button(_L('Cancel'),"cross", null, 'reports.php'));
 endWindow();
-buttons();
 EndForm();
 include("navbottom.inc.php");
 ?>
