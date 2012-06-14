@@ -197,9 +197,9 @@ function submit($form, $section, $name = 'Submit',$val = null) {
 	$ret = '<input class="btn_hide" type="submit" value="submit" name="submit[' . $form . '][' . $section . ']" />';
 
 	if ($val !== null) {
-		$ret .= button($name,"submitForm('$form','$section','$val');");
+		$ret .= icon_button($name,"accept","submitForm('$form','$section','$val');");
 	} else {
-		$ret .= button($name,"submitForm('$form','$section');");
+		$ret .= icon_button($name,"accept","submitForm('$form','$section');");
 	}
 	return $ret;
 }
