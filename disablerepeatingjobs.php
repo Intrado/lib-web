@@ -32,7 +32,7 @@ $formdata["disablerepeat"] = array(
 	"helpstep" => $helpstepnum
 );
 
-$buttons = array(submit_button(_L("Done"),"submit","accept"),
+$buttons = array(submit_button(_L('Save'),"submit","tick"),
 				icon_button(_L("Cancel"),"cross",null,"settings.php"));
 
 $form = new Form("disablerepeatingjobs", $formdata, $helpsteps, $buttons);

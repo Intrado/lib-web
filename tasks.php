@@ -103,7 +103,7 @@ include_once("nav.inc.php");
 
 startWindow('System Imports ' . help('Tasks_SystemTasks'), 'padding: 3px;');
 ?>
-	<div class="feed_btn_wrap cf"><?= icon_button(_L('Add New Import'),"add",null,"task.php?id=new"). icon_button(_L('Refresh'),"fugue/arrow_circle_double_135","window.location.reload()") ?></div>
+	<div class="feed_btn_wrap cf"><?= icon_button(_L('Add New Import'),"add",null,"task.php?id=new"). icon_button(_L('Refresh'),"arrow_refresh","window.location.reload()") ?></div>
 <?
 
 

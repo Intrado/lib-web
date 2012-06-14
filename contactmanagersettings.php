@@ -112,7 +112,7 @@ $formdata["multicheckbox"] = array(
 );
 
 
-$buttons = array(submit_button(_L("Done"),"submit","accept"),
+$buttons = array(submit_button(_L('Save'),"submit","tick"),
 				icon_button(_L("Cancel"),"cross",null,"settings.php"));
 
 $form = new Form("account", $formdata, null, $buttons);
@@ -198,7 +198,9 @@ window.location = '<?= addcslashes($_SERVER['REQUEST_URI']) ?>';
 </script>
 <?
 
-
+startWindow(_L("Contact Manager Settings"));
 echo $form->render();
+endWindow();
+
 include_once("navbottom.inc.php");
 ?>

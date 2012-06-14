@@ -103,9 +103,7 @@ function dolistbox (img, init, id) {
 $help = (($_SESSION['addressesorigin'] == "nav") ? '' : help('AddressBook_MyAddressBook'));
 startWindow('Contacts ' . $help);
 ?>
-
-<? button_bar(button('Add Contact', NULL,"addressedit.php?id=new&origin=".($_SESSION['addressesorigin'] == "manualadd" ? "manualaddbook" : "nav"))); ?>
-
+	<div class="feed_btn_wrap cf"><?= icon_button(_L('Add New Contact'),"add",null,"addressedit.php?id=new&origin=".($_SESSION['addressesorigin'] == "manualadd" ? "manualaddbook" : "nav")) ?></div>
 <?
 
 $first = FieldMap::getFirstNameField();

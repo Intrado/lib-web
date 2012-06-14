@@ -203,12 +203,11 @@ $TITLE = "Organization Manager";
 
 include_once("nav.inc.php");
 
-buttons(
-	icon_button(_L("Done"), "fugue/tick", "document.location='settings.php';"),
-	icon_button(_L("New"), "add", "document.location='organizationnew.php';"),
-	icon_button(_L("Delete Un-associated"), "cross", "if(confirm('". addslashes(_L('Are you sure you want to delete all un-associated organizations?')) ."')) document.location='organizationdatamanager.php?&deleteunassociated'"));
-	
+buttons(icon_button(_L("Done"), "fugue/tick", "document.location='settings.php';"));	
 startWindow(_L("Organizations"));
+?>
+	<div class="feed_btn_wrap cf"><?= icon_button(_L('Add New Organization'),"add",null,"organizationnew.php") . icon_button(_L('Delete Un-associated'),"cross","if(confirm('". addslashes(_L('Are you sure you want to delete all un-associated organizations?')) ."')) document.location='organizationdatamanager.php?&deleteunassociated'") ?></div>
+<?
 
 // if there are any organizations
 if (count($data)) {

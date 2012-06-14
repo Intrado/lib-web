@@ -163,7 +163,7 @@ NewForm($f);
 
 startWindow("Display Options" . help('Replies_DisplayOptions'), "padding: 3px;");
 ?>
-	<div class="feed_btn_wrap cf"><?= icon_button(_L('Delete All Played Responses'),"cross","if (confirm('$warning')) {window.location.href='replies.php?deleteplayed=true';}"). icon_button(_L('Refresh'),"fugue/arrow_circle_double_135","window.location.reload()") ?></div>
+	<div class="feed_btn_wrap cf"><?= icon_button(_L('Delete All Played Responses'),"cross","if (confirm('$warning')) {window.location.href='replies.php?deleteplayed=true';}"). icon_button(_L('Refresh'),"arrow_refresh","window.location.reload()") ?></div>
 
 <table class="usagelist">
 <tr>

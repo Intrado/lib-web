@@ -210,7 +210,7 @@ if (getSystemSetting('_hasldap', '0')) {
 
 }
 
-$buttons = array(submit_button(_L("Done"),"submit","accept"),
+$buttons = array(submit_button(_L('Save'),"submit","tick"),
 				icon_button(_L("Cancel"),"cross",null,"settings.php"));
 
 $form = new Form("securitysettings", $formdata, $helpsteps, $buttons);

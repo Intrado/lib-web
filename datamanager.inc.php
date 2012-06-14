@@ -300,7 +300,7 @@ break;
 include_once("nav.inc.php");
 
 NewForm($form);
-buttons(submit($form, $section, 'Save'));
+buttons(submit($form, $section, 'Done'));
 startWindow('Fields ' . help($hover), 'padding: 3px;');
 ?>
 
