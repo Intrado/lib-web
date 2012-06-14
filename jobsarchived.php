@@ -57,11 +57,11 @@ if (!$USER->authorize('leavemessage')) {
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "notifications:jobs:archived";
-$TITLE = "Archived Jobs";
+$TITLE = _L("Archived %s",getJobsTitle());
 
 include_once("nav.inc.php");
 
-startWindow('My Archived Jobs ' . help('Jobs_MyArchivedJobs'),'padding: 3px;', false, true);
+startWindow(_L('My Archived %s ',getJobsTitle()) . help('Jobs_MyArchivedJobs'),'padding: 3px;', false, true);
 
 showPageMenu($total, $start, $limit);
 
