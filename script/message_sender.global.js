@@ -141,6 +141,7 @@
 
       var nav = j(ele).attr('data-nav');
       var el  = nav.substr(2);
+      var tts = j(ele).attr('data-tts');
 
       j('.msg_content_nav li').removeClass('lighten');
       j('.msg_content_nav '+nav).removeClass('active').addClass('complete');
@@ -151,6 +152,10 @@
 
       // Set Message tabs on review tab
       j('#msgsndr_review_'+el).parent().addClass('complete');
+
+      if (tts == 'true') {
+        self.ttsSave();
+      }
 
     } // saveBtn
 
@@ -379,6 +384,128 @@
       return phonePartOne + phonePartTwo + phonePartThree;
     };
 
+
+
+    // Translate
+
+    this.doTranslate = function(langCodes,txtField,displayArea,msgType) {
+
+      var transTxt = makeTranslatableString(txtField);
+
+      var transURL = 'translate.php?english='+transTxt+'&languages='+langCodes;
+
+      var splitlangCodes = langCodes.split('|');
+      var langCount = splitlangCodes.length;
+
+      // $('a[data-target='+displayArea+']').show().text('Fetching translations, please wait...');   
+      // $(displayArea).empty();
+
+      j.ajax({
+        url: transURL,
+        type: 'GET',
+        dataType: 'json',
+        success: function(data) {
+
+          j.each(data.responseData, function(transIndex, transData) {
+
+            var langCode = splitlangCodes[transIndex];
+            var textareaId = '#'+msgType+'_translated_'+langCode;
+
+            transText = transData.translatedText;
+            if ( msgType == "email" ) {
+              j(textareaId).html(transText);
+            } else {
+              j(textareaId).text(transText);
+            }
+
+          });
+
+          j('img.loading').remove();
+
+        }
+
+      });
+
+    };
+
+
+
+      /* 
+        TTS Translate
+        
+        save tts need to generate hidden inputs buit up with value same as nickolas post data.txt
+  
+        postdata : {"enabled":true,"text":"Translated Text Here","override":false,"gender":"female","englishText":""}
+
+      */
+
+    this.ttsSave = function() {
+
+      var gender        = j('input[name=messagePhoneText_message-gender]:checked').val();
+      var enText        = j('#msgsndr_tts_message').val();
+
+      var translate     = j('#msgsndr_form_phonetranslate').attr('checked');
+
+      j('#text').append('<div id="post_data_translations"></div>');
+
+      j('#post_data_translations').empty().append('<input type="hidden" name="phone_translate" val="{"gender": "'+gender+'", "text": "'+enText+'"}">');
+
+      /*
+        Translations will only be built up if translate checkbox is checked
+        
+        We need to retranslate each language that is checked and store in a hidden input,
+        but if they have override check just take what is in the language box and store in hidden input
+  
+        ;) Simples ....
+
+      */
+
+      if ( translate == 'checked' ) {
+
+        var loopTranslations  = j('input[name=save_translation]:checked');
+        var translatedText    = '';
+
+        j(loopTranslations).each(function(transI, transD) {
+
+          var langCode = j(this).attr('id').split('_')[1]; // Gives me language code : en
+
+          var overRide = j('#tts_override_'+langCode).is(':checked');
+          if (overRide == true) {
+            translatedText = j('#tts_translated_'+langCode).val();
+          } else {
+            translatedText = self.getTranslation(enText,langCode);
+          }
+
+          j('#post_data_translations').append('<input type="hidden" name="phone_translate_'+langCode+'" val="{"enabled":true,"text":"'+translatedText+'","override":'+overRide+',"gender":'+gender+',"englishText":""}">');
+
+        });
+
+      }
+
+    };
+
+
+    this.getTranslation = function(enText,langCode) {
+
+      var transURL = 'translate.php?english='+enText+'&languages='+langCode;
+
+      var transText = '';
+
+      j.ajax({
+        url: transURL,
+        type: 'GET',
+        async: false,
+        dataType: 'json',
+        success: function(data) {
+
+          transText = data.responseData[0].translatedText;
+        }
+
+      });
+
+      return transText;
+
+    };
 
 
   } // globalValFunctions()

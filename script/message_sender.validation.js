@@ -367,7 +367,7 @@ jQuery.noConflict();
 
           $('#tts_translate fieldset > label[for^=tts_]').append(' <img src="img/ajax-loader.gif" class="loading" />');
 
-          doTranslate(ttslangCodes,txtField,displayArea,msgType);
+          notVal.doTranslate(ttslangCodes,txtField,displayArea,msgType);
 
         }
 
@@ -447,8 +447,8 @@ jQuery.noConflict();
 
         var ttsTranslate = '<fieldset>';
 
-        ttsTranslate += '<input type="checkbox" checked="checked" class="translations" id="tts_'+nLangs[langCode]+'" />';
-        ttsTranslate += '<label for="tts_'+nLangs[langCode]+'">'+nLangs[langCode]+'</label>';
+        ttsTranslate += '<input type="checkbox" checked="checked" name="save_translation" class="translations" id="tts_'+langCode+'" />';
+        ttsTranslate += '<label for="tts_'+langCode+'">'+nLangs[langCode]+'</label>';
         ttsTranslate += '<div class="controls">';
         ttsTranslate += '<textarea id="tts_translated_'+langCode+'" disabled="disabled"></textarea>';
         ttsTranslate += '<button class="playAudio" data-text="tts_'+nLangs[langCode]+'" data-code="'+langCode+'"><span class="icon play"></span> Play Audio</button>';
@@ -630,7 +630,7 @@ jQuery.noConflict();
 
           $('#email_translate fieldset > label[for^=email_]').append(' <img src="img/ajax-loader.gif" class="loading" />');
 
-          doTranslate(elangCodes,txtField,displayArea,msgType);
+          notVal.doTranslate(elangCodes,txtField,displayArea,msgType);
 
       }
 
@@ -894,48 +894,6 @@ jQuery.noConflict();
     
     *****/
 
-
-
-
-    function doTranslate(langCodes,txtField,displayArea,msgType) {
-
-      var transTxt = makeTranslatableString(txtField);
-
-      var transURL = 'translate.php?english='+transTxt+'&languages='+langCodes;
-
-      var splitlangCodes = langCodes.split('|');
-      var langCount = splitlangCodes.length;
-
-      // $('a[data-target='+displayArea+']').show().text('Fetching translations, please wait...');   
-      // $(displayArea).empty();
-
-      $.ajax({
-        url: transURL,
-        type: 'GET',
-        dataType: 'json',
-        success: function(data) {
-
-          $.each(data.responseData, function(transIndex, transData) {
-
-            var langCode = splitlangCodes[transIndex];
-            var textareaId = '#'+msgType+'_translated_'+langCode;
-
-            transText = transData.translatedText;
-            if ( msgType == "email" ) {
-              $(textareaId).html(transText);
-            } else {
-              $(textareaId).text(transText);
-            }
-
-          });
-
-          $('img.loading').remove();
-
-        }
-
-      });
-
-    };
 
 
     function doreTranslate(langCode,txt,displayArea,msgType) {

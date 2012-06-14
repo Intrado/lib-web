@@ -148,7 +148,7 @@
 
 				<fieldset class="form_actions">
 					<div class="controls">
-					<button class="btn_save" disabled="disabled" data-nav=".ophone">Save Phone Message</button>
+					<button class="btn_save" disabled="disabled" data-nav=".ophone" data-tts="true">Save Phone Message</button>
 					<button class="btn_cancel" data-nav=".ophone">Cancel</button>
 					</div>
 				</fieldset>
