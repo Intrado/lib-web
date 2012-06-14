@@ -371,5 +371,14 @@
     }
 
 
+    this.formatPhone = function(number){ // must be a 10 digit number with no spaces passed in
+      var phone = number;
+      var phonePartOne = '(' + phone.substring(0,3) + ') ';
+      var phonePartTwo = phone.substring(3,6) + '-';
+      var phonePartThree = phone.substring(6,10);
+      return phonePartOne + phonePartTwo + phonePartThree;
+    };
+
+
 
   } // globalValFunctions()
