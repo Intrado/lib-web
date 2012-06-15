@@ -830,3 +830,25 @@ span.error { color: rgb(219,30,30); font-size: 0.9em; }
  
  table th, table td { font-size: 13px; line-height: 28px; }
 }
+
+/* Very basic facebook style */
+.fbpagelist {
+	width: 96%;
+	border: 1px solid #CCC;
+	padding: 3px;
+	max-height: 250px;
+	overflow: auto;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+}
+.fbpagelist label {
+	text-align: left;
+	width: 90%;
+}
+.fbpagelist .fbname {
+	font-weight: bold;
+}
+.fbpagelist .fbimg {
+	padding: 3px;
+	float: left;
+}

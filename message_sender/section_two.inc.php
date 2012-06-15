@@ -309,7 +309,7 @@
 									<a id="msgsndr_fbpageall" class="actionlink btn">Select All</a>
 									<a id="msgsndr_fbpagenone" class="actionlink btn">Remove All</a>
 								</div>
-								<div id="msgsndr_fbpagefbpages"></div>
+								<div id="msgsndr_fbpagefbpages" class="hidden fbpagelist"></div>
 								<div id="msgsndr_fbpagesmessage" class="underneathmsg cf"></div>
 							</div>
 						</fieldset>
