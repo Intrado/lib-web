@@ -9,7 +9,6 @@
 
       var reqFields   = j('#'+section+' .required');
 
-
       var reqCount    = 0;
       var reqAmount   = parseInt(reqFields.length);
 
@@ -130,6 +129,7 @@
 
       j.each(items, function(index, item) {
         if ( j(item).hasClass('complete') ) {
+          j('#msg_section_2 .msg_confirm').removeClass('hide');
           j('#msg_section_2 .btn_confirm').removeAttr('disabled');
         }
       });
@@ -143,22 +143,31 @@
       var el  = nav.substr(2);
       var tts = j(ele).attr('data-tts');
 
-      j('.msg_content_nav li').removeClass('lighten');
-      j('.msg_content_nav '+nav).removeClass('active').addClass('complete');
-      j('#msgsndr_tab_'+el).hide();
-
-      j('input[name=has_'+el+']').attr('checked', 'checked');
-
-
-      // Set Message tabs on review tab
-      j('#msgsndr_review_'+el).parent().addClass('complete');
-
       if (tts == 'true') {
+        
+        j(ele).next('img').removeClass('hide');
         self.ttsSave();
-      }
-      if (el == 'email') {
+
+      } else if (el == 'email') {
+
+        j(ele).next('img').removeClass('hide');
         self.emailSave();
+      
+      } else {
+      
+        j('#msgsndr_tab_'+el).hide();
+
+        j('.msg_content_nav li').removeClass('lighten');
+        j('.msg_content_nav '+nav).removeClass('active').addClass('complete');
+
+        j('input[name=has_'+el+']').attr('checked', 'checked');
+
+        // Set Message tabs on review tab
+        j('#msgsndr_review_'+el).parent().addClass('complete');
       }
+
+      //j('#msg_section_2 .msg_confirm').removeClass('hide');
+      self.checkContent();
 
     } // saveBtn
 
@@ -449,9 +458,16 @@
 
       var translate     = j('#msgsndr_form_phonetranslate').attr('checked');
 
-      j('#text').append('<div id="post_data_translations"></div>');
+      j('#text').append('<div id="post_data_translations"><input type="hidden" name="phone_translate" /></div>');
 
-      j('#post_data_translations').empty().append('<input type="hidden" name="phone_translate" val="{"gender": "'+gender+'", "text": "'+enText+'"}">');
+      var jsonVal = {"gender":"","text":""};
+      jsonVal['text'] = enText;
+      jsonVal['gender'] = gender;
+      var jsonVal = j.toJSON(jsonVal)
+
+      j('input[name=phone_translate]').val(jsonVal);
+
+      //j('#post_data_translations').empty().append('<input type="hidden" name="phone_translate" value="{"gender": "'+gender+'", "text": "'+enText+'"}" />');
 
       /*
         Translations will only be built up if translate checkbox is checked
@@ -467,23 +483,105 @@
 
         var loopTranslations  = j('input[name=save_translation]:checked');
         var translatedText    = '';
+        var langCodes         = '';
 
-        j(loopTranslations).each(function(transI, transD) {
+        j.each(loopTranslations, function(transI, transD) {
+          langCode = j(transD).attr('id').split('_')[1];
+          j('#post_data_translations').append('<input type="hidden" name="phone_translate_'+langCode+'">');
+        });
 
-          var langCode = j(this).attr('id').split('_')[1]; // Gives me language code : en
+        j.each(loopTranslations, function(transI, transD) {
+
+          langCode = j(transD).attr('id').split('_')[1];
 
           var overRide = j('#tts_override_'+langCode).is(':checked');
           if (overRide == true) {
-            translatedText = j('#tts_translated_'+langCode).val();
-          } else {
-            translatedText = self.getTranslation(enText,langCode);
-          }
+            transText = j('#tts_translated_'+langCode).val();
 
-          j('#post_data_translations').append('<input type="hidden" name="phone_translate_'+langCode+'" val="{"enabled":true,"text":"'+translatedText+'","override":'+overRide+',"gender":'+gender+',"englishText":""}">');
+            var jsonVal = {"enabled":"true","text":"","override":"true","gender":"","englishText":""};
+            jsonVal['text'] = transText;
+            jsonVal['gender'] = gender;
+            var jsonVal = j.toJSON(jsonVal)
+
+            j('input[name=phone_translate_'+langCode+']').val(jsonVal);
+            // j('#post_data_translations').append('<input type="hidden" name="phone_translate_'+langCode+'" value="'+jsonVal+'">');
+          } else {
+            if (langCodes == '') {
+              langCodes = langCode;
+            } else {
+              langCodes = langCodes + '|' + langCode;
+            }
+          }
+        
+        });
+
+        var splitlangCodes = langCodes.split('|');
+
+        var transURL = 'translate.php?english='+enText+'&languages='+langCodes;
+        var transText = '';
+
+        var getTranslations = j.ajax({
+          url: transURL,
+          type: 'GET',
+          // async: false,
+          dataType: 'json',
+          success: function(data) {
+
+            j.each(data.responseData, function(transIndex, transData) {
+
+              var langCode = splitlangCodes[transIndex];
+
+              transText = transData.translatedText;
+
+              var jsonVal = {"enabled":"true","text":"","override":"false","gender":"","englishText":""};
+              jsonVal['text'] = transText;
+              jsonVal['gender'] = gender;
+              var jsonVal = j.toJSON(jsonVal)
+
+              j('input[name=phone_translate_'+langCode+']').val(jsonVal);
+              // j('#post_data_translations').append('<input type="hidden" name="phone_translate_'+langCode+'" value='+jsonVal+'>');
+
+
+            });
+
+          }
 
         });
 
-      }
+        j.when(getTranslations).done(function() {
+          j('#text .loading').addClass('hide');
+          j('#msgsndr_tab_phone').hide();
+
+          var el = 'phone';
+          var nav = '.ophone';
+
+          j('.msg_content_nav li').removeClass('lighten');
+          j('.msg_content_nav '+nav).removeClass('active').addClass('complete');
+
+          j('input[name=has_'+el+']').attr('checked', 'checked');
+
+          // Set Message tabs on review tab
+          j('#msgsndr_review_'+el).parent().addClass('complete');
+
+          self.checkContent();
+        });
+
+      //   j(loopTranslations).each(function(transI, transD) {
+
+      //     var langCode = j(this).attr('id').split('_')[1]; // Gives me language code : en
+
+      //     var overRide = j('#tts_override_'+langCode).is(':checked');
+      //     if (overRide == true) {
+      //       translatedText = j('#tts_translated_'+langCode).val();
+      //     } else {
+      //       translatedText = self.getTranslation(enText,langCode);
+      //     }
+
+      //     j('#post_data_translations').append('<input type="hidden" name="phone_translate_'+langCode+'" val="{"enabled":true,"text":"'+translatedText+'","override":'+overRide+',"gender":'+gender+',"englishText":""}">');
+
+      //   });
+
+       }
 
     };
 

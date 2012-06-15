@@ -11,6 +11,7 @@ jQuery.noConflict();
 		// Hiding stuff which is not needed
 		$('#msg_section_2, #msg_section_3, .close, .facebook, .twitter, .feed, div[id^="msgsndr_tab"]').hide();
 		//$('#audiolink').hide();
+		$('#msg_section_2 .msg_confirm').addClass('hide');
 
 		// Email Flag
 		emailSubject 	= "";
@@ -41,6 +42,8 @@ jQuery.noConflict();
 
 		$('.msg_content_nav button').on('click', function(event) {
 			event.preventDefault();
+
+			j('#msg_section_2 .msg_confirm').addClass('hide');
 
 			var elm = $(this).attr('id');
 			var elm = elm.split('_');  			// I need number elm[2]
