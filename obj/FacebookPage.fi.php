@@ -18,16 +18,22 @@ class FacebookPage extends FormItem {
 		$str = '
 			<style>
 				.fbpagelist {
-					width: 98%;
-					border: 1px dotted gray;
+					width: 96%;
+					border: 1px solid #CCC;
 					padding: 3px;
 					max-height: 250px;
 					overflow: auto;
+					-webkit-border-radius: 5px;
+					border-radius: 5px;
 				}
-				.fbname {
+				.fbpagelist label {
+					text-align: left;
+					width: 90%;
+				}
+				.fbpagelist .fbname {
 					font-weight: bold;
 				}
-				.fbimg {
+				.fbpagelist .fbimg {
 					padding: 3px;
 					float: left;
 				}
@@ -41,9 +47,8 @@ class FacebookPage extends FormItem {
 			<div id="'. $n. 'renew" style="display:'. ($showrenewbutton?"block":"none"). '">
 				'. icon_button(_L("Renew Facebook Authorization"), "custom/facebook", "popup('popupfacebookauth.php', 640, 400)").'
 			</div>
-			<div id="'.$n.'actionlinks" style="display:'. (($showconnectbutton || $showrenewbutton)?"none":"block"). '">
+			<div id="'.$n.'actionlinks" class="actionlinks" style="display:'. (($showconnectbutton || $showrenewbutton)?"none":"block"). '">
 				<a id="'. $n. 'all" class="actionlink">'._L("Select All").'</a>
-				&nbsp;|&nbsp;
 				<a id="'. $n. 'none" class="actionlink">'._L("Remove All").'</a>
 			</div>
 			<div id="'. $n. 'fbpages" class="fbpagelist" style="display:'. (($showconnectbutton || $showrenewbutton)?"none":"block"). '">
