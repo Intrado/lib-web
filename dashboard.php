@@ -334,8 +334,9 @@ include("nav.inc.php");
 	
 	
 	<div class="main_aside">
+		<div class="bigbtn">
 		<a class="bigbtn" href="message_sender.php"><span><?= _L("New %s",getJobTitle())?></span></a>
-	
+		</div>
 		<div class="templates">
 			<h3><?= _L("%s Templates",getJobTitle())?></h3>
 			<ul>

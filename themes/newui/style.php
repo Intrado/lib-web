@@ -143,7 +143,11 @@ border-top: 1px solid #bbb; border-right: 1px solid #bbb; border-bottom: 1px sol
 
 
 /*----- Big Broadcast button -----*/
-
+div.bigbtn {
+  margin: -10px -5px -5px -5px;
+  padding: 10px 5px 5px 5px;
+  background: url(themes/newui/images/circle-thin-mult.png) no-repeat;
+}
 a.bigbtn { display: block; width: 100%; margin: 0 0 25px 0; padding: 14px; color: #fff; font-size: 20px; font-weight: bold; text-align: center; border: 3px solid #AE330D;
 -webkit-border-radius: 8px; border-radius: 8px;
 -webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25) inset, 0 1px 2px rgba(0, 0, 0, 0.05); box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25) inset, 0 1px 2px rgba(0, 0, 0, 0.05);
