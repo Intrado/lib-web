@@ -53,6 +53,8 @@ $end_datetime = date("Y-m-d h:m:s",time());
 ////////////////////////////////////////////////////////////////////////////////
 
 function generateStats($useridList, $start_datetime, $end_datetime) {
+	error_log(json_encode($useridList));
+	
 	// sql query parameters, always in same order for all stats
 	$params = array();
 	$params[] = $start_datetime;
@@ -223,7 +225,7 @@ include("nav.inc.php");
 		
 		<div class="window summary">
 			<div class="window_title_wrap">
-			<h2>Activity Summary</h2>
+			<h2><?= _L("Activity Summary")?></h2>
 			<div class="btngroup">
 				<?
 				$urlQueryState = http_build_query(array_diff_key($requestValues,array("daterange" => '')));
@@ -237,26 +239,26 @@ include("nav.inc.php");
 			
 			<div class="window_body_wrap cf">
 			<div class="col">
-				<h4>Broadcasts</h4>
+				<h4><?= getJobsTitle()?></h4>
 				<p><strong><?=$stats["total_jobs"]?></strong></p>
-				<p><?=$stats["total_languages"]?> Languages</p>
-				<p><?=$stats["total_users"]?> Senders</p>
+				<p><?= _L("%s Languages", $stats["total_languages"])?></p>
+				<p><?=_L("%s Senders", $stats["total_users"])?></p>
 			</div>
 			
 			<div class="col bloc">
-				<h4>Message Content</h4>
+				<h4><?= _L("Content Mix")?></h4>
 				<img class="dashboard_graph" src="graph_dashboard.png.php?blue=<?=$stats["total_phones"]?>&red=<?=$stats["total_emails"]?>&organge=<?=$stats["total_sms"]?>&green=<?=$stats["total_posts"]?>" />
 				<ul>
-				<li><img src="themes/newui/images/phone-blue.png"/>&nbsp;<?= $stats["percentage_slice"] * $stats["total_phones"] ?>%</li>
-				<li><img src="themes/newui/images/email-red.png"/>&nbsp;<?= $stats["percentage_slice"] * $stats["total_emails"] ?>%</li>
-				<li><img src="themes/newui/images/sms-orange.png"/>&nbsp;<?= $stats["percentage_slice"] * $stats["total_sms"]?>%</li>
-				<li><img src="themes/newui/images/social-green.png"/>&nbsp;<?= $stats["percentage_slice"] * $stats["total_posts"]?>%</li>
+				<li><img src="themes/newui/images/phone-blue.png"/>&nbsp;<?= round($stats["percentage_slice"] * $stats["total_phones"]) ?>%</li>
+				<li><img src="themes/newui/images/email-red.png"/>&nbsp;<?= round($stats["percentage_slice"] * $stats["total_emails"]) ?>%</li>
+				<li><img src="themes/newui/images/sms-orange.png"/>&nbsp;<?= round($stats["percentage_slice"] * $stats["total_sms"]) ?>%</li>
+				<li><img src="themes/newui/images/social-green.png"/>&nbsp;<?= round($stats["percentage_slice"] * $stats["total_posts"]) ?>%</li>
 				</ul>
 				
 			</div>
 			
 			<div class="col bloc">
-				<h4>Top Types</h4>
+				<h4><?= _L("Top Types")?></h4>
 				<ul>
 <?
 				for ($i = 0; $i < 4; $i++) {
@@ -271,7 +273,7 @@ include("nav.inc.php");
 			</div>
 			
 			<div class="col bloc">
-				<h4>Top Senders</h4>
+				<h4><?= _L("Top Senders")?></h4>
 				<ul>
 <?
 				for ($i = 0; $i < 4; $i++) {
@@ -288,10 +290,10 @@ include("nav.inc.php");
 		</div>
 		
 		<div class="window broadcasts">
-			<div class="window_title_wrap"><h2>Broadcasts</h2></div>
+			<div class="window_title_wrap"><h2><?= getJobsTitle()?></h2></div>
 			
 			<div class="window_body_wrap">
-			<h3>In Progress <span>(Sending Now)</span></h3>
+			<h3><?= _L("In Progress")?><span><?= _L("(Sending Now)")?></span></h3>
 			<table class="jobprogress info" id="activejobs">
 				<thead>
 				</thead>
@@ -300,7 +302,7 @@ include("nav.inc.php");
 			</table>
 			<div id="moreactivejobs"></div>
 			
-			<h3>On Deck <span>(Sending Soon)</span></h3>
+			<h3><?= _L("On Deck")?> <span><?= _L("(Sending Soon)")?></span></h3>
 			<table class="info" id="scheduledjobs">
 				<thead>
 				</thead>
@@ -309,7 +311,7 @@ include("nav.inc.php");
 			</table>
 			<div id="morescheduledjobs"></div>
 			
-			<h3>Completed <span>(Already Sent)</span></h3>
+			<h3><?= _L("Completed")?> <span><?= _L("(Already Sent)")?></span></h3>
 			<table class="info" id="completedjobs">
 				<thead>
 				</thead>
@@ -324,10 +326,10 @@ include("nav.inc.php");
 	
 	
 	<div class="main_aside">
-		<a class="bigbtn" href="message_sender.php"><span>New Broadcast</span></a>
+		<a class="bigbtn" href="message_sender.php"><span><?= _L("New %s",getJobTitle())?></span></a>
 	
 		<div class="templates">
-			<h3>Broadcast Templates</h3>
+			<h3><?= _L("%s Templates",getJobTitle())?></h3>
 			<ul>
 			<?
 			if (count($jobtemplates)) {
@@ -339,7 +341,7 @@ include("nav.inc.php");
 			}
 			?>
 			</ul>
-			<?= icon_button("Create Template", "add",false,"jobtemplate.php?id=new") ?>
+			<?= icon_button(_L("Add Template"), "add",false,"jobtemplate.php?id=new") ?>
 			
 		</div>
 	
