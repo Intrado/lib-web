@@ -142,3 +142,11 @@ CREATE TABLE `tai_lockout` (
 $$$
 
 
+-- $rev 5
+alter table tai_thread modify topicid int(11)
+$$$
+alter table tai_thread drop column systemthread
+$$$
+alter table tai_thread add threadtype enum('thread', 'comment', 'identityreveal') not null default 'thread'
+$$$
+
