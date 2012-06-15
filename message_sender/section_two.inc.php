@@ -297,6 +297,7 @@
 
 						
 						<fieldset> 
+							<label for="msgsndr_form_fbpage">Page(s)</label>
 							<div id="msgsndr_fbpages" class="controls fb_reset">
 							<input id="msgsndr_fbpage" type="hidden" value="" name="social_fbpages">
 							<input id="msgsndr_fbpageauthpages" type="hidden" value="" name="social_fbpagesauthpages">
