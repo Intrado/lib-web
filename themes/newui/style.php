@@ -488,9 +488,9 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
 
 .window_panel button .play { background: url(themes/newui/images/play.png) 0 center no-repeat; }
 .window_panel a.toggle-more, a.toggle-translations { background: url(themes/newui/images/bluearo.png) 2px 4px no-repeat; padding: 0 0 0 15px; }
-.window_panel a.toggle-more.active, a.toggle-translations.active {
-  background: url(themes/newui/images/bluearo-down.png) 2px 4px no-repeat;
-}
+.window_panel a.toggle-more.active, a.toggle-translations.active { background: url(themes/newui/images/bluearo-down.png) 2px 4px no-repeat; }
+
+.msg_complete button[disabled], .msg_complete button[disabled]:hover { background: #f5f5f5; color: #444; border: 1px solid #ccc; opacity: .4; }
 
 .btn_left, .btn_right { display: none; }
 .btn_left, .btn_middle, .btn_right { background: none; height: 20px; margin: 0; padding: 0 5px; font-size: 13px; line-height: 20px; }
