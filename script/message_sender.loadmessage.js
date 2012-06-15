@@ -77,16 +77,8 @@
             
             mData['msgParts'] = msgParts;
 
-          });
-
-          j.each(allMessages, function(mIndex, mData) {
-
             var msgParts = self.getMessagePartsFormatted(msgGrpId,mData.id);
             mData['msgFormatted'] = msgParts;
-
-          });
-
-          j.each(allMessages, function(mIndex, mData) {
 
             var msgParts = self.getMessageAttachments(msgGrpId,mData.id);
             mData['msgAttachments'] = msgParts;
@@ -94,22 +86,26 @@
           });      
 
 
-          j.each(allMessages, function(mIndex, mData) {
-            if(typeof(mData.type) != "undefined" && mData.type.length > 0) { 
+		j.each(allMessages, function(mIndex, mData) {
+			if(typeof(mData.type) != "undefined" && mData.type.length > 0) { 
 
+				// ignore html plain emails
+				if (mData.type == "email" && mData.subType == "plain") {
+					// Nothing
+				} else {
+					if(typeof(messages[mData.type]) == "undefined")
+						messages[mData.type] = {};
 
-              if(typeof(messages[mData.type]) == "undefined")
-                  messages[mData.type] = {};
-              
-              // phone, email, sms are type.langcode
-              if(mData.type == "phone" || mData.type == "email" || mData.type == "sms") {
-                  messages[mData.type][mData.languageCode] = mData;
-              } else {
-                  // everything else, such as post, is type.subtype
-                  messages[mData.type][mData.subType] = mData;
-              }
-            }
-          });
+					// phone, email, sms are type.langcode
+					if(mData.type == "phone" || mData.type == "email" || mData.type == "sms") {
+						messages[mData.type][mData.languageCode] = mData;
+					} else {
+						// everything else, such as post, is type.subtype
+						messages[mData.type][mData.subType] = mData;
+					}
+				}
+			}
+		});
 
           // console.log(messages);
 
@@ -323,7 +319,7 @@
 				if (messages.phone.en != 'undefined' && messages.phone.en.msgFormatted)
 					j('#msgsndr_tts_message').val(messages.phone.en.msgFormatted).addClass('ok');
 
-				// additional languages... TODO: broken
+				// additional languages... TODO: Needs to check for overrides...
 				j.each(messages.phone, function(code) {
 					if (code != "en" && j('#tts_translated_' + code) != 'undefined' && messages.phone[code].msgFormatted)
 						j('#tts_translated_' + code).val(messages.phone[code].msgFormatted)
@@ -370,10 +366,10 @@
         	}
         }
 
-		// additional languages... TODO: broken
+		// additional languages...
 		j.each(messages.email, function(code) {
 			if (code != "en" && j('#email_translated_' + code) != 'undefined' && messages.email[code].msgFormatted)
-				j('#email_translated_' + code).val(messages.email[code].msgFormatted)
+				j('#email_translated_' + code).empty().append(messages.email[code].msgFormatted)
 		});
         
 
