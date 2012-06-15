@@ -16,6 +16,7 @@ body { background: #F5F3F0 url(themes/newui/images/bodybg.png) repeat; font-fami
 p { color: #333; font-size: 14px; line-height: 22px; margin: 0 0 11px 0; }
 a { color: #0088CC; }
 a:hover { color: #005580; text-decoration: underline; }
+button { font-family: "Helvetica Neue",helvetica,Arial,sans-serif; }
 
 h1, h2, h3, h4, h5, h6 { font-family: "Helvetica Neue",helvetica,Arial,sans-serif; color: #333333; font-weight: bold; margin: 0; text-rendering: optimizelegibility; }
 h2 { font-size: 24px; line-height: 44px; text-shadow: 0 1px 0 #fff; }
@@ -362,7 +363,7 @@ input[name=msgsndr_msggroup] {
 
 .msg_content_nav { list-style-type: none; margin: 15px 0; padding: 0; }
 .msg_content_nav li { position: relative; float: left; display: inline; width: 25%; }
-.msg_content_nav button { display: block; background: #f5f5f5; width: 95%; margin: 0; padding: 9px 12px; font-size: 20px; line-height: 23px; text-align: left; font-family: "Helvetica Neue",helvetica,Arial,sans-serif; color: #888; border-radius: 5px; border: 1px solid #ccc; }
+.msg_content_nav button { display: block; background: #f5f5f5; width: 95%; margin: 0; padding: 9px 12px; font-size: 20px; line-height: 23px; text-align: left; color: #888; border-radius: 5px; border: 1px solid #ccc; }
 .msg_content_nav li:last-child button { margin: 0; }
 .msg_content_nav button:hover { background: #ededed; color: #888; text-decoration: none; }
 .msg_content_nav button span { color: #444; font-weight: bold; }
@@ -403,13 +404,13 @@ border-color: #499122 transparent transparent; border-style: solid; border-width
 .msg_complete { list-style-type: none; margin: 5px 0; padding: 0; }
 .msg_complete li { position: relative; float: left; display: inline; width: 24%; }
 .msg_complete li:hover { /*opacity: 0.8; */ }
-.msg_complete li a { display: block; background: #f5f5f5; margin: 0 10px 0 0; padding: 9px 14px; font-size: 20px; font-weight: bold; color: #444; border-radius: 5px; border: 1px solid #ccc; opacity: .5;}
-.msg_complete li a:hover { color: #444; text-decoration: none; cursor: default;}
-.msg_complete li.complete a { background: #499122; color: #fbfbfb; text-shadow: 0 1px 1px #222; border: 1px solid #3A7A17; opacity: 1;
+.msg_complete button { display: block; background: #f5f5f5; width: 95%; margin: 0; padding: 9px 14px; font-size: 20px; line-height: 23px; text-align: left; font-weight: bold; color: #444; border-radius: 5px; border: 1px solid #ccc; opacity: .5;}
+.msg_complete button:hover { color: #444; text-decoration: none; cursor: default;}
+.msg_complete li.complete button { background: #499122; color: #fbfbfb; text-shadow: 0 1px 1px #222; border: 1px solid #3A7A17; opacity: 1;
 -webkit-box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.5); box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.5); }
 
-.msg_complete li a span.icon { background: url(themes/newui/images/remove.png) 0 center no-repeat; width: 16px; display: inline-block; /* display: none; */ }
-.msg_complete li.complete a span.icon { background: url(themes/newui/images/tick.png) 0 center no-repeat; width: 16px; display: inline-block; }
+.msg_complete button span.icon { background: url(themes/newui/images/remove.png) 0 center no-repeat; width: 16px; display: inline-block; /* display: none; */ }
+.msg_complete li.complete button span.icon { background: url(themes/newui/images/tick.png) 0 center no-repeat; width: 16px; display: inline-block; }
 
 .msg_confirm { background: #F9F8F6; margin: 0 -2% -20px -2%; padding: 22px 21px; text-align: right; border-radius: 0 0 5px 5px; border-top: 1px solid #DDDDDD; }
 
