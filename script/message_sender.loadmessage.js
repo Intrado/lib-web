@@ -98,24 +98,16 @@
             if(typeof(mData.type) != "undefined" && mData.type.length > 0) { 
 
 
-              if(mData.type == "post") {
-                if(typeof(messages[mData.type]) == "undefined") {
+              if(typeof(messages[mData.type]) == "undefined")
                   messages[mData.type] = {};
-                }
-                if(typeof(messages[mData.type][mData.subType]) == "undefined") {
+              
+              // phone, email, sms are type.langcode
+              if(mData.type == "phone" || mData.type == "email" || mData.type == "sms") {
+                  messages[mData.type][mData.languageCode] = mData;
+              } else {
+                  // everything else, such as post, is type.subtype
                   messages[mData.type][mData.subType] = mData;
-                }
-              } else if (mData.type == "email") {
-              	if(typeof(messages[mData.type]) == "undefined") {
-              		messages[mData.type] = {};
-              	}
-              	if(typeof(messages[mData.type][mData.languageCode]) == "undefined") {
-              		messages[mData.type][mData.languageCode] = mData;
-              	}
-              } else if(typeof(messages[mData.type]) == "undefined" && (mData.type != "email" || mData.subType != "plain")) {
-                messages[mData.type] = mData;
               }
-
             }
           });
 
@@ -303,24 +295,19 @@
 	  			notVal.watchContent('callme');
 
 	  			ctrIds = {};   // Used to store lang code and id = {"en":"987","es":"988","ca":"989"}
-	  			var ctrLangs = {}; // Used to store lang code and lang name = {"en":"Default","es":"Spanish"},"defaultphone":"4172140239"}
 
-					j(messages.phone).each(function(k, v) {
-				    if(typeof(v.languageCode) != "undefined" && j.isArray(v.msgParts) && v.msgParts.length > 0) {
-				    	ctrIds[v.languageCode] = v.msgParts[0].id;
-				    }
-					});
+				j.each(messages.phone, function(code) {
+					var msgParts = messages.phone[code].msgParts;
+					if(msgParts != 'undefined' && j.isArray(msgParts) && msgParts.length > 0 && msgParts[0].audioFile) {
+						ctrIds[code] = msgParts[0].audioFile.id;
+					}
+				});
 
-					ctrLang = {};
-					j(languages).each(function(k, v) {
-						ctrLang[v.code] = v.name;
-					});
-
-					j("#msgsndr_form_number").val(j.toJSON(ctrIds));
-					// now, reattach the easycall
-					j("#msgsndr_form_number").attachEasyCall({
-						"languages": ctrLang,
-						"defaultphone": notVal.formatPhone(orgOptions.callerid)});
+				j("#msgsndr_form_number").val(j.toJSON(ctrIds));
+				// now, reattach the easycall
+				j("#msgsndr_form_number").attachEasyCall({
+					"languages": easycallLangs,
+					"defaultphone": userInfo.phoneFormatted});
 
 	  		} else {
 
@@ -332,7 +319,15 @@
 	  			j('#callme').hide();
 	  			j('#text').show();
 
-	  			j('#msgsndr_tts_message').val(messages.phone.msgFormatted).addClass('ok');
+				// populate the English message into the default text area
+				if (messages.phone.en != 'undefined' && messages.phone.en.msgFormatted)
+					j('#msgsndr_tts_message').val(messages.phone.en.msgFormatted).addClass('ok');
+
+				// additional languages... TODO: broken
+				j.each(messages.phone, function(code) {
+					if (code != "en" && j('#tts_translated_' + code) != 'undefined' && messages.phone[code].msgFormatted)
+						j('#tts_translated_' + code).val(messages.phone[code].msgFormatted)
+				});
 
 	  			notVal.watchContent('text');
 
@@ -344,16 +339,18 @@
 
       if (typeof(messages.email) != "undefined") {
         j('li.oemail').addClass('complete');
-
-        emailSubject = messages.email.subject.replace("+"," ");
-
         j('input[name=has_email').attr('checked','checked');
-        j('#msgsndr_form_name').val(messages.email.fromName.replace(/\+/g," ")).addClass('ok');
-        j('#msgsndr_form_email').val(messages.email.fromEmail.replace("%40","@")).addClass('ok');
-        j('#msgsndr_form_mailsubject').val(emailSubject.replace(/\+/g," ")).addClass('ok');
 
-        // Email Attachements 
-        var eAttachments = messages.email.msgAttachments;
+        if (messages.email.en != 'undefined') {
+        	emailSubject = messages.email.en.subject.replace("+"," "); // FIXME: this isn't how you urldecode a string
+            j('#msgsndr_form_mailsubject').val(emailSubject.replace(/\+/g," ")).addClass('ok');
+            j('#msgsndr_form_name').val(messages.email.en.fromName.replace(/\+/g," ")).addClass('ok'); // FIXME: this isn't how you urldecode a string
+            j('#msgsndr_form_email').val(messages.email.en.fromEmail.replace("%40","@")).addClass('ok'); // FIXME: this isn't how you urldecode a string
+
+        	CKEDITOR.instances.reusableckeditor.setData(unescape(messages.email.en.msgFormatted));
+        	
+	        // Email Attachements 
+	        var eAttachments = messages.email.en.msgAttachments;
         	
         	if ( eAttachments.length != 0 ) {
         		j('#uploadedfiles').show();
@@ -370,11 +367,15 @@
 
 							j('#uploadedfiles').append(attach);
         		});
-        			
-        	
         	}
+        }
 
-        CKEDITOR.instances.reusableckeditor.setData(unescape(messages.email.msgFormatted));
+		// additional languages... TODO: broken
+		j.each(messages.email, function(code) {
+			if (code != "en" && j('#email_translated_' + code) != 'undefined' && messages.email[code].msgFormatted)
+				j('#email_translated_' + code).val(messages.email[code].msgFormatted)
+		});
+        
 
         notVal.watchContent('msgsndr_tab_email');
 
@@ -387,7 +388,10 @@
         j('li.osms').addClass('complete');
 
         j('input[name=has_sms]').attr('checked','checked');
-        j('#msgsndr_form_sms').val(messages.sms.msgParts[0].txt).addClass('ok');
+        
+        // SMS only has an english message
+        if (messages.sms.en != 'undefined')
+        	j('#msgsndr_form_sms').val(messages.sms.en.msgFormatted).addClass('ok');
 
         notVal.watchContent('msgsndr_tab_sms');
       }
