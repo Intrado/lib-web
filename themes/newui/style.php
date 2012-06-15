@@ -333,7 +333,7 @@ border-left: 1px solid #ddd; border-right: 1px solid #ddd; -webkit-border-radius
 .table-bordered th { background: #eee; font-weight: bold; vertical-align: bottom; line-height: 22px; padding: 8px; text-align: left; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; }
 .table-bordered th + th, .table-bordered td + td, .table-bordered th + td, .table-bordered td + th { border-left: 1px solid #DDDDDD; }
 .table-bordered a.remove { background: url(themes/newui/images/removelist.png) left 0 no-repeat; display: inline-block; width: 18px; height: 18px; vertical-align: middle; }
-.table-bordered a.remove:hover { background: url(themes/newui/images/removelist.png) left -22px no-repeat; display: inline-block; width: 18px; height: 18px; vertical-align: middle; }
+.table-bordered a.remove:hover { background: url(themes/newui/images/removelist.png) left -22px no-repeat; }
 .table-bordered td { border-bottom: 1px solid #ddd; }
 
 table.messages { width: 100%; margin: 0; font-size: 14px; line-height: 36px; border-bottom: 1px solid #ddd; border-left: 1px solid #ddd; border-right: 1px solid #ddd; }
@@ -347,6 +347,18 @@ table.messages tr:hover td { background: #e1eaf4; border-top: 1px solid #8cb2e0;
 tr.selected { background: rgb(228, 225, 153); }
 table.messages tr.selected:hover td { background: rgb(228, 224, 187);  }
 table.messages span.icon { background: url(themes/newui/images/dktick.png) 50% 11px no-repeat; display: block; text-indent: -9999px; }
+
+table.rules tr.saved-rule { color: #366C19; }
+table.rules tr.new-rule { background: #f5f5f5; }
+table.rules td { vertical-align: top; width: 148px; padding: 6px; line-height: 22px; border-top: 1px solid #ddd; }
+table.rules td:first-child { width: 30px; text-align: center; }
+table.rules td select, table.rules td input[type="text"] { width: 148px; }
+table.rules td label { float: none; display: block; width: 148px; margin: 0; text-align: left; }
+table.rules td input[type="checkbox"] { margin: 0 5px 0 0; }
+table.rules td .btn { display: inline-block; margin: 0 4px 0 0; line-height: 18px; }
+table.rules td .cancel { display: inline-block; padding: 6px 0; font-size: 14px; line-height: 18px; }
+table.rules td a.remove { background: url(themes/newui/images/removelist.png) left 0 no-repeat; display: inline-block; width: 18px; height: 18px; vertical-align: middle; }
+table.rules td a.remove:hover { background: url(themes/newui/images/removelist.png) left -22px no-repeat; }
 
 .scroll {
   max-height: 250px;
@@ -489,6 +501,7 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
 .window_panel a.toggle-more.active, a.toggle-translations.active { background: url(themes/newui/images/bluearo-down.png) 2px 4px no-repeat; }
 
 .msg_complete button[disabled], .msg_complete button[disabled]:hover { background: #f5f5f5; color: #444; border: 1px solid #ccc; opacity: .4; }
+.msg_complete li.complete button[disabled], .msg_complete li.complete button[disabled]:hover { background: #499122; color: #fbfbfb; border: 1px solid #3A7A17; opacity: .4; }
 
 .btn_left, .btn_right { display: none; }
 .btn_left, .btn_middle, .btn_right { background: none; height: 20px; margin: 0; padding: 0 5px; font-size: 13px; line-height: 20px; }
@@ -679,7 +692,31 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
 
 .modal { position: fixed; left: 50%; top: 50%; max-height: 500px; width: 700px; margin: -250px 0 0 -350px; padding: 0; background-clip: padding-box;  background-color: #FFFFFF; 
 border: 1px solid rgba(0, 0, 0, 0.3); -webkit-border-radius: 6px; border-radius: 6px; box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3); overflow: auto; z-index: 1050; }
-.modal h3 { position: relative; background: #fdfdfd; font-size: 21px; margin: 0; padding: 15px; border-bottom: 1px solid #ddd; -webkit-border-radius: 6px 6px 0 0; border-radius: 6px 6px 0 0; }
+
+.modal-header { position: relative; background: #fdfdfd; font-size: 21px; margin: 0; padding: 15px; border-bottom: 1px solid #ddd; -webkit-border-radius: 6px 6px 0 0; border-radius: 6px 6px 0 0; }
+
+.modal-body { padding: 15px; }
+.modal-body .existing-lists label { float: none; display: block; width: 100%; margin: 0; padding: 8px; text-align: left; line-height: 22px; border-top: 1px solid #ddd; }
+.modal-body .existing-lists label:hover { background: #f5f5f5; }
+.modal-body .existing-lists label:first-child { border: none; }
+.modal-body .existing-lists input[type="checkbox"] { margin: 0 5px 0 0; }
+.modal-body .existing-lists span { float: none; padding: 0 5px; }
+.modal-body .add-rule .btn { float: none; width: 200px; }
+
+.modal-footer { position: relative; background: #f5f5f5; font-size: 21px; margin: 0; padding: 15px; text-align: right; border-top: 1px solid #ddd; -webkit-border-radius: 0 0 6px 6px; border-radius: 0 0 6px 6px; }
+.modal-footer .btn { float: none; display: inline-block; }
+.modal-footer .btn-primary { color: #fff; border: 1px solid #0039ab; 
+	background-color: #006DCC;
+	background-image: -webkit-gradient(linear, left top, left bottom, from(#0088CC), to(#0044CC)); 
+  background-image: -webkit-linear-gradient(top, #0088CC, #0044CC); 
+  background-image:    -moz-linear-gradient(top, #0088CC, #0044CC); 
+  background-image:     -ms-linear-gradient(top, #0088CC, #0044CC); 
+  background-image:      -o-linear-gradient(top, #0088CC, #0044CC); 
+  background-image:         linear-gradient(top, #0088CC, #0044CC);}
+.modal-footer .btn-primary:hover { background: #0044cc; color: #fff; }
+.modal-footer .btn-primary:active { background: #0037a4; color: #f4f4f4; }
+
+
 .modal .close { position: absolute; top: 18px; right: 15px; color: #999; font-size: 14px; }
 .modal .close:hover { color: #666; text-decoration: none; }
 .modal ul { list-style-type: none; margin: 0; padding: 15px; }
@@ -764,7 +801,7 @@ li.notactive { display: none; }
 .window_panel input.er[type="text"]:focus, .window_panel textarea.er:focus { border: 1px solid rgb(219,30,30);
 -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(219,30,30, 0.6);	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(219,30,30, 0.6); }
 
-span.error { color: rgb(219,30,30); font-size: 0.9em; }
+span.error { float: none; color: rgb(219,30,30); font-size: 0.9em; }
 
 
 /*----- Prototip styles for shortcut menu, not actually used in this theme -----*/
