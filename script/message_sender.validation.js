@@ -713,10 +713,11 @@ jQuery.noConflict();
       };
 
     // social token ajax call
+    var tokenCheck = true;
     function getTokens(){
       fbToken = false;
       twToken = false;
-      return $.ajax({
+      tokenCheck = $.ajax({
         url: '/'+orgPath+'/api/2/users/'+userid+'/tokens',
         method: 'GET',
         dataType: 'json',
@@ -738,7 +739,7 @@ jQuery.noConflict();
       });
     };
 
-	var tokenCheck = getTokens();
+	getTokens();
 
 	// facebook authorized destinations ajax call
 	function getFbAuthorizedPages(){
@@ -762,6 +763,11 @@ jQuery.noConflict();
 			$("#msgsndr_fbpageauthpages").val($.toJSON({"pages":facebookPages,"wall":(orgOptions.fbauthorizewall?true:false)}));
 			// intialize facebook with the current user's token
 			initFacebook(fbToken);
+			// listen for clicks to show facebook info
+			$("#msgsndr_form_facebook").on('change', function(event) {
+				if (fbToken && event.currentTarget.checked)
+					updateFbPages(fbToken, "msgsndr_fbpage", "msgsndr_fbpagefbpages", false);
+			});
 		});
 
 		// Character Count

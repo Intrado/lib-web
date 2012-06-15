@@ -1,6 +1,7 @@
 // facebook page script
 /////////////////////////
 
+// TODO: track accesstoken changes on authorization
 function initFacebook(accesstoken){
 
 	// Facebook javascript API initialization, pulled from facebook documentation
@@ -13,11 +14,11 @@ function initFacebook(accesstoken){
 			});
 			
 			// load the initial list of pages if possible
-			//if (accesstoken) {
-			//	updateFbPages(accesstoken, "msgsndr_fbpage", "msgsndr_fbpagefbpages", false);
-			//} else {
+			if (accesstoken) {
+				$("msgsndr_fbpagerenew").removeClassName("hidden");
+			} else {
 				$("msgsndr_fbpageconnect").removeClassName("hidden");
-			//}
+			}
 		};
 
 		(function() {
@@ -34,8 +35,8 @@ function initFacebook(accesstoken){
 		});
 		
 		// Observe a click on the action links
-		$("msgsndr_fbpageall").observe("click", handleActionLink.curry("msgsndr_fbpages", true));
-		$("msgsndr_fbpagenone").observe("click", handleActionLink.curry("msgsndr_fbpages", false));
+		$("msgsndr_fbpageall").observe("click", handleActionLink.curry("msgsndr_fbpage", true));
+		$("msgsndr_fbpagenone").observe("click", handleActionLink.curry("msgsndr_fbpage", false));
 		// Observe event indicating page loading has completed
 		$("msgsndr_fbpages").observe("FbPages:update", function (res) {
 			if (res.memo.pagesloaded == 0) {
@@ -49,8 +50,7 @@ function initFacebook(accesstoken){
 
 // action link all clicked
 function handleActionLink(formitem, checkval, event) {
-	alert(checkval);
-	$$("#" + formitem + "fbpage input").each(function (checkbox) {
+	$$("#" + formitem + "fbpages input").each(function (checkbox) {
 		checkbox.checked = checkval;
 	});
 	handleFbPageChange(formitem, null);
