@@ -271,7 +271,7 @@
 			
 				<div class="social_tab hidden" data-social="facebook">
 					<fieldset class="check">
-						<div class="controls">
+						<div class="controls cf fbicon">
 							<input class="addme social" type="checkbox" id="msgsndr_form_facebook" name="has_facebook" />
 							<label class="addme" for="msgsndr_form_facebook"><strong>Post to Facebook</strong></label>
 						</div>
@@ -324,7 +324,7 @@
 
 				<div class="social_tab hidden" data-social="twitter">
 					<fieldset class="check">
-						<div class="controls">
+						<div class="controls cf twiticon">
 							<input class="addme social" type="checkbox" id="msgsndr_form_twitter" name="has_twitter" />
 							<label class="addme" for="msgsndr_form_twitter"><strong>Post to Twitter</strong></label>
 						</div>
@@ -348,7 +348,7 @@
 
 				<div class="social_tab hidden" data-social="feed">				
 					<fieldset class="check">
-						<div class="controls">
+						<div class="controls cf rssicon">
 							<input class="addme social" type="checkbox" id="msgsndr_form_feed" name="has_feed" />
 							<label class="addme" for="msgsndr_form_feed"><strong>Post to RSS</strong></label>
 						</div>
