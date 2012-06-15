@@ -344,7 +344,7 @@ $formdata["jobtypes"] = array(
 
 $formdata["result"] = array(
 	"label" => _L("Filter by result"),
-	"fieldhelp" => _L("These options let you create results based on delivery results."),
+	"fieldhelp" => _L("These options let you create reports based on delivery results."),
 	"value" => isset($options['result']) ? 1 : 0,
 	"control" => array("CheckBox"),
 	"validators" => array(),
