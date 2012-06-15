@@ -228,9 +228,9 @@ Paste from email button: Low proirity:
 		function emSubject() {
 
 			if ( emailSubject == '') {
-				$('#msgsndr_form_mailsubject').val($('#msgsndr_form_subject').val());
+				$('#msgsndr_form_mailsubject').val($('#msgsndr_form_subject').val()).addClass('ok');
 			} else {
-				$('#msgsndr_form_mailsubject').val(emailSubject);
+				$('#msgsndr_form_mailsubject').val(emailSubject).addClass('ok');
 			}
 
 			$('#msgsndr_form_mailsubject').on('change', function() {
