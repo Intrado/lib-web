@@ -358,49 +358,44 @@ input[name=msgsndr_msggroup] {
   display: none;
 }
 
+/*----- Message buttons -----*/
 
 .msg_content_nav { list-style-type: none; margin: 15px 0; padding: 0; }
 .msg_content_nav li { position: relative; float: left; display: inline; width: 25%; }
-.msg_content_nav li a { display: block; background: #f5f5f5; margin: 0 10px 0 0; padding: 9px 14px; font-size: 20px; color: #888; border-radius: 5px; border: 1px solid #ccc; }
-.msg_content_nav li:last-child a { margin: 0; }
-.msg_content_nav li a:hover { background: #ededed; color: #888; text-decoration: none; }
-.msg_content_nav li a span { color: #444; font-weight: bold; }
+.msg_content_nav button { display: block; background: #f5f5f5; width: 95%; margin: 0; padding: 9px 12px; font-size: 20px; line-height: 23px; text-align: left; color: #888; border-radius: 5px; border: 1px solid #ccc; }
+.msg_content_nav li:last-child button { margin: 0; }
+.msg_content_nav button:hover { background: #ededed; color: #888; text-decoration: none; }
+.msg_content_nav button span { color: #444; font-weight: bold; }
 
-.msg_content_nav li a span.icon { background: url(themes/newui/images/add.png) 0 center no-repeat; width: 16px; }
-.msg_content_nav li.active a { background: #363636; color: #f9f9f9; border-color: #222; 
+.msg_content_nav li button span.icon { background: url(themes/newui/images/add.png) 0 center no-repeat; width: 16px; }
+.msg_content_nav li.ophone button span.icon   { background-image: url(themes/newui/images/phone.png) }
+.msg_content_nav li.oemail button span.icon   { background-image: url(themes/newui/images/email.png) }
+.msg_content_nav li.osms button span.icon     { background-image: url(themes/newui/images/sms.png) }
+.msg_content_nav li.osocial button span.icon  { background-image: url(themes/newui/images/social.png) }
+
+.msg_content_nav li.active button { background: #363636; color: #f9f9f9; border-color: #222; 
 -webkit-box-shadow: inset 0px 1px 3px 0px #111; 
    -moz-box-shadow: inset 0px 1px 3px 0px #111; 
         box-shadow: inset 0px 1px 3px 0px #111; }
-
-.msg_content_nav li.ophone a span.icon   { background-image: url(themes/newui/images/phone.png) }
-.msg_content_nav li.oemail a span.icon   { background-image: url(themes/newui/images/email.png) }
-.msg_content_nav li.osms a span.icon     { background-image: url(themes/newui/images/sms.png) }
-.msg_content_nav li.osocial a span.icon  { background-image: url(themes/newui/images/social.png) }
-
-.msg_content_nav li.active a:after { content: ""; position: absolute; bottom: -12px; left: 50%; margin-left: -12px; display: block; width: 0; height: 0; 
+        
+.msg_content_nav li.active button:after { content: ""; position: absolute; bottom: -12px; left: 50%; margin-left: -12px; display: block; width: 0; height: 0; 
 border-color: #222222 transparent transparent; border-style: solid; border-width: 12px 12px 0; }
-.msg_content_nav li.active a span { color: #f9f9f9; }
-.msg_content_nav li.active a span.icon, 
-.msg_content_nav li.oemail.active a span.icon,
-.msg_content_nav li.ophone.active a span.icon,
-.msg_content_nav li.osms.active a span.icon,
-.msg_content_nav li.osocial.active a span.icon { background: url(themes/newui/images/pencil.png) 0 center no-repeat; }
+.msg_content_nav li.active button span { color: #f9f9f9; }
+.msg_content_nav li.active button span.icon { background: url(themes/newui/images/pencil.png) 0 center no-repeat; }
 
-.msg_content_nav li.complete a { background: #499122; color: #fbfbfb; text-shadow: 0 1px 1px #222; border-color: #3a7a17; 
+.msg_content_nav li.complete button { background: #499122; color: #fbfbfb; text-shadow: 0 1px 1px #222; border-color: #3a7a17; 
 -webkit-box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.5); 
    -moz-box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.5); 
         box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.5); }
+        
+.msg_content_nav li.complete.active button { border-bottom-color: #499122; }
+.msg_content_nav li.complete.active button:after { content: ""; position: absolute; bottom: -12px; left: 50%; margin-left: -12px; display: block; width: 0; height: 0; 
+border-color: #499122 transparent transparent; border-style: solid; border-width: 12px 12px 0; }
+.msg_content_nav li.complete button span { color: #fbfbfb; }
+.msg_content_nav li.complete button span.icon { background-image: url(themes/newui/images/tick.png) }
+.msg_content_nav li.complete:hover button span.icon { background-image: url(themes/newui/images/pencil.png) }
 
-.msg_content_nav li.complete.active a {
-  border-bottom-color: #499122;
-}
-.msg_content_nav li.complete.active a:after { 
-  content: ""; position: absolute; bottom: -12px; left: 50%; margin-left: -12px; display: block; width: 0; height: 0; 
-border-color: #499122 transparent transparent; border-style: solid; border-width: 12px 12px 0;
-}
-.msg_content_nav li.complete a span { color: #fbfbfb; }
-.msg_content_nav li.complete a span.icon { background-image: url(themes/newui/images/tick.png) }
-
+/*----- Message content -----*/
 
 .tab_content { margin: 0 0 20px 0; }
 .tab_panel form { border-radius: 8px; }
