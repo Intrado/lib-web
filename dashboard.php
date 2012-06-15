@@ -189,8 +189,16 @@ $expect = QuickQuery($query, null, $queryUsers);
 // keep one day, key generated
 $stats = gen2cache(60*60*24, $expect, null, "generateStats", $queryUsers, $start_datetime, $end_datetime);
 
-
-$jobtemplates = DBFindMany("Job", "from job where userid=? and status='template' and not deleted and type = 'notification' order by modifydate desc",false,array($USER->id));
+$query = "from job j 
+			inner join jobsetting js on (j.id = js.jobid) 
+			where 
+				j.userid=? and 
+				j.status='template' and 
+				not j.deleted and 
+				j.type = 'notification' and 
+				js.name='displayondashboard' and js.value=1
+			order by modifydate desc";
+$jobtemplates = DBFindMany("Job", $query,"j",array($USER->id));
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
@@ -336,12 +344,10 @@ include("nav.inc.php");
 				foreach($jobtemplates as $jobtemplate) {
 					echo "<li><a href=\"message_sender.php?templateid={$jobtemplate->id}\">{$jobtemplate->name}</a></li>";
 				}
-			} else {
-				echo "<li>" . _L("No Templates") . "</li>";
 			}
 			?>
 			</ul>
-			<?= icon_button(_L("Add Template"), "add",false,"jobtemplate.php?id=new") ?>
+			<?= icon_button(_L("New Template"), "add",false,"jobtemplate.php?id=new") ?>
 			
 		</div>
 	

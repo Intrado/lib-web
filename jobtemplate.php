@@ -243,6 +243,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$job->update();
 		} else {
 			$job->status = "template";
+			$job->setSetting("displayondashboard", 1);
 			$job->createdate = date("Y-m-d H:i:s", time());
 			$job->create();
 		}

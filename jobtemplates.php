@@ -20,7 +20,7 @@ if (!$USER->authorize('sendphone') && !$USER->authorize('sendemail') && !$USER->
 
 if (isset($_GET['delete'])) {
 	$deleteid = DBSafe($_GET['delete']);
-	if (userOwns("job",$deleteid) || $USER->authorize('managesystemjobs')) {
+	if (userOwns("job",$deleteid)) {
 		$job = new Job($deleteid);
 		if ($job->status == "template" && $job->softDelete())
 			notice(_L("The %s Template, %s, is now deleted.", getJobTitle(), escapehtml($job->name)));
@@ -32,6 +32,15 @@ if (isset($_GET['delete'])) {
 	redirectToReferrer();
 }
 
+if (isset($_GET['show']) && isset($_GET['templateid'])) {
+	$id = DBSafe($_GET['templateid']);
+	if (userOwns("job",$id)) {
+		$job = new Job($id);
+		$job->setSetting("displayondashboard",$_GET['show'] == "true"?true:false);
+		$job->update();
+	}
+	redirectToReferrer();
+}
 ///////////////////////////////////////////////////////////////////////////////
 // Request processing:
 ///////////////////////////////////////////////////////////////////////////////
@@ -66,8 +75,9 @@ if($isajax === true) {
 					j.modifydate as date,
 					j.name as name,
 					j.description as description,
+					js.value as displayondashboard,
 					(j.name +0) as digitsfirst
-				from job j where j.userid = ? and j.status='template' and not j.deleted
+				from job j left join jobsetting js on (j.id = js.jobid and js.name='displayondashboard') where j.userid = ? and j.status='template' and not j.deleted
 				order by $orderby, j.id
 				limit $start, $limit",true, false, array($USER->id));
 	
@@ -99,10 +109,18 @@ if($isajax === true) {
 			$title = escapehtml($template["name"]);
 			$icon = 'img/largeicons/globe.jpg';
 			
-			$tools = action_links (
-				action_link("Edit", "pencil", 'jobtemplate.php?id=' . $jobid),
-				action_link("Delete", "cross", 'jobtemplates.php?delete=' . $jobid, "return confirmDelete();")
+			$actionlinks = array(
+				action_link(_L("New %s",getJobTitle()), "add", 'message_sender.php?templateid=' . $jobid),
+				action_link(_L("Edit"), "pencil", 'jobtemplate.php?id=' . $jobid)
 			);
+			
+			if ($template["displayondashboard"]) {
+				$actionlinks[] = action_link(_L("Hide on Dashboard"), "application_form_delete", "jobtemplates.php?templateid=$jobid&show=false");
+			} else {
+				$actionlinks[] = action_link(_L("Show on Dashboard"), "application_form_add", "jobtemplates.php?templateid=$jobid&show=true");
+			}
+			$actionlinks[] = action_link(_L("Delete"), "cross", 'jobtemplates.php?delete=' . $jobid, "return confirmDelete();");
+			$tools = action_links ($actionlinks);
 			
 			$defaultlink = "jobtemplate.php?id=".$jobid;
 			$content = '<a href="' . $defaultlink . '" >' . $time .  ($template["description"] != ""?" - " . escapehtml($template["description"]):"") . '</a>';
@@ -135,7 +153,7 @@ $TITLE = _L("%s Templates", getJobTitle());
 
 include_once("nav.inc.php");
 
-startWindow(_L('Templates'));
+startWindow(_L("%s Templates", getJobTitle()));
 
 $feedButtons = array(icon_button(_L('Add New Template'),"add","location.href='jobtemplate.php?id=new'"));
 $feedFilters = array(
