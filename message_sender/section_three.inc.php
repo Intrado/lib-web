@@ -88,8 +88,11 @@
 			
 			
 			<div id="schedule_options" class="modal hide">
-			<h3>Schedule Message<a href="#" class="close" data-dismiss="modal">x</a></h3>			
-			<div class="modal_content">
+			<div class="modal-header">
+				<h3>Schedule Message<a href="#" class="close" data-dismiss="modal">x</a></h3>
+			</div>
+							
+			<div class="modal-body">
 				<fieldset class="cf">
 					<label for="scheduledate">Start Date</label>
 					<div class="controls">
@@ -693,7 +696,8 @@
 					</div>
 				</fieldset>
 			</div><!-- field_wrapper -->
-			<div class="msg_confirm">
+			
+			<div class="modal-footer">
 				<button data-dismiss="modal">Cancel</button>
 				<button class="submit_broadcast btn_confirm" data-dismiss="modal" id="schedule_new_broadcast">Send to 2,134 Recipients</button>
 			</div>	
