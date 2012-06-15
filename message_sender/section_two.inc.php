@@ -10,16 +10,16 @@
 
 			<ul class="msg_content_nav cf">
 				<li class="notactive ophone">
-					<a id="msgsndr_ctrl_phone" href="#"><span class="icon"></span> Add <span>Phone</span></a>
+					<button id="msgsndr_ctrl_phone"><span class="icon"></span> Add <span>Phone</span></button>
 				</li>
 				<li class="notactive oemail">
-					<a id="msgsndr_ctrl_email" href="#"><span class="icon"></span> Add <span>Email</span></a>
+					<button id="msgsndr_ctrl_email"><span class="icon"></span> Add <span>Email</span></button>
 				</li>
 				<li class="notactive osms">
-					<a id="msgsndr_ctrl_sms" href="#"><span class="icon"></span> Add <span>SMS</span></a>
+					<button id="msgsndr_ctrl_sms"><span class="icon"></span> Add <span>SMS</span></button>
 				</li>
 				<li class="notactive osocial">
-					<a id="msgsndr_ctrl_social" href="#"><span class="icon"></span> Add <span>Social</span></a>
+					<button id="msgsndr_ctrl_social"><span class="icon"></span> Add <span>Social</span></button>
 				</li>
 			</ul>
 			
@@ -138,8 +138,8 @@
 
 				<fieldset>
 					<label for="msgsndr_form_phonetranslate">Translate</label>
-					<input type="checkbox" id="msgsndr_form_phonetranslate" value="" data-txt="#msgsndr_tts_message" data-display="#tts_translate" />
-					<a class="toggle-translations hide" data-target="#tts_translate" data-txt="#msgsndr_tts_message" href=""></a>
+						<input type="checkbox" id="msgsndr_form_phonetranslate" value="" data-txt="#msgsndr_tts_message" data-display="#tts_translate" />
+						<a class="toggle-translations hide" data-target="#tts_translate" href=""></a>
 				</fieldset>
 
 				<div id="tts_translate" class="close translations">
@@ -205,8 +205,10 @@
 				
 				<fieldset>
 					<label for="msgsndr_form_translate">Translate</label>
-					<input type="checkbox" id="msgsndr_form_emailtranslate" name="email_translate" value=""  data-display="#email_translate" />
-					<a class="toggle-translations hide" data-target="#email_translate" href=""></a>
+					<div class="controls">
+						<input type="checkbox" id="msgsndr_form_emailtranslate" name="email_translate" value=""  data-display="#email_translate" />
+						<a class="toggle-translations hide" data-target="#email_translate" href=""></a>
+					</div>
 				</fieldset>
 
 				<div id="email_translate" class="close translations">
@@ -285,6 +287,7 @@
 							</div>
 						</fieldset>
 						
+						<!-- facebook WIP ...
 						<fieldset> 
 							<div id="msgsndr_fbpages" class="controls fb_reset">
 							<input id="msgsndr_fbpage" type="hidden" value="" name="social_fbpages">
@@ -312,7 +315,7 @@
 								<div id="msgsndr_fbpagefbpages" class="hidden fbpagelist"></div>
 								<div id="msgsndr_fbpagesmessage" class="underneathmsg cf"></div>
 							</div>
-						</fieldset>
+						</fieldset> -->
 					
 
 					</div><!-- facebook -->
