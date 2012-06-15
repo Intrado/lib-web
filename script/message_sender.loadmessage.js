@@ -290,7 +290,7 @@
 
     	// Phone
     	if (typeof(messages.phone) != "undefined") {
-	  		if(messages.phoneAudio != 'true') { // True is Call Me To Record
+	  		if(messages.phoneAudio == 'true') { // True is Call Me To Record
 
 	  			j('li.ophone').addClass('complete');
 
