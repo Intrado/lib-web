@@ -880,6 +880,7 @@ span.error { float: none; color: rgb(219,30,30); font-size: 0.9em; }
 .fbpagelist {
 	width: 96%;
 	border: 1px solid #CCC;
+	margin-top: 3px;
 	padding: 3px;
 	max-height: 250px;
 	overflow: auto;
