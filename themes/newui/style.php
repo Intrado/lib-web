@@ -362,7 +362,7 @@ input[name=msgsndr_msggroup] {
 
 .msg_content_nav { list-style-type: none; margin: 15px 0; padding: 0; }
 .msg_content_nav li { position: relative; float: left; display: inline; width: 25%; }
-.msg_content_nav button { display: block; background: #f5f5f5; width: 95%; margin: 0; padding: 9px 12px; font-size: 20px; line-height: 23px; text-align: left; color: #888; border-radius: 5px; border: 1px solid #ccc; }
+.msg_content_nav button { display: block; background: #f5f5f5; width: 95%; margin: 0; padding: 9px 12px; font-size: 20px; line-height: 23px; text-align: left; font-family: "Helvetica Neue",helvetica,Arial,sans-serif; color: #888; border-radius: 5px; border: 1px solid #ccc; }
 .msg_content_nav li:last-child button { margin: 0; }
 .msg_content_nav button:hover { background: #ededed; color: #888; text-decoration: none; }
 .msg_content_nav button span { color: #444; font-weight: bold; }
