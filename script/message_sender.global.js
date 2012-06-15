@@ -604,7 +604,7 @@
 
 // {"enabled":true,"text":"","override":false,"englishText":""}
 
-      var enText        = j('#msgsndr_tts_message').val();
+      var enText        = CKEDITOR.instances.reusableckeditor.getData();
       var translate     = j('#msgsndr_form_emailtranslate').attr('checked');
 
       j('#msgsndr_tab_email').append('<div id="post_data_email_translations"><input type="hidden" name="email_translate" /></div>');
