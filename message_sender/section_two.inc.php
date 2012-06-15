@@ -316,7 +316,7 @@
 									</button>
 								</div>
 								
-								<div id="msgsndr_fbpageactionlinks" class="hidden">
+								<div id="msgsndr_fbpageactionlinks" class="hidden actionlinks">
 									<a id="msgsndr_fbpageall" class="actionlink">Select All</a>
 									<a id="msgsndr_fbpagenone" class="actionlink">Remove All</a>
 								</div>
