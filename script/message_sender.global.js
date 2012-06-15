@@ -566,20 +566,6 @@
           self.checkContent();
         });
 
-      //   j(loopTranslations).each(function(transI, transD) {
-
-      //     var langCode = j(this).attr('id').split('_')[1]; // Gives me language code : en
-
-      //     var overRide = j('#tts_override_'+langCode).is(':checked');
-      //     if (overRide == true) {
-      //       translatedText = j('#tts_translated_'+langCode).val();
-      //     } else {
-      //       translatedText = self.getTranslation(enText,langCode);
-      //     }
-
-      //     j('#post_data_translations').append('<input type="hidden" name="phone_translate_'+langCode+'" val="{"enabled":true,"text":"'+translatedText+'","override":'+overRide+',"gender":'+gender+',"englishText":""}">');
-
-      //   });
 
        }
 
@@ -588,31 +574,126 @@
 
     this.emailSave = function() {
 
-      var enText        = CKEDITOR.instances.reusableckeditor.getData();
+      // var enText        = CKEDITOR.instances.reusableckeditor.getData();
+      // var translate     = j('#msgsndr_form_emailtranslate').attr('checked');
+
+      // j('#msgsndr_tab_email').append('<div id="post_data_email_translations"></div>');
+
+      // j('#post_data_email_translations').empty().append('<input type="hidden" name="email_translate" val="'+escape(enText)+'">');
+
+
+      // if ( translate == 'checked' ) {
+
+      //   var loopTranslations  = j('input[name=email_save_translation]:checked');
+      //   var translatedText    = '';
+
+      //   j(loopTranslations).each(function(transI, transD) {
+
+      //     var langCode = j(this).attr('id').split('_')[1]; // Gives me language code : en
+
+      //     enText = makeTranslatableString(enText);
+      //     translatedText = self.getTranslation(enText,langCode);
+
+      //     j('#post_data_email_translations').append('<input type="hidden" name="email_translate_'+langCode+'" val="{"enabled":true,"text":"'+escape(translatedText)+'","override":"false","englishText":""}">');
+
+      //   });
+
+      // }
+    //   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ OLD 
+
+
+// {"enabled":true,"text":"","override":false,"englishText":""}
+
+      var enText        = j('#msgsndr_tts_message').val();
       var translate     = j('#msgsndr_form_emailtranslate').attr('checked');
 
-      j('#msgsndr_tab_email').append('<div id="post_data_email_translations"></div>');
+      j('#msgsndr_tab_email').append('<div id="post_data_email_translations"><input type="hidden" name="email_translate" /></div>');
 
-      j('#post_data_email_translations').empty().append('<input type="hidden" name="email_translate" val="'+escape(enText)+'">');
+      var jsonVal = {"enabled":true,"text":"","override":false,"englishText":""};
+      jsonVal['text'] = enText;
+      var jsonVal = j.toJSON(jsonVal)
+
+      j('input[name=email_translate]').val(jsonVal);
 
 
       if ( translate == 'checked' ) {
 
         var loopTranslations  = j('input[name=email_save_translation]:checked');
         var translatedText    = '';
+        var langCodes         = '';
 
-        j(loopTranslations).each(function(transI, transD) {
+        j.each(loopTranslations, function(transI, transD) {
+          langCode = j(transD).attr('id').split('_')[1];
+          j('#post_data_email_translations').append('<input type="hidden" name="email_translate_'+langCode+'">');
+        });
 
-          var langCode = j(this).attr('id').split('_')[1]; // Gives me language code : en
+        j.each(loopTranslations, function(transI, transD) {
 
-          enText = makeTranslatableString(enText);
-          translatedText = self.getTranslation(enText,langCode);
+          langCode = j(transD).attr('id').split('_')[1];
 
-          j('#post_data_email_translations').append('<input type="hidden" name="phone_translate_'+langCode+'" val="{"enabled":true,"text":"'+escape(translatedText)+'","override":"false","englishText":""}">');
+          if (langCodes == '') {
+            langCodes = langCode;
+          } else {
+            langCodes = langCodes + '|' + langCode;
+          }
+        
+        });
+
+        var splitlangCodes = langCodes.split('|');
+
+        var enText = makeTranslatableString(enText);
+
+        var transURL = 'translate.php?english='+enText+'&languages='+langCodes;
+        var transText = '';
+
+        var getTranslations = j.ajax({
+          url: transURL,
+          type: 'GET',
+          // async: false,
+          dataType: 'json',
+          success: function(data) {
+
+            j.each(data.responseData, function(transIndex, transData) {
+
+              var langCode = splitlangCodes[transIndex];
+
+              transText = transData.translatedText;
+
+              var jsonVal = {"enabled":true,"text":"","override":false,"englishText":""};
+              jsonVal['text'] = enText;
+              var jsonVal = j.toJSON(jsonVal)
+
+              j('input[name=email_translate_'+langCode+']').val(jsonVal);
+              // j('#post_data_translations').append('<input type="hidden" name="email_translate_'+langCode+'" value='+jsonVal+'>');
+
+
+            });
+
+          }
 
         });
 
-      }
+        j.when(getTranslations).done(function() {
+          j('#msgsndr_tab_email .loading').addClass('hide');
+          j('#msgsndr_tab_email').hide();
+
+          var el = 'email';
+          var nav = '.oemail';
+
+          j('.msg_content_nav li').removeClass('lighten');
+          j('.msg_content_nav '+nav).removeClass('active').addClass('complete');
+
+          j('input[name=has_'+el+']').attr('checked', 'checked');
+
+          // Set Message tabs on review tab
+          j('#msgsndr_review_'+el).parent().addClass('complete');
+
+          self.checkContent();
+        });
+
+
+       }
+
 
     };
 
