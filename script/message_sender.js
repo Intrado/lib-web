@@ -107,6 +107,11 @@ Paste from email button: Low proirity:
 			// set the type value in a hidden input for the postdata
 			$('#msgsndr_phonetype').attr('value', type);
 
+			if ( type == 'callme') {
+				$('#text .phone_advanced_options').appendTo('#callme_advanced_options');
+			} else {
+				$('#callme .phone_advanced_options').appendTo('#text_advanced_options');
+			}
 		});
 
 

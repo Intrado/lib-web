@@ -57,6 +57,8 @@
 					</div>
 				</fieldset>
 				
+				<div id="callme_advanced_options">
+				<div class="phone_advanced_options">
 				<fieldset>
 					<div class="controls">
 						<a href="#" class="toggle-more" data-target="#advanced-opts">Advanced Options (caller ID, etc.)</a>
@@ -96,6 +98,8 @@
 					</div>
 				</fieldset>
 			</div><!-- #advanced-opts -->
+			</div>
+			</div>
 				
 				<fieldset class="form_actions">
 					<div class="controls">
@@ -143,6 +147,10 @@
 				</fieldset>
 
 				<div id="tts_translate" class="close translations">
+				</div>
+
+				<div id="text_advanced_options">
+
 				</div>
 
 
@@ -225,7 +233,7 @@
 				
 				<fieldset class="form_actions">
 					<div class="controls">
-					<button class="btn_save" disabled="disabled" data-nav=".oemail">Save Email Message</button>
+					<button class="btn_save" disabled="disabled" data-nav=".oemail">Save Email Message</button><img src="img/ajax-loader.gif" class="loading hide">
 					<button class="btn_cancel" data-nav=".oemail">Cancel</button>
 					</div>
 				</fieldset>
