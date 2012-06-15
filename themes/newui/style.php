@@ -734,8 +734,24 @@ li.notactive { display: none; }
 .window_panel .translations input[name^=tts_override] { margin-left: 10px; }
 .window_panel .translations label { float: none; width: auto;	}
 
-.html_translate { background: #fff; width: 96%; }
-.html_translate p { padding: 5px; color: #222; font-size: 14px; line-height: 18px; border: 1px solid #ccc; -webkit-border-radius: 5px; border-radius: 5px; }
+.html_translate { background: #fff; width: 96%; padding: 2px 5px; border: 1px solid #ccc; -webkit-border-radius: 5px; border-radius: 5px; }
+.html_translate h1,
+.html_translate h2,
+.html_translate h3,
+.html_translate h4,
+.html_translate h5,
+.html_translate h6 { padding: 5px; color: #444; text-shadow: none; }
+.html_translate h1 { font-size: 19px; line-height: 24px; }
+.html_translate h2 { font-size: 18px; line-height: 23px; }
+.html_translate h3 { font-size: 17px; line-height: 22px; }
+.html_translate h4 { font-size: 16px; line-height: 21px; }
+.html_translate h5 { font-size: 15px; line-height: 20px; }
+.html_translate h6 { font-size: 14px; line-height: 19px; }
+.html_translate p { padding: 5px; color: #444; font-size: 13px; line-height: 18px; }
+.html_translate em { font-style: italic; }
+.html_translate ul { list-style-type: disc; margin: 0 0 0 15px; padding: 0 0 0 15px; }
+.html_translate li { color: #444; font-size: 13px; line-height: 18px; }
+.html_translate ol { list-style-type: decimal; margin: 0 0 0 15px; padding: 0 0 0 15px; }
 
 #msgsndr_tab_social .form_actions { border: none; }
 
