@@ -73,7 +73,8 @@ class PeopleList extends DBMappedObject {
 		foreach ($pkeys as $pkey) {
 			if ($pkey == "")
 				continue;
-			$p = DBFind("Person","from person where pkey=?", false, array($pkey));
+			// only allow system contacts (not guardians)
+			$p = DBFind("Person","from person where pkey=? and type='system'", false, array($pkey));
 			if ($p && $USER->canSeePerson($p->id)) {
 				//use associative array to dedupe pids
 				$temppersonids[$p->id] = 1;
