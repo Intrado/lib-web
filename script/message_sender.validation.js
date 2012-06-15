@@ -161,7 +161,10 @@ jQuery.noConflict();
         success: function(data) {
           userInfo = data;
            // format the phone number and add the new formatted version to the userInfo object
-          userInfo.phoneFormatted = notVal.formatPhone(data.phone); 
+          if (data.phone)
+        	  userInfo.phoneFormatted = notVal.formatPhone(data.phone);
+          else
+        	  userInfo.phoneFormatted = "";
         }
       });  
     };
@@ -570,7 +573,13 @@ jQuery.noConflict();
 
 
       // Easy Call jQuery Plugin
-      $("#msgsndr_form_number").attachEasyCall({"languages": {"en":"English","es":"Spanish","ca":"Catalan"}});   
+      // make "English" into "Default" for easycalls (and make sure it's always set, even when there are no languages)
+      easycallLangs = {"en":"Default"};
+      $.each(nLangs, function(code) {
+    	  if (code != "en")
+    		  easycallLangs[code] = nLangs[code];
+      });
+      $("#msgsndr_form_number").attachEasyCall({"languages":easycallLangs,"defaultphone":userInfo.phoneFormatted});   
 
     };
 
