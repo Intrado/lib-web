@@ -284,7 +284,7 @@ jQuery.noConflict();
 		
 		// List Picker
 		$('.add-recipients').listPicker({
-			prepickedListIds: ["41"]
+			//prepickedListIds: ["41"]
 		});
 
 		// ckeditor
