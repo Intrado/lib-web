@@ -26,16 +26,16 @@
 					<div class="controls">
 						<ul class="msg_complete cf">
 							<li class="notactive ophone">
-								<button id="msgsndr_review_phone"><span class="icon"></span> Phone</button>
+								<button id="msgsndr_review_phone" disabled="disabled"><span class="icon"></span> Phone</button>
 							</li>
 							<li class="notactive oemail">
-								<button id="msgsndr_review_email"><span class="icon"></span> Email</button>
+								<button id="msgsndr_review_email" disabled="disabled"><span class="icon"></span> Email</button>
 							</li>
 							<li class="notactive osms">
-								<button id="msgsndr_review_sms"><span class="icon"></span> SMS</button>
+								<button id="msgsndr_review_sms" disabled="disabled"><span class="icon"></span> SMS</button>
 							</li>
 							<li class="notactive osocial">
-								<button id="msgsndr_review_social"><span class="icon"></span> Social</button>
+								<button id="msgsndr_review_social" disabled="disabled"><span class="icon"></span> Social</button>
 							</li>
 						</ul>
 					</div>
