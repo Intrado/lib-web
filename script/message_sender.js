@@ -39,7 +39,7 @@ jQuery.noConflict();
 		});
 
 
-		$('.msg_content_nav a').on('click', function(event) {
+		$('.msg_content_nav button').on('click', function(event) {
 			event.preventDefault();
 
 			var elm = $(this).attr('id');
