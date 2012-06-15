@@ -207,7 +207,7 @@
 					<label for="msgsndr_form_translate">Translate</label>
 					<div class="controls">
 						<input type="checkbox" id="msgsndr_form_emailtranslate" name="email_translate" value=""  data-display="#email_translate" />
-						<a class="toggle-translations hide" data-target="#email_translate" href=""></a>
+						<a class="toggle-translations hide" data-target="#email_translate" data-txt="#msgsndr_tts_message" href=""></a>
 					</div>
 				</fieldset>
 
@@ -286,8 +286,8 @@
 								<p><a href="javascript:void(null);" id="sms_sc" onclick="(new spellChecker($('msgsndr_form_fbmsg')) ).openChecker();">Spell Check</a> <span class="fb characters">420 Characters left</span></p>
 							</div>
 						</fieldset>
+
 						
-						<!-- facebook WIP ...
 						<fieldset> 
 							<div id="msgsndr_fbpages" class="controls fb_reset">
 							<input id="msgsndr_fbpage" type="hidden" value="" name="social_fbpages">
@@ -315,7 +315,7 @@
 								<div id="msgsndr_fbpagefbpages" class="hidden fbpagelist"></div>
 								<div id="msgsndr_fbpagesmessage" class="underneathmsg cf"></div>
 							</div>
-						</fieldset> -->
+						</fieldset>
 					
 
 					</div><!-- facebook -->
