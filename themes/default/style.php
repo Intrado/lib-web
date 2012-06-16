@@ -94,7 +94,9 @@ table.list td { color: #444; }
 .ie7 div.sectimeline { width: 84.8%; }
 
 /*----- Classes that need PIE -----*/
-
+/*
+ * Commenting out dependency on CSS3PIE until a stable version is included that do not crash IE
+ * Mantis Bug #5157
 .window, .window_title, .window_body
 { behavior: url(PIE.php); position: relative;}
-
+*/

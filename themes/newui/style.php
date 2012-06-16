@@ -815,11 +815,13 @@ span.error { float: none; color: rgb(219,30,30); font-size: 0.9em; }
 
 
 /*----- Classes that need PIE -----*/
-
+/*
+ * Commenting out dependency on CSS3PIE until a stable version is included that do not crash IE
+ * Mantis Bug #5157
 .navshortcut, .navtabs a, .newjob a, .emrjob a, .banner_links, .banner_logo a, .subnavtabs a, .btn, .window, .window_title_wrap, .window_body, a.bigbtn, .templates, .help, .col,
 .msg_steps li span.icon, .msg_content_nav li a
 { behavior: url(PIE.php); position: relative; }
-
+*/
 /*----- IE7 styling ----- */
 
 .ie7 .summary .col { width: 20%; }
