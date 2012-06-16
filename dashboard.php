@@ -255,7 +255,7 @@ include("nav.inc.php");
 			
 			<div class="col bloc">
 				<h4><?= _L("Content Mix")?></h4>
-				<img class="dashboard_graph" src="graph_dashboard.png.php?blue=<?=$stats["total_phones"]?>&red=<?=$stats["total_emails"]?>&organge=<?=$stats["total_sms"]?>&green=<?=$stats["total_posts"]?>" />
+				<img class="dashboard_graph" src="graph_dashboard.png.php?blue=<?=$stats["total_phones"]?>&red=<?=$stats["total_emails"]?>&orange=<?=$stats["total_sms"]?>&green=<?=$stats["total_posts"]?>" />
 				<ul>
 				<li><img src="themes/newui/images/phone-blue.png"/>&nbsp;<?= round($stats["percentage_slice"] * $stats["total_phones"]) ?>%</li>
 				<li><img src="themes/newui/images/email-red.png"/>&nbsp;<?= round($stats["percentage_slice"] * $stats["total_emails"]) ?>%</li>
