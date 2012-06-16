@@ -87,6 +87,7 @@ function output_simple_pie_graph($data, $colors, $w = 300, $h = 300) {
 
 	$p1->SetLabelType(PIE_VALUE_ABS);
 	$p1->value->SetFormat('');
+	$p1->SetGuideLines(false);
 	$p1->value->Show();
 
 	$p1->ExplodeAll(($w+$h)/200);
