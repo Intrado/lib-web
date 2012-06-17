@@ -304,7 +304,9 @@
 			self.loadMessageAttachments(msgGrpId, msg, self.elements.emailAttach);
 			self.loadMessagePartsFormatted(msgGrpId, msg, "ckeditor");
 		} else {
-			self.loadMessagePartsFormatted(msgGrpId, msg, j(self.elements.emailTranslatePrefix + msg.languageCode));
+			// only load translated, or overridden messages into the main text area for this language
+			if (msg.autoTranslate == "translated" || msg.autoTranslate == "overridden")
+				self.loadMessagePartsFormatted(msgGrpId, msg, j(self.elements.emailTranslatePrefix + msg.languageCode));
 		}
 	}
 	
