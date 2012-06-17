@@ -226,10 +226,10 @@ Paste from email button: Low proirity:
 
 
 		function emSubject() {
-
+			emailSubject = $('#msgsndr_form_mailsubject').val();
+			
 			if ( emailSubject == '') {
-				$('#msgsndr_form_mailsubject').val($('#msgsndr_form_subject').val()).addClass('ok');
-			} else {
+				emailSubject = $('#msgsndr_form_subject').val();
 				$('#msgsndr_form_mailsubject').val(emailSubject).addClass('ok');
 			}
 
