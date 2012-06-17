@@ -1,6 +1,6 @@
-	function loadMessage() {
-		// Instead of using j we use j
-		j = jQuery;
+function loadMessage() {
+	// Instead of using j we use j
+	j = jQuery;
 
 		var self = this;
 	this.msgGroups = [];
@@ -16,6 +16,8 @@
 		"phoneTranslatePrefix": "#tts_translated_",
 		"phoneOverridePrefix": "#tts_override_",
 		"phoneRetranslatePrefix": "#retranslate_",
+		"phoneTranslateCheck": j("#msgsndr_form_phonetranslate"),
+		"phoneLanguageCheckPrefix": "#tts_",
 		
 		"emailComplete": j('li.oemail'),
 		"hasEmail": j('input[name=has_email'),
@@ -24,6 +26,8 @@
 		"emailFromName": j('#msgsndr_form_name'),
 		"emailFromEmail": j('#msgsndr_form_email'),
 		"emailTranslatePrefix": "#email_translated_",
+		"emailTranslateCheck": j("#msgsndr_form_emailtranslate"),
+		"emailLanguageCheckPrefix": "#email_",
 
 		"smsComplete": j('li.osms'),
 		"hasSms": j('input[name=has_sms]'),
@@ -43,7 +47,7 @@
 		"feedSection": j('div.feed'),
 		"feedSubject": j('#msgsndr_form_rsstitle'),
 		"feedText": j('#msgsndr_form_rssmsg'),
-	}
+	};
 
 	// This makes the whole table row clickable to select the message ready for loading into content
 	j('#messages_list').on('click', 'tr', function(){
@@ -57,7 +61,6 @@
 		// Add class selected to tr
 		j(this).addClass('selected');
 	});
-
 
 	// Load Saved Message button in saved message modal window
 	j('#msgsndr_load_saved_msg').on('click', function(){
@@ -84,7 +87,6 @@
 		self.prepareFormForLoad(selectedMsgGroup);
 		self.getMessages(selectedMsgGroup);
 	});
-
 		
 	// get message group data ...
 	this.getMessageGroups = function() {
@@ -248,11 +250,10 @@
 	
 		});
 	
-		// Recheck all translations checkboxes 
-		var translationsChecks = j('input.translations');
-	
-		j.each(translationsChecks, function(aIndex, aData) {
-			j(aData).attr('checked','checked');
+		// Uncheck all translation check boxes and hide their controls
+		j.each(j('input.translations'), function(aIndex, aData) {
+			j(aData).removeAttr('checked');
+			j(aData).parent().children(".controls").addClass("hide");
 		});
 	
 		var reviewTabs = j('.msg_complete li');
@@ -278,6 +279,9 @@
 			} else {
 				// only load translated, or overridden messages into the main text area for this language
 				if (msg.autoTranslate == "translated" || msg.autoTranslate == "overridden") {
+					self.elements.phoneTranslateCheck.attr("checked","checked");
+					j(self.elements.phoneLanguageCheckPrefix + msg.languageCode).attr('checked','checked');
+					j(self.elements.phoneLanguageCheckPrefix + msg.languageCode).parent().children(".controls").first().removeClass("hide");
 					self.loadMessagePartsFormatted(msgGrpId, msg, j(self.elements.phoneTranslatePrefix + msg.languageCode));
 					if (msg.autoTranslate == "overridden") {
 						j(self.elements.phoneTranslatePrefix + msg.languageCode).removeAttr("disabled");
@@ -300,8 +304,12 @@
 			self.loadMessagePartsFormatted(msgGrpId, msg, "ckeditor");
 		} else {
 			// only load translated, or overridden messages into the main text area for this language
-			if (msg.autoTranslate == "translated" || msg.autoTranslate == "overridden")
+			if (msg.autoTranslate == "translated" || msg.autoTranslate == "overridden") {
+				self.elements.emailTranslateCheck.attr("checked","checked");
+				j(self.elements.emailLanguageCheckPrefix + msg.languageCode).attr('checked','checked');
+				j(self.elements.emailLanguageCheckPrefix + msg.languageCode).parent().children(".controls").first().removeClass("hide");
 				self.loadMessagePartsFormatted(msgGrpId, msg, j(self.elements.emailTranslatePrefix + msg.languageCode));
+			}
 		}
 	}
 	
