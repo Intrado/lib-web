@@ -342,9 +342,17 @@
 				parts = data.messageParts;
 				var code = msg.languageCode;
 				var afid = parts[0].audioFile.id;
+
 				// Used to store lang code and id = {"en":"987","es":"988","ca":"989"}
-				var ctrIds = j.extend({code: afid},j.fromJSON(self.elements.phoneRecording));
-				self.elements.phoneRecording.val(j.toJSON(ctrIds));
+				var elementval = element.val();
+				if (elementval == "")
+					elementdata = {};
+				else
+					elementdata = j.secureEvalJSON(elementval);
+				
+				elementdata[code] = afid;
+				element.val(j.toJSON(elementdata));
+				
 				// now, reattach the easycall
 				self.elements.phoneRecording.attachEasyCall({
 					"languages": easycallLangs,
