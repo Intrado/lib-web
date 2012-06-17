@@ -14,6 +14,8 @@
 		"phoneRecording": j("#msgsndr_form_number"),
 		"phoneText": j('#msgsndr_tts_message'),
 		"phoneTranslatePrefix": "#tts_translated_",
+		"phoneOverridePrefix": "#tts_override_",
+		"phoneRetranslatePrefix": "#retranslate_",
 		
 		"emailComplete": j('li.oemail'),
 		"hasEmail": j('input[name=has_email'),
@@ -28,6 +30,19 @@
 		"smsText": j('#msgsndr_form_sms'),
 
 		"socialComplete": j('li.osocial'),
+		
+		"hasFacebook": j('#msgsndr_form_facebook'),
+		"facebookSection": j('div.facebook'),
+		"facebookText": j('#msgsndr_form_fbmsg'),
+		
+		"hasTwitter": j('#msgsndr_form_twitter'),
+		"twitterSection": j('div.twitter'),
+		"twitterText": j('#msgsndr_form_tmsg'),
+		
+		"hasFeed": j('#msgsndr_form_feed'),
+		"feedSection": j('div.feed'),
+		"feedSubject": j('#msgsndr_form_rsstitle'),
+		"feedText": j('#msgsndr_form_rssmsg'),
 	}
 
 	// This makes the whole table row clickable to select the message ready for loading into content
@@ -152,6 +167,21 @@
 					break;
 				case 'post':
 					self.elements.socialComplete.addClass('complete');
+					switch (msgType.subType) {
+						case "facebook":
+							self.elements.hasFacebook.attr('checked','checked');
+							self.elements.hasFacebook.trigger("change");
+							self.elements.facebookSection.show();
+							break;
+						case "twitter":
+							self.elements.hasTwitter.attr('checked','checked');
+							self.elements.twitterSection.show();
+							break;
+						case "feed":
+							self.elements.hasFeed.attr('checked','checked');
+							self.elements.feedSection.show();
+							break;
+					}
 					notVal.watchSocial('msgsndr_tab_social');
 					break;
 			}
@@ -251,7 +281,16 @@
 			if (msg.languageCode == "en") {
 				self.loadMessagePartsFormatted(msgGrpId, msg, self.elements.phoneText.addClass('ok'));
 			} else {
-				self.loadMessagePartsFormatted(msgGrpId, msg, j(self.elements.phoneTranslatePrefix + msg.languageCode));
+				// only load translated, or overridden messages into the main text area for this language
+				if (msg.autoTranslate == "translated" || msg.autoTranslate == "overridden") {
+					self.loadMessagePartsFormatted(msgGrpId, msg, j(self.elements.phoneTranslatePrefix + msg.languageCode));
+					if (msg.autoTranslate == "overridden") {
+						j(self.elements.phoneTranslatePrefix + msg.languageCode).removeAttr("disabled");
+						j(self.elements.phoneOverridePrefix + msg.languageCode).attr('checked','checked');
+					}
+				} else if (msg.autoTranslage == "source") { // FIXME: This isn't working...
+					self.loadMessagePartsFormatted(msgGrpId, msg, j(self.elements.phoneRetranslatePrefix + msg.languageCode + " textarea"));
+				}
 			}
 		}
 	}
@@ -276,50 +315,19 @@
 
 	// load post message
 	this.loadPostMessage = function(msgGrpId, msg) {
-		// TODO: not implemented yet
+		switch (msg.subType) {
+			case "facebook":
+				self.loadMessagePartsFormatted(msgGrpId, msg, self.elements.facebookText.addClass('ok'));
+				break;
+			case "twitter":
+				self.loadMessagePartsFormatted(msgGrpId, msg, self.elements.twitterText.addClass('ok'));
+				break;
+			case "feed":
+				self.elements.feedSubject.val(decodeURIComponent(msg.subject).replace(/\+/g," ")).addClass('ok');
+				self.loadMessagePartsFormatted(msgGrpId, msg, self.elements.feedText.addClass('ok'));
+				break;
+		}
 	}
-	
-    // This will contain the logic to populate message content from a loaded message
-    this.doLoadMessageBroken = function() {
-
-      // Social 
-
-      if (typeof(messages.post) != "undefined") {
-        j('li.osocial').addClass('complete');
-
-
-        if (typeof(messages.post.facebook)  != "undefined") {
-          j('#msgsndr_form_facebook').attr('checked','checked');
-          j('div.facebook').show();
-
-          j('#msgsndr_form_fbmsg').val(messages.post.facebook.msgParts[0].txt).addClass('ok');
-        }
-
-        if (typeof(messages.post.twitter) != "undefined") {
-          j('#msgsndr_form_twitter').attr('checked','checked');
-          j('div.twitter').show();
-
-          j('#msgsndr_form_tmsg').val(messages.post.twitter.msgParts[0].txt).addClass('ok');
-        }
-
-        if (typeof(messages.post.feed) != "undefined") {
-          j('#msgsndr_form_feed').attr('checked','checked');
-          j('div.feed').show();
-
-         	var postTitle = unescape(messages.post.feed.subject);
-         	var postTitle = postTitle.replace(/\+/g," ");
-
-          j('#msgsndr_form_rsstitle').val(postTitle).addClass('ok');
-          j('#msgsndr_form_rssmsg').val(messages.post.feed.msgParts[0].txt).addClass('ok');
-        }
-
-        notVal.watchSocial('msgsndr_tab_social');
-
-      }
-
-      notVal.checkContent();
-
-    }
 
 	// get audiofile based on message id from message group
 	this.loadMessagePartsAudioFile = function(msgGrpId,msg,element){
