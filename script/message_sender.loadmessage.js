@@ -9,8 +9,8 @@
 		"phoneType": j('#msgsndr_phonetype'),
 		"phoneButtonCallMe": j('button.audioleft'),
 		"phoneButtonText": j('button.audioright'),
-		"phoneCallMe": j('#callme'),
-		"phoneText": j('#text'),
+		"phoneCallMeSection": j('#callme'),
+		"phoneTextSection": j('#text'),
 		"phoneRecording": j("#msgsndr_form_number"),
 		"phoneText": j('#msgsndr_tts_message'),
 		"phoneTranslatePrefix": "#tts_translated_",
@@ -21,6 +21,7 @@
 		"emailSubject": j('#msgsndr_form_mailsubject'),
 		"emailFromName": j('#msgsndr_form_name'),
 		"emailFromEmail": j('#msgsndr_form_email'),
+		"emailTranslatePrefix": "#email_translated_",
 
 		"smsComplete": j('li.osms'),
 		"hasSms": j('input[name=has_sms]'),
@@ -122,15 +123,15 @@
 						self.elements.phoneType.val('callme');
 						self.elements.phoneButtonCallMe.addClass('active'); 
 						self.elements.phoneButtonText.removeClass('active');
-						self.elements.phoneCallMe.show();
-						self.elements.phoneText.hide();
+						self.elements.phoneCallMeSection.removeClass("hide");
+						self.elements.phoneTextSection.addClass("hide");
 						notVal.watchContent('callme');
 					} else {
 						self.elements.phoneType.val('text');
 						self.elements.phoneButtonCallMe.removeClass('active'); 
 						self.elements.phoneButtonText.addClass('active');
-						self.elements.phoneCallMe.hide();
-						self.elements.phoneText.show();
+						self.elements.phoneCallMeSection.addClass("hide");
+						self.elements.phoneTextSection.removeClass("hide");
 						notVal.watchContent('text');
 					}
 					break;
@@ -258,13 +259,13 @@
 	// load email message
 	this.loadEmailMessage = function(msgGrpId, msg) {
 		if (msg.languageCode == "en") {
-			self.elements.emailFromName.val(unescape(msg.fromName)).addClass('ok');
-			self.elements.emailFromEmail.val(unescape(msg.fromEmail)).addClass('ok');
-			self.elements.emailSubject.val(unescape(msg.subject)).addClass('ok');
+			self.elements.emailFromName.val(decodeURIComponent(msg.fromName).replace(/\+/g," ")).addClass('ok');
+			self.elements.emailFromEmail.val(decodeURIComponent(msg.fromEmail).replace(/\+/g," ")).addClass('ok');
+			self.elements.emailSubject.val(decodeURIComponent(msg.subject).replace(/\+/g," ")).addClass('ok');
 			self.loadMessageAttachments(msgGrpId, msg, self.elements.emailAttach);
 			self.loadMessagePartsFormatted(msgGrpId, msg, "ckeditor");
 		} else {
-			self.loadMessagePartsFormatted(msgGrpId, msg, j(self.elements.emailTranslatePrefix + msg.languagecode));
+			self.loadMessagePartsFormatted(msgGrpId, msg, j(self.elements.emailTranslatePrefix + msg.languageCode));
 		}
 	}
 	
