@@ -288,7 +288,7 @@
 						j(self.elements.phoneTranslatePrefix + msg.languageCode).removeAttr("disabled");
 						j(self.elements.phoneOverridePrefix + msg.languageCode).attr('checked','checked');
 					}
-				} else if (msg.autoTranslage == "source") { // FIXME: This isn't working...
+				} else if (msg.autoTranslate == "source") {
 					self.loadMessagePartsFormatted(msgGrpId, msg, j(self.elements.phoneRetranslatePrefix + msg.languageCode + " textarea"));
 				}
 			}
