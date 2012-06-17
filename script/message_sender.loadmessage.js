@@ -1,8 +1,8 @@
-  function loadMessage() {
-    // Instead of using j we use j
-    j = jQuery;
+	function loadMessage() {
+		// Instead of using j we use j
+		j = jQuery;
 
-    var self = this;
+		var self = this;
 	this.msgGroups = [];
 	this.elements = {
 		"phoneComplete": j('li.ophone'),
@@ -59,73 +59,77 @@
 	});
 
 
-    // Load Saved Message button in saved message modal window
-    j('#msgsndr_load_saved_msg').on('click', function(){
-      var msgGroup = j('.msgsndr_msggroup > td > input:radio[name=msgsndr_msggroup]:checked'); //input:checkbox[name=msgsndr_msggroup]:checked'
-      var grpId = msgGroup.attr('value');
-      var msgName = msgGroup.parent().text();
+	// Load Saved Message button in saved message modal window
+	j('#msgsndr_load_saved_msg').on('click', function(){
+		var msgGroup = j('.msgsndr_msggroup > td > input:radio[name=msgsndr_msggroup]:checked'); //input:checkbox[name=msgsndr_msggroup]:checked'
+		
+		// get the selected message group data
+		var selectedMsgGroup = {};
+		j.each(self.msgGroups, function(index, mg) {
+			if (mg.id == msgGroup.attr('value'))
+				selectedMsgGroup = mg;
+		});
 
-      // put the messageGroup id in the hidden input and display the message name
-      j('#loaded_message_id').attr('value', grpId);
-      j('#loaded_message_name').text(msgName);
-      j('#msgsndr_loaded_message').fadeIn(300);
+		// put the messageGroup id in the hidden input and display the message name
+		j('#loaded_message_id').attr('value', selectedMsgGroup.id);
+		j('#loaded_message_name').text(selectedMsgGroup.name);
+		j('#msgsndr_loaded_message').fadeIn(300);
+	
+		// make sure the correct tab is shown
+		j('#msgsndr_saved_message').modal('hide');
+		j('.msg_steps li:eq(1)').addClass('active');
+		j('#msg_section_2').show();	
 
-      // make sure the correct tab is shown
-      j('#msgsndr_saved_message').modal('hide');
-      j('.msg_steps li:eq(1)').addClass('active');
-      j('#msg_section_2').show();  
+		self.clearForm();
+		self.prepareFormForLoad(selectedMsgGroup);
+		self.getMessages(selectedMsgGroup);
+	});
 
-
-      self.clearForm(); 
-      self.getMessages(grpId);
-
-    });
-
-    
+		
 	// get message group data ...
-    this.getMessageGroups = function() {
-      j.ajax({
-        url: '/'+orgPath+'/api/2/users/'+userid+'/messagegroups',
-        type: "GET",
-        dataType: "json",
-        success: function(data) {
-          self.msgGroups = data.messageGroups;
+	this.getMessageGroups = function() {
+		j.ajax({
+			url: '/'+orgPath+'/api/2/users/'+userid+'/messagegroups',
+			type: "GET",
+			dataType: "json",
+			success: function(data) {
+				self.msgGroups = data.messageGroups;
 
-          j.each(self.msgGroups, function(index, msgGroup) {
-            // format the date from the modifiedTimestamp value 
-            var fullDate = new Date(msgGroup.modifiedTimestamp*1000);
-            var DD = fullDate.getDate();
-            var MM = fullDate.getMonth();
-            var YY = fullDate.getFullYear();
-            var msgDate = MM+1 + '/' + DD + '/' + YY;
-            
-            var msgTypes = msgGroup.typeSummary;
-            // loop through the typeSummary array to see what message parts are included
-            var msgPhone = '';
-            var msgEmail = '';
-            var msgSms = '';
-            var msgPost = '';
-            var tickHtml = '<span class="icon">x</span>';
-            j.each(msgTypes, function(index, msgType) {
-              if (msgType.type == 'phone') {
-                msgPhone = tickHtml;
-              }
-              if (msgType.type == 'email') {
-                msgEmail = tickHtml;
-              }
-              if (msgType.type == 'sms') {
-                msgSms = tickHtml;
-              }
-              if (msgType.type == 'post') {
-                msgPost = tickHtml;
-              }
-            });
+				j.each(self.msgGroups, function(index, msgGroup) {
+					// format the date from the modifiedTimestamp value 
+					var fullDate = new Date(msgGroup.modifiedTimestamp*1000);
+					var DD = fullDate.getDate();
+					var MM = fullDate.getMonth();
+					var YY = fullDate.getFullYear();
+					var msgDate = MM+1 + '/' + DD + '/' + YY;
+					
+					var msgTypes = msgGroup.typeSummary;
+					// loop through the typeSummary array to see what message parts are included
+					var msgPhone = '';
+					var msgEmail = '';
+					var msgSms = '';
+					var msgPost = '';
+					var tickHtml = '<span class="icon">x</span>';
+					j.each(msgTypes, function(index, msgType) {
+						if (msgType.type == 'phone') {
+							msgPhone = tickHtml;
+						}
+						if (msgType.type == 'email') {
+							msgEmail = tickHtml;
+						}
+						if (msgType.type == 'sms') {
+							msgSms = tickHtml;
+						}
+						if (msgType.type == 'post') {
+							msgPost = tickHtml;
+						}
+					});
 
-            j('#messages_list').append('<tr id="msgsndr_msggroup-'+msgGroup.id+'" class="msgsndr_msggroup"><td><input type="radio" data-audio="'+msgGroup.phoneIsAudioOnly+'" name="msgsndr_msggroup" value="'+msgGroup.id+'"/>'+msgGroup.name+'</td><td class="created">'+msgDate+'</td><td class="ico">'+msgPhone+'</td><td class="ico">'+msgEmail+'</td><td class="ico">'+msgSms+'</td><td class="ico">'+msgPost+'</td></tr>');
-          });
-        } 
-      });   
-    };
+					j('#messages_list').append('<tr id="msgsndr_msggroup-'+msgGroup.id+'" class="msgsndr_msggroup"><td><input type="radio" data-audio="'+msgGroup.phoneIsAudioOnly+'" name="msgsndr_msggroup" value="'+msgGroup.id+'"/>'+msgGroup.name+'</td><td class="created">'+msgDate+'</td><td class="ico">'+msgPhone+'</td><td class="ico">'+msgEmail+'</td><td class="ico">'+msgSms+'</td><td class="ico">'+msgPost+'</td></tr>');
+				});
+			} 
+		});	 
+	};
 
 
 	this.prepareFormForLoad = function(msgGroup) {
@@ -189,19 +193,10 @@
 	};
 
 	// load messages from message group
-	this.getMessages = function(msgGrpId) {
-		// get the selected message group data
-		var selectedMsgGroup = {};
-		j.each(self.msgGroups, function(index, msgGroup) {
-			if (msgGroup.id == msgGrpId)
-				selectedMsgGroup = msgGroup;
-		});
-		
-		self.prepareFormForLoad(selectedMsgGroup);
-		
+	this.getMessages = function(msgGrp) {
 		// request all the messages for the selected message group
 		j.ajax({
-			url: '/'+orgPath+'/api/2/users/'+userid+'/messagegroups/'+selectedMsgGroup.id+'/messages',
+			url: '/'+orgPath+'/api/2/users/'+userid+'/messagegroups/'+msgGrp.id+'/messages',
 			type: "GET",
 			dataType: "json",
 			success: function(data) {
@@ -210,21 +205,21 @@
 					if(typeof(msg.type) != "undefined" && msg.type.length > 0) { 
 						switch (msg.type) {
 							case "phone":
-								self.loadPhoneMessage(msgGrpId, msg, selectedMsgGroup.phoneIsAudioOnly);
+								self.loadPhoneMessage(msgGrp.id, msg, msgGrp.phoneIsAudioOnly);
 								break;
 							case "email":
 								// ignore plain emails
 								if (msg.subType == "plain") {
 									// Nothing
 								} else {
-									self.loadEmailMessage(msgGrpId, msg);
+									self.loadEmailMessage(msgGrp.id, msg);
 								}
 								break;
 							case "sms":
-								self.loadSmsMessage(msgGrpId, msg);
+								self.loadSmsMessage(msgGrp.id, msg);
 								break;
 							case "post":
-								self.loadPostMessage(msgGrpId, msg);
+								self.loadPostMessage(msgGrp.id, msg);
 								break;
 						}
 					}
@@ -233,10 +228,10 @@
 		});
 	};
 
-    /*
-      function used to empty all form data in section 2 - Message content, this is used when loading a
-      previous message, as can not assume a user will only load one
-    */
+	/*
+		function used to empty all form data in section 2 - Message content, this is used when loading a
+		previous message, as can not assume a user will only load one
+	*/
 	this.clearForm = function() {
 		j('.msg_content_nav li').removeClass('complete active lighten');
 		j('.tab_content .tab_panel').hide();
