@@ -212,11 +212,23 @@ jQuery.noConflict();
         type: "GET",
         dataType: "json",
         success: function(data) {
-          
-          jobTypes = data.jobTypes;
+
+          sortTypes = data.jobTypes;
+          jobTypes = [];
+
+          for(var sortPr = 9; sortPr >= 1; sortPr--) {
+            $.each(sortTypes, function(index, jobType) {
+              if(jobType.priority == sortPr) {
+                jobTypes.push(jobType);
+              }
+            });
+          }
 
           $.each(jobTypes, function(index, jobType) {  
-            $('#msgsndr_form_type').append('<option value='+jobType.id+'>'+jobType.name+'</option');
+            // exclude surveys ...
+            if ( jobType.isSurvey == false){
+              $('#msgsndr_form_type').append('<option value='+jobType.id+'>'+jobType.name+'</option');
+            }
           });
 
           step1();
