@@ -250,10 +250,10 @@ border-color: transparent transparent #2A6576 transparent; border-width: 13px; b
 .window_panel { font-size: 14px; }
 .window_panel a { color: #0088CC; }
 .window_panel a:hover { color: #005580; text-decoration: underline; }
-.window_panel .icon { display: inline-block; height: 14px; width: 14px; }
+.window_panel .icon { display: inline-block; height: 14px; width: 14px; vertical-align: top; }
 .window_panel .btn { display: inline-block; padding: 5px 10px; margin: 0; color: #333; }
 .window_panel .btn:hover { color: #222; text-decoration: none; }
-.window_panel .record { float: left; display: inline; line-height: 17px; margin: 0 0 0 5px; color: #fff; border: 1px solid #9f320f; 
+.window_panel .record { float: left; display: inline; line-height: 18px; margin: 0 0 0 5px; color: #fff; border: 1px solid #9f320f; 
 	background-color: #CF451A;
 	background-image: -webkit-gradient(linear, left top, left bottom, from(#E84F1F), to(#A93611)); 
   background-image: -webkit-linear-gradient(top, #E84F1F, #A93611); 
@@ -262,7 +262,7 @@ border-color: transparent transparent #2A6576 transparent; border-width: 13px; b
   background-image:      -o-linear-gradient(top, #E84F1F, #A93611); 
   background-image:         linear-gradient(top, #E84F1F, #A93611); }
 .window_panel .record:hover { background: #a93611; color: #fff; }
-.window_panel .record span.icon, .call-progress span.icon { background: url(themes/newui/images/record.png) 0 center no-repeat; margin: 0 3px 0 0; }
+.window_panel .record span.icon, .call-progress span.icon { background: url(themes/newui/images/record.png) 0 center no-repeat; margin: 2px 3px 0 0; }
 .window_panel .audioleft { border-radius: 5px 0 0 5px; margin: 0; }
 .window_panel .audioright { border-radius: 0 5px 5px 0; margin-left: -1px; }
 
@@ -385,7 +385,7 @@ input[name=msgsndr_msggroup] {
 .msg_content_nav button:hover { background: #ededed; color: #888; text-decoration: none; }
 .msg_content_nav button span { color: #444; font-weight: bold; }
 
-.msg_content_nav li button span.icon { background: url(themes/newui/images/add.png) 0 center no-repeat; width: 16px; }
+.msg_content_nav li button span.icon { background: url(themes/newui/images/add.png) 0 center no-repeat; width: 16px; margin: 3px 0 0; }
 .msg_content_nav li.ophone button span.icon   { background-image: url(themes/newui/images/phone.png) }
 .msg_content_nav li.oemail button span.icon   { background-image: url(themes/newui/images/email.png) }
 .msg_content_nav li.osms button span.icon     { background-image: url(themes/newui/images/sms.png) }
@@ -503,7 +503,7 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
   cursor: default;
 }
 
-.window_panel button .play { background: url(themes/newui/images/play.png) 0 center no-repeat; }
+.window_panel button .play { background: url(themes/newui/images/play.png) 0 center no-repeat; margin: 2px 0 0; }
 .window_panel a.toggle-more, a.toggle-translations { background: url(themes/newui/images/bluearo.png) 2px 4px no-repeat; padding: 0 0 0 15px; }
 .window_panel a.toggle-more.active, a.toggle-translations.active { background: url(themes/newui/images/bluearo-down.png) 2px 4px no-repeat; }
 
@@ -580,7 +580,7 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
 .easycalllanguagetitle { float: left; display: inline; width: 115px; margin: 6px 0 0 20px; font-size: 14px; line-height: 18px; font-weight: bold; font-style: italic; }
 .easycallerrorcontainer { /*padding: 2px; background: pink;*/ }
 .easycallerrorcontainer span.easycallerrortext { margin: 0 5px 0 0; font-size: 14px; line-height: 18px; font-weight: bold; }
-.easycallerrorcontainer span.icon { background: url(img/icons/error.png) 0 center no-repeat; width: 20px; }
+.easycallerrorcontainer span.icon { background: url(img/icons/error.png) 0 center no-repeat; height: 16px; margin: 2px 3px 0 0; }
 
 /*----- list picker styles, taken from mockup -----*/
 
