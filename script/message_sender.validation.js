@@ -169,14 +169,6 @@ jQuery.noConflict();
       });  
     };
 
-    function formatPhone(number){ // must be a 10 digit number with no spaces passed in
-      var phone = number;
-      var phonePartOne = '(' + phone.substring(0,3) + ') ';
-      var phonePartTwo = phone.substring(3,6) + '-';
-      var phonePartThree = phone.substring(6,10);
-      return phonePartOne + phonePartTwo + phonePartThree;
-    };
-
 
       // call the functions
       getOptions();
@@ -508,7 +500,7 @@ jQuery.noConflict();
 
             // and append them as options to the select menu ...
             $.each(userCallerIds, function(cIndex, cItem){
-              $('#msgsndr_form_callid').append('<option value="'+cItem+'" >'+cItem+'</option>');
+              $('#msgsndr_form_callid').append('<option value="'+cItem+'" >'+formatPhone(cItem)+'</option>');
             });
 
             // if the users setcallerid permission is defined, 
@@ -531,7 +523,7 @@ jQuery.noConflict();
             
           } else { // not sure here, set the default callerid and display the select with that as the option?
             var callerIdnumber = getDefaultCallerId();
-            $('#msgsndr_form_callid').append('<option value="'+callerIdnumber+'" selected >'+callerIdnumber+'</option>'); 
+            $('#msgsndr_form_callid').append('<option value="'+callerIdnumber+'" selected >'+formatPhone(callerIdnumber)+'</option>'); 
           }
 
         } else { // the user hascallback so we hide caller id select fieldset from view
@@ -540,7 +532,7 @@ jQuery.noConflict();
           
           /* get the default caller id and append it as the selected option in the hidden callerid select menu
           * var callerIdnumber = getDefaultCallerId();
-          * $('#msgsndr_form_callid').append('<option value="'+callerIdnumber+'" selected >'+callerIdnumber+'</option>'); */
+          * $('#msgsndr_form_callid').append('<option value="'+callerIdnumber+'" selected >'+formatPhone(callerIdnumber)+'</option>'); */
         }
       };
 
@@ -1246,11 +1238,14 @@ jQuery.noConflict();
 
     
 
-
-
-
-
-
+    
+    function formatPhone(number){ // must be a 10 digit number with no spaces passed in
+      var phone = number;
+      var phonePartOne = '(' + phone.substring(0,3) + ') ';
+      var phonePartTwo = phone.substring(3,6) + '-';
+      var phonePartThree = phone.substring(6,10);
+      return phonePartOne + phonePartTwo + phonePartThree;
+    };
 
 
 
