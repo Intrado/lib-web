@@ -574,12 +574,10 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
 
 /*----- Easycall styles so it's less broken. TODO: these are not final! -----*/
 
-.easycallmaincontainer {}
-.easycallmaincontainer div { }
-.easycallmaincontainer btn { margin: 0 5px 5px 0; }
-.easycallmaincontainer select { float: left; margin-right: 5px; width: auto !important; }
+.easycallmaincontainer button { margin: 0 5px 5px 0; }
+.easycallmaincontainer select { float: left; margin-right: 5px; width: 130px !important; }
 .easycallmaincontainer input.blank { color: gray; font-style: italic; }
-.easycalllanguagetitle { float: left; display: inline; width: 100px; margin: 6px 0 0 20px; font-size: 14px; line-height: 18px; font-weight: bold; font-style: italic; }
+.easycalllanguagetitle { float: left; display: inline; width: 115px; margin: 6px 0 0 20px; font-size: 14px; line-height: 18px; font-weight: bold; font-style: italic; }
 .easycallerrorcontainer { /*padding: 2px; background: pink;*/ }
 .easycallerrorcontainer span.easycallerrortext { margin: 0 5px 0 0; font-size: 14px; line-height: 18px; font-weight: bold; }
 .easycallerrorcontainer .easycallerrorbutton { background: url(img/icons/error.png) 0 center no-repeat; }
