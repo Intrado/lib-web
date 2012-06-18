@@ -87,7 +87,7 @@ Paste from email button: Low proirity:
 			}
 
 			if (elm[2] == 'social' && $('#msgsndr_ctrl_phone').parent().hasClass('complete')) {
-				$('#audiolink input').removeAttr('disabled');
+				$('#audiolink').removeClass('hidden');
 			}
 
 

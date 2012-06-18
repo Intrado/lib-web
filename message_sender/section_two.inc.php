@@ -268,10 +268,10 @@
 			<!-- Add the social network panel -->
 			<div id="msgsndr_tab_social" class="tab_panel">
 		
-				<div class="social_tab" id="audiolink">
+				<div class="social_tab hidden" id="audiolink">
 					<fieldset class="check">
 						<div class="controls">
-							<input class="addme" type="checkbox" id="msgsndr_form_audio" name="social_audio" disabled="disabled" />
+							<input class="addme" type="checkbox" id="msgsndr_form_audio" name="social_audio" />
 							<label class="addme" for="msgsndr_form_audio">Include a link to the audio message</label>
 						</div>
 					</fieldset>
