@@ -19,7 +19,8 @@
             base.options = $.extend({}, $.listPicker.defaultOptions, options);
 
             base.pickedListIds = base.options.prepickedListIds;
-
+            base.numRecipients = 0;
+            
             // Get lists and info -----------------------------------
 
             $.ajax({
@@ -27,6 +28,7 @@
             }).done(function(dataLists){
 
                 base.lists = $.extend({}, dataLists);
+                base.unfetchedIds = [];
 
                 // Enable the "pick from lists" button
                 base.$el.find('[href=#add-recipients-existing_lists]').removeClass('disabled');
@@ -35,12 +37,14 @@
                 $.each(base.lists, function(id, data) {
                     data.isSaved = true;
                     data.stats = {name: data.name};
+                    base.unfetchedIds.push(id);
                     // If this is one of the prepicked lists, get the stats right away and rebuild the table
                     if (base.pickedListIds.indexOf(id) !== -1) {
                         $.ajax({
                             url: 'ajax.php?type=liststats&listids=["' + id + '"]'
                         }).done(function(dataListStats){
                             data.stats = $.extend(data.stats, dataListStats[id]);
+                            base.unfetchedIds.splice(base.unfetchedIds.indexOf(id), 1);
                             base.buildTable();
                         });
                     };
@@ -85,6 +89,9 @@
                     
                     // Put rows in table
                     modal.$el.find('.existing-lists').html(rows);
+
+                    // Start the rolling fetch
+                    modal.rollingFetch();
                     
                     // Disable the "add" button
                     $addButton.text('Add recipients').addClass('disabled');
@@ -103,6 +110,22 @@
                     // Rebuild the submit button
                     modal.buildSubmit();
                 });
+
+                modal.rollingFetch = function(){
+                    $.each(base.unfetchedIds, function(index, id){
+                        var $count = modal.$el.find('[data-list-id="' + id + '"] .count').text('(...)');
+                        $.ajax({
+                            url: 'ajax.php?type=liststats&listids=["' + id + '"]'
+                        }).done(function(dataListStats){
+                            base.lists[id].stats = $.extend(base.lists[id].stats, dataListStats[id]);
+                            $count.text('(' + base.lists[id].stats.total + ')');
+                            if (base.unfetchedIds.length > 0) {
+                                base.unfetchedIds.splice(base.unfetchedIds.indexOf(id), 1);
+                                modal.rollingFetch();
+                            };
+                        });
+                    })
+                }
 
                 modal.buildSubmit = function(){
                     if (modal.selectedListIds.length === 0) {
@@ -231,16 +254,17 @@
                                                 options = options + '<option value="' + value + '">' + name + '</option>';
                                             });
                                             options = '<select>' + options + '</select>';    
-                                        } else if (criteriaVal === 'date_range' || criteriaVal === 'reldate_range') {
+                                        } else if (criteriaVal === 'date_range') {
                                             options = '<input class="date" type="text"></input> and <input class="date" type="text"></input>';
+                                        } else if (criteriaVal === 'reldate_range') {
+                                            options = '<input type="text"></input> and <input type="text"></input>';
                                         } else {
                                             options = '<input class="date" type="text"></input>';
                                         };
                                         break;
                                 }
                             };
-                            modal.newRule.value.$el.html('<div class="value-options">' + options + '</div>');
-                            //modal.newRule.value.$el.find('.date').datepicker();
+                            modal.newRule.value.$el.html('<div class="value-options">' + options + '</div>').find('.date').datepicker();
                             modal.validateRule();
                         });
                     };
@@ -801,13 +825,13 @@
         base.buildTable = function(){
 
             var rows = '';
-                sum = 0;
+            var sum = 0;
 
             // Add each picked list to the table
             $.each(base.pickedListIds, function(index, id) {
 
                 // Only do this if the list has stats
-                if (base.lists[id] !== undefined && base.lists[id].stats !== undefined) {
+                if (base.lists[id].stats.total !== undefined) {
 
                     // Recalc total recipients
                     sum += base.lists[id].stats.total;
@@ -833,6 +857,12 @@
 
             // Cache the sum
             base.numRecipients = sum;
+
+            // Fire a custom event
+            base.$el.trigger({
+                type: 'updated',
+                numRecipients: sum
+            });
 
             //console.log(base);
         };
