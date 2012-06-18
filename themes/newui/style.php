@@ -33,6 +33,7 @@ h4 { font-size: 12px; line-height: 22px; color: #235563; text-shadow: 0 1px 0 #f
 .main_activity { width: 100%; }
 .main_aside { position: absolute; top: 0; right: -240px; width: 215px; }
 .window_body_wrap { padding: 20px 2%; }
+.window_body { overflow: auto; }
 
 
 /*----- Banner -----*/
