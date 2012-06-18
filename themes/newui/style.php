@@ -126,6 +126,7 @@ border-top: 1px solid #bbb; border-right: 1px solid #bbb; border-bottom: 1px sol
 .summary strong { font-weight: bold; font-size: 52px; line-height: 52px; }
 .summary .bloc { background: #fff; height: 140px; text-align: left; border: 1px solid #93C9D9; -webkit-border-radius: 5px; border-radius: 5px; }
 .summary img.dashboard_graph { width: 60%; margin: 0 5px 0 0; }
+.summary ul { float: left; }
 
 
 /*----- Broadcasts -----*/
@@ -855,6 +856,8 @@ span.error { float: none; color: rgb(219,30,30); font-size: 0.9em; }
  .help h3 { font-size: 13px; }
  .help p { font-size: 12px; }
  
+ .summary img.dashboard_graph { width: 55%; }
+ 
  .msg_steps li a { font-size: 13px; line-height: 20px; }
  .msg_steps li span.icon { height: 20px; width: 20px; font-size: 12px; }
  .msg_steps li a:after { border-width: 19px; margin-top: -19px; }
@@ -881,8 +884,13 @@ span.error { float: none; color: rgb(219,30,30); font-size: 0.9em; }
 
 @media screen and (max-width: 850px) {
  h2 { font-size: 18px; line-height: 34px; }
+ p { font-size: 13px; line-height: 21px; }
  .msg_steps li a { font-size: 11px; }
  .window_panel p, .window_panel a { font-size: 13px; }
+ 
+ .summary .col { padding: 7px 8px; }
+ .summary strong { font-size: 45px; }
+ .summary img.dashboard_graph { width: 50%; }
  
  .feed_btn_wrap { top: -58px; }
  button, .btn { padding: 4px 8px; }
