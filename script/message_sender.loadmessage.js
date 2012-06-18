@@ -253,7 +253,7 @@ function loadMessage() {
 		// Uncheck all translation check boxes and hide their controls
 		j.each(j('input.translations'), function(aIndex, aData) {
 			j(aData).removeAttr('checked');
-			j(aData).parent().children(".controls").addClass("hide");
+			j(aData).parent().children(".controls").addClass("hide").children("textarea").attr("disabled","disabled");
 		});
 	
 		var reviewTabs = j('.msg_complete li');
