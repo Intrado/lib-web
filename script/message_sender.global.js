@@ -280,7 +280,7 @@
 
       var watch = watch + ', ' + fieldId;
 
-      j(watch).on('keyup', function() {
+      j(watch).on('blur', function() {
         var elem  = j(this);
         self.formVal(elem);
       });
