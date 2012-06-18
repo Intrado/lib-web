@@ -195,6 +195,8 @@ function loadMessage() {
 
 	// load messages from message group
 	this.getMessages = function(msgGrp) {
+		// load message group content into session server side.
+		self.loadMessageGroupContentForPreview(msgGrp.id);
 		// request all the messages for the selected message group
 		j.ajax({
 			url: '/'+orgPath+'/api/2/users/'+userid+'/messagegroups/'+msgGrp.id+'/messages',
@@ -395,12 +397,20 @@ function loadMessage() {
 					element.show();
 					j.each(attachments, function(eIndex,eData) {
 						var filesize = Math.round(eData.size/1024);
-						var attach = '<a href="emailattachment.php?id=' + eData.id + '&name=' + eData.filename + '">' + eData.filename + '</a>' +
+						var attach = '<a href="emailattachment.php?maid=' + eData.id + '&name=' + eData.filename + '">' + eData.filename + '</a>' +
 							'&nbsp;(Size: ' + filesize + 'k)&nbsp;<a href="#">Remove</a><br>';
 						element.append(attach);
 					});
 				}
 			}
 		});
+	};
+	
+	// tell the server to load this messagegroups content into session data so it can be previed
+	this.loadMessageGroupContentForPreview = function(msgGrpId) {
+		j.post("ajax.php", {
+			"type": "loadmessagegroupcontent",
+			"id": msgGrpId}
+		);
 	};
 }

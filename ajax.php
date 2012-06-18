@@ -452,6 +452,34 @@ function handleRequest() {
 		case "keepalive":
 			//keeps the users session alive
 			return true;
+			
+		case "loadmessagegroupcontent":
+			if (!isset($_REQUEST['id']))
+				return false;
+			$mg = new MessageGroup($_REQUEST['id']);
+			if (!userCanSee("messagegroup", $mg->id))
+				return false;
+			
+			// find all the content referenced by this message group and permit it
+			$imagecontentids = QuickQueryList(
+					"select mp.imagecontentid
+					from messagepart mp inner join message m on (m.messagegroupid = ? and m.id = mp.messageid) 
+					where mp.imagecontentid is not null group by mp.imagecontentid", false, false, array($mg->id));
+			$audiofilecontentids = QuickQueryList(
+					"select af.contentid
+					from audiofile af
+					inner join messagepart mp on (mp.audiofileid = af.id)
+					inner join message m on (m.messagegroupid = ? and m.id = mp.messageid) 
+					group by af.contentid", false, false, array($mg->id));
+			$attachmentcontentids = QuickQueryList(
+					"select ma.contentid
+					from messageattachment ma
+					inner join message m on (m.messagegroupid = ? and m.id = ma.messageid) 
+					group by ma.contentid", false, false, array($mg->id));
+			$contentids = array_merge($imagecontentids, $audiofilecontentids, $attachmentcontentids);
+			foreach ($contentids as $contentid)
+				permitContent($contentid);
+			return true;
 		default:
 			error_log("No AJAX API for type=$type");
 			return false;
