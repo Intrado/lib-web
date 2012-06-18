@@ -117,13 +117,15 @@ border-top: 1px solid #bbb; border-right: 1px solid #bbb; border-bottom: 1px sol
 .btngroup button.active { background: #e4e4e4; -webkit-box-shadow: inset 0px 1px 4px 0 rgba(0,0,0,0.2); box-shadow: inset 0px 1px 4px 0 rgba(0,0,0,0.2); }
 
 .summary .window_body_wrap { background: #DFEFF3; padding: 20px 0; border: 1px solid #93C9D9; -webkit-border-radius: 0 0 5px 5px; border-radius: 0 0 5px 5px; }
-.summary .col { float: left; display: inline; width: 23%; margin: 0 0 0 1%; padding: 7px 14px; text-align: center; }
+.summary .col { float: left; display: inline; width: 24.5%; margin: 0 0 0 1%; padding: 7px 14px; text-align: center; }
+.summary .col:first-child { width: 20%; }
 .summary .col p { margin: 0; }
 .summary .col li { font-size: 14px; line-height: 22px; }
 .summary .col li span { display: inline-block; width: 30px; font-weight: bold; color: #48A3BE; }
 .summary .col li img { background: #555; display: inline-block; }
 .summary strong { font-weight: bold; font-size: 52px; line-height: 52px; }
 .summary .bloc { background: #fff; height: 140px; text-align: left; border: 1px solid #93C9D9; -webkit-border-radius: 5px; border-radius: 5px; }
+.summary img.dashboard_graph { width: 60%; margin: 0 5px 0 0; }
 
 
 /*----- Broadcasts -----*/
@@ -695,11 +697,11 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
 .modal-backdrop { background-color: #000000; bottom: 0; left: 0; position: fixed; right: 0; top: 0; opacity: 0.8; z-index: 1040; }
 
 .modal { position: fixed; left: 50%; top: 50%; max-height: 500px; width: 700px; margin: -250px 0 0 -350px; padding: 0; background-clip: padding-box;  background-color: #FFFFFF; 
-border: 1px solid rgba(0, 0, 0, 0.3); -webkit-border-radius: 6px; border-radius: 6px; box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3); overflow: auto; z-index: 1050; }
+border: 1px solid rgba(0, 0, 0, 0.3); -webkit-border-radius: 6px; border-radius: 6px; box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3); z-index: 1050; }
 
 .modal-header { position: relative; background: #fdfdfd; font-size: 21px; margin: 0; padding: 15px; border-bottom: 1px solid #ddd; -webkit-border-radius: 6px 6px 0 0; border-radius: 6px 6px 0 0; }
 
-.modal-body { padding: 15px; }
+.modal-body { max-height: 300px; padding: 15px; overflow: auto; }
 .modal-body .existing-lists label { float: none; display: block; width: 100%; margin: 0; padding: 8px; text-align: left; line-height: 22px; border-top: 1px solid #ddd; }
 .modal-body .existing-lists label:hover { background: #f5f5f5; }
 .modal-body .existing-lists label:first-child { border: none; }
@@ -829,7 +831,13 @@ span.error { float: none; color: rgb(219,30,30); font-size: 0.9em; }
 .ie7 .table-bordered, .ie7 table.info { border-collapse: collapse; }
 
 
+@media screen and (min-width: 1100px) {
+ .summary img.dashboard_graph { margin: 0 10px 0 0; width: 55%; }
+}
 
+@media screen and (min-width: 1200px) {
+ .summary img.dashboard_graph { margin: 0 15px 0 0; width: 50%; }
+}
 
 @media screen and (max-width: 1000px) { 
  .subnavtabs li { margin: 5px; }
