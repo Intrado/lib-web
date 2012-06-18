@@ -425,12 +425,8 @@ div.scrollTableContainer {
 }
 
 a.actionlink {
-	border-right: 1px solid #aaa;
+	/*border-right: 1px solid #aaa;*/
 }
-.actionlinks a.actionlink:last-child {
-	border: none;
-}
-
 
 .actionlink:hover{
 	text-decoration: underline;
@@ -444,9 +440,9 @@ a.actionlink {
 	vertical-align: middle;
 }
 
-.actionlinks {
-	white-space: nowrap;
-}
+.actionlinks { white-space: nowrap; }
+.actionlinks a { border-right: 1px solid #aaa; }
+.actionlinks a.actionlink:last-child { border: none; }
 
 /*----- items need to appear in vertical list on homepage -----*/
 
