@@ -59,7 +59,7 @@ if(CheckFormSubmit($f,$s))
 
 			$type->issurvey = GetFormData($f, $s, "issurvey");
 			if($type->issurvey && $type->systempriority != 3){
-				error("Survey job types can only have a system priority of General");
+				error(_L("Survey %s types can only have a system priority of General",getJobTitle()));
 			} else {
 				$type->create();
 
@@ -108,16 +108,16 @@ if($reloadform){
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "admin:settings";
-$TITLE = "Job Type Editor: New Job Type";
+$TITLE = _L("%s Type Editor: New %s Type" ,getJobTitle(),getJobTitle());
 include_once("nav.inc.php");
 NewForm($f);
 buttons(submit($f, $s, "Done"));
-startWindow("Add a Job Type");
+startWindow(_L("Add a %s Type",getJobTitle()));
 ?>
 
 <table border="0" cellpadding="3" cellspacing="0" width="100%">
 	<tr>
-		<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">New Job Type:</th>
+		<th align="right" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;"><?= _L("New %s Type:",getJobTitle())?></th>
 		<td class="bottomBorder">
 			<table border="0" cellpadding="2" cellspacing="0" width=100%>
 				<tr>
