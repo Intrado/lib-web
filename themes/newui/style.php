@@ -811,6 +811,13 @@ li.notactive { display: none; }
 span.error { float: none; color: rgb(219,30,30); font-size: 0.9em; }
 
 
+/*----- Search form styling -----*/
+
+#searchform input { display: block; width: 313px; padding: 4px 5px; font-size: 14px; line-height: 18px; border: 1px solid #E2E2E2;
+-webkit-border-radius: 5px; border-radius: 5px; -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
+#searchform .btn { margin: 0 5px; padding: 3px 8px; }
+
+
 /*----- Prototip styles for shortcut menu, not actually used in this theme -----*/
 	
 .shortcuts a { color: #26477d; }
