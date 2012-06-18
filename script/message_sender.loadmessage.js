@@ -15,7 +15,6 @@ function loadMessage() {
 		"phoneText": j('#msgsndr_tts_message'),
 		"phoneTranslatePrefix": "#tts_translated_",
 		"phoneOverridePrefix": "#tts_override_",
-		"phoneRetranslatePrefix": "#retranslate_",
 		"phoneTranslateCheck": j("#msgsndr_form_phonetranslate"),
 		"phoneLanguageCheckPrefix": "#tts_",
 		
@@ -396,8 +395,8 @@ function loadMessage() {
 					element.show();
 					j.each(attachments, function(eIndex,eData) {
 						var filesize = Math.round(eData.size/1024);
-						var attach = '<a href="emailattachment.php?id=' + eData.id + '&name=' + eData.filename + '">' + eData.filename + '</a> ' +
-							'(Size: ' + filesize + 'k) <a href="#">Remove</a>';
+						var attach = '<a href="emailattachment.php?id=' + eData.id + '&name=' + eData.filename + '">' + eData.filename + '</a>' +
+							'&nbsp;(Size: ' + filesize + 'k)&nbsp;<a href="#">Remove</a><br>';
 						element.append(attach);
 					});
 				}
