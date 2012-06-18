@@ -580,7 +580,7 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
 .easycalllanguagetitle { float: left; display: inline; width: 115px; margin: 6px 0 0 20px; font-size: 14px; line-height: 18px; font-weight: bold; font-style: italic; }
 .easycallerrorcontainer { /*padding: 2px; background: pink;*/ }
 .easycallerrorcontainer span.easycallerrortext { margin: 0 5px 0 0; font-size: 14px; line-height: 18px; font-weight: bold; }
-.easycallerrorcontainer span.icon { background: url(img/icons/error.png) 0 center no-repeat; height: 16px; margin: 2px 3px 0 0; }
+.easycallerrorcontainer span.icon { background: url(img/icons/error.png) 0 center no-repeat; height: 16px; width: 16px; margin: 2px 3px 0 0; }
 
 /*----- list picker styles, taken from mockup -----*/
 
@@ -749,7 +749,7 @@ li.notactive { display: none; }
 .window_panel label { float: left; display: inline; width: 140px; margin: 0 10px 0 0; padding: 6px 0; font-size: 14px; line-height: 18px; text-align: right; }
 .window_panel input.small { float: left; width: 135px; }
 .window_panel textarea { /*max-width: 300px; min-width: 300px;*/ width: 96%; min-height: 100px; }
-.window_panel select { font-size: 14px; padding: 5px; }
+.window_panel select { font-size: 14px; padding: 4px 5px; }
 .window_panel input[type="checkbox"] { margin: 9px 5px 0 0; }
 .window_panel .addme { float: left; display: inline; text-align: left; width: inherit; }
 .window_panel .fbicon { background: url(themes/newui/images/facebook.jpg) 180px 0 no-repeat; }
