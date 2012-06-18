@@ -334,9 +334,9 @@
           success: function(response) {
               var res = response;
               if (res.vres != true) {
-                element.removeClass('ok').addClass('er').next('.error').show().text(res.vmsg);
+                element.removeClass('ok').addClass('er').next('.error').fadeIn(300).text(res.vmsg);
               } else {
-                element.removeClass('er').addClass('ok').next('.error').hide();
+                element.removeClass('er').addClass('ok').next('.error').fadeOut(300);
               }
           }
         });
@@ -349,7 +349,7 @@
         for (var i = 0; i < validators.length; i++) {  
           var validator = validators[i];  
           if (value.length > 0 || validator.isrequired || validator.conditionalrequired || value.length == 0) {  
-            res = validator.validate(validator.name,validator.label,value,validator.args,requiredvalues); 
+            res = validator.validate(validator.name,validator.label,value,validator.args,requiredvalues);
             if (res != true) {  
               isValid = false;  
               // If SMS - add class er to textarea and disable save button
@@ -357,10 +357,12 @@
                 j('.sms.characters').addClass('error').text(res);
                 element.removeClass('ok').addClass('er'); 
                 j('#msgsndr_tab_sms .btn_save').attr('disabled','disabled');
+              } else if (element.hasClass('required') == false && element.val() == '') {
+                // check if the element isn't required, and if it's empty. If so, remove the validation message.
+                element.removeClass('er').addClass('ok').next('.error').fadeOut(300);
               } else {
-                element.removeClass('ok').addClass('er').next('.error').show().text(res);
+                element.removeClass('ok').addClass('er').next('.error').fadeIn(300).text(res);
               }
-              break; 
             } else {
               // If SMS - add class ok to textarea and remove disabled from save button
               if (name == 'sms_text') {
@@ -368,7 +370,7 @@
                 j('.sms.characters').removeClass('error')
                 j('#msgsndr_tab_sms .btn_save').removeAttr('disabled');
               } else {
-                element.removeClass('er').addClass('ok').next('.error').hide();
+                element.removeClass('er').addClass('ok').next('.error').fadeOut(300);
               }
             }
           } 
