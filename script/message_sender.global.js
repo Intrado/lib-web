@@ -423,11 +423,8 @@
         success: function(data) {
 
           j.each(data.responseData, function(transIndex, transData) {
-
-            var langCode = splitlangCodes[transIndex];
-            var textareaId = '#'+msgType+'_translated_'+langCode;
-
-            transText = transData.translatedText;
+            var textareaId = '#'+msgType+'_translated_'+transData.code;
+            var transText = transData.translatedText;
             if ( msgType == "email" ) {
               j(textareaId).html(transText);
             } else {
