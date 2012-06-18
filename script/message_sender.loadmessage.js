@@ -207,11 +207,16 @@ function loadMessage() {
 					if(typeof(msg.type) != "undefined" && msg.type.length > 0) { 
 						switch (msg.type) {
 							case "phone":
-								self.loadPhoneMessage(msgGrp.id, msg, msgGrp.phoneIsAudioOnly);
+								// ignore source phone messages
+								if (msg.autoTranslate == "source") {
+									// nothing
+								} else {
+									self.loadPhoneMessage(msgGrp.id, msg, msgGrp.phoneIsAudioOnly);
+								}
 								break;
 							case "email":
-								// ignore plain emails
-								if (msg.subType == "plain") {
+								// ignore plain and source emails
+								if (msg.subType == "plain" || msg.autoTranslate == "source") {
 									// Nothing
 								} else {
 									self.loadEmailMessage(msgGrp.id, msg);
@@ -279,18 +284,14 @@ function loadMessage() {
 			if (msg.languageCode == "en") {
 				self.loadMessagePartsFormatted(msgGrpId, msg, self.elements.phoneText.addClass('ok'));
 			} else {
-				// only load translated, or overridden messages into the main text area for this language
-				if (msg.autoTranslate == "translated" || msg.autoTranslate == "overridden") {
-					self.elements.phoneTranslateCheck.attr("checked","checked");
-					j(self.elements.phoneLanguageCheckPrefix + msg.languageCode).attr('checked','checked');
-					j(self.elements.phoneLanguageCheckPrefix + msg.languageCode).parent().children(".controls").first().removeClass("hide");
-					self.loadMessagePartsFormatted(msgGrpId, msg, j(self.elements.phoneTranslatePrefix + msg.languageCode));
-					if (msg.autoTranslate == "overridden") {
-						j(self.elements.phoneTranslatePrefix + msg.languageCode).removeAttr("disabled");
-						j(self.elements.phoneOverridePrefix + msg.languageCode).attr('checked','checked');
-					}
-				} else if (msg.autoTranslate == "source") {
-					self.loadMessagePartsFormatted(msgGrpId, msg, j(self.elements.phoneRetranslatePrefix + msg.languageCode + " textarea"));
+				self.elements.phoneTranslateCheck.attr("checked","checked");
+				j(self.elements.phoneLanguageCheckPrefix + msg.languageCode).attr('checked','checked');
+				j(self.elements.phoneLanguageCheckPrefix + msg.languageCode).parent().children(".controls").first().removeClass("hide");
+				self.loadMessagePartsFormatted(msgGrpId, msg, j(self.elements.phoneTranslatePrefix + msg.languageCode));
+				// overridden messages should have their text area editable and override checked.
+				if (msg.autoTranslate == "overridden") {
+					j(self.elements.phoneTranslatePrefix + msg.languageCode).removeAttr("disabled");
+					j(self.elements.phoneOverridePrefix + msg.languageCode).attr('checked','checked');
 				}
 			}
 		}
@@ -305,13 +306,10 @@ function loadMessage() {
 			self.loadMessageAttachments(msgGrpId, msg, self.elements.emailAttach);
 			self.loadMessagePartsFormatted(msgGrpId, msg, "ckeditor");
 		} else {
-			// only load translated, or overridden messages into the main text area for this language
-			if (msg.autoTranslate == "translated" || msg.autoTranslate == "overridden") {
-				self.elements.emailTranslateCheck.attr("checked","checked");
-				j(self.elements.emailLanguageCheckPrefix + msg.languageCode).attr('checked','checked');
-				j(self.elements.emailLanguageCheckPrefix + msg.languageCode).parent().children(".controls").first().removeClass("hide");
-				self.loadMessagePartsFormatted(msgGrpId, msg, j(self.elements.emailTranslatePrefix + msg.languageCode));
-			}
+			self.elements.emailTranslateCheck.attr("checked","checked");
+			j(self.elements.emailLanguageCheckPrefix + msg.languageCode).attr('checked','checked');
+			j(self.elements.emailLanguageCheckPrefix + msg.languageCode).parent().children(".controls").first().removeClass("hide");
+			self.loadMessagePartsFormatted(msgGrpId, msg, j(self.elements.emailTranslatePrefix + msg.languageCode));
 		}
 	}
 	
