@@ -327,8 +327,8 @@ _L('Advanced %s Options', getJobTitle()),
 		"helpstep" => 5
 	),
 	"setcallerid" => array(
-		"label" => _L('Override CallerID'),
-		"fieldhelp" => _L('Allows users to override CallerID on a %s to be any phone number.', getJobTitle()),
+		"label" => _L('Override Caller ID'),
+		"fieldhelp" => _L('Allows users to override Caller ID on a %s to be any phone number.', getJobTitle()),
 		"value" => $obj->getValue("setcallerid"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
