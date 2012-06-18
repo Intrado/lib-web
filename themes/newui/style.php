@@ -580,7 +580,7 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
 .easycalllanguagetitle { float: left; display: inline; width: 115px; margin: 6px 0 0 20px; font-size: 14px; line-height: 18px; font-weight: bold; font-style: italic; }
 .easycallerrorcontainer { /*padding: 2px; background: pink;*/ }
 .easycallerrorcontainer span.easycallerrortext { margin: 0 5px 0 0; font-size: 14px; line-height: 18px; font-weight: bold; }
-.easycallerrorcontainer .easycallerrorbutton { background: url(img/icons/error.png) 0 center no-repeat; }
+.easycallerrorcontainer span.icon { background: url(img/icons/error.png) 0 center no-repeat; width: 20px; }
 
 /*----- list picker styles, taken from mockup -----*/
 
