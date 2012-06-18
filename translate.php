@@ -30,6 +30,7 @@ if( (isset($_REQUEST['english']) && mb_strlen($_REQUEST['english']) > 5000) ||
 			$responseObj->responseStatus = 200;
 			$i = 0;
 			foreach($translations as $translation){
+				$responseObj->responseData[$i]->code = $languagearray[$i];
 				$responseObj->responseData[$i++]->translatedText = preg_replace('/<input value="(.+?)"\\/>/', '$1', html_entity_decode($translation,ENT_QUOTES,"UTF-8"));
 			}
 		}
