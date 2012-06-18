@@ -246,7 +246,9 @@ function loadMessage() {
 			if (j(aData).attr('type') == 'checkbox') {
 				j(aData).removeAttr('checked');
 			}
-			j(aData).val('').removeClass('ok');
+			// don't blank out easycall phone number field
+			if (!j(aData).hasClass("easycallphoneinput"))
+				j(aData).val('').removeClass('ok');
 	
 		});
 	
