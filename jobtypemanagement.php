@@ -136,7 +136,7 @@ foreach($systemprioritynames as $index => $name){
 	<tr>
 		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;"><?= _L("Name") ?></th>
 		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;"><?= _L("Display Information") ?></th>
-		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;"><?= _L("Default % Setting",getJobTitle()) ?></th>
+		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;"><?= _L("Default %s Setting",getJobTitle()) ?></th>
 		<th align="left" class="windowRowHeader bottomBorder" colspan=100 valign="top" style="padding-top: 6px;">&nbsp;</th>
 	</tr>
 
@@ -156,7 +156,7 @@ if (getSystemSetting('_hassurvey', true)) {
 	<tr>
 		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;"><?= _L("Name") ?></th>
 		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;"><?= _L("Display Information") ?></th>
-		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;"><?= _L("Default % Setting",getJobTitle()) ?></th>
+		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;"><?= _L("Default %s Setting",getJobTitle()) ?></th>
 		<th align="left" class="windowRowHeader bottomBorder" colspan=100 valign="top" style="padding-top: 6px;">&nbsp;</th>
 	</tr>
 <?
