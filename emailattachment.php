@@ -4,14 +4,21 @@ include_once("inc/securityhelper.inc.php");
 include_once("inc/content.inc.php");
 include_once("inc/appserver.inc.php");
 include_once("obj/Content.obj.php");
+include_once("obj/MessageAttachment.obj.php");
 
 if ($USER->authorize("sendemail") === false) {
 	redirect('./');
 }
 
-if(isset($_GET["name"]) && isset($_GET["id"])) {
-	if (contentAllowed($_GET['id'])) {
-		if ($c = contentGet($_GET["id"] + 0)){
+if(isset($_GET["name"]) && (isset($_GET["id"]) || isset($_GET["maid"]))) {
+	if (isset($_GET["maid"])) {
+		$ma = new MessageAttachment($_GET["maid"]);
+		$contentid = $ma->contentid;
+	} else {
+		$contentid = $_GET["id"];
+	}
+	if (contentAllowed($contentid)) {
+		if ($c = contentGet($contentid + 0)){
 			list($contenttype,$data) = $c;
 			if($data) {
 				header("HTTP/1.0 200 OK");
