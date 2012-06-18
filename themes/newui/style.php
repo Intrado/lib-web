@@ -125,7 +125,7 @@ border-top: 1px solid #bbb; border-right: 1px solid #bbb; border-bottom: 1px sol
 .summary .col li img { background: #555; display: inline-block; }
 .summary strong { font-weight: bold; font-size: 52px; line-height: 52px; }
 .summary .bloc { background: #fff; height: 140px; text-align: left; border: 1px solid #93C9D9; -webkit-border-radius: 5px; border-radius: 5px; }
-.summary img.dashboard_graph { width: 60%; margin: 0 5px 0 0; }
+.summary img.dashboard_graph { width: 55%; margin: 0 5px 0 0; }
 .summary ul { float: left; }
 
 
@@ -834,13 +834,7 @@ span.error { float: none; color: rgb(219,30,30); font-size: 0.9em; }
 .ie7 .table-bordered, .ie7 table.info { border-collapse: collapse; }
 
 
-@media screen and (min-width: 1100px) {
- .summary img.dashboard_graph { margin: 0 10px 0 0; width: 55%; }
-}
 
-@media screen and (min-width: 1200px) {
- .summary img.dashboard_graph { margin: 0 15px 0 0; width: 50%; }
-}
 
 @media screen and (max-width: 1000px) { 
  .subnavtabs li { margin: 5px; }
@@ -858,7 +852,8 @@ span.error { float: none; color: rgb(219,30,30); font-size: 0.9em; }
  .help h3 { font-size: 13px; }
  .help p { font-size: 12px; }
  
- .summary img.dashboard_graph { width: 55%; }
+ .summary .col li { font-size: 13px; }
+ .summary img.dashboard_graph { width: 50%; }
  
  .msg_steps li a { font-size: 13px; line-height: 20px; }
  .msg_steps li span.icon { height: 20px; width: 20px; font-size: 12px; }
@@ -891,8 +886,9 @@ span.error { float: none; color: rgb(219,30,30); font-size: 0.9em; }
  .window_panel p, .window_panel a { font-size: 13px; }
  
  .summary .col { padding: 7px 8px; }
+ .summary .col li { font-size: 12px; line-height: 21px; }
  .summary strong { font-size: 45px; }
- .summary img.dashboard_graph { width: 50%; }
+ .summary img.dashboard_graph { width: 48%; }
  
  .feed_btn_wrap { top: -58px; }
  button, .btn { padding: 4px 8px; }
