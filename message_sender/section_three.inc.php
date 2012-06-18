@@ -51,7 +51,7 @@
 				<fieldset>
 					<label for="auto_report">Auto Report</label>
 					<div class="controls cf">
-						<input type="checkbox" id="auto_report" name="options_autoreport"/>
+						<input type="checkbox" id="auto_report" name="options_autoreport" checked="checked"/>
 					</div>
 				</fieldset>
 
@@ -65,7 +65,7 @@
 				<fieldset>
 					<label for="skip_phones">Skip Duplicates</label>
 					<div class="controls cf">
-						<input type="checkbox" id="skip_phones" name="options_skipduplicates"/>
+						<input type="checkbox" id="skip_phones" name="options_skipduplicates" checked="checked"/>
 					</div>
 				</fieldset>
 
