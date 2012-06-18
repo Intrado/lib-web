@@ -261,8 +261,10 @@
           var calllate = lateProfile;
         }
 
-        j('#schedulecallearly option[value="'+callearly+'"]').attr('selected','selected');
-        j('#schedulecalllate option[value="'+calllate+'"]').attr('selected','selected');
+        j('#schedulecallearly option[value="'+callearly+'"]').attr('selected','selected').prevAll().remove();
+        j('#schedulecallearly option[value="'+calllate+'"]').nextAll().remove();
+        j('#schedulecalllate option[value="'+callearly+'"]').prevAll().remove();
+        j('#schedulecalllate option[value="'+calllate+'"]').attr('selected','selected').nextAll().remove();
 
         // Populate the max attempts select box
         var maxAttempts = userPrefs.callmax;
