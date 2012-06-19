@@ -308,6 +308,7 @@ include("nav.inc.php");
 				<tbody>
 				</tbody>
 			</table>
+			<h3 id="noactivejobs"><span><?= _L("No %s in progress", getJobsTitle())?></span></h3>
 			<div id="moreactivejobs"></div>
 			
 			<h3><?= _L("On Deck")?> <span><?= _L("(Sending Soon)")?></span></h3>
@@ -317,6 +318,7 @@ include("nav.inc.php");
 				<tbody>
 				</tbody>
 			</table>
+			<h3 id="noscheduledjobs"><span><?= _L("No %s on deck", getJobsTitle())?></span></h3>
 			<div id="morescheduledjobs"></div>
 			
 			<h3><?= _L("Completed")?> <span><?= _L("(Already Sent)")?></span></h3>
@@ -326,6 +328,7 @@ include("nav.inc.php");
 				<tbody>
 				</tbody>
 			</table>
+			<h3 id="nocompletedjobs"><span><?= _L("No %s completed", getJobsTitle())?></span></h3>
 			<div id="morecompletedjobs"></div>
 			
 			</div><!-- /window_body_wrap -->
@@ -337,7 +340,7 @@ include("nav.inc.php");
 		<div class="bigbtn">
 		<a class="bigbtn" href="message_sender.php?new"><span><?= _L("New %s",getJobTitle())?></span></a>
 		</div>
-		<div class="templates">
+		<div class="templates" onclick="window.location='jobtemplates.php'">
 			<h3><?= _L("%s Templates",getJobTitle())?></h3>
 			<ul>
 			<?
@@ -352,13 +355,11 @@ include("nav.inc.php");
 			}
 			?>
 			</ul>
-			<?= icon_button(_L("New Template"), "add",false,"jobtemplate.php?id=new") ?>
-			
 		</div>
 	
 		<div class="help">
 			<h3>Need Help?</h3>
-			<p>Visit the <a href="#" onclick="popup('help/index.php',750,500);">help section</a> or call (800) 920-3897. Also be sure to <a href="mailto:<?=$_SESSION['_supportemail']?>">give us feedback</a> about the new version.</p>
+			<p>Visit the <a href="#" onclick="popup('help/index.php',750,500);">help section</a> or call (800) 920-3897. Also be sure to <a href="mailto:feedback@schoolmessenger.com">give us feedback</a> about the new version.</p>
 		</div>
 	</div><!-- end main_aside -->
 	
@@ -387,6 +388,15 @@ function updateTableTools(section, action, override, start, limit, count){
 			offset: { x: 0, y: 0 }
 		});
 	});
+	
+	if (start == 0 && count == 0) {
+		$(section).hide();
+		$("no" + section).show();
+	} else {
+		$(section).show();
+		$("no" + section).hide();
+	}
+	
 	
 	//Update More link to with the correct show status and url
 	if (count >= limit) {

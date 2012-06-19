@@ -155,7 +155,7 @@ div.bigbtn {
   padding: 10px 5px 5px 5px;
   background: url(themes/newui/images/circle-thin-mult.png) no-repeat;
 }
-a.bigbtn { display: block; width: 100%; margin: 0 0 25px 0; padding: 14px; color: #fff; font-size: 20px; font-weight: bold; text-align: center; border: 3px solid #AE330D;
+a.bigbtn { display: block; width: 100%; margin: 0 0 25px 0; padding: 14px 7px; color: #fff; font-size: 20px; font-weight: bold; text-align: center; border: 3px solid #AE330D;
 -webkit-border-radius: 8px; border-radius: 8px;
 -webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25) inset, 0 1px 2px rgba(0, 0, 0, 0.05); box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25) inset, 0 1px 2px rgba(0, 0, 0, 0.05);
 text-shadow: 0 1px 1px rgba(0, 0, 0, 0.75); 
@@ -173,12 +173,12 @@ a.bigbtn:hover { background-color: #C63A0E; text-decoration: none;
   background-image:     -ms-linear-gradient(top, #e35326, #C63A0E); 
   background-image:      -o-linear-gradient(top, #e35326, #C63A0E); 
   background-image:         linear-gradient(top, #e35326, #C63A0E);}
-a.bigbtn span { background: url(themes/newui/images/icon-big-plus.png) no-repeat; display: block; line-height: 30px; padding: 0 0 0 30px; }
+a.bigbtn span { background: url(themes/newui/images/broadcast.png) 0 center no-repeat; display: block; line-height: 30px; padding: 0 0 0 30px; }
   
   
 /*----- Broadcast templates -----*/
 
-.templates { margin: 0 0 25px 0; padding: 11px 15px; background-color: #EBE7E1;
+.templates { margin: 0 0 25px 0; padding: 11px 15px; background-color: #EBE7E1; cursor: pointer;
 background-image: -webkit-gradient(linear, left top, left bottom, from(#F5F3F0), to(rgba(245, 243, 240, 0))); 
   background-image: -webkit-linear-gradient(center top , #F5F3F0, rgba(245, 243, 240, 0)); 
   background-image:    -moz-linear-gradient(center top , #F5F3F0, rgba(245, 243, 240, 0)); 
@@ -336,7 +336,15 @@ table.info th + th, table.info td + td, table.info th + td, table.info td + th {
 table.info a.remove { background: url(themes/newui/images/removelist.png) left 0 no-repeat; display: inline-block; width: 18px; height: 18px; vertical-align: middle; }
 table.info a.remove:hover { background: url(themes/newui/images/removelist.png) left -22px no-repeat; display: inline-block; width: 18px; height: 18px; vertical-align: middle; }
 table.info td { border-bottom: 1px solid #ddd; }
-table.info tr:hover td { background: #e1eaf4; color: #005580; }
+table.info tr:hover td { background: #e1eaf4; color: #005580; cursor: pointer;}
+table.info th:first-child {text-align: right;}
+table.jobprogress th:first-child {text-align: left;}
+table.info td:first-child { width: 150px; text-align: right;}
+table.info td:nth-child(2) { width: 100px; white-space: nowrap;}
+table.info td:nth-child(4) { width: 40px;}
+table.info td:nth-child(5) { width: 70px;}
+table.info td:last-child { width: 40px;}
+table.info span.activejob {display: inline-block; width: 150px; color: white; font-weight: bold; text-align: center; background: url('img/candybarcall.gif') center no-repeat; background-size: 100% 70%;}
 
 .table-bordered { background: #fff; width: 100%; max-width: 100%; margin: 0 0 22px 0; border-collapse: separate; border-spacing: 0; font-size: 13px; line-height: 22px; 
 border-left: 1px solid #ddd; border-right: 1px solid #ddd; -webkit-border-radius: 4px; border-radius: 4px; }
