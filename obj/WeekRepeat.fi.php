@@ -47,7 +47,7 @@ class WeekRepeatItem extends FormItem {
 							values.push($("itm" + i + "_" +  n).checked);
 						}' .
 						($hastime?'values.push($("itm7_" +  n).getValue());':'') .
-						'$(n).value = values.toJSON();
+						'$(n).value = Object.toJSON(values);
 						form_do_validation($("' . $this->form->name . '"), $("' . $n . '"));
 					}
 					document.observe("dom:loaded", function() {
