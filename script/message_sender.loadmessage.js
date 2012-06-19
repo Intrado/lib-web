@@ -5,6 +5,9 @@ function loadMessage(mgid) {
 	var self = this;
 	this.msgGroups = false;
 	this.elements = {
+		"messageTab": j('.msg_steps li:eq(1)'),
+		"messageSection": j('#msg_section_2'),
+		
 		"phoneComplete": j('li.ophone'),
 		"phoneType": j('#msgsndr_phonetype'),
 		"phoneButtonCallMe": j('button.audioleft'),
@@ -66,6 +69,7 @@ function loadMessage(mgid) {
 	j('#msgsndr_load_saved_msg').on('click', function(){
 		var msgGroup = j('.msgsndr_msggroup > td > input:radio[name=msgsndr_msggroup]:checked'); //input:checkbox[name=msgsndr_msggroup]:checked'
 		
+		self.elements.messageTab.addClass("active complete");
 		self.loadMessageGroup(msgGroup.attr('value'));
 	});
 	
@@ -92,11 +96,10 @@ function loadMessage(mgid) {
 	
 		// make sure the correct tab is shown
 		j('#msgsndr_saved_message').modal('hide');
-		if (j('#tab_2').hasClass("active")){
-			j('#msg_section_2').show();
-			j('.msg_steps li:eq(1)').addClass('active');
+		if (self.elements.messageTab.hasClass("active")){
+			self.elements.messageSection.show();
 		} else {
-			j('.msg_steps li:eq(1)').addClass('complete')
+			self.elements.messageTab.addClass('complete');
 		}
 
 		self.clearForm();
