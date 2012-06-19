@@ -357,7 +357,7 @@ table.messages span.icon { background: url(themes/newui/images/dktick.png) 50% 1
 
 table.rules tr.saved-rule { color: #366C19; }
 table.rules tr.new-rule { background: #f5f5f5; }
-table.rules td { vertical-align: top; width: 148px; padding: 6px; line-height: 22px; border-top: 1px solid #ddd; }
+table.rules td { vertical-align: top; width: 148px; padding: 6px; line-height: 30px; border-top: 1px solid #ddd; }
 table.rules td:first-child { width: 30px; text-align: center; }
 table.rules td select, table.rules td input[type="text"] { width: 148px; }
 table.rules td label { float: none; display: block; width: 148px; margin: 0; text-align: left; }
