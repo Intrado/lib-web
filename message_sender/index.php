@@ -277,7 +277,7 @@ Validator::load_validators(array(
 jQuery.noConflict();
 (function($) { 
   $(function() {
-		var subject = <?echo (isset($_SESSION['message_sender']['template']['subject'])?("'". $_SESSION['message_sender']['template']['subject']. "'"):"''")?>;
+		var subject = <?echo (isset($_SESSION['message_sender']['template']['subject'])?("'". str_replace("'", "\'", $_SESSION['message_sender']['template']['subject']). "'"):"''")?>;
 		var lists = <?echo (isset($_SESSION['message_sender']['template']['lists'])?$_SESSION['message_sender']['template']['lists']:'[]')?>;
 		var jtid = <?echo (isset($_SESSION['message_sender']['template']['jobtypeid'])?$_SESSION['message_sender']['template']['jobtypeid']:0)?>;
 		var mgid = <?echo (isset($_SESSION['message_sender']['template']['messagegroupid'])?$_SESSION['message_sender']['template']['messagegroupid']:0)?>;
@@ -299,7 +299,9 @@ jQuery.noConflict();
 				prepickedListIds: lists
 			});
 			
-			// TODO: jobtype
+			// jobtype
+			if (jtid)
+				$("#msgsndr_form_type").val(jtid);
 			
 			// message group
 			if (mgid != 0)
