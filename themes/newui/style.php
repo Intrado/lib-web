@@ -834,7 +834,7 @@ span.error { float: none; color: rgb(219,30,30); font-size: 0.9em; }
 
 
 
-@media screen and (max-width: 1000px) { 
+@media screen and (max-width: 980px) { 
  .subnavtabs li { margin: 5px; }
  .subnavtabs a { font-size: 13px; padding: 5px 8px; }
  .wrapper { margin: 0 180px 0 0; }
