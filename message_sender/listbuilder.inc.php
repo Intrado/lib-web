@@ -59,8 +59,8 @@
 										<div class="existing-lists"></div>
 									</div>
 									<div class="modal-footer">
-										<a href="#" class="btn btn-primary disabled">Add  recipients</a>
 										<a href="#" class="btn" data-dismiss="modal">Cancel</a>
+										<a href="#" class="btn btn-primary disabled">Add  recipients</a>
 									</div>
 								</div>
 
@@ -86,8 +86,8 @@
 										</p>
 									</div>
 									<div class="modal-footer">
-										<a href="#" class="btn btn-primary disabled">Add Recipients</a>
 										<a href="#" class="btn" data-dismiss="modal">Cancel</a>
+										<a href="#" class="btn btn-primary disabled">Add Recipients</a>
 									</div>
 								</div>
 
@@ -104,8 +104,8 @@
 										</div>
 									</div>
 									<div class="modal-footer">
-										<a href="#" class="btn btn-primary disabled">Add Sections</a>
 										<a href="#" class="btn" data-dismiss="modal">Cancel</a>
+										<a href="#" class="btn btn-primary disabled">Add Sections</a>
 									</div>
 								</div>
 
