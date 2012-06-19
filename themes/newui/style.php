@@ -51,6 +51,10 @@ h4 { font-size: 12px; line-height: 22px; color: #235563; text-shadow: 0 1px 0 #f
 .banner_links li a:hover { text-decoration: underline; }
 .banner_custname { top: 24px; right: 10px; text-align: right; font-size: 16px; font-weight: bold; color: #f2f2f2; text-shadow: 0 1px 0 #444; }
 
+.popup_logo { padding: 10px 10px 0 10px; border-top: 4px solid rgba(0,0,0,0.4); }
+.popup_logo img { display: none; }
+.popup_logo h1 { font-size: 25px; text-shadow: 0 1px 0 #fff; }
+
 
 /*----- Navigation -----*/
 
@@ -324,7 +328,7 @@ h3.flag { padding: 5px 22px; font-size: 18px; color: #fff; border: 1px solid #22
 
 /*----- Information tables -----*/
 
-table.info { background: #fff; width: 100%; max-width: 100%; margin: 0 0 22px 0; border-collapse: separate; border-spacing: 0; font-size: 14px; line-height: 22px; 
+table.info { background: #fff; width: 100%; max-width: 100%; margin: 0 0 22px 0; border-collapse: separate; border-spacing: 0; font-size: 13px; line-height: 22px; 
 border-left: 1px solid #ddd; border-right: 1px solid #ddd; -webkit-border-radius: 4px; border-radius: 4px; }
 table.info thead:first-child tr:first-child th:first-child, .table-bordered tbody:first-child tr:first-child td:first-child { border-radius: 4px 0 0 0; }
 table.info th { background: #eee; font-weight: bold; vertical-align: bottom; line-height: 22px; padding: 8px; text-align: left; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; }
@@ -334,7 +338,7 @@ table.info a.remove:hover { background: url(themes/newui/images/removelist.png) 
 table.info td { border-bottom: 1px solid #ddd; }
 table.info tr:hover td { background: #e1eaf4; color: #005580; }
 
-.table-bordered { background: #fff; width: 100%; max-width: 100%; margin: 0 0 22px 0; border-collapse: separate; border-spacing: 0; font-size: 14px; line-height: 22px; 
+.table-bordered { background: #fff; width: 100%; max-width: 100%; margin: 0 0 22px 0; border-collapse: separate; border-spacing: 0; font-size: 13px; line-height: 22px; 
 border-left: 1px solid #ddd; border-right: 1px solid #ddd; -webkit-border-radius: 4px; border-radius: 4px; }
 .table-bordered thead:first-child tr:first-child th:first-child, .table-bordered tbody:first-child tr:first-child td:first-child { border-radius: 4px 0 0 0; }
 .table-bordered th { background: #eee; font-weight: bold; vertical-align: bottom; line-height: 22px; padding: 8px; text-align: left; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; }
@@ -343,7 +347,7 @@ border-left: 1px solid #ddd; border-right: 1px solid #ddd; -webkit-border-radius
 .table-bordered a.remove:hover { background: url(themes/newui/images/removelist.png) left -22px no-repeat; }
 .table-bordered td { border-bottom: 1px solid #ddd; }
 
-table.messages { width: 100%; margin: 0; font-size: 14px; line-height: 36px; border-bottom: 1px solid #ddd; border-left: 1px solid #ddd; border-right: 1px solid #ddd; }
+table.messages { width: 100%; margin: 0; font-size: 13px; line-height: 36px; border-bottom: 1px solid #ddd; border-left: 1px solid #ddd; border-right: 1px solid #ddd; }
 table.messages.head { margin: 10px 0 0 0;}
 table.messages th { background: #eee; padding: 0 8px; }
 table.messages .ico { width: 40px; text-align: center; }
@@ -444,7 +448,7 @@ border-color: #499122 transparent transparent; border-style: solid; border-width
 
 /*----- table overrides for list styles -----*/
 
-table.list { background: #fff; width: 100%; margin: 0 0 20px 0; font-size: 14px; line-height: 36px; }
+table.list { background: #fff; width: 100%; margin: 0 0 20px 0; font-size: 13px; line-height: 36px; }
 table.list th { background: #eee; padding: 0 8px; font-weight: bold; text-align: left; border-bottom: 1px solid #ccc; border-top: 1px solid #ccc; }
 table.list td { padding: 0 8px; border-bottom: 1px solid #ccc; }
 table.list ul li { padding: 0; }
