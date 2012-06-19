@@ -1,34 +1,31 @@
 // facebook page script
 /////////////////////////
 
+// Facebook javascript API initialization, pulled from facebook documentation
+window.fbAsyncInit = function() {
+	FB.init({appId: "'+fbAppId+'",
+			status: true,
+			cookie: false,
+			xfbml: true,
+			oauth: true
+	});
+};
+
+(function() {
+	var e = document.createElement("script");
+	e.type = "text/javascript";
+	e.async = true;
+	e.src = document.location.protocol + "//connect.facebook.net/en_US/all.js";
+	document.getElementById("fb-root").appendChild(e);
+}());
+
 // TODO: track accesstoken changes on authorization
 function initFacebook(accesstoken){
-
-	// Facebook javascript API initialization, pulled from facebook documentation
-	window.fbAsyncInit = function() {
-			FB.init({appId: "'+fbAppId+'",
-					status: true,
-					cookie: false,
-					xfbml: true,
-					oauth: true
-			});
-			
-			// load the initial list of pages if possible
-			if (accesstoken) {
-				$("msgsndr_fbpagerenew").removeClassName("hidden");
-			} else {
-				$("msgsndr_fbpageconnect").removeClassName("hidden");
-			}
-		};
-
-		(function() {
-			var e = document.createElement("script");
-			e.type = "text/javascript";
-			e.async = true;
-			e.src = document.location.protocol + "//connect.facebook.net/en_US/all.js";
-			document.getElementById("fb-root").appendChild(e);
-		}());
-		
+		if (accesstoken) {
+			$("msgsndr_fbpagerenew").removeClassName("hidden");
+		} else {
+			$("msgsndr_fbpageconnect").removeClassName("hidden");
+		}
 		// Observe an authentication update on the document (the auth popup fires this event)
 		document.observe("FbAuth:update", function (res) {
 			updateFbPages(res.memo.access_token, "msgsndr_fbpage", "msgsndr_fbpagefbpages", false);
