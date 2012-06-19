@@ -15,6 +15,10 @@ a:hover { text-decoration: underline; }
 .banner_links li.bl_right { border-right: none;  background: url(img/accountlinksbg_right.gif) no-repeat 0 0; width: 12px;  } 
 .banner_custname { top: 0; right: 0; padding: .25em 1.25em; text-align: right; color: <?=$primary?> }
 
+.popup_logo { padding: 10px 1% 0 1%; background: url(img/header_bg.gif) 0 0 repeat-x; }
+.popup_logo img { margin: 5px 0 0; }
+.popup_logo h1 { display: none; }
+
 
 /*----- Navigation, adds images for link hover and active styles as well as bg image for the primary and sub nav bars -----*/
 
