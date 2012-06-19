@@ -362,7 +362,7 @@ table.rules td:first-child { width: 30px; text-align: center; }
 table.rules td select, table.rules td input[type="text"] { width: 148px; }
 table.rules td label { float: none; display: block; width: 148px; margin: 0; text-align: left; }
 table.rules td input[type="checkbox"] { margin: 0 5px 0 0; }
-table.rules .value-options { overflow: y; max-height: 200px; }
+table.rules .value-options { overflow: auto; max-height: 200px; }
 table.rules td .btn { display: inline-block; margin: 0 4px 0 0; line-height: 18px; }
 table.rules td .cancel { display: inline-block; padding: 6px 0; font-size: 14px; line-height: 18px; }
 table.rules td a.remove { background: url(themes/newui/images/removelist.png) left 0 no-repeat; display: inline-block; width: 18px; height: 18px; vertical-align: middle; }
