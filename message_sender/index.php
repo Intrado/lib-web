@@ -292,7 +292,8 @@ jQuery.noConflict();
 		
 		$(document).ready(function() {
 			// subject
-			$('#msgsndr_form_subject').val(subject).addClass("ok");
+			if (subject)
+				$('#msgsndr_form_subject').val(subject).addClass("ok");
 			
 			// List Picker
 			$('.add-recipients').listPicker({
