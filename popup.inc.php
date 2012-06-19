@@ -45,24 +45,25 @@ header('Content-type: text/html; charset=UTF-8') ;
 	$logo = '<img src="logo.img.php?hash=' . crc32("cid".getSystemSetting("_logocontentid")) . '">';
 ?>
 
-
+<!-- 
 <div>
 	<table width="100%" border=0 cellpadding=0 cellspacing=0 background="img/header_bg.gif" >
 		<tr><td style="font-size:8px;">&nbsp;</td></tr>
 	</table>
 </div>
+-->
 
-<div>
-	<table width="100%" border=0 cellpadding=0 cellspacing=0>
-	<tr>
-<?	// LOGO ?>
-		<td><div style="padding-left:10px; "><?=$logo?></div></td>
-	</tr>
-	</table>
+
+<div class="popup_logo">
+	<?=$logo?>
+	<h1>SchoolMessenger</h1>
 </div>
+
 
 
 <div class="pagetitle"><? if(isset($ICON)) print '<img src="img/icon_' . $ICON . '" align="absmiddle">'; ?> <?= (isset($TITLE) ? $TITLE : "") ?></div>
 <div class="pagetitlesubtext"><?= (isset($DESCRIPTION) ? $DESCRIPTION : "") ?></div>
 
+<div class="content_wrap">
 <div class="content">
+<div class="container">
