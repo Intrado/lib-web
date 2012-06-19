@@ -224,47 +224,75 @@
         });
 
 
-        // Callearly 
-        var earlyProfile  = userPermissions.callearly;
-        var earlyPref     = userPrefs.callearly;
+        /*
+        if a user has a callearly/calllate preference (in userPrefs), make them selected
+        show all the time options from the preference set in userPermissions
+        if no preferences are set in userPermissions, show all times. 
+        */
 
-        if ( typeof(earlyProfile) == "undefined" && typeof(earlyPref) == "undefined") {
-          var callearly = "8:00 am";
-        } else if (typeof(earlyPref) != "undefined" && typeof(earlyProfile) != "undefined") {
-          if (Date(earlyPref) < Date(earlyProfile)) {
-            var callearly = earlyProfile;
-          } else {
-            var callearly = earlyPref;
-          }
-        } else if (typeof(earlyPref) != "undefined") {
-          var callearly = earlyPref;
-        } else {
-          var callearly = earlyProfile;
+        var defaultcallearly = '8:00 am';
+        var defaultcalllate = '5:00 pm';
+        var usercallearly = false;
+        var rolecallearly = false;
+        var usercalllate = false;
+        var rolecalllate = false;
+
+        // checking if the user and role preferences exist, and if they contain any data
+        if (typeof(userPrefs.callearly) != 'undefined' && userPrefs.callearly != ''){
+          usercallearly = userPrefs.callearly;
+        } 
+        if (typeof(userPermissions.callearly) != 'undefined' && userPermissions.callearly != ''){
+          rolecallearly = userPermissions.callearly;
+        } 
+        if (typeof(userPrefs.calllate) != 'undefined' && userPrefs.calllate != ''){
+          usercalllate = userPrefs.calllate;
+        } 
+        if (typeof(userPermissions.calllate) != 'undefined' && userPermissions.calllate != ''){
+          rolecalllate = userPermissions.calllate;
         }
 
+        // set up values in the callearly select ...
+        if (usercallearly != false && rolecallearly != false) {
+          // select the users preference and remove earlier times than the role preference
+          j('#schedulecallearly option[value="'+usercallearly+'"]').attr('selected','selected');
+          j('#schedulecallearly option[value="'+rolecallearly+'"]').prevAll().remove();
+          j('#schedulecalllate option[value="'+rolecallearly+'"]').prevAll().remove();
 
-        // Calllate
-        var lateProfile   = userPermissions.calllate;
-        var latePref      = userPrefs.calllate;
+        } else if (usercallearly != false && rolecallearly == false) {
+          // select the users preference and leave all the times available for selection
+          j('#schedulecallearly option[value="'+usercallearly+'"]').attr('selected','selected');
 
-        if ( typeof(lateProfile) == "undefined" && typeof(latePref) == "undefined") {
-          var calllate = "5:00 pm";
-        } else if (typeof latePref != "undefined" && typeof(lateProfile) != "undefined") {
-          if (Date(latePref) > Date(lateProfile)) {
-            var calllate = lateProfile;
-          } else {
-            var calllate = latePref;
-          }
-        } else if (typeof(latePref) != "undefined") {
-          var calllate = latePref;
+        } else if (usercallearly == false && rolecallearly != false) {
+          // select the role permission and remove all earlier times
+          j('#schedulecallearly option[value="'+rolecallearly+'"]').attr('selected','selected').prevAll().remove();
+          j('#schedulecalllate option[value="'+rolecallearly+'"]').prevAll().remove();
+
         } else {
-          var calllate = lateProfile;
+          // select the default time and leave all times as options
+          j('#schedulecallearly option[value="'+defaultcallearly+'"]').attr('selected','selected');
         }
 
-        j('#schedulecallearly option[value="'+callearly+'"]').attr('selected','selected').prevAll().remove();
-        j('#schedulecallearly option[value="'+calllate+'"]').nextAll().remove();
-        j('#schedulecalllate option[value="'+callearly+'"]').prevAll().remove();
-        j('#schedulecalllate option[value="'+calllate+'"]').attr('selected','selected').nextAll().remove();
+        // set up values in the calllate select ...
+        if (usercalllate != false && rolecalllate != false) {
+          // select the users preference and remove later times than the role preference
+          j('#schedulecalllate option[value="'+usercalllate+'"]').attr('selected','selected');
+          j('#schedulecalllate option[value="'+rolecalllate+'"]').nextAll().remove();
+          j('#schedulecallearly option[value="'+rolecalllate+'"]').nextAll().remove();
+
+        } else if (usercalllate != false && rolecalllate == false) {
+          // select the users preference and leave all the times available for selection
+          j('#schedulecalllate option[value="'+usercalllate+'"]').attr('selected','selected');
+
+        } else if (usercalllate == false && rolecalllate != false) {
+          // select the role permission and remove all later times
+          j('#schedulecalllate option[value="'+rolecalllate+'"]').attr('selected','selected').nextAll().remove();
+          j('#schedulecallearly option[value="'+rolecalllate+'"]').nextAll().remove();
+
+        } else {
+          // select the default time and leave all times as options
+          j('#schedulecalllate option[value="'+defaultcalllate+'"]').attr('selected','selected');
+        }
+        
 
         // Populate the max attempts select box
         var maxAttempts = userPrefs.callmax;
