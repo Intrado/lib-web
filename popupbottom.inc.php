@@ -1,5 +1,6 @@
-
-</div>
+</div><!-- end container -->
+</div><!-- end content -->
+</div><!-- end content_wrap -->
 <?
 if(isset($ERRORS) && is_array($ERRORS)) {
 	foreach($ERRORS as $key => $value) {
