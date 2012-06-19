@@ -335,7 +335,7 @@ include("nav.inc.php");
 	
 	<div class="main_aside">
 		<div class="bigbtn">
-		<a class="bigbtn" href="message_sender.php"><span><?= _L("New %s",getJobTitle())?></span></a>
+		<a class="bigbtn" href="message_sender.php?new"><span><?= _L("New %s",getJobTitle())?></span></a>
 		</div>
 		<div class="templates">
 			<h3><?= _L("%s Templates",getJobTitle())?></h3>
@@ -343,7 +343,11 @@ include("nav.inc.php");
 			<?
 			if (count($jobtemplates)) {
 				foreach($jobtemplates as $jobtemplate) {
-					echo "<li><a href=\"message_sender.php?templateid={$jobtemplate->id}\">{$jobtemplate->name}</a></li>";
+					$subject = urlencode($jobtemplate->name);
+					$lists = urlencode(json_encode(quickQueryList("select listid from joblist where jobid = ?", false, false, array($jobtemplate->id))));
+					$jobtypeid = $jobtemplate->jobtypeid;
+					$messagegroupid = $jobtemplate->messagegroupid;
+					echo "<li><a href=\"message_sender.php?template=true&subject=$subject&lists=$lists&jobtypeid=$jobtypeid&messagegroupid=$messagegroupid\">{$jobtemplate->name}</a></li>";
 				}
 			}
 			?>
