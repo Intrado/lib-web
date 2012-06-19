@@ -300,8 +300,7 @@ jQuery.noConflict();
 			});
 			
 			// jobtype
-			if (jtid)
-				$("#msgsndr_form_type").val(jtid);
+			$("#msgsndr_form_type").loadJobTypes(jtid);
 			
 			// message group
 			if (mgid != 0)
