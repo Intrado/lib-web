@@ -1,9 +1,9 @@
-function loadMessage() {
+function loadMessage(mgid) {
 	// Instead of using j we use j
 	j = jQuery;
 
-		var self = this;
-	this.msgGroups = [];
+	var self = this;
+	this.msgGroups = false;
 	this.elements = {
 		"phoneComplete": j('li.ophone'),
 		"phoneType": j('#msgsndr_phonetype'),
@@ -20,6 +20,7 @@ function loadMessage() {
 		
 		"emailComplete": j('li.oemail'),
 		"hasEmail": j('input[name=has_email'),
+		"emailBody": j("#msgsndr_form_body"),
 		"emailAttach": j('#uploadedfiles'),
 		"emailSubject": j('#msgsndr_form_mailsubject'),
 		"emailFromName": j('#msgsndr_form_name'),
@@ -65,13 +66,25 @@ function loadMessage() {
 	j('#msgsndr_load_saved_msg').on('click', function(){
 		var msgGroup = j('.msgsndr_msggroup > td > input:radio[name=msgsndr_msggroup]:checked'); //input:checkbox[name=msgsndr_msggroup]:checked'
 		
+		self.loadMessageGroup(msgGroup.attr('value'));
+	});
+	
+	// load a specific message group
+	this.loadMessageGroup = function(msgGrpId) {
 		// get the selected message group data
-		var selectedMsgGroup = {};
-		j.each(self.msgGroups, function(index, mg) {
-			if (mg.id == msgGroup.attr('value'))
-				selectedMsgGroup = mg;
-		});
+		var selectedMsgGroup = false;
+		if (self.msgGroups) {
+			j.each(self.msgGroups, function(index, mg) {
+				if (mg.id == msgGrpId)
+					selectedMsgGroup = mg;
+			});
+		}
+		// not found? look it up via API request
+		if (!selectedMsgGroup)
+			selectedMsgGroup = self.getMessageGroup(msgGrpId);
 
+		// FIXME: still no message group? 
+		
 		// put the messageGroup id in the hidden input and display the message name
 		j('#loaded_message_id').attr('value', selectedMsgGroup.id);
 		j('#loaded_message_name').text(selectedMsgGroup.name);
@@ -79,14 +92,18 @@ function loadMessage() {
 	
 		// make sure the correct tab is shown
 		j('#msgsndr_saved_message').modal('hide');
-		j('.msg_steps li:eq(1)').addClass('active');
-		j('#msg_section_2').show();	
+		if (j('#tab_2').hasClass("active")){
+			j('#msg_section_2').show();
+			j('.msg_steps li:eq(1)').addClass('active');
+		} else {
+			j('.msg_steps li:eq(1)').addClass('complete')
+		}
 
 		self.clearForm();
 		self.prepareFormForLoad(selectedMsgGroup);
 		self.getMessages(selectedMsgGroup);
-	});
-		
+	};
+	
 	// get message group data ...
 	this.getMessageGroups = function() {
 		j.ajax({
@@ -131,7 +148,6 @@ function loadMessage() {
 			} 
 		});	 
 	};
-
 
 	this.prepareFormForLoad = function(msgGroup) {
 		// based on message group info, set appropriate form status
@@ -273,7 +289,9 @@ function loadMessage() {
 		j("#msgsndr_form_number").empty();
 	
 		// Email Message Content resets
-		CKEDITOR.instances.reusableckeditor.setData('');
+		clearHtmlEditorContent();
+		self.elements.emailBody.val("");
+		
 		j('#uploadedfiles').empty();
 	}
 
@@ -374,7 +392,10 @@ function loadMessage() {
 			dataType: "json",
 			success: function(data) {
 				if (element == "ckeditor") {
-					CKEDITOR.instances.reusableckeditor.setData(unescape(data.messageBody));
+					if (getHtmlEditorObject())
+						getHtmlEditorObject().instance.setData(data.messageBody);
+					else
+						self.elements.emailBody.val(data.messageBody);
 				} else if (element.is("div")) {
 					element.empty().append(data.messageBody);
 				} else {
@@ -412,5 +433,20 @@ function loadMessage() {
 			"type": "loadmessagegroupcontent",
 			"id": msgGrpId}
 		);
+	};
+	
+	// get the requested message group
+	this.getMessageGroup = function(msgGrpId) {
+		var messagegroup = false;
+		j.ajax({
+			url: '/'+orgPath+'/api/2/users/'+userid+'/messagegroups/'+msgGrpId,
+			async: false,
+			type: "GET",
+			dataType: "json",
+			success: function(data) {
+				messagegroup = data;
+			}
+		});
+		return messagegroup;
 	};
 }

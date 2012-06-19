@@ -277,18 +277,34 @@ Validator::load_validators(array(
 jQuery.noConflict();
 (function($) { 
   $(function() {
+		var subject = <?echo (isset($_SESSION['message_sender']['template']['subject'])?("'". $_SESSION['message_sender']['template']['subject']. "'"):"''")?>;
+		var lists = <?echo (isset($_SESSION['message_sender']['template']['lists'])?$_SESSION['message_sender']['template']['lists']:'[]')?>;
+		var jtid = <?echo (isset($_SESSION['message_sender']['template']['jobtypeid'])?$_SESSION['message_sender']['template']['jobtypeid']:0)?>;
+		var mgid = <?echo (isset($_SESSION['message_sender']['template']['messagegroupid'])?$_SESSION['message_sender']['template']['messagegroupid']:0)?>;
+		
 		// retreive a new serialnumber for the postdata form
 		$.get('_messagesender.php?new&snum', function (data) {
 			$('[name|=broadcast_formsnum]').val(data.snum);
 		}, "json");
 		
-		// List Picker
-		$('.add-recipients').listPicker({
-			//prepickedListIds: ["41"]
-		});
-
 		// ckeditor
 		applyHtmlEditor('msgsndr_form_body');
+		
+		$(document).ready(function() {
+			// subject
+			$('#msgsndr_form_subject').val(subject).addClass("ok");
+			
+			// List Picker
+			$('.add-recipients').listPicker({
+				prepickedListIds: lists
+			});
+			
+			// TODO: jobtype
+			
+			// message group
+			if (mgid != 0)
+				loadMsg.loadMessageGroup(mgid);
+		});
 
   });
 }) (jQuery);
