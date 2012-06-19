@@ -1,5 +1,38 @@
 jQuery.noConflict();
 (function($) { 
+	$.fn.loadJobTypes = function(jobtypeid) {
+      $this = this;
+      // Get Type for drop down on inital page
+      $.ajax({
+        url: '/'+orgPath+'/api/2/users/'+userid+'/roles/'+userRoleId+'/settings/jobtypes',
+        type: "GET",
+        dataType: "json",
+        success: function(data) {
+
+          sortTypes = data.jobTypes;
+          jobTypes = [];
+
+          for(var sortPr = 9; sortPr >= 1; sortPr--) {
+            $.each(sortTypes, function(index, jobType) {
+              if(jobType.priority == sortPr) {
+                jobTypes.push(jobType);
+              }
+            });
+          }
+
+          $.each(jobTypes, function(index, jobType) {  
+            // exclude surveys ...
+            if ( jobType.isSurvey == false){
+              $this.append('<option value='+jobType.id+'>'+jobType.name+'</option');
+            }
+          });
+
+          if (jobtypeid)
+            $this.val(jobtypeid);
+          
+        } // success
+      });
+	};
   $(function() {
 
     // Global Functions
@@ -197,37 +230,7 @@ jQuery.noConflict();
         return false;
       }
 
-
-      // Get Type for drop down on inital page
-      $.ajax({
-        url: '/'+orgPath+'/api/2/users/'+userid+'/roles/'+userRoleId+'/settings/jobtypes',
-        type: "GET",
-        dataType: "json",
-        success: function(data) {
-
-          sortTypes = data.jobTypes;
-          jobTypes = [];
-
-          for(var sortPr = 9; sortPr >= 1; sortPr--) {
-            $.each(sortTypes, function(index, jobType) {
-              if(jobType.priority == sortPr) {
-                jobTypes.push(jobType);
-              }
-            });
-          }
-
-          $.each(jobTypes, function(index, jobType) {  
-            // exclude surveys ...
-            if ( jobType.isSurvey == false){
-              $('#msgsndr_form_type').append('<option value='+jobType.id+'>'+jobType.name+'</option');
-            }
-          });
-
-          step1();
-        } // success
- 
-      });   
-
+      step1();
       /* -- 
         Depending on what options the users has will depend on what they can see
         Each message content Add part is seperated out into seperate functions
