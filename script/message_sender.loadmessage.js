@@ -49,7 +49,7 @@ function loadMessage(mgid) {
 		"hasFeed": j('#msgsndr_form_feed'),
 		"feedSection": j('div.feed'),
 		"feedSubject": j('#msgsndr_form_rsstitle'),
-		"feedText": j('#msgsndr_form_rssmsg'),
+		"feedText": j('#msgsndr_form_rssmsg')
 	};
 
 	// This makes the whole table row clickable to select the message ready for loading into content

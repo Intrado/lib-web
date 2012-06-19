@@ -677,7 +677,7 @@
                     var org = modal.orgs[modal.selectedOrg];
                     if (org.sections === undefined) {
                         $.ajax({
-                            url: 'ajax.php?type=getsections&organizationid=' + modal.selectedOrg,
+                            url: 'ajax.php?type=getsections&organizationid=' + modal.selectedOrg
                         }).done(function(sectionData){
                             if (sectionData) {
                                 org.sections = $.extend({}, sectionData);
@@ -729,7 +729,7 @@
                             if (newListId) {
                                 // Add the list to the table and close the modal
                                 $.ajax({
-                                    url: 'ajax.php?type=liststats&listids=["' + newListId + '"]',
+                                    url: 'ajax.php?type=liststats&listids=["' + newListId + '"]'
                                 }).done(function(data){
                                     base.pickedListIds.push(newListId);
                                     base.updateParentElement();
@@ -737,7 +737,7 @@
                                     var listName = 'School is ' + modal.orgs[modal.selectedOrg].name + '; Section is ' +  sectionNames.join('; ');
                                     data[newListId].name = listName.length > 60 ? (listName.substring(0, 59) + '...') : listName;
                                     base.lists[newListId] = {
-                                        stats: $.extend({}, data[newListId]),
+                                        stats: $.extend({}, data[newListId])
                                     };
                                     modal.$el.modal('hide');
                                     base.buildTable();
