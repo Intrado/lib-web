@@ -456,7 +456,7 @@
             if ( msgType == "email" ) {
               j(textareaId).html(transText);
             } else {
-              j(textareaId).text(transText);
+              j(textareaId).val(transText);
             }
 
           });
