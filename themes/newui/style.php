@@ -68,9 +68,9 @@ h4 { font-size: 12px; line-height: 22px; color: #235563; text-shadow: 0 1px 0 #f
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
 .navtabs li a:hover { border: 1px solid #2a4470; 
 -webkit-box-shadow: inset 0px 1px 0px rgba(255,255,255,0.5); box-shadow: inset 0px 1px 0px rgba(255,255,255,0.5); }
-.navtabs li.navtab_active a { background: #f7f7f7; color: #222; text-shadow: 0 1px 0 #fff; border: 1px solid #2a4470; border-bottom: 1px solid #f7f7f7; }
+.navtabs li.navtab_active a { background: #fff; color: #222; text-shadow: 0 1px 0 #fff; border: 1px solid #2a4470; border-bottom: 1px solid #fff; }
 
-.subnavtabs { background: #f7f7f7; padding: 5px 0; border-bottom: 1px solid #b6b6b6; }
+.subnavtabs { background: #fff; padding: 5px 0; border-bottom: 1px solid #b6b6b6; }
 .subnavtabs li { position: relative; margin: 5px 10px; }
 .subnavtabs a { display: block; margin: 0; padding: 5px 11px; font-size: 14px; color: #26477d; 
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
@@ -832,11 +832,11 @@ span.error { float: none; color: rgb(219,30,30); font-size: 0.9em; }
 /*----- Classes that need PIE -----*/
 /*
  * Commenting out dependency on CSS3PIE until a stable version is included that do not crash IE
- * Mantis Bug #5157
+ * Mantis Bug #5157 */
 .navshortcut, .navtabs a, .newjob a, .emrjob a, .banner_links, .banner_logo a, .subnavtabs a, .btn, .window, .window_title_wrap, .window_body, a.bigbtn, .templates, .help, .col,
 .msg_steps li span.icon, .msg_content_nav li a
 { behavior: url(PIE.php); position: relative; }
-*/
+
 /*----- IE7 styling ----- */
 
 .ie7 .summary .col { width: 20%; }
