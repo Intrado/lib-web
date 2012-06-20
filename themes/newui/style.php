@@ -28,7 +28,7 @@ h4 { font-size: 12px; line-height: 22px; color: #235563; text-shadow: 0 1px 0 #f
 .lighten { opacity: 0.5;}
 
 .content_wrap { position: relative; margin: 0; padding: 25px 0 0; }
-.container { position: relative; max-width: 95em; margin: 0 auto; padding: 0 10px; }
+.container { position: relative; max-width: 95em; min-width: 920px; _width: 920px; margin: 0 auto; padding: 0 10px; }
 .wrapper { position: relative; margin: 0 240px 0 0; }
 .main_activity { width: 100%; }
 .main_aside { position: absolute; top: 0; right: -240px; width: 215px; }
@@ -832,11 +832,11 @@ span.error { float: none; color: rgb(219,30,30); font-size: 0.9em; }
 /*----- Classes that need PIE -----*/
 /*
  * Commenting out dependency on CSS3PIE until a stable version is included that do not crash IE
- * Mantis Bug #5157 */
+ * Mantis Bug #5157 
 .navshortcut, .navtabs a, .newjob a, .emrjob a, .banner_links, .banner_logo a, .subnavtabs a, .btn, .window, .window_title_wrap, .window_body, a.bigbtn, .templates, .help, .col,
 .msg_steps li span.icon, .msg_content_nav li a
 { behavior: url(PIE.php); position: relative; }
-
+*/
 /*----- IE7 styling ----- */
 
 .ie7 .summary .col { width: 20%; }
@@ -887,23 +887,26 @@ span.error { float: none; color: rgb(219,30,30); font-size: 0.9em; }
  
  button, .btn { font-size: 13px; }
  .btn_left, .btn_middle, .btn_right { font-size: 11px; }
+
+ table.list { font-size: 11px; line-height: 18px; }
 }
 
 @media screen and (max-width: 850px) {
- h2 { font-size: 18px; line-height: 34px; }
- p { font-size: 13px; line-height: 21px; }
- .msg_steps li a { font-size: 11px; }
- .window_panel p, .window_panel a { font-size: 13px; }
- 
- .summary .col { padding: 7px 8px; }
- .summary .col li { font-size: 12px; line-height: 21px; }
- .summary strong { font-size: 45px; }
- .summary img.dashboard_graph { width: 48%; }
- 
- .feed_btn_wrap { top: -58px; }
- button, .btn { padding: 4px 8px; }
- 
- table th, table td { font-size: 13px; line-height: 28px; }
+  h2 { font-size: 18px; line-height: 34px; }
+  p { font-size: 13px; line-height: 21px; }
+  .msg_steps li a { font-size: 11px; }
+  .window_panel p, .window_panel a { font-size: 13px; }
+   
+  .summary .col { padding: 7px 8px; }
+  .summary .col li { font-size: 12px; line-height: 21px; }
+  .summary strong { font-size: 45px; }
+  .summary img.dashboard_graph { width: 48%; }
+   
+  .feed_btn_wrap { top: -58px; }
+  button, .btn { padding: 4px 8px; }
+   
+  table th, table td { font-size: 11px; line-height: 18px; }
+
 }
 
 /* Very basic facebook style */
@@ -928,3 +931,4 @@ span.error { float: none; color: rgb(219,30,30); font-size: 0.9em; }
 	padding: 3px;
 	float: left;
 }
+
