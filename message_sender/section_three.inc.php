@@ -62,7 +62,7 @@
 					</div>	
 				</fieldset> -->
 
-				<fieldset>
+				<fieldset id="skip_duplicates" class="hidden">
 					<label for="skip_phones">Skip Duplicates</label>
 					<div class="controls cf">
 						<input type="checkbox" id="skip_phones" name="options_skipduplicates" checked="checked"/>
@@ -73,7 +73,7 @@
 					<label for="save_later">Save Message</label>
 					<div class="controls cf">
 						<input type="checkbox" id="save_later" name="save_later" name="options_savemessage" />
-						<input type="text" name="options_savemessagename" />
+						<input type="text" name="options_savemessagename" disabled="disabled"/>
 					</div>
 				</fieldset>
 
@@ -699,7 +699,7 @@
 			
 			<div class="modal-footer">
 				<button data-dismiss="modal">Cancel</button>
-				<button class="submit_broadcast btn_confirm" data-dismiss="modal" id="schedule_new_broadcast">Send to 2,134 Recipients</button>
+				<button class="submit_broadcast btn_confirm" data-dismiss="modal" id="schedule_broadcast">Send to 2,134 Recipients</button>
 			</div>	
 			</div><!-- schedule_options -->
 
@@ -707,7 +707,7 @@
 			
 			<div class="msg_confirm">
 				<a href="#schedule_options" data-toggle="modal">Schedule</a> or 
-				<button class="submit_broadcast btn_confirm" id="send_new_broadcast">Send Now to 2,134 Recipients</button>
+				<button class="submit_broadcast btn_confirm" id="send_now_broadcast">Send Now to 2,134 Recipients</button>
 			</div>
 			
 		</div><!-- end window_panel -->
