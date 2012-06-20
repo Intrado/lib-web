@@ -78,7 +78,7 @@ h4 { font-size: 12px; line-height: 22px; color: #235563; text-shadow: 0 1px 0 #f
 .subnavtabs a:hover,
 .subnavtabs a:active,
 .subnavtabs .navtab_active a { background: #e2e2e2; color: #242424; text-decoration: none; }
-.subnavtabs .navtab_active:after { content: ''; position: absolute; bottom: -30px; left: 50%; margin-left: -10px; border-color: #f7f7f7 transparent transparent transparent; border-width: 10px; border-style: solid; }
+.subnavtabs .navtab_active:after { content: ''; position: absolute; bottom: -30px; left: 50%; margin-left: -10px; border-color: #fff transparent transparent transparent; border-width: 10px; border-style: solid; }
 .subnavtabs .navtab_active:before { content: ''; position: absolute; bottom: -32px; left: 50%; margin-left: -11px; border-color: #B6B6B6 transparent transparent transparent; border-width: 11px; border-style: solid; }
 
 
