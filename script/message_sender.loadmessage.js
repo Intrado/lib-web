@@ -24,7 +24,8 @@ function loadMessage(mgid) {
 		"emailComplete": j('li.oemail'),
 		"hasEmail": j('input[name=has_email'),
 		"emailBody": j("#msgsndr_form_body"),
-		"emailAttach": j('#uploadedfiles'),
+		"emailAttach" : j('#msgsndr_form_attachment'),
+		"emailAttachControls": j('#uploadedfiles'),
 		"emailSubject": j('#msgsndr_form_mailsubject'),
 		"emailFromName": j('#msgsndr_form_name'),
 		"emailFromEmail": j('#msgsndr_form_email'),
@@ -321,7 +322,7 @@ function loadMessage(mgid) {
 			self.elements.emailFromName.val(decodeURIComponent(msg.fromName).replace(/\+/g," ")).addClass('ok');
 			self.elements.emailFromEmail.val(decodeURIComponent(msg.fromEmail).replace(/\+/g," ")).addClass('ok');
 			self.elements.emailSubject.val(decodeURIComponent(msg.subject).replace(/\+/g," ")).addClass('ok');
-			self.loadMessageAttachments(msgGrpId, msg, self.elements.emailAttach);
+			self.loadMessageAttachments(msgGrpId, msg, self.elements.emailAttach, self.elements.emailAttachControls);
 			self.loadMessagePartsFormatted(msgGrpId, msg, "ckeditor");
 		} else {
 			self.elements.emailTranslateCheck.attr("checked","checked");
@@ -405,7 +406,7 @@ function loadMessage(mgid) {
 	};
 
 	// get message attachments based on message group id and message id
-	this.loadMessageAttachments = function(msgGrpId,msg,element){
+	this.loadMessageAttachments = function(msgGrpId,msg,element,controlElement){
 		j.ajax({
 			url: '/'+orgPath+'/api/2/users/'+userid+'/messagegroups/'+msgGrpId+'/messages/'+msg.id+'/messageattachments',
 			async: true,
@@ -413,15 +414,18 @@ function loadMessage(mgid) {
 			dataType: "json",
 			success: function(data) {
 				attachments = data.messageAttachments;
+				var files = new Object();
 				if ( attachments.length != 0 ) {
-					element.show();
+					controlElement.show();
 					j.each(attachments, function(eIndex,eData) {
 						var filesize = Math.round(eData.size/1024);
 						var attach = '<a href="emailattachment.php?maid=' + eData.id + '&name=' + eData.filename + '">' + eData.filename + '</a>' +
 							'&nbsp;(Size: ' + filesize + 'k)&nbsp;<a href="#">Remove</a><br>';
-						element.append(attach);
+						controlElement.append(attach);
+						files[eData.id] = {"name":eData.filename,"size":eData.size}
 					});
 				}
+				element.val(Object.toJSON(files));
 			}
 		});
 	};

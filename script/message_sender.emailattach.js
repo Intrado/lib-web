@@ -61,9 +61,7 @@ function stopUpload(id,name,size,errormessage, formname, itemname) {
 	fieldelement.value = Object.toJSON( $H(values) );
 	
 	if (errormessage) {
-		form_validation_display($(itemname), "blank", errormessage);
-	} else {
-		form_do_validation($(formname), fieldelement);
+		alert(errormessage);
 	}
 	return true;
 }
@@ -100,5 +98,4 @@ function removeAttachment(id, formname, itemname) {
 		);
 	});
 	$(itemname).value = Object.toJSON(values);
-	form_do_validation($(formname), $(itemname));
 };
