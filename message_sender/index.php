@@ -168,7 +168,10 @@ include("nav.inc.php");
 	<div class="window newbroadcast">
 		<div class="window_title_wrap">
 
-			<h2>New Broadcast</h2>
+			<h2><?
+			echo (isset($_SESSION['message_sender']['template']['subject'])?("Broadcast Template: ". $_SESSION['message_sender']['template']['subject']):"New Broadcast")?>
+			</h2>
+			
 			<ul class="msg_steps cf">
 				<li class="active"><a id="tab_1" ><span class="icon">1</span> Subject &amp; Recipients</a></li>
 				<li><a id="tab_2" data-active="true"><span class="icon">2</span> Message Content</a></li>
