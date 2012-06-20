@@ -218,8 +218,8 @@ Paste from email button: Low proirity:
     };
 
 
-    // set the schedule options startdate to today's date by default
- 		$('#schedule_datepicker').val(todaysDate());
+    // set the schedule options startdate to today's date by default (uses moment.js)
+ 		$('#schedule_datepicker').val(moment().format('MM/DD/YYYY'));
 
    
 
@@ -257,108 +257,6 @@ Paste from email button: Low proirity:
 			show: false
 		});
 		
-
-
-
-
-
-
-
-
-// lists -- to be replaced by listbuilder
-//////////////////////////////////////////
-
-/*  Commenting out these functions for now, to be removed once addme is integrated with new listpicker
-    // list id populator ...
-    function populateRecipientIdList() {
-      var listContainer = [];
-
-      $(".list_row", "#msgsndr_list_info_tbody").each(function() {
-        listContainer.push($(this).attr("data-id"));
-      });
-
-      if($("#msgsndr_form_myself").is(":checked")) {
-        listContainer.push("addme");
-      }
-
-      var listStr = listContainer.join(",");
-      $("#list_ids").val(listStr);
-    };
-
-
-		// get the available lists from lists.php
-    loadLists = function() {
-      $.ajax({
-        type: 'GET',
-        url: "lists.php?ajax=true&filter=filter&pagestart=activepage",
-        success: function(response) {
-            var lists = response.list;
-            $.each(lists, function(index, list) {
-            	$('#lists_list').append('<li class="choose_lists_row"><input type="checkbox" id="' + list.itemid + '" name="choose_list_add" value="' + list.itemid + '" data-title="' + list.title + '"/><label for="choose_list_add">' + list.title + '</label></li>');       
-            });
-          }
-      });
-    };
-    
-    // load the lists into the modal window ...
-    loadLists();
-
-    
-    // remove lists from the table of recipients
-		$('.removelist').live("click", function(){
-
-			var listId 			= $(this).attr('id');
-			var listRow 		= $(this).closest('.list_row');
-			var listsHidden	= $('#msgsndr_list_choices').children();
-
-			if ( listRow.attr('data-id') == listId ) {
-				listRow.remove();
-			}
-			$.each( listsHidden, function(index, listHidden) {
-				console.log(listHidden);
-				if ( $(this).attr('id') == listId ) {
-					// remove the input from the hidden fieldset
-					$('#msgsndr_list_choices > input[name=choose_list_add][id=' + listId +']').remove();
-					// revert the list item in the modal to its unchosen state
-					$('.choose_lists_row > input[name=choose_list_add][id=' + listId +']').attr('disabled', false).attr('checked', false);
-				}
-			});
-
-			notVal.watchSection('msg_section_1');
-			
-		});
- 
- 		// add lists to the table of recipients, and add a hidden checkbox to the form for submission
- 		$('#choose_list_add_btn').live("click", function() {
-
-    	var listItems = $('.choose_lists_row > input:checkbox[name=choose_list_add]:checked');
-
-    	$.each(listItems, function(index, listItem) {
-    		var listHtml	= $(this);
-    		var listTitle = $(this).attr('data-title');
-    		var listId 		= $(this).attr('value');
-    		
-    		if ( listHtml.attr('disabled') != 'disabled') { // check if the list has been chosen already, if not, add it in...
-    			$('#msgsndr_list_info_tbody').append('<tr class="list_row" data-id="' + listId + '"><td><a id="' + listId + '" class="removelist" title="Remove List"></a><a id="' + listId + '" class="savelist" title="Save List"></a></td><td>' + listTitle + '</td><td>[count]</td></tr>');
-    			// listHtml.clone().appendTo('#msgsndr_list_choices'); // clone the input in the msgsndr_list_choices fieldset 
-
-    			//$('#list_ids').val(listId);
-
-    			listHtml.attr('disabled', true); // set the checkbox to disabled so users can't choose a list twice
-    		}
-
-    		$('#list_ids').addClass('ok');
-
-    	});
-
-    	notVal.watchSection('msg_section_1');
-    	// close the modal and make sure the first panel and section is open...
-    	$('#msgsndr_choose_list').modal('hide');
-    	$('.msg_steps').find('li:eq(0)').addClass('active');
-    	$('#msg_section_1').show();
-
-    });
-*/
 
   });
 }) (jQuery);

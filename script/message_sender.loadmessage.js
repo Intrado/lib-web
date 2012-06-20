@@ -117,12 +117,8 @@ function loadMessage(mgid) {
 				self.msgGroups = data.messageGroups;
 
 				j.each(self.msgGroups, function(index, msgGroup) {
-					// format the date from the modifiedTimestamp value 
-					var fullDate = new Date(msgGroup.modifiedTimestamp*1000);
-					var DD = fullDate.getDate();
-					var MM = fullDate.getMonth();
-					var YY = fullDate.getFullYear();
-					var msgDate = MM+1 + '/' + DD + '/' + YY;
+					// format the date from the modifiedTimestamp value
+					var msgDate = moment(msgGroup.modifiedTimestamp*1000).format('MM/DD/YYYY');
 					
 					var msgTypes = msgGroup.typeSummary;
 					// loop through the typeSummary array to see what message parts are included
