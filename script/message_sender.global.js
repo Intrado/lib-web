@@ -334,17 +334,28 @@
 
 
 
-    // Set keyup event to the fields that need validating - These fields passed through from functions above
+    // Set events for fields that require validation ...
+
+    var valTimers = {};
+
     this.watchFields = function(fieldId) {
+      // fieldId could be a single #id or a list of ids
+      var watch = fieldId;
 
-      var watch = watch + ', ' + fieldId;
+      j(watch).on('keyup change click blur', function() {
+        var elem = j(this);
+        var elemId = j(this).attr("id");
 
-      j(watch).on('blur', function() {
-        var elem  = j(this);
-        self.formVal(elem);
+        if(typeof(valTimers[elemId]) == "undefined") {
+          valTimers[elemId] = null;
+        }
+        // clear the timeout before setting it again
+        clearTimeout(valTimers[elemId]);
+        valTimers[elemId] = setTimeout(function() {
+          self.formVal(elem);
+        }, 600);
+
       });
-
-
     } // WatchFields
 
 
