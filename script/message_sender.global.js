@@ -230,12 +230,12 @@
         if no preferences are set in userPermissions, show all times. 
         */
 
-        var defaultcallearly = '8:00 am';
-        var defaultcalllate = '5:00 pm';
-        var usercallearly = false;
-        var rolecallearly = false;
-        var usercalllate = false;
-        var rolecalllate = false;
+        defaultcallearly = '8:00 am';
+        defaultcalllate = '5:00 pm';
+        usercallearly = false;
+        rolecallearly = false;
+        usercalllate = false;
+        rolecalllate = false;
 
         // checking if the user and role preferences exist, and if they contain any data
         if (typeof(userPrefs.callearly) != 'undefined' && userPrefs.callearly != ''){
@@ -292,7 +292,36 @@
           // select the default time and leave all times as options
           j('#schedulecalllate option[value="'+defaultcalllate+'"]').attr('selected','selected');
         }
-        
+
+        // skip duplicates checkbox show / hide based on saved phone or email content
+        if (j('.msg_content_nav .ophone').hasClass('complete') == true || 
+            j('.msg_content_nav .oemail').hasClass('complete') == true){
+          if (j('#skip_duplicates').hasClass('hidden') == true){
+            j('#skip_duplicates').removeClass('hidden');
+          } else {
+            j('#skip_duplicates').addClass('hidden');
+          }
+        } else {
+          if (j('#skip_duplicates').hasClass('hidden') == false){
+            j('#skip_duplicates').addClass('hidden');
+          }
+        }
+
+
+        // populate save message input with broadcast subject, 
+        // and disable the input unless the save message checkbox is checked...
+        var bSubject = j('#msgsndr_form_subject').val();
+        j('input[name=options_savemessagename]').val(bSubject);
+
+        j('#save_later').on('click', function(){
+          var saveMsgName = j('input[name=options_savemessagename]');
+          if (j(this).attr('checked') == 'checked'){
+            saveMsgName.removeAttr('disabled');
+          } else {
+            saveMsgName.attr('disabled', 'disabled');
+          }
+        });
+
 
         // Populate the max attempts select box
         var maxAttempts = userPrefs.callmax;
