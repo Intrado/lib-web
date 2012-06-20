@@ -341,28 +341,34 @@
     this.watchFields = function(fieldId) {
       // fieldId could be a single #id or a list of ids
       var watch = fieldId;
-      var eventtype = 'keyup change click';
+      var eventtype = 'blur';
 
-      if (j(watch).attr('type') == 'checkbox' || j(watch).attr('type') == 'radio') {
-        eventtype = 'change click';
-      }
-      if (j(watch).attr('type') == 'text' || j(watch).attr('type') == 'textarea' ){
-        eventtype = 'keyup';
-      }
-
-      j(watch).on(eventtype, function() {
-        var elem = j(this);
-        var elemId = j(this).attr("id");
-
-        if(typeof(valTimers[elemId]) == "undefined") {
-          valTimers[elemId] = null;
+      j(watch).each(function() {
+        if (j(this).is(':checkbox, select')) {
+          eventtype = 'change';
+        } else if(j(this).is(':radio')) {
+          eventtype = 'click';
+        } else if(j(watch).is('input[type=text], textarea')){
+          eventtype = 'keydown';
         }
-        // clear the timeout before setting it again
-        clearTimeout(valTimers[elemId]);
-        valTimers[elemId] = setTimeout(function() {
-          self.formVal(elem);
-        }, 600);
 
+        j(watch).on(eventtype, function(e) {
+          var elem = j(this);
+          var elemId = j(this).attr("id");
+
+          if(typeof(valTimers[elemId]) == "undefined") {
+            valTimers[elemId] = null;
+          }
+          // clear the timeout before setting it again
+          clearTimeout(valTimers[elemId]);
+          /*if(typeof(e.which) != "undefined" && e.which == 9) {
+            return false;
+          }*/
+          valTimers[elemId] = setTimeout(function() {
+            self.formVal(elem);
+          }, 1000);
+
+        });
       });
     } // WatchFields
 
@@ -423,6 +429,33 @@
 
         requiredvalues = [];
 
+        function setError(element, res) {
+          if(element.next('.error').text() != res) {
+            element.removeClass('ok').addClass('er').next('.error').fadeIn(300).text(res);
+          }
+        };
+
+        function removeError(element) {
+          element.next('.error').text("");
+          element.removeClass('er').addClass('ok').next('.error').fadeOut(300);
+        };
+
+        function setErrorSocial(element, eclass, res) {
+          j(eclass+'.characters').addClass('error').text(res);
+          element.removeClass('ok').addClass('er'); 
+          if (eclass == '.sms'){
+            j('#msgsndr_tab_sms .btn_save').attr('disabled','disabled');
+          }
+        };
+
+        function removeErrorSocial(element, eclass) {
+          element.removeClass('er').addClass('ok'); 
+          j(eclass+'.characters').removeClass('error');
+          if (eclass == '.sms'){
+            j('#msgsndr_tab_sms .btn_save').removeAttr('disabled');
+          }
+        };
+
         // Loop validation
         for (var i = 0; i < validators.length; i++) {  
           var validator = validators[i];  
@@ -431,24 +464,31 @@
             if (res != true) {  
               isValid = false;  
               // If SMS - add class er to textarea and disable save button
-              if (name == 'sms_text') {
-                j('.sms.characters').addClass('error').text(res);
-                element.removeClass('ok').addClass('er'); 
-                j('#msgsndr_tab_sms .btn_save').attr('disabled','disabled');
+              if (name == 'sms_text' || name == 'twitter_message' || name == 'facebook_message') {
+                if (name == 'sms_text') {
+                  setErrorSocial(element, '.sms', res);
+                } else if (name == 'twitter_message') {
+                  setErrorSocial(element, '.twit', res);
+                } else if (name == 'facebook_message') {
+                  setErrorSocial(element, '.fb', res);
+                }
               } else if (element.hasClass('required') == false && element.val() == '') {
-                // check if the element isn't required, and if it's empty. If so, remove the validation message.
-                element.removeClass('er').addClass('ok').next('.error').fadeOut(300);
+                removeError(element);
               } else {
-                element.removeClass('ok').addClass('er').next('.error').fadeIn(300).text(res);
+                setError(element, res);
               }
             } else {
               // If SMS - add class ok to textarea and remove disabled from save button
-              if (name == 'sms_text') {
-                element.removeClass('er').addClass('ok'); 
-                j('.sms.characters').removeClass('error')
-                j('#msgsndr_tab_sms .btn_save').removeAttr('disabled');
+              if (name == 'sms_text' || name == 'twitter_message' || name == 'facebook_message') {
+                if (name == 'sms_text') {
+                  removeErrorSocial(element, '.sms');
+                } else if (name == 'twitter_message') {
+                  removeErrorSocial(element, '.twit');
+                } else if (name == 'facebook_message') {
+                  removeErrorSocial(element, '.fb');
+                }
               } else {
-                element.removeClass('er').addClass('ok').next('.error').fadeOut(300);
+                removeError(element);
               }
             }
           } 
