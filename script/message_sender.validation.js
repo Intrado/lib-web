@@ -973,9 +973,13 @@ jQuery.noConflict();
 
 
 
-    // Send Message Button
+    // Send Message Buttons -- section 3 on main page and schedule modal
     $('.submit_broadcast').on('click', function(e) {
       e.preventDefault();
+
+      if( $(this).attr('id') == 'send_now_broadcast'){
+        scheduleNow();
+      }
 
       //var formData = $('form[name=broadcast]').serializeArray();
       var formData = mapPostData();
@@ -989,15 +993,23 @@ jQuery.noConflict();
             var res = response;
             if (res.vres != true) {
               console.log(res);
+              // show alert message for server side validation fail (requires some input as to what this message should say!)... 
+               alert("Oops! That didn't quite work out :-(\nPerhaps something is missing or not quite right with the broadcast information entered?");
             } else {
               console.log(res);
+             // window.location = res.nexturl;
             }
         }
       });
-      //window.location = 'start.php';
+      
     });
 
 
+    function scheduleNow(){ // this will set the schedule options to send a broadcast out immediately
+      $('#schedule_datepicker').val(moment().format('MM/DD/YYYY'));
+      $('#schedulecallearly').append('<option value="'+moment().format('h:mm a')+'" selected="selected">'+moment().format('h:mm a')+'</option>');
+      $('#schedulecalllate').append('<option value="'+moment().add('hours', 1).format('h:mm a')+'" selected="selected">'+moment().add('hours', 1).format('h:mm a')+'</option>');
+    };
 
 
 
