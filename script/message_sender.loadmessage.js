@@ -323,7 +323,7 @@ function loadMessage(mgid) {
 			self.elements.emailFromEmail.val(decodeURIComponent(msg.fromEmail).replace(/\+/g," ")).addClass('ok');
 			self.elements.emailSubject.val(decodeURIComponent(msg.subject).replace(/\+/g," ")).addClass('ok');
 			self.loadMessageAttachments(msgGrpId, msg, self.elements.emailAttach, self.elements.emailAttachControls);
-			self.loadMessagePartsFormatted(msgGrpId, msg, "ckeditor");
+			self.loadMessagePartsFormatted(msgGrpId, msg, self.elements.emailBody, true);
 		} else {
 			self.elements.emailTranslateCheck.attr("checked","checked");
 			j(self.elements.emailLanguageCheckPrefix + msg.languageCode).attr('checked','checked');
@@ -384,22 +384,31 @@ function loadMessage(mgid) {
 	};
 
 	// get formatted message body based on message id from message group
-	this.loadMessagePartsFormatted = function(msgGrpId,msg,element){
+	this.loadMessagePartsFormatted = function(msgGrpId,msg,element,ckeditor){
+		// first hide the element and show a loading message
+		var loadingMessage = "<div class='loadingmessage'><img src='img/ajax-loader.gif'/>&nbsp;Loading content, please wait...</div>";
+		if (ckeditor)
+			hideHtmlEditor();
+		
+		element.addClass("hide");
+		element.after(loadingMessage);
+		
 		j.ajax({
 			url: '/'+orgPath+'/api/2/users/'+userid+'/messagegroups/'+msgGrpId+'/messages/'+msg.id+'/messageparts/formatted',
 			async: true,
 			type: "GET",
 			dataType: "json",
 			success: function(data) {
-				if (element == "ckeditor") {
-					if (getHtmlEditorObject())
-						getHtmlEditorObject().instance.setData(data.messageBody);
-					else
-						self.elements.emailBody.val(data.messageBody);
-				} else if (element.is("div")) {
+				element.parent().children(".loadingmessage").remove();
+				element.removeClass("hide");
+				if (element.is("div"))
 					element.empty().append(data.messageBody);
-				} else {
+				else
 					element.val(data.messageBody);
+				
+				if (ckeditor) {
+					var textarea = element.attr("id");
+					applyHtmlEditor(textarea, true);
 				}
 			}
 		});

@@ -292,7 +292,7 @@ jQuery.noConflict();
 		}, "json");
 		
 		// ckeditor
-		applyHtmlEditor('msgsndr_form_body');
+		applyHtmlEditor('msgsndr_form_body', true);
 		
 		$(document).ready(function() {
 			// subject
