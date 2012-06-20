@@ -455,7 +455,7 @@ border-color: #499122 transparent transparent; border-style: solid; border-width
 
 /*----- table overrides for list styles -----*/
 
-table.list { background: #fff; width: 100%; margin: 0 0 20px 0; font-size: 13px; line-height: 36px; }
+table.list { background: #fff; width: 100%; margin: 0 0 20px 0; font-size: 12px; line-height: 18px; }
 table.list th { background: #eee; padding: 0 8px; font-weight: bold; text-align: left; border-bottom: 1px solid #ccc; border-top: 1px solid #ccc; }
 table.list td { padding: 0 8px; border-bottom: 1px solid #ccc; }
 table.list ul li { padding: 0; }
