@@ -977,8 +977,34 @@ jQuery.noConflict();
     $('.submit_broadcast').on('click', function(e) {
       e.preventDefault();
 
+      // if the send now button is clicked
       if( $(this).attr('id') == 'send_now_broadcast'){
-        scheduleNow();
+
+        // check for role permissions settings
+        if (rolecallearly != false && rolecalllate != false){
+          // getting the time now, and setting up a moment object with it. 
+          // reset the date to the epoch first -- we don't have a date with the settings times 
+          var timenow       = moment().format('h:mm a');
+          var timecheck     = moment('1970,01,01,'+timenow).unix();
+          var callearlytime = moment('1970,01,01,'+rolecallearly).unix();
+          var calllatetime  = moment('1970,01,01,'+rolecalllate).unix();
+
+          // compare times
+          var isTooEarly    = timecheck <= callearlytime;
+          var isTooLate     = timecheck >= calllatetime;
+
+          if(isTooEarly == false && isTooLate == false){
+            // send now if the timecheck is passed
+            scheduleNow();
+          } else if(isTooEarly == true || isTooLate == true){
+            alert("You do not have authorization to send broadcasts at this time, please schedule your broadcast.")
+            // return so the postdata isn't submitted.
+            return;
+          } 
+        } else {
+          // no role settings for callearly/calllate, we're good to go!
+          scheduleNow();
+        }
       }
 
       //var formData = $('form[name=broadcast]').serializeArray();
