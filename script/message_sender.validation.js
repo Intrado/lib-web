@@ -713,10 +713,6 @@ jQuery.noConflict();
           }
       });
 
-      $('#email_change').on('click', function() {
-        $('#msgsndr_form_sms').val('Testing BOOOOMM');
-      })
-
     };
 
 
@@ -1175,12 +1171,12 @@ jQuery.noConflict();
         "sms_text":"msgsndr_smsmessagetext",
         "has_facebook":"msgsndr_hasfacebook", // true/false
         "facebook_message":"msgsndr_socialmediafacebookmessage",
+        "social_fbpages":"msgsndr_socialmediafacebookpage",
         "has_twitter":"msgsndr_hastwitter",
         "twitter_message":"msgsndr_socialmediatwittermessage",
         "has_feed":"msgsndr_hasfeed",
         "feed_message":"msgsndr_socialmediafeedmessage", // should be passed an object {"subject": "The feed title goes here", "message": "We have sent out a new message, you can preview it here. (RSS Feed)"}
         "feed_categories":"msgsndr_socialmediafeedcategory", // should be an array of feed category ids
-        //"":"msgsndr_socialmediafacebookpage", // facebook id
         "broadcast_daystorun":"msgsndr_optionmaxjobdays",
         "options_voiceresponse":"msgsndr_optionleavemessage",
         "options_callconfirmation":"msgsndr_optionmessageconfirmation",

@@ -341,8 +341,16 @@
     this.watchFields = function(fieldId) {
       // fieldId could be a single #id or a list of ids
       var watch = fieldId;
+      var eventtype = 'keyup change click';
 
-      j(watch).on('keyup change click blur', function() {
+      if (j(watch).attr('type') == 'checkbox' || j(watch).attr('type') == 'radio') {
+        eventtype = 'change click';
+      }
+      if (j(watch).attr('type') == 'text' || j(watch).attr('type') == 'textarea' ){
+        eventtype = 'keyup';
+      }
+
+      j(watch).on(eventtype, function() {
         var elem = j(this);
         var elemId = j(this).attr("id");
 

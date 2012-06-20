@@ -226,19 +226,14 @@ Paste from email button: Low proirity:
 
 
 		function emSubject() {
-			emailSubject = $('#msgsndr_form_mailsubject').val();
+
+			var emailSubject = $('#msgsndr_form_mailsubject');
+			var bSubject = $('#msgsndr_form_subject').val();
 			
-			if ( emailSubject == '') {
-				emailSubject = $('#msgsndr_form_subject').val();
-				$('#msgsndr_form_mailsubject').val(emailSubject).addClass('ok');
+			if (emailSubject.val().length == 0 && bSubject.length != 0) {
+				emailSubject.val(bSubject).addClass('ok');
 			}
-
-			$('#msgsndr_form_mailsubject').on('change', function() {
-				emailSubject = $(this).val();
-			});
-
-		}
-
+		};
 
 		// modal windows -- script/bootstrap-modal.js
 		$('#msgsndr_choose_list').modal({
