@@ -121,7 +121,24 @@ function loadMessage(mgid) {
 			type: "GET",
 			dataType: "json",
 			success: function(data) {
-				self.msgGroups = data.messageGroups;
+				self.msgGroups = [];
+				// sort by name
+				j.each(data.messageGroups, function(i,mg) {
+					if (self.msgGroups == []) {
+						self.msgGroups.push(mg);
+					} else {
+						var isInserted = false;
+						j.each(self.msgGroups, function(index, mgsorted) {
+							if (mg.name.toLowerCase() < mgsorted.name.toLowerCase()) {
+								self.msgGroups.splice(index,0,mg);
+								isInserted = true;
+								return false;
+							}
+						});
+						if (!isInserted)
+							self.msgGroups.push(mg);
+					}
+				});
 
 				j.each(self.msgGroups, function(index, msgGroup) {
 					// format the date from the modifiedTimestamp value
