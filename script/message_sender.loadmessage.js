@@ -214,7 +214,6 @@ function loadMessage(mgid) {
 					switch (msgType.subType) {
 						case "facebook":
 							self.elements.hasFacebook.attr('checked','checked');
-							self.elements.hasFacebook.trigger("change");
 							self.elements.facebookSection.show();
 							break;
 						case "twitter":
