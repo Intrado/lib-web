@@ -360,15 +360,18 @@ function updateTableTools(section, action, override, start, limit, count){
 			offset: { x: 0, y: 0 }
 		});
 	});
-	
+
+	// Hide tables when no data
+	/*
 	if (start == 0 && count == 0) {
 		$(section).hide();
 		$("no" + section).show();
 	} else {
 		$(section).show();
-		$("no" + section).hide();
+		
 	}
-	
+	*/
+	$("no" + section).hide();
 	
 	//Update More link to with the correct show status and url
 	if (count >= limit) {
