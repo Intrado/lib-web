@@ -522,7 +522,7 @@ table.schedule th, table.schedule td { width: 30px; padding: 5px 0; text-align: 
 
 .hovertitle { font-weight: bold; }
 
-#footer { padding: 0 0 15px 0; margin: 0 1%; }
+#footer { padding: 0 0 15px 0; }
 #logininfo { float: left; display: inline; text-align: left; font-size: 9px; line-height: 13px; color: gray; }
 #termsinfo { float: right; display: inline; text-align: right; font-size: 9px; line-height: 13px; color: gray; }
 
