@@ -20,6 +20,9 @@ function loadMessage(mgid) {
 		"phoneOverridePrefix": "#tts_override_",
 		"phoneTranslateCheck": j("#msgsndr_form_phonetranslate"),
 		"phoneLanguageCheckPrefix": "#tts_",
+		"phoneAdvancedOptions": j(".phone_advanced_options"),
+		"phoneCallMeOptions": j("#callme_advanced_options"),
+		"phoneTextOptions": j("#text_advanced_options"),
 		
 		"emailComplete": j('li.oemail'),
 		"hasEmail": j('input[name=has_email'),
@@ -52,6 +55,11 @@ function loadMessage(mgid) {
 		"feedSubject": j('#msgsndr_form_rsstitle'),
 		"feedText": j('#msgsndr_form_rssmsg')
 	};
+	
+	// load a saved message is clicked, get the messages
+	j('#load_saved_message').on("click", function(){
+		self.getMessageGroups();
+	});
 
 	// This makes the whole table row clickable to select the message ready for loading into content
 	j('#messages_list').on('click', 'tr', function(){
@@ -116,6 +124,8 @@ function loadMessage(mgid) {
 	
 	// get message group data ...
 	this.getMessageGroups = function() {
+		if (self.msgGroups)
+			return;
 		j.ajax({
 			url: '/'+orgPath+'/api/2/users/'+userid+'/messagegroups',
 			type: "GET",
@@ -184,6 +194,7 @@ function loadMessage(mgid) {
 						self.elements.phoneButtonText.removeClass('active');
 						self.elements.phoneCallMeSection.removeClass("hide");
 						self.elements.phoneTextSection.addClass("hide");
+						self.elements.phoneCallMeOptions.append(self.elements.phoneAdvancedOptions);
 						global.watchContent('callme');
 					} else {
 						self.elements.phoneType.val('text');
@@ -191,6 +202,7 @@ function loadMessage(mgid) {
 						self.elements.phoneButtonText.addClass('active');
 						self.elements.phoneCallMeSection.addClass("hide");
 						self.elements.phoneTextSection.removeClass("hide");
+						self.elements.phoneTextOptions.append(self.elements.phoneAdvancedOptions);
 						global.watchContent('text');
 					}
 					break;
@@ -231,6 +243,27 @@ function loadMessage(mgid) {
 		});
 	};
 
+	// check that user is authorized for the specified message (type/language)
+	this.checkUserAuth = function (msg) {
+		if (!userPermissions.sendmulti && msg.languageCode != "en")
+			return false;
+		switch (msg.type) {
+			case "phone":
+			case "email":
+			case "sms":
+				if (!userPermissions["send"+msg.type])
+					return false;
+				break;
+			case "post":
+				if (!userPermissions[msg.subType+"post"])
+					return false;
+				break;
+			default:
+				return false;
+		}
+		return true;
+	};
+	
 	// load messages from message group
 	this.getMessages = function(msgGrp) {
 		// load message group content into session server side.
@@ -243,6 +276,8 @@ function loadMessage(mgid) {
 			success: function(data) {
 				// itterate all the messages and call methods to populate the data
 				j.each(data.messages, function(mIndex, msg) {
+					if (!self.checkUserAuth(msg))
+						return true;
 					if(typeof(msg.type) != "undefined" && msg.type.length > 0) { 
 						switch (msg.type) {
 							case "phone":

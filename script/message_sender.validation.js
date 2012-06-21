@@ -209,10 +209,6 @@ jQuery.noConflict();
       getUserPrefs();
       getUserInfo();
 
-      // Load Saved message - this is in message_sender.loadmessage.js
-      loadMsg.getMessageGroups();
-
-
       userPermissions = {};
       userRoleId = false;
       $.each(roleData, function(rIndex, rItem) {
@@ -264,7 +260,17 @@ jQuery.noConflict();
         if(userPermissions.feedpost == 1) {
           socialFeed();
         }
-
+        
+        // if the user can "leavemessage" aka voice replies
+        if (userPermissions.leavemessage) {
+        	$("#msgsndr_leavemessage").removeClass("hide");
+        	$("#msgsndr_leavemessage").children("input").attr("checked", "checked");
+        }
+        
+        // if the user can "messageconfirmation" aka request confirmation of outbound messages
+        if (userPermissions.messageconfirmation) {
+        	$("#msgsndr_messageconfirmation").removeClass("hide");
+        }
       }
 
     }; 

@@ -1,7 +1,7 @@
 			<!-- ============== Message sender section 2, Message Content ============== -->
 
 			<div id="msg_section_2" class="window_panel">
-			<p>Create the content for this message, or <a href="#msgsndr_saved_message" data-toggle="modal">load a saved message</a></p>
+			<p>Create the content for this message, or <a id="load_saved_message" href="#msgsndr_saved_message" data-toggle="modal">load a saved message</a></p>
 			
 			<div id="msgsndr_loaded_message" style="display:none;">
 				<input type="hidden" id="loaded_message_id" name="message_loaded" value="" />
@@ -87,11 +87,11 @@
 				
 				<fieldset>
 					<div class="controls">
-					<div class="cf">
+					<div id="msgsndr_leavemessage" class="cf hide">
 						<input class="addme" type="checkbox" id="msgsndr_voice_response" name="phone_voiceresponse"/>
 						<label class="addme" for="msgsndr_voice_response">Voice Response</label>
 					</div>
-					<div class="cf">
+					<div id="msgsndr_messageconfirmation" class="cf hide">
 						<input class="addme" type="checkbox" id="msgsndr_call_confirmation" name="phone_callconfirmation"/>
 						<label class="addme">Call Confirmation</label>
 					</div>
