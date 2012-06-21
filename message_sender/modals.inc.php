@@ -24,7 +24,10 @@
 
 <!-- load saved message modal -->
 <div id="msgsndr_saved_message" class="modal hide">
-	<h3>Load a Saved Message <a href="" class="close" data-dismiss="modal">x</a></h3>
+	<div class="modal-header">
+		<a class="close" data-dismiss="modal">×</a>
+		<h3>Load a Saved Message</h3>
+	</div>
 	<div class="modal_content">
 	<!-- <input type="text"/><input class="btn" type="submit" value="Search"/> -->
 	<table class="messages head">
