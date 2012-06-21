@@ -461,8 +461,8 @@ border-color: #499122 transparent transparent; border-style: solid; border-width
 /*----- table overrides for list styles -----*/
 
 table.list { background: #fff; width: 100%; margin: 0 0 20px 0; font-size: 12px; line-height: 18px; }
-table.list th { background: #eee; padding: 0 8px; font-weight: bold; text-align: left; border-bottom: 1px solid #ccc; border-top: 1px solid #ccc; }
-table.list td { padding: 0 8px; border-bottom: 1px solid #ccc; }
+table.list th { background: #eee; padding: 5px; font-weight: bold; text-align: left; border-bottom: 1px solid #ccc; border-top: 1px solid #ccc; }
+table.list td { padding: 5px; border-bottom: 1px solid #ccc; }
 table.list ul li { padding: 0; }
 
 .bottomBorder { border-bottom: 1px solid #ccc; }
@@ -819,6 +819,11 @@ li.notactive { display: none; }
 -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(219,30,30, 0.6);	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(219,30,30, 0.6); }
 
 span.error { float: none; color: rgb(219,30,30); font-size: 0.9em; }
+
+/*----- Translation box -----*/
+
+.retranslateitems { width: 350px; }
+.retranslateitems .message { background: #f2f2f2; margin: 0 0 5px 0; -webkit-border-radius: 5px; border-radius: 5px; }
 
 /*----- Footer -----*/
 
