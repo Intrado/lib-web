@@ -86,7 +86,6 @@ class EmailMessageEditor extends FormItem {
 					'.$datafieldinsert.'
 				</div>
 			</div>';
-		
 		return $str;
 	}
 
@@ -101,8 +100,7 @@ class EmailMessageEditor extends FormItem {
 		
 		if ($subtype == "html") {
 			// set up the controls in the form and initialize any event listeners
-			$js .= '
-					document.observe("dom:loaded", setupHtmlTextArea("'.$n.'"));';
+			$js .= 'setupHtmlTextArea(\''.$n.'\');';
 		} else if ($subtype == "plain") {
 			//plain
 		}
@@ -125,7 +123,7 @@ class EmailMessageEditor extends FormItem {
 					e = $(e);
 					
 					// add the ckeditor to the textarea
-					applyHtmlEditor(e, true, e.id+"-htmleditor");
+					applyHtmlEditor(e, false, e.id+"-htmleditor");
 
 					// set up a keytimer to save content and validate
 					var htmlTextArea_keytimer = null;

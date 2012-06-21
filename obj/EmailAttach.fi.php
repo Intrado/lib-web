@@ -40,16 +40,16 @@ class EmailAttach extends FormItem {
 				setTimeout ("var uploadprocess = $(\'upload_process\'); if (uploadprocess) uploadprocess.hide();", 500 );
 				
 				
-				var values = {};
+				var values = new Object();
 				var fieldelement = $(itemname);
 				var uploadedfiles = $("uploadedfiles");
 				
 				if (!fieldelement)
 					return;
 				var field = fieldelement.value;
-				if(field != "") 
-					values = field.evalJSON();
-				if(id && name && size && !errormessage) {
+				if(field != "") {
+					values = field.evalJSON(true);
+				} if(id && name && size && !errormessage) {
 					values[id] = {"size":size,"name":name};
 				}
 				
@@ -80,7 +80,7 @@ class EmailAttach extends FormItem {
 					uploadedfiles.insert(downloadlink).insert(sizeinfo).insert(removelink).insert("<br/>");				 		
 				}
 			
-				fieldelement.value = Object.toJSON( $H(values) );
+				fieldelement.value = Object.toJSON( values );
 				
 				if (errormessage) {
 					form_validation_display($(itemname), "blank", errormessage);
@@ -93,7 +93,7 @@ class EmailAttach extends FormItem {
 			function removeAttachment(id, formname, itemname) {
 				if (!formname || !itemname)
 					return;
-				var values = $(itemname).value.evalJSON();
+				var values = $(itemname).value.evalJSON(true);
 				delete values[id];
 				
 				// if there are attachments display the div that shows them
