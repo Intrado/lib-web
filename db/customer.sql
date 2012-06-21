@@ -2013,7 +2013,8 @@ ALTER TABLE  `user` CHANGE  `globaluserid`  `portaluserid` INT( 11 ) NULL DEFAUL
 $$$
 
 -- fix unique index
-ALTER TABLE  `setting` DROP INDEX  `name` ,
+ALTER TABLE  `setting` CHANGE  `organizationid`  `organizationid` INT( 11 ) NOT NULL DEFAULT  '0',
+  DROP INDEX  `name` ,
   ADD UNIQUE  `name` (  `name` ,  `organizationid` )
 $$$
 
