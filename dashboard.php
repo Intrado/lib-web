@@ -53,7 +53,6 @@ $end_datetime = date("Y-m-d h:m:s",time());
 ////////////////////////////////////////////////////////////////////////////////
 
 function generateStats($useridList, $start_datetime, $end_datetime) {
-	error_log(json_encode($useridList));
 	
 	// sql query parameters, always in same order for all stats
 	$params = array();
@@ -139,34 +138,6 @@ function generateStats($useridList, $start_datetime, $end_datetime) {
 	return $stats;
 }
 
-//used in listcontacts as a callback for gen2cache
-function query_jobstats ($jobid) {
-	//FIXME this should use the slave
-	return QuickQueryRow("select
-		sum(rc.type='phone') as total_phone,
-		sum(rc.type='email') as total_email,
-		sum(rc.type='sms') as total_sms,
-		from reportperson rp
-		left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
-		where rp.jobid = ?", true, false, array($jobid));
-}
-
-
-function fmt_job_content($obj, $name) {
-	return "<img src=\"themes/newui/phone-grey.png\"/> <img src=\"themes/newui/email-grey.png\"/> <img src=\"themes/newui/sms-grey.png\"/> <img src=\"themes/newui/social-grey.png\"/>";
-}
-
-function fmt_job_recipients($obj, $name) {
-	$lists = QuickQueryList("select listid from joblist where jobid = ?", false, false, array($obj->id));
-	$total = 0;
-	foreach ($lists as $id) {
-		//expect the list mod date hasnt changed when using cache
-		$list = new PeopleList($id);
-		$expect = array("modifydate" => $list->modifydate);
-		$total += gen2cache(300, $expect, null, "calc_startpage_list_info", $id);
-	}
-	return $total;
-}
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -257,10 +228,10 @@ include("nav.inc.php");
 				<h4><?= _L("Content Mix")?></h4>
 				<img class="dashboard_graph" src="graph_dashboard.png.php?blue=<?=$stats["total_phones"]?>&red=<?=$stats["total_emails"]?>&orange=<?=$stats["total_sms"]?>&green=<?=$stats["total_posts"]?>" />
 				<ul>
-				<li><img src="themes/newui/images/phone-blue.png"/>&nbsp;<?= round($stats["percentage_slice"] * $stats["total_phones"]) ?>%</li>
-				<li><img src="themes/newui/images/email-red.png"/>&nbsp;<?= round($stats["percentage_slice"] * $stats["total_emails"]) ?>%</li>
-				<li><img src="themes/newui/images/sms-orange.png"/>&nbsp;<?= round($stats["percentage_slice"] * $stats["total_sms"]) ?>%</li>
-				<li><img src="themes/newui/images/social-green.png"/>&nbsp;<?= round($stats["percentage_slice"] * $stats["total_posts"]) ?>%</li>
+				<li><img src="themes/<?= $_SESSION['colorscheme']['_brandtheme'] ?>/images/phone-blue.png"/>&nbsp;<?= round($stats["percentage_slice"] * $stats["total_phones"]) ?>%</li>
+				<li><img src="themes/<?= $_SESSION['colorscheme']['_brandtheme'] ?>/images/email-red.png"/>&nbsp;<?= round($stats["percentage_slice"] * $stats["total_emails"]) ?>%</li>
+				<li><img src="themes/<?= $_SESSION['colorscheme']['_brandtheme'] ?>/images/sms-orange.png"/>&nbsp;<?= round($stats["percentage_slice"] * $stats["total_sms"]) ?>%</li>
+				<li><img src="themes/<?= $_SESSION['colorscheme']['_brandtheme'] ?>/images/social-green.png"/>&nbsp;<?= round($stats["percentage_slice"] * $stats["total_posts"]) ?>%</li>
 				</ul>
 				
 			</div>
@@ -340,8 +311,8 @@ include("nav.inc.php");
 		<div class="bigbtn">
 		<a class="bigbtn" href="message_sender.php?new"><span><?= _L("New %s",getJobTitle())?></span></a>
 		</div>
-		<div class="templates" onclick="window.location='jobtemplates.php'">
-			<h3><?= _L("%s Templates",getJobTitle())?></h3>
+		<div class="templates cf">
+			<h3 onclick="window.location='jobtemplates.php'"><?= _L("%s Templates",getJobTitle())?></h3>
 			<ul>
 			<?
 			if (count($jobtemplates)) {
@@ -355,6 +326,7 @@ include("nav.inc.php");
 			}
 			?>
 			</ul>
+			<a class="newtemplate" href="jobtemplate.php?id=new"><img src="themes/<?= $_SESSION['colorscheme']['_brandtheme'] ?>/images/add.png">&nbsp;<?= _L("New Template") ?></a>
 		</div>
 	
 		<div class="help">

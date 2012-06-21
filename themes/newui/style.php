@@ -184,7 +184,7 @@ a.bigbtn span { background: url(themes/newui/images/broadcast.png) 0 center no-r
   
 /*----- Broadcast templates -----*/
 
-.templates { margin: 0 0 25px 0; padding: 11px 15px; background-color: #EBE7E1; cursor: pointer;
+.templates { margin: 0 0 25px 0; padding: 11px 15px; background-color: #EBE7E1;
 background-image: -webkit-gradient(linear, left top, left bottom, from(#F5F3F0), to(rgba(245, 243, 240, 0))); 
   background-image: -webkit-linear-gradient(center top , #F5F3F0, rgba(245, 243, 240, 0)); 
   background-image:    -moz-linear-gradient(center top , #F5F3F0, rgba(245, 243, 240, 0)); 
@@ -193,9 +193,9 @@ background-image: -webkit-gradient(linear, left top, left bottom, from(#F5F3F0),
   background-image:         linear-gradient(center top , #F5F3F0, rgba(245, 243, 240, 0));
 -webkit-border-radius: 5px; border-radius: 5px;
 -webkit-box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25) inset; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25) inset; }
-.templates h3 { font-size: 14px; text-transform: uppercase; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.85); }
+.templates h3 { font-size: 14px; text-transform: uppercase; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.85); cursor: pointer}
 .templates li { font-size: 14px; line-height: 22px; padding: 4px 0; border-top: 1px solid #D6CEC2; }
-
+.templates a.newtemplate {float:right;}
 
 /*----- Help section -----*/
 
