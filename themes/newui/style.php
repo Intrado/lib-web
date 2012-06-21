@@ -373,12 +373,13 @@ table.messages span.icon { background: url(themes/newui/images/dktick.png) 50% 1
 
 table.rules tr.saved-rule { color: #366C19; }
 table.rules tr.new-rule { background: #f5f5f5; }
-table.rules td { vertical-align: top; width: 148px; padding: 6px; line-height: 30px; border-top: 1px solid #ddd; }
+table.rules td { vertical-align: top; width: 145px; padding: 6px; line-height: 30px; border-top: 1px solid #ddd; }
 table.rules td:first-child { width: 30px; text-align: center; }
-table.rules td select, table.rules td input[type="text"] { width: 148px; }
-table.rules td label { float: none; display: block; width: 148px; margin: 0; text-align: left; }
+table.rules td select, table.rules td input[type="text"] { width: 145px; }
+table.rules td label { float: none; display: block; width: 145px; margin: 0; text-align: left; }
 table.rules td input[type="checkbox"] { margin: 0 5px 0 0; }
 table.rules .value-options { overflow: auto; max-height: 200px; }
+table.rules .value-options label { width: 127px; }
 table.rules td .btn { display: inline-block; margin: 0 4px 0 0; line-height: 18px; }
 table.rules td .cancel { display: inline-block; padding: 6px 0; font-size: 14px; line-height: 18px; }
 table.rules td a.remove { background: url(themes/newui/images/removelist.png) left 0 no-repeat; display: inline-block; width: 18px; height: 18px; vertical-align: middle; }
@@ -732,6 +733,9 @@ border: 1px solid rgba(0, 0, 0, 0.3); -webkit-border-radius: 6px; border-radius:
   background-image:         linear-gradient(top, #0088CC, #0044CC);}
 .modal-footer .btn-primary:hover { background: #0044cc; color: #fff; }
 .modal-footer .btn-primary:active { background: #0037a4; color: #f4f4f4; }
+.modal-footer .disabled { background: #999; color: #fff; border: 1px solid #777; opacity: 0.7; cursor: default; }
+.modal-footer .disabled:hover { background: #999; color: #fff; }
+.modal-footer .disabled:active { background: #999; color: #fff; -webkit-box-shadow: inset 0px 1px 0px 0px rgba(255,255,255,0.3); box-shadow: inset 0px 1px 0px 0px rgba(255,255,255,0.3); }
 
 
 .modal .close { position: absolute; top: 18px; right: 15px; color: #999; font-size: 14px; }
