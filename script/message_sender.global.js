@@ -143,12 +143,12 @@
       var el  = nav.substr(2);
       var tts = j(ele).attr('data-tts');
 
-      if (tts == 'true') {
+      if ( tts == 'true' && j('#msgsndr_form_phonetranslate').is(':checked') ) {
         
         j(ele).next('img').removeClass('hide');
         self.ttsSave();
 
-      } else if (el == 'email') {
+      } else if ( el == 'email' && j('#msgsndr_form_emailtranslate').is(':checked') ) {
 
         j(ele).next('img').removeClass('hide');
         self.emailSave();
