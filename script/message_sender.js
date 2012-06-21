@@ -1,12 +1,12 @@
-// jQuery for newui message sender
-////////////////////////////////////
+// general dom manipulation functions
+///////////////////////////////////////
 
 jQuery.noConflict();
 (function($) { 
   $(function() {
 
     // Global Functions
-    var notVal = new globalValidationFunctions();
+    var global = new globalValidationFunctions();
 		
 		// Hiding stuff which is not needed
 		$('#msg_section_2, #msg_section_3, .close, .facebook, .twitter, .feed, div[id^="msgsndr_tab"]').hide();
@@ -33,7 +33,7 @@ jQuery.noConflict();
 				$('#msg_section_'+tabn).show();
 
 		      if (tabn == "3") {
-		      	notVal.reviewSend();
+		      	global.reviewSend();
 		      }
 
 			}
@@ -125,7 +125,7 @@ Paste from email button: Low proirity:
 
 			$('#addme').slideToggle('slow', function() {
 				$('#msgsndr_form_mephone').focus();
-				notVal.watchSection('msg_section_1');
+				global.watchSection('msg_section_1');
 			});
 
 		});
@@ -146,16 +146,22 @@ Paste from email button: Low proirity:
 		$('.playAudio').live('click', function(e) {
 			e.preventDefault();
 
+			var Gender = 'male';
 			if ($('#messagePhoneText_message-female').is(':checked')) {
-				var gender = "female";
-			} else {
-				var gender = "male";
+				Gender = "female";
 			}
-			var txtArea = $(this).attr('data-text');
-			var langC		= $(this).attr('data-code');
-			var val 		= $('#'+txtArea).val();
-		
-			showPreview({gender:gender,text:val,language:langC});
+
+			var textArea = $(this).attr('data-text');
+			var langCode = $(this).attr('data-code');
+			var textVal = $('#'+textArea).val();
+
+			var previewdata = {
+				gender: Gender,
+				text: textVal,
+				language: langCode
+			};
+
+			showPreview(previewdata);
 		})
 
 
@@ -195,7 +201,7 @@ Paste from email button: Low proirity:
       $('#msg_section_'+tabn).show();
 
       if (tabn == "3") {
-      	notVal.reviewSend();
+      	global.reviewSend();
       }
 
     });

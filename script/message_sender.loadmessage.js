@@ -68,7 +68,7 @@ function loadMessage(mgid) {
 
 	// Load Saved Message button in saved message modal window
 	j('#msgsndr_load_saved_msg').on('click', function(){
-		var msgGroup = j('.msgsndr_msggroup > td > input:radio[name=msgsndr_msggroup]:checked'); //input:checkbox[name=msgsndr_msggroup]:checked'
+		var msgGroup = j('.msgsndr_msggroup > td > input:radio[name=msgsndr_msggroup]:checked');
 		
 		self.elements.messageTab.addClass("active complete");
 		self.loadMessageGroup(msgGroup.attr('value'));
@@ -168,7 +168,7 @@ function loadMessage(mgid) {
 						self.elements.phoneButtonText.addClass('active');
 						self.elements.phoneCallMeSection.addClass("hide");
 						self.elements.phoneTextSection.removeClass("hide");
-						notVal.watchContent('text');
+						global.watchContent('text');
 					}
 					break;
 				case "email":
@@ -178,13 +178,13 @@ function loadMessage(mgid) {
 					} else {
 						self.elements.emailComplete.addClass('complete');
 						self.elements.hasEmail.attr('checked','checked');
-						notVal.watchContent('msgsndr_tab_email');
+						global.watchContent('msgsndr_tab_email');
 					}
 					break;
 				case 'sms':
 					self.elements.smsComplete.addClass('complete');
 					self.elements.hasSms.attr('checked','checked');
-					notVal.watchContent('msgsndr_tab_sms');
+					global.watchContent('msgsndr_tab_sms');
 					break;
 				case 'post':
 					self.elements.socialComplete.addClass('complete');
@@ -203,7 +203,7 @@ function loadMessage(mgid) {
 							self.elements.feedSection.show();
 							break;
 					}
-					notVal.watchSocial('msgsndr_tab_social');
+					global.watchSocial('msgsndr_tab_social');
 					break;
 			}
 		});
