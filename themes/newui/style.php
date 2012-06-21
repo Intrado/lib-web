@@ -360,7 +360,6 @@ border-left: 1px solid #ddd; border-right: 1px solid #ddd; -webkit-border-radius
 .table-bordered td { border-bottom: 1px solid #ddd; }
 
 table.messages { width: 100%; margin: 0; font-size: 13px; line-height: 36px; border-bottom: 1px solid #ddd; border-left: 1px solid #ddd; border-right: 1px solid #ddd; }
-table.messages.head { margin: 10px 0 0 0;}
 table.messages th { background: #eee; padding: 0 8px; }
 table.messages .ico { width: 40px; text-align: center; }
 table.messages .created { width: 90px; }
@@ -385,10 +384,7 @@ table.rules td .cancel { display: inline-block; padding: 6px 0; font-size: 14px;
 table.rules td a.remove { background: url(themes/newui/images/removelist.png) left 0 no-repeat; display: inline-block; width: 18px; height: 18px; vertical-align: middle; }
 table.rules td a.remove:hover { background: url(themes/newui/images/removelist.png) left -22px no-repeat; }
 
-.scroll {
-  max-height: 250px;
-  overflow: auto;
-}
+.scroll { max-height: 230px; overflow: auto; }
 
 input[name=msgsndr_msggroup] { 
   display: none;
