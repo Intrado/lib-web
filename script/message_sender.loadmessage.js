@@ -64,6 +64,10 @@ function loadMessage(mgid) {
 		j('td:first input:radio[name=msgsndr_msggroup]', this).attr('checked', 'checked');
 		// Add class selected to tr
 		j(this).addClass('selected');
+		
+		if(j('#msgsndr_load_saved_msg').is(':disabled')){                
+			j('#msgsndr_load_saved_msg').removeAttr('disabled');           
+		}
 	});
 
 	// Load Saved Message button in saved message modal window
@@ -72,6 +76,8 @@ function loadMessage(mgid) {
 		
 		self.elements.messageTab.addClass("active complete");
 		self.loadMessageGroup(msgGroup.attr('value'));
+		
+		j('#msgsndr_load_saved_msg').attr('disabled', 'disabled');
 	});
 	
 	// load a specific message group
