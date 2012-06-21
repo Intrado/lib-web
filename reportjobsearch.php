@@ -198,7 +198,7 @@ if($reload){
 
 $PAGE = "reports:reports";
 
-$TITLE = "Notification Summary";
+$TITLE = _L("%s Summary",getJobTitle());
 if(isset($_SESSION['reportid'])){
 	$subscription = new ReportSubscription($_SESSION['reportid']);
 	$TITLE .= " - " . escapehtml($subscription->name);

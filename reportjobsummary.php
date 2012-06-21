@@ -165,7 +165,7 @@ if($generator->format != "html"){
 } else {
 
 	$PAGE = "reports:reports";
-	$TITLE = _L("% Summary",getJobTitle());
+	$TITLE = _L("%s Summary",getJobTitle());
 	if(isset($_SESSION['reportid'])){
 		$subscription = new ReportSubscription($_SESSION['reportid']);
 		$TITLE .= " - " . escapehtml($subscription->name);
