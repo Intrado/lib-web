@@ -370,9 +370,11 @@ tr.selected { background: rgb(228, 225, 153); }
 table.messages tr.selected:hover td { background: rgb(228, 224, 187);  }
 table.messages span.icon { background: url(themes/newui/images/dktick.png) 50% 11px no-repeat; display: block; text-indent: -9999px; }
 
+table.rules { margin: 0 0 10px 0; border-top: 1px solid #ddd; }
 table.rules tr.saved-rule { color: #366C19; }
 table.rules tr.new-rule { background: #f5f5f5; }
-table.rules td { vertical-align: top; width: 145px; padding: 6px; line-height: 30px; border-top: 1px solid #ddd; }
+table.rules tr.saved-rule td { border-bottom: 1px solid #ddd; }
+table.rules td { vertical-align: top; width: 145px; padding: 6px; line-height: 30px; }
 table.rules td:first-child { width: 30px; text-align: center; }
 table.rules td select, table.rules td input[type="text"] { width: 145px; }
 table.rules td label { float: none; display: block; width: 145px; margin: 0; text-align: left; }
@@ -443,7 +445,7 @@ border-color: #499122 transparent transparent; border-style: solid; border-width
 .msg_complete button span.icon { background: url(themes/newui/images/remove.png) 0 center no-repeat; width: 16px; display: inline-block; /* display: none; */ }
 .msg_complete li.complete button span.icon { background: url(themes/newui/images/tick.png) 0 center no-repeat; width: 16px; display: inline-block; }
 
-.msg_confirm { background: #F9F8F6; margin: 0 -2% -20px -2%; padding: 22px 21px; text-align: right; border-radius: 0 0 5px 5px; border-top: 1px solid #DDDDDD; }
+.msg_confirm { background: #F9F8F6; margin: 0 -10px -15px -10px; padding: 22px 21px; text-align: right; border-radius: 0 0 5px 5px; border-top: 1px solid #DDDDDD; }
 
 
 /*----- List page styles -----*/
@@ -526,7 +528,6 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
 
 .btn_left, .btn_right { display: none; }
 .btn_left, .btn_middle, .btn_right { background: none; height: 20px; margin: 0; padding: 0 5px; font-size: 13px; line-height: 20px; }
-
 
 .call-progress, .call-progress:hover {
   background: none;
@@ -700,6 +701,17 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
 .add-recipients table.lists tr td:first-child { padding-right: 0; width: 55px; }
 .add-recipients table.lists tr td { vertical-align: top; }
 
+.add-rule a.btn { padding: 7px 10px; color: #FFFFFF; font-weight: bold; text-shadow: 0 1px 1px rgba(0, 0, 0, 0.75); border-color: #366C19;
+	background-color: #499122;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#55AA28), to(#366C19)); 
+  background-image: -webkit-linear-gradient(top, #55AA28, #366C19); 
+  background-image:    -moz-linear-gradient(top, #55AA28, #366C19); 
+  background-image:     -ms-linear-gradient(top, #55AA28, #366C19); 
+  background-image:      -o-linear-gradient(top, #55AA28, #366C19); 
+  background-image:         linear-gradient(top, #55AA28, #366C19); }
+.add-rule a.btn:hover { background: #366C19; color: #fff; }
+.add-rule a.btn .icon-plus { background: url("themes/newui/images/cross.png") 0 center no-repeat; display: inline-block; height: 14px; width: 16px; margin: 4px 0 0; vertical-align: top; }
+
 /*----- Bootstrap modal styles -----*/
 
 .modal-backdrop { background-color: #000000; bottom: 0; left: 0; position: fixed; right: 0; top: 0; opacity: 0.8; z-index: 1040; }
@@ -829,6 +841,7 @@ span.error { float: none; color: rgb(219,30,30); font-size: 0.9em; }
 
 #footer { background: #346998; position: relative; height: 84px; margin-top: -85px; padding: 20px 0 0; border-top: 1px solid #3f6485; clear: both; 
 -webkit-box-shadow: inset 0 1px 1px 0 #6797c2; box-shadow: inset 0 1px 1px 0 #6797c2; }
+#footer a { color: #9FBDF6; }
 #logininfo, #termsinfo { color: #fff; font-size: 10px; }
 #state { display: none; } 
 
