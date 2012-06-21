@@ -28,7 +28,7 @@ h4 { font-size: 12px; line-height: 22px; color: #235563; text-shadow: 0 1px 0 #f
 .lighten { opacity: 0.5;}
 
 .content_wrap { position: relative; margin: 0; padding: 25px 0 0; }
-.container { position: relative; max-width: 95em; min-width: 920px; _width: 920px; margin: 0 auto; padding: 0 10px; }
+.container { position: relative; width: 960px; margin: 0 auto; }
 .wrapper { position: relative; margin: 0 240px 0 0; }
 .main_activity { width: 100%; }
 .main_aside { position: absolute; top: 0; right: -240px; width: 215px; }
