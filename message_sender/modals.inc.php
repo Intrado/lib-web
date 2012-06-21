@@ -8,7 +8,7 @@
 	</ul>
 	<div class="msg_confirm">
 		<button data-dismiss="modal">Cancel</button>
-		<button id="choose_list_add_btn" class="btn_confirm" href="">Add Lists</button>
+		<button id="choose_list_add_btn" class="btn_confirm">Add Lists</button>
 	</div>
 </div>
 
@@ -29,33 +29,34 @@
 		<h3>Load a Saved Message</h3>
 	</div>
 	<div class="modal_content">
-	<!-- <input type="text"/><input class="btn" type="submit" value="Search"/> -->
-	<table class="messages head">
-		<thead>
-			<tr>
-			<th>Title</th>
-			<th class="created">Created</th>
-			<th class="ico"><img src="themes/newui/images/phone.png" alt=""/></th>
-			<th class="ico"><img src="themes/newui/images/email.png" alt=""/></th>
-			<th class="ico"><img src="themes/newui/images/sms.png" alt=""/></th>
-			<th class="ico"><img src="themes/newui/images/social.png" alt=""/></th>
-			</tr>
-		</thead>
-	</table>
-	<div class="scroll">
-		<table class="messages">
-		<tbody id="messages_list">
-			<!--tr>
-				<td>Example</td>
-				<td>[mm/dd/yyyy]</td>
-				<td>[p]</td>
-				<td>[e]</td>
-				<td>[t]</td>
-				<td>[s]</td>
-			</tr-->
-		</tbody>
-	</table>
-	</div>
+		<div class="scroll">
+		<!-- <input type="text"/><input class="btn" type="submit" value="Search"/> -->
+			<table class="messages head">
+				<thead>
+					<tr>
+					<th>Title</th>
+					<th class="created">Created</th>
+					<th class="ico"><img src="themes/newui/images/phone.png" alt=""/></th>
+					<th class="ico"><img src="themes/newui/images/email.png" alt=""/></th>
+					<th class="ico"><img src="themes/newui/images/sms.png" alt=""/></th>
+					<th class="ico"><img src="themes/newui/images/social.png" alt=""/></th>
+					</tr>
+				</thead>
+			</table>
+	
+			<table class="messages">
+			<tbody id="messages_list">
+				<!--tr>
+					<td>Example</td>
+					<td>[mm/dd/yyyy]</td>
+					<td>[p]</td>
+					<td>[e]</td>
+					<td>[t]</td>
+					<td>[s]</td>
+				</tr-->
+			</tbody>
+			</table>
+		</div>
 	</div>
 	
 	<div class="msg_confirm">
