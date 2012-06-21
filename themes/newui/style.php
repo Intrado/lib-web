@@ -355,6 +355,7 @@ table.info span.activejob {display: inline-block; width: 150px; color: white; fo
 border-left: 1px solid #ddd; border-right: 1px solid #ddd; -webkit-border-radius: 4px; border-radius: 4px; }
 .table-bordered thead:first-child tr:first-child th:first-child, .table-bordered tbody:first-child tr:first-child td:first-child { border-radius: 4px 0 0 0; }
 .table-bordered th { background: #eee; font-weight: bold; vertical-align: bottom; line-height: 22px; padding: 8px; text-align: left; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; }
+.lists th { background: #f6f6f6; }
 .table-bordered th + th, .table-bordered td + td, .table-bordered th + td, .table-bordered td + th { border-left: 1px solid #DDDDDD; }
 .table-bordered a.remove { background: url(themes/newui/images/removelist.png) left 0 no-repeat; display: inline-block; width: 18px; height: 18px; vertical-align: middle; }
 .table-bordered a.remove:hover { background: url(themes/newui/images/removelist.png) left -22px no-repeat; }
