@@ -35,8 +35,8 @@ jQuery.noConflict();
 	};
   $(function() {
 
-    // Global Functions
-    notVal        = new globalValidationFunctions();
+    // set up function objects
+    global        = new globalValidationFunctions();
     loadMsg       = new loadMessage();
 
     // Some Global variables
@@ -195,7 +195,7 @@ jQuery.noConflict();
           userInfo = data;
            // format the phone number and add the new formatted version to the userInfo object
           if (data.phone)
-        	  userInfo.phoneFormatted = notVal.formatPhone(data.phone);
+        	  userInfo.phoneFormatted = global.formatPhone(data.phone);
           else
         	  userInfo.phoneFormatted = "";
         }
@@ -278,16 +278,16 @@ jQuery.noConflict();
         new document.validators["ValRequired"]("broadcast_subject","Subject",{}), 
         new document.validators["ValLength"]("broadcast_subject","Subject",{min:7,max:30})
       ];
-      notVal.watchFields('#msgsndr_form_subject');
+      global.watchFields('#msgsndr_form_subject');
 
       
       document.formvars['addme']['phone'] = [new document.validators["ValPhone"]("addme_phone","My phone",{})];
       document.formvars['addme']['email'] = [new document.validators["ValEmail"]("addme_email","My email",{})];
       document.formvars['addme']['sms']   = [new document.validators["ValPhone"]("addme_sms","My SMS",{})];
 
-      notVal.watchFields('#msgsndr_form_mephone');
-      notVal.watchFields('#msgsndr_form_meemail');
-      notVal.watchFields('#msgsndr_form_mesms');
+      global.watchFields('#msgsndr_form_mephone');
+      global.watchFields('#msgsndr_form_meemail');
+      global.watchFields('#msgsndr_form_mesms');
 
       // set the addme values from the userInfo object...
       if(typeof(userInfo) != 'undefined' && userInfo != false){
@@ -318,7 +318,7 @@ jQuery.noConflict();
         // new document.validators["ValTextAreaPhone"]()
       ];
 
-      notVal.watchFields('#msgsndr_form_number, #msgsndr_tts_message');
+      global.watchFields('#msgsndr_form_number, #msgsndr_tts_message');
 
 
 
@@ -336,7 +336,7 @@ jQuery.noConflict();
 
         event.preventDefault();
 
-        var text          = $(this).text().split(" ");
+        var text = $(this).text().split(" ");
 
         $(this).text(text[0] == 'Show' ? 'Hide ' + text[1] + ' ' + text[2] : 'Show ' + text[1] + ' ' + text[2] );
 
@@ -384,7 +384,7 @@ jQuery.noConflict();
 
           $('#tts_translate fieldset > label[for^=tts_]').append(' <img src="img/ajax-loader.gif" class="loading" />');
 
-          notVal.doTranslate(ttslangCodes,txtField,displayArea,msgType);
+          global.doTranslate(ttslangCodes,txtField,displayArea,msgType);
 
         }
 
@@ -468,7 +468,7 @@ jQuery.noConflict();
         ttsTranslate += '<label for="tts_'+langCode+'">'+nLangs[langCode]+'</label>';
         ttsTranslate += '<div class="controls">';
         ttsTranslate += '<textarea id="tts_translated_'+langCode+'" disabled="disabled"></textarea>';
-        ttsTranslate += '<button class="playAudio" data-text="tts_'+nLangs[langCode]+'" data-code="'+langCode+'"><span class="icon play"></span> Play Audio</button>';
+        ttsTranslate += '<button class="playAudio" data-text="tts_translated_'+langCode+'" data-code="'+langCode+'"><span class="icon play"></span> Play Audio</button>';
         ttsTranslate += '<button class="show_hide_english" data-text="'+nLangs[langCode]+'" data-code="'+langCode+'">Show In English</button>';
         ttsTranslate += '<input type="checkbox" name="tts_override_'+langCode+'" id="tts_override_'+langCode+'" /><label for="tts_override_'+langCode+'">Override Translation</label>';
         ttsTranslate += '</div>';
@@ -512,7 +512,7 @@ jQuery.noConflict();
               $('#msgsndr_form_callid').append('<option value="other" >Other</option>');
               $('#msgsndr_form_callid').closest('div.controls').append('<span id="callerid_other_wrapper" class="hidden"><input type="text" id="callerid_other" name="phone_callerid"  /><span class="error"></span></span>');
               // set up the validation on the 'other' input
-              notVal.watchFields('#callerid_other');
+              global.watchFields('#callerid_other');
               document.formvars['phone']['callerid'] = [new document.validators["ValPhone"]("phone_callerid","Caller ID",{})];
               // watch for the 'other' option being selected and act accordingly
               $('#msgsndr_form_callid').on('change', function(){
@@ -614,7 +614,7 @@ jQuery.noConflict();
         ]
       }
 
-      notVal.watchFields('#msgsndr_form_name, #msgsndr_form_email, #msgsndr_form_mailsubject, #msgsndr_form_body');
+      global.watchFields('#msgsndr_form_name, #msgsndr_form_email, #msgsndr_form_mailsubject, #msgsndr_form_body');
 
 
 
@@ -653,7 +653,7 @@ jQuery.noConflict();
 
           $('#email_translate fieldset > label[for^=email_]').append(' <img src="img/ajax-loader.gif" class="loading" />');
 
-          notVal.doTranslate(elangCodes,txtField,displayArea,msgType);
+          global.doTranslate(elangCodes,txtField,displayArea,msgType);
 
       }
 
@@ -699,7 +699,7 @@ jQuery.noConflict();
             charCount(this, '160', '.sms.characters');
 
             var elem  = $(this);
-            notVal.formVal(elem);
+            global.formVal(elem);
             smsChar('set');
 
           },
@@ -708,7 +708,7 @@ jQuery.noConflict();
             charCount(this, '160', '.sms.characters');  
 
             var elem  = $(this);
-            notVal.formVal(elem);
+            global.formVal(elem);
           
           }
       });
@@ -743,9 +743,9 @@ jQuery.noConflict();
         async: true,
         success: function(data){
         if ($.isEmptyObject(data) != true) {
-          if (typeof(data.facebook) != 'undefined' && data.facebook.accessToken){
-            fbToken = data.facebook.accessToken;
-            }
+            if (typeof(data.facebook) != 'undefined' && data.facebook.accessToken){
+              fbToken = data.facebook.accessToken;
+              }
             if (typeof(data.twitter) != 'undefined' && data.twitter != ''){
               twToken = data.twitter;
               $('#msgsndr_twittername').append('Posting as <a class="" href="http://twitter.com/'+twToken.screenName+'">@'+twToken.screenName+'</a>');
@@ -843,28 +843,28 @@ jQuery.noConflict();
     // Watch form events to enable Save buttons
 
     // Section 1 - Watch
-    $('#msg_section_1').on('focusout', function() {
-      notVal.watchSection('msg_section_1');
+    $('#msg_section_1').on('change blur focusout', function() {
+      global.watchSection('msg_section_1');
     });
 
 
     // Watch Phone Content
-    $('#callme .required').on('change', function() {
-      notVal.watchContent('callme');
+    $('#callme .required').on('change blur focusout', function() {
+      global.watchContent('callme');
     });
 
     // Watch TTS Content
-    $('#text .required').on('keyup', function() {
-      notVal.watchContent('text');
+    $('#text .required').on('change blur focusout', function() {
+      global.watchContent('text');
     });
 
 
     // Watch Email Content
-    $('#msgsndr_tab_email .required').on('keyup', function() {
-      notVal.watchContent('msgsndr_tab_email');
+    $('#msgsndr_tab_email .required').on('change blur focusout', function() {
+      global.watchContent('msgsndr_tab_email');
     });
 
-
+    // FIXME: the social stuff should go here? 
 
     // Save Button for message content
     $('.btn_save').on('click', function(e) {
@@ -874,8 +874,8 @@ jQuery.noConflict();
         smsChar();
       }
 
-      notVal.saveBtn(this);
-      notVal.checkContent();
+      global.saveBtn(this);
+      global.checkContent();
 
     });
 
@@ -892,8 +892,8 @@ jQuery.noConflict();
 
       $('.msg_content_nav li').removeClass('lighten');
 
-      notVal.cancelBtn(this);
-      notVal.checkContent();
+      global.cancelBtn(this);
+      global.checkContent();
       
     });
 
@@ -916,9 +916,9 @@ jQuery.noConflict();
 
 
       if ($(this).attr('checked')) {
-        notVal.watchSocial(itemName);
+        global.watchSocial(itemName);
       } else {
-        notVal.unwatchSocial(itemName);
+        global.unwatchSocial(itemName);
       }
 
 
@@ -1284,40 +1284,6 @@ jQuery.noConflict();
       return phonePartOne + phonePartTwo + phonePartThree;
     };
 
-
-
-
-
-    // WIP: function to choose ckeditor toolbars for the email message body
-    // the idea is to pass this choice to the applyHtmlEditor() function in htmleditor.js
-    
-    chooseCkButtons = function(type){ // pass in 'basic' or 'advanced'
-
-      var toolbarBasic = [
-          ['Bold', 'Italic','NumberedList','BulletedList','Link']
-        ];
-        
-      var toolbarAdvanced = [
-          ['Print','Source','-','Undo','Redo','PasteFromWord','SpellCheck','-','NumberedList','BulletedList','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','Outdent','Indent','Styles'],
-          ['Bold', 'Italic', 'Underline','Strike','TextColor','BGColor', 'RemoveFormat','Link', 'Image','Table','HorizontalRule','Font','FontSize','Format']
-        ];
-
-      var choice = toolbarBasic;
-        if ( typeof(type) != undefined ){
-          if (type == 'basic'){
-          choice = toolbarBasic;
-          } else if (type == 'advanced'){
-            choice = toolbarAdvanced;
-          }
-        } else {
-          // default to basic toolbar ...
-          choice = toolbarBasic;
-        }
-      return choice;
-    };
-    
-    // set the toolbar choice variable before calling the ckeditor function
-    // toolbarChoice = chooseCkButtons('advanced');
 
 
   });
