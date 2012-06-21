@@ -777,6 +777,7 @@ li.notactive { display: none; }
 .window_panel input.small { float: left; width: 135px; }
 .window_panel textarea { /*max-width: 300px; min-width: 300px;*/ width: 96%; min-height: 100px; }
 .window_panel select { font-size: 14px; padding: 4px 5px; }
+.window_panel option { width: 300px; }
 .window_panel input[type="checkbox"] { margin: 9px 5px 0 0; }
 .window_panel .addme { float: left; display: inline; text-align: left; width: inherit; }
 .window_panel .fbicon { background: url(themes/newui/images/facebook.jpg) 180px 0 no-repeat; }
