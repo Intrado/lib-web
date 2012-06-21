@@ -16,6 +16,7 @@
 					"recording": {"en": false},
 					"specialtaskid": false,
 					"timer": false,
+					"reqcount": 0,
 					"defaultcode": "en",
 					"phonemindigits": 10,
 					"phonemaxdigits": 10,
@@ -393,11 +394,20 @@
 			
 			// read the return status and provide appropriate error handling messages
 			handleStatus: function(data) {
+				var $this = $(this);
+				
 				var complete = false;
 				var error = false;
 				var message = "";
-				if (data.status == "done")
-					complete = true;
+				switch (data.status) {
+					case "new":
+						$this.data('easyCall').reqcount++;
+						break;
+					case "done":
+						complete = true;
+					default:
+						$this.data('easyCall').reqcount= 0;
+				}
 				switch(data.error) {
 					case "notask":
 						error = true;
@@ -421,6 +431,11 @@
 						break;
 					default:
 						message = data.progress;
+				}
+				// if the specialtask is still "new" after 15 requests (30 seconds), something is wrong
+				if ($this.data('easyCall').reqcount > 15) {
+					error = true;
+					message = "Call setup has timed out. Please try again or contact your system administrator.";
 				}
 				return {
 					"complete": complete,
