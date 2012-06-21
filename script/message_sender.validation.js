@@ -271,6 +271,11 @@ jQuery.noConflict();
         if (userPermissions.messageconfirmation) {
         	$("#msgsndr_messageconfirmation").removeClass("hide");
         }
+        
+        if (userPermissions.sendmulti) {
+        	$("#msgsndr_form_phonetranslate").parent().removeClass("hide");
+        	$("#msgsndr_form_emailtranslate").parent().parent().removeClass("hide");
+        }
       }
 
     }; 

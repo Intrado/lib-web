@@ -140,7 +140,7 @@
 					</div>
 				</fieldset>
 
-				<fieldset>
+				<fieldset class="hide">
 					<label for="msgsndr_form_phonetranslate">Translate</label>
 						<input type="checkbox" id="msgsndr_form_phonetranslate" value="" name="phone_tts_translate" data-txt="#msgsndr_tts_message" data-display="#tts_translate" />
 						<a class="toggle-translations hide" data-target="#tts_translate" href=""></a>
@@ -211,7 +211,7 @@
 					</div>
 				</fieldset>
 				
-				<fieldset>
+				<fieldset class="hide">
 					<label for="msgsndr_form_translate">Translate</label>
 					<div class="controls">
 						<input type="checkbox" id="msgsndr_form_emailtranslate" name="email_translate" value=""  data-display="#email_translate" />

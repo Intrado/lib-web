@@ -191,8 +191,8 @@ function loadMessage(mgid) {
 					if (msgGroup.phoneIsAudioOnly) {
 						self.elements.phoneType.val('callme');
 						self.elements.phoneButtonCallMe.addClass('active'); 
-						self.elements.phoneButtonText.removeClass('active');
-						self.elements.phoneCallMeSection.removeClass("hide");
+						self.elements.phoneButtonText.hide();
+						self.elements.phoneCallMeSection.show();
 						self.elements.phoneTextSection.addClass("hide");
 						self.elements.phoneCallMeOptions.append(self.elements.phoneAdvancedOptions);
 						global.watchContent('callme');
@@ -200,8 +200,8 @@ function loadMessage(mgid) {
 						self.elements.phoneType.val('text');
 						self.elements.phoneButtonCallMe.removeClass('active'); 
 						self.elements.phoneButtonText.addClass('active');
-						self.elements.phoneCallMeSection.addClass("hide");
-						self.elements.phoneTextSection.removeClass("hide");
+						self.elements.phoneCallMeSection.hide();
+						self.elements.phoneTextSection.show();
 						self.elements.phoneTextOptions.append(self.elements.phoneAdvancedOptions);
 						global.watchContent('text');
 					}
