@@ -1,4 +1,4 @@
-</div><!-- end container -->
+</div><!-- end popup_container -->
 </div><!-- end content -->
 </div><!-- end content_wrap -->
 <?

@@ -66,4 +66,4 @@ header('Content-type: text/html; charset=UTF-8') ;
 
 <div class="content_wrap">
 <div class="content">
-<div class="container">
+<div class="popup_container">
