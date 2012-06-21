@@ -287,7 +287,7 @@ jQuery.noConflict();
 		var mgid = <?echo (isset($_SESSION['message_sender']['template']['messagegroupid'])?$_SESSION['message_sender']['template']['messagegroupid']:0)?>;
 		
 		// retreive a new serialnumber for the postdata form
-		$.get('_messagesender.php?new&snum', function (data) {
+		$.get('_messagesender.php?snum', function (data) {
 			$('[name|=broadcast_formsnum]').val(data.snum);
 		}, "json");
 		

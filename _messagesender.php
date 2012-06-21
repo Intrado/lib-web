@@ -73,7 +73,7 @@ if (!$USER->authorize('sendphone') && !$USER->authorize('sendemail') && !$USER->
 ////////////////////////////////////////////////////////////////////////////////
 
 // if initialization requires new uuid...
-if (isset($_GET['new']) || !isset($_SESSION['_messagesender']['uuid'])) {
+if (!isset($_SESSION['_messagesender']['uuid'])) {
 	$_SESSION['_messagesender'] = array();
 	$_SESSION['_messagesender']['uuid'] = "ms".uniqid();
 }
