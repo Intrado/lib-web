@@ -293,8 +293,8 @@ Event.observe(window, 'load', function() {
 });
 </script>
 
-<div class="primary_nav cf">
-<div class="container">
+<div class="primary_nav">
+<div class="container cf">
 
 	<div class="navshortcut">
 	<? 	if ($USER->authorize("startshort")) { ?>
