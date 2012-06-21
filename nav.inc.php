@@ -249,8 +249,8 @@ header('Content-type: text/html; charset=UTF-8') ;
 
 <!-- ********************************************************************* -->
 
-<div id="top_banner" class="banner cf">
-<div class="container">
+<div id="top_banner" class="banner">
+<div class="container cf">
 
 	<div class="banner_logo">
 		<? doLogo() ?>
