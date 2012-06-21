@@ -167,7 +167,7 @@ function loadMessage(mgid) {
 						self.elements.phoneButtonText.removeClass('active');
 						self.elements.phoneCallMeSection.removeClass("hide");
 						self.elements.phoneTextSection.addClass("hide");
-						notVal.watchContent('callme');
+						global.watchContent('callme');
 					} else {
 						self.elements.phoneType.val('text');
 						self.elements.phoneButtonCallMe.removeClass('active'); 
