@@ -91,4 +91,12 @@ memcache_session_lock_retry_us=50000
 ; if no urls are defined, memache support is disabled
 memcached_url[]="tcp://127.0.0.1:11211?persistent=1&timeoutms=1000"
 
+
+[portalauth]
+; redirect to portalauth server
+portalauth_url_prefix=http://localhost:8086/portalauth/
+; oauth client key and secret
+key=myKey
+secret=mySecret
+
 ;*/?>
