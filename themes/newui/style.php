@@ -31,6 +31,7 @@ h4 { font-size: 12px; line-height: 22px; color: #235563; text-shadow: 0 1px 0 #f
 
 .content_wrap { position: relative; margin: 0; padding: 20px 0 85px 0; overflow: auto; }
 .container { position: relative; width: 980px; margin: 0 auto; }
+.popup_container { position: relative; margin: 0 auto; padding: 0 10px; }
 .wrapper { position: relative; margin: 0 240px 0 0; }
 .main_activity { width: 740px; }
 .main_aside { position: absolute; top: 0; right: -240px; width: 215px; }
