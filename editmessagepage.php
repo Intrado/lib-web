@@ -108,7 +108,7 @@ class HtmlTextArea extends FormItem {
 		$n = $this->form->name."_".$this->name;
 		
 		// set up the controls in the form and initialize any event listeners
-		$str = 'document.observe("dom:loaded", setupHtmlTextArea("'.$n.'"));';
+		$str = 'setupHtmlTextArea("'.$n.'");';
 			
 		return $str;
 	}
@@ -123,7 +123,7 @@ class HtmlTextArea extends FormItem {
 					e = $(e);
 					
 					// add the ckeditor to the textarea
-					applyHtmlEditor(e, true, e.id+"-htmleditor");
+					applyHtmlEditor(e, false, e.id+"-htmleditor");
 
 					// set up a keytimer to save content and validate
 					var htmlTextArea_keytimer = null;
