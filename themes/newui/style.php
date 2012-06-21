@@ -451,9 +451,7 @@ border-color: #499122 transparent transparent; border-style: solid; border-width
 /*----- List page styles -----*/
 
 .feed_btn_wrap { position: absolute; top: -60px; right: 13px; margin: 0; padding: 0; border: none; }
-.feed_btn_wrap .btn { float: left; display: inline; margin: 0; -webkit-border-radius: 0; border-radius: 0; border-top: 1px solid #bbb; border-right: 1px solid #bbb; border-bottom: 1px solid #bbb; border-left: none; }
-.feed_btn_wrap .btn:first-child { border-left: 1px solid #bbb; -webkit-border-radius: 4px 0 0 4px; border-radius: 4px 0 0 4px; }
-.feed_btn_wrap .btn:last-child { -webkit-border-radius: 0 4px 4px 0; border-radius: 0 4px 4px 0; }
+.feed_btn_wrap .btn { float: left; display: inline; margin: 0 0 0 10px; border-top: 1px solid #bbb; border-right: 1px solid #bbb; border-bottom: 1px solid #bbb; border-left: none; }
 .feed_btn_wrap .btn:hover { background: #e7e7e7; }
 .feed_btn_wrap .btn.active { background: #e4e4e4; -webkit-box-shadow: inset 0px 1px 4px 0 rgba(0,0,0,0.2); box-shadow: inset 0px 1px 4px 0 rgba(0,0,0,0.2); }
 
