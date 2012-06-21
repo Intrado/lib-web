@@ -2006,3 +2006,24 @@ update setting set value='8.3/10' where name='_dbversion'
 $$$
 
 -- END 8.3/10
+
+-- rename globaluser to portaluser
+ALTER TABLE  `user` CHANGE  `globaluserid`  `portaluserid` INT( 11 ) NULL DEFAULT NULL,
+  add portaluserassociationtimestamp int default null after portaluserid
+$$$
+
+-- fix unique index
+ALTER TABLE  `setting` DROP INDEX  `name` ,
+  ADD UNIQUE  `name` (  `name` ,  `organizationid` )
+$$$
+
+-- rename field to match access table
+ALTER TABLE  `role` CHANGE  `profileid`  `accessid` INT( 11 ) NOT NULL,
+  ADD  `importid` INT NULL ,
+  ADD  `importstatus` ENUM(  'none',  'checking',  'new' ) NOT NULL DEFAULT  'none'
+$$$
+
+update setting set value='8.3/11' where name='_dbversion'
+$$$
+
+-- END 8.3/11
