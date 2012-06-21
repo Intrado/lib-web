@@ -593,10 +593,12 @@ jQuery.noConflict();
       // Easy Call jQuery Plugin
       // make "English" into "Default" for easycalls (and make sure it's always set, even when there are no languages)
       easycallLangs = {"en":"Default"};
-      $.each(nLangs, function(code) {
-    	  if (code != "en")
-    		  easycallLangs[code] = nLangs[code];
-      });
+      if (userPermissions.sendmulti) {
+	      $.each(nLangs, function(code) {
+	    	  if (code != "en")
+	    		  easycallLangs[code] = nLangs[code];
+	      });
+      }
       $("#msgsndr_form_number").attachEasyCall({"languages":easycallLangs,"defaultphone":userInfo.phoneFormatted});   
 
     };
