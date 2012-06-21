@@ -140,7 +140,7 @@ if (isset($_GET['copy'])) {
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "notifications:jobs";
-$TITLE = "Notification " . getJobsTitle();
+$TITLE = getJobsTitle();
 
 include_once("nav.inc.php");
 
