@@ -396,7 +396,7 @@ function loadMessage(mgid) {
 		if (ckeditor)
 			hideHtmlEditor();
 		
-		element.addClass("hide");
+		element.hide();
 		element.after(loadingMessage);
 		
 		j.ajax({
@@ -406,7 +406,7 @@ function loadMessage(mgid) {
 			dataType: "json",
 			success: function(data) {
 				element.parent().children(".loadingmessage").remove();
-				element.removeClass("hide");
+				element.show();
 				if (element.is("div"))
 					element.empty().append(data.messageBody);
 				else
