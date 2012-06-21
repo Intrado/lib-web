@@ -29,7 +29,7 @@ h4 { font-size: 12px; line-height: 22px; color: #235563; text-shadow: 0 1px 0 #f
 .light { color: #999; }
 .lighten { opacity: 0.5;}
 
-.content_wrap { position: relative; margin: 0; padding: 25px 0 85px 0; overflow: auto; }
+.content_wrap { position: relative; margin: 0; padding: 20px 0 85px 0; overflow: auto; }
 .container { position: relative; width: 980px; margin: 0 auto; }
 .wrapper { position: relative; margin: 0 240px 0 0; }
 .main_activity { width: 740px; }
@@ -86,11 +86,12 @@ h4 { font-size: 12px; line-height: 22px; color: #235563; text-shadow: 0 1px 0 #f
 
 /*----- Content sections -----*/
 
-.sectitle { display: none; }
+.sectitle {  }
 .secbutton { position: absolute; top: -62px; right: 15px; }
 .sectimeline { display: none; }
 
-.pagetitle { font-family: Verdana, Arial, sans-serif; margin: 0.5em 0; color: #333; text-shadow: 0 1px 0 #fff; }
+.pagetitle { font-family: Verdana, Arial, sans-serif; margin: 0 0 10px 0; color: #333; text-shadow: 0 1px 0 #fff; }
+.pagetitlesubtext { margin: 0 0 8px 0; }
 
 .window { border: none; -webkit-box-shadow: 0px 2px 8px 0px #777; box-shadow: 0px 2px 8px 0px #777;
 -webkit-border-radius: 5px; border-radius: 5px; -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
