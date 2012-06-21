@@ -249,6 +249,8 @@ header('Content-type: text/html; charset=UTF-8') ;
 
 <!-- ********************************************************************* -->
 
+<div class="wrap"><!-- ends in navbottom.inc -->
+
 <div id="top_banner" class="banner">
 <div class="container cf">
 
