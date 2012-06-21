@@ -272,16 +272,19 @@ include("nav.inc.php");
 			<div class="window_title_wrap"><h2><?= getJobsTitle()?></h2></div>
 			
 			<div class="window_body_wrap">
-			<h3><?= _L("In Progress")?><span><?= _L("(Sending Now)")?></span></h3>
+			
+			<div id="activejobswrapper">
+			<h3><?= _L("In Progress")?> <span><?= _L("(Sending Now)")?></span></h3>
 			<table class="jobprogress info" id="activejobs">
 				<thead>
 				</thead>
 				<tbody>
 				</tbody>
 			</table>
-			<h3 id="noactivejobs"><span><?= _L("No %s in progress", getJobsTitle())?></span></h3>
 			<div id="moreactivejobs"></div>
+			</div>
 			
+			<div id="scheduledjobswrapper">
 			<h3><?= _L("On Deck")?> <span><?= _L("(Sending Soon)")?></span></h3>
 			<table class="info" id="scheduledjobs">
 				<thead>
@@ -289,9 +292,10 @@ include("nav.inc.php");
 				<tbody>
 				</tbody>
 			</table>
-			<h3 id="noscheduledjobs"><span><?= _L("No %s on deck", getJobsTitle())?></span></h3>
 			<div id="morescheduledjobs"></div>
+			</div>
 			
+			<div id="completedjobswrapper">
 			<h3><?= _L("Completed")?> <span><?= _L("(Already Sent)")?></span></h3>
 			<table class="info" id="completedjobs">
 				<thead>
@@ -299,9 +303,12 @@ include("nav.inc.php");
 				<tbody>
 				</tbody>
 			</table>
-			<h3 id="nocompletedjobs"><span><?= _L("No %s completed", getJobsTitle())?></span></h3>
 			<div id="morecompletedjobs"></div>
+			</div>
 			
+			<div id="nocontenthelper" class="nocontent">
+				<?= _L("You haven't sent any %s.",getJobsTitle())?> <a href="message_sender.php?new"><?=_L("Create a %s",getJobTitle() )?></a>
+			</div>
 			</div><!-- /window_body_wrap -->
 		</div>
 	</div><!-- end main_activity -->
@@ -360,18 +367,23 @@ function updateTableTools(section, action, override, start, limit, count){
 			offset: { x: 0, y: 0 }
 		});
 	});
-
-	// Hide tables when no data
-	/*
+	
 	if (start == 0 && count == 0) {
-		$(section).hide();
-		$("no" + section).show();
+		$(section + "wrapper").hide();
+		// Check if any other jobs are showing if not show helper
+		var status = ["active","scheduled","completed"];
+		var showhelper = true;
+		status.each(function(s) {
+			if ($(s + "jobswrapper").visible())
+				showhelper = false;
+		});
+		if (showhelper)
+			$("nocontenthelper").show();
+		else
+			$("nocontenthelper").hide();
 	} else {
-		$(section).show();
-		
+		$(section + "wrapper").show();
 	}
-	*/
-	$("no" + section).hide();
 	
 	//Update More link to with the correct show status and url
 	if (count >= limit) {

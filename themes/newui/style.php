@@ -153,6 +153,7 @@ border-top: 1px solid #bbb; border-right: 1px solid #bbb; border-bottom: 1px sol
 .broadcasts .window_title_wrap h2 { display: inline-block; color: #fff; text-shadow: 0 1px 1px rgba(0,0,0,0.7); }
 .broadcasts .window_body_wrap { background: #fff; padding: 15px 2%; border: 1px solid #eee; -webkit-border-radius: 0 0 5px 5px; border-radius: 0 0 5px 5px; }
 .broadcasts h3 span { font-weight: normal; color: #ccc; }
+.broadcasts div.nocontent { padding: 40px 0 45px 0; text-align: center;font-size: 20px; font-weight: normal; }
 
 
 /*----- Big Broadcast button -----*/
