@@ -59,9 +59,9 @@
 		</div>
 	</div>
 	
-	<div class="msg_confirm">
+	<div class="modal-footer">
 		<button data-dismiss="modal">Cancel</button> 
-		<button id="msgsndr_load_saved_msg" class="btn_confirm">Load Selected Message</button>
+		<button id="msgsndr_load_saved_msg" class="btn-primary" disabled="disabled">Load Selected Message</button>
 	</div>
 
 </div>
