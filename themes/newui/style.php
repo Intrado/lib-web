@@ -740,9 +740,9 @@ border: 1px solid rgba(0, 0, 0, 0.3); -webkit-border-radius: 6px; border-radius:
   background-image:         linear-gradient(top, #0088CC, #0044CC);}
 .modal-footer .btn-primary:hover { background: #0044cc; color: #fff; }
 .modal-footer .btn-primary:active { background: #0037a4; color: #f4f4f4; }
-.modal-footer .disabled, .modal-footer button[disabled] { background: #999; color: #fff; border: 1px solid #777; opacity: 0.7; cursor: default; }
-.modal-footer .disabled:hover, .modal-footer button[disabled] { background: #999; color: #fff; }
-.modal-footer .disabled:active, .modal-footer button[disabled] { background: #999; color: #fff; -webkit-box-shadow: inset 0px 1px 0px 0px rgba(255,255,255,0.3); box-shadow: inset 0px 1px 0px 0px rgba(255,255,255,0.3); }
+.modal-footer .disabled, .modal-footer button[disabled], .modal-body .disabled { background: #999; color: #fff; border: 1px solid #777; opacity: 0.7; cursor: default; }
+.modal-footer .disabled:hover, .modal-footer button[disabled], .modal-body .disabled:hover { background: #999; color: #fff; }
+.modal-footer .disabled:active, .modal-footer button[disabled], .modal-body .disabled:active { background: #999; color: #fff; -webkit-box-shadow: inset 0px 1px 0px 0px rgba(255,255,255,0.3); box-shadow: inset 0px 1px 0px 0px rgba(255,255,255,0.3); }
 
 
 .modal .close { position: absolute; top: 18px; right: 15px; color: #999; font-size: 14px; }

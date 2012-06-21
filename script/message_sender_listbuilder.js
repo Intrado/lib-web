@@ -546,6 +546,9 @@
 
                 // "Save Rule" button is clicked
                 modal.$el.on('click', '.new-rule .btn-primary', function(){
+                	// if button is disabled, break
+                	if ($saveRuleBtn.hasClass("disabled"))
+                		return false;
                     // Indicate that we're saving the rule
                     $saveRuleBtn.addClass('disabled').text('Saving...');
                     // If there is no current list, create one and get the id
