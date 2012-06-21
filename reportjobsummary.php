@@ -165,7 +165,7 @@ if($generator->format != "html"){
 } else {
 
 	$PAGE = "reports:reports";
-	$TITLE = "Notification Summary";
+	$TITLE = _L("% Summary",getJobTitle());
 	if(isset($_SESSION['reportid'])){
 		$subscription = new ReportSubscription($_SESSION['reportid']);
 		$TITLE .= " - " . escapehtml($subscription->name);
@@ -180,12 +180,12 @@ if($generator->format != "html"){
 	NewForm($f);
 	//TODO buttons for notification log: download csv, view call details
 	if(isset($_SESSION['report']['jobsummary']))
-		$back = button("Back", "window.history.go(-1)");
+		$back = icon_button(_L("Back"), "arrow_left","window.history.go(-1)");
 	else {
 		$fallbackUrl = "reports.php";
-		$back = button("Back", "location.href='" . (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $fallbackUrl) . "'");
+		$back = icon_button(_L("Back"), "arrow_left","location.href='" . (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $fallbackUrl) . "'");
 	}
-	buttons($back, button('Refresh', 'window.location.reload()'), submit($f, $s, "Save/Schedule"));
+	buttons($back, icon_button(_L('Refresh'),"arrow_refresh","window.location.reload()"), submit($f, $s, "Save/Schedule"));
 
 		startWindow("Related Links ".help('ReportJobSummary_RelatedLinks'), "padding: 3px;");
 		?>

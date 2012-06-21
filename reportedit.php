@@ -204,12 +204,12 @@ $TITLE = "Saved/Scheduled Report";
 include("nav.inc.php");
 NewForm($f);
 if(isset($_SESSION['report']['edit']))
-	$back = button("Back", "window.history.go(-1)");
+	$back = icon_button(_L("Back"), "arrow_left",  "window.history.go(-1)");
 else {
 	$fallbackUrl = "reports.php";
-	$back = button("Back", "location.href='" . (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $fallbackUrl) . "'");
+	$back = icon_button(_L("Back"), "arrow_left",  "location.href='" . (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $fallbackUrl) . "'");
 }
-buttons($back, submit($f, $s, "Save"));
+
 startWindow("Report Details ".help('ReportEdit_ReportDetails'));
 ?>
 <table border="0" cellpadding="3" cellspacing="0" width="100%">
@@ -297,8 +297,8 @@ startWindow("Report Details ".help('ReportEdit_ReportDetails'));
 	</tr>
 </table>
 <?
+buttons($back, submit($f, $s, "Save"));
 EndWindow();
-buttons();
 EndForm();
 
 include("navbottom.inc.php");

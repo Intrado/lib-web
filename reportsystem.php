@@ -226,7 +226,6 @@ $PAGE = "reports:system";
 $TITLE = "Usage Statistics";
 include_once("nav.inc.php");
 NewForm($f);
-buttons(submit($f, $s, "Refresh"));
 startWindow("Display Options" . help("UsageStats_DisplayOptions"), "padding: 3px;");
 ?>
 	<table class="usagelist">
@@ -278,6 +277,8 @@ if(getSystemSetting('_hassms', false)){
 		</tr>
 	</table>
 <?
+buttons(submit($f, $s, _L("View Usage Stats")));
+
 endWindow();
 
 ?><br><?
@@ -405,7 +406,6 @@ if ($results && $showusers) {
 	</table>
 <?
 endWindow();
-buttons();
 endForm();
 ?>
 <script type="text/javascript" src="script/datepicker.js"></script>
