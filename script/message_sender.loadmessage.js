@@ -81,12 +81,16 @@ function loadMessage(mgid) {
 
 	// Load Saved Message button in saved message modal window
 	j('#msgsndr_load_saved_msg').on('click', function(){
-		var msgGroup = j('.msgsndr_msggroup > td > input:radio[name=msgsndr_msggroup]:checked');
-		
-		self.elements.messageTab.addClass("active complete");
-		self.loadMessageGroup(msgGroup.val());
-		
-		j('#msgsndr_load_saved_msg').attr('disabled', 'disabled');
+		//var msgGroup = j('.msgsndr_msggroup > td > input:radio[name=msgsndr_msggroup]:checked');
+		var msgGroup = j(".msgsndr_msggroup.selected");
+		if(msgGroup.size() > 0) {
+			var getId = msgGroup.attr("id").match(/msgsndr_msggroup-([0-9]*)/i)[1];
+			
+			self.elements.messageTab.addClass("active complete");
+			self.loadMessageGroup(getId);
+			
+			j('#msgsndr_load_saved_msg').attr('disabled', 'disabled');
+		}
 	});
 	
 	// load a specific message group
@@ -225,7 +229,8 @@ function loadMessage(mgid) {
 						self.elements.phoneCallMeSection.show();
 						self.elements.phoneTextSection.hide();
 						self.elements.phoneCallMeOptions.append(self.elements.phoneAdvancedOptions);
-						global.watchContent('callme');
+						//global.watchContent('callme');
+						obj_stepManager.updateStepStatus();
 					} else {
 						self.elements.phoneType.val('text');
 						self.elements.phoneButtonCallMe.removeClass('active'); 
@@ -233,7 +238,8 @@ function loadMessage(mgid) {
 						self.elements.phoneCallMeSection.hide();
 						self.elements.phoneTextSection.show();
 						self.elements.phoneTextOptions.append(self.elements.phoneAdvancedOptions);
-						global.watchContent('text');
+						//global.watchContent('text');
+						obj_stepManager.updateStepStatus();
 					}
 					break;
 				case "email":
@@ -243,13 +249,15 @@ function loadMessage(mgid) {
 					} else {
 						self.elements.emailComplete.addClass('complete');
 						self.elements.hasEmail.attr('checked','checked');
-						global.watchContent('msgsndr_tab_email');
+						//global.watchContent('msgsndr_tab_email');
+						obj_stepManager.updateStepStatus();
 					}
 					break;
 				case 'sms':
 					self.elements.smsComplete.addClass('complete');
 					self.elements.hasSms.attr('checked','checked');
-					global.watchContent('msgsndr_tab_sms');
+					//global.watchContent('msgsndr_tab_sms');
+					obj_stepManager.updateStepStatus();
 					break;
 				case 'post':
 					self.elements.socialComplete.addClass('complete');

@@ -220,11 +220,64 @@ Validator::load_validators(array(
 
 <script src="script/jquery.1.7.2.min.js"></script>
 <script src="script/jquery.json-2.3.min.js"></script>
+<script src="script/ckeditor/ckeditor_basic.js"></script>
+<script src="script/htmleditor.js"></script>
 
+<script>
+/*jQuery.noConflict();
+(function($) { 
+  //$(function() {
+*/	subject = <?echo (isset($_SESSION['message_sender']['template']['subject'])?("'". str_replace("'", "\'", $_SESSION['message_sender']['template']['subject']). "'"):"''")?>;
+		lists = <?echo (isset($_SESSION['message_sender']['template']['lists'])?$_SESSION['message_sender']['template']['lists']:'[]')?>;
+		jtid = <?echo (isset($_SESSION['message_sender']['template']['jobtypeid'])?$_SESSION['message_sender']['template']['jobtypeid']:0)?>;
+		mgid = <?echo (isset($_SESSION['message_sender']['template']['messagegroupid'])?$_SESSION['message_sender']['template']['messagegroupid']:0)?>;
+		
+		// retreive a new serialnumber for the postdata form
+		/*$.get('_messagesender.php?snum', function (data) {
+			$('[name|=broadcast_formsnum]').val(data.snum);
+		}, "json");
+		
+		// ckeditor
+		applyHtmlEditor('msgsndr_form_body', true);
+		
+		$(document).ready(function() {
+			// subject
+			if (subject)
+				$('#msgsndr_form_subject').val(subject).addClass("ok");
+			
+			// List Picker
+			$('.add-recipients').listPicker({
+				prepickedListIds: lists
+			});
+			
+			// jobtype
+			$("#msgsndr_form_type").loadJobTypes(jtid);
+			
+			// message group
+			if (mgid != 0)
+				loadMsg.loadMessageGroup(mgid);
+		});*/
+
+ // });
+//}) (jQuery);
+</script>
+
+<!-- 
 <script src="script/message_sender.js"></script>
 <script src="script/message_sender.validation.js"></script>
 <script src="script/message_sender.global.js"></script>
 <script src="script/message_sender.loadmessage.js"></script>
+ -->
+ 
+<script src="script/message_sender_global.js"></script>
+<script src="script/message_sender_permission.js"></script>
+<script src="script/message_sender_content_saver.js"></script>
+<script src="script/message_sender_content.js"></script>
+<script src="script/message_sender_step.js"></script>
+<script src="script/message_sender_validate.js"></script>
+<script src="script/message_sender_submit.js"></script>
+<script src="script/message_sender.loadmessage.js"></script>
+<script src="script/message_sender_base.js"></script>
 
 <script src="script/jquery-datepicker.js"></script>
 
@@ -267,8 +320,7 @@ Validator::load_validators(array(
 <script src="script/speller/spellChecker.js"></script>
 <script src="script/easycall.js.php"></script>
 <script src="script/niftyplayer.js.php"></script>
-<script src="script/ckeditor/ckeditor_basic.js"></script>
-<script src="script/htmleditor.js"></script>
+
 
 <script src="script/message_sender.previewmodal.js"></script>
 <script src="script/message_sender.emailattach.js"></script>
@@ -276,43 +328,4 @@ Validator::load_validators(array(
 <script src="script/message_sender_listbuilder.js"></script>
 
 <script src="script/datepicker.js"></script>
-
-<script>
-jQuery.noConflict();
-(function($) { 
-  $(function() {
-		var subject = <?echo (isset($_SESSION['message_sender']['template']['subject'])?("'". str_replace("'", "\'", $_SESSION['message_sender']['template']['subject']). "'"):"''")?>;
-		var lists = <?echo (isset($_SESSION['message_sender']['template']['lists'])?$_SESSION['message_sender']['template']['lists']:'[]')?>;
-		var jtid = <?echo (isset($_SESSION['message_sender']['template']['jobtypeid'])?$_SESSION['message_sender']['template']['jobtypeid']:0)?>;
-		var mgid = <?echo (isset($_SESSION['message_sender']['template']['messagegroupid'])?$_SESSION['message_sender']['template']['messagegroupid']:0)?>;
-		
-		// retreive a new serialnumber for the postdata form
-		$.get('_messagesender.php?snum', function (data) {
-			$('[name|=broadcast_formsnum]').val(data.snum);
-		}, "json");
-		
-		// ckeditor
-		applyHtmlEditor('msgsndr_form_body', true);
-		
-		$(document).ready(function() {
-			// subject
-			if (subject)
-				$('#msgsndr_form_subject').val(subject).addClass("ok");
-			
-			// List Picker
-			$('.add-recipients').listPicker({
-				prepickedListIds: lists
-			});
-			
-			// jobtype
-			$("#msgsndr_form_type").loadJobTypes(jtid);
-			
-			// message group
-			if (mgid != 0)
-				loadMsg.loadMessageGroup(mgid);
-		});
-
-  });
-}) (jQuery);
-</script>
 

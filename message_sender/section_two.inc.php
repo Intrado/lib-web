@@ -69,9 +69,10 @@
 				<fieldset>
 					<label for="msgsndr_form_callid">Caller ID</label>
 					<div class="controls">
-					<select id="msgsndr_form_callid" name="phone_callerid">
+					<select id="msgsndr_form_callid">
 					<!--option value="general">(651) 323-2003</option-->
 					</select>
+					<span id="callerid_other_wrapper" class="hidden"><input type="text" id="callerid_other" name="phone_callerid"  /><span class="error"></span></span>
 					</div>
 				</fieldset>
 
@@ -248,7 +249,7 @@
 				<fieldset class="check">
 					<label for="msgsndr_form_sms">SMS Text</label>
 					<div class="controls">
-					<textarea id="msgsndr_form_sms" name="sms_text"></textarea>
+					<textarea id="msgsndr_form_sms" name="sms_text" class="required"></textarea>
 					<div>
 					<p><a href="javascript:void(null);" id="sms_sc" onclick="(new spellChecker($('msgsndr_form_sms')) ).openChecker();">Spell Check</a> <span class="sms characters">160 Characters left</span></p>
 					</div>
