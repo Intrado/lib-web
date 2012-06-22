@@ -346,6 +346,19 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 .email .maincontainerseperator { margin-top: 50px; }
 .email .maincontainerright {  }
 
+#emaileedit_helpsection_5 .formtitle {  }
+#emaileedit_helpsection_5 .formtitle .formlabel { text-align: right; }
+#emaileedit_helpsection_5 .formcontrol { width: 600px; margin: 0 0 0 71px; }
+#emaileedit_helpsection_5 .formcontrol .maincontainerleft,
+#emaileedit_helpsection_5 .formcontrol .maincontainerright,
+#emaileedit_helpsection_5 .formcontrol .controlcontainer { width: 600px; }
+#emaileedit_helpsection_5 .maincontainerseperator { margin: 0; display: none; }
+
+.formcontrol .datafields { margin: 0 10px 0 0; }
+.formcontrol .datafields select { padding: 3px 6px; }
+.formcontrol .datafieldsinsert { margin: 25px 0 0; }
+.formcontrol .datafieldsinsert button { padding: 3px 10px; }
+
 
 /* phone messages 
 -------------------*/
