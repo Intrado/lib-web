@@ -604,7 +604,7 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
 .easycallerrorcontainer { /*padding: 2px; background: pink;*/ }
 .easycallerrorcontainer span.easycallerrortext { margin: 0 5px 0 0; font-size: 14px; line-height: 18px; font-weight: bold; }
 .easycallerrorcontainer span.icon { background: url(img/icons/error.png) 0 center no-repeat; height: 16px; width: 16px; margin: 2px 3px 0 0; }
-.easycallphoneinvalid { background: #ec4848; width: 96%; margin: 5px 0 0; padding: 5px 8px; font-size: 1em; color: #fff; -webkit-border-radius: 5px; border-radius: 5px; }
+.easycallerrorcontainer { background: #ec4848; width: 96%; margin: 5px 0 0; padding: 5px 8px; font-size: 1em; color: #fff; -webkit-border-radius: 5px; border-radius: 5px; }
 
 /*----- list picker styles, taken from mockup -----*/
 

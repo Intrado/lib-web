@@ -284,7 +284,7 @@
 			// Application logic
 			
 			valPhoneField: function (container) {
-				container.children(".easycallphoneinvalid").remove();
+				container.children(".easycallerrorcontainer").remove();
 				var $this = $(this);
 				
 				// get the phone number
@@ -295,7 +295,7 @@
 				if (valid !== true) {
 					if (phone == "")
 						phone = $this.data('easyCall').emptyphonetext;
-					container.append($('<div />', { "class": "easycallphoneinvalid", "text": phone + " " + valid }));
+					container.append($('<div />', { "class": "easycallerrorcontainer", "text": phone + " " + valid }));
 					return false;
 				}
 				return true;
