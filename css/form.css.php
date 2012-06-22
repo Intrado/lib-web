@@ -96,11 +96,11 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 .formfieldarea { padding: 8px 10px; }
 .formfieldarea .underneathmsg { float: left; display: inline; width: 100%; padding: 0 0 0 210px; font-weight: bold; color: #cc0000; line-height: 22px; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
 
-.newform .formtitle { float: left; display: inline; width: 200px; text-align: right; }
+.newform .formtitle { float: left; display: inline; width: 200px; text-align: right; margin: 0 10px 0 0; }
 .newform .formtitle .formlabel { display: inline-block; font-weight: bold; font-size: 1.1em; line-height: 25px; }
 .newform .formtitle .formicon { margin: -3px 0 0; }
 
-.newform .formcontrol { margin: 0 0 0 210px; font-size: 1.1em; line-height: 25px; }
+.newform .formcontrol { float: left; font-size: 1.1em; line-height: 25px; }
 .newform .formcontrol h3 { margin: 0 0 15px 0; }
 .newform .formcontrol input[type="text"] { width: 250px; padding: 4px 5px; border: 1px solid #E7E7E7; overflow: hidden; 
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
@@ -116,7 +116,7 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 .newform .formcontrol .confirm_note { width: 430px; font-size: 1.1em;  }
 .newform .formcontrol .translate_text { font-size: 1.1em; }
 
-.newform .formcontrol ul { margin: 0; padding: 0;  }
+/*.newform .formcontrol ul { margin: 0; padding: 0;  }*/
 
 .newform .formcontrol .translate { max-height: 150px; overflow: auto; }
 .newform .formcontrol .gBranding {}
@@ -157,15 +157,16 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 .newform fieldset#AddRuleFieldmap { width: 130px; padding: 0; margin: 0; background: none; }
 .newform fieldset#AddRuleFieldmap select { width: 120px; padding: 4px; }
 .newform fieldset#AddRuleCriteria { width: 100px; padding: 0; margin: 0; background: none; }
-.newform fieldset#AddRuleValue { width: 60px; padding: 0; margin: 0; background: none; }
+.newform fieldset#AddRuleValue { /*width: 60px;*/ padding: 0; margin: 0; background: none; }
 .newform fieldset#AddRuleValue input[type="text"] { width: 50px; }
 .newform fieldset#AddRuleAction { width: 75px; padding: 0; margin: 0; background: none; } 
 
 .newform select, .newform input { -webkit-transition: all 0.3s ease-out; -moz-transition: all 0.3s ease-out; -ms-transition: all 0.3s ease-out; -o-transition: all 0.3s ease-out; transition: all 0.3s ease-out; }
 
-.newform .MultiCheckbox { float: left; display: inline; width: 250px; margin: 0; padding: 7px 0 0; list-style-type: none; }
-.newform .MultiCheckbox li { height: 25px; }
-.newform .MultiCheckbox input[type="checkbox"] { float: left; display: inline; margin: 0 5px 0 0; }
+.newform .MultiCheckbox { /*float: left; display: inline;*/ width: 250px; margin: 5px 0 0 0; padding: 7px 0 0; overflow-y:auto; 
+position: relative;}
+.newform .MultiCheckbox li { /*height: 25px;*/ }
+.newform .MultiCheckbox input[type="checkbox"] { f/*loat: left;*/ /* display: inline;*/ margin: 0 5px 0 0; }
 .newform .list th.MultiCheckbox label { float: left; display: inline; margin: 0 10px 0 0; }
 
 .newform .form_list_table { width: 250px; margin: 0; padding: 0; }
@@ -203,6 +204,15 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 .newform .multiCheckBox_checkAll { float: left; white-space: nowrap; }
 .newform .multiCheckBox_clear		 { float: right; white-space: nowrap; }
 .newform .multiCheckBox_selectOptions	{ width:130px; height:1px; clear:both; }
+
+#list_newrule_fieldarea > .formtitle  {
+	text-align: left;
+}
+#list_newrule_fieldarea > .formcontrol, #list_advancedtools_fieldarea > .formcontrol  {
+	margin: 0;
+	clear: left;
+	width: 100%;
+}
 
 
 /* ----------------- Form Validation --------------------- */
@@ -418,11 +428,11 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 .newui .formfieldarea { padding: 8px 10px; }
 .newui .formfieldarea .underneathmsg { padding: 0 0 0 140px; font-size: 14px; font-weight: normal; color: #cc0000; }
 
-.newui .newform .formtitle { float: left; display: inline; width: 140px; margin: 0; padding: 0; }
+.newui .newform .formtitle { float: left; display: inline; width: 140px; /*margin: 0;*/ padding: 0; }
 .newui .newform .formtitle .formlabel { float: none; display: block; padding: 5px 10px 5px 0; font-size: 14px; line-height: 18px; font-weight: normal; text-align: right; }
 .newui .newform .formtitle .formicon { display: none; }
 
-.newui .newform .formcontrol { float: left; display: inline; width: 375px; margin: 0; padding: 0; }
+.newui .newform .formcontrol { float: left; display: inline; /*margin: 0;*/ padding: 0; }
 .newui .newform .formcontrol input[type="text"] { display: block; width: 313px; padding: 4px 5px; font-size: 14px; line-height: 18px; border: 1px solid #E2E2E2; 
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
