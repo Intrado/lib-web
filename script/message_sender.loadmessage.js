@@ -86,7 +86,6 @@ function loadMessage(mgid) {
 		if(msgGroup.size() > 0) {
 			var getId = msgGroup.attr("id").match(/msgsndr_msggroup-([0-9]*)/i)[1];
 			
-			self.elements.messageTab.addClass("active complete");
 			self.loadMessageGroup(getId);
 			
 			j('#msgsndr_load_saved_msg').attr('disabled', 'disabled');
@@ -109,7 +108,10 @@ function loadMessage(mgid) {
 		if (!selectedMsgGroup)
 			selectedMsgGroup = self.getMessageGroup(msgGrpId);
 
-		// FIXME: still no message group? 
+		// still no message group? 
+		if (selectedMsgGroup == 'undefined' || !selectedMsgGroup) {
+			return; // TODO: error message?
+		}
 		
 		// put the messageGroup id in the hidden input and display the message name
 		j('#loaded_message_id').attr('value', selectedMsgGroup.id);
@@ -118,11 +120,10 @@ function loadMessage(mgid) {
 	
 		// make sure the correct tab is shown
 		j('#msgsndr_saved_message').modal('hide');
-		if (self.elements.messageTab.hasClass("active")){
+		if (self.elements.messageTab.hasClass("active"))
 			self.elements.messageSection.show();
-		} else {
-			self.elements.messageTab.addClass('complete');
-		}
+		
+		self.elements.messageTab.addClass('complete');
 
 		self.clearForm();
 		self.prepareFormForLoad(selectedMsgGroup);
