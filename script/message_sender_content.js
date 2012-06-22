@@ -147,7 +147,16 @@ var allowControl = {
 			// check for orgOptions.requiredapprovedcallerid,
 			// then subsequently for userPermissions.setcallerid
 			if (orgOptions._hascallback == 0) {
-
+				$('#msgsndr_form_callid').on('change', function() {
+					if ($('option:selected', this).val() == 'other') {
+						$('#callerid_other_wrapper').removeClass('hidden');
+						$("#callerid_other").val("");
+					} else {
+						$('#callerid_other_wrapper').addClass('hidden');
+						$("#callerid_other").val($('option:selected', this).val());
+					}
+				})
+				
 				if (typeof (orgOptions.requireapprovedcallerid) != 'undefined' && orgOptions.requireapprovedcallerid == 1) {
 					// get the users callerid's ...
 					var userCallerIds = getUserCallerIds();
@@ -156,36 +165,26 @@ var allowControl = {
 					$.each(userCallerIds, function(cIndex, cItem) {
 						$('#msgsndr_form_callid').append('<option value="' + cItem + '" >' + formatPhone(cItem) + '</option>');
 					});
+					
+					$('#msgsndr_form_callid').trigger("change");
 
 					// if the users setcallerid permission is defined,
 					// add the 'other' option and create a text input for
 					// them to add arbitrary value, and validate it.
 					if (typeof (userPermissions.setcallerid) != 'undefined' && userPermissions.setcallerid == 1) {
 						$('#msgsndr_form_callid').append('<option value="other" >Other</option>');
-						$('#msgsndr_form_callid').closest('div.controls').append('<span id="callerid_other_wrapper" class="hidden"><input type="text" id="callerid_other" name="phone_callerid"  /><span class="error"></span></span>');
-						// set up the validation on the 'other' input
-						global.watchFields('#callerid_other');
-						document.formvars['phone']['callerid'] = [ new document.validators["ValPhone"]("phone_callerid", "Caller ID", {}) ];
-						// watch for the 'other' option being selected and
-						// act accordingly
-						$('#msgsndr_form_callid').on('change', function() {
-							if ($(this, 'option:selected').val() == 'other') {
-								$('#callerid_other_wrapper').removeClass('hidden');
-							} else {
-								$('#callerid_other_wrapper').addClass('hidden');
-							}
-						});
 					}
 
 				} else { // not sure here, set the default callerid and display the select with that as the option?
 					var callerIdnumber = getDefaultCallerId();
 					$('#msgsndr_form_callid').append('<option value="' + callerIdnumber + '" selected >' + formatPhone(callerIdnumber) + '</option>');
+					
+					$('#msgsndr_form_callid').trigger("change");
 				}
 
 			} else { // the user hascallback so we hide caller id select
 						// fieldset from view
-				$('#msgsndr_form_callid').closest('fieldset').addClass(
-						'hidden');
+				$('#msgsndr_form_callid').closest('fieldset').addClass('hidden');
 				// Commented out the following code, I believe there should
 				// be no callerid passed to postdata for users with
 				// 'hascallback'
@@ -382,7 +381,7 @@ var allowControl = {
 			}
 		});
 	},
-}
+};
 
 function ContentManager() {
 	var $ = jQuery;

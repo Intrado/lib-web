@@ -13,6 +13,7 @@ function ValidationManager() {
 		"2" : {
 			"phone|number" : [new document.validators["ValRequired"]("content_phone","Number to Call",{}), new document.validators["ValPhone"]("content_phone","Number to Call",{})],
 			"phone|tts" : [new document.validators["ValRequired"]("phone_tts","Phone Message",{}), new document.validators["ValLength"]("phone_tts","Phone Message",{min:1, max:10000}), new document.validators["ValTtsText"]("phone_tts","Phone Message")],
+			"phone|callerid" : [new document.validators["ValPhone"]("phone_callerid", "Caller ID", {})],
 			"email|name" : [new document.validators["ValRequired"]("email_name","Name",{}), new document.validators["ValLength"]("email_name","Name",{min: 1,max:30})],
 			"email|address" : [new document.validators["ValRequired"]("email_address","Email Address",{}), new document.validators["ValLength"]("email_address", "Email Address", {max:255}), new document.validators["ValEmail"]("email_address","Email Address",{domain:orgOptions.emaildomain})],
 			"email|subject" : [new document.validators["ValRequired"]("email_subject","Subject",{}), new document.validators["ValLength"]("email_subject","Subject",{min:4})],

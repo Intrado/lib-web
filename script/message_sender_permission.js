@@ -135,7 +135,7 @@ function PermissionManager() {
 					userInfo = data;
 					// format the phone number and add the new formatted version to the userInfo object
 					if (data.phone)
-						userInfo.phoneFormatted = global.formatPhone(data.phone);
+						userInfo.phoneFormatted = formatPhone(data.phone);
 					else
 						userInfo.phoneFormatted = "";
 				}
