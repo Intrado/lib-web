@@ -226,12 +226,51 @@ include("nav.inc.php");
 			
 			<div class="col bloc">
 				<h4><?= _L("Content Mix")?></h4>
-				<img class="dashboard_graph" src="graph_dashboard.png.php?blue=<?=$stats["total_phones"]?>&red=<?=$stats["total_emails"]?>&orange=<?=$stats["total_sms"]?>&green=<?=$stats["total_posts"]?>" />
+				<?
+				
+				// Figure out what icons should be shown based on 
+				// permissions, however if there is a point in history
+				// where a type has been sent we have to include this
+				// value to not mess up the percentage values
+				
+				$graphtypes = array();
+				$hasPhone = $USER->authorize('sendphone');
+				$hasPhone = $hasPhone || ($stats["total_phones"] != 0 && !$hasPhone);
+				if ($hasPhone) {
+					$graphtypes["blue"] = $stats["total_phones"];
+				}
+					
+				$hasSms = getSystemSetting('_hassms', false) && $USER->authorize('sendsms');
+				$hasSms = $hasSms || ($stats["total_sms"] != 0 && !$hasSms);
+				if ($hasPhone) {
+					$graphtypes["orange"] = $stats["total_sms"];	
+				}
+				
+				$hasEmail = $USER->authorize('sendemail');
+				$hasEmail = $hasEmail || ($stats["total_emails"] != 0 && !$hasEmail);
+				if ($hasEmail) {
+					$graphtypes["red"] = $stats["total_emails"];
+				}
+				
+				$hasFacebook = getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost');
+				$hasTwitter = getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost');
+				$hasFeed = getSystemSetting('_hasfeed', false) && $USER->authorize('feedpost');
+				$hasPost = $hasFacebook || $hasTwitter || $hasFeed;
+				$hasPost = $hasPost || ($stats["total_posts"] != 0 && !$hasPost);
+				if ($hasPost) {
+					$graphtypes["green"] = $stats["total_posts"];
+				}
+				
+				?>
+				
+				<img class="dashboard_graph" src="graph_dashboard.png.php?<?= http_build_query($graphtypes)?>" />
 				<ul>
-				<li><img src="themes/<?= $_SESSION['colorscheme']['_brandtheme'] ?>/images/phone-blue.png"/>&nbsp;<?= round($stats["percentage_slice"] * $stats["total_phones"]) ?>%</li>
-				<li><img src="themes/<?= $_SESSION['colorscheme']['_brandtheme'] ?>/images/email-red.png"/>&nbsp;<?= round($stats["percentage_slice"] * $stats["total_emails"]) ?>%</li>
-				<li><img src="themes/<?= $_SESSION['colorscheme']['_brandtheme'] ?>/images/sms-orange.png"/>&nbsp;<?= round($stats["percentage_slice"] * $stats["total_sms"]) ?>%</li>
-				<li><img src="themes/<?= $_SESSION['colorscheme']['_brandtheme'] ?>/images/social-green.png"/>&nbsp;<?= round($stats["percentage_slice"] * $stats["total_posts"]) ?>%</li>
+				<?
+				echo $hasPhone?"<li><img src=\"themes/{$_SESSION['colorscheme']['_brandtheme']}/images/phone-blue.png\"/>&nbsp;" . (round($stats["percentage_slice"] * $stats["total_phones"])) . "%</li>":"";
+				echo $hasEmail?"<li><img src=\"themes/{$_SESSION['colorscheme']['_brandtheme']}/images/email-red.png\"/>&nbsp;" . (round($stats["percentage_slice"] * $stats["total_emails"])) . "%</li>":"";
+				echo $hasSms?"<li><img src=\"themes/{$_SESSION['colorscheme']['_brandtheme']}/images/sms-orange.png\"/>&nbsp;" . (round($stats["percentage_slice"] * $stats["total_sms"])) . "%</li>":"";
+				echo $hasPost?"<li><img src=\"themes/{$_SESSION['colorscheme']['_brandtheme']}/images/social-green.png\"/>&nbsp;" . (round($stats["percentage_slice"] * $stats["total_posts"])) . "%</li>":"";
+				?>
 				</ul>
 				
 			</div>
