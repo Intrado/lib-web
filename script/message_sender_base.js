@@ -46,7 +46,7 @@ jQuery.noConflict();
 		emailSubject = "";
 		emailData = "";
 		userRoleId = "";
-		loadMsg = new loadMessage();
+		loadMsg = $.loadMessage();
 		recipientTrack = 0;
 		
 		document.formvars = {

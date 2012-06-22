@@ -1,94 +1,92 @@
-function loadMessage(mgid) {
-	// Instead of using j we use j
-	j = jQuery;
-
+(function ($) {
+$.loadMessage = function loadMessage() {
 	var self = this;
 	this.msgGroups = false;
 	this.elements = {
-		"messageTab": j('.msg_steps li:eq(1)'),
-		"messageSection": j('#msg_section_2'),
-		"messageGroupTable": j('#messages_list'),
+		"messageTab": $('.msg_steps li:eq(1)'),
+		"messageSection": $('#msg_section_2'),
+		"messageGroupTable": $('#messages_list'),
 		
-		"phoneComplete": j('li.ophone'),
-		"phoneType": j('#msgsndr_phonetype'),
-		"phoneButtonCallMe": j('button.audioleft'),
-		"phoneButtonText": j('button.audioright'),
-		"phoneCallMeSection": j('#callme'),
-		"phoneTextSection": j('#text'),
-		"phoneRecording": j("#msgsndr_form_number"),
-		"phoneText": j('#msgsndr_tts_message'),
+		"phoneComplete": $('li.ophone'),
+		"phoneType": $('#msgsndr_phonetype'),
+		"phoneButtonCallMe": $('button.audioleft'),
+		"phoneButtonText": $('button.audioright'),
+		"phoneCallMeSection": $('#callme'),
+		"phoneTextSection": $('#text'),
+		"phoneRecording": $("#msgsndr_form_number"),
+		"phoneText": $('#msgsndr_tts_message'),
 		"phoneTranslatePrefix": "#tts_translated_",
 		"phoneOverridePrefix": "#tts_override_",
-		"phoneTranslateCheck": j("#msgsndr_form_phonetranslate"),
+		"phoneTranslateCheck": $("#msgsndr_form_phonetranslate"),
 		"phoneLanguageCheckPrefix": "#tts_",
-		"phoneAdvancedOptions": j(".phone_advanced_options"),
-		"phoneCallMeOptions": j("#callme_advanced_options"),
-		"phoneTextOptions": j("#text_advanced_options"),
+		"phoneAdvancedOptions": $(".phone_advanced_options"),
+		"phoneCallMeOptions": $("#callme_advanced_options"),
+		"phoneTextOptions": $("#text_advanced_options"),
 		
-		"emailComplete": j('li.oemail'),
-		"hasEmail": j('input[name=has_email'),
-		"emailBody": j("#msgsndr_form_body"),
-		"emailAttach" : j('#msgsndr_form_attachment'),
-		"emailAttachControls": j('#uploadedfiles'),
-		"emailSubject": j('#msgsndr_form_mailsubject'),
-		"emailFromName": j('#msgsndr_form_name'),
-		"emailFromEmail": j('#msgsndr_form_email'),
+		"emailComplete": $('li.oemail'),
+		"hasEmail": $('input[name=has_email'),
+		"emailBody": $("#msgsndr_form_body"),
+		"emailAttach" : $('#msgsndr_form_attachment'),
+		"emailAttachControls": $('#uploadedfiles'),
+		"emailSubject": $('#msgsndr_form_mailsubject'),
+		"emailFromName": $('#msgsndr_form_name'),
+		"emailFromEmail": $('#msgsndr_form_email'),
 		"emailTranslatePrefix": "#email_translated_",
-		"emailTranslateCheck": j("#msgsndr_form_emailtranslate"),
+		"emailTranslateCheck": $("#msgsndr_form_emailtranslate"),
 		"emailLanguageCheckPrefix": "#email_",
 
-		"smsComplete": j('li.osms'),
-		"hasSms": j('input[name=has_sms]'),
-		"smsText": j('#msgsndr_form_sms'),
+		"smsComplete": $('li.osms'),
+		"hasSms": $('input[name=has_sms]'),
+		"smsText": $('#msgsndr_form_sms'),
 
-		"socialComplete": j('li.osocial'),
+		"socialComplete": $('li.osocial'),
 		
-		"hasFacebook": j('#msgsndr_form_facebook'),
-		"facebookSection": j('div.facebook'),
-		"facebookText": j('#msgsndr_form_fbmsg'),
+		"hasFacebook": $('#msgsndr_form_facebook'),
+		"facebookSection": $('div.facebook'),
+		"facebookText": $('#msgsndr_form_fbmsg'),
 		
-		"hasTwitter": j('#msgsndr_form_twitter'),
-		"twitterSection": j('div.twitter'),
-		"twitterText": j('#msgsndr_form_tmsg'),
+		"hasTwitter": $('#msgsndr_form_twitter'),
+		"twitterSection": $('div.twitter'),
+		"twitterText": $('#msgsndr_form_tmsg'),
 		
-		"hasFeed": j('#msgsndr_form_feed'),
-		"feedSection": j('div.feed'),
-		"feedSubject": j('#msgsndr_form_rsstitle'),
-		"feedText": j('#msgsndr_form_rssmsg')
+		"hasFeed": $('#msgsndr_form_feed'),
+		"feedSection": $('div.feed'),
+		"feedSubject": $('#msgsndr_form_rsstitle'),
+		"feedText": $('#msgsndr_form_rssmsg')
 	};
 	
 	// load a saved message is clicked, get the messages
-	j('#load_saved_message').on("click", function(){
+	$('#load_saved_message').on("click", function(){
 		self.getMessageGroups();
 	});
 
 	// This makes the whole table row clickable to select the message ready for loading into content
-	j('#messages_list').on('click', 'tr', function(){
+	$('#messages_list').on('click', 'tr', function(){
 		// Unset all inputs
-		j('input[name=msgsndr_msggroup]').removeAttr('checked');
+		$('input[name=msgsndr_msggroup]').removeAttr('checked');
 		// Remove selected class from all tr's
-		j('#messages_list tr').removeClass('selected');
+		$('#messages_list tr').removeClass('selected');
 	
 		// Set radio button to checked for selected message
-		j('td:first input:radio[name=msgsndr_msggroup]', this).attr('checked', 'checked');
+		$('td:first input:radio[name=msgsndr_msggroup]', this).attr('checked', 'checked');
 		// Add class selected to tr
-		j(this).addClass('selected');
+		$(this).addClass('selected');
 		
-		if(j('#msgsndr_load_saved_msg').is(':disabled')){                
-			j('#msgsndr_load_saved_msg').removeAttr('disabled');           
+		if($('#msgsndr_load_saved_msg').is(':disabled')){                
+			$('#msgsndr_load_saved_msg').removeAttr('disabled');           
 		}
 	});
 
 	// Load Saved Message button in saved message modal window
-	j('#msgsndr_load_saved_msg').on('click', function(){
-		//var msgGroup = j('.msgsndr_msggroup > td > input:radio[name=msgsndr_msggroup]:checked');
-		var msgGroup = j(".msgsndr_msggroup.selected");
+	$('#msgsndr_load_saved_msg').on('click', function(){
+		//var msgGroup = $('.msgsndr_msggroup > td > input:radio[name=msgsndr_msggroup]:checked');
+		var msgGroup = $(".msgsndr_msggroup.selected");
 		if(msgGroup.size() > 0) {
 			var getId = msgGroup.attr("id").match(/msgsndr_msggroup-([0-9]*)/i)[1];
 			
 			self.loadMessageGroup(getId);
 			
-			j('#msgsndr_load_saved_msg').attr('disabled', 'disabled');
+			$('#msgsndr_load_saved_msg').attr('disabled', 'disabled');
 		}
 	});
 	
@@ -97,7 +95,7 @@ function loadMessage(mgid) {
 		// get the selected message group data
 		var selectedMsgGroup = false;
 		if (self.msgGroups) {
-			j.each(self.msgGroups, function(index, mg) {
+			$.each(self.msgGroups, function(index, mg) {
 				if (mg.id == msgGrpId) {
 					selectedMsgGroup = mg;
 					return false;
@@ -114,12 +112,12 @@ function loadMessage(mgid) {
 		}
 		
 		// put the messageGroup id in the hidden input and display the message name
-		j('#loaded_message_id').attr('value', selectedMsgGroup.id);
-		j('#loaded_message_name').text(selectedMsgGroup.name);
-		j('#msgsndr_loaded_message').fadeIn(300);
+		$('#loaded_message_id').attr('value', selectedMsgGroup.id);
+		$('#loaded_message_name').text(selectedMsgGroup.name);
+		$('#msgsndr_loaded_message').fadeIn(300);
 	
 		// make sure the correct tab is shown
-		j('#msgsndr_saved_message').modal('hide');
+		$('#msgsndr_saved_message').modal('hide');
 		if (self.elements.messageTab.hasClass("active"))
 			self.elements.messageSection.show();
 		
@@ -141,7 +139,7 @@ function loadMessage(mgid) {
 				start = 0;
 		}
 		var limit = 25;
-		j.ajax({
+		$.ajax({
 			url: '/'+orgPath+'/api/2/users/'+userid+'/messagegroups',
 			type: "GET",
 			data: {"start": start, "limit": limit},
@@ -150,14 +148,14 @@ function loadMessage(mgid) {
 				if (!self.msgGroups)
 					self.msgGroups = [];
 				// sort by name
-				j.each(data.messageGroups, function(i,mg) {
+				$.each(data.messageGroups, function(i,mg) {
 					self.msgGroups.push(mg);
 					// format the date from the modifiedTimestamp value
 					var msgDate = moment(mg.modifiedTimestamp*1000).format('MM/DD/YYYY');
 					// loop through the typeSummary array to see what message parts are included
 					var msgPhone = msgEmail = msgSms =  msgPost = '';
 					var tickHtml = '<span class="icon">x</span>';
-					j.each(mg.typeSummary, function(index, msgType) {
+					$.each(mg.typeSummary, function(index, msgType) {
 						switch (msgType.type) {
 						case 'phone':
 							msgPhone = tickHtml;
@@ -173,7 +171,7 @@ function loadMessage(mgid) {
 						}
 					});
 					var mgtablerecord = 
-						j('<tr id="msgsndr_msggroup-'+mg.id+'" class="msgsndr_msggroup">'+
+						$('<tr id="msgsndr_msggroup-'+mg.id+'" class="msgsndr_msggroup">'+
 							'<td>'+
 								'<input type="radio" name="msgsndr_msggroup" value="'+mg.id+'"/>'+
 							'</td>'+
@@ -194,15 +192,15 @@ function loadMessage(mgid) {
 							'</td>'+
 						'</tr>');
 					// escape html in message group names
-					mgtablerecord.children("td").first().append(j("<span>", {"class":"msgsndr_msggroup_name"}).text(mg.name));
+					mgtablerecord.children("td").first().append($("<span>", {"class":"msgsndr_msggroup_name"}).text(mg.name));
 					var isInserted = false;
 					var tablerecords = self.elements.messageGroupTable.children("tr");
 					tablerecords.each(function(index) {
 						var name = mg.name.toLowerCase();
-						var td = j(this).find(".msgsndr_msggroup_name").first();
+						var td = $(this).find(".msgsndr_msggroup_name").first();
 						var sortedname = td.text().toLowerCase();
 						if (name < sortedname) {
-							j(this).before(mgtablerecord);
+							$(this).before(mgtablerecord);
 							isInserted = true;
 							return false;
 						}
@@ -219,7 +217,7 @@ function loadMessage(mgid) {
 
 	this.prepareFormForLoad = function(msgGroup) {
 		// based on message group info, set appropriate form status
-		j.each(msgGroup.typeSummary, function(index, msgType) {
+		$.each(msgGroup.typeSummary, function(index, msgType) {
 			switch (msgType.type) {
 				case 'phone':
 					self.elements.phoneComplete.addClass('complete');
@@ -309,13 +307,13 @@ function loadMessage(mgid) {
 		// load message group content into session server side.
 		self.loadMessageGroupContentForPreview(msgGrp.id);
 		// request all the messages for the selected message group
-		j.ajax({
+		$.ajax({
 			url: '/'+orgPath+'/api/2/users/'+userid+'/messagegroups/'+msgGrp.id+'/messages',
 			type: "GET",
 			dataType: "json",
 			success: function(data) {
 				// itterate all the messages and call methods to populate the data
-				j.each(data.messages, function(mIndex, msg) {
+				$.each(data.messages, function(mIndex, msg) {
 					if (!self.checkUserAuth(msg))
 						return true;
 					if(typeof(msg.type) != "undefined" && msg.type.length > 0) { 
@@ -354,42 +352,42 @@ function loadMessage(mgid) {
 		previous message, as can not assume a user will only load one
 	*/
 	this.clearForm = function() {
-		j('.msg_content_nav li').removeClass('complete active lighten');
-		j('.tab_content .tab_panel').hide();
-		j('.facebook, .twitter, .feed').hide();			
+		$('.msg_content_nav li').removeClass('complete active lighten');
+		$('.tab_content .tab_panel').hide();
+		$('.facebook, .twitter, .feed').hide();			
 	
-		var allDataInputs = j('#msg_section_2 input, textarea');
+		var allDataInputs = $('#msg_section_2 input, textarea');
 	
-		j.each(allDataInputs, function(aIndex, aData) {
+		$.each(allDataInputs, function(aIndex, aData) {
 	
-			if (j(aData).attr('type') == 'checkbox') {
-				j(aData).removeAttr('checked');
+			if ($(aData).attr('type') == 'checkbox') {
+				$(aData).removeAttr('checked');
 			}
 			// don't blank out easycall phone number field
-			if (!j(aData).hasClass("easycallphoneinput"))
-				j(aData).val('').removeClass('ok');
+			if (!$(aData).hasClass("easycallphoneinput"))
+				$(aData).val('').removeClass('ok');
 	
 		});
 	
 		// Uncheck all translation check boxes and hide their controls
-		j.each(j('input.translations'), function(aIndex, aData) {
-			j(aData).removeAttr('checked');
-			j(aData).parent().children(".controls").addClass("hide").children("textarea").attr("disabled","disabled");
+		$.each($('input.translations'), function(aIndex, aData) {
+			$(aData).removeAttr('checked');
+			$(aData).parent().children(".controls").addClass("hide").children("textarea").attr("disabled","disabled");
 		});
 	
-		var reviewTabs = j('.msg_complete li');
-		j.each(reviewTabs, function(tIndex, tData) {
-			j(tData).removeClass('complete');
+		var reviewTabs = $('.msg_complete li');
+		$.each(reviewTabs, function(tIndex, tData) {
+			$(tData).removeClass('complete');
 		});
 	
 		// Phone 
-		j("#msgsndr_form_number").empty();
+		$("#msgsndr_form_number").empty();
 	
 		// Email Message Content resets
 		clearHtmlEditorContent();
 		self.elements.emailBody.val("");
 		
-		j('#uploadedfiles').empty();
+		$('#uploadedfiles').empty();
 	}
 
 	// load phone message asynchronously from the server
@@ -401,13 +399,13 @@ function loadMessage(mgid) {
 				self.loadMessagePartsFormatted(msgGrpId, msg, self.elements.phoneText.addClass('ok'));
 			} else {
 				self.elements.phoneTranslateCheck.attr("checked","checked");
-				j(self.elements.phoneLanguageCheckPrefix + msg.languageCode).attr('checked','checked');
-				j(self.elements.phoneLanguageCheckPrefix + msg.languageCode).parent().children(".controls").first().removeClass("hide");
-				self.loadMessagePartsFormatted(msgGrpId, msg, j(self.elements.phoneTranslatePrefix + msg.languageCode));
+				$(self.elements.phoneLanguageCheckPrefix + msg.languageCode).attr('checked','checked');
+				$(self.elements.phoneLanguageCheckPrefix + msg.languageCode).parent().children(".controls").first().removeClass("hide");
+				self.loadMessagePartsFormatted(msgGrpId, msg, $(self.elements.phoneTranslatePrefix + msg.languageCode));
 				// overridden messages should have their text area editable and override checked.
 				if (msg.autoTranslate == "overridden") {
-					j(self.elements.phoneTranslatePrefix + msg.languageCode).removeAttr("disabled");
-					j(self.elements.phoneOverridePrefix + msg.languageCode).attr('checked','checked');
+					$(self.elements.phoneTranslatePrefix + msg.languageCode).removeAttr("disabled");
+					$(self.elements.phoneOverridePrefix + msg.languageCode).attr('checked','checked');
 				}
 			}
 		}
@@ -423,9 +421,9 @@ function loadMessage(mgid) {
 			self.loadMessagePartsFormatted(msgGrpId, msg, self.elements.emailBody, true);
 		} else {
 			self.elements.emailTranslateCheck.attr("checked","checked");
-			j(self.elements.emailLanguageCheckPrefix + msg.languageCode).attr('checked','checked');
-			j(self.elements.emailLanguageCheckPrefix + msg.languageCode).parent().children(".controls").first().removeClass("hide");
-			self.loadMessagePartsFormatted(msgGrpId, msg, j(self.elements.emailTranslatePrefix + msg.languageCode));
+			$(self.elements.emailLanguageCheckPrefix + msg.languageCode).attr('checked','checked');
+			$(self.elements.emailLanguageCheckPrefix + msg.languageCode).parent().children(".controls").first().removeClass("hide");
+			self.loadMessagePartsFormatted(msgGrpId, msg, $(self.elements.emailTranslatePrefix + msg.languageCode));
 		}
 	}
 	
@@ -452,7 +450,7 @@ function loadMessage(mgid) {
 
 	// get audiofile based on message id from message group
 	this.loadMessagePartsAudioFile = function(msgGrpId,msg,element){
-		j.ajax({
+		$.ajax({
 			url: '/'+orgPath+'/api/2/users/'+userid+'/messagegroups/'+msgGrpId+'/messages/'+msg.id+'/messageparts',
 			async: false,
 			type: "GET",
@@ -467,10 +465,10 @@ function loadMessage(mgid) {
 				if (elementval == "")
 					elementdata = {};
 				else
-					elementdata = j.secureEvalJSON(elementval);
+					elementdata = $.secureEvalJSON(elementval);
 				
 				elementdata[code] = afid;
-				element.val(j.toJSON(elementdata));
+				element.val($.toJSON(elementdata));
 				
 				// now, reattach the easycall
 				self.elements.phoneRecording.attachEasyCall({
@@ -490,7 +488,7 @@ function loadMessage(mgid) {
 		element.hide();
 		element.after(loadingMessage);
 		
-		j.ajax({
+		$.ajax({
 			url: '/'+orgPath+'/api/2/users/'+userid+'/messagegroups/'+msgGrpId+'/messages/'+msg.id+'/messageparts/formatted',
 			async: true,
 			type: "GET",
@@ -513,7 +511,7 @@ function loadMessage(mgid) {
 
 	// get message attachments based on message group id and message id
 	this.loadMessageAttachments = function(msgGrpId,msg,element,controlElement){
-		j.ajax({
+		$.ajax({
 			url: '/'+orgPath+'/api/2/users/'+userid+'/messagegroups/'+msgGrpId+'/messages/'+msg.id+'/messageattachments',
 			async: true,
 			type: "GET",
@@ -523,7 +521,7 @@ function loadMessage(mgid) {
 				var files = new Object();
 				if ( attachments.length != 0 ) {
 					controlElement.show();
-					j.each(attachments, function(eIndex,eData) {
+					$.each(attachments, function(eIndex,eData) {
 						var filesize = Math.round(eData.size/1024);
 						var attach = '<a href="emailattachment.php?maid=' + eData.id + '&name=' + eData.filename + '">' + eData.filename + '</a>' +
 							'&nbsp;(Size: ' + filesize + 'k)&nbsp;<a href="#">Remove</a><br>';
@@ -538,7 +536,7 @@ function loadMessage(mgid) {
 	
 	// tell the server to load this messagegroups content into session data so it can be previed
 	this.loadMessageGroupContentForPreview = function(msgGrpId) {
-		j.post("ajax.php", {
+		$.post("ajax.php", {
 			"type": "loadmessagegroupcontent",
 			"id": msgGrpId}
 		);
@@ -547,7 +545,7 @@ function loadMessage(mgid) {
 	// get the requested message group
 	this.getMessageGroup = function(msgGrpId) {
 		var messagegroup = false;
-		j.ajax({
+		$.ajax({
 			url: '/'+orgPath+'/api/2/users/'+userid+'/messagegroups/'+msgGrpId,
 			async: false,
 			type: "GET",
@@ -559,3 +557,4 @@ function loadMessage(mgid) {
 		return messagegroup;
 	};
 }
+})(jQuery);
