@@ -551,11 +551,11 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
   -moz-background-size: 40px 40px;
   -o-background-size: 40px 40px;
   background-size: 40px 40px;
-  width: 223px;
+  width: 300px;
   color: #fff;
   padding: 5px 10px; 
   line-height: 19px;
-  text-align: center;
+  text-align: left;
   -webkit-border-radius: 5px; border-radius: 5px;
 }
 
@@ -593,7 +593,7 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
 .easycallmaincontainer button { margin: 0 5px 5px 0; }
 .easycallmaincontainer select { float: left; margin-right: 5px; width: 130px !important; }
 .easycallmaincontainer input.blank { color: gray; font-style: italic; }
-.easycalllanguagetitle { float: left; display: inline; width: 115px; margin: 6px 0 0 20px; font-size: 14px; line-height: 18px; font-weight: bold; font-style: italic; }
+.easycalllanguagetitle { float: left; display: inline; width: 115px; margin: 6px 0 0 10px; font-size: 14px; line-height: 18px; font-weight: bold; font-style: italic; }
 .easycallerrorcontainer { /*padding: 2px; background: pink;*/ }
 .easycallerrorcontainer span.easycallerrortext { margin: 0 5px 0 0; font-size: 14px; line-height: 18px; font-weight: bold; }
 .easycallerrorcontainer span.icon { background: url(img/icons/error.png) 0 center no-repeat; height: 16px; width: 16px; margin: 2px 3px 0 0; }
