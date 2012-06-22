@@ -409,13 +409,13 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 .newui .newform .formtitle .formlabel { float: none; display: block; padding: 5px 10px 5px 0; font-size: 14px; line-height: 18px; font-weight: normal; text-align: right; }
 .newui .newform .formtitle .formicon { display: none; }
 
-.newui .newform .formcontrol { float: left; display: inline; margin: 0; padding: 0; }
+.newui .newform .formcontrol { float: left; display: inline; width: 375px; margin: 0; padding: 0; }
 .newui .newform .formcontrol input[type="text"] { display: block; width: 313px; padding: 4px 5px; font-size: 14px; line-height: 18px; border: 1px solid #E2E2E2; 
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
 .newui .newform .formcontrol input[type="radio"] { margin: 0 5px 5px 0; }
 .newui .newform .formcontrol input[type="checkbox"] { margin: 5px 0 0; }
-.newui .newform .formcontrol textarea { display: block; margin: 0 0 5px 0; padding: 4px 5px; font-size: 14px; line-height: 18px; border: 1px solid #E2E2E2; 
+.newui .newform .formcontrol textarea { display: block; width: 375px; margin: 0 0 5px 0; padding: 4px 5px; font-size: 14px; line-height: 18px; border: 1px solid #E2E2E2; 
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
 .newui .newform .formcontrol input#account_brandthemecustomize { float: left; display: inline; margin: 0 5px 0 0; }
@@ -434,12 +434,33 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 
 .newui .newform .formcontrol .datafields input { width: 140px; }
 
+.newui .controlcontainer { width: 375px; }
+
+.newui .maincontainerleft { width: 375px; margin: 0; }
+.newui .maincontainerseperator { display: none; }
+.newui .maincontainerright { width: 375px; margin: 0; padding: 0; }
+
+#phoneadvanced_message-voicerecorder_callcontrol input.easycallphoneinput {  }
+#phoneadvanced_message-voicerecorder_callcontrol .btn {}
+
+.newui #emaileedit_helpsection_5 .formtitle { width: 100%; text-align: left; }
+.newui #emaileedit_helpsection_5 .formtitle .formlabel { width: 140px; text-align: right; }
+.newui #emaileedit_helpsection_5 .formcontrol { width: 600px; margin: 0 0 0 34px; }
+.newui #emaileedit_helpsection_5 .formcontrol .maincontainerleft,
+.newui #emaileedit_helpsection_5 .formcontrol .maincontainerright,
+.newui #emaileedit_helpsection_5 .formcontrol .controlcontainer { width: 600px; }
+
+.newui .formcontrol .datafields { margin: 0 10px 0 0; }
+.newui .formcontrol .datafields select { padding: 3px 6px; font-size: 14px; }
+.newui .formcontrol .datafieldsinsert { margin: 25px 0 0; }
+.newui .formcontrol .datafieldsinsert button { padding: 3px 10px; }
+
 
 /*---------- Media queries for form elements ----------*/
 
 @media only screen and (max-width: 1024px) {
 	.formcontrol .messagegrid { width: 520px; }
-	.maincontainerleft { width: 320px; }
+
 	.newform .formcontrol textarea { width: 300px; }
 	.newform .htmlradiobuttonbigcheck { width: 320px; }
 	.newform .htmlradiobuttonbigcheck .creation_method { margin: 0 10px 5px 0; }
