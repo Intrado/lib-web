@@ -468,6 +468,9 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 .newui .formcontrol .datafieldsinsert { margin: 25px 0 0; }
 .newui .formcontrol .datafieldsinsert button { padding: 3px 10px; }
 
+.newui #list_helpsection_3 .formtitle { width: 100%; text-align: left; }
+.newui #list_helpsection_3 .formcontrol { width: 600px; margin: 0; }
+
 
 /*---------- Media queries for form elements ----------*/
 
