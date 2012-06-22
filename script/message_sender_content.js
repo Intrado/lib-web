@@ -338,11 +338,9 @@ var allowControl = {
 			// intialize facebook with the current user's token
 			initFacebook(fbToken);
 			// listen for clicks to show facebook info
-			$("#msgsndr_form_facebook").on('change', function(event) {
-				$("#msgsndr_ctrl_social").on('click', function(event) {
-					if (fbToken)
-					updateFbPages(fbToken, "msgsndr_fbpage", "msgsndr_fbpagefbpages", false);
-				});
+			$("#msgsndr_ctrl_social").on('click', function(event) {
+				if (fbToken)
+				updateFbPages(fbToken, "msgsndr_fbpage", "msgsndr_fbpagefbpages", false);
 			});
 		});
 
