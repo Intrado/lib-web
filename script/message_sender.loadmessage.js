@@ -149,6 +149,9 @@ $.loadMessage = function loadMessage() {
 					self.msgGroups = [];
 				// sort by name
 				$.each(data.messageGroups, function(i,mg) {
+					// only show notification type message groups
+					if (mg.type != "notification")
+						return;
 					self.msgGroups.push(mg);
 					// format the date from the modifiedTimestamp value
 					var msgDate = moment(mg.modifiedTimestamp*1000).format('MM/DD/YYYY');
