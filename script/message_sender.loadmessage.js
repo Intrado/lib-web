@@ -95,8 +95,10 @@ function loadMessage(mgid) {
 		var selectedMsgGroup = false;
 		if (self.msgGroups) {
 			j.each(self.msgGroups, function(index, mg) {
-				if (mg.id == msgGrpId)
+				if (mg.id == msgGrpId) {
 					selectedMsgGroup = mg;
+					return false;
+				}
 			});
 		}
 		// not found? look it up via API request
@@ -219,9 +221,9 @@ function loadMessage(mgid) {
 					if (msgGroup.phoneIsAudioOnly) {
 						self.elements.phoneType.val('callme');
 						self.elements.phoneButtonCallMe.addClass('active'); 
-						self.elements.phoneButtonText.hide();
+						self.elements.phoneButtonText.removeClass('active');
 						self.elements.phoneCallMeSection.show();
-						self.elements.phoneTextSection.addClass("hide");
+						self.elements.phoneTextSection.hide();
 						self.elements.phoneCallMeOptions.append(self.elements.phoneAdvancedOptions);
 						global.watchContent('callme');
 					} else {
