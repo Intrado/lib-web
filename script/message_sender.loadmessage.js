@@ -84,7 +84,7 @@ function loadMessage(mgid) {
 		var msgGroup = j('.msgsndr_msggroup > td > input:radio[name=msgsndr_msggroup]:checked');
 		
 		self.elements.messageTab.addClass("active complete");
-		self.loadMessageGroup(msgGroup.attr('value'));
+		self.loadMessageGroup(msgGroup.val());
 		
 		j('#msgsndr_load_saved_msg').attr('disabled', 'disabled');
 	});
@@ -169,6 +169,7 @@ function loadMessage(mgid) {
 					var mgtablerecord = 
 						'<tr id="msgsndr_msggroup-'+mg.id+'" class="msgsndr_msggroup">'+
 							'<td>'+
+								'<input type="radio" name="msgsndr_msggroup" value="'+mg.id+'"/>'+
 								'<span class="msgsndr_msggroup_name">'+mg.name+'</span>'+
 							'</td>'+
 							'<td class="created">'+
