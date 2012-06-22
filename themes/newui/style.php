@@ -206,7 +206,7 @@ background-image: -webkit-gradient(linear, left top, left bottom, from(#F5F3F0),
 
 /*------ Message sender ----- */
 
-.newbroadcast .window_title_wrap { padding: 5px 2% 15px 2%; border: 1px solid #2A6576; -webkit-border-radius: 5px 5px 0 0; border-radius: 5px 5px 0 0;
+.newbroadcast .window_title_wrap { padding: 5px 10px 15px 10px; border: 1px solid #2A6576; -webkit-border-radius: 5px 5px 0 0; border-radius: 5px 5px 0 0;
 -webkit-box-shadow: inset 0px 1px 1px 0 rgba(255,255,255,0.5); box-shadow: inset 0px 1px 1px 0 rgba(255,255,255,0.5); 
 	background-color: #3F90A9;
 	background-image: -webkit-gradient(linear, left top, left bottom, from(#48A3BE), to(#317589)); 
@@ -363,6 +363,7 @@ border-left: 1px solid #ddd; border-right: 1px solid #ddd; -webkit-border-radius
 .table-bordered td { border-bottom: 1px solid #ddd; }
 
 table.messages { width: 100%; margin: 0; font-size: 13px; line-height: 36px; border-bottom: 1px solid #ddd; border-left: 1px solid #ddd; border-right: 1px solid #ddd; }
+table.messages.head { margin: 10px 0 0 0;}
 table.messages th { background: #eee; padding: 0 8px; }
 table.messages .ico { width: 40px; text-align: center; }
 table.messages .created { width: 90px; }
@@ -383,11 +384,15 @@ table.rules td select, table.rules td input[type="text"] { width: 145px; }
 table.rules td label { float: none; display: block; width: 145px; margin: 0; text-align: left; }
 table.rules td input[type="checkbox"] { margin: 0 5px 0 0; }
 table.rules .value-options { overflow: auto; max-height: 200px; }
-table.rules .value-options label { width: 127px; }
+table.rules .value-options label { width: auto; }
 table.rules td .btn { display: inline-block; margin: 0 4px 0 0; line-height: 18px; }
 table.rules td .cancel { display: inline-block; padding: 6px 0; font-size: 14px; line-height: 18px; }
 table.rules td a.remove { background: url(themes/newui/images/removelist.png) left 0 no-repeat; display: inline-block; width: 18px; height: 18px; vertical-align: middle; }
 table.rules td a.remove:hover { background: url(themes/newui/images/removelist.png) left -22px no-repeat; }
+
+#new-rule-value { 
+  width: 190px;
+}
 
 .scroll { max-height: 230px; overflow: auto; }
 
@@ -474,7 +479,9 @@ table.list ul li { padding: 0; }
 /* reset the buttons for newui theme so background images aren't loaded */
 .btn:hover .btn_middle { background-image: none; background: transparent;}
 
-button, .btn { margin: 0 5px 0 0; padding: 5px 10px; color: #333; font-size: 14px; line-height: 19px; font-weight: normal; text-shadow: 0 1px 0 0 #fff; border: 1px solid #ccc;
+button, .btn { margin: 0 5px 0 0; padding: 5px 10px; color: #333; font-size: 14px; line-height: 19px; font-weight: normal; 
+  /*text-shadow: 0 1px 0 #fff; */
+  border: 1px solid #ccc;
 	background-color: #f5f5f5;  
   background-image: -webkit-gradient(linear, left top, left bottom, from(#fbfbfb), to(#e4e4e4)); 
   background-image: -webkit-linear-gradient(top, #fbfbfb, #e4e4e4); 
@@ -860,23 +867,6 @@ span.error { float: none; color: rgb(219,30,30); font-size: 0.9em; }
 	
 .shortcuts a { color: #26477d; }
 .shortcuts a:hover { background: #26477d; color: #fff; }
-
-
-/*----- Classes that need PIE -----*/
-/*
- * Commenting out dependency on CSS3PIE until a stable version is included that do not crash IE
- * Mantis Bug #5157 
-.navshortcut, .navtabs a, .newjob a, .emrjob a, .banner_links, .banner_logo a, .subnavtabs a, .btn, .window, .window_title_wrap, .window_body, a.bigbtn, .templates, .help, .col,
-.msg_steps li span.icon, .msg_content_nav li a
-{ behavior: url(PIE.php); position: relative; }
-*/
-/*----- IE7 styling ----- */
-
-.ie7 .summary .col { width: 20%; }
-.ie7 .msg_steps li { width: 32%; }
-.ie7 .table-bordered, .ie7 table.info { border-collapse: collapse; }
-
-
 
 
 @media screen and (max-width: 980px) { 
