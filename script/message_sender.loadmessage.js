@@ -172,12 +172,10 @@ function loadMessage(mgid) {
 							msgPost = tickHtml;
 						}
 					});
-					// FIXME: escape html in message group names
 					var mgtablerecord = 
-						'<tr id="msgsndr_msggroup-'+mg.id+'" class="msgsndr_msggroup">'+
+						j('<tr id="msgsndr_msggroup-'+mg.id+'" class="msgsndr_msggroup">'+
 							'<td>'+
 								'<input type="radio" name="msgsndr_msggroup" value="'+mg.id+'"/>'+
-								'<span class="msgsndr_msggroup_name">'+mg.name+'</span>'+
 							'</td>'+
 							'<td class="created">'+
 								msgDate+
@@ -194,7 +192,9 @@ function loadMessage(mgid) {
 							'<td class="ico">'+
 								msgPost+
 							'</td>'+
-						'</tr>';
+						'</tr>');
+					// escape html in message group names
+					mgtablerecord.children("td").first().append(j("<span>", {"class":"msgsndr_msggroup_name"}).text(mg.name));
 					var isInserted = false;
 					var tablerecords = self.elements.messageGroupTable.children("tr");
 					tablerecords.each(function(index) {
