@@ -107,8 +107,10 @@
 						phoneinput.removeClass("blank");
 					}
 				});
-				// observe the enter keypress inside the phone input field.
+				// observe the keypress inside the phone input field.
 				phoneinput.keydown(function(e) {
+					if ($this.data('easyCall').timer)
+						$this.data('easyCall').timer.stop();
 					// enter was pressed?
 					if (e.which == 13) {
 						e.preventDefault();
@@ -117,6 +119,11 @@
 							code = selectmenu.val();
 						$this.data('easyCall').subcontainer[code] = container;
 						method.doCall(code);
+					} else {
+						// set a timer to validate the phone number
+						$this.data('easyCall').timer = $.timer(function(){
+							method.valPhoneField(container);
+						}).set({time: 500, autostart: true});
 					}
 				});
 				
@@ -275,9 +282,37 @@
 			
 			//============================================================================================
 			// Application logic
+			
+			valPhoneField: function (container) {
+				container.children(".easycallphoneinvalid").remove();
+				var $this = $(this);
+				
+				// get the phone number
+				var phone = container.children(".easycallphoneinput").val();
+				
+				// validate the phone
+				var valid = method.validatePhone(phone);
+				if (valid !== true) {
+					if (phone == "")
+						phone = $this.data('easyCall').emptyphonetext;
+					container.append($('<div />', { "class": "easycallphoneinvalid", "text": phone + " " + valid }));
+					return false;
+				}
+				return true;
+			},
+			
 			// start the process by making a phone call to the provided number
 			doCall: function (code) {
 				var $this = $(this);
+				
+				var valid = method.valPhoneField($this.data('easyCall').subcontainer[code]);
+				
+				if (!valid) {
+					// if this isn't the record area for the default, clear the container association
+					if (code != $this.data('easyCall').defaultcode)
+						$this.data('easyCall').subcontainer[code] = false;
+					return;
+				}
 				
 				// get the phone number
 				var phone = $this.data('easyCall').subcontainer[code].children(".easycallphoneinput").val();
@@ -306,33 +341,38 @@
 				$.post("ajaxeasycall.php", {"action":"new","phone":phone}, function(data){
 					progresstext.empty().append("Initiated...");
 					
-					$this.data('easyCall').specialtaskid = data.id;
-					// on a timer, query the status
-					$this.data('easyCall').timer = $.timer(function(){
-						$.post("ajaxeasycall.php", {"action":"status","id":$this.data('easyCall').specialtaskid}, function(data){
-							// get the status
-							var status = method.handleStatus(data);
-							progresstext.empty().append(status.message);
-							if (!status.error && status.complete) {
-								$this.data('easyCall').timer.stop();
-								// save audiofile
-								method.doSaveAudioFile(code);
-							}
-							if (status.error) {
+					if (!data) {
+						$this.data('easyCall').specialtaskid = false;
+						method.replaceContainer(code, method.createErrorContainer(code, "An error occured while setting up the call."));
+					} else {
+						$this.data('easyCall').specialtaskid = data.id;
+						// on a timer, query the status
+						$this.data('easyCall').timer = $.timer(function(){
+							$.post("ajaxeasycall.php", {"action":"status","id":$this.data('easyCall').specialtaskid}, function(data){
+								// get the status
+								var status = method.handleStatus(data);
+								progresstext.empty().append(status.message);
+								if (!status.error && status.complete) {
+									$this.data('easyCall').timer.stop();
+									// save audiofile
+									method.doSaveAudioFile(code);
+								}
+								if (status.error) {
+									$this.data('easyCall').specialtaskid = false;
+									$this.data('easyCall').timer.stop();
+									
+									// transition to error mode
+									method.replaceContainer(code, method.createErrorContainer(code, status.message));
+								}
+							},"json")
+							.error(function() {
 								$this.data('easyCall').specialtaskid = false;
 								$this.data('easyCall').timer.stop();
-								
 								// transition to error mode
-								method.replaceContainer(code, method.createErrorContainer(code, status.message));
-							}
-						},"json")
-						.error(function() {
-							$this.data('easyCall').specialtaskid = false;
-							$this.data('easyCall').timer.stop();
-							// transition to error mode
-							method.replaceContainer(code, method.createErrorContainer(code, "An error occured while getting the status of a call."));
-						});
-					}).set({time: 2000, autostart: true});
+								method.replaceContainer(code, method.createErrorContainer(code, "An error occured while getting the status of a call."));
+							});
+						}).set({time: 2000, autostart: true});
+					}
 				},"json")
 				.error(function() {
 					$this.data('easyCall').specialtaskid = false;
