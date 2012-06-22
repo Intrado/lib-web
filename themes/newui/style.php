@@ -404,7 +404,7 @@ input[name=msgsndr_msggroup] {
 .msg_content_nav button:hover { background: #ededed; color: #888; text-decoration: none; }
 .msg_content_nav button span { color: #444; font-weight: bold; }
 
-.msg_content_nav li button span.icon { background: url(themes/newui/images/add.png) 0 center no-repeat; width: 16px; margin: 3px 0 0; }
+.msg_content_nav li button span.icon { background: url(themes/newui/images/add.png) 0 center no-repeat; width: 16px; margin: 4px 0 0; }
 .msg_content_nav li.ophone button span.icon   { background-image: url(themes/newui/images/phone.png) }
 .msg_content_nav li.oemail button span.icon   { background-image: url(themes/newui/images/email.png) }
 .msg_content_nav li.osms button span.icon     { background-image: url(themes/newui/images/sms.png) }
