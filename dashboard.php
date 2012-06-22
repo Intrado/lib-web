@@ -176,7 +176,7 @@ $jobtemplates = DBFindMany("Job", $query,"j",array($USER->id));
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "start:start";
-$TITLE = _L("Welcome");
+$TITLE = "";
 
 include("nav.inc.php");
 ?>

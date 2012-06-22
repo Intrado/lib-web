@@ -15,10 +15,7 @@ if (isset($_GET['template']) && $_GET['template'] && isset($_GET['subject']) && 
 }
 
 $PAGE = "notifications:jobs";
-// if (isset($_SESSION['message_sender']['template']['subject']))
-// 	$TITLE = _L("Broadcast Template: %s", $_SESSION['message_sender']['template']['subject']);
-// else
-	$TITLE = _L("New Broadcast");
+$TITLE = "";
 
 // Moved this include into message_sender/index.php 
 //include("nav.inc.php");
