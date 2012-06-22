@@ -596,6 +596,111 @@ _L('Security & Administrator Controls'),
 	)
 );
 
+$tai_formdata = array(
+_L('Talk About It Controls'),
+	"taicanforwardthread" => array(
+		"label" => _L('tai_canforwardthread'),
+		"fieldhelp" => _L('Allows users to TODO '),
+		"value" => $obj->getValue("tai_canforwardthread"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 13
+	),
+	"taicanviewreports" => array(
+		"label" => _L('tai_canviewreports'),
+		"fieldhelp" => _L('Allows users to TODO '),
+		"value" => $obj->getValue("tai_canviewreports"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 13
+	),
+	"taicansendanonymously" => array(
+		"label" => _L('tai_cansendanonymously'),
+		"fieldhelp" => _L('Allows users to TODO '),
+		"value" => $obj->getValue("tai_cansendanonymously"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 13
+	),
+	"taicanmanagenews" => array(
+		"label" => _L('tai_canmanagenews'),
+		"fieldhelp" => _L('Allows users to TODO '),
+		"value" => $obj->getValue("tai_canmanagenews"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 13
+	),
+	"taicanmanagetopics" => array(
+		"label" => _L('tai_canmanagetopics'),
+		"fieldhelp" => _L('Allows users to TODO '),
+		"value" => $obj->getValue("tai_canmanagetopics"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 13
+	),
+	"taicanbetopicrecipient" => array(
+		"label" => _L('tai_canbetopicrecipient'),
+		"fieldhelp" => _L('Allows users to TODO '),
+		"value" => $obj->getValue("tai_canbetopicrecipient"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 13
+	),
+	"taicanusecannedresponses" => array(
+		"label" => _L('tai_canusecannedresponses'),
+		"fieldhelp" => _L('Allows users to TODO '),
+		"value" => $obj->getValue("tai_canusecannedresponses"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 13
+	),
+	"taicanmanagecannedresponses" => array(
+		"label" => _L('tai_canmanagecannedresponses'),
+		"fieldhelp" => _L('Allows users to TODO '),
+		"value" => $obj->getValue("tai_canmanagecannedresponses"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 13
+	),
+	"taicanrequestidentityreveal" => array(
+		"label" => _L('tai_canrequestidentityreveal'),
+		"fieldhelp" => _L('Allows users to TODO '),
+		"value" => $obj->getValue("tai_canrequestidentityreveal"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 13
+	),
+	"taicanmanagesurveys" => array(
+		"label" => _L('tai_canmanagesurveys'),
+		"fieldhelp" => _L('Allows users to TODO '),
+		"value" => $obj->getValue("tai_canmanagesurveys"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 13
+	),
+	"taicanmanagelockouts" => array(
+		"label" => _L('tai_canmanagelockouts'),
+		"fieldhelp" => _L('Allows users to TODO '),
+		"value" => $obj->getValue("tai_canmanagelockouts"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 13
+	),
+	"taicanmanageactivationcodes" => array(
+		"label" => _L('tai_canmanageactivationcodes'),
+		"fieldhelp" => _L('Allows users to TODO '),
+		"value" => $obj->getValue("tai_canmanageactivationcodes"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 13
+	)
+);
+
+if (getSystemSetting("_hastai", false)) {
+	$formdata = array_merge($formdata, $tai_formdata);
+}
+
+
 //remove any formdata for features that are not enabled
 
 if(!getSystemSetting("_hasportal", false)) {
@@ -642,7 +747,8 @@ $helpsteps = array (
 	_L('Choose whether the user can create reports or not.'),
 	_L('Choose whether the user can monitor events like job sent and/or completed'),
 	_L('The options in this section control views of all of the activity in the system.'),
-	_L('This section contains options for top-level administrative functions such as creating users and managing system settings. You should only enable these features for top-level administrators.')
+	_L('This section contains options for top-level administrative functions such as creating users and managing system settings. You should only enable these features for top-level administrators.'),
+	_L('This section is for Talk About It permissions')
 );
 
 $buttons = array(submit_button(_L('Save'),"submit","tick"));
@@ -757,6 +863,22 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$obj->setPermission("setcallerid", (bool)$postdata['setcallerid']);
 			}
 			
+			// TAI
+			if (getSystemSetting("_hastai", false)) {
+				$obj->setPermission("tai_canforwardthread", (bool)$postdata['taicanforwardthread']);
+				$obj->setPermission("tai_canviewreports", (bool)$postdata['taicanviewreports']);
+				$obj->setPermission("tai_canmanagenews", (bool)$postdata['taicanmanagenews']);
+				$obj->setPermission("tai_cansendanonymously", (bool)$postdata['taicansendanonymously']);
+				$obj->setPermission("tai_canmanagetopics", (bool)$postdata['taicanmanagetopics']);
+				$obj->setPermission("tai_canbetopicrecipient", (bool)$postdata['taicanbetopicrecipient']);
+				$obj->setPermission("tai_canusecannedresponses", (bool)$postdata['taicanusecannedresponses']);
+				$obj->setPermission("tai_canmanagecannedresponses", (bool)$postdata['taicanmanagecannedresponses']);
+				$obj->setPermission("tai_canrequestidentityreveal", (bool)$postdata['taicanrequestidentityreveal']);
+				$obj->setPermission("tai_canmanagesurveys", (bool)$postdata['taicanmanagesurveys']);
+				$obj->setPermission("tai_canmanagelockouts", (bool)$postdata['taicanmanagelockouts']);
+				$obj->setPermission("tai_canmanageactivationcodes", (bool)$postdata['taicanmanageactivationcodes']);
+			}
+				
 		Query("COMMIT");
 
 		$_SESSION['editaccessid'] = $obj->id;
