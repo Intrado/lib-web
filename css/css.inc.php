@@ -147,7 +147,7 @@ button::-moz-focus-inner, input::-moz-focus-inner { border: 0; padding: 0; }
 textarea { overflow: auto; vertical-align: top; resize: vertical; }
 
 table { border-collapse: collapse; border-spacing: 0; }
-td, th { vertical-align: middle; padding: .5em; }
+td, th { vertical-align: top; padding: .5em; }
 
 
 /*----- Basic stylesheet for all themes, each theme has it's own specific styles in the theme folder. See example.css for guide and ideas -----*/
