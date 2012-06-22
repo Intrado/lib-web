@@ -7,6 +7,7 @@ function loadMessage(mgid) {
 	this.elements = {
 		"messageTab": j('.msg_steps li:eq(1)'),
 		"messageSection": j('#msg_section_2'),
+		"messageGroupTable": j('#messages_list'),
 		
 		"phoneComplete": j('li.ophone'),
 		"phoneType": j('#msgsndr_phonetype'),
@@ -123,63 +124,89 @@ function loadMessage(mgid) {
 	};
 	
 	// get message group data ...
-	this.getMessageGroups = function() {
-		if (self.msgGroups)
-			return;
+	this.getMessageGroups = function(start) {
+		// if no start set, this must be a new request to get message groups
+		if (!start) {
+			// if we have already loaded them, return
+			if (self.msgGroups)
+				return;
+			else
+				start = 0;
+		}
+		var limit = 25;
 		j.ajax({
 			url: '/'+orgPath+'/api/2/users/'+userid+'/messagegroups',
 			type: "GET",
+			data: {"start": start, "limit": limit},
 			dataType: "json",
 			success: function(data) {
-				self.msgGroups = [];
+				if (!self.msgGroups)
+					self.msgGroups = [];
 				// sort by name
 				j.each(data.messageGroups, function(i,mg) {
-					if (self.msgGroups == []) {
-						self.msgGroups.push(mg);
-					} else {
-						var isInserted = false;
-						j.each(self.msgGroups, function(index, mgsorted) {
-							if (mg.name.toLowerCase() < mgsorted.name.toLowerCase()) {
-								self.msgGroups.splice(index,0,mg);
-								isInserted = true;
-								return false;
-							}
-						});
-						if (!isInserted)
-							self.msgGroups.push(mg);
-					}
-				});
-
-				j.each(self.msgGroups, function(index, msgGroup) {
+					self.msgGroups.push(mg);
 					// format the date from the modifiedTimestamp value
-					var msgDate = moment(msgGroup.modifiedTimestamp*1000).format('MM/DD/YYYY');
-					
-					var msgTypes = msgGroup.typeSummary;
+					var msgDate = moment(mg.modifiedTimestamp*1000).format('MM/DD/YYYY');
 					// loop through the typeSummary array to see what message parts are included
-					var msgPhone = '';
-					var msgEmail = '';
-					var msgSms = '';
-					var msgPost = '';
+					var msgPhone = msgEmail = msgSms =  msgPost = '';
 					var tickHtml = '<span class="icon">x</span>';
-					j.each(msgTypes, function(index, msgType) {
-						if (msgType.type == 'phone') {
+					j.each(mg.typeSummary, function(index, msgType) {
+						switch (msgType.type) {
+						case 'phone':
 							msgPhone = tickHtml;
-						}
-						if (msgType.type == 'email') {
+							break;
+						case 'email':
 							msgEmail = tickHtml;
-						}
-						if (msgType.type == 'sms') {
+							break;
+						case 'sms':
 							msgSms = tickHtml;
-						}
-						if (msgType.type == 'post') {
+							break;
+						case 'post':
 							msgPost = tickHtml;
 						}
 					});
-
-					j('#messages_list').append('<tr id="msgsndr_msggroup-'+msgGroup.id+'" class="msgsndr_msggroup"><td><input type="radio" data-audio="'+msgGroup.phoneIsAudioOnly+'" name="msgsndr_msggroup" value="'+msgGroup.id+'"/>'+msgGroup.name+'</td><td class="created">'+msgDate+'</td><td class="ico">'+msgPhone+'</td><td class="ico">'+msgEmail+'</td><td class="ico">'+msgSms+'</td><td class="ico">'+msgPost+'</td></tr>');
+					// FIXME: escape html in message group names
+					var mgtablerecord = 
+						'<tr id="msgsndr_msggroup-'+mg.id+'" class="msgsndr_msggroup">'+
+							'<td>'+
+								'<span class="msgsndr_msggroup_name">'+mg.name+'</span>'+
+							'</td>'+
+							'<td class="created">'+
+								msgDate+
+							'</td>'+
+							'<td class="ico">'+
+								msgPhone+
+							'</td>'+
+							'<td class="ico">'+
+								msgEmail+
+							'</td>'+
+							'<td class="ico">'+
+								msgSms+
+							'</td>'+
+							'<td class="ico">'+
+								msgPost+
+							'</td>'+
+						'</tr>';
+					var isInserted = false;
+					var tablerecords = self.elements.messageGroupTable.children("tr");
+					tablerecords.each(function(index) {
+						var name = mg.name.toLowerCase();
+						var td = j(this).find(".msgsndr_msggroup_name").first();
+						var sortedname = td.text().toLowerCase();
+						if (name < sortedname) {
+							j(this).before(mgtablerecord);
+							isInserted = true;
+							return false;
+						}
+					});
+					if (!isInserted)
+						self.elements.messageGroupTable.append(mgtablerecord);
 				});
-			} 
-		});	 
+				// if there are more pages
+				if (data.paging.total > start + limit)
+					self.getMessageGroups(start + limit);
+			}
+		});
 	};
 
 	this.prepareFormForLoad = function(msgGroup) {
