@@ -275,7 +275,8 @@ function loadMessage(mgid) {
 							self.elements.feedSection.show();
 							break;
 					}
-					global.watchSocial('msgsndr_tab_social');
+					//global.watchSocial('msgsndr_tab_social');
+					obj_stepManager.updateStepStatus();
 					break;
 			}
 		});
