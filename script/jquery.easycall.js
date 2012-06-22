@@ -223,7 +223,7 @@
 				var container = $('<div />', { "class": "easycallerrorcontainer"});
 				var languagetitle = $('<div />', { "class": "easycalllanguagetitle", "text": $this.data('easyCall').languages[code] });
 				var resetbutton = $('<button />', { "class": "easycallerrorbutton" });
-				resetbutton.append($('<span />', { "class": "icon" })).append($('<span />').append("Retry"));
+				resetbutton.append("Retry");
 				container.append(languagetitle)
 						.append($('<span />', { "class": "easycallerrortext" }).append(errortext))
 						.append(resetbutton)
