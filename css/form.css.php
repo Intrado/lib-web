@@ -428,9 +428,9 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 .newui .formfieldarea { padding: 8px 10px; }
 .newui .formfieldarea .underneathmsg { padding: 0 0 0 140px; font-size: 14px; font-weight: normal; color: #cc0000; }
 
-.newui .newform .formtitle { float: left; display: inline; width: 140px; /*margin: 0;*/ padding: 0; }
-.newui .newform .formtitle .formlabel { float: none; display: block; padding: 5px 10px 5px 0; font-size: 14px; line-height: 18px; font-weight: normal; text-align: right; }
-.newui .newform .formtitle .formicon { display: none; }
+.newui .newform .formtitle { float: left; display: inline; width: 150px; /*margin: 0;*/ padding: 0; }
+.newui .newform .formtitle .formlabel { float: none; /*display: block;*/ padding: 5px 0px 5px 0; font-size: 14px; line-height: 18px; font-weight: normal; text-align: right; }
+.newui .newform .formtitle .formicon { /*display: none;*/ }
 
 .newui .newform .formcontrol { float: left; display: inline; /*margin: 0;*/ padding: 0; }
 .newui .newform .formcontrol input[type="text"] { display: block; width: 313px; padding: 4px 5px; font-size: 14px; line-height: 18px; border: 1px solid #E2E2E2; 
