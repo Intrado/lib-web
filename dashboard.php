@@ -377,7 +377,7 @@ include("nav.inc.php");
 	
 		<div class="help">
 			<h3>Need Help?</h3>
-			<p>Visit the <a href="#" onclick="popup('help/index.php',750,500);">help section</a> or call (800) 920-3897. Also be sure to <a href="mailto:feedback@schoolmessenger.com">give us feedback</a> about the new version.</p>
+			<p>Visit the <a href="#" onclick="popup('help/index.php',950,500);">help section</a> or call (800) 920-3897. Also be sure to <a href="mailto:feedback@schoolmessenger.com">give us feedback</a> about the new version.</p>
 		</div>
 	</div><!-- end main_aside -->
 	
