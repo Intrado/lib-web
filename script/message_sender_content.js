@@ -476,14 +476,17 @@ function ContentManager() {
 	};
 	
 	this.cancelContent = function() {
-		$("[id^=msgsndr_tab_]").hide();
-		$('.msg_content_nav > li').removeClass('active').removeClass('lighten');
-		
-		$('.msg_content_nav .o' + currentContent).removeClass('complete');
-		$('#msgsndr_review_' + currentContent).parent().removeClass('complete');
-		
-		currentContent = "";
-		obj_stepManager.updateStepStatus();
+		var remove = confirm("Warning, this will remove the message from your broadcast. Are you sure you wish to do this?");
+		if (remove) {
+			$("[id^=msgsndr_tab_]").hide();
+			$('.msg_content_nav > li').removeClass('active').removeClass('lighten');
+			
+			$('.msg_content_nav .o' + currentContent).removeClass('complete');
+			$('#msgsndr_review_' + currentContent).parent().removeClass('complete');
+			
+			currentContent = "";
+			obj_stepManager.updateStepStatus();
+		}
 	};
 	
 	this.saveContent = function($button) {
