@@ -97,7 +97,7 @@ function ContentSaveManager() {
 					if(overRide) {
 						transText = $('#tts_translated_' + langCode).val();
 						
-						var jsonVal = j.toJSON({
+						var jsonVal = $.toJSON({
 							"enabled" : "true",
 							"text" : transText,
 							"override" : "true",
