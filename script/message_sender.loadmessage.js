@@ -55,40 +55,42 @@ $.loadMessage = function loadMessage() {
 		"feedText": $('#msgsndr_form_rssmsg')
 	};
 	
-	// load a saved message is clicked, get the messages
-	$('#load_saved_message').on("click", function(){
-		self.getMessageGroups();
-	});
+	this.init = function() {
+		// load a saved message is clicked, get the messages
+		$('#load_saved_message').on("click", function(){
+			self.getMessageGroups();
+		});
 
-	// This makes the whole table row clickable to select the message ready for loading into content
-	$('#messages_list').on('click', 'tr', function(){
-		// Unset all inputs
-		$('input[name=msgsndr_msggroup]').removeAttr('checked');
-		// Remove selected class from all tr's
-		$('#messages_list tr').removeClass('selected');
-	
-		// Set radio button to checked for selected message
-		$('td:first input:radio[name=msgsndr_msggroup]', this).attr('checked', 'checked');
-		// Add class selected to tr
-		$(this).addClass('selected');
+		// This makes the whole table row clickable to select the message ready for loading into content
+		$('#messages_list').on('click', 'tr', function(){
+			// Unset all inputs
+			$('input[name=msgsndr_msggroup]').removeAttr('checked');
+			// Remove selected class from all tr's
+			$('#messages_list tr').removeClass('selected');
 		
-		if($('#msgsndr_load_saved_msg').is(':disabled')){                
-			$('#msgsndr_load_saved_msg').removeAttr('disabled');           
-		}
-	});
+			// Set radio button to checked for selected message
+			$('td:first input:radio[name=msgsndr_msggroup]', this).attr('checked', 'checked');
+			// Add class selected to tr
+			$(this).addClass('selected');
+			
+			if($('#msgsndr_load_saved_msg').is(':disabled')){                
+				$('#msgsndr_load_saved_msg').removeAttr('disabled');           
+			}
+		});
 
-	// Load Saved Message button in saved message modal window
-	$('#msgsndr_load_saved_msg').on('click', function(){
-		//var msgGroup = $('.msgsndr_msggroup > td > input:radio[name=msgsndr_msggroup]:checked');
-		var msgGroup = $(".msgsndr_msggroup.selected");
-		if(msgGroup.size() > 0) {
-			var getId = msgGroup.attr("id").match(/msgsndr_msggroup-([0-9]*)/i)[1];
-			
-			self.loadMessageGroup(getId);
-			
-			$('#msgsndr_load_saved_msg').attr('disabled', 'disabled');
-		}
-	});
+		// Load Saved Message button in saved message modal window
+		$('#msgsndr_load_saved_msg').on('click', function(){
+			//var msgGroup = $('.msgsndr_msggroup > td > input:radio[name=msgsndr_msggroup]:checked');
+			var msgGroup = $(".msgsndr_msggroup.selected");
+			if(msgGroup.size() > 0) {
+				var getId = msgGroup.attr("id").match(/msgsndr_msggroup-([0-9]*)/i)[1];
+				
+				self.loadMessageGroup(getId);
+				
+				$('#msgsndr_load_saved_msg').attr('disabled', 'disabled');
+			}
+		});
+	}
 	
 	// load a specific message group
 	this.loadMessageGroup = function(msgGrpId) {
