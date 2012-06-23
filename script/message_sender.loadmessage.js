@@ -90,7 +90,7 @@ $.loadMessage = function loadMessage() {
 				$('#msgsndr_load_saved_msg').attr('disabled', 'disabled');
 			}
 		});
-	}
+	};
 	
 	// load a specific message group
 	this.loadMessageGroup = function(msgGrpId) {
