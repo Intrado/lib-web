@@ -1,12 +1,30 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
  <meta name="generator" content="Adobe RoboHelp 9" />
 <title>Email Logs</title>
-<link rel="StyleSheet" href="../help.css" type="text/css" />
+<link rel="StyleSheet" href="../main.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function ehlp_showtip(current,e,text)
+{
+  if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape'))
+  {
+    document.tooltip.document.write("<layer bgColor='yellow' style='border:1px solid black;font-size:12px;'>"+ text + "</layer>");
+    document.tooltip.document.close();
+    document.tooltip.left=e.pageX+5;
+    document.tooltip.top=e.pageY+5;
+    document.tooltip.visibility="show";
+  }
+}
+function ehlp_hidetip()
+{
+  document.tooltip.visibility="hidden";
+}
+//]]>
+</script>
 <script type="text/javascript" language="JavaScript">
 //<![CDATA[
 function reDo() {
@@ -38,6 +56,7 @@ visibility:hidden; }
 <script type="text/javascript" language="javascript1.2" src="../whtopic.js"></script>
 
 </head>
+
 <body><script type="text/javascript" language="javascript1.2">//<![CDATA[
 <!--
 if (window.gbWhTopic)
@@ -85,118 +104,98 @@ else
 //-->
 //]]></script>
 <div style="width: 100%; position: relative;" id="header">
- <p><a href="javascript:top.window.close()">Exit Help</a></p>
+	<p>&#160;</p>
 </div>
 <h1>Email Logs</h1>
 <p>This section contains information to help you interpret Email Log reports.</p>
-<p><img src="../ReportEmailLog.gif" alt="Email Log Report" title="Email Log Report" style="border: none;" width="400" height="254" border="0" /></p>
+<p><img src="../EmailLog.jpg" alt="Email Log Report" title="Email Log Report" 
+		 style="border: none;" border="0" /></p>
 <p>&#160;</p>
-<span style="font-weight: bold;"><b>Display Options</b></span>
+<h4>Display Options </h4>
 <div style="
 padding:5px;
 background-repeat:Repeat-X;
-background-color:#cce0f2;
+background-color:#DFEFF3;
 margin-left:4px;
 margin-right:4px;
 margin-top:4px;
 margin-bottom:4px;
 float:right;
-width:50%;">
-<p style="font-weight: bold; text-align: center; font-size: 12pt;">Guide to Report Results</p>
-<p style="text-align: center; font-weight: normal;">This guide contains possible values which can be found in the Results section of the Email Log report.</p>
-<p style="line-height: Normal; margin-left: 0px;"><span style="line-height: Normal;"><span style="font-weight: bold;"><b>Sent:</b></span> The email was sent to the recipient's email address.</span></p>
-<p style="line-height: Normal; margin-left: 0px;"><span style="font-weight: bold;"><b>Unsent:</b></span> The email hasn't been sent to the recipient yet.</p>
-<p style="line-height: Normal; margin-left: 0px;"><span style="font-weight: bold;"><b>No email:</b></span> There is no email address in the database for the recipient.</p>
+width:35%;">
+	<h2>Guide to Report Results</h2>
+	<p>This guide contains possible results which can be found in an Email 
+	 Log report.</p>
+	<ul type="disc">
+		<li><p style="line-height: Normal; margin-left: 0px;"><span style="line-height: Normal;"><span 
+		 style="font-weight: bold;"><b>Sent:</b></span> The email was sent to 
+		 the recipient's email address.</span></p></li>
+		<li><p style="line-height: Normal; margin-left: 0px;"><span style="font-weight: bold;"><b>Unsent:</b></span> 
+		 The email hasn't been sent to the recipient yet.</p></li>
+		<li><p style="line-height: Normal; margin-left: 0px;"><span style="font-weight: bold;"><b>Duplicate:</b></span> 
+		 After sending an initial message, the system will flag an email 
+		 address as duplicate if it encounters it again in the same notification 
+		 Broadcast.</p></li>
+		<li><p style="line-height: Normal; margin-left: 0px;"><span style="font-weight: bold;"><b>Blocked:</b></span> 
+		 The email address the system was trying to contact is on the <a title="Click to view informatio about blocking email addresses." href="../System_Administration/System_Settings/Blocking_Email_Addresses.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to view informatio about blocking email addresses.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Blocked 
+		 Email</a> list.</p></li>
+		<li><p style="line-height: Normal; margin-left: 0px;"><span style="font-weight: bold;"><b>No 
+		 Email Selected:</b></span> The recipient's email address was not associated 
+		 with the Broadcast type. For example, if a recipient's email address 
+		 was associated only with emergency Broadcasts and not general 
+		 notifications, a general notification with an email message component 
+		 and a list including &#160;the recipient would result in &#160;&quot;No 
+		 Email Selected&quot;.</p></li>
+	</ul>
 </div>
-<p>The topmost part of the Phone Log contains options for viewing the report.</p>
+<p>The topmost part of the Email Log contains field and output options 
+ for creating the report.</p>
 <ul type="disc">
-<li class="p">
-<p><span style="font-weight: bold;"><b>Display Fields:</b></span> Select any additional fields you would like to display.</p>
-</li>
-<li class="p">
-<p><span style="font-weight: bold;"><b>Sort By:</b></span> Use the drop down menus to sort the report by certain fields.</p>
-</li>
-<li class="p">
-<p><span style="font-weight: bold;"><b>Output Format:</b></span> Click the CSV link to download the report as a CSV file. Click the PDF link to download the report as a PDF file.</p>
-</li>
+	<li class="p"><p><span style="font-weight: bold;"><b>Display Fields:</b></span> 
+	 Additional fields which can be included in the report</p></li>
+	<li class="p"><p><span style="font-weight: bold;"><b>Output Format:</b></span> 
+	 These buttons allow you to download your report as a CSV or PDF file.</p></li>
 </ul>
-<p style="font-weight: bold;">&#160;</p>
-<p style="font-weight: bold;">Filter By</p>
-<p>This section will display any filtering options you used to get to the report.</p>
-<p style="font-weight: bold;">&#160;</p>
-<p style="font-weight: bold;">Report Summary</p>
-<p>The top portion of the report displays the Report Summary which contains the results broken down by notification type as follows:</p>
+<h4>Report Details</h4>
+<p style="line-height: Normal;">The lower half of the report contains the 
+ Report Details which shows each recipient called and the results of the 
+ call. It's sections include:</p>
 <ul type="disc">
-<li class="p">
-<p style="line-height: Normal;"><span style="font-weight: bold;"><b>Job Name:</b></span> The name of the job associated with the report.</p>
-</li>
-<li class="p">
-<p style="line-height: Normal;"><span style="font-weight: bold;"><b>Type:</b></span> The priority level set for the job.</p>
-</li>
-<li class="p">
-<p style="line-height: Normal;"><span style="font-weight: bold;"><b>Submitted By:</b></span> The user who sent the job.</p>
-</li>
-<li class="p">
-<p style="line-height: Normal;"><span style="font-weight: bold;"><b>Start Date:</b></span> &#160;The date and time the job was scheduled to run.</p>
-</li>
-<li class="p">
-<p style="line-height: Normal;"><span style="font-weight: bold;"><b>End Date:</b></span> The date and time that the job was scheduled to end.</p>
-</li>
-<li class="p">
-<p style="line-height: Normal;"><span style="font-weight: bold;"><b>Status:</b></span> The current status of the job. For example, if the job is running currently, its status is "Active."</p>
-</li>
-<li class="p">
-<p style="line-height: Normal;"><span style="font-weight: bold;"><b>Ind's on List:</b></span> The number of individual recipients on the list for this job.</p>
-</li>
-<li class="p">
-<p style="line-height: Normal;"><span style="font-weight: bold;"><b># of Phones:</b></span> The number of phone numbers associated with this report.</p>
-</li>
-<li class="p">
-<p style="line-height: Normal;"><span style="font-weight: bold;"><b># of Emails:</b></span> The number of email address associated with this report.</p>
-</li>
-<li class="p">
-<p style="line-height: Normal;"><span style="font-weight: bold;"><b># of SMS:</b></span> The number of SMS numbers associated with this report.</p>
-</li>
-</ul>
-<p style="line-height: Normal;">&#160;</p>
-<p style="line-height: Normal; font-weight: bold;">Report Details</p>
-<p style="line-height: Normal;">The lower half of the report contains the Report Details which shows each recipient called and the results of the call. It's sections include:</p>
-<ul type="disc">
-<li class="p">
-<p style="line-height: Normal;"><span style="font-weight: bold;"><b>Job:</b></span> The job that the recipient is associated with.</p>
-</li>
-<li class="p">
-<p style="line-height: Normal;"><span style="font-weight: bold;"><b>Submitted by:</b></span> The user who submitted the job associated with the recipient.</p>
-</li>
-<li class="p">
-<p style="line-height: Normal;"><span style="font-weight: bold;"><b>ID#:</b></span> <span>The ID number of the recipient in the database.</span></p>
-</li>
-<li class="p">
-<p style="line-height: Normal;"><span style="font-weight: bold;"><b>First Name:</b></span> The recipient's first name.</p>
-</li>
-<li class="p">
-<p style="line-height: Normal;"><span style="font-weight: bold;"><b>Last Name:</b></span> The recipient's last name.</p>
-</li>
-<li class="p">
-<p style="line-height: Normal;"><span style="font-weight: bold;"><b>Message:</b></span> The name of the message the recipient received. The icon next to the message displays the type of message sent; phone or email.</p>
-</li>
-<li class="p">
-<p style="line-height: Normal;"><span style="font-weight: bold;"><b>Destination:</b></span> The email address that was used to reach the recipient.</p>
-</li>
-<li class="p">
-<p style="line-height: Normal;"><span style="font-weight: bold;"><b>Attempts:</b></span> The number of attempts to reach this recipient.</p>
-</li>
-<li class="p">
-<p style="line-height: Normal;"><span style="font-weight: bold;"><b>Last Attempt:</b></span> <span>The last time that the system tried to contact the recipient.</span></p>
-</li>
-<li class="p">
-<p style="line-height: Normal;"><span style="font-weight: bold;"><b>Last Result:</b></span> Shows the result of the delivery attempt. Results are explained in the Guide to Report Results in the blue box on this page.</p>
-</li>
+	<li class="p"><p style="line-height: Normal;"><span style="font-weight: bold;"><b>Job:</b></span> 
+	 The Broadcast that the recipient is associated with.</p></li>
+	<li class="p"><p style="line-height: Normal;"><span style="font-weight: bold;"><b>Submitted 
+	 by:</b></span> The user who submitted the Broadcast associated with the 
+	 recipient.</p></li>
+	<li class="p"><p style="line-height: Normal;"><span style="font-weight: bold;"><b>ID#:</b></span> 
+	 <span>The ID number of the recipient in the database.</span></p></li>
+	<li class="p"><p style="line-height: Normal;"><span style="font-weight: bold;"><b>First 
+	 Name:</b></span> The recipient's first name.</p></li>
+	<li class="p"><p style="line-height: Normal;"><span style="font-weight: bold;"><b>Last 
+	 Name:</b></span> The recipient's last name.</p></li>
+	<li class="p"><p style="line-height: Normal;"><span style="font-weight: bold;"><b>Message:</b></span> 
+	 The name of the message the recipient received. The icon next to the 
+	 message displays the type of message sent; phone or email.</p></li>
+	<li class="p"><p style="line-height: Normal;"><span style="font-weight: bold;"><b>Destination:</b></span> 
+	 The email address that was used to reach the recipient.</p></li>
+	<li class="p"><p style="line-height: Normal;"><span style="font-weight: bold;"><b>Attempts:</b></span> 
+	 The number of attempts to reach this recipient.</p></li>
+	<li class="p"><p style="line-height: Normal;"><span style="font-weight: bold;"><b>Last 
+	 Attempt:</b></span> <span>The last time that the system tried to contact 
+	 the recipient.</span></p></li>
+	<li class="p"><p style="line-height: Normal;"><span style="font-weight: bold;"><b>Last 
+	 Result:</b></span> Shows the result of the delivery attempt. Results are 
+	 explained in the Guide to Report Results in the blue box on this page.</p></li>
 </ul>
 <p style="line-height: Normal; margin-left: 80px;">&#160;</p>
-<div style="width: 100%; position: relative;" id="footer">&#160;&#160;<span style="font-size: xx-small;"><font size="1" style="font-size: xx-small;">©1999 - 2011 Reliance Communications, Inc.</font></span> 
+<div style="width: 100%; position: relative;" id="footer">
+	<p><span style="font-size: xx-small;"><font size="1" style="font-size: xx-small;">©1999 - 2012 Reliance Communications, 
+	 Inc.</font></span></p>
 </div>
-<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+ if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape'))
+  document.write("<div id='tooltip' class='WebHelpPopupMenu'></div>");
+//]]>
+</script><script type="text/javascript" language="javascript1.2">//<![CDATA[
 <!--
 if (window.writeIntopicBar)
 	writeIntopicBar(0);

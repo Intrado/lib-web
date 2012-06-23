@@ -3,7 +3,7 @@
 <book name="Getting Started" >
   <item name="Welcome" url="Getting_Started/Welcome.htm" />
   <item name="Send a Basic Message" url="Getting_Started/Send_a_Basic_Message.htm" />
-  <item name="Start Page" url="Getting_Started/Start_Page.htm" />
+  <item name="The Dashboard" url="Getting_Started/Start_Page.htm" />
 </book>
 <book name="Printable PDFs" >
   <item name="PDF Guides" url="PDFs/PDF_Guides.htm" />
@@ -16,19 +16,22 @@
 <book name="Publish and Subscribe" >
   <item name="Publish and Subscribe Overview" url="Publish_and_Subscribe/Publish_and_Subscribe_Overview.htm" />
 </book>
+<book name="Templates" >
+  <item name="Broadcast Templates" url="Broadcasts/Broadcast_Templates.htm" />
+</book>
 <book name="Surveys" >
   <item name="Survey Overview" url="Surveys/Survey_Overview.htm" />
   <item name="Important Tips for Creating Surveys" url="Surveys/Important_Tips_for_Creating_Surveys.htm" />
 </book>
 <book name="Remote Telephone Access" >
   <item name="Remote Telephone Access Overview" url="Remote_Telephone_Access/Remote_Telephone_Access_Overview.htm" />
-  <item name="Remotely Create a Single Language Job" url="Remote_Telephone_Access/Remotely_Create_a_Single_Language_Job.htm" />
-  <item name="Remotely Create a Multilingual Job" url="Remote_Telephone_Access/Remotely_Create_a_Multilingual_Job.htm" />
+  <item name="Create a Single Language Broadcast" url="Remote_Telephone_Access/Remotely_Create_a_Single_Language_Job.htm" />
+  <item name="Create a Multilingual Broadcast" url="Remote_Telephone_Access/Remotely_Create_a_Multilingual_Job.htm" />
 </book>
 <book name="Reports" >
   <item name="Reports Overview" url="Reports/Reports.htm" />
   <item name="Using the Report Builder" url="Reports/Querying_Report_Data.htm" />
-  <item name="Notification Summaries" url="Reports/Standard_Job_Reports.htm" />
+  <item name="Broadcast Summaries" url="Reports/Standard_Job_Reports.htm" />
   <item name="Phone Logs" url="Reports/Understanding_Call_Logs.htm" />
   <item name="Email Logs" url="Reports/Email_Logs.htm" />
   <item name="SMS Logs" url="Reports/SMS_Logs.htm" />

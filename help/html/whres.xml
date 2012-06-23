@@ -200,19 +200,19 @@
   </stems>
 
 	<paneskin>
-		<background color="#ffffff" img="" />
-		<font name="Tahoma" size="8pt" color="#000080" style="Normal" weight="Normal" decoration="none" />
+		<background color="#dfeff3" img="" />
+		<font name="Arial" size="9pt" color="#383838" style="Normal" weight="Bold" decoration="none" />
 		<toc>
-			<background color="#5c80ca" img="sidebar2.gif" />
+			<background color="#5c80ca" img="sidebar_grey.gif" />
 			<icons>
-				<book open="wht_toc2.gif" close="wht_toc1.gif" />
-				<item  local="wht_toc3.gif" remote="wht_toc4.gif" />
+				<book open="book_open.png" close="book.png" />
+				<item  local="page_white.png" remote="world_link.png" />
 				<newbook open="" close="" />
 				<newitem  local="" remote="" />
 			</icons>
 			<fonts>
-				<normal name="Tahoma" size="8pt" color="#000000" style="Normal" weight="Normal" decoration="none" />
-				<hover name="Tahoma" size="8pt" color="#000080" style="Normal" weight="Normal" decoration="underline" />
+				<normal name="Arial" size="9pt" color="#000000" style="Normal" weight="Bold" decoration="none" />
+				<hover name="Arial" size="9pt" color="#000080" style="Normal" weight="Bold" decoration="underline" />
 			</fonts>
 			<activebackgroundcolor attr="#b1c6cf" />
 			<margin attr="" />
@@ -221,16 +221,16 @@
 		<index>
 			<form>
 				<fonts>
-					<title name="Tahoma" size="8pt" color="#000080" style="Normal" weight="Normal" decoration="none" />
+					<title name="Arial" size="9pt" color="#383838" style="Normal" weight="Bold" decoration="none" />
 				</fonts>
 				<button normal="" hover="" />
 				<editwith value="20" />
 			</form>
-			<background color="#5c80ca" img="sidebar2.gif" />
+			<background color="#5c80ca" img="sidebar_grey.gif" />
 			<fonts>
-				<normal name="Tahoma" size="8pt" color="#000000" style="Normal" weight="Normal" decoration="none" />
-				<hover name="Tahoma" size="8pt" color="#000080" style="Normal" weight="Normal" decoration="underline" />
-				<empty name="" size="8pt" color="" style="" weight="" decoration="" />
+				<normal name="Arial" size="9pt" color="#000000" style="Normal" weight="Bold" decoration="none" />
+				<hover name="Arial" size="9pt" color="#000080" style="Normal" weight="Bold" decoration="underline" />
+				<empty name="" size="9pt" color="" style="" weight="" decoration="" />
 			</fonts>
 			<activebackgroundcolor attr="#b1c6cf" />
 			<margin attr="" />
@@ -239,26 +239,26 @@
 		<fts>
 			<form>
 				<fonts>
-					<title name="Tahoma" size="8pt" color="#000080" style="Normal" weight="Normal" decoration="none" />
+					<title name="Arial" size="9pt" color="#383838" style="Normal" weight="Bold" decoration="none" />
 				</fonts>
 				<button normal="" hover="" />
 				<editwith value="20" />
 			</form>
-			<background color="#5c80ca" img="sidebar2.gif" />
+			<background color="#5c80ca" img="sidebar_grey.gif" />
 			<fonts>
-				<normal name="Tahoma" size="8pt" color="#000000" style="Normal" weight="Normal" decoration="none" />
-				<hover name="Tahoma" size="8pt" color="#000080" style="Normal" weight="Normal" decoration="underline" />
-				<error name="Tahoma" size="8pt" color="#000000" style="Normal" weight="Normal" decoration="none" />
+				<normal name="Arial" size="9pt" color="#000000" style="Normal" weight="Bold" decoration="none" />
+				<hover name="Arial" size="9pt" color="#000080" style="Normal" weight="Bold" decoration="underline" />
+				<error name="Arial" size="9pt" color="#000000" style="Normal" weight="Bold" decoration="none" />
 			</fonts>
 			<activebackgroundcolor attr="#b1c6cf" />
 			<margin attr="" />
 			<indent attr="" />
 		</fts>
 		<glossary>
-			<background color="#5c80ca" img="sidebar2.gif" />
+			<background color="#5c80ca" img="sidebar_grey.gif" />
 			<fonts>
-				<normal name="Tahoma" size="8pt" color="#000000" style="Normal" weight="Normal" decoration="none" />
-				<hover name="Tahoma" size="8pt" color="#000080" style="Normal" weight="Normal" decoration="underline" />
+				<normal name="Arial" size="9pt" color="#000000" style="Normal" weight="Bold" decoration="none" />
+				<hover name="Arial" size="9pt" color="#000080" style="Normal" weight="Bold" decoration="underline" />
 			</fonts>
 			<activebackgroundcolor attr="#b1c6cf" />
 			<margin attr="" />

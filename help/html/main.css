@@ -1,60 +1,89 @@
-﻿/*Created with Adobe RoboHelp.*/
-/*Created with Adobe RoboHelp.*/
-/*Created with Adobe RoboHelp.*/
-/*Created with Adobe RoboHelp.*/
+/*Created with Adobe RoboHelp 9.*/
 SPAN.maincontent {
 	font-size: 10pt;
-	font-family: Verdana, sans-serif;
+	font-family: helvetica, Arial sans-serif;
 }
-A:active {
-	font-family: Verdana, sans-serif;
-	color: #a45200;
-	font-size: 8pt;
+
+a:link {
+	font-family: helvetica, Arial sans-serif;
+	color: #336799;
+	font-size: 10pt;
+	text-decoration:none;
+	font-weight: bold;
 }
-A:hover {
+a:visited {
 	font-family: Verdana, sans-serif;
+	color: #C73B0F;
+	font-size: 10pt;
+	text-decoration:none;
+	font-weight: bold;
+}
+a:hover {
+	font-family: helvetica, Arial sans-serif;
 	color: #208fff;
-	font-size: 8pt;
+	font-size: 10pt;
+	font-weight: bold;
+	text-decoration:underline;
+
 }
-A:link {
-	font-family: Verdana, sans-serif;
-	color: #004891;
-	font-size: 8pt;
+a:active {
+	font-family: helvetica, Arial sans-serif;
+	color: #1A3D5E;
+	font-size: 10pt;
+	font-weight: bold;
+
 }
-A:visited {
-	font-family: Verdana, sans-serif;
-	color: #572c00;
-	font-size: 8pt;
-}
+
 SPAN.glosstext {
 	font-size: 10pt;
-	font-family: Verdana, sans-serif;
+	font-family: helvetica, Arial sans-serif;
 }
 SPAN.expandtext {
 	font-size: 10pt;
-	font-family: Verdana, sans-serif;
+	font-family: helvetica, Arial sans-serif;
 }
 BODY {
-	font-family: Verdana, sans-serif;
+	font-family: helvetica, Arial sans-serif;
+	font-size: 10pt;
 	color: #585858;
 }
 OL,
 UL {
 	font-size: 10pt;
-	font-family: Verdana, sans-serif;
+	font-family: helvetica, Arial sans-serif;
 }
 P {
-	font-size: 8pt;
-}
-LI.P {
-	font-size: 8pt;
+	font-size: 10pt;
+	color: #000000;
 }
 
+p.important {
+	font-size: 10pt;
+	color: #386C9C;
+	font-style: italic;
+
+}
+
+LI.p {
+	font-size: 10pt;
+}
 H1 {
-	font-size: large;
+	font-size: 16pt;
+	color: #386C9C;
 }
-LI.H1 {
-	font-size: large;
+H4{
+	font-size: 12pt;
+	color: #469EB9;
+}
+H3{
+	font-size: 11pt;
+	color: #316597;
+}
+LI.h1 {
+	font-size: 15pt;
 }
 
-/*Created with Adobe RoboHelp.*/
+}
+LI.h4 {
+	font-weight: bold;
+}
