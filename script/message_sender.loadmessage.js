@@ -359,40 +359,25 @@ $.loadMessage = function loadMessage() {
 	this.clearForm = function() {
 		$('.msg_content_nav li').removeClass('complete active lighten');
 		$('.tab_content .tab_panel').hide();
-		$('.facebook, .twitter, .feed').hide();			
+		$('.facebook, .twitter, .feed').hide();
 	
-		var allDataInputs = $('#msg_section_2 input, textarea');
-	
-		$.each(allDataInputs, function(aIndex, aData) {
-	
+		$('#msg_section_2 .msgdata').each(function(aIndex, aData) {
 			if ($(aData).attr('type') == 'checkbox') {
 				$(aData).removeAttr('checked');
-			}
-			// don't blank out easycall phone number field
-			if (!$(aData).hasClass("easycallphoneinput"))
+				$(aData).parent().children(".controls").first().addClass("hide");
+			} else if ($(aData).is("div")) {
+				$(aData).empty();
+			} else {
 				$(aData).val('').removeClass('ok');
-	
+			}
 		});
 	
-		// Uncheck all translation check boxes and hide their controls
-		$.each($('input.translations'), function(aIndex, aData) {
-			$(aData).removeAttr('checked');
-			$(aData).parent().children(".controls").addClass("hide").children("textarea").attr("disabled","disabled");
-		});
-	
-		var reviewTabs = $('.msg_complete li');
-		$.each(reviewTabs, function(tIndex, tData) {
+		$('.msg_complete li').each(function(tIndex, tData) {
 			$(tData).removeClass('complete');
 		});
-	
-		// Phone 
-		$("#msgsndr_form_number").empty();
-	
-		// Email Message Content resets
-		clearHtmlEditorContent();
-		self.elements.emailBody.val("");
 		
-		$('#uploadedfiles').empty();
+		// ckEditor Message Content resets
+		clearHtmlEditorContent();
 	}
 
 	// load phone message asynchronously from the server

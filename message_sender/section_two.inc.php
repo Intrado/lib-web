@@ -43,7 +43,7 @@
 				<fieldset>
 					<label for="msgsndr_form_number">Recording</label>
 					<div class="controls">
-						<input class="small required ok" type="hidden" id="msgsndr_form_number" name="phone_number" /> <span class="error"></span>
+						<input class="small required ok msgdata" type="hidden" id="msgsndr_form_number" name="phone_number" /> <span class="error"></span>
 						<!-- <button class="record" id="ctrecord"><span class="icon"></span> Call Now to Record</button> -->
 					</div>
 				</fieldset>
@@ -117,10 +117,10 @@
 					<label for="msgsndr_tts_message">Message</label>
 					<div class="controls">
 						<button class="btn-small paste-from hidden" data-textarea="msgsndr_tts_message">Paste text from email</button>
-						<textarea id="msgsndr_tts_message" name="phone_tts" class="required"></textarea><span class="error"></span>
+						<textarea id="msgsndr_tts_message" name="phone_tts" class="required msgdata"></textarea><span class="error"></span>
 
 						<div class="hide">
-							<input id="messagePhoneText_message" name="messagePhoneText_message" type="hidden" value="{&quot;gender&quot;: &quot;female&quot;, &quot;text&quot;: &quot;&quot;}"/>
+							<input id="messagePhoneText_message" name="messagePhoneText_message msgdata" type="hidden" value="{&quot;gender&quot;: &quot;female&quot;, &quot;text&quot;: &quot;&quot;}"/>
 						</div>
 
 						<div class="cf">
@@ -143,7 +143,7 @@
 
 				<fieldset class="hide">
 					<label for="msgsndr_form_phonetranslate">Translate</label>
-						<input type="checkbox" id="msgsndr_form_phonetranslate" value="" name="phone_tts_translate" data-txt="#msgsndr_tts_message" data-display="#tts_translate" />
+						<input type="checkbox" id="msgsndr_form_phonetranslate" class="msgdata" value="" name="phone_tts_translate" data-txt="#msgsndr_tts_message" data-display="#tts_translate" />
 						<a class="toggle-translations hide" data-target="#tts_translate" href=""></a>
 				</fieldset>
 
@@ -175,27 +175,27 @@
 				<fieldset class="check">
 					<label for="msgsndr_form_name">From Name</label>
 					<div class="controls">
-						<input type="text" id="msgsndr_form_name" name="email_name" class="required" autocomplete="off" /> <span class="error"></span>
+						<input type="text" id="msgsndr_form_name" name="email_name" class="required msgdata" autocomplete="off" /> <span class="error"></span>
 					</div>
 				</fieldset>
 				
 				<fieldset>
 					<label for="msgsndr_form_email">From Email</label>
 					<div class="controls">
-						<input type="text" id="msgsndr_form_email" name="email_address" class="required" autocomplete="off" /> <span class="error"></span>
+						<input type="text" id="msgsndr_form_email" name="email_address" class="required msgdata" autocomplete="off" /> <span class="error"></span>
 					</div>
 				</fieldset>
 				
 				<fieldset>
 					<label for="msgsndr_form_mailsubject">Subject</label> 
 					<div class="controls">
-						<input type="text" id="msgsndr_form_mailsubject" name="email_subject" class="required" autocomplete="off" /> <span class="error"></span>
+						<input type="text" id="msgsndr_form_mailsubject" name="email_subject" class="required msgdata" autocomplete="off" /> <span class="error"></span>
 					</div>
 				</fieldset>
 
 				<fieldset>
 					<label for="msgsndr_form_attachment">Attachments</label>
-					<input id="msgsndr_form_attachment" name="email_attachment" type="hidden" value="{}">
+					<input id="msgsndr_form_attachment" name="email_attachment" class="msgdata" type="hidden" value="{}">
 					<div class="controls" style="overflow: hidden;">
 						<div id="uploadedfiles" style="display: none; "></div>
 						<div id="upload_process" style="display: none; "><img src="img/ajax-loader.gif"></div>
@@ -208,14 +208,14 @@
 					<!--a id="editor_basic" href="javascript:void(null);">basic</a> | <a id="editor_advanced" href="javascript:void(null);">advanced</a-->
 					<label for="msgsndr_form_body">Body</label>
 					<div class="controls">
-					<textarea id="msgsndr_form_body" name="email_body" data-ajax="true"></textarea><span id="emailBodyError" class="error"></span>
+					<textarea id="msgsndr_form_body" name="email_body" class="msgdata" data-ajax="true"></textarea><span id="emailBodyError" class="error"></span>
 					</div>
 				</fieldset>
 				
 				<fieldset class="hide">
 					<label for="msgsndr_form_translate">Translate</label>
 					<div class="controls">
-						<input type="checkbox" id="msgsndr_form_emailtranslate" name="email_translate" value=""  data-display="#email_translate" />
+						<input type="checkbox" id="msgsndr_form_emailtranslate" class="msgdata" name="email_translate" value=""  data-display="#email_translate" />
 						<a class="toggle-translations hide" data-target="#email_translate" data-txt="#msgsndr_tts_message" href=""></a>
 					</div>
 				</fieldset>
@@ -249,7 +249,7 @@
 				<fieldset class="check">
 					<label for="msgsndr_form_sms">SMS Text</label>
 					<div class="controls">
-					<textarea id="msgsndr_form_sms" name="sms_text" class="required"></textarea>
+					<textarea id="msgsndr_form_sms" name="sms_text" class="msgdata required"></textarea>
 					<div>
 					<p><a href="javascript:void(null);" id="sms_sc" onclick="(new spellChecker($('msgsndr_form_sms')) ).openChecker();">Spell Check</a> <span class="sms characters">160 Characters left</span></p>
 					</div>
@@ -281,7 +281,7 @@
 				<div class="social_tab hidden" data-social="facebook">
 					<fieldset class="check">
 						<div class="controls cf fbicon">
-							<input class="addme social" type="checkbox" id="msgsndr_form_facebook" name="has_facebook" />
+							<input class="msgdata addme social" type="checkbox" id="msgsndr_form_facebook" name="has_facebook" />
 							<label class="addme" for="msgsndr_form_facebook"><strong>Post to Facebook</strong></label>
 						</div>
 					</fieldset>
@@ -291,7 +291,7 @@
 						<fieldset>
 							<label for="msgsndr_form_fbmsg">Message</label>
 							<div class="controls">
-								<textarea id="msgsndr_form_fbmsg" name="facebook_message" class="required"></textarea> <span class="error"></span>
+								<textarea id="msgsndr_form_fbmsg" name="facebook_message" class="msgdata required"></textarea> <span class="error"></span>
 								<p><a href="javascript:void(null);" id="sms_sc" onclick="(new spellChecker($('msgsndr_form_fbmsg')) ).openChecker();">Spell Check</a> <span class="fb characters">420 Characters left</span></p>
 							</div>
 						</fieldset>
@@ -335,7 +335,7 @@
 				<div class="social_tab hidden" data-social="twitter">
 					<fieldset class="check">
 						<div class="controls cf twiticon">
-							<input class="addme social" type="checkbox" id="msgsndr_form_twitter" name="has_twitter" />
+							<input class="msgdata addme social" type="checkbox" id="msgsndr_form_twitter" name="has_twitter" />
 							<label class="addme" for="msgsndr_form_twitter"><strong>Post to Twitter</strong></label>
 						</div>
 					</fieldset>
@@ -346,7 +346,7 @@
 							<p id="msgsndr_twittername" class="twittername"></p>
 							<label for="msgsndr_form_tmsg">Message</label>
 							<div class="controls">
-							<textarea id="msgsndr_form_tmsg" name="twitter_message" class="required"></textarea> <span class="error"></span>
+							<textarea id="msgsndr_form_tmsg" name="twitter_message" class="msgdata required"></textarea> <span class="error"></span>
 							<p><a href="javascript:void(null);" id="sms_sc" onclick="(new spellChecker($('msgsndr_form_tmsg')) ).openChecker();">Spell Check</a> <span class="twit characters"> Characters left</span></p>
 							</div>
 						</fieldset>
@@ -359,7 +359,7 @@
 				<div class="social_tab hidden" data-social="feed">				
 					<fieldset class="check">
 						<div class="controls cf rssicon">
-							<input class="addme social" type="checkbox" id="msgsndr_form_feed" name="has_feed" />
+							<input class="msgdata addme social" type="checkbox" id="msgsndr_form_feed" name="has_feed" />
 							<label class="addme" for="msgsndr_form_feed"><strong>Post to RSS</strong></label>
 						</div>
 					</fieldset>
@@ -369,14 +369,14 @@
 						<fieldset>
 							<label for="msgsndr_form_rsstitle">Post Title</label>
 							<div class="controls">
-								<input type="text" id="msgsndr_form_rsstitle" name="rss_title" class="required" />
+								<input type="text" id="msgsndr_form_rsstitle" name="rss_title" class="msgdata required" />
 							</div>
 						</fieldset>
 
 						<fieldset>
 							<label for="msgsndr_form_rssmsg">Message</label>
 							<div class="controls">
-							<textarea id="msgsndr_form_rssmsg" name="feed_message" class="required"></textarea> <span class="error"></span>
+							<textarea id="msgsndr_form_rssmsg" name="feed_message" class="msgdata required"></textarea> <span class="error"></span>
 							<p><a href="#">Spell Check</a></p>
 							</div>
 						</fieldset>

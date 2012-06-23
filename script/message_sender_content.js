@@ -120,13 +120,13 @@ var allowControl = {
 
 			var ttsTranslate = '<fieldset>';
 
-	        ttsTranslate += '<input type="checkbox" checked="checked" name="save_translation" class="translations" id="tts_'+langCode+'" />';
+	        ttsTranslate += '<input type="checkbox" checked="checked" name="save_translation" class="msgdata translations" id="tts_'+langCode+'" />';
 	        ttsTranslate += '<label for="tts_'+langCode+'">'+nLangs[langCode]+'</label>';
 	        ttsTranslate += '<div class="controls">';
-	        ttsTranslate += '<textarea id="tts_translated_'+langCode+'" disabled="disabled"></textarea>';
+	        ttsTranslate += '<textarea id="tts_translated_'+langCode+'" class="msgdata" disabled="disabled"></textarea>';
 	        ttsTranslate += '<button class="playAudio" data-text="tts_translated_'+langCode+'" data-code="'+langCode+'"><span class="icon play"></span> Play Audio</button>';
 	        ttsTranslate += '<button class="show_hide_english" data-text="'+nLangs[langCode]+'" data-code="'+langCode+'">Show In English</button>';
-	        ttsTranslate += '<input type="checkbox" name="tts_override_'+langCode+'" id="tts_override_'+langCode+'" /><label for="tts_override_'+langCode+'">Override Translation</label>';
+	        ttsTranslate += '<input type="checkbox" name="tts_override_'+langCode+'" class="msgdata" id="tts_override_'+langCode+'" /><label for="tts_override_'+langCode+'">Override Translation</label>';
 	        ttsTranslate += '</div>';
 	        ttsTranslate += '<div class="controls hide" id="retranslate_'+langCode+'">';
 	        ttsTranslate += '<button class="retranslate" data-text="'+nLangs[langCode]+'" data-code="'+langCode+'">Refresh '+nLangs[langCode]+' to English Translation</button>';
@@ -309,7 +309,7 @@ var allowControl = {
 
 		$.each(splitlangCodes, function(transIndex, transData) {
 			var langCode = splitlangCodes[transIndex];
-			$('#email_translate').append('<fieldset><input type="checkbox" checked="checked" id="email_'+langCode+'"  name="email_save_translation" class="translations" /><label for="email_'+nLangs[langCode]+'">'+nLangs[langCode]+'</label><div class="controls"><div class="html_translate" id="email_translated_'+langCode+'"></div></div></fieldset>');
+			$('#email_translate').append('<fieldset><input type="checkbox" class="msgdata" checked="checked" id="email_'+langCode+'"  name="email_save_translation" class="translations" /><label for="email_'+langCode+'">'+nLangs[langCode]+'</label><div class="controls"><div class="msgdata html_translate" id="email_translated_'+langCode+'"></div></div></fieldset>');
 		});
 	},
 	"sms" : function() {
@@ -591,9 +591,9 @@ function ContentManager() {
 	}
 	
 	// if the user can "leavemessage" aka voice replies
-    if (userPermissions.leavemessage == 1) {
+    if (userPermissions.leavemessage) {
     	$("#msgsndr_leavemessage").removeClass("hide");
-    	$("#msgsndr_leavemessage").children("input").attr("checked", "checked");
+    	$("#msgsndr_voice_response").attr("checked","checked");
     }
     
     // if the user can "messageconfirmation" aka request confirmation of outbound messages
