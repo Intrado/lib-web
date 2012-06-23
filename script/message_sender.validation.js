@@ -37,7 +37,6 @@ jQuery.noConflict();
 
     // set up function objects
     global        = new globalValidationFunctions();
-    loadMsg       = new loadMessage();
 
     // Some Global variables
     // userid, orgid, and twitterReservedChars are set in index.php
