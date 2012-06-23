@@ -239,7 +239,7 @@ jQuery.noConflict();
 		});
 
 		// Translations Toggle
-		$('#email_translate').on('click', "input.translations", function() {
+		$('#email_translate').on('click', "input", function() {
 			$(this).next().next('.controls').toggleClass('hide');
 		});
 		
