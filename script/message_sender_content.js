@@ -543,6 +543,7 @@ function ContentManager() {
 		}
 		
 		$.when(doWait).done(function() {
+			$button.next('img').addClass('hide');
 			$('#msgsndr_tab_' + currentContent).hide();
 
 			$('.msg_content_nav li').removeClass('lighten');
