@@ -202,6 +202,7 @@ function ValidationManager() {
 			};
 
 			var ajaxurl = "message_sender.php?form=broadcast&ajaxvalidator=true&formitem=" + name;
+			//var ajaxurl = "_messagesender.php?form=msgsndr&ajaxvalidator=true&formitem=" + name;
 
 			$.ajax({
 				type : 'POST',

@@ -467,6 +467,13 @@ function ContentManager() {
 			autoUpdateCharCount($("#msgsndr_form_fbmsg"), 420, $(".fb.characters"));
 			var twitterCharCount = 140 - twitterReservedChars;
 			autoUpdateCharCount($("#msgsndr_form_tmsg"), twitterCharCount, $(".twit.characters"));
+			
+			var fieldinsertcheck = $('#msgsndr_tts_message').val();
+			if (fieldinsertcheck.indexOf('<<') == -1) {
+				$('#audiolink').removeClass('hidden');
+			} else {
+				$('#audiolink').addClass('hidden');
+			}
 		}
 		
 		//SWITCH STEP
@@ -495,9 +502,6 @@ function ContentManager() {
 			$('.msg_content_nav > li').removeClass('active').removeClass('lighten');
 			
 			$('input[name=has_' + currentContent + ']').removeAttr('checked');
-			
-			// clear form data on cancel ...
-			$(".msgdata", contentMap[currentContent]).val("").removeAttr("checked");
 		
 			$('.msg_content_nav .o' + currentContent).removeClass('complete');
 			$('#msgsndr_review_' + currentContent).parent().removeClass('complete');

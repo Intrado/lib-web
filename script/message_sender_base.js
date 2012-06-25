@@ -151,7 +151,13 @@ jQuery.noConflict();
 					emailSubject.val(bSubject).addClass('ok');
 				}
 			} else if(contentMode == "social" && $('#msgsndr_ctrl_phone').parent().hasClass('complete')) {
-				$('#audiolink').removeClass('hidden');
+				
+				var fieldinsertcheck = $('#msgsndr_tts_message').val();
+				if (fieldinsertcheck.indexOf('<<') == -1) {
+					$('#audiolink').removeClass('hidden');
+				} else {
+					$('#audiolink').addClass('hidden');
+				}
 			}
 			
 			obj_valManager.forceRunValidate(2);
