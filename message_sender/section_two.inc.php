@@ -197,7 +197,7 @@
 					<label for="msgsndr_form_attachment">Attachments</label>
 					<input id="msgsndr_form_attachment" name="email_attachment" class="msgdata" type="hidden" value="{}">
 					<div class="controls" style="overflow: hidden;">
-						<div id="uploadedfiles" style="display: none; "></div>
+						<div id="uploadedfiles" class="msgdata" style="display: none; "></div>
 						<div id="upload_process" style="display: none; "><img src="img/ajax-loader.gif"></div>
 						<iframe id="msgsndr_form_attachment_my_attach" class="attach_file" src="_emailattachment.php?formname=broadcast&amp;itemname=msgsndr_form_attachment"></iframe>
 						<div class="underneathmsg cf"></div>
