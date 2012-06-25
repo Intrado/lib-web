@@ -6,8 +6,8 @@ a:hover { text-decoration: underline; }
 /*----- Banner, adds in the logo background and moves the client name to sit above the account navigation -----*/
 
 .banner { background: <?=$topbg?>; border-bottom: 6px solid <?=$primary?>;  }
-.banner_logo { background: url(img/shwoosh.png) right center no-repeat; padding: 0 91px 0 0; }
-.banner_logo a { background: #fff; padding: 8px 5px; }
+.banner_logo { background: url(img/shwoosh.gif) right center no-repeat; padding: 0 91px 0 0; }
+.banner_logo a { background: #fff; height: 50px; padding: 0 0 0 10px; }
 .banner_links_wrap { padding: 20px 0 0; }
 .banner_links li { padding: 7px 5px 0 5px; background: url(img/accountlinksbg_mid.gif) repeat-x 0 0; font-size: .9em; border-right: 1px solid #ccc; height: 19px; }
 .banner_links li.bl_last { border-right: none;  } 
