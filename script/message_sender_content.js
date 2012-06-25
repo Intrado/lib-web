@@ -73,6 +73,7 @@ var allowControl = {
 			$('#retranslate_' + langCode).slideToggle('fast');
 
 			if ($(this).text() == "Show In English") {
+				$(this).after('<img src="img/ajax-loader.gif" class="loading" />');
 				reTranslate(this);
 			}
 
@@ -82,6 +83,7 @@ var allowControl = {
 
 		$('#tts_translate').on('click', '.retranslate', function(e) {
 			e.preventDefault();
+			$(this).after('<img src="img/ajax-loader.gif" class="loading" />');
 			reTranslate(this);
 		});
 

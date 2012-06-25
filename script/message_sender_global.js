@@ -33,7 +33,7 @@ jQuery.noConflict();
 	
 		$('#retranslate_' + langCode).removeClass('hide');
 		$.reverseTranslate(txt, langCode, function(data) {
-			$('img.loading').remove();
+			$(elem).parent().find('img.loading').remove();
 			$(displayArea).val(data.responseData.translatedText);
 		});
 	};
