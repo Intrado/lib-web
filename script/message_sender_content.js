@@ -459,6 +459,8 @@ function ContentManager() {
 		}
 		
 		//SWITCH STEP
+		$(".msg_confirm").hide();
+		
 		$(".msg_content_nav > li").not(".o" + mode).addClass("lighten");
 		currentContent = mode;
 		$(contentMap[mode]).show();
@@ -481,11 +483,18 @@ function ContentManager() {
 			$("[id^=msgsndr_tab_]").hide();
 			$('.msg_content_nav > li').removeClass('active').removeClass('lighten');
 			
+			$('input[name=has_' + currentContent + ']').removeAttr('checked');
+			
+			// clear form data on cancel ...
+			$(".msgdata", contentMap[currentContent]).val("").removeAttr("checked");
+		
 			$('.msg_content_nav .o' + currentContent).removeClass('complete');
 			$('#msgsndr_review_' + currentContent).parent().removeClass('complete');
 			
 			currentContent = "";
 			obj_stepManager.updateStepStatus();
+			
+			$(".msg_confirm").show();
 		}
 	};
 	
@@ -520,6 +529,8 @@ function ContentManager() {
 			
 			currentContent = "";
 			obj_stepManager.updateStepStatus();
+			
+			$(".msg_confirm").show();
 		});
 	};
 	
