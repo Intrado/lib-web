@@ -174,8 +174,8 @@ include("nav.inc.php");
 			
 			<ul class="msg_steps cf">
 				<li class="active"><a id="tab_1" ><span class="icon">1</span> Subject &amp; Recipients</a></li>
-				<li><a id="tab_2" data-active="true"><span class="icon">2</span> Message Content</a></li>
-				<li><a id="tab_3" data-active="true"><span class="icon">3</span> Review &amp; Send</a></li>
+				<li><a id="tab_2"><span class="icon">2</span> Message Content</a></li>
+				<li><a id="tab_3"><span class="icon">3</span> Review &amp; Send</a></li>
 			</ul>
 
 		</div>
