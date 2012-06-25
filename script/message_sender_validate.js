@@ -16,12 +16,12 @@ function ValidationManager() {
 			"phone|callerid" : [new document.validators["ValPhone"]("phone_callerid", "Caller ID", {})],
 			"email|name" : [new document.validators["ValRequired"]("email_name","Name",{}), new document.validators["ValLength"]("email_name","Name",{min: 1,max:30})],
 			"email|address" : [new document.validators["ValRequired"]("email_address","Email Address",{}), new document.validators["ValLength"]("email_address", "Email Address", {max:255}), new document.validators["ValEmail"]("email_address","Email Address",{domain:orgOptions.emaildomain})],
-			"email|subject" : [new document.validators["ValRequired"]("email_subject","Subject",{}), new document.validators["ValLength"]("email_subject","Subject",{min:4})],
+			"email|subject" : [new document.validators["ValRequired"]("email_subject","Subject",{}), new document.validators["ValLength"]("email_subject","Subject",{min:3, max: 30})],
 			"email|body" : [new document.validators["ValRequired"]("email_body","Body",{}), new document.validators["ValLength"]("email_body","Body",{min:4})],
 			"sms|text" : [new document.validators["ValRequired"]("sms_text","SMS",{}), new document.validators["ValLength"]("sms_text","SMS",{min:1, max:160}), new document.validators["ValSmsText"]("sms_text","SMS Text")],
-			"facebook|message" : [new document.validators["ValRequired"]("facebook_message","Facebook Message",{}), new document.validators["ValLength"]("facebook_message","Facebook Message",{min:4})],
-			"twitter|message" : [new document.validators["ValRequired"]("twitter_message","Twitter Message",{}), new document.validators["ValLength"]("twitter_message","Twitter Message",{min:4})],
-			"rss|title" : [new document.validators["ValRequired"]("rss_title","Post Title",{}), new document.validators["ValLength"]("rss_title","Post Title",{min:3})],
+			"facebook|message" : [new document.validators["ValRequired"]("facebook_message","Facebook Message",{}), new document.validators["ValLength"]("facebook_message","Facebook Message",{min:4, max: 420})],
+			"twitter|message" : [new document.validators["ValRequired"]("twitter_message","Twitter Message",{}), new document.validators["ValLength"]("twitter_message","Twitter Message",{min:4, max: 140})],
+			"rss|title" : [new document.validators["ValRequired"]("rss_title","Post Title",{}), new document.validators["ValLength"]("rss_title","Post Title",{min:3, max: 30})],
 			"feed|message" : [new document.validators["ValRequired"]("feed_message","Feed Message",{}), new document.validators["ValLength"]("feed_message","Feed Message",{min:4})]
 		},
 		"3" : {

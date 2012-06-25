@@ -117,7 +117,7 @@
 					<label for="msgsndr_tts_message">Message</label>
 					<div class="controls">
 						<button class="btn-small paste-from hidden" data-textarea="msgsndr_tts_message">Paste text from email</button>
-						<textarea id="msgsndr_tts_message" name="phone_tts" class="required msgdata"></textarea><span class="error"></span>
+						<textarea id="msgsndr_tts_message" name="phone_tts" class="required msgdata" maxlength="10000"></textarea><span class="error"></span>
 
 						<div class="hide">
 							<input id="messagePhoneText_message" name="messagePhoneText_message msgdata" type="hidden" value="{&quot;gender&quot;: &quot;female&quot;, &quot;text&quot;: &quot;&quot;}"/>
@@ -175,21 +175,21 @@
 				<fieldset class="check">
 					<label for="msgsndr_form_name">From Name</label>
 					<div class="controls">
-						<input type="text" id="msgsndr_form_name" name="email_name" class="required msgdata" autocomplete="off" /> <span class="error"></span>
+						<input type="text" id="msgsndr_form_name" name="email_name" class="required msgdata" autocomplete="off" maxlength="30"/> <span class="error"></span>
 					</div>
 				</fieldset>
 				
 				<fieldset>
 					<label for="msgsndr_form_email">From Email</label>
 					<div class="controls">
-						<input type="text" id="msgsndr_form_email" name="email_address" class="required msgdata" autocomplete="off" /> <span class="error"></span>
+						<input type="text" id="msgsndr_form_email" name="email_address" class="required msgdata" autocomplete="off" maxlength="255"/> <span class="error"></span>
 					</div>
 				</fieldset>
 				
 				<fieldset>
 					<label for="msgsndr_form_mailsubject">Subject</label> 
 					<div class="controls">
-						<input type="text" id="msgsndr_form_mailsubject" name="email_subject" class="required msgdata" autocomplete="off" /> <span class="error"></span>
+						<input type="text" id="msgsndr_form_mailsubject" name="email_subject" class="required msgdata" autocomplete="off" maxlength="30"/> <span class="error"></span>
 					</div>
 				</fieldset>
 
@@ -291,7 +291,7 @@
 						<fieldset>
 							<label for="msgsndr_form_fbmsg">Message</label>
 							<div class="controls">
-								<textarea id="msgsndr_form_fbmsg" name="facebook_message" class="msgdata required"></textarea> <span class="error"></span>
+								<textarea id="msgsndr_form_fbmsg" name="facebook_message" class="msgdata required" ></textarea> <span class="error"></span>
 								<p><a href="javascript:void(null);" id="sms_sc" onclick="(new spellChecker($('msgsndr_form_fbmsg')) ).openChecker();">Spell Check</a> <span class="fb characters">420 Characters left</span></p>
 							</div>
 						</fieldset>
@@ -346,7 +346,7 @@
 							<p id="msgsndr_twittername" class="twittername"></p>
 							<label for="msgsndr_form_tmsg">Message</label>
 							<div class="controls">
-							<textarea id="msgsndr_form_tmsg" name="twitter_message" class="msgdata required"></textarea> <span class="error"></span>
+							<textarea id="msgsndr_form_tmsg" name="twitter_message" class="msgdata required" ></textarea> <span class="error"></span>
 							<p><a href="javascript:void(null);" id="sms_sc" onclick="(new spellChecker($('msgsndr_form_tmsg')) ).openChecker();">Spell Check</a> <span class="twit characters"> Characters left</span></p>
 							</div>
 						</fieldset>
@@ -369,7 +369,7 @@
 						<fieldset>
 							<label for="msgsndr_form_rsstitle">Post Title</label>
 							<div class="controls">
-								<input type="text" id="msgsndr_form_rsstitle" name="rss_title" class="msgdata required" />
+								<input type="text" id="msgsndr_form_rsstitle" name="rss_title" class="msgdata required" maxlength="30"/>
 							</div>
 						</fieldset>
 
