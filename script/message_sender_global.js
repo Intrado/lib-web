@@ -25,59 +25,16 @@ jQuery.noConflict();
 		}, 1000);
 	};
 	
-	
-
-	doTranslate = function(langCodes, txtField, displayArea, msgType) {
-		var transTxt = makeTranslatableString(txtField);
-		var transURL = 'translate.php?english=' + transTxt + '&languages=' + langCodes;
-
-		var splitlangCodes = langCodes.split('|');
-		var langCount = splitlangCodes.length;
-
-		$.ajax({
-			url : transURL,
-			type : 'GET',
-			dataType : 'json',
-			success : function(data) {
-				$.each(data.responseData, function(transIndex, transData) {
-					var textareaId = '#' + msgType + '_translated_' + transData.code;
-					var transText = transData.translatedText;
-					if (msgType == "email") {
-						$(textareaId).html(transText);
-					} else {
-						$(textareaId).val(transText);
-					}
-				});
-
-				$('img.loading').remove();
-			}
-		});
-	};
-	
-			
 	reTranslate = function(elem) {
 		var langName = $(elem).attr('data-text');
 		var langCode = $(elem).attr('data-code');
 		var txt = $('#tts_translated_' + langCode).val();
 		var displayArea = $('#tts_' + langName + '_to_english');
-		var msgType = 'tts';
 	
 		$('#retranslate_' + langCode).removeClass('hide');
-		doreTranslate(langCode, txt, displayArea, msgType);
-	};
-	
-	
-	doreTranslate = function(langCode, txt, displayArea, msgType) {
-		var transURL = 'translate.php?text=' + txt + '&language=' + langCode;
-	
-		$.ajax({
-			url : transURL,
-			type : 'GET',
-			dataType : 'json',
-			success : function(data) {
-				$('img.loading').remove();
-				$(displayArea).val(data.responseData.translatedText);
-			}
+		$.reverseTranslate(txt, langCode, function(data) {
+			$('img.loading').remove();
+			$(displayArea).val(data.responseData.translatedText);
 		});
 	};
 	

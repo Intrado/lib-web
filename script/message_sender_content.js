@@ -42,28 +42,28 @@ var allowControl = {
 
 		function ttsTranslate(elem) {
 			var txtField = $('#msgsndr_tts_message').val();
-			var displayArea = $(elem).attr('data-target');
-			var msgType = 'tts';
-
-			var ttslangCodes = '';
+			var ttslangCodes = [];
 
 			var checkTranslations = $('input[name^=tts_override]');
 			$.each(checkTranslations, function(tIndex, tData) {
 				lCode = $(tData).attr('name').split('_')[2];
 				if ($(tData).is(':checked')) {
-
+					// Nothing... (Overridden)
 				} else {
-					if (ttslangCodes == '') {
-						ttslangCodes = lCode
-					} else {
-						ttslangCodes = ttslangCodes + '|' + lCode;
-					}
+					// add loading icon to label
+					$('#tts_translate fieldset > label[for^=tts_'+ lCode+ ']').append('<img src="img/ajax-loader.gif" class="loading" />');
+					ttslangCodes.push(lCode);
 				}
 			});
 
-			$('#tts_translate fieldset > label[for^=tts_]').append('<img src="img/ajax-loader.gif" class="loading" />');
-
-			doTranslate(ttslangCodes, txtField, displayArea, msgType);
+			$.translate(txtField, ttslangCodes.join("|"), function(data) {
+				$.each(data.responseData, function(transIndex, transData) {
+					var e = $('#tts_translated_' + transData.code);
+					e.val(transData.translatedText);
+					// remove loading icon from label
+					e.parent().parent().find("img.loading").remove();
+				});
+			});
 		};
 
 		$('#tts_translate').on('click', '.show_hide_english', function(e) {
@@ -286,16 +286,21 @@ var allowControl = {
 		});
 
 		function eTranslate() {
-
 			var txtField = CKEDITOR.instances.reusableckeditor.getData();
-			var displayArea = $(this).attr('data-display');
-			var msgType = 'email';
 
 			$(this).parent().append('<button id="email_retranslate" data-target="#email_translate">Re Translate</button>');
 
+			// add loading icon to label
 			$('#email_translate fieldset > label[for^=email_]').append('<img src="img/ajax-loader.gif" class="loading" />');
 
-			doTranslate(elangCodes, txtField, displayArea, msgType);
+			$.translate(txtField, elangCodes, function(data) {
+				$.each(data.responseData, function(transIndex, transData) {
+					var e = $('#email_translated_' + transData.code);
+					e.html(transData.translatedText);
+					// remove loading icon from label
+					e.parent().parent().find("img.loading").remove();
+				});
+			});
 		}
 
 		$('#msgsndr_tab_email').on('click', '#email_retranslate', function() {

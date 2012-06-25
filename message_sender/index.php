@@ -252,6 +252,7 @@ Validator::load_validators(array(
 <script src="script/jquery.timer.js"></script>
 <script src="script/jquery.moment.js"></script>
 <script src="script/jquery.easycall.js"></script>
+<script src="script/jquery.translate.js"></script>
 
 <script src="script/bootstrap-modal.js"></script>
 <!-- <script src="script/bootstrap-tooltip.js"></script> -->

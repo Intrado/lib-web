@@ -19,7 +19,6 @@ function ContentSaveManager() {
 
 			var getTranslations = true;
 			if(translate) {
-				var translatedText = '';
 				var langCodes = [];
 
 				$('input[name=email_save_translation]:checked').each(function(transI, transD) {
@@ -28,46 +27,18 @@ function ContentSaveManager() {
 					langCodes.push(langCode);
 				});
 
-				enText = makeTranslatableString(enText);
-
-				var transURL = 'translate.php?english=' + enText + '&languages=' + langCodes.join("|");
-
-				getTranslations = $.ajax({
-					url : transURL,
-					type : 'GET',
-					dataType : 'json',
-					success : function(data) {
-						$.each(data.responseData, function(transIndex, transData) {
-							var langCode = langCodes[transIndex];
-							
-							var jsonVal = $.toJSON({
-								"enabled" : true,
-								"text" : transData.translatedText,
-								"override" : false,
-								"englishText" : ""
-							});
-
-							$('input[name=email_translate_' + langCode + ']').val(jsonVal);
+				getTranslations = $.translate(enText, langCodes.join("|"), function(data) {
+					$.each(data.responseData, function(transIndex, transData) {
+						var jsonVal = $.toJSON({
+							"enabled" : true,
+							"text" : transData.translatedText,
+							"override" : false,
+							"englishText" : ""
 						});
-					},
-					complete: function() {
-						/*$('#msgsndr_tab_email .loading').addClass('hide');
-						$('#msgsndr_tab_email').hide();
-
-						var el = 'email';
-						var nav = '.oemail';
-
-						$('.msg_content_nav li').removeClass('lighten');
-						$('.msg_content_nav ' + nav).removeClass('active').addClass('complete');
-
-						$('input[name=has_' + el + ']').attr('checked', 'checked');
-
-						// Set Message tabs on review tab
-						$('#msgsndr_review_' + el).parent().addClass('complete');*/
-					}
+						$('input[name=email_translate_' + transData.code + ']').val(jsonVal);
+					});
 				});
 			}
-			
 			return getTranslations;
 		},
 		"translation" : function() {
@@ -86,7 +57,6 @@ function ContentSaveManager() {
 			$('input[name=phone_translate]').val(jsonVal);
 
 			if(translate) {
-				var translatedText = '';
 				var langCodes = [];
 
 				$('input[name=save_translation]:checked').each(function(transI, transD) {
@@ -111,43 +81,17 @@ function ContentSaveManager() {
 					}
 				});
 
-				var transURL = 'translate.php?english=' + enText + '&languages=' + langCodes.join("|");
-				
-				getTranslations = $.ajax({
-					url : transURL,
-					type : 'GET',
-					dataType : 'json',
-					success : function(data) {
-						$.each(data.responseData, function(transIndex, transData) {
-							var langCode = langCodes[transIndex];
-
-							var jsonVal = $.toJSON({
-								"enabled" : "true",
-								"text" : transData.translatedText,
-								"override" : "false",
-								"gender" : gender,
-								"englishText" : ""
-							});
-
-							$('input[name=phone_translate_' + langCode + ']').val(jsonVal);
+				getTranslations = $.translate(enText, langCodes.join("|"), function(data) {
+					$.each(data.responseData, function(transIndex, transData) {
+						var jsonVal = $.toJSON({
+							"enabled" : "true",
+							"text" : transData.translatedText,
+							"override" : "false",
+							"gender" : gender,
+							"englishText" : ""
 						});
-					},
-					complete : function() {
-						/*$('#text .loading').addClass('hide');
-						$('#msgsndr_tab_phone').hide();
-
-						var el = 'phone';
-						var nav = '.ophone';
-
-						$('.msg_content_nav li').removeClass('lighten');
-						$('.msg_content_nav ' + nav).removeClass('active').addClass('complete');
-
-						$('input[name=has_' + el + ']').attr('checked', 'checked');
-
-						// Set Message tabs on review tab
-						$('#msgsndr_review_' + el).parent().addClass('complete');*/
-					}
-
+						$('input[name=phone_translate_' + transData.code + ']').val(jsonVal);
+					});
 				});
 			}
 			
