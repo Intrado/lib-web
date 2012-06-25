@@ -196,6 +196,17 @@ jQuery.noConflict();
 			}
 			
 			$('#addme').slideToggle('slow', function() {
+				if($('#msgsndr_form_myself').is(':checked')){
+					if(userInfo.phone != ''){
+				        $('#msgsndr_form_mephone').attr('value', userInfo.phoneFormatted);
+			        }
+			        if(userInfo.email != ''){
+			          $('#msgsndr_form_meemail').attr('value', userInfo.email);
+			        }
+				} else {
+					$('#msgsndr_form_mephone').attr('value', '');
+					$('#msgsndr_form_meemail').attr('value', '');
+				}
 				$('#msgsndr_form_mephone').focus();
 				obj_stepManager.updateStepStatus();
 			});
