@@ -184,6 +184,9 @@ jQuery.noConflict();
 			} else {
 				$('#callme .phone_advanced_options').appendTo('#text_advanced_options');
 			}
+
+			obj_contentManager.updateContentStatus();
+			
 		});
 		
 		// Add myself toggle

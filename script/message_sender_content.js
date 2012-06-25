@@ -424,10 +424,21 @@ function ContentManager() {
 			}
 			
 		}
-		
-		if($(".er:visible").size() > 0) {
-			readyForSave = false;
+
+		if(currentContent == "phone") {
+			var voiceType = $('#switchaudio button.active').attr('data-type');
+			if($(".er:visible, .required.er", '#'+voiceType).size() > 0) {
+				readyForSave = false;
+			}
+		} else {
+			if($(".er:visible").size() > 0) {
+				readyForSave = false;
+			}
 		}
+		
+		// if($(".er:visible, .required.er", contentMap[currentContent]).size() > 0) {
+		// 	readyForSave = false;
+		// }
 		
 		if(readyForSave) {
 			$("button.btn_save", contentMap[currentContent]).removeAttr('disabled');

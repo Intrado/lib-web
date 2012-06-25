@@ -137,7 +137,7 @@ function ValidationManager() {
 	this.setInvalid = function($element, msg) {		
 		if($element.next('.error').text() != msg) {
 			if($element.is("[name=sms_text], [name=twitter_message], [name=facebook_message]")) {
-				$('.characters').addClass('error').text(msg);
+				$('.characters', $element.next("div")).addClass('error').text(msg);
 				$element.removeClass('ok').addClass('er');
 				if ($element.is("[name=sms_text]")) {
 					$('.btn_save').attr('disabled', 'disabled');

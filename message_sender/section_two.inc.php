@@ -291,8 +291,8 @@
 						<fieldset>
 							<label for="msgsndr_form_fbmsg">Message</label>
 							<div class="controls">
-								<textarea id="msgsndr_form_fbmsg" name="facebook_message" class="msgdata required" ></textarea> <span class="error"></span>
-								<p><a href="javascript:void(null);" id="sms_sc" onclick="(new spellChecker($('msgsndr_form_fbmsg')) ).openChecker();">Spell Check</a> <span class="fb characters">420 Characters left</span></p>
+								<textarea id="msgsndr_form_fbmsg" name="facebook_message" class="msgdata required" ></textarea>
+								<div><p><a href="javascript:void(null);" id="sms_sc" onclick="(new spellChecker($('msgsndr_form_fbmsg')) ).openChecker();">Spell Check</a> <span class="fb characters">420 Characters left</span></p></div>
 							</div>
 						</fieldset>
 
@@ -346,8 +346,8 @@
 							<p id="msgsndr_twittername" class="twittername"></p>
 							<label for="msgsndr_form_tmsg">Message</label>
 							<div class="controls">
-							<textarea id="msgsndr_form_tmsg" name="twitter_message" class="msgdata required" ></textarea> <span class="error"></span>
-							<p><a href="javascript:void(null);" id="sms_sc" onclick="(new spellChecker($('msgsndr_form_tmsg')) ).openChecker();">Spell Check</a> <span class="twit characters"> Characters left</span></p>
+							<textarea id="msgsndr_form_tmsg" name="twitter_message" class="msgdata required" ></textarea>
+							<div><p><a href="javascript:void(null);" id="sms_sc" onclick="(new spellChecker($('msgsndr_form_tmsg')) ).openChecker();">Spell Check</a> <span class="twit characters"> Characters left</span></p></div>
 							</div>
 						</fieldset>
 

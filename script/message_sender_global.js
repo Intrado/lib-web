@@ -10,13 +10,15 @@ jQuery.noConflict();
 		}
 		
 		autoCharCount[getId] = setTimeout(function() {
-			var remaining = limit - $element.val().length;
-		
-			if(remaining < 0) {
-				//$element.addClass('er');
-				$errorText.addClass("error").text((0 - remaining) + " too many characters");
-			} else {
-				$errorText.removeClass("error").text(remaining + " characters left");
+			if(!$element.hasClass("er")){
+				var remaining = limit - $element.val().length;
+			
+				if(remaining < 0) {
+					//$element.addClass('er');
+					$errorText.addClass("error").text((0 - remaining) + " too many characters");
+				} else {
+					$errorText.removeClass("error").text(remaining + " characters left");
+				}
 			}
 			
 			autoUpdateCharCount($element, limit, $errorText);
