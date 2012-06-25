@@ -390,6 +390,7 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 		
 		.form_table 		{ table-layout: auto; text-align: left; 900px; }
 		 .form_table td { vertical-align: top; }
+		 .form_table td#emailText_helpercell { width: 210px; }
 		 		
 		.form_fields, 
 		.form_guide 	{ display: block; }
@@ -432,7 +433,7 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 .newui .newform .formtitle .formlabel { float: none; /*display: block;*/ padding: 5px 0px 5px 0; font-size: 14px; line-height: 18px; font-weight: normal; text-align: right; }
 .newui .newform .formtitle .formicon { /*display: none;*/ }
 
-.newui .newform .formcontrol { float: left; display: inline; /*margin: 0;*/ padding: 0; }
+.newui .newform .formcontrol { float: left; display: inline; width: 370px; padding: 0; }
 .newui .newform .formcontrol input[type="text"] { display: block; width: 313px; padding: 4px 5px; font-size: 14px; line-height: 18px; border: 1px solid #E2E2E2; 
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
@@ -466,12 +467,19 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 #phoneadvanced_message-voicerecorder_callcontrol input.easycallphoneinput {  }
 #phoneadvanced_message-voicerecorder_callcontrol .btn {}
 
-.newui #emaileedit_helpsection_5 .formtitle { width: 100%; text-align: left; }
+.newui #emaileedit_helpsection_5 .formtitle { width: 100%; text-align: left; margin: 0; }
 .newui #emaileedit_helpsection_5 .formtitle .formlabel { width: 140px; text-align: right; }
 .newui #emaileedit_helpsection_5 .formcontrol { width: 600px; margin: 0 0 0 34px; }
 .newui #emaileedit_helpsection_5 .formcontrol .maincontainerleft,
 .newui #emaileedit_helpsection_5 .formcontrol .maincontainerright,
 .newui #emaileedit_helpsection_5 .formcontrol .controlcontainer { width: 600px; }
+
+.newui #emailText_helpsection_5 .formtitle { width: 100%; text-align: left; margin: 0; }
+.newui #emailText_helpsection_5 .formtitle .formlabel { width: 140px; text-align: right; }
+.newui #emailText_helpsection_5 .formcontrol { width: 500px; margin: 0 0 0 34px; }
+.newui #emailText_helpsection_5 .formcontrol .maincontainerleft,
+.newui #emailText_helpsection_5 .formcontrol .maincontainerright,
+.newui #emailText_helpsection_5 .formcontrol .controlcontainer { width: 500px; }
 
 .newui .formcontrol .datafields { margin: 0 10px 0 0; }
 .newui .formcontrol .datafields select { padding: 3px 6px; font-size: 14px; }
