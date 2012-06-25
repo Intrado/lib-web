@@ -19,7 +19,6 @@ window.fbAsyncInit = function() {
 	document.getElementById("fb-root").appendChild(e);
 }());
 
-// TODO: track accesstoken changes on authorization
 function initFacebook(accesstoken){
 		if (accesstoken) {
 			$("msgsndr_fbpagerenew").removeClassName("hidden");
