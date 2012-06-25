@@ -225,13 +225,12 @@ function SubmitManager() {
 			success: function(response) {
 				console.log(response);
 				var res = response;
-				if (res.vres != true) {
-					console.log(res);
-					// show alert message for server side validation fail (requires some input as to what this message should say!)... 
-					alert("Oops! That didn't quite work out :-(\nPerhaps something is missing or not quite right with the broadcast information entered?");
+				if(typeof(res.status) != "undefined" && typeof(res.nexturl) != "undefined" && res.status == "success") {
+					//success
+					window.location = res.nexturl;
 				} else {
-					console.log(res);
-					// window.location = res.nexturl;
+					//wrong
+					alert("Oops! That didn't quite work out :-(\nPerhaps something is missing or not quite right with the broadcast information entered?");
 				}
 			}
 		});
