@@ -461,9 +461,14 @@ $.loadMessage = function loadMessage() {
 				element.val($.toJSON(elementdata));
 				
 				// now, reattach the easycall
-				self.elements.phoneRecording.attachEasyCall({
-					"languages": easycallLangs,
-					"defaultphone": userInfo.phoneFormatted});
+				var mindigits = (orgOptions.easycallmin?orgOptions.easycallmin:10);
+				var maxdigits = (orgOptions.easycallmax?orgOptions.easycallmax:10);
+				self.elements.phoneRecording..attachEasyCall({
+					"languages" : easycallLangs,
+					"phonemindigits": mindigits,
+					"phonemaxdigits": maxdigits,
+					"defaultphone" : userInfo.phoneFormatted
+				});
 			}
 		});
 	};

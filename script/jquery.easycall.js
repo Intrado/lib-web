@@ -533,9 +533,9 @@
 				} else {
 					if ($this.data('easyCall').phonemindigits != 10 || $this.data('easyCall').phonemaxdigits != 10) {
 						if (phone.length < $this.data('easyCall').phonemindigits)
-							return label + " is invalid. The phone number or extension must be at least " + minlength + " digits long.\nYou do not need to include a 1 for long distance.";
+							return "is invalid. The phone number or extension must be at least " + $this.data('easyCall').phonemindigits + " digits long.\nYou do not need to include a 1 for long distance.";
 						if (phone.length > $this.data('easyCall').phonemaxdigits)
-							return "is invalid. The phone number or extension must be no more than " + maxlength + " digits long.\nYou do not need to include a 1 for long distance.";
+							return "is invalid. The phone number or extension must be no more than " + $this.data('easyCall').phonemaxdigits + " digits long.\nYou do not need to include a 1 for long distance.";
 					} else {
 						return "is invalid. The phone number must be exactly 10 digits long (including area code).\nYou do not need to include a 1 for long distance.";
 					}

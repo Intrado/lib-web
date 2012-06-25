@@ -253,8 +253,12 @@ var allowControl = {
 					easycallLangs[code] = nLangs[code];
 			});
 		}
+		var mindigits = (orgOptions.easycallmin?orgOptions.easycallmin:10);
+		var maxdigits = (orgOptions.easycallmax?orgOptions.easycallmax:10);
 		$("#msgsndr_form_number").attachEasyCall({
 			"languages" : easycallLangs,
+			"phonemindigits": mindigits,
+			"phonemaxdigits": maxdigits,
 			"defaultphone" : userInfo.phoneFormatted
 		});
 	},
