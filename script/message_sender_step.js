@@ -39,11 +39,6 @@ function StepManager(_valManager) {
 		var readyForSave = true;
 		
 		if(currentStep == 1) {
-			/*var getRecpTotal = recipientTrack//$("td:contains(Total)", ".added-lists").next("td").text();
-			if((typeof(getRecpTotal) == "undefined" || getRecpTotal == 0) && !$("#msgsndr_form_myself").is(":checked")) {
-				readyForSave = false;
-			}*/
-			
 			if(recipientTrack == 0) {
 				readyForSave = false;
 			}

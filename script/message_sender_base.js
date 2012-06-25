@@ -197,17 +197,21 @@ jQuery.noConflict();
 			
 			$('#addme').slideToggle('slow', function() {
 				if($('#msgsndr_form_myself').is(':checked')){
-					if(userInfo.phone != ''){
+					if(userInfo.phone != '' && userInfo.email != '') {
+			        	$('#msgsndr_form_mephone').attr('value', userInfo.phoneFormatted);
+			        	$('#msgsndr_form_meemail').attr('value', userInfo.email);
+			        } else if(userInfo.phone != '' && userInfo.email == ''){
 				        $('#msgsndr_form_mephone').attr('value', userInfo.phoneFormatted);
-			        }
-			        if(userInfo.email != ''){
-			          $('#msgsndr_form_meemail').attr('value', userInfo.email);
+				        $('#msgsndr_form_meemail').focus();
+			        } else if(userInfo.phone == '' && userInfo.email != '') {
+			        	$('#msgsndr_form_meemail').attr('value', userInfo.email);
+				        $('#msgsndr_form_mephone').focus();
 			        }
 				} else {
 					$('#msgsndr_form_mephone').attr('value', '');
 					$('#msgsndr_form_meemail').attr('value', '');
 				}
-				$('#msgsndr_form_mephone').focus();
+				
 				obj_stepManager.updateStepStatus();
 			});
 		});
