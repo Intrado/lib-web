@@ -227,11 +227,19 @@ function SubmitManager() {
 				var res = response;
 				if(typeof(res.status) != "undefined" && typeof(res.nexturl) != "undefined" && res.status == "success") {
 					//success
-					window.location = res.nexturl;
+					$('#msgsndr_submit_title').html("Message Submitted");
+					$('#msgsndr_submit_message').html("Broadcasting message to " + recipientTrack + " recipients");
+					$('#msgsndr_submit_confirmbutton').on('click', function(event) {
+						window.location = res.nexturl;
+					});
+					$('#msgsndr_submit_confirmation').bind("hide", function() {
+						window.location = res.nexturl;
+					});
 				} else {
-					//wrong
-					alert("Oops! That didn't quite work out :-(\nPerhaps something is missing or not quite right with the broadcast information entered?");
+					$('#msgsndr_submit_title').html("Submit Error");
+					$('#msgsndr_submit_message').html("Oops! That didn't quite work out :-(\nPerhaps something is missing or not quite right with the broadcast information entered?");
 				}
+				$('#msgsndr_submit_confirmation').modal('show');
 			}
 		});
 		

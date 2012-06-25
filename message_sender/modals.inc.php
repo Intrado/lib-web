@@ -65,3 +65,18 @@
 	</div>
 
 </div>
+
+
+<!-- build list modal -->
+<div id="msgsndr_submit_confirmation" class="modal hide">
+	<div class="modal-header">
+		<a class="close" data-dismiss="modal">×</a>
+		<h3 id="msgsndr_submit_title"></h3>
+	</div>
+	<div class="modal_content">
+		<p id="msgsndr_submit_message"></p>
+	</div>
+	<div class="modal-footer">
+		<button id="msgsndr_submit_confirmbutton" class="btn-primary" data-dismiss="modal">Ok</button>
+	</div>
+</div>
