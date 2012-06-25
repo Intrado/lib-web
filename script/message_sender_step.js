@@ -211,11 +211,6 @@ function StepManager(_valManager) {
 			}
 		}
 
-		// populate save message input with broadcast subject, 
-		// and disable the input unless the save message checkbox is checked...
-		var bSubject = $('#msgsndr_form_subject').val();
-		$('input[name=options_savemessagename]').val(bSubject);
-
 		// Populate the max attempts select box
 		var maxAttempts = userPrefs.callmax;
 		$('#msgsndr_form_maxattempts').empty();
@@ -251,8 +246,12 @@ function StepManager(_valManager) {
 		var saveMsgName = $('input[name=options_savemessagename]');
 		if ($(this).attr('checked') == 'checked') {
 			saveMsgName.removeAttr('disabled');
+			var bSubject = $('#msgsndr_form_subject').val();
+			$('input[name=options_savemessagename]').val(bSubject).focus();
+			
 		} else {
 			saveMsgName.attr('disabled', 'disabled');
+			$('input[name=options_savemessagename]').val('');
 		}
 	});
 };
