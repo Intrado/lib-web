@@ -96,7 +96,7 @@ h4 { font-size: 12px; line-height: 22px; color: #235563; text-shadow: 0 1px 0 #f
 
 .window { border: none; -webkit-box-shadow: 0px 2px 8px 0px #777; box-shadow: 0px 2px 8px 0px #777;
 -webkit-border-radius: 5px; border-radius: 5px; -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
-.window_aside { width: 195px; margin: 0 25px 0 0; }
+.window_aside { width: 170px; margin: 0 15px 0 0; }
 .window_main { width: 740px; margin: 0; }
 
 .users p { position: relative; background: #F5F3F0 url(themes/newui/images/bodybg.png) repeat; display: inline-block; margin: 0 0 15px 22px; padding: 0 10px; color: #7F7567; font-size: 20px; line-height: 40px; }
@@ -345,12 +345,12 @@ table.info td { border-bottom: 1px solid #ddd; }
 table.info tr:hover td { background: #e1eaf4; color: #005580; cursor: pointer;}
 table.info th:first-child {text-align: right;}
 table.jobprogress th:first-child {text-align: left;}
-table.info td:first-child { width: 150px; text-align: right;}
+table.info td:first-child { width: 120px; text-align: right;}
 table.info td:nth-child(2) { width: 100px; white-space: nowrap;}
 table.info td:nth-child(4) { width: 40px;}
-table.info td:nth-child(5) { width: 70px;}
+table.info td:nth-child(5) { width: 85px;}
 table.info td:last-child { width: 40px;}
-table.info span.activejob {display: inline-block; width: 150px; color: white; font-weight: bold; text-align: center; background: url('img/candybarcall.gif') center no-repeat; background-size: 100% 70%;}
+table.info span.activejob { display: inline-block; width: 150px; color: white; font-weight: bold; text-align: center; background: url('img/candybarcall.gif') center no-repeat; background-size: 100% 70%;}
 
 .table-bordered { background: #fff; width: 100%; max-width: 100%; margin: 0 0 22px 0; border-collapse: separate; border-spacing: 0; font-size: 13px; line-height: 22px; 
 border-left: 1px solid #ddd; border-right: 1px solid #ddd; -webkit-border-radius: 4px; border-radius: 4px; }
