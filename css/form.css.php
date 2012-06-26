@@ -84,11 +84,11 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 .newform label { line-height: 16px; }
 
 .formfieldarea { padding: 8px; }
-.formfieldarea .underneathmsg { float: left; display: inline; width: 100%; padding: 0 0 0 210px; font-weight: bold; color: #cc0000; line-height: 22px; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
+.formfieldarea .underneathmsg { float: left; display: inline; width: 100%; padding: 0 0 0 150px; font-weight: bold; color: #cc0000; line-height: 22px; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
 
-.newform .formtitle { float: left; display: inline; width: 140px; text-align: right; }
+.newform .formtitle { position: relative; float: left; display: inline; width: 120px; padding: 0 20px 0 0; text-align: right; }
 .newform .formtitle .formlabel { display: inline-block; font-size: 1.1em; line-height: 25px; }
-.newform .formtitle .formicon { margin: -3px 0 0; }
+.newform .formtitle .formicon { position: absolute; top: 5px; right: 0; }
 
 .newform .formcontrol { margin: 0 0 0 150px; font-size: 1.1em; line-height: 25px; }
 .newform .formcontrol h3 { margin: 0 0 15px 0; }
@@ -102,9 +102,9 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 .newform .formcontrol input#account_brandthemecustomize { float: left; display: inline; margin: 0 5px 0 0; }
 .newform .formcontrol .feed_url { margin: 2px 0 10px 0; font-size: 1.1em; line-height: 16px; }
 
-.newform .formcontrol .social_note { width: 350px; font-size: 1.1em; }
-.newform .formcontrol .confirm_note { width: 430px; font-size: 1.1em;  }
-.newform .formcontrol .translate_text { font-size: 1.1em; }
+.newform .formcontrol .social_note,
+.newform .formcontrol .confirm_note,
+.newform .formcontrol .translate_text { font-size: 13px; }
 
 /*.newform .formcontrol ul { margin: 0; padding: 0;  }*/
 
@@ -484,8 +484,6 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 
 @media only screen and (max-width: 1024px) {
 	.formcontrol .messagegrid { width: 520px; }
-
-	.newform .formcontrol textarea { width: 300px; }
 	
 	#jobedit_helpercell,
 	#emaileedit_helpercell,
