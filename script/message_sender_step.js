@@ -84,6 +84,11 @@ function StepManager(_valManager) {
 			stopSwitch = true;
 		}
 		
+		//STOP SWITCH IF CONTENT IS BEING EDITED
+		if(!$(".msg_confirm").is(":visible")){
+			stopSwitch = true;
+		}
+
 		//RUN BEFORE EVENTS
 		$.each(eventManager.beforeStepChange, function(eIndex, eEvent) {
 			var result = eEvent(currentStep, step);
