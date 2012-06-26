@@ -533,6 +533,11 @@ function ContentManager() {
 	};
 	
 	this.saveContent = function($button) {
+		// disable save and cancel buttons
+		var oldBtnText = $button.text();
+		$button.text("Saving content...");
+		$button.attr("disabled","disabled");
+		$button.parent().find("button.btn_cancel").attr("disabled","disabled");
 		//RUN ON SAVE EVENTS
 		$.each(eventManager.onContentSave, function(eIndex, eEvent) {
 			eEvent(currentContent);
@@ -551,6 +556,10 @@ function ContentManager() {
 		}
 		
 		$.when(doWait).done(function() {
+			// enable save and cancel buttons
+			$button.text(oldBtnText);
+			$button.removeAttr("disabled");
+			$button.parent().find("button.btn_cancel").removeAttr("disabled");
 			$button.next('img').addClass('hide');
 			$('#msgsndr_tab_' + currentContent).hide();
 
