@@ -614,7 +614,7 @@ function activityfeed($mergeditems,$ajax = false) {
 									actionids = 0;
 									for(i=0;i<size;i++){
 										var item = result[i];
-										html += '<div class=\"content_row cf\"><div class=\"content_feed_left\"><a href=\"' + item.defaultlink + '\" ' + item.defaultonclick + '><img src=\"img/' + item.icon + '\" alt=\"\" /></a></div><div class=\"content_feed_right\"><div class=\"feedtitle\"><a href=\"' + item.defaultlink + '\" ' + item.defaultonclick + '>' + item.title + '</a></div><div class=\"feed_content\">' + item.content + '</div></div>';
+										html += '<div class=\"content_row\"><div class=\"content_feed_left\"><a href=\"' + item.defaultlink + '\" ' + item.defaultonclick + '><img src=\"img/' + item.icon + '\" alt=\"\" /></a></div><div class=\"content_feed_right\"><div class=\"feedtitle\"><a href=\"' + item.defaultlink + '\" ' + item.defaultonclick + '>' + item.title + '</a></div><div class=\"feed_content\">' + item.content + '</div></div>';
 										if(item.tools) {
 											html += '<div id=\"actionlink_' + actionids + '\" class=\"actionlink_tools\" ><img src=\"img/largeicons/tiny20x20/tools.jpg\" alt=\"edit tools\"/>&nbsp;Tools</div><div id=\"actions_' + actionids + '\" class=\"hidden\">' + item.tools + '</div>';
 											actionids++;
