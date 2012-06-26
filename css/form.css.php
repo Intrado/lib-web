@@ -165,13 +165,8 @@ position: relative;}
 
 #cke_reusableckeditor { float: left; }
   
-.newform .vertical .formlabel  {
-	text-align: left;
-	width: auto;
-	margin-left: 2px;
-}
-
-.newform .vertical .formicon { float: none; display: inline; }
+.newform .vertical .formlabel  {  }
+.newform .vertical .formicon {  }
 
 .newform /*.formcontrol >*/ input[type="text"]:focus, 
 .newform /*.formcontrol >*/ select:focus { 
@@ -329,8 +324,8 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 
 .controlcontainer { margin-bottom: 10px; white-space: nowrap; }
 .controlcontainer .messagearea { height: 205px; width: 100%; }
-.controlcontainer .datafields { font-size: 9px; float: left; }
-.controlcontainer .datafieldsinsert { font-size: 9px; float: left; margin-top: 8px; }
+.controlcontainer .datafields { float: left; display: inline; font-size: 9px; }
+.controlcontainer .datafieldsinsert { float: left; display: inline; font-size: 9px; margin-top: 8px; }
 
 #pagemessage .controlcontainer { width: 550px; }
 
@@ -363,15 +358,15 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 /* phone messages 
 -------------------*/
 
-.phone .controlcontainer { width: 215px; }
+.phone .controlcontainer {  }
 .phone .controlcontainer .library { padding: 2px; border: 1px dotted gray; }
 .phone .controlcontainer .error { white-space: normal; font-style: italic; color: red; }
 .phone .controlcontainer .uploadiframe { overflow: hidden; width: 100%; border: 0; margin: 0; padding: 0; height: 2em; }
-.phone .controlcontainer input[type="text"] { width: 185px; }
+.phone .controlcontainer input[type="text"] {  }
 
-.phone .maincontainerleft {  }
-.phone .maincontainerseperator { margin-top: 80px; }
-.phone .maincontainerright {  }
+.phone .maincontainerleft { width: 436px; margin: 0; }
+.phone .maincontainerseperator { display: none; margin-top: 80px; }
+.phone .maincontainerright { width: 436px; margin: 0; }
 
 
 /* +----------------------------------------------------------------+
