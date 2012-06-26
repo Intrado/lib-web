@@ -141,7 +141,7 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 
 /* -------- CSS redesign ------- */
 
-.newform .formcontrol iframe { overflow: hidden; }
+.newform .formcontrol iframe {  }
 .newform .formcontrol > label { margin-left: 5px; line-height: 22px;}
 
 .newform fieldset#AddRuleFieldmap { width: 130px; padding: 0; margin: 0; background: none; }
@@ -361,7 +361,7 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 .phone .controlcontainer {  }
 .phone .controlcontainer .library { padding: 2px; border: 1px dotted gray; }
 .phone .controlcontainer .error { white-space: normal; font-style: italic; color: red; }
-.phone .controlcontainer .uploadiframe { overflow: hidden; width: 100%; border: 0; margin: 0; padding: 0; height: 2em; }
+.phone .controlcontainer iframe { width: 100%; border: 0; margin: 0; padding: 0; height: 2em; }
 .phone .controlcontainer input[type="text"] {  }
 
 .phone .maincontainerleft { width: 436px; margin: 0; }
@@ -414,11 +414,11 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 .newui .formfieldarea { padding: 8px 10px; }
 .newui .formfieldarea .underneathmsg { padding: 0 0 0 140px; font-size: 14px; font-weight: normal; color: #cc0000; }
 
-.newui .newform .formtitle { float: left; display: inline; width: 150px; /*margin: 0;*/ padding: 0; }
+.newui .newform .formtitle { width: 140px; }
 .newui .newform .formtitle .formlabel { float: none; /*display: block;*/ padding: 5px 0px 5px 0; font-size: 14px; line-height: 18px; font-weight: normal; text-align: right; }
 .newui .newform .formtitle .formicon { /*display: none;*/ }
 
-.newui .newform .formcontrol { float: left; display: inline; width: 370px; padding: 0; }
+.newui .newform .formcontrol { padding: 0; }
 .newui .newform .formcontrol input[type="text"] { display: block; width: 313px; padding: 4px 5px; font-size: 14px; line-height: 18px; border: 1px solid #E2E2E2; 
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
