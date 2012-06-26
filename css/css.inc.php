@@ -146,7 +146,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; }
 button::-moz-focus-inner, input::-moz-focus-inner { border: 0; padding: 0; }
 textarea { overflow: auto; vertical-align: top; resize: vertical; }
 
-table { border-collapse: collapse; border-spacing: 0; }
+table { border-collapse: collapse; border-spacing: 0; margin: 0 0 5px; }
 td, th { vertical-align: top; padding: .5em; }
 
 
@@ -495,7 +495,7 @@ table.list td.day { text-align: center; vertical-align: middle; }
 table.list ul { list-style: none; padding: 0; margin: 0; }
 table.list ul li { padding: 6px 8px; }
 
-table.usagelist { width: 100%; margin: 0; border: 1px solid #ccc; background-color: #f8f8f8;  }
+table.usagelist { width: 100%; border: 1px solid #ccc; background-color: #f8f8f8;  }
 table.usagelist tr:nth-child(even) { background-color: #f1f1f1; }
 
 table > .listHeader > th 	{ text-align: left;  color: white; }
