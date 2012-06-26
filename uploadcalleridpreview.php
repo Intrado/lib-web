@@ -124,7 +124,7 @@ NewForm($f);
 $PAGE="admin:settings";
 $TITLE="Upload Caller ID Routes Preview: " . escapehtml($dmname);
 include("nav.inc.php");
-buttons(submit($f, "save", "Save"), button("Select Different File", null, "uploadcallerid.php"), button("Cancel", null, "calleridroute.php"));
+buttons(submit($f, "save", "Save"), button("Select Different File", null, "uploadcallerid.php"), icon_button(_L("Cancel"), "cross", null, "calleridroute.php"));
 startWindow("Routes Preview" . ($count <= 0 ? " - First 5000 Records" : ""));
 ?>
 	<table cellpadding="3" cellspacing="1" class="list" width="100%">

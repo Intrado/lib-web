@@ -56,7 +56,7 @@ $TITLE="Upload Caller ID Routes: " . escapehtml($dmname);
 NewForm($f);
 include_once("nav.inc.php");
 
-buttons(submit($f, "upload", "Preview"), button("Cancel", null, "calleridroute.php"));
+buttons(submit($f, "upload", "Preview"), icon_button(_L("Cancel"), "cross", null, "calleridroute.php"));
 startWindow("Upload Caller ID Routes");
 ?>
 	<table border="0" cellpadding="3" cellspacing="0" width="100%">

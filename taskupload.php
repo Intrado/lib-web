@@ -77,7 +77,7 @@ include_once("nav.inc.php");
 
 NewForm($f);
 
-buttons(submit($f, 'upload','Upload'), button('Cancel',NULL,'tasks.php'));
+buttons(submit($f, 'upload','Upload'), icon_button(_L("Cancel"),"cross",null,"tasks.php"));
 
 
 startWindow('Upload Import File');

@@ -147,7 +147,7 @@ NewForm($f);
 $PAGE="admin:settings";
 $TITLE="Upload Telco Settings Preview: " . escapehtml($dmname);
 include("nav.inc.php");
-buttons(submit($f, "save", "Save"), button("Select Different File", null, "uploadroutes.php"), button("Cancel", null, "dmsettings.php"));
+buttons(submit($f, "save", "Save"), button("Select Different File", null, "uploadroutes.php"), icon_button(_L("Cancel"), "cross", null, "dmsettings.php"));
 startWindow("Routes Preview" . ($count <= 0 ? " - First 5000 Records" : ""));
 ?>
 	<table cellpadding="3" cellspacing="1" class="list" width="100%">

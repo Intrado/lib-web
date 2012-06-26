@@ -56,7 +56,7 @@ $TITLE="Upload Telco Settings: " . escapehtml($dmname);
 NewForm($f);
 include_once("nav.inc.php");
 
-buttons(submit($f, "upload", "Preview"), button("Cancel", null, "dmsettings.php"));
+buttons(submit($f, "upload", "Preview"), icon_button(_L("Cancel"), "cross", null, "dmsettings.php"));
 startWindow("Upload Routes");
 ?>
 	<table border="0" cellpadding="3" cellspacing="0" width="100%">
