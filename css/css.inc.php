@@ -236,7 +236,7 @@ secwindow is container for windows and table content set to fit screen width for
 -----*/
 
 .content_wrap { margin: 10px 1%; }
-.csec { float: left; display: inline; }
+.csec { /*float: left; display: inline;*/ }
 .secwindow { width: 100%; }
 
 .pagetitle { margin-bottom: .5em; font-size: 21px; }
@@ -828,8 +828,8 @@ div.autocomplete ul li {
 /*----- New Job and Emergency job table styles -----*/
 
 .htmlradiobuttonbigcheck img { position: absolute; left: 0; top: 25px; /*width: 34px; height: 34px; margin-left: -17px; padding: 0 0 0 50%;*/ }
-.htmlradiobuttonbigcheck ol { list-style-type: none; float: left; display: inline; margin: 0; padding: 0 0 0 5px; }
-.htmlradiobuttonbigcheck ol li { background: url(img/icons/bullet_blue.gif) center left no-repeat; padding: 0 0 0 20px; line-height: 21px; text-align: left; }
+.htmlradiobuttonbigcheck ol { list-style-type: none; float: left; display: inline; margin: 0; padding: 0 0 0 3px; }
+.htmlradiobuttonbigcheck ol li { background: url(img/icons/bullet_blue.gif) center left no-repeat; padding: 0 0 0 20px; font-size: 12px; line-height: 21px; text-align: left; }
 .htmlradiobuttonbigcheck button { padding: 0 0 10px 35px; }
 .htmlradiobuttonbigcheck .create_btn { float: left; width: 94px; height: 88px; }
 
