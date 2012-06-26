@@ -359,7 +359,7 @@ endWindow();
 
 if ($IMPORT->id) {
 ?>
-	<br><div style="margin-left: 10px;">[*Note: This option does not apply to data files that are manually uploaded using the Browse option.]</div>
+	<div style="margin-left: 10px;">[*Note: This option does not apply to data files that are manually uploaded using the Browse option.]</div>
 <?
 }
 buttons();
