@@ -72,7 +72,7 @@ jQuery.noConflict();
 			}, "json");
 			
 			// ckeditor
-			applyHtmlEditor('msgsndr_form_body', true);
+			applyCkEditor('msgsndr_form_body');
 			
 			$(document).ready(function() {
 				// subject

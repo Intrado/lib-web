@@ -3,7 +3,7 @@ function ContentSaveManager() {
 	
 	var saveProcess = {
 		"email" : function() {
-			var enText = CKEDITOR.instances.reusableckeditor.getData();
+			var enText = $("#msgsndr_form_body").val();
 			var translate = $('#msgsndr_form_emailtranslate').is(':checked');
 
 			$('#msgsndr_tab_email').append('<div id="post_data_email_translations"><input type="hidden" name="email_translate" /></div>');

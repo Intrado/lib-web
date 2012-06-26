@@ -511,7 +511,7 @@ $.loadMessage = function loadMessage() {
 				
 				if (ckeditor) {
 					var textarea = element.attr("id");
-					applyHtmlEditor(textarea, true);
+					applyCkEditor(textarea);
 				}
 			}
 		});

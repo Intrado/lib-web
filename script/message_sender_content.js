@@ -293,7 +293,7 @@ var allowControl = {
 		});
 
 		function eTranslate() {
-			var txtField = CKEDITOR.instances.reusableckeditor.getData();
+			var txtField = $("#msgsndr_form_body").val();
 
 			$(this).parent().append('<button id="email_retranslate" data-target="#email_translate">Re Translate</button>');
 

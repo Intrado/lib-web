@@ -87,4 +87,20 @@ jQuery.noConflict();
 		
 		return phonePartOne + phonePartTwo + phonePartThree;
 	};
+	
+	// using helper functions in htmleditor.js, set up the ckeditor on the textarea with id "elementid"
+	applyCkEditor = function(elementid) {
+		// add the ckeditor to the textarea
+		applyHtmlEditor(elementid, true, elementid+"-htmleditor");
+
+		// set up a keytimer to save content
+		var htmlTextArea_keytimer = null;
+		registerHtmlEditorKeyListener(function (event) {
+			window.clearTimeout(htmlTextArea_keytimer);
+			var htmleditor = getHtmlEditorObject();
+			htmlTextArea_keytimer = window.setTimeout(function() {
+				saveHtmlEditorContent(htmleditor);
+			}, 500);
+		});
+	};
 })(jQuery);
