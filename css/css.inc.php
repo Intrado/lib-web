@@ -341,8 +341,8 @@ table_left and table_right have the arrow controls, set to 8% width for 1024 scr
 .actionlink_tools:hover { cursor: pointer; }
 
 .content_feed_notification { margin: 10px 10px 0 0; }
-.content_feed_left, .content_feed_right { display: block; float: left; }
-.content_feed_left { overflow: hidden; margin-right: 10px; }
+.content_feed_left { display: inline; float: left; overflow: hidden; }
+.content_feed_right { margin: 0 0 0 55px; }
 
 
 /* +----------------------------------------------------------------+
@@ -355,6 +355,7 @@ table_left and table_right have the arrow controls, set to 8% width for 1024 scr
 .content_side {  margin: 0 1% .5% 0; padding: 0 1% .5% 0; width: 15%;  min-width: 180px; border-right: 1px dotted <?=$theme2?>; }
 .content_main { width: 80%; padding: 0 1% 0 1%; }
 .content_row { display: block; width: 100%; min-width: 600px; position: relative; margin: 0 auto; margin-bottom: 1em; }
+.window_main .content_row { height: 65px; }
 #feeditems .content_row { border-bottom: 1px solid #ccc; padding: 0 0 1em 0; }
 .content_col_1 { width: 16%; }
 .content_col_2 { width: 32%; }
