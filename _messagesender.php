@@ -134,7 +134,8 @@ class MessageSenderForm extends Form {
 		// has facebook message data?
 		if (isset($this->formdata["hasfacebook"]["value"]) && $this->formdata["hasfacebook"]["value"]) {
 			$this->markRequired("socialmediafacebookmessage");
-			$this->markRequired("socialmediafacebookpage");
+			// FIXME: message_sender javascript doesn't require facebook page to be set
+			//$this->markRequired("socialmediafacebookpage");
 		}
 		
 		// has twitter message data?
@@ -145,7 +146,8 @@ class MessageSenderForm extends Form {
 		// has feed message data?
 		if (isset($this->formdata["hasfeed"]["value"]) && $this->formdata["hasfeed"]["value"]) {
 			$this->markRequired("socialmediafeedmessage");
-			$this->markRequired("socialmediafeedcategory");
+			// FIXME: message_sender javascript doesn't require feed catetory to be set
+			//$this->markRequired("socialmediafeedcategory");
 		}
 		
 		// save this message?
@@ -1111,28 +1113,30 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			switch ($subtype) {
 				case "facebook":
 					// get the destinations for facebook
-					foreach (json_decode($postdata["socialmediafacebookpage"]) as $pageid) {
-						if ($pageid == "me")
-							$pageid = $USER->getSetting("fb_user_id");
-						$job->updateJobPost("facebook", $pageid);
+					if ($postdata["socialmediafacebookpage"]) {
+						foreach (json_decode($postdata["socialmediafacebookpage"]) as $pageid) {
+							if ($pageid == "me")
+								$pageid = $USER->getSetting("fb_user_id");
+							$job->updateJobPost("facebook", $pageid);
+						}
 					}
 					break;
 				case "twitter":
 					$twitterauth = json_decode($USER->getSetting("tw_access_token"));
 					$job->updateJobPost("twitter", $twitterauth->user_id);
 					break;
-				case "page":
-					if (!$createdpostpage) {
-						$createdpostpage = true;
-						$job->updateJobPost("page", "");
+				case "feed":
+					if ($postdata["socialmediafeedcategory"]) {
+						foreach ($postdata["socialmediafeedcategory"] as $feedcategoryid)
+							$job->updateJobPost("feed", $feedcategoryid);
 					}
+					break;
+				case "page":
 				case "voice":
 					if (!$createdpostpage) {
 						$createdpostpage = true;
 						$job->updateJobPost("page", "");
 					}
-				case "feed":
-					$job->updateJobPost("feed", $postdata["socialmediafeedcategory"]);
 			}
 		}
 		
