@@ -76,31 +76,21 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 
 /* fieldset is a container for a set of field elements, typ associated with a help page */
 
-.newform h2 {
-	margin-top: .5em; 
-	padding: 0.3125em 0.625em 0 ;
-	/*background: transparent url('../img/header_bg.gif') repeat-x 0 0 ;*/
-	/*border-bottom: 1px dotted #A4C8E9;*/
-	color: /* #87AFD4 */ #222; font-weight: normal;
-	-webkit-border-radius: 10px 10px 0 0; 
-     -moz-border-radius: 10px 10px 0 0; 
-          border-radius: 10px 10px 0 0; 
-  -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box;
-}
+.newform h2 { margin: 0 0 5px 0; color: #222; font-size: 18px; }
 
 /*---------- New forms layout ----------*/
 
 .newform fieldset { background: #f1f1f1; width: 100%; margin-bottom: 1em; border: none; border-radius: 5px; }
 .newform label { line-height: 16px; }
 
-.formfieldarea { padding: 8px 10px; }
+.formfieldarea { padding: 8px; }
 .formfieldarea .underneathmsg { float: left; display: inline; width: 100%; padding: 0 0 0 210px; font-weight: bold; color: #cc0000; line-height: 22px; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
 
-.newform .formtitle { float: left; display: inline; width: 200px; text-align: right; margin: 0 10px 0 0; }
-.newform .formtitle .formlabel { display: inline-block; font-weight: bold; font-size: 1.1em; line-height: 25px; }
+.newform .formtitle { float: left; display: inline; width: 140px; text-align: right; }
+.newform .formtitle .formlabel { display: inline-block; font-size: 1.1em; line-height: 25px; }
 .newform .formtitle .formicon { margin: -3px 0 0; }
 
-.newform .formcontrol { float: left; font-size: 1.1em; line-height: 25px; }
+.newform .formcontrol { margin: 0 0 0 150px; font-size: 1.1em; line-height: 25px; }
 .newform .formcontrol h3 { margin: 0 0 15px 0; }
 .newform .formcontrol input[type="text"] { width: 250px; padding: 4px 5px; border: 1px solid #E7E7E7; overflow: hidden; 
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
@@ -357,8 +347,8 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 .email .maincontainerright {  }
 
 #emaileedit_helpsection_5 .formtitle {  }
-#emaileedit_helpsection_5 .formtitle .formlabel { text-align: right; }
-#emaileedit_helpsection_5 .formcontrol { width: 600px; margin: 0 0 0 71px; }
+#emaileedit_helpsection_5 .formtitle .formlabel {  }
+#emaileedit_helpsection_5 .formcontrol { width: 600px; }
 #emaileedit_helpsection_5 .formcontrol .maincontainerleft,
 #emaileedit_helpsection_5 .formcontrol .maincontainerright,
 #emaileedit_helpsection_5 .formcontrol .controlcontainer { width: 600px; }
@@ -496,8 +486,6 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 	.formcontrol .messagegrid { width: 520px; }
 
 	.newform .formcontrol textarea { width: 300px; }
-	.newform .htmlradiobuttonbigcheck { width: 320px; }
-	.newform .htmlradiobuttonbigcheck .creation_method { margin: 0 10px 5px 0; }
 	
 	#jobedit_helpercell,
 	#emaileedit_helpercell,
