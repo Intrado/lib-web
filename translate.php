@@ -31,7 +31,7 @@ if( (isset($_REQUEST['english']) && mb_strlen($_REQUEST['english']) > 5000) ||
 			$i = 0;
 			foreach($translations as $translation){
 				$responseObj->responseData[$i]->code = $languagearray[$i];
-				$responseObj->responseData[$i++]->translatedText = preg_replace('/<input value="(.+?)"\\/>/', '$1', html_entity_decode($translation,ENT_QUOTES,"UTF-8"));
+				$responseObj->responseData[$i++]->translatedText = $translation;
 			}
 		}
 	} else if(isset($_REQUEST['text']) && isset($_REQUEST['language'])){
@@ -45,7 +45,7 @@ if( (isset($_REQUEST['english']) && mb_strlen($_REQUEST['english']) > 5000) ||
 			$responseObj->responseData = array();
 			$responseObj->responseDetails = "";
 			$responseObj->responseStatus = 200;
-			$translationObj->translatedText = preg_replace('/<input value="(.+?)"\\/>/', '$1', html_entity_decode($translations[0],ENT_QUOTES,"UTF-8"));
+			$translationObj->translatedText = $translations[0];
 			$responseObj->responseData = $translationObj;
 		}
 	}
