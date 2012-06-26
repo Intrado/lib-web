@@ -442,8 +442,8 @@ a.actionlink {
 }
 
 .actionlinks { white-space: nowrap; }
-.actionlinks a { border-right: 1px solid #aaa; }
-.actionlinks a.actionlink:last-child { border: none; }
+.actionlinks a { border-left: 1px solid #aaa; }
+.actionlinks a.actionlink:first-child { border: none; }
 
 /*----- items need to appear in vertical list on homepage -----*/
 
