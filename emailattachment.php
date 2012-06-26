@@ -71,10 +71,10 @@ if (is_array($result)) {
 	<link href="css.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print">
 	<link href="css/form.css.php" type="text/css" rel="stylesheet">
 	<style type="text/css">
-		body {
-			margin: 0;
-			padding: 0;
-			border: 0;
+		html, body, iframe {
+			background: transparent;
+			overflow: hidden;
+			border: none;
 		}
 	</style>
 </head>
