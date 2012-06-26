@@ -72,6 +72,7 @@ if($isajax === true) {
 	$templatedata = QuickQueryMultiRow(
 				"select SQL_CALC_FOUND_ROWS j.id as jobid, 
 					j.messagegroupid as messagegroupid,
+					j.jobtypeid as jobtypeid,
 					j.modifydate as date,
 					j.name as name,
 					j.description as description,
@@ -109,8 +110,16 @@ if($isajax === true) {
 			$title = escapehtml($template["name"]);
 			$icon = 'img/largeicons/globe.jpg';
 			
+			$lists = json_encode(quickQueryList("select listid from joblist where jobid = ?", false, false, array($jobid)));
+			$templateoptions = array(
+				"subject" => $template["name"],
+				"lists" => $lists,
+				"jobtypeid" => $template["jobtypeid"],
+				"messagegroupid" => $template["messagegroupid"]
+			);
+			
 			$actionlinks = array(
-				action_link(_L("New %s",getJobTitle()), "add", 'message_sender.php?templateid=' . $jobid),
+				action_link(_L("New %s",getJobTitle()), "add", 'message_sender.php?template=true&' . http_build_query($templateoptions)),
 				action_link(_L("Edit"), "pencil", 'jobtemplate.php?id=' . $jobid)
 			);
 			

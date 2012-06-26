@@ -363,11 +363,14 @@ include("nav.inc.php");
 			<?
 			if (count($jobtemplates)) {
 				foreach($jobtemplates as $jobtemplate) {
-					$subject = urlencode($jobtemplate->name);
-					$lists = urlencode(json_encode(quickQueryList("select listid from joblist where jobid = ?", false, false, array($jobtemplate->id))));
-					$jobtypeid = $jobtemplate->jobtypeid;
-					$messagegroupid = $jobtemplate->messagegroupid;
-					echo "<li><a href=\"message_sender.php?template=true&subject=$subject&lists=$lists&jobtypeid=$jobtypeid&messagegroupid=$messagegroupid\">{$jobtemplate->name}</a></li>";
+					$lists = json_encode(quickQueryList("select listid from joblist where jobid = ?", false, false, array($jobtemplate->id)));
+					$options = array(
+						"subject" => $jobtemplate->name,
+						"lists" => $lists,
+						"jobtypeid" => $jobtemplate->jobtypeid,
+						"messagegroupid" => $jobtemplate->messagegroupid
+					);
+					echo "<li><a href=\"message_sender.php?template=true&" . http_build_query($options) . "\">{$jobtemplate->name}</a></li>";
 				}
 			}
 			?>
