@@ -266,6 +266,12 @@ var allowControl = {
 	},
 	"email" : function() {
 		var $ = jQuery;
+		
+		// Add users' email address to the from email field
+		if(userInfo.email != '') {
+        	$('#msgsndr_form_email').attr('value', userInfo.email);
+		}
+		
 		// Hide / Show Translations
 		$('#msgsndr_tab_email').on('click', '.toggle-translations', function(event) {
 			event.preventDefault();
