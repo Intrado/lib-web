@@ -58,7 +58,20 @@ $.loadMessage = function loadMessage() {
 	this.init = function() {
 		// load a saved message is clicked, get the messages
 		$('#load_saved_message').on("click", function(){
-			self.getMessageGroups();
+			// check if there's a message being edited 
+			if(!$(".msg_confirm").is(":visible")){
+				// If there is, alert the user to save/cancel their message before loading a saved one.
+				confirm('Please save or cancel your message first');
+				// clear the data-toggle attribute to prevent the modal from firing
+				$(this).attr('data-toggle', '');
+			} else {
+				// restore the data-toggle if necessary and open the modal
+				if($(this).attr('data-toggle') == '') {
+					$(this).attr('data-toggle', 'modal');
+				}
+				self.getMessageGroups();
+			}
+			
 		});
 
 		// This makes the whole table row clickable to select the message ready for loading into content
