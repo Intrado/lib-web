@@ -61,7 +61,7 @@ $.loadMessage = function loadMessage() {
 			// check if there's a message being edited 
 			if(!$(".msg_confirm").is(":visible")){
 				// If there is, alert the user to save/cancel their message before loading a saved one.
-				confirm('Please save or cancel your message first');
+				alert('Please save or cancel your message first');
 				// clear the data-toggle attribute to prevent the modal from firing
 				$(this).attr('data-toggle', '');
 			} else {
