@@ -176,7 +176,7 @@ include("nav.inc.php");
 		
 		<div class="window_body_wrap">
 
-		<form name="broadcast">
+		<!-- <form name="broadcast"> -->
 		<input type="hidden" name="broadcast_formsnum" value="this should be overwritten with real serial number" />
 
 <? include("message_sender/section_one.inc.php"); ?>
@@ -185,7 +185,7 @@ include("nav.inc.php");
 
 <? include("message_sender/section_three.inc.php"); ?>
 
-		</form>
+		<!-- </form> -->
 		
 		</div><!-- /window_body_wrap -->
 		
