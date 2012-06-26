@@ -80,7 +80,7 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 
 /*---------- New forms layout ----------*/
 
-.newform fieldset { background: #f1f1f1; width: 100%; margin-bottom: 1em; border: none; border-radius: 5px; }
+.newform fieldset { background: #f1f1f1; margin-bottom: 1em; border: none; border-radius: 5px; }
 .newform label { line-height: 16px; }
 
 .formfieldarea { padding: 8px; }
@@ -478,6 +478,12 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 
 .newui #list_helpsection_3 .formtitle { width: 100%; text-align: left; }
 .newui #list_helpsection_3 .formcontrol { width: 600px; margin: 0; }
+
+
+/*---------- IE7 fixes ----------*/
+
+.ie7 .newform .formtitle { margin: 0 10px 0 0; }
+.ie7 .newform .formcontrol { margin: 0; }
 
 
 /*---------- Media queries for form elements ----------*/
