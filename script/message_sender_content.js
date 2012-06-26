@@ -303,7 +303,7 @@ var allowControl = {
 			$.translate(txtField, elangCodes, function(data) {
 				$.each(data.responseData, function(transIndex, transData) {
 					var e = $('#email_translated_' + transData.code);
-					e.html(transData.translatedText.replace("<<", "&lt;&lt;").replace(">>","&gt;&gt;"));
+					e.html(transData.translatedText.replace(/<</g, "&lt;&lt;").replace(/>>/g,"&gt;&gt;"));
 					// remove loading icon from label
 					e.parent().parent().find("img.loading").remove();
 				});
