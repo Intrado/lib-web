@@ -114,15 +114,15 @@ if (!empty($_POST) && empty($_FILES['audio'])) {
 	<link href="css.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print">
 	<link href="css/form.css.php" type="text/css" rel="stylesheet">
 	<style type="text/css">
-		body {
-			padding:0;
-			margin:0;
-			border: 0;
+		html, body, iframe {
+			background: transparent;
+			overflow: hidden;
+			border: none;
 		}
 	</style>
 </head>
 
-<body style="margin-left: 0px; margin-top: 1px; margin-bottom: 0px">
+<body style="margin-left: 0px;  margin-bottom: 0px">
 
 <form id="uploadform" style='margin:0;padding:0'action="uploadaudio.php?formname=<?=$_GET['formname']?>&itemname=<?=$_GET['itemname']?>" method="post" enctype="multipart/form-data" onsubmit="" >
 	<!-- TODO: Might need maximum size -->
