@@ -116,7 +116,7 @@ class ListForm extends Form {
 			</div>
 
 			<!-- FORM -->
-			<div class='newform_container' style='clear:both'>
+			<div class='newform_container'>
 				<form class='newform' id='{$this->name}' name='{$this->name}' method='POST' action='{$posturl}'>
 					<table id='listFormWorkspace' width='100%' height='100%' style='clear:both; margin-bottom:25px'>
 						<tr>
