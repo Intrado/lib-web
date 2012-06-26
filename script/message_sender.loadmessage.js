@@ -463,7 +463,7 @@ $.loadMessage = function loadMessage() {
 				// now, reattach the easycall
 				var mindigits = (orgOptions.easycallmin?orgOptions.easycallmin:10);
 				var maxdigits = (orgOptions.easycallmax?orgOptions.easycallmax:10);
-				self.elements.phoneRecording..attachEasyCall({
+				self.elements.phoneRecording.attachEasyCall({
 					"languages" : easycallLangs,
 					"phonemindigits": mindigits,
 					"phonemaxdigits": maxdigits,
