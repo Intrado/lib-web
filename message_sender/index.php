@@ -155,12 +155,6 @@ include("nav.inc.php");
 
 <link href="css/newui_datepicker.css" type="text/css" rel="stylesheet" />
 
-<script> 
-	userid = <? print_r($_SESSION['user']->id); ?>;
-	fbAppId = <? print_r($SETTINGS['facebook']['appid']); ?>;
-	twitterReservedChars = <? print_r(mb_strlen(" http://". getSystemSetting("tinydomain"). "/") + 6); ?>;
-</script>
-
 	<div class="wrapper">
 	
 	<!-- <div class="main_activity"> -->
@@ -210,91 +204,50 @@ include("nav.inc.php");
 <? include("message_sender/modals.inc.php"); ?>
 <script type="text/javascript">
 <?
-// Some of these are defined in jobwizard.inc.php 
+// Load custom validators
 Validator::load_validators(array(
 	"ValSmsText","ValTimeWindowCallEarly","ValTimeWindowCallLate","ValTimePassed","ValTtsText"
 ));
 ?>
-</script>
-
-
-<script src="script/jquery.1.7.2.min.js"></script>
-<script src="script/jquery.json-2.3.min.js"></script>
-<script src="script/ckeditor/ckeditor_basic.js"></script>
-<script src="script/htmleditor.js"></script>
-
-<script type="text/javascript">
+	var userid = <? print_r($_SESSION['user']->id); ?>;
+	var fbAppId = <? print_r($SETTINGS['facebook']['appid']); ?>;
+	var twitterReservedChars = <? print_r(mb_strlen(" http://". getSystemSetting("tinydomain"). "/") + 6); ?>;
+	
+	// get template settings (if loading from template, they will be set in session data)
 	var subject = <?echo (isset($_SESSION['message_sender']['template']['subject'])?("'". str_replace("'", "\'", $_SESSION['message_sender']['template']['subject']). "'"):"''")?>;
 	var lists = <?echo (isset($_SESSION['message_sender']['template']['lists'])?$_SESSION['message_sender']['template']['lists']:'[]')?>;
 	var jtid = <?echo (isset($_SESSION['message_sender']['template']['jobtypeid'])?$_SESSION['message_sender']['template']['jobtypeid']:0)?>;
 	var mgid = <?echo (isset($_SESSION['message_sender']['template']['messagegroupid'])?$_SESSION['message_sender']['template']['messagegroupid']:0)?>;
 </script>
 
-<!-- 
-<script src="script/message_sender.js"></script>
-<script src="script/message_sender.validation.js"></script>
-<script src="script/message_sender.global.js"></script>
-<script src="script/message_sender.loadmessage.js"></script>
- -->
- 
-<script src="script/message_sender_global.js"></script>
-<script src="script/message_sender_permission.js"></script>
-<script src="script/message_sender_content_saver.js"></script>
-<script src="script/message_sender_content.js"></script>
-<script src="script/message_sender_step.js"></script>
-<script src="script/message_sender_validate.js"></script>
-<script src="script/message_sender_submit.js"></script>
-<script src="script/message_sender.loadmessage.js"></script>
-<script src="script/message_sender_base.js"></script>
+<!-- get jQuery and jquery plugins -->
+<script type="text/javascript" src="script/jquery.1.7.2.min.js"></script>
+<script type="text/javascript" src="script/jquery.json-2.3.min.js"></script>
+<script type="text/javascript" src="script/jquery-datepicker.js"></script>
+<script type="text/javascript" src="script/jquery.timer.js"></script>
+<script type="text/javascript" src="script/jquery.moment.js"></script>
+<script type="text/javascript" src="script/jquery.easycall.js"></script>
+<script type="text/javascript" src="script/jquery.translate.js"></script>
 
-<script src="script/jquery-datepicker.js"></script>
+<script type="text/javascript" src="script/bootstrap-modal.js"></script>
+<script type="text/javascript" src="script/bootstrap-dropdown.js"></script>
 
-<script src="script/jquery.timer.js"></script>
-<script src="script/jquery.moment.js"></script>
-<script src="script/jquery.easycall.js"></script>
-<script src="script/jquery.translate.js"></script>
+<script type="text/javascript" src="script/message_sender_global.js"></script>
+<script type="text/javascript" src="script/message_sender_permission.js"></script>
+<script type="text/javascript" src="script/message_sender_content_saver.js"></script>
+<script type="text/javascript" src="script/message_sender_content.js"></script>
+<script type="text/javascript" src="script/message_sender_step.js"></script>
+<script type="text/javascript" src="script/message_sender_validate.js"></script>
+<script type="text/javascript" src="script/message_sender_submit.js"></script>
+<script type="text/javascript" src="script/message_sender.loadmessage.js"></script>
+<script type="text/javascript" src="script/message_sender_base.js"></script>
+<script type="text/javascript" src="script/message_sender.previewmodal.js"></script>
+<script type="text/javascript" src="script/message_sender.emailattach.js"></script>
+<script type="text/javascript" src="script/message_sender.facebook.js"></script>
+<script type="text/javascript" src="script/message_sender_listbuilder.js"></script>
 
-<script src="script/bootstrap-modal.js"></script>
-<!-- <script src="script/bootstrap-tooltip.js"></script> -->
-<script src="script/bootstrap-dropdown.js"></script>
-
-<script type="text/javascript">
-		$("msgsndr_tts_message").observe("change", textAreaPhone_storedata.curry("messagePhoneText_message"));
-		$("msgsndr_tts_message").observe("blur", textAreaPhone_storedata.curry("messagePhoneText_message"));
-		$("msgsndr_tts_message").observe("keyup", textAreaPhone_storedata.curry("messagePhoneText_message"));
-		$("msgsndr_tts_message").observe("focus", textAreaPhone_storedata.curry("messagePhoneText_message"));
-		$("msgsndr_tts_message").observe("click", textAreaPhone_storedata.curry("messagePhoneText_message"));
-		// $("messagePhoneText_message-female").observe("click", textAreaPhone_storedata.curry("messagePhoneText_message"));
-		// $("messagePhoneText_message-male").observe("click", textAreaPhone_storedata.curry("messagePhoneText_message"));
-
-		var textAreaPhone_keyupTimer = null;
-		function textAreaPhone_storedata(formitem, event) {
-			var form = event.findElement("form");
-			if (textAreaPhone_keyupTimer) {
-				window.clearTimeout(textAreaPhone_keyupTimer);
-			}
-			textAreaPhone_keyupTimer = window.setTimeout(function () {
-					var val = $(formitem).value.evalJSON();
-					val.text = $("msgsndr_tts_message").value;
-					val.gender = ($(formitem+"-female").checked?"female":"male");
-					$(formitem).value = Object.toJSON(val);
-					//form_do_validation(form, $(formitem));
-				},
-				event.type == "keyup" ? 500 : 100
-			);
-		}
-
-</script>
-
-<script src="script/speller/spellChecker.js"></script>
-<script src="script/easycall.js.php"></script>
-<script src="script/niftyplayer.js.php"></script>
-
-
-<script src="script/message_sender.previewmodal.js"></script>
-<script src="script/message_sender.emailattach.js"></script>
-<script src="script/message_sender.facebook.js"></script>
-<script src="script/message_sender_listbuilder.js"></script>
-
-<script src="script/datepicker.js"></script>
-
+<script type="text/javascript" src="script/ckeditor/ckeditor_basic.js"></script>
+<script type="text/javascript" src="script/htmleditor.js"></script>
+<script type="text/javascript" src="script/speller/spellChecker.js"></script>
+<script type="text/javascript" src="script/niftyplayer.js.php"></script>
+<script type="text/javascript" src="script/datepicker.js"></script>
