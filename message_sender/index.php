@@ -206,7 +206,7 @@ include("nav.inc.php");
 <?
 // Load custom validators
 Validator::load_validators(array(
-	"ValSmsText","ValTimeWindowCallEarly","ValTimeWindowCallLate","ValTimePassed","ValTtsText"
+	"ValSmsText","ValTimeWindowCallEarly","ValTimeWindowCallLate","ValTimePassed","ValTtsText","ValEmailAttach"
 ));
 ?>
 	var userid = <? print_r($_SESSION['user']->id); ?>;

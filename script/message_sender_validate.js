@@ -17,6 +17,7 @@ function ValidationManager() {
 			"email|name" : [new document.validators["ValRequired"]("email_name","Name",{}), new document.validators["ValLength"]("email_name","Name",{min: 1,max:30})],
 			"email|address" : [new document.validators["ValRequired"]("email_address","Email Address",{}), new document.validators["ValLength"]("email_address", "Email Address", {max:255}), new document.validators["ValEmail"]("email_address","Email Address",{domain:orgOptions.emaildomain})],
 			"email|subject" : [new document.validators["ValRequired"]("email_subject","Subject",{}), new document.validators["ValLength"]("email_subject","Subject",{min:3, max: 30})],
+			"email|attachment" : [new document.validators["ValEmailAttach"]("email_attachment","Attachment",{})],
 			"email|body" : [new document.validators["ValRequired"]("email_body","Body",{}), new document.validators["ValLength"]("email_body","Body",{min:4})],
 			"sms|text" : [new document.validators["ValRequired"]("sms_text","SMS",{}), new document.validators["ValLength"]("sms_text","SMS",{min:1, max:160}), new document.validators["ValSmsText"]("sms_text","SMS Text")],
 			"facebook|message" : [new document.validators["ValRequired"]("facebook_message","Facebook Message",{}), new document.validators["ValLength"]("facebook_message","Facebook Message",{min:4, max: 420})],
@@ -142,6 +143,10 @@ function ValidationManager() {
 				if ($element.is("[name=sms_text]")) {
 					$('.btn_save').attr('disabled', 'disabled');
 				}
+			} else if($element.hasClass('box_validator')) {
+				$element.removeClass('ok').addClass('er');
+				$($element.next("div")).children(".box_validatorerror").remove();
+				$($element.next("div")).append($('<div />', { "class": "box_validatorerror er", "text": msg }));
 			} else {
 				$element.removeClass('ok').addClass('er');
 				if(typeof(msg) != "undefined" && msg.length > 0) {
@@ -163,12 +168,21 @@ function ValidationManager() {
 			if($element.is("[name=sms_text]")) {
 				$('.btn_save').removeAttr('disabled');
 			}
+		} else if($element.hasClass('box_validator')) {
+			$element.removeClass('er').addClass('ok');
+			$($element.next("div")).children(".box_validatorerror").remove();
 		} else {
 			$element.removeClass('er').addClass('ok').next('.error').fadeOut(300).text("");
 		}
 		
 		obj_stepManager.updateStepStatus();
 		obj_contentManager.updateContentStatus();
+	};
+	
+	//This is to bridge prototype and jquery implementations when force running validation
+	this.runValidateById = function(id) {
+		var element = $('#' + id);
+		this.runValidate(element);
 	};
 	
 	this.runValidate = function($element) {

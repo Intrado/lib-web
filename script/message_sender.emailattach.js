@@ -7,7 +7,7 @@ function startUpload(){
 }
 
 function stopUpload(id,name,size,errormessage, formname, itemname) {
-	if (!formname || !itemname) {
+	if (!formname || !itemname || !$("msgsndr_form_attachment_my_attach").visible()) {
 		return;
 	}
 	// stopUpload() is called automatically when the iframe is loaded, which may be before document.formvars is initialized by form_load().
@@ -26,7 +26,7 @@ function stopUpload(id,name,size,errormessage, formname, itemname) {
 		return;
 	var field = fieldelement.value;
 	if(field != "") 
-		values = field.evalJSON();
+		values = field.evalJSON(true);
 	if(id && name && size && !errormessage) {
 		values[id] = {"size":size,"name":name};
 	}
@@ -37,7 +37,6 @@ function stopUpload(id,name,size,errormessage, formname, itemname) {
 	else
 		uploadedfiles.update().setStyle({"display":"none"});
 	
-	var str = "";
 	for(var contentid in values) {
 		var content = values[contentid];
 		
@@ -55,7 +54,7 @@ function stopUpload(id,name,size,errormessage, formname, itemname) {
 			event.stop();
 			removeAttachment(contentid, formname, itemname);
 		}.bindAsEventListener(uploadedfiles, contentid, formname, itemname));
-		uploadedfiles.insert(downloadlink).insert(sizeinfo).insert(removelink).insert("<br/>");				 		
+		uploadedfiles.insert(downloadlink).insert(sizeinfo).insert(removelink).insert("<br/>");
 	}
 
 	fieldelement.value = Object.toJSON( $H(values) );
@@ -63,19 +62,20 @@ function stopUpload(id,name,size,errormessage, formname, itemname) {
 	if (errormessage) {
 		alert(errormessage);
 	}
+	
+	obj_valManager.runValidateById(itemname);
 	return true;
 }
 
 function removeAttachment(id, formname, itemname) {
 	if (!formname || !itemname)
 		return;
-	var values = $(itemname).value.evalJSON();
+	var values = $(itemname).value.evalJSON(true);
 	delete values[id];
 	
 	// if there are attachments display the div that shows them
 	var uploadedfiles = $("uploadedfiles");
 	if (Object.keys(values).length > 0) {
-		console.log('hi');
 		uploadedfiles.setStyle({"display":"block"}).update();
 	} else {
 		uploadedfiles.update().setStyle({"display":"none"});
@@ -98,4 +98,5 @@ function removeAttachment(id, formname, itemname) {
 		);
 	});
 	$(itemname).value = Object.toJSON(values);
+	obj_valManager.runValidateById(itemname);
 };

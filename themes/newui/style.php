@@ -841,6 +841,9 @@ li.notactive { display: none; }
 
 span.error { color: rgb(219,30,30); font-size: 0.9em; }
 
+.box_validatorerror span { margin: 0 5px 0 0; font-size: 14px; line-height: 18px; font-weight: bold; }
+.box_validatorerror { background: #ec4848; width: 96%; margin: 5px 0 0; padding: 5px 8px; font-size: 1em; color: #fff; -webkit-border-radius: 5px; border-radius: 5px; }
+
 /*----- Translation box -----*/
 
 .retranslateitems { width: 350px; }
