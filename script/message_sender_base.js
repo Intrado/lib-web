@@ -61,8 +61,6 @@ jQuery.noConflict();
 			addme : {}
 		};
 		
-		getTokens();
-		
 		
 		//start up permission manager
 		obj_permissionManager = new PermissionManager();

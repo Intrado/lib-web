@@ -55,13 +55,16 @@ jQuery.noConflict();
 					if (typeof(data.twitter) != 'undefined' && data.twitter != ''){
 						twToken = data.twitter;
 						$('#msgsndr_twittername').append('Posting as <a class="" href="http://twitter.com/'+twToken.screenName+'">@'+twToken.screenName+'</a>');
-					} else {
-						$('#msgsndr_twittername').append('<a id="msgsndr_twitterauth" href="popuptwitterauth.php" class="btn"><img src="img/icons/custom/twitter.gif" alt="twitter"/> Add Twitter Account</a>');
-						$('#msgsndr_twitterauth').on('click', function(){
-							event.preventDefault();
-							window.open($(this).prop('href'), '', 'height=300, width=600');
-						});
+						if ( typeof($('#msgsndr_twitterauth')) != 'undefined' ){
+							$('#msgsndr_twitterauth').remove();	
+							}
 					}
+				} else {
+					$('#msgsndr_twittername').append('<a id="msgsndr_twitterauth" href="popuptwitterauth.php" class="btn"><img src="img/icons/custom/twitter.gif" alt="twitter"/> Add Twitter Account</a>');
+					$('#msgsndr_twitterauth').on('click', function(){
+						event.preventDefault();
+						window.open($(this).prop('href'), '', 'height=300, width=600');
+					});
 				}
 			}
 		});

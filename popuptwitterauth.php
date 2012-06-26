@@ -64,6 +64,10 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$form->modifyElement("callbackdiv", '
 				<script type="text/javascript">
 					window.opener.document.fire("TwAuth:update", {"access_token": "'. $postdata['twitterauth']. '"});
+					// if this has been triggered from the message sender, trigger the getTokens function to show the twittername
+					if (typeof(window.opener.getTokens) != "undefined") {
+						window.opener.getTokens();
+					}
 					window.close();
 				</script>');
 		return;
