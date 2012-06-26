@@ -96,8 +96,8 @@ h4 { font-size: 12px; line-height: 22px; color: #235563; text-shadow: 0 1px 0 #f
 
 .window { border: none; -webkit-box-shadow: 0px 2px 8px 0px #777; box-shadow: 0px 2px 8px 0px #777;
 -webkit-border-radius: 5px; border-radius: 5px; -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
-.window_aside { width: 170px; margin: 0 15px 0 0; }
-.window_main { width: 740px; margin: 0; }
+.window_aside { float: left; display: inline; width: 150px; margin: 0; }
+.window_main { width: inherit; margin: 0 0 0 160px; }
 
 .users p { position: relative; background: #F5F3F0 url(themes/newui/images/bodybg.png) repeat; display: inline-block; margin: 0 0 15px 22px; padding: 0 10px; color: #7F7567; font-size: 20px; line-height: 40px; }
 .users select { background: #fff; display: inline; width: 150px; margin: 0 0 0 5px; padding: 4px; font-size: 16px; border: 1px solid #ccc; -webkit-border-radius: 3px; border-radius: 3px; }
