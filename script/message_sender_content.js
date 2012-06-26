@@ -42,7 +42,7 @@ var allowControl = {
 
 		function ttsTranslate(elem) {
 			var txtField = $('#msgsndr_tts_message').val();
-			var ttslangCodes = [];
+			var selectedTtslangCodes = [];
 
 			var checkTranslations = $('input[name^=tts_override]');
 			$.each(checkTranslations, function(tIndex, tData) {
@@ -52,11 +52,11 @@ var allowControl = {
 				} else {
 					// add loading icon to label
 					$('#tts_translate fieldset > label[for^=tts_'+ lCode+ ']').append('<img src="img/ajax-loader.gif" class="loading" />');
-					ttslangCodes.push(lCode);
+					selectedTtslangCodes.push(lCode);
 				}
 			});
 
-			$.translate(txtField, ttslangCodes, function(data) {
+			$.translate(txtField, selectedTtslangCodes, function(data) {
 				$.each(data.responseData, function(transIndex, transData) {
 					var e = $('#tts_translated_' + transData.code);
 					e.val(transData.translatedText);
