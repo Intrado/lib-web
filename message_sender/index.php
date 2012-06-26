@@ -20,6 +20,7 @@ require_once("obj/Email.obj.php");
 require_once("obj/MessageAttachment.obj.php");
 require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
+require_once("inc/help.inc.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Validators
@@ -193,10 +194,7 @@ include("nav.inc.php");
 	
 
 	<div class="main_aside">
-		<div class="help">
-			<h3>Need Help?</h3>
-			<p>Visit the <a href="">help section</a> or call (800) 920-3897. Also be sure to <a href="">give us feedback</a> about the new version.</p>
-		</div>
+		<?= addHelpSection();?>
 	</div><!-- end main_aside-->
 	
 </div><!-- end wrapper -->

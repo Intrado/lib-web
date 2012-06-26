@@ -3,7 +3,7 @@
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
 require_once("inc/common.inc.php");
-
+require_once("inc/help.inc.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
@@ -374,11 +374,8 @@ include("nav.inc.php");
 			</ul>
 			<a class="newtemplate" href="jobtemplate.php?id=new"><img src="themes/<?= $_SESSION['colorscheme']['_brandtheme'] ?>/images/add.png">&nbsp;<?= _L("New Template") ?></a>
 		</div>
-	
-		<div class="help">
-			<h3>Need Help?</h3>
-			<p>Visit the <a href="#" onclick="popup('help/index.php',950,500);">help section</a> or call (800) 920-3897. Also be sure to <a href="mailto:feedback@schoolmessenger.com">give us feedback</a> about the new version.</p>
-		</div>
+		
+		<?= addHelpSection();?>
 	</div><!-- end main_aside -->
 	
 	</div><!-- end wrapper -->
