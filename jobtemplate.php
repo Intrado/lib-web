@@ -86,8 +86,8 @@ if ($jobid == NULL) {
 $userjobtypes = JobType::getUserJobTypes();
 
 // Prepare Job Type data
-$jobtypes = array();
-$jobtips = array();
+$jobtypes = array("0" => _L("None"));
+$jobtips = array("0" => _L("Choose %s type when using template", getJobTitle()));
 foreach ($userjobtypes as $id => $jobtype) {
 	$jobtypes[$id] = $jobtype->name;
 	$jobtips[$id] = escapehtml($jobtype->info);
@@ -159,9 +159,8 @@ $formdata["jobtype"] = array(
 	"label" => _L("Type/Category"),
 	"fieldhelp" => _L("Select the option that best describes the type of notification you are sending. ".
 						"The category you select will determine which introduction your recipients will hear."),
-	"value" => isset($job->jobtypeid)?$job->jobtypeid:"",
+	"value" => isset($job->jobtypeid)?$job->jobtypeid:"0",
 	"validators" => array(
-		array("ValRequired"),
 		array("ValInArray", "values" => array_keys($jobtypes))
 	),
 	"control" => array("RadioButton", "values" => $jobtypes, "hover" => $jobtips),
@@ -178,7 +177,6 @@ $formdata["lists"] = array(
 	"fieldhelp" => _L('Select a list from your existing lists.'),
 	"value" => ($selectedlists)?$selectedlists:array(),
 	"validators" => array(
-		array("ValRequired"),
 		array("ValFormListSelect")
 	),
 	"control" => array("FormListSelect","jobid" => $job->id),
@@ -193,7 +191,6 @@ $formdata["message"] = array(
 	"fieldhelp" => _L('Select a message from your existing messages.'),
 	"value" => (((isset($job->messagegroupid) && $job->messagegroupid))?$job->messagegroupid:""),
 	"validators" => array(
-		array("ValRequired"),
 		array("ValInArray","values"=>array_keys($messages)),
 		array("ValMessageGroup")
 	),
@@ -233,11 +230,15 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$job->modifydate = date("Y-m-d H:i:s", time());
 		$job->type = 'notification';
 		
-		$job->jobtypeid = $postdata['jobtype'];
+		$job->jobtypeid = $postdata['jobtype']!="0"?$postdata['jobtype']:null;
 		$job->userid = $USER->id;
 		
-		$messagegroup = new MessageGroup($postdata['message']);
-		$job->messagegroupid = $messagegroup->id;
+		if ($postdata['message'] != "") {
+			$messagegroup = new MessageGroup($postdata['message']);
+			$job->messagegroupid = $messagegroup->id;
+		} else {
+			$job->messagegroupid = null;
+		}
 		
 		if ($job->id) {
 			$job->update();
