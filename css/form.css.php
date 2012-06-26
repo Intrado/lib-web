@@ -141,7 +141,7 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 
 /* -------- CSS redesign ------- */
 
-.newform .formcontrol iframe {  }
+.newform .formcontrol iframe { height: 2em; }
 .newform .formcontrol > label { margin-left: 5px; line-height: 22px;}
 
 .newform fieldset#AddRuleFieldmap { width: 130px; padding: 0; margin: 0; background: none; }
@@ -427,7 +427,7 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 .newui .newform .formcontrol textarea { display: block; width: 375px; margin: 0 0 5px 0; padding: 4px 5px; font-size: 14px; line-height: 18px; border: 1px solid #E2E2E2; 
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
-.newui .newform .formcontrol input#account_brandthemecustomize { float: left; display: inline; margin: 0 5px 0 0; }
+.newui .newform .formcontrol input#account_brandthemecustomize { margin: 5px 5px 0 0; }
 
 .newui .newform .formcontrol .translate { max-height: 150px; overflow: auto; }
 .newui .newform .formcontrol .gBranding {}
@@ -443,31 +443,25 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 
 .newui .newform .formcontrol .datafields input { width: 140px; }
 
-.newui .controlcontainer { width: 375px; }
+.newui .controlcontainer {  }
 
-.newui .maincontainerleft { width: 375px; margin: 0; }
+.newui .maincontainerleft { margin: 0; }
 .newui .maincontainerseperator { display: none; }
-.newui .maincontainerright { width: 375px; margin: 0; padding: 0; }
+.newui .maincontainerright { margin: 0; padding: 0; }
 
 #phoneadvanced_message-voicerecorder_callcontrol input.easycallphoneinput {  }
 #phoneadvanced_message-voicerecorder_callcontrol .btn {}
 
-.newui #emaileedit_helpsection_5 .formtitle { width: 100%; text-align: left; margin: 0; }
-.newui #emaileedit_helpsection_5 .formtitle .formlabel { width: 140px; text-align: right; }
-.newui #emaileedit_helpsection_5 .formcontrol { width: 600px; margin: 0 0 0 34px; }
 .newui #emaileedit_helpsection_5 .formcontrol .maincontainerleft,
 .newui #emaileedit_helpsection_5 .formcontrol .maincontainerright,
 .newui #emaileedit_helpsection_5 .formcontrol .controlcontainer { width: 600px; }
 
-.newui #emailText_helpsection_5 .formtitle { width: 100%; text-align: left; margin: 0; }
-.newui #emailText_helpsection_5 .formtitle .formlabel { width: 140px; text-align: right; }
-.newui #emailText_helpsection_5 .formcontrol { width: 500px; margin: 0 0 0 34px; }
 .newui #emailText_helpsection_5 .formcontrol .maincontainerleft,
 .newui #emailText_helpsection_5 .formcontrol .maincontainerright,
-.newui #emailText_helpsection_5 .formcontrol .controlcontainer { width: 500px; }
+.newui #emailText_helpsection_5 .formcontrol .controlcontainer { width: 455px; }
 
 .newui .formcontrol .datafields { margin: 0 10px 0 0; }
-.newui .formcontrol .datafields select { padding: 3px 6px; font-size: 14px; }
+.newui .formcontrol .datafields select { width: 175px; padding: 3px 6px; font-size: 14px; }
 .newui .formcontrol .datafieldsinsert { margin: 25px 0 0; }
 .newui .formcontrol .datafieldsinsert button { padding: 3px 10px; }
 
