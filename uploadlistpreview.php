@@ -133,7 +133,7 @@ include_once("nav.inc.php");
 
 NewForm($f);
 
-buttons(submit($f, 'save','Save'), button("Select Different File",NULL,"uploadlist.php"), button('Cancel',NULL,'list.php'));
+buttons(submit($f, 'save','Save'), button("Select Different File",NULL,"uploadlist.php"), icon_button(_L('Cancel'),"cross",null,'list.php'));
 
 
 if ($notfound > 0) {

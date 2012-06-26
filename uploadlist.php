@@ -123,7 +123,7 @@ include_once("nav.inc.php");
 
 NewForm($f);
 
-buttons(submit($f, 'upload','Preview'), button('Cancel',NULL,'list.php'));
+buttons(submit($f, 'upload','Preview'), icon_button(_L('Cancel'),"cross",null,'list.php'));
 
 
 startWindow('Upload Call List File');

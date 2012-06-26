@@ -185,7 +185,7 @@ include_once("nav.inc.php");
 
 NewForm($f);
 
-buttons(submit($f, 'save','Save'), submit($f, 'preview','Preview'),  button("Select Different File",NULL,"uploadlist.php"), button('Cancel',NULL,'list.php'));
+buttons(submit($f, 'save','Save'), submit($f, 'preview','Preview'),  button("Select Different File",NULL,"uploadlist.php"), icon_button(_L('Cancel'),"cross",null,'list.php'));
 
 
 startWindow('Upload Preview' . ($count <= 0 ? " - First 5000 Records" : ""));
