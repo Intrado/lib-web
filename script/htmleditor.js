@@ -179,6 +179,7 @@ function applyHtmlEditor(textarea, dontwait,target) {
 			} else {
 				document.body.insert(hider);
 			}
+			
 
 			CKEDITOR.replace(reusableckeditor, {
 				'customConfig': '', // Prevent ckeditor from trying to load an external configuration file, should improve startup time.
@@ -187,14 +188,21 @@ function applyHtmlEditor(textarea, dontwait,target) {
 				'extraPlugins': 'aspell', //enable aspell port
 				'removePlugins': 'wsc,scayt,smiley,showblocks,flash,elementspath,save',
 				'toolbar': [
-          ['Print','Source','Undo','Redo','PasteFromWord','SpellCheck','Font','FontSize','Format','Styles'],
-          '/',
-          ['Bold', 'Italic', 'Underline','Strike','TextColor','BGColor','NumberedList','BulletedList','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','Outdent','Indent','RemoveFormat','Link', 'Image','Table','HorizontalRule']
-        ],
+				            ['Print','Source'],
+				            ['Undo','Redo'],
+				            ['PasteFromWord','SpellCheck'],
+				            ['Link','Image','Table','HorizontalRule'],
+				            '/',
+				            ['Bold','Italic','Underline','Strike','TextColor','BGColor','RemoveFormat'],
+				            ['NumberedList','BulletedList','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','Outdent','Indent'],
+				            '/',
+				            ['Styles','Format','Font','FontSize']
+				        ],
 				'disableObjectResizing': true,
 				'resize_enabled': false,
 				'width': '100%',
 				'filebrowserImageUploadUrl' : 'uploadimage.php',
+				'toolbarStartupExpanded' : false,
 				'on': {
 					'instanceReady': function(event) {
 						this.previous('.HTMLEditorAjaxLoader').remove();
