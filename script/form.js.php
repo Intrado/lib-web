@@ -563,6 +563,7 @@ function form_handle_submit(form,event) {
 			var res = response.responseJSON;
 			try {
 			if (res == null) {
+				//HACK: check to see if we hit the login page (due to logout)
 				if (response.responseText.indexOf(" Login</title>") != -1) {
 					alert('Your changes cannot be saved because your session has expired or logged out.');
 					window.location="index.php?logout=1";
