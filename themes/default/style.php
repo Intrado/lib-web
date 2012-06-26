@@ -45,12 +45,8 @@ a:hover { text-decoration: underline; }
 .sectitle { width: 100%; }
 .secbutton { position: absolute; top: 36px; left: 0; width: 150px; }
 .sectimeline { width: 100%; padding: 0 0 0 150px; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
-
-
-/*------ An idea for layout
-.window_aside { position: absolute; left: 0; width: 225px; margin: 0; z-index: 99; }
-.window_main { position: relative; min-height: 250px; width: 100%; margin: 0; padding: 0 0 0 250px; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
----------------------------*/
+.window_aside { float: left; display: inline; width: 165px; margin: 0; }
+.window_main { width: inherit; margin: 0 0 0 175px; }
 
 .pagetitle { font-weight: bold; color: <?=$primary?>;  }
 
