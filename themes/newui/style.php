@@ -94,7 +94,7 @@ h4 { font-size: 12px; line-height: 22px; color: #235563; text-shadow: 0 1px 0 #f
 .pagetitle { font-family: Verdana, Arial, sans-serif; margin: 0 0 10px 0; color: #333; text-shadow: 0 1px 0 #fff; }
 .pagetitlesubtext { margin: 0 0 8px 0; }
 
-.window { border: none; -webkit-box-shadow: 0px 2px 8px 0px #777; box-shadow: 0px 2px 8px 0px #777;
+.window { margin: 5px 0 15px 0; border: none; -webkit-box-shadow: 0px 2px 8px 0px #777; box-shadow: 0px 2px 8px 0px #777;
 -webkit-border-radius: 5px; border-radius: 5px; -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
 .window_aside { float: left; display: inline; width: 150px; margin: 0; }
 .window_main { width: inherit; margin: 0 0 0 160px; }
