@@ -3,7 +3,7 @@
 	$.translate = function(text, langCodes, callback) {
 		var data = {
 			"english":makeTranslatableString(text),
-			"languages": langCodes};
+			"languages": langCodes.join("|")};
 		
 		return $.post("translate.php", data, callback);
 	};

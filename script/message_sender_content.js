@@ -56,7 +56,7 @@ var allowControl = {
 				}
 			});
 
-			$.translate(txtField, ttslangCodes.join("|"), function(data) {
+			$.translate(txtField, ttslangCodes, function(data) {
 				$.each(data.responseData, function(transIndex, transData) {
 					var e = $('#tts_translated_' + transData.code);
 					e.val(transData.translatedText);
@@ -108,8 +108,7 @@ var allowControl = {
 			}
 		});
 
-		var splitlangCodes = ttslangCodes.split('|');
-		var langCount = splitlangCodes.length;
+		var langCount = ttslangCodes.length;
 
 		if (langCount == 1) {
 			$('a[data-target=#tts_translate]').show().text('Show ' + langCount + ' translation');
@@ -117,8 +116,8 @@ var allowControl = {
 			$('a[data-target=#tts_translate]').show().text('Show ' + langCount + ' translations');
 		}
 
-		$.each(splitlangCodes, function(transIndex, transData) {
-			var langCode = splitlangCodes[transIndex];
+		$.each(ttslangCodes, function(transIndex, transData) {
+			var langCode = ttslangCodes[transIndex];
 
 			var ttsTranslate = '<fieldset>';
 
@@ -315,8 +314,7 @@ var allowControl = {
 			eTranslate(this);
 		});
 
-		var splitlangCodes = elangCodes.split('|');
-		var langCount = splitlangCodes.length;
+		var langCount = elangCodes.length;
 
 		if (langCount == 1) {
 			$('a[data-target=#email_translate]').show().text('Show ' + langCount + ' translation');
@@ -324,8 +322,8 @@ var allowControl = {
 			$('a[data-target=#email_translate]').show().text('Show ' + langCount + ' translations');
 		}
 
-		$.each(splitlangCodes, function(transIndex, transData) {
-			var langCode = splitlangCodes[transIndex];
+		$.each(elangCodes, function(transIndex, transData) {
+			var langCode = elangCodes[transIndex];
 			$('#email_translate').append('<fieldset><input type="checkbox" class="msgdata" checked="checked" id="email_'+langCode+'"  name="email_save_translation" class="translations" /><label for="email_'+langCode+'">'+nLangs[langCode]+'</label><div class="controls"><div class="msgdata html_translate" id="email_translated_'+langCode+'"></div></div></fieldset>');
 		});
 	},

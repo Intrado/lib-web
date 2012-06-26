@@ -27,7 +27,7 @@ function ContentSaveManager() {
 					langCodes.push(langCode);
 				});
 
-				getTranslations = $.translate(enText, langCodes.join("|"), function(data) {
+				getTranslations = $.translate(enText, langCodes, function(data) {
 					$.each(data.responseData, function(transIndex, transData) {
 						var jsonVal = $.toJSON({
 							"enabled" : true,
@@ -81,7 +81,7 @@ function ContentSaveManager() {
 					}
 				});
 
-				getTranslations = $.translate(enText, langCodes.join("|"), function(data) {
+				getTranslations = $.translate(enText, langCodes, function(data) {
 					$.each(data.responseData, function(transIndex, transData) {
 						var jsonVal = $.toJSON({
 							"enabled" : "true",

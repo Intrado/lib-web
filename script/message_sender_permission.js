@@ -55,8 +55,8 @@ function PermissionManager() {
 		};
 
 		function getLanguages() {
-			ttslangCodes = "";
-			elangCodes = "";
+			ttslangCodes = [];
+			elangCodes = [];
 			nLangs = {};
 
 			$.ajax({
@@ -69,35 +69,15 @@ function PermissionManager() {
 
 					$.each(languages, function(lIndex, lData) {
 						var lCodes = lData.code;
+						var hasTranslate = (lData.hasTranslate?true:false);
 						nLangs[lCodes] = lData.name;
 						var voices = lData.voices;
 
-						/*
-						  If languages has voices then add code to ttlangcodes as well as elangcodes
-						  if voices is undefined only add code to elangcodes
-						 */
-
-						if (lCodes != "en") {
-							if (typeof (voices) != "undefined") {
-								if (ttslangCodes == "") {
-									ttslangCodes = lCodes;
-									if (elangCodes == "") {
-										elangCodes = lCodes;
-									}
-								} else {
-									ttslangCodes = ttslangCodes + '|' + lCodes;
-									elangCodes = elangCodes + '|' + lCodes;
-								}
-
-							} else {
-
-								if (elangCodes == "") {
-									elangCodes = lCodes;
-								} else {
-									elangCodes = elangCodes + '|' + lCodes;
-								}
-
-							}
+						// If language has translate add to elangCodes and ttslangCodes (if has voice)
+						if (lCodes != "en" && hasTranslate) {
+							elangCodes.push(lCodes);
+							if (typeof (voices) != "undefined")
+								ttslangCodes.push(lCodes);
 						}
 					});
 
