@@ -340,8 +340,8 @@ var allowControl = {
 	},
 	"facebook" : function() {
 		var $ = jQuery;
-		$('div[data-social=facebook]').removeClass('hidden');
-
+		//$('div[data-social=facebook]').removeClass('hidden');
+		
 		// set up the facebook api and any event listeners
 		$.when(window.tokenCheck, getFbAuthorizedPages()).done(function() {
 			// populate the authorized destinations hidden form item
@@ -363,8 +363,8 @@ var allowControl = {
 	},
 	"twitter" : function() {
 		var $ = jQuery;
-		$('div[data-social=twitter]').removeClass('hidden');
-
+		
+		//$('div[data-social=twitter]').removeClass('hidden');
 		//$('.twit.characters').prepend(twitterCharCount);
 		// Character Count
 		/*$('#msgsndr_form_tmsg').on('keyup', function() {
@@ -374,7 +374,7 @@ var allowControl = {
 	},
 	"feed" : function() {
 		var $ = jQuery;
-		$('div[data-social=feed]').removeClass('hidden');
+		//$('div[data-social=feed]').removeClass('hidden');
 
 		$.ajax({
 			url: '/'+orgPath+'/api/2/users/'+userid+'/roles/'+userRoleId+'/settings/feedcategories',
@@ -479,12 +479,16 @@ function ContentManager() {
 			var twitterCharCount = 140 - twitterReservedChars;
 			autoUpdateCharCount($("#msgsndr_form_tmsg"), twitterCharCount, $(".twit.characters"));
 			
-			var fieldinsertcheck = $('#msgsndr_tts_message').val();
-			if (fieldinsertcheck.indexOf('<<') == -1) {
-				$('#audiolink').removeClass('hidden');
-			} else {
-				$('#audiolink').addClass('hidden');
+			//IF NO PHONE MESSAGE IS SAVED, HIDE THE LINK TO AUDIO FILE
+			if($(".ophone", ".msg_content_nav").hasClass('complete')){
+				var fieldinsertcheck = $('#msgsndr_tts_message').val();
+				if (fieldinsertcheck.indexOf('<<') == -1) {
+					$('#audiolink').removeClass('hidden');
+				} else {
+					$('#audiolink').addClass('hidden');
+				}
 			}
+			
 		}
 		
 		//SWITCH STEP
@@ -617,6 +621,7 @@ function ContentManager() {
 
 	if (userPermissions.facebookpost == 1 || userPermissions.twitterpost == 1 || userPermissions.feedpost == 1) {
 		$('li.osocial').removeClass('notactive');
+		getTokens();
 
 		if (userPermissions.facebookpost == 1) {
 			self.allowContent("facebook");
