@@ -52,9 +52,9 @@ form.newform {
 #twitterauth_helpercell,
 #socialMedia_helpercell,
 #scheduleOptions_helpercell,
-#scheduleAdvanced_helpercell { width: 200px; padding: 0.5em 0;  }
+#scheduleAdvanced_helpercell { padding: 0.5em 0;  }
 
-.helper { width: 180px; margin: -6px 0 0; padding: 0 5px 0 10px; overflow: hidden; display: none; z-index: 99; }
+.helper { width: 150px; margin: -6px 0 0; padding: 0 5px 0 10px; overflow: hidden; display: none; z-index: 99; }
 .helper:before { content: ''; position: absolute; top: 12px; left: -10px; display: block; width: 0; height: 0; 
 border-color: transparent #ccc transparent transparent; border-width: 10px; border-style: solid; }
 .helper:after { content: ''; position: absolute; top: 12px; left: -9px; display: block; width: 0; height: 0; 
@@ -81,30 +81,31 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 /*---------- New forms layout ----------*/
 
 .newform fieldset { background: #f1f1f1; margin-bottom: 1em; border: none; border-radius: 5px; }
-.newform label { line-height: 16px; }
+.newform label { font-size: 13px; line-height: 21px; }
 
 .formfieldarea { padding: 8px; }
 .formfieldarea .underneathmsg { float: left; display: inline; width: 100%; padding: 0 0 0 150px; font-weight: bold; color: #cc0000; line-height: 22px; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
 
-.newform .formtitle { position: relative; float: left; display: inline; width: 120px; padding: 0 20px 0 0; text-align: right; }
-.newform .formtitle .formlabel { display: inline-block; font-size: 1.1em; line-height: 25px; }
-.newform .formtitle .formicon { position: absolute; top: 5px; right: 0; }
+.newform .formtitle { position: relative; float: left; display: inline; width: 120px; padding: 3px 20px 0 0; text-align: right; }
+.newform .formtitle .formlabel { font-size: 13px; line-height: 21px; }
+.newform .formtitle .formicon { position: absolute; top: 6px; right: 0; }
 
-.newform .formcontrol { margin: 0 0 0 150px; font-size: 1.1em; line-height: 25px; }
+.newform .formcontrol { margin: 0 0 0 150px; font-size: 13px; line-height: 21px; }
 .newform .formcontrol h3 { margin: 0 0 15px 0; }
-.newform .formcontrol input[type="text"] { width: 250px; padding: 4px 5px; border: 1px solid #E7E7E7; overflow: hidden; 
--webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
--moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
+.newform .formcontrol input[type="text"] { width: 250px; padding: 4px 5px; font-size: 13px; line-height: 21px; border: 1px solid #E7E7E7; overflow: hidden; 
+-webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
+/*.newform .formcontrol input[type="password"] { width: 250px; padding: 4px 5px; font-size: 13px; line-height: 21px; border: 1px solid #E7E7E7; overflow: hidden; 
+-webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }*/
 .newform .formcontrol input[type="radio"] { margin: 0 5px 5px 0; }
 .newform .formcontrol textarea { width: 425px; margin: 0 0 5px 0; padding: 4px 5px; border: 1px solid #E7E7E7; 
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
-.newform .formcontrol input#account_brandthemecustomize { float: left; display: inline; margin: 0 5px 0 0; }
+.newform .formcontrol input#account_brandthemecustomize { float: left; display: inline; }
 .newform .formcontrol .feed_url { margin: 2px 0 10px 0; font-size: 1.1em; line-height: 16px; }
 
 .newform .formcontrol .social_note,
 .newform .formcontrol .confirm_note,
-.newform .formcontrol .translate_text { font-size: 13px; }
+.newform .formcontrol .translate_text { padding: 3px 0 0; font-size: 13px; line-height: 21px; }
 
 /*.newform .formcontrol ul { margin: 0; padding: 0;  }*/
 
@@ -112,8 +113,8 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 .newform .formcontrol .gBranding {}
 .newform .formcontrol .gBrandingText { font-size: 11px; }
 
-.newform .formcontrol .radiobox { float: left; display: inline; width: 250px; list-style-type: none; padding: 1px 0 0; margin: 0 20px 0 0; }
-.newform .formcontrol .radiobox li { padding: 0; }
+.newform .formcontrol .radiobox { float: left; display: inline; width: 250px; list-style-type: none; padding: 3px 0 0; margin: 0 20px 0 0; }
+.newform .formcontrol .radiobox li { font-size: 13px; line-height: 21px; }
 .newform .formcontrol .radiobox input[type="radio"],
 .newform .formcontrol .radiobox input[type="checkbox"] { margin: 0 5px 0 0; }
 
@@ -127,9 +128,8 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 
 .newform .formcontrol .radio_box { width: 250px; list-style-type: none; padding: 0; margin: 0 20px 0 0; }
 
-.newform .formcontrol select  { margin: 0; padding: 4px 6px; border: 1px solid #E7E7E7; 
--webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
--moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
+.newform .formcontrol select  { margin: 0; padding: 4px 6px; font-size: 13px; border: 1px solid #E7E7E7; 
+-webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px;  -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
 
 .newform .formcontrol .datafields input { width: 140px; }
 
@@ -329,9 +329,9 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 
 #pagemessage .controlcontainer { width: 550px; }
 
-.maincontainerleft { float: left; display: inline; margin-right: 10px; width: 438px; }
+.maincontainerleft { float: left; display: inline; margin-right: 10px; width: /*438px;*/ }
 .maincontainerseperator { float: left; width: 15px; }
-.maincontainerright { float: left; display: inline; width: 155px; margin-left: 10px; padding:6px; border: 1px solid #'.$_SESSION['colorscheme']['_brandtheme2'].'; }
+.maincontainerright { float: left; display: inline; /*margin-left: 10px;*/ padding:6px; border: 1px solid #'.$_SESSION['colorscheme']['_brandtheme2'].'; }
 
 
 /* email messages 
@@ -343,15 +343,15 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 
 #emaileedit_helpsection_5 .formtitle {  }
 #emaileedit_helpsection_5 .formtitle .formlabel {  }
-#emaileedit_helpsection_5 .formcontrol { width: 600px; }
-#emaileedit_helpsection_5 .formcontrol .maincontainerleft,
-#emaileedit_helpsection_5 .formcontrol .maincontainerright,
-#emaileedit_helpsection_5 .formcontrol .controlcontainer { width: 600px; }
+#emaileedit_helpsection_5 .formcontrol { /*width: 600px;*/ }
+#emaileedit_helpsection_5 .formcontrol .maincontainerleft { width: 65%; }
+#emaileedit_helpsection_5 .formcontrol .maincontainerright { width: 175px }
+#emaileedit_helpsection_5 .formcontrol .controlcontainer { width: /*600px;*/ }
 #emaileedit_helpsection_5 .maincontainerseperator { margin: 0; display: none; }
 
-.formcontrol .datafields { margin: 0 10px 0 0; }
+.formcontrol .datafields { margin: 0 5px 0 0; }
 .formcontrol .datafields select { padding: 3px 6px; }
-.formcontrol .datafieldsinsert { margin: 25px 0 0; }
+.formcontrol .datafieldsinsert { margin: 20px 0 0; }
 .formcontrol .datafieldsinsert button { padding: 3px 10px; }
 
 
@@ -364,9 +364,9 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 .phone .controlcontainer iframe { width: 100%; border: 0; margin: 0; padding: 0; height: 2em; }
 .phone .controlcontainer input[type="text"] {  }
 
-.phone .maincontainerleft { width: 436px; margin: 0; }
+.phone .maincontainerleft { margin: 0; }
 .phone .maincontainerseperator { display: none; margin-top: 80px; }
-.phone .maincontainerright { width: 436px; margin: 0; }
+.phone .maincontainerright { margin: 0; }
 
 
 /* +----------------------------------------------------------------+
@@ -423,7 +423,7 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
 .newui .newform .formcontrol input[type="radio"] { margin: 0 5px 5px 0; }
-.newui .newform .formcontrol input[type="checkbox"] { margin: 5px 0 0; }
+.newui .newform .formcontrol input[type="checkbox"] {  }
 .newui .newform .formcontrol textarea { display: block; width: 375px; margin: 0 0 5px 0; padding: 4px 5px; font-size: 14px; line-height: 18px; border: 1px solid #E2E2E2; 
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
@@ -511,8 +511,8 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 	#twitterauth_helpercell,
 	#socialMedia_helpercell,
 	#scheduleOptions_helpercell,
-	#scheduleAdvanced_helpercell { width: 175px; }
-	.helper { width: 155px; }
+	#scheduleAdvanced_helpercell {  }
+	.helper {  }
 }
 
 @media only screen and (max-width: 800px) {
