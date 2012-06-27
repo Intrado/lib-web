@@ -549,7 +549,7 @@ function ContentManager() {
 		
 		var doWait = null;
 		
-		if($button.attr('data-tts') == "true" && $('#msgsndr_form_phonetranslate').is(':checked')) {
+		if($button.attr('data-tts') == "true") {
 			$button.next('img').removeClass('hide');
 			doWait = saveManager.save("translation");
 		} else {

@@ -11,7 +11,6 @@ function ValidationManager() {
 			"addme|sms" : [new document.validators["ValPhone"]("addme_sms","My SMS",{})]
 		},
 		"2" : {
-			//"phone|number" : [new document.validators["ValRequired"]("content_phone","Number to Call",{}), new document.validators["ValPhone"]("content_phone","Number to Call",{})],
 			"phone|number" : [new document.validators["ValRequired"]("phone_number","Call Recording Error",{}), new document.validators["ValLength"]("phone_number","Call Recording Error",{min: 1})],
 			"phone|tts" : [new document.validators["ValRequired"]("phone_tts","Phone Message",{}), new document.validators["ValLength"]("phone_tts","Phone Message",{min:1, max:10000}), new document.validators["ValTtsText"]("phone_tts","Phone Message")],
 			"phone|callerid" : [new document.validators["ValPhone"]("phone_callerid", "Caller ID", {})],
