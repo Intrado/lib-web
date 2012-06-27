@@ -438,7 +438,7 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 .newui .newform .formcontrol .gBranding {}
 .newui .newform .formcontrol .gBrandingText { font-size: 11px; }
 
-.newui .newform .formcontrol .radiobox li { padding: 5px 0; }
+.newui .newform .formcontrol .radiobox li { padding: 2px 0; }
 .newui .newform .formcontrol .radiobox input[type="radio"],
 .newui .newform .formcontrol .radiobox input[type="checkbox"] { margin: 0 5px 0 0; }
 
