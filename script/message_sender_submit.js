@@ -73,7 +73,7 @@ function SubmitManager() {
 		"email_address" : "msgsndr_emailmessagefromemail",
 		"email_subject" : "msgsndr_emailmessagesubject",
 		"email_attachment" : "msgsndr_emailmessageattachment",
-		"email_body" : "msgsndr_emailmessagetext", // data from CK editor panel
+		"broadcast_emailbody" : "msgsndr_emailmessagetext", // data from CK editor panel
 		"email_translate" : "msgsndr_emailmessagetexttranslate", // convert this from 1/0 to true/false
 		"email_translate_es" : "msgsndr_emailmessagetexttranslateestext", // translates example
 		"email_translate_es" : "msgsndr_emailmessagetexttranslateestext",
