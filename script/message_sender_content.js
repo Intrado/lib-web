@@ -124,6 +124,7 @@ var allowControl = {
 	        ttsTranslate += '<input type="checkbox" checked="checked" name="save_translation" class="msgdata translations" id="tts_'+langCode+'" />';
 	        ttsTranslate += '<label for="tts_'+langCode+'">'+nLangs[langCode]+'</label>';
 	        ttsTranslate += '<div class="controls">';
+	        ttsTranslate += '<input type="hidden" name="phone_translate_' + langCode + '">';
 	        ttsTranslate += '<textarea id="tts_translated_'+langCode+'" class="msgdata" disabled="disabled"></textarea>';
 	        ttsTranslate += '<button class="playAudio" data-text="tts_translated_'+langCode+'" data-code="'+langCode+'"><span class="icon play"></span> Play Audio</button>';
 	        ttsTranslate += '<button class="show_hide_english" data-text="'+nLangs[langCode]+'" data-code="'+langCode+'">Show In English</button>';

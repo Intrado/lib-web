@@ -341,7 +341,7 @@ $.loadMessage = function loadMessage() {
 								if (msg.autoTranslate == "source") {
 									// nothing
 								} else {
-									self.loadPhoneMessage(msgGrp.id, msg, msgGrp.phoneIsAudioOnly);
+									self.loadPhoneMessage(msgGrp, msg, msgGrp.phoneIsAudioOnly);
 								}
 								break;
 							case "email":
@@ -349,14 +349,14 @@ $.loadMessage = function loadMessage() {
 								if (msg.subType == "plain" || msg.autoTranslate == "source") {
 									// Nothing
 								} else {
-									self.loadEmailMessage(msgGrp.id, msg);
+									self.loadEmailMessage(msgGrp, msg);
 								}
 								break;
 							case "sms":
-								self.loadSmsMessage(msgGrp.id, msg);
+								self.loadSmsMessage(msgGrp, msg);
 								break;
 							case "post":
-								self.loadPostMessage(msgGrp.id, msg);
+								self.loadPostMessage(msgGrp, msg);
 								break;
 						}
 					}
@@ -394,59 +394,84 @@ $.loadMessage = function loadMessage() {
 	}
 
 	// load phone message asynchronously from the server
-	this.loadPhoneMessage = function(msgGrpId, msg, isRecording) {
+	this.loadPhoneMessage = function(msgGrp, msg, isRecording) {
 		if (isRecording) {
-			self.loadMessagePartsAudioFile(msgGrpId, msg, self.elements.phoneRecording);
+			self.loadMessagePartsAudioFile(msgGrp.id, msg, self.elements.phoneRecording);
 		} else {
+			var gender = "female";
+			$.each(msgGrp.data, function (index, data) {
+				if (data.name == "preferredgender") {
+					gender = data.value;
+					return false;
+				}
+			});
+			
 			if (msg.languageCode == "en") {
-				self.loadMessagePartsFormatted(msgGrpId, msg, self.elements.phoneText.addClass('ok'));
+				self.loadMessagePartsFormatted(msgGrp.id, msg, self.elements.phoneText.addClass('ok'), false,
+					function (data) {
+						$('input[name=phone_translate]').val($.toJSON({ "gender" : gender, "text" : data.messageBody }))
+					});
+				
+				//$('input[name=phone_translate]')
 			} else {
 				self.elements.phoneTranslateCheck.attr("checked","checked");
 				$(self.elements.phoneLanguageCheckPrefix + msg.languageCode).attr('checked','checked');
 				$(self.elements.phoneLanguageCheckPrefix + msg.languageCode).parent().children(".controls").first().removeClass("hide");
-				self.loadMessagePartsFormatted(msgGrpId, msg, $(self.elements.phoneTranslatePrefix + msg.languageCode));
-				// overridden messages should have their text area editable and override checked.
-				if (msg.autoTranslate == "overridden") {
-					$(self.elements.phoneTranslatePrefix + msg.languageCode).removeAttr("disabled");
-					$(self.elements.phoneOverridePrefix + msg.languageCode).attr('checked','checked');
-				}
+				self.loadMessagePartsFormatted(msgGrp.id, msg, $(self.elements.phoneTranslatePrefix + msg.languageCode), false,
+					function (data) {
+						var override = false;
+						// overridden messages should have their text area editable and override checked.
+						if (msg.autoTranslate == "overridden") {
+							override = true;
+							$(self.elements.phoneTranslatePrefix + msg.languageCode).removeAttr("disabled");
+							$(self.elements.phoneOverridePrefix + msg.languageCode).attr('checked','checked');
+						}
+						updateTranslatedField(
+							$('input[name=phone_translate_' + msg.languageCode + ']'),
+							data.messageBody, true, override, gender);
+					});
 			}
 		}
 	}
 	
 	// load email message
-	this.loadEmailMessage = function(msgGrpId, msg) {
+	this.loadEmailMessage = function(msgGrp, msg) {
 		if (msg.languageCode == "en") {
 			self.elements.emailFromName.val(decodeURIComponent(msg.fromName).replace(/\+/g," ")).addClass('ok');
 			self.elements.emailFromEmail.val(decodeURIComponent(msg.fromEmail).replace(/\+/g," ")).addClass('ok');
 			self.elements.emailSubject.val(decodeURIComponent(msg.subject).replace(/\+/g," ")).addClass('ok');
-			self.loadMessageAttachments(msgGrpId, msg, self.elements.emailAttach, self.elements.emailAttachControls);
-			self.loadMessagePartsFormatted(msgGrpId, msg, self.elements.emailBody, true);
+			self.loadMessageAttachments(msgGrp.id, msg, self.elements.emailAttach, self.elements.emailAttachControls);
+			self.loadMessagePartsFormatted(msgGrp.id, msg, self.elements.emailBody, true);
 		} else {
 			self.elements.emailTranslateCheck.attr("checked","checked");
 			$(self.elements.emailLanguageCheckPrefix + msg.languageCode).attr('checked','checked');
 			$(self.elements.emailLanguageCheckPrefix + msg.languageCode).parent().children(".controls").first().removeClass("hide");
-			self.loadMessagePartsFormatted(msgGrpId, msg, $(self.elements.emailTranslatePrefix + msg.languageCode));
+			self.loadMessagePartsFormatted(msgGrp.id, msg, $(self.elements.emailTranslatePrefix + msg.languageCode), false,
+				function (data) {
+					updateTranslatedField(
+						$('input[name=email_translate_' + msg.languageCode + ']'),
+						data.messageBody, true, false, null);
+				});
 		}
 	}
 	
 	// load sms message
-	this.loadSmsMessage = function(msgGrpId, msg) {
-		self.loadMessagePartsFormatted(msgGrpId, msg, self.elements.smsText.addClass('ok'));
+	this.loadSmsMessage = function(msgGrp, msg) {
+		self.loadMessagePartsFormatted(msgGrp.id, msg, self.elements.smsText.addClass('ok'));
 	}
 
 	// load post message
-	this.loadPostMessage = function(msgGrpId, msg) {
+	this.loadPostMessage = function(msgGrp, msg) {
 		switch (msg.subType) {
 			case "facebook":
-				self.loadMessagePartsFormatted(msgGrpId, msg, self.elements.facebookText.addClass('ok'));
+				self.loadMessagePartsFormatted(msgGrp.id, msg, self.elements.facebookText.addClass('ok'));
 				break;
 			case "twitter":
-				self.loadMessagePartsFormatted(msgGrpId, msg, self.elements.twitterText.addClass('ok'));
+				self.loadMessagePartsFormatted(msgGrp.id, msg, self.elements.twitterText.addClass('ok'));
 				break;
 			case "feed":
 				self.elements.feedSubject.val(decodeURIComponent(msg.subject).replace(/\+/g," ")).addClass('ok');
-				self.loadMessagePartsFormatted(msgGrpId, msg, self.elements.feedText.addClass('ok'));
+				self.loadMessagePartsFormatted(msgGrp.id, msg, self.elements.feedText.addClass('ok'));
 				break;
 		}
 	}
@@ -487,7 +512,7 @@ $.loadMessage = function loadMessage() {
 	};
 
 	// get formatted message body based on message id from message group
-	this.loadMessagePartsFormatted = function(msgGrpId,msg,element,ckeditor){
+	this.loadMessagePartsFormatted = function(msgGrpId,msg,element,ckeditor,callback){
 		// first hide the element and show a loading message
 		var loadingMessage = "<div class='loadingmessage'><img src='img/ajax-loader.gif'/>&nbsp;Loading content, please wait...</div>";
 		if (ckeditor)
@@ -513,6 +538,8 @@ $.loadMessage = function loadMessage() {
 					var textarea = element.attr("id");
 					applyCkEditor(textarea);
 				}
+				if (callback != "undefined" && callback !== false)
+					callback(data);
 			}
 		});
 	};

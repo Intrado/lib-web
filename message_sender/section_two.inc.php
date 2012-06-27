@@ -116,6 +116,7 @@
 				<fieldset>
 					<label for="msgsndr_tts_message">Message</label>
 					<div class="controls">
+						<input type="hidden" name="phone_translate" />
 						<button class="btn-small paste-from hidden" data-textarea="msgsndr_tts_message">Paste text from email</button>
 						<textarea id="msgsndr_tts_message" name="phone_tts" class="required msgdata" maxlength="10000"></textarea><span class="error"></span>
 

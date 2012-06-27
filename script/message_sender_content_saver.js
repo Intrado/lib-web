@@ -18,13 +18,9 @@ function ContentSaveManager() {
 
 				getTranslations = $.translate(enText, langCodes, function(data) {
 					$.each(data.responseData, function(transIndex, transData) {
-						var jsonVal = $.toJSON({
-							"enabled" : true,
-							"text" : transData.translatedText,
-							"override" : false,
-							"englishText" : ""
-						});
-						$('input[name=email_translate_' + transData.code + ']').val(jsonVal);
+						updateTranslatedField(
+								$('input[name=email_translate_' + transData.code + ']'),
+								transData.translatedText, true, false, null);
 					});
 				});
 			}
@@ -35,10 +31,6 @@ function ContentSaveManager() {
 			var enText = $('#msgsndr_tts_message').val();
 			var translate = $('#msgsndr_form_phonetranslate').is(':checked');
 			var getTranslations = true;
-
-			if ( !$('#post_data_translations').length > 0 ) {
-				$('#text').append('<div id="post_data_translations"><input type="hidden" name="phone_translate" /></div>');
-			}
 			
 			var jsonVal = $.toJSON({
 				"gender" : gender,
@@ -52,21 +44,12 @@ function ContentSaveManager() {
 
 				$('input[name=save_translation]:checked').each(function(transI, transD) {
 					var langCode = $(transD).attr('id').split('_')[1];
-					$('#post_data_translations').append('<input type="hidden" name="phone_translate_' + langCode + '">');
 					
 					var overRide = $('#tts_override_' + langCode).is(':checked');
 					if(overRide) {
-						transText = $('#tts_translated_' + langCode).val();
-						
-						var jsonVal = $.toJSON({
-							"enabled" : "true",
-							"text" : transText,
-							"override" : "true",
-							"gender" : gender,
-							"englishText" : ""
-						});
-		
-						$('input[name=phone_translate_' + langCode + ']').val(jsonVal);
+						updateTranslatedField(
+								$('input[name=phone_translate_' + langCode + ']'),
+								$('#tts_translated_' + langCode).val(), true, true, gender);
 					} else {
 						langCodes.push(langCode);
 					}
@@ -74,14 +57,9 @@ function ContentSaveManager() {
 
 				getTranslations = $.translate(enText, langCodes, function(data) {
 					$.each(data.responseData, function(transIndex, transData) {
-						var jsonVal = $.toJSON({
-							"enabled" : "true",
-							"text" : transData.translatedText,
-							"override" : "false",
-							"gender" : gender,
-							"englishText" : ""
-						});
-						$('input[name=phone_translate_' + transData.code + ']').val(jsonVal);
+						updateTranslatedField(
+								$('input[name=phone_translate_' + transData.code + ']'),
+								transData.translatedText, true, false, gender);
 					});
 				});
 			}
