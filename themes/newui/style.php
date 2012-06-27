@@ -43,7 +43,7 @@ h4 { font-size: 12px; line-height: 22px; color: #235563; text-shadow: 0 1px 0 #f
 .banner { background: #346799 url(themes/newui/images/themebg.jpg) repeat; border-top: 4px solid #222; }
 .banner_logo { margin: 30px 0 0; }
 .banner_logo h1 { display: block; margin: 0; font-size: 30px; color: #f5f5f5; text-shadow: 0 1px 0 #444; }
-.banner_logo a { display: none; }
+.banner_logo .logo { display: none; }
 
 .banner_links_wrap { margin: 50px 0 0 0; }
 .banner_links { list-style-type: none; }
