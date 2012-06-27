@@ -134,7 +134,7 @@ function SubmitManager() {
 		"has_twitter" : "msgsndr_hastwitter",
 		"twitter_message" : "msgsndr_socialmediatwittermessage",
 		"has_feed" : "msgsndr_hasfeed",
-		"feed_message" : "msgsndr_socialmediafeedmessage",
+		"rss_post" : "msgsndr_socialmediafeedmessage",
 		"feed_categories" : "msgsndr_socialmediafeedcategory",
 		"broadcast_daystorun" : "msgsndr_optionmaxjobdays",
 		"options_voiceresponse" : "msgsndr_optionleavemessage",

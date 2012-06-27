@@ -366,6 +366,7 @@
 					</fieldset>
 
 					<div class="feed">
+						<input type="hidden" id="msgsndr_rsspost" name="rss_post" class="" value="" />
 
 						<fieldset>
 							<label for="msgsndr_form_rsstitle">Post Title</label>

@@ -556,6 +556,9 @@ function ContentManager() {
 			if(currentContent == "email") {
 				$button.next('img').removeClass('hide');
 				doWait = saveManager.save("email");
+			} else if(currentContent == "social") {
+				$button.next('img').removeClass('hide');
+				doWait = saveManager.save("feed");
 			}
 		}
 		

@@ -96,6 +96,15 @@ function ContentSaveManager() {
 			}
 			
 			return getTranslations;
+		},
+		"feed" : function() {
+			var titleVal = $('#msgsndr_form_rsstitle').val();
+			var messageVal = $('#msgsndr_form_rssmsg').val();
+			var rssPost = $.toJSON({
+				"subject" : titleVal,
+				"message" : messageVal
+			});
+			$('#msgsndr_rsspost').val(rssPost);
 		}
 	};
 	
