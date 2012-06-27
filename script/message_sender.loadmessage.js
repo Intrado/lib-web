@@ -8,6 +8,7 @@ $.loadMessage = function loadMessage() {
 		"messageGroupTable": $('#messages_list'),
 		
 		"phoneComplete": $('li.ophone'),
+		"hasPhone": $('input[name=has_phone]'),
 		"phoneType": $('#msgsndr_phonetype'),
 		"phoneButtonCallMe": $('button.audioleft'),
 		"phoneButtonText": $('button.audioright'),
@@ -24,7 +25,7 @@ $.loadMessage = function loadMessage() {
 		"phoneTextOptions": $("#text_advanced_options"),
 		
 		"emailComplete": $('li.oemail'),
-		"hasEmail": $('input[name=has_email'),
+		"hasEmail": $('input[name=has_email]'),
 		"emailBody": $("#msgsndr_form_body"),
 		"emailAttach" : $('#msgsndr_form_attachment'),
 		"emailAttachControls": $('#uploadedfiles'),
@@ -239,6 +240,7 @@ $.loadMessage = function loadMessage() {
 			switch (msgType.type) {
 				case 'phone':
 					self.elements.phoneComplete.addClass('complete');
+					self.elements.hasPhone.attr('checked','checked');
 					if (msgGroup.phoneIsAudioOnly) {
 						self.elements.phoneType.val('callme');
 						self.elements.phoneButtonCallMe.addClass('active'); 
