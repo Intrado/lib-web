@@ -276,11 +276,11 @@ position: relative;}
 
 .wiznavcontainer { padding: 3px; margin: 3px; margin-top: 15px; }
 
-ol.wiznav_0 { padding: 0; margin: 0px;  border: none; list-style: none; }
+ol.wiznav_0 { padding: 0; margin: 0px; border: none; list-style: none; }
 li.wiznav_0 { padding: 7px 5px; margin: 0px; border-bottom: 1px dashed #ccc; }
-ol.wiznav_1 { padding: 0px; margin: 0px; list-style: none; }
+ol.wiznav_1 { padding: 0 0 0 10px; margin: 0px; list-style: none; }
 li.wiznav_1 { padding: 7px 0 0; margin: 0px; }
-ol.wiznav_2 { padding: 0px; margin: 0px; list-style: none; }
+ol.wiznav_2 { padding: 0 0 0 10px; margin: 0px; list-style: none; }
 li.wiznav_2 { padding: 7px 0 0; margin: 0px; }
 
 li.wizbuttonlist {
