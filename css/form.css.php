@@ -429,6 +429,8 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
 .newui .newform .formcontrol input#account_brandthemecustomize { margin: 5px 5px 0 0; }
 
+.newui .newform .formcontrol .domain { padding: 5px 0 0; font-size: 14px; line-height: 18px; }
+
 .newui .newform .formcontrol .translate { max-height: 150px; padding: 5px 0 0; font-size: 14px; line-height: 18px; overflow: auto; }
 .newui .newform .formcontrol .translate p { margin: 0; line-height: 18px; }
 
