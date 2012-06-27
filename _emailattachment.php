@@ -60,7 +60,7 @@ if (is_array($result)) {
 
 <html>
 <head>
-	<meta http-equiv="Content-type" value="text/html; charset=UTF-8" />
+	<meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
 	<style>
 		/* resetting styles */
 		body, iframe, form, input {
@@ -71,15 +71,18 @@ if (is_array($result)) {
 			vertical-align: baseline;
 		}
 	</style>
+	<script type="text/javascript">
+	function load() {
+		if (window.top.window.stopUpload != undefined) {
+			window.top.window.stopUpload('<?=$contentid?>','<?= addslashes($filename) ?>','<?= $size ?>','<?= addslashes($errormessage) ?>', '<?=$_GET['formname']?>', '<?=$_GET['itemname']?>');
+		}
+	}
+	</script>
 </head>
-
-<body>
+<body onload="load()">
 <form id="uploadform" action="_emailattachment.php?formname=<?=$_GET['formname']?>&itemname=<?=$_GET['itemname']?>" method="post" enctype="multipart/form-data" onsubmit="" >
 	<input type="hidden" name="MAX_FILE_SIZE" value="<?= $maxattachmentsize ?>">
 	<input id="emailattachment" name="emailattachment" type="file" onChange="window.top.window.startUpload();this.form.submit();"/>	
 </form>
-<script language="javascript" type="text/javascript">
-	window.top.window.stopUpload('<?=$contentid?>','<?= addslashes($filename) ?>','<?= $size ?>','<?= addslashes($errormessage) ?>', '<?=$_GET['formname']?>', '<?=$_GET['itemname']?>');
-</script> 
 </body>
 </html>
