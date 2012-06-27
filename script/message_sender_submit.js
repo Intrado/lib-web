@@ -174,7 +174,7 @@ function SubmitManager() {
 					}
 				} else {
 					var value = $(this).val();
-					if (value == "[]")
+					if (value == "[]" || value == "{}")
 						value = "";
 					sendData[thisKey] = value;
 				}
