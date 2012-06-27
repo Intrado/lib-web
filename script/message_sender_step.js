@@ -85,7 +85,7 @@ function StepManager(_valManager) {
 		}
 		
 		//STOP SWITCH IF CONTENT IS BEING EDITED
-		if(!$(".msg_confirm").is(":visible")){
+		if(obj_contentManager.isEditing()){
 			stopSwitch = true;
 		}
 

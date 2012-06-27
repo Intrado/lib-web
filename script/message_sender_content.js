@@ -393,7 +393,7 @@ var allowControl = {
 				});
 			}
 		});
-	},
+	}
 };
 
 function ContentManager() {
@@ -462,6 +462,10 @@ function ContentManager() {
 		}
 	};
 	
+	this.resetContentStatus = function() {
+		currentContent = "";
+	}
+	
 	this.gotoContent = function(mode) {
 		//DONT SWITCH IF ALREADY ADJUSTING CONTENT
 		if(currentContent.length > 0) {
@@ -525,7 +529,7 @@ function ContentManager() {
 			$('.msg_content_nav .o' + currentContent).removeClass('complete');
 			$('#msgsndr_review_' + currentContent).parent().removeClass('complete');
 			
-			currentContent = "";
+			self.resetContentStatus();
 			obj_stepManager.updateStepStatus();
 			
 			$(".msg_confirm").show();
@@ -571,12 +575,16 @@ function ContentManager() {
 			// Set Message tabs on review tab
 			$('#msgsndr_review_' + currentContent).parent().addClass('complete');
 			
-			currentContent = "";
+			self.resetContentStatus();
 			obj_stepManager.updateStepStatus();
 			
 			$(".msg_confirm").show();
 		});
 	};
+	
+	this.isEditing = function() {
+		return (currentContent.length > 0);
+	}
 	
 	// BIND CONTENT BUTTONS
 	$('.msg_content_nav button').on('click', function(event) {
