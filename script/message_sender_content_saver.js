@@ -6,7 +6,9 @@ function ContentSaveManager() {
 			var enText = $("#msgsndr_form_body").val();
 			var translate = $('#msgsndr_form_emailtranslate').is(':checked');
 
-			$('#msgsndr_tab_email').append('<div id="post_data_email_translations"><input type="hidden" name="email_translate" /></div>');
+			if ( !$('#post_data_email_translations').length > 0 ) {
+				$('#msgsndr_tab_email').append('<div id="post_data_email_translations"><input type="hidden" name="email_translate" /></div>');
+			}
 			
 			var jsonVal = $.toJSON({
 				"enabled" : true,
@@ -47,7 +49,9 @@ function ContentSaveManager() {
 			var translate = $('#msgsndr_form_phonetranslate').is(':checked');
 			var getTranslations = true;
 
-			$('#text').append('<div id="post_data_translations"><input type="hidden" name="phone_translate" /></div>');
+			if ( !$('#post_data_translations').length > 0 ) {
+				$('#text').append('<div id="post_data_translations"><input type="hidden" name="phone_translate" /></div>');
+			}
 			
 			var jsonVal = $.toJSON({
 				"gender" : gender,
