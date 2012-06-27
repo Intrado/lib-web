@@ -19,6 +19,7 @@
             base.options = $.extend({}, $.listPicker.defaultOptions, options);
 
             base.pickedListIds = base.options.prepickedListIds;
+            base.updateParentElement();
             base.numRecipients = 0;
             
             // Get lists and info -----------------------------------
