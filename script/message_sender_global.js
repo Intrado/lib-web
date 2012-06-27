@@ -100,6 +100,7 @@ jQuery.noConflict();
 			var htmleditor = getHtmlEditorObject();
 			htmlTextArea_keytimer = window.setTimeout(function() {
 				saveHtmlEditorContent(htmleditor);
+				obj_valManager.runValidateById(elementid);
 			}, 500);
 		});
 	};

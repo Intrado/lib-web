@@ -148,6 +148,8 @@ function ValidationManager() {
 				$element.removeClass('ok').addClass('er');
 				$($element.next("div")).children(".box_validatorerror").remove();
 				$($element.next("div")).append($('<div />', { "class": "box_validatorerror er", "text": msg }));
+			} else if ($element.is("#msgsndr_form_body")) {
+				$('#cke_reusableckeditor').removeClass('er').addClass('ok');
 			} else {
 				$element.removeClass('ok').addClass('er');
 				if(typeof(msg) != "undefined" && msg.length > 0) {
@@ -172,6 +174,8 @@ function ValidationManager() {
 		} else if($element.hasClass('box_validator')) {
 			$element.removeClass('er').addClass('ok');
 			$($element.next("div")).children(".box_validatorerror").remove();
+		} else if ($element.is("#msgsndr_form_body")) {
+			$('#cke_reusableckeditor').removeClass('er').addClass('ok');
 		} else {
 			$element.removeClass('er').addClass('ok').next('.error').fadeOut(300).text("");
 		}

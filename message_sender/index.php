@@ -15,6 +15,7 @@ require_once("obj/ValTtsText.val.php");
 require_once("obj/ValTimeWindowCallEarly.val.php");
 require_once("obj/ValTimeWindowCallLate.val.php");
 require_once("obj/EmailAttach.val.php");
+require_once("obj/ValMessageBody.val.php");
 
 require_once("obj/Email.obj.php");
 require_once("obj/MessageAttachment.obj.php");
@@ -64,15 +65,15 @@ $formdata = array(
 		)
 	),
 
-		"emailmessagetext" => array(
-		"label" => "emailmessagetext",
-		"value" => "",
-		"validators" => array(
-			array("ValMessageBody"),
-			array("ValLength","max" => 256000)
-		),
-		"control" => array("TextField"),
-		"helpstep" => 1
+	"email_body" => array(
+	"label" => "emailmessagetext",
+	"value" => "",
+	"validators" => array(
+		array("ValMessageBody"),
+		array("ValLength","max" => 256000)
+	),
+	"control" => array("TextField"),
+	"helpstep" => 1
 	),
 
 
