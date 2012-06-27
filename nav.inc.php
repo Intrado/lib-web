@@ -255,7 +255,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 <div class="container cf">
 
 	<div class="banner_logo">
-		<? doLogo() ?>
+		<table class="logo"><tr><td><? doLogo() ?></td></tr></table>
 		<h1>SchoolMessenger</h1>
 	</div>  
 	
