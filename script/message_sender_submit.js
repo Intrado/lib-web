@@ -73,7 +73,7 @@ function SubmitManager() {
 		"email_address" : "msgsndr_emailmessagefromemail",
 		"email_subject" : "msgsndr_emailmessagesubject",
 		"email_attachment" : "msgsndr_emailmessageattachment",
-		"email_message" : "msgsndr_emailmessagetext", // data from CK editor panel
+		"email_body" : "msgsndr_emailmessagetext", // data from CK editor panel
 		"email_translate" : "msgsndr_emailmessagetexttranslate", // convert this from 1/0 to true/false
 		"email_translate_es" : "msgsndr_emailmessagetexttranslateestext", // translates example
 		"email_translate_es" : "msgsndr_emailmessagetexttranslateestext",
@@ -235,9 +235,13 @@ function SubmitManager() {
 					$('#msgsndr_submit_confirmation').bind("hide", function() {
 						window.location = res.nexturl;
 					});
+				} else if (typeof(res.validationerrors) == "undefined") {
+					// this is to differentiate errors where the form hasn't submitted properly (possibly due to session expiry)
+					$('#msgsndr_submit_title').html("Submit Error");
+					$('#msgsndr_submit_message').html("Hmmm, looks like something went wrong. <br/>That's all we know.");
 				} else {
 					$('#msgsndr_submit_title').html("Submit Error");
-					$('#msgsndr_submit_message').html("Oops! That didn't quite work out :-(\nPerhaps something is missing or not quite right with the broadcast information entered?");
+					$('#msgsndr_submit_message').html("Oops! That didn't quite work out.<br/>Perhaps something is missing or not quite right with the broadcast information entered?");
 				}
 				$('#msgsndr_submit_confirmation').modal('show');
 			}
