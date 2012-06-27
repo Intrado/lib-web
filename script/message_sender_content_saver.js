@@ -6,26 +6,13 @@ function ContentSaveManager() {
 			var enText = $("#msgsndr_form_body").val();
 			var translate = $('#msgsndr_form_emailtranslate').is(':checked');
 
-			if ( !$('#post_data_email_translations').length > 0 ) {
-				$('#msgsndr_tab_email').append('<div id="post_data_email_translations"><input type="hidden" name="email_translate" /></div>');
-			}
-			
-			var jsonVal = $.toJSON({
-				"enabled" : true,
-				"text" : enText,
-				"override" : false,
-				"englishText" : ""
-			});
-
-			$('input[name=email_translate]').val(jsonVal);
-
 			var getTranslations = true;
 			if(translate) {
 				var langCodes = [];
 
 				$('input[name=email_save_translation]:checked').each(function(transI, transD) {
 					var langCode = $(transD).attr('id').split('_')[1];
-					$('#post_data_email_translations').append('<input type="hidden" name="email_translate_' + langCode + '">');
+					$('#post_data_email_translations').append();
 					langCodes.push(langCode);
 				});
 

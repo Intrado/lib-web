@@ -324,7 +324,15 @@ var allowControl = {
 
 		$.each(elangCodes, function(transIndex, transData) {
 			var langCode = elangCodes[transIndex];
-			$('#email_translate').append('<fieldset><input type="checkbox" class="msgdata" checked="checked" id="email_'+langCode+'"  name="email_save_translation" class="translations" /><label for="email_'+langCode+'">'+nLangs[langCode]+'</label><div class="controls"><div class="msgdata html_translate" id="email_translated_'+langCode+'"></div></div></fieldset>');
+			$('#email_translate').append(
+				'<fieldset>'+
+					'<input type="checkbox" class="msgdata" checked="checked" id="email_'+langCode+'"  name="email_save_translation" class="translations" />'+
+					'<label for="email_'+langCode+'">'+nLangs[langCode]+'</label>'+
+					'<div class="controls">'+
+						'<input type="hidden" name="email_translate_' + langCode + '">'+
+						'<div class="msgdata html_translate" id="email_translated_'+langCode+'"></div>'+
+					'</div>'+
+				'</fieldset>');
 		});
 	},
 	"sms" : function() {
