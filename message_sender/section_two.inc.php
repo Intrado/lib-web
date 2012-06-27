@@ -384,6 +384,7 @@
 						</fieldset>
 
 						<fieldset class="check">
+							<input type="hidden" id="msgsndr_feed_categories" name="feed_cat_ids" value="" />
 							<label class="control-label" for="">Post to Feeds</label>
 							<div class="controls" id="feed_categories">
 							</div>

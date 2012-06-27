@@ -135,7 +135,7 @@ function SubmitManager() {
 		"twitter_message" : "msgsndr_socialmediatwittermessage",
 		"has_feed" : "msgsndr_hasfeed",
 		"rss_post" : "msgsndr_socialmediafeedmessage",
-		"feed_categories" : "msgsndr_socialmediafeedcategory",
+		"feed_cat_ids" : "msgsndr_socialmediafeedcategory",
 		"broadcast_daystorun" : "msgsndr_optionmaxjobdays",
 		"options_voiceresponse" : "msgsndr_optionleavemessage",
 		"options_callconfirmation" : "msgsndr_optionmessageconfirmation",
@@ -242,6 +242,7 @@ function SubmitManager() {
 				} else {
 					$('#msgsndr_submit_title').html("Submit Error");
 					$('#msgsndr_submit_message').html("Oops! That didn't quite work out.<br/>Perhaps something is missing or not quite right with the broadcast information entered?");
+					
 				}
 				$('#msgsndr_submit_confirmation').modal('show');
 			}

@@ -389,7 +389,7 @@ var allowControl = {
 
 				$.each(feedCats, function(index, feedCat) {  
 					var name = feedCat.name.toLowerCase().replace(" ","_");
-					$('#feed_categories').append('<div class="cf"><input type="checkbox" class="addme" name="" id="'+name+'" /><label class="addme" for="'+name+'">'+feedCat.name+'</label></div>');
+					$('#feed_categories').append('<div class="cf"><input type="checkbox" class="addme" name="feed_categories" id="'+name+'" value="'+feedCat.id+'" /><label class="addme" for="'+name+'">'+feedCat.name+'</label></div>');
 				});
 			}
 		});
