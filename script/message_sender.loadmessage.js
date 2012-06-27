@@ -470,8 +470,13 @@ $.loadMessage = function loadMessage() {
 				self.loadMessagePartsFormatted(msgGrp.id, msg, self.elements.twitterText.addClass('ok'));
 				break;
 			case "feed":
-				self.elements.feedSubject.val(decodeURIComponent(msg.subject).replace(/\+/g," ")).addClass('ok');
-				self.loadMessagePartsFormatted(msgGrp.id, msg, self.elements.feedText.addClass('ok'));
+				var subject = decodeURIComponent(msg.subject).replace(/\+/g," ");
+				self.elements.feedSubject.val(subject).addClass('ok');
+				self.loadMessagePartsFormatted(msgGrp.id, msg, self.elements.feedText.addClass('ok'), false,
+					function (data) {
+						$("#msgsndr_rsspost").val($.toJSON({ "subject": subject, "message": data.messageBody }));
+					});
+				
 				break;
 		}
 	}
@@ -538,7 +543,7 @@ $.loadMessage = function loadMessage() {
 					var textarea = element.attr("id");
 					applyCkEditor(textarea);
 				}
-				if (callback != "undefined" && callback !== false)
+				if (callback)
 					callback(data);
 			}
 		});
