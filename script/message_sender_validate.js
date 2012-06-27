@@ -18,7 +18,7 @@ function ValidationManager() {
 			"email|address" : [new document.validators["ValRequired"]("email_address","Email Address",{}), new document.validators["ValLength"]("email_address", "Email Address", {max:255}), new document.validators["ValEmail"]("email_address","Email Address",{domain:orgOptions.emaildomain})],
 			"email|subject" : [new document.validators["ValRequired"]("email_subject","Subject",{}), new document.validators["ValLength"]("email_subject","Subject",{min:3, max: 30})],
 			"email|attachment" : [new document.validators["ValEmailAttach"]("email_attachment","Attachment",{})],
-			"email|body" : [new document.validators["ValRequired"]("email_body","Body",{}), new document.validators["ValLength"]("email_body","Body",{min:4})],
+			"broadcast|emailbody" : [new document.validators["ValRequired"]("broadcast_emailbody","Body",{}), new document.validators["ValLength"]("broadcast_emailbody","Body",{min:4})],
 			"sms|text" : [new document.validators["ValRequired"]("sms_text","SMS",{}), new document.validators["ValLength"]("sms_text","SMS",{min:1, max:160}), new document.validators["ValSmsText"]("sms_text","SMS Text")],
 			"facebook|message" : [new document.validators["ValRequired"]("facebook_message","Facebook Message",{}), new document.validators["ValLength"]("facebook_message","Facebook Message",{min:4, max: 420})],
 			"twitter|message" : [new document.validators["ValRequired"]("twitter_message","Twitter Message",{}), new document.validators["ValLength"]("twitter_message","Twitter Message",{min:4, max: 140})],
@@ -148,7 +148,7 @@ function ValidationManager() {
 				$($element.next("div")).children(".box_validatorerror").remove();
 				$($element.next("div")).append($('<div />', { "class": "box_validatorerror er", "text": msg }));
 			} else if ($element.is("#msgsndr_form_body")) {
-				$('#cke_reusableckeditor').removeClass('er').addClass('ok');
+				$('#cke_reusableckeditor').removeClass('ok').addClass('er');
 			} else {
 				$element.removeClass('ok').addClass('er');
 				if(typeof(msg) != "undefined" && msg.length > 0) {

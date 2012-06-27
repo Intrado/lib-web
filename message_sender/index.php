@@ -65,11 +65,12 @@ $formdata = array(
 		)
 	),
 
-	"email_body" => array(
+	"emailbody" => array(
 	"label" => "emailmessagetext",
 	"value" => "",
 	"validators" => array(
-		array("ValMessageBody"),
+		array("ValRequired"),
+		//array("ValMessageBody"),
 		array("ValLength","max" => 256000)
 	),
 	"control" => array("TextField"),
@@ -205,7 +206,7 @@ include("nav.inc.php");
 <?
 // Load custom validators
 Validator::load_validators(array(
-	"ValSmsText","ValTimeWindowCallEarly","ValTimeWindowCallLate","ValTimePassed","ValTtsText","ValEmailAttach"
+	"ValSmsText","ValTimeWindowCallEarly","ValTimeWindowCallLate","ValTimePassed","ValTtsText","ValEmailAttach","ValMessageBody"
 ));
 ?>
 	var userid = <? print_r($_SESSION['user']->id); ?>;

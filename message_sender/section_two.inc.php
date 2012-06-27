@@ -208,7 +208,7 @@
 					<!--a id="editor_basic" href="javascript:void(null);">basic</a> | <a id="editor_advanced" href="javascript:void(null);">advanced</a-->
 					<label for="msgsndr_form_body">Body</label>
 					<div class="controls">
-					<textarea id="msgsndr_form_body" name="email_body" class="msgdata hide" data-ajax="true"></textarea><span id="emailBodyError" class="error"></span>
+					<textarea id="msgsndr_form_body" name="broadcast_emailbody" class="msgdata hide" data-ajax="true"></textarea><span id="emailBodyError" class="error"></span>
 					<div id="msgsndr_form_body-htmleditor"></div>
 					</div>
 				</fieldset>
