@@ -1,4 +1,4 @@
-/* Padding is not added to width of elements, so you can set div etc to the size you want */
+/* Padding is not added to width of elements, so you can set div etc to the size you want, doesn't work with IE7 or IE9 set with IE7 standards */
 * { -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
 
 
@@ -157,12 +157,10 @@ border-top: 1px solid #bbb; border-right: 1px solid #bbb; border-bottom: 1px sol
 
 
 /*----- Big Broadcast button -----*/
-div.bigbtn {
-  margin: -10px -5px -5px -5px;
-  padding: 10px 5px 5px 5px;
-  background: url(themes/newui/images/circle-thin-mult.png) no-repeat;
-}
-a.bigbtn { display: block; width: 100%; margin: 0 0 25px 0; padding: 14px 7px; color: #fff; font-size: 20px; font-weight: bold; text-align: center; border: 3px solid #AE330D;
+
+div.bigbtn { background: url(themes/newui/images/circle-thin-mult.png) no-repeat; padding: 10px 0; }
+
+a.bigbtn { display: block; margin: 0 0 25px 0; padding: 14px 7px; color: #fff; font-size: 20px; font-weight: bold; text-align: center; border: 3px solid #AE330D;
 -webkit-border-radius: 8px; border-radius: 8px;
 -webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25) inset, 0 1px 2px rgba(0, 0, 0, 0.05); box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25) inset, 0 1px 2px rgba(0, 0, 0, 0.05);
 text-shadow: 0 1px 1px rgba(0, 0, 0, 0.75); 
@@ -863,6 +861,13 @@ span.error { color: rgb(219,30,30); font-size: 0.9em; }
 #searchform input { display: block; width: 313px; padding: 4px 5px; font-size: 14px; line-height: 18px; border: 1px solid #E2E2E2;
 -webkit-border-radius: 5px; border-radius: 5px; -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
 #searchform .btn { margin: 0 5px; padding: 3px 8px; }
+
+/*---- IE7 styling -----*/
+
+.ie7 .summary .col { width: 150px; }
+.ie7 .summary .col:first-child { width: 120px; }
+
+.ie7 table.info { border-collapse: collapse; }
 
 
 /*----- Prototip styles for shortcut menu, not actually used in this theme -----*/
