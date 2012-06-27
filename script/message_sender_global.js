@@ -104,4 +104,15 @@ jQuery.noConflict();
 			}, 500);
 		});
 	};
+	
+	// stuff translation info into the specified hidden input field
+	updateTranslatedField = function(field, text, enable, override, gender) {
+		$(field).val($.toJSON({
+			"enabled" : enable,
+			"text" : text,
+			"override" : override,
+			"englishText" : "",
+			"gender": gender
+		}));
+	};
 })(jQuery);
