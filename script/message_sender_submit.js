@@ -173,7 +173,10 @@ function SubmitManager() {
 						sendData[thisKey] = 'checked';
 					}
 				} else {
-					sendData[thisKey] = $(this).val();
+					var value = $(this).val();
+					if (value == "[]")
+						value = "";
+					sendData[thisKey] = value;
 				}
 			}
 		});
