@@ -356,8 +356,21 @@ border-left: 1px solid #ddd; border-right: 1px solid #ddd; -webkit-border-radius
 .table-bordered th { background: #eee; font-weight: bold; vertical-align: bottom; line-height: 22px; padding: 8px; text-align: left; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; }
 .lists th { background: #f6f6f6; }
 .table-bordered th + th, .table-bordered td + td, .table-bordered th + td, .table-bordered td + th { border-left: 1px solid #DDDDDD; }
+
+/*
+	FIXME this is not the correct way of styling the remove list button, it was designed so that the child element would be styled, not the anchor. 
+	style ".icon-remove" (which is attached to a child element), not ".table-bordered a.remove"
+	the classes "action remove" added to the anchor tag are used for some kind of internal action jquery magic.
+*/
 .table-bordered a.remove { background: url(themes/newui/images/removelist.png) left 0 no-repeat; display: inline-block; width: 18px; height: 18px; vertical-align: middle; }
 .table-bordered a.remove:hover { background: url(themes/newui/images/removelist.png) left -22px no-repeat; }
+
+/*
+	FIXME see above, similar incorrect styling as remove button, but just copying for now to get working
+*/
+.table-bordered a.save { background: url(themes/newui/images/savelist.png) left 0 no-repeat; display: inline-block; width: 18px; height: 18px; vertical-align: middle; }
+.table-bordered a.save:hover { background: url(themes/newui/images/savelist.png) left -22px no-repeat; }
+
 .table-bordered td { border-bottom: 1px solid #ddd; }
 
 table.messages { width: 100%; margin: 0; font-size: 13px; line-height: 36px; border-bottom: 1px solid #ddd; border-left: 1px solid #ddd; border-right: 1px solid #ddd; }
