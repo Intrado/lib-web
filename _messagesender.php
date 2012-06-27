@@ -127,7 +127,7 @@ class MessageSenderForm extends Form {
 		}
 		
 		// has sms message data?
-		if (isset($this->formdata["hasemail"]["value"]) && $this->formdata["hasemail"]["value"]) {
+		if (isset($this->formdata["hassms"]["value"]) && $this->formdata["hassms"]["value"]) {
 			$this->markRequired("smsmessagetext");
 		}
 		
