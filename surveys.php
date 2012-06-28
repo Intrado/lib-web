@@ -41,10 +41,11 @@ if (isset($_GET['deletetemplate'])) {
 ////////////////////////////////////////////////////////////////////////////////
 
 function fmt_surveyactions ($obj,$name) {
-
-	return '<a href="surveytemplatewiz.php?id=' . $obj->id . '">Edit</a>&nbsp;|&nbsp;'
-			. '<a href="survey.php?scheduletemplate=' . $obj->id . '">Schedule</a>&nbsp;|&nbsp;'
-			. '<a href="surveys.php?deletetemplate=' . $obj->id . '">Delete</a>';
+	return action_links(array(
+		action_link(_L("Edit"),"pencil","surveytemplatewiz.php?id={$obj->id}"),
+		action_link(_L("Schedule"),"add","survey.php?scheduletemplate={$obj->id}"),
+		action_link(_L("Delete"),"cross","surveys.php?deletetemplate={$obj->id}","return confirmDelete();")
+	));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
