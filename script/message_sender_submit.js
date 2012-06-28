@@ -287,7 +287,6 @@ function SubmitManager() {
 			data: formData,
 			dataType: 'json',
 			success: function(response) {
-				console.log(response);
 				var res = response;
 				if(typeof(res.status) != "undefined" && typeof(res.nexturl) != "undefined" && res.status == "success") {
 					//success
