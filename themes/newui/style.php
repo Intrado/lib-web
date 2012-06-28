@@ -889,67 +889,14 @@ span.error { color: rgb(219,30,30); font-size: 0.9em; }
 .shortcuts a:hover { background: #26477d; color: #fff; }
 
 
-@media screen and (max-width: 980px) { 
- .subnavtabs li { margin: 5px; }
- .subnavtabs a { font-size: 13px; padding: 5px 8px; }
- .wrapper { margin: 0 180px 0 0; }
- .main_aside { width: 170px; right: -180px; }
- 
- a.bigbtn { margin: 0 0 15px 0; padding: 5px; font-size: 16px; }
- 
- .templates { margin: 0 0 15px 0; padding: 7px 12px; }
- .templates h3 { font-size: 12px; }
- .templates li { font-size: 13px; }
- 
- .help { padding: 7px 12px; }
- .help h3 { font-size: 13px; }
- .help p { font-size: 12px; }
- 
- .summary .col li { font-size: 13px; }
- .summary img.dashboard_graph { width: 50%; }
- 
- .msg_steps li a { font-size: 13px; line-height: 20px; }
- .msg_steps li span.icon { height: 20px; width: 20px; font-size: 12px; }
- .msg_steps li a:after { border-width: 19px; margin-top: -19px; }
- .msg_steps li a:before { border-width: 20px; margin-top: -20px; }
- .msg_steps li.active + li a:after { border-width: 19px; margin-top: -19px; }
- .msg_steps li.active + li a:before { border-width: 20px; margin-top: -20px; }
- .msg_steps li.complete + li a:after { border-width: 19px; margin-top: -19px; }
- .msg_steps li.complete + li a:before { border-width: 20px; margin-top: -20px; }
- 
- .msg_content_nav li a { padding: 6px 10px; font-size: 15px; }
- 
- .window_panel label { width: 90px; padding: 5px 0; font-size: 13px; }
- .window_panel input[type="text"],
- .window_panel select,
- .window_panel textarea { font-size: 13px; }
- .window_panel input[type="checkbox"] { margin: 7px 5px 0 0; }
- .window_panel .controls { margin: 0 0 0 100px; }
- .easycallmaincontainer input.small { width: 135px; }
- .window_panel .translations input { margin-left: 100px; }
- 
- button, .btn { font-size: 13px; }
- .btn_left, .btn_middle, .btn_right { font-size: 11px; }
-
- table.list { font-size: 11px; line-height: 18px; }
+@media screen and (min-width: 1180px) { 
+ .container { width: 1150px; }
+ .main_activity { width: 910px; }
 }
 
-@media screen and (max-width: 850px) {
-  h2 { font-size: 18px; line-height: 34px; }
-  p { font-size: 13px; line-height: 21px; }
-  .msg_steps li a { font-size: 11px; }
-  .window_panel p, .window_panel a { font-size: 13px; }
-   
-  .summary .col { padding: 7px 8px; }
-  .summary .col li { font-size: 12px; line-height: 21px; }
-  .summary strong { font-size: 45px; }
-  .summary img.dashboard_graph { width: 48%; }
-   
-  .feed_btn_wrap { top: -58px; }
-  button, .btn { padding: 4px 8px; }
-   
-  table th, table td { font-size: 11px; line-height: 18px; }
-
+@media screen and (min-width: 1580px) { 
+ .container { width: 1300px; }
+ .main_activity { width: 1060px; }
 }
 
 /* Very basic facebook style */
