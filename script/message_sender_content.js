@@ -179,7 +179,13 @@ var allowControl = {
 
 				} else { 
 					// hide the callerid field 
-					$('#msgsndr_form_callid').closest('fieldset').addClass('hidden');
+					
+					if (typeof (userPermissions.setcallerid) != 'undefined' && userPermissions.setcallerid == 1) {
+						$('#callerid_other_wrapper').removeClass('hidden');
+						$('#msgsndr_form_callid').addClass('hidden');
+					} else {
+						$('#msgsndr_form_callid').closest('fieldset').addClass('hidden');
+					}
 				}
 
 			} else {
