@@ -635,23 +635,27 @@ function ContentManager() {
 		self.allowContent("email");
 	}
 
-	if (userPermissions.sendsms == 1) {
+	if (userPermissions.sendsms == 1 && orgFeatures.sms == true) {
 		self.allowContent("sms");
 	}
-
-	if (userPermissions.facebookpost == 1 || userPermissions.twitterpost == 1 || userPermissions.feedpost == 1) {
+	
+	var hasFacebook = orgFeatures.facebook == true && userPermissions.facebookpost == 1;
+	var hasTwitter = orgFeatures.twitter == true && userPermissions.twitterpost == 1;
+	var hasFeed = orgFeatures.feed == true && userPermissions.feedpost == 1;
+	
+	if (hasFacebook || hasTwitter || hasFeed) {
 		$('li.osocial').removeClass('notactive');
 		getTokens();
 
-		if (userPermissions.facebookpost == 1) {
+		if (hasFacebook) {
 			self.allowContent("facebook");
 		}
 
-		if (userPermissions.twitterpost == 1) {
+		if (hasTwitter) {
 			self.allowContent("twitter");
 		}
 
-		if (userPermissions.feedpost == 1) {
+		if (hasFeed) {
 			self.allowContent("feed");
 		}
 	}

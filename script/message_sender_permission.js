@@ -53,7 +53,23 @@ function PermissionManager() {
 				}
 			});
 		};
-
+		
+		function getOrganizationSettingsFeatures(){
+			orgFeatures = {};
+			$.ajax({
+				url : '/'+orgPath+'/api/2/organizations/'+orgid+'/settings/features',
+				type : "GET",
+				dataType : "json",
+				async : false,
+				success : function(data) {
+					var features = data.features;
+					$.each(features, function(fIndex, fItem) {
+						orgFeatures[fItem.name] = fItem.isEnabled;
+					});
+				}
+			});
+		};
+		
 		function getLanguages() {
 			ttslangCodes = [];
 			elangCodes = [];
@@ -127,6 +143,7 @@ function PermissionManager() {
 		getLanguages();
 		getUserPrefs();
 		getUserInfo();
+		getOrganizationSettingsFeatures();
 
 		userPermissions = {};
 		userRoleId = false;

@@ -39,6 +39,7 @@ jQuery.noConflict();
 		$('.close, .facebook, .twitter, .feed, .error, div[id^="msgsndr_tab"]').hide();
 		
 		// initialise global variables
+		orgFeatures = {};
 		orgOptions = {};
 		userPrefs = {};
 		userPermissions = {};
