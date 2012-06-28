@@ -67,7 +67,7 @@ jQuery.noConflict();
 		
 		obj_permissionManager.onPermissionsLoaded(function() {
 			// retreive a new serialnumber for the postdata form
-			$.get('_messagesender.php?snum', function (data) {
+			$.ajax({"url":'_messagesender.php?snum', "cache":false}, function (data) {
 				$('[name|=broadcast_formsnum]').val(data.snum);
 			}, "json");
 			
