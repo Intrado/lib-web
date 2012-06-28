@@ -343,7 +343,7 @@ table.info td { border-bottom: 1px solid #ddd; }
 table.info tr:hover td { background: #e1eaf4; color: #005580; cursor: pointer;}
 table.info th:first-child {text-align: right;}
 table.jobprogress th:first-child {text-align: left;}
-table.info td:first-child { width: 120px; text-align: right;}
+table.info td:first-child { width: 100px; text-align: right;}
 table.info td:nth-child(2) { width: 100px; white-space: nowrap;}
 table.info td:nth-child(4) { width: 40px;}
 table.info td:nth-child(5) { width: 85px;}

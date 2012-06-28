@@ -71,7 +71,7 @@ function fmt_obj_date_no_time ($obj,$name) {
 	if (isset($obj->$name) && $obj->$name != "") {
 		$time = strtotime($obj->$name);
 		if ($time !== -1 && $obj->$name != "0000-00-00 00:00:00")
-			return date('l m/d/y',$time);
+			return date('D n/j/y',$time);
 	}
 	return "- Never -";
 }
