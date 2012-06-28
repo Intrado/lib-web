@@ -134,14 +134,18 @@ $.loadMessage = function loadMessage() {
 	
 		// make sure the correct tab is shown
 		$('#msgsndr_saved_message').modal('hide');
-		if (self.elements.messageTab.hasClass("active"))
+		// if we are on step 2, show the message section
+		if (obj_stepManager.currentStep == 2)
 			self.elements.messageSection.show();
 		
-		self.elements.messageTab.addClass('complete');
-
 		self.clearForm();
 		self.prepareFormForLoad(selectedMsgGroup);
-		self.getMessages(selectedMsgGroup);
+		// TODO: append loading message
+		self.getMessages(selectedMsgGroup, function () {
+			// TODO: remove loading message
+			obj_valManager.forceRunValidate(2);
+			obj_stepManager.updateStepStatus();
+		});
 	};
 	
 	// get message group data ...
@@ -248,8 +252,6 @@ $.loadMessage = function loadMessage() {
 						self.elements.phoneCallMeSection.show();
 						self.elements.phoneTextSection.hide();
 						self.elements.phoneCallMeOptions.append(self.elements.phoneAdvancedOptions);
-						//global.watchContent('callme');
-						obj_stepManager.updateStepStatus();
 					} else {
 						self.elements.phoneType.val('text');
 						self.elements.phoneButtonCallMe.removeClass('active'); 
@@ -257,8 +259,6 @@ $.loadMessage = function loadMessage() {
 						self.elements.phoneCallMeSection.hide();
 						self.elements.phoneTextSection.show();
 						self.elements.phoneTextOptions.append(self.elements.phoneAdvancedOptions);
-						//global.watchContent('text');
-						obj_stepManager.updateStepStatus();
 					}
 					break;
 				case "email":
@@ -268,15 +268,11 @@ $.loadMessage = function loadMessage() {
 					} else {
 						self.elements.emailComplete.addClass('complete');
 						self.elements.hasEmail.attr('checked','checked');
-						//global.watchContent('msgsndr_tab_email');
-						obj_stepManager.updateStepStatus();
 					}
 					break;
 				case 'sms':
 					self.elements.smsComplete.addClass('complete');
 					self.elements.hasSms.attr('checked','checked');
-					//global.watchContent('msgsndr_tab_sms');
-					obj_stepManager.updateStepStatus();
 					break;
 				case 'post':
 					self.elements.socialComplete.addClass('complete');
@@ -294,8 +290,6 @@ $.loadMessage = function loadMessage() {
 							self.elements.feedSection.show();
 							break;
 					}
-					//global.watchSocial('msgsndr_tab_social');
-					obj_stepManager.updateStepStatus();
 					break;
 			}
 		});
@@ -323,7 +317,7 @@ $.loadMessage = function loadMessage() {
 	};
 	
 	// load messages from message group
-	this.getMessages = function(msgGrp) {
+	this.getMessages = function(msgGrp, callback) {
 		// load message group content into session server side.
 		self.loadMessageGroupContentForPreview(msgGrp.id);
 		// request all the messages for the selected message group
@@ -331,6 +325,7 @@ $.loadMessage = function loadMessage() {
 			url: '/'+orgPath+'/api/2/users/'+userid+'/messagegroups/'+msgGrp.id+'/messages',
 			type: "GET",
 			dataType: "json",
+			async: "false",
 			success: function(data) {
 				// itterate all the messages and call methods to populate the data
 				$.each(data.messages, function(mIndex, msg) {
@@ -363,6 +358,7 @@ $.loadMessage = function loadMessage() {
 						}
 					}
 				});
+				callback();
 			}
 		});
 	};
