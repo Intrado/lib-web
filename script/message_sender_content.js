@@ -149,6 +149,8 @@ var allowControl = {
 			// check for orgOptions.requiredapprovedcallerid,
 			// then subsequently for userPermissions.setcallerid
 			if (orgOptions._hascallback == 0) {
+				
+				// this sets the selected callerid in the text input for postdata
 				$('#msgsndr_form_callid').on('change', function() {
 					if ($('option:selected', this).val() == 'other') {
 						$('#callerid_other_wrapper').removeClass('hidden');
@@ -170,35 +172,20 @@ var allowControl = {
 					
 					$('#msgsndr_form_callid').trigger("change");
 
-					// if the users setcallerid permission is defined,
-					// add the 'other' option and create a text input for
-					// them to add arbitrary value, and validate it.
+					// if the users setcallerid permission is defined, add the 'other' option 
 					if (typeof (userPermissions.setcallerid) != 'undefined' && userPermissions.setcallerid == 1) {
 						$('#msgsndr_form_callid').append('<option value="other" >Other</option>');
 					}
 
-				} else { // not sure here, set the default callerid and display the select with that as the option?
-					var callerIdnumber = getDefaultCallerId();
-					$('#msgsndr_form_callid').append('<option value="' + callerIdnumber + '" selected >' + formatPhone(callerIdnumber) + '</option>');
-					
-					$('#msgsndr_form_callid').trigger("change");
+				} else { 
+					// hide the callerid field 
+					$('#msgsndr_form_callid').closest('fieldset').addClass('hidden');
 				}
 
-			} else { // the user hascallback so we hide caller id select
-						// fieldset from view
+			} else {
+				// the user hascallback so we hide caller id select fieldset from view
 				$('#msgsndr_form_callid').closest('fieldset').addClass('hidden');
-				// Commented out the following code, I believe there should
-				// be no callerid passed to postdata for users with
-				// 'hascallback'
 
-				/*
-				 * get the default caller id and append it as the selected
-				 * option in the hidden callerid select menu var
-				 * callerIdnumber = getDefaultCallerId();
-				 * $('#msgsndr_form_callid').append('<option
-				 * value="'+callerIdnumber+'" selected
-				 * >'+formatPhone(callerIdnumber)+'</option>');
-				 */
 			}
 		};
 

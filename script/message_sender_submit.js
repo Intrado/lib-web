@@ -10,14 +10,12 @@ function SubmitManager() {
 		"addme_phone" : "msgsndr_addmephone",
 		"addme_email" : "msgsndr_addmeemail",
 		"addme_sms" : "msgsndr_addmesms",
-		"lists" : "msgsndr_listids", // check what this is in the new listpicker, currently passing in test data
-		"has_phone" : "msgsndr_hasphone", // true/false
-		"phone_type" : "msgsndr_phonemessagetype", // callme or text
-		"phone_number" : "msgsndr_phonemessagecallme", // callme messages object
-		//"phone_voiceresponse":"", // true/false
-		"phone_callconfirmation" : "msgsndr_phonemessagepost",// true/false
-		"phone_translate" : "msgsndr_phonemessagetext", // english version
-		"phone_tts_translate" : "msgsndr_phonemessagetexttranslate", // true/false
+		"lists" : "msgsndr_listids",
+		"has_phone" : "msgsndr_hasphone",
+		"phone_type" : "msgsndr_phonemessagetype",
+		"phone_number" : "msgsndr_phonemessagecallme",
+		"phone_translate" : "msgsndr_phonemessagetext",
+		"phone_tts_translate" : "msgsndr_phonemessagetexttranslate",
 		"phone_translate_es" : "msgsndr_phonemessagetexttranslateestext",
 		"phone_translate_af" : "msgsndr_phonemessagetexttranslateaftext",
 		"phone_translate_sq" : "msgsndr_phonemessagetexttranslatesqtext",
@@ -68,14 +66,13 @@ function SubmitManager() {
 		"phone_translate_vi" : "msgsndr_phonemessagetexttranslatevitext",
 		"phone_translate_cy" : "msgsndr_phonemessagetexttranslatecytext",
 		"phone_translate_yi" : "msgsndr_phonemessagetexttranslateyitext",
-		"has_email" : "msgsndr_hasemail", // true/false
+		"has_email" : "msgsndr_hasemail",
 		"email_name" : "msgsndr_emailmessagefromname",
 		"email_address" : "msgsndr_emailmessagefromemail",
 		"email_subject" : "msgsndr_emailmessagesubject",
 		"email_attachment" : "msgsndr_emailmessageattachment",
-		"broadcast_emailbody" : "msgsndr_emailmessagetext", // data from CK editor panel
-		"email_translate" : "msgsndr_emailmessagetexttranslate", // convert this from 1/0 to true/false
-		"email_translate_es" : "msgsndr_emailmessagetexttranslateestext", // translates example
+		"broadcast_emailbody" : "msgsndr_emailmessagetext",
+		"email_translate" : "msgsndr_emailmessagetexttranslate",
 		"email_translate_es" : "msgsndr_emailmessagetexttranslateestext",
 		"email_translate_af" : "msgsndr_emailmessagetexttranslateaftext",
 		"email_translate_sq" : "msgsndr_emailmessagetexttranslatesqtext",
@@ -126,9 +123,9 @@ function SubmitManager() {
 		"email_translate_vi" : "msgsndr_emailmessagetexttranslatevitext",
 		"email_translate_cy" : "msgsndr_emailmessagetexttranslatecytext",
 		"email_translate_yi" : "msgsndr_emailmessagetexttranslateyitext",
-		"has_sms" : "msgsndr_hassms", // true/false
+		"has_sms" : "msgsndr_hassms",
 		"sms_text" : "msgsndr_smsmessagetext",
-		"has_facebook" : "msgsndr_hasfacebook", // true/false
+		"has_facebook" : "msgsndr_hasfacebook",
 		"facebook_message" : "msgsndr_socialmediafacebookmessage",
 		"social_fbpages" : "msgsndr_socialmediafacebookpage",
 		"has_twitter" : "msgsndr_hastwitter",
@@ -137,8 +134,9 @@ function SubmitManager() {
 		"rss_post" : "msgsndr_socialmediafeedmessage",
 		//"feed_categories" : "msgsndr_socialmediafeedcategory[]",
 		"broadcast_daystorun" : "msgsndr_optionmaxjobdays",
-		"options_voiceresponse" : "msgsndr_optionleavemessage",
-		"options_callconfirmation" : "msgsndr_optionmessageconfirmation",
+		"phone_voiceresponse" : "msgsndr_optionleavemessage",
+		"phone_callconfirmation" : "msgsndr_optionmessageconfirmation",
+		//"options_autoreport" : "msgsndr_optionautoreport",
 		"options_skipduplicates" : "msgsndr_optionskipduplicate",
 		"phone_callerid" : "msgsndr_optioncallerid",
 		"options_savemessage" : "msgsndr_optionsavemessage",
@@ -270,7 +268,7 @@ function SubmitManager() {
 					// send now if the timecheck is passed
 					scheduleNow(onehour);
 				} else if(isTooEarly == true || isTooLate == true){
-					alert("You do not have authorization to send broadcasts at this time, please schedule your broadcast.")
+					alert("You do not have authorization to send broadcasts at this time, please schedule your broadcast.");
 					// return so the postdata isn't submitted.
 					return;
 				} 
