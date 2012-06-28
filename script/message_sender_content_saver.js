@@ -75,14 +75,14 @@ function ContentSaveManager() {
 			});
 			$('#msgsndr_rsspost').val(rssPost);
 			
-			var rssCats = [];
+			/*var rssCats = [];
 			$('input[name=feed_categories]').each(function(findex, fitem){
 				var feedid = $(this).attr('value');
 				if($(this).is(':checked')){
 					rssCats.push(feedid);
 				}
 			});
-			$('#msgsndr_feed_categories').val(rssCats);
+			$('#msgsndr_feed_categories').val(rssCats);*/
 		}
 	};
 	

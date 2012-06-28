@@ -14,7 +14,7 @@ function SubmitManager() {
 		"has_phone" : "msgsndr_hasphone", // true/false
 		"phone_type" : "msgsndr_phonemessagetype", // callme or text
 		"phone_number" : "msgsndr_phonemessagecallme", // callme messages object
-		// "phone_voiceresponse":"", // true/false
+		//"phone_voiceresponse":"", // true/false
 		"phone_callconfirmation" : "msgsndr_phonemessagepost",// true/false
 		"phone_translate" : "msgsndr_phonemessagetext", // english version
 		"phone_tts_translate" : "msgsndr_phonemessagetexttranslate", // true/false
@@ -135,7 +135,7 @@ function SubmitManager() {
 		"twitter_message" : "msgsndr_socialmediatwittermessage",
 		"has_feed" : "msgsndr_hasfeed",
 		"rss_post" : "msgsndr_socialmediafeedmessage",
-		"feed_cat_ids" : "msgsndr_socialmediafeedcategory",
+		//"feed_categories" : "msgsndr_socialmediafeedcategory[]",
 		"broadcast_daystorun" : "msgsndr_optionmaxjobdays",
 		"options_voiceresponse" : "msgsndr_optionleavemessage",
 		"options_callconfirmation" : "msgsndr_optionmessageconfirmation",
@@ -145,7 +145,8 @@ function SubmitManager() {
 		"options_savemessagename" : "msgsndr_optionsavemessagename",
 		"broadcast_scheduledate" : "msgsndr_scheduledate",
 		"broadcast_schedulecallearly" : "msgsndr_schedulecallearly",
-		"broadcast_schedulecalllate" : "msgsndr_schedulecalllate"
+		"broadcast_schedulecalllate" : "msgsndr_schedulecalllate",
+		"submit" : "submit"
 	};
 
 	// this will set the schedule options to send a broadcast out immediately
@@ -157,10 +158,36 @@ function SubmitManager() {
 
 	mapPostData = function() {
 		// The store for our new POST data
+		
+		// changed mapping to work using serialize -- this is so we can pick up the individual feed categories as required server side
 		var sendData = {};
+		var getFieldClass = "saverclass";
+		
+			$.each(keyMap, function(fKey, fVal) {
+				var $findField = $("[name=" + fKey + "]");
+				
+				if ($findField.attr("type") == "checkbox") {
+					if ($findField.is(":checked")) {
+						$findField.val("checked");
+					} else {
+						$findField.val("");
+					}
+				} else {
+					var value = $findField.val();
+					if (value == "[]" || value == "{}") {
+						value = "";
+					}
+						
+					$findField.val(value);
+				}
+				
+				$findField.attr("name", fVal);
+				
+				$findField.addClass(getFieldClass);
+			});
 
 		// process all inputs into POST data
-		$("input[name], textarea[name], select[name]").each(function() {
+		/*$("input[name], textarea[name], select[name]").each(function() {
 			var thisType = $(this).attr("type");
 			var thisKey = $(this).attr("name");
 
@@ -170,7 +197,15 @@ function SubmitManager() {
 				// make checkboxes true or false
 				if (thisType == 'checkbox') {
 					if ($(this).attr('checked') == 'checked') {
-						sendData[thisKey] = 'checked';
+						if ($(this).attr('name') == 'feed_categories') {
+							console.log(thisKey);
+							$('input[name=feed_categories]:checked').each(function(findex, fitem){
+								sendData["msgsndr_socialmediafeedcategory[]"] = fitem.value;
+							});
+						} else {
+							console.log(thisKey);
+							sendData[thisKey] = 'checked';
+						}
 					}
 				} else {
 					var value = $(this).val();
@@ -181,7 +216,17 @@ function SubmitManager() {
 			}
 		});
 		// add in the submit ...
-		sendData['submit'] = 'submit';
+		sendData['submit'] = 'submit';*/
+		//sendData = $("input[name], textarea[name], select[name]").not("[name=email_save_translation], [name=save_translation]").serialize();
+		sendData = $("." + getFieldClass).serialize();
+
+		$.each(keyMap, function(fKey, fVal) {
+			var $findField = $("[name=" + fVal + "]");
+			
+			$findField.attr("name", fKey);
+			$findField.removeClass(getFieldClass).not("input[name^=msgsndr_socialmediafeedcategory]");
+		});
+		
 		return sendData;
 	};
     
@@ -220,6 +265,8 @@ function SubmitManager() {
 
 		//var formData = $('form[name=broadcast]').serializeArray();
 		var formData = mapPostData();
+		console.log(formData);
+		//return false;
 		$.ajax({
 			type: 'POST',
 			url: '_messagesender.php?form=msgsndr&ajax=true',

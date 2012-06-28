@@ -710,4 +710,7 @@
 				<button class="submit_broadcast btn_confirm" id="send_now_broadcast">Send Now to 2,134 Recipients</button>
 			</div>
 			
+			<!--  hidden submit for postdata -->
+			<input type="hidden" name="submit" value="submit" />
+			
 		</div><!-- end window_panel -->
