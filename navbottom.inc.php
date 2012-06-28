@@ -7,7 +7,7 @@
 <div class="container">
 
 <div id="termsinfo">
-Service &amp; Support:&nbsp;<a href="mailto:<?=$_SESSION['_supportemail']?>"><?=$_SESSION['_supportemail']?></a>&nbsp;|&nbsp;<?=substr($_SESSION['_supportphone'],0,3) . "." . substr($_SESSION['_supportphone'],3,3) . "." . substr($_SESSION['_supportphone'],6,4);?>
+Service &amp; Support:&nbsp;<a href="mailto:<?=$_SESSION['_supportemail']?>"><?=$_SESSION['_supportemail']?></a>&nbsp;|&nbsp;(<?=substr($_SESSION['_supportphone'],0,3) . ")&nbsp;" . substr($_SESSION['_supportphone'],3,3) . "-" . substr($_SESSION['_supportphone'],6,4);?>
 <br>
 Use of this system is subject to the <a href="privacy.html" target="_blank">Privacy Policy</a> and <a href="terms.html" target="_blank">Terms of Service</a>
 <br>
