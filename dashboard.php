@@ -388,7 +388,7 @@ include("nav.inc.php");
 <?
 $who = isset($_GET["showactivity"])?$_GET["showactivity"]:"me";
 ?>
-
+var jobloads = 3;
 
 function updateTableTools(section, action, override, start, limit, count){
 	// Remove previous tooltips if they exist add add new ones
@@ -409,7 +409,13 @@ function updateTableTools(section, action, override, start, limit, count){
 	
 	if (start == 0 && count == 0) {
 		$(section + "wrapper").hide();
-		// Check if any other jobs are showing if not show helper
+	} else {
+		$(section + "wrapper").show();
+	}
+	
+	jobloads--;
+	if (jobloads <= 0) {
+		// Once all 3 initial job loads returned check if we should show helper
 		var status = ["active","scheduled","completed"];
 		var showhelper = true;
 		status.each(function(s) {
@@ -420,8 +426,6 @@ function updateTableTools(section, action, override, start, limit, count){
 			$("nocontenthelper").show();
 		else
 			$("nocontenthelper").hide();
-	} else {
-		$(section + "wrapper").show();
 	}
 	
 	//Update More link to with the correct show status and url
@@ -442,6 +446,7 @@ function updateTableTools(section, action, override, start, limit, count){
 }
 
 document.observe('dom:loaded', function() {
+	$("nocontenthelper").hide();
 	ajax_obj_table_update('activejobs','ajaxjob.php?action=activejobs&who=<?=$who?>&start=0&limit=10',true,updateTableTools.curry("activejobs","activejobs",true,0,10));
 	ajax_obj_table_update('scheduledjobs','ajaxjob.php?action=scheduledjobs&who=<?=$who?>&start=0&limit=10',false,updateTableTools.curry("scheduledjobs","scheduledjobs",false,0,10));
 	ajax_obj_table_update('completedjobs','ajaxjob.php?action=completedjobs&who=<?=$who?>&start=0&limit=5',false,updateTableTools.curry("completedjobs","completedjobs",false,0,5));
