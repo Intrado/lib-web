@@ -150,10 +150,19 @@ function SubmitManager() {
 	};
 
 	// this will set the schedule options to send a broadcast out immediately
-	scheduleNow = function() {
+	scheduleNow = function(onehour) {
+
 		$('#schedule_datepicker').val(moment().format('MM/DD/YYYY'));
 		$('#schedulecallearly').append('<option value="'+moment().format('h:mm a')+'" selected="selected">'+moment().format('h:mm a')+'</option>');
-		$('#schedulecalllate').append('<option value="'+moment().add('hours', 1).format('h:mm a')+'" selected="selected">'+moment().add('hours', 1).format('h:mm a')+'</option>');
+
+		$('#schedulecalllate option').removeAttr('selected')
+
+		// User is submitting a job within the hour window so we need to give the post data and hour gap
+		if (typeof onehour != undefined && onehour == true) { 
+			$('#schedulecalllate').append('<option value="'+moment().add('hours', 1).format('h:mm a')+'" selected="selected">'+moment().add('hours', 1).format('h:mm a')+'</option>');
+		} else {
+			$('#schedulecalllate option:last-child').attr('selected', 'selected');
+		}
 	};
 
 	mapPostData = function() {
@@ -249,9 +258,17 @@ function SubmitManager() {
 				var isTooEarly    = timecheck <= callearlytime;
 				var isTooLate     = timecheck >= calllatetime;
 
+				// hour check - need to check if the difference in time between calllatetime and timecheck
+				// onehour is set to false if they have more than an hour window available, else it's true
+				var onehour = true;
+				var hourcheck = (timecheck - calllatetime) / 3600;
+				if ( hourcheck > 1) {
+					var onehour = false 
+				}
+
 				if(isTooEarly == false && isTooLate == false){
 					// send now if the timecheck is passed
-					scheduleNow();
+					scheduleNow(onehour);
 				} else if(isTooEarly == true || isTooLate == true){
 					alert("You do not have authorization to send broadcasts at this time, please schedule your broadcast.")
 					// return so the postdata isn't submitted.
@@ -263,10 +280,9 @@ function SubmitManager() {
 			}
 		}
 
+		//return false;
 		//var formData = $('form[name=broadcast]').serializeArray();
 		var formData = mapPostData();
-		console.log(formData);
-		//return false;
 		$.ajax({
 			type: 'POST',
 			url: '_messagesender.php?form=msgsndr&ajax=true',
