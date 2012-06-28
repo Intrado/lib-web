@@ -136,7 +136,7 @@ function SubmitManager() {
 		"broadcast_daystorun" : "msgsndr_optionmaxjobdays",
 		"phone_voiceresponse" : "msgsndr_optionleavemessage",
 		"phone_callconfirmation" : "msgsndr_optionmessageconfirmation",
-		//"options_autoreport" : "msgsndr_optionautoreport",
+		"options_autoreport" : "msgsndr_optionautoreport",
 		"options_skipduplicates" : "msgsndr_optionskipduplicate",
 		"phone_callerid" : "msgsndr_optioncallerid",
 		"options_savemessage" : "msgsndr_optionsavemessage",
