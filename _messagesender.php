@@ -617,6 +617,13 @@ $formdata = array_merge($formdata, array(
 		"control" => array("TextField"),
 		"helpstep" => 1
 	),
+	"optionautoreport" => array(
+		"label" => "optionautoreport",
+		"value" => "",
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 1
+	),
 	"optionleavemessage" => array(
 		"label" => "optionleavemessage",
 		"value" => "",
@@ -775,6 +782,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		
 		// for all the job settings on the "Advanced" step. set some advanced options that will get stuffed into the job
 		$job->setSetting("leavemessage", (isset($postdata["optionleavemessage"]) && $postdata["optionleavemessage"])?1:0);
+		$job->setSetting("sendreport", (isset($postdata["optionautoreport"]) && $postdata["optionautoreport"])?1:0);
 		$job->setSetting("messageconfirmation", (isset($postdata["optionmessageconfirmation"]) && $postdata["optionmessageconfirmation"])?1:0);
 		$job->setSetting("skipduplicates", (isset($postdata["optionskipduplicate"]) && $postdata["optionskipduplicate"])?1:0);
 		$job->setSetting("skipemailduplicates", (isset($postdata["optionskipduplicate"]) && $postdata["optionskipduplicate"])?1:0);
