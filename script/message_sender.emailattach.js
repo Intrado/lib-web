@@ -7,7 +7,7 @@ function startUpload(){
 }
 
 function stopUpload(id,name,size,errormessage, formname, itemname) {
-	if (!formname || !itemname || !$("msgsndr_form_attachment_my_attach").visible()) {
+	if (!formname || !itemname || typeof(obj_valManager) == "undefined") {
 		return;
 	}
 	// stopUpload() is called automatically when the iframe is loaded, which may be before document.formvars is initialized by form_load().
