@@ -139,13 +139,19 @@ $.loadMessage = function loadMessage() {
 			self.elements.messageSection.show();
 		
 		self.clearForm();
-		self.prepareFormForLoad(selectedMsgGroup);
-		// TODO: append loading message
-		self.getMessages(selectedMsgGroup, function () {
+		
+		var callback = function () {
 			// TODO: remove loading message
 			obj_valManager.forceRunValidate(2);
 			obj_stepManager.updateStepStatus();
-		});
+		};
+		if (selectedMsgGroup.typeSummary.length > 0) {
+			self.prepareFormForLoad(selectedMsgGroup);
+			// TODO: append loading message
+			self.getMessages(selectedMsgGroup, callback);
+		} else {
+			callback();
+		}
 	};
 	
 	// get message group data ...
@@ -169,8 +175,8 @@ $.loadMessage = function loadMessage() {
 					self.msgGroups = [];
 				// sort by name
 				$.each(data.messageGroups, function(i,mg) {
-					// only show notification type message groups
-					if (mg.type != "notification")
+					// only show notification type message groups and message groups with messages
+					if (mg.type != "notification" || mg.typeSummary.length == 0)
 						return;
 					self.msgGroups.push(mg);
 					// format the date from the modifiedTimestamp value
