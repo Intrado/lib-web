@@ -422,7 +422,9 @@ div.scrollTableContainer {
 	cursor: pointer;
 	font-size: 11px;
 
-	color: <?=$primary?>;;
+	color: <?=$primary?>;
+	margin: 2px 0;
+	display: inline-block;
 }
 
 a.actionlink {
