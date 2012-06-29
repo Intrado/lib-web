@@ -164,7 +164,7 @@ $.loadMessage = function loadMessage() {
 			else
 				start = 0;
 		}
-		var limit = 25;
+		var limit = 1000;
 		$.ajax({
 			url: '/'+orgPath+'/api/2/users/'+userid+'/messagegroups',
 			type: "GET",

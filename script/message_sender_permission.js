@@ -20,6 +20,7 @@ function PermissionManager() {
 		$.ajax({
 			url : '/' + orgPath + '/api/2/users/' + userid + '/roles',
 			type : "GET",
+            data :  { "limit" : 1000 },
 			dataType : "json",
 			async : false,
 			success : function(data) {

@@ -6,6 +6,7 @@ jQuery.noConflict();
 		$.ajax({
 			url : '/' + orgPath + '/api/2/users/' + userid + '/roles/' + userRoleId + '/settings/jobtypes',
 			type : "GET",
+            data : { "limit" : 1000 },
 			dataType : "json",
 			success : function(data) {
 				sortTypes = data.jobTypes;

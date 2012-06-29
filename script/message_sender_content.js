@@ -385,6 +385,7 @@ var allowControl = {
 		$.ajax({
 			url: '/'+orgPath+'/api/2/users/'+userid+'/roles/'+userRoleId+'/settings/feedcategories',
 			type: "GET",
+            data: { "limit": 1000 },
 			dataType: "json",
 			success: function(data) {
 				feedCats = data.feedCategories;
