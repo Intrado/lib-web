@@ -38,6 +38,7 @@ jQuery.noConflict();
 		});
 	};
 	
+	
 	// social token ajax call
 	getTokens = function(){
 		fbToken = false;
@@ -52,22 +53,34 @@ jQuery.noConflict();
 					if (typeof(data.facebook) != 'undefined' && data.facebook.accessToken){
 						fbToken = data.facebook.accessToken;
 					}
-					if (typeof(data.twitter) != 'undefined' && data.twitter != ''){
+					if (typeof(data.twitter) != 'undefined' && (data.twitter != '' || data.twitter != 'false')){
 						twToken = data.twitter;
-						$('#msgsndr_twittername').append('Posting as <a class="" href="http://twitter.com/'+twToken.screenName+'">@'+twToken.screenName+'</a>');
+						addTwitterHandle(twToken);
 						if ( typeof($('#msgsndr_twitterauth')) != 'undefined' ){
 							$('#msgsndr_twitterauth').remove();	
-							}
+						}
+					} else {
+						addTwitterAuth();
 					}
 				} else {
-					$('#msgsndr_twittername').append('<a id="msgsndr_twitterauth" href="popuptwitterauth.php" class="btn"><img src="img/icons/custom/twitter.gif" alt="twitter"/> Add Twitter Account</a>');
-					$('#msgsndr_twitterauth').on('click', function(){
-						event.preventDefault();
-						window.open($(this).prop('href'), '', 'height=300, width=600');
-					});
+					addTwitterAuth();
 				}
 			}
 		});
+	};
+	
+	// add auth button for twitter
+	addTwitterAuth = function(){
+		$('#msgsndr_twittername').append('<a id="msgsndr_twitterauth" href="popuptwitterauth.php" class="btn"><img src="img/icons/custom/twitter.gif" alt="twitter"/> Add Twitter Account</a>');
+		$('#msgsndr_twitterauth').on('click', function(){
+			event.preventDefault();
+			window.open($(this).prop('href'), '', 'height=300, width=600');
+		});
+	};
+	
+	// add twitter handle based on api details for twitter account
+	addTwitterHandle = function(token){
+		$('#msgsndr_twittername').append('Posting as <a class="" href="http://twitter.com/'+token.screenName+'">@'+token.screenName+'</a>');
 	};
 	
 	// facebook authorized destinations ajax call
