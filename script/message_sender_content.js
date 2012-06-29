@@ -438,6 +438,10 @@ function ContentManager() {
 				readyForSave = false;
 			} else if($("#msgsndr_form_feed").is(":checked") && $("input:checked", "#feed_categories").size() == 0) {
 				readyForSave = false;
+			} else if($("#msgsndr_form_facebook").is(":checked")) {
+				if($("#msgsndr_fbpageconnect").is(":visible")) {
+					readyForSave = false;
+				}
 			}
 			
 		}
@@ -629,6 +633,11 @@ function ContentManager() {
 	
 	//BIND FEED CHECKBOXES FOR VALIDATING
 	$("#feed_categories").on("click change", function() {
+		self.updateContentStatus();
+	});
+	
+	// BIND FACEBOOK PAGE CHECKBOXES FOR VALIDATING
+	$("#msgsndr_fbpagefbpages").on("click", function(){
 		self.updateContentStatus();
 	});
 	
