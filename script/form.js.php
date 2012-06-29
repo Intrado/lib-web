@@ -227,7 +227,7 @@ function form_validation_display(element,style, msgtext) {
 
 		//set up 2 queued effects that will fade to new bg color, then swap text and fade in
 		Effect.Queues.get(msg.id).each(function(effect) { effect.cancel(); });
-		new Effect.Opacity(msg,{duration: 0.25, from:1, to:0, afterFinish: function () {msg.innerHTML = msgtext}, queue: { position: 'end', scope: msg.id }});
+		new Effect.Opacity(msg,{duration: 0.25, from:1, to:0, afterFinish: function () {if (!(msg.innerHTML == "" && msgtext == "")) msg.innerHTML = msgtext}, queue: { position: 'end', scope: msg.id }});
 		new Effect.Opacity(msg,{duration: 0.25, from:0, to:1, afterFinish: function () {if(msgtext == "") msg.hide();}, queue: { position: 'end', scope: msg.id }});
 	}
 }
