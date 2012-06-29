@@ -12,7 +12,7 @@ class RestrictedValues extends FormItem {
 		
 		$label = (isset($this->args['label']) && $this->args['label'])? $this->args['label']: _L('Restrict to these fields:');
 		$restrictchecked = count($value) > 0 ? "checked" : "";
-		$str = '<input type="checkbox" id="'.$n.'-restrict" '.$restrictchecked .' onclick="restrictcheck(\''.$n.'-restrict\', \''.$n.'\')"><label for="'.$n.'-restrict">'.$label.'</label>';
+		$str = '<div><input type="checkbox" id="'.$n.'-restrict" '.$restrictchecked .' onclick="restrictcheck(\''.$n.'-restrict\', \''.$n.'\')"><label for="'.$n.'-restrict">'.$label.'</label></div>';
 
 		$str .= '<div id='.$n.' class="radiobox" style="margin-left: 1em;">';
 
