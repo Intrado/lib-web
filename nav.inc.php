@@ -256,7 +256,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 
 	<div class="banner_logo">
 		<table class="logo"><tr><td><? doLogo() ?></td></tr></table>
-		<h1>SchoolMessenger</h1>
+		<h1><?= getBrand();?></h1>
 	</div>  
 	
 	<div class="banner_custname"><?= escapehtml($_SESSION['custname']); ?></div>
