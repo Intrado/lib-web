@@ -4,9 +4,9 @@
 if (!isset($_SESSION['colorscheme'])) {
 	// TODO these should come from customer display data (still brand the login pages)
 	$theme = "classroom";
-	$primary = "484848";
-	$theme1 = "000000";
-	$theme2 = "444444";
+	$primary = "3e693f";
+	$theme1 = "3e693f";
+	$theme2 = "b47727";
 	$globalratio = ".2";
 } else {
 	$theme = $_SESSION['colorscheme']['_brandtheme'];
