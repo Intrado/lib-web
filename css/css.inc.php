@@ -923,14 +923,21 @@ input.submit_survey:active {
    +----------------------------------------------------------------+ */
    
 <?
-$themecssfilename = "themes/$theme/style.php"; //FIXME rename css files to themes/$theme/css.php - had to rename to style.php, css.php wasn't being included. sd. 
-if ( is_readable($themecssfilename) ) {
+$themecssfilename = "themes/$theme/style.php";
+if (!is_readable($themecssfilename)) {
+	//this can happen if the theme doesn't provide any override css. the default will image swap, and do a few variable colors.
+	//FIXME this should probably be included unconditionally, providing a base that themes can further customize with additional css. otherwise a theme that wants to customize a few things will have no easy way of including the default behavior, promoting copy/paste or nasty nested includes
+	$themecssfilename = "themes/default/style.php");
+}
+
+//check again, in case default is also not available!
+if (is_readable($themecssfilename)) {
 	include_once($themecssfilename);
 } else {
-	include_once("themes/default/style.php"); //FIXME should be themes/default/css.php - had to rename to style.php, css.php wasn't being included. sd.
+	error_log("unable to find $themecssfilename, something is wrong! theme: " . $theme . " cwd:" . getcwd());	
 }
-?>
 
+?>
 
 /* +----------------------------------------------------------------+
    | Print styles                                                   |
