@@ -133,6 +133,8 @@ function StepManager(_valManager) {
 		$("#schedule_broadcast").text("Send to " + recipientTrack + " Recipients");
 		$("#send_now_broadcast").text("Send Now to " + recipientTrack + " Recipients");
 		$('.review_count p').text(recipientTrack);
+
+		$('#schedule_options .warning').remove();
 		
 		/*
 		if a user has a callearly/calllate preference (in userPrefs), make them selected
@@ -231,7 +233,6 @@ function StepManager(_valManager) {
 				var addOneDay = moment().add('days',1); 
 				var futureDay = addOneDay.format('MM/DD/YYYY');
 				$('#schedule_datepicker').val(futureDay);
-				$('#schedule_options .warning').remove();
 				$('#schedule_datepicker').parent().parent().prepend('<p class="warning">Note: Start Date has been adjusted for tomorrow due to the limitations of your account</p>');
 			}
 		}
