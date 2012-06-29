@@ -306,7 +306,10 @@ include("nav.inc.php");
 			</div>
 			</div><!-- /window_body_wrap -->
 		</div>
-		
+
+<?
+		if ($USER->authorize('sendphone') || $USER->authorize('sendemail') || $USER->authorize('sendsms')) {
+?>
 		<div class="window broadcasts">
 			<div class="window_title_wrap"><h2><?= getJobsTitle()?></h2></div>
 			
@@ -350,10 +353,16 @@ include("nav.inc.php");
 			</div>
 			</div><!-- /window_body_wrap -->
 		</div>
+<?
+		}
+?>
 	</div><!-- end main_activity -->
 	
 	
 	<div class="main_aside">
+<?
+		if ($USER->authorize('sendphone') || $USER->authorize('sendemail') || $USER->authorize('sendsms')) {
+?>
 		<div class="bigbtn">
 		<a class="bigbtn" href="message_sender.php?new"><span><?= _L("New %s",getJobTitle())?></span></a>
 		</div>
@@ -377,7 +386,9 @@ include("nav.inc.php");
 			</ul>
 			<a class="newtemplate" href="jobtemplate.php?id=new"><img src="themes/<?= $_SESSION['colorscheme']['_brandtheme'] ?>/images/add.png">&nbsp;<?= _L("New Template") ?></a>
 		</div>
-		
+<?
+		}
+?>
 		<?= addHelpSection();?>
 	</div><!-- end main_aside -->
 	
