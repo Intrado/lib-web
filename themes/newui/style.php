@@ -853,9 +853,10 @@ li.notactive { display: none; }
 span.error { color: rgb(219,30,30); font-size: 0.9em; }
 
 p.warning {
-  font-weight: bold;
   color: rgb(0,0,0);
+  font-weight: bold;
   margin: 0 0 10px 0;
+  text-align: center;
 }
 
 .box_validatorerror span { margin: 0 5px 0 0; font-size: 14px; line-height: 18px; font-weight: bold; }
