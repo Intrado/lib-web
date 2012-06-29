@@ -168,9 +168,7 @@ class ListForm extends Form {
 					<div style='display:none'>
 						<!-- Generic Form Items -->
 						<div>
-							<table class='border' style='clear:both;text-align:left; margin-left:10px'>
 								" . $this->renderFormItems() . "
-							</table>
 						</div>
 					</div>
 
