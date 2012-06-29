@@ -666,7 +666,7 @@ function ContentManager() {
 			self.allowContent("facebook");
 		}
 
-		if (hasTwitter) {
+		if (hasTwitter && twToken != false) {
 			self.allowContent("twitter");
 		}
 

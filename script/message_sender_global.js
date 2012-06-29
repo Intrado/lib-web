@@ -47,7 +47,7 @@ jQuery.noConflict();
 			url: '/'+orgPath+'/api/2/users/'+userid+'/tokens',
 			method: 'GET',
 			dataType: 'json',
-			async: true,
+			async: false,
 			success: function(data){
 				if ($.isEmptyObject(data) != true) {
 					if (typeof(data.facebook) != 'undefined' && data.facebook.accessToken){
@@ -62,8 +62,6 @@ jQuery.noConflict();
 					} else {
 						addTwitterAuth();
 					}
-				} else {
-					addTwitterAuth();
 				}
 			}
 		});
