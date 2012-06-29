@@ -47,7 +47,7 @@ a:hover { text-decoration: none; }
 .secbutton { position: absolute; top: 36px; left: 0; width: 150px; }
 .sectimeline { width: 100%; padding: 0 0 0 150px; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
 .window_aside { float: left; display: inline; width: 165px; margin: 0; }
-.window_main { width: inherit; margin: 0 0 0 175px; }
+.window_main { width: inherit; margin: 0 0 0 175px; border-left: 1px dotted grey; padding: 0 0 0 10px;}
 
 .pagetitle { font-weight: bold; color: <?=$primary?>;  }
 
