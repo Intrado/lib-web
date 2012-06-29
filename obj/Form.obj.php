@@ -379,20 +379,24 @@ class Form {
 		</table>
 		</form>
 		</div>
-		
-		<script type="text/javascript">
-
-		form_load("'.$this->name.'",
-			"'.$posturl.'",
-			'.json_encode($this->formdata).',
-			'.json_encode($this->helpsteps).',
-			'.($this->ajaxsubmit ? "true" : "false").'
-		);
-		</script>
 		';
+		$str .= $this->renderFormJavascript($posturl);
 		
 		$str .= $this->renderJavascript();
 		
+		return $str;
+	}
+	
+	function renderFormJavascript($posturl) {
+		$str = '
+		<script type="text/javascript">
+			form_load("'.$this->name.'",
+				"'.$posturl.'",
+				'.json_encode($this->formdata).',
+				'.json_encode($this->helpsteps).',
+				'.($this->ajaxsubmit ? "true" : "false").'
+			);
+		</script>';
 		return $str;
 	}
 
