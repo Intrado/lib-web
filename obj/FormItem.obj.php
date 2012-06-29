@@ -138,7 +138,7 @@ class RadioButton extends FormItem {
 		$ishtml = false;
 		if (isset($this->args['ishtml']) && $this->args['ishtml'])
 			$ishtml = true; 
-		$str = '<ul id='.$n.' class="radiobox">';
+		$str = '<div id='.$n.' class="radiobox">';
 		$hoverdata = array();
 		$counter = 1;
 		$autoselect = count($this->args['values']) == 1; //if there is only one value, autoselect it
@@ -147,8 +147,7 @@ class RadioButton extends FormItem {
 				$str .= "<hr />\n";
 			} else {
 				$id = $n.'-'.$counter;
-				$str .= '<li><input id="'.$id.'" name="'.$n.'" type="radio" value="'.escapehtml($radiovalue).'" '.($value == $radiovalue || $autoselect ? 'checked' : '').' /><label id="'.$id.'-label" for="'.$id.'">'.($ishtml?$radioname:escapehtml($radioname)).'</label></li>
-				';
+				$str .= '<input id="'.$id.'" name="'.$n.'" type="radio" value="'.escapehtml($radiovalue).'" '.($value == $radiovalue || $autoselect ? 'checked' : '').' /><label id="'.$id.'-label" for="'.$id.'">'.($ishtml?$radioname:escapehtml($radioname)).'</label><br />';
 				if (isset($this->args['hover'])) {
 					$hoverdata[$id] = $this->args['hover'][$radiovalue];
 					$hoverdata[$id.'-label'] = $this->args['hover'][$radiovalue];
@@ -156,7 +155,7 @@ class RadioButton extends FormItem {
 				$counter++;
 			}
 		}
-		$str .= '</ul>
+		$str .= '</div>
 		';
 		if (isset($this->args['hover']))
 			$str .= '<script type="text/javascript">form_do_hover(' . json_encode($hoverdata) .');</script>
