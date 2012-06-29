@@ -1,5 +1,5 @@
 							<div class="add-recipients">
-								<input type="hidden" id="msgsndr_lists" name="lists" />
+								<input type="hidden" id="msgsndr_listids" name="msgsndr_listids" />
 								<div class="add-btns cf"> 
 									<a href="#add-recipients-existing_lists" class="btn disabled" data-toggle="modal">Pick from Existing Lists</a> 
 									<span>or</span>
@@ -35,14 +35,14 @@
 										<h3>Save List for Reuse</h3>
 									</div>
 									<div class="modal-body">
-										<form action="" class="form-horizontal">
+										<!-- <form action="" class="form-horizontal"> -->
 											<div class="control-group">
 												<label class="control-label" for="">List Name</label>
 												<div class="controls">
 													<input class="input" type="text" value="Grade is 4; Gender is Male" />
 												</div>
 											</div>
-										</form>
+										<!-- </form> -->
 									</div>
 									<div class="modal-footer">
 										<a href="#" class="btn btn-primary">Save List</a>
@@ -113,32 +113,32 @@
 
 <!-- from section_one -->
 				<fieldset>
-					<input class="addme" type="checkbox" id="msgsndr_form_myself" name="addme_check"/>
-					<label class="addme" for="msgsndr_form_myself">Add Myself</label>
+					<input class="addme" type="checkbox" id="msgsndr_addme" name="msgsndr_addme"/>
+					<label class="addme" for="msgsndr_addme">Add Myself</label>
 				</fieldset>
 
 				<div id="addme" class="hide">
 
 					<fieldset>
-						<label for="msgsndr_form_mephone">Phone</label>
+						<label for="msgsndr_addmephone">Phone</label>
 						<div class="controls">
-							<input type="text" id="msgsndr_form_mephone" name="addme_phone" />
+							<input type="text" id="msgsndr_addmephone" name="msgsndr_addmephone" />
 							<span class="error"></span>
 						</div>
 					</fieldset>
 
 					<fieldset>
-						<label for="msgsndr_form_meemail">Email</label>
+						<label for="msgsndr_addmeemail">Email</label>
 						<div class="controls">
-							<input type="text" id="msgsndr_form_meemail" name="addme_email" />
+							<input type="text" id="msgsndr_addmeemail" name="msgsndr_addmeemail" />
 							<span class="error"></span>
 						</div>
 					</fieldset>
 
 					<fieldset>
-						<label for="msgsndr_form_mesms">SMS</label>
+						<label for="msgsndr_addmesms">SMS</label>
 						<div class="controls">
-							<input type="text" id="msgsndr_form_mesms" name="addme_sms" />
+							<input type="text" id="msgsndr_addmesms" name="msgsndr_addmesms" />
 							<span class="error"></span>
 						</div>
 					</fieldset>

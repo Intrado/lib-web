@@ -14,7 +14,7 @@ $.loadMessage = function loadMessage() {
 		"phoneButtonText": $('button.audioright'),
 		"phoneCallMeSection": $('#callme'),
 		"phoneTextSection": $('#text'),
-		"phoneRecording": $("#msgsndr_form_number"),
+		"phoneRecording": $("#msgsndr_phonemessagecallme"),
 		"phoneText": $('#msgsndr_tts_message'),
 		"phoneTranslatePrefix": "#tts_translated_",
 		"phoneOverridePrefix": "#tts_override_",

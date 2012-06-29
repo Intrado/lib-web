@@ -51,39 +51,18 @@ jQuery.noConflict();
 		loadMsg.init();
 		recipientTrack = 0;
 		
-		document.formvars = {
-			broadcast : {
-				subject : {}
-			},
-			phone : {},
-			email : {},
-			sms : {},
-			social : {},
-			addme : {}
-		};
-		
 		
 		//start up permission manager
 		obj_permissionManager = new PermissionManager();
 		
 		obj_permissionManager.onPermissionsLoaded(function() {
-			// retreive a new serialnumber for the postdata form
-			$.ajax({
-				 url :'_messagesender.php?snum', 
-				 cache :false, 
-				 contentType : "json",
-				 success : function (data) {
-					 $('[name|=broadcast_formsnum]').val(data.snum);
-				 }
-			});
-			
 			// ckeditor
 			applyCkEditor('msgsndr_form_body');
 			
 			$(document).ready(function() {
 				// subject
 				if (subject)
-					$('#msgsndr_form_subject').val(subject).addClass("ok");
+					$('#msgsndr_name').val(subject).addClass("ok");
 				
 				// List Picker
 				$('.add-recipients').listPicker({
@@ -91,7 +70,7 @@ jQuery.noConflict();
 				}).on("updated", function(listData) {
 					recipientTrack = listData.numRecipients;
 					
-					if($("#msgsndr_form_myself").is(":checked")) {
+					if($("#msgsndr_addme").is(":checked")) {
 						recipientTrack++;
 					}
 					
@@ -99,7 +78,7 @@ jQuery.noConflict();
 				});
 				
 				// jobtype
-				$("#msgsndr_form_type").loadJobTypes(jtid);
+				$("#msgsndr_jobtype").loadJobTypes(jtid);
 				
 				// message group
 				if (mgid != 0)
@@ -149,7 +128,7 @@ jQuery.noConflict();
 				});*/
 			} else if(contentMode == "email") {
 				var emailSubject = $('#msgsndr_form_mailsubject');
-				var bSubject = $('#msgsndr_form_subject').val();
+				var bSubject = $('#msgsndr_name').val();
 				
 				if (emailSubject.val().length == 0 && bSubject.length != 0) {
 					emailSubject.val(bSubject).addClass('ok');
@@ -200,7 +179,7 @@ jQuery.noConflict();
 		});
 		
 		// Add myself toggle
-		$('#msgsndr_form_myself').on('click', function() {
+		$('#msgsndr_addme').on('click', function() {
 			//$('#list_ids').val('[addme]');//.addClass('ok');
 			if($(this).is(":checked")) {
 				recipientTrack++;
@@ -209,20 +188,20 @@ jQuery.noConflict();
 			}
 			
 			$('#addme').slideToggle('slow', function() {
-				if($('#msgsndr_form_myself').is(':checked')){
+				if($('#msgsndr_addme').is(':checked')){
 					if(userInfo.phone != '' && userInfo.email != '') {
-			        	$('#msgsndr_form_mephone').attr('value', userInfo.phoneFormatted);
-			        	$('#msgsndr_form_meemail').attr('value', userInfo.email);
+			        	$('#msgsndr_addmephone').attr('value', userInfo.phoneFormatted);
+			        	$('#msgsndr_addmeemail').attr('value', userInfo.email);
 			        } else if(userInfo.phone != '' && userInfo.email == ''){
-				        $('#msgsndr_form_mephone').attr('value', userInfo.phoneFormatted);
-				        $('#msgsndr_form_meemail').focus();
+				        $('#msgsndr_addmephone').attr('value', userInfo.phoneFormatted);
+				        $('#msgsndr_addmeemail').focus();
 			        } else if(userInfo.phone == '' && userInfo.email != '') {
-			        	$('#msgsndr_form_meemail').attr('value', userInfo.email);
-				        $('#msgsndr_form_mephone').focus();
+			        	$('#msgsndr_addmeemail').attr('value', userInfo.email);
+				        $('#msgsndr_addmephone').focus();
 			        }
 				} else {
-					$('#msgsndr_form_mephone').attr('value', '');
-					$('#msgsndr_form_meemail').attr('value', '');
+					$('#msgsndr_addmephone').attr('value', '');
+					$('#msgsndr_addmeemail').attr('value', '');
 				}
 				
 				obj_stepManager.updateStepStatus();

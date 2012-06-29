@@ -879,7 +879,7 @@
         };
         
         base.updateParentElement = function() {
-        	$("#msgsndr_lists").val($.toJSON(base.pickedListIds));
+        	$("#msgsndr_listids").val($.toJSON(base.pickedListIds));
         };
 
         // Run initializer

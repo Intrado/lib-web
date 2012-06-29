@@ -30,7 +30,7 @@
 				<input type="checkbox" class="hidden" name="has_phone" />
 
 				<fieldset class="check">
-					<label for="msgsndr_form_type">Voice Type</label>
+					<label for="msgsndr_phonetype">Voice Type</label>
 					<input type="hidden" id="msgsndr_phonetype" name="phone_type" value="callme" />
 					<div id="switchaudio" class="controls">
 						<button class="audioleft active" data-type="callme">Call Me to Record</button><button class="audioright" data-type="text">Text-to-Speech</button>
@@ -41,9 +41,9 @@
 
 				<div id="callme" class="audio">
 				<fieldset>
-					<label for="msgsndr_form_number">Recording</label>
+					<label for="msgsndr_phonemessagecallme">Recording</label>
 					<div class="controls">
-						<input class="small required ok msgdata" type="hidden" id="msgsndr_form_number" name="phone_number" /> <span class="error"></span>
+						<input class="small required ok msgdata" type="hidden" id="msgsndr_phonemessagecallme" name="msgsndr_phonemessagecallme" /> <span class="error"></span>
 						<!-- <button class="record" id="ctrecord"><span class="icon"></span> Call Now to Record</button> -->
 					</div>
 				</fieldset>

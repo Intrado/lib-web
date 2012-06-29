@@ -4,49 +4,50 @@ function ValidationManager() {
 	var valTimers = {};
 	
 	var validationMap = {
-		"1" : {
-			"broadcast|subject" : [new document.validators["ValRequired"]("broadcast_subject","Subject",{}), new document.validators["ValLength"]("broadcast_subject","Subject",{min:7,max:30})],
-			"addme|phone" : [new document.validators["ValPhone"]("addme_phone","My phone",{})],
-			"addme|email" : [new document.validators["ValEmail"]("addme_email","My email",{})],
-			"addme|sms" : [new document.validators["ValPhone"]("addme_sms","My SMS",{})]
-		},
-		"2" : {
-			"phone|number" : [new document.validators["ValRequired"]("phone_number","Call Recording Error",{}), new document.validators["ValLength"]("phone_number","Call Recording Error",{min: 1})],
-			"phone|tts" : [new document.validators["ValRequired"]("phone_tts","Phone Message",{}), new document.validators["ValLength"]("phone_tts","Phone Message",{min:1, max:10000}), new document.validators["ValTtsText"]("phone_tts","Phone Message")],
-			"phone|callerid" : [new document.validators["ValPhone"]("phone_callerid", "Caller ID", {})],
-			"email|name" : [new document.validators["ValRequired"]("email_name","Name",{}), new document.validators["ValLength"]("email_name","Name",{min: 1,max:30})],
-			"email|address" : [new document.validators["ValRequired"]("email_address","Email Address",{}), new document.validators["ValLength"]("email_address", "Email Address", {max:255}), new document.validators["ValEmail"]("email_address","Email Address",{domain:orgOptions.emaildomain})],
-			"email|subject" : [new document.validators["ValRequired"]("email_subject","Subject",{}), new document.validators["ValLength"]("email_subject","Subject",{min:3, max: 30})],
-			"email|attachment" : [new document.validators["ValEmailAttach"]("email_attachment","Attachment",{})],
-			"broadcast|emailbody" : [new document.validators["ValRequired"]("broadcast_emailbody","Body",{}), new document.validators["ValLength"]("broadcast_emailbody","Body",{min:4})],
-			"sms|text" : [new document.validators["ValRequired"]("sms_text","SMS",{}), new document.validators["ValLength"]("sms_text","SMS",{min:1, max:160}), new document.validators["ValSmsText"]("sms_text","SMS Text")],
-			"facebook|message" : [new document.validators["ValRequired"]("facebook_message","Facebook Message",{}), new document.validators["ValLength"]("facebook_message","Facebook Message",{min:4, max: 420})],
-			"twitter|message" : [new document.validators["ValRequired"]("twitter_message","Twitter Message",{}), new document.validators["ValLength"]("twitter_message","Twitter Message",{min:4, max: 140})],
-			"rss|title" : [new document.validators["ValRequired"]("rss_title","Post Title",{}), new document.validators["ValLength"]("rss_title","Post Title",{min:3, max: 30})],
-			"feed|message" : [new document.validators["ValRequired"]("feed_message","Feed Message",{}), new document.validators["ValLength"]("feed_message","Feed Message",{min:4})]
-		},
-		"3" : {
-			"broadcast|schedulecallearly" : [new document.validators["ValTimeCheck"]("schedulecallearly","Early",{min:userPrefs.callearly,max:userPrefs.calllate}), new document.validators["ValTimeWindowCallEarly"]("schedulecallearly")],
-			"broadcast|schedulecalllate" : [new document.validators["ValTimeCheck"]("schedulecalllate","Late",{min:userPrefs.callearly,max:userPrefs.calllate}), new document.validators["ValTimeWindowCallEarly"]("schedulecalllate"), new document.validators["ValTimePassed"]("scheduledate")],
-			"broadcast|requires|schedulecallearly" : ["schedulecalllate", "scheduledate"],
-			"broadcast|requires|schedulecalllate" : ["schedulecallearly", "scheduledate"]
-		}
+		"1": [
+			"msgsndr_name",
+			"msgsndr_jobtype",
+			"msgsndr_addmephone",
+			"msgsndr_addmeemail",
+			"msgsndr_addmesms",
+			"msgsndr_listids"
+		],
+		"2": [
+			"msgsndr_phonemessagecallme",
+			"msgsndr_phonemessagetext",
+			// TODO: phone message translations
+			"msgsndr_emailmessagefromname",
+			"msgsndr_emailmessagefromemail",
+			"msgsndr_emailmessagesubject",
+			"msgsndr_emailmessageattachment",
+			"msgsndr_emailmessagetext",
+			// email translations arn't editable...
+			"msgsndr_smsmessagetext",
+			"msgsndr_socialmediafacebookmessage",
+			"msgsndr_socialmediatwittermessage",
+			"msgsndr_socialmediafeedmessage",
+			"msgsndr_socialmediafeedcategory",
+			"msgsndr_optioncallerid"
+		],
+		"3": [
+			
+		]
 	};
 	
 	this.forceRunValidate = function(step) {
 		var stepArea = stepMap[step];
 		if(typeof(stepArea) == "undefined") {
-			return false;
+			//return false;
+			return;
 		}
 		stepArea = $(stepArea);
 		
 		$.each(validationMap[step], function(vIndex, vItem) {
-			var elementLookup = vIndex.split("|");
-			var $element = $("[name=" + elementLookup[0] + "_" + elementLookup[1] + "]", stepArea);
+			var $element = $("[name=" + vItem + "]", stepArea);
 			
 			if($element) {
 				var eventtype = "blur.valsys";
-				if ($element.is(':checkbox, select, #msgsndr_form_number')) {
+				if ($element.is(':checkbox, select, #msgsndr_phonemessagecallme')) {
 					eventtype = 'change.valsys';
 				} else if ($element.is(':radio')) {
 					eventtype = 'click.valsys';
@@ -68,35 +69,10 @@ function ValidationManager() {
 		stepArea = $(stepArea);
 		
 		$.each(validationMap[step], function(vIndex, vItem) {
-			var elementLookup = vIndex.split("|");
-			var $element = $("[name=" + elementLookup[0] + "_" + elementLookup[1] + "]", stepArea);
-			
-			var keyTracker = "";
-			
-			$.each(elementLookup, function(sIndex, sItem) {
-				var getCheck = null;
-				
-				if(sIndex == 0) {
-					getCheck = document.formvars;
-				} else {
-					var setString = "return document.formvars." + keyTracker + ";";
-					getCheck = new Function(setString)();
-				}
-				
-				if(sIndex == elementLookup.length - 1) {
-					getCheck[sItem] = vItem;
-				} else if(typeof(getCheck[sItem]) == "undefined") {
-					getCheck[sItem] = {};
-				}
-				
-				if(keyTracker.length != 0) {
-					keyTracker += ".";
-				}
-				keyTracker += sItem;
-			});
+			var $element = $("[name=" + vItem + "]", stepArea);
 			
 			var eventtype = "blur.valsys";
-			if ($element.is(':checkbox, select, #msgsndr_form_number')) {
+			if ($element.is(':checkbox, select, #msgsndr_phonemessagecallme')) {
 				eventtype = 'change.valsys';
 			} else if ($element.is(':radio')) {
 				eventtype = 'click.valsys';
@@ -128,8 +104,7 @@ function ValidationManager() {
 		stepArea = $(stepArea);
 		
 		$.each(validationMap[step], function(vIndex, vItem) {
-			var elementLookup = vIndex.split("|");
-			var $element = $("[name=" + elementLookup[0] + "_" + elementLookup[1] + "]", stepArea);
+			var $element = $("[name=" + vItem + "]", stepArea);
 			
 			$element.off(".valsys");
 		});
@@ -217,11 +192,10 @@ function ValidationManager() {
 		var field = name.split("_")[1];
 		
 		var value = $element.val();
-		var ajax = $element.attr('data-ajax');
-		var validators = document.formvars[form][field];
-
+		var validators = document.formvars[form]["validators"][name];
+		
 		if(typeof document.formvars[form]['requires'] != "undefined") {
-			var requiredFields = document.formvars[form]['requires'][field];
+			var requiredFields = document.formvars[form]["formdata"][field]["requires"];
 		} else {
 			requiredFields = false;
 		}
@@ -234,8 +208,7 @@ function ValidationManager() {
 			}
 		}
 		
-		
-		if (ajax == 'true') {
+		if (validators == "ajax") {
 			if (value == "") {
 				self.emptyValidate($element);
 			} else {
@@ -244,8 +217,8 @@ function ValidationManager() {
 					requiredvalues : requiredValues
 				};
 
-				var ajaxurl = "message_sender.php?form=broadcast&ajaxvalidator=true&formitem=" + name;
-				//var ajaxurl = "_messagesender.php?form=msgsndr&ajaxvalidator=true&formitem=" + name;
+			var ajaxurl = "message_sender.php?form=msgsndr&ajaxvalidator=true&formitem=" + name;
+			//var ajaxurl = "_messagesender.php?form=msgsndr&ajaxvalidator=true&formitem=" + name;
 
 				$.ajax({
 					type : 'POST',

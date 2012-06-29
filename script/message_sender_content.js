@@ -250,7 +250,7 @@ var allowControl = {
 		}
 		var mindigits = (orgOptions.easycallmin?orgOptions.easycallmin:10);
 		var maxdigits = (orgOptions.easycallmax?orgOptions.easycallmax:10);
-		$("#msgsndr_form_number").attachEasyCall({
+		$("#msgsndr_phonemessagecallme").attachEasyCall({
 			"languages" : easycallLangs,
 			"phonemindigits": mindigits,
 			"phonemaxdigits": maxdigits,
@@ -605,12 +605,14 @@ function ContentManager() {
 	});
 	
 	//BIND CONTENT CANCEL
-	$(".btn_cancel", "[id^=msgsndr_tab_]").on("click", function() {
+	$(".btn_cancel", "[id^=msgsndr_tab_]").on("click", function(event) {
+		event.preventDefault();
 		self.cancelContent();
 	});
 	
 	//BIND CONTENT CANCEL
-	$(".btn_save", "[id^=msgsndr_tab_]").on("click", function() {
+	$(".btn_save", "[id^=msgsndr_tab_]").on("click", function(event) {
+		event.preventDefault();
 		self.saveContent($(this));
 	});
 	

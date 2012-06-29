@@ -6,18 +6,18 @@
 			<h3 class="flag">Broadcast Info</h3>
 			<div class="field_wrapper">
 				<fieldset>
-				<label for="msgsndr_form_subject">Subject</label>
+				<label for="msgsndr_name">Subject</label>
 					<div class="controls">
-						<input type="text" id="msgsndr_form_subject" name="broadcast_subject" data-ajax="true" class="required" autocomplete="off" maxlength="30"/> 
+						<input type="text" id="msgsndr_name" name="msgsndr_name" data-ajax="true" class="required" autocomplete="off" maxlength="30"/> 
 						<span class="error"></span>
 						<p>e.g. "PTA Meeting Reminder"</p>
 					</div>
 				</fieldset>
 				
 				<fieldset class="cf">
-					<label for="msgsndr_form_type">Type</label>
+					<label for="msgsndr_jobtype">Type</label>
 					<div class="controls">
-						<select id="msgsndr_form_type" name="broadcast_type"></select>
+						<select id="msgsndr_jobtype" name="msgsndr_jobtype"></select>
 					</div>
 				</fieldset>
 			</div>

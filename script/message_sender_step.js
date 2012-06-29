@@ -127,8 +127,8 @@ function StepManager(_valManager) {
 	};
 	
 	this.preSubmitConfig = function() {
-		$('.review_subject p').text($('#msgsndr_form_subject').val());
-		$('.review_type p').text($('#msgsndr_form_type option:selected').text());
+		$('.review_subject p').text($('#msgsndr_name').val());
+		$('.review_type p').text($('#msgsndr_jobtype option:selected').text());
 		
 		$("#schedule_broadcast").text("Send to " + recipientTrack + " Recipients");
 		$("#send_now_broadcast").text("Send Now to " + recipientTrack + " Recipients");
@@ -272,7 +272,7 @@ function StepManager(_valManager) {
 		var saveMsgName = $('input[name=options_savemessagename]');
 		if ($(this).attr('checked') == 'checked') {
 			saveMsgName.removeAttr('disabled');
-			var bSubject = $('#msgsndr_form_subject').val();
+			var bSubject = $('#msgsndr_name').val();
 			$('input[name=options_savemessagename]').val(bSubject).focus();
 			
 		} else {
