@@ -632,7 +632,7 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
 	display: table;
 }
 .add-recipients .btn { float: left; display: inline; vertical-align: middle; }
-.add-recipients span { float: left; display: inline; padding: 5px 8px; line-height: 19px; }
+.add-recipients span { display: inline; padding: 5px 8px; line-height: 19px; }
 .add-recipients .add-btns .btn-group { float: left; display: inline; }
 .btn-group {
 	position: relative;
