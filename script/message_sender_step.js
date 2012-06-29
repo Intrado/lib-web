@@ -231,6 +231,7 @@ function StepManager(_valManager) {
 				var addOneDay = moment().add('days',1); 
 				var futureDay = addOneDay.format('MM/DD/YYYY');
 				$('#schedule_datepicker').val(futureDay);
+				$('#schedule_options .warning').remove();
 				$('#schedule_datepicker').parent().parent().prepend('<p class="warning">Note: Start Date has been adjusted for tomorrow due to the limitations of your account</p>');
 			}
 		}
