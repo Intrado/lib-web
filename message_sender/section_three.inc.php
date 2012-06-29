@@ -707,7 +707,7 @@
 			
 			<div class="msg_confirm">
 				<a href="#schedule_options" data-toggle="modal">Schedule</a> or 
-				<button class="submit_broadcast btn_confirm" id="send_now_broadcast">Send Now to 2,134 Recipients</button>
+				<button class="submit_broadcast" id="send_now_broadcast">Send Now to 2,134 Recipients</button>
 			</div>
 			
 			<!--  hidden submit for postdata -->

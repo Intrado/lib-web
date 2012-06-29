@@ -216,6 +216,25 @@ function StepManager(_valManager) {
 			}
 		}
 
+		var timenow       = moment().format('h:mm a');
+		var timecheck     = moment('1970,01,01,'+timenow).unix();
+		var callearlytime = moment('1970,01,01,'+rolecallearly).unix();
+		var calllatetime  = moment('1970,01,01,'+rolecalllate).unix();
+
+		// compare times
+		var isTooEarly    = timecheck <= callearlytime;
+		var isTooLate     = timecheck >= calllatetime;
+
+		if(isTooEarly == true || isTooLate == true){
+			$('#send_now_broadcast').attr('disabled','disabled');
+			if (isTooLate == true) {
+				var addOneDay = moment().add('days',1); 
+				var futureDay = addOneDay.format('MM/DD/YYYY');
+				$('#schedule_datepicker').val(futureDay);
+				$('#schedule_datepicker').parent().parent().prepend('<div>Note: Start Date has been adjusted for tomorrow due to the limitations of your account</div>');
+			}
+		}
+
 		// Populate the max attempts select box
 		var maxAttempts = userPrefs.callmax;
 		$('#msgsndr_form_maxattempts').empty();

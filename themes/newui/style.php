@@ -275,7 +275,7 @@ border-color: transparent transparent #2A6576 transparent; border-width: 13px; b
 .window_panel .audioleft { border-radius: 5px 0 0 5px; margin: 0; }
 .window_panel .audioright { border-radius: 0 5px 5px 0; margin-left: -1px; }
 
-.window_panel .btn_confirm { color: #fff; border: 1px solid #0039ab; 
+.window_panel .btn_confirm, #send_now_broadcast { color: #fff; border: 1px solid #0039ab; 
 	background-color: #006DCC;
 	background-image: -webkit-gradient(linear, left top, left bottom, from(#0088CC), to(#0044CC)); 
   background-image: -webkit-linear-gradient(top, #0088CC, #0044CC); 
@@ -283,8 +283,8 @@ border-color: transparent transparent #2A6576 transparent; border-width: 13px; b
   background-image:     -ms-linear-gradient(top, #0088CC, #0044CC); 
   background-image:      -o-linear-gradient(top, #0088CC, #0044CC); 
   background-image:         linear-gradient(top, #0088CC, #0044CC);}
-.window_panel .btn_confirm:hover { background: #0044cc; color: #fff; }
-.window_panel .btn_confirm:active { background: #0037a4; color: #f4f4f4; }
+.window_panel .btn_confirm:hover, #send_now_broadcast:hover { background: #0044cc; color: #fff; }
+.window_panel .btn_confirm:active, #send_now_broadcast:active { background: #0037a4; color: #f4f4f4; }
 .window_panel .btn_confirm span.icon { background: url(themes/newui/images/arrow.png) right 2px no-repeat; }
 
 .window_panel .btn_save { color: #676003; border: 1px solid #dcd13e; 
@@ -525,7 +525,7 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
 		 -moz-box-shadow: inset 0px 2px 3px 0px rgba(0,0,0,0.25); 
 	        box-shadow: inset 0px 2px 3px 0px rgba(0,0,0,0.25);  }
 
-.window_panel button[disabled], .window_panel button[disabled]:hover {
+.window_panel button[disabled], .window_panel button[disabled]:hover, #send_now_broadcast[disabled], #send_now_broadcast[disbaled]:hover {
   background-color: rgb(100,100,100);
   background-image: -webkit-gradient(linear, left top, left bottom, from(#999), to(#AAA)); 
   background-image: -webkit-linear-gradient(top, #999, #AAA); 

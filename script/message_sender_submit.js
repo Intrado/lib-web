@@ -157,7 +157,8 @@ function SubmitManager() {
 
 		// User is submitting a job within the hour window so we need to give the post data and hour gap
 		if (typeof onehour != undefined && onehour == true) { 
-			$('#schedulecalllate').append('<option value="'+moment().add('hours', 1).format('h:mm a')+'" selected="selected">'+moment().add('hours', 1).format('h:mm a')+'</option>');
+			//$('#schedulecalllate').append('<option value="'+moment().add('hours', 1).format('h:mm a')+'" selected="selected">'+moment().add('hours', 1).format('h:mm a')+'</option>');
+			$('#schedulecalllate option:last-child').attr('selected', 'selected');
 		} else {
 			$('#schedulecalllate option:last-child').attr('selected', 'selected');
 		}
@@ -193,38 +194,6 @@ function SubmitManager() {
 				$findField.addClass(getFieldClass);
 			});
 
-		// process all inputs into POST data
-		/*$("input[name], textarea[name], select[name]").each(function() {
-			var thisType = $(this).attr("type");
-			var thisKey = $(this).attr("name");
-
-			if (typeof (keyMap[thisKey]) != "undefined") {
-				thisKey = keyMap[thisKey];
-
-				// make checkboxes true or false
-				if (thisType == 'checkbox') {
-					if ($(this).attr('checked') == 'checked') {
-						if ($(this).attr('name') == 'feed_categories') {
-							console.log(thisKey);
-							$('input[name=feed_categories]:checked').each(function(findex, fitem){
-								sendData["msgsndr_socialmediafeedcategory[]"] = fitem.value;
-							});
-						} else {
-							console.log(thisKey);
-							sendData[thisKey] = 'checked';
-						}
-					}
-				} else {
-					var value = $(this).val();
-					if (value == "[]" || value == "{}")
-						value = "";
-					sendData[thisKey] = value;
-				}
-			}
-		});
-		// add in the submit ...
-		sendData['submit'] = 'submit';*/
-		//sendData = $("input[name], textarea[name], select[name]").not("[name=email_save_translation], [name=save_translation]").serialize();
 		sendData = $("." + getFieldClass).serialize();
 
 		$.each(keyMap, function(fKey, fVal) {
