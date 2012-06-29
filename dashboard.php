@@ -184,7 +184,7 @@ include("nav.inc.php");
 	<div class="wrapper">
 	
 	<div class="main_activity">
-<?if (count($useridList) > 0) {?>
+<?if (count($useridList) > 1) {?>
 		<div class="users cf">
 			<p>Show activity for
 			<select onchange="window.location='start.php?showactivity=' + this.options[selectedIndex].value + '&<?= http_build_query(array_diff_key($requestValues,array("showactivity" => ''))) ?>'">
