@@ -49,7 +49,7 @@ function StepManager(_valManager) {
 				readyForSave = false;
 			}
 		} else {
-			if($(".er:visible").size() > 0) {
+			if ($(".er:visible").size() > 0 || $(".emp:visible").size() > 0) {
 				readyForSave = false;
 			}
 		}

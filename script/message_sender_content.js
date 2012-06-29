@@ -448,11 +448,11 @@ function ContentManager() {
 
 		if(currentContent == "phone") {
 			var voiceType = $('#switchaudio button.active').attr('data-type');
-			if($(".er:visible, .required.er", '#'+voiceType).size() > 0) {
+			if($(".er:visible, .required.er, .required.emp", '#'+voiceType).size() > 0) {
 				readyForSave = false;
 			}
 		} else {
-			if($(".er:visible").size() > 0) {
+			if ($(".er:visible").size() > 0 || $(".emp", contentMap[currentContent]).size() > 0) {
 				readyForSave = false;
 			}
 		}
@@ -633,6 +633,14 @@ function ContentManager() {
 	
 	//BIND FEED CHECKBOXES FOR VALIDATING
 	$("#feed_categories").on("click change", function() {
+
+		if ( $("#feed_categories input:checked").length > 0) {
+			$('label[for=feed_categories]').removeClass('req').addClass('ok');
+		} else {
+			$('label[for=feed_categories]').removeClass('ok').addClass('req');
+		}
+
+
 		self.updateContentStatus();
 	});
 	

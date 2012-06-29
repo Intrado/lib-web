@@ -136,6 +136,8 @@ function ValidationManager() {
 	};
 	
 	this.setInvalid = function($element, msg) {		
+		var elemId = $element.attr('id');
+
 		if($element.next('.error').text() != msg) {
 			if($element.is("[name=sms_text], [name=twitter_message], [name=facebook_message]")) {
 				$('.characters', $element.next("div")).addClass('error').text(msg);
@@ -148,7 +150,8 @@ function ValidationManager() {
 				$($element.next("div")).children(".box_validatorerror").remove();
 				$($element.next("div")).append($('<div />', { "class": "box_validatorerror er", "text": msg }));
 			} else if ($element.is("#msgsndr_form_body")) {
-				$('#cke_reusableckeditor').removeClass('ok').addClass('er');
+				//$('#cke_reusableckeditor').removeClass('ok').addClass('er emp');
+				$('#msgsndr_form_body').removeClass('ok').addClass('er emp');
 			} else {
 				$element.removeClass('ok').addClass('er');
 				if(typeof(msg) != "undefined" && msg.length > 0) {
@@ -158,37 +161,56 @@ function ValidationManager() {
 				}
 			}
 		}
+
+		$('label[for='+elemId+']').removeClass('req ok').addClass('er');
 		
 		obj_stepManager.updateStepStatus();
 		obj_contentManager.updateContentStatus();
 	};
 	
 	this.setValid = function($element) {
+		var elemId = $element.attr('id');
+
 		if($element.is("[name=sms_text], [name=twitter_message], [name=facebook_message]")) {
-			$element.removeClass('er').addClass('ok');
+			$element.removeClass('er emp').addClass('ok');
 			$('.characters').removeClass('error');
 			if($element.is("[name=sms_text]")) {
 				$('.btn_save').removeAttr('disabled');
 			}
 		} else if($element.hasClass('box_validator')) {
-			$element.removeClass('er').addClass('ok');
+			$element.removeClass('er emp').addClass('ok');
 			$($element.next("div")).children(".box_validatorerror").remove();
 		} else if ($element.is("#msgsndr_form_body")) {
-			$('#cke_reusableckeditor').removeClass('er').addClass('ok');
+			// $('#cke_reusableckeditor').removeClass('er emp').addClass('ok');
+			$('#msgsndr_form_body').removeClass('er emp').addClass('ok');
 		} else {
-			$element.removeClass('er').addClass('ok').next('.error').fadeOut(300).text("");
+			$element.removeClass('er emp').addClass('ok').next('.error').fadeOut(300).text("");
 		}
+
+		$('label[for='+elemId+']').removeClass('req er').addClass('ok');
 		
 		obj_stepManager.updateStepStatus();
 		obj_contentManager.updateContentStatus();
 	};
+	
+	this.emptyValidate = function($element) {
+		var elemId = $element.attr('id');
+
+		$element.removeClass('er ok').addClass('emp').next('.error').fadeOut(300).text("");
+
+		$('label[for='+elemId+']').removeClass('ok er').addClass('req');
+
+		obj_stepManager.updateStepStatus();
+		obj_contentManager.updateContentStatus();
+
+	}
 	
 	//This is to bridge prototype and jquery implementations when force running validation
 	this.runValidateById = function(id) {
 		var element = $('#' + id);
 		this.runValidate(element);
 	};
-	
+
 	this.runValidate = function($element) {
 		var name = $element.attr('name');
 		var form = name.split("_")[0];
@@ -214,29 +236,33 @@ function ValidationManager() {
 		
 		
 		if (ajax == 'true') {
-			var postData = {
-				value : value,
-				requiredvalues : requiredValues
-			};
+			if (value == "") {
+				self.emptyValidate($element);
+			} else {
+				var postData = {
+					value : value,
+					requiredvalues : requiredValues
+				};
 
-			var ajaxurl = "message_sender.php?form=broadcast&ajaxvalidator=true&formitem=" + name;
-			//var ajaxurl = "_messagesender.php?form=msgsndr&ajaxvalidator=true&formitem=" + name;
+				var ajaxurl = "message_sender.php?form=broadcast&ajaxvalidator=true&formitem=" + name;
+				//var ajaxurl = "_messagesender.php?form=msgsndr&ajaxvalidator=true&formitem=" + name;
 
-			$.ajax({
-				type : 'POST',
-				url : ajaxurl,
-				data : {
-					json : $.toJSON(postData)
-				},
+				$.ajax({
+					type : 'POST',
+					url : ajaxurl,
+					data : {
+						json : $.toJSON(postData)
+					},
 
-				success : function(response) {
-					if(response.vres != true) {
-						self.setInvalid($element, response.vmsg);
-					} else {
-						self.setValid($element);
+					success : function(response) {
+						if(response.vres != true) {
+							self.setInvalid($element, response.vmsg);
+						} else {
+							self.setValid($element);
+						}
 					}
-				}
-			});
+				});
+			}
 
 		} else { // None AJAX validation
 			requiredvalues = [];
@@ -254,6 +280,8 @@ function ValidationManager() {
 			if(typeof(response) == "string") {
 				if($element.hasClass('required') == false && value.length == 0) {
 					self.setValid($element);
+				} else if ($element.hasClass('required') == true && value.length == 0) {
+					self.emptyValidate($element);
 				} else {
 					self.setInvalid($element, response);
 				}

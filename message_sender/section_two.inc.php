@@ -209,7 +209,7 @@
 					<!--a id="editor_basic" href="javascript:void(null);">basic</a> | <a id="editor_advanced" href="javascript:void(null);">advanced</a-->
 					<label for="msgsndr_form_body">Body</label>
 					<div class="controls">
-					<textarea id="msgsndr_form_body" name="broadcast_emailbody" class="msgdata hide" data-ajax="true"></textarea><span id="emailBodyError" class="error"></span>
+					<textarea id="msgsndr_form_body" name="broadcast_emailbody" class="required msgdata hide" data-ajax="true"></textarea><span id="emailBodyError" class="error"></span>
 					<div id="msgsndr_form_body-htmleditor"></div>
 					</div>
 				</fieldset>
@@ -386,7 +386,7 @@
 
 						<fieldset class="check">
 							<input type="hidden" id="msgsndr_feed_categories" name="feed_cat_ids" value="" />
-							<label class="control-label" for="">Post to Feeds</label>
+							<label class="control-label req" for="feed_categories">Post to Feeds</label>
 							<div class="controls" id="feed_categories">
 							</div>
 						</fieldset>

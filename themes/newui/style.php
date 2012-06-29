@@ -846,6 +846,35 @@ li.notactive { display: none; }
 .window_panel input.ok[type="text"]:focus, .window_panel textarea.ok:focus { border: 1px solid rgb(75,149,35);
 -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(75,149,35, 0.6);	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(75,149,35, 0.6); }
 
+
+/*input.ok, input.required.ok {
+  background: url(img/icons/accept.gif) 99% 44% no-repeat;
+}
+input.er, input.required.er {
+  background: url(img/icons/exclamation.gif) 99% 44% no-repeat;
+}
+input.required.emp {
+  background: url(img/icons/error.gif) 99% 44% no-repeat;
+  border:1px solid rgb(199, 162, 16);
+}*/
+  label.req {
+    background: url(img/icons/error.gif) 99% 44% no-repeat;
+    padding: 6px 20px 6px 0;
+  }
+
+  label.ok {
+    background: url(img/icons/accept.gif) 99% 44% no-repeat;
+    padding: 6px 20px 6px 0;
+  }
+
+  label.er {
+    background: url(img/icons/exclamation.gif) 99% 44% no-repeat;
+    padding: 6px 20px 6px 0;
+  }
+
+/* error.gif  = Exclamation Mark in triangle */ 
+
+
 .window_panel input.er, .window_panel textarea.er, span.er { border: 1px solid rgb(219,30,30); }
 .window_panel input.er[type="text"]:focus, .window_panel textarea.er:focus { border: 1px solid rgb(219,30,30);
 -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(219,30,30, 0.6);	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(219,30,30, 0.6); }
