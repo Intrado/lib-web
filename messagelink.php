@@ -196,7 +196,7 @@ if ($appservererror) {
 		<script language="JavaScript" type="text/javascript">
 	 		embedPlayer("<?= (isset($_SERVER["HTTPS"])?"https://":"http://") . $_SERVER['HTTP_HOST'] ?>/m/messagelinkaudio.mp3.php?code=<?=escapehtml($code)?>","player",<?= $messageinfo->nummessageparts ?>);
 		</script>
-		<br /><a href="messagelinkaudio.mp3.php?code=<?=escapehtml($code)?>">Click here to download</a>
+		<br /><a href="messagelinkaudio.mp3.php?download&code=<?=escapehtml($code)?>">Click here to download</a>
 	</div>
 <?
 }
