@@ -260,10 +260,10 @@ var RuleWidget = Class.create({
 		// ValueTD
 		var value = this.format_readable_value(data);
 		var widthCSS = (addHiddenFieldnum) ? '  ' : ' width:80px; ';
-		var heightCSS = (value.length > 400) ? ' height: 200px; ' : '';
+		var heightCSS = (value.length > 400) ? ' height: auto; ' : '';
 		if (addHiddenFieldnum)
-			heightCSS += ' overflow: auto; ';
-		var valueDiv = new Element('div', {'style': 'overflow:hidden; white-space:normal; ' + widthCSS + heightCSS}).update(value);
+			// heightCSS += ' overflow: auto; ';
+		var valueDiv = new Element('div', {'style': ' white-space:normal; ' + widthCSS + heightCSS}).update(value);
 		var valueTD = new Element('td', {'class':'list',  'style':'overflow:hidden; white-space:normal; font-size:90%','valign':'top'}).update(valueDiv);
 		tr.insert(fieldmapTD).insert(criteriaTD).insert(valueTD);
 
