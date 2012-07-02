@@ -242,7 +242,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 	  </style>
 	<![endif]-->
 </head>
-<body <?=setBodyClass();?><?php if ($MESSAGESENDER == true) { ?> id="ms" <?php }; ?>>
+<body <?=setBodyClass();?> <?= isset($MESSAGESENDER) && $MESSAGESENDER == true?' id="ms"':''?> >
 	<script>
 		var _brandtheme = "<?=getBrandTheme();?>";
 	</script>
