@@ -83,9 +83,8 @@ class ListForm extends Form {
 		
 		if (getSystemSetting('_hasenrollment')) {
 			$str .= "
-				<table style='border-collapse:collapse;width:100%;' id='chooseSectionsWindow'>
-					<tbody></tbody>
-				</table>
+				<div id='chooseSectionsWindow'>
+				</div>
 			";
 		}
 		
@@ -110,9 +109,8 @@ class ListForm extends Form {
 					</table>
 				</div>
 
-				<table style='border-collapse:collapse' id='addMeWindow'>
-					<tbody></tbody>
-				</table>
+				<div id='addMeWindow'>
+				</div>
 			</div>
 
 			<!-- FORM -->
@@ -200,18 +198,6 @@ class ListForm extends Form {
 					listform_load('{$this->name}', " . json_encode($this->formdata) . ", {$posturlJSON});
 		";
 		
-		if (getSystemSetting('_hasenrollment')) {
-			$str .= "
-					// Move SectionWidget things into chooseSectionsWindow.
-					(function() {
-						var tbody = $('chooseSectionsWindow').down('tbody');
-						if (tbody) {
-							tbody.insert({'top': $('listChoose_sectionwidget_fieldarea')});
-						}
-					})();
-			";
-		}
-		
 		$str .= "
 					// Move AddMe things into addMeWindow.
 					var addme = $('listChoose_addme');
@@ -224,15 +210,15 @@ class ListForm extends Form {
 					var addmeEmailUp = $('listChoose_addmeEmail_fieldarea');
 					var addmeSmsUp = $('listChoose_addmeSms_fieldarea');
 					
-					var tbody = $('addMeWindow').down('tbody');
+					var addMeWindow = $('addMeWindow');
 					if (addme)
-						tbody.insert(addmeUp.remove());
+						addMeWindow.insert(addmeUp.remove());
 					if (addmePhone)
-						tbody.insert(addmePhoneUp.remove());
+						addMeWindow.insert(addmePhoneUp.remove());
 					if (addmeEmail)
-						tbody.insert(addmeEmailUp.remove());
+						addMeWindow.insert(addmeEmailUp.remove());
 					if (addmeSms)
-						tbody.insert(addmeSmsUp.remove());
+						addMeWindow.insert(addmeSmsUp.remove());
 					// Show/Hide 'AddMe' textboxes, and register observers.
 					listform_refresh_addme();
 					$('{$this->name}_addme').observe('click', listform_refresh_addme);

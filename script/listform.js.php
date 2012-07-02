@@ -66,9 +66,10 @@ function listform_load(listformID, formData, postURL) {
 	if (sectionsWindow) {
 		accordion.add_section('choosesections');
 		
+		sectionsWindow.insert($('listChoose_sectionwidget_fieldarea'));
 		var button = icon_button('Create This List','accept');
 		
-		sectionsWindow.down("tbody").insert(Element("tr").insert(new Element("td").insert(button)));
+		sectionsWindow.insert(button);
 		
 		button.observe('click', function() {
 			var selectedcheckboxes = $('listChoose_sectionwidget_fieldarea').select('input:checked');

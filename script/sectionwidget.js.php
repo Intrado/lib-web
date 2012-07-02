@@ -45,7 +45,7 @@ var SectionWidget = Class.create({
 		
 		cachedAjaxGet('ajax.php?type=getsections&organizationid=' + organizationid, function(transport) {
 			var sections = transport.responseJSON,
-				radiobox = new Element('ul', {'id':this.formitemname, 'class':'radiobox' }),
+				radiobox = new Element('div', {'id':this.formitemname, 'class':'radiobox', 'style':'width: -moz-available; white-space: nowrap; overflow:auto'}),
 				checkboxname = this.formitemname + '[]',
 				count = 0,
 				i = 0;
@@ -53,9 +53,6 @@ var SectionWidget = Class.create({
 			if (sections) {
 				for (var id in sections) {
 					var skey = sections[id];
-					
-					// Create surrounding li tag
-					var checkbox_li = new Element('li');
 					
 					// Create a checkbox and label for each section.
 					var checkbox = new Element('input', {
@@ -73,8 +70,7 @@ var SectionWidget = Class.create({
 						checkbox.defaultChecked = true;
 					}
 					
-					checkbox_li.insert(checkbox).insert(label);
-					radiobox.insert(checkbox_li);
+					radiobox.insert(checkbox).insert(label).insert('<br/>');
 					
 					// Keep track of the count, since sections is an object literal.
 					count++;
@@ -84,7 +80,7 @@ var SectionWidget = Class.create({
 				radiobox.observe('change', form_event_handler);
 				
 				if (count > 10) {
-					radiobox.setStyle({height: '100px', overflow: 'auto'});
+					radiobox.setStyle({height: '100px'});
 				} else {
 					radiobox.setStyle({height: 'auto'});
 				}
