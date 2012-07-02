@@ -28,28 +28,28 @@ function fmt_job_content($obj, $name) {
 	$theme = $_SESSION['colorscheme']['_brandtheme'];
 	$str = "";
 	if ($obj->hasPhone()){
-		$str .= " <img src=\"themes/$theme/images/phone-grey.png\" title=\"" . _L("Phone") . "\" />";
+		$str .= " <img src=\"themes/$theme/phone-grey.png\" title=\"" . _L("Phone") . "\" />";
 	} else {
-		$str .= " <img src=\"themes/$theme/images/blank-content.png\" />";
+		$str .= " <img src=\"themes/$theme/blank-content.png\" />";
 	}
 	
 	if ($obj->hasEmail()){
-		$str .= " <img src=\"themes/$theme/images/email-grey.png\" title=\"" . _L("Email") . "\" />";
+		$str .= " <img src=\"themes/$theme/email-grey.png\" title=\"" . _L("Email") . "\" />";
 	} else {
-		$str .= " <img src=\"themes/$theme/images/blank-content.png\" />";
+		$str .= " <img src=\"themes/$theme/blank-content.png\" />";
 	}
 	
 	if ($obj->hasSMS()){
-		$str .= " <img src=\"themes/$theme/images/sms-grey.png\" title=\"" . _L("SMS") . "\" />";
+		$str .= " <img src=\"themes/$theme/sms-grey.png\" title=\"" . _L("SMS") . "\" />";
 	}
 	else {
-		$str .= " <img src=\"themes/$theme/images/blank-content.png\" />";
+		$str .= " <img src=\"themes/$theme/blank-content.png\" />";
 	}
 	
 	if ($obj->hasPost()){
-		$str .= " <img src=\"themes/$theme/images/social-grey.png\" title=\"" . _L("Social") . "\" />";
+		$str .= " <img src=\"themes/$theme/social-grey.png\" title=\"" . _L("Social") . "\" />";
 	} else {
-		$str .= " <img src=\"themes/$theme/images/blank-content.png\" />";
+		$str .= " <img src=\"themes/$theme/blank-content.png\" />";
 	}
 	
 	return $str;
@@ -101,7 +101,7 @@ function fmt_job_default_action ($obj) {
 
 function frm_job_tools($obj, $name) {
 	$actions = fmt_jobs_actions($obj,$name);
-	return "<img id=\"actionlink_{$obj->id}\" class=\"jobtools\" src=\"themes/{$_SESSION['colorscheme']['_brandtheme']}/images/tools.png\" /><div class=\"hidden\">{$actions}</div>";
+	return "<img id=\"actionlink_{$obj->id}\" class=\"jobtools\" src=\"themes/{$_SESSION['colorscheme']['_brandtheme']}/tools.png\" /><div class=\"hidden\">{$actions}</div>";
 }
 
 // All actions require a valid messagegroupid; the user must own the messagegroup.

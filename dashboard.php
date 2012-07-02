@@ -267,10 +267,10 @@ include("nav.inc.php");
 				<img class="dashboard_graph" src="graph_dashboard.png.php?<?= http_build_query($graphtypes)?>" />
 				<ul>
 				<?
-				echo $hasPhone?"<li><img src=\"themes/{$_SESSION['colorscheme']['_brandtheme']}/images/phone-blue.png\"/>&nbsp;" . (round($stats["percentage_slice"] * $stats["total_phones"])) . "%</li>":"";
-				echo $hasEmail?"<li><img src=\"themes/{$_SESSION['colorscheme']['_brandtheme']}/images/email-red.png\"/>&nbsp;" . (round($stats["percentage_slice"] * $stats["total_emails"])) . "%</li>":"";
-				echo $hasSms?"<li><img src=\"themes/{$_SESSION['colorscheme']['_brandtheme']}/images/sms-orange.png\"/>&nbsp;" . (round($stats["percentage_slice"] * $stats["total_sms"])) . "%</li>":"";
-				echo $hasPost?"<li><img src=\"themes/{$_SESSION['colorscheme']['_brandtheme']}/images/social-green.png\"/>&nbsp;" . (round($stats["percentage_slice"] * $stats["total_posts"])) . "%</li>":"";
+				echo $hasPhone?"<li><img src=\"themes/{$_SESSION['colorscheme']['_brandtheme']}/phone-blue.png\"/>&nbsp;" . (round($stats["percentage_slice"] * $stats["total_phones"])) . "%</li>":"";
+				echo $hasEmail?"<li><img src=\"themes/{$_SESSION['colorscheme']['_brandtheme']}/email-red.png\"/>&nbsp;" . (round($stats["percentage_slice"] * $stats["total_emails"])) . "%</li>":"";
+				echo $hasSms?"<li><img src=\"themes/{$_SESSION['colorscheme']['_brandtheme']}/sms-orange.png\"/>&nbsp;" . (round($stats["percentage_slice"] * $stats["total_sms"])) . "%</li>":"";
+				echo $hasPost?"<li><img src=\"themes/{$_SESSION['colorscheme']['_brandtheme']}/social-green.png\"/>&nbsp;" . (round($stats["percentage_slice"] * $stats["total_posts"])) . "%</li>":"";
 				?>
 				</ul>
 				
@@ -385,7 +385,7 @@ include("nav.inc.php");
 			}
 			?>
 			</ul>
-			<a class="newtemplate" href="jobtemplate.php?id=new"><img src="themes/<?= $_SESSION['colorscheme']['_brandtheme'] ?>/images/add.png">&nbsp;<?= _L("New Template") ?></a>
+			<a class="newtemplate" href="jobtemplate.php?id=new"><img src="themes/<?= $_SESSION['colorscheme']['_brandtheme'] ?>/add.png">&nbsp;<?= _L("New Template") ?></a>
 		</div>
 <?
 		}
