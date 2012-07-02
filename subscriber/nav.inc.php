@@ -33,7 +33,7 @@ $NAVTREE = array (
 
 function navMainTab ($display, $hint, $accesskey, $link, $isselected) {
 	$theme = getBrandTheme();
-	return '<li '. ($isselected ? 'class="navtab_active"' : "") .'><a accesskey="'.$accesskey.'" onfocus="blur()" href="' . $link . '" title="'.$hint.'"><img alt="" src="themes/' . $theme . '/main_nav_tab' . ($isselected ? "_active" : "") . '.gif"><span>' . $display . '</span></a></li>';
+	return '<li '. ($isselected ? 'class="navtab_active"' : "") .'><a accesskey="'.$accesskey.'" onfocus="blur()" href="' . $link . '" title="'.$hint.'"><span>' . $display . '</span></a></li>';
 }
 
 function navSubTab ($title, $link, $isselected) {
@@ -119,9 +119,15 @@ header('Content-type: text/html; charset=UTF-8') ;
 
 <!-- ********************************************************************* -->
 
-<div id="top_banner" class="banner cf">
+<div class="wrap"><!-- ends in navbottom.inc -->
 
-		<div class="banner_logo"><? doLogo() ?></div>
+<div id="top_banner" class="banner cf">
+	<div class="container cf">
+
+	<div class="banner_logo">
+		<table class="logo"><tr><td><? doLogo() ?></td></tr></table>
+		<h1><?= getBrand();?></h1>
+	</div> 
 		
 		<div class="banner_custname"><?= escapehtml($_SESSION['custname']); ?></div>
 			
@@ -133,13 +139,16 @@ header('Content-type: text/html; charset=UTF-8') ;
 				</ul>		
 		</div>
 	
-</div><!-- #top_banner .banner -->
+</div><!-- /container -->	
+</div><!--  end top_banner -->
 
 
 <div class="primary_nav cf">
+<div class="container cf">
 		<ul class="navtabs">
 			<?= $MAINTABS ?>
 		</ul>
+</div>
 </div><!-- .primary_nav -->
 
 
@@ -149,6 +158,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 
 
 <div class="content_wrap cf"><!-- starts main content section, tag is ended in navbottom.inc.php -->
+		<div class="container cf">
 
 	<div class="pagetitle"><?= (isset($TITLE) ? $TITLE : "") ?></div>
 	<div class="pagetitlesubtext"><?= (isset($DESCRIPTION) ? $DESCRIPTION : "") ?></div>
