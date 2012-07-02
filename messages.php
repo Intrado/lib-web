@@ -183,7 +183,12 @@ if($isajax === true) {
 			$types .= $item["pagemedia"] > 0?' <a href="' . $defaultlink . '&redirect=voice"><img src="img/nifty_play.png" alt="Page Media" title="Page Media"></a>':"";
 			$title = escapehtml($item["name"]);
 			$publishid = $item['publishid'];
-			$icon = 'img/largeicons/letter.jpg';
+
+			if (getBrandTheme() == 'newui') { 
+				$icon = 'img/newui/letter.png';
+			} else {
+				$icon = 'img/largeicons/letter.jpg';
+			}
 			
 			// Users with published messages or subscribed messages will get a special action item
 			$publishactionlink = "";

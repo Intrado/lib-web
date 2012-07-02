@@ -89,6 +89,16 @@ if($isajax === true) {
 	$displaystart = ($total) ? $start +1 : 0;
 
 	if(empty($postdata)) {
+
+		if (getBrandTheme() == 'newui') { 
+			$data->list[] = array(
+				"icon" => "img/newui/posts.png",
+				"title" => _L("No Posts."),
+				"details" => "",
+				"defaultlink" => "",
+				"content" => "",
+				"tools" => "");
+		} else {
 		$data->list[] = array(
 			"icon" => "img/largeicons/globe.jpg",
 			"title" => _L("No Posts."),
@@ -96,6 +106,7 @@ if($isajax === true) {
 			"defaultlink" => "",
 			"content" => "",
 			"tools" => "");
+		}
 	} else {
 		foreach ($postdata as $post) {
 			$mgid = $post["messagegroupid"];
@@ -104,7 +115,11 @@ if($isajax === true) {
 			$time = date("M j, Y g:i a",strtotime($post["date"]));
 			$title = escapehtml($post["name"]);
 			
-			$icon = 'img/largeicons/globe.jpg';
+			if (getBrandTheme() == 'newui') { 
+				$icon = 'img/newui/posts.png';
+			} else {
+				$icon = 'img/largeicons/globe.jpg';
+			}
 			
 			// if the user owns this message group, they can edit, delete
 			$actions = array();

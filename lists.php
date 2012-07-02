@@ -181,7 +181,12 @@ if (isset($_GET['ajax'])) {
 				$content .= 'This list has never been used';
 			$content .= '</a>';
 			
-			$icon = 'img/largeicons/addrbook.jpg';
+
+			if (getBrandTheme() == 'newui') { 
+				$icon = 'img/newui/lists.png';
+			} else {
+				$icon = 'img/largeicons/addrbook.jpg';
+			}
 
 			$data->list[] = array("itemid" => $itemid,
 										"defaultlink" => $defaultlink,
