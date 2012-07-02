@@ -14,7 +14,7 @@ jQuery.noConflict();
 				oldPrototypeFire(elem, event, data ? data[0] : null, !onlyHandlers);
 			}
 		}
-		oldjQueryTrigger(event, data, elem, onlyHandlers);
+		return oldjQueryTrigger(event, data, elem, onlyHandlers);
 	};
 
 	//trigger jQuery event handlers if Prototype fires a custom event
@@ -23,7 +23,7 @@ jQuery.noConflict();
 			if (eventName.indexOf(':') > 0) {
 				oldjQueryTrigger(eventName, memo ? [memo] : null, element, !bubble);
 			}
-			oldPrototypeFire(element, eventName, memo, bubble);
+			return oldPrototypeFire(element, eventName, memo, bubble);
 		}
 	});
 	
