@@ -13,7 +13,7 @@
 
 /*----- basics -----*/
 html, body { height: 100%; }
-body { background: #F5F3F0 url(themes/newui/images/bodybg.png) repeat; font-family: "Helvetica Neue",helvetica,Arial,sans-serif; }
+body { background: #F5F3F0 url(themes/newui/bodybg.png) repeat; font-family: "Helvetica Neue",helvetica,Arial,sans-serif; }
 .wrap { min-height: 100%; min-width: 980px; }
 /*.wrap { min-height: 100%; width: 100%; min-w  }*/
 p { color: #333; font-size: 14px; line-height: 22px; margin: 0 0 11px 0; }
@@ -41,7 +41,7 @@ h4 { font-size: 12px; line-height: 22px; color: #235563; text-shadow: 0 1px 0 #f
 
 /*----- Banner -----*/
 
-.banner { background: #346799 url(themes/newui/images/themebg.jpg) repeat; border-top: 4px solid #222; }
+.banner { background: #346799 url(themes/newui/themebg.jpg) repeat; border-top: 4px solid #222; }
 .banner_logo { margin: 30px 0 0; }
 .banner_logo h1 { display: block; margin: 0; font-size: 30px; color: #f5f5f5; text-shadow: 0 1px 0 #444; }
 .banner_logo .logo { display: none; }
@@ -62,7 +62,7 @@ h4 { font-size: 12px; line-height: 22px; color: #235563; text-shadow: 0 1px 0 #f
 
 /*----- Navigation -----*/
 
-.primary_nav { background: #346799 url(themes/newui/images/themebg.jpg) repeat; width: 100%; padding: 25px 0 0; border-bottom: 1px solid #2a4470; }
+.primary_nav { background: #346799 url(themes/newui/themebg.jpg) repeat; width: 100%; padding: 25px 0 0; border-bottom: 1px solid #2a4470; }
   
 .navshortcut { display: none; }
 	
@@ -100,7 +100,7 @@ h4 { font-size: 12px; line-height: 22px; color: #235563; text-shadow: 0 1px 0 #f
 .window_aside { float: left; display: inline; width: 150px; margin: 0; }
 .window_main { width: inherit; margin: 0 0 0 160px; }
 
-.users p { position: relative; background: #F5F3F0 url(themes/newui/images/bodybg.png) repeat; display: inline-block; margin: 0 0 15px 22px; padding: 0 10px; color: #7F7567; font-size: 20px; line-height: 40px; }
+.users p { position: relative; background: #F5F3F0 url(themes/newui/bodybg.png) repeat; display: inline-block; margin: 0 0 15px 22px; padding: 0 10px; color: #7F7567; font-size: 20px; line-height: 40px; }
 .users select { background: #fff; display: inline; width: 150px; margin: 0 0 0 5px; padding: 4px; font-size: 16px; border: 1px solid #ccc; -webkit-border-radius: 3px; border-radius: 3px; }
 .users:before { content: ''; position: absolute; top: 20px; left: 0; background: #bbb; height: 1px; width: 100%; }
 
@@ -159,7 +159,7 @@ border-top: 1px solid #bbb; border-right: 1px solid #bbb; border-bottom: 1px sol
 
 /*----- Big Broadcast button -----*/
 
-div.bigbtn { background: url(themes/newui/images/circle-thin-mult.png) no-repeat; padding: 10px 0; }
+div.bigbtn { background: url(themes/newui/circle-thin-mult.png) no-repeat; padding: 10px 0; }
 
 a.bigbtn { display: block; margin: 0 0 25px 0; padding: 14px 7px; color: #fff; font-size: 20px; font-weight: bold; text-align: center; border: 3px solid #AE330D;
 -webkit-border-radius: 8px; border-radius: 8px;
@@ -179,7 +179,7 @@ a.bigbtn:hover { background-color: #C63A0E; text-decoration: none;
   background-image:     -ms-linear-gradient(top, #e35326, #C63A0E); 
   background-image:      -o-linear-gradient(top, #e35326, #C63A0E); 
   background-image:         linear-gradient(top, #e35326, #C63A0E);}
-a.bigbtn span { background: url(themes/newui/images/broadcast.png) 0 center no-repeat; display: block; line-height: 30px; padding: 0 0 0 30px; }
+a.bigbtn span { background: url(themes/newui/broadcast.png) 0 center no-repeat; display: block; line-height: 30px; padding: 0 0 0 30px; }
   
   
 /*----- Broadcast templates -----*/
@@ -244,13 +244,13 @@ border-color: transparent transparent transparent #4B9523; border-width: 25px; b
 border-color: transparent transparent transparent #2C5715; border-width: 26px; border-style: solid; }
 
 .msg_steps li.complete a { background: #3A5F27; color: #C9E3BB; border-color: #111111; text-shadow: 0 1px 1px #222; }
-.msg_steps li.complete span.icon { background: #4B9523 url(themes/newui/images/tick.png) 7px 7px no-repeat; color: #4B9523; text-shadow: none; text-indent: -9999px; }
+.msg_steps li.complete span.icon { background: #4B9523 url(themes/newui/tick.png) 7px 7px no-repeat; color: #4B9523; text-shadow: none; text-indent: -9999px; }
 .msg_steps li.complete + li a:after { content: ''; position: absolute; top: 50%; left: 0; display: block; margin-top: -25px; 
 border-color: transparent transparent transparent #3A5F27; border-width: 25px; border-style: solid; }
 .msg_steps li.complete + li a:before { content: ''; position: absolute; top: 50%; left: 0; display: block; margin-top: -26px; 
 border-color: transparent transparent transparent #111111; border-width: 26px; border-style: solid; }
 .msg_steps li.complete a:hover { color: #f2f2f2; }
-.msg_steps li.complete a:hover span.icon { background: #4B9523 url(themes/newui/images/pen.png) 7px 7px no-repeat; }
+.msg_steps li.complete a:hover span.icon { background: #4B9523 url(themes/newui/pen.png) 7px 7px no-repeat; }
 
 .msg_steps li.active:after { content: ''; position: absolute; bottom: -16px; left: 50%; display: block; margin-left: -12px; 
 border-color: transparent transparent #FFFFFF transparent; border-width: 12px; border-style: solid; }
@@ -272,7 +272,7 @@ border-color: transparent transparent #2A6576 transparent; border-width: 13px; b
   background-image:      -o-linear-gradient(top, #E84F1F, #A93611); 
   background-image:         linear-gradient(top, #E84F1F, #A93611); }
 .window_panel .record:hover { background: #a93611; color: #fff; }
-.window_panel .record span.icon, .call-progress span.icon { background: url(themes/newui/images/record.png) 0 center no-repeat; margin: 2px 3px 0 0; }
+.window_panel .record span.icon, .call-progress span.icon { background: url(themes/newui/record.png) 0 center no-repeat; margin: 2px 3px 0 0; }
 .window_panel .audioleft { border-radius: 5px 0 0 5px; margin: 0; }
 .window_panel .audioright { border-radius: 0 5px 5px 0; margin-left: -1px; }
 
@@ -286,7 +286,7 @@ border-color: transparent transparent #2A6576 transparent; border-width: 13px; b
   background-image:         linear-gradient(top, #0088CC, #0044CC);}
 .window_panel .btn_confirm:hover, #send_now_broadcast:hover { background: #0044cc; color: #fff; }
 .window_panel .btn_confirm:active, #send_now_broadcast:active { background: #0037a4; color: #f4f4f4; }
-.window_panel .btn_confirm span.icon { background: url(themes/newui/images/arrow.png) right 2px no-repeat; }
+.window_panel .btn_confirm span.icon { background: url(themes/newui/arrow.png) right 2px no-repeat; }
 
 .window_panel .btn_save { color: #676003; border: 1px solid #dcd13e; 
 	background-color: #fff568;
@@ -338,8 +338,8 @@ table.info { background: #fff; width: 100%; max-width: 100%; margin: 0 0 22px 0;
 border-left: 1px solid #ddd; border-right: 1px solid #ddd; -webkit-border-radius: 4px; border-radius: 4px; }
 table.info thead:first-child tr:first-child th:first-child, .table-bordered tbody:first-child tr:first-child td:first-child { border-radius: 4px 0 0 0; }
 table.info th { background: #eee; font-weight: bold; vertical-align: bottom; line-height: 22px; padding: 8px; text-align: left; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; }
-table.info a.remove { background: url(themes/newui/images/removelist.png) left 0 no-repeat; display: inline-block; width: 18px; height: 18px; vertical-align: middle; }
-table.info a.remove:hover { background: url(themes/newui/images/removelist.png) left -22px no-repeat; display: inline-block; width: 18px; height: 18px; vertical-align: middle; }
+table.info a.remove { background: url(themes/newui/removelist.png) left 0 no-repeat; display: inline-block; width: 18px; height: 18px; vertical-align: middle; }
+table.info a.remove:hover { background: url(themes/newui/removelist.png) left -22px no-repeat; display: inline-block; width: 18px; height: 18px; vertical-align: middle; }
 table.info td { border-bottom: 1px solid #ddd; }
 table.info tr:hover td { background: #e1eaf4; color: #005580; cursor: pointer;}
 table.info th:first-child {text-align: right;}
@@ -363,14 +363,14 @@ border-left: 1px solid #ddd; border-right: 1px solid #ddd; -webkit-border-radius
 	style ".icon-remove" (which is attached to a child element), not ".table-bordered a.remove"
 	the classes "action remove" added to the anchor tag are used for some kind of internal action jquery magic.
 */
-.table-bordered a.remove { background: url(themes/newui/images/removelist.png) left 0 no-repeat; display: inline-block; width: 18px; height: 18px; vertical-align: middle; }
-.table-bordered a.remove:hover { background: url(themes/newui/images/removelist.png) left -22px no-repeat; }
+.table-bordered a.remove { background: url(themes/newui/removelist.png) left 0 no-repeat; display: inline-block; width: 18px; height: 18px; vertical-align: middle; }
+.table-bordered a.remove:hover { background: url(themes/newui/removelist.png) left -22px no-repeat; }
 
 /*
 	FIXME see above, similar incorrect styling as remove button, but just copying for now to get working
 */
-.table-bordered a.save { background: url(themes/newui/images/savelist.png) left 0 no-repeat; display: inline-block; width: 18px; height: 18px; vertical-align: middle; }
-.table-bordered a.save:hover { background: url(themes/newui/images/savelist.png) left -22px no-repeat; }
+.table-bordered a.save { background: url(themes/newui/savelist.png) left 0 no-repeat; display: inline-block; width: 18px; height: 18px; vertical-align: middle; }
+.table-bordered a.save:hover { background: url(themes/newui/savelist.png) left -22px no-repeat; }
 
 .table-bordered td { border-bottom: 1px solid #ddd; }
 
@@ -384,7 +384,7 @@ table.messages td { padding: 0 8px; border-bottom: 1px solid #ccc; }
 table.messages tr:hover td { background: #e1eaf4; border-top: 1px solid #8cb2e0; }
 tr.selected { background: rgb(228, 225, 153); }
 table.messages tr.selected:hover td { background: rgb(228, 224, 187);  }
-table.messages span.icon { background: url(themes/newui/images/dktick.png) 50% 11px no-repeat; display: block; text-indent: -9999px; }
+table.messages span.icon { background: url(themes/newui/dktick.png) 50% 11px no-repeat; display: block; text-indent: -9999px; }
 
 table.rules { margin: 0 0 10px 0; border-top: 1px solid #ddd; }
 table.rules tr.saved-rule { color: #366C19; }
@@ -399,8 +399,8 @@ table.rules .value-options { overflow: auto; max-height: 200px; }
 table.rules .value-options label { width: auto; }
 table.rules td .btn { display: inline-block; margin: 0 4px 0 0; line-height: 18px; }
 table.rules td .cancel { display: inline-block; padding: 6px 0; font-size: 14px; line-height: 18px; }
-table.rules td a.remove { background: url(themes/newui/images/removelist.png) left 0 no-repeat; display: inline-block; width: 18px; height: 18px; vertical-align: middle; }
-table.rules td a.remove:hover { background: url(themes/newui/images/removelist.png) left -22px no-repeat; }
+table.rules td a.remove { background: url(themes/newui/removelist.png) left 0 no-repeat; display: inline-block; width: 18px; height: 18px; vertical-align: middle; }
+table.rules td a.remove:hover { background: url(themes/newui/removelist.png) left -22px no-repeat; }
 
 #new-rule-value { 
   width: 190px;
@@ -421,11 +421,11 @@ input[name=msgsndr_msggroup] {
 .msg_content_nav button:hover { background: #ededed; color: #888; text-decoration: none; }
 .msg_content_nav button span { color: #444; font-weight: bold; }
 
-.msg_content_nav li button span.icon { background: url(themes/newui/images/add.png) 0 center no-repeat; width: 16px; margin: 4px 0 0; }
-.msg_content_nav li.ophone button span.icon   { background-image: url(themes/newui/images/phone.png) }
-.msg_content_nav li.oemail button span.icon   { background-image: url(themes/newui/images/email.png) }
-.msg_content_nav li.osms button span.icon     { background-image: url(themes/newui/images/sms.png) }
-.msg_content_nav li.osocial button span.icon  { background-image: url(themes/newui/images/social.png) }
+.msg_content_nav li button span.icon { background: url(themes/newui/add.png) 0 center no-repeat; width: 16px; margin: 4px 0 0; }
+.msg_content_nav li.ophone button span.icon   { background-image: url(themes/newui/phone.png) }
+.msg_content_nav li.oemail button span.icon   { background-image: url(themes/newui/email.png) }
+.msg_content_nav li.osms button span.icon     { background-image: url(themes/newui/sms.png) }
+.msg_content_nav li.osocial button span.icon  { background-image: url(themes/newui/social.png) }
 
 .msg_content_nav li.active button { background: #363636; color: #f9f9f9; border-color: #222; 
 -webkit-box-shadow: inset 0px 1px 3px 0px #111; 
@@ -435,7 +435,7 @@ input[name=msgsndr_msggroup] {
 .msg_content_nav li.active button:after { content: ""; position: absolute; bottom: -12px; left: 50%; margin-left: -12px; display: block; width: 0; height: 0; 
 border-color: #222222 transparent transparent; border-style: solid; border-width: 12px 12px 0; }
 .msg_content_nav li.active button span { color: #f9f9f9; }
-.msg_content_nav li.active button span.icon { background: url(themes/newui/images/pencil.png) 0 center no-repeat; }
+.msg_content_nav li.active button span.icon { background: url(themes/newui/pencil.png) 0 center no-repeat; }
 
 .msg_content_nav li.complete button { background: #499122; color: #fbfbfb; text-shadow: 0 1px 1px #222; border-color: #3a7a17; 
 -webkit-box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.5); 
@@ -446,8 +446,8 @@ border-color: #222222 transparent transparent; border-style: solid; border-width
 .msg_content_nav li.complete.active button:after { content: ""; position: absolute; bottom: -12px; left: 50%; margin-left: -12px; display: block; width: 0; height: 0; 
 border-color: #499122 transparent transparent; border-style: solid; border-width: 12px 12px 0; }
 .msg_content_nav li.complete button span { color: #fbfbfb; }
-.msg_content_nav li.complete button span.icon { background-image: url(themes/newui/images/tick.png) }
-.msg_content_nav li.complete:hover button span.icon { background-image: url(themes/newui/images/pencil.png) }
+.msg_content_nav li.complete button span.icon { background-image: url(themes/newui/tick.png) }
+.msg_content_nav li.complete:hover button span.icon { background-image: url(themes/newui/pencil.png) }
 
 /*----- Message content -----*/
 
@@ -462,8 +462,8 @@ border-color: #499122 transparent transparent; border-style: solid; border-width
 .msg_complete li.complete button { background: #499122; color: #fbfbfb; text-shadow: 0 1px 1px #222; border: 1px solid #3A7A17; opacity: 1;
 -webkit-box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.5); box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.5); }
 
-.msg_complete button span.icon { background: url(themes/newui/images/remove.png) 0 center no-repeat; width: 16px; display: inline-block; margin: 4px 0 0; }
-.msg_complete li.complete button span.icon { background: url(themes/newui/images/tick.png) 0 center no-repeat; width: 16px; display: inline-block; }
+.msg_complete button span.icon { background: url(themes/newui/remove.png) 0 center no-repeat; width: 16px; display: inline-block; margin: 4px 0 0; }
+.msg_complete li.complete button span.icon { background: url(themes/newui/tick.png) 0 center no-repeat; width: 16px; display: inline-block; }
 
 .msg_confirm { background: #F9F8F6; margin: 0 -10px -15px -10px; padding: 22px 21px; text-align: right; border-radius: 0 0 5px 5px; border-top: 1px solid #DDDDDD; }
 
@@ -539,9 +539,9 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
   cursor: default;
 }
 
-.window_panel button .play { background: url(themes/newui/images/play.png) 0 center no-repeat; margin: 2px 0 0; }
-.window_panel a.toggle-more, a.toggle-translations { background: url(themes/newui/images/bluearo.png) 2px 4px no-repeat; padding: 0 0 0 15px; }
-.window_panel a.toggle-more.active, a.toggle-translations.active { background: url(themes/newui/images/bluearo-down.png) 2px 4px no-repeat; }
+.window_panel button .play { background: url(themes/newui/play.png) 0 center no-repeat; margin: 2px 0 0; }
+.window_panel a.toggle-more, a.toggle-translations { background: url(themes/newui/bluearo.png) 2px 4px no-repeat; padding: 0 0 0 15px; }
+.window_panel a.toggle-more.active, a.toggle-translations.active { background: url(themes/newui/bluearo-down.png) 2px 4px no-repeat; }
 
 .msg_complete button[disabled], .msg_complete button[disabled]:hover { background: #f5f5f5; color: #444; border: 1px solid #ccc; opacity: 0.5; }
 .msg_complete li.complete button[disabled], .msg_complete li.complete button[disabled]:hover { background: #499122; color: #fbfbfb; border: 1px solid #3A7A17; opacity: 1; }
@@ -730,7 +730,7 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
   background-image:      -o-linear-gradient(top, #55AA28, #366C19); 
   background-image:         linear-gradient(top, #55AA28, #366C19); }
 .add-rule a.btn:hover { background: #366C19; color: #fff; }
-.add-rule a.btn .icon-plus { background: url("themes/newui/images/cross.png") 0 center no-repeat; display: inline-block; height: 14px; width: 16px; margin: 4px 0 0; vertical-align: top; }
+.add-rule a.btn .icon-plus { background: url("themes/newui/cross.png") 0 center no-repeat; display: inline-block; height: 14px; width: 16px; margin: 4px 0 0; vertical-align: top; }
 
 /*----- Bootstrap modal styles -----*/
 
@@ -802,9 +802,9 @@ li.notactive { display: none; }
 .window_panel option { width: 300px; }
 .window_panel input[type="checkbox"] { margin: 9px 5px 0 0; }
 .window_panel .addme { float: left; display: inline; text-align: left; width: inherit; }
-.window_panel .fbicon { background: url(themes/newui/images/facebook.jpg) 180px 0 no-repeat; }
-.window_panel .twiticon { background: url(themes/newui/images/twitter.jpg) 180px 0 no-repeat; }
-.window_panel .rssicon { background: url(themes/newui/images/rss.jpg) 180px 0 no-repeat; }
+.window_panel .fbicon { background: url(themes/newui/facebook.jpg) 180px 0 no-repeat; }
+.window_panel .twiticon { background: url(themes/newui/twitter.jpg) 180px 0 no-repeat; }
+.window_panel .rssicon { background: url(themes/newui/rss.jpg) 180px 0 no-repeat; }
 .window_panel p { margin: 0; padding: 4px 0; color: #888; }
 .window_panel .controls { margin: 0 0 0 150px; }
 .window_panel .controls #cke_reusableckeditor { width: 96% !important; }
