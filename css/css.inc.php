@@ -570,8 +570,7 @@ table.schedule th, table.schedule td { width: 30px; padding: 5px 0; text-align: 
 }
 
 .horizontaltabstitlediv td.middle {
-	padding-right: 3px;
-	padding-left: 0;
+	padding: 5px 3px 0 0; 
 	background: <?=$theme1?> url('img/horizontaltab_middle.gif') repeat-x;
 }
 .horizontaltabstitlediv td.right {
