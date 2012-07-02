@@ -29,7 +29,7 @@ function ContentSaveManager() {
 		"translation" : function() {
 			var gender = $('input[name=messagePhoneText_message-gender]:checked').val();
 			var enText = $('#msgsndr_tts_message').val();
-			var translate = $('#msgsndr_form_phonetranslate').is(':checked');
+			var translate = $('#msgsndr_phonemessagetexttranslate').is(':checked');
 			var getTranslations = true;
 			
 			var jsonVal = $.toJSON({
@@ -37,7 +37,7 @@ function ContentSaveManager() {
 				"text" : enText
 			});
 
-			$('input[name=phone_translate]').val(jsonVal);
+			$('#msgsndr_phonemessagetext').val(jsonVal);
 
 			if(translate) {
 				var langCodes = [];

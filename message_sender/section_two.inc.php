@@ -27,24 +27,25 @@
 				<!-- Add the phone panel -->
 				<div id="msgsndr_tab_phone" class="tab_panel">
 
-				<input type="checkbox" class="hidden" name="has_phone" />
+				<input type="checkbox" class="hidden" id="msgsndr_hasphone" name="msgsndr_hasphone" />
 
-				<fieldset class="check">
-					<label for="msgsndr_phonetype">Voice Type</label>
-					<input type="hidden" id="msgsndr_phonetype" name="phone_type" value="callme" />
+				<fieldset id="msgsndr_phonemessagetype_fieldarea" class="check">
+					<label for="msgsndr_phonemessagetype">Voice Type&nbsp;<img id="msgsndr_phonemessagetype_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>
+					<input type="hidden" id="msgsndr_phonemessagetype" name="msgsndr_phonemessagetype" value="callme" />
 					<div id="switchaudio" class="controls">
 						<button class="audioleft active" data-type="callme">Call Me to Record</button><button class="audioright" data-type="text">Text-to-Speech</button>
+						<div id="msgsndr_phonemessagetype_msg" class="box_validatorerror er" style="display:none"/>
 					</div>
 				</fieldset>
 				
 				<hr />
 
 				<div id="callme" class="audio">
-				<fieldset>
-					<label for="msgsndr_phonemessagecallme">Recording</label>
+				<fieldset id="msgsndr_phonemessagecallme_fieldarea">
+					<label for="msgsndr_phonemessagecallme">Recording&nbsp;<img id="msgsndr_phonemessagecallme_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>
 					<div class="controls">
-						<input class="small required ok msgdata" type="hidden" id="msgsndr_phonemessagecallme" name="msgsndr_phonemessagecallme" /> <span class="error"></span>
-						<!-- <button class="record" id="ctrecord"><span class="icon"></span> Call Now to Record</button> -->
+						<input class="msgdata" type="hidden" id="msgsndr_phonemessagecallme" name="msgsndr_phonemessagecallme" /> <span class="error"></span>
+						<div id="msgsndr_phonemessagecallme_msg" class="box_validatorerror er" style="display:none"/>
 					</div>
 				</fieldset>
 				
@@ -116,7 +117,7 @@
 				<fieldset>
 					<label for="msgsndr_tts_message">Message</label>
 					<div class="controls">
-						<input type="hidden" name="phone_translate" />
+						<input type="hidden" id="msgsndr_phonemessagetext" name="msgsndr_phonemessagetext" />
 						<button class="btn-small paste-from hidden" data-textarea="msgsndr_tts_message">Paste text from email</button>
 						<textarea id="msgsndr_tts_message" name="phone_tts" class="required msgdata" maxlength="10000"></textarea><span class="error"></span>
 
@@ -143,9 +144,9 @@
 				</fieldset>
 
 				<fieldset class="hide">
-					<label for="msgsndr_form_phonetranslate">Translate</label>
-						<input type="checkbox" id="msgsndr_form_phonetranslate" class="msgdata" value="" name="phone_tts_translate" data-txt="#msgsndr_tts_message" data-display="#tts_translate" />
-						<a class="toggle-translations hide" data-target="#tts_translate" href=""></a>
+					<label for="msgsndr_phonemessagetexttranslate">Translate</label>
+					<input type="checkbox" id="msgsndr_phonemessagetexttranslate" class="msgdata" value="" name="msgsndr_phonemessagetexttranslate" data-txt="#msgsndr_tts_message" data-display="#tts_translate" />
+					<a class="toggle-translations hide" data-target="#tts_translate" href=""></a>
 				</fieldset>
 
 				<div id="tts_translate" class="close translations">

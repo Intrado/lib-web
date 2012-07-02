@@ -110,36 +110,41 @@
 								</div>
 
 								<!-- /hidden modals -->
+								<div id="msgsndr_listids_msg" class="box_validatorerror er" style="display:none"></div>
 
 <!-- from section_one -->
 				<fieldset>
 					<input class="addme" type="checkbox" id="msgsndr_addme" name="msgsndr_addme"/>
 					<label class="addme" for="msgsndr_addme">Add Myself</label>
+					<div id="msgsndr_addme_msg" class="box_validatorerror er" style="display:none"/>
 				</fieldset>
 
 				<div id="addme" class="hide">
 
-					<fieldset>
-						<label for="msgsndr_addmephone">Phone</label>
+					<fieldset id="msgsndr_addmephone_fieldarea">
+						<label for="msgsndr_addmephone">Phone&nbsp;<img id="msgsndr_addmephone_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>
 						<div class="controls">
 							<input type="text" id="msgsndr_addmephone" name="msgsndr_addmephone" />
 							<span class="error"></span>
+							<div id="msgsndr_addmephone_msg" class="box_validatorerror er" style="display:none"/>
 						</div>
 					</fieldset>
 
-					<fieldset>
-						<label for="msgsndr_addmeemail">Email</label>
+					<fieldset id="msgsndr_addmeemail_fieldarea">
+						<label for="msgsndr_addmeemail">Email&nbsp;<img id="msgsndr_addmeemail_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>
 						<div class="controls">
 							<input type="text" id="msgsndr_addmeemail" name="msgsndr_addmeemail" />
 							<span class="error"></span>
+							<div id="msgsndr_addmeemail_msg" class="box_validatorerror er" style="display:none"/>
 						</div>
 					</fieldset>
 
-					<fieldset>
-						<label for="msgsndr_addmesms">SMS</label>
+					<fieldset id="msgsndr_addmesms_fieldarea">
+						<label for="msgsndr_addmesms">SMS&nbsp;<img id="msgsndr_addmesms_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>
 						<div class="controls">
 							<input type="text" id="msgsndr_addmesms" name="msgsndr_addmesms" />
 							<span class="error"></span>
+							<div id="msgsndr_addmesms_msg" class="box_validatorerror er" style="display:none"/>
 						</div>
 					</fieldset>
 

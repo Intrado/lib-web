@@ -136,7 +136,7 @@ jQuery.noConflict();
 				}
 			} else if(contentMode == "social" && $('#msgsndr_ctrl_phone').parent().hasClass('complete')) {
 				
-				var fieldinsertcheck = $('#msgsndr_tts_message').val();
+				var fieldinsertcheck = $('#msgsndr_phonemessagetext').val();
 				if (fieldinsertcheck.indexOf('<<') == -1) {
 					$('#audiolink').removeClass('hidden');
 				} else {
@@ -167,7 +167,7 @@ jQuery.noConflict();
 			$(this).addClass('active');
 
 			// set the type value in a hidden input for the postdata
-			$('#msgsndr_phonetype').attr('value', type);
+			$('#msgsndr_phonemessagetype').attr('value', type);
 
 			if ( type == 'callme') {
 				$('#text .phone_advanced_options').appendTo('#callme_advanced_options');

@@ -41,7 +41,7 @@ var allowControl = {
 		});
 
 		function ttsTranslate(elem) {
-			var txtField = $('#msgsndr_tts_message').val();
+			var txtField = $('#msgsndr_phonemessagetext').val();
 			var selectedTtslangCodes = [];
 
 			var checkTranslations = $('input[name^=tts_override]');
@@ -496,7 +496,7 @@ function ContentManager() {
 			
 			//IF NO PHONE MESSAGE IS SAVED, HIDE THE LINK TO AUDIO FILE
 			if($(".ophone", ".msg_content_nav").hasClass('complete')){
-				var fieldinsertcheck = $('#msgsndr_tts_message').val();
+				var fieldinsertcheck = $('#msgsndr_phonemessagetext').val();
 				if (fieldinsertcheck.indexOf('<<') == -1) {
 					$('#audiolink').removeClass('hidden');
 				} else {
@@ -698,7 +698,7 @@ function ContentManager() {
     }
     
     if (userPermissions.sendmulti == 1) {
-    	$("#msgsndr_form_phonetranslate").parent().removeClass("hide");
+    	$("#msgsndr_phonemessagetexttranslate").parent().removeClass("hide");
     	$("#msgsndr_form_emailtranslate").parent().parent().removeClass("hide");
     }
 };

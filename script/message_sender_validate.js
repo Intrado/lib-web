@@ -13,21 +13,23 @@ function ValidationManager() {
 			"msgsndr_listids"
 		],
 		"2": [
+			"msgsndr_phonemessagetype",
 			"msgsndr_phonemessagecallme",
 			"msgsndr_phonemessagetext",
+			"msgsndr_phonemessagetexttranslate",
 			// TODO: phone message translations
-			"msgsndr_emailmessagefromname",
-			"msgsndr_emailmessagefromemail",
-			"msgsndr_emailmessagesubject",
-			"msgsndr_emailmessageattachment",
-			"msgsndr_emailmessagetext",
+			//"msgsndr_emailmessagefromname",
+			//"msgsndr_emailmessagefromemail",
+			//"msgsndr_emailmessagesubject",
+			//"msgsndr_emailmessageattachment",
+			//"msgsndr_emailmessagetext",
 			// email translations arn't editable...
-			"msgsndr_smsmessagetext",
-			"msgsndr_socialmediafacebookmessage",
-			"msgsndr_socialmediatwittermessage",
-			"msgsndr_socialmediafeedmessage",
-			"msgsndr_socialmediafeedcategory",
-			"msgsndr_optioncallerid"
+			//"msgsndr_smsmessagetext",
+			//"msgsndr_socialmediafacebookmessage",
+			//"msgsndr_socialmediatwittermessage",
+			//"msgsndr_socialmediafeedmessage",
+			//"msgsndr_socialmediafeedcategory",
+			//"msgsndr_optioncallerid"
 		],
 		"3": [
 			
@@ -35,32 +37,13 @@ function ValidationManager() {
 	};
 	
 	this.forceRunValidate = function(step) {
-		var stepArea = stepMap[step];
-		if(typeof(stepArea) == "undefined") {
-			//return false;
-			return;
-		}
-		stepArea = $(stepArea);
-		
 		$.each(validationMap[step], function(vIndex, vItem) {
-			var $element = $("[name=" + vItem + "]", stepArea);
-			
-			if($element) {
-				var eventtype = "blur.valsys";
-				if ($element.is(':checkbox, select, #msgsndr_phonemessagecallme')) {
-					eventtype = 'change.valsys';
-				} else if ($element.is(':radio')) {
-					eventtype = 'click.valsys';
-				} else if ($element.is('input[type=text], textarea')) {
-					eventtype = 'keydown.valsys';
-				}
-				
-				$element.trigger(eventtype);
-			}
+			self.runValidateById(vItem);
 		});
 	};
 	
 	this.bindValidations = function(step) {
+		/*
 		//GET STEP DIVISION
 		var stepArea = stepMap[step];
 		if(typeof(stepArea) == "undefined") {
@@ -94,9 +77,11 @@ function ValidationManager() {
 				}, 600);
 			});
 		});
+		*/
 	};
 	
 	this.unbindValidations = function(step) {
+		/*
 		var stepArea = stepMap[step];
 		if(typeof(stepArea) == "undefined") {
 			return false;
@@ -108,9 +93,11 @@ function ValidationManager() {
 			
 			$element.off(".valsys");
 		});
+		*/
 	};
 	
-	this.setInvalid = function($element, msg) {		
+	this.setInvalid = function($element, msg) {
+		/*
 		var elemId = $element.attr('id');
 
 		if($element.next('.error').text() != msg) {
@@ -141,9 +128,11 @@ function ValidationManager() {
 		
 		obj_stepManager.updateStepStatus();
 		obj_contentManager.updateContentStatus();
+		*/
 	};
 	
 	this.setValid = function($element) {
+		/*
 		var elemId = $element.attr('id');
 
 		if($element.is("[name=sms_text], [name=twitter_message], [name=facebook_message]")) {
@@ -166,9 +155,11 @@ function ValidationManager() {
 		
 		obj_stepManager.updateStepStatus();
 		obj_contentManager.updateContentStatus();
+		*/
 	};
 	
 	this.emptyValidate = function($element) {
+		/*
 		var elemId = $element.attr('id');
 
 		$element.removeClass('er ok').addClass('emp').next('.error').fadeOut(300).text("");
@@ -177,7 +168,7 @@ function ValidationManager() {
 
 		obj_stepManager.updateStepStatus();
 		obj_contentManager.updateContentStatus();
-
+		*/
 	}
 	
 	//This is to bridge prototype and jquery implementations when force running validation
@@ -190,21 +181,18 @@ function ValidationManager() {
 		var name = $element.attr('name');
 		var form = name.split("_")[0];
 		var field = name.split("_")[1];
+		form_do_validation(form, field);
 		
+		/*
 		var value = $element.val();
 		var validators = document.formvars[form]["validators"][name];
-		
-		if(typeof document.formvars[form]['requires'] != "undefined") {
-			var requiredFields = document.formvars[form]["formdata"][field]["requires"];
-		} else {
-			requiredFields = false;
-		}
+		var requiredFields = document.formvars[form]["formdata"][field]["requires"];
 
-		requiredValues = {};
+		var requiredValues = {};
 		if(requiredFields) {
 			for(var i = 0; i < requiredFields.length; i++) {
 				var requiredName = requiredFields[i];
-				requiredValues[requiredName] = $("#" + requiredName).val();
+				requiredValues[requiredName] = $("#" + name).val();
 			}
 		}
 		
@@ -216,15 +204,14 @@ function ValidationManager() {
 					value : value,
 					requiredvalues : requiredValues
 				};
-
-			var ajaxurl = "message_sender.php?form=msgsndr&ajaxvalidator=true&formitem=" + name;
-			//var ajaxurl = "_messagesender.php?form=msgsndr&ajaxvalidator=true&formitem=" + name;
-
 				$.ajax({
 					type : 'POST',
-					url : ajaxurl,
+					url : "message_sender.php", //?form=msgsndr&ajaxvalidator=true&formitem=" + name
 					data : {
-						json : $.toJSON(postData)
+						form: "msgsndr",
+						ajaxvalidator: true,
+						formitem: name,
+						json: $.toJSON(postData)
 					},
 
 					success : function(response) {
@@ -238,13 +225,12 @@ function ValidationManager() {
 			}
 
 		} else { // None AJAX validation
-			requiredvalues = [];
 			var response = true;
 			
 			// Loop validation
 			for(var i = 0; i < validators.length; i++) {
 				var validator = validators[i];
-				response = validator.validate(validator.name, validator.label, value, validator.args, requiredvalues);
+				response = validator.validate(validator.name, validator.label, value, validator.args, requiredValues);
 				if(typeof(response) == "string") {
 					break;
 				}
@@ -263,6 +249,6 @@ function ValidationManager() {
 			}
 			
 		} // if ajax
-		
+		*/
 	};
 };

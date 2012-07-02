@@ -8,8 +8,8 @@ $.loadMessage = function loadMessage() {
 		"messageGroupTable": $('#messages_list'),
 		
 		"phoneComplete": $('li.ophone'),
-		"hasPhone": $('input[name=has_phone]'),
-		"phoneType": $('#msgsndr_phonetype'),
+		"hasPhone": $('#msgsndr_hasphone'),
+		"phoneType": $('#msgsndr_phonemessagetype'),
 		"phoneButtonCallMe": $('button.audioleft'),
 		"phoneButtonText": $('button.audioright'),
 		"phoneCallMeSection": $('#callme'),
@@ -18,7 +18,7 @@ $.loadMessage = function loadMessage() {
 		"phoneText": $('#msgsndr_tts_message'),
 		"phoneTranslatePrefix": "#tts_translated_",
 		"phoneOverridePrefix": "#tts_override_",
-		"phoneTranslateCheck": $("#msgsndr_form_phonetranslate"),
+		"phoneTranslateCheck": $("#msgsndr_phonemessagetexttranslate"),
 		"phoneLanguageCheckPrefix": "#tts_",
 		"phoneAdvancedOptions": $(".phone_advanced_options"),
 		"phoneCallMeOptions": $("#callme_advanced_options"),
@@ -413,10 +413,8 @@ $.loadMessage = function loadMessage() {
 			if (msg.languageCode == "en") {
 				self.loadMessagePartsFormatted(msgGrp.id, msg, self.elements.phoneText.addClass('ok'), false,
 					function (data) {
-						$('input[name=phone_translate]').val($.toJSON({ "gender" : gender, "text" : data.messageBody }))
+						$('#msgsndr_phonemessagetext').val($.toJSON({ "gender" : gender, "text" : data.messageBody }))
 					});
-				
-				//$('input[name=phone_translate]')
 			} else {
 				self.elements.phoneTranslateCheck.attr("checked","checked");
 				$(self.elements.phoneLanguageCheckPrefix + msg.languageCode).attr('checked','checked');

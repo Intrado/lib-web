@@ -288,7 +288,7 @@ $formdata = array(
 				"helpstep" => 1
 		),
 		"name" => array(
-				"label" => "name",
+				"label" => "Subject",
 				"value" => "",
 				"validators" => array(
 						array("ValRequired"),
@@ -299,7 +299,7 @@ $formdata = array(
 				"helpstep" => 1
 		),
 		"jobtype" => array(
-				"label" => "jobtype",
+				"label" => "Type",
 				"value" => "",
 				"validators" => array(
 						array("ValRequired"),
@@ -312,7 +312,7 @@ $formdata = array(
 		"LIST DATA",
 		//=========================================================================================
 		"addme" => array(
-				"label" => "addme",
+				"label" => "Add Myself",
 				"value" => "",
 				"validators" => array(
 						// None, just toggles logic for addme fields
@@ -321,7 +321,7 @@ $formdata = array(
 				"helpstep" => 1
 		),
 		"addmephone" => array(
-				"label" => "addmephone",
+				"label" => "Phone",
 				"value" => "",
 				"validators" => array(
 						array("ValPhone")
@@ -330,7 +330,7 @@ $formdata = array(
 				"helpstep" => 1
 		),
 		"addmeemail" => array(
-				"label" => "addmeemail",
+				"label" => "Email",
 				"value" => "",
 				"validators" => array(
 						array("ValEmail")
@@ -339,7 +339,7 @@ $formdata = array(
 				"helpstep" => 1
 		),
 		"addmesms" => array(
-				"label" => "addmesms",
+				"label" => "SMS",
 				"value" => "",
 				"validators" => array(
 						array("ValPhone")
@@ -348,7 +348,7 @@ $formdata = array(
 				"helpstep" => 1
 		),
 		"listids" => array(
-				"label" => "listids",
+				"label" => "List(s)",
 				"value" => "",
 				"validators" => array(
 						array("ValLists")
