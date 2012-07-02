@@ -15,6 +15,7 @@
 html, body { height: 100%; }
 body { background: #F5F3F0 url(themes/newui/images/bodybg.png) repeat; font-family: "Helvetica Neue",helvetica,Arial,sans-serif; }
 .wrap { min-height: 100%; min-width: 980px; }
+/*.wrap { min-height: 100%; width: 100%; min-w  }*/
 p { color: #333; font-size: 14px; line-height: 22px; margin: 0 0 11px 0; }
 a { color: #0088CC; }
 a:hover { color: #005580; text-decoration: underline; }
@@ -30,10 +31,10 @@ h4 { font-size: 12px; line-height: 22px; color: #235563; text-shadow: 0 1px 0 #f
 .lighten { opacity: 0.5;}
 
 .content_wrap { position: relative; margin: 0; padding: 20px 0 85px 0; overflow: auto; }
-.container { position: relative; width: 980px; margin: 0 auto; }
+#ms .container { position: relative; width: 980px; margin: 0 auto; }
+.container { margin: 0 1%; }
 .popup_container { position: relative; margin: 0 auto; padding: 0 10px; }
 .wrapper { position: relative; margin: 0 240px 0 0; }
-.main_activity { width: 740px; }
 .main_aside { position: absolute; top: 0; right: -240px; width: 215px; }
 .window_body_wrap { padding: 15px 10px; }
 
@@ -52,7 +53,7 @@ h4 { font-size: 12px; line-height: 22px; color: #235563; text-shadow: 0 1px 0 #f
 .banner_links li.bl_left, .banner_links li.bl_right { padding: 0; border: 0; }
 .banner_links li a { font-size: 14px; color: #9fbdf6; text-shadow: 0 1px 0 rgba(0,0,0,0.4); }
 .banner_links li a:hover { text-decoration: underline; }
-.banner_custname { top: 24px; right: 0; text-align: right; font-size: 16px; font-weight: bold; color: #f2f2f2; text-shadow: 0 1px 0 #444; }
+.banner_custname { top: 24px; right: 1%; text-align: right; font-size: 16px; font-weight: bold; color: #f2f2f2; text-shadow: 0 1px 0 #444; }
 
 .popup_logo { padding: 10px 10px 0 10px; border-top: 4px solid rgba(0,0,0,0.4); }
 .popup_logo img { display: none; }
@@ -926,13 +927,13 @@ p.warning {
 
 
 @media screen and (min-width: 1180px) { 
- .container { width: 1150px; }
- .main_activity { width: 910px; }
+ #ms .container { width: 1150px; }
+ /*.main_activity { width: 910px; }*/
 }
 
 @media screen and (min-width: 1580px) { 
- .container { width: 1300px; }
- .main_activity { width: 1060px; }
+ #ms .container { width: 1300px; }
+ /*.main_activity { width: 1060px; }*/
 }
 
 /* Very basic facebook style */

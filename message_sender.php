@@ -1168,6 +1168,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "notifications:jobs";
 $TITLE = "";
+$MESSAGESENDER = true;
 
 include("nav.inc.php");
 // Load Custom Form Validators
