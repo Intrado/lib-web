@@ -18,10 +18,10 @@ function calc_job_list_total ($listid) {
 	return $renderedlist->getTotal();
 }
 function fmt_activestatus($obj, $name) {
-	$str = "";
-	$str .= "<span class=\"activejob\">Calling...</span>";
-
-	return $str;
+	if ($obj->status == 'cancelling')
+		return "<span class=\"activejob\">" . _L("Cancelling...") . "</span>";
+	else
+		return "<span class=\"activejob\">" . _L("Calling...") . "</span>";
 }
 
 function fmt_job_content($obj, $name) {
