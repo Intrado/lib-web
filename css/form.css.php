@@ -182,6 +182,19 @@ position: relative;}
  
  
  /* ----------------- rule widget --------------------*/
+
+ #ruleWidgetContainer table {
+ 	border-collapse: separate;
+ }
+
+#ruleWidgetContainer td.list {
+	border: 1px solid rgb(223, 150, 16);
+	display: inline;
+	float:left;
+	margin: 4px;
+	padding: 4px;
+}
+
  
 .newform .ruleHelperContentDiv	{ padding: 3px; background-color: #ffcccc; border-radius: 3px;}
 .newform .rulesTable 						{ margin-bottom: 10px; }
