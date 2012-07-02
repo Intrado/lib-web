@@ -5,7 +5,7 @@
 			
 			<h3 class="flag">Broadcast Info</h3>
 			<div class="field_wrapper">
-				<fieldset id="msgsndr_name_fieldarea">
+				<fieldset>
 					<label for="msgsndr_name">Subject&nbsp;<img id="msgsndr_name_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>
 					<div class="controls">
 						<input type="text" id="msgsndr_name" name="msgsndr_name" data-ajax="true" class="required" autocomplete="off" maxlength="30"/> 
@@ -15,7 +15,7 @@
 					</div>
 				</fieldset>
 				
-				<fieldset id="msgsndr_jobtype_fieldarea" class="cf">
+				<fieldset class="cf">
 					<label for="msgsndr_jobtype">Type&nbsp;<img id="msgsndr_jobtype_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>
 					<div class="controls">
 						<select id="msgsndr_jobtype" name="msgsndr_jobtype"></select>

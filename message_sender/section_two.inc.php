@@ -29,32 +29,32 @@
 
 				<input type="checkbox" class="hidden" id="msgsndr_hasphone" name="msgsndr_hasphone" />
 
-				<fieldset id="msgsndr_phonemessagetype_fieldarea" class="check">
+				<fieldset class="check">
 					<label for="msgsndr_phonemessagetype">Voice Type&nbsp;<img id="msgsndr_phonemessagetype_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>
 					<input type="hidden" id="msgsndr_phonemessagetype" name="msgsndr_phonemessagetype" value="callme" />
 					<div id="switchaudio" class="controls">
 						<button class="audioleft active" data-type="callme">Call Me to Record</button><button class="audioright" data-type="text">Text-to-Speech</button>
-						<div id="msgsndr_phonemessagetype_msg" class="box_validatorerror er" style="display:none"/>
+						<div id="msgsndr_phonemessagetype_msg" class="box_validatorerror er" style="display:none"></div>
 					</div>
 				</fieldset>
 				
 				<hr />
 
 				<div id="callme" class="audio">
-				<fieldset id="msgsndr_phonemessagecallme_fieldarea">
+				<fieldset>
 					<label for="msgsndr_phonemessagecallme">Recording&nbsp;<img id="msgsndr_phonemessagecallme_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>
 					<div class="controls">
-						<input class="msgdata" type="hidden" id="msgsndr_phonemessagecallme" name="msgsndr_phonemessagecallme" /> <span class="error"></span>
-						<div id="msgsndr_phonemessagecallme_msg" class="box_validatorerror er" style="display:none"/>
+						<input class="msgdata" type="hidden" id="msgsndr_phonemessagecallme" name="msgsndr_phonemessagecallme" />
+						<div id="msgsndr_phonemessagecallme_msg" class="box_validatorerror er" style="display:none"></div>
 					</div>
 				</fieldset>
 				
 				<fieldset>
 					<label for="msgsndr_form_scratch">Scratch Pad <span class="light">(optional)</span></label>
 					<div class="controls">
-					<button class="btn-small paste-from hidden" data-textarea="msgsndr_form_scratch">Paste text from email</button>
-					<textarea id="msgsndr_form_scratch" name="msgsndr_form_scratch"></textarea>
-					<p>You can use this to write notes about what you'd like to say. This information isn't saved anywhere.</p>
+						<button class="btn-small paste-from hidden" data-textarea="msgsndr_form_scratch">Paste text from email</button>
+						<textarea id="msgsndr_form_scratch" name="msgsndr_form_scratch"></textarea>
+						<p>You can use this to write notes about what you'd like to say. This information isn't saved anywhere.</p>
 					</div>
 				</fieldset>
 				
@@ -68,35 +68,35 @@
 				
 				<div id="advanced-opts" class="close">
 				<fieldset>
-					<label for="msgsndr_form_callid">Caller ID</label>
+					<label for="msgsndr_optioncallerid">Caller ID&nbsp;<img id="msgsndr_optioncallerid_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>
 					<div class="controls">
-					<select id="msgsndr_form_callid">
-					<!--option value="general">(651) 323-2003</option-->
-					</select>
-					<span id="callerid_other_wrapper" class="hidden"><input type="text" id="callerid_other" name="phone_callerid"  /><span class="error"></span></span>
+						<select id="optioncallerid_select"></select>
+						<input type="text" id="msgsndr_optioncallerid" name="msgsndr_optioncallerid"/>
+						<div id="msgsndr_optioncallerid_msg" class="box_validatorerror er" style="display:none"></div>
 					</div>
 				</fieldset>
 
 				<fieldset class="cf">
-					<label for="msgsndr_form_days">Days to run</label>
+					<label for="msgsndr_optionmaxjobdays">Days to run&nbsp;<img id="msgsndr_optionmaxjobdays_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>
 					<div class="controls">
-						<select id="msgsndr_form_days" name="broadcast_daystorun">
+						<select id="msgsndr_optionmaxjobdays" name="msgsndr_optionmaxjobdays">
 						</select>
+						<div id="msgsndr_optionmaxjobdays_msg" class="box_validatorerror er" style="display:none"></div>
 					</div>
 				</fieldset>
 				
-				
+				<fieldset>
+					<div class="controls cf hide">
+						<label for="msgsndr_optionleavemessage">Voice Response&nbsp;<img id="msgsndr_optionleavemessage_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>
+						<input class="addme" type="checkbox" id="msgsndr_optionleavemessage" name="msgsndr_optionleavemessage"/>
+						<div id="msgsndr_optionleavemessage_msg" class="box_validatorerror er" style="display:none"></div>
+					</div>
+				</fieldset>
 				
 				<fieldset>
-					<div class="controls">
-					<div id="msgsndr_leavemessage" class="cf hide">
-						<input class="addme" type="checkbox" id="msgsndr_voice_response" name="phone_voiceresponse"/>
-						<label class="addme" for="msgsndr_voice_response">Voice Response</label>
-					</div>
-					<div id="msgsndr_messageconfirmation" class="cf hide">
+					<div class="controls cf hide">
 						<input class="addme" type="checkbox" id="msgsndr_call_confirmation" name="phone_callconfirmation"/>
 						<label class="addme">Call Confirmation</label>
-					</div>
 					</div>
 				</fieldset>
 			</div><!-- #advanced-opts -->

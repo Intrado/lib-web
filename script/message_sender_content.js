@@ -10,9 +10,8 @@ var allowControl = {
 		var $ = jQuery;
 		// Build up select box based on the maxjobdays user permission
 		var daysToRun = userPermissions.maxjobdays;
-		$('#msgsndr_form_daystorun').empty();
 		for (i = 1; i <= daysToRun; i++) {
-			$('#msgsndr_form_days').append('<option value="' + i + '">' + i + '</option>');
+			$('#msgsndr_optionmaxjobdays').append('<option value="' + i + '">' + i + '</option>');
 		}
 
 		// Hide / Show Translations
@@ -151,46 +150,48 @@ var allowControl = {
 			if (orgOptions._hascallback == 0) {
 				
 				// this sets the selected callerid in the text input for postdata
-				$('#msgsndr_form_callid').on('change', function() {
+				$('#optioncallerid_select').on('change', function() {
 					if ($('option:selected', this).val() == 'other') {
-						$('#callerid_other_wrapper').removeClass('hidden');
-						$("#callerid_other").val("");
+						$("#msgsndr_optioncallerid").removeClass('hidden');
+						$("#msgsndr_optioncallerid").val("");
 					} else {
-						$('#callerid_other_wrapper').addClass('hidden');
-						$("#callerid_other").val($('option:selected', this).val());
+						$("#msgsndr_optioncallerid").addClass('hidden');
+						$("#msgsndr_optioncallerid").val($('option:selected', this).val());
 					}
 				})
 				
 				if (typeof (orgOptions.requireapprovedcallerid) != 'undefined' && orgOptions.requireapprovedcallerid == 1) {
+					$("#msgsndr_optioncallerid").addClass('hidden');
+					
 					// get the users callerid's ...
 					var userCallerIds = getUserCallerIds();
 
 					// and append them as options to the select menu ...
 					$.each(userCallerIds, function(cIndex, cItem) {
-						$('#msgsndr_form_callid').append('<option value="' + cItem + '" >' + formatPhone(cItem) + '</option>');
+						$('#optioncallerid_select').append('<option value="' + cItem + '" >' + formatPhone(cItem) + '</option>');
 					});
 					
-					$('#msgsndr_form_callid').trigger("change");
+					$('#optioncallerid_select').trigger("change");
 
 					// if the users setcallerid permission is defined, add the 'other' option 
 					if (typeof (userPermissions.setcallerid) != 'undefined' && userPermissions.setcallerid == 1) {
-						$('#msgsndr_form_callid').append('<option value="other" >Other</option>');
+						$('#optioncallerid_select').append('<option value="other" >Other</option>');
 					}
 
 				} else { 
 					// hide the callerid field 
 					
 					if (typeof (userPermissions.setcallerid) != 'undefined' && userPermissions.setcallerid == 1) {
-						$('#callerid_other_wrapper').removeClass('hidden');
-						$('#msgsndr_form_callid').addClass('hidden');
+						$("#msgsndr_optioncallerid").removeClass('hidden');
+						$('#optioncallerid_select').addClass('hidden');
 					} else {
-						$('#msgsndr_form_callid').closest('fieldset').addClass('hidden');
+						$('#msgsndr_optioncallerid_fieldarea').addClass('hidden');
 					}
 				}
 
 			} else {
 				// the user hascallback so we hide caller id select fieldset from view
-				$('#msgsndr_form_callid').closest('fieldset').addClass('hidden');
+				$('#msgsndr_optioncallerid_fieldarea').addClass('hidden');
 
 			}
 		};
