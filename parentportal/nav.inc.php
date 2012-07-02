@@ -37,7 +37,7 @@ function doLogo () {
 
 function navMainTab ($display, $hint, $accesskey, $link, $isselected) {
 	$theme = getBrandTheme(); // contact manager is hardcoded to 3dblue
-	return '<li '. ($isselected ? 'class="navtab_active"' : "") .'><a accesskey="'.$accesskey.'" onfocus="blur()" href="' . $link . '" title="'.$hint.'"><img alt="" src="themes/' . $theme . '/main_nav_tab' . ($isselected ? "_active" : "") . '.gif"><span>' . $display . '</span></a></li>';
+	return '<li '. ($isselected ? 'class="navtab_active"' : "") .'><a accesskey="'.$accesskey.'" onfocus="blur()" href="' . $link . '" title="'.$hint.'"><span>' . $display . '</span></a></li>';
 }
 
 function navSubTab ($title, $link, $isselected) {
