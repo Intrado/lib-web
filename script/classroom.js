@@ -129,7 +129,7 @@
 		new Ajax.Request(requesturl,
 		{
 			method:'post',
-			parameters: {eventContacts: checkedcontacts.keys().toJSON(),
+			parameters: {eventContacts: Object.toJSON(checkedcontacts.keys()),
 						eventMessage: id,
 						isChecked: true,
 						eventComments:text,
@@ -148,7 +148,7 @@
 						setEvent(contact,id,cat,true,text);
 					});
 
-					if(checkedcontacts.keys().toJSON() != cuurentcontacts.toJSON()) {
+					if(Object.toJSON(checkedcontacts.keys()) != Object.toJSON(cuurentcontacts)) {
 						updatemessages(tabs.currentSection,tabs.currentSection);
 					} else {
 						$(prefix + 'rem' + id).hide();
@@ -528,7 +528,7 @@
 			new Ajax.Request(requesturl,
 			{
 				method:'post',
-				parameters: {eventContacts: checkedcontacts.keys().toJSON(),
+				parameters: {eventContacts: Object.toJSON(checkedcontacts.keys()),
 							eventMessage: msgid,
 							isChecked:(state == 2),
 							sectionid:$('classselect').getValue()},
@@ -558,7 +558,7 @@
 						}
 						setEvent(contact,msgid,$(htmlid).readAttribute('category'),(state == 2),false);
 					});
-					if(checkedcontacts.keys().toJSON() != cuurentcontacts.toJSON()) {
+					if(Object.toJSON(checkedcontacts.keys()) != Object.toJSON(cuurentcontacts) {
 						updatemessages(tabs.currentSection,tabs.currentSection);
 					} else {
 						$(htmlid).down('img').src = getstatesrc(state);
