@@ -558,7 +558,7 @@
 						}
 						setEvent(contact,msgid,$(htmlid).readAttribute('category'),(state == 2),false);
 					});
-					if(Object.toJSON(checkedcontacts.keys()) != Object.toJSON(cuurentcontacts) {
+					if(Object.toJSON(checkedcontacts.keys()) != Object.toJSON(cuurentcontacts)) {
 						updatemessages(tabs.currentSection,tabs.currentSection);
 					} else {
 						$(htmlid).down('img').src = getstatesrc(state);
