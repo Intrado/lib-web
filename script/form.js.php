@@ -179,10 +179,6 @@ function form_validation_display(element,style, msgtext) {
 	var name = $(e.up(".radiobox") || e.up(".multicheckbox") || e).id ;
 
 	var fieldarea = $(name + "_fieldarea");
-	
-	// If field is in a modal it may not exist after closeing. if element does not exist, exit validation
-	if(!fieldarea)
-		return;
 
 	var icon = $(name + "_icon");
 	var msg = $(name + "_msg");
@@ -211,25 +207,36 @@ function form_validation_display(element,style, msgtext) {
 	//set up the validation transition effects
 
 	//for IE, make sure we dont fade between blank msgs or it will expand the msg box and move around
-	if (msgtext.length == 0)
-		msg.hide();
-	else
-		msg.show();
-
-		//dont refade anything unless the message has changed or is in process of changing
-	if ((msgtext.length == 0 || msgtext != msg.innerHTML) || fieldarea.bgeffect) {
-		//set BG color
-		if (fieldarea.bgeffect) {
-			fieldarea.bgeffect.cancel();
-			fieldarea.bgeffect = null;
-		}
-		fieldarea.bgeffect = new Effect.Morph(fieldarea,{style: css, duration: 0.5, afterFinish: function() {fieldarea.bgeffect = null;}});
-
-		//set up 2 queued effects that will fade to new bg color, then swap text and fade in
-		Effect.Queues.get(msg.id).each(function(effect) { effect.cancel(); });
-		new Effect.Opacity(msg,{duration: 0.25, from:1, to:0, afterFinish: function () {if (!(msg.innerHTML == "" && msgtext == "")) msg.innerHTML = msgtext}, queue: { position: 'end', scope: msg.id }});
-		new Effect.Opacity(msg,{duration: 0.25, from:0, to:1, afterFinish: function () {if(msgtext == "") msg.hide();}, queue: { position: 'end', scope: msg.id }});
+	if (msg) {
+		if (msgtext.length == 0)
+			msg.hide();
+		else
+			msg.show();
 	}
+	
+	// If field is in a modal it may not exist after closeing.
+	if (fieldarea) {
+		//dont refade anything unless the message has changed or is in process of changing
+		if ((msgtext.length == 0 || msgtext != msg.innerHTML) || fieldarea.bgeffect) {
+			//set BG color
+			if (fieldarea.bgeffect) {
+				fieldarea.bgeffect.cancel();
+				fieldarea.bgeffect = null;
+			}
+			fieldarea.bgeffect = new Effect.Morph(fieldarea,{style: css, duration: 0.5, afterFinish: function() {fieldarea.bgeffect = null;}});
+	
+			//set up 2 queued effects that will fade to new bg color, then swap text and fade in
+			Effect.Queues.get(msg.id).each(function(effect) { effect.cancel(); });
+			new Effect.Opacity(msg,{duration: 0.25, from:1, to:0, afterFinish: function () {if (!(msg.innerHTML == "" && msgtext == "")) msg.innerHTML = msgtext}, queue: { position: 'end', scope: msg.id }});
+			new Effect.Opacity(msg,{duration: 0.25, from:0, to:1, afterFinish: function () {if(msgtext == "") msg.hide();}, queue: { position: 'end', scope: msg.id }});
+		}
+	} else {
+		// if the message field does exist, set the content
+		if (msg)
+			msg.innerHTML = msgtext
+	}
+	// fire an event indicating validation is complete.
+	e.fire("validation:complete", { "style": style });
 }
 
 function form_make_validators(form, formvars) {
