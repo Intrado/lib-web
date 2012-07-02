@@ -267,6 +267,10 @@ class ValTimePassed extends Validator {
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
 $userjobtypes = JobType::getUserJobTypes(false);
+$jobtypes = array();
+foreach ($userjobtypes as $id => $jobtype) {
+	$jobtypes[$id] = $jobtype->name;
+}
 
 // need to reserve some characters for the link url and the six byte code. (http://smalldomain.com/<code>)
 $twitterreservedchars = mb_strlen(" http://". getSystemSetting("tinydomain"). "/") + 6;
@@ -303,9 +307,9 @@ $formdata = array(
 				"value" => "",
 				"validators" => array(
 						array("ValRequired"),
-						array("ValInArray", "values" => array_keys($userjobtypes))
+						array("ValInArray", "values" => array_keys($jobtypes))
 				),
-				"control" => array("SelectMenu", "values" => $userjobtypes),
+				"control" => array("SelectMenu", "values" => $jobtypes),
 				"helpstep" => 1
 		),
 		//=========================================================================================
