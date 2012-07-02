@@ -1,5 +1,32 @@
 jQuery.noConflict();
 (function($) {
+
+	// prototype to jquery event bridge
+	var oldjQueryTrigger = $.event.trigger;
+	var oldPrototypeFire = Element.fire;
+
+	//trigger Prototype event handlers if jQuery fires an allowable Prototype custom event
+	$.event.trigger = function(event, data, elem, onlyHandlers) {
+		if (elem && event && typeof(event) === 'string' && event.indexOf(':') > 0) {
+			if ($(elem).is(document)) {
+				document.fire(event, data ? data[0] : null);
+			} else {
+				oldPrototypeFire(elem, event, data ? data[0] : null, !onlyHandlers);
+			}
+		}
+		oldjQueryTrigger(event, data, elem, onlyHandlers);
+	};
+
+	//trigger jQuery event handlers if Prototype fires a custom event
+	Element.addMethods( {
+		fire: function(element, eventName, memo, bubble) {
+			if (eventName.indexOf(':') > 0) {
+				oldjQueryTrigger(eventName, memo ? [memo] : null, element, !bubble);
+			}
+			oldPrototypeFire(element, eventName, memo, bubble);
+		}
+	});
+	
 	$.fn.loadJobTypes = function(jobtypeid) {
 		$this = this;
 		// Get Type for drop down on inital page
@@ -91,6 +118,7 @@ jQuery.noConflict();
 		
 		// start up validation manager
 		obj_valManager = new ValidationManager();
+		obj_valManager.init();
 		//start up step manager
 		obj_stepManager = new StepManager(obj_valManager);
 		//start up content manager

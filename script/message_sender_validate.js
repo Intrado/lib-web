@@ -36,6 +36,26 @@ function ValidationManager() {
 		]
 	};
 	
+	this.init = function() {
+		$.each(validationMap, function(vIndex, vItems) {
+			$.each(vItems, function(vIndex2, vItem) {
+				var e = $('#'+vItem);
+				e.on("validation:complete", function(event, memo) {
+					switch (memo.style) {
+					case "error":
+						e.removeClass('ok').addClass('er');
+						break;
+					case "valid":
+						e.removeClass('er').addClass('ok');
+						break;
+					default:
+						e.removeClass('ok er');
+					}
+				});
+			});
+		});
+	};
+	
 	this.forceRunValidate = function(step) {
 		$.each(validationMap[step], function(vIndex, vItem) {
 			self.runValidateById(vItem);
@@ -181,7 +201,7 @@ function ValidationManager() {
 		var name = $element.attr('name');
 		var form = name.split("_")[0];
 		var field = name.split("_")[1];
-		form_do_validation(form, field);
+		form_do_validation(form, $element);
 		
 		/*
 		var value = $element.val();
