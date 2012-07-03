@@ -31,13 +31,6 @@ function ContentSaveManager() {
 			var enText = $('#msgsndr_tts_message').val();
 			var translate = $('#msgsndr_phonemessagetexttranslate').is(':checked');
 			var getTranslations = true;
-			
-			var jsonVal = $.toJSON({
-				"gender" : gender,
-				"text" : enText
-			});
-
-			$('#msgsndr_phonemessagetext').val(jsonVal);
 
 			if(translate) {
 				var langCodes = [];
