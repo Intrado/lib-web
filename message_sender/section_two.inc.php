@@ -106,7 +106,7 @@
 				<fieldset class="form_actions">
 					<div class="controls">
 					<button class="btn_save" disabled="disabled" data-nav=".ophone">Save Phone Message</button>
-					<button class="btn_cancel" data-nav=".ophone">Cancel</button>
+					<button class="btn_discard" data-nav=".ophone">Discard</button>
 					</div>
 				</fieldset>
 
@@ -160,7 +160,7 @@
 				<fieldset class="form_actions">
 					<div class="controls">
 					<button class="btn_save" disabled="disabled" data-nav=".ophone" data-tts="true">Save Phone Message </button><img src="img/ajax-loader.gif" class="loading hide">
-					<button class="btn_cancel" data-nav=".ophone">Cancel</button>
+					<button class="btn_discard" data-nav=".ophone">Discard</button>
 					</div>
 				</fieldset>
 
@@ -216,7 +216,7 @@
 				</fieldset>
 				
 				<fieldset class="hide">
-					<label for="msgsndr_form_translate">Translate</label>
+					<label for="msgsndr_form_emailtranslate">Translate</label>
 					<div class="controls">
 						<input type="checkbox" id="msgsndr_form_emailtranslate" class="msgdata" name="email_translate" value=""  data-display="#email_translate" />
 						<a class="toggle-translations hide" data-target="#email_translate" data-txt="#msgsndr_tts_message" href=""></a>
@@ -238,7 +238,7 @@
 				<fieldset class="form_actions">
 					<div class="controls">
 					<button class="btn_save" disabled="disabled" data-nav=".oemail">Save Email Message</button><img src="img/ajax-loader.gif" class="loading hide" />
-					<button class="btn_cancel" data-nav=".oemail">Cancel</button>
+					<button class="btn_discard" data-nav=".oemail">Discard</button>
 					</div>
 				</fieldset>
 
@@ -263,7 +263,7 @@
 				<fieldset class="form_actions">
 					<div class="controls">
 						<button class="btn_save" disabled="disabled" data-nav=".osms">Save SMS Message</button>
-						<button class="btn_cancel" data-nav=".osms">Cancel</button>
+						<button class="btn_discard" data-nav=".osms">Discard</button>
 					</div>
 				</fieldset>
 
@@ -399,7 +399,7 @@
 				<fieldset class="form_actions">
 					<div class="controls">
 						<button class="btn_save" disabled="disabled" data-nav=".osocial">Save Social Messages</button>
-						<button class="btn_cancel" data-nav=".osocial">Cancel</button>
+						<button class="btn_discard" data-nav=".osocial">Discard</button>
 					</div>
 				</fieldset>
 

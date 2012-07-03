@@ -1,6 +1,5 @@
 jQuery.noConflict();
 (function($) {
-
 	// prototype to jquery event bridge
 	var oldjQueryTrigger = $.event.trigger;
 	var oldPrototypeFire = Element.fire;
@@ -61,6 +60,47 @@ jQuery.noConflict();
 			} // success
 		});
 	};
+
+
+    /**
+     * Saves or restores a memento for the form fields found below the current element(s).  If the data
+     * parameter is undefined or not an object, returns the current state of each input as an object.
+     * Otherwise, sets the state of each input based on the contents of the data object.
+     * @param data null to save the current state, or an object where keys correspond to form field names to restore
+     * @return when saving, an object with the current state of the matched form fields; when restoring, the jquery object
+     */
+    $.fn.memento = function(data) {
+        var inputs = $(this).find(":input").get();
+
+        if(data == null || typeof data != "object") {
+            // return all data
+            data = {};
+
+            $.each(inputs, function() {
+                if (typeof this.name !== 'undefined'
+                        && (this.checked
+                                    || /select|textarea/i.test(this.nodeName)
+                        || /text|hidden|password/i.test(this.type))) {
+                    data[this.name] = $(this).val();
+                }
+            });
+            return data;
+        } else {
+            $.each(inputs, function() {
+                if (typeof this.name !== 'undefined'
+                        && typeof data[this.name] !== 'undefined') {
+                    if(this.type == "checkbox" || this.type == "radio") {
+                        $(this).prop("checked", (data[this.name] == $(this).val()));
+                    } else {
+                        $(this).val(data[this.name]);
+                    }
+                } else if (this.type == "checkbox") {
+                    $(this).prop("checked", false);
+                }
+            });
+            return $(this);
+        }
+    };
 	
 	$(function() {
 		// hide a few items
@@ -78,7 +118,8 @@ jQuery.noConflict();
 		loadMsg = new $.loadMessage();
 		loadMsg.init();
 		recipientTrack = 0;
-		
+
+        mementos = {};
 		
 		//start up permission manager
 		obj_permissionManager = new PermissionManager();
@@ -125,14 +166,47 @@ jQuery.noConflict();
 		obj_contentManager = new ContentManager();
 		//start up submit manager
 		obj_submitManager = new SubmitManager();
-		
+
 		obj_stepManager.onStepChange(function(lastStep, nextStep) {
 			//alert("stepChange! " + lastStep + " to " + nextStep);
 			obj_valManager.forceRunValidate(nextStep);
 		});
-		
+
+        obj_contentManager.onContentDiscard(function(contentMode) {
+            var idSelector = "#msgsndr_tab_" + contentMode;
+
+            //Hide various toggle-able HTML components, if they are currently open...
+            //close up the translators
+            if (contentMode == "phone" || contentMode == "email") {
+                if ($(idSelector + " .toggle-translations").text().substring(0, 4) == "Hide") {
+                    $(idSelector + " .toggle-translations").click();
+                }
+            }
+
+            //close up the Post to ___ regions
+            if (contentMode == "social") {
+                $("input.social").each(function(index, element) {
+                    if (element.checked) {
+                        element.click();
+                    }
+                });
+            }
+
+            //Restore original form field states
+            if (mementos[contentMode]) {
+                $(idSelector).memento(mementos[contentMode]);
+            }
+
+            clearHtmlEditorContent();
+        });
+
+
 		obj_contentManager.onContentStart(function(contentMode) {
-			if(contentMode == "phone") {
+            if (!mementos[contentMode]) {
+                mementos[contentMode] = $("#msgsndr_tab_" + contentMode).memento(null);
+            }
+
+            if(contentMode == "phone") {
 				/*
 					Paste from email button: Low proirity: 
 					Issues with getting text from CKEDITOR as comes through as HTML, need to strip this and 
