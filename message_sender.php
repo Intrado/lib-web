@@ -971,7 +971,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					break;
 				case "text":
 					$sourcemessage = json_decode($postdata["phonemessagetext"]);
-					error_log($postdata["phonemessagetext"]. " ". $sourcemessage->text);
 
 					// this is the default 'en' message so it's autotranslate value is 'none'
 					$messages['phone']['voice']['en']['none']['text'] = $sourcemessage->text;
