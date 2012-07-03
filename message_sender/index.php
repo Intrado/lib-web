@@ -21,7 +21,7 @@
 		
 		<div class="window_body_wrap">
 
-		<input type="hidden" name="broadcast_formsnum" value="<?=$form->serialnum?>" />
+		<input type="hidden" name=msgsndr-formsnum value="<?=$form->serialnum?>" />
 
 <? include("message_sender/section_one.inc.php"); ?>
 

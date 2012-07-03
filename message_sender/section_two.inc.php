@@ -171,7 +171,7 @@
 			<!-- Add the email panel -->
 			<div id="msgsndr_tab_email" class="tab_panel">
 
-				<input type="checkbox" class="hidden msgdata" id="msgsndr_hasemail" name="msgsndr_hasemail"/>>
+				<input type="checkbox" class="hidden msgdata" id="msgsndr_hasemail" name="msgsndr_hasemail"/>
 				<div id="msgsndr_hasemail_msg" class="box_validatorerror er" style="display:none"></div>
 
 				<fieldset class="check">

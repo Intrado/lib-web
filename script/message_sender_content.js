@@ -40,7 +40,7 @@ var allowControl = {
 		});
 
 		function ttsTranslate(elem) {
-			var txtField = $('#msgsndr_phonemessagetext').val();
+			var txtField = $('#msgsndr_tts_message').val();
 			var selectedTtslangCodes = [];
 
 			var checkTranslations = $('input[name^=tts_override]');
@@ -119,12 +119,13 @@ var allowControl = {
 			var langCode = ttslangCodes[transIndex];
 
 			var ttsTranslate = '<fieldset>';
+			var fieldname = "msgsndr_phonemessagetexttranslate" + langCode + "text";
 
 	        ttsTranslate += '<input type="checkbox" checked="checked" name="save_translation" class="msgdata translations" id="tts_'+langCode+'" />';
-	        ttsTranslate += '<label for="tts_'+langCode+'">'+nLangs[langCode]+'</label>';
+	        ttsTranslate += '<label for="tts_'+langCode+'">'+nLangs[langCode]+'&nbsp;<img id="'+fieldname+'_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>';
 	        ttsTranslate += '<div class="controls">';
-	        ttsTranslate += '<input type="hidden" name="phone_translate_' + langCode + '">';
 	        ttsTranslate += '<textarea id="tts_translated_'+langCode+'" class="msgdata" disabled="disabled"></textarea>';
+	        ttsTranslate += '<div id="'+fieldname+'_msg" class="box_validatorerror er" style="display:none"></div>';
 	        ttsTranslate += '<button class="playAudio" data-text="tts_translated_'+langCode+'" data-code="'+langCode+'"><span class="icon play"></span> Play Audio</button>';
 	        ttsTranslate += '<button class="show_hide_english" data-text="'+nLangs[langCode]+'" data-code="'+langCode+'">Show In English</button>';
 	        ttsTranslate += '<input type="checkbox" name="tts_override_'+langCode+'" class="msgdata" id="tts_override_'+langCode+'" /><label for="tts_override_'+langCode+'">Override Translation</label>';
@@ -319,12 +320,13 @@ var allowControl = {
 
 		$.each(elangCodes, function(transIndex, transData) {
 			var langCode = elangCodes[transIndex];
+			var fieldname = "msgsndr_emailmessagetexttranslate"+langCode+"text";
 			$('#email_translate').append(
 				'<fieldset>'+
 					'<input type="checkbox" class="msgdata" checked="checked" id="email_'+langCode+'"  name="email_save_translation" class="translations" />'+
 					'<label for="email_'+langCode+'">'+nLangs[langCode]+'</label>'+
 					'<div class="controls">'+
-						'<input type="hidden" name="email_translate_' + langCode + '">'+
+						'<input type="hidden" name="'+fieldname+'">'+
 						'<div class="msgdata html_translate" id="email_translated_'+langCode+'"></div>'+
 					'</div>'+
 				'</fieldset>');
@@ -605,7 +607,7 @@ function ContentManager() {
 			$('.msg_content_nav li').removeClass('lighten');
 			$('.msg_content_nav ' + $button.attr("data-nav")).removeClass('active').addClass('complete');
 
-			$('input[name=has_' + currentContent + ']').attr('checked', 'checked');
+			$('input[name=msgsndr_has' + currentContent + ']').attr('checked', 'checked');
 
 			// Set Message tabs on review tab
 			$('#msgsndr_review_' + currentContent).parent().addClass('complete');

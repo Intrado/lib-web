@@ -49,40 +49,29 @@
 				
 				<div id="adv_options" class="close">
 				<fieldset>
-					<label for="auto_report">Auto Report</label>
+					<label for="msgsndr_optionautoreport">Auto Report&nbsp;<img id="msgsndr_optionautoreport_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>
 					<div class="controls cf">
-						<input type="checkbox" id="auto_report" name="options_autoreport" checked="checked"/>
+						<input type="checkbox" id="msgsndr_optionautoreport" name="msgsndr_optionautoreport" checked="checked"/>
+						<div id="msgsndr_optionautoreport_msg" class="box_validatorerror er" style="display:none"></div>
 					</div>
 				</fieldset>
-
-<!-- 				<fieldset>
-				<label for="allow_reply">Allow Reply</label>
-					<div class="controls cf">
-						<input type="checkbox" id="allow_reply" name="options_allowreply"/>
-					</div>	
-				</fieldset> -->
 
 				<fieldset id="skip_duplicates" class="hidden">
-					<label for="skip_phones">Skip Duplicates</label>
+					<label for="msgsndr_optionskipduplicate">Skip Duplicates&nbsp;<img id="msgsndr_optionskipduplicate_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>
 					<div class="controls cf">
-						<input type="checkbox" id="skip_phones" name="options_skipduplicates" checked="checked"/>
+						<input type="checkbox" id="msgsndr_optionskipduplicate" name="msgsndr_optionskipduplicate" checked="checked"/>
+						<div id="msgsndr_optionskipduplicate_msg" class="box_validatorerror er" style="display:none"></div>
 					</div>
 				</fieldset>
 
-				<fieldset>				
-					<label for="save_later">Save Message</label>
+				<fieldset>
+					<label for="msgsndr_optionsavemessage">Save Message&nbsp;<img id="msgsndr_optionsavemessagename_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>
 					<div class="controls cf">
-						<input type="checkbox" id="save_later" name="save_later" name="options_savemessage" />
-						<input type="text" name="options_savemessagename" maxlength="30" disabled="disabled"/>
+						<input type="checkbox" id="msgsndr_optionsavemessage" name="msgsndr_optionsavemessage" />
+						<input type="text" id="msgsndr_optionsavemessagename" name="msgsndr_optionsavemessagename" maxlength="30" disabled="disabled"/>
+						<div id="msgsndr_optionsavemessagename_msg" class="box_validatorerror er" style="display:none"></div>
 					</div>
 				</fieldset>
-
-<!-- 				<fieldset>
-					<label for="max_attempts">Max Attempts</label>
-					<div class="controls cf">
-						<select id="msgsndr_form_maxattempts" name="max_attempts" name="options_maxattempts"></select>
-					</div>
-				</fieldset> -->
 
 				</div><!-- adv_options -->
 			
@@ -94,16 +83,17 @@
 							
 			<div class="modal-body">
 				<fieldset class="cf">
-					<label for="scheduledate">Start Date</label>
+					<label for="msgsndr_scheduledate">Start Date&nbsp;<img id="msgsndr_scheduledate_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>
 					<div class="controls">
-						<input type="text" id="schedule_datepicker" name="broadcast_scheduledate" data-ajax="true" />
+						<input type="text" id="msgsndr_scheduledate" name="msgsndr_scheduledate" data-ajax="true" />
+						<div id="msgsndr_scheduledate_msg" class="box_validatorerror er" style="display:none"></div>
 					</div>
 				</fieldset>
 				
 				<fieldset class="cf">
-					<label for="schedulecallearly">Start Time</label>
+					<label for="msgsndr_schedulecallearly">Start Time&nbsp;<img id="msgsndr_schedulecallearly_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>
 					<div class="controls">
-						<select id="schedulecallearly" name="broadcast_schedulecallearly" data-ajax="true">
+						<select id="msgsndr_schedulecallearly" name="msgsndr_schedulecallearly" data-ajax="true">
 							<option value="12:00 am"  >12:00 am</option>
 							<option value="12:05 am"  >12:05 am</option>
 							<option value="12:10 am"  >12:10 am</option>
@@ -394,14 +384,14 @@
 							<option value="11:55 pm"  >11:55 pm</option>
 							<option value="11:59 pm"  >11:59 pm</option>
 						</select>
-						<span class="error"></span>
+						<div id="msgsndr_schedulecallearly_msg" class="box_validatorerror er" style="display:none"></div>
 					</div>
 				</fieldset>
 				
 				<fieldset class="cf">
-					<label for="schedulecalllate">End Time</label>
+					<label for="msgsndr_schedulecalllate">End Time&nbsp;<img id="msgsndr_schedulecalllate_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>
 					<div class="controls">
-						<select id="schedulecalllate" name="broadcast_schedulecalllate" data-ajax="true">
+						<select id="msgsndr_schedulecalllate" name="msgsndr_schedulecalllate" data-ajax="true">
 							<option value="12:00 am"  >12:00 am</option>
 							<option value="12:05 am"  >12:05 am</option>
 							<option value="12:10 am"  >12:10 am</option>
@@ -692,7 +682,7 @@
 							<option value="11:55 pm"  >11:55 pm</option>
 							<option value="11:59 pm"  >11:59 pm</option>
 						</select>
-						<span class="error"></span>
+						<div id="msgsndr_schedulecalllate_msg" class="box_validatorerror er" style="display:none"></div>
 					</div>
 				</fieldset>
 			</div><!-- field_wrapper -->

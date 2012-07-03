@@ -275,8 +275,14 @@ foreach ($userjobtypes as $id => $jobtype) {
 // need to reserve some characters for the link url and the six byte code. (http://smalldomain.com/<code>)
 $twitterreservedchars = mb_strlen(" http://". getSystemSetting("tinydomain"). "/") + 6;
 
-//Get available languages
-$translationlanguages = Voice::getTTSLanguageMap();
+//Get available tts languages
+$ttslanguages = Voice::getTTSLanguageMap();
+unset($ttslanguages['en']);
+
+// get available translation languages
+global $TRANSLATIONLANGUAGECODES;
+$alllanguages = QuickQueryList("select code, name from language", true);
+$translationlanguages = array_intersect_key($alllanguages, array_flip($TRANSLATIONLANGUAGECODES));
 unset($translationlanguages['en']);
 
 $fcids = array_keys(FeedCategory::getAllowedFeedCategories());
@@ -422,7 +428,7 @@ $formdata = array(
 		)
 );
 
-foreach ($translationlanguages as $code => $language) {
+foreach ($ttslanguages as $code => $language) {
 	$formdata["phonemessagetexttranslate". $code. "text"] = array(
 			"label" => "phonemessagetexttranslate". $code. "text",
 			"value" => "",
@@ -965,6 +971,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					break;
 				case "text":
 					$sourcemessage = json_decode($postdata["phonemessagetext"]);
+					error_log($postdata["phonemessagetext"]. " ". $sourcemessage->text);
 
 					// this is the default 'en' message so it's autotranslate value is 'none'
 					$messages['phone']['voice']['en']['none']['text'] = $sourcemessage->text;
@@ -1199,11 +1206,23 @@ include("nav.inc.php");
 </script>
 
 
-<form id="<?=$form->name?>" name="<?=$form->name?>">
-<?include("message_sender/index.php");?>
-</form>
+<form id="<?=$form->name?>" name="<?=$form->name?>" action="/default/message_sender.php?form=msgsndr" method="POST" ><?
 
-<?
+include("message_sender/index.php");
+
+// cheat and create the hidden translation fields now
+?><div style="display:none"><?
+foreach ($ttslanguages as $code => $language) {
+	$fieldname = "msgsndr_phonemessagetexttranslate". $code. "text";
+	?><input type="hidden" name="<?=$fieldname?>" id="<?=$fieldname?>"><?
+}
+foreach ($translationlanguages as $code => $language) {
+	$fieldname = "msgsndr_emailmessagetexttranslate". $code. "text";
+	?><input type="hidden" name="<?=$fieldname?>" id="<?=$fieldname?>"><?
+}
+?></div>
+</form><?
+
 $posturl = $_SERVER['REQUEST_URI'];
 $posturl .= mb_strpos($posturl,"?") !== false ? "&" : "?";
 $posturl .= "form=". $form->name;

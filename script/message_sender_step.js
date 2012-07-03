@@ -166,43 +166,43 @@ function StepManager(_valManager) {
 		// set up values in the callearly select ...
 		if (usercallearly != false && rolecallearly != false) {
 			// select the users preference and remove earlier times than the role preference
-			$('#schedulecallearly option[value="'+usercallearly+'"]').attr('selected','selected');
-			$('#schedulecallearly option[value="'+rolecallearly+'"]').prevAll().remove();
-			$('#schedulecalllate option[value="'+rolecallearly+'"]').prevAll().remove();
+			$('#msgsndr_schedulecallearly option[value="'+usercallearly+'"]').attr('selected','selected');
+			$('#msgsndr_schedulecallearly option[value="'+rolecallearly+'"]').prevAll().remove();
+			$('#msgsndr_schedulecalllate option[value="'+rolecallearly+'"]').prevAll().remove();
 
 		} else if (usercallearly != false && rolecallearly == false) {
 			// select the users preference and leave all the times available for selection
-			$('#schedulecallearly option[value="'+usercallearly+'"]').attr('selected','selected');
+			$('#msgsndr_schedulecallearly option[value="'+usercallearly+'"]').attr('selected','selected');
 
 		} else if (usercallearly == false && rolecallearly != false) {
 			// select the role permission and remove all earlier times
-			$('#schedulecallearly option[value="'+rolecallearly+'"]').attr('selected','selected').prevAll().remove();
-			$('#schedulecalllate option[value="'+rolecallearly+'"]').prevAll().remove();
+			$('#msgsndr_schedulecallearly option[value="'+rolecallearly+'"]').attr('selected','selected').prevAll().remove();
+			$('#msgsndr_schedulecalllate option[value="'+rolecallearly+'"]').prevAll().remove();
 
 		} else {
 			// select the default time and leave all times as options
-			$('#schedulecallearly option[value="'+defaultcallearly+'"]').attr('selected','selected');
+			$('#msgsndr_schedulecallearly option[value="'+defaultcallearly+'"]').attr('selected','selected');
 		}
 
 		// set up values in the calllate select ...
 		if (usercalllate != false && rolecalllate != false) {
 			// select the users preference and remove later times than the role preference
-			$('#schedulecalllate option[value="'+usercalllate+'"]').attr('selected','selected');
-			$('#schedulecalllate option[value="'+rolecalllate+'"]').nextAll().remove();
-			$('#schedulecallearly option[value="'+rolecalllate+'"]').nextAll().remove();
+			$('#msgsndr_schedulecalllate option[value="'+usercalllate+'"]').attr('selected','selected');
+			$('#msgsndr_schedulecalllate option[value="'+rolecalllate+'"]').nextAll().remove();
+			$('#msgsndr_schedulecallearly option[value="'+rolecalllate+'"]').nextAll().remove();
 
 		} else if (usercalllate != false && rolecalllate == false) {
 			// select the users preference and leave all the times available for selection
-			$('#schedulecalllate option[value="'+usercalllate+'"]').attr('selected','selected');
+			$('#msgsndr_schedulecalllate option[value="'+usercalllate+'"]').attr('selected','selected');
 			
 		} else if (usercalllate == false && rolecalllate != false) {
 			// select the role permission and remove all later times
-			$('#schedulecalllate option[value="'+rolecalllate+'"]').attr('selected','selected').nextAll().remove();
-			$('#schedulecallearly option[value="'+rolecalllate+'"]').nextAll().remove();
+			$('#msgsndr_schedulecalllate option[value="'+rolecalllate+'"]').attr('selected','selected').nextAll().remove();
+			$('#msgsndr_schedulecallearly option[value="'+rolecalllate+'"]').nextAll().remove();
 
 		} else {
 			// select the default time and leave all times as options
-			$('#schedulecalllate option[value="'+defaultcalllate+'"]').attr('selected','selected');
+			$('#msgsndr_schedulecalllate option[value="'+defaultcalllate+'"]').attr('selected','selected');
 		}
 
 		// skip duplicates checkbox show / hide based on saved phone or email content
@@ -232,8 +232,8 @@ function StepManager(_valManager) {
 			if (isTooLate == true) {
 				var addOneDay = moment().add('days',1); 
 				var futureDay = addOneDay.format('MM/DD/YYYY');
-				$('#schedule_datepicker').val(futureDay);
-				$('#schedule_datepicker').parent().parent().prepend('<p class="warning">Note: Start Date has been adjusted for tomorrow due to the limitations of your account</p>');
+				$('#msgsndr_scheduledate').val(futureDay);
+				$('#msgsndr_scheduledate').parent().parent().prepend('<p class="warning">Note: Start Date has been adjusted for tomorrow due to the limitations of your account</p>');
 			}
 		}
 
@@ -268,16 +268,16 @@ function StepManager(_valManager) {
 	});
 	
 	//BIND STEP 3 SAVE MESSAGE
-	$('#save_later').on('click', function() {
-		var saveMsgName = $('input[name=options_savemessagename]');
+	$('#msgsndr_optionsavemessage').on('click', function() {
+		var saveMsgName = $('#msgsndr_optionsavemessagename');
 		if ($(this).attr('checked') == 'checked') {
 			saveMsgName.removeAttr('disabled');
 			var bSubject = $('#msgsndr_name').val();
-			$('input[name=options_savemessagename]').val(bSubject).focus();
+			$('#msgsndr_optionsavemessagename').val(bSubject).focus();
 			
 		} else {
 			saveMsgName.attr('disabled', 'disabled');
-			$('input[name=options_savemessagename]').val('');
+			$('#msgsndr_optionsavemessagename').val('');
 		}
 	});
 };

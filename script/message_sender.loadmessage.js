@@ -430,7 +430,7 @@ $.loadMessage = function loadMessage() {
 							$(self.elements.phoneOverridePrefix + msg.languageCode).attr('checked','checked');
 						}
 						updateTranslatedField(
-							$('input[name=phone_translate_' + msg.languageCode + ']'),
+								$('#msgsndr_phonemessagetexttranslate' + msg.languageCode + 'text'),
 							data.messageBody, true, override, gender);
 					});
 			}

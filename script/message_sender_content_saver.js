@@ -24,6 +24,7 @@ function ContentSaveManager() {
 					});
 				});
 			}
+			
 			return getTranslations;
 		},
 		"translation" : function() {
@@ -41,7 +42,7 @@ function ContentSaveManager() {
 					var overRide = $('#tts_override_' + langCode).is(':checked');
 					if(overRide) {
 						updateTranslatedField(
-								$('input[name=phone_translate_' + langCode + ']'),
+								$('#msgsndr_phonemessagetexttranslate' + langCode + 'text'),
 								$('#tts_translated_' + langCode).val(), true, true, gender);
 					} else {
 						langCodes.push(langCode);
@@ -51,12 +52,12 @@ function ContentSaveManager() {
 				getTranslations = $.translate(enText, langCodes, function(data) {
 					$.each(data.responseData, function(transIndex, transData) {
 						updateTranslatedField(
-								$('input[name=phone_translate_' + transData.code + ']'),
+								$('#msgsndr_phonemessagetexttranslate' + transData.code + 'text'),
 								transData.translatedText, true, false, gender);
 					});
 				});
 			}
-			
+
 			return getTranslations;
 		},
 		"feed" : function() {
