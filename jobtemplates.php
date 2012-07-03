@@ -25,9 +25,9 @@ if (isset($_GET['delete'])) {
 		if ($job->status == "template" && $job->softDelete())
 			notice(_L("The %s Template, %s, is now deleted.", getJobTitle(), escapehtml($job->name)));
 		else
-			notice(_L("The %s Template, %s, Count not be deleted. %s", getJobTitle(), escapehtml($job->name),$job->status));
+			notice(_L("The %s Template, %s, Could not be deleted. %s", getJobTitle(), escapehtml($job->name),$job->status));
 	} else {
-		notice(_L("The %s Template, Count not be deleted.", getJobTitle()));
+		notice(_L("The %s Template, Could not be deleted.", getJobTitle()));
 	}
 	redirectToReferrer();
 }
