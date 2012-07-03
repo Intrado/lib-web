@@ -654,8 +654,7 @@ function sessionKeepAliveWarning(timeout) {
 		var content = new Element('div', {'class': 'keepalive'});
 		content.appendChild(new Element('img', {src:"img/icons/lock.png", alt: "Warning"}));
 		content.appendChild(new Element('span').update("Your session is about to close due to inactivity."));
-		content.appendChild(new Element('p').update(new Element('button')
-			.update("Refresh Session")
+		content.appendChild(new Element('p', {style: "margin: 10px 0"}).update(icon_button("Refresh Session","tick")
 			.observe("click", function() {
 				content.update(new Element('img', {src:"img/ajax-loader.gif", alt: "Refreshing Session"}));
 				new Ajax.Request('ajax.php',{
