@@ -260,7 +260,7 @@
 						<textarea id="msgsndr_smsmessagetext" name="msgsndr_smsmessagetext" class="msgdata required"></textarea>
 						<div id="msgsndr_smsmessagetext_msg" class="box_validatorerror er" style="display:none"></div>
 						<div>
-							<p><a href="javascript:void(null);" id="sms_sc" onclick="(new spellChecker($('msgsndr_form_sms')) ).openChecker();">Spell Check</a> <span class="sms characters">160 Characters left</span></p>
+							<p><a href="javascript:void(null);" id="sms_sc" onclick="(new spellChecker($('msgsndr_smsmessagetext')) ).openChecker();">Spell Check</a> <span class="sms characters">160 Characters left</span></p>
 						</div>
 					</div>
 				</fieldset>
