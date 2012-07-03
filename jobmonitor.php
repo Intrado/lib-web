@@ -329,7 +329,7 @@ if (!$noupdate) {
 					}
 
 					$('notice').update(data.notice);
-					$('jobmonitor').down('div.windowtitle').update(data.windowtitle);
+					$('jobmonitor').down('h2.window_title').update(data.windowtitle);
 
 					displayDestinations(data.jobstatus);
 
