@@ -25,32 +25,32 @@ $.loadMessage = function loadMessage() {
 		"phoneTextOptions": $("#text_advanced_options"),
 		
 		"emailComplete": $('li.oemail'),
-		"hasEmail": $('input[name=has_email]'),
-		"emailBody": $("#msgsndr_form_body"),
-		"emailAttach" : $('#msgsndr_form_attachment'),
+		"hasEmail": $('#msgsndr_hasemail'),
+		"emailBody": $("#msgsndr_emailmessagetext"),
+		"emailAttach" : $('#msgsndr_emailmessageattachment'),
 		"emailAttachControls": $('#uploadedfiles'),
-		"emailSubject": $('#msgsndr_form_mailsubject'),
-		"emailFromName": $('#msgsndr_form_name'),
-		"emailFromEmail": $('#msgsndr_form_email'),
+		"emailSubject": $('#msgsndr_emailmessagesubject'),
+		"emailFromName": $('#msgsndr_emailmessagefromname'),
+		"emailFromEmail": $('#msgsndr_emailmessagefromemail'),
 		"emailTranslatePrefix": "#email_translated_",
-		"emailTranslateCheck": $("#msgsndr_form_emailtranslate"),
+		"emailTranslateCheck": $("#msgsndr_emailmessagetexttranslate"),
 		"emailLanguageCheckPrefix": "#email_",
 
 		"smsComplete": $('li.osms'),
-		"hasSms": $('input[name=has_sms]'),
-		"smsText": $('#msgsndr_form_sms'),
+		"hasSms": $('#msgsndr_hassms'),
+		"smsText": $('#msgsndr_smsmessagetext'),
 
 		"socialComplete": $('li.osocial'),
 		
-		"hasFacebook": $('#msgsndr_form_facebook'),
+		"hasFacebook": $('#msgsndr_hasfacebook'),
 		"facebookSection": $('div.facebook'),
-		"facebookText": $('#msgsndr_form_fbmsg'),
+		"facebookText": $('#msgsndr_socialmediafacebookmessage'),
 		
-		"hasTwitter": $('#msgsndr_form_twitter'),
+		"hasTwitter": $('#msgsndr_hastwitter'),
 		"twitterSection": $('div.twitter'),
-		"twitterText": $('#msgsndr_form_tmsg'),
+		"twitterText": $('#msgsndr_socialmediatwittermessage'),
 		
-		"hasFeed": $('#msgsndr_form_feed'),
+		"hasFeed": $('#msgsndr_hasfeed'),
 		"feedSection": $('div.feed'),
 		"feedSubject": $('#msgsndr_form_rsstitle'),
 		"feedText": $('#msgsndr_form_rssmsg')
@@ -415,6 +415,7 @@ $.loadMessage = function loadMessage() {
 					function (data) {
 						$('#msgsndr_phonemessagetext').val($.toJSON({ "gender" : gender, "text" : data.messageBody }))
 					});
+				// TODO: assign gender
 			} else {
 				self.elements.phoneTranslateCheck.attr("checked","checked");
 				$(self.elements.phoneLanguageCheckPrefix + msg.languageCode).attr('checked','checked');
@@ -476,7 +477,7 @@ $.loadMessage = function loadMessage() {
 				self.elements.feedSubject.val(subject).addClass('ok');
 				self.loadMessagePartsFormatted(msgGrp.id, msg, self.elements.feedText.addClass('ok'), false,
 					function (data) {
-						$("#msgsndr_rsspost").val($.toJSON({ "subject": subject, "message": data.messageBody }));
+						$("#msgsndr_socialmediafeedmessage").val($.toJSON({ "subject": subject, "message": data.messageBody }));
 					});
 				
 				break;

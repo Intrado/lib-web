@@ -17,19 +17,27 @@ function ValidationManager() {
 			"msgsndr_phonemessagecallme",
 			"msgsndr_phonemessagetext",
 			"msgsndr_phonemessagetexttranslate",
+			"msgsndr_optioncallerid",
+			"msgsndr_optionmaxjobdays",
+			"msgsndr_optionleavemessage",
+			"msgsndr_optionmessageconfirmation",
 			// TODO: phone message translations
-			//"msgsndr_emailmessagefromname",
-			//"msgsndr_emailmessagefromemail",
-			//"msgsndr_emailmessagesubject",
-			//"msgsndr_emailmessageattachment",
-			//"msgsndr_emailmessagetext",
+			"msgsndr_emailmessagefromname",
+			"msgsndr_emailmessagefromemail",
+			"msgsndr_emailmessagesubject",
+			"msgsndr_emailmessageattachment",
+			"msgsndr_emailmessagetext",
 			// email translations arn't editable...
-			//"msgsndr_smsmessagetext",
-			//"msgsndr_socialmediafacebookmessage",
-			//"msgsndr_socialmediatwittermessage",
-			//"msgsndr_socialmediafeedmessage",
-			//"msgsndr_socialmediafeedcategory",
-			//"msgsndr_optioncallerid"
+			"msgsndr_smsmessagetext",
+			"msgsndr_phonemessagepost",
+			"msgsndr_hasfacebook",
+			"msgsndr_socialmediafacebookmessage",
+			"msgsndr_socialmediafacebookpage",
+			"msgsndr_hastwitter",
+			"msgsndr_socialmediatwittermessage",
+			"msgsndr_hasfeed",
+			"msgsndr_socialmediafeedmessage",
+			"msgsndr_socialmediafeedcategory"
 		],
 		"3": [
 			

@@ -263,7 +263,7 @@ var allowControl = {
 		
 		// Add users' email address to the from email field
 		if(userInfo.email != '') {
-        	$('#msgsndr_form_email').attr('value', userInfo.email);
+        	$('#msgsndr_emailmessagefromemail').attr('value', userInfo.email);
 		}
 		
 		// Hide / Show Translations
@@ -288,7 +288,7 @@ var allowControl = {
 		});
 
 		function eTranslate() {
-			var txtField = $("#msgsndr_form_body").val();
+			var txtField = $("#msgsndr_emailmessagetext").val();
 
 			$(this).parent().append('<button id="email_retranslate" data-target="#email_translate">Re Translate</button>');
 
@@ -334,7 +334,7 @@ var allowControl = {
 		var $ = jQuery;
 		$('li.osms').removeClass('notactive');
 
-		/*$("#msgsndr_form_sms").on({
+		/*$("#msgsndr_smsmessagetext").on({
 			keyup : function() {
 				charCount(this, '160', '.sms.characters');
 
@@ -352,18 +352,18 @@ var allowControl = {
 		// set up the facebook api and any event listeners
 		$.when(window.tokenCheck, getFbAuthorizedPages()).done(function() {
 			// populate the authorized destinations hidden form item
-			$("#msgsndr_fbpageauthpages").val($.toJSON({"pages":facebookPages,"wall":(orgOptions.fbauthorizewall?true:false)}));
+			$("#msgsndr_socialmediafacebookpageauthpages").val($.toJSON({"pages":facebookPages,"wall":(orgOptions.fbauthorizewall?true:false)}));
 			// intialize facebook with the current user's token
 			initFacebook(fbToken);
 			// listen for clicks to show facebook info
 			$("#msgsndr_ctrl_social").on('click', function(event) {
 				if (fbToken)
-				updateFbPages(fbToken, "msgsndr_fbpage", "msgsndr_fbpagefbpages", false);
+				updateFbPages(fbToken, "msgsndr_socialmediafacebookpage", "msgsndr_socialmediafacebookpagefbpages", false);
 			});
 		});
 
 		// Character Count
-		/*$('#msgsndr_form_fbmsg').on('keyup', function() {
+		/*$('#msgsndr_socialmediafacebookmessage').on('keyup', function() {
 			charCount(this, '420', '.fb.characters');
 		});*/
 		
@@ -374,7 +374,7 @@ var allowControl = {
 		//$('div[data-social=twitter]').removeClass('hidden');
 		//$('.twit.characters').prepend(twitterCharCount);
 		// Character Count
-		/*$('#msgsndr_form_tmsg').on('keyup', function() {
+		/*$('#msgsndr_socialmediatwittermessage').on('keyup', function() {
 			charCount(this, twitterCharCount, '.twit.characters');
 		});*/
 		
@@ -390,10 +390,18 @@ var allowControl = {
 			dataType: "json",
 			success: function(data) {
 				feedCats = data.feedCategories;
-
-				$.each(feedCats, function(index, feedCat) {  
-					var name = feedCat.name.toLowerCase().replace(" ","_");
-					$('#feed_categories').append('<div class="cf"><input type="checkbox" class="addme saverclass" name="msgsndr_socialmediafeedcategory[]" id="'+name+'" value="'+feedCat.id+'" /><label class="addme" for="'+name+'">'+feedCat.name+'</label></div>');
+				
+				var count = 0;
+				var fieldname = "msgsndr_socialmediafeedcategory";
+				var field = $('#'+fieldname);
+				$.each(feedCats, function(index, feedCat) {
+					count++;
+					var id = fieldname+'_'+count;
+					field.append(
+							'<input type="checkbox" class="addme saverclass" name="'+fieldname+'[]" id="'+id+'" value="'+feedCat.id+'" />'+
+							'<label class="addme" for="'+id+'"></label><div style="clear:both"></div>');
+					// escape html on feed category names
+					field.children("label[for='"+id+"']").text(feedCat.name);
 				});
 			}
 		});
@@ -449,11 +457,11 @@ function ContentManager() {
 		if(currentContent == "social") {
 			if($("input.social:checked").size() == 0) {
 				readyForSave = false;
-			} else if($("#msgsndr_form_feed").is(":checked") && $("input:checked", "#feed_categories").size() == 0) {
-				readyForSave = false;
-			} else if($("#msgsndr_form_facebook").is(":checked")) {
-				if($("#msgsndr_fbpageconnect").is(":visible")) {
-					readyForSave = false;
+			} else if($("#msgsndr_hasfeed").is(":checked") && $("input:checked", "#feed_categories").size() == 0) {
+				//readyForSave = false;
+			} else if($("#msgsndr_hasfacebook").is(":checked")) {
+				if($("#msgsndr_socialmediafacebookpageconnect").is(":visible")) {
+					//readyForSave = false;
 				}
 			}
 			
@@ -500,11 +508,11 @@ function ContentManager() {
 			clearTimeout(item);
 		});
 		if(mode == "sms") {
-			autoUpdateCharCount($("#msgsndr_form_sms"), 160, $(".sms.characters"));
+			autoUpdateCharCount($("#msgsndr_smsmessagetext"), 160, $(".sms.characters"));
 		} else if(mode == "social") {
-			autoUpdateCharCount($("#msgsndr_form_fbmsg"), 420, $(".fb.characters"));
+			autoUpdateCharCount($("#msgsndr_socialmediafacebookmessage"), 420, $(".fb.characters"));
 			var twitterCharCount = 140 - twitterReservedChars;
-			autoUpdateCharCount($("#msgsndr_form_tmsg"), twitterCharCount, $(".twit.characters"));
+			autoUpdateCharCount($("#msgsndr_socialmediatwittermessage"), twitterCharCount, $(".twit.characters"));
 			
 			//IF NO PHONE MESSAGE IS SAVED, HIDE THE LINK TO AUDIO FILE
 			if($(".ophone", ".msg_content_nav").hasClass('complete')){
@@ -638,7 +646,7 @@ function ContentManager() {
 	// Social Input Buttons
 	$('input.social').on('click', function(event) {
         show = event.target.checked;
-        var itemName = $(this).attr('id').split('_')[2];
+        var itemName = $(this).attr('id').split('_')[1].substring(3);
 
         if (show) {
             $('.' + itemName).slideDown('slow', function() {
@@ -671,7 +679,7 @@ function ContentManager() {
 	});
 	
 	// BIND FACEBOOK PAGE CHECKBOXES FOR VALIDATING
-	$("#msgsndr_fbpagefbpages").on("click", function(){
+	$("#msgsndr_socialmediafacebookpagefbpages").on("click", function(){
 		self.updateContentStatus();
 	});
 
@@ -722,6 +730,6 @@ function ContentManager() {
 
     if (userPermissions.sendmulti == 1) {
     	$("#msgsndr_phonemessagetexttranslate").parent().removeClass("hide");
-    	$("#msgsndr_form_emailtranslate").parent().parent().removeClass("hide");
+    	$("#msgsndr_emailmessagetexttranslate").parent().parent().removeClass("hide");
     }
 };

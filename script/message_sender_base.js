@@ -106,8 +106,6 @@ jQuery.noConflict();
 	doCommonEventCallback($("#msgsndr_tts_message,input[name=messagePhoneText_message-gender]"), function() {
 		var gender = $('input[name=messagePhoneText_message-gender]:checked').val();
 		var enText = $('#msgsndr_tts_message').val();
-		var translate = $('#msgsndr_phonemessagetexttranslate').is(':checked');
-		var getTranslations = true;
 		
 		var jsonVal = $.toJSON({
 			"gender" : gender,
@@ -116,6 +114,15 @@ jQuery.noConflict();
 
 		$('#msgsndr_phonemessagetext').val(jsonVal);
 		obj_valManager.runValidate($('#msgsndr_phonemessagetext'));
+	});
+	
+	// observe changes to the feed subject/message inputs and save to hidden field
+	doCommonEventCallback($("#msgsndr_form_rsstitle,#msgsndr_form_rssmsg"), function() {
+		var subject = $("#msgsndr_form_rsstitle").val();
+		var message = $("#msgsndr_form_rssmsg").val();
+		
+		$("#msgsndr_socialmediafeedmessage").val($.toJSON({ "subject": subject, "message": message }));
+		obj_valManager.runValidate($('#msgsndr_socialmediafeedmessage'));
 	});
 	
 	$(function() {
@@ -142,7 +149,7 @@ jQuery.noConflict();
 		
 		obj_permissionManager.onPermissionsLoaded(function() {
 			// ckeditor
-			applyCkEditor('msgsndr_form_body');
+			applyCkEditor('msgsndr_emailmessagetext');
 			
 			$(document).ready(function() {
 				// subject
@@ -246,7 +253,7 @@ jQuery.noConflict();
 					$('#'+pasteTo).val(emailBody);
 				});*/
 			} else if(contentMode == "email") {
-				var emailSubject = $('#msgsndr_form_mailsubject');
+				var emailSubject = $('#msgsndr_emailmessagesubject');
 				var bSubject = $('#msgsndr_name').val();
 				
 				if (emailSubject.val().length == 0 && bSubject.length != 0) {

@@ -21,25 +21,25 @@ window.fbAsyncInit = function() {
 
 function initFacebook(accesstoken){
 		if (accesstoken) {
-			$("msgsndr_fbpagerenew").removeClassName("hidden");
+			$("msgsndr_socialmediafacebookpagerenew").removeClassName("hidden");
 		} else {
-			$("msgsndr_fbpageconnect").removeClassName("hidden");
+			$("msgsndr_socialmediafacebookpageconnect").removeClassName("hidden");
 		}
 		// Observe an authentication update on the document (the auth popup fires this event)
 		document.observe("FbAuth:update", function (res) {
-			updateFbPages(res.memo.access_token, "msgsndr_fbpage", "msgsndr_fbpagefbpages", false);
+			updateFbPages(res.memo.access_token, "msgsndr_socialmediafacebookpage", "msgsndr_socialmediafacebookpagefbpages", false);
 		});
 		
 		// Observe a click on the action links
-		$("msgsndr_fbpageall").observe("click", handleActionLink.curry("msgsndr_fbpage", true));
-		$("msgsndr_fbpagenone").observe("click", handleActionLink.curry("msgsndr_fbpage", false));
+		$("msgsndr_socialmediafacebookpageall").observe("click", handleActionLink.curry("msgsndr_socialmediafacebookpage", true));
+		$("msgsndr_socialmediafacebookpagenone").observe("click", handleActionLink.curry("msgsndr_socialmediafacebookpage", false));
 		// Observe event indicating page loading has completed
-		$("msgsndr_fbpages").observe("FbPages:update", function (res) {
+		$("msgsndr_socialmediafacebookpages").observe("FbPages:update", function (res) {
 			if (res.memo.pagesloaded == 0) {
-				$("msgsndr_fbpagefbpages").update("There were no authorized posting locations found!<br>Contact your system administrator for assistance.");
-				$("msgsndr_fbpageactionlinks").addClassName("hidden");
+				$("msgsndr_socialmediafacebookpagefbpages").update("There were no authorized posting locations found!<br>Contact your system administrator for assistance.");
+				$("msgsndr_socialmediafacebookpageactionlinks").addClassName("hidden");
 			} else {
-				$("msgsndr_fbpageactionlinks").removeClassName("hidden");
+				$("msgsndr_socialmediafacebookpageactionlinks").removeClassName("hidden");
 			}
 		});
 };

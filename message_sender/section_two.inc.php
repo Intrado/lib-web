@@ -142,9 +142,10 @@
 				</fieldset>
 
 				<fieldset class="hide">
-					<label for="msgsndr_phonemessagetexttranslate">Translate</label>
+					<label for="msgsndr_phonemessagetexttranslate">Translate&nbsp;<img id="msgsndr_phonemessagetexttranslate_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>
 					<input type="checkbox" id="msgsndr_phonemessagetexttranslate" class="msgdata" value="" name="msgsndr_phonemessagetexttranslate" data-txt="#msgsndr_tts_message" data-display="#tts_translate" />
 					<a class="toggle-translations hide" data-target="#tts_translate" href=""></a>
+					<div id="msgsndr_phonemessagetexttranslate_msg" class="box_validatorerror er" style="display:none"></div>
 				</fieldset>
 
 				<div id="tts_translate" class="close translations">
@@ -170,54 +171,59 @@
 			<!-- Add the email panel -->
 			<div id="msgsndr_tab_email" class="tab_panel">
 
-				<input type="checkbox" class="hidden" name="has_email" />
+				<input type="checkbox" class="hidden msgdata" id="msgsndr_hasemail" name="msgsndr_hasemail"/>>
+				<div id="msgsndr_hasemail_msg" class="box_validatorerror er" style="display:none"></div>
 
 				<fieldset class="check">
-					<label for="msgsndr_form_name">From Name</label>
+					<label for="msgsndr_emailmessagefromname">From Name&nbsp;<img id="msgsndr_emailmessagefromname_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>
 					<div class="controls">
-						<input type="text" id="msgsndr_form_name" name="email_name" class="required msgdata" autocomplete="off" maxlength="30"/> <span class="error"></span>
+						<input type="text" id="msgsndr_emailmessagefromname" name="msgsndr_emailmessagefromname" class="required msgdata" autocomplete="off" maxlength="30"/> <span class="error"></span>
+						<div id="msgsndr_emailmessagefromname_msg" class="box_validatorerror er" style="display:none"></div>
 					</div>
 				</fieldset>
 				
 				<fieldset>
-					<label for="msgsndr_form_email">From Email</label>
+					<label for="msgsndr_emailmessagefromemail">From Email&nbsp;<img id="msgsndr_emailmessagefromemail_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>
 					<div class="controls">
-						<input type="text" id="msgsndr_form_email" name="email_address" class="required msgdata" autocomplete="off" maxlength="255"/> <span class="error"></span>
+						<input type="text" id="msgsndr_emailmessagefromemail" name="msgsndr_emailmessagefromemail" class="required msgdata" autocomplete="off" maxlength="255"/>
+						<div id="msgsndr_emailmessagefromemail_msg" class="box_validatorerror er" style="display:none"></div>
 					</div>
 				</fieldset>
 				
 				<fieldset>
-					<label for="msgsndr_form_mailsubject">Subject</label> 
+					<label for="msgsndr_emailmessagesubject">Subject&nbsp;<img id="msgsndr_emailmessagesubject_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label> 
 					<div class="controls">
-						<input type="text" id="msgsndr_form_mailsubject" name="email_subject" class="required msgdata" autocomplete="off" maxlength="30"/> <span class="error"></span>
+						<input type="text" id="msgsndr_emailmessagesubject" name="msgsndr_emailmessagesubject" class="required msgdata" autocomplete="off" maxlength="30"/> <span class="error"></span>
+						<div id="msgsndr_emailmessagesubject_msg" class="box_validatorerror er" style="display:none"></div>
 					</div>
 				</fieldset>
 
 				<fieldset>
-					<label for="msgsndr_form_attachment">Attachments</label>
-					<input id="msgsndr_form_attachment" name="email_attachment" class="box_validator msgdata" type="hidden" value="{}">
+					<label for="msgsndr_emailmessageattachment">Attachments&nbsp;<img id="msgsndr_emailmessageattachment_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>
+					<input id="msgsndr_emailmessageattachment" name="msgsndr_emailmessageattachment" class="box_validator msgdata" type="hidden" value="{}">
 					<div class="controls" style="overflow: hidden;">
 						<div id="uploadedfiles" class="msgdata" style="display: none; "></div>
 						<div id="upload_process" style="display: none; "><img src="img/ajax-loader.gif"></div>
 						<iframe id="msgsndr_form_attachment_my_attach" class="attach_file" src="_emailattachment.php?formname=broadcast&amp;itemname=msgsndr_form_attachment"></iframe>
-						<div class="underneathmsg cf"></div>
+						<div id="msgsndr_emailmessageattachment_msg" class="box_validatorerror er" style="display:none"></div>
 					</div>
 				</fieldset>
 				
 				<fieldset>
-					<!--a id="editor_basic" href="javascript:void(null);">basic</a> | <a id="editor_advanced" href="javascript:void(null);">advanced</a-->
-					<label for="msgsndr_form_body">Body</label>
+					<label for="msgsndr_emailmessagetext">Body&nbsp;<img id="msgsndr_emailmessagetext_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>
 					<div class="controls">
-					<textarea id="msgsndr_form_body" name="broadcast_emailbody" class="required msgdata hide" data-ajax="true"></textarea><span id="emailBodyError" class="error"></span>
-					<div id="msgsndr_form_body-htmleditor"></div>
+						<textarea id="msgsndr_emailmessagetext" name="msgsndr_emailmessagetext" class="required msgdata hide" data-ajax="true"></textarea>
+						<div id="msgsndr_emailmessagetext_msg" class="box_validatorerror er" style="display:none"></div>
+						<div id="msgsndr_emailmessagetext-htmleditor"></div>
 					</div>
 				</fieldset>
 				
 				<fieldset class="hide">
-					<label for="msgsndr_form_emailtranslate">Translate</label>
+					<label for="msgsndr_emailmessagetexttranslate">Translate&nbsp;<img id="msgsndr_emailmessagetexttranslate_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>
 					<div class="controls">
-						<input type="checkbox" id="msgsndr_form_emailtranslate" class="msgdata" name="email_translate" value=""  data-display="#email_translate" />
+						<input type="checkbox" id="msgsndr_emailmessagetexttranslate" class="msgdata" name="msgsndr_emailmessagetexttranslate" value=""  data-display="#email_translate" />
 						<a class="toggle-translations hide" data-target="#email_translate" data-txt="#msgsndr_tts_message" href=""></a>
+						<div id="msgsndr_emailmessagetexttranslate_msg" class="box_validatorerror er" style="display:none"></div>
 					</div>
 				</fieldset>
 
@@ -245,16 +251,17 @@
 			<!-- Add the sms panel -->
 			<div id="msgsndr_tab_sms" class="tab_panel">
 
-				<input type="checkbox" class="hidden" name="has_sms" />
+				<input type="checkbox" class="hidden" id="msgsndr_hassms" name="msgsndr_hassms"/>
+				<div id="msgsndr_hassms_msg" class="box_validatorerror er" style="display:none"></div>
 
 				<fieldset class="check">
-					<label for="msgsndr_form_sms">SMS Text</label>
+					<label for="msgsndr_smsmessagetext">SMS Text&nbsp;<img id="msgsndr_smsmessagetext_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>
 					<div class="controls">
-					<textarea id="msgsndr_form_sms" name="sms_text" class="msgdata required"></textarea>
-					<div>
-					<p><a href="javascript:void(null);" id="sms_sc" onclick="(new spellChecker($('msgsndr_form_sms')) ).openChecker();">Spell Check</a> <span class="sms characters">160 Characters left</span></p>
-					</div>
-					
+						<textarea id="msgsndr_smsmessagetext" name="msgsndr_smsmessagetext" class="msgdata required"></textarea>
+						<div id="msgsndr_smsmessagetext_msg" class="box_validatorerror er" style="display:none"></div>
+						<div>
+							<p><a href="javascript:void(null);" id="sms_sc" onclick="(new spellChecker($('msgsndr_form_sms')) ).openChecker();">Spell Check</a> <span class="sms characters">160 Characters left</span></p>
+						</div>
 					</div>
 				</fieldset>
 				
@@ -273,8 +280,9 @@
 				<div class="social_tab hidden" id="audiolink">
 					<fieldset class="check">
 						<div class="controls">
-							<input class="addme" type="checkbox" id="msgsndr_form_audio" name="social_audio" />
-							<label class="addme" for="msgsndr_form_audio">Include a link to the audio message</label>
+							<input class="addme msgdata" type="checkbox" id="msgsndr_phonemessagepost" name="msgsndr_phonemessagepost" />
+							<label class="addme" for="msgsndr_phonemessagepost"><img id="msgsndr_phonemessagepost_icon" class="formicon" src="img/pixel.gif" title="" alt="">&nbsp;Include a link to the audio message</label>
+							<div id="msgsndr_phonemessagepost_msg" class="box_validatorerror er" style="display:none"></div>
 						</div>
 					</fieldset>
 				</div><!--  -->
@@ -282,49 +290,52 @@
 				<div class="social_tab hidden" data-social="facebook">
 					<fieldset class="check">
 						<div class="controls cf fbicon">
-							<input class="msgdata addme social" type="checkbox" id="msgsndr_form_facebook" name="has_facebook" />
-							<label class="addme" for="msgsndr_form_facebook"><strong>Post to Facebook</strong></label>
+							<input class="msgdata addme social" type="checkbox" id="msgsndr_hasfacebook" name="msgsndr_hasfacebook" />
+							<label class="addme" for="msgsndr_hasfacebook"><img id="msgsndr_hasfacebook_icon" class="formicon" src="img/pixel.gif" title="" alt="">&nbsp;<strong>Post to Facebook</strong></label>
+							<div id="msgsndr_hasfacebook_msg" class="box_validatorerror er" style="display:none"></div>
 						</div>
 					</fieldset>
 
 					<div class="facebook">
 
 						<fieldset>
-							<label for="msgsndr_form_fbmsg">Message</label>
+							<label for="msgsndr_socialmediafacebookmessage">Message&nbsp;<img id="msgsndr_socialmediafacebookmessage_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>
 							<div class="controls">
-								<textarea id="msgsndr_form_fbmsg" name="facebook_message" class="msgdata required" ></textarea>
+								<textarea id="msgsndr_socialmediafacebookmessage" name="msgsndr_socialmediafacebookmessage" class="msgdata required" ></textarea>
+								<div id="msgsndr_socialmediafacebookmessage_msg" class="box_validatorerror er" style="display:none"></div>
 								<div><p><a href="javascript:void(null);" id="sms_sc" onclick="(new spellChecker($('msgsndr_form_fbmsg')) ).openChecker();">Spell Check</a> <span class="fb characters">420 Characters left</span></p></div>
 							</div>
 						</fieldset>
 
 						
 						<fieldset> 
-							<label for="msgsndr_form_fbpage">Post to</label>
-							<div id="msgsndr_fbpages" class="controls fb_reset">
-							<input id="msgsndr_fbpage" type="hidden" value="" name="social_fbpages">
-							<input id="msgsndr_fbpageauthpages" type="hidden" value="" name="social_fbpagesauthpages">
+							<label for="msgsndr_socialmediafacebookpage">Post to&nbsp;<img id="msgsndr_socialmediafacebookpage_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>
+							<div id="msgsndr_socialmediafacebookpages" class="controls fb_reset">
+								<input id="msgsndr_socialmediafacebookpage" type="hidden" value="" name="msgsndr_socialmediafacebookpage">
+								<input id="msgsndr_socialmediafacebookpageauthpages" type="hidden" value="">
 								<div id="fb-root"></div>
 								
-								<div id="msgsndr_fbpageconnect" class="hidden">
+								<div id="msgsndr_socialmediafacebookpageconnect" class="hidden">
 									<button class="btn" onclick="popup('popupfacebookauth.php', 640, 400);" type="button">
 										<img class="btn_middle_icon" alt="" src="img/icons/custom/facebook.gif">
 										Add Facebook Account
 									</button>
 								</div>
 								
-								<div id="msgsndr_fbpagerenew" class="hidden">
+								<div id="msgsndr_socialmediafacebookpagerenew" class="hidden">
 									<button class="btn" onclick="popup('popupfacebookauth.php', 640, 400);" type="button">
 										<img class="btn_middle_icon" alt="" src="img/icons/custom/facebook.gif">
 										Renew Facebook Authorization
 									</button>
 								</div>
 								
-								<div id="msgsndr_fbpageactionlinks" class="hidden actionlinks">
-									<a id="msgsndr_fbpageall" class="actionlink">Select All</a>
-									<a id="msgsndr_fbpagenone" class="actionlink">Remove All</a>
+								<div id="msgsndr_socialmediafacebookpageactionlinks" class="hidden actionlinks">
+									<a id="msgsndr_socialmediafacebookpageall" class="actionlink">Select All</a>
+									<a id="msgsndr_socialmediafacebookpagenone" class="actionlink">Remove All</a>
 								</div>
-								<div id="msgsndr_fbpagefbpages" class="hidden fbpagelist"></div>
-								<div id="msgsndr_fbpagesmessage" class="underneathmsg cf"></div>
+								<div id="msgsndr_socialmediafacebookpagefbpages" class="hidden fbpagelist"></div>
+								<div id="msgsndr_socialmediafacebookpagesmessage" class="underneathmsg cf"></div>
+								<div id="msgsndr_socialmediafacebookpage_msg" class="box_validatorerror er" style="display:none"></div>
 							</div>
 						</fieldset>
 					
@@ -336,8 +347,9 @@
 				<div class="social_tab hidden" data-social="twitter">
 					<fieldset class="check">
 						<div class="controls cf twiticon">
-							<input class="msgdata addme social" type="checkbox" id="msgsndr_form_twitter" name="has_twitter" />
-							<label class="addme" for="msgsndr_form_twitter"><strong>Post to Twitter</strong></label>
+							<input class="msgdata addme social" type="checkbox" id="msgsndr_hastwitter" name="msgsndr_hastwitter" />
+							<label class="addme" for="msgsndr_hastwitter"><img id="msgsndr_hastwitter_icon" class="formicon" src="img/pixel.gif" title="" alt="">&nbsp;<strong>Post to Twitter</strong></label>
+							<div id="msgsndr_hastwitter_msg" class="box_validatorerror er" style="display:none"></div>
 						</div>
 					</fieldset>
 
@@ -345,10 +357,11 @@
 
 						<fieldset>
 							<p id="msgsndr_twittername" class="twittername"></p>
-							<label for="msgsndr_form_tmsg">Message</label>
+							<label for="msgsndr_socialmediatwittermessage">Message&nbsp;<img id="msgsndr_socialmediatwittermessage_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>
 							<div class="controls">
-							<textarea id="msgsndr_form_tmsg" name="twitter_message" class="msgdata required" ></textarea>
-							<div><p><a href="javascript:void(null);" id="sms_sc" onclick="(new spellChecker($('msgsndr_form_tmsg')) ).openChecker();">Spell Check</a> <span class="twit characters"> Characters left</span></p></div>
+								<textarea id="msgsndr_socialmediatwittermessage" name="msgsndr_socialmediatwittermessage" class="msgdata required" ></textarea>
+								<div id="msgsndr_socialmediatwittermessage_msg" class="box_validatorerror er" style="display:none"></div>
+								<div><p><a href="javascript:void(null);" id="sms_sc" onclick="(new spellChecker($('msgsndr_form_tmsg')) ).openChecker();">Spell Check</a> <span class="twit characters"> Characters left</span></p></div>
 							</div>
 						</fieldset>
 
@@ -360,16 +373,17 @@
 				<div class="social_tab hidden" data-social="feed">				
 					<fieldset class="check">
 						<div class="controls cf rssicon">
-							<input class="msgdata addme social" type="checkbox" id="msgsndr_form_feed" name="has_feed" />
-							<label class="addme" for="msgsndr_form_feed"><strong>Post to RSS</strong></label>
+							<input class="msgdata addme social" type="checkbox" id="msgsndr_hasfeed" name="msgsndr_hasfeed" />
+							<label class="addme" for="msgsndr_hasfeed"><img id="msgsndr_hasfeed_icon" class="formicon" src="img/pixel.gif" title="" alt="">&nbsp;<strong>Post to RSS</strong></label>
+							<div id="msgsndr_hasfeed_msg" class="box_validatorerror er" style="display:none"></div>
 						</div>
 					</fieldset>
 
 					<div class="feed">
-						<input type="hidden" id="msgsndr_rsspost" name="rss_post" class="" value="" />
+						<input type="hidden" id="msgsndr_socialmediafeedmessage" name="msgsndr_socialmediafeedmessage" class="" value="" />
 
 						<fieldset>
-							<label for="msgsndr_form_rsstitle">Post Title</label>
+							<label for="msgsndr_form_rsstitle">Post Title&nbsp;<img id="msgsndr_socialmediafeedmessage_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>
 							<div class="controls">
 								<input type="text" id="msgsndr_form_rsstitle" name="rss_title" class="msgdata required" maxlength="30"/>
 							</div>
@@ -379,14 +393,14 @@
 							<label for="msgsndr_form_rssmsg">Message</label>
 							<div class="controls">
 							<textarea id="msgsndr_form_rssmsg" name="feed_message" class="msgdata required"></textarea> <span class="error"></span>
+							<div id="msgsndr_socialmediafeedmessage_msg" class="box_validatorerror er" style="display:none"></div>
 							<p><a href="#">Spell Check</a></p>
 							</div>
 						</fieldset>
-
+						
 						<fieldset class="check">
-							<input type="hidden" id="msgsndr_feed_categories" name="feed_cat_ids" value="" />
 							<label class="control-label req" for="feed_categories">Post to Feeds</label>
-							<div class="controls" id="feed_categories">
+							<div class="controls multicheckbox" id="msgsndr_socialmediafeedcategory" name="msgsndr_socialmediafeedcategory">
 							</div>
 						</fieldset>
 

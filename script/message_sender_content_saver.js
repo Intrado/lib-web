@@ -3,8 +3,8 @@ function ContentSaveManager() {
 	
 	var saveProcess = {
 		"email" : function() {
-			var enText = $("#msgsndr_form_body").val();
-			var translate = $('#msgsndr_form_emailtranslate').is(':checked');
+			var enText = $("#msgsndr_emailmessagetext").val();
+			var translate = $('#msgsndr_emailmessagetexttranslate').is(':checked');
 
 			var getTranslations = true;
 			if(translate) {
@@ -66,7 +66,7 @@ function ContentSaveManager() {
 				"subject" : titleVal,
 				"message" : messageVal
 			});
-			$('#msgsndr_rsspost').val(rssPost);
+			$('#msgsndr_socialmediafeedmessage').val(rssPost);
 			
 			/*var rssCats = [];
 			$('input[name=feed_categories]').each(function(findex, fitem){
