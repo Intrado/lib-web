@@ -303,7 +303,7 @@ if ($readonly) {
 	);
 }
 // Notification Defaults
-$formdata[] = _L("Notification Defaults");
+$formdata[] = _L("%s Defaults", getJobTitle());
 
 $startvalues = newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $USER->getCallEarly());
 $formdata["callearly"] = array(

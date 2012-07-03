@@ -63,7 +63,7 @@ function ViewOnlyItem($label,$content) {
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "notifications:jobs";
-$TITLE = _L('Notification Viewer');
+$TITLE = _L('%s Viewer',getJobTitle());
 
 include_once("nav.inc.php");
 ?>

@@ -349,7 +349,7 @@ if($error || $reportgenerator->format == "html"){
 <?
 		if(isset($_SESSION['report']['options']['reporttype']) && $_SESSION['report']['options']['reporttype'] == "notcontacted"){
 ?>
-			<tr><th align="right" class="windowRowHeader">Finalized Notifications:</th>
+			<tr><th align="right" class="windowRowHeader"><?= _L("Finalized %s:",getJobsTitle()) ?></th>
 				<td class="bottomBorder"><?=NewFormItem($f, $s, "hideinprogress", "checkbox");?>Only Display Final Results</td>
 			</tr>
 <?
