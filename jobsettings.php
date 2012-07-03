@@ -159,7 +159,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = _L("admin").":"._L("settings");
-$TITLE = _L('Systemwide Job Settings');
+$TITLE = _L('Systemwide %s Settings',getJobTitle());
 
 require_once("nav.inc.php");
 
