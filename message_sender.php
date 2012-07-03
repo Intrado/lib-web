@@ -55,7 +55,7 @@ require_once("obj/ValTimeWindowCallLate.val.php");
 require_once("obj/ValMessageBody.val.php");
 require_once("obj/ValMessageGroup.val.php");
 require_once("obj/EmailAttach.val.php");
-require_once("obj/TextAreaPhone.val.php");
+require_once("obj/ValMessageBody.val.php");
 require_once("obj/TraslationItem.fi.php");
 require_once("obj/CallerID.fi.php");
 require_once("obj/ValDuplicateNameCheck.val.php");
@@ -400,10 +400,10 @@ $formdata = array(
 				"helpstep" => 1
 		),
 		"phonemessagetext" => array(
-				"label" => "phonemessagetext",
+				"label" => "Message",
 				"value" => "",
 				"validators" => array(
-						array("ValTextAreaPhone"),
+						array("ValMessageBody"),
 						array("ValTtsText"),
 						array("ValLength","max" => 10000) // 10000 Characters is about 40 minutes of tts, considered to be more than enough
 				),
@@ -1179,7 +1179,7 @@ include("nav.inc.php");
 ?>
 <script type="text/javascript">
 <?Validator::load_validators(array("ValInArray", "ValDuplicateNameCheck", "ValHasMessage",
-	"ValTextAreaPhone", "ValEasycall", "ValLists", "ValTranslation", "ValEmailAttach",
+	"ValMessageBody", "ValEasycall", "ValLists", "ValTranslation", "ValEmailAttach",
 	"ValTimeWindowCallLate", "ValTimeWindowCallEarly", "ValSmsText", "valPhone",
 	"ValMessageBody", "ValMessageGroup", "ValMessageTypeSelect", "ValFacebookPage",
 	"ValTranslationCharacterLimit","ValTimePassed","ValTtsText","ValCallerID",

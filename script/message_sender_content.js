@@ -711,13 +711,13 @@ function ContentManager() {
 
 	// if the user can "leavemessage" aka voice replies
     if (userPermissions.leavemessage) {
-    	$("#msgsndr_leavemessage").removeClass("hide");
-    	$("#msgsndr_voice_response").attr("checked","checked");
+    	$("#msgsndr_optionleavemessage").closest("fieldset").removeClass("hide");
+    	$("#msgsndr_optionleavemessage").attr("checked","checked");
     }
 
     // if the user can "messageconfirmation" aka request confirmation of outbound messages
     if (userPermissions.messageconfirmation == 1) {
-    	$("#msgsndr_messageconfirmation").removeClass("hide");
+    	$("#msgsndr_optionmessageconfirmation").closest("fieldset").removeClass("hide");
     }
 
     if (userPermissions.sendmulti == 1) {

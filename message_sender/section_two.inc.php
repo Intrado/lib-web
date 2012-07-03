@@ -85,18 +85,21 @@
 					</div>
 				</fieldset>
 				
-				<fieldset>
-					<div class="controls cf hide">
-						<label for="msgsndr_optionleavemessage">Voice Response&nbsp;<img id="msgsndr_optionleavemessage_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>
+				<fieldset class="hide">
+					<label for="msgsndr_optionleavemessage"><img id="msgsndr_optionleavemessage_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>
+					<div class="controls cf">
 						<input class="addme" type="checkbox" id="msgsndr_optionleavemessage" name="msgsndr_optionleavemessage"/>
+						<label class="addme" for="msgsndr_optionleavemessage">Voice Response</label>
 						<div id="msgsndr_optionleavemessage_msg" class="box_validatorerror er" style="display:none"></div>
 					</div>
 				</fieldset>
 				
-				<fieldset>
-					<div class="controls cf hide">
-						<input class="addme" type="checkbox" id="msgsndr_call_confirmation" name="phone_callconfirmation"/>
-						<label class="addme">Call Confirmation</label>
+				<fieldset class="hide">
+					<label for="msgsndr_optionmessageconfirmation"><img id="msgsndr_optionmessageconfirmation_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>
+					<div class="controls cf">
+						<input class="addme" type="checkbox" id="msgsndr_optionmessageconfirmation" name="msgsndr_optionmessageconfirmation"/>
+						<label class="addme" for="msgsndr_optionmessageconfirmation">Call Confirmation</label>
+						<div id="msgsndr_optionmessageconfirmation_msg" class="box_validatorerror er" style="display:none"></div>
 					</div>
 				</fieldset>
 			</div><!-- #advanced-opts -->
@@ -115,16 +118,13 @@
 			<div id="text" class="audio hide">
 
 				<fieldset>
-					<label for="msgsndr_tts_message">Message</label>
+					<label for="msgsndr_tts_message">Message&nbsp;<img id="msgsndr_phonemessagetext_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>
 					<div class="controls">
-						<input type="hidden" id="msgsndr_phonemessagetext" name="msgsndr_phonemessagetext" />
+						<input type="hidden" id="msgsndr_phonemessagetext" name="msgsndr_phonemessagetext" class="msgdata"/>
 						<button class="btn-small paste-from hidden" data-textarea="msgsndr_tts_message">Paste text from email</button>
 						<textarea id="msgsndr_tts_message" name="phone_tts" class="required msgdata" maxlength="10000"></textarea><span class="error"></span>
-
-						<div class="hide">
-							<input id="messagePhoneText_message" name="messagePhoneText_message msgdata" type="hidden" value="{&quot;gender&quot;: &quot;female&quot;, &quot;text&quot;: &quot;&quot;}"/>
-						</div>
-
+						<div id="msgsndr_phonemessagetext_msg" class="box_validatorerror er" style="display:none"></div>
+						
 						<div class="cf">
 							<input id="messagePhoneText_message-female" name="messagePhoneText_message-gender" type="radio" value="female" checked/>
 							<label for="messagePhoneText_message-female">Female</label>
@@ -138,8 +138,6 @@
 						<button id="tts_play" class="playAudio" data-text="msgsndr_tts_message" data-code="en">
 							<span class="icon play"></span> Play Audio
 						</button>
-
-						<!-- <span class="tts characters">10000 Characters Left</span> -->
 					</div>
 				</fieldset>
 

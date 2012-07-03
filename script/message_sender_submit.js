@@ -135,7 +135,7 @@ function SubmitManager() {
 		//"feed_categories" : "msgsndr_socialmediafeedcategory[]",
 		"msgsndr_optionmaxjobdays" : "msgsndr_optionmaxjobdays",
 		"msgsndr_optionleavemessage" : "msgsndr_optionleavemessage",
-		"phone_callconfirmation" : "msgsndr_optionmessageconfirmation",
+		"msgsndr_optionmessageconfirmation" : "msgsndr_optionmessageconfirmation",
 		"options_autoreport" : "msgsndr_optionautoreport",
 		"options_skipduplicates" : "msgsndr_optionskipduplicate",
 		"msgsndr_optioncallerid" : "msgsndr_optioncallerid",

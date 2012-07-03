@@ -10,8 +10,8 @@
 					<div class="controls">
 						<input type="text" id="msgsndr_name" name="msgsndr_name" data-ajax="true" class="required" autocomplete="off" maxlength="30"/> 
 						<span class="error"></span>
-						<p>e.g. "PTA Meeting Reminder"</p>
 						<div id="msgsndr_name_msg" class="box_validatorerror er" style="display:none"></div>
+						<p>e.g. "PTA Meeting Reminder"</p>
 					</div>
 				</fieldset>
 				
