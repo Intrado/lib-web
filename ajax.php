@@ -20,6 +20,21 @@ require_once("inc/date.inc.php");
 require_once("inc/securityhelper.inc.php");
 require_once("obj/Job.obj.php");
 
+function generateListStats($listid) {
+	$list = new PeopleList($listid);
+	$renderedlist = new RenderedList2();
+	$renderedlist->pagelimit = 0;
+	$renderedlist->initWithList($list);
+	$stats = array(
+		'name' => $list->name,
+		'advancedlist' => false, //TODO remove this
+		'totalremoved' => $list->countRemoved(),
+		'totaladded' => $list->countAdded(),
+		'totalrule' => -999, //TOOD remove this
+		'total' => $renderedlist->getTotal() + 0);
+	return $stats;
+}
+
 function handleRequest() {
 	if (!isset($_GET['type']) && !isset($_POST['type']))
 		return false;
@@ -191,17 +206,9 @@ function handleRequest() {
 			foreach ($listids as $id) {
 				if (!userOwns('list', $id) && !isSubscribed("list", $id))
 					continue;
-				$list = new PeopleList($id+0);
-				$renderedlist = new RenderedList2();
-				$renderedlist->pagelimit = 0;
-				$renderedlist->initWithList($list);
-				$stats[$list->id]= array(
-					'name' => $list->name,
-					'advancedlist' => false, //TODO remove this
-					'totalremoved' => $list->countRemoved(),
-					'totaladded' => $list->countAdded(),
-					'totalrule' => -999, //TOOD remove this
-					'total' => $renderedlist->getTotal() + 0);
+				$query = "select modifydate from list where id = ?";
+				$expect = QuickQuery($query, null, array($id));
+				$stats[$id] = gen2cache(60*60*24, $expect, null, "generateListStats", $id);
 			}
 			return $stats;
 
