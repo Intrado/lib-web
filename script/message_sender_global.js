@@ -126,4 +126,22 @@ jQuery.noConflict();
 			"gender": gender
 		}));
 	};
+	
+	// do callback based on common events
+	var doCommonEventCallbackTimers = {};
+	doCommonEventCallback = function(elements, callback) {
+		elements.on('click change blur focus keyup', function() {
+			var $elem = $(this);
+			var elemId = $(this).attr("id");
+	
+			if (typeof (doCommonEventCallbackTimers[elemId]) == "undefined")
+				doCommonEventCallbackTimers[elemId] = null;
+			
+			clearTimeout(doCommonEventCallbackTimers[elemId]);
+			
+			doCommonEventCallbackTimers[elemId] = setTimeout(function() {
+				callback();
+			}, 500);
+		});
+	};
 })(jQuery);
