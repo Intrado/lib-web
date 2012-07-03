@@ -364,7 +364,7 @@ $formdata = array(
 		"PHONE MESSAGE",
 		//=========================================================================================
 		"hasphone" => array(
-				"label" => "hasphone",
+				"label" => "Phone",
 				"value" => "",
 				"validators" => array(
 						array("ValPermission", "name" => "sendphone")
@@ -373,7 +373,7 @@ $formdata = array(
 				"helpstep" => 1
 		),
 		"phonemessagetype" => array(
-				"label" => "phonemessagetype",
+				"label" => "Phone Type",
 				"value" => "",
 				"validators" => array(
 						array("ValInArray", "values" => array("callme","text"))
@@ -382,7 +382,7 @@ $formdata = array(
 				"helpstep" => 1
 		),
 		"phonemessagepost" => array(
-				"label" => "phonemessagepost",
+				"label" => "Audio Link",
 				"value" => "",
 				"validators" => array(
 						// NOTE: Will need complicated validation based on user permissions and message contents (has dynamic parts?)
@@ -391,7 +391,7 @@ $formdata = array(
 				"helpstep" => 1
 		),
 		"phonemessagecallme" => array(
-				"label" => "phonemessagecallme",
+				"label" => "Call Me",
 				"value" => "",
 				"validators" => array(
 						array("ValEasycall")
@@ -411,7 +411,7 @@ $formdata = array(
 				"helpstep" => 1
 		),
 		"phonemessagetexttranslate" => array(
-				"label" => "phonemessagetexttranslate",
+				"label" => "Translate",
 				"value" => "",
 				"validators" => array(
 						array("ValTranslationCharacterLimit", "field" => "phonemessagetext")
@@ -439,7 +439,7 @@ $formdata = array_merge($formdata, array(
 		"EMAIL MESSAGE",
 		//=========================================================================================
 		"hasemail" => array(
-				"label" => "hasemail",
+				"label" => "Email",
 				"value" => "",
 				"validators" => array(
 						array("ValPermission", "name" => "sendemail")
@@ -448,7 +448,7 @@ $formdata = array_merge($formdata, array(
 				"helpstep" => 1
 		),
 		"emailmessagefromname" => array(
-				"label" => "emailmessagefromname",
+				"label" => "Name",
 				"value" => "",
 				"validators" => array(
 						array("ValLength","max" => 50)
@@ -457,7 +457,7 @@ $formdata = array_merge($formdata, array(
 				"helpstep" => 1
 		),
 		"emailmessagefromemail" => array(
-				"label" => "emailmessagefromemail",
+				"label" => "Email",
 				"value" => "",
 				"validators" => array(
 						array("ValLength","max" => 255),
@@ -467,7 +467,7 @@ $formdata = array_merge($formdata, array(
 				"helpstep" => 1
 		),
 		"emailmessagesubject" => array(
-				"label" => "emailmessagesubject",
+				"label" => "Subject",
 				"value" => "",
 				"validators" => array(
 						array("ValLength","max" => 255)
@@ -476,7 +476,7 @@ $formdata = array_merge($formdata, array(
 				"helpstep" => 1
 		),
 		"emailmessageattachment" => array(
-				"label" => "emailmessageattachment",
+				"label" => "Attachment(s)",
 				"value" => "",
 				"validators" => array(
 						array("ValEmailAttach")
@@ -485,7 +485,7 @@ $formdata = array_merge($formdata, array(
 				"helpstep" => 1
 		),
 		"emailmessagetext" => array(
-				"label" => "emailmessagetext",
+				"label" => "Body",
 				"value" => "",
 				"validators" => array(
 						array("ValMessageBody"),
@@ -495,7 +495,7 @@ $formdata = array_merge($formdata, array(
 				"helpstep" => 1
 		),
 		"emailmessagetexttranslate" => array(
-				"label" => "emailmessagetexttranslate",
+				"label" => "Translate",
 				"value" => "",
 				"validators" => array(
 						array("ValTranslationCharacterLimit", "field" => "emailmessagetext")
@@ -523,7 +523,7 @@ $formdata = array_merge($formdata, array(
 		"SMS MESSAGE",
 		//=========================================================================================
 		"hassms" => array(
-				"label" => "hassms",
+				"label" => "SMS",
 				"value" => "",
 				"validators" => array(
 						array("ValPermission", "name" => "sendsms")
@@ -532,7 +532,7 @@ $formdata = array_merge($formdata, array(
 				"helpstep" => 1
 		),
 		"smsmessagetext" => array(
-				"label" => "smsmessagetext",
+				"label" => "Message",
 				"value" => "",
 				"validators" => array(
 						array("ValLength","max"=>160),
@@ -545,7 +545,7 @@ $formdata = array_merge($formdata, array(
 		"SOCIAL MESSAGE",
 		//=========================================================================================
 		"hasfacebook" => array(
-				"label" => "hasfacebook",
+				"label" => "Facebook",
 				"value" => "",
 				"validators" => array(
 						array("ValPermission", "name" => "facebookpost")
@@ -554,7 +554,7 @@ $formdata = array_merge($formdata, array(
 				"helpstep" => 1
 		),
 		"socialmediafacebookmessage" => array(
-				"label" => "socialmediafacebookmessage",
+				"label" => "Message",
 				"value" => "",
 				"validators" => array(
 						array("ValLength","max"=>420)
@@ -563,7 +563,7 @@ $formdata = array_merge($formdata, array(
 				"helpstep" => 1
 		),
 		"hastwitter" => array(
-				"label" => "hastwitter",
+				"label" => "Twitter",
 				"value" => "",
 				"validators" => array(
 						array("ValPermission", "name" => "twitterpost")
@@ -572,7 +572,7 @@ $formdata = array_merge($formdata, array(
 				"helpstep" => 1
 		),
 		"socialmediatwittermessage" => array(
-				"label" => "socialmediatwittermessage",
+				"label" => "Message",
 				"value" => "",
 				"validators" => array(
 						array("ValLength","max"=>(140 - $twitterreservedchars))
@@ -581,7 +581,7 @@ $formdata = array_merge($formdata, array(
 				"helpstep" => 1
 		),
 		"hasfeed" => array(
-				"label" => "hasfeed",
+				"label" => "Feed",
 				"value" => "",
 				"validators" => array(
 						array("ValPermission", "name" => "feedpost")
@@ -590,7 +590,7 @@ $formdata = array_merge($formdata, array(
 				"helpstep" => 1
 		),
 		"socialmediafeedmessage" => array(
-				"label" => "socialmediafeedmessage",
+				"label" => "Message",
 				"value" => "",
 				"validators" => array(
 						array("ValTextAreaAndSubjectWithCheckbox","requiresubject" => true),
@@ -600,7 +600,7 @@ $formdata = array_merge($formdata, array(
 				"helpstep" => 1
 		),
 		"socialmediafacebookpage" => array(
-				"label" => "socialmediafacebookpage",
+				"label" => "Page(s)",
 				"value" => "",
 				"validators" => array(
 						array("ValFacebookPage", "authpages" => getFbAuthorizedPages(), "authwall" => getSystemSetting("fbauthorizewall"))
@@ -609,7 +609,7 @@ $formdata = array_merge($formdata, array(
 				"helpstep" => 1
 		),
 		"socialmediafeedcategory" => array( // TODO: this is currently a multi-checkbox
-				"label" => "socialmediafeedcategory",
+				"label" => "Category",
 				"value" => "",
 				"validators" => array(
 						array("ValInArray", "values" => array_keys($feedcategoryids))
@@ -621,7 +621,7 @@ $formdata = array_merge($formdata, array(
 		"JOB OPTIONS",
 		//=========================================================================================
 		"optionmaxjobdays" => array(
-				"label" => "optionmaxjobdays",
+				"label" => "Day(s)",
 				"value" => "",
 				"validators" => array(
 						array("ValInArray", "values" => range(1,$ACCESS->getValue('maxjobdays', 7)))
@@ -630,14 +630,14 @@ $formdata = array_merge($formdata, array(
 				"helpstep" => 1
 		),
 		"optionautoreport" => array(
-				"label" => "optionautoreport",
+				"label" => "Auto Report",
 				"value" => "",
 				"validators" => array(),
 				"control" => array("CheckBox"),
 				"helpstep" => 1
 		),
 		"optionleavemessage" => array(
-				"label" => "optionleavemessage",
+				"label" => "Response",
 				"value" => "",
 				"validators" => array(
 						// NOTE: no validation, will be ignored if the user can't use this option
@@ -646,7 +646,7 @@ $formdata = array_merge($formdata, array(
 				"helpstep" => 1
 		),
 		"optionmessageconfirmation" => array(
-				"label" => "optionmessageconfirmation",
+				"label" => "Confirmation",
 				"value" => "",
 				"validators" => array(
 						// NOTE: no validation, will be ignored if the user can't use this option
@@ -655,7 +655,7 @@ $formdata = array_merge($formdata, array(
 				"helpstep" => 1
 		),
 		"optionskipduplicate" => array( // NOTE: using same setting for both skipduplicates and skipemailduplicates?
-				"label" => "optionskipduplicate",
+				"label" => "Skip Duplicate",
 				"value" => "",
 				"validators" => array(
 						// NOTE: no validation, will be ignored if the user can't use this option
@@ -664,7 +664,7 @@ $formdata = array_merge($formdata, array(
 				"helpstep" => 1
 		),
 		"optioncallerid" => array(
-				"label" => "optioncallerid",
+				"label" => "Caller ID",
 				"value" => "",
 				"validators" => array(
 						array("ValLength","min" => 0,"max" => 20),
@@ -675,7 +675,7 @@ $formdata = array_merge($formdata, array(
 				"helpstep" => 1
 		),
 		"optionsavemessage" => array(
-				"label" => "optionsavemessage",
+				"label" => "Save Message",
 				"value" => "",
 				"validators" => array(
 						// NOTE: no validation. just toggles save message mode
@@ -684,7 +684,7 @@ $formdata = array_merge($formdata, array(
 				"helpstep" => 1
 		),
 		"optionsavemessagename" => array(
-				"label" => "optionsavemessagename",
+				"label" => "Name",
 				"value" => "",
 				"validators" => array(
 						array("ValDuplicateNameCheck", "type" => "messagegroup"),
@@ -697,7 +697,7 @@ $formdata = array_merge($formdata, array(
 		"SCHEDULE OPTIONS",
 		//=========================================================================================
 		"scheduledate" => array(
-				"label" => "scheduledate",
+				"label" => "Date",
 				"value" => "",
 				"validators" => array(
 						array("ValRequired")
@@ -707,7 +707,7 @@ $formdata = array_merge($formdata, array(
 				"helpstep" => 1
 		),
 		"schedulecallearly" => array(
-				"label" => "schedulecallearly",
+				"label" => "Start",
 				"value" => "",
 				"validators" => array(
 						array("ValRequired"),
@@ -719,7 +719,7 @@ $formdata = array_merge($formdata, array(
 				"helpstep" => 1
 		),
 		"schedulecalllate" => array(
-				"label" => "schedulecalllate",
+				"label" => "End",
 				"value" => "",
 				"validators" => array(
 						array("ValRequired"),
