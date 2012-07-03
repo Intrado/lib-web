@@ -312,7 +312,7 @@ if($sections) {
 								. escapehtml($title) .
 								' </div>
 								<img src="img/icons/fugue/marker.gif" alt="Mark" title="Mark this Comment" class="marker" onclick="markcomment(\'msg-\',\'' . $message->id .'\')" />
-								<div style="clear:both;">' .
+								<div>' .
 									($USER->authorize('targetedcomment')?'<div id="msgprem' . $message->id .'" class="remarklink"></div><a href="#" class="remarklink">Remark</a>':'&nbsp;') .
 								'</div>
 								<span id="msgrem' . $message->id .'" class="remark" style="display:none;">
