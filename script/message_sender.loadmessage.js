@@ -93,8 +93,8 @@ $.loadMessage = function loadMessage() {
 		});
 
 		// Load Saved Message button in saved message modal window
-		$('#msgsndr_load_saved_msg').on('click', function(){
-			//var msgGroup = $('.msgsndr_msggroup > td > input:radio[name=msgsndr_msggroup]:checked');
+		$('#msgsndr_load_saved_msg').on('click', function(event){
+			event.preventDefault();
 			var msgGroup = $(".msgsndr_msggroup.selected");
 			if(msgGroup.size() > 0) {
 				var getId = msgGroup.attr("id").match(/msgsndr_msggroup-([0-9]*)/i)[1];
@@ -428,6 +428,9 @@ $.loadMessage = function loadMessage() {
 							override = true;
 							$(self.elements.phoneTranslatePrefix + msg.languageCode).removeAttr("disabled");
 							$(self.elements.phoneOverridePrefix + msg.languageCode).attr('checked','checked');
+						} else {
+							$(self.elements.phoneTranslatePrefix + msg.languageCode).attr("disabled","disabled");
+							$(self.elements.phoneOverridePrefix + msg.languageCode).removeAttr('checked','checked');
 						}
 						updateTranslatedField(
 								$('#msgsndr_phonemessagetexttranslate' + msg.languageCode + 'text'),
