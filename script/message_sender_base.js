@@ -102,6 +102,22 @@ jQuery.noConflict();
         }
     };
 	
+	// observe changes to the phone tts inputs and save to hidden field
+	doCommonEventCallback($("#msgsndr_tts_message,input[name=messagePhoneText_message-gender]"), function() {
+		var gender = $('input[name=messagePhoneText_message-gender]:checked').val();
+		var enText = $('#msgsndr_tts_message').val();
+		var translate = $('#msgsndr_phonemessagetexttranslate').is(':checked');
+		var getTranslations = true;
+		
+		var jsonVal = $.toJSON({
+			"gender" : gender,
+			"text" : enText
+		});
+
+		$('#msgsndr_phonemessagetext').val(jsonVal);
+		obj_valManager.runValidate($('#msgsndr_phonemessagetext'));
+	});
+	
 	$(function() {
 		// hide a few items
 		$('.close, .facebook, .twitter, .feed, .error, div[id^="msgsndr_tab"]').hide();
