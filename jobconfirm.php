@@ -136,20 +136,12 @@ foreach($multilist as $mlist) {
 
 $PAGE = "notifications:jobs";
 $TITLE = "Review and Confirm Selections";
-$DESCRIPTION = "After verifying job settings click Submit Job";
+$DESCRIPTION = _L("After verifying %s settings click Submit %s", getJobTitle(),getJobTitle());
 
 $f = "notification";
 $s = "send";
 
 include_once("nav.inc.php");
-
-if (!$blocksubmit)
-	buttons(button(_L('Save For Later'), null, 'jobs.php'),
-			button(_L('Modify %s Settings',getJobTitle()),null, 'job.php'),
-			button(_L('Submit %s',getJobTitle()),null, 'jobsubmit.php?jobid=' . $_SESSION['jobid']));
-else {
-	buttons(button(_L('Modify %s Settings',getJobTitle()),null, 'job.php'));
-}
 
 startWindow("Confirmation &amp; Submit");
 ?>
@@ -308,9 +300,17 @@ if ($USER->authorize("messageconfirmation")){
 </table>
 
 <?
-endWindow();
-buttons();
+if (!$blocksubmit) {
+	buttons(
+		icon_button(_L('Modify %s Settings',getJobTitle()),"arrow_left",null, 'job.php'),
+		icon_button(_L("Save For Later"), "tick",null,'jobs.php'),
+		icon_button(_L('Submit %s',getJobTitle()),"arrow_right",null, 'jobsubmit.php?jobid=' . $_SESSION['jobid'])
+	);
+} else {
+	buttons(icon_button(_L('Modify %s Settings',getJobTitle()),"tick",null, 'job.php'));
+}
 
+endWindow();
 include_once("navbottom.inc.php");
 
 ?>
