@@ -200,8 +200,7 @@ function ValidationManager() {
 	this.runValidate = function($element) {
 		var name = $element.attr('name');
 		var form = name.split("_")[0];
-		var field = name.split("_")[1];
-		form_do_validation(form, $element);
+		form_do_validation(document.getElementById(form), document.getElementById(name));
 		
 		/*
 		var value = $element.val();
