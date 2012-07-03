@@ -278,23 +278,9 @@ header('Content-type: text/html; charset=UTF-8') ;
 </div><!--  end top_banner -->
 
 <script type="text/javascript">
-if (_brandtheme != 'newui') {
-	Event.observe(window, 'load', function() {
-		new Tip('shortcutmenu', $('shortcuts'), {
-			style: 'default',
-			radius: 4,
-			border: 4,
-			target: 'shortcutmenu',
-			hideOn: false,
-			hideAfter: 0.5,
-			hook: { target: 'bottomRight', tip: 'topRight' },
-			offset: { x: 6, y: 0 },
-			width: 'auto'
-		});
-		
-		sessionKeepAliveWarning(<?=$SESSION_WARNING_TIME?>);
-	});
-}
+Event.observe(window, 'load', function() {
+	sessionKeepAliveWarning(<?=$SESSION_WARNING_TIME?>);
+});
 </script>
 
 <div class="primary_nav">
