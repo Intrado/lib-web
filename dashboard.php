@@ -45,8 +45,8 @@ switch($requestValues["daterange"]) {
 		break;
 }
 
-$start_datetime = date("Y-m-d h:m:s",$start_datetime);
-$end_datetime = date("Y-m-d h:m:s",time());
+$start_datetime = date("Y-m-d G:i:s",$start_datetime);
+$end_datetime = date("Y-m-d G:i:s");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Stats functions
