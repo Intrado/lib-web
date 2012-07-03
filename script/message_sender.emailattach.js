@@ -10,11 +10,7 @@ function stopUpload(id,name,size,errormessage, formname, itemname) {
 	if (!formname || !itemname || typeof(obj_valManager) == "undefined") {
 		return;
 	}
-	// stopUpload() is called automatically when the iframe is loaded, which may be before document.formvars is initialized by form_load().
-	// In that case, just return.
-	if (!document.formvars || !document.formvars[formname])
-		return;
-		
+	
 	setTimeout ("var uploadprocess = $(\'upload_process\'); if (uploadprocess) uploadprocess.hide();", 500 );
 	
 	

@@ -204,7 +204,7 @@
 					<div class="controls" style="overflow: hidden;">
 						<div id="uploadedfiles" class="msgdata" style="display: none; "></div>
 						<div id="upload_process" style="display: none; "><img src="img/ajax-loader.gif"></div>
-						<iframe id="msgsndr_form_attachment_my_attach" class="attach_file" src="_emailattachment.php?formname=broadcast&amp;itemname=msgsndr_form_attachment"></iframe>
+						<iframe id="msgsndr_form_attachment_my_attach" class="attach_file" src="_emailattachment.php?formname=broadcast&amp;itemname=msgsndr_emailmessageattachment"></iframe>
 						<div id="msgsndr_emailmessageattachment_msg" class="box_validatorerror er" style="display:none"></div>
 					</div>
 				</fieldset>
