@@ -716,7 +716,7 @@ $formdata["maxguardians"] = array(
 						"label" => _L('Max Guardians'),
 						"value" => $settings['maxguardians'],
 						"validators" => array(
-							array('ValNumber', 'min' => 0, 'max' => 99)
+							array('ValNumber', 'min' => $settings['maxguardians']>=0?$settings['maxguardians']:0, 'max' => 99)
 						),
 						"control" => array("TextField","size" => 4, "maxlength" => 4),
 						"helpstep" => $helpstepnum
@@ -726,7 +726,7 @@ $formdata["maxphones"] = array(
 						"label" => _L('Max Phones'),
 						"value" => $settings['maxphones'],
 						"validators" => array(
-							array('ValNumber', 'min' => 1, 'max' => 99)
+							array('ValNumber', 'min' => $settings['maxphones']>0?$settings['maxphones']:1, 'max' => 99)
 						),
 						"control" => array("TextField","size" => 4, "maxlength" => 4),
 						"helpstep" => $helpstepnum
@@ -736,7 +736,7 @@ $formdata["maxemails"] = array(
 						"label" => _L('Max Emails'),
 						"value" => $settings['maxemails'],
 						"validators" => array(
-							array('ValNumber', 'min' => 1, 'max' => 99)
+							array('ValNumber', 'min' => $settings['maxemails']>0?$settings['maxemails']:1, 'max' => 99)
 						),
 						"control" => array("TextField","size" => 4, "maxlength" => 4),
 						"helpstep" => $helpstepnum
@@ -860,7 +860,7 @@ $formdata["maxsms"] = array(
 						"label" => _L('Max SMS'),
 						"value" => $settings['maxsms'],
 						"validators" => array(
-							array('ValNumber', 'min' => 1, 'max' => 99)
+							array('ValNumber', 'min' => $settings['maxsms']>0?$settings['maxsms']:1, 'max' => 99)
 						),
 						"control" => array("TextField","size" => 4, "maxlength" => 4),
 						"helpstep" => $helpstepnum
