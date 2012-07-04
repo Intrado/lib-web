@@ -14,7 +14,7 @@ function ContentSaveManager() {
 				if (translate) {
 					langCodes.push(langCode);
 				} else {
-					$('input[name=email_translate_' + langCode + ']').html("");
+					$('#msgsndr_emailmessagetexttranslate' + langCode + 'text').val("");
 				}
 			});
 
@@ -22,7 +22,7 @@ function ContentSaveManager() {
 				getTranslations = $.translate(enText, langCodes, function(data) {
 					$.each(data.responseData, function(transIndex, transData) {
 						updateTranslatedField(
-								$('input[name=email_translate_' + transData.code + ']'),
+								$('#msgsndr_emailmessagetexttranslate' + transData.code + 'text'),
 								transData.translatedText, true, false, null);
 					});
 				});
