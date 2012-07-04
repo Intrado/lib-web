@@ -99,7 +99,7 @@ function StepManager(_valManager) {
 		
 		if(!stopSwitch) {
 			//UNBIND VAL
-			validationManager.unbindValidations(currentStep);
+			//validationManager.unbindValidations(currentStep);
 			
 			//SWITCH STEP
 			$("[id^=msg_section_]").hide();
@@ -113,7 +113,7 @@ function StepManager(_valManager) {
 			$("a#tab_" + currentStep, ".msg_steps").parent().addClass('active').addClass("allow");
 			
 			//BIND VALIDATIONS
-			validationManager.bindValidations(currentStep);
+			//validationManager.bindValidations(currentStep);
 			
 			//RUN ON CHANGE EVENTS
 			$.each(eventManager.onStepChange, function(eIndex, eEvent) {

@@ -192,7 +192,7 @@ jQuery.noConflict();
 
 		obj_stepManager.onStepChange(function(lastStep, nextStep) {
 			//alert("stepChange! " + lastStep + " to " + nextStep);
-			obj_valManager.forceRunValidate(nextStep);
+			//obj_valManager.forceRunValidate(nextStep);
 		});
 
         obj_contentManager.onContentDiscard(function(contentMode) {
@@ -269,7 +269,7 @@ jQuery.noConflict();
 				}
 			}
 			
-			obj_valManager.forceRunValidate(2);
+			//obj_valManager.forceRunValidate(2);
 			//alert("contentModeStarted! " + contentMode);
 		});
 		

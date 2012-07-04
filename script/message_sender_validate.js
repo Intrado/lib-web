@@ -40,7 +40,13 @@ function ValidationManager() {
 			"msgsndr_socialmediafeedcategory"
 		],
 		"3": [
-			
+			"msgsndr_optionautoreport",
+			"msgsndr_optionskipduplicate",
+			"msgsndr_optionsavemessage",
+			"msgsndr_optionsavemessagename",
+			"msgsndr_scheduledate",
+			"msgsndr_schedulecallearly",
+			"msgsndr_schedulecalllate"
 		]
 	};
 	
@@ -48,21 +54,43 @@ function ValidationManager() {
 		$.each(validationMap, function(vIndex, vItems) {
 			$.each(vItems, function(vIndex2, vItem) {
 				var e = $('#'+vItem);
+				self.preValidate(e);
 				e.on("validation:complete", function(event, memo) {
 					switch (memo.style) {
 					case "error":
-						e.removeClass('ok').addClass('er');
+						self.setInvalid(e);
 						break;
 					case "valid":
-						e.removeClass('er').addClass('ok');
+						self.setValid(e);
 						break;
 					default:
-						e.removeClass('ok er');
+						self.setUnknown(e);
 					}
 				});
 			});
 		});
 	};
+	
+	// set the prevalidate status on all form items (adds default required style)
+	this.preValidate = function(e) {
+		if (!e)
+			return;
+		var name = e.attr('name');
+		var field = name.split('_')[1];
+		var validators = document.formvars["msgsndr"].formdata[field].validators;
+		// get the presense of the required validator
+		var isRequired = false;
+		$.each(validators, function (index, validator) {
+			if (validator && validator[0] == "ValRequired") {
+				isRequired = true;
+				return false;
+			}
+		});
+		if (isRequired) {
+			$("#"+name+"_icon").attr("src","img/icons/error.gif");
+			self.setPreValidate(e);
+		}
+	}
 	
 	this.forceRunValidate = function(step) {
 		$.each(validationMap[step], function(vIndex, vItem) {
@@ -70,19 +98,16 @@ function ValidationManager() {
 		});
 	};
 	
-	this.bindValidations = function(step) {
+	this.setInvalid = function(e) {
+		e.removeClass('pre ok').addClass('er');
 	};
 	
-	this.unbindValidations = function(step) {
+	this.setValid = function(e) {
+		e.removeClass('pre er').addClass('ok');
 	};
 	
-	this.setInvalid = function($element, msg) {
-	};
-	
-	this.setValid = function($element) {
-	};
-	
-	this.emptyValidate = function($element) {
+	this.setPreValidate = function(e) {
+		e.removeClass('ok er').addClass("pre");
 	}
 	
 	//This is to bridge prototype and jquery implementations when force running validation
