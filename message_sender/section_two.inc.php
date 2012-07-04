@@ -399,9 +399,9 @@
 						</fieldset>
 						
 						<fieldset class="check">
-							<label class="control-label" for="feed_categories">Post to Feeds</label>
-							<div class="controls multicheckbox" id="msgsndr_socialmediafeedcategory" name="msgsndr_socialmediafeedcategory">
-							</div>
+							<label class="control-label" for="feed_categories">Post to Feeds&nbsp;<img id="msgsndr_socialmediafeedcategory_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>
+							<div class="controls multicheckbox" id="msgsndr_socialmediafeedcategory" name="msgsndr_socialmediafeedcategory"></div>
+							<div id="msgsndr_socialmediafeedcategory_msg" class="box_validatorerror er" style="display:none"></div>
 						</fieldset>
 
 					</div><!-- rss -->
