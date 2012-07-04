@@ -14,7 +14,7 @@ function ContentSaveManager() {
 				if (translate) {
 					langCodes.push(langCode);
 				} else {
-					$('input[name=email_translate_' + transData.code + ']').html("");
+					$('input[name=email_translate_' + langCode + ']').html("");
 				}
 			});
 
