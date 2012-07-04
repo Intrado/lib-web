@@ -1,7 +1,7 @@
 function ValidationManager() {
 	var $ = jQuery;
 	var self = this;
-	var valTimers = {};
+	var pending = 0;
 	
 	var validationMap = {
 		"1": [
@@ -36,8 +36,8 @@ function ValidationManager() {
 			"msgsndr_hastwitter",
 			"msgsndr_socialmediatwittermessage",
 			"msgsndr_hasfeed",
-			"msgsndr_socialmediafeedmessage",
-			"msgsndr_socialmediafeedcategory"
+			"msgsndr_socialmediafeedmessage"
+			//"msgsndr_socialmediafeedcategory" // TODO: can't call validate on a div...
 		],
 		"3": [
 			"msgsndr_optionautoreport",
@@ -92,10 +92,31 @@ function ValidationManager() {
 		}
 	}
 	
-	this.forceRunValidate = function(step) {
+	this.forceRunValidate = function(step, callback) {
+		pending = validationMap[step].length;
 		$.each(validationMap[step], function(vIndex, vItem) {
+			var e = $('#'+vItem);
+			e.on("validation:complete.forced", function(event, memo) {
+				pending--;
+				// NOTE: this might run the callback early if another form item is doing validation...
+				if (callback && pending == 0)
+					callback();
+				e.off("validation:complete.forced");
+			});
 			self.runValidateById(vItem);
 		});
+	};
+	
+	this.stepIsValid = function(step) {
+		var passed = true;
+		$.each(validationMap[step], function(vIndex, vItem) {
+			var e = $('#'+vItem);
+			if (!e.hasClass("ok")) {
+				passed = false;
+				return false;
+			}
+		});
+		return passed;
 	};
 	
 	this.setInvalid = function(e) {
@@ -116,8 +137,12 @@ function ValidationManager() {
 		this.runValidate(element);
 	};
 
-	this.runValidate = function($element) {
-		var name = $element.attr('name');
+	this.runValidate = function(e) {
+		self.setPreValidate(e);
+		// FIXME: probably a better way to do this...
+		if (e.val() == "[]" || e.val() == "{}")
+			e.val("");
+		var name = e.attr('name');
 		var form = name.split("_")[0];
 		form_do_validation(document.getElementById(form), document.getElementById(name));
 	};

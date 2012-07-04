@@ -261,10 +261,23 @@ function StepManager(_valManager) {
 	//BIND CONTINUE BUTTONS
 	$('button.btn_confirm').on('click', function(e) {
 		e.preventDefault();
+		var btn = $(this);
+		var oldname = btn.html();
+		btn.text("Validating...");
+		btn.attr("disabled","disabled");
 		//NEXT STEP ID
 		var getStepId = $(this).attr('data-next');
-		//SWITCH STEP
-		self.gotoStep(getStepId);
+		validationManager.forceRunValidate(currentStep, function () {
+			btn.html(oldname);
+			btn.removeAttr("disabled");
+			// check that there are no validation errors
+			if (validationManager.stepIsValid(currentStep)) {
+				//SWITCH STEP
+				self.gotoStep(getStepId);
+			} else {
+				alert("Some fields failed validation!");
+			}
+		});
 	});
 	
 	//BIND STEP 3 SAVE MESSAGE

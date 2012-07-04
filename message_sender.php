@@ -325,7 +325,7 @@ $formdata = array(
 				"label" => "Add Myself",
 				"value" => "",
 				"validators" => array(
-						// None, just toggles logic for addme fields
+						array("ValDummy")// None, just toggles logic for addme fields
 				),
 				"control" => array("CheckBox"),
 				"helpstep" => 1
@@ -391,7 +391,7 @@ $formdata = array(
 				"label" => "Audio Link",
 				"value" => "",
 				"validators" => array(
-						// NOTE: Will need complicated validation based on user permissions and message contents (has dynamic parts?)
+						array("ValDummy")// NOTE: Will need complicated validation based on user permissions and message contents (has dynamic parts?)
 				),
 				"control" => array("CheckBox"),
 				"helpstep" => 1
@@ -630,15 +630,19 @@ $formdata = array_merge($formdata, array(
 				"label" => "Day(s)",
 				"value" => "",
 				"validators" => array(
+						array("ValConditionallyRequired", "field" => "hasphone"),
 						array("ValInArray", "values" => range(1,$ACCESS->getValue('maxjobdays', 7)))
 				),
+				"requires" => array("hasphone"),
 				"control" => array("TextField"),
 				"helpstep" => 1
 		),
 		"optionautoreport" => array(
 				"label" => "Auto Report",
 				"value" => "",
-				"validators" => array(),
+				"validators" => array(
+						array("ValDummy")
+				),
 				"control" => array("CheckBox"),
 				"helpstep" => 1
 		),
@@ -646,7 +650,7 @@ $formdata = array_merge($formdata, array(
 				"label" => "Response",
 				"value" => "",
 				"validators" => array(
-						// NOTE: no validation, will be ignored if the user can't use this option
+						array("ValDummy")// NOTE: no validation, will be ignored if the user can't use this option
 				),
 				"control" => array("CheckBox"),
 				"helpstep" => 1
@@ -655,7 +659,7 @@ $formdata = array_merge($formdata, array(
 				"label" => "Confirmation",
 				"value" => "",
 				"validators" => array(
-						// NOTE: no validation, will be ignored if the user can't use this option
+						array("ValDummy")// NOTE: no validation, will be ignored if the user can't use this option
 				),
 				"control" => array("CheckBox"),
 				"helpstep" => 1
@@ -664,7 +668,7 @@ $formdata = array_merge($formdata, array(
 				"label" => "Skip Duplicate",
 				"value" => "",
 				"validators" => array(
-						// NOTE: no validation, will be ignored if the user can't use this option
+						array("ValDummy")// NOTE: no validation, will be ignored if the user can't use this option
 				),
 				"control" => array("CheckBox"),
 				"helpstep" => 1
@@ -673,10 +677,12 @@ $formdata = array_merge($formdata, array(
 				"label" => "Caller ID",
 				"value" => "",
 				"validators" => array(
+						array("ValConditionallyRequired", "field" => "hasphone"),
 						array("ValLength","min" => 0,"max" => 20),
 						array("ValPhone"),
 						array("ValCallerID")
 				),
+				"requires" => array("hasphone"),
 				"control" => array("TextField"),
 				"helpstep" => 1
 		),
@@ -684,7 +690,7 @@ $formdata = array_merge($formdata, array(
 				"label" => "Save Message",
 				"value" => "",
 				"validators" => array(
-						// NOTE: no validation. just toggles save message mode
+						array("ValDummy")// NOTE: no validation. just toggles save message mode
 				),
 				"control" => array("CheckBox"),
 				"helpstep" => 1
@@ -706,8 +712,8 @@ $formdata = array_merge($formdata, array(
 				"label" => "Date",
 				"value" => "",
 				"validators" => array(
-						array("ValRequired")
-						// TODO: date validation
+						array("ValRequired"),
+						array("ValDate")
 				),
 				"control" => array("TextField"),
 				"helpstep" => 1
