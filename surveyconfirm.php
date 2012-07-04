@@ -144,14 +144,6 @@ $TITLE = "Review and Confirm Selections";
 $DESCRIPTION = "After verifying survey settings click Submit Survey";
 
 include_once("nav.inc.php");
-
-if (!$blocksubmit)
-	buttons(button('Save For Later', null, 'surveys.php'),
-			button('Modify Survey Settings',null, 'survey.php'),
-			button('Submit Survey',null, 'jobsubmit.php?jobid=' . $jobid));
-else {
-	buttons(button('Modify Survey Settings',null, 'survey.php'));
-}	
 	
 startWindow("Confirmation &amp; Submit");
 ?>
@@ -286,9 +278,16 @@ startWindow("Confirmation &amp; Submit");
 </table>
 <?
 
+if (!$blocksubmit) {
+	buttons(
+	icon_button(_L('Modify Survey Settings'),"arrow_left",null, 'survey.php'),
+	icon_button(_L("Save For Later"), "tick",null,'surveys.php'),
+	icon_button(_L('Submit Survey'),"arrow_right",null, 'jobsubmit.php?jobid=' . $jobid)
+	);
+} else {
+	buttons(icon_button(_L('Modify Survey Settings'),"tick",null, 'survey.php'));
+}
 endWindow();
 
-
-buttons();
 include_once("navbottom.inc.php");
 ?>
