@@ -66,36 +66,99 @@ function SubmitManager() {
 		})
 		
 		var result = form_submit(e, 'submit', document.getElementById('msgsndr'));
-		/*$.ajax({
-			type: 'POST',
-			url: 'message_sender.php?form=msgsndr&ajax=true',
-			data: formData,
-			dataType: 'json',
-			success: function(response) {
-				var res = response;
-				if(typeof(res.status) != "undefined" && typeof(res.nexturl) != "undefined" && res.status == "success") {
-					//success
-					$('#msgsndr_submit_title').html("Message Submitted");
-					$('#msgsndr_submit_message').html("Broadcasting message to " + recipientTrack + " recipients");
-					$('#msgsndr_submit_confirmbutton').on('click', function(event) {
-						window.location = res.nexturl;
-					});
-					$('#msgsndr_submit_confirmation').bind("hide", function() {
-						window.location = res.nexturl;
-					});
-				} else if (typeof(res.validationerrors) == "undefined") {
-					// this is to differentiate errors where the form hasn't submitted properly (possibly due to session expiry)
-					$('#msgsndr_submit_title').html("Submit Error");
-					$('#msgsndr_submit_message').html("Hmmm, looks like something went wrong. <br/>That's all we know.");
-				} else {
-					$('#msgsndr_submit_title').html("Submit Error");
-					$('#msgsndr_submit_message').html("Oops! That didn't quite work out.<br/>Perhaps something is missing or not quite right with the broadcast information entered?");
-					
-				}
-				$('#msgsndr_submit_confirmation').modal('show');
-			}
-		});*/
-		
 	});
-	
 };
+
+(function($) {
+	// overload form.js.php behavior for handling submit
+	form_handle_submit = function(form,event) {
+		var formvars = document.formvars[form.name];
+		
+		//don't allow more than one submit at a time
+		if (formvars.submitting)
+			return;
+		formvars.submitting = true;
+		
+		//stop any pending validations from occuring
+		if (formvars.keyuptimer) {
+			window.clearTimeout(formvars.keyuptimer);
+		}
+		
+		//prep an ajax call with entire form contents and post back to server
+		//server side will validate
+		//if successful, results with have some action to take and/or code
+		//otherwise responce has validation results for each item,
+		//update each element's msg area, and throw up an alert box explaining there are unresolved issues.
+	
+		//add an ajax marker
+		var posturl = form_make_url(formvars.scriptname, {
+			'ajax': 'true'
+		});
+		
+		//start spinner
+		var spinner =  $(form.name + "_spinner");
+		if (spinner) {
+			spinner.show();
+		}
+		
+		new Ajax.Request(posturl, {
+			method:'post',
+			parameters: form.serialize(true),
+			onSuccess: function(response) {
+				if (spinner) {
+					spinner.hide();
+				}
+				var res = response.responseJSON;
+				try {
+					if (res == null) {
+						//HACK: check to see if we hit the login page (due to logout)
+						if (response.responseText.indexOf(" Login</title>") != -1) {
+							// this is to differentiate errors where the form hasn't submitted properly (possibly due to session expiry)
+							$('#msgsndr_submit_title').html("Submit Error");
+							$('#msgsndr_submit_message').html("Your changes cannot be saved because your session has expired or logged out.");
+							window.location="index.php?logout=1";
+						} else {
+							$('#msgsndr_submit_title').html("Submit Error");
+							$('#msgsndr_submit_message').html("There was a problem submitting the form. Please try again.");
+						}
+					} else if ("fail" == res.status) {
+						$('#msgsndr_submit_title').html("Submit Error");
+						//show the validation results
+						if (res.validationerrors)
+							$('#msgsndr_submit_message').html("There are some errors on this form.<br>Please correct them before trying again.");
+						
+						if (res.datachange) {
+							$('#msgsndr_submit_message').html("The data on this form has changed.<br>Your changes cannot be saved.");
+							window.location=formvars.scriptname;
+						}
+					} else if ("success" == res.status && res.nexturl) {
+						$('#msgsndr_submit_title').html("Message Submitted");
+						$('#msgsndr_submit_message').html("Broadcasting message to " + recipientTrack + " recipients");
+							
+						$('#msgsndr_submit_confirmbutton').on('click', function(event) {
+							window.location = res.nexturl;
+						});
+						$('#msgsndr_submit_confirmation').bind("hide", function() {
+							window.location = res.nexturl;
+						});
+					} else if ("modify" == res.status) {
+						$(res.name).update(res.content);
+					} else if ("fireevent" == res.status) {
+						$(form).trigger("Form:Submitted", res.memo);
+					}
+				} catch (e) {
+					alert(e.message + "\n" + response.responseText);
+				}
+				formvars.submitting = false;
+				$('#msgsndr_submit_confirmation').modal('show');
+			},
+			onFailure: function(){
+				if (spinner) {
+					spinner.hide();
+				}
+				alert('There was a problem submitting the form. Please try again.'); //TODO better error handling
+				formvars.submitting = false;
+			}
+		});
+	}
+})(jQuery);
