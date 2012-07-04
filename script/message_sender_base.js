@@ -2,7 +2,7 @@ jQuery.noConflict();
 (function($) {
 
 	// hide stuff straight away
-	$('.close, .facebook, .twitter, .feed, .error, #msg_section_2, #msg_section_3').hide();
+	$('#msg_section_2, #msg_section_3').hide().removeClass('hide');
 
 	// prototype to jquery event bridge
 	var oldjQueryTrigger = $.event.trigger;
@@ -131,7 +131,7 @@ jQuery.noConflict();
 	
 	$(function() {
 		// hide a few items
-		$('div[id^="msgsndr_tab"]').hide();
+		$('.close, .facebook, .twitter, .feed, .error, div[id^="msgsndr_tab"]').hide();
 		
 		// initialise global variables
 		orgFeatures = {};
@@ -313,29 +313,29 @@ jQuery.noConflict();
 			//$('#list_ids').val('[addme]');//.addClass('ok');
 			if($(this).is(":checked")) {
 				recipientTrack++;
+
+				$('#addme').slideDown('slow', function() {
+					if (userInfo.phone != '' && userInfo.email != '') {
+	        	$('#msgsndr_addmephone').attr('value', userInfo.phoneFormatted);
+	        	$('#msgsndr_addmeemail').attr('value', userInfo.email);
+	        } else if(userInfo.phone != '' && userInfo.email == ''){
+		        $('#msgsndr_addmephone').attr('value', userInfo.phoneFormatted);
+		        $('#msgsndr_addmeemail').focus();
+	        } else if(userInfo.phone == '' && userInfo.email != '') {
+	        	$('#msgsndr_addmeemail').attr('value', userInfo.email);
+		        $('#msgsndr_addmephone').focus();
+					} else {
+						$('#msgsndr_addmephone').attr('value', '');
+						$('#msgsndr_addmeemail').attr('value', '');
+					}
+				});
 			} else {
 				recipientTrack--;
+				$('#addme').slideUp();
 			}
-			
-			$('#addme').slideToggle('slow', function() {
-				if($('#msgsndr_addme').is(':checked')){
-					if(userInfo.phone != '' && userInfo.email != '') {
-			        	$('#msgsndr_addmephone').attr('value', userInfo.phoneFormatted);
-			        	$('#msgsndr_addmeemail').attr('value', userInfo.email);
-			        } else if(userInfo.phone != '' && userInfo.email == ''){
-				        $('#msgsndr_addmephone').attr('value', userInfo.phoneFormatted);
-				        $('#msgsndr_addmeemail').focus();
-			        } else if(userInfo.phone == '' && userInfo.email != '') {
-			        	$('#msgsndr_addmeemail').attr('value', userInfo.email);
-				        $('#msgsndr_addmephone').focus();
-			        }
-				} else {
-					$('#msgsndr_addmephone').attr('value', '');
-					$('#msgsndr_addmeemail').attr('value', '');
-				}
 				
-				obj_stepManager.updateStepStatus();
-			});
+			obj_stepManager.updateStepStatus();
+			
 		});
 		
 		// Toggle Collapse - Generic 

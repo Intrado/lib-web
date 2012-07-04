@@ -1,6 +1,6 @@
 			<!-- ============== Message sender section 2, Message Content ============== -->
 
-			<div id="msg_section_2" class="window_panel">
+			<div id="msg_section_2" class="window_panel hide">
 			<p>Create the content for this message, or <a id="load_saved_message" href="#msgsndr_saved_message" data-toggle="modal">load a saved message</a></p>
 			
 			<div id="msgsndr_loaded_message" style="display:none;">

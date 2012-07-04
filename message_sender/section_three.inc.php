@@ -2,7 +2,7 @@
 			
 			<!-- ============== Message sender section 3, Review and Send ============== -->
 
-			<div id="msg_section_3" class="window_panel">
+			<div id="msg_section_3" class="window_panel hide">
 			
 				<fieldset class="review_subject">
 					<label>Subject</label>
