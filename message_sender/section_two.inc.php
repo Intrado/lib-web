@@ -399,7 +399,7 @@
 						</fieldset>
 						
 						<fieldset class="check">
-							<label class="control-label req" for="feed_categories">Post to Feeds</label>
+							<label class="control-label" for="feed_categories">Post to Feeds</label>
 							<div class="controls multicheckbox" id="msgsndr_socialmediafeedcategory" name="msgsndr_socialmediafeedcategory">
 							</div>
 						</fieldset>
