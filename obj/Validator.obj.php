@@ -613,6 +613,19 @@ class ValReldate extends Validator {
 	}
 }
 
+class ValDummy extends Validator {
+	function validate ($value, $args) {
+		return true;
+	}
+
+	function getJSValidator () {
+		return
+			'function (name, label, value, args) {
+				return true;
+			}';
+	}
+}
+
 //alpha
 //alphanumeric
 //phoneeasycall ??
