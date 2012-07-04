@@ -1,7 +1,7 @@
 jQuery.noConflict();
 (function($) {
 
-	// hide a few items
+	// hide stuff straight away
 	$('.close, .facebook, .twitter, .feed, .error, #msg_section_2, #msg_section_3').hide();
 
 	// prototype to jquery event bridge
