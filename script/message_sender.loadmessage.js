@@ -415,7 +415,13 @@ $.loadMessage = function loadMessage() {
 					function (data) {
 						$('#msgsndr_phonemessagetext').val($.toJSON({ "gender" : gender, "text" : data.messageBody }))
 					});
-				// TODO: assign gender
+				if (gender == "female") {
+					$('#messagePhoneText_message-female').attr("checked","checked");
+					$('#messagePhoneText_message-male').removeAttr("checked");
+				} else {
+					$('#messagePhoneText_message-female').removeAttr("checked");
+					$('#messagePhoneText_message-male').attr("checked","checked");
+				}
 			} else {
 				self.elements.phoneTranslateCheck.attr("checked","checked");
 				$(self.elements.phoneLanguageCheckPrefix + msg.languageCode).attr('checked','checked');
