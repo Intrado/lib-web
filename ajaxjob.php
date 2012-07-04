@@ -92,10 +92,17 @@ function fmt_scheduledjobs_action ($obj) {
 }
 
 function fmt_job_default_action ($obj) {
-	if ($obj->status == 'complete' || $obj->status == 'cancelled')
-		return "window.location = 'reportjobsummary.php?id=$obj->id';";
-	else
-		return "window.location = 'job.php?id=$obj->id';";
+	if ($obj->status == 'complete' || $obj->status == 'cancelled') {
+		if ($obj->type = "survey")
+			return "window.location = 'reportsurveysummary.php?jobid==$obj->id';";
+		else
+			return "window.location = 'reportjobsummary.php?id=$obj->id';";
+	} else {
+		if ($obj->type = "survey")
+			return "window.location = 'survey.php?id=$obj->id';";
+		else
+			return "window.location = 'job.php?id=$obj->id';";
+	}
 }
 
 
