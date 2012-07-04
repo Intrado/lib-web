@@ -10,7 +10,7 @@ header("Cache-Control: private");
 ?>
 
 /* ======= BEGIN VALIDATORS =======  */
-<? Validator::load_validators(array("ValRequired","ValConditionallyRequired","ValLength","ValNumber","ValNumeric","ValEmail","ValEmailList","ValPhone","ValFieldConfirmation","ValInArray","ValDomain","ValTimeCheck","ValDomainList","ValDate")); ?>
+<? Validator::load_validators(array("ValRequired","ValConditionallyRequired","ValLength","ValNumber","ValNumeric","ValEmail","ValEmailList","ValPhone","ValFieldConfirmation","ValInArray","ValDomain","ValTimeCheck","ValDomainList","ValDate","ValDummy")); ?>
 /* ======= END VALIDATORS =======  */
 
 // TODO: Need to localize text
