@@ -303,7 +303,7 @@
 							<div class="controls">
 								<textarea id="msgsndr_socialmediafacebookmessage" name="msgsndr_socialmediafacebookmessage" class="msgdata required" ></textarea>
 								<div id="msgsndr_socialmediafacebookmessage_msg" class="box_validatorerror er" style="display:none"></div>
-								<div><p><a href="javascript:void(null);" id="sms_sc" onclick="(new spellChecker($('msgsndr_form_fbmsg')) ).openChecker();">Spell Check</a> <span class="fb characters">420 Characters left</span></p></div>
+								<div><p><a href="javascript:void(null);" id="fb_sc" onclick="(new spellChecker($('msgsndr_form_fbmsg')) ).openChecker();">Spell Check</a> <span class="fb characters">420 Characters left</span></p></div>
 							</div>
 						</fieldset>
 
@@ -361,7 +361,7 @@
 							<div class="controls">
 								<textarea id="msgsndr_socialmediatwittermessage" name="msgsndr_socialmediatwittermessage" class="msgdata required" ></textarea>
 								<div id="msgsndr_socialmediatwittermessage_msg" class="box_validatorerror er" style="display:none"></div>
-								<div><p><a href="javascript:void(null);" id="sms_sc" onclick="(new spellChecker($('msgsndr_form_tmsg')) ).openChecker();">Spell Check</a> <span class="twit characters"> Characters left</span></p></div>
+								<div><p><a href="javascript:void(null);" id="tw_sc" onclick="(new spellChecker($('msgsndr_form_tmsg')) ).openChecker();">Spell Check</a> <span class="twit characters"> Characters left</span></p></div>
 							</div>
 						</fieldset>
 
@@ -394,7 +394,7 @@
 							<div class="controls">
 							<textarea id="msgsndr_form_rssmsg" name="feed_message" class="msgdata required"></textarea> <span class="error"></span>
 							<div id="msgsndr_socialmediafeedmessage_msg" class="box_validatorerror er" style="display:none"></div>
-							<p><a href="#">Spell Check</a></p>
+							<p><a href="javascript:void(null);" id="rss_sc" onclick="(new spellChecker($('msgsndr_form_rssmsg')) ).openChecker();">Spell Check</a></p>
 							</div>
 						</fieldset>
 						
