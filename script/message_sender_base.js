@@ -1,5 +1,9 @@
 jQuery.noConflict();
 (function($) {
+
+	// hide a few items
+	$('.close, .facebook, .twitter, .feed, .error, #msg_section_2, #msg_section_3').hide();
+
 	// prototype to jquery event bridge
 	var oldjQueryTrigger = $.event.trigger;
 	var oldPrototypeFire = Element.fire;
@@ -127,7 +131,7 @@ jQuery.noConflict();
 	
 	$(function() {
 		// hide a few items
-		$('.close, .facebook, .twitter, .feed, .error, div[id^="msgsndr_tab"]').hide();
+		$('div[id^="msgsndr_tab"]').hide();
 		
 		// initialise global variables
 		orgFeatures = {};
