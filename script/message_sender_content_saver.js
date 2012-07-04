@@ -7,15 +7,18 @@ function ContentSaveManager() {
 			var translate = $('#msgsndr_emailmessagetexttranslate').is(':checked');
 
 			var getTranslations = true;
-			if(translate) {
-				var langCodes = [];
+			var langCodes = [];
 
-				$('input[name=email_save_translation]:checked').each(function(transI, transD) {
-					var langCode = $(transD).attr('id').split('_')[1];
-					$('#post_data_email_translations').append();
+			$('input[name=email_save_translation]:checked').each(function(transI, transD) {
+				var langCode = $(transD).attr('id').split('_')[1];
+				if (translate) {
 					langCodes.push(langCode);
-				});
+				} else {
+					$('input[name=email_translate_' + transData.code + ']').html("");
+				}
+			});
 
+			if (langCodes.length > 0) {
 				getTranslations = $.translate(enText, langCodes, function(data) {
 					$.each(data.responseData, function(transIndex, transData) {
 						updateTranslatedField(
@@ -33,12 +36,12 @@ function ContentSaveManager() {
 			var translate = $('#msgsndr_phonemessagetexttranslate').is(':checked');
 			var getTranslations = true;
 
-			if(translate) {
-				var langCodes = [];
+			var langCodes = [];
 
-				$('input[name=save_translation]:checked').each(function(transI, transD) {
-					var langCode = $(transD).attr('id').split('_')[1];
-					
+			$('input[name=save_translation]:checked').each(function(transI, transD) {
+				var langCode = $(transD).attr('id').split('_')[1];
+				
+				if (translate) {
 					var overRide = $('#tts_override_' + langCode).is(':checked');
 					if(overRide) {
 						updateTranslatedField(
@@ -47,8 +50,12 @@ function ContentSaveManager() {
 					} else {
 						langCodes.push(langCode);
 					}
-				});
+				} else {
+					$('#msgsndr_phonemessagetexttranslate' + langCode + 'text').val("");
+				}
+			});
 
+			if (langCodes.length > 0) {
 				getTranslations = $.translate(enText, langCodes, function(data) {
 					$.each(data.responseData, function(transIndex, transData) {
 						updateTranslatedField(
@@ -57,7 +64,7 @@ function ContentSaveManager() {
 					});
 				});
 			}
-
+			
 			return getTranslations;
 		},
 		"feed" : function() {

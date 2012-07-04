@@ -123,6 +123,7 @@ function StepManager(_valManager) {
 			if(currentStep == 3) {
 				self.preSubmitConfig();
 			}
+			self.updateStepStatus();
 		}
 	};
 	
