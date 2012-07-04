@@ -575,10 +575,10 @@ $.loadMessage = function loadMessage() {
 					controlElement.show();
 					$.each(attachments, function(eIndex,eData) {
 						var filesize = Math.round(eData.size/1024);
-						var attach = '<a href="emailattachment.php?maid=' + eData.id + '&name=' + eData.filename + '">' + eData.filename + '</a>' +
+						var attach = '<a href="emailattachment.php?id=' + eData.contentid + '&name=' + eData.filename + '">' + eData.filename + '</a>' +
 							'&nbsp;(Size: ' + filesize + 'k)&nbsp;<a href="#">Remove</a><br>';
 						controlElement.append(attach);
-						files[eData.id] = {"name":eData.filename,"size":eData.size}
+						files[eData.contentid] = {"name":eData.filename,"size":eData.size}
 					});
 				}
 				element.val(Object.toJSON(files));
