@@ -737,7 +737,7 @@ $formdata = array_merge($formdata, array(
 				"value" => "",
 				"validators" => array(
 						array("ValRequired"),
-						array("ValDate")
+						array("ValDate", "min" => date("m/d/Y"))
 				),
 				"control" => array("TextField"),
 				"helpstep" => 1
@@ -1051,7 +1051,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			if (isset($postdata["emailmessagetexttranslate"]) && $postdata["emailmessagetexttranslate"]) {
 				foreach ($translationlanguages as $code => $language) {
 					if (isset($postdata["emailmessagetexttranslate". $code. "text"])) {
-						$translatedmessage = json_decode($postdata["phonemessagetexttranslate". $code. "text"], true);
+						$translatedmessage = json_decode($postdata["emailmessagetexttranslate". $code. "text"], true);
 						if ($translatedmessage["enabled"]) {
 							// if the translation text is overridden, don't attach a source message
 							// it isn't applicable since we have no way to know what they changed the text to.
