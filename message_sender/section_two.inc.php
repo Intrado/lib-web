@@ -143,7 +143,7 @@
 
 				<fieldset class="hide">
 					<label for="msgsndr_phonemessagetexttranslate">Translate&nbsp;<img id="msgsndr_phonemessagetexttranslate_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>
-					<input type="checkbox" id="msgsndr_phonemessagetexttranslate" class="msgdata" value="" name="msgsndr_phonemessagetexttranslate" data-txt="#msgsndr_tts_message" data-display="#tts_translate" />
+					<input type="checkbox" id="msgsndr_phonemessagetexttranslate" class="msgdata" value="tts_translate" name="msgsndr_phonemessagetexttranslate" data-txt="#msgsndr_tts_message" data-display="#tts_translate" />
 					<a class="toggle-translations hide" data-target="#tts_translate" href=""></a>
 					<div id="msgsndr_phonemessagetexttranslate_msg" class="box_validatorerror er" style="display:none"></div>
 				</fieldset>
@@ -221,7 +221,7 @@
 				<fieldset class="hide">
 					<label for="msgsndr_emailmessagetexttranslate">Translate&nbsp;<img id="msgsndr_emailmessagetexttranslate_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>
 					<div class="controls">
-						<input type="checkbox" id="msgsndr_emailmessagetexttranslate" class="msgdata" name="msgsndr_emailmessagetexttranslate" value=""  data-display="#email_translate" />
+						<input type="checkbox" id="msgsndr_emailmessagetexttranslate" class="msgdata" name="msgsndr_emailmessagetexttranslate" value="email_translate"  data-display="#email_translate" />
 						<a class="toggle-translations hide" data-target="#email_translate" data-txt="#msgsndr_tts_message" href=""></a>
 						<div id="msgsndr_emailmessagetexttranslate_msg" class="box_validatorerror er" style="display:none"></div>
 					</div>
