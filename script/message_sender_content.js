@@ -170,7 +170,7 @@ var allowControl = {
 
 					// and append them as options to the select menu ...
 					$.each(userCallerIds, function(cIndex, cItem) {
-						$('#optioncallerid_select').append('<option value="' + cItem + '" >' + formatPhone(cItem) + '</option>');
+						$('#optioncallerid_select').append('<option value="' + cItem + '" ' + (userPrefs.callerid==cItem?'selected':'') + '>' + formatPhone(cItem) + '</option>');
 					});
 					
 					$('#optioncallerid_select').trigger("change");
