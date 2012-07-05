@@ -563,8 +563,10 @@ $formdata = array_merge($formdata, array(
 				"label" => "Message",
 				"value" => "",
 				"validators" => array(
+						array("ValConditionallyRequired", "field" => "hasfacebook"),
 						array("ValLength","max"=>420)
 				),
+				"requires" => "hasfacebook",
 				"control" => array("TextField"),
 				"helpstep" => 1
 		),
@@ -581,8 +583,10 @@ $formdata = array_merge($formdata, array(
 				"label" => "Message",
 				"value" => "",
 				"validators" => array(
+						array("ValConditionallyRequired", "field" => "hastwitter"),
 						array("ValLength","max"=>(140 - $twitterreservedchars))
 				),
+				"requires" => "hastwitter",
 				"control" => array("TextField"),
 				"helpstep" => 1
 		),
@@ -599,9 +603,11 @@ $formdata = array_merge($formdata, array(
 				"label" => "Message",
 				"value" => "",
 				"validators" => array(
+						array("ValConditionallyRequired", "field" => "hasfeed"),
 						array("ValTextAreaAndSubjectWithCheckbox","requiresubject" => true),
 						array("ValLength","max"=>32000)
 				),
+				"requires" => "hasfeed",
 				"control" => array("TextField"),
 				"helpstep" => 1
 		),
