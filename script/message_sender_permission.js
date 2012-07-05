@@ -111,6 +111,7 @@ function PermissionManager() {
 				url : '/' + orgPath + '/api/2/users/' + userid + '/preferences',
 				type : "GET",
 				dataType : "json",
+				async : false,
 				success : function(data) {
 					$.each(data.preferences, function(uIndex, uPrefs) {
 						userPrefs[uPrefs.name] = uPrefs.value;
