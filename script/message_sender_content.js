@@ -35,7 +35,8 @@ var allowControl = {
 
 		});
 
-		$('#text').on('click', '#tts_retranslate', function() {
+		$('#text').on('click', '#tts_retranslate', function(e) {
+			e.preventDefault();
 			ttsTranslate(this);
 		});
 
