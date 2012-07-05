@@ -363,7 +363,7 @@ $helpsteps[] = _L("Enter a name for your survey. " .
 				array("ValRequired"),
 				array("ValInArray","values"=>array_keys($templates))
 			),
-			"control" => array("MessageGroupSelectMenu", "values" => $templates, "surveytemplate" => true),
+			"control" => array("MessageGroupSelectMenu", "values" => $templates, "preview" => true),
 			"helpstep" => 5
 		);
 		

@@ -1,5 +1,6 @@
 <?
 class MessageGroupSelectMenu extends FormItem {
+	var $dopreview = true;
 	function render ($value) {
 		
 		$n = $this->form->name."_".$this->name;
@@ -11,15 +12,19 @@ class MessageGroupSelectMenu extends FormItem {
 			$str .= '<option value="'.escapehtml($selectvalue).'" '.($checked ? 'selected' : '').' >'.escapehtml($selectname).'</option>';
 		}
 		$str .= '</select>';
-
-		$issurveytemplate = isset($this->args['surveytemplate']) && $this->args['surveytemplate'] == true;
-		if (!$issurveytemplate)
+		
+		$dopreview = !(isset($this->args['preview']) && $this->args['preview'] == false);
+		if ($dopreview)
 			$str .= '<div id="'.$n.'_preview"></div>';
 		
 		return $str;
 	}
 		
 	function renderJavascript($value) {
+		if (!$this->dopreview) {
+			return;
+		}
+		
 		$n = $this->form->name."_".$this->name;
 		// jobtype.systempriority used for email message preview
 		if (isset($this->args['jobtypeid']))
@@ -52,6 +57,10 @@ class MessageGroupSelectMenu extends FormItem {
 	}
 		
 	function renderJavascriptLibraries() {
+		if (!$this->dopreview) {
+			return;
+		}
+		
 		$str = '
 			<script type="text/javascript" src="script/getMessageGroupPreviewGrid.js"></script>
 			<script type="text/javascript">
