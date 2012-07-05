@@ -45,6 +45,7 @@ function form_event_handler (event) {
 	formvars.keyupelement = e;
 	formvars.keyuptimer = window.setTimeout(function () {
 			form_do_validation(form,e); formvars.keyuptimer = null;
+			//TODO nickolas: fire event "just did a field validation because a user interacted with something"
 		},
 		event.type == "keyup" ? 1000 : 200
 	);
@@ -100,9 +101,29 @@ function form_default_get_value (form,targetname) {
 	return value;
 }
 
-function form_do_validation (form, element) {
-	if (!element.name)
+/**
+
+checks validation for the given element, and calls the validationHandler callback.
+If no callback is provided, its assumed that form_validation_display should be used
+(for backwards compatibility)
+
+callback function (element, resultcode, validationMessage)
+
+result codes:
+	"error": a validation error is present, see validationMessage for details
+	"valid": validation OK
+	"noname": the element is missing a name field, unable to get a value!
+	"neterror": something went wrong doing an ajax call to the validator, see validationMessage for reponseText
+	"uninit": validators for this item are not initialized
+
+*/
+function form_do_validation (form, element, validationHander) {
+	validationHander = validationHander == undefined ? form_validation_display : validationHander;
+
+	if (!element.name) {
+		validationHander(element,"noname",""); //FIXME workaround for calling validate on a parent div of checkboxes -- should call validate on a checkbox?
 		return;
+	}
 	var targetname = element.name;
 	var formvars = document.formvars[form.name];
 	targetname = targetname.replace("[]",""); //might need to strip off the some brackets from the name
@@ -114,10 +135,13 @@ function form_do_validation (form, element) {
 		var value = form_get_value(form,targetname);
 
 		//set progress animation
-		//if radio button, get the id of the container div
-		var statusindicator = $((element.up(".radiobox") || element.up(".multicheckbox") || element).id + "_icon");
-		if (statusindicator)
-			statusindicator.src = "img/ajax-loader.gif";;
+		//FIXME HACK don't put a spinner on if our validationHandler isn't do_validation_display, as nothing will erase the spinner
+		if (validationHander == form_validation_display) {
+			//if radio button, get the id of the container div
+			var statusindicator = $((element.up(".radiobox") || element.up(".multicheckbox") || element).id + "_icon");
+			if (statusindicator)
+				statusindicator.src = "img/ajax-loader.gif";
+		}
 
 		//see if we need additional fields for validation
 		var requiredvalues = {};
@@ -146,12 +170,14 @@ function form_do_validation (form, element) {
 				onSuccess: function(response){
 					var res = response.responseJSON;
 					if (res.vres != true) {
-						form_validation_display(element,"error",res.vmsg);
+						validationHander(element,"error",res.vmsg);
 					} else {
-						form_validation_display(element,"valid","");
+						validationHander(element,"valid","");
 					}
 				},
-				onFailure: function(){ alert('Something went wrong...') } //TODO better error handling
+				onFailure: function(response) { 
+					validationHander(element,"neterror",response.responseText);
+				}
 			});
 		//otherwise, do normal client-side validation
 		} else {
@@ -161,19 +187,22 @@ function form_do_validation (form, element) {
 				if (value.length > 0 || v.isrequired || v.conditionalrequired) {
 					res = v.validate(v.name,v.label,value,v.args,requiredvalues);
 					if (res != true) {
-						form_validation_display(element,"error",res);
+						validationHander(element,"error",res);
 						return;
 					}
 				}
 			}
-			form_validation_display(element,"valid","");
+			validationHander(element,"valid","");
 		}
+	} else {
+		validationHander(element,"uninit","Validation system not initialized");
 	}
-
 }
 
-function form_validation_display(element,style, msgtext) {
+function form_validation_display(element,resultcode, msgtext) {
 	e = $(element);
+	
+	var style = resultcode;
 
 	//if radio button or multicheckbox, get the id of the container div
 	var name = $(e.up(".radiobox") || e.up(".multicheckbox") || e).id ;
@@ -184,7 +213,7 @@ function form_validation_display(element,style, msgtext) {
 	var msg = $(name + "_msg");
 	var css = 'background: rgb(255,255,255);';
 
-	if (style == "error") {
+	if (style == "error" || style == "neterror") {
 		css = 'background: rgb(255,200,200);';
 		if (icon) {
 			icon.src = "img/icons/exclamation.gif";
