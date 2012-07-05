@@ -880,9 +880,11 @@ input.required.emp {
 .window_panel input.er[type="text"]:focus, .window_panel textarea.er:focus { border: 1px solid rgb(219,30,30);
 -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(219,30,30, 0.6);	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(219,30,30, 0.6); }
 
+/*
 .window_panel input.pre, .window_panel textarea.pre { border: 1px solid rgb(199, 162, 16); }
 .window_panel input.pre[type="text"]:focus, .window_panel textarea.pre:focus { border: 1px solid rgb(199, 162, 16);
 -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(199, 162, 16, 0.6);	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(199, 162, 16, 0.6); }
+*/
 
 span.error { color: rgb(219,30,30); font-size: 0.9em; }
 

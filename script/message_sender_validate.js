@@ -105,7 +105,7 @@ function ValidationManager() {
 		// get the presense of the required validator
 		var isRequired = false;
 		$.each(validators, function (index, validator) {
-			if (validator && validator[0] == "ValRequired") {
+			if (validator && (validator[0] == "ValRequired" || validator[0] == "ValConditional" || validator[0] == "ValConditionallyRequired")) {
 				isRequired = true;
 				return false;
 			}
