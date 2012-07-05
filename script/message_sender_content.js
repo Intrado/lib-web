@@ -306,7 +306,8 @@ var allowControl = {
 			});
 		}
 
-		$('#msgsndr_tab_email').on('click', '#email_retranslate', function() {
+		$('#msgsndr_tab_email').on('click', '#email_retranslate', function(e) {
+			e.preventDefault();
 			eTranslate(this);
 		});
 
