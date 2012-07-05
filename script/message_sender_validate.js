@@ -1,7 +1,6 @@
 function ValidationManager() {
 	var $ = jQuery;
 	var self = this;
-	var pending = 0;
 	
 	var validationMap = {
 		"1": {"all": [
@@ -99,6 +98,8 @@ function ValidationManager() {
 	
 	this.getElements = function (step, substep) {
 		var elements = [];
+		if (!step)
+			return elements;
 		if (substep) {
 			$.each(validationMap[step][substep], function (index, element) {
 				elements.push(element);
@@ -144,7 +145,7 @@ function ValidationManager() {
 			callback();
 			return;
 		}
-		pending = elements.length;
+		var pending = elements.length;
 		var passed = true;
 		$.each(elements, function(vIndex, vItem) {
 			var e = $('#'+vItem);
