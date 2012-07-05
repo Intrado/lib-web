@@ -491,7 +491,7 @@ table.list ul li { padding: 0; }
 /* reset the buttons for newui theme so background images aren't loaded */
 .btn:hover .btn_middle { background-image: none; background: transparent;}
 
-button, .btn { margin: 0 5px 0 0; padding: 5px 10px; color: #333; font-size: 14px; line-height: 19px; font-weight: normal; 
+button, .btn { width: auto; margin: 0 5px 0 0; padding: 5px 6px; color: #333; font-size: 14px; line-height: 19px; font-weight: normal; overflow: visible;
   /*text-shadow: 0 1px 0 #fff; */
   border: 1px solid #ccc;
 	background-color: #f5f5f5;  
@@ -546,8 +546,8 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
 .msg_complete button[disabled], .msg_complete button[disabled]:hover { background: #f5f5f5; color: #444; border: 1px solid #ccc; opacity: 0.5; }
 .msg_complete li.complete button[disabled], .msg_complete li.complete button[disabled]:hover { background: #499122; color: #fbfbfb; border: 1px solid #3A7A17; opacity: 1; }
 
-.btn_left, .btn_right { display: none; }
-.btn_left, .btn_middle, .btn_right { background: none; height: 20px; margin: 0; padding: 0 5px; font-size: 13px; line-height: 20px; }
+.btn_left, .btn_right { display: none; width: 0px; }
+.btn_middle { background: none; height: 20px; margin: 0; padding: 0 5px; font-size: 13px; line-height: 20px; }
 
 .call-progress, .call-progress:hover {
   background: none;
@@ -922,7 +922,6 @@ p.warning {
 .ie7 .summary .col:first-child { width: 120px; }
 
 .ie7 table.info { border-collapse: collapse; }
-
 
 /*----- Prototip styles for shortcut menu, not actually used in this theme -----*/
 	
