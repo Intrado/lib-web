@@ -614,17 +614,22 @@ $formdata["datarules"] = array(
 
 $linkusers = QuickQueryList("select id, concat(firstname,' ', lastname) from user where id!=? and enabled=1 and login!='schoolmessenger' order by firstname,lastname",true,false,array($edituser->id));
 $userlinks = QuickQueryList("select subordinateuserid from userlink where userid=?",false,false,array($edituser->id));
-
-$formdata["userlinks"] = array(
-	"label" => "Viewable Users",
-	"fieldhelp" => _L('Add user link'),
-	"value" => $userlinks,
-	"validators" => array(
-		array("ValInArray","values" => array_keys($linkusers))
-	),
-	"control" => array("MultiCheckBox","values" => $linkusers, "height" => "300px"),
-	"helpstep" => 2
-);
+if (count($linkusers) > 0) {
+	$multicheckbox = array("MultiCheckBox","values" => $linkusers);
+	if (count($linkusers) > 15)
+		$multicheckbox["height"] = "300px";
+	
+	$formdata["userlinks"] = array(
+		"label" => "Viewable Users",
+		"fieldhelp" => _L('Add user link'),
+		"value" => $userlinks,
+		"validators" => array(
+			array("ValInArray","values" => array_keys($linkusers))
+		),
+		"control" => $multicheckbox,
+		"helpstep" => 2
+	);
+}
 
 
 // if user has a staff ID then only f and g field restrictions can be used.
