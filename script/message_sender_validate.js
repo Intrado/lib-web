@@ -95,7 +95,7 @@ function ValidationManager() {
 		return elements;
 	};
 	
-	// set the prevalidate status on all form items (adds default required style)
+	// set the prevalidate status on passed element based on validators attached to it.
 	this.preValidate = function(e) {
 		if (!e)
 			return;
@@ -127,30 +127,17 @@ function ValidationManager() {
 			return;
 		}
 		pending = elements.length;
-		$.each(elements, function(vIndex, vItem) {
-			var e = $('#'+vItem);
-			e.on("validation:complete.forced", function(event, memo) {
-				e.off("validation:complete.forced");
-				pending--;
-				// NOTE: this might run the callback early if another form item is doing validation...
-				if (callback && pending == 0)
-					callback();
-			});
-			self.runValidateById(vItem);
-		});
-	};
-	
-	this.stepIsValid = function(step, substep) {
-		var elements = self.getElements(step, substep);
 		var passed = true;
 		$.each(elements, function(vIndex, vItem) {
 			var e = $('#'+vItem);
-			if (!e.hasClass("ok")) {
-				passed = false;
-				return false;
-			}
+			self.runValidateById(vItem, function(element, resultcode, validationMessage) {
+				pending--;
+				if (resultcode != "valid")
+					passed = false
+				if (callback && pending == 0)
+					callback(passed);
+			});
 		});
-		return passed;
 	};
 	
 	this.setInvalid = function(e) {
@@ -166,18 +153,18 @@ function ValidationManager() {
 	}
 	
 	//This is to bridge prototype and jquery implementations when force running validation
-	this.runValidateById = function(id) {
+	this.runValidateById = function(id, callback) {
 		var element = $('#' + id);
-		this.runValidate(element);
+		this.runValidate(element, callback);
 	};
 
-	this.runValidate = function(e) {
+	this.runValidate = function(e, callback) {
 		self.setPreValidate(e);
 		// FIXME: probably a better way to do this...
 		if (e.val() == "[]" || e.val() == "{}")
 			e.val("");
 		var name = e.attr('name');
 		var form = name.split("_")[0];
-		form_do_validation(document.getElementById(form), document.getElementById(name));
+		form_do_validation(document.getElementById(form), document.getElementById(name), callback);
 	};
 };

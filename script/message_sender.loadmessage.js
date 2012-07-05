@@ -142,7 +142,7 @@ $.loadMessage = function loadMessage() {
 		
 		var callback = function () {
 			// TODO: remove loading message
-			obj_valManager.validateStep(2, false, function () {
+			obj_valManager.validateStep(2, false, function (passed) {
 				obj_stepManager.updateStepStatus();
 			});
 		};

@@ -45,7 +45,8 @@ function form_event_handler (event) {
 	formvars.keyupelement = e;
 	formvars.keyuptimer = window.setTimeout(function () {
 			form_do_validation(form,e); formvars.keyuptimer = null;
-			//TODO nickolas: fire event "just did a field validation because a user interacted with something"
+			// fire event "just did a field validation because a user interacted with something"
+			e.fire("validation:form_event_handler", {});
 		},
 		event.type == "keyup" ? 1000 : 200
 	);

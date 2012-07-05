@@ -272,11 +272,11 @@ function StepManager(_valManager) {
 		btn.attr("disabled","disabled");
 		//NEXT STEP ID
 		var getStepId = $(this).attr('data-next');
-		validationManager.validateStep(currentStep, false, function () {
+		validationManager.validateStep(currentStep, false, function (passed) {
 			btn.html(oldname);
 			btn.removeAttr("disabled");
 			// check that there are no validation errors
-			if (validationManager.stepIsValid(currentStep, false)) {
+			if (passed) {
 				//SWITCH STEP
 				self.gotoStep(getStepId);
 			} else {

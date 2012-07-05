@@ -613,11 +613,11 @@ function ContentManager() {
 			$button.attr("disabled","disabled");
 			
 			// do validation
-			obj_valManager.validateStep(obj_stepManager.getCurrentStep(), substep, function () {
+			obj_valManager.validateStep(obj_stepManager.getCurrentStep(), substep, function (passed) {
 				$button.text(oldBtnText);
 				$button.removeAttr("disabled");
 				// check that there are no validation errors
-				if (obj_valManager.stepIsValid(obj_stepManager.getCurrentStep(), substep)) {
+				if (passed) {
 					$('#msgsndr_tab_' + currentContent).hide();
 
 					$('.msg_content_nav li').removeClass('lighten');
