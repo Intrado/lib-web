@@ -205,11 +205,11 @@ if(isset($options['rules']) && $options['rules']){
 		if(count($data) > 0){
 ?>
 			<div>Your search returned more than one result.
-			<br>Please select one of the following:<div>
+			<br>Please select one of the following:</div>
 <?
 		} else {
 ?>
-			<div>Your search did not find any matching results. Click the back button and try modifying your search settings.<div>
+			<div>Your search did not find any matching results. Click the back button and try modifying your search settings.</div>
 <?
 		}
 ?>
