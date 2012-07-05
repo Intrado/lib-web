@@ -40,34 +40,26 @@ function StepManager(_valManager) {
 	};
 	
 	this.updateStepStatus = function() {
-		var readyForSave = true;
-		
-		if(currentStep == 1) {
-			if(recipientTrack == 0) {
-				readyForSave = false;
-			}
-		}
-		
-		if(currentStep == 2) {
-			if($(".msg_content_nav > li.complete").not(".osocial").size() == 0) {
-				readyForSave = false;
-			}
-		} else {
-			if ($(".er:visible").size() > 0 || $(".emp:visible").size() > 0) {
-				readyForSave = false;
-			}
-		}
-		/*$(".required:visible", stepMap[currentStep]).each(function() {
-			if(!$(this).hasClass("ok")) {
-				readyForSave = false;
-			}
-		});*/
-		
-		if(readyForSave) {
-			$("button.btn_confirm", stepMap[currentStep]).removeAttr('disabled');
-		} else {
+		// step 1 is special, you must have a list or have "addme"
+		if (currentStep == 1 && ($("#msgsndr_listids").val() == "[]" || $("#msgsndr_listids").val() == "") && 
+				!$("#msgsndr_addme").is(":checked")) {
 			$('button.btn_confirm', stepMap[currentStep]).attr('disabled','disabled');
+			return;
 		}
+		// step 2 is special, you must have atleast a phone, email or sms message
+		if (currentStep == 2 && !$("#msgsndr_hasphone").is(":checked") && !$("#msgsndr_hasemail").is(":checked") &&
+				!$("#msgsndr_hassms").is(":checked")) {
+			$('button.btn_confirm', stepMap[currentStep]).attr('disabled','disabled');
+			return;
+		}
+			
+		obj_valManager.validateStep(currentStep, false, function (passed) {
+			if(passed) {
+				$("button.btn_confirm", stepMap[currentStep]).removeAttr('disabled');
+			} else {
+				$('button.btn_confirm', stepMap[currentStep]).attr('disabled','disabled');
+			}
+		});
 	};
 	
 	this.gotoStep = function(step) {
@@ -102,8 +94,8 @@ function StepManager(_valManager) {
 		});
 		
 		if(!stopSwitch) {
-			//UNBIND VAL
-			//validationManager.unbindValidations(currentStep);
+			// stop observing old step validation
+			obj_valManager.offFormEventHandler(currentStep);
 			
 			//SWITCH STEP
 			$("[id^=msg_section_]").hide();
@@ -116,9 +108,6 @@ function StepManager(_valManager) {
 			$(stepMap[currentStep]).show();
 			$("a#tab_" + currentStep, ".msg_steps").parent().addClass('active').addClass("allow");
 			
-			//BIND VALIDATIONS
-			//validationManager.bindValidations(currentStep);
-			
 			//RUN ON CHANGE EVENTS
 			$.each(eventManager.onStepChange, function(eIndex, eEvent) {
 				eEvent(currentStep, step);
@@ -126,6 +115,13 @@ function StepManager(_valManager) {
 			
 			if(currentStep == 3) {
 				self.preSubmitConfig();
+			}
+
+			// observe validation on the items in step 1, update status appropriatly
+			if (currentStep == 1) {
+				obj_valManager.onFormEventHandler(currentStep, false, function (event, memo) {
+					self.updateStepStatus();
+				});
 			}
 			self.updateStepStatus();
 		}
