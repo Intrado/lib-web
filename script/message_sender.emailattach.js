@@ -59,7 +59,7 @@ function stopUpload(id,name,size,errormessage, formname, itemname) {
 		alert(errormessage);
 	}
 	
-	obj_valManager.runValidateById(itemname);
+	obj_valManager.runValidateEventDriven(itemname);
 	return true;
 }
 
@@ -94,5 +94,5 @@ function removeAttachment(id, formname, itemname) {
 		);
 	});
 	$(itemname).value = Object.toJSON(values);
-	obj_valManager.runValidateById(itemname);
+	obj_valManager.runValidateEventDriven(itemname);
 };

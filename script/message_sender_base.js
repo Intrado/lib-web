@@ -119,7 +119,7 @@ jQuery.noConflict();
 		} else {
 			$('#msgsndr_phonemessagetext').val("");
 		}
-		obj_valManager.runValidate($('#msgsndr_phonemessagetext'));
+		obj_valManager.runValidateEventDriven("msgsndr_phonemessagetext");
 	});
 	
 	// observe changes to the feed subject/message inputs and save to hidden field
@@ -132,7 +132,12 @@ jQuery.noConflict();
 		else
 			$("#msgsndr_socialmediafeedmessage").val("");
 			
-		obj_valManager.runValidate($('#msgsndr_socialmediafeedmessage'));
+		obj_valManager.runValidateEventDriven("msgsndr_socialmediafeedmessage");
+	});
+	
+	// observe easycall updates to do validation
+	$("#msgsndr_phonemessagecallme").on("easycall:update", function () {
+		obj_valManager.runValidateEventDriven("msgsndr_phonemessagecallme");
 	});
 	
 	$(function() {

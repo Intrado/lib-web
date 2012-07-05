@@ -427,9 +427,8 @@
 				});
 				$this.data('easyCall').element.val($.toJSON(itemdata));
 				
-				// data was changed. trigger a change event on the parent element
-				var updateevent = jQuery.Event("change");
-				$this.data('easyCall').element.trigger(updateevent);
+				// data was changed. trigger an event on the parent element
+				$this.data('easyCall').element.trigger("easycall:update");
 			},
 			
 			// read the return status and provide appropriate error handling messages

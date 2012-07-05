@@ -79,6 +79,24 @@ function ValidationManager() {
 		});
 	};
 	
+	this.onFormEventHandler = function (step, substep, callback) {
+		var elements = self.getElements(step, substep);
+		if (elements.length > 0) {
+			var elist = "#"+elements.join(", #");
+			$(elist).on("validation:form_event_handler.valman", function (event, memo) {
+				callback(event, memo);
+			});
+		}
+	}
+	
+	this.offFormEventHandler = function (step, substep, callback) {
+		var elements = self.getElements(step, substep);
+		if (elements.length > 0) {
+			var elist = "#"+elements.join(", #");
+			$(elist).off("validation:form_event_handler.valman");
+		}
+	}
+	
 	this.getElements = function (step, substep) {
 		var elements = [];
 		if (substep) {
@@ -130,7 +148,7 @@ function ValidationManager() {
 		var passed = true;
 		$.each(elements, function(vIndex, vItem) {
 			var e = $('#'+vItem);
-			self.runValidateById(vItem, function(element, resultcode, validationMessage) {
+			self.runValidate(vItem, function(element, resultcode, validationMessage) {
 				pending--;
 				if (resultcode != "valid")
 					passed = false
@@ -150,15 +168,17 @@ function ValidationManager() {
 	
 	this.setPreValidate = function(e) {
 		e.removeClass('ok er').addClass("pre");
-	}
+	};
 	
-	//This is to bridge prototype and jquery implementations when force running validation
-	this.runValidateById = function(id, callback) {
-		var element = $('#' + id);
-		this.runValidate(element, callback);
+	// event based validation is treated a little differently, as it's replicating the behavior of form_event_handler
+	this.runValidateEventDriven = function (id) {
+		self.runValidate(id);
+		// fire the same event as form_event_handler, so we know this was event driven validation
+		$("#"+id).trigger("validation:form_event_handler");
 	};
 
-	this.runValidate = function(e, callback) {
+	this.runValidate = function(id, callback) {
+		var e = $('#' + id);
 		self.setPreValidate(e);
 		// FIXME: probably a better way to do this...
 		if (e.val() == "[]" || e.val() == "{}")

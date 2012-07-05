@@ -337,17 +337,6 @@ var allowControl = {
 	"sms" : function() {
 		var $ = jQuery;
 		$('li.osms').removeClass('notactive');
-
-		/*$("#msgsndr_smsmessagetext").on({
-			keyup : function() {
-				charCount(this, '160', '.sms.characters');
-
-				var elem = $(this);
-				obj_valManager.runValidate(elem);
-				smsChar('set');
-			}
-		});*/
-		
 	},
 	"facebook" : function() {
 		var $ = jQuery;
@@ -456,41 +445,20 @@ function ContentManager() {
     };
 
 	this.updateContentStatus = function() {
-		var readyForSave = true;
-		
-		if(currentContent == "social") {
-			if($("input.social:checked").size() == 0) {
-				readyForSave = false;
-			} else if($("#msgsndr_hasfeed").is(":checked") && $("input:checked", "#feed_categories").size() == 0) {
-				//readyForSave = false;
-			} else if($("#msgsndr_hasfacebook").is(":checked")) {
-				if($("#msgsndr_socialmediafacebookpageconnect").is(":visible")) {
-					//readyForSave = false;
-				}
-			}
-			
-		}
-
-		if(currentContent == "phone") {
-			var voiceType = $('#switchaudio button.active').attr('data-type');
-			if($(".er:visible, .required.er, .required.emp", '#'+voiceType).size() > 0) {
-				readyForSave = false;
-			}
-		} else {
-			if ($(".er:visible").size() > 0 || $(".emp", contentMap[currentContent]).size() > 0) {
-				readyForSave = false;
-			}
-		}
-		
-		// if($(".er:visible, .required.er", contentMap[currentContent]).size() > 0) {
-		// 	readyForSave = false;
-		// }
-		
-		if(readyForSave) {
-			$("button.btn_save", contentMap[currentContent]).removeAttr('disabled');
-		} else {
+		// social step has special conditions... must have checked atleast one of the message types
+		if (currentContent == "social" && !$("#msgsndr_phonemessagepost").attr("checked") && !$("#msgsndr_hasfacebook").attr("checked") && 
+				!$("#msgsndr_hastwitter").attr("checked") && !$("#msgsndr_hasfeed").attr("checked")) {
 			$('button.btn_save', contentMap[currentContent]).attr('disabled','disabled');
+			return;
 		}
+			
+		obj_valManager.validateStep(obj_stepManager.getCurrentStep(), currentContent, function (passed) {
+			if(passed) {
+				$("button.btn_save", contentMap[currentContent]).removeAttr('disabled');
+			} else {
+				$('button.btn_save', contentMap[currentContent]).attr('disabled','disabled');
+			}
+		});
 	};
 	
 	this.resetContentStatus = function() {
@@ -502,6 +470,9 @@ function ContentManager() {
 		if(currentContent.length > 0) {
 			return false;
 		}
+		
+		// stop observing old content tab validation
+		obj_valManager.offFormEventHandler(obj_stepManager.getCurrentStep(), currentContent);
 		
 		//RUN ON CHANGE EVENTS
 		$.each(eventManager.onContentStart, function(eIndex, eEvent) {
@@ -539,6 +510,11 @@ function ContentManager() {
 		$(".o" + currentContent, ".msg_content_nav").addClass('active');
 		
 		$('input[name=msgsndr_has' + currentContent + ']').attr('checked', 'checked');
+		
+		// observe validation on the items in this content tab, update status appropriatly
+		obj_valManager.onFormEventHandler(obj_stepManager.getCurrentStep(), currentContent, function (event, memo) {
+			self.updateContentStatus();
+		});
 		
 		self.updateContentStatus();
 	};
