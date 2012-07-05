@@ -313,7 +313,6 @@ $formdata = array(
 				"label" => "Type",
 				"value" => "",
 				"validators" => array(
-						array("ValRequired"),
 						array("ValInArray", "values" => array_keys($jobtypes))
 				),
 				"control" => array("SelectMenu", "values" => $jobtypes),
@@ -462,8 +461,10 @@ $formdata = array_merge($formdata, array(
 				"label" => "Name",
 				"value" => "",
 				"validators" => array(
+						array("ValConditionallyRequired", "field" => "hasemail"),
 						array("ValLength","max" => 50)
 				),
+				"requires" => array("hasemail"),
 				"control" => array("TextField"),
 				"helpstep" => 1
 		),
@@ -471,9 +472,11 @@ $formdata = array_merge($formdata, array(
 				"label" => "Email",
 				"value" => "",
 				"validators" => array(
+						array("ValConditionallyRequired", "field" => "hasemail"),
 						array("ValLength","max" => 255),
 						array("ValEmail", "domain" => getSystemSetting('emaildomain'))
 				),
+				"requires" => array("hasemail"),
 				"control" => array("TextField"),
 				"helpstep" => 1
 		),
@@ -481,8 +484,10 @@ $formdata = array_merge($formdata, array(
 				"label" => "Subject",
 				"value" => "",
 				"validators" => array(
+						array("ValConditionallyRequired", "field" => "hasemail"),
 						array("ValLength","max" => 255)
 				),
+				"requires" => array("hasemail"),
 				"control" => array("TextField"),
 				"helpstep" => 1
 		),
@@ -499,9 +504,11 @@ $formdata = array_merge($formdata, array(
 				"label" => "Body",
 				"value" => "",
 				"validators" => array(
+						array("ValConditionallyRequired", "field" => "hasemail"),
 						array("ValMessageBody"),
 						array("ValLength","max" => 256000)
 				),
+				"requires" => array("hasemail"),
 				"control" => array("TextField"),
 				"helpstep" => 1
 		),
@@ -546,9 +553,11 @@ $formdata = array_merge($formdata, array(
 				"label" => "Message",
 				"value" => "",
 				"validators" => array(
+						array("ValConditionallyRequired", "field" => "hassms"),
 						array("ValLength","max"=>160),
 						array("ValSmsText")
 				),
+				"requires" => array("hassms"),
 				"control" => array("TextField"),
 				"helpstep" => 1
 		),

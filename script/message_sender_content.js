@@ -536,6 +536,8 @@ function ContentManager() {
 		$(contentMap[mode]).show();
 		$(".o" + currentContent, ".msg_content_nav").addClass('active');
 		
+		$('input[name=msgsndr_has' + currentContent + ']').attr('checked', 'checked');
+		
 		self.updateContentStatus();
 	};
 	
@@ -558,7 +560,7 @@ function ContentManager() {
             $("[id^=msgsndr_tab_]").hide();
 			$('.msg_content_nav > li').removeClass('active').removeClass('lighten');
 			
-			$('input[name=has_' + currentContent + ']').removeAttr('checked');
+			$('input[name=msgsndr_has' + currentContent + ']').removeAttr('checked');
 		
 			$('.msg_content_nav .o' + currentContent).removeClass('complete');
 			$('#msgsndr_review_' + currentContent).parent().removeClass('complete');
