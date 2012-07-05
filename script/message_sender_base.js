@@ -207,7 +207,16 @@ jQuery.noConflict();
 
 		obj_stepManager.onStepChange(function(lastStep, nextStep) {
 			//alert("stepChange! " + lastStep + " to " + nextStep);
-			//obj_valManager.onStepChange(nextStep, false);
+            //obj_valManager.onStepChange(nextStep, false);
+            if (nextStep == 2) {
+                // Let's create our mementos now, while the messages are in their original state...  otherwise, the memento
+                // could end up being based on a pre-loaded message, which we don't want
+                $.each(contentMap, function(contentMode, cssId) {
+                    if (!mementos[contentMode]) {
+                        mementos[contentMode] = $(cssId).memento(null);
+                    }
+                });
+            }
 		});
 
         obj_contentManager.onContentDiscard(function(contentMode) {
@@ -235,15 +244,13 @@ jQuery.noConflict();
                 $(idSelector).memento(mementos[contentMode]);
             }
 
+//            $(idSelector + " .msgdata").val('');
+
             clearHtmlEditorContent();
         });
 
 
 		obj_contentManager.onContentStart(function(contentMode) {
-            if (!mementos[contentMode]) {
-                mementos[contentMode] = $("#msgsndr_tab_" + contentMode).memento(null);
-            }
-
             if(contentMode == "phone") {
 				/*
 					Paste from email button: Low proirity: 
