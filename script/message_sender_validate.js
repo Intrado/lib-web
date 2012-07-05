@@ -4,71 +4,95 @@ function ValidationManager() {
 	var pending = 0;
 	
 	var validationMap = {
-		"1": [
-			"msgsndr_name",
-			"msgsndr_jobtype",
-			"msgsndr_addmephone",
-			"msgsndr_addmeemail",
-			"msgsndr_addmesms",
-			"msgsndr_listids"
-		],
-		"2": [
-			"msgsndr_phonemessagetype",
-			"msgsndr_phonemessagecallme",
-			"msgsndr_phonemessagetext",
-			"msgsndr_phonemessagetexttranslate",
-			"msgsndr_optioncallerid",
-			"msgsndr_optionmaxjobdays",
-			"msgsndr_optionleavemessage",
-			"msgsndr_optionmessageconfirmation",
-			// TODO: phone message translations
-			"msgsndr_emailmessagefromname",
-			"msgsndr_emailmessagefromemail",
-			"msgsndr_emailmessagesubject",
-			"msgsndr_emailmessageattachment",
-			"msgsndr_emailmessagetext",
-			// email translations arn't editable...
-			"msgsndr_smsmessagetext",
-			"msgsndr_phonemessagepost",
-			"msgsndr_hasfacebook",
-			"msgsndr_socialmediafacebookmessage",
-			"msgsndr_socialmediafacebookpage",
-			"msgsndr_hastwitter",
-			"msgsndr_socialmediatwittermessage",
-			"msgsndr_hasfeed",
-			"msgsndr_socialmediafeedmessage"
-			//"msgsndr_socialmediafeedcategory" // TODO: can't call validate on a div...
-		],
-		"3": [
-			"msgsndr_optionautoreport",
-			"msgsndr_optionskipduplicate",
-			"msgsndr_optionsavemessage",
-			"msgsndr_optionsavemessagename",
-			"msgsndr_scheduledate",
-			"msgsndr_schedulecallearly",
-			"msgsndr_schedulecalllate"
-		]
+		"1": {"all": [
+				"msgsndr_name",
+				"msgsndr_jobtype",
+				"msgsndr_addmephone",
+				"msgsndr_addmeemail",
+				"msgsndr_addmesms",
+				"msgsndr_listids"
+				]},
+		"2": {"phone": [
+				"msgsndr_phonemessagetype",
+				"msgsndr_phonemessagecallme",
+				"msgsndr_phonemessagetext",
+				"msgsndr_phonemessagetexttranslate",
+				"msgsndr_optioncallerid",
+				"msgsndr_optionmaxjobdays",
+				"msgsndr_optionleavemessage",
+				"msgsndr_optionmessageconfirmation"
+				],
+			"email": [
+				// TODO: phone message translations
+				"msgsndr_emailmessagefromname",
+				"msgsndr_emailmessagefromemail",
+				"msgsndr_emailmessagesubject",
+				"msgsndr_emailmessageattachment",
+				"msgsndr_emailmessagetext"
+				// email translations arn't editable...
+				],
+			"sms": [
+				"msgsndr_smsmessagetext"
+				],
+			"social": [
+				"msgsndr_phonemessagepost",
+				"msgsndr_hasfacebook",
+				"msgsndr_socialmediafacebookmessage",
+				"msgsndr_socialmediafacebookpage",
+				"msgsndr_hastwitter",
+				"msgsndr_socialmediatwittermessage",
+				"msgsndr_hasfeed",
+				"msgsndr_socialmediafeedmessage"
+				//"msgsndr_socialmediafeedcategory" // TODO: can't call validate on a div...
+				]},
+		"3": {"all": [
+				"msgsndr_optionautoreport",
+				"msgsndr_optionskipduplicate",
+				"msgsndr_optionsavemessage",
+				"msgsndr_optionsavemessagename",
+				"msgsndr_scheduledate",
+				"msgsndr_schedulecallearly",
+				"msgsndr_schedulecalllate"
+				]}
 	};
 	
 	this.init = function() {
-		$.each(validationMap, function(vIndex, vItems) {
-			$.each(vItems, function(vIndex2, vItem) {
-				var e = $('#'+vItem);
-				self.preValidate(e);
-				e.on("validation:complete", function(event, memo) {
-					switch (memo.style) {
-					case "error":
-						self.setInvalid(e);
-						break;
-					case "valid":
-						self.setValid(e);
-						break;
-					default:
-						self.setUnknown(e);
-					}
+		$.each(validationMap, function(step, substeps) {
+			$.each(substeps, function(substep, elements) {
+				$.each(elements, function(index, element) {
+					var e = $('#'+element);
+					self.preValidate(e);
+					e.on("validation:complete", function(event, memo) {
+						switch (memo.style) {
+						case "error":
+							self.setInvalid(e);
+							break;
+						case "valid":
+							self.setValid(e);
+							break;
+						default:
+							self.setUnknown(e);
+						}
+					});
 				});
 			});
 		});
+	};
+	
+	this.getElements = function (step, substep) {
+		var elements = [];
+		if (substep) {
+			$.each(validationMap[step][substep], function (index, element) {
+				elements.push(element);
+			});
+		} else {
+			$.each(validationMap[step], function (substep, stepelements) {
+				$.each(stepelements, function (index, element) {
+					elements.push(element);
+				});
+			});
+		}
+		return elements;
 	};
 	
 	// set the prevalidate status on all form items (adds default required style)
@@ -90,26 +114,36 @@ function ValidationManager() {
 			$("#"+name+"_icon").attr("src","img/icons/error.gif");
 			self.setPreValidate(e);
 		}
-	}
+	};
 	
-	this.forceRunValidate = function(step, callback) {
-		pending = validationMap[step].length;
-		$.each(validationMap[step], function(vIndex, vItem) {
+	this.validateStep = function(step, substep, callback) {
+		var elements = self.getElements(step, substep);
+		self.forceRunValidate(elements, callback);
+	};
+	
+	this.forceRunValidate = function(elements, callback) {
+		if (elements.length == 0) {
+			callback();
+			return;
+		}
+		pending = elements.length;
+		$.each(elements, function(vIndex, vItem) {
 			var e = $('#'+vItem);
 			e.on("validation:complete.forced", function(event, memo) {
+				e.off("validation:complete.forced");
 				pending--;
 				// NOTE: this might run the callback early if another form item is doing validation...
 				if (callback && pending == 0)
 					callback();
-				e.off("validation:complete.forced");
 			});
 			self.runValidateById(vItem);
 		});
 	};
 	
-	this.stepIsValid = function(step) {
+	this.stepIsValid = function(step, substep) {
+		var elements = self.getElements(step, substep);
 		var passed = true;
-		$.each(validationMap[step], function(vIndex, vItem) {
+		$.each(elements, function(vIndex, vItem) {
 			var e = $('#'+vItem);
 			if (!e.hasClass("ok")) {
 				passed = false;

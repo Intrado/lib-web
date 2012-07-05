@@ -571,6 +571,7 @@ function ContentManager() {
 	};
 	
 	this.saveContent = function($button) {
+		var substep = $button.attr("data-nav").substring(2);
 		// disable save and cancel buttons
 		var oldBtnText = $button.text();
 		$button.text("Saving content...");
@@ -602,20 +603,35 @@ function ContentManager() {
 			$button.removeAttr("disabled");
 			$button.parent().find("button.btn_discard").removeAttr("disabled");
 			$button.next('img').addClass('hide');
-			$('#msgsndr_tab_' + currentContent).hide();
-
-			$('.msg_content_nav li').removeClass('lighten');
-			$('.msg_content_nav ' + $button.attr("data-nav")).removeClass('active').addClass('complete');
-
-			$('input[name=msgsndr_has' + currentContent + ']').attr('checked', 'checked');
-
-			// Set Message tabs on review tab
-			$('#msgsndr_review_' + currentContent).parent().addClass('complete');
 			
-			self.resetContentStatus();
-			obj_stepManager.updateStepStatus();
+			oldBtnText = $button.text();
+			$button.text("Validating...");
+			$button.attr("disabled","disabled");
 			
-			$(".msg_confirm").show();
+			// do validation
+			obj_valManager.validateStep(obj_stepManager.getCurrentStep(), substep, function () {
+				$button.text(oldBtnText);
+				$button.removeAttr("disabled");
+				// check that there are no validation errors
+				if (obj_valManager.stepIsValid(obj_stepManager.getCurrentStep(), substep)) {
+					$('#msgsndr_tab_' + currentContent).hide();
+
+					$('.msg_content_nav li').removeClass('lighten');
+					$('.msg_content_nav ' + $button.attr("data-nav")).removeClass('active').addClass('complete');
+
+					$('input[name=msgsndr_has' + currentContent + ']').attr('checked', 'checked');
+
+					// Set Message tabs on review tab
+					$('#msgsndr_review_' + currentContent).parent().addClass('complete');
+					
+					self.resetContentStatus();
+					obj_stepManager.updateStepStatus();
+					
+					$(".msg_confirm").show();
+				} else {
+					alert("Some fields failed validation!");
+				}
+			});
 		});
 	};
 	
@@ -638,7 +654,7 @@ function ContentManager() {
 		self.discardContent();
 	});
 	
-	//BIND CONTENT CANCEL
+	//BIND CONTENT SAVE
 	$(".btn_save", "[id^=msgsndr_tab_]").on("click", function(event) {
 		event.preventDefault();
 		self.saveContent($(this));

@@ -66,24 +66,6 @@ function ContentSaveManager() {
 			}
 			
 			return getTranslations;
-		},
-		"feed" : function() {
-			var titleVal = $('#msgsndr_form_rsstitle').val();
-			var messageVal = $('#msgsndr_form_rssmsg').val();
-			var rssPost = $.toJSON({
-				"subject" : titleVal,
-				"message" : messageVal
-			});
-			$('#msgsndr_socialmediafeedmessage').val(rssPost);
-			
-			/*var rssCats = [];
-			$('input[name=feed_categories]').each(function(findex, fitem){
-				var feedid = $(this).attr('value');
-				if($(this).is(':checked')){
-					rssCats.push(feedid);
-				}
-			});
-			$('#msgsndr_feed_categories').val(rssCats);*/
 		}
 	};
 	

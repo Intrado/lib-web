@@ -142,8 +142,9 @@ $.loadMessage = function loadMessage() {
 		
 		var callback = function () {
 			// TODO: remove loading message
-			obj_valManager.forceRunValidate(2);
-			obj_stepManager.updateStepStatus();
+			obj_valManager.validateStep(2, false, function () {
+				obj_stepManager.updateStepStatus();
+			});
 		};
 		if (selectedMsgGroup.typeSummary.length > 0) {
 			self.prepareFormForLoad(selectedMsgGroup);

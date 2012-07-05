@@ -25,6 +25,8 @@ abstract class Validator {
 			function (name, label, args) {
 				this.validator = "<?=$validator?>";
 				this.onlyserverside = <?= $obj->onlyserverside ? "true" : "false" ?>;
+				this.isrequired = <?= $obj->isrequired ? "true" : "false" ?>;
+				this.conditionalrequired = <?= $obj->conditionalrequired ? "true" : "false" ?>;
 				this.name = name;
 				this.label = label;
 				this.args = args;

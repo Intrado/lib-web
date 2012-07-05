@@ -15,6 +15,10 @@ function StepManager(_valManager) {
 		onStepChange: []
 	};
 	
+	this.getCurrentStep = function () {
+		return currentStep;
+	}
+	
 	this.beforeStepChange = function(callback) {
 		//callback(laststep, nextstep)
 		eventManager.beforeStepChange.push(callback);
@@ -268,11 +272,11 @@ function StepManager(_valManager) {
 		btn.attr("disabled","disabled");
 		//NEXT STEP ID
 		var getStepId = $(this).attr('data-next');
-		validationManager.forceRunValidate(currentStep, function () {
+		validationManager.validateStep(currentStep, false, function () {
 			btn.html(oldname);
 			btn.removeAttr("disabled");
 			// check that there are no validation errors
-			if (validationManager.stepIsValid(currentStep)) {
+			if (validationManager.stepIsValid(currentStep, false)) {
 				//SWITCH STEP
 				self.gotoStep(getStepId);
 			} else {

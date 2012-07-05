@@ -111,12 +111,14 @@ jQuery.noConflict();
 		var gender = $('input[name=messagePhoneText_message-gender]:checked').val();
 		var enText = $('#msgsndr_tts_message').val();
 		
-		var jsonVal = $.toJSON({
-			"gender" : gender,
-			"text" : enText
-		});
-
-		$('#msgsndr_phonemessagetext').val(jsonVal);
+		if (enText) {
+			$('#msgsndr_phonemessagetext').val($.toJSON({
+				"gender" : gender,
+				"text" : enText
+			}));
+		} else {
+			$('#msgsndr_phonemessagetext').val("");
+		}
 		obj_valManager.runValidate($('#msgsndr_phonemessagetext'));
 	});
 	
@@ -125,7 +127,11 @@ jQuery.noConflict();
 		var subject = $("#msgsndr_form_rsstitle").val();
 		var message = $("#msgsndr_form_rssmsg").val();
 		
-		$("#msgsndr_socialmediafeedmessage").val($.toJSON({ "subject": subject, "message": message }));
+		if (subject || message)
+			$("#msgsndr_socialmediafeedmessage").val($.toJSON({ "subject": subject, "message": message }));
+		else
+			$("#msgsndr_socialmediafeedmessage").val("");
+			
 		obj_valManager.runValidate($('#msgsndr_socialmediafeedmessage'));
 	});
 	
@@ -196,7 +202,7 @@ jQuery.noConflict();
 
 		obj_stepManager.onStepChange(function(lastStep, nextStep) {
 			//alert("stepChange! " + lastStep + " to " + nextStep);
-			//obj_valManager.forceRunValidate(nextStep);
+			//obj_valManager.onStepChange(nextStep, false);
 		});
 
         obj_contentManager.onContentDiscard(function(contentMode) {
@@ -273,7 +279,6 @@ jQuery.noConflict();
 				}
 			}
 			
-			//obj_valManager.forceRunValidate(2);
 			//alert("contentModeStarted! " + contentMode);
 		});
 		
