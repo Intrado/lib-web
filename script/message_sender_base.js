@@ -207,54 +207,54 @@ jQuery.noConflict();
 
 		obj_stepManager.onStepChange(function(lastStep, nextStep) {
 			//alert("stepChange! " + lastStep + " to " + nextStep);
-            //obj_valManager.onStepChange(nextStep, false);
-            if (nextStep == 2) {
-                // Let's create our mementos now, while the messages are in their original state...  otherwise, the memento
-                // could end up being based on a pre-loaded message, which we don't want
-                $.each(contentMap, function(contentMode, cssId) {
-                    if (!mementos[contentMode]) {
-                        mementos[contentMode] = $(cssId).memento(null);
-                    }
-                });
-            }
+			//obj_valManager.onStepChange(nextStep, false);
+			if (nextStep == 2) {
+				// Let's create our mementos now, while the messages are in their original state...  otherwise, the memento
+				// could end up being based on a pre-loaded message, which we don't want
+				$.each(contentMap, function(contentMode, cssId) {
+					if (!mementos[contentMode]) {
+						mementos[contentMode] = $(cssId).memento(null);
+					}
+				});
+			}
 		});
 
-        obj_contentManager.onContentDiscard(function(contentMode) {
-            var idSelector = "#msgsndr_tab_" + contentMode;
+		obj_contentManager.onContentDiscard(function(contentMode) {
+			var idSelector = "#msgsndr_tab_" + contentMode;
 
-            //Hide various toggle-able HTML components, if they are currently open...
-            //close up the translators
-            if (contentMode == "phone" || contentMode == "email") {
-                if ($(idSelector + " .toggle-translations").text().substring(0, 4) == "Hide") {
-                    $(idSelector + " .toggle-translations").click();
-                }
-            }
+			//Hide various toggle-able HTML components, if they are currently open...
+			//close up the translators
+			if (contentMode == "phone" || contentMode == "email") {
+				if ($(idSelector + " .toggle-translations").text().substring(0, 4) == "Hide") {
+					$(idSelector + " .toggle-translations").click();
+				}
+			}
 
-            //close up the Post to ___ regions
-            if (contentMode == "social") {
-                $("input.social").each(function(index, element) {
-                    if (element.checked) {
-                        element.click();
-                    }
-                });
-            }
+			//close up the Post to ___ regions
+			if (contentMode == "social") {
+				$("input.social").each(function(index, element) {
+					if (element.checked) {
+						element.click();
+					}
+				});
+			}
 
-            //Restore original form field states
-            if (mementos[contentMode]) {
-                $(idSelector).memento(mementos[contentMode]);
-            }
+			//Restore original form field states
+			if (mementos[contentMode]) {
+				$(idSelector).memento(mementos[contentMode]);
+			}
 
 //            $(idSelector + " .msgdata").val('');
 
-            clearHtmlEditorContent();
-        });
+			clearHtmlEditorContent();
+		});
 
 
 		obj_contentManager.onContentStart(function(contentMode) {
             if(contentMode == "phone") {
 				/*
-					Paste from email button: Low proirity: 
-					Issues with getting text from CKEDITOR as comes through as HTML, need to strip this and 
+					Paste from email button: Low proirity:
+					Issues with getting text from CKEDITOR as comes through as HTML, need to strip this and
 					take in consideration for HTML elements like images, etc
 
 						$('button.paste-from').addClass('hidden');
@@ -277,12 +277,12 @@ jQuery.noConflict();
 			} else if(contentMode == "email") {
 				var emailSubject = $('#msgsndr_emailmessagesubject');
 				var bSubject = $('#msgsndr_name').val();
-				
+
 				if (emailSubject.val().length == 0 && bSubject.length != 0) {
 					emailSubject.val(bSubject).addClass('ok');
 				}
 			} else if(contentMode == "social" && $('#msgsndr_ctrl_phone').parent().hasClass('complete')) {
-				
+
 				var fieldinsertcheck = $('#msgsndr_phonemessagetext').val();
 				if (fieldinsertcheck.indexOf('<<') == -1) {
 					$('#audiolink').removeClass('hidden');
@@ -290,23 +290,23 @@ jQuery.noConflict();
 					$('#audiolink').addClass('hidden');
 				}
 			}
-			
+
 			//alert("contentModeStarted! " + contentMode);
 		});
-		
+
 		obj_contentManager.onContentSave(function(contentMode) {
 			//alert("contentModeSaved! " + contentMode);
 		});
-		
+
 		//step 1
 		obj_stepManager.gotoStep(1);
-		
+
 		//ADDITIONAL EVENT BINDING FOR CERTAIN ACTIVITIES
 		// Switch Audio 
 		$('#switchaudio button').on('click', function(event) {
 			event.preventDefault();
 			var type = $(this).attr('data-type');
-			
+
 			$('div.audio').hide();
 			$('#'+type+'').show();
 			$('#switchaudio button').removeClass('active');
@@ -322,9 +322,9 @@ jQuery.noConflict();
 			}
 
 			obj_contentManager.updateContentStatus();
-			
+
 		});
-		
+
 		// Add myself toggle
 		$('#msgsndr_addme').on('click', function() {
 			//$('#list_ids').val('[addme]');//.addClass('ok');
@@ -350,11 +350,11 @@ jQuery.noConflict();
 				recipientTrack--;
 				$('#addme').slideUp();
 			}
-				
+
 			obj_stepManager.updateStepStatus();
-			
+
 		});
-		
+
 		// Toggle Collapse - Generic 
 		$('.toggle-more').on('click', function(event) {
 			event.preventDefault();
@@ -383,7 +383,7 @@ jQuery.noConflict();
 				text: textVal,
 				language: langCode
 			};
-			
+
 			showPreview(previewdata);
 		});
 
@@ -396,17 +396,17 @@ jQuery.noConflict();
 		$('#email_translate').on('click', "input", function() {
 			$(this).next().next('.controls').toggleClass('hide');
 		});
-		
-		
+
+
 	    // datepicker for scheduling
-	   	// TODO: add facebook token expiry date 
+	   	// TODO: add facebook token expiry date
 		$("#msgsndr_scheduledate").datepicker({
 			minDate: 0
 		});
-		
+
 	    // set the schedule options startdate to today's date by default (uses moment.js)
 	 	$('#msgsndr_scheduledate').val(moment().format('MM/DD/YYYY'));
-	 	
+
 		// modal windows -- script/bootstrap-modal.js
 		$('#msgsndr_choose_list, #msgsndr_build_list, #msgsndr_saved_message, #schedule_options, #msgsndr_submit_confirmation').modal({
 			show : false

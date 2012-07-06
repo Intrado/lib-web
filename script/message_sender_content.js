@@ -411,7 +411,7 @@ function ContentManager() {
 	var eventManager = {
 		onContentStart: [],
 		onContentSave: [],
-        onContentDiscard: []
+		onContentDiscard: []
 	};
 	
 	this.onContentStart = function(callback) {
@@ -434,15 +434,15 @@ function ContentManager() {
 		eventManager.onContentSave.splice(id, 1);
 	};
 
-    this.onContentDiscard = function(callback) {
-        //callback(lastcontent, nextcontent)
-        eventManager.onContentDiscard.push(callback);
-        return eventManager.onContentDiscard.length - 1;
-    };
+	this.onContentDiscard = function(callback) {
+		//callback(lastcontent, nextcontent)
+		eventManager.onContentDiscard.push(callback);
+		return eventManager.onContentDiscard.length - 1;
+	};
 
-    this.unbindOnContentDiscard = function(id) {
-        eventManager.onContentDiscard.splice(id, 1);
-    };
+	this.unbindOnContentDiscard = function(id) {
+		eventManager.onContentDiscard.splice(id, 1);
+	};
 
 	this.updateContentStatus = function() {
 		// social step has special conditions... must have checked atleast one of the message types
@@ -526,27 +526,27 @@ function ContentManager() {
 			allowControl[type]();
 		}
 	};
-	
+
 	this.discardContent = function() {
 		var remove = confirm("Warning, this will remove the message from your broadcast. Are you sure you wish to do this?");
 		if (remove) {
-            //RUN ON CANCEL EVENTS
-            $.each(eventManager.onContentDiscard, function(eIndex, eEvent) {
-                eEvent(currentContent);
-            });
+			//RUN ON CANCEL EVENTS
+			$.each(eventManager.onContentDiscard, function(eIndex, eEvent) {
+				eEvent(currentContent);
+			});
 
-            $("[id^=msgsndr_tab_]").hide();
+			$("[id^=msgsndr_tab_]").hide();
 			$('.msg_content_nav > li').removeClass('active').removeClass('lighten');
-			
+
 			$('input[name=msgsndr_has' + currentContent + ']').removeAttr('checked');
-		
+
 			$('.msg_content_nav .o' + currentContent).removeClass('complete');
 			$('#msgsndr_review_' + currentContent).parent().removeClass('complete');
 
 			self.resetContentStatus();
 			obj_stepManager.updateStepStatus();
 
-            $(".msg_confirm").show();
+			$(".msg_confirm").show();
 		}
 	};
 	
@@ -643,26 +643,26 @@ function ContentManager() {
 	// BIND SOCIAL BUTTONS
 	// Social Input Buttons
 	$('input.social').on('click', function(event) {
-        show = event.target.checked;
-        var itemName = $(this).attr('id').split('_')[1].substring(3);
+		show = event.target.checked;
+		var itemName = $(this).attr('id').split('_')[1].substring(3);
 
-        if (show) {
-            $('.' + itemName).slideDown('slow', function() {
-                if (itemName == 'feed') { // if Post to Feeds set focus to the
-                    // Post title input
-                    $('#msgsndr_form_rsstitle').focus();
-                } else { // Set focus to the textarea
-                    $('.' + itemName + ' textarea').focus();
-                }
-                self.updateContentStatus();
-            });
-        } else {
-            $('.' + itemName).slideUp('slow', function() {
-                self.updateContentStatus();
-            });
-        }
+		if (show) {
+			$('.' + itemName).slideDown('slow', function() {
+				if (itemName == 'feed') { // if Post to Feeds set focus to the
+					// Post title input
+					$('#msgsndr_form_rsstitle').focus();
+				} else { // Set focus to the textarea
+					$('.' + itemName + ' textarea').focus();
+				}
+				self.updateContentStatus();
+			});
+		} else {
+			$('.' + itemName).slideUp('slow', function() {
+				self.updateContentStatus();
+			});
+		}
 	});
-	
+
 	//BIND FEED CHECKBOXES FOR VALIDATING
 	$("#feed_categories").on("click change", function() {
 
