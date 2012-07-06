@@ -459,7 +459,7 @@ function handleRequest() {
 		case "keepalive":
 			//keeps the users session alive
 			return true;
-			
+		//FIXME HACK this is a workaround, we should be passing enough data in to the resource that is doing the validation such that it can check the contentids (ie don't use session data for mg)
 		case "loadmessagegroupcontent":
 			if (!isset($_REQUEST['id']))
 				return false;
