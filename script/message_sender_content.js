@@ -145,7 +145,7 @@ var allowControl = {
 		// determine whether we show or hide the callerId
 		function callerIdDisplay() {
 			var callerIdnumber = false;
-
+			$("#msgsndr_optioncallerid").attr('value', getDefaultCallerId());
 			// If hascallback isn't enabled,
 			// check for orgOptions.requiredapprovedcallerid,
 			// then subsequently for userPermissions.setcallerid
@@ -205,7 +205,7 @@ var allowControl = {
 		// role permissions first,
 		// if that isn't set, then get the callerid from system options.
 		function getDefaultCallerId() {
-			var userCallerId = userPermissions.callerid;
+			var userCallerId = userPrefs.callerid;
 			var orgCallerId = orgOptions.callerid;
 
 			if (typeof (userCallerId) == 'undefined') {
