@@ -204,10 +204,10 @@ $TITLE = "Saved/Scheduled Report";
 include("nav.inc.php");
 NewForm($f);
 if(isset($_SESSION['report']['edit']))
-	$back = icon_button(_L("Back"), "arrow_left",  "window.history.go(-1)");
+	$back = icon_button(_L("Back"), "fugue/arrow_180",  "window.history.go(-1)");
 else {
 	$fallbackUrl = "reports.php";
-	$back = icon_button(_L("Back"), "arrow_left",  "location.href='" . (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $fallbackUrl) . "'");
+	$back = icon_button(_L("Back"), "fugue/arrow_180",  "location.href='" . (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $fallbackUrl) . "'");
 }
 
 startWindow("Report Details ".help('ReportEdit_ReportDetails'));

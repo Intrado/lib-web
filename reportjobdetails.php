@@ -326,12 +326,12 @@ if($error || $reportgenerator->format == "html"){
 	
 	//check to see if referer came from summary page.  if so, go to history instead of referer
 	if(isset($_SESSION['report']['jobdetail']) || $error || $submit || $pagestartflag)
-		$back = icon_button(_L("Back"), "arrow_left", "window.history.go(-1)");
+		$back = icon_button(_L("Back"), "fugue/arrow_180", "window.history.go(-1)");
 	else {
 		$fallbackUrl = "reports.php";
-		$back = icon_button(_L("Back"), "arrow_left", "location.href='" . (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $fallbackUrl) . "'");
+		$back = icon_button(_L("Back"), "fugue/arrow_180", "location.href='" . (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $fallbackUrl) . "'");
 	}
-	buttons($back, submit($f, $s, "Refresh"), submit($f, "save", "Save/Schedule"));
+	buttons($back, submit($f, $s, "Refresh", null, "arrow_refresh"), submit($f, "save", "Save/Schedule"));
 	startWindow("Display Options ".help('ReportJobDetails_DisplayOptions'), "padding: 3px;", "true");
 	?>
 	<table border="0" cellpadding="3" cellspacing="0" width="100%">

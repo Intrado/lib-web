@@ -61,7 +61,7 @@ $formatters = array("actions" => "fmt_dm_actions",
 $PAGE="admin:settings";
 $TITLE="SmartCall Appliance Manager";
 include_once("nav.inc.php");
-buttons(button("Back", null, "settings.php"));
+buttons(icon_button("Back", "fugue/arrow_180", null, "settings.php"));
 startWindow("Authorized Appliances" . help('Settings_DMs'));
 ?>
 <table border="0" width="100%" cellpadding="3" cellspacing="1" class="list" >

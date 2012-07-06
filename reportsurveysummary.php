@@ -172,12 +172,12 @@ if($generator->format != "html"){
 	NewForm($f);
 	//TODO buttons for notification log: download csv, view call details
 	if(isset($_SESSION['report']['surveysummary']))
-		$back = button("Back", "window.history.go(-1)");
+		$back = icon_button("Back", "fugue/arrow_180", "window.history.go(-1)");
 	else {
 		$fallbackUrl = "reports.php";
-		$back = button("Back", "location.href=' " . (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $fallbackUrl) . "'");
+		$back = icon_button("Back", "fugue/arrow_180", "location.href=' " . (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $fallbackUrl) . "'");
 	}
-	buttons($back, submit($f, $s, "Save/Schedule"),button('Refresh', 'window.location.reload()'));
+	buttons($back, submit($f, $s, "Save/Schedule"), icon_button('Refresh', "arrow_refresh", 'window.location.reload()'));
 
 		startWindow("Related Links", "padding: 3px;");
 		?>

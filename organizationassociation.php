@@ -108,7 +108,7 @@ $TITLE = escapehtml($orgkey);
 
 include_once("nav.inc.php");
 
-buttons(icon_button(_L("Back"), "fugue/tick", "document.location='organizationdatamanager.php';"));
+buttons(icon_button(_L("Back"), "fugue/arrow_180", "document.location='organizationdatamanager.php';"));
 
 startWindow("Associations");
 

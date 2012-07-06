@@ -180,10 +180,10 @@ if($generator->format != "html"){
 	NewForm($f);
 	//TODO buttons for notification log: download csv, view call details
 	if(isset($_SESSION['report']['jobsummary']))
-		$back = icon_button(_L("Back"), "arrow_left","window.history.go(-1)");
+		$back = icon_button(_L("Back"), "fugue/arrow_180", "window.history.go(-1)");
 	else {
 		$fallbackUrl = "reports.php";
-		$back = icon_button(_L("Back"), "arrow_left","location.href='" . (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $fallbackUrl) . "'");
+		$back = icon_button(_L("Back"), "fugue/arrow_180", "location.href='" . (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $fallbackUrl) . "'");
 	}
 	buttons($back, icon_button(_L('Refresh'),"arrow_refresh","window.location.reload()"), submit($f, $s, "Save/Schedule"));
 

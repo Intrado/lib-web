@@ -143,7 +143,7 @@ if(isset($options['rules']) && $options['rules']){
 
 
 	include_once("nav.inc.php");
-	buttons(button('Back', null, 'reportcallssearch.php'));
+	buttons(icon_button('Back', "fugue/arrow_180", null, 'reportcallssearch.php'));
 
 	startWindow("Search Parameters");
 ?>

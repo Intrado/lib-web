@@ -155,10 +155,10 @@ NewForm($f);
 
 $fallbackUrl = "reportcallssearch.php";
 if(isset($_SESSION['report']['singleperson']))
-	$back = button("Back", null, "reportcallssearch.php");
+	$back = icon_button(_L("Back"), "fugue/arrow_180", null, "reportcallssearch.php");
 else
-	$back = button("Back", "location.href='" . (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $fallbackUrl) . "'");
-buttons($back, submit($f, $s, "Refresh"));
+	$back = icon_button(_L("Back"), "fugue/arrow_180", "location.href='" . (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $fallbackUrl) . "'");
+buttons($back, submit($f, $s, _L("Refresh"), null, "arrow_refresh"));
 startWindow("Display Options", "padding: 3px;", "true");
 ?>
 	<table border="0" cellpadding="3" cellspacing="0" width="100%">

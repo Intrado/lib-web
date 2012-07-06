@@ -120,7 +120,7 @@ $buttons = array(
 if ($generateBulkTokens)
 	$buttons[] = icon_button("Generate Activation Codes", "key_go", "if(confirmGenerate()) window.location='?generate=1'", "activationcodemanager.php");	
 
-$buttons[] = icon_button(_L('Back to Contacts'),"arrow_left",null,"contacts.php");
+$buttons[] = icon_button(_L('Back to Contacts'),"fugue/arrow_180",null,"contacts.php");
 	
 	
 $redirectpage = "activationcodemanager.php";
