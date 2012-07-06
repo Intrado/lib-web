@@ -22,16 +22,13 @@ require_once("obj/Job.obj.php");
 
 function generateListStats($listid) {
 	$list = new PeopleList($listid);
-	$renderedlist = new RenderedList2();
-	$renderedlist->pagelimit = 0;
-	$renderedlist->initWithList($list);
 	$stats = array(
 		'name' => $list->name,
 		'advancedlist' => false, //TODO remove this
 		'totalremoved' => $list->countRemoved(),
 		'totaladded' => $list->countAdded(),
 		'totalrule' => -999, //TOOD remove this
-		'total' => $renderedlist->getTotal() + 0);
+		'total' => RenderedList2::caclListTotal($listid));
 	return $stats;
 }
 

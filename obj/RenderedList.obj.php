@@ -37,6 +37,28 @@ class RenderedList2 {
 	//statistics
 	var $total = 0; //total people on list = (rules/org/section - skips) + adds
 	
+	
+	//static methods
+	
+	static private function _calcListTotal($listid) {
+		$list = new PeopleList($listid);
+		$renderedlist = new RenderedList2();
+		$renderedlist->initWithList($list);		
+		return $renderedlist->getTotal();
+	}
+	
+	/**
+	 * gets list total and caches as appropriate 
+	 */
+	static function caclListTotal($listid) {
+		$list = new PeopleList($listid);
+		$expect = array("modifydate" => $list->modifydate);
+		return gen2cache(300, $expect, null, "RenderedList2::_calcListTotal", $listid);	
+	}
+	
+	
+	// instance methods
+	
 	function RenderedList2 () {
 		global $USER;
 		$this->owneruser = $USER; //default to global user unless we are set to use a list with a different user
@@ -304,7 +326,7 @@ class RenderedList2 {
 	
 	function getTotal() {
 		$this->loadPagePersonIds(); //also gets total from found_rows
-		return $this->total;
+		return (int) $this->total;
 	}
 	
 	function getPageData() {

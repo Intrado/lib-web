@@ -21,6 +21,7 @@ require_once("obj/Person.obj.php");
 require_once("obj/RenderedList.obj.php");
 
 // Redirect to dashboard for 'newui' theme ...
+//FIXME HACK using theme to version ui
 if ( $_SESSION['colorscheme']['_brandtheme'] == "newui") {
 	include_once("dashboard.php");
 	exit();
@@ -300,13 +301,6 @@ function query_startpage_jobstats ($jobid) {
 		left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
 		where rp.jobid = ?", true, false, array($jobid));
 }
-//used in listcontacts as a callback for gen2cache
-function calc_startpage_list_info ($listid) {
-	$list = new PeopleList($listid);
-	$renderedlist = new RenderedList2();
-	$renderedlist->initWithList($list);		
-	return $renderedlist->getTotal();
-}
 
 function listcontacts ($obj,$name) {
 	$lists = array();
@@ -377,10 +371,7 @@ function listcontacts ($obj,$name) {
 	}
 	$calctotal = 0;
 	foreach ($lists as $id) {
-		//expect the list mod date hasnt changed when using cache
-		$list = new PeopleList($id);
-		$expect = array("modifydate" => $list->modifydate);
-		$calctotal += gen2cache(300, $expect, null, "calc_startpage_list_info", $id);		
+		$calctotal += RenderedList2::caclListTotal($id);
 	}
 	return "<b>" . $calctotal . ($calctotal!=1?"</b>&nbsp;contacts":"</b>&nbsp;contact");
 }

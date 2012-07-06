@@ -10,13 +10,6 @@ require_once("obj/RenderedList.obj.php");
 require_once("inc/html.inc.php");
 
 
-//used in listcontacts as a callback for gen2cache
-function calc_job_list_total ($listid) {
-	$list = new PeopleList($listid);
-	$renderedlist = new RenderedList2();
-	$renderedlist->initWithList($list);
-	return $renderedlist->getTotal();
-}
 function fmt_activestatus($obj, $name) {
 	if ($obj->status == 'cancelling')
 		return "<span class=\"activejob\">" . _L("Cancelling...") . "</span>";
@@ -60,10 +53,7 @@ function fmt_job_recipients($obj, $name) {
 	$lists = QuickQueryList("select listid from joblist where jobid = ?", false, false, array($obj->id));
 	$total = 0;
 	foreach ($lists as $id) {
-		//expect the list mod date hasnt changed when using cache
-		$list = new PeopleList($id);
-		$expect = array("modifydate" => $list->modifydate);
-		$total += gen2cache(300, $expect, null, "calc_job_list_total", $id);
+		$total += RenderedList2::caclListTotal($id);
 	}
 	return $total;
 }
