@@ -307,7 +307,7 @@ if($error || $reportgenerator->format == "html"){
 		$fallbackUrl = "reports.php";
 		$back = icon_button("Back", "fugue/arrow_180", "location.href='" . (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $fallbackUrl) . "'");
 	}
-	buttons($back, submit($f, $s, "Refresh"), submit($f, "save", "Save/Schedule"));
+	buttons($back, submit($f, $s, "Refresh", null, "arrow_refresh"), submit($f, "save", "Save/Schedule"));
 	startWindow("Display Options", "padding: 3px;", "true");
 	?>
 	<table border="0" cellpadding="3" cellspacing="0" width="100%">
