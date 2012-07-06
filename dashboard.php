@@ -30,6 +30,7 @@ foreach($requestValues as $key => $values) {
 }
 
 $useridList = array();
+//FIXME don't format strings in DB
 $useridList = QuickQueryList("select u.id, concat_ws(' ', u.firstname, u.lastname) from userlink ul inner join user u on (ul.subordinateuserid = u.id) where ul.userid=?",true,false,array($USER->id));
 $useridList[$USER->id] = _L("Me");
 $start_datetime = time();
@@ -123,6 +124,7 @@ function generateStats($useridList, $start_datetime, $end_datetime) {
 	$stats["top_jobtypes"] = QuickQueryMultiRow($query, true, null, $params);
 
 	// top senders
+	//FIXME don't format strings in DB
 	$query = "select concat_ws(' ', u.firstname, u.lastname) as name, count(*) as total from job j " .
 		"left join user u on (u.id = j.userid) " .
 		"where j.status in ('procactive','active','complete','cancelled','cancelling') and " .
