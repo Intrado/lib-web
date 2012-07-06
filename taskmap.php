@@ -73,6 +73,7 @@ $datatype = $import->datatype;
 if ($datatype == "person") {
 	//menu of guardian sequence
 	$guardiansequence = array();
+	//$guardiansequence[-1] = "- Unmapped -";
 	$guardiansequence[0] = "Student";
 	$maxguardians = getSystemSetting("maxguardians", 0);
 	for ($i=1; $i<=$maxguardians; $i++) {
@@ -82,44 +83,90 @@ if ($datatype == "person") {
 	//make a menu of all available fields
 	$fieldmaps  = DBFindMany("FieldMap","from fieldmap where fieldnum like 'f%' order by fieldnum");
 	$gfieldmaps = DBFindMany("FieldMap","from fieldmap where fieldnum like 'g%' order by fieldnum");
+	// first, last, language only used by guardian
+	$firstnamefield = FieldMap::getFirstNameField();
+	$lastnamefield = FieldMap::getLastNameField();
+	$languagefield = FieldMap::getLanguageField();
 
-	$maptofields = array();
-	$maptofields[""] = "- Unmapped -";
-	$maptofields["key"] = "Unique ID";
-	$maptofields["-cat"] = "Guardian Category";
+	//$maptofields = array(); // TODO remove
+	
+	//// student fields
+	$studentmapto = array();
+	
+	$studentmapto[""] = "- Unmapped -";
+	$studentmapto["key"] = "Unique ID";
 	//F fields
 	foreach ($fieldmaps as $fieldmap)
-		$maptofields[$fieldmap->fieldnum] = $fieldmap->name;
+		$studentmapto[$fieldmap->fieldnum] = $fieldmap->name;
 
-	$maptofields["sep"] = "--------------";
-	$maptofields["okey"] = getSystemSetting("organizationfieldname","Organization");
-	$maptofields["sep2"] = "--------------";
+	$studentmapto["sep"] = "--------------";
+	$studentmapto["okey"] = getSystemSetting("organizationfieldname","Organization");
+	$studentmapto["sep2"] = "--------------";
 	
 	//G fields
 	foreach ($gfieldmaps as $fieldmap)
-		$maptofields[$fieldmap->fieldnum] = $fieldmap->name;
-	if (count($gfieldmaps) > 0) $maptofields["sep3"] = "--------------";
+		$studentmapto[$fieldmap->fieldnum] = $fieldmap->name;
+	if (count($gfieldmaps) > 0) $studentmapto["sep3"] = "--------------";
 
 	//phones, emails, SMS
 	$maxphones = getSystemSetting("maxphones",3);
 	for ($x = 0; $x < $maxphones; $x++)
-		$maptofields["p$x"] = destination_label("phone",$x); //"Phone " . ($x + 1);
+		$studentmapto["p$x"] = destination_label("phone",$x); //"Phone " . ($x + 1);
 	if (getSystemSetting('_hassms', false)) {
 		$maxsms = getSystemSetting("maxsms",2);
 		for ($x = 0; $x < $maxsms; $x++)
-			$maptofields["s$x"] = destination_label("sms",$x); //"SMS " . ($x + 1);
+			$studentmapto["s$x"] = destination_label("sms",$x); //"SMS " . ($x + 1);
 	}
 	$maxemails = getSystemSetting("maxemails",2);
 	for ($x = 0; $x < $maxemails; $x++)
-		$maptofields["e$x"] = destination_label("email",$x); //"Email " . ($x + 1);
+		$studentmapto["e$x"] = destination_label("email",$x); //"Email " . ($x + 1);
 	//address fields
-	$maptofields["a6"] = "Address ATTN";
-	$maptofields["a1"] = "Address 1";
-	$maptofields["a2"] = "Address 2";
-	$maptofields["a3"] = "City";
-	$maptofields["a4"] = "State";
-	$maptofields["a5"] = "Zip";
+	$studentmapto["a6"] = "Address ATTN";
+	$studentmapto["a1"] = "Address 1";
+	$studentmapto["a2"] = "Address 2";
+	$studentmapto["a3"] = "City";
+	$studentmapto["a4"] = "State";
+	$studentmapto["a5"] = "Zip";
 
+	
+	////guardians fields
+	$guardianmapto = array();
+	$guardianmapto[""] = "- Unmapped -";
+	$guardianmapto["key"] = "Unique ID";
+	$guardianmapto["-cat"] = "Guardian Category";
+	//F fields
+	foreach ($fieldmaps as $fieldmap) {
+		$fname = $fieldmap->fieldnum;
+		
+		if (!strcmp($fname, $firstnamefield) ||
+			!strcmp($fname, $lastnamefield) ||
+			!strcmp($fname, $languagefield)) {
+				$guardianmapto[$fieldmap->fieldnum] = $fieldmap->name;
+		} // else skip Ffields not supported by guardians
+	}
+	$guardianmapto["sep2"] = "--------------";
+
+	//phones, emails, SMS
+	$maxphones = getSystemSetting("maxphones",3);
+	for ($x = 0; $x < $maxphones; $x++)
+		$guardianmapto["p$x"] = destination_label("phone",$x); //"Phone " . ($x + 1);
+	if (getSystemSetting('_hassms', false)) {
+		$maxsms = getSystemSetting("maxsms",2);
+		for ($x = 0; $x < $maxsms; $x++)
+			$guardianmapto["s$x"] = destination_label("sms",$x); //"SMS " . ($x + 1);
+	}
+	$maxemails = getSystemSetting("maxemails",2);
+	for ($x = 0; $x < $maxemails; $x++)
+		$guardianmapto["e$x"] = destination_label("email",$x); //"Email " . ($x + 1);
+	//address fields
+	$guardianmapto["a6"] = "Address ATTN";
+	$guardianmapto["a1"] = "Address 1";
+	$guardianmapto["a2"] = "Address 2";
+	$guardianmapto["a3"] = "City";
+	$guardianmapto["a4"] = "State";
+	$guardianmapto["a5"] = "Zip";
+	
+	
 } else if ($datatype == "user") {
 	$hasldap = getSystemSetting('_hasldap', '0');
 	$hasenrollment = getSystemSetting('_hasenrollment', '0');
@@ -310,7 +357,17 @@ if (CheckFormSubmit($f, $s) || CheckFormSubmit($f, 'run') || CheckFormSubmit($f,
 		$count = 0;
 		foreach ($importfields as $importfield) {
 
-			if (GetFormData($f,$s,"mapto_$count") != "") {
+			$mapto_datafieldname = "mapto_$count"; // default
+			
+			// only person import has guardian sequence
+			if ($datatype == "person") {
+				$guardseq = GetFormData($f,$s,"guardseq_$count");
+				if ($guardseq > 0)
+					$mapto_datafieldname = "gmapto_$count";
+				else
+					$mapto_datafieldname = "smapto_$count";
+			}
+			if (GetFormData($f,$s,$mapto_datafieldname) != "") {
 
 				$action = GetFormData($f,$s,"action_$count");
 
@@ -336,7 +393,18 @@ if (CheckFormSubmit($f, $s) || CheckFormSubmit($f, 'run') || CheckFormSubmit($f,
 			foreach ($importfields as $importfield) {
 				//check each map. if not static value, needs to have a col mapping
 
-				$importfield->mapto = $mapto = GetFormData($f,$s,"mapto_$count");
+				$mapto_datafieldname = "mapto_$count"; // default
+			
+				// only person import has guardian sequence
+				if ($datatype == "person") {
+					$guardseq = GetFormData($f,$s,"guardseq_$count");
+					if ($guardseq > 0)
+						$mapto_datafieldname = "gmapto_$count";
+					else
+						$mapto_datafieldname = "smapto_$count";
+				}
+
+				$importfield->mapto = $mapto = GetFormData($f,$s,$mapto_datafieldname);
 
 				//if the user submitted the form via delete button, check and delete the item as if it where unmapped
 				if (CheckFormSubmit($f, 'delete') !== false &&
@@ -417,13 +485,17 @@ if ($reloadform) {
 			//guardiansequence
 			if ($importfield->guardiansequence == null) {
 				PutFormData($f,$s,"guardseq_$count",0,"array",array_keys($guardiansequence));
+				//mapto
+				PutFormData($f,$s,"smapto_$count",$importfield->mapto, "array",array_keys($studentmapto));
 			} else {
 				PutFormData($f,$s,"guardseq_$count",$importfield->guardiansequence,"array",array_keys($guardiansequence));
+				//mapto
+				PutFormData($f,$s,"gmapto_$count",$importfield->mapto, "array",array_keys($guardianmapto));
 			}
+		} else {
+			//mapto
+			PutFormData($f,$s,"mapto_$count",$importfield->mapto, "array",array_keys($maptofields));
 		}
-		//mapto
-		PutFormData($f,$s,"mapto_$count",$importfield->mapto, "array",array_keys($maptofields));
-
 		//action
 		PutFormData($f,$s,"action_$count",$importfield->action, "array",array_keys($actions));
 
@@ -521,7 +593,7 @@ if ($noimportdata) { ?>
 ?>
 		<td>
 <?
-			NewFormItem($f,$s,"guardseq_$count","selectstart");
+			NewFormItem($f,$s,"guardseq_$count","selectstart",null,null,'onchange="switchmaptodata(' . $count . ',this.value);"');
 			foreach ($guardiansequence as $seqid => $name) {
 				NewFormItem($f,$s,"guardseq_$count","selectoption",$name,$seqid);
 			}
@@ -533,6 +605,41 @@ if ($noimportdata) { ?>
 ?>
 		<td>
 <?
+		// only person type has extra guardian column to map, and show/hide mapto options
+		if ($datatype == "person") {
+
+			// mapto fields, show/hide based on person type
+			$show = GetFormData($f,$s,"guardseq_$count");
+?>			
+			<div id="mapto_<?=$count?>_student" style="<?= $show == 0 ? '' : 'display:none'?>">
+<?
+			//student
+			NewFormItem($f,$s,"smapto_$count","selectstart");
+			foreach ($studentmapto as $mapto => $name) {
+				$extrahtml = "";
+				if (strpos($mapto,"sep") === 0) $extrahtml = "disabled=\"disabled\"";
+				NewFormItem($f,$s,"smapto_$count","selectoption",$name,$mapto,$extrahtml);
+			}
+			NewFormItem($f,$s,"smapto_$count","selectend");
+?>
+			</div>
+			<div id="mapto_<?=$count?>_guardian" style="<?= $show == 0 ? 'display:none' : ''?>">
+<?
+			//guardian
+			error_log("selectstart");
+			NewFormItem($f,$s,"gmapto_$count","selectstart");
+			foreach ($guardianmapto as $mapto => $name) {
+				$extrahtml = "";
+				if (strpos($mapto,"sep") === 0) $extrahtml = "disabled=\"disabled\"";
+				error_log("selectoption $count");
+				NewFormItem($f,$s,"gmapto_$count","selectoption",$name,$mapto,$extrahtml);
+			}
+			error_log("selectend");
+			NewFormItem($f,$s,"gmapto_$count","selectend");
+?>
+			</div>
+<?
+		} else {
 			NewFormItem($f,$s,"mapto_$count","selectstart");
 			foreach ($maptofields as $mapto => $name) {
 				$extrahtml = "";
@@ -540,6 +647,7 @@ if ($noimportdata) { ?>
 				NewFormItem($f,$s,"mapto_$count","selectoption",$name,$mapto,$extrahtml);
 			}
 			NewFormItem($f,$s,"mapto_$count","selectend");
+		}
 ?>
 		</td>
 		<td>
@@ -553,10 +661,8 @@ if ($noimportdata) { ?>
 		</td>
 		<td>
 <?
-			//TODO action datas, show/hide these based on action menu
-
+			//action datas, show/hide these based on action menu
 			$show = GetFormData($f,$s,"action_$count");
-
 ?>
 			<div id="actiondata_<?=$count?>_lookup" style="<?= $show == 'lookup' ? '' : 'display:none'?>">
 
@@ -670,6 +776,21 @@ function switchactiondata (num,newaction) {
 		$("filedata_" + num).show();
 		setdata(num);
 	}
+}
+
+function switchmaptodata (num,newaction) {
+	//hide any already showing mapto's div
+	$("mapto_" + num + "_student").hide();
+	$("mapto_" + num + "_guardian").hide();
+
+	var persontype = 'guardian';
+	if (newaction == 0)
+		persontype = 'student';
+		
+	//see if a div exists for the new person type
+	var newactiondiv = $("mapto_" + num + "_" + persontype);
+	if (newactiondiv)
+		newactiondiv.show();
 }
 
 function nextselect (num) {
