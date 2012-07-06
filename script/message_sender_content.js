@@ -161,7 +161,7 @@ var allowControl = {
 						$("#msgsndr_optioncallerid").val($('option:selected', this).val());
 						obj_valManager.runValidateEventDriven("msgsndr_optioncallerid");
 					}
-				})
+				});
 				
 				if (typeof (orgOptions.requireapprovedcallerid) != 'undefined' && orgOptions.requireapprovedcallerid == 1) {
 					$("#msgsndr_optioncallerid").addClass('hidden');
@@ -188,14 +188,13 @@ var allowControl = {
 						$("#msgsndr_optioncallerid").removeClass('hidden');
 						$('#optioncallerid_select').addClass('hidden');
 					} else {
-						$('#msgsndr_optioncallerid_fieldarea').addClass('hidden');
+						$('#optioncallerid_select').closest("fieldset").addClass('hidden');
 					}
 				}
 
 			} else {
 				// the user hascallback so we hide caller id select fieldset from view
-				$('#msgsndr_optioncallerid_fieldarea').addClass('hidden');
-
+				$('#optioncallerid_select').closest("fieldset").addClass('hidden');
 			}
 		};
 

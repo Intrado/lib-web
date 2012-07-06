@@ -67,7 +67,7 @@
 				</fieldset>
 				
 				<div id="advanced-opts" class="close">
-				<fieldset id="msgsndr_optioncallerid_fieldarea">
+				<fieldset>
 					<label for="msgsndr_optioncallerid">Caller ID&nbsp;<img id="msgsndr_optioncallerid_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>
 					<div class="controls">
 						<select id="optioncallerid_select"></select>
