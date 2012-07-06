@@ -40,7 +40,7 @@ class RenderedList2 {
 	
 	//static methods
 	
-	static private function _calcListTotal($listid) {
+	static function _calcListTotal($listid) {
 		$list = new PeopleList($listid);
 		$renderedlist = new RenderedList2();
 		$renderedlist->initWithList($list);		
