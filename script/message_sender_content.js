@@ -145,7 +145,7 @@ var allowControl = {
 		// determine whether we show or hide the callerId
 		function callerIdDisplay() {
 			var callerIdnumber = false;
-			$("#msgsndr_optioncallerid").attr('value', getDefaultCallerId());
+			$("#msgsndr_optioncallerid").val(getDefaultCallerId());
 			// If hascallback isn't enabled,
 			// check for orgOptions.requiredapprovedcallerid,
 			// then subsequently for userPermissions.setcallerid
@@ -159,6 +159,7 @@ var allowControl = {
 					} else {
 						$("#msgsndr_optioncallerid").addClass('hidden');
 						$("#msgsndr_optioncallerid").val($('option:selected', this).val());
+						obj_valManager.runValidateEventDriven("msgsndr_optioncallerid");
 					}
 				})
 				
