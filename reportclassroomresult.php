@@ -30,6 +30,7 @@ if(!(getSystemSetting('_hastargetedmessage', false) && $USER->authorize('viewsys
 $options = $_SESSION['report']['options'];
 $personsql = "";
 $emailtable = "";
+$emailtableGuardianauto = "";
 $emailsql = "";
 $datesql = "";
 
@@ -37,6 +38,7 @@ if(isset($options['personid']) && $options['personid'] != "")
 	$personsql = " AND p.pkey = '" . DBSafe($options['personid']) . "'";
 else if(isset($options['email']) && $options['email'] != "") {
 	$emailtable = " LEFT JOIN email e ON ( e.personid = p.id )";
+	$emailtableGuardianauto = " LEFT JOIN email e ON ( e.personid = pg.guardianpersonid )";
 	$emailsql = "AND e.email = '" . DBSafe($options['email']) . "'";
 }
 
@@ -49,7 +51,7 @@ if(isset($options['reldate']) && $options['reldate'] != ""){
 	$datesql = " AND Date(e.occurence) = CURDATE()";
 }
 
-$query = "SELECT p.pkey,
+$query = "(SELECT p.pkey,
 			p." . FieldMap::getFirstNameField() . " as firstname,
 			p." . FieldMap::getLastNameField() . " as lastname,
 			p.id
@@ -61,7 +63,40 @@ $query = "SELECT p.pkey,
 				$personsql
 				$emailsql
 				$datesql
-				group by p.pkey
+				group by p.pkey)
+			UNION
+				(SELECT p.pkey,
+				p." . FieldMap::getFirstNameField() . " as firstname,
+				p." . FieldMap::getLastNameField() . " as lastname,
+				p.id
+				FROM personguardian pg
+				left join person g on (g.id = pg.guardianpersonid)
+				left join person p on (p.id = pg.personid)
+				LEFT JOIN personassociation pa ON ( p.id = pa.personid )
+				LEFT JOIN alert a ON ( a.eventid = pa.eventid )
+				$emailtableGuardianauto
+				where not p.deleted and not g.deleted and g.type = 'guardianauto'
+				and not exists (select * from personguardian pg2 where pg2.importid is null and pg2.personid = pg.personid)
+				$personsql
+				$emailsql
+				$datesql
+				group by p.pkey)
+			UNION
+				(SELECT p.pkey,
+				p." . FieldMap::getFirstNameField() . " as firstname,
+				p." . FieldMap::getLastNameField() . " as lastname,
+				p.id
+				FROM personguardian pg
+				left join person g on (g.id = pg.guardianpersonid)
+				left join person p on (p.id = pg.personid)
+				LEFT JOIN personassociation pa ON ( p.id = pa.personid )
+				LEFT JOIN alert a ON ( a.eventid = pa.eventid )
+				$emailtableGuardianauto
+				where not p.deleted and not g.deleted and g.type = 'guardiancm'
+				$personsql
+				$emailsql
+				$datesql
+				group by p.pkey)
 				";
 $result = Query($query);
 
