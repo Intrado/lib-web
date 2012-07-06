@@ -964,3 +964,16 @@ p.warning {
 	float: left;
 }
 
+div.progressbar {
+	border: 2px solid #306496;
+	margin: 20px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	width:94%;
+	overflow:hidden;
+}
+div.progressbar div.progress {
+	color: black;
+	background: #306496;
+	height: 15px;
+}

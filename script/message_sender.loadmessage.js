@@ -134,6 +134,7 @@ $.loadMessage = function loadMessage() {
 	
 		// make sure the correct tab is shown
 		$('#msgsndr_saved_message').modal('hide');
+		
 		// if we are on step 2, show the message section
 		if (obj_stepManager.getCurrentStep() == 2) {
 			// disable the continue button
@@ -144,12 +145,25 @@ $.loadMessage = function loadMessage() {
 		self.clearForm();
 		
 		if (selectedMsgGroup.typeSummary.length > 0) {
+			// show the loading message progress dialog
+			self.updateProgressBar(1);
+			$('#msgsndr_loading_saved_message').find("span[name='msgname']").text(selectedMsgGroup.name);
+			$('#msgsndr_loading_saved_message').modal('show');
+			
 			self.prepareFormForLoad(selectedMsgGroup);
-			// TODO: append loading message
-			self.getMessages(selectedMsgGroup, obj_stepManager.updateStepStatus);
+			self.getMessages(selectedMsgGroup, function () {
+				// hide the loading message
+				$('#msgsndr_loading_saved_message').modal('hide');
+				obj_stepManager.updateStepStatus();
+			});
 		} else {
 			obj_stepManager.updateStepStatus();
+			
 		}
+	};
+	
+	this.updateProgressBar = function (progress) {
+		$('#msgsndr_loading_saved_message').find(".progress").width(progress+'%');
 	};
 	
 	// get message group data ...
@@ -328,11 +342,18 @@ $.loadMessage = function loadMessage() {
 		$.ajax({
 			url: '/'+orgPath+'/api/2/users/'+userid+'/messagegroups/'+msgGrp.id+'/messages',
 			type: "GET",
+			async: false,
 			dataType: "json",
 			async: "false",
 			success: function(data) {
+				var pctper = parseInt(100 / data.messages.length);
+				var progress = 0;
 				// itterate all the messages and call methods to populate the data
 				$.each(data.messages, function(mIndex, msg) {
+					progress += pctper;
+					if (progress > 100)
+						progress = 100;
+					self.updateProgressBar(progress);
 					if (!self.checkUserAuth(msg))
 						return true;
 					if(typeof(msg.type) != "undefined" && msg.type.length > 0) { 

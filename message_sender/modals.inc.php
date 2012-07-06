@@ -66,6 +66,16 @@
 
 </div>
 
+<!-- Saved message loading modal -->
+<div id="msgsndr_loading_saved_message" class="modal hide">
+	<div class="modal-header">
+		<h3>Please be patient...</h3>
+	</div>
+	<div class="modal_content">
+		<p>Please wait while your message <strong>"<span name="msgname"></span>"</strong> is loading!</p><p>When complete, this message will automatically close.</p>
+		<div class="progressbar"><div class="progress"><img src="img/pixel.gif"></div></div>
+	</div>
+</div>
 
 <!-- build list modal -->
 <div id="msgsndr_submit_confirmation" class="modal hide">

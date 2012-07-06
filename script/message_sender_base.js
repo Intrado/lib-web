@@ -408,7 +408,7 @@ jQuery.noConflict();
 	 	$('#msgsndr_scheduledate').val(moment().format('MM/DD/YYYY'));
 
 		// modal windows -- script/bootstrap-modal.js
-		$('#msgsndr_choose_list, #msgsndr_build_list, #msgsndr_saved_message, #schedule_options, #msgsndr_submit_confirmation').modal({
+		$('#msgsndr_choose_list, #msgsndr_build_list, #msgsndr_saved_message, #schedule_options, #msgsndr_submit_confirmation, #msgsndr_loading_saved_message').modal({
 			show : false
 		});
 	});
