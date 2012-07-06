@@ -151,8 +151,10 @@ function ValidationManager() {
 			var e = $('#'+vItem);
 			self.runValidate(vItem, function(element, resultcode, validationMessage) {
 				pending--;
-				if (resultcode != "valid")
-					passed = false
+				if (resultcode != "valid") {
+					passed = false;
+					//console.log("Failed validation: "+element.id+" code: "+resultcode+" msg: "+validationMessage);
+				}
 				if (callback && pending == 0)
 					callback(passed);
 			});

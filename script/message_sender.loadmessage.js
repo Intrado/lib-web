@@ -135,8 +135,11 @@ $.loadMessage = function loadMessage() {
 		// make sure the correct tab is shown
 		$('#msgsndr_saved_message').modal('hide');
 		// if we are on step 2, show the message section
-		if (obj_stepManager.currentStep == 2)
+		if (obj_stepManager.getCurrentStep() == 2) {
+			// disable the continue button
+			$('button.btn_confirm', stepMap[obj_stepManager.getCurrentStep()]).attr('disabled','disabled');
 			self.elements.messageSection.show();
+		}
 		
 		self.clearForm();
 		
@@ -373,6 +376,10 @@ $.loadMessage = function loadMessage() {
 		$('.tab_content .tab_panel').hide();
 		$('.facebook, .twitter, .feed').hide();
 	
+		self.elements.hasPhone.removeAttr('checked');
+		self.elements.hasEmail.removeAttr('checked');
+		self.elements.hasSms.removeAttr('checked');
+		
 		$('#msg_section_2 .msgdata').each(function(aIndex, aData) {
 			if ($(aData).attr('type') == 'checkbox') {
 				$(aData).removeAttr('checked');
@@ -535,7 +542,7 @@ $.loadMessage = function loadMessage() {
 		
 		$.ajax({
 			url: '/'+orgPath+'/api/2/users/'+userid+'/messagegroups/'+msgGrpId+'/messages/'+msg.id+'/messageparts/formatted',
-			async: true,
+			async: false,
 			type: "GET",
 			dataType: "json",
 			success: function(data) {
@@ -560,7 +567,7 @@ $.loadMessage = function loadMessage() {
 	this.loadMessageAttachments = function(msgGrpId,msg,element,controlElement){
 		$.ajax({
 			url: '/'+orgPath+'/api/2/users/'+userid+'/messagegroups/'+msgGrpId+'/messages/'+msg.id+'/messageattachments',
-			async: true,
+			async: false,
 			type: "GET",
 			dataType: "json",
 			success: function(data) {
