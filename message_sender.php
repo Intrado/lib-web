@@ -361,7 +361,7 @@ $formdata = array(
 				"label" => "List(s)",
 				"value" => "",
 				"validators" => array(
-						array("ValLists")
+						array("ValLists", "allowempty" => true)
 				),
 				"control" => array("TextField"),
 				"helpstep" => 1

@@ -880,6 +880,7 @@
         
         base.updateParentElement = function() {
         	$("#msgsndr_listids").val($.toJSON(base.pickedListIds));
+        	$("#msgsndr_listids").trigger("listwidget:updated");
         };
 
         // Run initializer

@@ -5,6 +5,8 @@ class ValLists extends Validator {
 
 	function validate ($value, $args) {
 		global $USER;
+		
+		$allowempty = (isset($args["allowempty"])?$args["allowempty"]:false);
 
 		if (strpos($value, 'pending') !== false)
 			return _L('Please finish adding this rule, or unselect the field');
@@ -24,20 +26,24 @@ class ValLists extends Validator {
 		if (isset($args['skipemptycheck']) && $args['skipemptycheck'])
 			return true;
 		
-		//check to see if they are all empty
-		foreach ($listids as $listid) {
-			if ($listid === 'addme') {
-				return true; //stop looking as soon as we find any non empty list
+		if ($allowempty) {
+			return true;
+		} else {
+			//check to see if they are all empty
+			foreach ($listids as $listid) {
+				if ($listid === 'addme') {
+					return true; //stop looking as soon as we find any non empty list
+				}
+			
+				$list = new PeopleList($listid);
+				$renderedlist = new RenderedList2($list);
+				$renderedlist->initWithList($list);
+				$renderedlist->pagelimit = 0; //save a bit of memory by not trying to get anyone, just calc totals
+				if ($renderedlist->getTotal() > 0)
+					return true; //stop looking as soon as we find any non empty list
 			}
-		
-			$list = new PeopleList($listid);
-			$renderedlist = new RenderedList2($list);
-			$renderedlist->initWithList($list);
-			$renderedlist->pagelimit = 0; //save a bit of memory by not trying to get anyone, just calc totals
-			if ($renderedlist->getTotal() > 0)
-				return true; //stop looking as soon as we find any non empty list
+			return _L('All of the lists are empty');
 		}
-		return _L('All of the lists are empty');
 	}
 }
 

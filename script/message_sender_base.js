@@ -411,5 +411,10 @@ jQuery.noConflict();
 		$('#msgsndr_choose_list, #msgsndr_build_list, #msgsndr_saved_message, #schedule_options, #msgsndr_submit_confirmation, #msgsndr_loading_saved_message').modal({
 			show : false
 		});
+		
+		// observe list changes and validate
+		$("#msgsndr_listids").on("listwidget:updated", function () {
+			obj_valManager.runValidateEventDriven("msgsndr_listids");
+		});
 	});
 })(jQuery);
