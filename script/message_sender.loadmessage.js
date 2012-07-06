@@ -140,18 +140,12 @@ $.loadMessage = function loadMessage() {
 		
 		self.clearForm();
 		
-		var callback = function () {
-			// TODO: remove loading message
-			obj_valManager.validateStep(2, false, function (passed) {
-				obj_stepManager.updateStepStatus();
-			});
-		};
 		if (selectedMsgGroup.typeSummary.length > 0) {
 			self.prepareFormForLoad(selectedMsgGroup);
 			// TODO: append loading message
-			self.getMessages(selectedMsgGroup, callback);
+			self.getMessages(selectedMsgGroup, obj_stepManager.updateStepStatus);
 		} else {
-			callback();
+			obj_stepManager.updateStepStatus();
 		}
 	};
 	
