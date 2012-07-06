@@ -279,10 +279,28 @@ class RenderedList2 {
 				//less than 4 seems to not use any index, and would get entire area codes anyhow
 				if (strlen($digits) >= 4) {
 					foreach (array("phone","sms") as $type) {
+						// search system contact
 						$query = "select distinct $fieldsql from person p \n"
 							."	$joinsql \n"
 							." inner join $type x on (x.personid = p.id) \n"
 							."	where not p.deleted and p.type in ('system', 'subscriber') \n"
+							." $rulesql $this->extrawheresql and x.$type like '$digits%' \n";
+						$queries[] = $query;
+						// search guardianauto
+						$query = "select distinct $fieldsql from personguardian pg \n"
+							." left join person g on (g.id = pg.guardianpersonid) "
+							." left join person p on (p.id = pg.personid) "
+							." inner join $type x on (x.personid = pg.guardianpersonid) \n"
+							." where not p.deleted and not g.deleted and g.type = 'guardianauto' \n"
+							." and not exists (select * from personguardian pg2 where pg2.importid is null and pg2.personid = pg.personid) "
+							." $rulesql $this->extrawheresql and x.$type like '$digits%' \n";
+						$queries[] = $query;
+						// search guardiancm
+						$query = "select distinct $fieldsql from personguardian pg \n"
+							." left join person g on (g.id = pg.guardianpersonid) "
+							." left join person p on (p.id = pg.personid) "
+							." inner join $type x on (x.personid = pg.guardianpersonid) \n"
+							." where not p.deleted and not g.deleted and g.type = 'guardiancm' \n"
 							." $rulesql $this->extrawheresql and x.$type like '$digits%' \n";
 						$queries[] = $query;
 					}
@@ -290,10 +308,28 @@ class RenderedList2 {
 				
 				//add email if we have at least 3 chars
 				if (strlen($searchstring) >= 3) {
+					//system
 					$query = "select distinct $fieldsql from person p \n"
 						."	$joinsql \n"
 						." inner join email x on (x.personid = p.id) \n"
 						."	where not p.deleted and p.type in ('system', 'subscriber') \n"
+						." $rulesql $this->extrawheresql and x.email like '$searchstring%' \n";
+					$queries[] = $query;
+					//guardianauto
+					$query = "select distinct $fieldsql from personguardian pg \n"
+						." left join person g on (g.id = pg.guardianpersonid) "
+						." left join person p on (p.id = pg.personid) "
+						." inner join email x on (x.personid = pg.guardianpersonid) \n"
+						." where not p.deleted and not g.deleted and g.type = 'guardianauto' \n"
+						." and not exists (select * from personguardian pg2 where pg2.importid is null and pg2.personid = pg.personid) "
+						." $rulesql $this->extrawheresql and x.email like '$searchstring%' \n";
+					$queries[] = $query;
+					//guardiancm
+					$query = "select distinct $fieldsql from personguardian pg \n"
+						." left join person g on (g.id = pg.guardianpersonid) "
+						." left join person p on (p.id = pg.personid) "
+						." inner join email x on (x.personid = pg.guardianpersonid) \n"
+						." where not p.deleted and not g.deleted and g.type = 'guardiancm' \n"
 						." $rulesql $this->extrawheresql and x.email like '$searchstring%' \n";
 					$queries[] = $query;
 				}
