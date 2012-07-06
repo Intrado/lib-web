@@ -294,7 +294,7 @@ startWindow("Select ".help('ReportJobSearch_Select'), NULL, false);
 </table>
 
 <?
-buttons(submit($f, "view", "View Report"),submit($f, "save", "Save/Schedule"),icon_button(_L('Cancel'),"cross", null, 'reports.php'));
+buttons(submit($f, "view", "View Report", null, "arrow_refresh"),submit($f, "save", "Save/Schedule"),icon_button(_L('Cancel'),"cross", null, 'reports.php'));
 
 endWindow();
 EndForm();

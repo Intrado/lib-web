@@ -179,7 +179,7 @@ startWindow("Select ".help('ReportSurvey_Select'), NULL, false);
 </table>
 
 <?
-buttons(submit($f, "run", "View Report"), submit($f, "save", "Save/Schedule"),icon_button(_L('Cancel'),"cross", null, 'reports.php'));
+buttons(submit($f, "run", "View Report", null, "arrow_refresh"), submit($f, "save", "Save/Schedule"),icon_button(_L('Cancel'),"cross", null, 'reports.php'));
 endWindow();
 EndForm();
 include("navbottom.inc.php");
