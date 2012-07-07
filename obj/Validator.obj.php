@@ -615,6 +615,7 @@ class ValReldate extends Validator {
 	}
 }
 
+//FIXME HACK is ValDummy needed anymore?
 class ValDummy extends Validator {
 	function validate ($value, $args) {
 		return true;
