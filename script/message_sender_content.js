@@ -149,7 +149,7 @@ var allowControl = {
 			// If hascallback isn't enabled,
 			// check for orgOptions.requiredapprovedcallerid,
 			// then subsequently for userPermissions.setcallerid
-			if (orgOptions._hascallback == 0) {
+			if (orgFeatures.callback == true) {
 				
 				// this sets the selected callerid in the text input for postdata
 				$('#optioncallerid_select').on('change', function() {
