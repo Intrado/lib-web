@@ -82,7 +82,7 @@ function generateStats($useridList, $start_datetime, $end_datetime) {
 	$stats["total_languages"] = QuickQuery($query, null, $params);
 	
 	// total of each message type
-	$query = "select m.type as type, count(*) as total from message m " .
+	$query = "select m.type as type, count(distinct m.messagegroupid) as total from message m " .
 		"join messagegroup mg on (mg.id = m.messagegroupid) " .
 		"join job j on (j.messagegroupid = mg.id) " .
 		"where  " .
