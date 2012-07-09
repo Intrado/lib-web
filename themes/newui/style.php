@@ -341,7 +341,6 @@ table.info th { background: #eee; font-weight: bold; vertical-align: bottom; lin
 table.info a.remove { background: url(themes/newui/removelist.png) left 0 no-repeat; display: inline-block; width: 18px; height: 18px; vertical-align: middle; }
 table.info a.remove:hover { background: url(themes/newui/removelist.png) left -22px no-repeat; display: inline-block; width: 18px; height: 18px; vertical-align: middle; }
 table.info td { border-bottom: 1px solid #ddd; }
-table.info tr:hover td { background: #e1eaf4; color: #005580; cursor: pointer;}
 table.info th:first-child {text-align: right;}
 table.jobprogress th:first-child {text-align: left;}
 table.info td:first-child { width: 100px; text-align: right;}

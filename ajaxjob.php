@@ -18,7 +18,6 @@ function fmt_activestatus($obj, $name) {
 }
 
 function fmt_job_content($obj, $name) {
-	//FIXME use getBrandTheme()
 	$theme = $_SESSION['colorscheme']['_brandtheme'];
 	$str = "";
 	if ($obj->hasPhone()){
@@ -99,7 +98,6 @@ function fmt_job_default_action ($obj) {
 
 function frm_job_tools($obj, $name) {
 	$actions = fmt_jobs_actions($obj,$name);
-	//FIXME use getBrandTheme()
 	return "<img id=\"actionlink_{$obj->id}\" class=\"jobtools\" src=\"themes/{$_SESSION['colorscheme']['_brandtheme']}/tools.png\" /><div class=\"hidden\">{$actions}</div>";
 }
 
@@ -159,10 +157,8 @@ function handleRequest() {
 				'tools' => 'frm_job_tools'
 			);
 			
-			$rowActionFormatter = 'fmt_job_default_action';
-			
-			return prepareAjaxTableObjects($activejobs, $titles, $formatters,$rowActionFormatter);
-			
+			return prepareAjaxTableObjects($activejobs, $titles, $formatters,false);
+		
 		case 'scheduledjobs':
 			$activejobs = DBFindMany("Job", "from job j
 				where $queryUsers 
@@ -188,10 +184,8 @@ function handleRequest() {
 				'tools' => 'frm_job_tools'
 			);
 			
-			$rowActionFormatter = 'fmt_job_default_action';
-			
-			return prepareAjaxTableObjects($activejobs, $titles, $formatters, $rowActionFormatter);
-				
+			return prepareAjaxTableObjects($activejobs, $titles, $formatters, false);
+		
 		case 'completedjobs':
 			$activejobs = DBFindMany("Job", "from job j
 				where $queryUsers 
@@ -217,9 +211,7 @@ function handleRequest() {
 				'tools' => 'frm_job_tools'
 			);
 			
-			$rowActionFormatter = 'fmt_job_default_action';
-			
-			return prepareAjaxTableObjects($activejobs, $titles, $formatters, $rowActionFormatter);
+			return prepareAjaxTableObjects($activejobs, $titles, $formatters, false);
 		
 		default:
 			error_log("Unknown request " . $_REQUEST['action']);
