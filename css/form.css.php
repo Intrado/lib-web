@@ -92,7 +92,7 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 
 .newform .formcontrol { margin: 0 0 0 150px; font-size: 13px; line-height: 21px; }
 .newform .formcontrol h3 { margin: 0 0 15px 0; }
-.newform .formcontrol input[type="text"] { width: 250px; padding: 4px 5px; font-size: 13px; line-height: 21px; border: 1px solid #E7E7E7; overflow: hidden; 
+.newform .formcontrol input[type="text"] { width: 250px; padding: 4px 5px; font-size: 13px; height: 17px; border: 1px solid #E7E7E7; overflow: hidden; 
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
 /*.newform .formcontrol input[type="password"] { width: 250px; padding: 4px 5px; font-size: 13px; line-height: 21px; border: 1px solid #E7E7E7; overflow: hidden; 
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }*/
@@ -433,7 +433,7 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 .newui .newform .formtitle .formicon { /*display: none;*/ }
 
 .newui .newform .formcontrol { padding: 0; }
-.newui .newform .formcontrol input[type="text"] { display: block; width: 313px; padding: 4px 5px; font-size: 14px; line-height: 18px; border: 1px solid #E2E2E2; 
+.newui .newform .formcontrol input[type="text"] { width: 313px; height: 28px; padding: 4px 5px; font-size: 14px; border: 1px solid #E2E2E2; 
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
 .newui .newform .formcontrol input[type="radio"] { margin: 0 5px 5px 0; }
