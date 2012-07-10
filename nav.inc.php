@@ -331,8 +331,7 @@ Event.observe(window, 'load', function() {
 	<div class="container cf">
 		<div class="sectitle">
 			<div class="pagetitle"><?= (isset($TITLE) ? $TITLE : "") ?></div>
-			<!--  div class="pagetitlesubtext"><?= (isset($DESCRIPTION) ? $DESCRIPTION : "") ?></div-->
-			<div class="pagetitlesubtext">I have a huge pen that I want to write some big stuff with</div>
+			<div class="pagetitlesubtext"><?= (isset($DESCRIPTION) ? $DESCRIPTION : "") ?></div>
 		</div><!-- end sectitle -->
 	</div>
 
