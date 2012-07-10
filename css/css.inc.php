@@ -148,6 +148,7 @@ textarea { overflow: auto; vertical-align: top; resize: vertical; }
 
 table { border-collapse: collapse; border-spacing: 0; margin: 0 0 5px; }
 td, th { vertical-align: top; padding: .5em; }
+td > table td { padding: 0; }
 
 
 /*----- Basic stylesheet for all themes, each theme has it's own specific styles in the theme folder. See example.css for guide and ideas -----*/
