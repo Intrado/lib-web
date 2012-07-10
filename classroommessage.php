@@ -255,7 +255,7 @@ startWindow(_L('Classroom Comments'));
 echo button_bar(icon_button("Done Picking Comments", "tick", null, $redirect), '<div id="clock" class="clock"></div>');
 ?>
 
-<label>Section: <select id="classselect" name="classselect">
+<label>Section: <select id="classselect" class="comment_section" name="classselect">
 <?
 
 if($sections) {

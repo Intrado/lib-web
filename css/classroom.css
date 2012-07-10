@@ -77,3 +77,5 @@ a.remarklink{
 .nowedit {
 	float:left;color:graytext;font-weight:lighter;font-style:italic;
 }
+
+.comment_section { margin: 10px 0 0; }
