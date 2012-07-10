@@ -42,14 +42,16 @@ a:hover { text-decoration: underline; }
 
 /*----- Content sections, section widths set up here for layout design -----*/
 
-.content_wrap { position: relative; margin-top: 15px; }
+.content_wrap { margin-top: 15px; }
+.container { position: relative; }
 .sectitle { width: 100%; }
-.secbutton { position: absolute; top: 36px; left: 0; width: 150px; }
+.secbutton { position: absolute; width: 150px; }
 .sectimeline { width: 100%; padding: 0 0 0 150px; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
 .window_aside { float: left; display: inline; width: 165px; margin: 0; }
 .window_main { width: inherit; margin: 0 0 0 175px; border-left: 1px dotted grey; padding: 0 0 0 10px;}
 
-.pagetitle { font-weight: bold; color: <?=$primary?>;  }
+.pagetitle { margin: 0 0 10px 0; font-weight: bold; color: <?=$primary?>;  }
+.pagetitlesubtext { margin: 0 0 10px 0; }
 
 .newjob a { background: url(img/newjob.jpg) center top no-repeat; display: block; width: 100%; height: 122px; text-indent: -9999px; }
 .emrjob a { background: url(img/newemergency.jpg) center top no-repeat; display: block; width: 100%; height: 45px; text-indent: -9999px; }
