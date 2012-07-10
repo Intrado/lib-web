@@ -97,8 +97,17 @@ startWindow(_L('Job Settings'));
 	?>
 </table>
 <? 
-$fallbackUrl = "jobs.php";
-echo icon_button(_L("Done"),"tick","location.href='" . (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $fallbackUrl) . "'");
+if (isset($_SERVER['HTTP_REFERER'])) {
+	if (strpos($_SERVER['HTTP_REFERER'],"index.php") === false) {
+		$donelink = $_SERVER['HTTP_REFERER'];
+	} else {
+		$donelink = "start.php";
+	}
+} else {
+	$donelink = "jobs.php";
+}
+
+echo icon_button(_L("Done"),"tick",null,$donelink);
 
 endWindow();
 include_once("navbottom.inc.php");
