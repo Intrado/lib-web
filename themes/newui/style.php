@@ -976,3 +976,7 @@ div.progressbar div.progress {
 	background: #306496;
 	height: 15px;
 }
+
+.ie8 #cke_reusableckeditor input {
+  border: none;
+}

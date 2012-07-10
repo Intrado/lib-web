@@ -163,8 +163,8 @@ jQuery.noConflict();
 		obj_permissionManager = new PermissionManager();
 		
 		obj_permissionManager.onPermissionsLoaded(function() {
-			// ckeditor
-			applyCkEditor('msgsndr_emailmessagetext');
+			// CKEDITOR
+			applyHtmlEditor('msgsndr_emailmessagetext');
 			
 			$(document).ready(function() {
 				// subject
