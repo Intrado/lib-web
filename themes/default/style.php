@@ -46,7 +46,7 @@ a:hover { text-decoration: underline; }
 .container { position: relative; }
 .sectitle { width: 100%; }
 .secbutton { position: absolute; width: 150px; }
-.sectimeline { width: 100%; padding: 0 0 0 150px; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
+.sectimeline { padding: 0 0 0 150px; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
 .window_aside { float: left; display: inline; width: 165px; margin: 0; }
 .window_main { width: inherit; margin: 0 0 0 175px; border-left: 1px dotted grey; padding: 0 0 0 10px;}
 
@@ -92,9 +92,10 @@ table.list td { color: #444; }
 .shortcuts a { color: #444444; }
 .shortcuts a:hover { background: #92bde5; color: #fff; }
 
-/*----- IE7 classes -----*/
+/*----- IE7 classes re-adds the rounded corners for ie7-----*/
 
-.ie7 div.sectimeline { width: 84.8%; }
+
+
 
 /*----- Classes that need PIE -----*/
 /*
