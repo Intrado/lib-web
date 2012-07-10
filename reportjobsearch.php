@@ -221,8 +221,8 @@ startWindow("Select ".help('ReportJobSearch_Select'), NULL, false);
 					<td>
 						<table>
 							<tr>
-								<td><? NewFormItem($f, $s, "radioselect", "radio", null, "job", "id=\"job\" onclick='$(\"daterange\").hide(); $(\"jobs\").show()'");?> Job</td>
-								<td><? NewFormItem($f, $s, "radioselect", "radio", null, "date", "onclick='$(\"jobs\").hide(); $(\"daterange\").show()'");?> Date</td>
+								<td><label class="report_options"><? NewFormItem($f, $s, "radioselect", "radio", null, "job", "id=\"job\" onclick='$(\"daterange\").hide(); $(\"jobs\").show()'");?> Job</label></td>
+								<td><label class="report_options"><? NewFormItem($f, $s, "radioselect", "radio", null, "date", "onclick='$(\"jobs\").hide(); $(\"daterange\").show()'");?> Date</label></td>
 							</tr>
 						</table>
 					</td>
@@ -259,8 +259,8 @@ startWindow("Select ".help('ReportJobSearch_Select'), NULL, false);
 									NewFormItem($f, $s, "jobid_archived", "selectend");
 								?>
 								</td>
-								<td align="left"><? NewFormItem($f, $s, "check_archived", "checkbox", null, null, "id='check_archived' onclick = \"setHiddenIfChecked(this, 'jobid'); setVisibleIfChecked(this, 'jobid_archived');\"") ?>
-								Show archived jobs</td>
+								<td align="left"><label class="archived_jobs"><? NewFormItem($f, $s, "check_archived", "checkbox", null, null, "id='check_archived' onclick = \"setHiddenIfChecked(this, 'jobid'); setVisibleIfChecked(this, 'jobid_archived');\"") ?>
+								Show archived jobs</label></td>
 							</tr>
 						</table>
 					</td>

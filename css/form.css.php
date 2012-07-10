@@ -26,6 +26,15 @@ form.newform {
 	margin-left: 10px; 
 }
 
+/*---------- Random form elements ----------*/
+
+label.report_options { display: block; padding: 0 10px 8px 0; }
+label.report_options input { margin: 0; }
+
+label.archived_jobs input { margin: 0 0 0 5px; }
+input#jobtype { margin: 0 5px 0 0; }
+select#jobtypeselect { margin: 0 0 0 5px; }
+
 /*---------- Guide helper ----------*/
 
 #jobedit_helpercell,
