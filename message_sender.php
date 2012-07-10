@@ -836,7 +836,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$job->setSetting("skipemailduplicates", (isset($postdata["optionskipduplicate"]) && $postdata["optionskipduplicate"])?1:0);
 
 		// set jobsetting 'callerid'
-		if ($displayingCallerid && $postdata["optioncallerid"]) {
+		if ($displayingCallerid && $postdata["optioncallerid"])
 			$job->setSetting('callerid', $postdata["optioncallerid"]);
 
 		$job->update();
