@@ -384,6 +384,7 @@
 							<option value="11:55 pm"  >11:55 pm</option>
 							<option value="11:59 pm"  >11:59 pm</option>
 						</select>
+						<span id="msgsndr_schedulecallearly_timenote" class="notify"><img src="img/icons/weather_sun.gif" alt="Within Typical calling hours"/></span>
 						<div id="msgsndr_schedulecallearly_msg" class="box_validatorerror er" style="display:none"></div>
 					</div>
 				</fieldset>
@@ -682,6 +683,7 @@
 							<option value="11:55 pm"  >11:55 pm</option>
 							<option value="11:59 pm"  >11:59 pm</option>
 						</select>
+						<span id="msgsndr_schedulecalllate_timenote" class="notify"><img src="img/icons/weather_sun.gif" alt="Within Typical calling hours"/></span>
 						<div id="msgsndr_schedulecalllate_msg" class="box_validatorerror er" style="display:none"></div>
 					</div>
 				</fieldset>

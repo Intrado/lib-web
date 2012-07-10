@@ -99,6 +99,19 @@ jQuery.noConflict();
 		return phonePartOne + phonePartTwo + phonePartThree;
 	};
 	
+	
+	// schedule atypical call time check
+	changeTimeSelectNote = function(element, value) {
+		var earlyTime = new Date("1/1/2010 7:00 am");
+		var lateTime = new Date("1/1/2010 9:00 pm");
+		var thisTime = new Date("1/1/2010 " + value);
+			if (thisTime < earlyTime || thisTime > lateTime) {
+				$(element + "_timenote").html('<img src="img/icons/moon_16.gif" alt="WARNING: Outside typical calling hours"/> WARNING: Outside typical calling hours.');
+			} else {
+				$(element + "_timenote").html('<img src="img/icons/weather_sun.gif" alt="Within typical calling hours"/>');
+			}
+	};
+	
 	// using helper functions in htmleditor.js, set up the ckeditor on the textarea with id "elementid"
 	applyCkEditor = function(elementid) {
 		// add the ckeditor to the textarea

@@ -244,6 +244,18 @@ function StepManager(_valManager) {
 		for(i=1;i<=maxAttempts;i++) {
 			$('#msgsndr_form_maxattempts').append('<option value="'+i+'">'+i+'</option>');
 		};
+		
+		// check callearly time for day/night
+		$("#msgsndr_schedulecallearly").on("change", function(){
+			var el = $("#msgsndr_schedulecallearly option:selected");
+			changeTimeSelectNote("#msgsndr_schedulecallearly", el.val());
+		});
+		
+		// check calllatetime for day/night
+		$("select#msgsndr_schedulecalllate").on("change", function(){
+			var el = $("#msgsndr_schedulecalllate option:selected");
+			changeTimeSelectNote("#msgsndr_schedulecalllate", el.val());
+		});
 	};
 	
 	//BIND STEP BUTTONS
