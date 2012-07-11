@@ -139,7 +139,15 @@ jQuery.noConflict();
 	$("#msgsndr_phonemessagecallme").on("easycall:update", function () {
 		obj_valManager.runValidateEventDriven("msgsndr_phonemessagecallme");
 	});
-	
+
+	$("#msgsndr_phonemessagecallme").on("easycall:startcall", function() {
+		$(".btn_discard", "[id^=msgsndr_tab_]").attr("disabled", "disabled");
+	});
+
+	$("#msgsndr_phonemessagecallme").on("easycall:endcall", function() {
+		$(".btn_discard", "[id^=msgsndr_tab_]").removeAttr("disabled");
+	});
+
 	$(function() {
 		// hide a few items
 		$('.close, .facebook, .twitter, .feed, .error, div[id^="msgsndr_tab"]').hide();
@@ -217,6 +225,9 @@ jQuery.noConflict();
 						mementos[contentMode] = $(cssId).memento(null);
 					}
 				});
+
+				//Now capture the existing HTML in the "Call to Record" region so we can discard a recorded message.
+				 easycallContent = $(".easycallcallmecontainer").contents();
 			}
 		});
 
@@ -239,6 +250,22 @@ jQuery.noConflict();
 					}
 				});
 			}
+
+
+			// Restore the state of the easycall plugin and related fields
+			// (TODO - pull CSS definitions into a shared location?)
+			$("#msgsndr_phonemessagecallme_msg").hide();    //clear any previous validation error
+			$("#msgsndr_phonemessagecallme").easy
+			$(".easycallcallmecontainer").remove();
+			//TODO - pull mindigits/maxdigits up into a shared function somewhere?  It's duplicated from message_sender_content.js/allowControl{phone}
+			var mindigits = (orgOptions.easycallmin?orgOptions.easycallmin:10);
+			var maxdigits = (orgOptions.easycallmax?orgOptions.easycallmax:10);
+			$("#msgsndr_phonemessagecallme").attachEasyCall({
+																"languages" : easycallLangs,
+																"phonemindigits": mindigits,
+																"phonemaxdigits": maxdigits,
+																"defaultphone" : userInfo.phoneFormatted
+															});
 
 			//Restore original form field states
 			if (mementos[contentMode]) {

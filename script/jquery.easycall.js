@@ -330,7 +330,9 @@
 					return;
 				}
 				$this.data('easyCall').defaultphone = phone;
-				
+
+				$this.data('easyCall').element.trigger("easycall:startcall", this);
+
 				var progresscontainer = method.createProgressContainer(code);
 				var progresstext = progresscontainer.find(".easycallprogresstext");
 				
@@ -340,10 +342,10 @@
 				
 				$.post("ajaxeasycall.php", {"action":"new","phone":phone}, function(data){
 					progresstext.empty().append("Initiated...");
-					
 					if (!data) {
 						$this.data('easyCall').specialtaskid = false;
 						method.replaceContainer(code, method.createErrorContainer(code, "An error occured while setting up the call."));
+						$this.data('easyCall').element.trigger("easycall:endcall", this);
 					} else {
 						$this.data('easyCall').specialtaskid = data.id;
 						// on a timer, query the status
@@ -354,13 +356,14 @@
 								progresstext.empty().append(status.message);
 								if (!status.error && status.complete) {
 									$this.data('easyCall').timer.stop();
+									$this.data('easyCall').element.trigger("easycall:endcall", this);
 									// save audiofile
 									method.doSaveAudioFile(code);
 								}
 								if (status.error) {
 									$this.data('easyCall').specialtaskid = false;
 									$this.data('easyCall').timer.stop();
-									
+									$this.data('easyCall').element.trigger("easycall:endcall", this);
 									// transition to error mode
 									method.replaceContainer(code, method.createErrorContainer(code, status.message));
 								}
@@ -368,9 +371,11 @@
 							.error(function() {
 								$this.data('easyCall').specialtaskid = false;
 								$this.data('easyCall').timer.stop();
+								$this.data('easyCall').element.trigger("easycall:endcall", this);
+
 								// transition to error mode
 								method.replaceContainer(code, method.createErrorContainer(code, "An error occured while getting the status of a call."));
-							});
+							})
 						}).set({time: 2000, autostart: true});
 					}
 				},"json")
