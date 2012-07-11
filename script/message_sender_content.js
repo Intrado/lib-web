@@ -263,9 +263,11 @@ var allowControl = {
 	"email" : function() {
 		var $ = jQuery;
 		
+		// Add users' name to from name
+		$('#msgsndr_emailmessagefromname').val(userInfo.firstName + ' ' + userInfo.lastName);
 		// Add users' email address to the from email field
 		if(userInfo.email != '') {
-        	$('#msgsndr_emailmessagefromemail').attr('value', userInfo.email);
+			$('#msgsndr_emailmessagefromemail').val(userInfo.email);
 		}
 		
 		// Hide / Show Translations
