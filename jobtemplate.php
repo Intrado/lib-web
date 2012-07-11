@@ -86,8 +86,8 @@ if ($jobid == NULL) {
 $userjobtypes = JobType::getUserJobTypes();
 
 // Prepare Job Type data
-$jobtypes = array("0" => _L("None"));
-$jobtips = array("0" => _L("Choose %s type when using template", getJobTitle()));
+//$jobtypes = array("0" => _L("None"));
+//$jobtips = array("0" => _L("Choose %s type when using template", getJobTitle()));
 foreach ($userjobtypes as $id => $jobtype) {
 	$jobtypes[$id] = $jobtype->name;
 	$jobtips[$id] = escapehtml($jobtype->info);
@@ -161,6 +161,7 @@ $formdata["jobtype"] = array(
 						"The category you select will determine which introduction your recipients will hear."),
 	"value" => isset($job->jobtypeid)?$job->jobtypeid:"0",
 	"validators" => array(
+		array("ValRequired"),
 		array("ValInArray", "values" => array_keys($jobtypes))
 	),
 	"control" => array("RadioButton", "values" => $jobtypes, "hover" => $jobtips),
