@@ -313,6 +313,7 @@ $formdata = array(
 				"label" => "Type",
 				"value" => "",
 				"validators" => array(
+						array("ValRequired"),
 						array("ValInArray", "values" => array_keys($jobtypes))
 				),
 				"control" => array("SelectMenu", "values" => $jobtypes),
