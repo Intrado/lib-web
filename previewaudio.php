@@ -12,7 +12,7 @@ $TITLE = "Audio Preview";
 
 include_once("popup.inc.php");
 
-echo buttons(button("Done",isset($_GET['close']) ? "window.close()" : "window.history.go(-1)"));
+echo buttons(icon_button(_L("Done"), "tick",isset($_GET['close']) ? "window.close()" : "window.history.go(-1)"));
 
 startWindow('Audio Preview', 'padding: 3px;');
 

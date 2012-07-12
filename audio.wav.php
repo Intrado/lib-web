@@ -11,7 +11,7 @@ session_write_close();//WARNING: we don't keep a lock on the session file, any c
 
 if(isset($_GET['id'])) {
 	$id = DBSafe($_GET['id']);
-	if (userOwns("audiofile",$id)) {
+	if (userCanSee("audiofile",$id)) {
 		$af = new AudioFile($id);
 
 		if ($c = contentGet($af->contentid)){

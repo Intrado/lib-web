@@ -60,10 +60,17 @@ function userCanSee ($type,$id) {
 		return true;
 	
 	switch($type) {
+		case "audiofile":
+			// vieable if:
+			//   it's message group matches below
+			$messagegroupid = QuickQuery("select messagegroupid from audiofile where id=?", false, array($id));
+			if ($messagegroupid == null)
+				return false;
 		case "message":
 			// vieable if:
 			//   it's message group matches below
-			$messagegroupid = QuickQuery("select messagegroupid from message where id=?", false, array($id));
+			if (!isset($messagegroupid))
+				$messagegroupid = QuickQuery("select messagegroupid from message where id=?", false, array($id));
 		case "messagegroup":
 			if (!isset($messagegroupid))
 				$messagegroupid = $id;
