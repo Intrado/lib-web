@@ -385,9 +385,9 @@ tr.selected { background: rgb(228, 225, 153); }
 table.messages tr.selected:hover td { background: rgb(228, 224, 187);  }
 table.messages span.icon { background: url(themes/newui/dktick.png) 50% 11px no-repeat; display: block; text-indent: -9999px; }
 
-table.rules { margin: 0 0 10px 0; border-top: 1px solid #ddd; }
+table.rules { margin: 0 0 10px 0; }
 table.rules tr.saved-rule { color: #366C19; }
-table.rules tr.new-rule { background: #f5f5f5; }
+table.rules tr.new-rule { background-color: transparent; }
 table.rules tr.saved-rule td { border-bottom: 1px solid #ddd; }
 table.rules td { vertical-align: top; width: 145px; padding: 6px; line-height: 30px; }
 table.rules td:first-child { width: 30px; text-align: center; }

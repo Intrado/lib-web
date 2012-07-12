@@ -70,7 +70,6 @@
 										<h3>Add Recipients Using Rules</h3>
 									</div>
 									<div class="modal-body">
-										<p class="instructions">Use filter rules to match a group of entries in your Address Book</p>
 										<table class="rules">
 											<tr id="new-rule" class="new-rule">
 												<td></td>
