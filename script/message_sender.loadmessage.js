@@ -188,8 +188,7 @@ $.loadMessage = function loadMessage() {
 				// sort by name
 				$.each(data.messageGroups, function(i,mg) {
 					// only show notification type message groups and message groups with messages
-					// FIXME: once subscribed message preview works. remove mg.isSubscribed
-					if (mg.type != "notification" || mg.typeSummary.length == 0 || mg.isSubscribed)
+					if (mg.type != "notification" || mg.typeSummary.length == 0)
 						return;
 					self.msgGroups.push(mg);
 					// format the date from the modifiedTimestamp value
