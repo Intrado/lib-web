@@ -63,10 +63,12 @@ if (is_array($result)) {
 	<meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
 	<style>
 		/* resetting styles */
-		body, iframe, form, input {
+		html, body, iframe, form {
 			margin: 0;
 			padding: 0;
 			border: 0;
+			background: transparent;
+			overflow: hidden;
 			font-size: 95%;
 			vertical-align: baseline;
 		}
