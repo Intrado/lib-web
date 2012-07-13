@@ -36,6 +36,8 @@ require_once("obj/PreviewButton.fi.php");
 // appserver and thrift includes
 require_once("inc/appserver.inc.php");
 
+require_once("inc/editmessagecommon.inc.php");
+
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
@@ -47,22 +49,7 @@ if (!$USER->authorize("sendemail"))
 ////////////////////////////////////////////////////////////////////////////////
 // Action/Request Processing
 ////////////////////////////////////////////////////////////////////////////////
-if (isset($_GET['id']) && $_GET['id'] != "new") {
-	// this is an edit for an existing message
-	$_SESSION['editmessage'] = array("messageid" => $_GET['id']);
-	redirect("editmessageemail.php");
-} else if (isset($_GET['languagecode']) && isset($_GET['mgid'])) {
-	$_SESSION['editmessage'] = array(
-		"messagegroupid" => $_GET['mgid'],
-		"languagecode" => $_GET['languagecode']);
-	
-	// subtype is optional but will tell the form item if it should load the "plain" editor
-	// default behavior loads the "html" editor
-	if (isset($_GET['subtype']))
-		$_SESSION['editmessage']['subtype'] = $_GET['subtype'];
-	
-	redirect("editmessageemail.php");
-}
+setEditMessageSession();
 
 // get the messagegroup and/or the message
 if (isset($_SESSION['editmessage']['messageid']))
@@ -356,9 +343,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		unset($_SESSION['editmessage']);
 		
 		if ($ajax)
-			$form->sendTo("mgeditor.php?id=".$messagegroup->id);
+			$form->sendTo(getEditMessageSendTo($messagegroup->id));
 		else
-			redirect("mgeditor.php?id=".$messagegroup->id);
+			redirect(getEditMessageSendTo($messagegroup->id));
 	}
 }
 

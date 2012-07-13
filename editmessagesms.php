@@ -26,6 +26,8 @@ require_once("obj/Validator.obj.php");
 require_once("obj/ValMessageBody.val.php");
 require_once("obj/ValSmsText.val.php");
 
+require_once("inc/editmessagecommon.inc.php");
+
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
@@ -37,16 +39,8 @@ if (!$USER->authorize("sendsms"))
 ////////////////////////////////////////////////////////////////////////////////
 // Action/Request Processing
 ////////////////////////////////////////////////////////////////////////////////
-if (isset($_GET['id']) && $_GET['id'] != "new") {
-	// this is an edit for an existing message
-	$_SESSION['editmessage'] = array("messageid" => $_GET['id']);
-	redirect("editmessagesms.php");
-} else if (isset($_GET['mgid'])) {
-	$_SESSION['editmessage'] = array(
-		"messagegroupid" => $_GET['mgid']);
-	
-	redirect("editmessagesms.php");
-}
+setEditMessageSession();
+
 
 // get the messagegroup and/or the message
 if (isset($_SESSION['editmessage']['messageid']))
@@ -169,9 +163,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		unset($_SESSION['editmessage']);
 
 		if ($ajax)
-			$form->sendTo("mgeditor.php?id=".$messagegroup->id);
+			$form->sendTo(getEditMessageSendTo($messagegroup->id));
 		else
-			redirect("mgeditor.php?id=".$messagegroup->id);
+			redirect(getEditMessageSendTo($messagegroup->id));
 	}
 }
 

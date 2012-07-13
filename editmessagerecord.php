@@ -27,6 +27,8 @@ require_once("obj/Validator.obj.php");
 require_once("obj/PhoneMessageRecorder.fi.php");
 require_once("obj/PhoneMessageRecorder.val.php");
 
+require_once("inc/editmessagecommon.inc.php");
+
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
@@ -38,12 +40,7 @@ if (!$USER->authorize("sendphone") || !$USER->authorize("starteasy"))
 ////////////////////////////////////////////////////////////////////////////////
 // Action/Request Processing
 ////////////////////////////////////////////////////////////////////////////////
-if (isset($_GET['languagecode']) && isset($_GET['mgid'])) {
-	$_SESSION['editmessage'] = array(
-		"messagegroupid" => $_GET['mgid'],
-		"languagecode" => $_GET['languagecode']);
-	redirect("editmessagerecord.php");
-}
+setEditMessageSession();
 
 // set the message bits
 if (isset($_SESSION['editmessage']['messagegroupid']) && 
@@ -177,9 +174,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		unset($_SESSION['editmessage']);
 		
 		if ($ajax)
-			$form->sendTo("mgeditor.php?id=".$messagegroup->id);
+			$form->sendTo(getEditMessageSendTo($messagegroup->id));
 		else
-			redirect("mgeditor.php?id=".$messagegroup->id);
+			redirect(getEditMessageSendTo($messagegroup->id));
 	}
 }
 
