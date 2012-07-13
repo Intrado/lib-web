@@ -208,9 +208,9 @@ class JobDetailReport extends ReportGenerator{
 		function fmt_person_status($status){
 			switch ($status){
 				case 'nocontacts':
-					return "No Contacts";
+					return _L("No Contacts");
 				case 'declined':
-					return "Declined";
+					return _L("Declined");
 				default;
 					return ucfirst($status);
 			}
@@ -252,7 +252,7 @@ class JobDetailReport extends ReportGenerator{
 
 		// DISPLAY
 		if( (isset($this->params['jobtypes']) && $this->params['jobtypes'] != "") || (isset($this->params['result']) && $this->params['result'] != "") || count($searchrules) || (isset($this->params['status']) && $this->params['status'] != "") ){
-			startWindow("Filter By");
+			startWindow(_L("Filter By"));
 ?>
 			<table>
 <?
@@ -303,21 +303,21 @@ class JobDetailReport extends ReportGenerator{
 		//displayJobSummary($this->params['joblist'], $this->_readonlyDB);
 
 		?><br><?
-		startWindow("Report Details ".help("JobDetailReport_ReportDetails"), 'padding: 3px;', false);
+		startWindow(_L("Report Details ").help("JobDetailReport_ReportDetails"), 'padding: 3px;', false);
 
 		showPageMenu($total,$pagestart,500);
 		echo '<table width="100%" cellpadding="3" cellspacing="1" class="list" id="reportdetails">';
-		$titles = array(0 => "Job Name",
-						1 => "Submitted by",
-						2 => "ID#",
-						3 => "First Name",
-						4 => "Last Name",
-						15 => "Sequence",
-						7 => "Destination",
-						11 => "Attempts",
-						8 => "Last Attempt",
-						9 => "Last Result",
-						14 => "Response",
+		$titles = array(0 => _L("%s Name",getJobTitle()),
+						1 => _L("Submitted by"),
+						2 => _L("ID#"),
+						3 => _L("First Name"),
+						4 => _L("Last Name"),
+						15 => _L("Sequence"),
+						7 => _L("Destination"),
+						11 => _L("Attempts"),
+						8 => _L("Last Attempt"),
+						9 => _L("Last Result"),
+						14 => _L("Response"),
 						17 => getSystemSetting("organizationfieldname","Organization"));
 		$titles = appendFieldTitles($titles, 17, $fieldlist, $activefields);
 
@@ -388,20 +388,20 @@ class JobDetailReport extends ReportGenerator{
 		$fieldindex = getFieldIndexList("p");
 		$activefields = array_flip($activefields);
 		//generate the CSV header
-		$header = '"Job Name","Submitted by","ID","First Name","Last Name","Dst. Src.","Destination","Attempts","Last Attempt","Last Result","Response","Organization"';
+		$header = array(_L("%s Name",getJobTitle()),_L("Submitted by"),_L("ID","First Name"),_L("Last Name"),_L("Dst. Src."),_L("Destination"),_L("Attempts"),_L("Last Attempt"),_L("Last Result"),_L("Response"),_L("Organization"));
 		foreach($fieldlist as $fieldnum => $fieldname){
 			if(isset($activefields[$fieldnum])){
-				$header .= ',"' . $fieldname . '"';
+				$header[] = $fieldname;
 			}
 		}
 
 		if (isset($issurvey) && $issurvey) {
 			for ($x = 1; $x <= $maxquestions; $x++) {
-				$header .= ',"Question '. $x . '"';
+				$header[] = "Question $x";
 			}
 		}
 
-		echo $header;
+		echo '"' . implode('","',$header) . '"';
 		echo "\r\n";
 
 		$result = Query($this->query, $this->_readonlyDB);
@@ -461,7 +461,7 @@ class JobDetailReport extends ReportGenerator{
 		$daterange = "";
 		if(isset($this->params['reldate'])){
 			list($startdate, $enddate) = getStartEndDate($this->params['reldate'], $this->params);
-			$daterange = "From: " . date("m/d/Y", $startdate) . " To: " . date("m/d/Y", $enddate);
+			$daterange = _L("From: % To: %s", date("m/d/Y", $startdate),date("m/d/Y", $enddate));
 		}
 		$joblist = array();
 		if($this->params['joblist'] != "")
@@ -481,15 +481,15 @@ class JobDetailReport extends ReportGenerator{
 		$fields = FieldMap::getAuthorizedFieldMaps();
 
 		$ordering = array();
-		$ordering["Job"] = "j.name";
-		$ordering["Submitted By"] = "u.login";
-		$ordering["ID#"] = "rp.pkey";
-		$ordering["Message"]="m.name";
-		$ordering["Destination"]="destination";
-		$ordering["Attempts"] = "numattempts";
-		$ordering["Last Attempt"]="lastattempt";
-		$ordering["Last Result"]="result";
-		$ordering["Response"]="confirmed DESC, voicereplyid DESC";
+		$ordering[getJobTitle()] = "j.name";
+		$ordering[_L("Submitted By")] = "u.login";
+		$ordering[_L("ID#")] = "rp.pkey";
+		$ordering[_L("Message")]="m.name";
+		$ordering[_L("Destination")]="destination";
+		$ordering[_L("Attempts")] = "numattempts";
+		$ordering[_L("Last Attempt")]="lastattempt";
+		$ordering[_L("Last Result")]="result";
+		$ordering[_L("Response")]="confirmed DESC, voicereplyid DESC";
 		$ordering[getSystemSetting("organizationfieldname","Organization")]="org";
 
 		foreach($fields as $field){

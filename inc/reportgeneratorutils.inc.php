@@ -112,26 +112,26 @@ function displayJobSummary($joblist, $readonlyDB = false){
 		//Check for any sms messages
 		$hassms = QuickQuery("select exists (select * from message m where m.type='sms' and m.messagegroupid = j.messagegroupid) from job j where id in ('" . $joblist . "')", $readonlyDB);
 
-		startWindow("Summary ". help("ReportGeneratorUtils_Summary"), 'padding: 3px;');
+		startWindow(_L("Summary "). help("ReportGeneratorUtils_Summary"), 'padding: 3px;');
 		?>
 			<table border="0" cellpadding="3" cellspacing="0" width="100%">
 				<tr valign="top">
-					<th align="right" class="windowRowHeader">Job Summary:</th>
+					<th align="right" class="windowRowHeader"><?= _L("%s Summary:", getJobTitle()) ?></th>
 					<td>
 						<table border="0" cellpadding="2" cellspacing="1" class="list" width="100%">
 							<tr class="listHeader" align="left" valign="bottom">
-								<th>Job Name</th>
-								<th>Job Type</th>
-								<th>Submitted by</th>
-								<th>Scheduled Date</th>
-								<th>Scheduled Time</th>
-								<th>First Pass</th>
-								<th>Status</th>
-								<th>Recipients</th>
-								<th># of Phones</th>
-								<th># of Emails</th>
+								<th><?= _L("%s Name", getJobTitle()) ?></th>
+								<th><?= _L("%s Type", getJobTitle()) ?></th>
+								<th><?= _L("Submitted by") ?></th>
+								<th><?= _L("Scheduled Date") ?></th>
+								<th><?= _L("Scheduled Time") ?></th>
+								<th><?= _L("First Pass") ?></th>
+								<th><?= _L("Status") ?></th>
+								<th><?= _L("Recipients") ?></th>
+								<th><?= _L("# of Phones") ?></th>
+								<th><?= _L("# of Emails") ?></th>
 <? if($hassms) { ?>
-								<th># of SMS</th>
+								<th><?= _L("# of SMS") ?></th>
 <? } ?>
 							</tr>
 <?

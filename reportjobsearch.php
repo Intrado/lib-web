@@ -113,7 +113,7 @@ if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f,
 		} else if(GetFormData($f, $s, "radioselect") == "date" && (GetFormData($f, $s, "relativedate") == "xdays") && GetFormData($f, $s, "xdays") == ""){
 			error('You must enter a number for X days');
 		} else if(GetFormData($f, $s, "radioselect") == "job" && !GetFormData($f, $s, "jobid_archived") && !GetFormData($f, $s, "jobid")){
-			error('You must pick a job');
+			error(_L('You must pick a %s',getJobTitle()));
 		} else {
 			$options = array();
 			switch($radio){
@@ -221,7 +221,7 @@ startWindow("Select ".help('ReportJobSearch_Select'), NULL, false);
 					<td>
 						<table>
 							<tr>
-								<td><label class="report_options"><? NewFormItem($f, $s, "radioselect", "radio", null, "job", "id=\"job\" onclick='$(\"daterange\").hide(); $(\"jobs\").show()'");?> Job</label></td>
+								<td><label class="report_options"><? NewFormItem($f, $s, "radioselect", "radio", null, "job", "id=\"job\" onclick='$(\"daterange\").hide(); $(\"jobs\").show()'");?> <?= getJobTitle()?></label></td>
 								<td><label class="report_options"><? NewFormItem($f, $s, "radioselect", "radio", null, "date", "onclick='$(\"jobs\").hide(); $(\"daterange\").show()'");?> Date</label></td>
 							</tr>
 						</table>
@@ -243,7 +243,7 @@ startWindow("Select ".help('ReportJobSearch_Select'), NULL, false);
 								<td width="1%">
 								<?
 									NewFormItem($f, $s, "jobid", "selectstart", null, null, "id='jobid'");
-									NewFormItem($f, $s, "jobid", "selectoption", "-- Select a Job --", "");
+									NewFormItem($f, $s, "jobid", "selectoption", "-- " . _L("Select a %s",getJobTitle()) . " --", "");
 									$jobs = DBFindMany("Job","from job where deleted = 0 and status in ('active','complete','cancelled','cancelling') $userJoin and questionnaireid is null order by id desc limit 500");
 
 									foreach ($jobs as $job) {
@@ -251,7 +251,7 @@ startWindow("Select ".help('ReportJobSearch_Select'), NULL, false);
 									}
 									NewFormItem($f, $s, "jobid", "selectend");
 									NewFormItem($f, $s, "jobid_archived", "selectstart", null, null, "id='jobid_archived' style='display: none'");
-									NewFormItem($f, $s, "jobid_archived", "selectoption", "-- Select a Job --", "");
+									NewFormItem($f, $s, "jobid_archived", "selectoption", "-- " . _L("Select a %s",getJobTitle()) . " --", "");
 									$jobs = DBFindMany("Job","from job where deleted = 2 and status!='repeating' $userJoin and questionnaireid is null order by id desc limit 500");
 									foreach ($jobs as $job) {
 										NewFormItem($f, $s, "jobid_archived", "selectoption", $job->name, $job->id);
@@ -260,7 +260,7 @@ startWindow("Select ".help('ReportJobSearch_Select'), NULL, false);
 								?>
 								</td>
 								<td align="left"><label class="archived_jobs"><? NewFormItem($f, $s, "check_archived", "checkbox", null, null, "id='check_archived' onclick = \"setHiddenIfChecked(this, 'jobid'); setVisibleIfChecked(this, 'jobid_archived');\"") ?>
-								Show archived jobs</label></td>
+								<?=_L("Show archived %s",getJobsTitle()) ?></label></td>
 							</tr>
 						</table>
 					</td>
@@ -278,7 +278,7 @@ startWindow("Select ".help('ReportJobSearch_Select'), NULL, false);
 						<table>
 							<tr valign="top">
 								<td><? NewFormItem($f,$s,"jobtype","checkbox",NULL,NULL,'id="jobtype" onclick="clearAllIfNotChecked(this,\'jobtypeselect\');"'); ?></td>
-								<td>Job Type: </td>
+								<td><?=_L("%s Type: ",getJobsTitle()) ?></td>
 								<td>
 									<?
 									NewFormItem($f, $s, 'jobtypes', 'selectmultiple', count($jobtypes), $jobtypes, 'id="jobtypeselect" onmousedown="setChecked(\'jobtype\');"');

@@ -163,14 +163,14 @@ class CallsReport extends ReportGenerator{
 
 
 
-		$titles = array("0" => "Job Name",
-						"1" => "Submitted by",
-						"2" => "Job Type",
-						"8" => "Sequence",
-						"5" => "Destination",
-						"6" => "Date/Time",
-						"7" => "Result",
-						"9" => getSystemSetting("organizationfieldname","Organization"));
+		$titles = array("0" => _L("%s Name",getJobTitle()),
+						"1" => _L("Submitted by"),
+						"2" => _L("%s Type",getJobTitle()),
+						"8" => _L("Sequence"),
+						"5" => _L("Destination"),
+						"6" => _L("Date/Time"),
+						"7" => _L("Result"),
+						"9" => getSystemSetting("organizationfieldname",_L("Organization")));
 		$titles = appendFieldTitles($titles, 8, $fieldlist, $activefields);
 
 		$formatters = array("3" => "fmt_delivery_type_list",
@@ -186,29 +186,29 @@ class CallsReport extends ReportGenerator{
 			$searchrules = displayRules($this->params['rules']);
 		}
 
-		startWindow("Search Parameters");
+		startWindow(_L("Search Parameters"));
 ?>
 		<table>
 <?
 			if(isset($this->params['personid']) && $this->params['personid'] != ""){
 ?>
-				<tr><td>ID#: <?=$this->params['personid']?></td></tr>
+				<tr><td><?= _L("ID#: ") . $this->params['personid']?></td></tr>
 <?
 			}
 			if(isset($this->params['phone']) && $this->params['phone'] != ""){
 ?>
-				<tr><td>Phone: <?=Phone::format($this->params['phone'])?></td></tr>
+				<tr><td><?= _L("Phone: ") . Phone::format($this->params['phone'])?></td></tr>
 <?
 			}
 			if(isset($this->params['email']) && $this->params['email'] != ""){
 ?>
-				<tr><td>Email: <?=$this->params['email']?></td></tr>
+				<tr><td><?= _L("Email: ") . $this->params['email']?></td></tr>
 <?
 			}
 			if(isset($this->params['reldate']) && $this->params['reldate'] != ""){
 				list($startdate, $enddate) = getStartEndDate($this->params['reldate'], $this->params);
 ?>
-				<tr><td>From: <?=date("m/d/Y", $startdate)?> To: <?=date("m/d/Y", $enddate)?></td></tr>
+				<tr><td><?= _L("From: ") . date("m/d/Y", $startdate)?> To: <?=date("m/d/Y", $enddate)?></td></tr>
 <?
 			}
 			if(isset($this->params['jobtypes']) && $this->params['jobtypes'] != ""){
@@ -220,7 +220,7 @@ class CallsReport extends ReportGenerator{
 				}
 				$jobtypenames = implode(", ",$jobtypenames);
 ?>
-				<tr><td>Job Type: <?=$jobtypenames?></td></tr>
+				<tr><td><?= _L("%s Type: ",getJobTitle()) . $jobtypenames?></td></tr>
 <?
 			}
 			if(isset($this->params['results']) && $this->params['results'] != ""){
@@ -230,7 +230,7 @@ class CallsReport extends ReportGenerator{
 					$resultnames[] = fmt_result(array($result), 0);
 				$resultnames = implode(", ", $resultnames);
 ?>
-				<tr><td>Result: <?=$resultnames?></td></tr>
+				<tr><td><?= _L("Result: ") . $resultnames?></td></tr>
 <?
 			}
 
@@ -244,7 +244,7 @@ class CallsReport extends ReportGenerator{
 		?>
 		<br>
 		<?
-		startWindow("Search Results", "padding: 3px;");
+		startWindow(_L("Search Results"), "padding: 3px;");
 			$query = "select rp.pkey, " .
 						" rp." . FieldMap::getFirstNameField() . ", " .
 						" rp." . FieldMap::getLastNameField() .
@@ -254,9 +254,9 @@ class CallsReport extends ReportGenerator{
 			list($pkey,$firstname, $lastname) = QuickQueryRow($query, false, $this->_readonlyDB);
 ?>
 			<table  width="100%" cellpadding="3" cellspacing="1">
-				<tr><td>ID#: <?=escapehtml($pkey)?></td></tr>
-				<tr><td>First Name: <?=escapehtml($firstname)?></td></tr>
-				<tr><td>Last Name: <?=escapehtml($lastname)?></td></tr>
+				<tr><td><?= _L("ID#: ") . escapehtml($pkey)?></td></tr>
+				<tr><td><?= _L("First Name: ") . escapehtml($firstname)?></td></tr>
+				<tr><td><?= _L("Last Name: ") . escapehtml($lastname)?></td></tr>
 			</table>
 <?
 		endWindow();
@@ -264,7 +264,7 @@ class CallsReport extends ReportGenerator{
 <br>
 <?
 
-		startWindow("Contact History", "padding: 3px;");
+		startWindow(_L("Contact History"), "padding: 3px;");
 ?>
 		<table width="100%" cellpadding="3" cellspacing="1" class="list" id="searchresults">
 <?
@@ -351,13 +351,13 @@ class CallsReport extends ReportGenerator{
 		header("Content-disposition: attachment; filename=report.csv");
 		header("Content-type: application/vnd.ms-excel");
 
-		$titles = "Person ID, First Name,Last Name,Job Name,Date";
+		$titles = array(_L("Person ID"),_L("First Name"),_L("Last Name"),_L("%s Name",getJobTitle()),_L("Date"));
 		foreach($fieldlist as $index => $field){
 			if(in_array($index, $activefields)){
-				$titles .= "," . $field;
+				$titles[] = $field;
 			}
 		}
-		echo $titles;
+		echo '"' . implode('","', $titles) . '"';
 		echo "\r\n";
 		foreach($persondata as $row){
 			$line = array();
@@ -396,12 +396,12 @@ class CallsReport extends ReportGenerator{
 		$fields = FieldMap::getOptionalAuthorizedFieldMaps();
 
 		$ordering = array();
-		$ordering["Job Name"]="jobname";
-		$ordering["Message"] = "message";
-		$ordering["Destination"] = "destination";
-		$ordering["Date/Time"] = "date";
-		$ordering["result"] = "result";
-		$ordering[getSystemSetting("organizationfieldname","Organization")] = "org";
+		$ordering[_L("%s Name",getJobTitle())]="jobname";
+		$ordering[_L("Message")] = "message";
+		$ordering[_L("Destination")] = "destination";
+		$ordering[_L("Date/Time")] = "date";
+		$ordering[_L("result")] = "result";
+		$ordering[getSystemSetting("organizationfieldname",_L("Organization"))] = "org";
 		foreach($fields as $field){
 			$ordering[$field->name]= "rp." . $field->fieldnum;
 		}

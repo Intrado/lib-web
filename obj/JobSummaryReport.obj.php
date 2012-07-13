@@ -172,17 +172,17 @@ class JobSummaryReport extends ReportGenerator{
 							"declined" => 0
 						);
 		$cpcodes = array(
-							"A" => "Answered",
-							"M" => "Machine",
-							"B" => "Busy",
-							"N" => "No Answer",
-							"X" => "Disconnect",
-							"F" => "Unknown",
-							"notattempted" => "Not Attempted",
-							"blocked" => "Blocked",
-							"duplicate" => "Duplicate",
-							"nocontacts" => "No Phone #",
-							"declined" => "No Phone Selected"
+							"A" => _L("Answered"),
+							"M" => _L("Machine"),
+							"B" => _L("Busy"),
+							"N" => _L("No Answer"),
+							"X" => _L("Disconnect"),
+							"F" => _L("Unknown"),
+							"notattempted" => _L("Not Attempted"),
+							"blocked" => _L("Blocked"),
+							"duplicate" => _L("Duplicate"),
+							"nocontacts" => _L("No Phone #"),
+							"declined" => _L("No Phone Selected")
 						);
 		$jobstats["phone"] = $cpstats;
 		$remainingcalls=0;
@@ -205,7 +205,7 @@ class JobSummaryReport extends ReportGenerator{
 
 		if(isset($this->params['jobtypes']) && $this->params['jobtypes'] != ""){
 
-			startWindow("Filter by");
+			startWindow(_L("Filter by"));
 ?>
 			<table>
 <?
@@ -217,7 +217,7 @@ class JobSummaryReport extends ReportGenerator{
 				}
 				$jobtypenames = implode(", ",$jobtypenames);
 ?>
-				<tr><td>Job Type: <?=$jobtypenames?></td></tr>
+				<tr><td><?= _L("%s Type: ", getJobTitle()) . $jobtypenames?></td></tr>
 
 			</table>
 <?
@@ -228,27 +228,27 @@ class JobSummaryReport extends ReportGenerator{
 
 		displayJobSummary($this->params['joblist'], $this->_readonlyDB);
 		?><br><?
-		startWindow("Totals ".help("JobSummaryReport_Totals"), "padding: 3px;");
+		startWindow(_L("Totals ") .help("JobSummaryReport_Totals"), "padding: 3px;");
 ?>
 			<table border="0" cellpadding="3" cellspacing="0" width="100%">
 <?
 				if(array_sum($emailinfo) > 0){
 ?>
 				<tr>
-					<th align="right" class="windowRowHeader bottomBorder"><a href="reportjobdetails.php?type=email">Email:</a></th>
+					<th align="right" class="windowRowHeader bottomBorder"><a href="reportjobdetails.php?type=email"><?= _L("Email:") ?></a></th>
 					<td class="bottomBorder">
 						<table width="100%">
 							<tr>
 								<td>
 									<table  border="0" cellpadding="2" cellspacing="1" class="list" width="100%">
 										<tr class="listHeader" align="left" valign="bottom">
-											<th># of Emails</th>
-											<th>Completed</th>
-											<th>Remaining</th>
-											<th>Duplicates Removed</th>
-											<th>No Email</th>
-											<th>No Email Selected</th>
-											<th>% Contacted</th>
+											<th><?= _L("# of Emails") ?></th>
+											<th><?= _L("Completed") ?></th>
+											<th><?= _L("Remaining") ?></th>
+											<th><?= _L("Duplicates Removed") ?></th>
+											<th><?= _L("No Email") ?></th>
+											<th><?= _L("No Email Selected") ?></th>
+											<th><?= _L("% Contacted") ?></th>
 										</tr>
 										<tr>
 											<td><?=$emailinfo[0]+0?></td>
@@ -277,14 +277,14 @@ class JobSummaryReport extends ReportGenerator{
 								<td>
 									<table  border="0" cellpadding="2" cellspacing="1" class="list" width="100%">
 										<tr class="listHeader" align="left" valign="bottom">
-											<th># of SMS</th>
-											<th>Completed</th>
-											<th>Remaining</th>
-											<th>Blocked</th>
-											<th>Duplicates Removed</th>
-											<th>No SMS</th>
-											<th>No SMS Selected</th>
-											<th>% Contacted</th>
+											<th><?= _L("# of SMS") ?></th>
+											<th><?= _L("Completed") ?></th>
+											<th><?= _L("Remaining") ?></th>
+											<th><?= _L("Blocked") ?></th>
+											<th><?= _L("Duplicates Removed") ?></th>
+											<th><?= _L("No SMS") ?></th>
+											<th><?= _L("No SMS Selected") ?></th>
+											<th><?= _L("% Contacted") ?></th>
 										</tr>
 										<tr>
 											<td><?=$smsinfo[0]+0?></td>
@@ -314,15 +314,15 @@ class JobSummaryReport extends ReportGenerator{
 								<td>
 									<table  border="0" cellpadding="2" cellspacing="1" class="list" width="100%">
 										<tr class="listHeader" align="left" valign="bottom">
-											<th># of Phones</th>
-											<th>Completed</th>
-											<th>Remaining</th>
-											<th>Blocked</th>
-											<th>Duplicates Removed</th>
-											<th>No Phone #</th>
-											<th>No Phone Selected</th>
-											<th>Total Attempts</th>
-											<th>% Contacted</th>
+											<th><?= _L("# of Phones") ?></th>
+											<th><?= _L("Completed") ?></th>
+											<th><?= _L("Remaining") ?></th>
+											<th><?= _L("Blocked") ?></th>
+											<th><?= _L("Duplicates Removed") ?></th>
+											<th><?= _L("No Phone #") ?></th>
+											<th><?= _L("No Phone Selected") ?></th>
+											<th><?= _L("Total Attempts") ?></th>
+											<th><?= _L("% Contacted") ?></th>
 										</tr>
 										<tr>
 											<td><?=$phonenumberinfo[0]+0?></td>
@@ -342,7 +342,7 @@ class JobSummaryReport extends ReportGenerator{
 					</td>
 				</tr>
 				<tr>
-					<th align="right" class="windowRowHeader bottomBorder">Phone Details:</th>
+					<th align="right" class="windowRowHeader bottomBorder"><?= _L("Phone Details:") ?></th>
 					<td class="bottomBorder">
 						<table width="100%">
 							<tr>
@@ -385,7 +385,7 @@ class JobSummaryReport extends ReportGenerator{
 				if($hasconfirmation){
 ?>
 				<tr>
-					<th align="right" class="windowRowHeader bottomBorder">Message Confirmation:</th>
+					<th align="right" class="windowRowHeader bottomBorder"><?= _L("Message Confirmation:") ?></th>
 					<td class="bottomBorder">
 						<table width="100%">
 							<tr>
@@ -404,7 +404,7 @@ class JobSummaryReport extends ReportGenerator{
 				}
 				if(array_sum($phonenumberinfo) < 1 && array_sum($smsinfo) < 1 && array_sum($emailinfo) < 1){
 ?>
-				<tr><td>No Job Data</td></tr>
+				<tr><td><?= _L("No %s Data",getJobTitle()) ?></td></tr>
 <?
 				}
 ?>
@@ -424,7 +424,7 @@ class JobSummaryReport extends ReportGenerator{
 		$daterange = "";
 		if(isset($this->params['reldate'])){
 			list($startdate, $enddate) = getStartEndDate($this->params['reldate'], $this->params);
-			$daterange = "From: " . date("m/d/Y", $startdate) . " To: " . date("m/d/Y", $enddate);
+			$daterange = _L("From: %s To: %s",date("m/d/Y", $startdate),date("m/d/Y", $enddate));
 		}
 		$joblist = array();
 		if($this->params['joblist'] != "")
