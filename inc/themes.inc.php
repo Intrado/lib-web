@@ -53,7 +53,7 @@ $COLORSCHEMES = array(
 //											"_brandtheme1" => "634A94",
 //											"_brandtheme2" => "392C53",
 //											"_brandratio" => ".2"),
-					"newui" => array("displayname" => "Messenger",
+					"newui" => array("displayname" => "Revolution (v9)",
 											"_brandprimary" => "2a4470",
 											"_brandtheme1" => "346799",
 											"_brandtheme2" => "3399ff",
