@@ -73,3 +73,9 @@
 <script type="text/javascript" src="script/speller/spellChecker.js"></script>
 <script type="text/javascript" src="script/niftyplayer.js.php"></script>
 <script type="text/javascript" src="script/datepicker.js"></script>
+
+<script>
+	startServerTime = moment("<? print_r(date("Y-m-d G:i")); ?>", "YYYY-MM-DD HH:mm").unix();
+	serverDate = "<? print_r(date("Y,m,d,")); ?>";
+	startClientTime = Math.round((new Date()).getTime() / 1000);
+</script>

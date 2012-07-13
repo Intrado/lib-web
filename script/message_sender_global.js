@@ -157,4 +157,16 @@ jQuery.noConflict();
 			}, 500);
 		});
 	};
+
+
+	timeUpdate = function() {
+
+		var clientTimeNow = Math.round((new Date()).getTime() / 1000);
+		var clientTimeDiff = clientTimeNow - startClientTime;
+		var newServerTime = startServerTime + clientTimeDiff;
+
+		return newServerTime;
+
+	};
+
 })(jQuery);

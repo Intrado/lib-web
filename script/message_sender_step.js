@@ -219,14 +219,23 @@ function StepManager(_valManager) {
 			}
 		}
 
-		var timenow       = moment().format('h:mm a');
-		var timecheck     = moment('1970,01,01,'+timenow).unix();
-		var callearlytime = moment('1970,01,01,'+rolecallearly).unix();
-		var calllatetime  = moment('1970,01,01,'+rolecalllate).unix();
+		var callearlytime = moment(serverDate+rolecallearly).unix();
+		var calllatetime  = moment(serverDate+rolecalllate).unix();
 
+		var timecheck = timeUpdate();
 		// compare times
-		var isTooEarly    = timecheck <= callearlytime;
-		var isTooLate     = timecheck >= calllatetime;
+		// var isTooEarly    = timecheck <= callearlytime;
+		// var isTooLate     = timecheck >= calllatetime;
+		if (timecheck <= callearlytime) {
+			var isTooEarly = true
+		} else {
+			var isTooEarly = false
+		}
+		if (timecheck >= calllatetime) {
+			var isTooLate = true
+		} else {
+			var isTooLate = false
+		}
 
 		if(isTooEarly == true || isTooLate == true){
 			$('#send_now_broadcast').attr('disabled','disabled');
