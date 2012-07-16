@@ -154,10 +154,10 @@ $.loadMessage = function loadMessage() {
 			self.getMessages(selectedMsgGroup, function () {
 				// hide the loading message
 				$('#msgsndr_loading_saved_message').modal('hide');
-				obj_stepManager.updateStepStatus();
+				obj_stepManager.updateStepStatus(2);
 			});
 		} else {
-			obj_stepManager.updateStepStatus();
+			obj_stepManager.updateStepStatus(2);
 			
 		}
 	};

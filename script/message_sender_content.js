@@ -546,13 +546,14 @@ function ContentManager() {
 			$('#msgsndr_review_' + currentContent).parent().removeClass('complete');
 
 			self.resetContentStatus();
-			obj_stepManager.updateStepStatus();
+			obj_stepManager.updateStepStatus(2);
 
 			$(".msg_confirm").show();
 		}
 	};
 	
 	this.saveContent = function($button) {
+		var step = obj_stepManager.getCurrentStep();
 		var substep = $button.attr("data-nav").substring(2);
 		// disable save and cancel buttons
 		var oldBtnText = $button.text();
@@ -591,7 +592,7 @@ function ContentManager() {
 			$button.attr("disabled","disabled");
 			
 			// do validation
-			obj_valManager.validateStep(obj_stepManager.getCurrentStep(), substep, function (passed) {
+			obj_valManager.validateStep(step, substep, function (passed) {
 				$button.text(oldBtnText);
 				$button.removeAttr("disabled");
 				// check that there are no validation errors
@@ -607,7 +608,7 @@ function ContentManager() {
 					$('#msgsndr_review_' + currentContent).parent().addClass('complete');
 					
 					self.resetContentStatus();
-					obj_stepManager.updateStepStatus();
+					obj_stepManager.updateStepStatus(step);
 					
 					$(".msg_confirm").show();
 				} else {

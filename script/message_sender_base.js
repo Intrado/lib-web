@@ -167,6 +167,10 @@ jQuery.noConflict();
 
         mementos = {};
 		
+		// start up validation manager
+		obj_valManager = new ValidationManager();
+		obj_valManager.init();
+		
 		//start up permission manager
 		obj_permissionManager = new PermissionManager();
 		
@@ -189,8 +193,7 @@ jQuery.noConflict();
 					if($("#msgsndr_addme").is(":checked")) {
 						recipientTrack++;
 					}
-					
-					obj_stepManager.updateStepStatus();
+					obj_valManager.runValidateEventDriven("msgsndr_listids");
 				});
 				
 				// jobtype
@@ -204,9 +207,6 @@ jQuery.noConflict();
 		
 		obj_permissionManager.getRoles();
 		
-		// start up validation manager
-		obj_valManager = new ValidationManager();
-		obj_valManager.init();
 		//start up step manager
 		obj_stepManager = new StepManager(obj_valManager);
 		//start up content manager
@@ -377,7 +377,7 @@ jQuery.noConflict();
 				$('#addme').slideUp();
 			}
 
-			obj_stepManager.updateStepStatus();
+			obj_stepManager.updateStepStatus(1);
 
 		});
 

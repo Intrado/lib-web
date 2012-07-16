@@ -39,25 +39,25 @@ function StepManager(_valManager) {
 		eventManager.onStepChange.splice(id, 1);
 	};
 	
-	this.updateStepStatus = function() {
+	this.updateStepStatus = function(step) {
 		// step 1 is special, you must have a list or have "addme"
-		if (currentStep == 1 && ($("#msgsndr_listids").val() == "[]" || $("#msgsndr_listids").val() == "") && 
+		if (step == 1 && ($("#msgsndr_listids").val() == "[]" || $("#msgsndr_listids").val() == "") && 
 				!$("#msgsndr_addme").is(":checked")) {
-			$('button.btn_confirm', stepMap[currentStep]).attr('disabled','disabled');
+			$('button.btn_confirm', stepMap[step]).attr('disabled','disabled');
 			return;
 		}
 		// step 2 is special, you must have atleast a phone, email or sms message
 		if (currentStep == 2 && !$("#msgsndr_hasphone").is(":checked") && !$("#msgsndr_hasemail").is(":checked") &&
 				!$("#msgsndr_hassms").is(":checked")) {
-			$('button.btn_confirm', stepMap[currentStep]).attr('disabled','disabled');
+			$('button.btn_confirm', stepMap[step]).attr('disabled','disabled');
 			return;
 		}
 			
 		obj_valManager.validateStep(currentStep, false, function (passed) {
 			if(passed) {
-				$("button.btn_confirm", stepMap[currentStep]).removeAttr('disabled');
+				$("button.btn_confirm", stepMap[step]).removeAttr('disabled');
 			} else {
-				$('button.btn_confirm', stepMap[currentStep]).attr('disabled','disabled');
+				$('button.btn_confirm', stepMap[step]).attr('disabled','disabled');
 			}
 		});
 	};
@@ -120,10 +120,10 @@ function StepManager(_valManager) {
 			// observe validation on the items in step 1, update status appropriatly
 			if (currentStep == 1) {
 				obj_valManager.onFormEventHandler(currentStep, false, function (event, memo) {
-					self.updateStepStatus();
+					self.updateStepStatus(step);
 				});
 			}
-			self.updateStepStatus();
+			self.updateStepStatus(step);
 		}
 	};
 	
