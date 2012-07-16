@@ -241,6 +241,12 @@ jQuery.noConflict();
 					$(idSelector + " .toggle-translations").click();
 				}
 			}
+			
+			// remove any easycall data and detach the easycall control
+			if (contentMode == "phone") {
+				$("#msgsndr_phonemessagecallme").detachEasyCall();
+				$("#msgsndr_phonemessagecallme").val("");
+			}
 
 			//close up the Post to ___ regions
 			if (contentMode == "social") {
@@ -251,27 +257,19 @@ jQuery.noConflict();
 				});
 			}
 
-
-			// Restore the state of the easycall plugin and related fields
-			// (TODO - pull CSS definitions into a shared location?)
-			$("#msgsndr_phonemessagecallme_msg").hide();    //clear any previous validation error
-			$("#msgsndr_phonemessagecallme").easy
-			$(".easycallcallmecontainer").remove();
-			//TODO - pull mindigits/maxdigits up into a shared function somewhere?  It's duplicated from message_sender_content.js/allowControl{phone}
-			var mindigits = (orgOptions.easycallmin?orgOptions.easycallmin:10);
-			var maxdigits = (orgOptions.easycallmax?orgOptions.easycallmax:10);
-			$("#msgsndr_phonemessagecallme").attachEasyCall({
-																"languages" : easycallLangs,
-																"phonemindigits": mindigits,
-																"phonemaxdigits": maxdigits,
-																"defaultphone" : userInfo.phoneFormatted
-															});
-
 			//Restore original form field states
 			if (mementos[contentMode]) {
 				$(idSelector).memento(mementos[contentMode]);
 			}
-
+			
+			// reattach easycall if it's a phone discard
+			if (contentMode == "phone") {
+				$("#msgsndr_phonemessagecallme").attachEasyCall({
+					"languages" : easycallLangs,
+					"phonemindigits": (orgOptions.easycallmin?orgOptions.easycallmin:10),
+					"phonemaxdigits": (orgOptions.easycallmax?orgOptions.easycallmax:10),
+					"defaultphone" : userInfo.phoneFormatted });
+			}
 //            $(idSelector + " .msgdata").val('');
 
 			clearHtmlEditorContent();

@@ -1,4 +1,22 @@
 (function($){
+	$.fn.detachEasyCall = function() {
+		return this.each(function() {
+			var $this = $(this);
+			// if there is easyCall data, then it has been initialized
+			if ($this.data('easyCall')) {
+				// kill any running timer
+				if ($this.data('easyCall').timer)
+					$this.data('easyCall').timer.stop();
+	
+				// destroy all the easycall DOM containers by removing their parent
+				if ($this.data('easyCall').maincontainer)
+					$this.data('easyCall').maincontainer.remove();
+				
+				$this.data('easyCall', null);
+			}
+		});
+	};
+	
 	$.fn.attachEasyCall = function(options) {
 
 		var method = {
@@ -8,7 +26,7 @@
 			init: function (options, element) {
 				var $this = $(this);
 				$this.hide();
-				var easycalldata = $.extend({
+				var defaultdata = $.extend({
 					"element": $(element),
 					"maincontainer": false,
 					"subcontainer": {"en": false},
@@ -21,9 +39,12 @@
 					"phonemindigits": 10,
 					"phonemaxdigits": 10,
 					"defaultphone": "",
-					"emptyphonetext": "Number to Call"}, options);
-
+					"emptyphonetext": "Number to Call"}, $(element).data('easyCall'));
+								
+				var easycalldata = $.extend(defaultdata, options);
 				$this.data('easyCall', easycalldata);
+				// FIXME: Oops. looks like data is attached to the wrong "this". Add a pointer here for data access on the element (for now).
+				$(element).data('easyCall', $this.data('easyCall'));
 				
 				// load existing values from attached input
 				var elementval = $(element).val();
@@ -36,8 +57,10 @@
 					if ($this.data('easyCall').languages[code])
 						$this.data('easyCall').recording[code] = elementdata[code];
 				});
-				// destroy all the easycall DOM containers (if there are any)
-				$(".easycallmaincontainer").remove();
+				
+				// destroy all the easycall DOM containers by removing their parent
+				if ($this.data('easyCall').maincontainer)
+					$this.data('easyCall').maincontainer.remove();
 				
 				// remove all existing references to old DOM subcontainers
 				$.each($this.data('easyCall').subcontainer, function (code) {
@@ -331,7 +354,7 @@
 				}
 				$this.data('easyCall').defaultphone = phone;
 
-				$this.data('easyCall').element.trigger("easycall:startcall", this);
+				//$this.data('easyCall').element.trigger("easycall:startcall", this);
 
 				var progresscontainer = method.createProgressContainer(code);
 				var progresstext = progresscontainer.find(".easycallprogresstext");
@@ -345,7 +368,7 @@
 					if (!data) {
 						$this.data('easyCall').specialtaskid = false;
 						method.replaceContainer(code, method.createErrorContainer(code, "An error occured while setting up the call."));
-						$this.data('easyCall').element.trigger("easycall:endcall", this);
+						//$this.data('easyCall').element.trigger("easycall:endcall", this);
 					} else {
 						$this.data('easyCall').specialtaskid = data.id;
 						// on a timer, query the status
@@ -356,14 +379,14 @@
 								progresstext.empty().append(status.message);
 								if (!status.error && status.complete) {
 									$this.data('easyCall').timer.stop();
-									$this.data('easyCall').element.trigger("easycall:endcall", this);
+									//$this.data('easyCall').element.trigger("easycall:endcall", this);
 									// save audiofile
 									method.doSaveAudioFile(code);
 								}
 								if (status.error) {
 									$this.data('easyCall').specialtaskid = false;
 									$this.data('easyCall').timer.stop();
-									$this.data('easyCall').element.trigger("easycall:endcall", this);
+									//$this.data('easyCall').element.trigger("easycall:endcall", this);
 									// transition to error mode
 									method.replaceContainer(code, method.createErrorContainer(code, status.message));
 								}
@@ -371,7 +394,7 @@
 							.error(function() {
 								$this.data('easyCall').specialtaskid = false;
 								$this.data('easyCall').timer.stop();
-								$this.data('easyCall').element.trigger("easycall:endcall", this);
+								//$this.data('easyCall').element.trigger("easycall:endcall", this);
 
 								// transition to error mode
 								method.replaceContainer(code, method.createErrorContainer(code, "An error occured while getting the status of a call."));
