@@ -327,8 +327,7 @@ $formdata = array(
 		"addme" => array(
 				"label" => "Add Myself",
 				"value" => "",
-				"validators" => array(
-						array("ValDummy")// None, just toggles logic for addme fields
+				"validators" => array(// None, just toggles logic for addme fields
 				),
 				"control" => array("CheckBox"),
 				"helpstep" => 1
@@ -393,8 +392,7 @@ $formdata = array(
 		"phonemessagepost" => array(
 				"label" => "Audio Link",
 				"value" => "",
-				"validators" => array(
-						array("ValDummy")// NOTE: Will need complicated validation based on user permissions and message contents (has dynamic parts?)
+				"validators" => array(// NOTE: Will need complicated validation based on user permissions and message contents (has dynamic parts?)
 				),
 				"control" => array("CheckBox"),
 				"helpstep" => 1
@@ -668,7 +666,6 @@ $formdata = array_merge($formdata, array(
 				"label" => "Auto Report",
 				"value" => "",
 				"validators" => array(
-						array("ValDummy")
 				),
 				"control" => array("CheckBox"),
 				"helpstep" => 1
@@ -676,8 +673,7 @@ $formdata = array_merge($formdata, array(
 		"optionleavemessage" => array(
 				"label" => "Response",
 				"value" => "",
-				"validators" => array(
-						array("ValDummy")// NOTE: no validation, will be ignored if the user can't use this option
+				"validators" => array(// NOTE: no validation, will be ignored if the user can't use this option
 				),
 				"control" => array("CheckBox"),
 				"helpstep" => 1
@@ -685,8 +681,7 @@ $formdata = array_merge($formdata, array(
 		"optionmessageconfirmation" => array(
 				"label" => "Confirmation",
 				"value" => "",
-				"validators" => array(
-						array("ValDummy")// NOTE: no validation, will be ignored if the user can't use this option
+				"validators" => array(// NOTE: no validation, will be ignored if the user can't use this option
 				),
 				"control" => array("CheckBox"),
 				"helpstep" => 1
@@ -694,8 +689,7 @@ $formdata = array_merge($formdata, array(
 		"optionskipduplicate" => array( // NOTE: using same setting for both skipduplicates and skipemailduplicates?
 				"label" => "Skip Duplicate",
 				"value" => "",
-				"validators" => array(
-						array("ValDummy")// NOTE: no validation, will be ignored if the user can't use this option
+				"validators" => array(// NOTE: no validation, will be ignored if the user can't use this option
 				),
 				"control" => array("CheckBox"),
 				"helpstep" => 1
@@ -716,8 +710,7 @@ $formdata = array_merge($formdata, array(
 		"optionsavemessage" => array(
 				"label" => "Save Message",
 				"value" => "",
-				"validators" => array(
-						array("ValDummy")// NOTE: no validation. just toggles save message mode
+				"validators" => array(// NOTE: no validation. just toggles save message mode
 				),
 				"control" => array("CheckBox"),
 				"helpstep" => 1
