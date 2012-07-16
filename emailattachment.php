@@ -85,7 +85,7 @@ if (is_array($result)) {
 	<input id="emailattachment" name="emailattachment" type="file" onChange="window.top.window.startUpload();this.form.submit();"/>	
 </form>
 <script language="javascript" type="text/javascript">
-	window.top.window.stopUpload('<?=$contentid?>','<?= addslashes($filename) ?>','<?= $size ?>','<?= addslashes($errormessage) ?>', '<?=$_GET['formname']?>', '<?=$_GET['itemname']?>');
+	window.top.window.stopUpload('<?=$contentid?>','<?= addslashes($filename) ?>','<?= $size ?>','<?= isset($errormessage)?addslashes($errormessage):'' ?>', '<?=$_GET['formname']?>', '<?=$_GET['itemname']?>');
 </script> 
 </body>
 </html>
