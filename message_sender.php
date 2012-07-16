@@ -60,7 +60,6 @@ require_once("obj/TraslationItem.fi.php");
 require_once("obj/CallerID.fi.php");
 require_once("obj/ValDuplicateNameCheck.val.php");
 require_once("obj/ValPermission.val.php");
-require_once("obj/ValConditional.val.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -266,6 +265,37 @@ class ValTimePassed extends Validator {
 	}
 }
 
+class ValConditionalOnValue extends Validator {
+	var $conditionalrequired = true;
+	function validate ($value, $args, $requiredvalues) {
+		error_log("value: ". json_encode($value). " args: ". json_encode($args). " reqfields: ". json_encode($requiredvalues));
+		$required = true;
+		foreach ($args['fields'] as $field => $testvalue) {
+			if ($requiredvalues[$field] != $testvalue)
+				$required = false;
+		}
+		if ($required && !$value)
+			return "$this->label is required.";
+		
+		return true;
+	}
+	
+	function getJSValidator () {
+		return '
+			function (name, label, value, args, requiredvalues) {
+				var required = true;
+				$H(args.fields).each(function (field, testvalue) {
+					if (requiredvalues[field] != testvalue)
+						required = false;
+				});
+				if (required && !value)
+					return this.label + " is required.";
+				
+				return true;
+			}';
+	}
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
@@ -401,10 +431,10 @@ $formdata = array(
 				"label" => "Call Me",
 				"value" => "",
 				"validators" => array(
-						array("ValConditional", "has" => array("hasphone"), "not" => array("phonemessagetext")),
+						array("ValConditionalOnValue", "fields" => array("hasphone" => "on", "phonemessagetype" => "callme")),
 						array("ValEasycall")
 				),
-				"requires" => array("hasphone","phonemessagetext"),
+				"requires" => array("hasphone","phonemessagetype"),
 				"control" => array("TextField"),
 				"helpstep" => 1
 		),
@@ -412,12 +442,12 @@ $formdata = array(
 				"label" => "Message",
 				"value" => "",
 				"validators" => array(
-						array("ValConditional", "has" => array("hasphone"), "not" => array("phonemessagecallme")),
+						array("ValConditionalOnValue", "fields" => array("hasphone" => "on", "phonemessagetype" => "text")),
 						array("ValMessageBody"),
 						array("ValTtsText"),
 						array("ValLength","max" => 10000) // 10000 Characters is about 40 minutes of tts, considered to be more than enough
 				),
-				"requires" => array("hasphone","phonemessagecallme"),
+				"requires" => array("hasphone","phonemessagetype"),
 				"control" => array("TextField"),
 				"helpstep" => 1
 		),
@@ -1219,7 +1249,7 @@ include("nav.inc.php");
 	"ValTimeWindowCallLate", "ValTimeWindowCallEarly", "ValSmsText", "valPhone",
 	"ValMessageBody", "ValMessageGroup", "ValMessageTypeSelect", "ValFacebookPage",
 	"ValTranslationCharacterLimit","ValTimePassed","ValTtsText","ValCallerID",
-	"ValTextAreaAndSubjectWithCheckbox", "ValPermission", "ValConditional"));?>
+	"ValTextAreaAndSubjectWithCheckbox", "ValPermission", "ValConditionalOnValue"));?>
 
 	// get php data into js vars
 	var userid = <? print_r($_SESSION['user']->id); ?>;
