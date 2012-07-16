@@ -7,8 +7,9 @@ class TextAreaPhone extends FormItem {
 			$value = '{"gender": "female", "text": ""}';
 		$vals = json_decode($value);
 		$rows = isset($this->args['rows']) ? 'rows="'.$this->args['rows'].'"' : "";
+		$width = isset($this->args['width']) ? ' width:'.$this->args['width'].';' : "";
 		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'"/>
-			<textarea id="'.$n.'-textarea" style="clear:both; width:'.$this->args['width'].'" name="'.$n.'-textarea" '.$rows.'/>'.escapehtml($vals->text).'</textarea>
+			<textarea id="'.$n.'-textarea" style="clear:both; '.$width.'" name="'.$n.'-textarea" '.$rows.'/>'.escapehtml($vals->text).'</textarea>
 			<div>
 				<input id="'.$n.'-female" name="'.$n.'-gender" type="radio" value="female" '.($vals->gender == "female"?"checked":"").'/><label for="'.$n.'-female">'._L('Female').'</label><br />
 				<input id="'.$n.'-male" name="'.$n.'-gender" type="radio" value="male" '.($vals->gender == "male"?"checked":"").'/><label for="'.$n.'-male">'._L('Male').'</label><br />
