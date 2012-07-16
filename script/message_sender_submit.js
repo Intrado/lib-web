@@ -143,7 +143,7 @@ function SubmitManager() {
 						$('#msgsndr_submit_title').html("Broadcast Sent!");recipientTrack
 						$('#msgsndr_submit_message').html(
 								"Your broadcast, <strong>\""+$("#msgsndr_name").val()+"\"</strong> is being sent to <strong>"+recipientTrack+" recipient(s)</strong>. "+
-								"You can track it's status on the <a href='start.php'>dashboard</a>.");
+								"You can track its status on the <a href='start.php'>dashboard</a>.");
 							
 						$('#msgsndr_submit_confirmbutton').on('click', function(event) {
 							window.location = res.nexturl;
