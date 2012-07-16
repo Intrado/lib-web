@@ -86,13 +86,13 @@ var SectionWidget = Class.create({
 				}
 			}
 			
-			if (count === 0) {
-				this.sectionscontainer.update('There are no sections found.');
-				return;
-			}
-			
 			// Show the section column and preselect selectedskeys.
 			this.sectionscontainer.update(radiobox);
+			
+			if (count === 0) {
+				this.sectionscontainer.insert('<br/>There are no sections found.');
+				return;
+			}
 			
 			if (this.selectedsectionidsmap) {
 				form_do_validation(this.form, checkbox);
