@@ -1090,7 +1090,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		if (isset($postdata["hasfacebook"]) && $postdata["hasfacebook"])
 			$messages['post']['facebook']['en']['none']['text'] = $postdata["socialmediafacebookmessage"];
 
-		if (isset($postdata["hasfacebook"]) && $postdata["hasfacebook"])
+		if (isset($postdata["hastwitter"]) && $postdata["hastwitter"])
 			$messages['post']['twitter']['en']['none']['text'] = $postdata["socialmediatwittermessage"];
 
 		if (isset($postdata["hasfeed"]) && $postdata["hasfeed"]) {
