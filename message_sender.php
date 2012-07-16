@@ -268,7 +268,6 @@ class ValTimePassed extends Validator {
 class ValConditionalOnValue extends Validator {
 	var $conditionalrequired = true;
 	function validate ($value, $args, $requiredvalues) {
-		error_log("value: ". json_encode($value). " args: ". json_encode($args). " reqfields: ". json_encode($requiredvalues));
 		$required = true;
 		foreach ($args['fields'] as $field => $testvalue) {
 			if ($requiredvalues[$field] != $testvalue)
