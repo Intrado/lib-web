@@ -100,15 +100,6 @@ if (isset($_POST['Submit']) && $reason == 'ok') {
 $TITLE= isset($questionnaire->webpagetitle) ? $questionnaire->usehtml ? $questionnaire->webpagetitle : escapehtml($questionnaire->webpagetitle) : "";
 
 
-function doLogo () {
-	$logohash = crc32("cid".getSystemSetting("_logocontentid"));
-	$clickurl = getSystemSetting("_logoclickurl");
-	if($clickurl != "" && $clickurl != "http://")
-	echo '<a href="' . $clickurl . '" target="_blank"><img src="../logo.img.php?hash=' . $logohash .'" alt="Logo"></a>';
-	else
-	echo '<img src="../logo.img.php?hash=' . $logohash .'" alt="">';
-}
-
 //Do inpage CSS
 $theme = $scheme['_brandtheme'];
 $primary = $scheme['colors']['_brandprimary'];
@@ -154,7 +145,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 
 <div class="survey_banner cf">
 	
-	<div class="survey_logo"><? doLogo() ?></div>
+	<div class="survey_logo"><img src="logo.img.php"></div>
 	<h2 class="survey_custname"><?= escapehtml($custdisplayname) ?></h2>
 	
 </div><!-- .survey_banner -->
