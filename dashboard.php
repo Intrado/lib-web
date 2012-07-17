@@ -180,6 +180,28 @@ $jobtemplates = DBFindMany("Job", $query,"j",array($USER->id));
 $PAGE = "start:start";
 $TITLE = "";
 $MESSAGESENDER = true;
+$DESCRIPTION = "";
+
+if($USER->authorize("leavemessage")){
+	if($count > 0){
+		$DESCRIPTION = "<img src=\"img/bug_important.gif\"> You have unplayed responses to your notifications..." .
+				"<a href=\"replies.php?jobid=all&showonlyunheard=true\">click to view</a>";
+	}
+}
+
+// display a reminder to renew their facebook authorization token
+if ($fbtokenexpires) {
+	if ($DESCRIPTION)
+	$DESCRIPTION .= "<br>";
+	$timeleft = $fbtokenexpires - strtotime("now");
+	if ($timeleft < 0) {
+		$DESCRIPTION .= "<img src=\"img/bug_important.gif\"> ". _L("Your Facebook authorization has expired!") .
+			'<a href="account.php#facebookauth">  click to renew</a>';
+	} else if ($timeleft < 59*24*60*60) {
+		$DESCRIPTION .= "<img src=\"img/bug_important.gif\"> ". _L("Your Facebook authorization will expire on: %s...", date("F jS", $fbtokenexpires)).
+			'<a href="account.php#facebookauth">  click to renew</a>';
+	}
+}
 
 include("nav.inc.php");
 ?>
@@ -369,6 +391,13 @@ include("nav.inc.php");
 		<div class="bigbtn">
 		<a class="bigbtn" href="message_sender.php?new"><span><?= _L("New %s",getJobTitle())?></span></a>
 		</div>
+		
+<? 
+	if (isset($DESCRIPTION) && $DESCRIPTION != "") {
+		echo '<div class="notify">' . $DESCRIPTION . '</div>';
+	}
+?>
+		
 		<div class="templates cf">
 			<h3 onclick="window.location='jobtemplates.php'"><?= _L("%s Templates",getJobTitle())?></h3>
 			<ul>

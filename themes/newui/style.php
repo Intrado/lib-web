@@ -33,6 +33,7 @@ h4 { font-size: 12px; line-height: 22px; color: #235563; text-shadow: 0 1px 0 #f
 .content_wrap { position: relative; margin: 0; padding: 20px 0 85px 0; overflow: auto; }
 #ms .container { position: relative; width: 980px; margin: 0 auto; }
 .container { margin: 0 1%; }
+.contain { position: relative; width: 980px; margin: 0 auto; }
 .popup_container { position: relative; margin: 0 auto; padding: 0 10px; }
 .wrapper { position: relative; margin: 0 240px 0 0; }
 .main_aside { position: absolute; top: 0; right: -240px; width: 215px; }
@@ -94,6 +95,7 @@ h4 { font-size: 12px; line-height: 22px; color: #235563; text-shadow: 0 1px 0 #f
 
 .pagetitle { font-family: Verdana, Arial, sans-serif; margin: 0 0 10px 0; color: #333; text-shadow: 0 1px 0 #fff; }
 .pagetitlesubtext { margin: 0 0 8px 0; }
+#ms .pagetitlesubtext { display: none; }
 
 .window { margin: 5px 0 15px 0; border: none; -webkit-box-shadow: 0px 2px 8px 0px #777; box-shadow: 0px 2px 8px 0px #777;
 -webkit-border-radius: 5px; border-radius: 5px; -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
@@ -181,6 +183,14 @@ a.bigbtn:hover { background-color: #C63A0E; text-decoration: none;
   background-image:         linear-gradient(top, #e35326, #C63A0E);}
 a.bigbtn span { background: url(themes/newui/broadcast.png) 0 center no-repeat; display: block; line-height: 30px; padding: 0 0 0 30px; }
   
+
+/*----- Notify - used for facebook alerts and unplayed message alerts -----*/
+
+.notify { background-color: #ede105; margin: 0 0 25px 0; padding: 11px 15px; font-size: 14px; line-height: 22px; font-weight: bold;
+-webkit-border-radius: 5px; border-radius: 5px;
+-webkit-box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25) inset; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25) inset; }
+.notify a { display: block; }
+
   
 /*----- Broadcast templates -----*/
 
@@ -931,12 +941,12 @@ p.warning {
 
 
 @media screen and (min-width: 1180px) { 
- #ms .container { width: 1150px; }
+ #ms .container, .contain { width: 1150px; }
  /*.main_activity { width: 910px; }*/
 }
 
 @media screen and (min-width: 1580px) { 
- #ms .container { width: 1300px; }
+ #ms .container, .contain { width: 1300px; }
  /*.main_activity { width: 1060px; }*/
 }
 
