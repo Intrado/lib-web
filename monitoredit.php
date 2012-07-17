@@ -120,16 +120,16 @@ $formdata["jobevent"] = array(
 		"helpstep" => $helpstepnum
 );
 
-$jobtypes = QuickQueryList("select id,name from jobtype where deleted=0 and not issurvey order by name",true);
+$jobtypes = QuickQueryList("select id,name from jobtype where deleted=0 and not issurvey order by systempriority desc, name",true);
 $selectedjobtypes = $monitor->id?QuickQuery("select val from monitorfilter where type='jobtypeid' and monitorid=?",false,array($monitor->id)):'';
 $formdata["jobtypes"] = array(
 		"label" => _L('%s Types',getJobTitle()),
-		"fieldhelp" => _L('Optionally add a filter for certain types of jobs.'),
+		"fieldhelp" => _L('Optionally add a filter for certain types of %s.', getJobsTitle()),
 		"value" => $selectedjobtypes != ""?explode(",",$selectedjobtypes):array(),
 		"validators" => array(
 			array("ValInArray", 'values'=>array_keys($jobtypes))
 		),
-		"control" => array("RestrictedValues", "values" => $jobtypes, "label" => _L("Limit to these job types:")),
+		"control" => array("RestrictedValues", "values" => $jobtypes, "label" => _L("Limit to these %s types:",getJobTitle())),
 		"helpstep" => $helpstepnum
 );
 
