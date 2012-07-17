@@ -2,6 +2,12 @@
 // List Picker Plugin
 
 (function($){
+    // disable anchor tags which have the disabled class
+    $(".add-recipients a").click(function (e) {
+        if ($(this).hasClass("disabled"))
+            e.stopPropagation();
+    });
+    
     $.listPicker = function(el, options){
 
         var base = this;
@@ -31,11 +37,10 @@
                 base.lists = $.extend({}, dataLists);
                 base.unfetchedIds = [];
 
-                // Enable the "pick from lists" button
-                base.$el.find('[href=#add-recipients-existing_lists]').removeClass('disabled');
-                
                 // Initialize the lists and stats objects
+                var hasLists = false;
                 $.each(base.lists, function(id, data) {
+                    hasLists = true;
                     data.isSaved = true;
                     data.stats = {name: data.name};
                     base.unfetchedIds.push(id);
@@ -50,6 +55,10 @@
                         });
                     };
                 });
+
+                // Enable the "pick from lists" button
+                if (hasLists)
+                    base.$el.find('[href=#add-recipients-existing_lists]').removeClass('disabled');
 
             });
 
