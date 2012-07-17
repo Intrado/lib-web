@@ -122,19 +122,18 @@
                 });
 
                 modal.rollingFetch = function(){
-                    $.each(base.unfetchedIds, function(index, id){
+                    if (base.unfetchedIds.length > 0) {
+                        var id = base.unfetchedIds[0];
+                        base.unfetchedIds.splice(0,1);
                         var $count = modal.$el.find('[data-list-id="' + id + '"] .count').text('(...)');
                         $.ajax({
                             url: 'ajax.php?type=liststats&listids=["' + id + '"]'
                         }).done(function(dataListStats){
                             base.lists[id].stats = $.extend(base.lists[id].stats, dataListStats[id]);
                             $count.text('(' + base.lists[id].stats.total + ')');
-                            if (base.unfetchedIds.length > 0) {
-                                base.unfetchedIds.splice(base.unfetchedIds.indexOf(id), 1);
-                                modal.rollingFetch();
-                            };
+                            modal.rollingFetch();
                         });
-                    })
+                    }
                 }
 
                 modal.buildSubmit = function(){
