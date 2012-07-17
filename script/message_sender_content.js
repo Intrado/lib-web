@@ -265,10 +265,12 @@ var allowControl = {
 		
 		// Add users' name to from name
 		$('#msgsndr_emailmessagefromname').val(userInfo.firstName + ' ' + userInfo.lastName);
+		
+		// FIXME: can't pre populate from email till validation errors can be resolved by the user
 		// Add users' email address to the from email field
-		if(userInfo.email != '') {
-			$('#msgsndr_emailmessagefromemail').val(userInfo.email);
-		}
+		//if(userInfo.email != '') {
+		//	$('#msgsndr_emailmessagefromemail').attr('value', userInfo.email);
+		//}
 		
 		// Hide / Show Translations
 		$('#msgsndr_tab_email').on('click', '.toggle-translations', function(event) {
