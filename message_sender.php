@@ -298,6 +298,73 @@ class ValConditionalOnValue extends Validator {
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
+// get the user requested schedule out of postdata
+function getSchedule($postdata) {
+	global $ACCESS;
+	global $USER;
+	
+	$type = $postdata["scheduletype"];
+	$maxjobdays = $postdata["optionmaxjobdays"];
+	$callearly = $postdata['schedulecallearly'];
+	$calllate = $postdata['schedulecalllate'];
+	$date = $postdata['scheduledate'];
+	
+	$schedule = array();
+	
+	if (!$maxjobdays)
+		$maxjobdays = 1;
+	
+	switch ($type) {
+		case "now":
+			//get the callearly and calllate defaults
+			$callearly = date("g:i a");
+			$calllate = $USER->getCallLate();
+				
+			//get access profile settings
+			$accessCallearly = $ACCESS->getValue("callearly");
+			if (!$accessCallearly)
+				$accessCallearly = "12:00 am";
+			$accessCalllate = $ACCESS->getValue("calllate");
+			if (!$accessCalllate)
+				$accessCalllate = "11:59 pm";
+				
+			//convert everything to timestamps for comparisons
+			$callearlysec = strtotime($callearly);
+			$calllatesec = strtotime($calllate);
+			$accessCallearlysec = strtotime($accessCallearly);
+			$accessCalllatesec = strtotime($accessCalllate);
+				
+			//get calllate first from user pref, try to ensure it is at least an hour after start, up to access restriction
+			if ($callearlysec + 3600 > $calllatesec)
+				$calllatesec = $callearlysec + 3600;
+				
+			//make sure the calculated calllate is not past access profile
+			if ($calllatesec  > $accessCalllatesec)
+				$calllatesec = $accessCalllatesec;
+				
+			$calllate = date("g:i a", $calllatesec);
+				
+			$schedule = array(
+					"maxjobdays" => $maxjobdays,
+					"date" => date('m/d/Y'),
+					"callearly" => $callearly,
+					"calllate" => $calllate
+			);
+			break;
+		case "schedule":
+			$schedule = array(
+			"maxjobdays" => $maxjobdays,
+			"date" => date('m/d/Y', strtotime($date)),
+			"callearly" => $callearly,
+			"calllate" => $calllate
+			);
+			break;
+		default:
+			break;
+	}
+	return $schedule;
+}
+
 $userjobtypes = JobType::getUserJobTypes(false);
 $jobtypes = array();
 foreach ($userjobtypes as $id => $jobtype) {
@@ -757,13 +824,23 @@ $formdata = array_merge($formdata, array(
 		//=========================================================================================
 		"SCHEDULE OPTIONS",
 		//=========================================================================================
+		"scheduletype" => array(
+				"label" => "Schedule type",
+				"value" => "",
+				"validators" => array(
+						array("ValInArray", "values" => array("now","schedule"))
+				),
+				"control" => array("RadioButton", "values" => array("now" => "now", "schedule" => "schedule")),
+				"helpstep" => 1
+		),
 		"scheduledate" => array(
 				"label" => "Date",
 				"value" => "",
 				"validators" => array(
-						array("ValRequired"),
+						array("ValConditionalOnValue", "fields" => array("scheduletype" => "schedule")),
 						array("ValDate", "min" => date("m/d/Y"))
 				),
+				"requires" => array("scheduletype"),
 				"control" => array("TextField"),
 				"helpstep" => 1
 		),
@@ -771,25 +848,25 @@ $formdata = array_merge($formdata, array(
 				"label" => "Start",
 				"value" => "",
 				"validators" => array(
-						array("ValRequired"),
+						array("ValConditionalOnValue", "fields" => array("scheduletype" => "schedule")),
 						array("ValTimeCheck", "min" => $ACCESS->getValue('callearly'), "max" => $ACCESS->getValue('calllate')),
 						array("ValTimeWindowCallEarly", "calllatefield" => "schedulecalllate")
 				),
 				"control" => array("TextField"),
-				"requires" => array("schedulecalllate", "scheduledate"),
+				"requires" => array("scheduletype", "schedulecalllate", "scheduledate"),
 				"helpstep" => 1
 		),
 		"schedulecalllate" => array(
 				"label" => "End",
 				"value" => "",
 				"validators" => array(
-						array("ValRequired"),
+						array("ValConditionalOnValue", "fields" => array("scheduletype" => "schedule")),
 						array("ValTimeCheck", "min" => $ACCESS->getValue('callearly'), "max" => $ACCESS->getValue('calllate')),
 						array("ValTimeWindowCallLate", "callearlyfield" => "schedulecallearly"),
 						array("ValTimePassed", "field" => "scheduledate")
 				),
 				"control" => array("TextField"),
-				"requires" => array("schedulecallearly", "scheduledate"),
+				"requires" => array("scheduletype", "schedulecallearly", "scheduledate"),
 				"helpstep" => 1
 		)
 ));
@@ -840,13 +917,16 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$job->type = 'notification';
 		$job->modifydate = $job->createdate = date("Y-m-d H:i:s");
 
+		$schedule = getSchedule($postdata);
+		
 		$job->scheduleid = null;
-		$job->startdate = date("Y-m-d", strtotime($postdata['scheduledate']));
-		$job->enddate = date("Y-m-d",
-				strtotime($job->startdate) +
-				(($postdata["optionmaxjobdays"]?($postdata["optionmaxjobdays"] - 1):0) * 86400));
-		$job->starttime = date("H:i", strtotime($postdata['schedulecallearly']));
-		$job->endtime = date("H:i", strtotime($postdata['schedulecalllate']));
+		if ($schedule['date'])
+			$job->startdate = date("Y-m-d", strtotime($schedule['date']));
+		else
+			$job->startdate = date("Y-m-d");
+		$job->enddate = date("Y-m-d", strtotime($job->startdate) + (($schedule["maxjobdays"] - 1) * 86400));
+		$job->starttime = ($schedule['callearly'])?date("H:i", strtotime($schedule['callearly'])):date("H:i", strtotime($USER->getCallEarly()));
+		$job->endtime = ($schedule['calllate'])?date("H:i", strtotime($schedule['calllate'])):date("H:i", strtotime($USER->getCallLate()));
 		$job->finishdate = null;
 		$job->status = "new";
 		$job->create();

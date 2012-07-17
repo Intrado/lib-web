@@ -1,68 +1,40 @@
 function SubmitManager() {
 	var $ = jQuery;
 
-	// this will set the schedule options to send a broadcast out immediately
-	scheduleNow = function(onehour) {
-
-		$('#msgsndr_scheduledate').val(moment().format('MM/DD/YYYY'));
-		// $('#msgsndr_schedulecallearly').append('<option value="'+moment().format('h:mm a')+'" selected="selected">'+moment().format('h:mm a')+'</option>');
-		$('#msgsndr_schedulecallearly').append('<option value="'+moment.unix(timeUpdate()).format('h:mm a')+'" selected="selected">'+moment.unix(timeUpdate()).format('h:mm a')+'</option>');
-
-		$('#msgsndr_schedulecalllate option').removeAttr('selected')
-
-		$('#msgsndr_schedulecalllate option:last-child').attr('selected', 'selected');
-		// User is submitting a job within the hour window so we need to give the post data and hour gap
-		// if (typeof onehour != undefined && onehour == true) { 
-		// 	$('#msgsndr_schedulecalllate option:last-child').attr('selected', 'selected');
-		// } else {
-		// 	$('#msgsndr_schedulecalllate option:last-child').attr('selected', 'selected');
-		// }
-	};
-
 	// Send Message Buttons -- section 3 on main page and schedule modal
 	$('.submit_broadcast').on('click', function(e) {
 		e.preventDefault();
 
-		//if the send now button is clicked
-		if( $(this).attr('id') == 'send_now_broadcast'){
-			// check for role permissions settings
-			if (rolecallearly != false && rolecalllate != false){
-				// getting the time now, and setting up a moment object with it. 
-				// reset the date to the epoch first -- we don't have a date with the settings times 
-				// var timenow       = moment().format('h:mm a');
-				// var timecheck     = moment('1970,01,01,'+timenow).unix();
-				// var callearlytime = moment('1970,01,01,'+rolecallearly).unix();
-				// var calllatetime  = moment('1970,01,01,'+rolecalllate).unix();
+		//if the send now button is clicked and the user is restricted.
+		if($("#msgsndr_scheduletype").val() == "now" && rolecallearly != false && rolecalllate != false){
+			// getting the time now, and setting up a moment object with it. 
+			// reset the date to the epoch first -- we don't have a date with the settings times 
+			// var timenow       = moment().format('h:mm a');
+			// var timecheck     = moment('1970,01,01,'+timenow).unix();
+			// var callearlytime = moment('1970,01,01,'+rolecallearly).unix();
+			// var calllatetime  = moment('1970,01,01,'+rolecalllate).unix();
 
-				var callearlytime = moment(serverDate+rolecallearly).unix();
-				var calllatetime  = moment(serverDate+rolecalllate).unix();
+			var callearlytime = moment(serverDate+rolecallearly).unix();
+			var calllatetime  = moment(serverDate+rolecalllate).unix();
 
-				var timecheck = timeUpdate();
+			var timecheck = timeUpdate();
 
-				// compare times
-				var isTooEarly    = timecheck <= callearlytime;
-				var isTooLate     = timecheck >= calllatetime;
+			// compare times
+			var isTooEarly    = timecheck <= callearlytime;
+			var isTooLate     = timecheck >= calllatetime;
 
-				// hour check - need to check if the difference in time between calllatetime and timecheck
-				// onehour is set to false if they have more than an hour window available, else it's true
-				// var onehour = true;
-				// var hourcheck = (timecheck - calllatetime) / 3600;
-				// if ( hourcheck > 1) {
-				// 	var onehour = false 
-				// }
+			// hour check - need to check if the difference in time between calllatetime and timecheck
+			// onehour is set to false if they have more than an hour window available, else it's true
+			// var onehour = true;
+			// var hourcheck = (timecheck - calllatetime) / 3600;
+			// if ( hourcheck > 1) {
+			// 	var onehour = false 
+			// }
 
-				if(isTooEarly == false && isTooLate == false){
-					// send now if the timecheck is passed
-					// scheduleNow(onehour);
-					scheduleNow();
-				} else if(isTooEarly == true || isTooLate == true){
-					alert("You do not have authorization to send broadcasts at this time, please schedule your broadcast.");
-					// return so the postdata isn't submitted.
-					return;
-				} 
-			} else {
-				// no role settings for callearly/calllate, we're good to go!
-				scheduleNow();
+			if(isTooEarly == true || isTooLate == true){
+				alert("You do not have authorization to send broadcasts at this time, please schedule your broadcast.");
+				// return so the postdata isn't submitted.
+				return;
 			}
 		}
 		

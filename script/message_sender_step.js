@@ -315,4 +315,12 @@ function StepManager(_valManager) {
 			$('#msgsndr_optionsavemessagename').val('');
 		}
 	});
+	
+	// Bind scheduleing buttons on step 3
+	$('a[href="#schedule_options"], #send_now_broadcast').on("click", function(event) {
+		if ($(this).attr('id') == 'send_now_broadcast')
+			$("#msgsndr_scheduletype").val("now");
+		else
+			$("#msgsndr_scheduletype").val("schedule");
+	});
 };

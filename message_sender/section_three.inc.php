@@ -77,6 +77,7 @@
 			
 			
 			<div id="schedule_options" class="modal hide">
+			<input type="hidden" id="msgsndr_scheduletype" name="msgsndr_scheduletype" value="now" />
 			<div class="modal-header">
 				<h3>Schedule Message<a href="#" class="close" data-dismiss="modal">x</a></h3>
 			</div>
