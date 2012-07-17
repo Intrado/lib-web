@@ -99,7 +99,7 @@ if (isset($_POST['eventContacts']) && isset($_POST['eventMessage']) && isset($_P
 											true,false,$args);
 
 		// Making sure that the contacts belong to the section
-    	$sectioncontacts = QuickQueryList("select personid from personassociation where type = 'section' and sectionid = ? and personid in (" . repeatWithSeparator("?",",",count($contacts)) . ")",false,false,array_merge(array($section->id),$contacts));
+		$sectioncontacts = QuickQueryList("select p.id from person p join personassociation pa on (p.id = pa.personid) where pa.type = 'section' and pa.sectionid = ? and not p.deleted and p.id in (" . repeatWithSeparator("?",",",count($contacts)) . ")",false,false,array_merge(array($section->id),$contacts));
 
 		if($sectioncontacts) {
 			foreach($sectioncontacts as $contact) {
@@ -133,6 +133,9 @@ if (isset($_POST['eventContacts']) && isset($_POST['eventMessage']) && isset($_P
 				}
 				QuickQuery("COMMIT");
 			}
+		} else {
+			echo json_encode(false);
+			exit(0);
 		}
 	}
 	echo json_encode(true);
@@ -154,7 +157,7 @@ if (isset($_GET['sectionid'])) {
 
 		$res = Query("select p.id, p.pkey,concat(p.$firstnamefield,' ', p.$lastnamefield) name
 											from person p join personassociation pa on (p.id = pa.personid)
-											where pa.type = 'section' and sectionid = ? order by p.$firstnamefield,p.$lastnamefield",false,array($id));
+											where pa.type = 'section' and sectionid = ? and not p.deleted order by p.$firstnamefield,p.$lastnamefield",false,array($id));
 		while($row = DBGetRow($res)){
 			$obj = null;
 			$obj->pkey = escapehtml($row[1]);

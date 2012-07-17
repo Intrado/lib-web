@@ -93,7 +93,7 @@ from personassociation pa
 inner join person p on (pa.personid = p.id)
 inner join event e on (pa.eventid = e.id)
 inner join targetedmessage tm on (e.targetedmessageid = tm.id)
-where e.userid = ? $orderby limit $start, $limit";
+where e.userid = ? and not p.deleted $orderby limit $start, $limit";
 
 $personcomments = QuickQueryMultiRow($query,true,false,array($USER->id));
 

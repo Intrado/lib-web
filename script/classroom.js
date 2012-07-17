@@ -539,7 +539,11 @@
 						alert('Your changes cannot be saved because your session has expired or logged out.');
 						window.location="index.php?logout=1";
 					}
-
+					if(response.responseJSON == false) {
+						alert('Unable to set comment');
+						$(htmlid).down('img').src = getstatesrc(checkedmessages.get(msgid) || 0);
+						return;
+					}
 					var markedid = markedcomment?markedcomment.substr(markedcomment.indexOf('-')+1):'';
 
 					cuurentcontacts.each(function(contact) {
