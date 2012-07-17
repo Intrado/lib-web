@@ -16,11 +16,15 @@ require_once("inc/help.inc.php");
 
 // List all possible request values and set their defaults
 $ranges = array("7days" => "7 Days","month" => "Month","year" => "Year");
-$requestValues = array(
-			"showactivity" => 'me',
-			"daterange" => '7days',
-);
 
+if (isset($_SESSION["dashboardactivity"])) {
+	$requestValues = $_SESSION["dashboardactivity"];
+} else {
+	$requestValues = array(
+				"showactivity" => 'me',
+				"daterange" => '7days',
+	);
+}
 
 // Update request values from what is passed in
 foreach($requestValues as $key => $values) {
@@ -28,6 +32,8 @@ foreach($requestValues as $key => $values) {
 		$requestValues[$key] = $_REQUEST[$key];
 	}
 }
+
+$_SESSION["dashboardactivity"] = $requestValues;
 
 $useridList = array();
 //FIXME don't format strings in DB
@@ -151,7 +157,13 @@ if ($requestValues["showactivity"] == "me") {
 } else if ($requestValues["showactivity"] == "everyone") {
 	$queryUsers = array_keys($useridList);
 } else {
-	$queryUsers = array($requestValues["showactivity"] + 0);
+	if (in_array($requestValues["showactivity"], array_keys($useridList))) {
+		$queryUsers = array($requestValues["showactivity"] + 0);
+	} else {
+		// in case of tampering with request, clear dashboardactivity variable so user can get back to dashboard and redirect to unauth
+		unset($_SESSION["dashboardactivity"]);
+		redirect('unauthorized.php');
+	}
 }
 
 // sql explained key useraccess
