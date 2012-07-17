@@ -67,8 +67,8 @@ function fmt_custurl($row, $index){
 		return escapehtml(escapehtml($CUSTOMERINFO[$row[0]]['urlcomponent']));
 }
 function fmt_actions($row, $index){
-	$str = "<a href='#' onclick='clearpassword(\"" . $row[0] ."\",\"" . $row[1] ."\");this.setStyle({color: \"black\"});return false;' target=\"_blank\">clear</a>";
-	$str .= ",<a href='#' onclick='resetpassword(\"" . $row[0] ."\",\"" . $row[1] ."\");this.setStyle({color: \"black\"});return false;' target=\"_blank\">reset</a>";
+	$str = "<a href='#' onclick='clearpassword(\"" . $row[0] ."\",\"" . $row[1] ."\");return false;'>clear</a>";
+	$str .= ",<a href='#' onclick='resetpassword(\"" . $row[0] ."\",\"" . $row[1] ."\");return false;'>reset</a>";
 	return $str;
 }
 
@@ -168,6 +168,8 @@ function clearpassword(customerid,userid) {
 			var result = response.responseJSON;
 			if(!result) {
 				alert("Failed to clear/reset password");
+			} else {
+				alert("Cleared Password");
 			}
 		},
 		onFailure: function(){
@@ -185,6 +187,8 @@ function resetpassword(customerid,userid) {
 			var result = response.responseJSON;
 			if(!result) {
 				alert("Unable to clear/reset password, Most likely because the user do not have a email assigned to the account or the account is Not enabled");
+			} else {
+				alert("Password Reset");
 			}
 		},
 		onFailure: function(){
