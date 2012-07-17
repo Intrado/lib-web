@@ -94,9 +94,9 @@ $formatters = array(
 ////////////////////////////////////////////////////////////////////////////////
 function fmt_monitor_event($row,$index) {
 	$types = array(
-		'job-active' => 'Jobs Submitted',
-		'job-firstpass' => 'Jobs First Attempt Completed',
-		'job-complete' => 'Jobs Completed'
+		'job-active' => _L('%s Submitted',getJobTitle()),
+		'job-firstpass' => _L('%s First Attempt Completed',getJobTitle()),
+		'job-complete' => _L('%s Completed',getJobTitle())
 	);
 	return isset($types[$row[$index]])?$types[$row[$index]]:"Unknown";
 }
@@ -113,7 +113,7 @@ function fmt_monitor_filter ($row,$index) {
 					if (isset($users[$userid]))
 						$filterbyusers[] = $users[$userid];
 				}
-				$filterbyvalues[] = "Users: " . implode(",",$filterbyusers);
+				$filterbyvalues[] = _L("Users: %s",implode(",",$filterbyusers));
 				break;
 			case 'jobtypeid':		
 				$fiterbyjobtypes = array();
@@ -121,15 +121,15 @@ function fmt_monitor_filter ($row,$index) {
 					if (isset($jobtypes[$jobtypeid]))
 						$fiterbyjobtypes[] = $jobtypes[$jobtypeid]->name;
 				}
-				$filterbyvalues[] =  "Job Types: " . implode(",",$fiterbyjobtypes);
+				$filterbyvalues[] =  _L("%s Types: %s",getJobTitle(),implode(",",$fiterbyjobtypes));
 				break;
 		}
 	}
 	
 	if (!in_array('userid',array_keys($row[$index])))
-		$filterbyvalues[] = "Users: All";
+		$filterbyvalues[] = _L("Users: All");
 	if (!in_array('jobtypeid',array_keys($row[$index])))
-		$filterbyvalues[] = "Job Types: All";
+		$filterbyvalues[] = _L("%s Types: All",getJobTitle());
 	
 	return implode(";",$filterbyvalues);
 }

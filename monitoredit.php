@@ -110,7 +110,7 @@ $helpsteps = array ();
 $helpstepnum = 1;
 $jobevents = array("job-active" => "Submitted","job-firstpass" => "First Attempt Completed", "job-complete" => "Completed");
 $formdata["jobevent"] = array(
-		"label" => _L('Job Event'),
+		"label" => _L('%s Event',getJobTitle()),
 		"fieldhelp" => _L('The type of event which will trigger this monitor.'),
 		"value" => $monitor->id?$monitor->type:'',
 		"validators" => array(
@@ -123,7 +123,7 @@ $formdata["jobevent"] = array(
 $jobtypes = QuickQueryList("select id,name from jobtype where deleted=0 and not issurvey order by name",true);
 $selectedjobtypes = $monitor->id?QuickQuery("select val from monitorfilter where type='jobtypeid' and monitorid=?",false,array($monitor->id)):'';
 $formdata["jobtypes"] = array(
-		"label" => _L('Job Types'),
+		"label" => _L('%s Types',getJobTitle()),
 		"fieldhelp" => _L('Optionally add a filter for certain types of jobs.'),
 		"value" => $selectedjobtypes != ""?explode(",",$selectedjobtypes):array(),
 		"validators" => array(
@@ -245,7 +245,7 @@ else
 	$TITLE = _L('Add Monitor');
 
 include_once("nav.inc.php");
-startWindow(_L('Job Monitor Settings'));
+startWindow(_L('%s Monitor Settings',getJobTitle()));
 echo $form->render();
 endWindow();
 include_once("navbottom.inc.php");
