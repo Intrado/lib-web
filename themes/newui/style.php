@@ -137,7 +137,7 @@ border-top: 1px solid #bbb; border-right: 1px solid #bbb; border-bottom: 1px sol
 .summary .col li span { display: inline-block; width: 30px; font-weight: bold; color: #48A3BE; }
 .summary .col li img { background: #555; display: inline-block; }
 .summary strong { font-weight: bold; font-size: 52px; line-height: 52px; }
-.summary .bloc { background: #fff; height: 140px; text-align: left; border: 1px solid #93C9D9; -webkit-border-radius: 5px; border-radius: 5px; }
+.summary .bloc { background: #fff; height: 140px; text-align: left; border: 1px solid #93C9D9; -webkit-border-radius: 5px; border-radius: 5px; white-space: nowrap;overflow: hidden;}
 .summary img.dashboard_graph { width: 55%; margin: 0 5px 0 0; }
 .summary ul { float: left; }
 
