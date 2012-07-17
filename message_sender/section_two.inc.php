@@ -193,7 +193,7 @@
 				<fieldset>
 					<label for="msgsndr_emailmessagesubject">Subject&nbsp;<img id="msgsndr_emailmessagesubject_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label> 
 					<div class="controls">
-						<input type="text" id="msgsndr_emailmessagesubject" name="msgsndr_emailmessagesubject" class="required msgdata" autocomplete="off" maxlength="30"/> <span class="error"></span>
+						<input type="text" id="msgsndr_emailmessagesubject" name="msgsndr_emailmessagesubject" class="required msgdata" autocomplete="off"/> <span class="error"></span>
 						<div id="msgsndr_emailmessagesubject_msg" class="box_validatorerror er" style="display:none"></div>
 					</div>
 				</fieldset>
