@@ -252,7 +252,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 <div class="wrap"><!-- ends in navbottom.inc -->
 
 <div id="top_banner" class="banner">
-<div class="container cf">
+<div class="contain cf">
 
 	<div class="banner_logo">
 		<table class="logo"><tr><td><? doLogo() ?></td></tr></table>
@@ -284,7 +284,7 @@ Event.observe(window, 'load', function() {
 </script>
 
 <div class="primary_nav">
-<div class="container cf">
+<div class="contain cf">
 
 	<div class="navshortcut">
 	<? 	if ($USER->authorize("startshort")) { ?>
@@ -318,7 +318,7 @@ Event.observe(window, 'load', function() {
 </div><!-- primary_nav -->
 
 <div class="subnavtabs">
-	<div class="container">
+	<div class="contain">
 		<ul class="cf">
 			<?= $SUBTABS ?>
 		</ul>

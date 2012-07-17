@@ -4,7 +4,7 @@
 </div><!-- end for wrap starts in nav.inc.php -->
 
 <div id="footer" class="cf">
-<div class="container">
+<div class="contain">
 
 <div id="termsinfo">
 Service &amp; Support:&nbsp;<a href="mailto:<?=$_SESSION['_supportemail']?>"><?=$_SESSION['_supportemail']?></a>&nbsp;|&nbsp;(<?=substr($_SESSION['_supportphone'],0,3) . ")&nbsp;" . substr($_SESSION['_supportphone'],3,3) . "-" . substr($_SESSION['_supportphone'],6,4);?>
