@@ -699,6 +699,12 @@ function ContentManager() {
 		self.allowContent("sms");
 	}
 
+	var hasEnrollment = orgFeatures.enrollment;
+	
+	if (hasEnrollment) {
+		$("#listwidget_enrollment").removeClass("hidden");
+	}
+	
 	var hasFacebook = orgFeatures.facebook == true && userPermissions.facebookpost == 1;
 	var hasTwitter = orgFeatures.twitter == true && userPermissions.twitterpost == 1;
 	var hasFeed = orgFeatures.feed == true && userPermissions.feedpost == 1;

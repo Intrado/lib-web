@@ -5,7 +5,7 @@
 									<span>or</span>
 									<div class="btn-group">
 										<a href="#add-recipients-rules" class="btn" data-toggle="modal">Build a List Using Rules</a>
-										<a href="#" class="btn dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></a>
+										<a href="#" id="listwidget_enrollment" class="btn dropdown-toggle hidden" data-toggle="dropdown"><span class="caret"></span></a>
 										<ul class="dropdown-menu">
 											<li><a href="#add-recipients-sections" data-toggle="modal">Use Sections</a></li>
 										</ul>
