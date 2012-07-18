@@ -448,7 +448,7 @@ $formdata["name"] = array(
 		array("ValDuplicateNameCheck","type" => "job"),
 		array("ValLength","max" => ($JOBTYPE == "repeating")?30:50)
 	),
-	"control" => array("TextField","size" => 30, "maxlength" => 50),
+	"control" => array("TextField","size" => 30, "maxlength" => ($JOBTYPE == "repeating")?30:50),
 	"helpstep" => $helpstepnum
 );
 $formdata["description"] = array(
