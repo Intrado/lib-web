@@ -402,7 +402,7 @@ $formdata = array(
 				"validators" => array(
 						array("ValRequired"),
 						array("ValDuplicateNameCheck", "type" => "job"),
-						array("ValLength","max" => 30)
+						array("ValLength","max" => 50)
 				),
 				"control" => array("TextField"),
 				"helpstep" => 1

@@ -8,7 +8,7 @@
 				<fieldset>
 					<label for="msgsndr_name">Subject&nbsp;<img id="msgsndr_name_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>
 					<div class="controls">
-						<input type="text" id="msgsndr_name" name="msgsndr_name" data-ajax="true" class="required" autocomplete="off" maxlength="30"/> 
+						<input type="text" id="msgsndr_name" name="msgsndr_name" data-ajax="true" class="required" autocomplete="off" maxlength="50"/> 
 						<span class="error"></span>
 						<div id="msgsndr_name_msg" class="box_validatorerror er" style="display:none"></div>
 						<p>e.g. "PTA Meeting Reminder"</p>
