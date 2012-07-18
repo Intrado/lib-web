@@ -2,6 +2,7 @@ function ValidationManager() {
 	var $ = jQuery;
 	var self = this;
 	
+	var formname = "msgsndr";
 	var validationMap = {
 		"1": {"all": [
 				"msgsndr_name",
@@ -190,4 +191,10 @@ function ValidationManager() {
 		var form = name.split("_")[0];
 		form_do_validation(document.getElementById(form), document.getElementById(name), callback);
 	};
+	
+	this.stopValidationTimer = function () {
+		formvars = document.formvars[formname];
+		if (formvars.keyuptimer)
+			window.clearTimeout(formvars.keyuptimer);
+	}
 };
