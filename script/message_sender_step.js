@@ -113,6 +113,11 @@ function StepManager(_valManager) {
 				eEvent(currentStep, step);
 			});
 			
+
+			if(currentStep == 2) {
+				loadMsg.getMessageGroupsTotal();
+			}
+
 			if(currentStep == 3) {
 				self.preSubmitConfig();
 			}

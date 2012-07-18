@@ -165,6 +165,20 @@ $.loadMessage = function loadMessage() {
 	this.updateProgressBar = function (progress) {
 		$('#msgsndr_loading_saved_message').find(".progress").width(progress+'%');
 	};
+
+	this.getMessageGroupsTotal = function() {
+		$.ajax({
+			url: '/'+orgPath+'/api/2/users/'+userid+'/messagegroups',
+			type: "GET",
+			dataType: "json",
+			async: false,
+			success: function(data) {
+				if (data.paging.total >= 1) {
+					$('#load-a-saved-message').removeClass('hide');
+				}
+			}
+		});
+	};
 	
 	// get message group data ...
 	this.getMessageGroups = function(start) {
