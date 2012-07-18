@@ -196,5 +196,5 @@ function ValidationManager() {
 		formvars = document.formvars[formname];
 		if (formvars.keyuptimer)
 			window.clearTimeout(formvars.keyuptimer);
-	}
+	};
 };
