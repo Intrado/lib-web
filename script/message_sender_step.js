@@ -52,13 +52,16 @@ function StepManager(_valManager) {
 			$('button.btn_confirm', stepMap[step]).attr('disabled','disabled');
 			return;
 		}
-			
+		
+		// Start step validation
+		$(stepMap[step] + ' img[name="valspinner"]').removeClass("hidden");
 		obj_valManager.validateStep(currentStep, false, function (passed) {
 			if(passed) {
 				$("button.btn_confirm", stepMap[step]).removeAttr('disabled');
 			} else {
 				$('button.btn_confirm', stepMap[step]).attr('disabled','disabled');
 			}
+			$(stepMap[step] + ' img[name="valspinner"]').addClass("hidden");
 		});
 	};
 	

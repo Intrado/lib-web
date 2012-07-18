@@ -30,7 +30,7 @@
 			</div>
 			
 			<div class="msg_confirm">
-					<button class="btn_confirm" disabled="disabled" data-next="2">Continue <span class="icon"></span></button>
+					<img name="valspinner" class="hidden" src="img/ajax-loader.gif"><button class="btn_confirm" disabled="disabled" data-next="2">Continue <span class="icon"></span></button>
 			</div>
 			
 			</div><!-- end window_panel -->

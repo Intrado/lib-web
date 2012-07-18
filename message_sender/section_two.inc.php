@@ -159,6 +159,7 @@
 				<fieldset class="form_actions">
 					<div class="controls">
 					<button class="btn_save" disabled="disabled" data-nav=".ophone" data-tts="true">Save Phone Message </button><img src="img/ajax-loader.gif" class="loading hide">
+					<img name="valspinner" class="hidden" src="img/ajax-loader.gif">
 					<button class="btn_discard" data-nav=".ophone">Discard</button>
 					</div>
 				</fieldset>
@@ -242,6 +243,7 @@
 				<fieldset class="form_actions">
 					<div class="controls">
 					<button class="btn_save" disabled="disabled" data-nav=".oemail">Save Email Message</button><img src="img/ajax-loader.gif" class="loading hide" />
+					<img name="valspinner" class="hidden" src="img/ajax-loader.gif">
 					<button class="btn_discard" data-nav=".oemail">Discard</button>
 					</div>
 				</fieldset>
@@ -268,6 +270,7 @@
 				<fieldset class="form_actions">
 					<div class="controls">
 						<button class="btn_save" disabled="disabled" data-nav=".osms">Save SMS Message</button>
+						<img name="valspinner" class="hidden" src="img/ajax-loader.gif">
 						<button class="btn_discard" data-nav=".osms">Discard</button>
 					</div>
 				</fieldset>
@@ -411,6 +414,7 @@
 				<fieldset class="form_actions">
 					<div class="controls">
 						<button class="btn_save" disabled="disabled" data-nav=".osocial">Save Social Messages</button>
+						<img name="valspinner" class="hidden" src="img/ajax-loader.gif">
 						<button class="btn_discard" data-nav=".osocial">Discard</button>
 					</div>
 				</fieldset>
@@ -420,7 +424,7 @@
 			</div><!-- end tab_content -->
 			
 			<div class="msg_confirm">
-				<button class="btn_confirm" disabled="disabled" data-next="3">Continue <span class="icon"></span></button>
+				<img name="valspinner" class="hidden" src="img/ajax-loader.gif"><button class="btn_confirm" disabled="disabled" data-next="3">Continue <span class="icon"></span></button>
 			</div>
 			
 			</div><!-- end window_panel -->
