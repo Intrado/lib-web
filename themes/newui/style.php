@@ -184,12 +184,12 @@ a.bigbtn:hover { background-color: #C63A0E; text-decoration: none;
 a.bigbtn span { background: url(themes/newui/broadcast.png) 0 center no-repeat; display: block; line-height: 30px; padding: 0 0 0 30px; }
   
 
-/*----- Notify - used for facebook alerts and unplayed message alerts -----*/
+/*----- .dash_alert - used for facebook alerts and unplayed message alerts -----*/
 
-.notify { background-color: #ede105; margin: 0 0 25px 0; padding: 11px 15px; font-size: 14px; line-height: 22px; font-weight: bold;
+.dash_alert { background-color: #ede105; margin: 0 0 25px 0; padding: 11px 15px; font-size: 14px; line-height: 22px; font-weight: bold;
 -webkit-border-radius: 5px; border-radius: 5px;
 -webkit-box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25) inset; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25) inset; }
-.notify a { display: block; }
+.dash_alert a { display: block; }
 
   
 /*----- Broadcast templates -----*/

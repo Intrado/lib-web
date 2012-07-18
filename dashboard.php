@@ -411,7 +411,7 @@ include("nav.inc.php");
 		
 <? 
 	if (isset($DESCRIPTION) && $DESCRIPTION != "") {
-		echo '<div class="notify">' . $DESCRIPTION . '</div>';
+		echo '<div class="dash_alert">' . $DESCRIPTION . '</div>';
 	}
 ?>
 		
