@@ -28,6 +28,11 @@ function PermissionManager() {
 				orgid = data.roles[0].organization.id;
 
 				self.configureRoles(data.roles); // Send Data over to the function setUp();
+			},
+			error: function() {
+				$('#error').show();
+				$('#loading').hide();
+				$('.error_list').append('<li>Unable to get your role data</li>');
 			}
 		});
 	};
@@ -51,6 +56,11 @@ function PermissionManager() {
 					$.each(options, function(oIndex, oItem) {
 						orgOptions[oItem.name] = oItem.value;
 					});
+				},
+				error: function() {
+					$('#error').show();
+					$('#loading').hide();
+					$('.error_list').append('<li>Unable to get your organisations options</li>');
 				}
 			});
 		};
@@ -67,6 +77,11 @@ function PermissionManager() {
 					$.each(features, function(fIndex, fItem) {
 						orgFeatures[fItem.name] = fItem.isEnabled;
 					});
+				},
+				error: function() {
+					$('#error').show();
+					$('#loading').hide();
+					$('.error_list').append('<li>Unable to get your organisations settings</li>');
 				}
 			});
 		};
@@ -98,6 +113,11 @@ function PermissionManager() {
 						}
 					});
 
+				},
+				error: function() {
+					$('#error').show();
+					$('#loading').hide();
+					$('.error_list').append('<li>Unable to get your language options</li>');
 				}
 			});
 
@@ -116,6 +136,11 @@ function PermissionManager() {
 					$.each(data.preferences, function(uIndex, uPrefs) {
 						userPrefs[uPrefs.name] = uPrefs.value;
 					});
+				},
+				error: function() {
+					$('#error').show();
+					$('#loading').hide();
+					$('.error_list').append('<li>Unable to get your user preferences</li>');
 				}
 			});
 		};
@@ -136,6 +161,11 @@ function PermissionManager() {
 						userInfo.phoneFormatted = formatPhone(data.phone);
 					else
 						userInfo.phoneFormatted = "";
+				},
+				error: function() {
+					$('#error').show();
+					$('#loading').hide();
+					$('.error_list').append('<li>Unable to get your user information</li>');
 				}
 			});
 		};

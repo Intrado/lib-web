@@ -2,7 +2,7 @@ jQuery.noConflict();
 (function($) {
 
 	// hide stuff straight away
-	$('#msg_section_2, #msg_section_3').hide().removeClass('hide');
+	$('#error, #msg_section_1, #msg_section_2, #msg_section_3').hide().removeClass('hide');
 
 	// prototype to jquery event bridge
 	var oldjQueryTrigger = $.event.trigger;
@@ -61,7 +61,12 @@ jQuery.noConflict();
 					$this.val(jobtypeid);
 				}
 
-			} // success
+			},
+			error: function() {
+				$('#error').show();
+				$('#loading').hide();
+				$('.error_list').append('<li>Unable to load job types</li>');
+			}
 		});
 	};
 
@@ -176,7 +181,6 @@ jQuery.noConflict();
 		
 		obj_permissionManager.onPermissionsLoaded(function() {
 			// CKEDITOR
-			// applyHtmlEditor('msgsndr_emailmessagetext');
 			applyCkEditor('msgsndr_emailmessagetext');
 			
 			$(document).ready(function() {
@@ -202,6 +206,12 @@ jQuery.noConflict();
 				// message group
 				if (mgid != 0)
 					loadMsg.loadMessageGroup(mgid);
+
+				if (!$('#error').is(':visible')) {
+					$('#loading').hide();
+					// Load Step 1 - This will only happen if all previous checks are returned fine
+					obj_stepManager.gotoStep(1);
+				}
 			});
 		});
 		
@@ -325,7 +335,7 @@ jQuery.noConflict();
 		});
 
 		//step 1
-		obj_stepManager.gotoStep(1);
+		//obj_stepManager.gotoStep(1);
 
 		//ADDITIONAL EVENT BINDING FOR CERTAIN ACTIVITIES
 		// Switch Audio 
@@ -441,6 +451,11 @@ jQuery.noConflict();
 		// observe list changes and validate
 		$("#msgsndr_listids").on("listwidget:updated", function () {
 			obj_valManager.runValidateEventDriven("msgsndr_listids");
+		});
+
+		$('#refresh_page').on('click', function(e) {
+			e.preventDefault()
+			window.location.reload()
 		});
 	});
 })(jQuery);

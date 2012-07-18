@@ -1,7 +1,7 @@
 
 			<!-- ============== Message sender section 1, Subject and Recipients ============== -->
 				
-			<div id="msg_section_1" class="window_panel">
+			<div id="msg_section_1" class="window_panel hide">
 			
 			<h3 class="flag">Broadcast Info</h3>
 			<div class="field_wrapper">

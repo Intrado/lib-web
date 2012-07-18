@@ -23,6 +23,45 @@
 
 		<input type="hidden" name=msgsndr-formsnum value="<?=$form->serialnum?>" />
 
+			<!-- ============== Loading ============== -->
+				
+			<div id="loading" class="window_panel">
+			
+			<h3 class="flag">Loading Broadcast</h3>
+			<div class="field_wrapper">
+				
+				<p>We are grabbing all your data and loading the job wizard based on your permission, please bear with us.
+				</p>
+
+			</div>
+			
+			</div><!-- end window_panel -->
+
+			<!-- ============== Error ============== -->
+				
+			<div id="error" class="window_panel hide">
+			
+			<h3 class="flag">Error</h3>
+			<div class="field_wrapper">
+				
+				<p>We have been unable to load the New Broadcast Wizard due to the following errors: </p>
+
+				<ul class="error_list"></ul>
+
+				<p>
+					Try refreshing the page, either by using the default refresh button in your browser or the button 
+					below
+				</p>
+
+			</div>
+
+			
+			<div class="msg_confirm">
+					<button class="abtn_confirm" id="refresh_page">Refresh</span></button>
+			</div>
+			
+			</div><!-- end window_panel -->
+
 <? include("message_sender/section_one.inc.php"); ?>
 
 <? include("message_sender/section_two.inc.php"); ?>

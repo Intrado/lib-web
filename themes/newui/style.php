@@ -322,6 +322,16 @@ h3.flag { padding: 5px 22px; font-size: 18px; color: #fff; border: 1px solid #22
 .window_panel form { padding: 20px 0; border: 1px solid #ccc; -webkit-border-radius: 0 0 5px 5px; border-radius: 0 0 5px 5px; }
 
 .field_wrapper { margin: 0 0 20px 0; padding: 20px 0; border: 1px solid #ccc; -webkit-border-radius: 0 0 5px 5px; border-radius: 0 0 5px 5px; }
+
+#error .field_wrapper, #loading .field_wrapper {
+  padding: 20px;
+}
+  .error_list {
+    color: rgb(202, 86, 86);
+    list-style: disc;
+    margin: 0 0 0 20px;
+  }
+
 .add_recipients { margin: 0 0 20px 0; padding: 20px; border: 1px solid #ccc; -webkit-border-radius: 0 0 5px 5px; border-radius: 0 0 5px 5px; }
 .add_recipients form { border: none; }
 .tab_panel { background: #fafafa; padding: 5px 0 0; border: 1px solid #ccc; -webkit-border-radius: 8px; border-radius: 8px; }
