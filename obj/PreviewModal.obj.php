@@ -72,6 +72,11 @@ class PreviewModal {
 					}
 				}
 				
+				$imageparts = DBFindMany('MessagePart', "from messagepart where messageid=? and type='I'", false, array($message->id));
+				foreach($imageparts as $part) {
+					permitContent($part->imagecontentid);
+				}
+				
 				$email = messagePreviewForPriority($message->id, $jobpriority); // returns commsuite_EmailMessageView object
 				$modal->text = $modal->formatEmailHeader($email);
 				switch ($message->subtype) {
