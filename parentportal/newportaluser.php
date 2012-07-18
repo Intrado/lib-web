@@ -203,6 +203,21 @@ if(!$success){
 			<p class="right"><a href="index.php<?echo $appendcustomerurl;?>"><?=_L("Return to Sign In")?></a></p>
 
 	</form>
+	<script type="text/javascript">
+		$("form_textme").observe('click', function() {
+			if (this.checked) {
+				$('form_phone').removeClassName("disabled");
+				$('form_phone').writeAttribute("disabled",false);
+				$('label_phone').removeClassName("disabled");
+			} else {
+				$('form_phone').value = "";
+				$('form_phone').addClassName("disabled");
+				$('form_phone').writeAttribute("disabled",true);
+				$('label_phone').addClassName("disabled");
+				
+			}
+		});
+	</script>
 <?
 } else {
 ?>

@@ -159,9 +159,7 @@ include_once("cmlogintop.inc.php");
 
 </form>
 
-<?
-include("cmloginbottom.inc.php");
-?>
+
 <script type="text/javascript">
 document.getElementById('form_email').focus();
 
@@ -193,3 +191,7 @@ function capslockCheck(e){
 <noscript>
 	<?= escapehtml(_L("It looks like you don't have JavaScript enabled! You must have JavaScript enabled for full use of this system. Please enable JavaScript in your browser or contact your system administrator for assistance.")) ?>
 </noscript>
+
+<?
+include("cmloginbottom.inc.php");
+?>
