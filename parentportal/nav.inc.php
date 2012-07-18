@@ -98,6 +98,13 @@ header('Content-type: text/html; charset=UTF-8') ;
 	<link href="css/form.css.php" type="text/css" rel="stylesheet">
 	<link href="css/prototip.css.php" type="text/css" rel="stylesheet">
 	<link href='css/style_print.css' type='text/css' rel='stylesheet' media='print'>
+	
+	<!-- FIXME: temporary fix for bug 5392 -->
+	<style>
+	table input {
+		overflow: hidden;
+	}
+	</style>
 
 <!--[if lte IE 6]>
     <link href="css/ie6.css" type="text/css" rel="stylesheet"/>
