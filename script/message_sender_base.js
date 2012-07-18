@@ -60,7 +60,7 @@ jQuery.noConflict();
 				if(jobtypeid) {
 					$this.val(jobtypeid);
 				}
-
+				obj_valManager.runValidateEventDriven($this.attr("id"));
 			},
 			error: function() {
 				$('#error').show();
@@ -185,8 +185,10 @@ jQuery.noConflict();
 			
 			$(document).ready(function() {
 				// subject
-				if (subject)
+				if (subject) {
 					$('#msgsndr_name').val(subject).addClass("ok");
+					obj_valManager.runValidateEventDriven("msgsndr_name");
+				}
 				
 				// List Picker
 				$('.add-recipients').listPicker({
@@ -442,6 +444,7 @@ jQuery.noConflict();
 
 	    // set the schedule options startdate to today's date by default (uses moment.js)
 	 	$('#msgsndr_scheduledate').val(moment().format('MM/DD/YYYY'));
+		obj_valManager.runValidateEventDriven("msgsndr_scheduledate");
 
 		// modal windows -- script/bootstrap-modal.js
 		$('#msgsndr_choose_list, #msgsndr_build_list, #msgsndr_saved_message, #schedule_options, #msgsndr_submit_confirmation, #msgsndr_loading_saved_message').modal({

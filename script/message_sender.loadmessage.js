@@ -448,10 +448,6 @@ $.loadMessage = function loadMessage() {
 			});
 			
 			if (msg.languageCode == "en") {
-				self.loadMessagePartsFormatted(msgGrp.id, msg, self.elements.phoneText.addClass('ok'), false,
-					function (data) {
-						$('#msgsndr_phonemessagetext').val($.toJSON({ "gender" : gender, "text" : data.messageBody }))
-					});
 				if (gender == "female") {
 					$('#messagePhoneText_message-female').attr("checked","checked");
 					$('#messagePhoneText_message-male').removeAttr("checked");
@@ -459,6 +455,11 @@ $.loadMessage = function loadMessage() {
 					$('#messagePhoneText_message-female').removeAttr("checked");
 					$('#messagePhoneText_message-male').attr("checked","checked");
 				}
+				self.loadMessagePartsFormatted(msgGrp.id, msg, self.elements.phoneText.addClass('ok'), false,
+					function (data) {
+						$('#msgsndr_phonemessagetext').val($.toJSON({ "gender" : gender, "text" : data.messageBody }));
+						obj_valManager.runValidateEventDriven("msgsndr_phonemessagetext");
+					});
 			} else {
 				self.elements.phoneTranslateCheck.attr("checked","checked");
 				$(self.elements.phoneLanguageCheckPrefix + msg.languageCode).attr('checked','checked');
@@ -478,6 +479,7 @@ $.loadMessage = function loadMessage() {
 						updateTranslatedField(
 								$('#msgsndr_phonemessagetexttranslate' + msg.languageCode + 'text'),
 							data.messageBody, true, override, gender);
+						obj_valManager.runValidateEventDriven("msgsndr_phonemessagetexttranslate" + msg.languageCode + "text");
 					});
 			}
 		}
@@ -491,6 +493,11 @@ $.loadMessage = function loadMessage() {
 			self.elements.emailSubject.val(decodeURIComponent(msg.subject).replace(/\+/g," ")).addClass('ok');
 			self.loadMessageAttachments(msgGrp.id, msg, self.elements.emailAttach, self.elements.emailAttachControls);
 			self.loadMessagePartsFormatted(msgGrp.id, msg, self.elements.emailBody, true);
+			obj_valManager.runValidateEventDriven(self.elements.emailFromName.attr("id"));
+			obj_valManager.runValidateEventDriven(self.elements.emailFromEmail.attr("id"));
+			obj_valManager.runValidateEventDriven(self.elements.emailSubject.attr("id"));
+			obj_valManager.runValidateEventDriven(self.elements.emailAttach.attr("id"));
+			obj_valManager.runValidateEventDriven(self.elements.emailBody.attr("id"));
 		} else {
 			self.elements.emailTranslateCheck.attr("checked","checked");
 			$(self.elements.emailLanguageCheckPrefix + msg.languageCode).attr('checked','checked');
@@ -506,17 +513,23 @@ $.loadMessage = function loadMessage() {
 	
 	// load sms message
 	this.loadSmsMessage = function(msgGrp, msg) {
-		self.loadMessagePartsFormatted(msgGrp.id, msg, self.elements.smsText.addClass('ok'));
+		self.loadMessagePartsFormatted(msgGrp.id, msg, self.elements.smsText.addClass('ok'), false, function () {
+			obj_valManager.runValidateEventDriven(self.elements.smsText.attr("id"));
+		});
 	}
 
 	// load post message
 	this.loadPostMessage = function(msgGrp, msg) {
 		switch (msg.subType) {
 			case "facebook":
-				self.loadMessagePartsFormatted(msgGrp.id, msg, self.elements.facebookText.addClass('ok'));
+				self.loadMessagePartsFormatted(msgGrp.id, msg, self.elements.facebookText.addClass('ok'), false, function () {
+					obj_valManager.runValidateEventDriven(self.elements.facebookText.attr("id"));
+				});
 				break;
 			case "twitter":
-				self.loadMessagePartsFormatted(msgGrp.id, msg, self.elements.twitterText.addClass('ok'));
+				self.loadMessagePartsFormatted(msgGrp.id, msg, self.elements.twitterText.addClass('ok'), false, function () {
+					obj_valManager.runValidateEventDriven(self.elements.twitterText.attr("id"));
+				});
 				break;
 			case "feed":
 				var subject = decodeURIComponent(msg.subject).replace(/\+/g," ");
@@ -524,6 +537,7 @@ $.loadMessage = function loadMessage() {
 				self.loadMessagePartsFormatted(msgGrp.id, msg, self.elements.feedText.addClass('ok'), false,
 					function (data) {
 						$("#msgsndr_socialmediafeedmessage").val($.toJSON({ "subject": subject, "message": data.messageBody }));
+						obj_valManager.runValidateEventDriven("msgsndr_socialmediafeedmessage");
 					});
 				
 				break;

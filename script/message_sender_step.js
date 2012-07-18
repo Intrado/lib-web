@@ -210,6 +210,8 @@ function StepManager(_valManager) {
 			// select the default time and leave all times as options
 			$('#msgsndr_schedulecalllate option[value="'+defaultcalllate+'"]').attr('selected','selected');
 		}
+		obj_valManager.runValidateEventDriven("msgsndr_schedulecallearly");
+		obj_valManager.runValidateEventDriven("msgsndr_schedulecalllate");
 
 		// skip duplicates checkbox show / hide based on saved phone or email content
 		if ($('.msg_content_nav .ophone').hasClass('complete') == true || $('.msg_content_nav .oemail').hasClass('complete') == true){
@@ -248,6 +250,7 @@ function StepManager(_valManager) {
 				var addOneDay = moment().add('days',1); 
 				var futureDay = addOneDay.format('MM/DD/YYYY');
 				$('#msgsndr_scheduledate').val(futureDay);
+				obj_valManager.runValidateEventDriven("msgsndr_scheduledate");
 				$('#msgsndr_scheduledate').parent().parent().prepend('<p class="warning">Note: Start Date has been adjusted for tomorrow due to the limitations of your account</p>');
 			}
 		}

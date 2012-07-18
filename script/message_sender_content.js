@@ -13,6 +13,7 @@ var allowControl = {
 		for (i = 1; i <= daysToRun; i++) {
 			$('#msgsndr_optionmaxjobdays').append('<option value="' + i + '">' + i + '</option>');
 		}
+		obj_valManager.runValidateEventDriven("msgsndr_optionmaxjobdays");
 
 		// Hide / Show Translations
 		$('#text').on('click', '.toggle-translations', function(event) {
@@ -196,6 +197,7 @@ var allowControl = {
 				// the user hascallback so we hide caller id select fieldset from view
 				$('#optioncallerid_select').closest("fieldset").addClass('hidden');
 			}
+			obj_valManager.runValidateEventDriven("msgsndr_optioncallerid");
 		};
 
 		// call the callerIdDisplay function...
