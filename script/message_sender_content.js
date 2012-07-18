@@ -451,6 +451,9 @@ function ContentManager() {
 	};
 
 	this.updateContentStatus = function() {
+		// disable any validation timers, data will be validated with validateStep
+		obj_valManager.stopValidationTimer();
+		
 		// social step has special conditions... must have checked atleast one of the message types
 		if (currentContent == "social" && !$("#msgsndr_phonemessagepost").attr("checked") && !$("#msgsndr_hasfacebook").attr("checked") && 
 				!$("#msgsndr_hastwitter").attr("checked") && !$("#msgsndr_hasfeed").attr("checked")) {
@@ -654,6 +657,15 @@ function ContentManager() {
 		var itemName = $(this).attr('id').split('_')[1].substring(3);
 
 		if (show) {
+			if (itemName == 'feed') {
+				// load old values (if there are any)
+				var oldvalue = $("#msgsndr_socialmediafeedmessage").data("oldvalue");
+				if (oldvalue) {
+					$("#msgsndr_form_rsstitle").val(oldvalue.sub);
+					$("#msgsndr_form_rssmsg").val(oldvalue.msg);
+					$("#msgsndr_socialmediafeedmessage").val($.toJSON({ "subject": oldvalue.sub, "message": oldvalue.msg }));
+				}
+			}
 			$('.' + itemName).slideDown('slow', function() {
 				if (itemName == 'feed') { // if Post to Feeds set focus to the
 					// Post title input
@@ -665,27 +677,16 @@ function ContentManager() {
 			});
 		} else {
 			$('.' + itemName).slideUp('slow', function() {
+				if (itemName == 'feed') {
+					// must clear feed content
+					$("#msgsndr_socialmediafeedmessage").data("oldvalue", { "sub": $("#msgsndr_form_rsstitle").val(), "msg": $("#msgsndr_form_rssmsg").val() });
+					$("#msgsndr_form_rsstitle").val("");
+					$("#msgsndr_form_rssmsg").val("");
+					$("#msgsndr_socialmediafeedmessage").val("");
+				}
 				self.updateContentStatus();
 			});
 		}
-	});
-
-	//BIND FEED CHECKBOXES FOR VALIDATING
-	$("#feed_categories").on("click change", function() {
-
-		if ( $("#feed_categories input:checked").length > 0) {
-			$('label[for=feed_categories]').removeClass('req').addClass('ok');
-		} else {
-			$('label[for=feed_categories]').removeClass('ok').addClass('req');
-		}
-
-
-		self.updateContentStatus();
-	});
-	
-	// BIND FACEBOOK PAGE CHECKBOXES FOR VALIDATING
-	$("#msgsndr_socialmediafacebookpagefbpages").on("click", function(){
-		self.updateContentStatus();
 	});
 
 	// SET CONTENT ALLOWANCES
