@@ -146,8 +146,16 @@ $$$
 alter table tai_thread modify topicid int(11)
 $$$
 alter table tai_thread add threadtype enum('thread', 'comment', 'identityreveal') not null default 'thread'
-$$$
+$$$            
 
 -- $rev 6
 alter table tai_userthread add column frombcc tinyint(4) not null default 0;
+$$$
+
+-- $rev 7
+alter table tai_lockout add start_date DATE;
+$$$
+alter table tai_lockout add end_date DATE;
+$$$
+
 
