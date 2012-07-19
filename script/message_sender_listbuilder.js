@@ -199,15 +199,33 @@
 
                 // Populate the field options
                 modal.buildFields = function(){
-
                     // Build the options html
                     var fieldOptions = '';
-                    $.each(modal.ruleSettings.fieldmaps, function(id, field){
-                        
+                    
+                    var createFieldOption = function (id) {
+                        if (!modal.ruleSettings.fieldmaps[id])
+                            return;
                         // If the field is not already in a rule, add it as an option
                         if (modal.newList === undefined || modal.newList.rules[id] === undefined) {
-                            fieldOptions = fieldOptions + '<option value="' + id + '">' + field.name + '</option>';
+                            fieldOptions = fieldOptions + '<option value="' + id + '">' + modal.ruleSettings.fieldmaps[id].name + '</option>';
                         };
+                    }
+                    
+                    // F fields, separator, organization, G fields, separator, C fields
+                    $.each(["f","sep","organization","g","sep","c"], function (index, type) {
+                        switch (type) {
+                        case "sep":
+                            fieldOptions += '<option value="" disabled="disabled">-----------</option>';
+                            break;
+                        case "organization":
+                            createFieldOption(type);
+                            break;
+                        default:
+                            for (var i = 1; i <=20; i++) {
+                                var id = type + ("0" + i.toString()).substring(-2);
+                                createFieldOption(id);
+                            }
+                        }
                     });
                     modal.newRule.field.$el.html('<select><option value="">Select a field</option>' + fieldOptions + '</select>');
                 };
