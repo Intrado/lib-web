@@ -29,8 +29,10 @@ function insertNewWizEasyCall(formitemname, maincontainerid, langselect, langcod
 		$(langselect).value = 0;
 
 		// hide the language from the selector
-		if ($(langselect+"_"+langcode))
+		if ($(langselect+"_"+langcode)) {
 			$(langselect+"_"+langcode).hide();
+			$(langselect+"_"+langcode).writeAttribute("disabled","disabled");
+		}
 	}
 	
 	new WizEasyCall(
@@ -196,8 +198,10 @@ var WizEasyCall = Class.create(EasyCall,{
 			$(this.formitemname+"_altlangs").show();
 
 			// unhide the langcode from the selector
-			if ($(this.formitemname+"_select_"+this.langcode))
+			if ($(this.formitemname+"_select_"+this.langcode)) {
 				$(this.formitemname+"_select_"+this.langcode).show();
+				$(this.formitemname+"_select_"+this.langcode).removeAttribute("disabled");
+			}
 		}.bind(this));
 
 		return rembutton;
