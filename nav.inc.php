@@ -234,12 +234,8 @@ header('Content-type: text/html; charset=UTF-8') ;
 	<link href="css/prototip.css.php" type="text/css" rel="stylesheet" />
 	<link href="css/style_print.css" type="text/css" rel="stylesheet" media="print" />
 	
-	<!--[if gte IE 9]>
-	  <style type="text/css">
-	    .gradient {
-	       filter: none;
-	    }
-	  </style>
+	<!--[if IE 8]>
+		<script src="script/respond.min.js" type="text/javascript"></script>
 	<![endif]-->
 </head>
 <body <?=setBodyClass();?> <?= isset($MESSAGESENDER) && $MESSAGESENDER == true?' id="ms"':''?> >

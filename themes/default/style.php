@@ -48,7 +48,7 @@ a:hover { text-decoration: underline; }
 .secbutton { position: absolute; width: 150px; }
 .sectimeline { padding: 0 0 0 150px; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
 .window_aside { float: left; display: inline; width: 165px; margin: 0; }
-.window_main { width: inherit; margin: 0 0 0 175px; border-left: 1px dotted grey; padding: 0 0 0 10px;}
+.window_main { width: inherit; margin: 0 0 0 175px; border-left: 1px dotted gray; padding: 0 0 0 10px;}
 
 .pagetitle { margin: 0 0 10px 0; font-weight: bold; color: <?=$primary?>;  }
 .pagetitlesubtext { margin: 0 0 10px 0; }

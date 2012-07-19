@@ -201,6 +201,7 @@ function applyHtmlEditor(textarea, dontwait,target) {
 				'disableObjectResizing': true,
 				'resize_enabled': false,
 				'width': '100%',
+				'height': '400px',
 				'filebrowserImageUploadUrl' : 'uploadimage.php',
 				'toolbarStartupExpanded' : false,
 				'on': {
