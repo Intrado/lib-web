@@ -462,7 +462,7 @@ if(count($data) > 0) {
 	echo "\n</table>";
 	showPageMenu($total, $start, $limit);
 } else {
-	echo "<div class='destlabel'><img src='img/largeicons/information.jpg' align='middle'> " . _L("No blocked phones found") . "<div>";
+	echo "<div class='destlabel'><img src='img/largeicons/information.jpg' align='middle'> " . _L("No blocked phones found") . "</div>";
 }
 endWindow();
 
