@@ -52,7 +52,19 @@ function SubmitManager() {
 (function($) {
 	// overload form.js.php behavior for handling submit
 	form_handle_submit = function(form,event) {
-		var formvars = document.formvars[form.name];
+		// get jQuery extended version of this form
+		if (form.name)
+			form = $('form[name="' + form.name + '"]');
+		else
+			form = $('form[name="' + form + '"]');
+		
+		var formvars = document.formvars[form.attr("name")];
+
+		//only continue here if we are going to override the default submit behavior
+		if (!formvars.ajaxsubmit)
+			return;
+		if (event)
+			Event.stop(event); //we'll take it from here with ajax
 		
 		//don't allow more than one submit at a time
 		if (formvars.submitting)
@@ -76,7 +88,7 @@ function SubmitManager() {
 		});
 		
 		//start spinner
-		var spinner =  $(form.name + "_spinner");
+		var spinner =  $("#" + form.attr("name") + "_spinner");
 		if (spinner) {
 			spinner.show();
 		}
@@ -101,6 +113,7 @@ function SubmitManager() {
 							$('#msgsndr_submit_title').html("Submit Error");
 							$('#msgsndr_submit_message').html("There was a problem submitting the form. Please try again.");
 						}
+						$('#msgsndr_submit_confirmation').modal('show');
 					} else if ("fail" == res.status) {
 						$('#msgsndr_submit_title').html("Submit Error");
 						//show the validation results
@@ -111,6 +124,7 @@ function SubmitManager() {
 							$('#msgsndr_submit_message').html("The data on this form has changed.<br>Your changes cannot be saved.");
 							window.location=formvars.scriptname;
 						}
+						$('#msgsndr_submit_confirmation').modal('show');
 					} else if ("success" == res.status && res.nexturl) {
 						$('#msgsndr_submit_title').html("Broadcast Sent!");recipientTrack
 						$('#msgsndr_submit_message').html(
@@ -123,16 +137,16 @@ function SubmitManager() {
 						$('#msgsndr_submit_confirmation').bind("hide", function() {
 							window.location = res.nexturl;
 						});
+						$('#msgsndr_submit_confirmation').modal('show');
 					} else if ("modify" == res.status) {
 						$(res.name).update(res.content);
 					} else if ("fireevent" == res.status) {
-						$(form).trigger("Form:Submitted", res.memo);
+						form.trigger("Form:Submitted", res.memo);
 					}
 				} catch (e) {
 					alert(e.message + "\n" + response.responseText);
 				}
 				formvars.submitting = false;
-				$('#msgsndr_submit_confirmation').modal('show');
 			},
 			onFailure: function(){
 				if (spinner) {
