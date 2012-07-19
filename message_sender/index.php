@@ -102,7 +102,6 @@
 <script type="text/javascript" src="script/message_sender_submit.js"></script>
 <script type="text/javascript" src="script/message_sender.loadmessage.js"></script>
 <script type="text/javascript" src="script/message_sender_base.js"></script>
-<script type="text/javascript" src="script/message_sender.previewmodal.js"></script>
 <script type="text/javascript" src="script/message_sender.emailattach.js"></script>
 <script type="text/javascript" src="script/message_sender.facebook.js"></script>
 <script type="text/javascript" src="script/message_sender_listbuilder.js"></script>

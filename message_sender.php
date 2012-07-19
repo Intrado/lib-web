@@ -61,6 +61,12 @@ require_once("obj/CallerID.fi.php");
 require_once("obj/ValDuplicateNameCheck.val.php");
 require_once("obj/ValPermission.val.php");
 
+// Preview
+require_once("inc/previewfields.inc.php");
+require_once("obj/PreviewModal.obj.php");
+require_once("inc/appserver.inc.php");
+PreviewModal::HandleRequestWithPhoneText();
+
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
@@ -298,6 +304,9 @@ class ValConditionalOnValue extends Validator {
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
+
+PreviewModal::HandleRequestWithPhoneText();
+
 // get the user requested schedule out of postdata
 function getSchedule($postdata) {
 	global $ACCESS;
@@ -1343,6 +1352,7 @@ include("nav.inc.php");
 	
 </script>
 
+<?PreviewModal::includePreviewScript();?>
 
 <form id="<?=$form->name?>" name="<?=$form->name?>" action="/default/message_sender.php?form=msgsndr" method="POST" ><?
 
