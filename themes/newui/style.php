@@ -411,7 +411,7 @@ table.rules tr.new-rule { background-color: transparent; }
 table.rules tr.saved-rule td { border-bottom: 1px solid #ddd; }
 table.rules td { vertical-align: top; width: 145px; padding: 6px; line-height: 30px; }
 table.rules td:first-child { width: 30px; text-align: center; }
-table.rules td select, table.rules td input[type="text"] { width: 145px; }
+table.rules td select, table.rules td input[type="text"] { width: 145px; padding: 5px; }
 table.rules td label { float: none; display: block; width: 145px; margin: 0; text-align: left; }
 table.rules td input[type="checkbox"] { margin: 0 5px 0 0; }
 table.rules .value-options { overflow: auto; max-height: 200px; }
