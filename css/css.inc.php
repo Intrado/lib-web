@@ -102,7 +102,7 @@ audio:not([controls]) { display: none; }
 
 html { font-size: 100%; overflow-y: scroll; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
 body { margin: 0; font-size: 0.75em; line-height: 1.231; }
-body, input, select, textarea, button { font-family: Verdana, "Helvetica Neue", helvetica,  Arial, sans-serif; color: <?=$primary?>; }
+body, input, select, textarea, button { font-family: Verdana, "Helvetica Neue", helvetica,  Arial, sans-serif; color: #444 /*<?=$primary?>*/; }
 
 a { color: <?=$primary?>; text-decoration: none; }
 a:hover { color: <?=$theme1?>; }
@@ -353,21 +353,21 @@ table_left and table_right have the arrow controls, set to 8% width for 1024 scr
 .content_recordcount_btm { padding-top: .5em; }
 .content_recordcount { text-align: right; margin: 0;}
 
-.content_feed { position: relative; width: 100%; color: #444; }
+.content_feed { position: relative; display: table; width: 100%; color: #444; }
 .content_feed { /*margin-bottom: 35px;*/  }
 .content_feed img {  } 
 .content_feed span, .feed_detail { display: block; padding: 0 0 5px 0; width: 100%; }
-.content_feed .msg_icon { float: left; display: inline; margin: 0 10px 0 0; }
-.content_feed .feed_wrap { float: left; display: inline; margin: 0; }
-.content_feed .actionlinks { display: block; float: right; }
+.content_feed .msg_icon { display: table-cell; margin: 0 10px 0 0; width: 48px;}
+.content_feed .feed_wrap { display: table-cell; margin: 0; padding-left: 10px; vertical-align: middle; }
+.content_feed .actionlinks { display: table-cell; text-align: right; }
 	
-.feed, .feedtitle, .feed_title, .feedtitle a { color: #444; /* <?=$primary?> */ }
+.feed, .feedtitle, .feed_title, .feedtitle a { <?=$primary?> }
 .feedtitle, .feed_title { font-size: 14px; font-weight: bold;  }
 .feed_icon { width: 48px; vertical-align: top; }
 .feed_actions { width: 100px; }
 .feedtitle a:hover, .feed_title:hover { text-decoration: underline; }	
 .feed_btn_wrap { 	border-bottom: 1px dashed #ccc;	margin: 0 0 10px 0;	padding: 0 0 10px 0; }
-.feed_item { border-bottom: 1px solid #ccc; padding: 1em 0.5em; }
+.feed_item { display:table-row; border-bottom: 1px solid #ccc; padding: 1em 0.5em; margin-bottom: 5px; }
 .feed_item td { padding: 1em 0.5em; }
 
 
