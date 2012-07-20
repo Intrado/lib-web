@@ -141,7 +141,7 @@ function SubmitManager() {
 					} else if ("modify" == res.status) {
 						$(res.name).update(res.content);
 					} else if ("fireevent" == res.status) {
-						form.trigger("Form:Submitted", res.memo);
+						form.trigger("Form:Submitted", [res.memo]);
 					}
 				} catch (e) {
 					alert(e.message + "\n" + response.responseText);
