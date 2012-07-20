@@ -13,6 +13,24 @@
   <item name="Message Templates" url="Tips_for_Effective_Communication/Simple_Message_Templates.htm" />
   <item name="Communication Ideas" url="Tips_for_Effective_Communication/Communication_Ideas.htm" />
 </book>
+<book name="List Builder" >
+  <item name="About List Builder" url="List_Builder/Overview.htm" />
+  <item name="Create a List" url="List_Builder/Create_a_List.htm" />
+  <item name="Add Individual Contacts" url="List_Builder/Add_Individual_Contacts.htm" />
+</book>
+<book name="Message Builder" >
+  <item name="About Message Builder" url="Message_Builder/Overview.htm" />
+  <item name="Create a Message" url="Message_Builder/Create_a_Message.htm" />
+  <book name="Adding Content" >
+    <item name="Phone Message Content" url="Message_Builder/Phone_Message_Content.htm" />
+    <item name="SMS Message Content" url="Message_Builder/SMS_Message_Content.htm" />
+    <item name="Email Message Content" url="Message_Builder/Email_Message_Content.htm" />
+    <item name="Facebook Message Content" url="Message_Builder/Facebook_Message_Content.htm" />
+    <item name="Twitter Message Content" url="Message_Builder/Twitter_Message_Content.htm" />
+    <item name="RSS Feed Content" url="Message_Builder/RSS_Feed_Content.htm" />
+    <item name="Page Message Content" url="Message_Builder/Page_Message_Content.htm" />
+  </book>
+</book>
 <book name="Publish and Subscribe" >
   <item name="Publish and Subscribe Overview" url="Publish_and_Subscribe/Publish_and_Subscribe_Overview.htm" />
 </book>
@@ -56,7 +74,7 @@
     <item name="Twitter" url="Social_Media/Twitter.htm" />
   </book>
   <book name="Pages" >
-    <item name="Creating Pages" url="Social_Media/Creating_Pages.htm" />
+    <item name="Pages" url="Social_Media/Creating_Pages.htm" />
   </book>
 </book>
 <book name="RSS Feeds" >
