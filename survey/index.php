@@ -22,15 +22,15 @@ header("Pragma: no-cache");
 require_once("XML/RPC.php");
 require_once("../inc/auth.inc.php");
 require_once("../inc/db.inc.php");
-include_once("../inc/utils.inc.php");
+require_once("../inc/utils.inc.php");
 require_once("../inc/memcache.inc.php");
 require_once("../inc/DBMappedObject.php");
 require_once("../inc/DBRelationMap.php");
-include_once("../inc/html.inc.php");
-include_once("../inc/table.inc.php");
-include_once("../obj/Job.obj.php");
-include_once("../obj/SurveyQuestionnaire.obj.php");
-include_once("../obj/SurveyQuestion.obj.php");
+require_once("../inc/html.inc.php");
+require_once("../inc/table.inc.php");
+require_once("../obj/Job.obj.php");
+require_once("../obj/SurveyQuestionnaire.obj.php");
+require_once("../obj/SurveyQuestion.obj.php");
 
 
 $custdisplayname = getCustomerName($CUSTOMERURL);
@@ -136,8 +136,8 @@ header('Content-type: text/html; charset=UTF-8') ;
 <head>
 	<meta http-equiv="Content-type" value="text/html; charset=UTF-8" />
 	<title><?= isset($questionnaire->webpagetitle) ? escapehtml($questionnaire->webpagetitle) : "Survey" ?></title>
+	<link href="../css.php?nocommoninc" type="text/css" rel="stylesheet" media="screen, print" />
 	<link href='../css/style_print.css' type='text/css' rel='stylesheet' media='print'>
-	<link href='../css/css.inc.php' type="text/css" rel="stylesheet" media="screen, print">
 </head>
 
 
