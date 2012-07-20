@@ -446,6 +446,10 @@ input[name=msgsndr_msggroup] {
 .msg_content_nav li.osms button span.icon     { background-image: url(themes/newui/sms.png) }
 .msg_content_nav li.osocial button span.icon  { background-image: url(themes/newui/social.png) }
 
+.msg_content_nav li.lighten button:hover { 
+  cursor: auto;
+}
+
 .msg_content_nav li.active button { background: #363636; color: #f9f9f9; border-color: #222; 
 -webkit-box-shadow: inset 0px 1px 3px 0px #111; 
    -moz-box-shadow: inset 0px 1px 3px 0px #111; 
