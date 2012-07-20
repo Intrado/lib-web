@@ -93,7 +93,7 @@ table {
 	border-spacing: 0;
 }
 
-/*----- Normalize - this resets default styles applied by browsers -----*/
+/*----- Custom Normalize css : http://necolas.github.com/normalize.css/ -----*/
 
 article, aside, details, figcaption, figure, footer, header, hgroup, nav, section { display: block; }
 audio, canvas, video { display: inline-block; *display: inline; *zoom: 1; }
@@ -102,7 +102,7 @@ audio:not([controls]) { display: none; }
 
 html { font-size: 100%; overflow-y: scroll; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
 body { margin: 0; font-size: 0.75em; line-height: 1.231; }
-body, input, select, textarea, button { font-family: Verdana, "Helvetica Neue", helvetica,  Arial, sans-serif; color: #444 /* <?=$primary?> */ ; }
+body, input, select, textarea, button { font-family: Verdana, "Helvetica Neue", helvetica,  Arial, sans-serif; color: <?=$primary?>; }
 
 a { color: <?=$primary?>; text-decoration: none; }
 a:hover { color: <?=$theme1?>; }
@@ -112,33 +112,13 @@ a.cust_link { color: #1e7398; }
 a.cust_link:hover { color: #56a8cc; text-decoration: underline; }
 
 b, strong { font-weight: bold; }
-blockquote { margin: 1em 40px; }
-dfn { font-style: italic; }
 hr { display: block; height: 1px; border: 0; border-top: 1px solid #ccc; margin: 1em 0; padding: 0; }
-ins { background: #ff9; color: #000; text-decoration: none; }
-mark { background: #ff0; color: #000; font-style: italic; font-weight: bold; }
-pre, code, kbd, samp { font-family: monospace, monospace; _font-family: 'courier new', monospace; font-size: 1em; }
-pre { white-space: pre; white-space: pre-wrap; word-wrap: break-word; }
-q { quotes: none; }
-q:before, q:after { content: ""; content: none; }
 small { font-size: 85%; }
-sub, sup { font-size: 75%; line-height: 0; position: relative; vertical-align: baseline; }
-sup { top: -0.5em; }
-sub { bottom: -0.25em; }
-
-dd { margin: 0 0 0 40px; }
-nav ul, nav ol { list-style: none; list-style-image: none; margin: 0; padding: 0; }
 img { border: 0; -ms-interpolation-mode: bicubic; vertical-align: middle; }
-svg:not(:root) { overflow: hidden; }
-figure { margin: 0; }
 
-form { margin: 0; }
-fieldset { border: 0; margin: 0; padding: 0; }
 label { cursor: pointer; }
-legend { border: 0; *margin-left: -7px; padding: 0; }
-button, input, select, textarea { font-size: 100%; margin: 0; vertical-align: baseline; *vertical-align: middle;}
-button, input { line-height: normal; *overflow: visible; }
-table button, table input { *overflow: auto; }
+button, input, select, textarea { font-size: 100%; margin: 0; vertical-align: baseline;}
+button, input { line-height: normal; }
 button, input[type="button"], input[type="reset"], input[type="submit"] { cursor: pointer; -webkit-appearance: button; }
 input[type="checkbox"], input[type="radio"] { margin: 6px 5px 0 0; box-sizing: border-box; }
 input[type="search"] { -webkit-appearance: textfield; -moz-box-sizing: content-box; -webkit-box-sizing: content-box; box-sizing: content-box; }
@@ -146,7 +126,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; }
 button::-moz-focus-inner, input::-moz-focus-inner { border: 0; padding: 0; }
 textarea { overflow: auto; vertical-align: top; resize: vertical; }
 
-table { border-collapse: collapse; border-spacing: 0; margin: 0 0 5px; }
+table { margin: 0 0 5px; }
 td, th { vertical-align: top; padding: .5em; }
 td > table td { padding: 0; }
 
