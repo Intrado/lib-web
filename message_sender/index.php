@@ -30,7 +30,7 @@
 			<h3 class="flag">Loading Broadcast</h3>
 			<div class="field_wrapper">
 				
-				<p>We are grabbing all your data and loading the job wizard based on your permission, please bear with us.
+				<p>Loading É
 				</p>
 
 			</div>
@@ -44,7 +44,7 @@
 			<h3 class="flag">Error</h3>
 			<div class="field_wrapper">
 				
-				<p>We have been unable to load the New Broadcast Wizard due to the following errors: </p>
+				<p>There was an error loading: </p>
 
 				<ul class="error_list"></ul>
 
