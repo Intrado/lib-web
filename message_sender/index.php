@@ -30,7 +30,7 @@
 			<h3 class="flag">Loading Broadcast</h3>
 			<div class="field_wrapper">
 				
-				<p>Loading É
+				<p>Loading ...
 				</p>
 
 			</div>
