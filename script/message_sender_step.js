@@ -125,12 +125,11 @@ function StepManager(_valManager) {
 				self.preSubmitConfig();
 			}
 
-			// observe validation on the items in step 1, update status appropriatly
-			if (currentStep == 1) {
-				obj_valManager.onFormEventHandler(currentStep, false, function (event, memo) {
-					self.updateStepStatus(step);
-				});
-			}
+			// observe validation on the items in this step
+			obj_valManager.onFormEventHandler(currentStep, false, function (event, memo) {
+				self.updateStepStatus(step);
+			});
+			
 			self.updateStepStatus(step);
 		}
 	};
@@ -213,8 +212,6 @@ function StepManager(_valManager) {
 			// select the default time and leave all times as options
 			$('#msgsndr_schedulecalllate option[value="'+defaultcalllate+'"]').attr('selected','selected');
 		}
-		obj_valManager.runValidateEventDriven("msgsndr_schedulecallearly");
-		obj_valManager.runValidateEventDriven("msgsndr_schedulecalllate");
 
 		// skip duplicates checkbox show / hide based on saved phone or email content
 		if ($('.msg_content_nav .ophone').hasClass('complete') == true || $('.msg_content_nav .oemail').hasClass('complete') == true){
@@ -276,6 +273,10 @@ function StepManager(_valManager) {
 			var el = $("#msgsndr_schedulecalllate option:selected");
 			changeTimeSelectNote("#msgsndr_schedulecalllate", el.val());
 		});
+
+		obj_valManager.runValidateEventDriven("msgsndr_scheduledate");
+		obj_valManager.runValidateEventDriven("msgsndr_schedulecallearly");
+		obj_valManager.runValidateEventDriven("msgsndr_schedulecalllate");
 	};
 	
 	//BIND STEP BUTTONS
