@@ -166,6 +166,13 @@ class MessageSenderForm extends Form {
 		if (isset($this->formdata["optionsavemessage"]["value"]) && $this->formdata["optionsavemessage"]["value"]) {
 			$this->markRequired("optionsavemessagename");
 		}
+		
+		// if this job will be sent "now", remove the schedule date/time validators
+		if ($this->formdata["scheduletype"]["value"] == "now") {
+			$this->formdata["scheduledate"]['validators'] = array();
+			$this->formdata["schedulecallearly"]['validators'] = array();
+			$this->formdata["schedulecalllate"]['validators'] = array();
+		}
 	}
 }
 
