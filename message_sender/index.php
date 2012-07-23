@@ -57,7 +57,7 @@
 
 			
 			<div class="msg_confirm">
-					<button class="abtn_confirm" id="refresh_page">Refresh</span></button>
+					<button class="abtn_confirm" id="refresh_page">Refresh</button>
 			</div>
 			
 			</div><!-- end window_panel -->
