@@ -14,7 +14,7 @@ function fmt_activestatus($obj, $name) {
 	if ($obj->status == 'cancelling')
 		return "<span class=\"activejob\">" . _L("Cancelling...") . "</span>";
 	else
-		return "<span class=\"activejob\">" . _L("Calling...") . "</span>";
+		return "<span class=\"activejob\">" . _L("Active...") . "</span>";
 }
 
 function fmt_job_content($obj, $name) {
