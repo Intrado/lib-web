@@ -1072,6 +1072,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		// Phone Message (callme, text, translations)
 		// ============================================================================================================================
 		$jobpostmessage = array();
+		//FIXME move ValPermission logic here. check to see if the user is allowed to sendphone before reading postdata
 		if (isset($postdata["hasphone"]) && $postdata["hasphone"]) {
 			switch ($postdata["phonemessagetype"]) {
 				case "callme":
