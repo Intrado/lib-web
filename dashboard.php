@@ -213,7 +213,7 @@ if (getSystemSetting("_hasfacebook") && $ACCESS->getPermission("facebookpost")) 
 		if ($timeleft < 0) {
 			$DESCRIPTION .= "<img src=\"img/bug_important.gif\"> ". _L("Your Facebook authorization has expired!") .
 				'<a href="account.php#facebookauth">  click to renew</a>';
-		} else if ($timeleft < 59*24*60*60) {
+		} else if ($timeleft < 14*24*60*60) { // two weeks till expiration
 			$DESCRIPTION .= "<img src=\"img/bug_important.gif\"> ". _L("Your Facebook authorization will expire on: %s...", date("F jS", $fbtokenexpires)).
 				'<a href="account.php#facebookauth">  click to renew</a>';
 		}
