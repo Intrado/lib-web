@@ -169,4 +169,42 @@ jQuery.noConflict();
 
 	};
 
+
+	timezoneOffset = function(timestamp, format) {
+
+		var offset = orgOptions.timezoneOffset;
+
+		function getMins(hours,mins) {
+
+			var hoursMins = parseInt(hours) * 60,
+					minutes = parseInt(hoursMins) + mins;
+
+			return minutes;
+
+		}
+
+		if (offset.length == 5) { // subtract time
+
+			var hours = offset.substr(1,2),
+					mins = offset.substr(3,2),
+					minutes = getMins(hours,mins),
+					timestamp = parseInt(timestamp) - parseInt(minutes);
+
+			var timeOffset = moment(timestamp*1000).format(format);
+
+		} else { // Add time
+
+			var hours = offset.substr(0,2),
+					mins = offset.substr(2,2),
+					minutes = getMins(hours,mins),
+					timestamp = parseInt(timestamp) + parseInt(minutes);
+
+			var timeOffset = moment(timestamp*1000).format(format);
+
+		}
+
+		return timeOffset;
+
+	};
+
 })(jQuery);
