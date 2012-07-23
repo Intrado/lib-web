@@ -32,13 +32,22 @@ function upgrade_8_3 ($rev, $shardid, $customerid, $db) {
 		case 8:
 			echo "|";
 			apply_sql("upgrades/db_8-3_pre.sql", $customerid, $db, 9);
-        case 9:
-            echo "|";
-            apply_sql("upgrades/db_8-3_pre.sql", $customerid, $db, 10);
-        case 10:
-            echo "|";
-            apply_sql("upgrades/db_8-3_pre.sql", $customerid, $db, 11);
-    }
+		case 9:
+			echo "|";
+			apply_sql("upgrades/db_8-3_pre.sql", $customerid, $db, 10);
+		case 10:
+			echo "|";
+			apply_sql("upgrades/db_8-3_pre.sql", $customerid, $db, 11);
+		case 11:
+			echo "|";
+			apply_sql("upgrades/db_8-3_pre.sql", $customerid, $db, 12);
+			// copy the dmuuid from the authserver db into the customer's custdm table
+			$dmuuids = QuickQueryList("select id, dmuuid from dm where customerid = ?", true, $authdb, array($customerid));
+			if ($dmuuids) {
+				foreach ($dmuuids as $dmid => $dmuuid)
+					QuickUpdate("update custdm set dmuuid = ? where dmid = ?", $db, array($dmuuid, $dmid));
+			}
+	}
 	
 	return true;
 }

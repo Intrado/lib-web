@@ -7,6 +7,7 @@ include_once("inc/securityhelper.inc.php");
 include_once("inc/table.inc.php");
 include_once("inc/html.inc.php");
 include_once("inc/utils.inc.php");
+include_once("inc/memcache.inc.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -28,11 +29,11 @@ if (isset($_GET['dmid'])) {
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
+list($dmname,$dmuuid) = QuickQueryRow("select name, dmuuid from custdm where dmid=?",false,false,array($dmid));
 
-$dmname = QuickQuery("select name from custdm where dmid=?", false, array($dmid));
-
-$jsonstats = QuickQuery("select poststatus from custdm where dmid=?", false, array($dmid));
-
+init_memcache();
+global $mcache;
+$jsonstats = $mcache->get("dmpoststatus/".$dmuuid);
 
 include_once("dmstatusdata.inc.php");
 

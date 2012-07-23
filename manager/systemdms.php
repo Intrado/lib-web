@@ -5,6 +5,7 @@ require_once("../inc/html.inc.php");
 require_once("../inc/table.inc.php");
 require_once("../inc/formatters.inc.php");
 require_once("dbmo//authserver/DmGroup.obj.php");
+include_once("../inc/memcache.inc.php");
 
 if (!$MANAGERUSER->authorized("systemdm"))
 	exit("Not Authorized");
@@ -182,11 +183,7 @@ $dms = array();
 $query = "select dm.id, dm.name, dm.authorizedip, dm.lastip,
 			dm.enablestate, dm.lastseen, dm.version, dm.dmuuid, dm.command, s_telco_calls_sec.value as telco_calls_sec, 
 			s_telco_type.value as telco_type, s_delmech_resource_count.value as delmech_resource_count,
-			s_telco_inboundtoken.value as telco_inboundtoken,
-			poststatus,
-			dm.routetype,
-			dm.dmgroupid,
-			dm.notes
+			s_telco_inboundtoken.value as telco_inboundtoken, '' as poststatus, dm.routetype, dm.dmgroupid, dm.notes
 			from dm dm
 			left join dmsetting s_telco_calls_sec on 
 					(dm.id = s_telco_calls_sec.dmid 
@@ -211,10 +208,14 @@ $data = array();
 $restotal = 0;
 $resactout = 0;
 $resactin = 0;
+
+init_memcache();
+global $mcache;
+
 while($row = DBGetRow($result)){
 	$data[$row[0]] = $row;
-	
-	$poststatus = json_decode($row[13]);
+	$data[$row[0]][13] = $mcache->get("dmpoststatus/".$row[7]);
+	$poststatus = json_decode($data[$row[0]][13]);
 	$poststatus = $poststatus[0];
 	$restotal += $poststatus->restotal;
 	$resactout += $poststatus->resactout;

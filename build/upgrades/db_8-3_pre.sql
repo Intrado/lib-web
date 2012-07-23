@@ -153,4 +153,9 @@ ALTER TABLE  `role` CHANGE  `profileid`  `accessid` INT( 11 ) NOT NULL,
   ADD  `importstatus` ENUM(  'none',  'checking',  'new' ) NOT NULL DEFAULT  'none'
 $$$
 
+-- $rev 12
 
+ALTER TABLE `custdm` DROP `poststatus`
+$$$
+ALTER TABLE `custdm` ADD `dmuuid` VARCHAR( 50 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL AFTER `dmid`
+$$$

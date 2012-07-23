@@ -621,3 +621,6 @@ ALTER TABLE  `sessiondata` DROP  `data`;
 
 -- tai person-user token to associate portaluser
 ALTER TABLE  `persontoken` ADD  `options` TEXT NULL;
+
+-- remove obsolete poststatus field (8.3.12)
+ALTER TABLE `dm` DROP `poststatus`;

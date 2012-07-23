@@ -5,6 +5,7 @@ include_once("../inc/form.inc.php");
 include_once("../inc/table.inc.php");
 include_once("../obj/Phone.obj.php");
 include_once("../inc/html.inc.php");
+include_once("../inc/memcache.inc.php");
 $dmType = '';
 
 if (!$MANAGERUSER->authorized("editdm") && !$MANAGERUSER->authorized("systemdm"))
@@ -23,26 +24,12 @@ if(isset($_GET['dmid'])){
 	redirect();
 } else {
 	$dmid = $_SESSION['dmid'];
-	list($dmType,$dmName,$notes) = QuickQueryRow("select type,name,notes from dm where id=?",false,false,array($dmid));
+	list($dmuuid,$dmType,$dmName,$notes) = QuickQueryRow("select dmuuid,type,name,notes from dm where id=?",false,false,array($dmid));
 }
 
-if ($dmType == "customer") {
-	// customer SmartCall Appliance
-	
-	$custid = QuickQuery("select customerid from dm where id = ?", false, array($dmid));
-	$custinfo = QuickQueryRow("select s.dbhost, c.dbusername, c.dbpassword from customer c inner join shard s on (c.shardid = s.id) where c.id = '$custid'");
-	$custdb = DBConnect($custinfo[0], $custinfo[1], $custinfo[2], "c_$custid");
-	if (!$custdb) {
-		exit("Connection failed for customer: $custinfo[0], db: c_$custid");
-	}
-	$jsonstats = QuickQuery("select poststatus from custdm where dmid=?", $custdb, array($dmid));
-	
-} else {
-	// system DM
-	
-	$jsonstats = QuickQuery("select poststatus from dm where id=?", false, array($dmid));
-}
-
+init_memcache();
+global $mcache;
+$jsonstats = $mcache->get("dmpoststatus/".$dmuuid);
 
 include_once("../dmstatusdata.inc.php");
 

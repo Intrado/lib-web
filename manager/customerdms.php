@@ -4,6 +4,7 @@ require_once("../inc/form.inc.php");
 require_once("../inc/html.inc.php");
 require_once("../inc/table.inc.php");
 require_once("../inc/formatters.inc.php");
+include_once("../inc/memcache.inc.php");
 
 if (!$MANAGERUSER->authorized("editdm"))
 	exit("Not Authorized");
@@ -208,7 +209,7 @@ $dms = array();
 $query = "select dm.id, dm.customerid, c.urlcomponent, dm.name, dm.authorizedip, dm.lastip,
 			dm.enablestate, dm.lastseen, dm.version, dm.dmuuid, dm.command, s_telco_calls_sec.value as telco_calls_sec, 
 			s_telco_type.value as telco_type, s_delmech_resource_count.value as delmech_resource_count,
-			s_telco_inboundtoken.value as telco_inboundtoken, c.shardid, dm.poststatus, dm.notes
+			s_telco_inboundtoken.value as telco_inboundtoken, c.shardid, '' as poststatus, dm.notes
 			from dm dm
 			left join customer c on (c.id = dm.customerid)
 			left join dmsetting s_telco_calls_sec on 
@@ -235,6 +236,9 @@ while($row = DBGetRow($result))
 	$data[$row[0]] = $row;
 
 if ($data) {
+	init_memcache();
+	global $mcache;
+	
 	// First, get a list of every shard, $shardinfo[], indexed by ID, storing dbhost, dbusername, and dbpassword.
 	$result = Query("select id, dbhost, dbusername, dbpassword, name from shard order by id");
 	$shardinfo = array();
@@ -258,12 +262,12 @@ if ($data) {
 				$query = "select value from setting where name = '_dmmethod' limit 1";
 				$data[$dmid]['dmmethod'] = QuickQuery($query, $custdb);
 				
-				$query = "select dmid,name,telco_type,poststatus,notes from custdm where dmid = ?";
+				$query = "select dmid,name,telco_type,notes from custdm where dmid = ?";
 				$custdminfo = QuickQueryRow($query,true,$custdb, array($dmid));
 				if ($custdminfo) {
 					$data[$dmid][3] = $custdminfo["name"];
 					$data[$dmid][12] = $custdminfo["telco_type"];
-					$data[$dmid][16] = $custdminfo["poststatus"];
+					$data[$dmid][16] = $mcache->get("dmpoststatus/".$data[$dmid][9]);
 					$data[$dmid][17] = $custdminfo["notes"];
 				}
 			}
