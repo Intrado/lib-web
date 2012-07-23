@@ -30,7 +30,7 @@ h4 { font-size: 12px; line-height: 22px; color: #235563; text-shadow: 0 1px 0 #f
 .light { color: #999; }
 .lighten { opacity: 0.5;}
 
-.content_wrap { position: relative; margin: 0; padding: 20px 0 85px 0; overflow: auto; }
+.content_wrap { position: relative; margin: 0; padding: 20px 0 85px 0;} /* Removed overflow:auto -- declaring this property causes problems with ckeditor */
 #ms .container { position: relative; width: 980px; margin: 0 auto; }
 .container { margin: 0 1%; }
 .contain { position: relative; width: 980px; margin: 0 auto; }
