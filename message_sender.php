@@ -59,7 +59,6 @@ require_once("obj/ValMessageBody.val.php");
 require_once("obj/TraslationItem.fi.php");
 require_once("obj/CallerID.fi.php");
 require_once("obj/ValDuplicateNameCheck.val.php");
-require_once("obj/ValPermission.val.php");
 
 // Preview
 require_once("inc/previewfields.inc.php");
@@ -487,7 +486,6 @@ $formdata = array(
 				"label" => "Phone",
 				"value" => "",
 				"validators" => array(
-						array("ValPermission", "name" => "sendphone")
 				),
 				"control" => array("CheckBox"),
 				"helpstep" => 1
@@ -565,7 +563,6 @@ $formdata = array_merge($formdata, array(
 				"label" => "Email",
 				"value" => "",
 				"validators" => array(
-						array("ValPermission", "name" => "sendemail")
 				),
 				"control" => array("CheckBox"),
 				"helpstep" => 1
@@ -657,7 +654,6 @@ $formdata = array_merge($formdata, array(
 				"label" => "SMS",
 				"value" => "",
 				"validators" => array(
-						array("ValPermission", "name" => "sendsms")
 				),
 				"control" => array("CheckBox"),
 				"helpstep" => 1
@@ -681,7 +677,6 @@ $formdata = array_merge($formdata, array(
 				"label" => "Facebook",
 				"value" => "",
 				"validators" => array(
-						array("ValPermission", "name" => "facebookpost")
 				),
 				"control" => array("CheckBox"),
 				"helpstep" => 1
@@ -701,7 +696,6 @@ $formdata = array_merge($formdata, array(
 				"label" => "Twitter",
 				"value" => "",
 				"validators" => array(
-						array("ValPermission", "name" => "twitterpost")
 				),
 				"control" => array("CheckBox"),
 				"helpstep" => 1
@@ -721,7 +715,6 @@ $formdata = array_merge($formdata, array(
 				"label" => "Feed",
 				"value" => "",
 				"validators" => array(
-						array("ValPermission", "name" => "feedpost")
 				),
 				"control" => array("CheckBox"),
 				"helpstep" => 1
@@ -1067,13 +1060,12 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				'sms' => array(),
 				'post' => array()
 		);
-
+		
 		// ============================================================================================================================
 		// Phone Message (callme, text, translations)
 		// ============================================================================================================================
 		$jobpostmessage = array();
-		//FIXME move ValPermission logic here. check to see if the user is allowed to sendphone before reading postdata
-		if (isset($postdata["hasphone"]) && $postdata["hasphone"]) {
+		if (isset($postdata["hasphone"]) && $postdata["hasphone"] && $USER->authorize("sendphone")) {
 			switch ($postdata["phonemessagetype"]) {
 				case "callme":
 					$audiofileidmap = json_decode($postdata["phonemessagecallme"]);
@@ -1164,7 +1156,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		// ============================================================================================================================
 		// Email Message (text, translations)
 		// ============================================================================================================================
-		if (isset($postdata["hasemail"]) && $postdata["hasemail"]) {
+		if (isset($postdata["hasemail"]) && $postdata["hasemail"] && $USER->authorize("sendemail")) {
 			// this is the default 'en' message so it's autotranslate value is 'none'
 			$messages['email']['html']['en']['none']['text'] = $postdata["emailmessagetext"];
 			$messages['email']['html']['en']['none']["fromname"] = $postdata["emailmessagefromname"];
@@ -1200,19 +1192,19 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		// ============================================================================================================================
 		// SMS Message
 		// ============================================================================================================================
-		if (isset($postdata["hassms"]) && $postdata["hassms"])
+		if (isset($postdata["hassms"]) && $postdata["hassms"] && $USER->authorize("sendsms"))
 			$messages['sms']['plain']['en']['none']['text'] = $postdata["smsmessagetext"];
 
 		// ============================================================================================================================
 		// Social Media Message(s)
 		// ============================================================================================================================
-		if (isset($postdata["hasfacebook"]) && $postdata["hasfacebook"])
+		if (isset($postdata["hasfacebook"]) && $postdata["hasfacebook"] && $USER->authorize("facebookpost"))
 			$messages['post']['facebook']['en']['none']['text'] = $postdata["socialmediafacebookmessage"];
 
-		if (isset($postdata["hastwitter"]) && $postdata["hastwitter"])
+		if (isset($postdata["hastwitter"]) && $postdata["hastwitter"] && $USER->authorize("twitterpost"))
 			$messages['post']['twitter']['en']['none']['text'] = $postdata["socialmediatwittermessage"];
 
-		if (isset($postdata["hasfeed"]) && $postdata["hasfeed"]) {
+		if (isset($postdata["hasfeed"]) && $postdata["hasfeed"] && $USER->authorize("feedpost")) {
 			$feeddata = json_decode($postdata["socialmediafeedmessage"], true);
 			$messages['post']['feed']['en']['none']['subject'] = $feeddata["subject"];
 			$messages['post']['feed']['en']['none']['text'] = $feeddata["message"];
@@ -1345,7 +1337,7 @@ include("nav.inc.php");
 	"ValTimeWindowCallLate", "ValTimeWindowCallEarly", "ValSmsText", "valPhone",
 	"ValMessageBody", "ValMessageGroup", "ValMessageTypeSelect", "ValFacebookPage",
 	"ValTranslationCharacterLimit","ValTimePassed","ValTtsText","ValCallerID",
-	"ValTextAreaAndSubjectWithCheckbox", "ValPermission", "ValConditionalOnValue"));?>
+	"ValTextAreaAndSubjectWithCheckbox", "ValConditionalOnValue"));?>
 
 	// get php data into js vars
 	var userid = <? print_r($_SESSION['user']->id); ?>;
