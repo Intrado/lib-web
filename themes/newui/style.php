@@ -757,7 +757,7 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
 
 /*----- Bootstrap modal styles -----*/
 
-.modal-backdrop { background-color: #000000; bottom: 0; left: 0; position: fixed; right: 0; top: 0; opacity: 0.8; z-index: 1040; }
+.modal-backdrop { background-color: #000000; bottom: 0; left: 0; position: fixed; right: 0; top: 0; opacity: 0.8; z-index: 1040; filter: alpha(opacity=80); }
 
 .modal { position: fixed; left: 50%; top: 50%; max-height: 500px; width: 700px; margin: -250px 0 0 -350px; padding: 0; background-clip: padding-box;  background-color: #FFFFFF; 
 border: 1px solid rgba(0, 0, 0, 0.3); -webkit-border-radius: 6px; border-radius: 6px; box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3); z-index: 1050; }
@@ -765,7 +765,7 @@ border: 1px solid rgba(0, 0, 0, 0.3); -webkit-border-radius: 6px; border-radius:
 .modal-header { position: relative; background: #fdfdfd; font-size: 21px; margin: 0; padding: 15px; border-bottom: 1px solid #ddd; -webkit-border-radius: 6px 6px 0 0; border-radius: 6px 6px 0 0; }
 
 .modal-body { max-height: 300px; padding: 15px; overflow: auto; }
-.modal-body .existing-lists label { float: none; display: block; width: 100%; margin: 0; padding: 8px; text-align: left; line-height: 22px; border-top: 1px solid #ddd; }
+.modal-body .existing-lists label { float: none; display: block; /*width: 100%;*/ margin: 0; padding: 8px; text-align: left; line-height: 22px; border-top: 1px solid #ddd; }
 .modal-body .existing-lists label:hover { background: #f5f5f5; }
 .modal-body .existing-lists label:first-child { border: none; }
 .modal-body .existing-lists input[type="checkbox"] { margin: 0 5px 0 0; }
