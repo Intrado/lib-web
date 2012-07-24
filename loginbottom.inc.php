@@ -9,7 +9,7 @@
 <div id="footer" class="cf">
 
 	<div style="float: left;">
-		<script src=https://seal.verisign.com/getseal?host_name=asp.schoolmessenger.com&size=S&use_flash=NO&use_transparent=NO&lang=en></script>
+		<script src=https://seal.verisign.com/getseal?host_name=asp.schoolmessenger.com&size=S&use_flash=YES&use_transparent=YES&lang=en></script>
 		<p><a class="ssl" href="http://www.verisign.com/ssl-certificate/" target="_blank" title="Click to Verify - This site chose VeriSign SSL for secure e-commerce and confidential communications.">About SSL Certificates</a></p>
 	</div>
 
