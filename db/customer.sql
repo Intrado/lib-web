@@ -2037,3 +2037,15 @@ $$$
 update setting set value='8.3/12' where name='_dbversion'
 $$$
 -- END 8.3/12
+
+-- ------------------------------
+-- START 9.1/1
+
+-- need more chars
+ALTER TABLE  `importfield` CHANGE  `mapto`  `mapto` VARCHAR( 10 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT  ''
+$$$
+
+update setting set value='9.1/1' where name='_dbversion'
+$$$
+-- END 9.1/1
+

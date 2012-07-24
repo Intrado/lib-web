@@ -88,8 +88,6 @@ if ($datatype == "person") {
 	$lastnamefield = FieldMap::getLastNameField();
 	$languagefield = FieldMap::getLanguageField();
 
-	//$maptofields = array(); // TODO remove
-	
 	//// student fields
 	$studentmapto = array();
 	
@@ -171,49 +169,96 @@ if ($datatype == "person") {
 	$hasldap = getSystemSetting('_hasldap', '0');
 	$hasenrollment = getSystemSetting('_hasenrollment', '0');
 	
-	$maptofields = array();
-	$maptofields[""] = "- Unmapped -";
-	$maptofields["u1"] = "Username";
-	$maptofields["u2"] = "First Name";
-	$maptofields["u3"] = "Last Name";
-	$maptofields["u4"] = "Description";
+	// person column to select type for field map options
+	$persontypeselection = array();
+	$persontypeselection[0] = "User";
+	$persontypeselection[1] = "Person";
+	
+	///////////////
+	// user fields
+	$usermapto = array();
+	$usermapto[""] = "- Unmapped -";
+	$usermapto["u1"] = "Username";
+	$usermapto["u2"] = "First Name";
+	$usermapto["u3"] = "Last Name";
+	$usermapto["u4"] = "Description";
 	if ($hasldap)
-		$maptofields["u13"] = "Use LDAP";
-	$maptofields["u5"] = "Telephone User ID";
-	$maptofields["u6"] = "Email";
-	$maptofields["u7"] = "Auto Report Emails";
-	$maptofields["u8"] = "Phone";
-	$maptofields["u9"] = "Caller ID";
-	$maptofields["u11"] = "Access Profile";
-	$maptofields["u12"] = "Restricted Job Types";
+		$usermapto["u13"] = "Use LDAP";
+	$usermapto["u5"] = "Telephone User ID";
+	$usermapto["u6"] = "Email";
+	$usermapto["u7"] = "Auto Report Emails";
+	$usermapto["u8"] = "Phone";
+	$usermapto["u9"] = "Caller ID";
+	$usermapto["u11"] = "Access Profile";
+	$usermapto["u12"] = "Restricted Job Types";
 	if ($hasenrollment)
-		$maptofields["u10"] = "Staff ID";
-	$maptofields["sep"] = "--------------";
+		$usermapto["u10"] = "Staff ID";
+	$usermapto["sep"] = "--------------";
 
 	//F fields, limit to multisearch
 	$fieldmaps = DBFindMany("FieldMap","from fieldmap where fieldnum like 'f%' order by fieldnum");
 	foreach ($fieldmaps as $fieldmap) {
 		if ($fieldmap->isOptionEnabled("multisearch")) {
-			$maptofields[$fieldmap->fieldnum] = "Rule - " . $fieldmap->name;
+			$usermapto['u' . $fieldmap->fieldnum] = "Rule - " . $fieldmap->name;
 		}
 	}
 
-	$maptofields["sep2"] = "--------------";
-	$maptofields["okey"] = getSystemSetting("organizationfieldname","Organization");
+	$usermapto["sep2"] = "--------------";
+	$usermapto["uokey"] = getSystemSetting("organizationfieldname","Organization");
 	
 	//G fields
 	$gfieldmaps = DBFindMany("FieldMap","from fieldmap where fieldnum like 'g%' order by fieldnum");
-	if (count($gfieldmaps) > 0) $maptofields["sep3"] = "--------------";
+	if (count($gfieldmaps) > 0) $usermapto["sep3"] = "--------------";
 	foreach ($gfieldmaps as $fieldmap)
-		$maptofields[$fieldmap->fieldnum] = "Rule - " . $fieldmap->name;
+		$usermapto['u' . $fieldmap->fieldnum] = "Rule - " . $fieldmap->name;
 
 	//C fields (all assumed multisearch)
 	$cfieldmaps = DBFindMany("FieldMap","from fieldmap where fieldnum like 'c%' order by fieldnum");
-	if (count($cfieldmaps) > 1) $maptofields["sep4"] = "--------------";
+	if (count($cfieldmaps) > 1) $usermapto["sep4"] = "--------------";
 	foreach ($cfieldmaps as $fieldmap) {
 		if ($fieldmap->fieldnum == "c01") continue; // skip the teacherid
-		$maptofields[$fieldmap->fieldnum] = "Rule - " . $fieldmap->name;
+		$usermapto['u' . $fieldmap->fieldnum] = "Rule - " . $fieldmap->name;
 	}
+	
+	////////////////////
+	// person fields
+	$studentmapto = array();
+	
+	$studentmapto[""] = "- Unmapped -";
+	$studentmapto["key"] = "Unique ID";
+	//F fields
+	foreach ($fieldmaps as $fieldmap)
+		$studentmapto[$fieldmap->fieldnum] = $fieldmap->name;
+
+	$studentmapto["sep"] = "--------------";
+	$studentmapto["okey"] = getSystemSetting("organizationfieldname","Organization");
+	$studentmapto["sep2"] = "--------------";
+	
+	//G fields
+	foreach ($gfieldmaps as $fieldmap)
+		$studentmapto[$fieldmap->fieldnum] = $fieldmap->name;
+	if (count($gfieldmaps) > 0) $studentmapto["sep3"] = "--------------";
+
+	//phones, emails, SMS
+	$maxphones = getSystemSetting("maxphones",3);
+	for ($x = 0; $x < $maxphones; $x++)
+		$studentmapto["p$x"] = destination_label("phone",$x); //"Phone " . ($x + 1);
+	if (getSystemSetting('_hassms', false)) {
+		$maxsms = getSystemSetting("maxsms",2);
+		for ($x = 0; $x < $maxsms; $x++)
+			$studentmapto["s$x"] = destination_label("sms",$x); //"SMS " . ($x + 1);
+	}
+	$maxemails = getSystemSetting("maxemails",2);
+	for ($x = 0; $x < $maxemails; $x++)
+		$studentmapto["e$x"] = destination_label("email",$x); //"Email " . ($x + 1);
+	//address fields
+	$studentmapto["a6"] = "Address ATTN";
+	$studentmapto["a1"] = "Address 1";
+	$studentmapto["a2"] = "Address 2";
+	$studentmapto["a3"] = "City";
+	$studentmapto["a4"] = "State";
+	$studentmapto["a5"] = "Zip";
+	
 
 } else if ($datatype == "enrollment") {
 	
@@ -367,6 +412,14 @@ if (CheckFormSubmit($f, $s) || CheckFormSubmit($f, 'run') || CheckFormSubmit($f,
 				else
 					$mapto_datafieldname = "smapto_$count";
 			}
+			// only user import has person type sequence
+			if ($datatype == "user") {
+				$ptype = GetFormData($f,$s,"ptype_$count");
+				if ($ptype == 0)
+					$mapto_datafieldname = "usermapto_$count";
+				else
+					$mapto_datafieldname = "smapto_$count";
+			}
 			if (GetFormData($f,$s,$mapto_datafieldname) != "") {
 
 				$action = GetFormData($f,$s,"action_$count");
@@ -400,6 +453,14 @@ if (CheckFormSubmit($f, $s) || CheckFormSubmit($f, 'run') || CheckFormSubmit($f,
 					$guardseq = GetFormData($f,$s,"guardseq_$count");
 					if ($guardseq > 0)
 						$mapto_datafieldname = "gmapto_$count";
+					else
+						$mapto_datafieldname = "smapto_$count";
+				}
+				// only user import has person type sequence
+				if ($datatype == "user") {
+					$ptype = GetFormData($f,$s,"ptype_$count");
+					if ($ptype == 0)
+						$mapto_datafieldname = "usermapto_$count";
 					else
 						$mapto_datafieldname = "smapto_$count";
 				}
@@ -487,10 +548,30 @@ if ($reloadform) {
 				PutFormData($f,$s,"guardseq_$count",0,"array",array_keys($guardiansequence));
 				//mapto
 				PutFormData($f,$s,"smapto_$count",$importfield->mapto, "array",array_keys($studentmapto));
+				// define default guardian fields
+				PutFormData($f,$s,"gmapto_$count",0, "array",array_keys($guardianmapto));
 			} else {
 				PutFormData($f,$s,"guardseq_$count",$importfield->guardiansequence,"array",array_keys($guardiansequence));
 				//mapto
 				PutFormData($f,$s,"gmapto_$count",$importfield->mapto, "array",array_keys($guardianmapto));
+				// define default student fields
+				PutFormData($f,$s,"smapto_$count",0, "array",array_keys($studentmapto));
+			}
+		} else if ($datatype == "user") {
+			if (strncmp($importfield->mapto, 'u', 1) == 0) { // user
+				//persontype
+				PutFormData($f,$s,"ptype_$count",0,"array",array_keys($persontypeselection));
+				//mapto user
+				PutFormData($f,$s,"usermapto_$count",$importfield->mapto, "array",array_keys($usermapto));
+				//mapto default personfields
+				PutFormData($f,$s,"smapto_$count",0, "array",array_keys($studentmapto));
+			} else { //person
+				//persontype
+				PutFormData($f,$s,"ptype_$count",1,"array",array_keys($persontypeselection));
+				//mapto default user fields
+				PutFormData($f,$s,"usermapto_$count",0, "array",array_keys($usermapto));
+				//mapto person
+				PutFormData($f,$s,"smapto_$count",$importfield->mapto, "array",array_keys($studentmapto));
 			}
 		} else {
 			//mapto
@@ -573,7 +654,7 @@ if ($noimportdata) { ?>
 <table width="100%" cellpadding="3" cellspacing="1" class="list">
 	<tr class="listHeader">
 <?
-		if ($datatype == "person") {
+		if ($datatype == "person" || $datatype == "user") {
 ?>
 		<th align="left">Person</th>
 <?
@@ -585,7 +666,6 @@ if ($noimportdata) { ?>
 	$alt = 0;
 	$count = 0;
 	foreach ($importfields as $importfield) {
-
 		echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
 		
 		// only person type has extra guardian column to map
@@ -598,6 +678,20 @@ if ($noimportdata) { ?>
 				NewFormItem($f,$s,"guardseq_$count","selectoption",$name,$seqid);
 			}
 			NewFormItem($f,$s,"guardseq_$count","selectend");
+?>
+		</td>
+<?
+		}
+		// only user type has extra person type column to map
+		if ($datatype == "user") {
+?>
+		<td>
+<?
+			NewFormItem($f,$s,"ptype_$count","selectstart",null,null,'onchange="switchusermaptodata(' . $count . ',this.value);"');
+			foreach ($persontypeselection as $seqid => $name) {
+				NewFormItem($f,$s,"ptype_$count","selectoption",$name,$seqid);
+			}
+			NewFormItem($f,$s,"ptype_$count","selectend");
 ?>
 		</td>
 <?
@@ -626,16 +720,43 @@ if ($noimportdata) { ?>
 			<div id="mapto_<?=$count?>_guardian" style="<?= $show == 0 ? 'display:none' : ''?>">
 <?
 			//guardian
-			error_log("selectstart");
 			NewFormItem($f,$s,"gmapto_$count","selectstart");
 			foreach ($guardianmapto as $mapto => $name) {
 				$extrahtml = "";
 				if (strpos($mapto,"sep") === 0) $extrahtml = "disabled=\"disabled\"";
-				error_log("selectoption $count");
 				NewFormItem($f,$s,"gmapto_$count","selectoption",$name,$mapto,$extrahtml);
 			}
-			error_log("selectend");
 			NewFormItem($f,$s,"gmapto_$count","selectend");
+?>
+			</div>
+<?
+		// only user type has extra person column to map, and show/hide mapto options
+		} else if ($datatype == "user") {
+			// mapto fields, show/hide based on person type
+			$show = GetFormData($f,$s,"ptype_$count");
+?>			
+			<div id="mapto_<?=$count?>_student" style="<?= $show == 0 ? 'display:none' : ''?>">
+<?
+			//person
+			NewFormItem($f,$s,"smapto_$count","selectstart");
+			foreach ($studentmapto as $mapto => $name) {
+				$extrahtml = "";
+				if (strpos($mapto,"sep") === 0) $extrahtml = "disabled=\"disabled\"";
+				NewFormItem($f,$s,"smapto_$count","selectoption",$name,$mapto,$extrahtml);
+			}
+			NewFormItem($f,$s,"smapto_$count","selectend");
+?>
+			</div>
+			<div id="mapto_<?=$count?>_user" style="<?= $show == 0 ? '' : 'display:none'?>">
+<?
+			//user
+			NewFormItem($f,$s,"usermapto_$count","selectstart");
+			foreach ($usermapto as $mapto => $name) {
+				$extrahtml = "";
+				if (strpos($mapto,"sep") === 0) $extrahtml = "disabled=\"disabled\"";
+				NewFormItem($f,$s,"usermapto_$count","selectoption",$name,$mapto,$extrahtml);
+			}
+			NewFormItem($f,$s,"usermapto_$count","selectend");
 ?>
 			</div>
 <?
@@ -778,6 +899,7 @@ function switchactiondata (num,newaction) {
 	}
 }
 
+// only for person imports
 function switchmaptodata (num,newaction) {
 	//hide any already showing mapto's div
 	$("mapto_" + num + "_student").hide();
@@ -786,6 +908,22 @@ function switchmaptodata (num,newaction) {
 	var persontype = 'guardian';
 	if (newaction == 0)
 		persontype = 'student';
+		
+	//see if a div exists for the new person type
+	var newactiondiv = $("mapto_" + num + "_" + persontype);
+	if (newactiondiv)
+		newactiondiv.show();
+}
+
+// only for user imports
+function switchusermaptodata (num, newaction) {
+	//hide any already showing mapto's div
+	$("mapto_" + num + "_student").hide();
+	$("mapto_" + num + "_user").hide();
+
+	var persontype = 'student';
+	if (newaction == 0)
+		persontype = 'user';
 		
 	//see if a div exists for the new person type
 	var newactiondiv = $("mapto_" + num + "_" + persontype);
