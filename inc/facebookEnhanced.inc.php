@@ -18,16 +18,19 @@ class FacebookEnhanced extends Facebook {
 		} catch (FacebookApiException $e) {
 		// most likely that user very recently revoked authorization.
 		// In any event, we don't have an access token, so say so.
+			error_log("FacebookEnhanced error getting extended access token:". $e);
 			return array(false, false);
 		}
 
 		if (empty($access_token_response)) {
+			error_log("FacebookEnhanced error getting extended access token: Empty response.");
 			return array(false, false);
 		}
 
 		$response_params = array();
 		parse_str($access_token_response, $response_params);
 		if (!isset($response_params['access_token'])) {
+			error_log("FacebookEnhanced error getting extended access token: No token set in response.");
 			return array(false, false);
 		}
 		
