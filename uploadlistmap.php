@@ -117,13 +117,16 @@ if (CheckFormSubmit($f,'save') || CheckFormSubmit($f,'preview')) {
 			if (CheckFormSubmit($f,'save')) {
 				
 				$import->runNow();
-	
-				$import->refresh();
-				while ($import->status == "queued" || $import->status == "running") {
-					sleep(1);
-					$import->refresh();
-				}
-			
+				
+				//wait for the import to finish, up to 10 minutes, until the import is done
+				//stop waiting if the import didn't refresh from the db
+				$starttime = time();
+				do {
+					sleep(1); //this doesn't count toward php exec time!
+				} while (time() - $starttime < 60*10 &&
+					$import->refresh() && 
+					($import->status == "queued" || $import->status == "running"));
+				
 				redirect("list.php");
 			}
 			//otherwise show preview again, with new mapping (need to reload form data?)
