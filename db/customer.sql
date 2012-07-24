@@ -2034,4 +2034,6 @@ ALTER TABLE `custdm` DROP `poststatus`
 $$$
 ALTER TABLE `custdm` ADD `dmuuid` VARCHAR( 50 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL AFTER `dmid`
 $$$
+update setting set value='8.3/12' where name='_dbversion'
+$$$
 -- END 8.3/12
