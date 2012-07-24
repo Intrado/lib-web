@@ -62,11 +62,12 @@ else if ($viewoptions["enabled"] == "true")
 function fmt_DMActions($row, $index){
 	$actions = array();
 	$dmid = $row[0];
-	$date_parts = explode("=", $row[6]);
+	$dm = urlencode($row[1]);
+
 	$actions[] = action_link("Edit", "pencil","editdm.php?dmid=" . $dmid);
 	$actions[] = action_link("Status", "fugue/globe","dmstatus.php?dmid=" . $dmid);
-	$actions[] = action_link("Reset", "fugue/burn","systemdms.php?resetDM=" . $dmid, "return confirm('Are you sure you want to reset DM " . addslashes($row[3]) . "?');");
-	$actions[] = action_link("Graph", "phone", "aspcallsbydm.php?startdate=" . $date_parts[1]);
+	$actions[] = action_link("Reset", "fugue/burn","systemdms.php?resetDM=" . $dmid, "return confirm('Are you sure you want to reset DM " . addslashes($row[3]) . "?');");		
+	$actions[] = action_link("Graph", "phone", "aspcallsbytimebyday.php?dm=$dm");
 	if ($row[4] != "deleted") {
 		$actions[] = action_link("Delete", "cross","systemdms.php?delete=" . $dmid,"return confirm('Are you sure you want to delete DM " . addslashes($row[3]) . "?');");
 	} else {
@@ -209,12 +210,10 @@ $restotal = 0;
 $resactout = 0;
 $resactin = 0;
 
-init_memcache();
-global $mcache;
-
 while($row = DBGetRow($result)){
 	$data[$row[0]] = $row;
-	$data[$row[0]][13] = $mcache->get("dmpoststatus/".$row[7]);
+	//fake some blank data when memcache is unavailable
+	$data[$row[0]][13] = $mcache ? $mcache->get("dmpoststatus/".$row[7]) : "[{\"restotal\":0, \"resactout\": 0, \"resactin\":0}]";
 	$poststatus = json_decode($data[$row[0]][13]);
 	$poststatus = $poststatus[0];
 	$restotal += $poststatus->restotal;
