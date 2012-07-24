@@ -831,6 +831,9 @@ li.notactive { display: none; }
 .window_panel p { margin: 0; padding: 4px 0; color: #888; }
 .window_panel .controls { margin: 0 0 0 150px; }
 .window_panel .controls #cke_reusableckeditor { width: 96% !important; }
+.newui .cke_skin_kama .cke_dialog_footer_buttons span.cke_dialog_ui_button {
+  width: 100px;
+}
 .window_panel .form_actions { background: #ededed; margin: 0; padding: 15px 0; border-radius: 0 0 8px 8px; border-top: 1px solid #ccc; }
 
 .window_panel .translations fieldset { border-top: 1px solid rgb(204,204,204); }
