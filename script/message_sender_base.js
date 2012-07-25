@@ -2,7 +2,7 @@ jQuery.noConflict();
 (function($) {
 
 	// hide stuff straight away
-	$('#error, #msg_section_1, #msg_section_2, #msg_section_3').hide().removeClass('hide');
+	$('#error, #msg_section_1, #msg_section_2, #msg_section_3, #addme').hide().removeClass('hide');
 
 	// prototype to jquery event bridge
 	var oldjQueryTrigger = $.event.trigger;

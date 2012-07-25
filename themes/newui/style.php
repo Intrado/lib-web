@@ -836,6 +836,10 @@ li.notactive { display: none; }
 .newui .cke_skin_kama .cke_dialog_footer_buttons span.cke_dialog_ui_button {
   width: 100px;
 }
+
+#addme {
+  overflow: auto;
+}
 .window_panel .form_actions { background: #ededed; margin: 0; padding: 15px 0; border-radius: 0 0 8px 8px; border-top: 1px solid #ccc; }
 
 .window_panel .translations fieldset { border-top: 1px solid rgb(204,204,204); }
