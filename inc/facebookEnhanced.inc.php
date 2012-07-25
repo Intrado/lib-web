@@ -34,6 +34,12 @@ class FacebookEnhanced extends Facebook {
 			return array(false, false);
 		}
 		
+		if (!isset($response_params['expires'])) {
+			error_log("FacebookEnhanced error getting extended access token: No expires set in response.");
+			// assume 60day extended access token (though it appears this token doesn't expire!)
+			$response_params['expires'] = 5184000;
+		}
+		
 		return array($response_params['access_token'], $response_params['expires']);
 	}
 	
