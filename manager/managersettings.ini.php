@@ -59,6 +59,9 @@ autologoutminutes=60
 ; server to redirect customer link to
 customer_url_prefix=https://localhost
 
+; tai server to redirect customer link to
+tai_backdoor_url=https://localhost:83/api/v1/session/backdoor
+
 ; list of tiny domains to choose from in the manager
 tinydomain[]="alrt4.me"
 tinydomain[]="am4.me"
@@ -90,13 +93,5 @@ memcache_session_lock_retry_us=50000
 ; other memcache calls.
 ; if no urls are defined, memache support is disabled
 memcached_url[]="tcp://127.0.0.1:11211?persistent=1&timeoutms=1000"
-
-
-[portalauth]
-; redirect to portalauth server
-portalauth_url_prefix=http://localhost:8086/portalauth/
-; oauth client key and secret
-key=myKey
-secret=mySecret
 
 ;*/?>
