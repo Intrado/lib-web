@@ -206,15 +206,11 @@ doNavTabs($NAVTREE);
 header('Content-type: text/html; charset=UTF-8') ;
 ?>
 <!DOCTYPE html>
-<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en"> <![endif]-->
-<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en"> <![endif]-->
-<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en"> <![endif]-->
-<!--[if (gte IE 9)|!(IE)]><!--> 
-<html class="no-js" lang="en">
-<!--<![endif]-->
+<html>
 <head>
 	<meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
-	<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	
 	<title><?= getBrand();?>: <?= $PAGETITLE ?></title>
 
 	<script src="script/prototype.js" type="text/javascript"></script> <!-- updated to prototype 1.7 -->
@@ -237,8 +233,12 @@ header('Content-type: text/html; charset=UTF-8') ;
 	<!--[if IE 8]>
 		<script src="script/respond.min.js" type="text/javascript"></script>
 	<![endif]-->
+	
 </head>
-<body <?=setBodyClass();?> <?= isset($MESSAGESENDER) && $MESSAGESENDER == true?' id="ms"':''?> >
+
+<!--[if IE 7]>    <body class="<?=getBrandTheme();?> ie7" <?= isset($MESSAGESENDER) && $MESSAGESENDER == true?' id="ms"':''?>> <![endif]-->
+<!--[if IE 8]>    <body class="<?=getBrandTheme();?> ie8" <?= isset($MESSAGESENDER) && $MESSAGESENDER == true?' id="ms"':''?>> <![endif]-->
+<!--[if gt IE 8]><!--> <body <?=setBodyClass();?> <?= isset($MESSAGESENDER) && $MESSAGESENDER == true?' id="ms"':''?> ><!--<![endif]-->
 	<script>
 		var _brandtheme = "<?=getBrandTheme();?>";
 	</script>
