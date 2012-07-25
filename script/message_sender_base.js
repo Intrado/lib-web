@@ -440,6 +440,10 @@ jQuery.noConflict();
 	   	// TODO: add facebook token expiry date
 		$("#msgsndr_scheduledate").datepicker({
 			minDate: 0
+		}).keypress(function(e) {
+			if (e.keyCode == 13) {
+				e.preventDefault();
+			}
 		});
 
 	    // set the schedule options startdate to today's date by default (uses moment.js)
