@@ -3,6 +3,7 @@
 // Translation widget
 class TranslationItem extends FormItem {
 	function render ($value) {
+		global $USER;
 		static $renderscript = true;
 
 		$n = $this->form->name."_".$this->name;
@@ -98,7 +99,7 @@ class TranslationItem extends FormItem {
 			<table width="100%">
 				<tr>
 					<td '.(!empty($this->args['translationcheckboxnewline']) ? 'colspan=2' : '').' valign="top" width="80px" class="TranslationItemCheckboxTD" style="'.(!empty($this->args['hidetranslationcheckbox']) ? 'display:none' : '').'">
-						<input id="'.$n.'translatecheck" name="'.$n.'checkbox" type="checkbox" onclick="toggleTranslation(\''.$n.'\',\''.$language.'\', '.$usehtmleditor.', '.$escapehtml.');" '.(($msgdata->enabled)?"checked":"").' />
+						<input id="'.$n.'translatecheck" name="'.$n.'checkbox" type="checkbox" onclick="toggleTranslation(\''.$n.'\',\''.$language.'\', '.$usehtmleditor.', '.$escapehtml.',false,'.$USER->getSetting("hideemailtools", "false").');" '.(($msgdata->enabled)?"checked":"").' />
 						<label for="'.$n.'translatecheck"><b>'.$translationcheckboxlabel.'</b></label>
 					</td>
 					
@@ -131,7 +132,7 @@ class TranslationItem extends FormItem {
 							
 							'. icon_button(_L("Show in English"), "fugue/magnifier", "toEnglishButton('$n','$language',$usehtmleditor, $escapehtml)", null, 'id="'. $n .'showenglish"').'
 							'. icon_button(_L("Hide English"), "fugue/magnifier__minus", "toEnglishButton('$n','$language',$usehtmleditor, $escapehtml)", null, 'id="'. $n .'hideenglish" style="display:none"').'
-							<span style="'.(!$allowoverride ? 'display:none' : '').'"><input id="'.$n.'override" name="'.$n.'checkbox" type="checkbox" '.(($msgdata->override)?"checked":"").' onclick="overrideTranslation(\''.$n.'\',\''.$language.'\', '.$usehtmleditor.', '.$escapehtml.');"/>' . _L('Override Translation') . '</span>
+							<span style="'.(!$allowoverride ? 'display:none' : '').'"><input id="'.$n.'override" name="'.$n.'checkbox" type="checkbox" '.(($msgdata->override)?"checked":"").' onclick="overrideTranslation(\''.$n.'\',\''.$language.'\', '.$usehtmleditor.', '.$escapehtml.',false,'.$USER->getSetting("hideemailtools", "false").');"/>' . _L('Override Translation') . '</span>
 
 							<div id="'.$n.'retranslation" style="width: 100%; display: none;margin-top: 15px; clear:both">
 								'. icon_button(_L('Refresh %s to English Translation', Language::getName($language)),"arrow_refresh","submitRetranslation('$n','$language', $usehtmleditor, $escapehtml)", null, 'style="margin-bottom: 12px"') . '
@@ -345,7 +346,7 @@ class TranslationItem extends FormItem {
 					return state;
 				}
 				
-				function overrideTranslation(section,language, usehtmleditor, escapehtml, nowarning) {
+				function overrideTranslation(section,language, usehtmleditor, escapehtml, nowarning, hidetoolbar) {
 					var langtext = $(section + "text");
 					var overridesave = $(section + "overridesave");
 					
@@ -362,7 +363,7 @@ class TranslationItem extends FormItem {
 						$(section + "textdiv").hide();
 						
 						if (usehtmleditor)
-							applyHtmlEditor(langtext);
+							applyHtmlEditor(langtext, false, false, hidetoolbar);
 							
 						$(section + "englishText").up(".MessageBodyContainer").hide();
 					} else {
@@ -381,12 +382,12 @@ class TranslationItem extends FormItem {
 						$(section + "editlock").hide();
 						$(section + "textdiv").show();
 						if (usehtmleditor)
-							applyHtmlEditor($(section+"englishText"));
+							applyHtmlEditor($(section+"englishText"), false, false, hidetoolbar);
 					}
 					setTranslationValue(section);
 				}
 				
-				function toggleTranslation(section,language, usehtmleditor, escapehtml) {
+				function toggleTranslation(section,language, usehtmleditor, escapehtml, hidetoolbar) {
 					if (usehtmleditor)
 						saveHtmlEditorContent();
 					
@@ -403,14 +404,14 @@ class TranslationItem extends FormItem {
 						
 						if ($(section+"override").checked) {
 							if (usehtmleditor)
-								applyHtmlEditor(section+"text");
+								applyHtmlEditor(section+"text", false, false, hidetoolbar);
 							else
 								$(section+"text").up(".MessageBodyContainer").show();
 						} else {
 							$(section+"englishText").up(".MessageBodyContainer").show();
 							$(section+"text").up(".MessageBodyContainer").hide();
 							if (usehtmleditor)
-								applyHtmlEditor($(section+"englishText"));
+								applyHtmlEditor($(section+"englishText"), false, false, hidetoolbar);
 						}
 					} else {
 						$(section +"icons").hide();
@@ -428,7 +429,7 @@ class TranslationItem extends FormItem {
 						}
 						
 						if (usehtmleditor)
-							applyHtmlEditor($(section+"text"));
+							applyHtmlEditor($(section+"text"), false, false, hidetoolbar);
 					}
 					setTranslationValue(section);
 				}
@@ -451,7 +452,7 @@ class TranslationItem extends FormItem {
 		
 		if (isset($this->args['usehtmleditor']) && $this->args['usehtmleditor']) {
 			$str .= "
-				applyHtmlEditor(textarea);
+				applyHtmlEditor(textarea, false, false, ".$USER->getSetting("hideemailtools", "false").");
 				
 				formitemcontainer.observe('HtmlEditor:SavedContent', function(event) {
 					setTranslationValue(this.identify());

@@ -98,10 +98,11 @@ class HtmlTextArea extends FormItem {
 	}
 	
 	function renderJavascript($value) {
+		global $USER;
 		$n = $this->form->name."_".$this->name;
 		
 		// set up the controls in the form and initialize any event listeners
-		$str = 'setupHtmlTextArea("'.$n.'");';
+		$str = 'setupHtmlTextArea("'.$n.'",'.$USER->getSetting("hideemailtools","false").');';
 			
 		return $str;
 	}
@@ -112,11 +113,11 @@ class HtmlTextArea extends FormItem {
 			<script type="text/javascript" src="script/ckeditor/ckeditor_basic.js"></script>
 			<script type="text/javascript" src="script/htmleditor.js"></script>
 			<script type="text/javascript">
-				function setupHtmlTextArea(e) {
+				function setupHtmlTextArea(e, hidetoolbar) {
 					e = $(e);
 					
 					// add the ckeditor to the textarea
-					applyHtmlEditor(e, false, e.id+"-htmleditor");
+					applyHtmlEditor(e, false, e.id+"-htmleditor", hidetoolbar);
 
 					// set up a keytimer to save content and validate
 					var htmlTextArea_keytimer = null;

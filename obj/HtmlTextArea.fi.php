@@ -2,6 +2,7 @@
 
 class HtmlTextArea extends FormItem {
 	function render ($value) {
+		global $USER;
 		$n = $this->form->name."_".$this->name;
 		if (!$value)
 			$value = '';
@@ -14,7 +15,7 @@ class HtmlTextArea extends FormItem {
 				document.observe("dom:loaded",
 					function() {
 						// add the ckeditor to the textarea
-						applyHtmlEditor($("'.$n.'"),true,"'.$n.'htmleditor");
+						applyHtmlEditor($("'.$n.'"),true,"'.$n.'htmleditor",'.$USER->getSetting("hideemailtools", "false").');
 
 						// set up a keytimer to save content and validate
 						var htmlTextArea_keytimer = null;

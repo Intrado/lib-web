@@ -143,10 +143,11 @@ function clearHtmlEditorContent() {
 // NOTE: It is assumed that there be only a single html editor on the page; CKEditor is buggy with multiple instances.
 var htmleditorloadinterval = null;
 
-function applyHtmlEditor(textarea, dontwait,target) {
+function applyHtmlEditor(textarea, dontwait,target,hidetoolbar) {
 
 	textarea = $(textarea);
-
+	hidetoolbar = !!hidetoolbar;
+	
 	var editorobject = getHtmlEditorObject();
 	if (!editorobject) {
 		if ($('reusableckeditor'))
@@ -160,7 +161,7 @@ function applyHtmlEditor(textarea, dontwait,target) {
 
 		if (!dontwait) {
 			document.observe('dom:loaded', function(event) {
-				applyHtmlEditor(this, true,target);
+				applyHtmlEditor(this, true, target, hidetoolbar);
 			}.bindAsEventListener(textarea));
 		}
 
@@ -203,7 +204,7 @@ function applyHtmlEditor(textarea, dontwait,target) {
 				'width': '100%',
 				'height': '400px',
 				'filebrowserImageUploadUrl' : 'uploadimage.php',
-				'toolbarStartupExpanded' : false,
+				'toolbarStartupExpanded' : !hidetoolbar,
 				'on': {
 					'instanceReady': function(event) {
 						this.previous('.HTMLEditorAjaxLoader').remove();

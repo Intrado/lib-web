@@ -115,7 +115,7 @@ jQuery.noConflict();
 	// using helper functions in htmleditor.js, set up the ckeditor on the textarea with id "elementid"
 	applyCkEditor = function(elementid) {
 		// add the ckeditor to the textarea
-		applyHtmlEditor(elementid, true, elementid+"-htmleditor");
+		applyHtmlEditor(elementid, true, elementid+"-htmleditor", userPrefs.hideemailtools);
 
 		// set up a keytimer to save content
 		var htmlTextArea_keytimer = null;

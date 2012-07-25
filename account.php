@@ -452,6 +452,15 @@ $formdata["locale"] = array(
 );
 */
 
+$formdata["hideemailtools"] = array(
+	"label" => _L("Hide Email Editor Tools"),
+	"fieldhelp" => ("For a less cluttered UI, you can hide the email editor's toolbar by default."),
+	"value" => $USER->getSetting('hideemailtools'),
+	"validators" => array(),
+	"control" => array("CheckBox"),
+	"helpstep" => 3
+);
+
 $formdata["brandtheme"] = array(
 	"label" => _L("Customize Theme"),
 	"fieldhelp" => ("Use this to select a different theme for the user interface. Themes can be customized with alternate primary colors (in hex) and primary to background color ratio settings."),
@@ -525,6 +534,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$USER->setSetting("actionlinks", $postdata['actionlinks']);
 		//$USER->setSetting("_locale", $postdata['locale']);
 		//$_SESSION['_locale'] = $postdata['locale'];
+		$USER->setSetting("hideemailtools", $postdata['hideemailtools']);
 
 		$newTheme = json_decode($postdata['brandtheme']);
 
