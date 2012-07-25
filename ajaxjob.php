@@ -142,7 +142,7 @@ function handleRequest() {
 		case 'activejobs':
 			$activejobs = DBFindMany("Job", "from job j
 				where $queryUsers 
-					and not j.deleted and j.finishdate is null and j.modifydate is not null and j.status in ('processing','procactive','active','cancelling') 
+					and not j.deleted and j.finishdate is null and j.status in ('processing','procactive','active','cancelling') 
 					and j.type != 'alert' 
 				order by j.modifydate desc 
 				limit $start,$limit","j",$queryArgs);
@@ -169,9 +169,9 @@ function handleRequest() {
 		case 'scheduledjobs':
 			$activejobs = DBFindMany("Job", "from job j
 				where $queryUsers 
-					and not j.deleted and j.modifydate is not null and j.status in ('scheduled') 
+					and not j.deleted and j.status in ('scheduled') 
 					and j.type != 'alert' 
-				order by j.modifydate desc 
+				order by j.startdate desc 
 				limit $start,$limit","j",$queryArgs);
 		
 			$titles = array(
@@ -196,9 +196,9 @@ function handleRequest() {
 		case 'completedjobs':
 			$activejobs = DBFindMany("Job", "from job j
 				where $queryUsers 
-					and not j.deleted and j.modifydate is not null and j.status in ('complete','cancelled') 
+					and not j.deleted and j.status in ('complete','cancelled') 
 					and j.type != 'alert' 
-				order by j.modifydate desc 
+				order by j.finishdate desc 
 				limit $start,$limit","j",$queryArgs);
 				
 			$titles = array(
