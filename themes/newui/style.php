@@ -35,8 +35,10 @@ h4 { font-size: 12px; line-height: 22px; color: #235563; text-shadow: 0 1px 0 #f
 .container { margin: 0 1%; }
 .contain { position: relative; width: 980px; margin: 0 auto; }
 .popup_container { position: relative; margin: 0 auto; padding: 0 10px; }
-.wrapper { position: relative; margin: 0 240px 0 0; }
-.main_aside { position: absolute; top: 0; right: -240px; width: 215px; }
+
+.wrapper {  }
+.newbroadcast { float: left; display: inline; width: 750px; }
+.main_aside { float: left; display: inline; width: 215px; margin: 5px 0 0 15px; }
 .window_body_wrap { padding: 15px 10px; }
 
 
@@ -231,8 +233,8 @@ background-image: -webkit-gradient(linear, left top, left bottom, from(#F5F3F0),
 .hide { display: none; }
 
 .msg_steps { list-style-type: none; padding: 0; }
-.msg_steps li { position: relative; float: left; display: inline; width: 34%; cursor: pointer; }
-.msg_steps li:first-child { width: 32%; }
+.msg_steps li { position: relative; float: left; display: inline; width: 251px; cursor: pointer; }
+.msg_steps li:first-child { width: 226px; }
 .msg_steps li a { background: #f1f1f1; display: block; padding: 10px 5px 10px 35px; color: #777; font-size: 14px; line-height: 30px; font-weight: bold; text-transform: uppercase; text-shadow: 0 1px 0 #fdfdfd; 
 border-bottom: 1px solid #2A6576; border-top: 1px solid #2A6576; outline: 0px; text-decoration: none; -webkit-box-shadow: 0 1px 0 0 rgba(255,255,255,0.4); box-shadow: 0 1px 0 0 rgba(255,255,255,0.4); }
 .msg_steps li span.icon { display: inline-block; background: #cbcbcb; height: 30px; width: 30px; font-size: 16px; text-align: center; border-radius: 50%; }
@@ -948,6 +950,8 @@ p.warning {
 
 .ie7 .summary .col { width: 150px; }
 .ie7 .summary .col:first-child { width: 120px; }
+.ie7 .modal-backdrop { background: none; }
+.ie7 .main_aside { z-index: 99; }
 
 .ie7 table.info { border-collapse: collapse; }
 
