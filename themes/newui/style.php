@@ -37,7 +37,7 @@ h4 { font-size: 12px; line-height: 22px; color: #235563; text-shadow: 0 1px 0 #f
 .popup_container { position: relative; margin: 0 auto; padding: 0 10px; }
 
 .wrapper {  }
-.newbroadcast { float: left; display: inline; width: 750px; }
+.newbroadcast, .main_activity { float: left; display: inline; width: 750px; }
 .main_aside { float: left; display: inline; width: 215px; margin: 5px 0 0 15px; }
 .window_body_wrap { padding: 15px 10px; }
 
