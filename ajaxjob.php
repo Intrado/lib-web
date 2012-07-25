@@ -77,6 +77,13 @@ function fmt_job_ownername ($obj, $name) {
 	}
 }
 
+function fmt_job_name ($obj, $name) {
+	if ($obj->status == "cancelled")
+		return "<span style='text-decoration:line-through;'>".escapehtml($obj->$name)."</span> (canceled)"; // canceled
+	else
+		return "<span>".escapehtml($obj->$name)."</span>";
+}
+
 function fmt_scheduledjobs_action ($obj) {
 	return "window.location = 'reportjobsummary.php?id=$obj->id';";
 }
@@ -206,6 +213,7 @@ function handleRequest() {
 			$formatters = array(
 				'finishdate' => 'fmt_obj_date_no_time',
 				'userid' => 'fmt_job_ownername',
+				'name' => 'fmt_job_name',
 				'rcpts' => 'fmt_job_recipients',
 				'content' => 'fmt_job_content',
 				'tools' => 'frm_job_tools'
