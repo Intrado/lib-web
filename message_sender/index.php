@@ -12,9 +12,9 @@
 			</h2>
 			
 			<ul class="msg_steps cf">
-				<li class="active"><a id="tab_1" ><span class="icon">1</span> Subject &amp; Recipients</a></li>
-				<li><a id="tab_2"><span class="icon">2</span> Message Content</a></li>
-				<li><a id="tab_3"><span class="icon">3</span> Review &amp; Send</a></li>
+				<li class="step1 active"><a id="tab_1"><span class="icon"></span> Subject &amp; Recipients</a></li>
+				<li class="step2"><a id="tab_2"><span class="icon"></span> Message Content</a></li>
+				<li class="step3"><a id="tab_3"><span class="icon"></span> Review &amp; Send</a></li>
 			</ul>
 
 		</div>
