@@ -964,8 +964,13 @@ p.warning {
 .ie7 .main_aside { z-index: 99; }
 
 .ie7 table.info { border-collapse: collapse; }
+.ie7 a.bigbtn { background: url(themes/newui/ie_bigbtn.png) 0 0 no-repeat; height: 64px; padding: 0 7px; border: none; }
+.ie7 a.bigbtn span { line-height: 64px; }
 
 /*---- IE8 styling -----*/
+
+.ie8 .summary .col { width: 150px; }
+.ie8 .summary .col:first-child { width: 120px; }
 
 .ie8 .navtabs li { width: 130px; }
 .ie8 .navtabs li:hover { background: url(themes/newui/ie_navtab_hover.png) 0 0 no-repeat; }
@@ -982,8 +987,11 @@ p.warning {
 
 .ie8 .window_body_wrap { border: 1px solid #ccc; }
 .ie8 .broadcasts .window_body_wrap { border: 1px solid #ccc; }
-.ie8 a.bigbtn { background: url(themes/newui/ie_bigbtn.png) 0 0 no-repeat; height: 64px; padding: 18px 7px 0 7px; border: none; }
+.ie8 a.bigbtn { background: url(themes/newui/ie_bigbtn.png) 0 0 no-repeat; height: 64px; padding: 0 7px; border: none; }
 .ie8 a.bigbtn:hover { background: url(themes/newui/ie_bigbtn.png) 0 -64px no-repeat; }
+.ie8 a.bigbtn span { line-height: 64px; }
+
+.ie8 .msg_content_nav button { width: 174px; }
 
 /*----- Prototip styles for shortcut menu, not actually used in this theme -----*/
 	
