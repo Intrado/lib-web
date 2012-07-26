@@ -201,7 +201,7 @@ $limit = 500;
 $extrasql = "";
 $dataqueryargs = array();
 if ($settings["searchtext"] != "") {
-	$extrasql .= " and b.destination like ? or b.description like ?";
+	$extrasql .= " and (b.destination like ? or b.description like ?)";
 	$dataqueryargs[] = "%{$settings["searchtext"]}%";
 	$dataqueryargs[] = "%{$settings["searchtext"]}%";
 }
