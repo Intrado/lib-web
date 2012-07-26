@@ -268,7 +268,9 @@ border-color: transparent transparent transparent #222; border-width: 27px; bord
 .msg_steps li.step2.active .icon { background: url(themes/newui/msgstep_icon.png) -35px -35px no-repeat; }
 .msg_steps li.step3.active .icon { background: url(themes/newui/msgstep_icon.png) -70px -35px no-repeat; }
 
-.msg_steps li.complete .icon { background: url(themes/newui/msgstep_icon.png) 0 -70px no-repeat; }
+.msg_steps li.step1.complete .icon,
+.msg_steps li.step2.complete .icon,
+.msg_steps li.step3.complete .icon { background: url(themes/newui/msgstep_icon.png) 0 -70px no-repeat; }
 .msg_steps li.complete a:hover .icon { background: url(themes/newui/msgstep_icon.png) -35px -70px no-repeat; }
 
 
