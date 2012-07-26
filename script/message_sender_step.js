@@ -283,7 +283,8 @@ function StepManager(_valManager) {
 	$('a', '.msg_steps').on('click', function(event) {
 		event.preventDefault();
 		//NEXT STEP ID
-		var getStepId = $.trim($(".icon", this).text());
+		// var getStepId = $.trim($(".icon", this).text());
+		var getStepId = $(this).attr('id').split('_')[1];
 		//SWITCH STEP
 		//STOP IF TRYING TO PROCEED TO A NEW STEP WITHOUT CONTINUE USE
 		var $checkStepState = $(this).closest("li");
