@@ -965,6 +965,26 @@ p.warning {
 
 .ie7 table.info { border-collapse: collapse; }
 
+/*---- IE8 styling -----*/
+
+.ie8 .navtabs li { width: 130px; }
+.ie8 .navtabs li:hover { background: url(themes/newui/ie_navtab_hover.png) 0 0 no-repeat; }
+.ie8 .navtabs li.navtab_active { background: url(themes/newui/ie_navtab.png) 0 0 no-repeat; }
+.ie8 .navtabs li a { background: none; padding: 14px 0; text-align: center; border: none; }
+
+.ie8 .window_title_wrap { background: url(themes/newui/ie_title.png) 0 0 repeat-x; border: none; }
+.ie8 .window_title_l { background: url(themes/newui/ie_title_l.png) 0 0 no-repeat; position: absolute; top: 0; left: 0; display: block; width: 10px; height: 54px;}
+.ie8 .window_title_r { background: url(themes/newui/ie_title_r.png) 0 0 no-repeat; position: absolute; top: 0; right: 0; display: block; width: 10px; height: 54px; }
+
+.ie8 .summary .window_title_wrap { background: url(themes/newui/ie_title_wrap.png) 0 0 no-repeat; border: none; }
+.ie8 .broadcasts .window_title_wrap { background: url(themes/newui/ie_title_wrap2.png) 0 0 no-repeat; border: none; }
+.ie8 .newbroadcast .window_title_wrap { background: url(themes/newui/ie_title_wrap3.png) 0 0 no-repeat; border: none; }
+
+.ie8 .window_body_wrap { border: 1px solid #ccc; }
+.ie8 .broadcasts .window_body_wrap { border: 1px solid #ccc; }
+.ie8 a.bigbtn { background: url(themes/newui/ie_bigbtn.png) 0 0 no-repeat; height: 64px; padding: 18px 7px 0 7px; border: none; }
+.ie8 a.bigbtn:hover { background: url(themes/newui/ie_bigbtn.png) 0 -64px no-repeat; }
+
 /*----- Prototip styles for shortcut menu, not actually used in this theme -----*/
 	
 .shortcuts a { color: #26477d; }
