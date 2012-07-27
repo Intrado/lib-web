@@ -222,7 +222,7 @@
                             break;
                         default:
                             for (var i = 1; i <=20; i++) {
-                                var id = type + ("0" + i.toString()).substring(-2);
+                                var id = type + ("0" + i.toString()).substr(-2);
                                 createFieldOption(id);
                             }
                         }
