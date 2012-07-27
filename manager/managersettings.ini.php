@@ -34,6 +34,12 @@ pass=
 db=aspcalls
 callstable=aspcalls2
 
+[aspreports]
+host="localhost"
+user=root
+pass=asp123
+db=aspreports
+
 ;diskserver to query active agent status
 [diskserver]
 host="localhost:8082"

@@ -126,7 +126,8 @@ $advancedroles = array(
 	"emergencyjobs" => "List of Recent Emergency Jobs",
 	"tollfreenumbers" => "Add Toll Free Numbers",
 	"aspcallgraphs" => "View ASP Graphs",
-	"logcollector" => "Run Log Collector"
+	"logcollector" => "Run Log Collector",
+	"aspreportgraphs" => "View ASP Report Graphs"
 );
 
 $superroles = array(

@@ -66,7 +66,7 @@ function fmt_DMActions($row, $index){
 
 	$actions[] = action_link("Edit", "pencil","editdm.php?dmid=" . $dmid);
 	$actions[] = action_link("Status", "fugue/globe","dmstatus.php?dmid=" . $dmid);
-	$actions[] = action_link("Reset", "fugue/burn","systemdms.php?resetDM=" . $dmid, "return confirm('Are you sure you want to reset DM " . addslashes($row[3]) . "?');");		
+	$actions[] = action_link("Reset", "fugue/burn","systemdms.php?resetDM=" . $dmid, "return confirm('Are you sure you want to reset DM " . addslashes($row[3]) . "?');");
 	$actions[] = action_link("Graph", "phone", "aspcallsbytimebyday.php?dm=$dm");
 	if ($row[4] != "deleted") {
 		$actions[] = action_link("Delete", "cross","systemdms.php?delete=" . $dmid,"return confirm('Are you sure you want to delete DM " . addslashes($row[3]) . "?');");
