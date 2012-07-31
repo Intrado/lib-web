@@ -245,6 +245,11 @@ outline: 0px; text-decoration: none; }
 .msg_steps li.step2 { background: #f1f1f1; }
 .msg_steps li.step3 { background: #f1f1f1; border-right: 1px solid #444; border-radius: 0 8px 8px 0; }
 
+.msg_steps li + li a:after { content: ''; position: absolute; top: 50%; left: 0; display: block; margin-top: -26px; 
+border-color: transparent transparent transparent #f1f1f1; border-width: 26px; border-style: solid; }
+.msg_steps li + li a:before { content: ''; position: absolute; top: 50%; left: 0; display: block; margin-top: -27px; 
+border-color: transparent transparent transparent #777; border-width: 27px; border-style: solid; }
+
 .msg_steps li.active.step2 { background: #4B9523; }
 .msg_steps li.active.step3 { background: #4B9523; }
 
@@ -969,7 +974,9 @@ p.warning {
 .ie7 .main_aside { z-index: 99; }
 
 .ie7 table.info,
-.ie8 table.info { border-collapse: collapse; }
+.ie7 .table-bordered,
+.ie8 table.info,
+.ie8 .table-bordered { border-collapse: collapse; }
 
 .ie8 .col { box-sizing: content-box; }
 
@@ -1026,7 +1033,7 @@ p.warning {
 
 @media screen and (min-width: 1180px) { 
  #ms .container, .contain { width: 1150px; }
- .main_activity { width: 910px; }
+ .newbroadcast, .main_activity { width: 910px; }
  
  .summary .col { width: 225px; }
  .summary .col:first-child { width: 181px; }
@@ -1039,10 +1046,16 @@ p.warning {
  .ie8 .summary .window_title_wrap { background: url(themes/newui/title_wrap_910.jpg) 0 0 no-repeat; }
  .ie7 .broadcasts .window_title_wrap,
  .ie8 .broadcasts .window_title_wrap { background: url(themes/newui/title_wrap2_910.jpg) 0 0 no-repeat; }
+ .ie8 .newbroadcast .window_title_wrap { background: url(themes/newui/title_wrap3_910.jpg) 0 0 no-repeat; }
+ 
+ .msg_steps li { width: 296px; }
+ .msg_content_nav button { width: 215px; }
+ .ie8 .msg_content_nav button { width: 214px; }
 }
 
 @media screen and (min-width: 1580px) { 
  #ms .container, .contain { width: 1300px; }
+ .newbroadcast, .main_activity { width: 1060px; }
  
  .summary .col { width: 264px; }
  .summary .col:first-child { width: 215px; }
@@ -1050,11 +1063,15 @@ p.warning {
  .ie8 .summary .col { width: 234px; }
  .ie8 .summary .col:first-child { width: 185px; }
     
- .main_activity { width: 1060px; }
  .ie7 .summary .window_title_wrap,
  .ie8 .summary .window_title_wrap { background: url(themes/newui/title_wrap_1060.jpg) 0 0 no-repeat; }
  .ie7 .broadcasts .window_title_wrap,
  .ie8 .broadcasts .window_title_wrap { background: url(themes/newui/title_wrap2_1060.jpg) 0 0 no-repeat; }
+ .ie8 .newbroadcast .window_title_wrap { background: url(themes/newui/title_wrap3_1060.jpg) 0 0 no-repeat; }
+ 
+ .msg_steps li { width: 346px; }
+ .msg_content_nav button { width: 252px; }
+ .ie8 .msg_content_nav button { width: 251px; }
 }
 
 /* Very basic facebook style */
