@@ -959,14 +959,19 @@ p.warning {
 
 /*---- IE styling -----*/
 
-.ie7 .summary .col { width: 150px; }
-.ie7 .summary .col:first-child { width: 120px; }
+.ie7 .summary .col,
+.ie8 .summary .col { width: 150px; }
+
+.ie7 .summary .col:first-child,
+.ie8 .summary .col:first-child { width: 120px; }
+
 .ie7 .modal-backdrop { background: none; }
 .ie7 .main_aside { z-index: 99; }
 
-.ie7 table.info { border-collapse: collapse; }
+.ie7 table.info,
+.ie8 table.info { border-collapse: collapse; }
 
-.ie8 { box-sizing: border-box; }
+.ie8 .col { box-sizing: content-box; }
 
 .ie7 a.bigbtn,
 .ie8 a.bigbtn { background: url(themes/newui/ie_bigbtn.png) 0 0 no-repeat; height: 64px; padding: 0 7px; border: none; }
@@ -1027,6 +1032,9 @@ p.warning {
  .summary .col:first-child { width: 181px; }
  .summary img.dashboard_graph { width: 100px; }
  
+ .ie8 .summary .col { width: 195px; }
+ .ie8 .summary .col:first-child { width: 151px; }
+ 
  .ie7 .summary .window_title_wrap,
  .ie8 .summary .window_title_wrap { background: url(themes/newui/title_wrap_910.jpg) 0 0 no-repeat; }
  .ie7 .broadcasts .window_title_wrap,
@@ -1038,6 +1046,9 @@ p.warning {
  
  .summary .col { width: 264px; }
  .summary .col:first-child { width: 215px; }
+ 
+ .ie8 .summary .col { width: 234px; }
+ .ie8 .summary .col:first-child { width: 185px; }
     
  .main_activity { width: 1060px; }
  .ie7 .summary .window_title_wrap,
