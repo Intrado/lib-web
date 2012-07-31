@@ -1023,6 +1023,7 @@ p.warning {
 .ie7 .broadcasts .window_body_wrap,
 .ie8 .broadcasts .window_body_wrap { border: 1px solid #ccc; }
 
+.ie7 .msg_content_nav button,
 .ie8 .msg_content_nav button { width: 174px; }
 
 /*----- Prototip styles for shortcut menu, not actually used in this theme -----*/
