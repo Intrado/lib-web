@@ -843,9 +843,10 @@ li.notactive { display: none; }
   width: 100px;
 }
 
-#addme {
-  overflow: auto;
-}
+.window_panel #adv_options, 
+.window_panel #addme,
+.window_panel #callme_advanced_options { overflow: auto; }
+
 .window_panel .form_actions { background: #ededed; margin: 0; padding: 15px 0; border-radius: 0 0 8px 8px; border-top: 1px solid #ccc; }
 
 .window_panel .translations fieldset { border-top: 1px solid rgb(204,204,204); }
