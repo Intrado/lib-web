@@ -175,7 +175,7 @@ function startWindow($title) {
 
 ?>
 
-<div class="window cf">
+<div class="window">
 	<div class="window_title_wrap">
 		<div class="window_title_l"></div>
 		<h2 class="window_title"><?= $title ?></h2>
@@ -183,7 +183,7 @@ function startWindow($title) {
 	</div>
 	<div class="window_body_wrap">
 		<div class="window_body_l"></div>
-		<div class="window_body cf">
+		<div class="window_body">
 <?
 }
 
@@ -199,7 +199,7 @@ function endWindow() {
 		<div class="window_foot"></div>
 		<div class="window_foot_r"></div>
 	</div>
-</div><!-- window cf -->
+</div><!-- window -->
 
 <?
 }
