@@ -108,6 +108,8 @@ table.list td { color: #444; }
 .ie7 .btn { overflow: visible;  }
 .ie7 .btn_middle img { margin-top: 0; }
 
+.ie7 #footer { padding: 15px 0; }
+
 
 /*----- IE8 classes re-adds the rounded corners for ie8-----*/
 
