@@ -53,6 +53,13 @@ if (!$MANAGERUSER->authorized("editcustomer")) {
 // Helper Functions
 ////////////////////////////////////////////////////////////////////////////////
 
+class CustomerProduct {
+	var $product;
+	var $createdtimestamp;
+	var $modifiedtimestamp;
+	var $enabled;
+}
+
 class ValUrlComponent extends Validator {
 	var $onlyserverside = true;
 	function validate ($value, $args) {
@@ -368,14 +375,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		setCustomerSystemSetting('timezone', $postdata["timezone"], $custdb);
 		setCustomerSystemSetting('displayname', $postdata["displayname"], $custdb);
 		
-		// products saved in customer setting, as well as authserver.customerproduct table
-		$customerproducts = array();
-		foreach ($products as $prod => $prodenable) {
-			if ($prodenable == "1")
-				$customerproducts[] = $prod;
-		}
-		setCustomerSystemSetting('_products', json_encode($customerproducts), $custdb);
-		
 		if (!isset($products["cs"])) {
 			if ($postdata["commsuite"]) {
 				// Create all commsuite specific 
@@ -467,7 +466,20 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			QuickUpdate("update customerproduct set enabled=?, modifiedtimestamp=? where customerid=? and product='tai'",false,array($postdata["tai"]?'1':'0',time(),$customerid));
 		}
 		
-		
+		// products saved in customer setting, as well as authserver.customerproduct table
+		$query = "select product, createdtimestamp, modifiedtimestamp, enabled from customerproduct where customerid = ?";
+		$rows = QuickQueryMultiRow($query, false, null, array($customerid));
+		$customerproducts = array();
+		foreach ($rows as $row) {
+			$cp = new CustomerProduct();
+			$cp->product = $row[0];
+			$cp->createdtimestamp = $row[1];
+			$cp->modifiedtimestamp = $row[2];
+			$cp->enabled = $row[3];
+			$customerproducts[] = $cp;
+		}
+		setCustomerSystemSetting('_products', json_encode($customerproducts), $custdb);
+				
 		Query("COMMIT");
 		if($button == "done") {
 			if ($ajax)

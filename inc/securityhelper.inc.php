@@ -374,7 +374,11 @@ function getAuthorizedUserCallerIDs($userid) {
 // Returns False otherwise
 function hasProduct($productname) {
 	$products = json_decode(getSystemSetting("_products", "[]"));
-	return in_array($productname, $products);
+	foreach ($products as $product) {
+		if ($product->product == $productname && $product->enabled)
+			return true;
+	}
+	return false;
 }
 
 ?>
