@@ -358,8 +358,7 @@ table_left and table_right have the arrow controls, set to 8% width for 1024 scr
 .content_feed .msg_icon { float: left; display: inline; margin: 0 10px 0 0; width: 48px;}
 .content_feed .feed_wrap { float: left; display: inline; margin: 0; }
 .content_feed .actionlinks { float: right; display: inline; text-align: right; }
-.content_feed .no_content { display: block; padding: 12px 0 0; }
-	
+.content_feed .no_content, td.no_content .feedtitle { display: block; padding: 12px 0 0; }
 .feed, .feedtitle, .feed_title, .feedtitle a { <?=$primary?> }
 .feedtitle, .feed_title { font-size: 14px; font-weight: bold;  }
 .feed_icon { width: 48px; vertical-align: top; }
@@ -368,6 +367,8 @@ table_left and table_right have the arrow controls, set to 8% width for 1024 scr
 .feed_btn_wrap { 	border-bottom: 1px dashed #ccc;	margin: 0 0 10px 0;	padding: 0 0 10px 0; }
 .feed_item { border-bottom: 1px solid #ccc; padding: 1em 0.5em; margin-bottom: 5px; }
 .feed_item td { padding: 1em 0.5em; }
+
+
 
 
 

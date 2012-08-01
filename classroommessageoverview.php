@@ -225,7 +225,7 @@ startWindow(_L('My Classroom Messages'));
 				}
 			} else {
 			?>
-				<tr><td valign="top" width="30px"><img src="img/largeicons/information.jpg" /></td><td><div class="feedtitle"><?=_L("No Classroom Comments") ?></div>
+				<tr><td valign="top" width="30px"><img src="img/largeicons/information.jpg" /></td><td class="no_content"><div class="feedtitle"><?=_L("No Classroom Comments") ?></div>
 			<?
 			}
 
