@@ -16,7 +16,9 @@
 <book name="List Builder" >
   <item name="About List Builder" url="List_Builder/Overview.htm" />
   <item name="Create a List" url="List_Builder/Create_a_List.htm" />
+  <item name="Add Groups Using Rules" url="List_Builder/Add_Groups_Using_Rules.htm" />
   <item name="Add Individual Contacts" url="List_Builder/Add_Individual_Contacts.htm" />
+  <item name="Upload a List" url="List_Builder/Upload_a_List.htm" />
 </book>
 <book name="Message Builder" >
   <item name="About Message Builder" url="Message_Builder/Overview.htm" />

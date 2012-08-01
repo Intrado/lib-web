@@ -53,7 +53,8 @@ if (window.gbWhTopic)
 
 	if (window.addTocInfo)
 	{
-	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+	addTocInfo("List Builder\nUpload a List");
+addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
 
 	}
 	if (window.writeBtnStyle)
@@ -65,7 +66,7 @@ if (window.gbWhTopic)
 	
 	document.write("<p style=\"text-align:right\"> ");
 AddMasterBreadcrumbs("../CommSuite_User_Guide.htm", "", ">", "Home", "../Getting_Started/Welcome.htm");
-document.write("Upload a List<\/p>");
+document.write("<a href=\"Overview.htm\">List Builder<\/a> > Upload a List<\/p>");
 
 
 	if (window.setRelStartPage)
@@ -93,27 +94,52 @@ else
  Important:</b></span> Only those features that you have been granted access 
  to will display. For access to additional features contact your system 
  administrator.</p>
-<p class="important" style="margin-left: 0px;"><span style="font-weight: bold;"><b><img src="../light_bulb__exclamation.png" alt="light_bulb__exclamation.png" style="border: none;" border="0" /> Note:</b></span> Format notes like this.</p>
-<h4><span>Subsections in H4</span></h4>
-<p style="font-size: 10pt;">This guide contains useful tips to help you 
- use the system to effectively communicate with your contacts.</p>
-<h3>Subsubsection headers</h3>
+<p>This topic covers how to add individuals by uploading a list.</p>
+<p>To use this tutorial, you should first follow the steps in <a href="Create_a_List.htm">Create 
+ a List</a>. If you have done this, you will be in the <a href="Create_a_List.htm#List_Editor">List 
+ Editor</a>, shown below. </p>
+<p><img src="../ListEditor.jpg" title="The List Editor" alt="The List Editor" 
+		 style="border: none;" border="0" /></p>
+<h4>Upload Types</h4>
+<p style="font-size: 10pt;">You can upload two different types of lists 
+ into the system. You must use a CSV (comma separated value) &#160;file 
+ for either type. You can easily create a CSV file using a spreadsheet 
+ application, such as Microsoft Excel.</p>
+<h3>Contact Data</h3>
+<p>Contact data CSV files contain complete contact information for your 
+ recipients with each column containing one field. For example: First name, 
+ Last name, email 1, email 2, phone 1, phone 2, etc.</p>
 <ul type="disc">
-	<li class="p" style="font-size: 10pt;"><p><span style="font-weight: bold;"><b>Guide 
-	 Help:</b></span> If you are unsure about any process, you can click the 
-	 Guide button in the upper right corner of the screen, opening the 
-	 inline help which can guide you with useful steps and information. 
-	 The guide will follow you as you make your way through a screen, giving 
-	 you the information you need when you need it.</p></li>
-	<li class="p" style="font-size: 10pt;"><p><span style="font-weight: bold;"><b>Label 
-	 Help:</b></span> &#160;For most fields and options, you can mouse over 
-	 the field name for more information about what the field should contain 
-	 and what it is used for.</p></li>
-	<li class="p" style="font-size: 10pt;"><p><span style="font-weight: bold;"><b>Form 
-	 Confirmation:</b></span> Clear confirmation on every field lets you know 
-	 that you've correctly filled in the field and helps you know if you've 
-	 made any mistakes.</p></li>
+	<li><p>From the List Editor, click the Upload List button in the Additional 
+	 List Tools </p></li>
+	<li><p>Select the radio button labeled Contact Data.</p></li>
+	<li><p>Click Choose File to locate the file you would like to upload 
+	 from your computer.</p></li>
+	<li><p>Click Preview. In the Upload Preview, use the menus to tell 
+	 the system what type of data is in each field, &#160;as shown in the 
+	 following screenshot.</p></li>
+	<li><p>When you are done, click Save to return to the List Editor.</p></li>
 </ul>
+<p><img src="../UploadListMapValues.jpg" title="Mapping values when uploading a list." 
+		 alt="Mapping values when uploading a list." style="border: none;" 
+		 border="0" /></p>
+<h3>ID# Lookup</h3>
+<p>ID# Lookup CSV files contain only the ID numbers of recipients as they 
+ exist in your database. The system will use the ID number to locate the 
+ recipient's contact information already stored in your database.</p>
+<ul type="disc">
+	<li><p>From the List Editor, click the Upload List button in the Additional 
+	 List Tools </p></li>
+	<li><p>Select the radio button labeled ID# Lookup.</p></li>
+	<li><p>Click Choose File to locate the file you would like to upload 
+	 from your computer.</p></li>
+	<li><p>Click Preview to see the data for the recipients in your list, 
+	 as shown in the following screenshot.</p></li>
+	<li><p>If your list looks correct, click Save to return to the List 
+	 Editor.</p></li>
+</ul>
+<p><img src="../UploadListID.jpg" title="Previewing an ID Lookup list." 
+		 alt="Previewing an ID Lookup list." style="border: none;" border="0" /></p>
 <p>&#160;</p>
 <div style="width: 100%; position: relative;" id="footer">
 	<p><span style="font-size: xx-small;"><font size="1" style="font-size: xx-small;">©1999 - 2012 Reliance Communications, 
