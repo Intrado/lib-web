@@ -33,9 +33,17 @@ function feed_applyfilter(url,filter) {
 					
 					var feedWrap = new Element('div', {'class': 'feed_wrap'});
 					
+					// set feed title class based on content
+					var ftClass = 'feed_title';
+					if ( item.title == 'No Lists.' || 
+							item.title == 'No Messages.' || 
+							item.title == 'No Posts.' || 
+							item.title == 'No Templates.' )
+						var ftClass = 'feed_title no_content';
+
 					// insert title and content details
 					feedWrap.insert(
-						new Element('a', {'class': 'feed_title', 'href': item.defaultlink}).insert(
+						new Element('a', {'class': ftClass, 'href': item.defaultlink}).insert(
 							item.title
 							)
 						);
