@@ -158,4 +158,5 @@ $$$
 alter table tai_lockout add end_date DATE;
 $$$
 
+-- NOTE if adding additional schema must update kona/db/taicustomer.sql and set latest _dbtaiversion setting
 
