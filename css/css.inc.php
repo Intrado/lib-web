@@ -356,8 +356,9 @@ table_left and table_right have the arrow controls, set to 8% width for 1024 scr
 .content_feed { position: relative; width: 100%; color: #444; }
 .content_feed span, .feed_detail { display: block; padding: 0 0 5px 0; width: 100%; }
 .content_feed .msg_icon { float: left; display: inline; margin: 0 10px 0 0; width: 48px;}
-.content_feed .feed_wrap { float: left; display: inline; margin: 0; padding-left: 10px; vertical-align: middle; }
+.content_feed .feed_wrap { float: left; display: inline; margin: 0; }
 .content_feed .actionlinks { float: right; display: inline; text-align: right; }
+.content_feed .no_content { display: block; padding: 12px 0 0; }
 	
 .feed, .feedtitle, .feed_title, .feedtitle a { <?=$primary?> }
 .feedtitle, .feed_title { font-size: 14px; font-weight: bold;  }
