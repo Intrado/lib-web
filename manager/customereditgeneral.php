@@ -368,6 +368,13 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		setCustomerSystemSetting('timezone', $postdata["timezone"], $custdb);
 		setCustomerSystemSetting('displayname', $postdata["displayname"], $custdb);
 		
+		// products saved in customer setting, as well as authserver.customerproduct table
+		$customerproducts = array();
+		foreach ($products as $prod => $prodenable) {
+			if ($prodenable == "1")
+				$customerproducts[] = $prod;
+		}
+		setCustomerSystemSetting('_products', json_encode($customerproducts), $custdb);
 		
 		if (!isset($products["cs"])) {
 			if ($postdata["commsuite"]) {

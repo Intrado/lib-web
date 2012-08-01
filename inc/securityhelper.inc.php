@@ -369,5 +369,12 @@ function getAuthorizedUserCallerIDs($userid) {
 	return $callerids;
 }
 
+// productname such as 'cs', 'tai', ...
+// Returns True if customer has product enabled
+// Returns False otherwise
+function hasProduct($productname) {
+	$products = json_decode(getSystemSetting("_products", "[]"));
+	return in_array($productname, $products);
+}
 
 ?>

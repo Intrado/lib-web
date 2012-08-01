@@ -3,6 +3,7 @@
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
 require_once("inc/common.inc.php");
+require_once("inc/securityhelper.inc.php");
 require_once("inc/table.inc.php");
 require_once("inc/html.inc.php");
 require_once("inc/utils.inc.php");
@@ -599,7 +600,7 @@ _L('Security & Administrator Controls'),
 $tai_formdata = array(
 _L('Talk About It Controls'),
 	"taicanforwardthread" => array(
-		"label" => _L('tai_canforwardthread'),
+		"label" => _L('Forward Thread'),
 		"fieldhelp" => _L('Allows users to TODO '),
 		"value" => $obj->getValue("tai_canforwardthread"),
 		"validators" => array(),
@@ -607,7 +608,7 @@ _L('Talk About It Controls'),
 		"helpstep" => 13
 	),
 	"taicanviewreports" => array(
-		"label" => _L('tai_canviewreports'),
+		"label" => _L('View Reports'),
 		"fieldhelp" => _L('Allows users to TODO '),
 		"value" => $obj->getValue("tai_canviewreports"),
 		"validators" => array(),
@@ -615,7 +616,7 @@ _L('Talk About It Controls'),
 		"helpstep" => 13
 	),
 	"taicansendanonymously" => array(
-		"label" => _L('tai_cansendanonymously'),
+		"label" => _L('Send Anonymously'),
 		"fieldhelp" => _L('Allows users to TODO '),
 		"value" => $obj->getValue("tai_cansendanonymously"),
 		"validators" => array(),
@@ -623,7 +624,7 @@ _L('Talk About It Controls'),
 		"helpstep" => 13
 	),
 	"taicanmanagenews" => array(
-		"label" => _L('tai_canmanagenews'),
+		"label" => _L('Manage News'),
 		"fieldhelp" => _L('Allows users to TODO '),
 		"value" => $obj->getValue("tai_canmanagenews"),
 		"validators" => array(),
@@ -631,7 +632,7 @@ _L('Talk About It Controls'),
 		"helpstep" => 13
 	),
 	"taicanmanagetopics" => array(
-		"label" => _L('tai_canmanagetopics'),
+		"label" => _L('Manage Topics'),
 		"fieldhelp" => _L('Allows users to TODO '),
 		"value" => $obj->getValue("tai_canmanagetopics"),
 		"validators" => array(),
@@ -639,7 +640,7 @@ _L('Talk About It Controls'),
 		"helpstep" => 13
 	),
 	"taicanbetopicrecipient" => array(
-		"label" => _L('tai_canbetopicrecipient'),
+		"label" => _L('Topic Recipient'),
 		"fieldhelp" => _L('Allows users to TODO '),
 		"value" => $obj->getValue("tai_canbetopicrecipient"),
 		"validators" => array(),
@@ -647,7 +648,7 @@ _L('Talk About It Controls'),
 		"helpstep" => 13
 	),
 	"taicanusecannedresponses" => array(
-		"label" => _L('tai_canusecannedresponses'),
+		"label" => _L('Use Canned Responses'),
 		"fieldhelp" => _L('Allows users to TODO '),
 		"value" => $obj->getValue("tai_canusecannedresponses"),
 		"validators" => array(),
@@ -655,7 +656,7 @@ _L('Talk About It Controls'),
 		"helpstep" => 13
 	),
 	"taicanmanagecannedresponses" => array(
-		"label" => _L('tai_canmanagecannedresponses'),
+		"label" => _L('Manage Canned Responses'),
 		"fieldhelp" => _L('Allows users to TODO '),
 		"value" => $obj->getValue("tai_canmanagecannedresponses"),
 		"validators" => array(),
@@ -663,7 +664,7 @@ _L('Talk About It Controls'),
 		"helpstep" => 13
 	),
 	"taicanrequestidentityreveal" => array(
-		"label" => _L('tai_canrequestidentityreveal'),
+		"label" => _L('Request Identity Reveal'),
 		"fieldhelp" => _L('Allows users to TODO '),
 		"value" => $obj->getValue("tai_canrequestidentityreveal"),
 		"validators" => array(),
@@ -671,7 +672,7 @@ _L('Talk About It Controls'),
 		"helpstep" => 13
 	),
 	"taicanmanagesurveys" => array(
-		"label" => _L('tai_canmanagesurveys'),
+		"label" => _L('Manage Surveys'),
 		"fieldhelp" => _L('Allows users to TODO '),
 		"value" => $obj->getValue("tai_canmanagesurveys"),
 		"validators" => array(),
@@ -679,7 +680,7 @@ _L('Talk About It Controls'),
 		"helpstep" => 13
 	),
 	"taicanmanagelockouts" => array(
-		"label" => _L('tai_canmanagelockouts'),
+		"label" => _L('Manage Lockouts'),
 		"fieldhelp" => _L('Allows users to TODO '),
 		"value" => $obj->getValue("tai_canmanagelockouts"),
 		"validators" => array(),
@@ -687,7 +688,7 @@ _L('Talk About It Controls'),
 		"helpstep" => 13
 	),
 	"taicanmanageactivationcodes" => array(
-		"label" => _L('tai_canmanageactivationcodes'),
+		"label" => _L('Manage Activation Codes'),
 		"fieldhelp" => _L('Allows users to TODO '),
 		"value" => $obj->getValue("tai_canmanageactivationcodes"),
 		"validators" => array(),
@@ -696,7 +697,7 @@ _L('Talk About It Controls'),
 	)
 );
 
-if (getSystemSetting("_hastai", false)) {
+if (hasProduct('tai')) {
 	$formdata = array_merge($formdata, $tai_formdata);
 }
 
@@ -864,7 +865,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			}
 			
 			// TAI
-			if (getSystemSetting("_hastai", false)) {
+			if (hasProduct('tai')) {
 				$obj->setPermission("tai_canforwardthread", (bool)$postdata['taicanforwardthread']);
 				$obj->setPermission("tai_canviewreports", (bool)$postdata['taicanviewreports']);
 				$obj->setPermission("tai_canmanagenews", (bool)$postdata['taicanmanagenews']);
