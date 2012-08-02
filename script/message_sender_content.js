@@ -550,7 +550,7 @@ function ContentManager() {
 			$('input[name=msgsndr_has' + currentContent + ']').removeAttr('checked');
 
 			$('.msg_content_nav .o' + currentContent).removeClass('complete');
-			$('#msgsndr_review_' + currentContent).parent().removeClass('complete');
+			$('#msgsndr_review_' + currentContent).removeClass('complete');
 
 			self.resetContentStatus();
 			obj_stepManager.updateStepStatus(2);
@@ -612,7 +612,7 @@ function ContentManager() {
 					$('input[name=msgsndr_has' + currentContent + ']').attr('checked', 'checked');
 
 					// Set Message tabs on review tab
-					$('#msgsndr_review_' + currentContent).parent().addClass('complete');
+					$('#msgsndr_review_' + currentContent).addClass('complete');
 					
 					self.resetContentStatus();
 					obj_stepManager.updateStepStatus(step);
