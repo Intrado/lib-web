@@ -15,6 +15,7 @@ require_once("../obj/Message.obj.php");
 require_once("../obj/MessagePart.obj.php");
 require_once("loadtemplatedata.php");
 require_once("createtemplates.php");
+require_once("taisetup.php");
 require_once("../inc/themes.inc.php");
 require_once("../obj/FormBrandTheme.obj.php");
 require_once("../obj/ValSmsText.val.php");
@@ -125,11 +126,16 @@ $products = array();
 $customerid = null;
 if (isset($_SESSION['customerid'])) {
 	$customerid = $_SESSION['customerid'];
-	$query = "select s.dbhost, c.dbusername, c.dbpassword, c.urlcomponent, c.enabled, c.oem, c.oemid, c.nsid, c.notes from customer c inner join shard s on (c.shardid = s.id) where c.id = '$customerid'";
+	$query = "select s.dbhost, c.dbusername, c.dbpassword, c.urlcomponent, c.enabled, c.oem, c.oemid, c.nsid, c.notes, s.dbusername as shardusername, s.dbpassword as shardpassword from customer c inner join shard s on (c.shardid = s.id) where c.id = '$customerid'";
 	$custinfo = QuickQueryRow($query,true);
 	$custdb = DBConnect($custinfo["dbhost"], $custinfo["dbusername"], $custinfo["dbpassword"], "c_$customerid");
 	if (!$custdb) {
 		exit("Connection failed for customer: {$custinfo["dbhost"]}, db: c_$customerid");
+	}
+	// connect to customer database as the shard user (needed to create tables for new products)
+	$custdbShard = DBConnect($custinfo["dbhost"], $custinfo["shardusername"], $custinfo["shardpassword"], "c_$customerid");
+	if (!$custdbShard) {
+		exit("Connection failed for customer: {$custinfo["dbhost"]}, db: c_$customerid, as shard user");
 	}
 
 	$query = "select name,value from setting";
@@ -461,6 +467,12 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$query = "INSERT INTO `customerproduct` (`customerid`,`product`,`createdtimestamp`,`modifiedtimestamp`,`enabled`) VALUES
 																	(?,'tai',?,?,1)";
 				QuickUpdate($query, false,array($customerid,time(),time()));
+				
+				// initial customer setup for tai product enablement
+				$savedbcon = $_dbcon;
+				$_dbcon = $custdbShard;
+				tai_setup($customerid);
+				$_dbcon = $savedbcon;
 			}
 		} else {
 			QuickUpdate("update customerproduct set enabled=?, modifiedtimestamp=? where customerid=? and product='tai'",false,array($postdata["tai"]?'1':'0',time(),$customerid));

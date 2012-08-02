@@ -50,7 +50,7 @@ function customersetting($customerid,$setting,$defaultvalue){
 		exit("Connection failed for customer: {$custinfo["dbhost"]}, db: c_{$custinfo["id"]}");
 	}
 	
-	error_log("getting $setting $defaultvalue from customer $customerid");
+	//error_log("getting $setting $defaultvalue from customer $customerid");
 	return getCustomerSystemSetting($setting,$defaultvalue,true,$custdb);
 }
 
@@ -130,7 +130,7 @@ while($row = DBGetRow($res,true)){
 $query = "select c.id,c.shardid,c.urlcomponent,group_concat(p.product) as products,c.nsid,c.notes from customer c " .
  "left join customerproduct p on (c.id = p.customerid and p.enabled) " .
  " where $sqlsearch $sqltoggledisabled $favidsql group by id order by id";
-error_log($query);
+//error_log($query);
 $customerquery = Query($query);
 $customers = array();
 if (!$shownone) {

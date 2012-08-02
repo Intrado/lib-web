@@ -19,6 +19,9 @@ class User extends DBMappedObject {
 	var $staffpkey;
 	var $importid;
 	var $lastimport;
+	//var $portaluserid; // READONLY, comment out for now
+	//var $portaluserassociationtimestamp;
+	var $personid;
 
 	//new constructor
 	function User ($id = NULL) {
@@ -26,7 +29,7 @@ class User extends DBMappedObject {
 		$this->_tablename = "user";
 		$this->_fieldlist = array("accessid", "login", "accesscode", "firstname", "lastname",
 								"description", "email", "aremail", "phone", "enabled",
-								"lastlogin","deleted", "ldap","staffpkey","importid","lastimport");
+								"lastlogin","deleted", "ldap","staffpkey","importid","lastimport", "personid");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}
