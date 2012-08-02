@@ -441,7 +441,7 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 .newui .newform .formtitle .formlabel { float: none; /*display: block;*/ padding: 5px 0px 5px 0; font-size: 14px; line-height: 18px; font-weight: normal; text-align: right; }
 .newui .newform .formtitle .formicon { /*display: none;*/ }
 
-.newui .newform .formcontrol { padding: 0; margin: 0 0 0 10px }
+.newui .newform .formcontrol { padding: 0; }
 .newui .newform .formcontrol input[type="text"] { width: 313px; padding: 4px 5px; font-size: 14px; border: 1px solid #E2E2E2; 
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
