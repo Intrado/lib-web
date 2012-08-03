@@ -1,8 +1,18 @@
 <?
-header("Expires: " . gmdate('D, d M Y H:i:s', time() + 60*60) . " GMT"); //exire in 1 hour, but if theme changes so will hash pointing to this file
-header("Content-Type: text/css");
-header("Cache-Control: private");
-
+if (!isset($_SESSION['colorscheme'])) {
+	// TODO these should come from customer display data (still brand the login pages)
+	$theme = "classroom";
+	$primary = "3e693f";
+	$theme1 = "3e693f";
+	$theme2 = "b47727";
+	$globalratio = ".2";
+} else {
+	$theme = $_SESSION['colorscheme']['_brandtheme'];
+	$primary = $_SESSION['colorscheme']['_brandprimary'];
+	$theme1 = $_SESSION['colorscheme']['_brandtheme1'];
+	$theme2 = $_SESSION['colorscheme']['_brandtheme2'];
+	$globalratio = $_SESSION['colorscheme']['_brandratio'];
+}
 ?>
 
 .newform_container {
@@ -428,81 +438,18 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 	.form_col.custom_btn_image img { padding-top: 20px; }
 
 
-/*---------- Newui theme form ----------*/
-
-.newui .newform fieldset { background: #fff; margin-bottom: 1em; border: none; }
-
-.newui .formsectionheader { margin: 5px 0 10px 0; padding: 0; font-size: 14px; line-height: 21px; font-weight: bold; color: #444; text-transform: uppercase; border-bottom: 1px dashed #999; }
- 
-.newui .formfieldarea { padding: 8px 10px; }
-.newui .formfieldarea .underneathmsg { padding: 0 0 0 140px; font-size: 14px; font-weight: normal; color: #cc0000; }
-
-.newui .newform .formtitle { width: 140px; padding: 5px 20px 0 0; }
-.newui .newform .formtitle .formlabel { float: none; /*display: block;*/ padding: 5px 0px 5px 0; font-size: 14px; line-height: 18px; font-weight: normal; text-align: right; }
-.newui .newform .formtitle .formicon { /*display: none;*/ }
-
-.newui .newform .formcontrol { padding: 0; }
-.newui .newform .formcontrol input[type="text"] { width: 313px; padding: 4px 5px; font-size: 14px; border: 1px solid #E2E2E2; 
--webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
--moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
-.newui .newform .formcontrol input[type="radio"] { margin: 0 5px 5px 0; }
-.newui .newform .formcontrol input[type="checkbox"] {  }
-.newui .newform .formcontrol textarea { display: block; width: 375px; margin: 0 20px 5px 0; padding: 4px 5px; font-size: 14px; line-height: 18px; border: 1px solid #E2E2E2; 
--webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
--moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
-.newui .newform .formcontrol input#account_brandthemecustomize { margin: 5px 5px 0 0; }
-
-.newui .newform .formcontrol .domain { padding: 5px 0 0; font-size: 14px; line-height: 18px; }
-
-.newui .newform .formcontrol .translate { max-height: 150px; padding: 5px 0 0; font-size: 14px; line-height: 18px; overflow: auto; }
-.newui .newform .formcontrol .translate p { margin: 0; line-height: 18px; }
-
-.retranslateitems .message { font-size: 14px; line-height: 18px; }
-.retranslateitems .message p { margin: 0; line-height: 18px; }
-
-.newui .newform .formcontrol .gBranding {}
-.newui .newform .formcontrol .gBrandingText { font-size: 11px; }
-
-.newui .newform .formcontrol .radiobox li { padding: 2px 0; }
-.newui .newform .formcontrol .radiobox input[type="radio"],
-.newui .newform .formcontrol .radiobox input[type="checkbox"] { margin: 0 5px 0 0; }
-
-.newui .newform .formcontrol select { margin: 0; padding: 4px 6px; border: 1px solid #E7E7E7; 
--webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
--moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
-
-.newui .newform .formcontrol .datafields input { width: 140px; }
-
-.newui .controlcontainer {  }
-
-.newui .maincontainerleft { margin: 0; }
-.newui .maincontainerseperator { display: none; }
-.newui .maincontainerright { margin: 0; padding: 0; }
-
-#phoneadvanced_message-voicerecorder_callcontrol input.easycallphoneinput {  }
-#phoneadvanced_message-voicerecorder_callcontrol .btn {}
-
-.newui #emaileedit_helpsection_5 .formcontrol .maincontainerleft,
-.newui #emaileedit_helpsection_5 .formcontrol .maincontainerright,
-.newui #emaileedit_helpsection_5 .formcontrol .controlcontainer { width: 600px; }
-
-.newui #emailText_helpsection_5 .formcontrol .maincontainerleft,
-.newui #emailText_helpsection_5 .formcontrol .maincontainerright,
-.newui #emailText_helpsection_5 .formcontrol .controlcontainer { width: 455px; }
-
-.newui .formcontrol .datafields { margin: 0 10px 0 0; }
-.newui .formcontrol .datafields select { width: 175px; padding: 3px 6px; font-size: 14px; }
-.newui .formcontrol .datafieldsinsert { margin: 25px 0 0; }
-.newui .formcontrol .datafieldsinsert button { padding: 3px 10px; }
-
-.newui #list_helpsection_3 .formtitle { width: 100%; text-align: left; }
-.newui #list_helpsection_3 .formcontrol { width: 600px; margin: 0; }
-
-
 /*---------- IE7 fixes ----------*/
 
 .ie7 .newform .formtitle { margin: 0 10px 0 0; }
 .ie7 .newform .formcontrol { margin: 0; }
+
+
+/*---------- Include specific form theme styling ----------*/
+
+<?
+$formcssfilename = "themes/$theme/style.form.php";
+	include_once($formcssfilename);
+?>
 
 
 /*---------- Media queries for form elements ----------*/
