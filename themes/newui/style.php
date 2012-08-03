@@ -14,7 +14,7 @@
 /*----- basics -----*/
 html, body { height: 100%; }
 body { background: #F5F3F0 url(themes/newui/bodybg.png) repeat; font-family: "Helvetica Neue",helvetica,Arial,sans-serif; }
-.wrap { min-height: 100%; min-width: 980px; }
+.wrap { min-height: 100%;  }
 /*.wrap { min-height: 100%; width: 100%; min-w  }*/
 p { color: #333; font-size: 14px; line-height: 22px; margin: 0 0 11px 0; }
 a { color: #0088CC; }
@@ -30,9 +30,9 @@ h4 { font-size: 12px; line-height: 22px; color: #235563; text-shadow: 0 1px 0 #f
 .lighten { opacity: 0.5;}
 
 .content_wrap { position: relative; margin: 0; padding: 20px 0 85px 0;} /* Removed overflow:auto -- declaring this property causes problems with ckeditor */
-#ms .container { position: relative; width: 980px; margin: 0 auto; }
+#ms .container { position: relative; ; margin: 0 auto; }
 .container { margin: 0 1%; }
-.contain { position: relative; width: 980px; margin: 0 auto; }
+.contain { position: relative; ; margin: 0 auto; }
 .popup_container { position: relative; margin: 0 auto; padding: 0 10px; }
 
 .wrapper {  }
@@ -949,7 +949,7 @@ p.warning {
 
 /*----- Footer -----*/
 
-#footer { background: #346998; position: relative; min-width: 980px; height: 84px; margin-top: -85px; padding: 20px 0 0; border-top: 1px solid #3f6485; clear: both; 
+#footer { background: #346998; position: relative;  height: 84px; margin-top: -85px; padding: 20px 0 0; border-top: 1px solid #3f6485; clear: both; 
 -webkit-box-shadow: inset 0 1px 1px 0 #6797c2; box-shadow: inset 0 1px 1px 0 #6797c2; }
 #footer a { color: #9FBDF6; }
 #logininfo, #termsinfo { color: #fff; font-size: 10px; }
