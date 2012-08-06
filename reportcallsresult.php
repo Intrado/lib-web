@@ -54,7 +54,8 @@ function drilldownOnId($row, $index){
 ////////////////////////////////////////////////////////////////////////////////
 
 //don't let the user nagivate directly here with no options, send them back to the search page
-if (!isset($_SESSION['report']['options']) || count($_SESSION['report']['options']) == 0)
+//reportcallssearch.php sets 2 options when initializing the form, before saving any real search criteria, so look for more than 2
+if (!isset($_SESSION['report']['options']) || count($_SESSION['report']['options']) <= 2)
 	redirect('reportcallssearch.php');
 
 $options = $_SESSION['report']['options'];
@@ -91,6 +92,8 @@ if(isset($options['reldate']) && $options['reldate'] != ""){
 	$joblist = implode("','", getJobList($startdate, $enddate, $jobtypes));
 	$jobquery = " and rp.jobid in ('" . $joblist . "')";
 }
+
+
 
 $query = "select rp.pkey,
 			rp. " . FieldMap::getFirstNameField() . " as firstname,
