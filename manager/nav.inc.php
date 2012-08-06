@@ -35,7 +35,7 @@ if (isset($_GET['monitor'])) {
 	<script src="script/sorttable.js"></script>
 	<script src="script/form.js.php" type="text/javascript"></script>
 	<link href="css.php" type="text/css" rel="stylesheet" media="screen, print" />
-	<link href="css/form.css.php" type="text/css" rel="stylesheet" />
+	<link href="css.forms.php" type="text/css" rel="stylesheet" />
 	<link href="css/datepicker.css.php" type="text/css" rel="stylesheet" />
 	<link href="css/prototip.css.php" type="text/css" rel="stylesheet" />
 	<link href="css/style_print.css" type="text/css" rel="stylesheet" media="print" />
