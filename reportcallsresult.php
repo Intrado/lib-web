@@ -53,6 +53,10 @@ function drilldownOnId($row, $index){
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
+//don't let the user nagivate directly here with no options, send them back to the search page
+if (!isset($_SESSION['report']['options']) || count($_SESSION['report']['options']) == 0)
+	redirect('reportcallssearch.php');
+
 $options = $_SESSION['report']['options'];
 $personsql = "";
 $phonesql = "";
