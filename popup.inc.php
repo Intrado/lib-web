@@ -20,7 +20,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 	<link href="css.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen">
 	
 	<script src="script/form.js.php" type="text/javascript"></script>
-	<link href="css.forms.php" type="text/css" rel="stylesheet" media="screen, print" />
+	<link href="css.forms.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print" />
 	<link href="css/datepicker.css.php" type="text/css" rel="stylesheet">
 	
 <!--[if lte IE 6]>
