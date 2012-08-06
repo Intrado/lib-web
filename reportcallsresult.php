@@ -111,7 +111,9 @@ $query = "select rp.pkey,
 			$rulesql
 			group by rp.personid";
 
-$result = Query($query);
+$readonlyDB = readonlyDBConnect();
+
+$result = Query($query, $readonlyDB);
 $data = array();
 while($row = DBGetRow($result)){
 	$data[] = $row;
