@@ -83,7 +83,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 <!DOCTYPE html>
 <head>
 	<meta http-equiv="Content-type" value="text/html; charset=UTF-8" />
-	<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
 	<title>Contact Manager: <?= $PAGETITLE ?></title>
 	
