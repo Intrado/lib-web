@@ -141,6 +141,7 @@ border-top: 1px solid #bbb; border-right: 1px solid #bbb; border-bottom: 1px sol
 .summary .bloc { background: #fff; height: 140px; text-align: left; border: 1px solid #93C9D9; -webkit-border-radius: 5px; border-radius: 5px; white-space: nowrap;overflow: hidden;}
 .summary img.dashboard_graph { width: 55%; margin: 0 5px 0 0; }
 .summary ul { float: left; }
+.summary .ellipsis { white-space: nowrap; width: 150px; overflow: hidden; -o-text-overflow: ellipsis; text-overflow: ellipsis; }
 
 
 /*----- Broadcasts -----*/
@@ -1039,6 +1040,7 @@ p.warning {
  .summary .col { width: 225px; }
  .summary .col:first-child { width: 181px; }
  .summary img.dashboard_graph { width: 100px; }
+ .summary .ellipsis {  width: 195px; }
  
  .ie8 .summary .col { width: 195px; }
  .ie8 .summary .col:first-child { width: 151px; }
@@ -1060,6 +1062,7 @@ p.warning {
  
  .summary .col { width: 264px; }
  .summary .col:first-child { width: 215px; }
+ .summary .ellipsis {  width: 234px; }
  
  .ie8 .summary .col { width: 234px; }
  .ie8 .summary .col:first-child { width: 185px; }

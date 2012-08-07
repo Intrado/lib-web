@@ -340,7 +340,7 @@ include("nav.inc.php");
 					if (!isset($stats['top_users'][$i]))
 						break;
 ?>
-					<li><span><?=$stats["top_users"][$i]['total']?></span><?=$stats["top_users"][$i]['name']?></li>
+					<li class="ellipsis"><span><?=$stats["top_users"][$i]['total']?></span><?=$stats["top_users"][$i]['name']?></li>
 <?
 				}
 ?>
