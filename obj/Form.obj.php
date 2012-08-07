@@ -314,9 +314,9 @@ class Form {
 							<label class="formlabel" for="'.$n.'" >'.$l.'</label>
 							<img class="formicon" alt="'.$alt.'" title="'.$alt.'" id="'.$n.'_icon" src="'.$i.'" />
 						</div>
-						<div class="formcontrol cf">
+						<div class="formcontrol cf"><span>
 											'.$item->render($value).'
-						</div>
+						</span></div>
 						<div id="'.$n.'_msg" class="underneathmsg cf">'.($msg ? $msg : "").'</div>
 					</div>
 					';

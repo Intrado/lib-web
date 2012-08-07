@@ -124,6 +124,7 @@ table.list td { color: #444; }
 .ie8 .window_foot_l { background: url("themes/classroom/win_bl.gif") no-repeat; position: absolute; top: 0; left: 0; display: block; width: 12px; height: 15px; z-index: 9; }
 .ie8 .window_foot_r { background: url("themes/classroom/win_br.gif") 2px 0 no-repeat; position: absolute; top: 0; right: 0; display: block; width: 14px; height: 15px; z-index: 9; }
 
+.ie8 .btn { overflow: visible;  }
 
 /*----- Classes that need PIE -----*/
 /*

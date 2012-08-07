@@ -438,12 +438,6 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 	.form_col.custom_btn_image img { padding-top: 20px; }
 
 
-/*---------- IE7 fixes ----------*/
-
-.ie7 .newform .formtitle { margin: 0 10px 0 0; }
-.ie7 .newform .formcontrol { margin: 0; }
-
-
 /*---------- Include specific form theme styling ----------*/
 
 <?
