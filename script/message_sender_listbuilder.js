@@ -210,7 +210,8 @@
                             fieldOptions = fieldOptions + '<option value="' + id + '">' + modal.ruleSettings.fieldmaps[id].name + '</option>';
                         };
                     }
-                    
+
+                    var pattern = new RegExp(/[0-9][0-9]$/);
                     // F fields, separator, organization, G fields, separator, C fields
                     $.each(["f","sep","organization","g","sep","c"], function (index, type) {
                         switch (type) {
@@ -222,7 +223,7 @@
                             break;
                         default:
                             for (var i = 1; i <=20; i++) {
-                                var id = type + ("0" + i.toString()).substr(-2);
+                                var id = type + pattern.exec("0" + i.toString());
                                 createFieldOption(id);
                             }
                         }
