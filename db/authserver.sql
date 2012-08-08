@@ -624,3 +624,6 @@ ALTER TABLE  `persontoken` ADD  `options` TEXT NULL;
 
 -- remove obsolete poststatus field (8.3.12)
 ALTER TABLE `dm` DROP `poststatus`;
+
+-- add powerschool type for portal user identification (08-07-2012)
+ALTER TABLE `portaluseridentification` CHANGE `type` `type` ENUM( 'local', 'facebook', 'twitter', 'google', 'yahoo', 'powerschool' ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL;
