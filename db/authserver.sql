@@ -627,3 +627,6 @@ ALTER TABLE `dm` DROP `poststatus`;
 
 -- add powerschool type for portal user identification (08-07-2012)
 ALTER TABLE `portaluseridentification` CHANGE `type` `type` ENUM( 'local', 'facebook', 'twitter', 'google', 'yahoo', 'powerschool' ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL;
+
+-- add last login timestamp to indicate the most recently used portal user identification data (08-10-2012)
+ALTER TABLE `portaluseridentification` ADD `lastlogintimestamp` INT NULL;
