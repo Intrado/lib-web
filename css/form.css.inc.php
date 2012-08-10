@@ -167,7 +167,7 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 .newform fieldset#AddRuleFieldmap select { width: 120px; padding: 4px; }
 .newform fieldset#AddRuleCriteria { /*width: 210px;*/ padding: 0; margin: 0; background: none; }
 .newform fieldset#AddRuleValue { /*width: 60px;*/ padding: 0; margin: 0; background: none; }
-.newform fieldset#AddRuleValue input[type="text"] { width: 50px; }
+.newform fieldset#AddRuleValue input[type="text"] { width: 85px; margin: 3px 0 0; }
 .newform fieldset#AddRuleValue .MultiCheckbox { margin: 0; padding: 0; }
 .newform fieldset#AddRuleAction { width: 75px; padding: 0; margin: 0; background: none; } 
 
