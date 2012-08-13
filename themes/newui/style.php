@@ -1,5 +1,5 @@
 /* Padding is not added to width of elements, so you can set div etc to the size you want, doesn't work with IE7 or IE9 set with IE7 standards */
-* { -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
+          box-sizing: border-box; 
 
 
 /*----- New IU theme, uses css.inc.php as basic layout example can be seen in example.css -----*/
@@ -492,15 +492,14 @@ border-color: #499122 transparent transparent; border-style: solid; border-width
 .tab_panel form { border-radius: 8px; }
 
 .msg_complete { list-style-type: none; margin: 5px 0; padding: 0; }
-.msg_complete li { position: relative; float: left; display: inline; width: 24%; }
-.msg_complete li:hover { /*opacity: 0.8; */ }
-.msg_complete button { display: block; background: #f5f5f5; width: 95%; margin: 0; padding: 9px 14px; font-size: 20px; line-height: 23px; text-align: left; font-weight: bold; color: #444; border-radius: 5px; border: 1px solid #ccc; opacity: .5;}
+.msg_complete li { position: relative; float: left; width: 23%; display: block; background: #f5f5f5; /*width: 95%;*/ margin: 0 0 0 10px; padding: 9px 14px; font-size: 20px; line-height: 23px; text-align: left; font-weight: bold; color: #444; border-radius: 5px; border: 1px solid #ccc; opacity: .5;}
+.msg_complete li:first-child { marign: 0;}
 .msg_complete button:hover { color: #444; text-decoration: none; cursor: default;}
-.msg_complete li.complete button { background: #499122; color: #fbfbfb; text-shadow: 0 1px 1px #222; border: 1px solid #3A7A17; opacity: 1;
+.msg_complete li.complete /*button */{ background: #499122; color: #fbfbfb; text-shadow: 0 1px 1px #222; border: 1px solid #3A7A17; opacity: 1;
 -webkit-box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.5); box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.5); }
 
-.msg_complete button span.icon { background: url(themes/newui/remove.png) 0 center no-repeat; width: 16px; display: inline-block; margin: 4px 0 0; }
-.msg_complete li.complete button span.icon { background: url(themes/newui/tick.png) 0 center no-repeat; width: 16px; display: inline-block; }
+.msg_complete li span.icon { background: url(themes/newui/remove.png) 0 center no-repeat; width: 16px; display: inline-block; margin: 4px 0 0; }
+.msg_complete li.complete span.icon { background: url(themes/newui/tick.png) 0 center no-repeat; width: 16px; display: inline-block; }
 
 .msg_confirm { background: #F9F8F6; margin: 0 -10px -15px -10px; padding: 22px 21px; text-align: right; border-radius: 0 0 5px 5px; border-top: 1px solid #DDDDDD; }
 
