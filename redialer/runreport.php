@@ -1,5 +1,7 @@
 <?
 setlocale(LC_ALL, 'en_US.UTF-8');
+mb_internal_encoding('UTF-8');
+
 
 if ($argc < 7) {
 	echo "Usage: reportsubscriptionid | jobid, type 'subscription' | 'job', filename, dbhost, dbname, dbuser, dbpass";
@@ -71,6 +73,12 @@ if($timezone){
 
 if($type == "subscription"){
 	$subscription = new ReportSubscription($id);
+	$USER = new User($subscription->userid);
+
+	// load customer/user locale 
+	//this needs the USER object to already be loaded
+	require_once("../inc/locale.inc.php");
+
 	$instance = new ReportInstance($subscription->reportinstanceid);
 	$options = $instance->getParameters();
 
@@ -95,11 +103,16 @@ if($type == "subscription"){
 			$generator = new JobDetailReport();
 			break;
 	}
-	$USER = new User($subscription->userid);
 	$generator->userid = $subscription->userid;
 } else if($type == "job"){
 	$instance = new ReportInstance();
 	$job = new Job($id+0);
+	$USER = new User($job->userid);
+
+	// load customer/user locale 
+	//this needs the USER object to already be loaded
+	require_once("../inc/locale.inc.php");
+	
 	$options = array();
 	$count = QuickQuery("select sum(numcontacts) from reportperson where jobid = ?", false, array($id));
 	if($job->questionnaireid == null){
@@ -121,7 +134,6 @@ if($type == "subscription"){
 	$options['jobid'] = $id;
 	$options['subname'] = $job->name;
 	$instance->setParameters($options);
-	$USER = new User($job->userid);
 	$generator->userid = $job->userid;
 }
 

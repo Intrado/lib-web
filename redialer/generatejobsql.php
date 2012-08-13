@@ -2,6 +2,7 @@
 // redialer.schedulemanager executes this to populate job.thesql field
 
 setlocale(LC_ALL, 'en_US.UTF-8');
+mb_internal_encoding('UTF-8');
 
 require_once("../inc/db.inc.php");
 require_once("../inc/utils.inc.php");
@@ -69,6 +70,10 @@ $thesql = array(); // key=listid, value=thesql
 $job = new Job($jobid);
 
 $USER = new User($job->userid);
+
+// load customer/user locale 
+//this needs the USER object to already be loaded
+require_once("../inc/locale.inc.php");
 
 $joblists = DBFindMany('PeopleList', "from list l inner join joblist jl on (jl.listid=l.id) where jl.jobid=$jobid","l");
 foreach ($joblists as $joblist) {
