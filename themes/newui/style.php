@@ -1,5 +1,5 @@
 /* Padding is not added to width of elements, so you can set div etc to the size you want, doesn't work with IE7 or IE9 set with IE7 standards */
-          box-sizing: border-box; 
+* { -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
 
 
 /*----- New IU theme, uses css.inc.php as basic layout example can be seen in example.css -----*/
