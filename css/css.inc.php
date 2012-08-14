@@ -469,7 +469,7 @@ table.list ul.actionlinks li:nth-child(2n) { background: transparent; }
    +---------------------------------+ */
 
 table.list { width: 100%; border-left: 1px solid #ccc; border-bottom: 1px solid #ccc; border-top: 1px solid #ccc; }
-table.list tr { background-color: #fbfbfb; }
+table.list > tr { background-color: #fbfbfb; }
 table.list tr.listHeader { background-color: #d4d4d4; vertical-align: top; }
 table.list tr.listAlt { background-color: #f1f1f1; }
 table.list th, table.list td { text-align: left; vertical-align: top; border-right: 1px solid #ccc; color: #484848; }
