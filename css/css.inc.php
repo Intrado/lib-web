@@ -762,6 +762,11 @@ div.autocomplete ul li {
 	overflow: auto;
 }
 
+.modalwindow .window_contents ul { list-style-type: disc; margin: 0 0 8px 10px; padding: 0 0 0 20px; font-size: 13px; }
+.modalwindow .window_contents ol { list-style-type: decimal; margin: 0 0 8px 10px; padding: 0 0 0 20px; font-size: 13px; }
+.modalwindow .window_contents p { margin: 0 0 8px 10px; font-size: 13px; }
+.modalwindow .window_contents em { font-style: italic; }
+
 .modalwindow .window_header {
 	background-color:#333;
 	text-align:center;  
