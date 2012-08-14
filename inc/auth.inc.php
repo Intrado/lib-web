@@ -566,8 +566,8 @@ function inboundSubscriberPhoneActivation($callerid, $code) {
 	return $result;
 }
 
-function getPortalAuthAuthRequestTokenUrl($callbackUrl) {
-    $params = array(new XML_RPC_Value($callbackUrl, 'string'));
+function getPortalAuthAuthRequestTokenUrl() {
+    $params = array(new XML_RPC_Value(session_id(), 'string'));
     $method = "AuthServer.getPortalAuthAuthRequestTokenUrl";
     $result = pearxmlrpc($method, $params);
     if ($result !== false) {
@@ -577,19 +577,8 @@ function getPortalAuthAuthRequestTokenUrl($callbackUrl) {
     return false;
 }
 
-function getPortalAuthAccessToken($requestToken) {
-    $params = array(new XML_RPC_Value($requestToken, 'string'));
-    $method = "AuthServer.getPortalAuthAccessToken";
-    $result = pearxmlrpc($method, $params);
-    if ($result !== false) {
-        // success
-        return array($result["oauth_token"], $result["oauth_token_secret"]);
-    }
-    return false;
-}
-
-function loginViaPortalAuth($accessToken, $customerUrl, $clientIpAddress) {
-    $params = array(new XML_RPC_Value($accessToken, 'string'), new XML_RPC_Value($customerUrl, 'string'), new XML_RPC_Value($clientIpAddress, 'string'));
+function loginViaPortalAuth($customerUrl, $clientIpAddress) {
+    $params = array(new XML_RPC_Value(session_id(), 'string'), new XML_RPC_Value($customerUrl, 'string'), new XML_RPC_Value($clientIpAddress, 'string'));
     $method = "AuthServer.loginViaPortalAuth";
     $result = pearxmlrpc($method, $params);
     if ($result !== false) {
