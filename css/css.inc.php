@@ -478,6 +478,7 @@ table.list td { padding: 5px; }
 table.list td.day { text-align: center; vertical-align: middle; }
 table.list ul { list-style: none; padding: 0; margin: 0; }
 table.list ul li { padding: 6px 8px; }
+table.list td table td { border: none; }
 
 table.usagelist { width: 100%; border: 1px solid #ccc; background-color: #f8f8f8;  }
 table.usagelist tr:nth-child(even) { background-color: #f1f1f1; }
