@@ -874,6 +874,11 @@ input.submit_survey:active {
 .linkslist li { font-size: 13px; padding: 5px; }
 .linkslist li.heading { font-size: 14px; font-weight: bold; border-bottom: 1px solid #ccc; }
 
+/*----- Report page styling -----*/
+
+label.schedule { margin: 0 10px 0 0; }
+label.schedule input[type="radio"] { margin: 0 3px 0 0; }
+
 /* +----------------------------------------------------------------+
 	 | non-semantic helper classes                                    |
    +----------------------------------------------------------------+ */

@@ -228,10 +228,10 @@ startWindow("Report Details ".help('ReportEdit_ReportDetails'));
 		<td>
 			<table  border="0" cellpadding="3" cellspacing="0">
 				<tr>
-					<td><? NewFormItem($f, $s, "radio", "radio", NULL, "none", "id=radio_none' onclick='$(\"schedule\").hide()'")?> None</td>
-					<td><? NewFormItem($f, $s, "radio", "radio", NULL, "runonce", "id='radio_date' onclick='$(\"schedule\").show();$(\"date\").show();$(\"date2\").show();$(\"weekly\").hide();$(\"monthly\").hide();$(\"weekly2\").hide();$(\"monthly2\").hide()'")?>Run Once</td>
-					<td><? NewFormItem($f, $s, "radio", "radio", NULL, "dow", "id='radio_dow' onclick='$(\"schedule\").show();$(\"weekly\").show();$(\"weekly2\").show();$(\"date\").hide();$(\"monthly\").hide();$(\"date2\").hide();$(\"monthly2\").hide()'")?>Daily/Weekly</td>
-					<td><? NewFormItem($f, $s, "radio", "radio", NULL, "dom", "id='radio_dom' onclick='$(\"schedule\").show();$(\"monthly\").show();$(\"monthly2\").show();$(\"weekly\").hide();$(\"date\").hide();$(\"weekly2\").hide();$(\"date2\").hide()'")?>Monthly</td>
+					<td><label class="schedule"><? NewFormItem($f, $s, "radio", "radio", NULL, "none", "id=radio_none' onclick='$(\"schedule\").hide()'")?>None</label></td>
+					<td><label class="schedule"><? NewFormItem($f, $s, "radio", "radio", NULL, "runonce", "id='radio_date' onclick='$(\"schedule\").show();$(\"date\").show();$(\"date2\").show();$(\"weekly\").hide();$(\"monthly\").hide();$(\"weekly2\").hide();$(\"monthly2\").hide()'")?>Run Once</label></td>
+					<td><label class="schedule"><? NewFormItem($f, $s, "radio", "radio", NULL, "dow", "id='radio_dow' onclick='$(\"schedule\").show();$(\"weekly\").show();$(\"weekly2\").show();$(\"date\").hide();$(\"monthly\").hide();$(\"date2\").hide();$(\"monthly2\").hide()'")?>Daily/Weekly</label></td>
+					<td><label class="schedule"><? NewFormItem($f, $s, "radio", "radio", NULL, "dom", "id='radio_dom' onclick='$(\"schedule\").show();$(\"monthly\").show();$(\"monthly2\").show();$(\"weekly\").hide();$(\"date\").hide();$(\"weekly2\").hide();$(\"date2\").hide()'")?>Monthly</label></td>
 				</tr>
 			</table>
 			<table>
