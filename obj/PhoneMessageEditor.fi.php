@@ -299,12 +299,14 @@ class PhoneMessageEditor extends FormItem {
 									"id": audiofileid,
 									"messagegroupid": messagegroupid
 								},
+								"onSuccess": function() {
+									// reload the audio library
+									audiolibrarywidget.reload();
+								},
 								"onFailure": function() {
 									alert("There was a problem assigning this audiofile to this message group");
 								}
 							});
-							// reload the audio library
-							audiolibrarywidget.reload();
 						}
 					});
 				}
