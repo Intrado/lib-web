@@ -8,10 +8,11 @@
  */
 $isindexpage = true;
 require_once("inc/common.inc.php");
+doStartSession();
 
 if (isset($_REQUEST["is_return"])) {
     // useing the access token, request that authserver create a session for whoever is logged into portal
-    list($sessionid, $userid) = loginViaPortalAuth($token, $CUSTOMERURL, $_SERVER["REMOTE_ADDR"]);
+    list($sessionid, $userid) = loginViaPortalAuth($CUSTOMERURL, $_SERVER["REMOTE_ADDR"]);
 } else {
     $portalauthRequestTokenUrl = getPortalAuthAuthRequestTokenUrl("http://". $_SERVER['SERVER_NAME']. $_SERVER['REQUEST_URI']. "?is_return");
     redirect($portalauthRequestTokenUrl);
