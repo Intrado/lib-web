@@ -628,13 +628,15 @@ $.loadMessage = function loadMessage() {
 					$.each(attachments, function(eIndex,eData) {
 						var filesize = Math.round(eData.size/1024);
 						var attach = '<a href="emailattachment.php?id=' + eData.contentid + '&name=' + eData.filename + '">' + eData.filename + '</a>' +
-							'&nbsp;(Size: ' + filesize + 'k)&nbsp;<a class="remove_emailattachment" href="#" data-contentid="' + eData.contentid + '">Remove</a><br>';
+						// reverting changes in 19849 to check if they caused bug 5477 to manifest on test.asp 
+							//'&nbsp;(Size: ' + filesize + 'k)&nbsp;<a class="remove_emailattachment" href="#" data-contentid="' + eData.contentid + '">Remove</a><br>';
+							'&nbsp;(Size: ' + filesize + 'k)&nbsp;<a href="#">Remove</a><br>';
 						controlElement.append(attach);
-						controlElement.on("click", ".remove_emailattachment", function(event){
+						/*controlElement.on("click", ".remove_emailattachment", function(event){
 							event.preventDefault();
 							removeAttachment( $(this).attr("data-contentid"), 'msgsndr', 'msgsndr_emailmessageattachment' );
-						});
-						files[eData.contentid] = {"name":eData.filename,"size":eData.size};
+						});*/
+						files[eData.contentid] = {"name":eData.filename,"size":eData.size}
 					});
 				}
 				element.val(Object.toJSON(files));
