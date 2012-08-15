@@ -1,6 +1,10 @@
 jQuery.noConflict();
 (function($) {
 
+	$.ajaxSetup ({
+		cache: false
+	});
+
 	// hide stuff straight away
 	$('#error, #msg_section_1, #msg_section_2, #msg_section_3, #addme').hide().removeClass('hide');
 
