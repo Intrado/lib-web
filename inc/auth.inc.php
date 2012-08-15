@@ -566,8 +566,8 @@ function inboundSubscriberPhoneActivation($callerid, $code) {
 	return $result;
 }
 
-function getPortalAuthAuthRequestTokenUrl() {
-    $params = array(new XML_RPC_Value(session_id(), 'string'));
+function getPortalAuthAuthRequestTokenUrl($callbackUrl) {
+    $params = array(new XML_RPC_Value(session_id(), 'string'), new XML_RPC_Value($callbackUrl, 'string'));
     $method = "AuthServer.getPortalAuthAuthRequestTokenUrl";
     $result = pearxmlrpc($method, $params);
     if ($result !== false) {
