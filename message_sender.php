@@ -1296,10 +1296,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					$job->updateJobPost("twitter", $twitterauth->user_id);
 					break;
 				case "feed":
-					if ($postdata["socialmediafeedcategory"]) {
-						foreach ($postdata["socialmediafeedcategory"] as $feedcategoryid)
-							$job->updateJobPost("feed", $feedcategoryid);
-					}
+					if ($postdata["socialmediafeedcategory"] && count($postdata["socialmediafeedcategory"]))
+						$job->updateJobPost("feed", $postdata["socialmediafeedcategory"]);
 					break;
 				case "page":
 				case "voice":
