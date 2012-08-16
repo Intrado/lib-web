@@ -630,3 +630,10 @@ ALTER TABLE `portaluseridentification` CHANGE `type` `type` ENUM( 'local', 'face
 
 -- add last login timestamp to indicate the most recently used portal user identification data (08-10-2012)
 ALTER TABLE `portaluseridentification` ADD `lastlogintimestamp` INT NULL;
+
+-- store times in millis (08-15-2012)
+ALTER TABLE  `portaluseridentification` CHANGE  `createdtimestamp`  `createdtimestamp` BIGINT( 11 ) NOT NULL,
+ CHANGE  `modifiedtimestamp`  `modifiedtimestamp` BIGINT( 11 ) NOT NULL,
+ CHANGE  `lastlogintimestamp`  `lastlogintimestamp` BIGINT( 11 )  NULL;
+ 
+
