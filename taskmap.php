@@ -182,6 +182,7 @@ if ($datatype == "person") {
 	$usermapto["u2"] = "First Name";
 	$usermapto["u3"] = "Last Name";
 	$usermapto["u4"] = "Description";
+	$usermapto["u14"] = "Enabled"; // values enable, disable, disableonnew (default)
 	if ($hasldap)
 		$usermapto["u13"] = "Use LDAP";
 	$usermapto["u5"] = "Telephone User ID";
@@ -558,7 +559,8 @@ if ($reloadform) {
 				PutFormData($f,$s,"smapto_$count",0, "array",array_keys($studentmapto));
 			}
 		} else if ($datatype == "user") {
-			if (strncmp($importfield->mapto, 'u', 1) == 0) { // user
+			if (strncmp($importfield->mapto, 'u', 1) == 0 ||
+				strlen($importfield->mapto) == 0) { // user or default to user
 				//persontype
 				PutFormData($f,$s,"ptype_$count",0,"array",array_keys($persontypeselection));
 				//mapto user
