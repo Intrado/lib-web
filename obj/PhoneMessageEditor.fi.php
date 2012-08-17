@@ -256,9 +256,10 @@ class PhoneMessageEditor extends FormItem {
 					// listen for any new uploaded audio files so they can be inserted into the message and the library can be reloaded
 					audioupload.observe("AudioUpload:complete", function(event) {
 						var audiofilename = event.memo.audiofilename;
+						var audiofileid = event.memo.audiofileid;
 						
 						// insert the audiofile into the message
-						textInsert("{{" + audiofilename + "}}", messagearea);
+						textInsert("{{" + audiofilename + ":#" + audiofileid +"}}", messagearea);
 						
 						// reload the audio library
 						audiolibrarywidget.reload();
@@ -283,9 +284,9 @@ class PhoneMessageEditor extends FormItem {
 						// get the audiofile bits from the event
 						var audiofilename = event.memo.audiofilename;
 						var audiofileid = event.memo.audiofileid;
-						
+
 						// insert the audiofile into the message
-						textInsert("{{" + audiofilename + "}}", messagearea);
+						textInsert("{{" + audiofilename + ":#" + audiofileid +"}}", messagearea);
 						
 						// create a new recorder
 						setupVoiceRecorder(e, name, messagegroupid, audiolibrarywidget);
@@ -323,7 +324,9 @@ class PhoneMessageEditor extends FormItem {
 					// If insert is clicked in the library, insert that audio file into the message
 					library.observe("AudioLibraryWidget:ClickInsert", function(event) {
 						var audiofile = event.memo.audiofile;
-						textInsert("{{" + audiofile.name + "}}", messagearea);
+
+						// insert the audiofile into the message
+						textInsert("{{" + audiofile.name + ":#" + audiofile.id +"}}", messagearea);
 					});
 					
 					return audiolibrarywidget;

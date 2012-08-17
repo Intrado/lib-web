@@ -277,16 +277,33 @@ class Message extends DBMappedObject {
 				switch ($type) {
 					case "A":
 						$part->sequence = $partcount++;
-						if (is_array($audiofileids)) {
-							if (count($audiofileids) > 0) {
-								$query = "select id from audiofile where userid=? and name=? and deleted = 0 and id in (".implode(",", $audiofileids).")";
-								$audioid = QuickQuery($query, false, array($USER->id,$token));
-							} else {
-								$audioid = false;
-							}
+						
+						if (strpos($token,":#") !== false) {
+							list($afname,$afidtag) = explode(":#",$token);
 						} else {
-							$query = "select id from audiofile where userid=? and name=? and deleted = 0";
-							$audioid = QuickQuery($query, false, array($USER->id, $token));
+							$afname = $token;
+							$afidtag = false;
+						}
+						
+						//if we have the audio file ID, check for it
+						$audioid = false;
+						if ($afidtag)
+							$audioid = QuickQuery("select id from audiofile where userid=? and not deleted and id=?", false, array($USER->id,$afidtag));
+						
+						//if we didn't find one by ID, fall back to other methods
+						if (!$audioid) {
+							//if we have an array of audiofileids, scan for the named af in them
+							 if (is_array($audiofileids)) {
+								if (count($audiofileids) > 0) {
+									$query = "select id from audiofile where userid=? and name=? and deleted = 0 and id in (".implode(",", $audiofileids).")";
+									$audioid = QuickQuery($query, false, array($USER->id,$afname));
+								}
+							//otherwise search all audiofiles, preferring recent files
+							} else {
+								error_log_helper("WARNING: searching all audio files, may result in wrong results!"); 
+								$query = "select id from audiofile where userid=? and name=? and deleted = 0 order by recorddate desc";
+								$audioid = QuickQuery($query, false, array($USER->id, $afname));
+							}
 						}
 						
 						if ($audioid !== false) {
@@ -294,7 +311,7 @@ class Message extends DBMappedObject {
 							$part->audiofileid = $audioid;
 							$parts[] = $part;
 						} else {
-							$errors[] = "Can't find audio file named '$token'";
+							$errors[] = "Can't find audio file named '$afname'";
 						}
 
 						break;
@@ -399,7 +416,7 @@ class Message extends DBMappedObject {
 			switch ($part->type) {
 			case 'A':
 				$part->audiofile = new AudioFile($part->audiofileid);
-				$partstr .= "{{" . $part->audiofile->name . "}}";
+				$partstr .= "{{" . $part->audiofile->name . ":#" . $part->audiofileid . "}}";
 				break;
 			case 'T':
 				$partstr .= $part->txt;
