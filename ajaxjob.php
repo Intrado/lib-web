@@ -8,6 +8,7 @@ require_once("obj/PeopleList.obj.php");
 require_once("obj/Person.obj.php");
 require_once("obj/RenderedList.obj.php");
 require_once("inc/html.inc.php");
+require_once("inc/date.inc.php");
 
 
 function fmt_activestatus($obj, $name) {
