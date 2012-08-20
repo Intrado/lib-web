@@ -176,11 +176,13 @@ function startWindow($title) {
 ?>
 
 <div class="window">
+	
 	<div class="window_title_wrap">
 		<div class="window_title_l"></div>
 		<h2 class="window_title"><?= $title ?></h2>
 		<div class="window_title_r"></div>
 	</div>
+	
 	<div class="window_body_wrap">
 	
 		<div class="window_left">
@@ -198,12 +200,14 @@ function endWindow() {
 		</div>
 			
 	</div><!-- window_body_wrap -->
-	<div class="window_foot_wrap">  
-		<div class="window_foot_l"></div>
-		<div class="window_foot"></div>
-		<div class="window_foot_r"></div>
-	</div>
 </div><!-- window -->
+
+<div class="window_foot_wrap">  
+	<div class="window_foot_left">
+		<div class="window_foot_right">
+		</div>
+	</div>
+</div>
 
 <?
 }
