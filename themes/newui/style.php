@@ -35,10 +35,8 @@ h4 { font-size: 12px; line-height: 22px; color: #235563; text-shadow: 0 1px 0 #f
 .contain { position: relative; ; margin: 0 auto; }
 .popup_container { position: relative; margin: 0 auto; padding: 0 10px; }
 
-.wrapper {  }
 .newbroadcast, .main_activity { float: left; display: inline; width: 750px; }
 .main_aside { float: left; display: inline; width: 215px; margin: 5px 0 0 15px; }
-.window_body_wrap { padding: 15px 10px; }
 
 
 /*----- Banner -----*/
@@ -98,7 +96,7 @@ h4 { font-size: 12px; line-height: 22px; color: #235563; text-shadow: 0 1px 0 #f
 .pagetitlesubtext { margin: 0 0 8px 0; }
 #ms .pagetitlesubtext { display: none; }
 
-.window { margin: 5px 0 15px 0; border: none; -webkit-box-shadow: 0px 2px 8px 0px #777; box-shadow: 0px 2px 8px 0px #777;
+.window { margin: 5px 0 0; border: none; -webkit-box-shadow: 0px 2px 8px 0px #777; box-shadow: 0px 2px 8px 0px #777;
 -webkit-border-radius: 5px; border-radius: 5px; -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
 .window_aside { float: left; display: inline; width: 150px; margin: 0; }
 .window_main { width: inherit; margin: 0 0 0 160px; }
@@ -146,6 +144,7 @@ border-top: 1px solid #bbb; border-right: 1px solid #bbb; border-bottom: 1px sol
 
 /*----- Broadcasts -----*/
 
+.broadcasts { background: none; }
 .broadcasts .window_title_wrap { border: 1px solid #222; -webkit-border-radius: 5px 5px 0 0; border-radius: 5px 5px 0 0;
 -webkit-box-shadow: inset 0px 1px 1px 0 rgba(255,255,255,0.5); box-shadow: inset 0px 1px 1px 0 rgba(255,255,255,0.5);
 	background-color: #363636;
@@ -506,7 +505,7 @@ border-color: #499122 transparent transparent; border-style: solid; border-width
 
 /*----- List page styles -----*/
 
-.feed_btn_wrap { position: absolute; top: -60px; right: 13px; margin: 0; padding: 0; border: none; }
+.feed_btn_wrap { position: absolute; top: -45px; right: 13px; margin: 0; padding: 0; border: none; }
 .feed_btn_wrap .btn { float: left; display: inline; margin: 0 0 0 10px; border-top: 1px solid #bbb; border-right: 1px solid #bbb; border-bottom: 1px solid #bbb; border-left: none; }
 .feed_btn_wrap .btn:hover { background: #e7e7e7; }
 .feed_btn_wrap .btn.active { background: #e4e4e4; -webkit-box-shadow: inset 0px 1px 4px 0 rgba(0,0,0,0.2); box-shadow: inset 0px 1px 4px 0 rgba(0,0,0,0.2); }
@@ -1001,7 +1000,12 @@ p.warning {
 .ie7 .navtabs li a,
 .ie8 .navtabs li a { background: none; padding: 14px 0; text-align: center; border: none; }
 
-.ie8 .window_title_wrap { background: url(themes/newui/ie_title.png) 0 0 repeat-x; border: none; }
+.ie7 .window_title_wrap { background: url(themes/newui/ie_title.png) 0 0 repeat-x; padding: 0 22px; height: 54px; border: none; }
+.ie7 .window_title { background: none; padding: 10px 0 0 0; }
+.ie7 .window_title_l { background: url(themes/newui/ie_title_l.png) 0 0 no-repeat; position: absolute; top: 0; left: 0; display: block; width: 10px; height: 54px;}
+.ie7 .window_title_r { background: url(themes/newui/ie_title_r.png) 0 0 no-repeat; position: absolute; top: 0; right: 0; display: block; width: 10px; height: 54px; }
+.ie8 .window_title_wrap { background: url(themes/newui/ie_title.png) 0 0 repeat-x; height: 54px; border: none; }
+.ie8 .window_title { background: none; padding-top: 10px; }
 .ie8 .window_title_l { background: url(themes/newui/ie_title_l.png) 0 0 no-repeat; position: absolute; top: 0; left: 0; display: block; width: 10px; height: 54px;}
 .ie8 .window_title_r { background: url(themes/newui/ie_title_r.png) 0 0 no-repeat; position: absolute; top: 0; right: 0; display: block; width: 10px; height: 54px; }
 
@@ -1015,7 +1019,7 @@ p.warning {
 .ie8 .newbroadcast .window_title_wrap { background: url(themes/newui/ie_title_wrap3.png) 0 0 no-repeat; border: none; }
 
 .ie7 .window_body_wrap,
-.ie8 .window_body_wrap { border: 1px solid #ccc; }
+.ie8 .window_body_wrap { border-left: 1px solid #ccc; border-right: 1px solid #ccc; }
 
 .ie7 .summary .window_body_wrap,
 .ie8 .summary .window_body_wrap { border: 1px solid #93C9D9 }
