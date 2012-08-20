@@ -35,7 +35,7 @@ h4 { font-size: 12px; line-height: 22px; color: #235563; text-shadow: 0 1px 0 #f
 .contain { position: relative; ; margin: 0 auto; }
 .popup_container { position: relative; margin: 0 auto; padding: 0 10px; }
 
-.newbroadcast, .main_activity { float: left; display: inline; width: 750px; }
+.newbroadcast, .main_activity { float: left; display: inline; width: 750px; margin: 5px 0 15px 0; }
 .main_aside { float: left; display: inline; width: 215px; margin: 5px 0 0 15px; }
 
 
@@ -96,7 +96,7 @@ h4 { font-size: 12px; line-height: 22px; color: #235563; text-shadow: 0 1px 0 #f
 .pagetitlesubtext { margin: 0 0 8px 0; }
 #ms .pagetitlesubtext { display: none; }
 
-.window { margin: 5px 0 0; border: none; -webkit-box-shadow: 0px 2px 8px 0px #777; box-shadow: 0px 2px 8px 0px #777;
+.window { border: none; -webkit-box-shadow: 0px 2px 8px 0px #777; box-shadow: 0px 2px 8px 0px #777;
 -webkit-border-radius: 5px; border-radius: 5px; -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
 .window_aside { float: left; display: inline; width: 150px; margin: 0; }
 .window_main { width: inherit; margin: 0 0 0 160px; }
@@ -281,7 +281,7 @@ border-color: transparent transparent transparent #222; border-width: 27px; bord
 
 
 
-.window_panel { font-size: 14px; }
+.window_panel { margin: 15px 10px 0; font-size: 14px; }
 .window_panel a { color: #0088CC; }
 .window_panel a:hover { color: #005580; text-decoration: underline; }
 .window_panel .icon { display: inline-block; height: 14px; width: 14px; vertical-align: top; }
@@ -501,7 +501,7 @@ border-color: #499122 transparent transparent; border-style: solid; border-width
 .msg_complete li span.icon { background: url(themes/newui/remove.png) 0 center no-repeat; width: 16px; display: inline-block; margin: 4px 0 0; }
 .msg_complete li.complete span.icon { background: url(themes/newui/tick.png) 0 center no-repeat; width: 16px; display: inline-block; }
 
-.msg_confirm { background: #F9F8F6; margin: 0 -10px -15px -10px; padding: 22px 21px; text-align: right; border-radius: 0 0 5px 5px; border-top: 1px solid #DDDDDD; }
+.msg_confirm { background: #F9F8F6; margin: 0 -10px; padding: 22px 21px; text-align: right; border-radius: 0 0 5px 5px; border-top: 1px solid #DDDDDD; }
 
 
 /*----- List page styles -----*/
