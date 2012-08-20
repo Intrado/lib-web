@@ -92,39 +92,12 @@ table.list td { color: #444; }
 .shortcuts a { color: #444444; }
 .shortcuts a:hover { background: #92bde5; color: #fff; }
 
-/*----- IE7 classes re-adds the rounded corners for ie7-----*/
 
-.ie7 .window { border: none; }
-.ie7 .window_title { background: url("themes/classroom/win_t.gif") repeat-x; height: 23px; padding: 0 0 0 20px; line-height: 23px; }
-.ie7 .window_title_l { background: url("themes/classroom/win_tl.gif") no-repeat; position: absolute; top: 0; left: 0; display: block; width: 12px; height: 23px; }
-.ie7 .window_title_r { background: url("themes/classroom/win_tr.gif") no-repeat; position: absolute; top: 0; right: 0; display: block; width: 12px; height: 23px; }
-.ie7 .window_body_l { background: url("themes/classroom/win_l.gif") repeat-y; position: absolute; top: 0; left: 0; display: block; width: 12px; height: 100%; }
-.ie7 .window_body_r { background: url("themes/classroom/win_r.gif") repeat-y; position: absolute; top: 0; right: 0; display: block; width: 12px; height: 100%; }
-.ie7 .window_foot_wrap { position: relative; display: block; }
-.ie7 .window_foot { background: url("themes/classroom/win_b.gif") repeat-x; position: absolute; top: 0; left: 0; display: block; width: 100%; height: 15px; }
-.ie7 .window_foot_l { background: url("themes/classroom/win_bl.gif") no-repeat; position: absolute; top: 0; left: 0; display: block; width: 12px; height: 15px; z-index: 9; }
-.ie7 .window_foot_r { background: url("themes/classroom/win_br.gif") 2px 0 no-repeat; position: absolute; top: 0; right: 0; display: block; width: 14px; height: 15px; z-index: 9; }
 
 .ie7 .btn { overflow: visible;  }
 .ie7 .btn_middle img { margin-top: 0; }
 
 .ie7 #footer { padding: 15px 0; }
-
-
-/*----- IE8 classes re-adds the rounded corners for ie8-----*/
-
-.ie8 .window { border: none; }
-.ie8 .window_title { background: url("themes/classroom/win_t.gif") repeat-x; height: 23px; padding: 0 0 0 20px; line-height: 23px; }
-.ie8 .window_title_l { background: url("themes/classroom/win_tl.gif") no-repeat; position: absolute; top: 0; left: 0; display: block; width: 12px; height: 23px; }
-.ie8 .window_title_r { background: url("themes/classroom/win_tr.gif") no-repeat; position: absolute; top: 0; right: 0; display: block; width: 12px; height: 23px; }
-.ie8 .window_body_l { background: url("themes/classroom/win_l.gif") repeat-y; position: absolute; top: 0; left: 0; display: block; width: 12px; height: 100%; }
-.ie8 .window_body_r { background: url("themes/classroom/win_r.gif") repeat-y; position: absolute; top: 0; right: 0; display: block; width: 12px; height: 100%; }
-.ie8 .window_foot_wrap { position: relative; display: block; }
-.ie8 .window_foot { background: url("themes/classroom/win_b.gif") repeat-x; position: absolute; top: 0; left: 0; display: block; width: 100%; height: 15px; }
-.ie8 .window_foot_l { background: url("themes/classroom/win_bl.gif") no-repeat; position: absolute; top: 0; left: 0; display: block; width: 12px; height: 15px; z-index: 9; }
-.ie8 .window_foot_r { background: url("themes/classroom/win_br.gif") 2px 0 no-repeat; position: absolute; top: 0; right: 0; display: block; width: 14px; height: 15px; z-index: 9; }
-
-.ie8 .btn { overflow: visible;  }
 
 /*----- Classes that need PIE -----*/
 /*
