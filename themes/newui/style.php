@@ -1013,10 +1013,10 @@ p.warning {
 .ie8 .window_title_r { width: 10px; height: 58px; }
 
 .ie7 .summary .window_title_wrap,
-.ie8 .summary .window_title_wrap { background: url(themes/newui/ie_title_wrap.png) 0 0 no-repeat; border: none; }
+.ie8 .summary .window_title_wrap { background: url(themes/newui/ie_title_wrap.png) 0 0 no-repeat; height: 56px; border: none; }
 
 .ie7 .broadcasts .window_title_wrap,
-.ie8 .broadcasts .window_title_wrap { background: url(themes/newui/ie_title_wrap2.png) 0 0 no-repeat; border: none; }
+.ie8 .broadcasts .window_title_wrap { background: url(themes/newui/ie_title_wrap2.png) 0 0 no-repeat; height: 56px; border: none; }
 
 .ie7 .newbroadcast .window_title_wrap,
 .ie8 .newbroadcast .window_title_wrap { background: url(themes/newui/ie_title_wrap3.png) 0 0 no-repeat; border: none; }
