@@ -181,9 +181,11 @@ function startWindow($title) {
 		<h2 class="window_title"><?= $title ?></h2>
 		<div class="window_title_r"></div>
 	</div>
-	<div class="window_body_wrap cf">
-		<div class="window_body_l"></div>
-		<div class="window_body">
+	<div class="window_body_wrap">
+	
+		<div class="window_left">
+			<div class="window_right">
+				<div class="window_body cf">
 <?
 }
 
@@ -191,8 +193,10 @@ function endWindow() {
 	$theme = getBrandTheme();
 
 ?>
-		</div><!-- window_body -->
-		<div class="window_body_r"></div>
+				</div><!-- window_body -->
+			</div>
+		</div>
+			
 	</div><!-- window_body_wrap -->
 	<div class="window_foot_wrap">  
 		<div class="window_foot_l"></div>
