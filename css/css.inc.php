@@ -240,18 +240,19 @@ further styles for buttons and links are defined in each specific theme within t
 
 .menucollapse { float: right; margin-top: 4px; margin-right: 5px; border: 2px outset white; width: 10px; height: 10px; }
 
-.window {	background-color: #ffffff; border: 1px solid #999; margin: 0 0 15px 0; }
+.window {	background-color: #ffffff; border: 1px solid #999; }
 .window_title_wrap 	{ padding: 0; position: relative;} 
 .window_title_l, .window_title_r 	{ display: none; }
 			
-.window_body_wrap { position: relative; margin: 0; padding: 20px 1%; }
+.window_body_wrap { position: relative; margin: 0; }
 .window_body_l, .window_body_r { display: none; } /* hide from newer browsers... */
-.window_body { position: relative; }
+.window_body { position: relative; padding: 20px 1%; }
 table.window_body { width: 100%; }
-.window_foot_wrap { display: none; } /* hide from newer browsers... */
+
+.window_foot_wrap { margin: 0 0 15px; }
 
 .window_aside { width: 18%; margin: 0 2% 0 0; }
-.window_main { width: 78%; margin: 0 0 0 2%; }
+.window_main { width: 77%; margin: 0 0 0 2%; }
 
 .feedfilter {	margin: 0; padding: 0; list-style: none; }
 .feedfilter li { line-height: 20px; padding-top: 5px; }
@@ -910,6 +911,37 @@ select#reldate { margin: 0 10px 0 0; }
 
 /*----- fixes the column layout wrapping in main content window -----*/
 .ie7 .window_aside { margin: 0 1.8% 0 0; }
+.ie7 .window_main { float: right; margin: 0; }
+
+/*----- IE7 classes re-adds the rounded corners for ie7-----*/
+
+.ie7 .window { border: none; }
+.ie7 .window_title { background: url("themes/<?=$theme?>/win_t.gif") repeat-x; height: 23px; padding: 0 0 0 20px; line-height: 23px; }
+.ie7 .window_title_l { background: url("themes/<?=$theme?>/win_tl.gif") no-repeat; position: absolute; top: 0; left: 0; display: block; width: 12px; height: 23px; }
+.ie7 .window_title_r { background: url("themes/<?=$theme?>/win_tr.gif") no-repeat; position: absolute; top: 0; right: 0; display: block; width: 12px; height: 23px; }
+
+.ie7 .window_left { background: url("themes/<?=$theme?>/win_l.gif") top left repeat-y; }
+.ie7 .window_right { background: url("themes/<?=$theme?>/win_r.gif") top right repeat-y; }
+
+.ie7 .window_foot_wrap { background: url("themes/<?=$theme?>/win_b.gif") 0 0 repeat-x; height: 15px; }
+.ie7 .window_foot_left { background: url("themes/<?=$theme?>/win_bl.gif") top left no-repeat; height: 15px; width: 100%; }
+.ie7 .window_foot_right { background: url("themes/<?=$theme?>/win_br.gif") top right no-repeat; height: 15px; width: 100%; }
+
+/*----- IE8 classes re-adds the rounded corners for ie8-----*/
+
+.ie8 .window { border: none; }
+.ie8 .window_title { background: url("themes/<?=$theme?>/win_t.gif") repeat-x; height: 23px; padding: 0 0 0 20px; line-height: 23px; }
+.ie8 .window_title_l { background: url("themes/<?=$theme?>/win_tl.gif") no-repeat; position: absolute; top: 0; left: 0; display: block; width: 12px; height: 23px; }
+.ie8 .window_title_r { background: url("themes/<?=$theme?>/win_tr.gif") no-repeat; position: absolute; top: 0; right: 0; display: block; width: 12px; height: 23px; }
+
+.ie8 .window_left { background: url("themes/<?=$theme?>/win_l.gif") top left repeat-y; }
+.ie8 .window_right { background: url("themes/<?=$theme?>/win_r.gif") top right repeat-y; }
+
+.ie8 .window_foot_wrap { background: url("themes/<?=$theme?>/win_b.gif") 0 0 repeat-x; height: 15px; }
+.ie8 .window_foot_left { background: url("themes/<?=$theme?>/win_bl.gif") top left no-repeat; height: 15px; width: 100%; }
+.ie8 .window_foot_right { background: url("themes/<?=$theme?>/win_br.gif") top right no-repeat; height: 15px; width: 100%; }
+
+.ie8 .btn { overflow: visible; }
 
 
 /* +----------------------------------------------------------------+
