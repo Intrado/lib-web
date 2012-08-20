@@ -1001,14 +1001,16 @@ p.warning {
 .ie7 .navtabs li a,
 .ie8 .navtabs li a { background: none; padding: 14px 0; text-align: center; border: none; }
 
-.ie7 .window_title_wrap { background: url(themes/newui/ie_title.png) 0 0 repeat-x; padding: 0 22px; height: 54px; border: none; }
-.ie7 .window_title { background: none; padding: 10px 0 0 0; }
-.ie7 .window_title_l { background: url(themes/newui/ie_title_l.png) 0 0 no-repeat; position: absolute; top: 0; left: 0; display: block; width: 10px; height: 54px;}
-.ie7 .window_title_r { background: url(themes/newui/ie_title_r.png) 0 0 no-repeat; position: absolute; top: 0; right: 0; display: block; width: 10px; height: 54px; }
-.ie8 .window_title_wrap { background: url(themes/newui/ie_title.png) 0 0 repeat-x; height: 54px; border: none; }
-.ie8 .window_title { background: none; padding-top: 10px; }
-.ie8 .window_title_l { background: url(themes/newui/ie_title_l.png) 0 0 no-repeat; position: absolute; top: 0; left: 0; display: block; width: 10px; height: 54px;}
-.ie8 .window_title_r { background: url(themes/newui/ie_title_r.png) 0 0 no-repeat; position: absolute; top: 0; right: 0; display: block; width: 10px; height: 54px; }
+.ie7 .window_title_wrap,
+.ie8 .window_title_wrap { background: url("themes/<?=$theme?>/win_t.gif") repeat-x; height: 58px; padding: 0 22px; border: none; }
+
+.ie7 .window_title,
+.ie8 .window_title { background: none; padding: 15px 0 0 0; }
+
+.ie7 .window_title_l,
+.ie7 .window_title_r,
+.ie8 .window_title_l,
+.ie8 .window_title_r { width: 10px; height: 58px; }
 
 .ie7 .summary .window_title_wrap,
 .ie8 .summary .window_title_wrap { background: url(themes/newui/ie_title_wrap.png) 0 0 no-repeat; border: none; }
@@ -1018,9 +1020,6 @@ p.warning {
 
 .ie7 .newbroadcast .window_title_wrap,
 .ie8 .newbroadcast .window_title_wrap { background: url(themes/newui/ie_title_wrap3.png) 0 0 no-repeat; border: none; }
-
-.ie7 .window_body_wrap,
-.ie8 .window_body_wrap { border-left: 1px solid #ccc; border-right: 1px solid #ccc; }
 
 .ie7 .summary .window_body_wrap,
 .ie8 .summary .window_body_wrap { border: 1px solid #93C9D9 }
