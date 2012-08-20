@@ -1014,9 +1014,13 @@ p.warning {
 
 .ie7 .summary .window_title_wrap,
 .ie8 .summary .window_title_wrap { background: url(themes/newui/ie_title_wrap.png) 0 0 no-repeat; height: 56px; border: none; }
+.ie7 .summary .window_title_wrap h2,
+.ie8 .summary .window_title_wrap h2 { padding: 5px 0 0; }
 
 .ie7 .broadcasts .window_title_wrap,
 .ie8 .broadcasts .window_title_wrap { background: url(themes/newui/ie_title_wrap2.png) 0 0 no-repeat; height: 56px; border: none; }
+.ie7 .broadcasts .window_title_wrap h2,
+.ie8 .broadcasts .window_title_wrap h2 { padding: 5px 0 0; }
 
 .ie7 .newbroadcast .window_title_wrap,
 .ie8 .newbroadcast .window_title_wrap { background: url(themes/newui/ie_title_wrap3.png) 0 0 no-repeat; border: none; }
