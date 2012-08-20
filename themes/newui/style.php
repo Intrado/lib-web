@@ -128,6 +128,7 @@ border-top: 1px solid #bbb; border-right: 1px solid #bbb; border-bottom: 1px sol
 .btngroup button:hover { background: #e7e7e7; }
 .btngroup button.active { background: #e4e4e4; -webkit-box-shadow: inset 0px 1px 4px 0 rgba(0,0,0,0.2); box-shadow: inset 0px 1px 4px 0 rgba(0,0,0,0.2); }
 
+.summary { margin: 0 0 15px; }
 .summary .window_body_wrap { background: #DFEFF3; padding: 20px 0; border: 1px solid #93C9D9; -webkit-border-radius: 0 0 5px 5px; border-radius: 0 0 5px 5px; }
 .summary .col { float: left; display: inline; width: 180px; margin: 0 0 0 10px; padding: 7px 14px; text-align: center; }
 .summary .col:first-child { width: 154px; }
@@ -144,7 +145,7 @@ border-top: 1px solid #bbb; border-right: 1px solid #bbb; border-bottom: 1px sol
 
 /*----- Broadcasts -----*/
 
-.broadcasts { background: none; }
+.broadcasts { background: none; margin: 0 0 15px; }
 .broadcasts .window_title_wrap { border: 1px solid #222; -webkit-border-radius: 5px 5px 0 0; border-radius: 5px 5px 0 0;
 -webkit-box-shadow: inset 0px 1px 1px 0 rgba(255,255,255,0.5); box-shadow: inset 0px 1px 1px 0 rgba(255,255,255,0.5);
 	background-color: #363636;
