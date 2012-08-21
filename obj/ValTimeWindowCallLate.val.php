@@ -19,7 +19,7 @@ class ValTimeWindowCallLate extends Validator {
 		$isAtLeastAnHourAfterStartTime = strtotime($value) >= strtotime($requiredvalues[$callearlyfield]) + 3600;
 		
 		if (!$isAfterStartTime)
-			return _L('%1$s must be after the end time.', $this->label);
+			return _L('%1$s must be after the start time.', $this->label);
 		
 		if (!$isLateCall && !$isAtLeastAnHourAfterStartTime)
 			return _L('%1$s must be at least an hour after the start time', $this->label);
