@@ -201,7 +201,7 @@ class FinishJobWizard extends WizFinish {
 				$deliveryTypes = array();
 				if ($addme['phone']) {
 					$deliveryTypes["phone"] = new Phone();
-					$deliveryTypes["phone"]->phone = $addme['phone'];
+					$deliveryTypes["phone"]->phone = Phone::parse($addme['phone']);
 				}
 				if ($addme['email']) {
 					$deliveryTypes["email"] = new Email();
@@ -209,7 +209,7 @@ class FinishJobWizard extends WizFinish {
 				}
 				if ($addme['sms']) {
 					$deliveryTypes["sms"] = new Sms();
-					$deliveryTypes["sms"]->sms = $addme['sms'];
+					$deliveryTypes["sms"]->sms = Phone::parse($addme['sms']);
 				}
 
 				// Delivery Types and Job Types

@@ -990,7 +990,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$deliveryTypes = array();
 				if (isset($postdata['addmephone']) && $postdata['addmephone']) {
 					$deliveryTypes["phone"] = new Phone();
-					$deliveryTypes["phone"]->phone = $postdata['addmephone'];
+					$deliveryTypes["phone"]->phone = Phone::parse($postdata['addmephone']);
 				}
 				if (isset($postdata['addmeemail']) && $postdata['addmeemail']) {
 					$deliveryTypes["email"] = new Email();
@@ -998,7 +998,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				}
 				if (isset($postdata['addmesms']) && $postdata['addmesms']) {
 					$deliveryTypes["sms"] = new Sms();
-					$deliveryTypes["sms"]->sms = $postdata['addmesms'];
+					$deliveryTypes["sms"]->sms = Phone::parse($postdata['addmesms']);
 				}
 
 				// Delivery Types and Job Types
