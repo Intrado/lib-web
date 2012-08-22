@@ -66,7 +66,7 @@ autologoutminutes=60
 customer_url_prefix=https://localhost
 
 ; tai server to redirect customer link to
-tai_backdoor_url=https://localhost:83/api/v1/session/backdoor
+tai_url=https://localhost:83
 
 ; list of tiny domains to choose from in the manager
 tinydomain[]="alrt4.me"
