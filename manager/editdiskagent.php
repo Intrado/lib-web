@@ -3,6 +3,8 @@ include_once("common.inc.php");
 include_once("../inc/form.inc.php");
 include_once("../inc/table.inc.php");
 include_once("../inc/html.inc.php");
+include_once("obj/LdapVars.obj.php");
+
 
 // is admin user authorized to manage disk agents
 if (!$MANAGERUSER->authorized("diskagent"))
@@ -31,7 +33,7 @@ if (isset($_GET['agentid'])) {
 }
 
 // get the agent
-$agent = QuickQueryRow("select uuid, name, numpollthread from agent where id=?", true, $diskdb, array($agentid));
+$agent = QuickQueryRow("select uuid, name, numpollthread, options from agent where id=?", true, $diskdb, array($agentid));
 
 // find all agent customerids to lookup customerurl in authserver db
 $customerids = QuickQueryList("select distinct customerid from customeragent where agentid=?", false, $diskdb, array($agentid));
@@ -50,6 +52,12 @@ while ($row = DBGetRow($result)) {
 	$data[] = $row;
 }
 
+// what type of ldap server is configured in the agent options
+$ldapvars = json_decode($agent['options']);
+if ($ldapvars->usernameAttributeName == "uid")
+	$ldaptype = "directoryserver";
+else
+	$ldaptype = "activedirectory";
 
 // Main Form
 $f = "editdiskagent";
@@ -67,10 +75,14 @@ if (CheckFormSubmit($f,$s) || CheckFormSubmit($f, "addcust")) {
 		TrimFormData($f, $s, "addcustomerurl");
 		TrimFormData($f, $s, "agent_name");
 		TrimFormData($f, $s, "agent_numpollthread");
+		TrimFormData($f, $s, "agent_ldaptype");
+		TrimFormData($f, $s, "agent_ou");
 
 		$agentname = GetFormData($f, $s, "agent_name");
 		$agentnamelength = strlen($agentname);
 		$numpollthread = GetFormData($f, $s, "agent_numpollthread") + 0;
+		$ldaptype = GetFormData($f, $s, "agent_ldaptype");
+		$ldapou = GetFormData($f, $s, "agent_ou");
 
 		//do check
 		if ( CheckFormSection($f, $s) ) {
@@ -95,8 +107,27 @@ if (CheckFormSubmit($f,$s) || CheckFormSubmit($f, "addcust")) {
 				} else if ($numpollthread < 2 || $numpollthread > 10) {
 					error('Number of Polling Threads must be between 2 and 10');
 				} else {
+					// buid LDAP vars based on type of server
+					$ldapvars = new LdapVars();
+					switch ($ldaptype) {
+						case "directoryserver":
+							$ldapvars->usernameAttributeName = "uid";
+							$ldapvars->accountAttributeName = "sdpaccountstatus";
+							$ldapvars->useFQDN = false;
+							$ldapvars->enabledOperation = "stringcompare";
+							$ldapvars->ou = $ldapou;
+							break;
+						default: // "activedirectory"
+							$ldapvars->usernameAttributeName = "userPrincipalName";
+							$ldapvars->accountAttributeName = "userAccountControl";
+							$ldapvars->useFQDN = true;
+							$ldapvars->enabledOperation = "bitcompare";
+							$ldapvars->ou = null; // ou null, not used
+					}
+					$json_ldapvars = json_encode($ldapvars);
+				
 					// update agent properties
-					QuickUpdate("update agent set name=?, numpollthread=? where id=?", $diskdb, array($agentname, $numpollthread, $agentid));
+					QuickUpdate("update agent set name=?, numpollthread=?, options=? where id=?", $diskdb, array($agentname, $numpollthread, $json_ldapvars, $agentid));
 
 					// find each auth checkbox value
 					foreach ($data as $row) {
@@ -129,6 +160,8 @@ if ( $reloadform ) {
 	PutFormData($f, $s, "addcustomerurl", "", "text", "nomin", "nomax", false);
 	PutFormData($f, $s, "agent_name", $agent['name'], "text", "nomin", "nomax", true);
 	PutFormData($f, $s, "agent_numpollthread", $agent['numpollthread'], "number", "2", "10", true);
+	PutFormData($f, $s, "agent_ldaptype", $ldaptype, "text");
+	PutFormData($f, $s, "agent_ou", $ldapvars->ou, "text", "nomin", "nomax", false);
 	
 	// find each auth checkbox value
 	foreach ($data as $row) {
@@ -189,6 +222,21 @@ NewForm($f);
 	<tr>
 		<td>Number of Polling Threads: </td>
 		<td><? NewFormItem($f, $s, "agent_numpollthread", "text", "5");?></td>
+	</tr>
+	<tr>
+		<td>Type of LDAP Server: </td>
+		<td>
+<?
+		NewFormItem($f, $s, 'agent_ldaptype', 'selectstart');
+		NewFormItem($f, $s, 'agent_ldaptype', 'selectoption', "MS Active Directory", 'activedirectory');
+		NewFormItem($f, $s, 'agent_ldaptype', 'selectoption', "RedHat Directory Server", 'directoryserver');
+		NewFormItem($f, $s, 'agent_ldaptype', 'selectend');
+?>
+		</td>
+	</tr>
+	<tr>
+		<td>OU (only for Directory Server): </td>
+		<td><? NewFormItem($f, $s, "agent_ou", "text", "20");?></td>
 	</tr>
 	<tr>
 		<td colspan="2">
