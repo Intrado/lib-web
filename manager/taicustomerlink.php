@@ -18,6 +18,6 @@ $string = md5($MANAGERUSER->login . microtime() . $customerurl);
 // TODO we may want to set the expiration interval in the properties file
 QuickUpdate("update customer set logintoken = '$string', logintokenexpiretime = now() + interval 5 minute where id = '$custid'");
 
-redirect($SETTINGS['feature']['tai_backdoor_url'] ."/?asptoken=$string&cid=$custid");
+redirect($SETTINGS['feature']['tai_backdoor_url'] ."/#backdoor?asptoken=$string"); // NOTE customerid not passed, looked up via authserver
 
 ?>
