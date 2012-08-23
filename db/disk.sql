@@ -18,6 +18,6 @@ CREATE TABLE `customeragent` (
 ALTER TABLE  `agent` ADD  `options` TEXT NULL;
 
 -- update all agents the defaults for active directory
-update agent set options = '"{"usernameAttributeName":"userPrincipalName","accountAttributeName":"userAccountControl","useFQDN":true,"enabledOperation":"bitcompare","ou":null}';
+update agent set options = '{"usernameAttributeName":"userPrincipalName","accountAttributeName":"userAccountControl","useFQDN":true,"enabledOperation":"bitcompare","ou":null}';
 
 
