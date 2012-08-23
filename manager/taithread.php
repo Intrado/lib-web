@@ -20,20 +20,21 @@ if (!isset($_GET['customerid']) && !isset($_GET['threadid'])) {
 // formatters
 ////////////////////////////////////////////////////////////////////////////////
 function fmt_user($row, $index) {
-	global $threaduser;	
+	global $thread,$threadusers;
 	if ($row[$index] == 1)
 		return "School Messenger";
-	if ($row[$index] === $threaduser->id)
-		return $threaduser->firstname . " " .  $threaduser->lastname;
-	else
+	if (isset($threadusers[$row[$index]])) {
+		$user = $threadusers[$row[$index]];
+		if ($thread->wassentanonymously && $thread->originatinguserid == $row[$index])
+			return "Anonymous " . action_link(_L('View'),"tick",null,"alert('ID: {$user->id} Name: {$user->firstname} {$user->lastname}');return false;");
+		return $user->firstname . " " .  $user->lastname;
+	} else
 		return "&nbsp;";
 }
 
-
-
 $formdata = array();
 $formdata["reply"] = array(
-	"label" => _L('Reply'),
+	"label" => _L('Reply to Originator'),
 	"value" => "",
 	"validators" => array(),
 	"control" => array("TextArea", "rows" => 3, "cols" => 40),
@@ -51,8 +52,13 @@ $form = new Form("threadreply",$formdata,null,$buttons);
 
 loadManagerConnectionData();
 $custdb = getPooledCustomerConnection($_GET['customerid'],true);
-$threaduser = DBFind("User", "from user u inner join tai_thread t on (u.id = t.originatinguserid or u.id = t.recipientuserid) where u.id != 1 and t.id=? ","u",array($_GET['threadid']),$custdb);
 
+$thread = DBFind("Thread", "from tai_thread where id=?",false,array($_GET['threadid']),$custdb);
+if ($thread === null) {
+	redirectToReferrer();
+}
+
+$threadusers = DBFindMany("User", "from user u inner join tai_thread t on (u.id = t.originatinguserid or u.id = t.recipientuserid) where u.id != 1 and t.id=? ","u",array($_GET['threadid']),$custdb);
 
 //check and handle an ajax request (will exit early)
 //or merge in related post data
@@ -77,20 +83,20 @@ if ($button = $form->getSubmit()) {
 		$_dbcon = $custdb;
 		
 		Query("BEGIN");
-		$thread = DBFind("Thread", "from tai_thread where id=? ",false,array($_GET['threadid']));
+		//$thread = DBFind("Thread", "from tai_thread where id=? ",false,array($_GET['threadid']));
 
 		if ($thread !== null) {
 			$message = new Message();
 			$message->body = $postdata["reply"];
 			$message->senderuserid = 1;
-			$message->recipientuserid = $threaduser->id;
+			$message->recipientuserid = $thread->originatinguserid;
 			$message->modifiedtimestamp = time();
 			$message->threadid = $_GET['threadid'];
 			$message->create();
 			
 			$usermessage = new UserMessage();
 			$usermessage->messageid = $message->id;
-			$usermessage->userid = $threaduser->id;
+			$usermessage->userid = $thread->originatinguserid;
 			$usermessage->create();
 			
 			$usermessage = new UserMessage();	
@@ -115,12 +121,12 @@ if ($button = $form->getSubmit()) {
 
 
 $TITLE = "Talk About It Thread";
-$PAGE = "tai:inbox";
+$PAGE = "tai:thread";
 
 
 include_once("nav.inc.php");
 
-buttons(icon_button(_L('Back to Inbox'),"arrow_left",null,"taithread.php"));
+//buttons(icon_button(_L('Done'),"tick",null,$_SERVER['HTTP_REFERER']?$_SERVER['HTTP_REFERER']:"taiinbox.php"));
 startWindow(_L('Thread: %s on Customer: %s',$_GET['threadid'],$_GET['customerid']));
 
 
@@ -151,6 +157,5 @@ echo $form->render();
 
 
 endWindow();
-buttons();
 include_once("navbottom.inc.php");
 ?>

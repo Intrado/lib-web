@@ -18,19 +18,22 @@ function fmt_custurl($row, $index){
 }
 function fmt_actions($row, $index) {
 	global $MANAGERUSER;
-	
+
+	$threadid = ltrim(strrchr($row["body"], " "), " ");
 	$links = array();
-	$links[] = action_link(_L("View"),"pencil","taithread.php?customerid={$row["customerid"]}&threadid={$row["threadid"]}");
-	$links[] = action_link(_L("Delete"),"cross","taiinbox.php?delete=true&customerid={$row["customerid"]}&threadid={$row["threadid"]}");
+	if (is_numeric($threadid)) {
+		$links[] = action_link(_L("View Thread $threadid"),"pencil","taithread.php?customerid={$row["customerid"]}&threadid={$threadid}");
+	}
+	$links[] = action_link(_L("Delete"),"cross","tairevealrequests.php?delete=true&customerid={$row["customerid"]}&threadid={$row["threadid"]}","confirmDelete()");
 	
 	return action_links($links);
 }
 
-$TITLE = "Talk About It Inbox";
-$PAGE = "tai:inbox";
+$TITLE = _L("Identity Reveal Requests");
+$PAGE = "tai:requests";
 
 include_once("nav.inc.php");
-startWindow(_L('Inbox'));
+startWindow($TITLE);
 
 
 loadManagerConnectionData();
@@ -45,7 +48,7 @@ $taicustomers = QuickQueryList($query);
 foreach ($taicustomers as $cid) {
 	$custdb = getPooledCustomerConnection($cid,true);
 	
-	$query = "SELECT ? as customerid,m.threadid,m.body FROM `tai_message` m inner join `tai_thread` t on (t.id = m.threadid) WHERE exists (select * from tai_usermessage um where um.userid=1 and um.isdeleted=0) and m.recipientuserid=1 and t.threadtype='comment' group by threadid";
+	$query = "SELECT ? as customerid,m.threadid,t.originatinguserid, m.body FROM `tai_message` m inner join `tai_thread` t on (t.id = m.threadid) WHERE exists (select * from tai_usermessage um where um.userid=1 and um.isdeleted=0) and m.recipientuserid=1 and t.threadtype='identityreveal' group by m.threadid";
 	$customerthreads = QuickQueryMultiRow($query,true,$custdb,array($cid));
 	$thread = array_merge($thread,$customerthreads);
 	
@@ -59,8 +62,8 @@ foreach ($taicustomers as $cid) {
 $titles = array(
 	"customerid" => "#Customer ID",
 	"url" => "#Custoemr URL",
-	"threadid" => "#Thread Id",
-	"body" => "Last Message",
+	"originatinguserid" => "Userid",
+	"body" => "Request Information",
 	"actions" => "Actions");
 $formatters = array(
 	"url" => "fmt_custurl",
