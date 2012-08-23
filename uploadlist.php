@@ -137,16 +137,14 @@ startWindow('Upload Call List File');
 	if ($USER->authorize('listuploadcontacts')) {
 ?>
 				<tr>
-					<td><label><? NewFormItem($f, $s, "type", "radio", null, "contacts"); ?>Contact&nbsp;data:</label></td>
-					<td>
-						File format must be a Comma Separated Value (CSV) text file. Once uploaded, the files columns can be mapped to names, destinations, and insertable fields for use in messages.
-					</td>
+					<td class="upload_type"><label><? NewFormItem($f, $s, "type", "radio", null, "contacts"); ?>Contact&nbsp;data:</label></td>
+					<td class="upload_type">File format must be a Comma Separated Value (CSV) text file. Once uploaded, the files columns can be mapped to names, destinations, and insertable fields for use in messages.</td>
 				<tr>
 <? } ?>
 <? if ($USER->authorize('listuploadids')) { ?>
 				<tr>
-					<td><label><? NewFormItem($f, $s, "type", "radio", null, "ids"); ?>ID#&nbsp;lookup:</label></td>
-					<td>File must be a list of ID#s only (one per line)</td>
+					<td class="upload_type"><label><? NewFormItem($f, $s, "type", "radio", null, "ids"); ?>ID#&nbsp;lookup:</label></td>
+					<td class="upload_type">File must be a list of ID#s only (one per line)</td>
 				</tr>
 <? } ?>
 			</table>

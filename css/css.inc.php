@@ -814,7 +814,11 @@ div.autocomplete ul li {
 	padding-right: 5px;
 }
 
+/*----------*/
 
+.upload_type { line-height: 17px; }
+.upload_type label { display: block; width: 125px; }
+.upload_type input { margin: 0 4px 0 0; }
 
 /*----- New Job and Emergency job table styles -----*/
 
