@@ -820,6 +820,9 @@ div.autocomplete ul li {
 .upload_type label { display: block; width: 125px; }
 .upload_type input { margin: 0 4px 0 0; }
 
+.block_email input, .block_email label { float: left; margin: 7px 5px 0 0; }
+.block_email a { display: block; margin: 7px 0 0; }
+
 /*----- New Job and Emergency job table styles -----*/
 
 .htmlradiobuttonbigcheck img { position: absolute; left: 0; top: 25px; /*width: 34px; height: 34px; margin-left: -17px; padding: 0 0 0 50%;*/ }

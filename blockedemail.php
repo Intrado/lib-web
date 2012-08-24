@@ -383,11 +383,11 @@ startWindow(_L('Blocked Emails') , 'padding: 3px;', false, true);
 			<input style='float:left;' id='searchtext' size="75" value='<?= $settings["searchtext"] ?>'><?= icon_button(_L("Search"),"magnifier","if($('searchtext').getStyle('color') != 'gray') {window.location='?searchtext=' + encodeURIComponent($('searchtext').value);} else {window.location='?searchtext='}"); ?>
 			</form>
 		</td>
-		<td>
+		<td class="block_email">
 			<input type='checkbox' id='checkboxDisplayContact' onclick='location.href="?displaycontact=" + this.checked + "&pagestart=" + "<? echo($start); ?>"' <?=$settings["displaycontact"] ? 'checked' : ''?>><label for='checkboxDisplayContact'><?=_L('Display Contacts')?></label> 
 		</td>
-		<td>
-			<a href='blockedemail.php?csv'><?= _L("CSV Download"); ?></a>
+		<td class="block_email">
+			<a class="csv_dload" href='blockedemail.php?csv'><?= _L("CSV Download"); ?></a>
 		</td>
 	</tr>
 </table>
