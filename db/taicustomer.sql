@@ -161,6 +161,10 @@ $$$
 alter table tai_lockout add end_date DATE;
 $$$
 
-update setting set value='0.1/7' where name='_dbtaiversion'
+-- $rev 8
+alter table tai_thread add identityrequested tinyint(4) not null default 0
+$$$
+
+update setting set value='0.1/8' where name='_dbtaiversion'
 $$$
 -- END 0.1/7

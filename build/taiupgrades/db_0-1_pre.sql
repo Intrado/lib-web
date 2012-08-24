@@ -158,5 +158,8 @@ $$$
 alter table tai_lockout add end_date DATE;
 $$$
 
+-- $rev 8
+alter table tai_thread add identityrequested tinyint(4) not null default 0
+$$$  
 -- NOTE if adding additional schema must update kona/db/taicustomer.sql and set latest _dbtaiversion setting
 
