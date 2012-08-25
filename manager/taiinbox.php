@@ -20,7 +20,7 @@ function fmt_actions($row, $index) {
 	global $MANAGERUSER;
 	
 	$links = array();
-	$links[] = action_link(_L("View"),"pencil","taithread.php?customerid={$row["customerid"]}&threadid={$row["threadid"]}");
+	$links[] = action_link(_L("View"),"magnifier","taithread.php?customerid={$row["customerid"]}&threadid={$row["threadid"]}");
 	$links[] = action_link(_L("Delete"),"cross","taiinbox.php?delete=true&customerid={$row["customerid"]}&threadid={$row["threadid"]}");
 	
 	return action_links($links);
