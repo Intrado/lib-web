@@ -65,6 +65,7 @@ require_once("inc/previewfields.inc.php");
 require_once("obj/PreviewModal.obj.php");
 require_once("inc/appserver.inc.php");
 PreviewModal::HandleRequestWithPhoneText();
+PreviewModal::HandleRequestWithEmailText();
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -312,6 +313,7 @@ class ValConditionalOnValue extends Validator {
 ////////////////////////////////////////////////////////////////////////////////
 
 PreviewModal::HandleRequestWithPhoneText();
+PreviewModal::HandleRequestWithEmailText();
 
 // get the user requested schedule out of postdata
 function getSchedule($postdata) {

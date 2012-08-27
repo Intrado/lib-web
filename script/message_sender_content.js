@@ -277,6 +277,21 @@ var allowControl = {
 		//if(userInfo.email != '') {
 		//	$('#msgsndr_emailmessagefromemail').attr('value', userInfo.email);
 		//}
+
+		$('#msgsndr_previewemail').on('click', function(e) {
+			e.preventDefault();
+
+			var postParams = {
+				language:"en",
+				subtype:"html",
+				text: $("#msgsndr_emailmessagetext").val(),
+				fromname:$("#msgsndr_emailmessagefromname").val(),
+				from: $('#msgsndr_emailmessagefromemail').val(),
+				subject:$('#msgsndr_emailmessagesubject').val()
+			};
+			showPreview(postParams);			
+
+		});
 		
 		// Hide / Show Translations
 		$('#msgsndr_tab_email').on('click', '.toggle-translations', function(event) {

@@ -218,6 +218,13 @@
 						<div id="msgsndr_emailmessagetext-htmleditor"></div>
 					</div>
 				</fieldset>
+
+				<fieldset>
+					<!-- <label for="msgsndr_previewemail">Preivew </label> -->
+					<div class="controls">
+						<button id="msgsndr_previewemail">Preview Email</button>
+					</div>
+				</fieldset>
 				
 				<fieldset class="hide">
 					<label for="msgsndr_emailmessagetexttranslate">Translate&nbsp;<img id="msgsndr_emailmessagetexttranslate_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>
