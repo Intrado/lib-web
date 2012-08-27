@@ -26,29 +26,16 @@ function fmt_user($row, $index) {
 	if (isset($threadusers[$row[$index]])) {
 		$user = $threadusers[$row[$index]];
 		if ($thread->wassentanonymously && $thread->originatinguserid == $row[$index])
-			return "Anonymous " . action_link(_L('View'),"tick",null,"alert('ID: {$user->id} Name: {$user->firstname} {$user->lastname}');return false;");
+			return "Anonymous " . action_link(_L('View User'),"magnifier",null,"alert('ID: {$user->id} Name: {$user->firstname} {$user->lastname}');return false;");
 		return $user->firstname . " " .  $user->lastname;
 	} else
 		return "&nbsp;";
 }
 
-$formdata = array();
-$formdata["reply"] = array(
-	"label" => _L('Reply to Originator'),
-	"value" => "",
-	"validators" => array(),
-	"control" => array("TextArea", "rows" => 3, "cols" => 40),
-	"helpstep" => 1
-);
 
-$buttons = array(submit_button(_L('Reply'),"submit","tick"));
-
-$form = new Form("threadreply",$formdata,null,$buttons);
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Form Data Handling
-////////////////////////////////////////////////////////////////////////////////
+function fmt_timestamp($row, $index) {
+	return date("Y-m-d G:i:s",$row[$index]);;
+}
 
 loadManagerConnectionData();
 $custdb = getPooledCustomerConnection($_GET['customerid'],true);
@@ -57,6 +44,49 @@ $thread = DBFind("Thread", "from tai_thread where id=?",false,array($_GET['threa
 if ($thread === null) {
 	redirectToReferrer();
 }
+
+
+
+$formdata = array();
+$formdata["reply"] = array(
+	"label" => _L('Reply to Originator'),
+	"value" => "",
+	"validators" => array(
+		array("ValRequired")
+	),
+	"control" => array("TextArea", "rows" => 3, "cols" => 40),
+	"helpstep" => 1
+);
+
+$windowdescription = "";
+switch($thread->threadtype) {
+	case "identityreveal":
+		$PAGE = "tai:requests";
+		$windowdescription = _L('Identity Request on Customer: %s',$_GET['customerid']);
+		$backbutton = icon_button(_L('Back'),"	fugue/arrow_180",null,"tairevealrequests.php");
+		break;
+	case "comment":
+		$PAGE = "tai:inbox";
+		$windowdescription = _L('Comment on Customer: %s',$_GET['customerid']);
+		$backbutton = icon_button(_L('Back'),"	fugue/arrow_180",null,"taiinbox.php");
+
+		break;
+	default:
+		$PAGE = "tai:inbox";
+		$backbutton = icon_button(_L('Back'),"	fugue/arrow_180",null,$_SERVER['HTTP_REFERER']?$_SERVER['HTTP_REFERER']:"taiinbox.php");
+		$windowdescription = _L('Thread: %s on Customer: %s',$_GET['threadid'],$_GET['customerid']);
+	break;
+}
+
+$buttons = array($backbutton,submit_button(_L('Reply To Originator'),"submit","tick"));
+
+$form = new Form("threadreply",$formdata,null,$buttons);
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Form Data Handling
+////////////////////////////////////////////////////////////////////////////////
+
 
 $threadusers = DBFindMany("User", "from user u inner join tai_thread t on (u.id = t.originatinguserid or u.id = t.recipientuserid) where u.id != 1 and t.id=? ","u",array($_GET['threadid']),$custdb);
 
@@ -119,15 +149,13 @@ if ($button = $form->getSubmit()) {
 }
 
 
-
 $TITLE = "Talk About It Thread";
-$PAGE = "tai:thread";
+
+
 
 
 include_once("nav.inc.php");
-
-//buttons(icon_button(_L('Done'),"tick",null,$_SERVER['HTTP_REFERER']?$_SERVER['HTTP_REFERER']:"taiinbox.php"));
-startWindow(_L('Thread: %s on Customer: %s',$_GET['threadid'],$_GET['customerid']));
+startWindow($windowdescription);
 
 
 
@@ -139,23 +167,26 @@ $messages = QuickQueryMultiRow($query,true,$custdb,array($_GET['threadid']));
 $titles = array(
 	"senderuserid" => "From",
 	"recipientuserid" => "To",
-	"body" => "Message");
+	"body" => "Message",
+	"modifiedtimestamp" => "sent");
 $formatters = array(
 	"senderuserid" => "fmt_user",
-	"recipientuserid" => "fmt_user"
+	"recipientuserid" => "fmt_user",
+	"modifiedtimestamp" => "fmt_timestamp"
 );
+
+if ($thread->threadtype == "thread") {
+	$topic = QuickQuery("select name from tai_topic where id=?",$custdb,array($thread->topicid));
+	echo "<b>Thread Topic:</b>$topic<br/>";
+}
+echo  "<b>Last Modified Date:</b> " . date("Y-m-d G:i:s",$thread->modifiedtimestamp) . "<hr/>";
 
 echo '<table id="taimessages" class="list sortable">';
 
 showTable($messages,$titles,$formatters);
 
 echo '</table>';
-
-
 echo $form->render();
-
-
-
 endWindow();
 include_once("navbottom.inc.php");
 ?>
