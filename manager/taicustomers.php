@@ -43,10 +43,7 @@ function fmt_custurl($row, $index){
 }
 
 function fmt_actions($row, $index) {
-	$dmmethod = "system";
-	if ($row[11] != 'asp')
-		$dmmethod = "customer";
-		
+	
 	global $MANAGERUSER;
 	$actions = '<div class="actionlinks">';
 	if ($MANAGERUSER->authorized("users"))

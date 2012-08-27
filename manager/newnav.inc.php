@@ -22,7 +22,13 @@ if(isset($PAGELOOKUP[$currentpage])) {
 	$PAGE = $PAGELOOKUP[$currentpage]["page"];
 }
 
-include_once("../inc/themes.inc.php");
+$COLORSCHEMES = array(
+	"forest" => array("displayname" => "Forest",
+							"_brandprimary" => "0D8336", /* mid green */
+							"_brandtheme1" => "13a545",
+							"_brandtheme2" => "484848",
+							"_brandratio" => ".2")
+);
 $_SESSION['colorscheme'] = array();
 $_SESSION['colorscheme']['_brandtheme'] = "forest";
 $_SESSION['colorscheme']['_brandprimary'] = "0D8336";
