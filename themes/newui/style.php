@@ -891,6 +891,9 @@ li.notactive { display: none; }
 .window_panel input.ok[type="text"]:focus, .window_panel textarea.ok:focus { border: 1px solid rgb(75,149,35);
 -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(75,149,35, 0.6);	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(75,149,35, 0.6); }
 
+textarea[readonly] {
+  background: rgb(231, 231, 231);
+}
 
 /*input.ok, input.required.ok {
   background: url(img/icons/accept.gif) 99% 44% no-repeat;

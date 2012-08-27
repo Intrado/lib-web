@@ -95,15 +95,18 @@ var allowControl = {
 
 			if (typeof (checkedState) != "undefined") {
 				$(this).data('translatedtext', $('#tts_translated_' + langCode).val());
-				$('#tts_translated_' + langCode).removeAttr('disabled');
+				// $('#tts_translated_' + langCode).removeAttr('disabled');
+				$('#tts_translated_' + langCode).removeAttr('readonly');
 			} else {
 				var revertTranslation = confirm('The translation will be put back to the previous translation');
 				if (!revertTranslation) {
 					$(this).attr('checked', 'checked');
-					$('#tts_translated_' + langCode).removeAttr('disabled');
+					// $('#tts_translated_' + langCode).removeAttr('disabled');
+					$('#tts_translated_' + langCode).removeAttr('readonly');
 				} else {
 					// $('#tts_translated_'+langCode)
-					$('#tts_translated_' + langCode).attr('disabled', 'disbaled');
+					// $('#tts_translated_' + langCode).attr('disabled', 'disbaled');
+					$('#tts_translated_' + langCode).attr('readonly', 'readonly');
 					$('#tts_translated_' + langCode).val($(this).data('translatedtext'));
 				}
 			}
@@ -126,7 +129,8 @@ var allowControl = {
 	        ttsTranslate += '<input type="checkbox" checked="checked" name="save_translation" class="msgdata translations" id="tts_'+langCode+'" />';
 	        ttsTranslate += '<label for="tts_'+langCode+'">'+nLangs[langCode]+'&nbsp;<img id="'+fieldname+'_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>';
 	        ttsTranslate += '<div class="controls">';
-	        ttsTranslate += '<textarea id="tts_translated_'+langCode+'" class="msgdata" disabled="disabled"></textarea>';
+	        // ttsTranslate += '<textarea id="tts_translated_'+langCode+'" class="msgdata" disabled="disabled"></textarea>';
+	        ttsTranslate += '<textarea id="tts_translated_'+langCode+'" class="msgdata" readonly="readonly"></textarea>';
 	        ttsTranslate += '<div id="'+fieldname+'_msg" class="box_validatorerror er" style="display:none"></div>';
 	        ttsTranslate += '<button class="playAudio" data-text="tts_translated_'+langCode+'" data-code="'+langCode+'"><span class="icon play"></span> Play Audio</button>';
 	        ttsTranslate += '<button class="show_hide_english" data-text="'+nLangs[langCode]+'" data-code="'+langCode+'">Show In English</button>';
@@ -134,7 +138,7 @@ var allowControl = {
 	        ttsTranslate += '</div>';
 	        ttsTranslate += '<div class="controls hide" id="retranslate_'+langCode+'">';
 	        ttsTranslate += '<button class="retranslate" data-text="'+nLangs[langCode]+'" data-code="'+langCode+'">Refresh '+nLangs[langCode]+' to English Translation</button>';
-	        ttsTranslate += '<textarea id="tts_'+nLangs[langCode]+'_to_english" disabled="disabled"></textarea>';
+	        ttsTranslate += '<textarea id="tts_'+nLangs[langCode]+'_to_english" readonly="readonly"></textarea>';
 	        ttsTranslate += '</fieldset>';
 
 			$('#tts_translate').append(ttsTranslate);
