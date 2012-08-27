@@ -10,7 +10,7 @@ include_once("../obj/User.obj.php");
 // formatters
 ////////////////////////////////////////////////////////////////////////////////
 
-if ($_GET["delete"]) {
+if (isset($_GET["delete"])) {
 	if ($_GET["customerid"] && $_GET["threadid"]) {
 		loadManagerConnectionData();
 		$custdb = getPooledCustomerConnection($_GET["customerid"],true);
@@ -72,7 +72,7 @@ $taicustomers = QuickQueryList($query);
 foreach ($taicustomers as $cid) {
 	$custdb = getPooledCustomerConnection($cid,true);
 	
-	$query = "SELECT ? as customerid,m.threadid,t.originatinguserid, t.parentthreadid, m.body FROM `tai_message` m inner join `tai_thread` t on (t.id = m.threadid) WHERE exists (select * from tai_userthread ut where t.id=ut.threadid and ut.userid=1 and ut.isdeleted=0) and m.recipientuserid=1 and t.threadtype='identityreveal' group by m.threadid";
+	$query = "SELECT ? as customerid,m.threadid,t.originatinguserid, t.parentthreadid, m.body,t.modifiedtimestamp FROM `tai_message` m inner join `tai_thread` t on (t.id = m.threadid) WHERE exists (select * from tai_userthread ut where t.id=ut.threadid and ut.userid=1 and ut.isdeleted=0) and m.recipientuserid=1 and t.threadtype='identityreveal' group by m.threadid";
 	$customerthreads = QuickQueryMultiRow($query,true,$custdb,array($cid));
 	
 	// set global to customer db, restore after this section

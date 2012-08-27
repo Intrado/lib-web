@@ -8,7 +8,7 @@ include_once("../inc/html.inc.php");
 // formatters
 ////////////////////////////////////////////////////////////////////////////////
 
-if ($_GET["delete"]) {
+if (isset($_GET["delete"])) {
 	if ($_GET["customerid"] && $_GET["threadid"]) {
 		loadManagerConnectionData();
 		$custdb = getPooledCustomerConnection($_GET["customerid"],true);
