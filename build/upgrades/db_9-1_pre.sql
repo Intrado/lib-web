@@ -15,3 +15,7 @@ CREATE TABLE IF NOT EXISTS `authenticationprovider` (
   PRIMARY KEY (`type`,`endpoint`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
+
+-- $rev 3
+ALTER TABLE `portaluseridentification` CHANGE `type` `type` ENUM( 'local', 'facebook', 'twitter', 'yahoo', 'powerschool', 'openid' ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL
+$$$
