@@ -320,6 +320,8 @@ jQuery.noConflict();
 				var emailSubject = $('#msgsndr_emailmessagesubject');
 				var bSubject = $('#msgsndr_name').val();
 
+				$('#msgsndr_emailmessagefromname').val(userInfo.firstName + ' ' + userInfo.lastName);
+
 				if (emailSubject.val().length == 0 && bSubject.length != 0) {
 					emailSubject.val(bSubject).addClass('ok');
 				}

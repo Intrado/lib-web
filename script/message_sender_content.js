@@ -270,7 +270,7 @@ var allowControl = {
 		var $ = jQuery;
 		
 		// Add users' name to from name
-		$('#msgsndr_emailmessagefromname').val(userInfo.firstName + ' ' + userInfo.lastName);
+		//$('#msgsndr_emailmessagefromname').val(userInfo.firstName + ' ' + userInfo.lastName);
 		
 		// FIXME: can't pre populate from email till validation errors can be resolved by the user
 		// Add users' email address to the from email field
