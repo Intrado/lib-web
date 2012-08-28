@@ -130,6 +130,9 @@ border: 1px solid #494949; text-shadow: 0 1px 0 #333; opacity: 0.8;
 
 
 /*----- Buttons, changes to the basic buttons featured across the site -----*/
+.btn_left, .btn_right { display: none; width: 0px; }
+.btn_middle { background: none; height: 20px; margin: 0; padding: 0 5px; font-size: 13px; line-height: 20px; }
+.btn:hover .btn_middle { background-image: none; background: transparent;}
 
 .btn { background: #b2b2b2; margin: 0 8px 5px 0; padding: 4px 0; border: none; color: #f1f1f1; font-weight: bold; cursor: pointer; border: 1px solid #8a8a8a; 
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
