@@ -43,6 +43,7 @@ class PhoneMessageEditor extends FormItem {
 		// textarea for message bits
 		$textarea = '
 			<div class="controlcontainer">
+				<div>Text to speech</div>
 				<textarea id="'.$n.'" name="'.$n.'" class="messagearea"/>'.escapehtml($value).'</textarea>
 			</div>';
 		
@@ -111,20 +112,27 @@ class PhoneMessageEditor extends FormItem {
 		// main containers
 		// NOTE: audio library and uploadaudio only work when a messagegroup id is provided
 		$str = '
-			<div class="phone">
-				<div class="maincontainerleft">
-					'.$textarea.'
-				</div>';
-		// if there are additional tools available, show them to the right
-		if ($USER->authorize('starteasy') || $messagegroupid || $enableFieldInserts) {
+			<div class="phone">';
+		
+		// if there are additional tools available, show them first
+		if ($USER->authorize('starteasy') || $messagegroupid ) {
 			$str .= '
-				<div class="maincontainerseperator">
-					'.$seperator.'
-				</div>
-				<div class="maincontainerright">
+				<div class="maincontainerleft">
 					'.($USER->authorize('starteasy')?$voicerecorder:"").'
 					'.($messagegroupid?$audioupload:"").'
 					'.($messagegroupid?$audiolibrary:"").'
+				</div>';
+		}
+		
+		// Drop in the tts textarea ...
+		$str .= '<div class="maincontainerleft">
+					'.$textarea.'
+				</div>';
+
+		// if fieldinserts are available, show them below the textarea ...
+		if ($USER->authorize('starteasy') || $enableFieldInserts) {
+			$str .= '
+				<div class="maincontainerleft">
 					'.($enableFieldInserts?$datafieldinsert:"").'
 				</div>';
 		}
