@@ -876,7 +876,7 @@ var RuleEditor = Class.create({
 		this.criteriaTD.down('fieldset').down('div').update();
 		this.valueTD.down('fieldset').down('div').update();
 		this.actionTD.down('fieldset').down('div').update();
-		this.ruleWidget.container.style.width = '400px';
+		//this.ruleWidget.container.style.width = '400px';
 
 		this.criteriaTD.down('span').stopObserving('click').hide();
 		this.valueTD.down('span').stopObserving('click').hide();
