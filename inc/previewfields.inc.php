@@ -10,7 +10,7 @@ function getpreviewformdata($fields,$fielddata,$fielddefaults,$msgType) {
 					"label" => $fieldmap->name,
 					"value" => $USER->firstname,
 					"validators" => array(),
-					"control" => array("TextField", "maxlength" => 50, "size"=>20),
+					"control" => array("TextField", "maxlength" => 255, "size"=>20),
 					"helpstep" => 1
 				);
 			} else if ($fieldmap->isOptionEnabled("lastname")) {
@@ -18,7 +18,7 @@ function getpreviewformdata($fields,$fielddata,$fielddefaults,$msgType) {
 					"label" => $fieldmap->name,
 					"value" => $USER->lastname,
 					"validators" => array(),
-					"control" => array("TextField", "maxlength" => 50, "size"=>20),
+					"control" => array("TextField", "maxlength" => 255, "size"=>20),
 					"helpstep" => 1
 				);
 			} else if ($fieldmap->isOptionEnabled("language")) {
@@ -50,7 +50,7 @@ function getpreviewformdata($fields,$fielddata,$fielddefaults,$msgType) {
 					"label" => $fieldmap->name,
 					"value" => $fielddefaults[$field],
 					"validators" => array(),
-					"control" => array("TextField", "maxlength" => 20, "size"=>20),
+					"control" => array("TextField", "maxlength" => 255, "size"=>20),
 					"helpstep" => 1
 				);
 			}
