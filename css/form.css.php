@@ -116,7 +116,7 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 /*.newform .formcontrol input[type="password"] { width: 250px; padding: 4px 5px; font-size: 13px; line-height: 21px; border: 1px solid #E7E7E7; overflow: hidden; 
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }*/
 .newform .formcontrol input[type="radio"] { margin: 0 5px 5px 0; }
-.newform .formcontrol textarea { width: 425px; margin: 0 0 5px 0; padding: 4px 5px; border: 1px solid #E7E7E7; 
+.newform .formcontrol textarea { min-width: 425px; margin: 0 0 5px 0; padding: 4px 5px; border: 1px solid #E7E7E7; 
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
 .newform .formcontrol input#account_brandthemecustomize { float: left; display: inline; }

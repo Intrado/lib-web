@@ -293,7 +293,7 @@ jQuery.noConflict();
 
 
 		obj_contentManager.onContentStart(function(contentMode) {
-            if(contentMode == "phone") {
+			if(contentMode == "phone") {
 				/*
 					Paste from email button: Low proirity:
 					Issues with getting text from CKEDITOR as comes through as HTML, need to strip this and
@@ -319,6 +319,20 @@ jQuery.noConflict();
 			} else if(contentMode == "email") {
 				var emailSubject = $('#msgsndr_emailmessagesubject');
 				var bSubject = $('#msgsndr_name').val();
+
+				if ( $('#msgsndr_tts_message').val() != '' ) {
+					$('#paste_from_tts').removeAttr('disabled','disbaled');
+					$('#paste_from_tts').on('click', function(e) {
+						e.preventDefault();
+
+						$('#msgsndr_emailmessagetext').val($('#msgsndr_tts_message').val());
+						applyCkEditor('msgsndr_emailmessagetext');
+
+					});
+
+				} else {
+					$('#paste_from_tts').attr('disabled','disbaled');
+				}
 
 				$('#msgsndr_emailmessagefromname').val(userInfo.firstName + ' ' + userInfo.lastName);
 

@@ -221,7 +221,7 @@ function form_validation_display(element,resultcode, msgtext) {
 			icon.alt = icon.title = "Validation Error";
 		}
 	} else if (style == "valid") {
-		css = 'background: rgb(241,241,241);'; //rgb(225,255,225)
+		css = 'background: rgb(225,255,225);'; //rgb(241,241,241)
 		if (icon) {
 			icon.src = "img/icons/accept.gif";
 			icon.alt = icon.title = "Valid";

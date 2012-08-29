@@ -575,6 +575,11 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
   cursor: default;
 }
 
+.paste-from {
+  float: right;
+  margin: 0 4% 10px 0;
+}
+
 .window_panel button .play { background: url(themes/newui/play.png) 0 center no-repeat; margin: 2px 0 0; }
 .window_panel a.toggle-more, a.toggle-translations { background: url(themes/newui/bluearo.png) 2px 4px no-repeat; padding: 0 0 0 15px; }
 .window_panel a.toggle-more.active, a.toggle-translations.active { background: url(themes/newui/bluearo-down.png) 2px 4px no-repeat; }
