@@ -219,11 +219,7 @@ var EasyCall = Class.create({
 			new Element("div", {"id": this.containerid+"_callcontrol"}).insert(
 				this.getPhoneInput()
 			).insert(
-				new Element("div", { style: "clear: both;" })
-			).insert(
 				this.getCallMeButton()
-			).insert(
-				new Element("div", { style: "clear: both;" })
 			)
 		);
 	},
