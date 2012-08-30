@@ -640,4 +640,4 @@ ALTER TABLE  `portaluseridentification` CHANGE  `createdtimestamp`  `createdtime
  CHANGE  `lastlogintimestamp`  `lastlogintimestamp` BIGINT( 11 )  NULL;
 
 -- add openid and remove google (08-27-2012)
-ALTER TABLE `portaluseridentification` CHANGE `type` `type` ENUM( 'local', 'facebook', 'twitter', 'yahoo', 'powerschool', 'openid' ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL
+ALTER TABLE `portaluseridentification` CHANGE `type` `type` ENUM( 'local', 'facebook', 'twitter', 'yahoo', 'powerschool', 'openid' ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL;
