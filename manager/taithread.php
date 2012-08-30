@@ -73,14 +73,14 @@ switch($thread->threadtype) {
 		break;
 	default:
 		$PAGE = "tai:inbox";
-		$backbutton = icon_button(_L('Back'),"	fugue/arrow_180",null,$_SERVER['HTTP_REFERER']?$_SERVER['HTTP_REFERER']:"taiinbox.php");
+		$backbutton = icon_button(_L('Back'),"	fugue/arrow_180",null,isset($_SERVER['HTTP_REFERER'])?$_SERVER['HTTP_REFERER']:"taiinbox.php");
 		$windowdescription = _L('Thread: %s on Customer: %s',$_GET['threadid'],$_GET['customerid']);
 	break;
 }
 
 $buttons = array($backbutton,submit_button(_L('Reply To Originator'),"submit","tick"));
 
-$form = new Form("threadreply",$formdata,null,$buttons);
+$threadusers = DBFindMany("User", "from user u inner join tai_thread t on (u.id = t.originatinguserid or u.id = t.recipientuserid) where u.id != 1 and t.id=? ","u",array($_GET['threadid']),$custdb);
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -88,63 +88,65 @@ $form = new Form("threadreply",$formdata,null,$buttons);
 ////////////////////////////////////////////////////////////////////////////////
 
 
-$threadusers = DBFindMany("User", "from user u inner join tai_thread t on (u.id = t.originatinguserid or u.id = t.recipientuserid) where u.id != 1 and t.id=? ","u",array($_GET['threadid']),$custdb);
-
-//check and handle an ajax request (will exit early)
-//or merge in related post data
-$form->handleRequest();
-
-$datachange = false;
-$errors = false;
-//check for form submission
-if ($button = $form->getSubmit()) {
-	//checks for submit and merges in post data
-	$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response
-
-	if ($form->checkForDataChange()) {
-		$datachange = true;
-	} else if (($errors = $form->validate()) === false) {
-		//checks all of the items in this form
-		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
-		
-		// set global to customer db, restore after this section
-		global $_dbcon;
-		$savedbcon = $_dbcon;
-		$_dbcon = $custdb;
-		
-		Query("BEGIN");
-		//$thread = DBFind("Thread", "from tai_thread where id=? ",false,array($_GET['threadid']));
-
-		if ($thread !== null) {
-			$message = new Message();
-			$message->body = $postdata["reply"];
-			$message->senderuserid = 1;
-			$message->recipientuserid = $thread->originatinguserid;
-			$message->modifiedtimestamp = time();
-			$message->threadid = $_GET['threadid'];
-			$message->create();
+if ($thread->originatinguserid == 1 || $thread->recipientuserid ==1) {
+	$form = new Form("threadreply",$formdata,null,$buttons);
+	
+	//check and handle an ajax request (will exit early)
+	//or merge in related post data
+	$form->handleRequest();
+	
+	$datachange = false;
+	$errors = false;
+	//check for form submission
+	if ($button = $form->getSubmit()) {
+		//checks for submit and merges in post data
+		$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response
+	
+		if ($form->checkForDataChange()) {
+			$datachange = true;
+		} else if (($errors = $form->validate()) === false) {
+			//checks all of the items in this form
+			$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 			
-			$usermessage = new UserMessage();
-			$usermessage->messageid = $message->id;
-			$usermessage->userid = $thread->originatinguserid;
-			$usermessage->create();
+			// set global to customer db, restore after this section
+			global $_dbcon;
+			$savedbcon = $_dbcon;
+			$_dbcon = $custdb;
 			
-			$usermessage = new UserMessage();	
-			$usermessage->messageid = $message->id;
-			$usermessage->userid = 1;
-			$usermessage->isread = 1;
-			$usermessage->create();
+			Query("BEGIN");
+			
+			// Can only reply to messages schoolmessenger is originator or recipient to
+			if ($thread->originatinguserid == 1 || $thread->recipientuserid ==1) {
+				$message = new Message();
+				$message->body = $postdata["reply"];
+				$message->senderuserid = 1;
+				$message->recipientuserid = $thread->originatinguserid;
+				$message->modifiedtimestamp = time();
+				$message->threadid = $_GET['threadid'];
+				$message->create();
+				
+				$usermessage = new UserMessage();
+				$usermessage->messageid = $message->id;
+				$usermessage->userid = $thread->originatinguserid;
+				$usermessage->create();
+				
+				$usermessage = new UserMessage();	
+				$usermessage->messageid = $message->id;
+				$usermessage->userid = 1;
+				$usermessage->isread = 1;
+				$usermessage->create();
+			}
+			
+			
+			Query("COMMIT");
+			
+			// restore global db connection
+			$_dbcon = $savedbcon;
+			if ($ajax)
+				$form->sendTo("taithread.php?customerid=" . $_GET['customerid'] . "&threadid=" . $_GET['threadid']);
+			else
+				redirect("taithread.php?customerid=" . $_GET['customerid'] . "&threadid=" . $_GET['threadid']);
 		}
-		
-		
-		Query("COMMIT");
-		
-		// restore global db connection
-		$_dbcon = $savedbcon;
-		if ($ajax)
-			$form->sendTo("taithread.php?customerid=" . $_GET['customerid'] . "&threadid=" . $_GET['threadid']);
-		else
-			redirect("taithread.php?customerid=" . $_GET['customerid'] . "&threadid=" . $_GET['threadid']);
 	}
 }
 
@@ -186,7 +188,7 @@ echo '<table id="taimessages" class="list sortable">';
 showTable($messages,$titles,$formatters);
 
 echo '</table>';
-echo $form->render();
+echo "<hr/>" . (isset($form)?$form->render():$backbutton);
 endWindow();
 include_once("navbottom.inc.php");
 ?>
