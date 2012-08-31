@@ -19,7 +19,7 @@ function fmt_custid($row, $index){
 	else if (isset($_GET["showdisabled"]))
 		$urlget = "?showdisabled";
 
-	$urlget = "customers.php" . (isset($urlget) ? "$urlget&" : "?");
+	$urlget = "commsuitecustomers.php" . (isset($urlget) ? "$urlget&" : "?");
 
 	if ($MANAGERUSER->preference("favcustomers") && in_array($row[0],$MANAGERUSER->preference("favcustomers")))
 		return "<a title='Remove Favorite' href='$urlget" . "removefavorites={$row[0]}'><img style='margin-right: 4px;' src='mimg/removefav.png' border=0/></a>" . $row[0];
@@ -343,10 +343,10 @@ function submitform (name) {
 		$('searchpreview').innerHTML = "";
 		return;
 	}
-	var request = 'customers.php?ajax=true&search=' + $('searchvalue').value;
+	var request = 'commsuitecustomers.php?ajax=true&search=' + $('searchvalue').value;
 	cachedAjaxGet(request,setcontent,$('searchpreview'));
 	
-	//ajax('customers.php?ajax=true&' + serialize(document.getElementById(name)),null,setcontent, document.getElementById('searchpreview'));
+	//ajax('commsuitecustomers.php?ajax=true&' + serialize(document.getElementById(name)),null,setcontent, document.getElementById('searchpreview'));
 }
 
 function keyuptimer (e, t, ignoreenterkey, fn, args) {
@@ -359,7 +359,7 @@ function keyuptimer (e, t, ignoreenterkey, fn, args) {
 }
 </script>
 
-<form id="search" autocomplete="off" action="customers.php" method="get">
+<form id="search" autocomplete="off" action="commsuitecustomers.php" method="get">
 	<? if (isset($_GET["showdisabled"]))
 		print "<input type='hidden' name='showdisabled' value='1'/>";
 	?>
@@ -368,14 +368,14 @@ function keyuptimer (e, t, ignoreenterkey, fn, args) {
 	</div>
 </form>
 
-<input id="showdisabled" type="checkbox" onclick="window.location='customers.php?' + (this.checked ? 'showdisabled&' : '') <? if(isset($_GET["showall"])) print "+ 'showall'"; else if (isset($_GET["search"])) print "+ 'search=" . escapehtml($_GET['search']) . "'"; ?>;" <?= isset($_GET['showdisabled']) ? "checked" : ""?>>
+<input id="showdisabled" type="checkbox" onclick="window.location='commsuitecustomers.php?' + (this.checked ? 'showdisabled&' : '') <? if(isset($_GET["showall"])) print "+ 'showall'"; else if (isset($_GET["search"])) print "+ 'search=" . escapehtml($_GET['search']) . "'"; ?>;" <?= isset($_GET['showdisabled']) ? "checked" : ""?>>
 <label for="showdisabled">Show Disabled</label>
 
 <?
 if (!isset($_GET["showall"]))
-	print "<a href='customers.php?showall'>Show All Customers</a> ";
+	print "<a href='commsuitecustomers.php?showall'>Show All Customers</a> ";
 else if ($MANAGERUSER->preference("favcustomers")) {
-	echo "<a href='customers.php'> <img src='mimg/fav.png' border=0/>Show Favorites</a>";
+	echo "<a href='commsuitecustomers.php'> <img src='mimg/fav.png' border=0/>Show Favorites</a>";
 	echo "<a style='margin-left: 4px' href='?clearfavorites'><i>Clear Favorites</i></a>";
 }
 

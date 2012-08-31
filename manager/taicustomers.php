@@ -36,10 +36,11 @@ function fmt_custurl($row, $index){
 	if (isset($_GET["ajax"]))
 		return escapehtml($row[1]);
 	
-	if ($MANAGERUSER->authorized("logincustomer"))
-		return escapehtml($row[2]) . " (<a href='taicustomerlink.php?id=" . $row[0] ."' target=\"_blank\">" . escapehtml($row[1]) . "</a>)";
-	else
-		return escapehtml($row[2] . " (" . $row[1] . ")");
+	if ($MANAGERUSER->authorized("logincustomer")) {
+		return escapehtml($row[2]) . " (<a href='taicustomerlink.php?id=" . $row[0] ."' target=\"_blank\">TAI Login</a>)" .
+			 " (<a class='cust_link' href='customerlink.php?id=" . $row[0] ."' target=\"_blank\">CS Login</a>)";
+		
+	}
 }
 
 function fmt_actions($row, $index) {
