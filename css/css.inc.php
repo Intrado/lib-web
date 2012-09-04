@@ -127,7 +127,7 @@ button::-moz-focus-inner, input::-moz-focus-inner { border: 0; padding: 0; }
 textarea { overflow: auto; vertical-align: top; resize: vertical; }
 
 table { margin: 0 0 5px; }
-td, th { vertical-align: top; padding: .5em; }
+td, th { vertical-align: top; padding: .15em; }
 td > table td { padding: 0; }
 
 

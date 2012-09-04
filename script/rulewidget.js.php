@@ -77,12 +77,12 @@ var RuleWidget = Class.create({
 			this.ignoredFields = ignoredFields;
 
 		this.container = container;
-		this.warningDiv = new Element('div', {'style':'color:red; padding:2px'});
+		this.warningDiv = new Element('div', {'class' : 'ruleWidgetWarning'});
 		this.warningDiv.hide();
 		this.container.insert(this.warningDiv);
-		this.ruleHelperDiv = new Element('div', {'style':''});
+		this.ruleHelperDiv = new Element('div', {'class':'ruleWidgetHelper'});
 		this.ruleHelperContentDiv = new Element('div');
-		this.ruleHelperInfoDiv = new Element('div', {'style':'clear:both'});
+		this.ruleHelperInfoDiv = new Element('div');
 
 		this.ruleHelperDiv.insert(this.ruleHelperContentDiv).insert(this.ruleHelperInfoDiv);
 
@@ -91,7 +91,7 @@ var RuleWidget = Class.create({
 		this.rulesTableHead = new Element('thead');
 		this.rulesTableBody = new Element('tbody');
 		this.container
-			.insert(new Element('table', {'style':'margin-bottom:10px'})
+			.insert(new Element('table', {'class':'rulewidgetTable'})
 				.insert(this.rulesTableHead)
 				.insert(this.rulesTableBody)
 				.insert(new Element('tfoot')
@@ -99,7 +99,7 @@ var RuleWidget = Class.create({
 				)
 			)
 			.insert(this.ruleHelperDiv)
-			.insert(new Element('table', {style:''})
+			.insert(new Element('table')
 				.insert(new Element('tbody')
 					.insert(this.rulesTableFootLastTR)
 				)
@@ -242,13 +242,13 @@ var RuleWidget = Class.create({
 			data.type = this.fieldmaps[data.fieldnum].type;
 
 		// FieldmapTD
-		var fieldmapTD = new Element('td', {'class':'list', 'style':'white-space:normal;  width:auto; font-size:90%', 'valign':'top'}).insert(this.fieldmaps[data.fieldnum].name);
+		var fieldmapTD = new Element('td', {'class':'list'}).insert(this.fieldmaps[data.fieldnum].name);
 		// Keep track of the row's data.fieldnum by using a hidden input.
 		if (addHiddenFieldnum)
 			fieldmapTD.insert(new Element('input', {'type':'hidden', 'value':data.fieldnum}));
 		
 		// CriteriaTD
-		var criteriaTD = new Element('td', {'class':'list', 'style':'white-space:normal;  width:auto; font-size:90%; width:50px', 'valign':'top'});
+		var criteriaTD = new Element('td', {'class':'list'});
 		var criteria = this.operators[data.type][data.op];
 		if (data.op == 'in') {
 			criteria = '<?=addslashes(_L('is'))?>';
@@ -262,9 +262,9 @@ var RuleWidget = Class.create({
 		var widthCSS = (addHiddenFieldnum) ? '  ' : ' width:80px; ';
 		var heightCSS = (value.length > 400) ? ' height: auto; ' : '';
 		if (addHiddenFieldnum)
-			// heightCSS += ' overflow: auto; ';
-		var valueDiv = new Element('div', {'style': ' white-space:normal; ' + widthCSS + heightCSS}).update(value);
-		var valueTD = new Element('td', {'class':'list',  'style':'overflow:hidden; white-space:normal; font-size:90%','valign':'top'}).update(valueDiv);
+		// heightCSS += ' overflow: auto; ';
+		//var valueDiv = new Element('div', {'style': widthCSS + heightCSS}).update(value);
+		var valueTD = new Element('td', {'class':'list'}).update(value);
 		tr.insert(fieldmapTD).insert(criteriaTD).insert(valueTD);
 
 		return true;
@@ -333,7 +333,7 @@ var RuleWidget = Class.create({
 				this.guideStepIndex = i;
 			else {
 				fieldset.style.borderWidth = '0';
-				fieldset.down('div').style.margin = '3px';
+				fieldset.down('div').style.margin = '0';
 			}
 		}
 		if (sectionFieldsets.length < 1 || this.guideDisabled) {
@@ -343,7 +343,7 @@ var RuleWidget = Class.create({
 		this.guideStepIndex = (reset) ? 0 : Math.min(sectionFieldsets.length-1, Math.max(0, this.guideStepIndex));
 		var currentFieldset = sectionFieldsets[this.guideStepIndex];
 		// Visual effect.
-		currentFieldset.style.borderWidth = '3px';
+		currentFieldset.style.borderWidth = '0';
 		currentFieldset.down('div').style.margin = '0';
 		this.guideFieldset = currentFieldset;
 
@@ -383,7 +383,7 @@ var RuleWidget = Class.create({
 		}
 
 		this.ruleHelperContentDiv.update(helpContent);
-		this.ruleHelperContentDiv.setStyle({'border':'solid 3px rgb(150,150,255)', 'padding':'2px'});
+		this.ruleHelperContentDiv.addClassName('ruleWidgetHelperContent');
 	},
 
 	refresh_rules_table: function(latestData) {
@@ -397,7 +397,7 @@ var RuleWidget = Class.create({
 					var fieldnum = hiddenField.getValue();
 					if (latestData && fieldnum == latestData.fieldnum) {
 						// cells[3] is ValueTD
-						var valueDiv = rows[i].cells[3].down('div');
+						var valueDiv = rows[i].cells[3];
 						if (valueDiv)
 							valueDiv.update(this.format_readable_value(latestData));
 					}
@@ -424,8 +424,8 @@ var RuleWidget = Class.create({
 			data.logical = 'and';
 		}
 		
-		var tr = new Element('tr');
-		tr.appendChild(new Element('td', {'valign':'top', 'style':'white-space:nowrap; font-size:90%'}));
+		var tr = new Element('tr', { 'class' : 'listRow'});
+		tr.appendChild(new Element('td', { 'class' : 'listHeading' }));
 		if (!this.format_readable_rule(data, tr, true)) {
 			if (!suppressFire)
 				alert('<?=addslashes(_L('cannot add this rule'))?>');
@@ -435,8 +435,8 @@ var RuleWidget = Class.create({
 		if (!this.delayActions || suppressFire) {
 			// Actions
 			if (this.ruleEditor) {
-				var actionTD = new Element('td', { 'style':'', 'valign':'top'}).update(
-					'<div style="clear:both"><?=addslashes(icon_button(_L('Remove'), 'diagona/10/101'))?></div><span style="clear:both"></span>'
+				var actionTD = new Element('td').update(
+					'<div><?=addslashes(icon_button(_L('Remove'), 'diagona/10/101'))?>'
 				);
 				
 				// Observe clicks on the "Remove" button.
@@ -506,10 +506,10 @@ var RuleEditor = Class.create({
 	initialize: function(ruleWidget, containerTR) {
 		this.ruleWidget = ruleWidget;
 
-		this.fieldTD = new Element('td',{'style':'', 'valign':'top'});
-		this.criteriaTD = new Element('td',{'style':'', 'valign':'top'});
-		this.valueTD = new Element('td',{'style':'', 'valign':'top'});
-		this.actionTD = new Element('td',{'style':'clear:both;', 'valign':'top'});
+		this.fieldTD = new Element('td');
+		this.criteriaTD = new Element('td');
+		this.valueTD = new Element('td');
+		this.actionTD = new Element('td');
 		if (!this.ruleWidget.noHelper) {
 			this.fieldTD.update('<span style="cursor:help; font-style:italic; font-weight: bold;"><?=addslashes(_L('Field'))?></span>');
 			this.criteriaTD.update('<span style="cursor:help; font-style:italic; display:none; font-weight: bold;"><?=addslashes(_L('Criteria'))?></span>');

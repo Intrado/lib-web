@@ -163,14 +163,6 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 .newform .formcontrol iframe { height: 2em; }
 .newform .formcontrol > label { margin-left: 5px; line-height: 22px;}
 
-.newform fieldset#AddRuleFieldmap { width: 130px; padding: 0; margin: 0; background: none; }
-.newform fieldset#AddRuleFieldmap select { width: 120px; padding: 4px; }
-.newform fieldset#AddRuleCriteria { /*width: 210px;*/ padding: 0; margin: 0; background: none; }
-.newform fieldset#AddRuleValue { /*width: 60px;*/ padding: 0; margin: 0; background: none; }
-.newform fieldset#AddRuleValue input[type="text"] { width: 85px; margin: 3px 0 0; }
-.newform fieldset#AddRuleValue .MultiCheckbox { margin: 0; padding: 0; }
-.newform fieldset#AddRuleAction { width: 75px; padding: 0; margin: 0; background: none; } 
-
 .newform select, .newform input { -webkit-transition: all 0.3s ease-out; -moz-transition: all 0.3s ease-out; -ms-transition: all 0.3s ease-out; -o-transition: all 0.3s ease-out; transition: all 0.3s ease-out; }
 
 .newform .MultiCheckbox { /*float: left; display: inline;*/ width: 250px; margin: 5px 0 0 0; padding: 7px 0 0; overflow-y:auto; 
@@ -202,22 +194,26 @@ position: relative;}
  
  /* ----------------- rule widget --------------------*/
 
- #ruleWidgetContainer table {
- 	border-collapse: separate;
- }
+.newform #ruleWidgetContainer table { border-collapse: separate; }
 
-#ruleWidgetContainer td.list {
-	border: 1px solid rgb(223, 150, 16);
-	display: inline;
-	float:left;
-	margin: 4px;
-	padding: 4px;
-}
+.newform #ruleWidgetContainer td.list,
+.newform #ruleWidgetContainer td.listHeading { padding: .15em .5em; background-color: #fff; border: 1px solid #E2E2E2; border-radius: 3px; font-size: 90%; min-width: 80px;}
 
- 
-.newform .ruleHelperContentDiv	{ padding: 3px; background-color: #ffcccc; border-radius: 3px;}
-.newform .rulesTable 						{ margin-bottom: 10px; }
-.newform .ruleWarningDiv 				{ padding: 2px; color: red; }
+.newform #ruleWidgetContainer .btn { margin: 0; } /* stops the button margins adding to the height of the td's */
+
+.newform #ruleWidgetContainer .ruleWidgetHelper			{ margin: .5em 0; padding: 0; }
+.newform #ruleWidgetContainer .ruleWidgetHelperContent 	{ padding: .25em .5em; background-color: #fff; border: 1px solid rgb(150,150,255); border-radius: 3px;}
+.newform #ruleWidgetContainer .ruleWidgetTable 			{ margin-bottom: 10px; }
+.newform #ruleWidgetContainer .ruleWidgetWarning 		{ padding: 2px; color: red; }
+.newform #ruleWidgetContainer .RuleWidgetColumnDiv		{ min-width: 80px; }
+
+.newform fieldset#AddRuleFieldmap { width: 130px; padding: 0; margin: 0; background: none; }
+.newform fieldset#AddRuleFieldmap select { width: 120px; padding: 4px; }
+.newform fieldset#AddRuleCriteria { /*width: 210px;*/ padding: 0; margin: 0; background: none; }
+.newform fieldset#AddRuleValue { /*width: 60px;*/ padding: 0; margin: 0; background: none; }
+.newform fieldset#AddRuleValue input[type="text"] { width: 85px; margin: 0; }
+.newform fieldset#AddRuleValue .MultiCheckbox { margin: 0; padding: 0; }
+.newform fieldset#AddRuleAction { width: 75px; padding: 0; margin: 0; background: none; } 
 
 .newform .multiCheckBox_checkAll { float: left; white-space: nowrap; }
 .newform .multiCheckBox_clear		 { float: right; white-space: nowrap; }
@@ -406,7 +402,7 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 	 | Form styles for UI redesign                                    |
    +----------------------------------------------------------------+ */
 		
-		.form_table 		{ table-layout: auto; text-align: left; 900px; }
+		.form_table 		{ table-layout: auto; text-align: left; }
 		 .form_table td { vertical-align: top; }
 		 .form_table td#emailText_helpercell { width: 210px; }
 		 		

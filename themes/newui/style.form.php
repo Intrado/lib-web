@@ -58,3 +58,7 @@
 
 #list_helpsection_3 .formtitle { width: 100%; text-align: left; }
 #list_helpsection_3 .formcontrol { width: 600px; margin: 0; }
+
+#ruleWidgetContainer table { border-spacing: 2px; }
+#ruleWidgetContainer td.list, 
+#ruleWidgetContainer td.listHeading { padding: .5em; vertical-align: middle;}
