@@ -15,3 +15,12 @@ CREATE TABLE IF NOT EXISTS `authenticationprovider` (
   PRIMARY KEY (`type`,`endpoint`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
+
+-- $rev 3
+CREATE TABLE IF NOT EXISTS `authenticationprovider` (
+  `type` enum('powerschool') CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  `endpoint` varchar(255) NOT NULL,
+  PRIMARY KEY (`type`,`endpoint`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
+
