@@ -2063,3 +2063,11 @@ $$$
 update setting set value='9.1/3' where name='_dbversion'
 $$$
 -- END 9.1/3
+-- START 9.1/4
+ALTER TABLE role ADD INDEX `userorganization` ( `userid` , `organizationid` ) 
+$$$
+update setting set value='9.1/4' where name='_dbversion'
+$$$
+-- END 9.1/4
+
+

@@ -167,8 +167,6 @@ ALTER TABLE tai_userthread ADD INDEX `userfolder` ( `userid` , `folderid` )
 $$$
 ALTER TABLE tai_usermessage ADD INDEX `usermessage` ( `userid` , `messageid` )
 $$$
-ALTER TABLE role ADD INDEX `userorganization` ( `userid` , `organizationid` ) 
-$$$
 
 -- NOTE if adding additional schema must update kona/db/taicustomer.sql and set latest _dbtaiversion setting
 

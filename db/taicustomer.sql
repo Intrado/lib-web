@@ -173,8 +173,6 @@ ALTER TABLE tai_userthread ADD INDEX `userfolder` ( `userid` , `folderid` )
 $$$
 ALTER TABLE tai_usermessage ADD INDEX `usermessage` ( `userid` , `messageid` )
 $$$
-ALTER TABLE role ADD INDEX `userorganization` ( `userid` , `organizationid` ) 
-$$$
 
 update setting set value='0.1/9' where name='_dbtaiversion'
 $$$
