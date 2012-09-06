@@ -214,7 +214,7 @@
 					<label for="msgsndr_emailmessagetext">Body&nbsp;<img id="msgsndr_emailmessagetext_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>
 					<div class="controls">
 						
-						<button id="paste_from_tts" class="paste-from" data-textarea="msgsndr_tts_message" disabled="disabled">Paste text from TTS</button>
+						<button id="paste_from_tts" class="paste-from" data-textarea="msgsndr_tts_message" disabled="disabled">Paste text from Phone</button>
 
 						<textarea id="msgsndr_emailmessagetext" name="msgsndr_emailmessagetext" class="required msgdata hide" data-ajax="true"></textarea>
 						<div id="msgsndr_emailmessagetext_msg" class="box_validatorerror er" style="display:none"></div>
