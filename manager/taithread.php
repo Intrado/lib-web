@@ -38,7 +38,7 @@ function fmt_timestamp($row, $index) {
 }
 
 loadManagerConnectionData();
-$custdb = getPooledCustomerConnection($_GET['customerid'],true);
+$custdb = getPooledCustomerConnection($_GET['customerid']);
 
 $thread = DBFind("Thread", "from tai_thread where id=?",false,array($_GET['threadid']),$custdb);
 if ($thread === null) {

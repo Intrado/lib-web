@@ -11,7 +11,7 @@ include_once("../inc/html.inc.php");
 if (isset($_GET["delete"])) {
 	if ($_GET["customerid"] && $_GET["threadid"]) {
 		loadManagerConnectionData();
-		$custdb = getPooledCustomerConnection($_GET["customerid"],true);
+		$custdb = getPooledCustomerConnection($_GET["customerid"]);
 		QuickUpdate("UPDATE tai_userthread SET isdeleted=1 WHERE userid=1 and threadid=?",$custdb,array($_GET["threadid"]));
 	}
 	exit();
@@ -56,7 +56,7 @@ $taicustomers = QuickQueryList($query);
 
 
 foreach ($taicustomers as $cid) {
-	$custdb = getPooledCustomerConnection($cid,true);
+	$custdb = getPooledCustomerConnection($cid);
 	
 	$query = "SELECT ? as customerid,m.threadid,m.body,t.modifiedtimestamp FROM `tai_message` m inner join `tai_thread` t on (t.id = m.threadid) WHERE exists (select * from tai_userthread ut where t.id=ut.threadid and ut.userid=1 and ut.isdeleted=0) and m.recipientuserid=1 and t.threadtype='comment' group by threadid";
 	$customerthreads = QuickQueryMultiRow($query,true,$custdb,array($cid));
