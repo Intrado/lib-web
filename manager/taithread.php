@@ -15,19 +15,18 @@ if (!isset($_GET['customerid']) && !isset($_GET['threadid'])) {
 	redirect("taiinbox.php");
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // formatters
 ////////////////////////////////////////////////////////////////////////////////
 function fmt_user($row, $index) {
-	global $thread,$threadusers;
+	global $thread,$threadpersons;
 	if ($row[$index] == 1)
-		return "School Messenger";
-	if (isset($threadusers[$row[$index]])) {
-		$user = $threadusers[$row[$index]];
+		return "School&nbsp;Messenger";
+	if (isset($threadpersons[$row[$index]])) {
+		$user = $threadpersons[$row[$index]];
 		if ($thread->wassentanonymously && $thread->originatinguserid == $row[$index])
-			return "Anonymous " . action_link(_L('View User'),"magnifier",null,"alert('ID: {$user->id} Name: {$user->firstname} {$user->lastname}');return false;");
-		return $user->firstname . " " .  $user->lastname;
+			return "Anonymous " . action_link(_L('View User'),"magnifier",null,"alert('id: {$user["id"]}, pkey: {$user["pkey"]} Name: {$user["firstname"]} {$user["lastname"]}');return false;");
+		return $user["firstname"] . "&nbsp;" .  $user["lastname"] . " (" . $user["pkey"] . ")";
 	} else
 		return "&nbsp;";
 }
@@ -80,7 +79,11 @@ switch($thread->threadtype) {
 
 $buttons = array($backbutton,submit_button(_L('Reply To Originator'),"submit","tick"));
 
-$threadusers = DBFindMany("User", "from user u inner join tai_thread t on (u.id = t.originatinguserid or u.id = t.recipientuserid) where u.id != 1 and t.id=? ","u",array($_GET['threadid']),$custdb);
+$threadpersons = Array();
+$personvalues  = QuickQueryMultiRow("select u.id, p.pkey, p.f01 as firstname, p.f02, lastname from person p inner join user u on (u.personid = p.id) inner join tai_thread t on (u.id = t.originatinguserid or u.id = t.recipientuserid) where u.id != 1 and t.id=? ",true,$custdb, array($_GET['threadid']));
+foreach ($personvalues as $personvalue) {
+	$threadpersons[$personvalue["id"]] = $personvalue;
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////
