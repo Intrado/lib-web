@@ -112,9 +112,9 @@ if (CheckFormSubmit($f,$s) || CheckFormSubmit($f, "addcust")) {
 					switch ($ldaptype) {
 						case "directoryserver":
 							$ldapvars->usernameAttributeName = "uid";
-							$ldapvars->accountAttributeName = "sdpaccountstatus";
+							$ldapvars->accountAttributeName = "nsaccountlock";
 							$ldapvars->useFQDN = false;
-							$ldapvars->enabledOperation = "stringcompare";
+							$ldapvars->enabledOperation = "nottrue";
 							$ldapvars->ou = $ldapou;
 							break;
 						default: // "activedirectory"
