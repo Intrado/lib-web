@@ -37,8 +37,6 @@
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
 
-.newform .formcontrol .datafields input { width: 140px; }
-
 .maincontainerleft { margin: 0; }
 .maincontainerseperator { display: none; }
 .maincontainerright { margin: 0; padding: 0; }
@@ -51,10 +49,12 @@
 #emailText_helpsection_5 .formcontrol .maincontainerright,
 #emailText_helpsection_5 .formcontrol .controlcontainer { width: 455px; }
 
-.formcontrol .datafields { margin: 0 10px 0 0; }
 .formcontrol .datafields select { width: 175px; padding: 3px 6px; font-size: 14px; }
 .formcontrol .datafieldsinsert { margin: 25px 0 0; }
 .formcontrol .datafieldsinsert button { padding: 3px 10px; }
+
+.newform .formcontrol .datafields input { width: 175px; }
+.newform .formcontrol .audiocontainer input { width: 270px; margin: 0 8px 0 0; }
 
 #list_helpsection_3 .formtitle { width: 100%; text-align: left; }
 #list_helpsection_3 .formcontrol { width: 600px; margin: 0; }

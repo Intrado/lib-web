@@ -42,6 +42,7 @@ class PhoneMessageEditor extends FormItem {
 		
 		// textarea for message bits
 		$textarea = '
+			<div>Text to speech</div>
 			<div class="controlcontainer">
 				<textarea id="'.$n.'" name="'.$n.'" class="messagearea"/>'.escapehtml($value).'</textarea>
 			</div>';
@@ -115,17 +116,23 @@ class PhoneMessageEditor extends FormItem {
 				<div class="maincontainerleft">
 					'.$textarea.'
 				</div>';
-		// if there are additional tools available, show them to the right
-		if ($USER->authorize('starteasy') || $messagegroupid || $enableFieldInserts) {
+		
+		// load date inserts if allowed
+		if ($USER->authorize('starteasy') || $enableFieldInserts) {
 			$str .= '
-				<div class="maincontainerseperator">
-					'.$seperator.'
-				</div>
-				<div class="maincontainerright">
+						<div class="fieldscontainer">
+							'.($enableFieldInserts?$datafieldinsert:"").'
+						</div>';
+		}
+		
+		// if there are additional tools available, show them to the right
+		if ($USER->authorize('starteasy') || $messagegroupid ) {
+			$str .= '
+				<div class="cf"></div>
+				<div class="audiocontainer">
 					'.($USER->authorize('starteasy')?$voicerecorder:"").'
 					'.($messagegroupid?$audioupload:"").'
 					'.($messagegroupid?$audiolibrary:"").'
-					'.($enableFieldInserts?$datafieldinsert:"").'
 				</div>';
 		}
 		$str .= '

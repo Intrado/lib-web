@@ -378,8 +378,8 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 #emaileedit_helpsection_5 .formcontrol .controlcontainer { width: /*600px;*/ }
 #emaileedit_helpsection_5 .maincontainerseperator { margin: 0; display: none; }
 
-.formcontrol .datafields { margin: 0 5px 0 0; }
-.formcontrol .datafields select { padding: 3px 6px; }
+.formcontrol .datafields input[type="text"] { width: 163px; }
+.formcontrol .datafields select { width: 175px; padding: 3px 6px; font-size: 14px; }
 .formcontrol .datafieldsinsert { margin: 20px 0 0; }
 .formcontrol .datafieldsinsert button { padding: 3px 10px; }
 
@@ -387,15 +387,25 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 /* phone messages 
 -------------------*/
 
-.phone .controlcontainer {  }
 .phone .controlcontainer .library { padding: 2px; border: 1px dotted gray; }
 .phone .controlcontainer .error { white-space: normal; font-style: italic; color: red; }
 .phone .controlcontainer iframe { width: 100%; border: 0; margin: 0; padding: 0; height: 2em; }
-.phone .controlcontainer input[type="text"] {  }
 
 .phone .maincontainerleft { margin: 0; }
 .phone .maincontainerseperator { display: none; margin-top: 80px; }
 .phone .maincontainerright { margin: 0; }
+
+.phone .audiocontainer { float: left; display: inline; padding: 10px 0 0; }
+
+.phone .fieldscontainer { float: left; display: inline; width: 200px; }
+
+.voice_recording { margin: 0 0 10px; padding: 0 0 10px; border-bottom: 1px dashed #ccc; }
+.voice_recording input[type="text"] { margin: 0 10px 0 0; }
+.text_to_speech { float: left; margin: 0 0 10px; padding: 0 0 10px; }
+
+.newform .maincontainerleft textarea { width: 375px; margin: 0 20px 0 0; }
+.newform .audiocontainer input[type="text"] { width: 270px; margin: 0 8px 0 0; }
+
 
 
 /* +----------------------------------------------------------------+
