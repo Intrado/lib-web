@@ -25,7 +25,7 @@ function fmt_user($row, $index) {
 	if (isset($threadpersons[$row[$index]])) {
 		$user = $threadpersons[$row[$index]];
 		if ($thread->wassentanonymously && $thread->originatinguserid == $row[$index])
-			return "Anonymous " . action_link(_L('View User'),"magnifier",null,"alert('id: {$user["id"]}, pkey: {$user["pkey"]} Name: {$user["firstname"]} {$user["lastname"]}');return false;");
+			return "Anonymous " . action_link(_L('View User'),"magnifier",false,"if (confirm('Are you sure you want to reveal this user?')) { popup('tairevealthread.php?customerid={$_GET['customerid']}&threadid={$row["threadid"]}', 500, 500); return false;}");
 		return $user["firstname"] . "&nbsp;" .  $user["lastname"] . " (" . $user["pkey"] . ")";
 	} else
 		return "&nbsp;";
@@ -184,7 +184,10 @@ if ($thread->threadtype == "thread") {
 	$topic = QuickQuery("select name from tai_topic where id=?",$custdb,array($thread->topicid));
 	echo "<b>Thread Topic:</b>$topic<br/>";
 }
-echo  "<b>Last Modified Date:</b> " . date("Y-m-d G:i:s",$thread->modifiedtimestamp) . "<hr/>";
+echo  "<b>Last Modified Date:</b> " . date("Y-m-d G:i:s",$thread->modifiedtimestamp) . "<br/>";
+
+echo isset($thread->parentthreadid)?"<b>Parent Thread Id:</b> <a href=\"taithread.php?customerid={$_GET['customerid']}&threadid=$thread->parentthreadid\">" . $thread->parentthreadid . "</a>":""; 
+echo "<hr/>";
 
 echo '<table id="taimessages" class="list sortable">';
 
