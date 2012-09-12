@@ -1056,7 +1056,6 @@ p.warning {
 @media screen and (min-width: 1180px) { 
  /*#ms .container, .contain { width: 1150px; }*/
  .newbroadcast, .main_activity { width: 910px; }
- .main_aside { width: 220px; }
  
  .summary .col { width: 225px; }
  .summary .col:first-child { width: 181px; }
