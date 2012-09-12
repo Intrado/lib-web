@@ -30,13 +30,13 @@ h4 { font-size: 12px; line-height: 22px; color: #235563; text-shadow: 0 1px 0 #f
 .lighten { opacity: 0.5;}
 
 .content_wrap { position: relative; margin: 0; padding: 20px 0 85px 0;} /* Removed overflow:auto -- declaring this property causes problems with ckeditor */
-#ms .container { position: relative; ; margin: 0 auto; }
+#ms .container { position: relative; /*margin: 0 auto;*/ }
 .container { margin: 0 1%; }
-.contain { position: relative; ; margin: 0 auto; }
+.contain { position: relative; margin: 0 1%; }
 .popup_container { position: relative; margin: 0 auto; padding: 0 10px; }
 
 .newbroadcast, .main_activity { float: left; display: inline; width: 750px; margin: 5px 0 15px 0; }
-.main_aside { float: left; display: inline; width: 215px; margin: 5px 0 0 15px; }
+.main_aside { float: left; display: inline; width: 210px; margin: 5px 0 0 13px; }
 
 
 /*----- Banner -----*/
@@ -53,7 +53,7 @@ h4 { font-size: 12px; line-height: 22px; color: #235563; text-shadow: 0 1px 0 #f
 .banner_links li.bl_left, .banner_links li.bl_right { padding: 0; border: 0; }
 .banner_links li a { font-size: 14px; color: #9fbdf6; text-shadow: 0 1px 0 rgba(0,0,0,0.4); }
 .banner_links li a:hover { text-decoration: underline; }
-.banner_custname { top: 24px; right: 1%; text-align: right; font-size: 16px; font-weight: bold; color: #f2f2f2; text-shadow: 0 1px 0 #444; }
+.banner_custname { top: 24px; right: 0; text-align: right; font-size: 16px; font-weight: bold; color: #f2f2f2; text-shadow: 0 1px 0 #444; }
 
 .popup_logo { padding: 10px 10px 0 10px; border-top: 4px solid rgba(0,0,0,0.4); }
 .popup_logo img { display: none; }
@@ -1042,15 +1042,21 @@ p.warning {
 .ie7 .msg_content_nav button,
 .ie8 .msg_content_nav button { width: 174px; }
 
+.ie9 .window_panel textarea { overflow: scroll; }
+
 /*----- Prototip styles for shortcut menu, not actually used in this theme -----*/
 	
 .shortcuts a { color: #26477d; }
 .shortcuts a:hover { background: #26477d; color: #fff; }
 
 
+
+/*----- Media queries for newer browsers -----*/
+
 @media screen and (min-width: 1180px) { 
- #ms .container, .contain { width: 1150px; }
+ /*#ms .container, .contain { width: 1150px; }*/
  .newbroadcast, .main_activity { width: 910px; }
+ .main_aside { width: 220px; }
  
  .summary .col { width: 225px; }
  .summary .col:first-child { width: 181px; }
@@ -1072,7 +1078,7 @@ p.warning {
 }
 
 @media screen and (min-width: 1580px) { 
- #ms .container, .contain { width: 1300px; }
+ /*#ms .container, .contain { width: 1300px; }*/
  .newbroadcast, .main_activity { width: 1060px; }
  
  .summary .col { width: 264px; }
