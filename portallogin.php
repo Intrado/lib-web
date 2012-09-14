@@ -12,16 +12,18 @@ require_once("inc/DBMappedObject.php");
 require_once("obj/User.obj.php");
 require_once("obj/Access.obj.php");
 
-doStartSession();
-
 $doRedirect = false;
 if (isset($_REQUEST["is_return"])) {
+	doStartSession();
 	$doRedirect = true;
 	// useing the access token, request that authserver create a session for whoever is logged into portal
 	$userid = loginViaPortalAuth($CUSTOMERURL, $_SERVER["REMOTE_ADDR"]);
 	loadCredentials($userid);
 	$redirectLoc = "index.php";
 } else {
+	// create a brand new session
+	newSession();
+	doStartSession();
 	$doRedirect = true;
 	$http = ($_SERVER["HTTPS"]?"https://":"http://");
 	$redirectLoc = getPortalAuthAuthRequestTokenUrl($http. $_SERVER['SERVER_NAME']. $_SERVER['REQUEST_URI']. "?is_return");

@@ -219,8 +219,6 @@ function getSessionData($id) {
 		if (doDBConnect($result)) return $sess_data;
 	} else {
 		error_log_helper("ERROR trying to getSessionData for '$id'");
-		// no valid session for this id, create a new one
-		newSession();
 	}
 	return "";
 }
@@ -599,6 +597,7 @@ function newSession() {
 	if ($result !== false && $result["sessionID"] != "") {
 		error_log_helper("set sessionid to ". $result["sessionID"]);
 		session_id($result["sessionID"]);
+
 		return true;
 	} else {
 		error_log_helper("Problem requesting newSession() - result: ". $result["result"]. " resultdetail: ". $result["resultdetail"]);
