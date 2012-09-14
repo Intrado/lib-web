@@ -320,18 +320,39 @@ jQuery.noConflict();
 				var emailSubject = $('#msgsndr_emailmessagesubject');
 				var bSubject = $('#msgsndr_name').val();
 
-				if ( $('#msgsndr_tts_message').val() != '' ) {
+				if ( $('#msgsndr_phonemessagetype').val() == 'text' && $('#msgsndr_tts_message').val() != '' ) {
 					$('#paste_from_tts').removeAttr('disabled','disbaled');
-					$('#paste_from_tts').on('click', function(e) {
-						e.preventDefault();
+					phonePaste('#msgsndr_tts_message');
 
-						$('#msgsndr_emailmessagetext').val($('#msgsndr_tts_message').val());
-						applyCkEditor('msgsndr_emailmessagetext');
-
-					});
+				} else if ( $('#msgsndr_phonemessagetype').val() == 'callme' && $('#msgsndr_form_scratch').val() != '' ) {
+					$('#paste_from_tts').removeAttr('disabled','disbaled');
+					phonePaste('#msgsndr_form_scratch');
 
 				} else {
 					$('#paste_from_tts').attr('disabled','disbaled');
+				}
+
+				function phonePaste(from) {
+
+					$('#paste_from_tts').on('click', function(e) {
+						e.preventDefault();
+
+						if ( $('#msgsndr_emailmessagetext').val() != '' ) {
+							var doOverwrite = confirm('You already have text in your email are you sure you wish to overwrite this?')
+
+							if (doOverwrite == true ) {
+								$('#msgsndr_emailmessagetext').val($(from).val());
+								applyCkEditor('msgsndr_emailmessagetext');
+							} else {
+								return;
+							}
+						} else {
+							$('#msgsndr_emailmessagetext').val($(from).val());
+							applyCkEditor('msgsndr_emailmessagetext');	
+						}
+
+					});
+
 				}
 
 				$('#msgsndr_emailmessagefromname').val(userInfo.firstName + ' ' + userInfo.lastName);
