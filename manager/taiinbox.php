@@ -71,7 +71,7 @@ foreach ($taicustomers as $cid) {
 
 $titles = array(
 	"customerid" => "#Customer ID",
-	"url" => "#Custoemr URL",
+	"url" => "#Customer URL",
 	"threadid" => "@Thread",
 	"body" => "Last Message",
 	"modifiedtimestamp" => "Modified",
