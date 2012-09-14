@@ -219,6 +219,8 @@ function getSessionData($id) {
 		if (doDBConnect($result)) return $sess_data;
 	} else {
 		error_log_helper("ERROR trying to getSessionData for '$id'");
+		// no valid session for this id, create a new one
+		newSession();
 	}
 	return "";
 }
@@ -567,25 +569,40 @@ function inboundSubscriberPhoneActivation($callerid, $code) {
 }
 
 function getPortalAuthAuthRequestTokenUrl($callbackUrl) {
-    $params = array(new XML_RPC_Value(session_id(), 'string'), new XML_RPC_Value($callbackUrl, 'string'));
-    $method = "AuthServer.getPortalAuthAuthRequestTokenUrl";
-    $result = pearxmlrpc($method, $params);
-    if ($result !== false) {
-        // success
-        return $result['url'];
-    }
-    return false;
+	$params = array(new XML_RPC_Value(session_id(), 'string'), new XML_RPC_Value($callbackUrl, 'string'));
+	$method = "AuthServer.getPortalAuthAuthRequestTokenUrl";
+	$result = pearxmlrpc($method, $params);
+	if ($result !== false) {
+		// success
+		return $result['url'];
+	}
+	return false;
 }
 
 function loginViaPortalAuth($customerUrl, $clientIpAddress) {
-    $params = array(new XML_RPC_Value(session_id(), 'string'), new XML_RPC_Value($customerUrl, 'string'), new XML_RPC_Value($clientIpAddress, 'string'));
-    $method = "AuthServer.loginViaPortalAuth";
-    $result = pearxmlrpc($method, $params);
-    if ($result !== false) {
-        // success
-        return array($result["sessionID"], $result["userID"]);
-    }
-    return false;
+	$params = array(new XML_RPC_Value(session_id(), 'string'), new XML_RPC_Value($customerUrl, 'string'), new XML_RPC_Value($clientIpAddress, 'string'));
+	$method = "AuthServer.loginViaPortalAuth";
+	$result = pearxmlrpc($method, $params);
+	if ($result !== false) {
+		// success
+		if (doDBConnect($result)) return $result['userID'];
+	}
+	return false;
 }
 
+//****************************************************************************************
+// anonymous session methods
+
+function newSession() {
+	$method = "AuthServer.newSession";
+	$result = pearxmlrpc($method, array());
+	if ($result !== false && $result["sessionID"] != "") {
+		error_log_helper("set sessionid to ". $result["sessionID"]);
+		session_id($result["sessionID"]);
+		return true;
+	} else {
+		error_log_helper("Problem requesting newSession() - result: ". $result["result"]. " resultdetail: ". $result["resultdetail"]);
+	}
+	return false;
+}
 ?>

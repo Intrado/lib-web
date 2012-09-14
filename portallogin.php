@@ -8,20 +8,40 @@
  */
 $isindexpage = true;
 require_once("inc/common.inc.php");
+require_once("inc/DBMappedObject.php");
+require_once("obj/User.obj.php");
+require_once("obj/Access.obj.php");
+
 doStartSession();
 
+$doRedirect = false;
 if (isset($_REQUEST["is_return"])) {
-    // useing the access token, request that authserver create a session for whoever is logged into portal
-    list($sessionid, $userid) = loginViaPortalAuth($CUSTOMERURL, $_SERVER["REMOTE_ADDR"]);
+	$doRedirect = true;
+	// useing the access token, request that authserver create a session for whoever is logged into portal
+	$userid = loginViaPortalAuth($CUSTOMERURL, $_SERVER["REMOTE_ADDR"]);
+	loadCredentials($userid);
+	$redirectLoc = "index.php";
 } else {
-    $portalauthRequestTokenUrl = getPortalAuthAuthRequestTokenUrl("http://". $_SERVER['SERVER_NAME']. $_SERVER['REQUEST_URI']. "?is_return");
-    redirect($portalauthRequestTokenUrl);
+	$doRedirect = true;
+	$http = ($_SERVER["HTTPS"]?"https://":"http://");
+	$redirectLoc = getPortalAuthAuthRequestTokenUrl($http. $_SERVER['SERVER_NAME']. $_SERVER['REQUEST_URI']. "?is_return");
 }
 
 $TITLE = "Portal Authentication Login";
 include_once("logintop.inc.php");
+?>
 
-?><div><?=$sessionid. " - ". $userid?></div><?
+<div><h2>Please wait while we attempt to log you in...</h2></div>
 
+<?if ($doRedirect) {?>
+	<script type="text/javascript">
+		!function ($) {
+			window.location = "<?=addslashes($redirectLoc)?>";
+		}(window.jQuery);
+	</script>
+<?}?>
+<script type="text/javascript" src="script/jquery.1.7.2.min.js"></script>
+
+<?
 include_once("loginbottom.inc.php");
 ?>
