@@ -296,7 +296,7 @@ function doDBConnect($authresult = false) {
 	global $_DBPASS;
 	
 	//if we're being called with an authresult, parse it into globals
-	if ($authresult !== false) {
+	if ($authresult !== false && isset($authresult["dbhost"])) {
 		$_DBHOST = $authresult['dbhost'];
 		$_DBUSER = $authresult['dbuser'];
 		$_DBPASS = $authresult['dbpass'];
@@ -306,7 +306,11 @@ function doDBConnect($authresult = false) {
 	//don't bother connecting to the db twice (caused by some strange legacy authserver methods)
 	if (isset($_dbcon))
 		return true;
-	
+
+	// no database connection information, then don't try to connect
+	if (!isset($_DBHOST))
+		return false;
+
 	try {
 		$dsn = 'mysql:dbname='.$_DBNAME.';host='.$_DBHOST;
 		$_dbcon = new PDO($dsn, $_DBUSER, $_DBPASS);
@@ -595,7 +599,7 @@ function newSession() {
 	$method = "AuthServer.newSession";
 	$result = pearxmlrpc($method, array());
 	if ($result !== false && $result["sessionID"] != "") {
-		error_log_helper("set sessionid to ". $result["sessionID"]);
+		//error_log_helper("set sessionid to ". $result["sessionID"]);
 		session_id($result["sessionID"]);
 
 		return true;

@@ -19,6 +19,7 @@ if (isset($_REQUEST["is_return"])) {
 	// useing the access token, request that authserver create a session for whoever is logged into portal
 	$userid = loginViaPortalAuth($CUSTOMERURL, $_SERVER["REMOTE_ADDR"]);
 	loadCredentials($userid);
+	loadDisplaySettings();
 	$redirectLoc = "index.php";
 } else {
 	// create a brand new session
