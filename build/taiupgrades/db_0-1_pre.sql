@@ -168,5 +168,11 @@ $$$
 ALTER TABLE tai_usermessage ADD INDEX `usermessage` ( `userid` , `messageid` )
 $$$
 
+-- $rev 10
+alter table tai_organizationtopic add enabled tinyint(4) not null default 1
+$$$
+ALTER TABLE tai_folder CHANGE `type` `type` ENUM( 'inbox', 'sent', 'trash', 'custom' ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'custom'
+$$$
+
 -- NOTE if adding additional schema must update kona/db/taicustomer.sql and set latest _dbtaiversion setting
 
