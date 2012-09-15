@@ -2070,11 +2070,4 @@ update setting set value='9.1/4' where name='_dbversion'
 $$$
 -- END 9.1/4
 
--- START 9.2/1
-DROP TABLE `authenticationprovider`
-$$$
-update setting set value='9.2/1' where name='_dbversion'
-$$$
--- END 9.2/1
-
 

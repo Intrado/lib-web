@@ -1,4 +1,3 @@
-
 CREATE TABLE `aspadminuser` (
   `id` int(11) NOT NULL auto_increment,
   `login` varchar(20) collate utf8_bin NOT NULL,
@@ -641,11 +640,3 @@ ALTER TABLE  `portaluseridentification` CHANGE  `createdtimestamp`  `createdtime
 
 -- add openid and remove google (08-27-2012)
 ALTER TABLE `portaluseridentification` CHANGE `type` `type` ENUM( 'local', 'facebook', 'twitter', 'yahoo', 'powerschool', 'openid' ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL;
-
--- add authentication provider information for application login restrictions (09-15-2012)
-CREATE TABLE IF NOT EXISTS `authenticationprovider` (
-  `customerid` int(11) NOT NULL,
-  `type` enum('powerschool') CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
-  `endpoint` varchar(255) NOT NULL,
-  KEY `customerid` (`customerid`,`type`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
