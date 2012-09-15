@@ -51,7 +51,7 @@ loadManagerConnectionData();
 $thread = array();
 $count = 0;
 
-$query = "select customerid from customerproduct p where p.product = 'tai' and enabled";
+$query = "select c.id from customer c inner join customerproduct p on (p.customerid = c.id) where c.enabled and p.product = 'tai' and p.enabled";
 $taicustomers = QuickQueryList($query);
 
 
