@@ -39,6 +39,13 @@ function fmt_actions($row, $index) {
 	return action_links($links);
 }
 
+function threadcompare($a, $b) {
+	if ($a["modifiedtimestamp"] == $b["modifiedtimestamp"]) {
+		return 0;
+	}
+	return ($a["modifiedtimestamp"] > $b["modifiedtimestamp"]) ? -1 : 1;
+}
+
 $TITLE = "Talk About It Inbox";
 $PAGE = "tai:inbox";
 
@@ -48,7 +55,7 @@ startWindow(_L('Inbox'));
 
 loadManagerConnectionData();
 
-$thread = array();
+$threads = array();
 $count = 0;
 
 $query = "select c.id from customer c inner join customerproduct p on (p.customerid = c.id) where c.enabled and p.product = 'tai' and p.enabled";
@@ -60,7 +67,7 @@ foreach ($taicustomers as $cid) {
 	
 	$query = "SELECT ? as customerid,m.threadid,m.body,t.modifiedtimestamp FROM `tai_message` m inner join `tai_thread` t on (t.id = m.threadid) WHERE exists (select * from tai_userthread ut where t.id=ut.threadid and ut.userid=1 and ut.isdeleted=0) and m.recipientuserid=1 and t.threadtype='comment' group by threadid";
 	$customerthreads = QuickQueryMultiRow($query,true,$custdb,array($cid));
-	$thread = array_merge($thread,$customerthreads);
+	$threads = array_merge($threads,$customerthreads);
 	
 	echo ".";
 	if (++$count % 20 == 0)
@@ -68,13 +75,15 @@ foreach ($taicustomers as $cid) {
 	ob_flush();
 	flush();
 }
+uasort($threads, 'threadcompare');
+
 
 $titles = array(
 	"customerid" => "#Customer ID",
 	"url" => "#Customer URL",
 	"threadid" => "@Thread",
 	"body" => "Last Message",
-	"modifiedtimestamp" => "Modified",
+	"modifiedtimestamp" => "#Modified",
 	"actions" => "Actions");
 $formatters = array(
 	"url" => "fmt_custurl",
@@ -86,7 +95,7 @@ show_column_selector('taiinbox', $titles);
 
 echo '<table id="taiinbox" class="list sortable">';
 
-showTable($thread,$titles,$formatters);
+showTable($threads,$titles,$formatters);
 
 echo '</table>';
 

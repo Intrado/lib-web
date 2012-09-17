@@ -53,6 +53,13 @@ function fmt_actions($row, $index) {
 	return action_links($links);
 }
 
+function threadcompare($a, $b) {
+	if ($a["modifiedtimestamp"] == $b["modifiedtimestamp"]) {
+		return 0;
+	}
+	return ($a["modifiedtimestamp"] > $b["modifiedtimestamp"]) ? -1 : 1;
+}
+
 $TITLE = _L("Identity Reveal Requests");
 $PAGE = "tai:requests";
 
@@ -62,7 +69,7 @@ startWindow($TITLE);
 
 loadManagerConnectionData();
 
-$thread = array();
+$threads = array();
 $count = 0;
 
 $query = "select c.id from customer c inner join customerproduct p on (p.customerid = c.id) where c.enabled and p.product = 'tai' and p.enabled";
@@ -92,7 +99,7 @@ foreach ($taicustomers as $cid) {
 	// restore global db connection
 	$_dbcon = $savedbcon;
 	
-	$thread = array_merge($thread,$customerthreads);
+	$threads = array_merge($threads,$customerthreads);
 	
 	echo ".";
 	if (++$count % 20 == 0)
@@ -100,6 +107,8 @@ foreach ($taicustomers as $cid) {
 	ob_flush();
 	flush();
 }
+
+uasort($threads, 'threadcompare');
 
 $titles = array(
 	"customerid" => "#Customer ID",
@@ -109,7 +118,7 @@ $titles = array(
 	"originatinguserdisplay" => "From",
 	"originatinguserinfo" => "@From Info",
 	"body" => "Request Information",
-	"modifiedtimestamp" => "Modified",
+	"modifiedtimestamp" => "#Modified",
 	"actions" => "Actions");
 $formatters = array(
 	"url" => "fmt_custurl",
@@ -123,7 +132,7 @@ show_column_selector('tairequests', $titles);
 
 echo '<table id="tairequests" class="list sortable">';
 
-showTable($thread,$titles,$formatters);
+showTable($threads,$titles,$formatters);
 
 echo '</table>';
 
