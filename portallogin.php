@@ -12,7 +12,6 @@ require_once("inc/DBMappedObject.php");
 require_once("obj/User.obj.php");
 require_once("obj/Access.obj.php");
 
-$badUser = false;
 if (isset($_REQUEST["is_return"])) {
 	doStartSession();
 	// useing the access token, request that authserver create a session for whoever is logged into portal
@@ -22,7 +21,14 @@ if (isset($_REQUEST["is_return"])) {
 		loadDisplaySettings();
 		$redirectLoc = "index.php";
 	} else {
-		$badUser = true;
+		$portalAuthLocation = getPortalAuthLocation();
+		if ($portalAuthLocation != false) {
+			// if we get a valid location back from authserver for the commsuite app's login form, send the user there with an error code
+			$redirectLoc = $portalAuthLocation["url"]. $portalAuthLocation["login"]. "#nocommsuiteuser";
+		} else {
+			// Nothing much we can do, authserver doesn't know where to send them! Just go to index.php
+			$redirectLoc = "index.php";
+		}
 	}
 } else {
 	// create a brand new session
@@ -34,22 +40,17 @@ if (isset($_REQUEST["is_return"])) {
 
 $TITLE = "Portal Authentication Login";
 include_once("logintop.inc.php");
-
-if ($badUser) {
 ?>
-	<div style="margin-left:10px;"><h2>The requested user is not found, or not authorized to log in via this method.<br><br>Please contact your system administrator for assistance.</h2></div>
-<?
-} else {
-?>
-	<div><h2>Please wait while an attempt is made to log you in...</h2></div>
 
-	<script type="text/javascript">
-		!function ($) {
-			window.location = "<?=addslashes($redirectLoc)?>";
-		}(window.jQuery);
-	</script>
-	<script type="text/javascript" src="script/jquery.1.7.2.min.js"></script>
+<div><h2>Please wait while an attempt is made to log you in...</h2></div>
+
+<script type="text/javascript">
+	!function ($) {
+		window.location = "<?=addslashes($redirectLoc)?>";
+	}(window.jQuery);
+</script>
+<script type="text/javascript" src="script/jquery.1.7.2.min.js"></script>
+
 <?
-}
 include_once("loginbottom.inc.php");
 ?>

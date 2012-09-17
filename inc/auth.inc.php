@@ -581,6 +581,16 @@ function getPortalAuthAuthRequestTokenUrl($callbackUrl) {
 	return false;
 }
 
+function getPortalAuthLocation() {
+	$method = "AuthServer.getPortalAuthLocationUrl";
+	$result = pearxmlrpc($method, array());
+	if ($result !== false) {
+		// success
+		return $result;
+	}
+	return false;
+}
+
 function loginViaPortalAuth($customerUrl, $clientIpAddress) {
 	$params = array(new XML_RPC_Value(session_id(), 'string'), new XML_RPC_Value($customerUrl, 'string'), new XML_RPC_Value($clientIpAddress, 'string'));
 	$method = "AuthServer.loginViaPortalAuth";
