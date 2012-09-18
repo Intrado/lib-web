@@ -1,0 +1,52 @@
+# automatically set proper eol character for all text files
+* text=auto
+
+# source files
+*.js text
+*.css text
+*.sql text
+*.sh text
+*.php text
+*.html text
+*.htm text
+
+# config files
+*.xml text
+*.conf text
+*.ini text
+*.cnf text
+.project text
+.htaccess text
+
+
+# misc text files
+*.txt text
+*.csv text
+*.xsl text
+*.wsdl text
+
+# graphic files
+*.png binary
+*.gif binary
+*.ico binary
+*.jpg binary
+
+# compressed files
+*.zip binary
+*.gz binary
+
+# audio files
+*.wav binary
+
+# misc binary
+*.swd binary
+*.swf binary
+*.dat binary
+
+# document files
+*.pdf binary
+*.doc binary
+*.xls binary
+*.xlsx binary
+
+
