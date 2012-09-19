@@ -15,10 +15,17 @@ require_once("obj/Access.obj.php");
 if (isset($_REQUEST["is_return"])) {
 	doStartSession();
 	// useing the access token, request that authserver create a session for whoever is logged into portal
-	$userid = loginViaPortalAuth($CUSTOMERURL, $_SERVER["REMOTE_ADDR"]);
-	if ($userid && $userid > 0) {
-		loadCredentials($userid);
+	$loginDetails = loginViaPortalAuth($CUSTOMERURL, $_SERVER["REMOTE_ADDR"]);
+	if ($loginDetails && isset($loginDetails["userID"]) && $loginDetails["userID"] > 0) {
+		// set a cookie to be used on session timeout to decide where to send the user on logout. NOTE: only good for the session
+		$loginSrc = array("src" => "portal", "user" => $loginDetails["username"], "type" => $loginDetails["type"]);
+		setcookie($CUSTOMERURL. "_login_src", json_encode($loginSrc));
+
+		// load the user's credentials and prepare the session
+		loadCredentials($loginDetails["userID"]);
 		loadDisplaySettings();
+
+		// send to the index.php page to get them properly loaded.
 		$redirectLoc = "index.php";
 	} else {
 		$portalAuthLocation = getPortalAuthLocation();

@@ -597,7 +597,7 @@ function loginViaPortalAuth($customerUrl, $clientIpAddress) {
 	$result = pearxmlrpc($method, $params);
 	if ($result !== false) {
 		// success
-		if (doDBConnect($result)) return $result['userID'];
+		if (doDBConnect($result)) return $result;
 	}
 	return false;
 }

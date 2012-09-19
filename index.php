@@ -105,6 +105,30 @@ if ($userid && $userid != -1) {
 		$redirpage = isset($_POST['last']) ? $_POST['last'] : 'start.php';
 		redirect($redirpage);
 	}
+} else {
+	// check for the $CUSTOMERURL + "_login_src" cookie. If this exists, send the user to the appropriate login location
+	if (isset($_COOKIE[$CUSTOMERURL. "_login_src"]) && $_COOKIE[$CUSTOMERURL. "_login_src"]) {
+		$loginDetails = json_decode($_COOKIE[$CUSTOMERURL. "_login_src"], true);
+		// clear the cookie
+		setcookie($CUSTOMERURL + "_login_src", "");
+
+		$src = $loginDetails["src"];
+		$user = $loginDetails["user"];
+		$type = $loginDetails["type"];
+
+		// if the cookie is valid...
+		if ($src && $user && $type) {
+			if ($src == "portal") {
+				// get the location of portalauth
+				$portalAuthLocation = getPortalAuthLocation();
+
+				// check if it was a powerschool login and send to the powerschool portalauth servlet
+				if ($type == 'powerschool') {
+					redirect($portalAuthLocation["url"]. "/portalauth/powerschool?customerurl=". urlencode($CUSTOMERURL). "&openid_identifier=". urlencode($user));
+				}
+			}
+		}
+	}
 }
 
 $custname = getCustomerName($CUSTOMERURL); // also found by getSystemSetting("displayname") but we may not be logged in yet
