@@ -110,7 +110,7 @@ if ($userid && $userid != -1) {
 	if (isset($_COOKIE[$CUSTOMERURL. "_login_src"]) && $_COOKIE[$CUSTOMERURL. "_login_src"]) {
 		$loginDetails = json_decode($_COOKIE[$CUSTOMERURL. "_login_src"], true);
 		// clear the cookie
-		setcookie($CUSTOMERURL + "_login_src", "");
+		setcookie($CUSTOMERURL. "_login_src", "");
 
 		$src = $loginDetails["src"];
 		$user = $loginDetails["user"];
