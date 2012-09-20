@@ -93,7 +93,7 @@ include_once("nav.inc.php");
 
 if (isset($_SESSION['servicebulkrestart'])) {
 	startWindow(_L('Command Status'));
-	?><table>
+	?><table class='list sortable' id='commandstatus_preview'>
 	<?
 	showTable($_SESSION['servicebulkrestart'], $cmdtitles, $cmdformatters);
 	?></table>
@@ -102,7 +102,7 @@ if (isset($_SESSION['servicebulkrestart'])) {
 	unset($_SESSION['servicebulkrestart']);
 }
 startWindow(_L('Server List'));
-?><table>
+?><table class='list sortable' id='serverlist_preview'>
 <?
 showTable($data, $titles, $formatters);
 ?></table>

@@ -183,7 +183,7 @@ if (isset($_SESSION['servicelist']['restart'])) {
 	unset($_SESSION['servicelist']['restart']);
 }
 startWindow(_L('%s Service Profile List', $server->hostname));
-?><table>
+?><table class='list sortable' id='servicelist_preview'>
 <?
 showTable($data, $titles, $formatters);
 ?></table>

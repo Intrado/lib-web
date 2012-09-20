@@ -135,10 +135,14 @@ $TITLE = _L('Authentication Providers');
 include_once("nav.inc.php");
 
 startWindow(_L('Authentication Providers for Customer: %s', $custurl));
+?><table class='list sortable' id='providers_preview'><?
 showTable($data, $titles, $formatters);
+?></table><?
 endWindow();
+
 startWindow(_L('New Authentication Provider'));
 echo $form->render();
 endWindow();
+
 include_once("navbottom.inc.php");
 ?>
