@@ -174,5 +174,10 @@ $$$
 ALTER TABLE tai_folder CHANGE `type` `type` ENUM( 'inbox', 'sent', 'trash', 'custom' ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'custom'
 $$$
 
+-- $rev 11
+ALTER TABLE `tai_organizationtopic` DROP `enabled`;
+$$$
+ALTER TABLE `tai_userthread` DROP `frombcc` ;
+$$$
 -- NOTE if adding additional schema must update kona/db/taicustomer.sql and set latest _dbtaiversion setting
 

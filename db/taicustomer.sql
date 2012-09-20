@@ -186,4 +186,14 @@ $$$
 
 update setting set value='0.1/10' where name='_dbtaiversion'
 $$$
--- END 0.1/9
+-- END 0.1/10
+
+-- $rev 11
+ALTER TABLE `tai_organizationtopic` DROP `enabled`;
+$$$
+ALTER TABLE `tai_userthread` DROP `frombcc` ;
+$$$
+
+update setting set value='0.1/11' where name='_dbtaiversion'
+$$$
+-- END 0.1/11
