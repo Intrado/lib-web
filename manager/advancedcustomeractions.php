@@ -34,6 +34,10 @@ include_once("nav.inc.php");
 <li><a href="customertemplates.php?cid=<?=$cid?>">Templates</a></li>
 <? } ?>
 
+<? if ($MANAGERUSER->authorized("editcustomer")) { ?>
+<li><a href="authproviders.php?cid=<?=$cid?>">Authentication Providers</a></li>
+<? } ?>
+
 <? if ($MANAGERUSER->authorized("runqueries")) { ?>
 <li><a href="querylist.php?cid=<?=$cid?>">Run Queries</a></li>
 <? } ?>
