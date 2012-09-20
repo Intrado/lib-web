@@ -35,6 +35,9 @@ function tai_upgrade_0_1 ($rev, $shardid, $customerid, $db) {
 		case 9:
 			echo "|";
 			apply_sql("taiupgrades/db_0-1_pre.sql", $customerid, $db, 10);
+		case 10:
+			echo "|";
+			apply_sql("taiupgrades/db_0-1_pre.sql", $customerid, $db, 11);
 	}
 	
 	return true;
