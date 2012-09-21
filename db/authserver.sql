@@ -648,3 +648,9 @@ CREATE TABLE IF NOT EXISTS `authenticationprovider` (
   `endpoint` varchar(255) NOT NULL,
   KEY `customerid` (`customerid`,`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------Release ASP_9-2
+
+-- product type 'cs' or 'tai' or NULL
+ALTER TABLE `shortcodegroup` ADD  `type` VARCHAR( 255 ) NULL;
+
