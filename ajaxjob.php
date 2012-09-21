@@ -58,6 +58,11 @@ function fmt_job_recipients($obj, $name) {
 	return $total;
 }
 
+
+function fmt_completedjob_recipients($obj, $name) {
+	return QuickQuery("select count(distinct personid) FROM reportperson WHERE jobid=?", false, array($obj->id));
+}
+
 function fmt_obj_date_no_time ($obj,$name) {
 	if (isset($obj->$name) && $obj->$name != "") {
 		$time = strtotime($obj->$name);
@@ -215,7 +220,7 @@ function handleRequest() {
 				'finishdate' => 'fmt_obj_date_no_time',
 				'userid' => 'fmt_job_ownername',
 				'name' => 'fmt_job_name',
-				'rcpts' => 'fmt_job_recipients',
+				'rcpts' => 'fmt_completedjob_recipients',
 				'content' => 'fmt_job_content',
 				'tools' => 'frm_job_tools'
 			);
