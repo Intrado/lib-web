@@ -9,7 +9,8 @@ require_once("../inc/html.inc.php");
 require_once("dbmo/tai/Thread.obj.php");
 require_once("dbmo/tai/Message.obj.php");
 require_once("dbmo/tai/UserMessage.obj.php");
-
+require_once("dbmo/tai/UserThread.obj.php");
+require_once("dbmo/tai/Folder.obj.php");
 
 if (!isset($_GET['customerid']) && !isset($_GET['threadid'])) {
 	redirect("taiinbox.php");
@@ -120,6 +121,24 @@ if ($thread->originatinguserid == 1 || $thread->recipientuserid ==1) {
 			
 			// Can only reply to messages schoolmessenger is originator or recipient to
 			if ($thread->originatinguserid == 1 || $thread->recipientuserid ==1) {
+				
+				// Move thread into recipients Inboxs
+				$recipientUserThreads = DBFindMany("UserThread", "from tai_userthread where threadid=? and userid!=1",null,array($thread->id));
+				foreach($recipientUserThreads as $recipientUserThread) {
+					$recipientInbox = DBFind("Folder", "from tai_folder where userid=? and type='inbox'",null,array($recipientUserThread->userid));
+					if (!$recipientInbox) {
+						$recipientInbox = new Folder();
+						$recipientInbox->name = "Inbox";
+						$recipientInbox->type = "inbox";
+						$recipientInbox->userid = $recipientUserThreads->userid;
+						$recipientInbox->create();
+					}
+					$recipientUserThread->folderid = $recipientInbox->id;
+					$recipientUserThread->isdeleted = 0;
+					$recipientUserThread->update();
+				}
+				
+				//Add Message
 				$message = new Message();
 				$message->body = $postdata["reply"];
 				$message->senderuserid = 1;
