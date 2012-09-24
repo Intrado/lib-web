@@ -651,7 +651,29 @@ CREATE TABLE IF NOT EXISTS `authenticationprovider` (
 
 -- --------Release ASP_9-2
 
--- product type 'cs' or 'tai' or NULL
-ALTER TABLE `shortcodegroup` ADD  `type` VARCHAR( 255 ) NULL,
+-- customers have tai shortcode group
+ALTER TABLE  `customer` ADD  `taishortcodegroupid` INT NULL;
+
+-- shortcodegroup needs product and an indicator for default group within that product
+ALTER TABLE `shortcodegroup` ADD  `product` ENUM(  'cs',  'tai' ) NOT NULL,
     ADD  `isdefault` TINYINT NOT NULL DEFAULT  '0';
+
+-- add new tai shortcodegroup
+INSERT INTO `shortcodegroup` (`id`, `description`, `queuecapacity`, `numthreads`, `product`, `isdefault`) VALUES (NULL, 'TalkAboutIt', '100', '2', 'tai', 1);
+
+-- store the new shortcodegroup id
+SET @taigroupid = LAST_INSERT_ID();
+
+-- add new tai shortcode
+INSERT INTO `shortcode` (`shortcode`, `smsaggregatorid`, `shortcodegroupid`) VALUES ('85130', '1', @taigroupid);
+
+-- update all customers with default tai shortcode group
+UPDATE customer SET taishortcodegroupid = @taigroupid;
+
+-- update existing commsuite shortcodegroup with default indicator
+UPDATE shortcodegroup SET isdefault = 1 WHERE id = 1;
+
+-- insert the default shortcode areacode lookup
+INSERT INTO `shortcodeareacode` (`shortcode`, `areacode`) VALUES ('85130', '');
+
 

@@ -7,8 +7,8 @@ function createnewcustomer($shardid) {
 	
 	$shardinfo = QuickQueryRow("select id, dbhost, dbusername, dbpassword from shard where id = ?", true,false,array($shardid));
 	
-	$csShortcodeGroupId = QuickQuery("select id from shortcodegroup where type = 'cs' and isdefault = 1");
-	$taiShortcodeGroupId = QuickQuery("select id from shortcodegroup where type = 'tai' and isdefault = 1");
+	$csShortcodeGroupId = QuickQuery("select id from shortcodegroup where product = 'cs' and isdefault = 1");
+	$taiShortcodeGroupId = QuickQuery("select id from shortcodegroup where product = 'tai' and isdefault = 1");
 	
 	$shardid = $shardinfo['id'];
 	$shardhost = $shardinfo['dbhost'];
