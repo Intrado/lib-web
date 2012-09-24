@@ -652,5 +652,6 @@ CREATE TABLE IF NOT EXISTS `authenticationprovider` (
 -- --------Release ASP_9-2
 
 -- product type 'cs' or 'tai' or NULL
-ALTER TABLE `shortcodegroup` ADD  `type` VARCHAR( 255 ) NULL;
+ALTER TABLE `shortcodegroup` ADD  `type` VARCHAR( 255 ) NULL,
+    ADD  `isdefault` TINYINT NOT NULL DEFAULT  '0';
 
