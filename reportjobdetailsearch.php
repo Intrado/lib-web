@@ -582,6 +582,26 @@ endWindow();
 ?>
 	<script type="text/javascript">
 		document.observe('dom:loaded', function() {
+			var radioselectchoice = $('<?=$form->name?>_radioselect').down('input:checked');
+			if (radioselectchoice.value == 'job') {
+				$('<?=$form->name?>_dateoptions_fieldarea').hide();
+				$('<?=$form->name?>_checkarchived_fieldarea').show();
+
+				if ($('<?=$form->name?>_checkarchived_fieldarea').checked) {
+					$('<?=$form->name?>_jobid_fieldarea').hide();
+					$('<?=$form->name?>_jobidarchived_fieldarea').show();
+				} else {
+					$('<?=$form->name?>_jobid_fieldarea').show();
+					$('<?=$form->name?>_jobidarchived_fieldarea').hide();
+				}
+			} else if (radioselectchoice.value == 'date') {
+				$('<?=$form->name?>_dateoptions_fieldarea').show();
+				$('<?=$form->name?>_checkarchived_fieldarea').hide();
+				$('<?=$form->name?>_jobid_fieldarea').hide();
+				$('<?=$form->name?>_jobidarchived_fieldarea').hide();
+				$('<?=$form->name?>_checkarchived_fieldarea').hide();
+			}
+			
 			ruleWidget.delayActions = true;
 			ruleWidget.container.observe('RuleWidget:AddRule', rulewidget_add_rule);
 			ruleWidget.container.observe('RuleWidget:DeleteRule', rulewidget_delete_rule);
@@ -641,25 +661,7 @@ endWindow();
 				$('<?=$form->name?>_result').checked = true;
 			});
 
-			var radioselectchoice = $('<?=$form->name?>_radioselect').down('input:checked');
-			if (radioselectchoice.value == 'job') {
-				$('<?=$form->name?>_dateoptions_fieldarea').hide();
-				$('<?=$form->name?>_checkarchived_fieldarea').show();
 
-				if ($('<?=$form->name?>_checkarchived_fieldarea').checked) {
-					$('<?=$form->name?>_jobid_fieldarea').hide();
-					$('<?=$form->name?>_jobidarchived_fieldarea').show();
-				} else {
-					$('<?=$form->name?>_jobid_fieldarea').show();
-					$('<?=$form->name?>_jobidarchived_fieldarea').hide();
-				}
-			} else if (radioselectchoice.value == 'date') {
-				$('<?=$form->name?>_dateoptions_fieldarea').show();
-				$('<?=$form->name?>_checkarchived_fieldarea').hide();
-				$('<?=$form->name?>_jobid_fieldarea').hide();
-				$('<?=$form->name?>_jobidarchived_fieldarea').hide();
-				$('<?=$form->name?>_checkarchived_fieldarea').hide();
-			}
 
 			$('metadataDiv').update($('metadataTempDiv').innerHTML);
 		});
