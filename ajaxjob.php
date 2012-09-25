@@ -49,6 +49,7 @@ function fmt_job_content($obj, $name) {
 	return $str;
 }
 
+// this comment added to help resolve CRLF/LF end-of-line issue in this file
 function fmt_job_recipients($obj, $name) {
 	$lists = QuickQueryList("select listid from joblist where jobid = ?", false, false, array($obj->id));
 	$total = 0;
