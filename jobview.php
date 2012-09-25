@@ -71,7 +71,7 @@ include_once("nav.inc.php");
 <script type="text/javascript" src="script/getMessageGroupPreviewGrid.js"></script>
 <?
 PreviewModal::includePreviewScript();
-startWindow(_L('Job Settings'));
+startWindow(_L('%s Settings',getJobTitle()));
 ?>
 <table>	
 	<?
@@ -79,7 +79,7 @@ startWindow(_L('Job Settings'));
 	ViewOnlyItem(_L("Name"),$job->name);
 	ViewOnlyItem(_L("Description"),$job->description);
 	$jobtypes = JobType::getUserJobTypes();
-	ViewOnlyItem(_L("Job Type"),$jobtypes[$job->jobtypeid]->name);
+	ViewOnlyItem(_L("%s Type",getJobTitle()),$jobtypes[$job->jobtypeid]->name);
 	$selectedlists = QuickQueryList("select l.name from joblist jl left join list l on (l.id = jl.id) where jl.jobid=?", false,false,array($job->id));
 	
 	ViewOnlyItem(_L("Start Date"),date("m/d/Y", strtotime($job->startdate)));
