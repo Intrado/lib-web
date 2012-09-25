@@ -80,7 +80,7 @@ startWindow(_L('%s Settings',getJobTitle()));
 	ViewOnlyItem(_L("Description"),$job->description);
 	$jobtypes = JobType::getUserJobTypes();
 	ViewOnlyItem(_L("%s Type",getJobTitle()),$jobtypes[$job->jobtypeid]->name);
-	$selectedlists = QuickQueryList("select l.name from joblist jl left join list l on (l.id = jl.id) where jl.jobid=?", false,false,array($job->id));
+	$selectedlists = QuickQueryList("select l.name from joblist jl left join list l on (l.id = jl.listid) where jl.jobid=?", false,false,array($job->id));
 	
 	ViewOnlyItem(_L("Start Date"),date("m/d/Y", strtotime($job->startdate)));
 	ViewOnlyItem(_L("Days to run"),((86400 + strtotime($job->enddate) - strtotime($job->startdate) ) / 86400));
