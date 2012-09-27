@@ -217,7 +217,7 @@ $$$
 -- START 1.2
 
 -- $rev 1
-alter table tai_topicuser add notify tinyint(4) not null default 0
+alter table tai_topicuser add notify tinyint(4) not null default 1
 $$$
 
 update setting set value='1.2/1' where name='_dbtaiversion'
