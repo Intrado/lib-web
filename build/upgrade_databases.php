@@ -52,7 +52,8 @@ $versions = array (
 	),
 	
 	"tai" => array (
-		"0.1/11"
+		"0.1/11",
+		"1.2/1"
 		//etc
 	)
 	
@@ -346,6 +347,7 @@ function update_taicustomer($db, $customerid, $shardid) {
 
 	// require the necessary version upgrade scripts
 	require_once("taiupgrades/db_0-1.php");
+	require_once("taiupgrades/db_1-2.php");
 
 	// for each version, upgrade to the next
 	$foundstartingversion = false;
@@ -377,6 +379,11 @@ function update_taicustomer($db, $customerid, $shardid) {
 		switch ($targetversion) {
 			case "0.1":
 				if (!tai_upgrade_0_1($rev, $shardid, $customerid, $db)) {
+					exit("Error upgrading DB; Shard: $shardid, Customer: $customerid, Rev: " . $rev);
+				}
+				break;
+			case "1.2":
+				if (!tai_upgrade_1_2($rev, $shardid, $customerid, $db)) {
 					exit("Error upgrading DB; Shard: $shardid, Customer: $customerid, Rev: " . $rev);
 				}
 				break;

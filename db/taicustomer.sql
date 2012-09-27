@@ -213,3 +213,14 @@ INSERT INTO tai_cannedresponse (`topicid`, `title`, `description`, `modifiedtime
 $$$
 
 -- NOTE Version unchanged (0.1/11). Default topics and canned responses only inserted in taicustomer and not in tai upgrade
+
+-- START 1.2
+
+-- $rev 1
+alter table tai_topicuser add notify tinyint(4) not null default 0
+$$$
+
+update setting set value='1.2/1' where name='_dbtaiversion'
+$$$
+
+-- END 1.2/1
