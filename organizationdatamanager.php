@@ -70,8 +70,20 @@ if (isset($_GET["delete"]) && isset($_GET["orgid"])) {
 														(pa.personid = p.id)
 												where not p.deleted and p.type = 'subscriber' and pa.organizationid = o.id)",
 											false, array($org["id"]));
+		$userroleassociationorgid = QuickQuery("select o.id
+											from organization o
+											where o.id = ?
+											and exists
+												(select *
+												from role r
+													inner join user u on
+														(r.userid = u.id)
+												where not u.deleted and r.organizationid = o.id)",
+											false, array($org["id"]));
 		
-		if ($listentryorgid || $userassociationorgid || $persondatavaluesorgid || $personassociationorgid)
+		
+		
+		if ($listentryorgid || $userassociationorgid || $persondatavaluesorgid || $personassociationorgid || $userroleassociationorgid)
 			$associatedorgid = true;
 		else
 			$associatedorgid = false;
@@ -92,7 +104,7 @@ if (isset($_GET["delete"]) && isset($_GET["orgid"])) {
 
 if (isset($_GET['deleteunassociated'])) {
 	// get all org associations
-	$listentryorgids = QuickQueryList("select le.organizationid, 1
+	$listentryorgids = QuickQueryList("select le.organizationid
 											from listentry le
 												inner join list l on
 													(le.listid = l.id)
@@ -100,30 +112,32 @@ if (isset($_GET['deleteunassociated'])) {
 													(l.userid = u.id)
 											where not l.deleted and le.type = 'organization'
 												and not u.deleted
-											group by le.organizationid",
-											false, false, array());
+											group by le.organizationid");
 	
-	$userassociationorgids = QuickQueryList("select ua.organizationid, 1
+	$userassociationorgids = QuickQueryList("select ua.organizationid
 											from userassociation ua
 												inner join user u on
 													(ua.userid = u.id)
 											where not u.deleted and ua.type = 'organization'
-											group by ua.organizationid",
-											false, false, array());
+											group by ua.organizationid");
 	
-	$persondatavaluesorgids = QuickQueryList("select (value + 0) as orgid, 1
+	$persondatavaluesorgids = QuickQueryList("select (value + 0) as orgid
 											from persondatavalues
 											where fieldnum = 'oid'
-											group by orgid",
-											false, false, array());
+											group by orgid");
 	
-	$personassociationorgids = QuickQueryList("select pa.id, 1
+	$personassociationorgids = QuickQueryList("select pa.organizationid
 											from personassociation pa
 												inner join person p on
 													(pa.personid = p.id)
 											where not p.deleted and p.type = 'subscriber' and pa.type = 'organization'
-											group by pa.organizationid",
-											false, false, array());
+											group by pa.organizationid");
+	
+	$userroleassociationorgid = QuickQueryList("select r.organizationid
+											from role r
+											inner join user u on
+											(r.userid = u.id)
+											where not u.deleted	group by r.organizationid");
 	
 	$associatedorgids = array();
 	foreach ($listentryorgids as $orgid)
@@ -133,6 +147,8 @@ if (isset($_GET['deleteunassociated'])) {
 	foreach ($persondatavaluesorgids as $orgid)
 		$associatedorgids[$orgid] = true;
 	foreach ($personassociationorgids as $orgid)
+		$associatedorgids[$orgid] = true;
+	foreach ($userroleassociationorgid as $orgid)
 		$associatedorgids[$orgid] = true;
 	
 	// if there are any associated org ids, query out the un-associated ones. Otherwise just get all the un-deleted ones.

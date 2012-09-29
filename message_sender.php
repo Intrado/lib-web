@@ -1136,7 +1136,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 						$messages['post']['voice']['en']['none'] = $messages['phone']['voice']['en']['none'];
 						
 					// check for and retrieve translations
-					foreach ($translationlanguages as $code => $language) {
+					foreach ($ttslanguages as $code => $language) {
 						if (isset($postdata["phonemessagetexttranslate". $code. "text"]))
 							$translatedmessage = json_decode($postdata["phonemessagetexttranslate". $code. "text"], true);
 						if ($translatedmessage["enabled"]) {

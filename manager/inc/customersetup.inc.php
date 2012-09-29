@@ -7,14 +7,17 @@ function createnewcustomer($shardid) {
 	
 	$shardinfo = QuickQueryRow("select id, dbhost, dbusername, dbpassword from shard where id = ?", true,false,array($shardid));
 	
+	$csShortcodeGroupId = QuickQuery("select id from shortcodegroup where product = 'cs' and isdefault = 1");
+	$taiShortcodeGroupId = QuickQuery("select id from shortcodegroup where product = 'tai' and isdefault = 1");
+	
 	$shardid = $shardinfo['id'];
 	$shardhost = $shardinfo['dbhost'];
 	$sharduser = $shardinfo['dbusername'];
 	$shardpass = $shardinfo['dbpassword'];
 	$dbpassword = genpassword();
 	$limitedpassword = genpassword();
-	QuickUpdate("insert into customer (urlcomponent, shardid, dbpassword, limitedpassword)
-																values (?, ?, ?, ?)", false, array('', $shardid, $dbpassword, $limitedpassword) )
+	QuickUpdate("insert into customer (urlcomponent, shardid, dbpassword, limitedpassword, shortcodegroupid, taishortcodegroupid)
+																values (?, ?, ?, ?, ?, ?)", false, array('', $shardid, $dbpassword, $limitedpassword, $csShortcodeGroupId, $taiShortcodeGroupId) )
 	or dieWithError("failed to insert customer into auth server", $_dbcon);
 		
 	$customerid = $_dbcon->lastInsertId();
