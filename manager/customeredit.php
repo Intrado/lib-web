@@ -21,6 +21,10 @@ require_once("../obj/ValSmsText.val.php");
 require_once("XML/RPC.php");
 require_once("authclient.inc.php");
 require_once("obj/ValUrlComponent.val.php");
+require_once("obj/ValUrl.val.php");
+require_once("obj/LogoRadioButton.fi.php");
+require_once("obj/LanguagesItem.fi.php");
+require_once("obj/ValInboundNumber.val.php");
 require_once("inc/customersetup.inc.php");
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -90,247 +94,7 @@ function update_jobtypeprefs($min, $max, $type, $custdb){
 // Form Items And Validators
 ////////////////////////////////////////////////////////////////////////////////
 
-class LogoRadioButton extends FormItem {
-	function render ($value) {
-		$n = $this->form->name."_".$this->name;
-		$str = '<div id='.$n.' class="radiobox"><table>';
-		$counter = 1;
-		foreach ($this->args['values'] as $radiovalue => $radiohtml) {
-			$id = $n.'-'.$counter;
-			$str .= '<tr><td><input id="'.$id.'" name="'.$n.'" type="radio" value="'.escapehtml($radiovalue).'" '.($value == $radiovalue ? 'checked' : '').' /></td><td><label for="'.$id.'"><div style="width: 100%; border: 2px outset; background-color: white; color: black; margin-left: 0px;">'.($radiohtml).'</div></label></td></tr>
-				';
-			$counter++;
-		}
-		$str .= '</table></div>';
-		return $str;
-	}
-}
 
-class LanguagesItem extends FormItem {
-	function render ($value) {
-		$n = $this->form->name."_".$this->name;
-		
-		$str = "
-				<input id='$n' name='$n' type='hidden' value='$value' />
-				<div id='$n-removelang' style='display:none'>" . icon_button("Remove", "delete") . "</div>
-				<div id='$n-disp'></div>
-				<table><td style=\"border: 1px solid black;\">
-				Language Lookup:<br />
-				<table><tr><td>
-				<select id='newlanginputselect' onchange='languageselect();'>
-				<option value=0> -- Select Common Language -- </option>";
-				foreach ($this->args['googlelangs'] as $code => $googlang) {
-					$ttsLangSup = '';
-					if (in_array($code, $this->args['ttslangs']))
-						$ttsLangSup .= " (TTS Support)";
-					$str .= "<option value='" . str_pad($code,3) . " $googlang' >$googlang $ttsLangSup</option>";
-				}
-				$str .= '
-				</select>
-				</td><td>&nbsp;&nbsp;&nbsp;or&nbsp;&nbsp;&nbsp;</td><td><input id="searchbox" type="text" size="30" /></td><td>' . icon_button("Search", "magnifier","searchlanguages();") . '</td></tr></table>
-				<table id="searchresult" style=""><tr><td></td></tr></table>
-				<table style="display:inline;"><tr><td>Code: 
-				<div style="display:inline;font-weight: bold;" id="newlangcodedisp">N/A</div> Name: 
-				<input id="newlangcode" type="hidden" maxlength="50" size="25" />
-				<input id="newlanginput" type="text" maxlength="50" size="25" />
-				</td><td>' . icon_button("Add", "add","changelanguage('$n')") . '</td></tr></table>
-				</td></tr>
-				</table>
-				';
-		return $str;
-	}
-	function renderJavascript() {
-		$n = $this->form->name."_".$this->name;
-		$str = "
-			function updatelanguage(code,name) {
-				var langs = \$H($('$n').value.evalJSON(true));
-				langs.set(code.strip(),name.strip());
-				$('$n').value = Object.toJSON(langs);	
-			}
-			function removelanguage(code) {
-				var langs = \$H($('$n').value.evalJSON(true));
-				langs.unset(code.strip());
-				$('$n').value = Object.toJSON(langs);
-				renderlanguages();
-			}
-			function renderlanguages() {
-				var ttslangs = " . json_encode($this->args['ttslangs']) . ";
-				var googlelangs = " . json_encode(array_keys($this->args['googlelangs'])) . ";
-				var langs = \$H($('$n').value.evalJSON(true));
-				var table = new Element('table',{'style':'text-align:left;'});
-				var tableheader = new Element('tr');
-				tableheader.insert(new Element('th').insert('Code'));
-				tableheader.insert(new Element('th',{'style':'border-left: 1px dashed black;border-right: 1px dashed black;'}).insert('TTS'));
-				tableheader.insert(new Element('th',{'style':'border-right: 1px dashed black;'}).insert('Translatable'));
-				tableheader.insert(new Element('th').insert('Name'));
-				table.insert(tableheader);
-				langs.each(function(lang) {
-
-					var tablecontent = new Element('tr');
-					var input = new Element('input', { 'type': 'text', 'value': lang.value});
-					
-					if (lang.key != 'en') {
-						input.observe('change',function(e) {
-							updatelanguage(lang.key,e.element().getValue());
-						});
-					} else {
-						input.disabled = true;
-					}
-					tablecontent.insert(new Element('td',{'style':'text-align:right;'}).insert(lang.key));
-					var tts = new Element('td',{'style':'text-align:center;border-left: 1px dashed black;border-right: 1px dashed black;'});
-					if (ttslangs.indexOf(lang.key) != -1)
-						tts.insert(new Element('img', {'src':'img/icons/accept.png'}));
-					tablecontent.insert(tts);
-					var translatable = new Element('td',{'style':'text-align:center;border-right: 1px dashed black;'});
-					if (googlelangs.indexOf(lang.key) != -1)
-						translatable.insert(new Element('img', {'src':'img/icons/accept.png'}));
-					tablecontent.insert(translatable);
-					tablecontent.insert(new Element('td').insert(input));
-
-					if (lang.key != 'en') {
-						var removebutton = new Element('div').update($('$n-removelang').innerHTML);
-						removebutton.observe('click',function(e) {
-							removelanguage(lang.key);
-						});
-						tablecontent.insert(new Element('td').insert(removebutton));		
-					}
-					table.insert(tablecontent);
-				});	
-				$('$n-disp').update(table);		
-				form_do_validation($('{$this->form->name}'), $('$n'));
-			}
-			
-			document.observe('dom:loaded', renderlanguages);
-				
-			function languageselect() {
-				var s = $('newlanginputselect');
-				if (s.selectedIndex !== 0) {
-					var value = s.options[s.selectedIndex].value;
-					$('newlanginput').value = value.substring(4);
-					$('newlangcode').value = value.substring(0,3);
-					$('newlangcodedisp').update(value.substring(0,3));
-				}
-			}
-			
-			function addlang(code,name) {
-				$('newlangcode').value = code;
-				$('newlanginput').value = name;
-				$('newlanginputselect').selectedIndex = 0;
-				$('searchresult').update('');
-				$('newlangcodedisp').update(code);
-			}
-			
-			function changelanguage(formitemid){
-				var code = $('newlangcode').value;
-				var language = $('newlanginput').value;
-				if (code && language) {
-					var langs = \$H($(formitemid).value.evalJSON(true));
-					langs.set(code.strip(),language.strip());
-					$(formitemid).value = Object.toJSON(langs);
-				}
-				$('newlanginputselect').selectedIndex = 0;
-				$('searchresult').update('');
-				$('newlangcodedisp').update('');
-				$('newlangcode').value = '';
-				$('newlanginput').value = '';
-				renderlanguages();
-			}	
-	
-			function searchlanguages() {
-				var searchtxt = $('searchbox').value;
-				new Ajax.Request('languagesearch.php',
-				{
-					method:'get',
-					parameters: {searchtxt: searchtxt},
-					onSuccess: function(response){
-						var result = response.responseJSON;
-						var items = new Element('tbody',{width:'100%'});
-						var header = new Element('tr').addClassName('listHeader');
-			
-						if(result) {
-							header.insert(new Element('th').update('Code'));
-							header.insert(new Element('th',{align:'left'}).update('Language'));
-			
-							items.insert(header);
-							var i = 0;
-							\$H(result).each(function(itm) {
-								var row = new Element('tr');
-								if(i%2)
-									row.addClassName('listAlt');
-								row.insert(new Element('td',{align:'right'}).update(itm.key));
-								row.insert(new Element('td').update('<a href=\"#\" onclick=\"addlang(\'' + itm.key + '\',\'' + itm.value + '\');return false;\">' + itm.value + '</a>'));
-								items.insert(row);
-								i++;
-							});
-						} else {
-							header.insert(new Element('th').update('No Language Found containing the search sting \"' + searchtxt + '\"'));
-							items.insert(header);
-			
-						}
-						$('searchresult').update(items);
-					}
-				});
-			}";
-		return $str;
-	}
-}
-
-class ValLanguages extends Validator {
-	function validate ($value) {
-		$languages = json_decode($value,true);
-		if(!is_array($languages) || !isset($languages['en'])) {
-			return 'English is required for ' . $this->label;
-		}
-		return true;
-	}
-	function getJSValidator () {
-		return
-		'function (name, label, value, args) {
-			var langs = $H(value.evalJSON(true));
-			if (langs.length == 0)
-				return label + " is required";
-			if (!langs.get("en"))
-				return "English is required for " + label;
-
-			return true;
-		}';
-	}
-}
-
-class ValInboundNumber extends Validator {
-	var $onlyserverside = true;
-	function validate ($value, $args) {
-		$query = "select count(*) from customer where inboundnumber=?";
-		if (($args["customerid"] && QuickQuery($query . " and id!=?",false,array($value,$args["customerid"]))) ||
-			(!$args["customerid"] && QuickQuery($query,false,array($value)))) {		
-			return 'Number is already in use for ' . $this->label;
-		}
-		return true;
-	}
-}
-
-
-class ValUrl extends Validator {
-	var $urlregexp = "(http|https)\://[a-zA-Z0-9\-]+\.[a-zA-Z]{2,3}(:[a-zA-Z0-9]*)?/?([a-zA-Z0-9\-\._\'/\\\+&amp;%\$#\=~])*";
-
-	function validate ($value, $args) {
-		if (!preg_match("!^{$this->urlregexp}$!", $value))
-		return "$this->label is not a valid url format";
-
-		return true;
-	}
-
-	function getJSValidator () {
-		return
-		'function (name, label, value, args) {
-			var urlregexp = "^' . addslashes($this->urlregexp) . '$";
-			var reg = new RegExp(urlregexp);
-			if (!reg.test(value))
-				return label + " is not a valid url format";
-			return true;
-		}';
-	}
-}
 	
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
@@ -387,7 +151,8 @@ $googlangs = array(
 	"uk" => "Ukrainian",
 	"vi" => "Vietnamese",
 	"yi" => "Yiddish",
-	"zh" => "Chinese");
+	"zh" => "Chinese"
+);
 asort($googlangs); // Sort by value and not by country code
 
 $ttslangs = array(
@@ -409,84 +174,89 @@ $ttslangs = array(
 
 // default settings
 $settings = array(
-					'_dmmethod' => '',
-					'timezone' => '',
-					'displayname' => '',
-					'organizationfieldname' => 'School',
-					'urlcomponent' => '',
-					'_logocontentid' => '',
-					'_logoclickurl' => '',
-					'_productname' => '',
-					'_supportemail' => '',
-					'_supportphone' => '',
-					'callerid' => '',
-					'defaultareacode' => '',
-					'inboundnumber' => '',
-					'maxguardians' => '0',
-					'maxphones' => '1',
-					'maxemails' => '1',
-					'emaildomain' => '',
-					'tinydomain' => '',
-					'softdeletemonths' => '6',
-					'harddeletemonths' => '24',
-					'disablerepeat' => '0',
-					'_hassurvey' => '0',
-					'surveyurl' => '',
-					'_hassms' => '0',
-					'maxsms' => '1',
-					'smscustomername' => '',
-					'enablesmsoptin' => '0',
-					'_hassmapi' => '0',
-					'_hascallback' => '0',
-					'callbackdefault' => 'inboundnumber',
-					'_hasldap' => '0',
-					'_hasenrollment' => '0',
-					'_hastargetedmessage' => '0',
-					'_hasselfsignup' => '',
-					'_hasportal' => '',
-					'_hasfacebook' => '0',
-					'_hastwitter' => '0',
-					'_hasfeed' => '0',
-					'autoreport_replyname' => 'SchoolMessenger',
-					'autoreport_replyemail' => 'autoreport@schoolmessenger.com',
-					'_renewaldate' => '',
-					'_callspurchased' => '',
-					'_maxusers' => '',
-					'_timeslice' => '450',
-					'loginlockoutattempts' => '5',
-					'logindisableattempts' => '0',
-					'loginlockouttime' => '5',
-					'_brandtheme' => 'newui',
-					'_brandprimary' => '3e693f',
-					'_brandratio' => '.2',
-					'_amdtype' => "ivr");
+	'_dmmethod' => '',
+	'timezone' => '',
+	'displayname' => '',
+	'organizationfieldname' => 'School',
+	'urlcomponent' => '',
+	'_logocontentid' => '',
+	'_logoclickurl' => '',
+	'_productname' => '',
+	'_supportemail' => '',
+	'_supportphone' => '',
+	'callerid' => '',
+	'defaultareacode' => '',
+	'inboundnumber' => '',
+	'maxguardians' => '0',
+	'maxphones' => '1',
+	'maxemails' => '1',
+	'emaildomain' => '',
+	'tinydomain' => '',
+	'softdeletemonths' => '6',
+	'harddeletemonths' => '24',
+	'disablerepeat' => '0',
+	'_hassurvey' => '0',
+	'surveyurl' => '',
+	'_hassms' => '0',
+	'maxsms' => '1',
+	'smscustomername' => '',
+	'enablesmsoptin' => '0',
+	'_hassmapi' => '0',
+	'_hascallback' => '0',
+	'callbackdefault' => 'inboundnumber',
+	'_hasldap' => '0',
+	'_hasenrollment' => '0',
+	'_hastargetedmessage' => '0',
+	'_hasselfsignup' => '',
+	'_hasportal' => '',
+	'_hasfacebook' => '0',
+	'_hastwitter' => '0',
+	'_hasfeed' => '0',
+	'autoreport_replyname' => 'SchoolMessenger',
+	'autoreport_replyemail' => 'autoreport@schoolmessenger.com',
+	'_renewaldate' => '',
+	'_callspurchased' => '',
+	'_maxusers' => '',
+	'_timeslice' => '450',
+	'loginlockoutattempts' => '5',
+	'logindisableattempts' => '0',
+	'loginlockouttime' => '5',
+	'_brandtheme' => 'newui',
+	'_brandprimary' => '3e693f',
+	'_brandratio' => '.2',
+	'_amdtype' => "ivr"
+);
+
+$timezones = array(
+	"US/Alaska",
+	"US/Aleutian",
+	"US/Arizona",
+	"US/Central",
+	"US/East-Indiana",
+	"US/Eastern",
+	"US/Hawaii",
+	"US/Indiana-Starke",
+	"US/Michigan",
+	"US/Mountain",
+	"US/Pacific",
+	"US/Samoa"
+);
 
 $customerid = null;
 if (isset($_SESSION['customerid'])) {
 	$customerid = $_SESSION['customerid'];
-	$query = "select s.dbhost, c.dbusername, c.dbpassword, c.urlcomponent, c.enabled, c.oem, c.oemid, c.nsid, c.notes from customer c inner join shard s on (c.shardid = s.id) where c.id = '$customerid'";
+	$query = "select s.dbhost, c.urlcomponent, c.enabled, c.oem, c.oemid, c.nsid, c.notes, s.dbusername as shardusername, s.dbpassword as shardpassword from customer c inner join shard s on (c.shardid = s.id) where c.id = '$customerid'";
 	$custinfo = QuickQueryRow($query,true);
-	$custdb = DBConnect($custinfo["dbhost"], $custinfo["dbusername"], $custinfo["dbpassword"], "c_$customerid");
+	// connect to customer database as the shard user (needed to create tables for new products)
+	$custdb = DBConnect($custinfo["dbhost"], $custinfo["shardusername"], $custinfo["shardpassword"], "c_$customerid");
 	if (!$custdb) {
-		exit("Connection failed for customer: {$custinfo["dbhost"]}, db: c_$customerid");
+		exit("Connection failed for customer: {$custinfo["dbhost"]}, db: c_$customerid, as shard user");
 	}
 
 	$query = "select name,value from setting";
 	$settings = array_merge($settings, QuickQueryList($query,true,$custdb));
 }
 
-$timezones = array(	"US/Alaska",
-					"US/Aleutian",
-					"US/Arizona",
-					"US/Central",
-					"US/East-Indiana",
-					"US/Eastern",
-					"US/Hawaii",
-					"US/Indiana-Starke",
-					"US/Michigan",
-					"US/Mountain",
-					"US/Pacific",
-					"US/Samoa"	);
 
 $logos = array(); 
 if ($customerid && $settings['_logocontentid'] != '') {
@@ -519,160 +289,9 @@ else
 
 
 $helpstepnum = 1;
-$helpsteps = array("TODO");
 $formdata = array(_L('Basics'));
 
-$formdata["enabled"] = array(
-						"label" => _L('Enabled'),
-						"fieldhelp" => "Unchecking this box will disable this customer!  All repeating jobs will be stopped.  All scheduled jobs must be canceled manually.",
-						"value" => isset($custinfo)?$custinfo["enabled"]:"",
-						"validators" => array(),
-						"control" => array("CheckBox"),
-						"helpstep" => $helpstepnum
-);
-
-//Unable to change shard on this form
-if (!$customerid) {
-	$formdata["shard"] = array(
-							"label" => _L('Shard'),
-							"value" => "",
-							"validators" => array(
-								array("ValRequired"),
-								array("ValInArray", "values" => array_keys($shards))
-								),
-							"control" => array("SelectMenu", "values" => array("" =>_L("-- Select a Shard --")) + $shards),
-							"helpstep" => $helpstepnum
-	);
-}
-
-$formdata["dmmethod"] = array(
-						"label" => _L('DM Method'),
-						"value" => $settings['_dmmethod'],
-						"validators" => array(
-							array("ValRequired"),
-							array("ValInArray", "values" => array_keys($dmmethod))
-							),
-						"control" => array("SelectMenu", "values" => array("" =>_L("-- Select a Method --")) + $dmmethod),
-						"helpstep" => $helpstepnum
-);
-$formdata["timezone"] = array(
-						"label" => _L('Time zone'),
-						"value" => $settings['timezone'],
-						"validators" => array(
-							array("ValRequired"),
-							array("ValInArray", "values" => $timezones)
-						),
-						"control" => array("SelectMenu", "values" => array_merge(array("" =>_L("-- Select a Timezone --")),array_combine($timezones,$timezones))),
-						"helpstep" => $helpstepnum
-);
-
-$formdata["displayname"] = array(
-						"label" => _L('Display Name'),
-						"value" => $settings['displayname'],
-						"validators" => array(
-							array("ValRequired"),
-							array("ValLength","min" => 3,"max" => 50)
-						),
-						"control" => array("TextField","size" => 30, "maxlength" => 51),
-						"helpstep" => $helpstepnum
-					);
-
-$formdata["organizationfieldname"] = array(
-						"label" => _L("'Organization' Display Name"),
-						"value" => $settings['organizationfieldname'],
-						"validators" => array(
-							array("ValLength","min" => 3,"max" => 50)
-						),
-						"control" => array("TextField","size" => 30, "maxlength" => 51),
-						"helpstep" => $helpstepnum
-);
-
-$formdata["urlcomponent"] =	array(
-						"label" => _L('URL Path'),
-						"value" => $settings['urlcomponent'],
-						"validators" => array(
-							array("ValRequired"),
-							array("ValLength","max" => 30),
-							array("ValUrlComponent", "customerid" => $customerid, "urlcomponent" => $settings['urlcomponent'])
-						),
-						"control" => array("TextField","size" => 30, "maxlength" => 51),
-						"helpstep" => $helpstepnum
-					);
-
-$formdata["logo"] = array(
-						"label" => _L('Logo'),
-						"value" => ($customerid && $settings['_logocontentid'] != '')?"Saved":'',
-						"validators" => array(
-							array("ValRequired"),
-							array("ValInArray", "values" => array_keys($logos))
-							),
-						"control" => array("LogoRadioButton", "values" => $logos),
-						"helpstep" => $helpstepnum
-					);
-$formdata["logoclickurl"] = array(
-						"label" => _L('Logo Click URL'),
-						"value" => $settings['_logoclickurl'],
-						"validators" => array(
-							array("ValRequired"),
-							array("ValUrl"),
-							array("ValLength","min" => 3,"max" => 50)
-						),
-						"control" => array("TextField","size" => 30, "maxlength" => 51),
-						"helpstep" => $helpstepnum
-);
-$formdata["productname"] = array(
-						"label" => _L('Brand'),
-						"value" => $settings['_productname'],
-						"validators" => array(
-							array("ValRequired"),
-							array("ValLength","min" => 3,"max" => 50)
-						),
-						"control" => array("TextField","size" => 30, "maxlength" => 51),
-						"helpstep" => $helpstepnum
-					);
-
-$formdata["supportemail"] = array(
-						"label" => _L('Support Email'),
-						"value" => $settings['_supportemail'],
-						"validators" => array(
-							array("ValRequired"),
-							array("ValLength","max" => 255),
-							array("ValEmail")
-						),
-						"control" => array("TextField","maxlength"=>255,"min"=>3,"size"=>35),
-						"helpstep" => $helpstepnum
-);
-$formdata["supportphone"] = array(
-						"label" => _L('Support Phone'),
-						"value" => $settings['_supportphone'],
-						"validators" => array(
-							array("ValRequired"),
-							array("ValPhone")
-						),
-						"control" => array("TextField","size" => 15, "maxlength" => 20),
-						"helpstep" => $helpstepnum
-);
-
-$formdata["callerid"] = array(
-						"label" => _L('Default Caller ID'),
-						"value" => $settings['callerid'],
-						"validators" => array(
-							array("ValRequired"),
-							array("ValPhone")
-						),
-						"control" => array("TextField","size" => 15, "maxlength" => 20),
-						"helpstep" => $helpstepnum
-);
-
-$formdata["defaultareacode"] = array(
-						"label" => _L('Default Area Code'),
-						"value" => $settings['defaultareacode'],
-						"validators" => array(
-							array('ValNumber')
-						),
-						"control" => array("TextField","size" => 3, "maxlength" => 3),
-						"helpstep" => $helpstepnum
-);
+include("inc/customerRequiredFormItems.inc.php");
 
 $availablenumbers = QuickQueryList("select phone from tollfreenumbers");
 $tollfreenumbers = array();
@@ -803,15 +422,6 @@ $formdata["harddeletemonths"] = array(
 							array("ValInArray", "values" => array_keys($autoreportexpire))
 						),
 						"control" => array("SelectMenu", "values" => $autoreportexpire),
-						"helpstep" => $helpstepnum
-);
-
-
-$formdata["notes"] = array(
-						"label" => _L('Notes'),
-						"value" => isset($custinfo)?$custinfo["notes"]:"",
-						"validators" => array(),
-						"control" => array("TextArea", "rows" => 3, "cols" => 100),
 						"helpstep" => $helpstepnum
 );
 
@@ -1000,15 +610,6 @@ $formdata["amdtype"] = array(
 						"control" => array("SelectMenu", "values" => $amdtypes),
 						"helpstep" => $helpstepnum
 );
-$formdata["nsid"] = array(
-						"label" => _L('NetSuite ID'),
-						"value" => isset($custinfo)?$custinfo["nsid"]:"",
-						"validators" => array(
-							array("ValLength","max" => 50)
-						),
-						"control" => array("TextField","maxlength"=>50,"size"=>4),
-						"helpstep" => $helpstepnum
-);
 
 $formdata["renewaldate"] = array(
 						"label" => _L('Renewal Date'),
@@ -1094,9 +695,11 @@ $formdata["brandtheme"] = array(
 );
 
 
+$thispage = "customeredit.php";
+$returntopage = isset($_SESSION["newnav"])?"commsuitecustomers.php":"customers.php";
 
 $buttons = array(submit_button(_L("Save"),"save","tick"),submit_button(_L("Save and Return"),"done","tick"),
-				icon_button(_L('Cancel'),"cross",null,"customers.php"));
+				icon_button(_L('Cancel'),"cross",null,$returntopage));
 $form = new Form("newcustomer",$formdata,null,$buttons);
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data Handling
@@ -1123,100 +726,31 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$customerid = $_SESSION['customerid'];
 		}
 		
-		$query = "update customer set
-								urlcomponent = ?,
-								inboundnumber = ?,
-								enabled=?,
-								oem=?,
-								oemid=?,
-								nsid=?,
-								notes=?
-								where id = ?";
-				
+		saveRequiredFields($custdb,$customerid,$postdata);
+		
+		
+		$query = "update customer set (inboundnumber,oem,oemid) values (?,?,?)		where id = ?";
+		
 		QuickUpdate($query,false,array(
-			$postdata["urlcomponent"],
-			$postdata["inboundnumber"],
-			$postdata["enabled"]?'1':'0',
-			$postdata["oem"],
-			$postdata["oemid"],
-			$postdata["nsid"],
-			$postdata["notes"],
-			$customerid
+				$postdata["inboundnumber"],
+				$postdata["oem"],
+				$postdata["oemid"],
+				$customerid
 		));
-		
-		// notify authserver to refresh the customer cache
-		refreshCustomer($customerid);
-		
-		$shardinfo = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword from shard s inner join customer c on (c.shardid = s.id) where c.id = ?", true,false,array($customerid));
-		$sharddb = DBConnect($shardinfo["dbhost"], $shardinfo["dbusername"], $shardinfo["dbpassword"], "aspshard");
-		if(!$sharddb) {
-			exit("Connection failed for customer: $customerid, shardhost: {$shardinfo["dbhost"]}");
-		}
-		
-		// if timezone changed (rare occurance, but we must update scheduled jobs and report records on the shard database)
-		if ($postdata["timezone"] != getCustomerSystemSetting('timezone', false, true, $custdb)) {
-			QuickUpdate("update qjob set timezone=? where customerid=?", $sharddb, array($postdata["timezone"],$customerid));
-			QuickUpdate("update qschedule set timezone=? where customerid=?", $sharddb,array($postdata["timezone"],$customerid));
-			QuickUpdate("update qreportsubscription set timezone=? where customerid=?", $sharddb,array($postdata["timezone"],$customerid));
-		}
-		
-		if (!$postdata["enabled"]) {
-			setCustomerSystemSetting("disablerepeat", "1", $custdb);
-			setCustomerSystemSetting("_customerenabled", "0", $custdb);
-			// Remove active import alerts but leave the alert rules since they will not trigger for disabled customers
-			QuickUpdate("delete from importalert where customerid=?", $sharddb, array($customerid));
-		} else {
-			setCustomerSystemSetting("_customerenabled", "1", $custdb);
-		}
-		
-		
-		if(getCustomerSystemSetting('_dmmethod', '', true, $custdb)!='asp' && $postdata["dmmethod"] == 'asp'){
-			$aspquery = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword from customer c inner join shard s on (c.shardid = s.id) where c.id = '$customerid'");
-			$aspsharddb = DBConnect($aspquery[0], $aspquery[1], $aspquery[2], "aspshard");
-			QuickUpdate("delete from specialtaskqueue where customerid = " . $customerid, $aspsharddb);
-			QuickUpdate("update qjob set dispatchtype = 'system' where customerid = " . $customerid . " and status = 'active'", $aspsharddb);
-		}
-		setCustomerSystemSetting('_dmmethod', $postdata["dmmethod"], $custdb);
-		setCustomerSystemSetting('timezone', $postdata["timezone"], $custdb);
-		setCustomerSystemSetting('displayname', $postdata["displayname"], $custdb);
-		setCustomerSystemSetting('organizationfieldname', $postdata['organizationfieldname'], $custdb);
-		
-		setCustomerSystemSetting('urlcomponent', $postdata["urlcomponent"], $custdb);
-		setCustomerSystemSetting('surveyurl', $SETTINGS['feature']['customer_url_prefix'] . "/" . $postdata["urlcomponent"] . "/survey/", $custdb);
-		
-		// Logo Picture
-		$logo = $postdata["logo"];
-		if (isset($defaultlogos[$logo])) {
-			$logofile = @file_get_contents($defaultlogos[$logo]['filelocation']);
-			if($logofile) {
-				$query = "INSERT INTO `content` (`contenttype`, `data`) VALUES
-										('" . $defaultlogos[$logo]["filetype"] . "', '" . base64_encode($logofile) . "');";
-				QuickUpdate($query, $custdb);
-				$logocontentid = $custdb->lastInsertId();
-				setCustomerSystemSetting('_logocontentid', $logocontentid, $custdb);			
-			}
-		}
-
-		setCustomerSystemSetting('_logoclickurl', $postdata["logoclickurl"], $custdb);
-		setCustomerSystemSetting('_productname',  $postdata["productname"],$custdb);
-		setCustomerSystemSetting('_supportemail', $postdata["supportemail"], $custdb);
-		setCustomerSystemSetting('_supportphone', Phone::parse($postdata["supportphone"]), $custdb);
-		setCustomerSystemSetting('callerid', Phone::parse($postdata["callerid"]), $custdb);
-		setCustomerSystemSetting('defaultareacode', $postdata["defaultareacode"], $custdb);
 		
 		// if inbound changed
 		if ($postdata["inboundnumber"] != $settings['inboundnumber']){
-			// Remove phone from available toll free Numbers			
+			// Remove phone from available toll free Numbers
 			if ($postdata["inboundnumber"] != "") {
 				QuickUpdate("delete from tollfreenumbers where phone=?",false,array($postdata["inboundnumber"]));
-			} 
+			}
 			// Put back unused phone to available toll free Numbers
 			if ($settings["inboundnumber"] != "") {
 				QuickUpdate("insert into tollfreenumbers (phone) values (?)",false,array($settings['inboundnumber']));
 			}
 			setCustomerSystemSetting("inboundnumber", $postdata["inboundnumber"], $custdb);
 		}
-
+		
 		setCustomerSystemSetting('maxguardians', $postdata["maxguardians"], $custdb);
 		
 		update_jobtypeprefs(1, $postdata["maxphones"], "phone", $custdb);
@@ -1327,14 +861,14 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		Query("COMMIT");
 		if($button == "done") {
 			if ($ajax)
-				$form->sendTo("customers.php");
+				$form->sendTo($returntopage);
 			else
-				redirect("customers.php");
+				redirect($returntopage);
 		} else {
 			if ($ajax)
-				$form->sendTo("customeredit.php");
+				$form->sendTo($thispage);
 			else
-				redirect("customeredit.php");
+				redirect($thispage);
 		}
 	}
 }
@@ -1348,6 +882,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $TITLE = $customerid?_L('Edit Customer'):_L('New Customer');
+$PAGE = "commsuite:customers";
 
 include_once("nav.inc.php");
 
@@ -1355,8 +890,6 @@ include_once("nav.inc.php");
 ?>
 
 <script type="text/javascript">
-
-
 
 document.observe('dom:loaded', function() {
 	$('newcustomer_logo').observe("change", function (event) {
