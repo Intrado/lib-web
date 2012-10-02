@@ -267,6 +267,8 @@ $filterFormatters = array("status" => "fmt_dmstatus_nohtml",4 => "fmt_state");
 /////////////////////////////
 // Display
 /////////////////////////////
+$TITLE = _L("System&nbsp;DMs");
+$PAGE = "commsuite:systemdms";
 
 include_once("nav.inc.php");
 

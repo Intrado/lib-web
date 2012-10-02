@@ -112,6 +112,7 @@ function fmt_play_activejobs($row, $index){
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $TITLE = _L('Customer Jobs');
+$PAGE = "commsuite:activejobs";
 
 include_once("nav.inc.php");
 

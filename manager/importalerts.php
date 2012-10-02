@@ -142,6 +142,8 @@ function fmt_actions($row, $index){
 /////////////////////////////
 // Display
 /////////////////////////////
+$TITLE = _L("Import Alerts");
+$PAGE = "commsuite:importalerts";
 
 include("nav.inc.php");
 

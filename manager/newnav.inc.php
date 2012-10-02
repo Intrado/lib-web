@@ -5,22 +5,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 
-// Temporary page mapping until it makes it into each page
-$PAGELOOKUP = array(
-	"customers.php" => array("title" => "Commsuite&nbsp;Customers","page" => "commsuite:customers"),
-	"importalerts.php" => array("title" => "Import&nbsp;Alerts","page" => "commsuite:importalerts"),
-	"customeractivejobs.php" => array("title" => "Active&nbsp;Jobs","page" => "commsuite:activejobs"),
-	"lockedusers.php" => array("title" => "Locked&nbsp;Users","page" => "commsuite:lockedusers"),
-	"customerdms.php" => array("title" => "SmartCall","page" => "commsuite:customerdms"),
-	"systemdms.php" => array("title" => "System&nbsp;DMs","page" => "commsuite:systemdms"),
-	"users.php" => array("title" => "Users","page" => "admin:users"),
-	"diskagents.php" => array("title" => "SwiftSync","page" => "tools:swiftsync")
-);
 $currentpage = substr($_SERVER["SCRIPT_NAME"],strrpos($_SERVER["SCRIPT_NAME"],"/")+1);
-if(isset($PAGELOOKUP[$currentpage])) {
-	$TITLE = $PAGELOOKUP[$currentpage]["title"];
-	$PAGE = $PAGELOOKUP[$currentpage]["page"];
-}
 
 $COLORSCHEMES = array(
 	"forest" => array("displayname" => "Forest",

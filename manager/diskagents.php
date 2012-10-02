@@ -264,6 +264,8 @@ $formatters = array(2 => "fmt_customerUrls",
 /////////////////////////////
 // Display
 /////////////////////////////
+$TITLE = _L("SwiftSync");
+$PAGE = "tools:swiftsync";
 
 include_once("nav.inc.php");
 

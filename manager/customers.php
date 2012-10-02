@@ -310,6 +310,8 @@ $formatters = array("0" => "fmt_custid",
 		"16" => "fmt_hasdm");
 
 $lockedTitles = array(0, "status", "actions");
+$TITLE = _L("Commsuite Customers");
+$PAGE = "commsuite:customers";
 
 include_once("nav.inc.php");
 ?>
