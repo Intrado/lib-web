@@ -1,4 +1,5 @@
 <?
+// NOTE deprecated, please use NotificationType as of ASP_9-3 release
 class JobType extends DBMappedObject {
 
 	var $name;
