@@ -374,7 +374,7 @@ table.info thead:first-child tr:first-child th:first-child, .table-bordered tbod
 table.info th { background: #eee; font-weight: bold; vertical-align: bottom; line-height: 22px; padding: 8px; text-align: left; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; }
 table.info a.remove { background: url(themes/newui/removelist.png) left 0 no-repeat; display: inline-block; width: 18px; height: 18px; vertical-align: middle; }
 table.info a.remove:hover { background: url(themes/newui/removelist.png) left -22px no-repeat; display: inline-block; width: 18px; height: 18px; vertical-align: middle; }
-table.info td { border-bottom: 1px solid #ddd; }
+table.info td { padding: 4px; border-bottom: 1px solid #ddd; }
 table.info th:first-child {text-align: right;}
 table.jobprogress th:first-child {text-align: left;}
 table.info td:first-child { width: 100px; text-align: right;}
