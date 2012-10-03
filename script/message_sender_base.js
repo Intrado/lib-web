@@ -322,6 +322,7 @@ jQuery.noConflict();
 
 				function phonePaste(from) {
 
+					$('#paste_from_tts').off('click');
 					$('#paste_from_tts').on('click', function(e) {
 						e.preventDefault();
 
@@ -349,15 +350,15 @@ jQuery.noConflict();
 				}
 
 				if ( $('#msgsndr_phonemessagetype').val() == 'text' && $('#msgsndr_tts_message').val() != '' ) {
-					$('#paste_from_tts').removeAttr('disabled','disabled');
+					$('#paste_from_tts').removeAttr('disabled');
 					phonePaste('#msgsndr_tts_message');
 
 				} else if ( $('#msgsndr_phonemessagetype').val() == 'callme' && $('#msgsndr_form_scratch').val() != '' ) {
-					$('#paste_from_tts').removeAttr('disabled','disabled');
+					$('#paste_from_tts').removeAttr('disabled');
 					phonePaste('#msgsndr_form_scratch');
 
 				} else {
-					$('#paste_from_tts').attr('disabled','disabled');
+					$('#paste_from_tts').attr('disabled','disbaled');
 				}
 
 				$('#msgsndr_emailmessagefromname').val(userInfo.firstName + ' ' + userInfo.lastName);
