@@ -279,15 +279,11 @@ function handleRequest() {
 				}
 			// if it's an organization field
 			} else if ($fieldnum == 'organization') {
-				class OrgDto {
-					var $id;
-					var $name;
-				}
 				$orgsassisiative = Organization::getAuthorizedOrgKeys();
 				$orgobjectarray = array();
 				foreach($orgsassisiative as $id => $name) {
-					$o = new OrgDto();
-					$o->id = $id;
+					$o = new ValueNamePairDto();
+					$o->value = $id;
 					$o->name = $name;
 					$orgobjectarray[] = $o;
 				}
