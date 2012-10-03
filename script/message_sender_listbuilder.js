@@ -666,8 +666,8 @@
                         }).done(function(orgsData){
                             if (orgsData) {
                                 modal.orgs = {};
-                                $.each(orgsData, function(id, name){
-                                    modal.orgs[id] = {name: name};
+                                $.each(orgsData, function(organization){
+                                    modal.orgs[organization.id] = organization;
                                 });
                                 modal.buildSelect();
                             } else {
@@ -686,8 +686,8 @@
                 // Build the School picker
                 modal.buildSelect = function(){
                     var options = '';
-                    $.each(modal.orgs, function(orgId, orgData){
-                        options = options + '<option value="' + orgId + '">' + orgData.name + '</option>';
+                    $.each(modal.orgs, function(orgData){
+                        options = options + '<option value="' + orgData.id + '">' + orgData.name + '</option>';
                     });
                     $orgSelect.html('<option value="">Select a School</option>' + options);
                 };

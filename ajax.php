@@ -271,7 +271,19 @@ function handleRequest() {
 				}
 			// if it's an organization field
 			} else if ($fieldnum == 'organization') {
-				return Organization::getAuthorizedOrgKeys();
+				class OrgDto {
+					var $id;
+					var $name;
+				}
+				$orgsassisiative = Organization::getAuthorizedOrgKeys();
+				$orgobjectarray = array();
+				foreach($orgsassisiative as $id => $name) {
+					$o = new OrgDto();
+					$o->id = $id;
+					$o->name = $name;
+					$orgobjectarray[] = $o;
+				}
+				return $orgobjectarray;
 			} else { // Unknown fieldnum, return false.
 				return false;
 			}
