@@ -116,7 +116,7 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 /*.newform .formcontrol input[type="password"] { width: 250px; padding: 4px 5px; font-size: 13px; line-height: 21px; border: 1px solid #E7E7E7; overflow: hidden; 
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }*/
 .newform .formcontrol input[type="radio"] { margin: 0 5px 5px 0; }
-.newform .formcontrol textarea { min-width: 425px; margin: 0 0 5px 0; padding: 4px 5px; border: 1px solid #E7E7E7; 
+.newform .formcontrol textarea { margin: 0 0 5px 0; padding: 4px 5px; border: 1px solid #E7E7E7; 
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
 .newform .formcontrol input#account_brandthemecustomize { float: left; display: inline; }
@@ -397,7 +397,7 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 
 .phone .audiocontainer { float: left; display: inline; padding: 10px 0 0; }
 
-.phone .fieldscontainer { float: left; display: inline; width: 200px; }
+.phone .fieldscontainer { float: left; display: inline; width: 180px; }
 
 .voice_recording { margin: 0 0 10px; padding: 0 0 10px; border-bottom: 1px dashed #ccc; }
 .voice_recording input[type="text"] { margin: 0 10px 0 0; }
@@ -439,7 +439,7 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 				.reqd_field 			{ background: rgb(255,255,220); } /* add this to the same element as form_row */
 				
 				.valid_true 	{ background: rgb(255,255,255); }
-				.valid_false 	{ background: rgb(255,200,200;) }
+				.valid_false 	{ background: rgb(255,200,200); }
 				
 	.form_col.custom_btn_image img { padding-top: 20px; }
 
