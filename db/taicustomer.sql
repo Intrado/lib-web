@@ -200,7 +200,7 @@ $$$
 
 -- Default Topics 
 INSERT INTO tai_topic (`name`) VALUES 
-('Abuse'),('Alcohol'),('Bullying'),('Bus Concerns'),('Cheating on Schoolwork'),('Cutting/Self-Injury'),('Cyber Bullying'),('Dating Violence'),('Depression'),('Discrimination'),('Dropping Out'),('Drugs'),('Eating Disorder'),('Family Problems'),('Fighting'),('Gangs'),('Health Issues'),('Peer Pressure'),('Pregnancy'),('Run Away'),('School Closing'),('Sexual Harassment'),('Smoking'),('Stealing/Theft'),('Stress'),('Suicide'),('Thank You/Compliment'),('Vandalism'),('Violence'),('Weapons')
+('Abuse'),('Alcohol'),('Body Image'),('Bullying'),('Cheating in School'),('Cutting/Self-Injury'),('Cyber Bullying'),('Dating Violence'),('Depression'),('Discrimination'),('Drugs'),('Eating Disorder'),('Family Problems'),('Fighting'),('Hazing'),('Health Problems'),('Peer Pressure'),('Pregnancy'),('Schoolwork Concerns'),('Sexual Harassment'),('Smoking'),('Stealing'),('Stress'),('Student/Teacher Relationship'),('Suicide'),('Threats'),('Vandalism'),('Weapons')
 $$$
 
 -- NOTE Version unchanged (0.1/11). Default topics only inserted in taicustomer and not in tai upgrade
