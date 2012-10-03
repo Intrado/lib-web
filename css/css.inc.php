@@ -258,6 +258,9 @@ table.window_body { width: 100%; }
 .feedfilter li { line-height: 20px; padding-top: 5px; }
 .feedfilter li a img { margin-top: -5px; margin-right: 5px; }
 
+.caller_id { float: left; display: inline; width: 70.5%; }
+.approved_id { float: left; display: inline; width: 28.5%; margin: 0 0 0 1%; }
+
 
 /*----- Buttons, for buttons within the windows and tables, further styling is in the specific theme file for each theme -----*/
    
