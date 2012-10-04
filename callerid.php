@@ -268,12 +268,12 @@ include_once("nav.inc.php");
 </script>
 <?
 buttons(icon_button("Done", "tick",false,"jobsettings.php","style='margin-bottom:6px'"));
-echo '<div style="width:65%;float:left;">';
+echo '<div class="caller_id">';
 startWindow(_L('Caller ID Management'));
 echo $form->render();
 endWindow();
 
-echo '</div><div style="width:300px;float:left;">';
+echo '</div><div class="approved_id">';
 $numbervalues = array();
 foreach ($numbers as $number => $value) {
 	$numbervalues[] = array($number);
