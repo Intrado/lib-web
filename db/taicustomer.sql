@@ -215,3 +215,17 @@ update setting set value='1.2/1' where name='_dbtaiversion'
 $$$
 
 -- END 1.2/1
+
+-- $rev 2
+INSERT INTO tai_topic (`name`) VALUES ('SMS Messages')
+$$$
+
+INSERT INTO setting (`name`,`value`) VALUES ('smsinboundtopicname','SMS Messages');
+$$$
+
+INSERT INTO `notificationtype` (`name`, `systempriority`, `info`, `deleted`, `type`) VALUES ('Topic Notifications', '3', 'Topic Notifications', '0', 'messaging');
+$$$
+
+update setting set value='1.2/2' where name='_dbtaiversion'
+$$$
+-- END 1.2/2

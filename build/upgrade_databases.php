@@ -54,7 +54,7 @@ $versions = array (
 	
 	"tai" => array (
 		"0.1/11",
-		"1.2/1"
+		"1.2/2"
 		//etc
 	)
 	
