@@ -21,7 +21,10 @@ $_SESSION['colorscheme']['_brandratio'] = ".2";
 $_SESSION['colorscheme']['_brandtheme1'] = $COLORSCHEMES["forest"]["_brandtheme1"];
 $_SESSION['colorscheme']['_brandtheme2'] = $COLORSCHEMES["forest"]["_brandtheme2"];
 
-
+if (!isset($TITLE))
+	$TITLE = "TODO: No Title";
+if (!isset($PAGE))
+	$PAGE = "nopage";
 $PAGETITLE = preg_replace('/\\<.+>/','',$TITLE);
 
 list($MAINTAB,$SUBTAB) = explode(":",$PAGE);
@@ -60,7 +63,8 @@ $NAVTREE = array (
 
 	)),
 	array("Tools",NULL,NULL,$MAINTAB=="tools",array(
-	array("SwiftSync","diskagents.php",NULL,$SUBTAB=="swiftsync")
+	array("SwiftSync","diskagents.php",NULL,$SUBTAB=="swiftsync"),
+	array("Queries","querylist.php",array("runqueries","editqueries"),$SUBTAB=="queries")
 	)),
 	array("Admin","users.php","superuser",$MAINTAB=="admin",array(
 	array("Users","users.php","superuser",$SUBTAB=="users")
