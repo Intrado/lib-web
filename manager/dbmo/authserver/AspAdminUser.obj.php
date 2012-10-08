@@ -24,11 +24,35 @@ class AspAdminUser extends DBMappedObject{
 		DBMappedObject::DBMappedObject($id);
 	}
 	
-	function authorized($auth) {
+	// Example: authorize('sendemail', 'sendphone') returns true only if user has both permissions.
+	// Example: authorize(array('sendemail', 'sendphone')) returns true if user has either permission.
+	function authorized() {
 		if ($this->permsarray === false)
 			$this->permsarray = explode(",",$this->permissions);
-		return in_array($auth,$this->permsarray) ? true : false;
+		
+		$features = func_get_args();
+		if(isset($this->permsarray)) {
+			foreach($features as $feature) {
+				if(is_array($feature)) {
+					$any = false;
+					foreach($feature as $or) {
+						if(in_array($or,$this->permsarray)) {
+							$any = true;
+							break;
+						}
+					}
+					if(!$any)
+						return false;
+				}
+				elseif(!in_array($feature,$this->permsarray)) {
+					return false;
+				}
+			}
+			return true;
+		}
+		return false;
 	}
+	
 	function authorizedAny($auths) {
 		if ($this->permsarray === false)
 			$this->permsarray = explode(",",$this->permissions);
