@@ -258,7 +258,7 @@ startWindow("Confirmation &amp; Submit");
 ?>
 					<tr>
 						<td class="bottomBorder" >Leave Message</td>
-						<td class="bottomBorder" ><input type="checkbox" disabled <?= $questionnaire->leavemessage ? "checked":"" ?>></td>
+						<td class="bottomBorder" ><input type="checkbox" disabled <?= $questionnaire->machinemessageid!=null ? "checked":"" ?>></td>
 					</tr>
 <?
 				}
