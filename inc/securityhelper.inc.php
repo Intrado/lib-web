@@ -101,7 +101,8 @@ function userCanSee ($type,$id) {
 					return true;
 				}
 			}
-			return false;
+			$hasUserLink = QuickQuery("select 1 from userlink ul where ul.userid = ? and ul.subordinateuserid=?",false,array($USER->id,$job->userid));
+			return $hasUserLink!=null;
 		default:
 			return false;
 	}
