@@ -401,7 +401,7 @@ include("nav.inc.php");
 					break;
 				default:
 					if (isset($useridList[$requestValues["showactivity"]])) {
-						echo _L("%s haven't sent any %s.",$useridList[$requestValues["showactivity"]], getJobsTitle());
+						echo _L("%s hasn't sent any %s.",$useridList[$requestValues["showactivity"]], getJobsTitle());
 					} else {
 						echo _L("No %s have been sent.",getJobsTitle()) . ' <a href="message_sender.php?new">' . _L("Create a %s",getJobTitle() ) . '</a>';
 					}
