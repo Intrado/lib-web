@@ -445,9 +445,6 @@ include("nav.inc.php");
 
 
 <script type="text/javascript">
-<?
-$who = isset($_GET["showactivity"])?$_GET["showactivity"]:"me";
-?>
 var jobloads = 3;
 
 function updateTableTools(section, action, override, start, limit, count){
@@ -498,7 +495,7 @@ function updateTableTools(section, action, override, start, limit, count){
 		}
 		
 		$("more" + section).update(new Element("a",{href: "#", 
-			onclick: "ajax_obj_table_update('" + section + "','ajaxjob.php?action=" + action + "&who=<?=$who?>&start=" + start + "&limit=" + limit + "'," + override + ",updateTableTools.curry('" + section + "','" + action + "'," + override + "," + start + "," + limit + ")); return false;"
+			onclick: "ajax_obj_table_update('" + section + "','ajaxjob.php?action=" + action + "&who=<?=$requestValues["showactivity"]?>&start=" + start + "&limit=" + limit + "'," + override + ",updateTableTools.curry('" + section + "','" + action + "'," + override + "," + start + "," + limit + ")); return false;"
 			}).insert("<?= _L("Show More")?>"));
 	} else {
 		$("more" + section).update("");
@@ -507,9 +504,9 @@ function updateTableTools(section, action, override, start, limit, count){
 
 document.observe('dom:loaded', function() {
 	$("nocontenthelper").hide();
-	ajax_obj_table_update('activejobs','ajaxjob.php?action=activejobs&who=<?=$who?>&start=0&limit=10',true,updateTableTools.curry("activejobs","activejobs",true,0,10));
-	ajax_obj_table_update('scheduledjobs','ajaxjob.php?action=scheduledjobs&who=<?=$who?>&start=0&limit=10',false,updateTableTools.curry("scheduledjobs","scheduledjobs",false,0,10));
-	ajax_obj_table_update('completedjobs','ajaxjob.php?action=completedjobs&who=<?=$who?>&start=0&limit=5',false,updateTableTools.curry("completedjobs","completedjobs",false,0,5));
+	ajax_obj_table_update('activejobs','ajaxjob.php?action=activejobs&who=<?=$requestValues["showactivity"]?>&start=0&limit=10',true,updateTableTools.curry("activejobs","activejobs",true,0,10));
+	ajax_obj_table_update('scheduledjobs','ajaxjob.php?action=scheduledjobs&who=<?=$requestValues["showactivity"]?>&start=0&limit=10',false,updateTableTools.curry("scheduledjobs","scheduledjobs",false,0,10));
+	ajax_obj_table_update('completedjobs','ajaxjob.php?action=completedjobs&who=<?=$requestValues["showactivity"]?>&start=0&limit=5',false,updateTableTools.curry("completedjobs","completedjobs",false,0,5));
 });
 
 </script>
