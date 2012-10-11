@@ -391,7 +391,23 @@ include("nav.inc.php");
 			</div>
 			
 			<div id="nocontenthelper" class="nocontent">
-				<?= _L("You haven't sent any %s.",getJobsTitle())?> <a href="message_sender.php?new"><?=_L("Create a %s",getJobTitle() )?></a>
+			<?  
+			Switch($requestValues["showactivity"]) {
+				case "me":
+					echo _L("You haven't sent any %s.",getJobsTitle()) . ' <a href="message_sender.php?new">' . _L("Create a %s",getJobTitle() ) . '</a>';
+					break;
+				case "everyone":
+					echo _L("No %s have been sent.",getJobsTitle()) . ' <a href="message_sender.php?new">' . _L("Create a %s",getJobTitle() ) . '</a>';
+					break;
+				default:
+					if (isset($useridList[$requestValues["showactivity"]])) {
+						echo _L("%s haven't sent any %s.",$useridList[$requestValues["showactivity"]], getJobsTitle());
+					} else {
+						echo _L("No %s have been sent.",getJobsTitle()) . ' <a href="message_sender.php?new">' . _L("Create a %s",getJobTitle() ) . '</a>';
+					}
+					break;
+			} 
+			?>
 			</div>
 			</div><!-- /window_body_wrap -->
 		</div>
