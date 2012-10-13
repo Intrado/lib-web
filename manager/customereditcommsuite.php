@@ -1197,11 +1197,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 													('Spanish','es')";
 			QuickUpdate($query, $custdb) or dieWithError("SQL:" . $query, $custdb);
 			
-			$query = "INSERT INTO `jobtype` (`name`, `systempriority`, `info`, `issurvey`, `deleted`) VALUES
-										('Emergency', 1, 'Emergencies Only', 0, 0),
-										('Attendance', 2, 'Attendance', 0, 0),
-										('General', 3, 'General Announcements', 0, 0),
-										('Survey', 3, 'Surveys', 1, 0)";
+			$query = "INSERT INTO `notificationtype` (`name`, `systempriority`, `info`, `deleted`, `type`) VALUES
+											('Emergency', 1, 'Emergencies Only', 0, 'job'),
+											('Attendance', 2, 'Attendance', 0, 'job'),
+											('General', 3, 'General Announcements', 0, 'job'),
+											('Survey', 3, 'Surveys', 0, 'survey')";
 			
 			QuickUpdate($query, $custdb) or dieWithError(" SQL:" . $query, $custdb);
 			

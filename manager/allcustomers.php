@@ -199,7 +199,7 @@ include_once("nav.inc.php");
 
 ?>
 <div class="csec secbutton">
-	<?= icon_button("Add Customer", "add",null,"customereditgeneral.php?id=new") ?>
+	<?//= icon_button("Add Customer", "add",null,"customereditgeneral.php?id=new") ?>
 </div><!-- .csec .secbutton -->
 <div class="csec secwindow"><!-- contains recent activity -->
 

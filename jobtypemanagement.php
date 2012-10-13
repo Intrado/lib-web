@@ -8,7 +8,7 @@ include_once("inc/table.inc.php");
 include_once("inc/html.inc.php");
 include_once("inc/utils.inc.php");
 include_once("inc/form.inc.php");
-include_once("obj/JobType.obj.php");
+include_once("obj/NotificationType.obj.php");
 include_once("obj/Setting.obj.php");
 include_once("obj/Phone.obj.php");
 
@@ -22,9 +22,9 @@ $systemprioritynames = array("1" => "Emergency",
 							"3" => "General");
 
 foreach($systemprioritynames as $index => $name){
-	$types[$index] = DBFindMany('JobType', "from jobtype where deleted=0 and systempriority = '" . $index . "' and not issurvey order by name");
+	$types[$index] = DBFindMany('NotificationType', "from notificationtype where deleted=0 and systempriority = '" . $index . "' and type = 'job' order by name");
 }
-$surveytypes = getSystemSetting('_hassurvey', true) ? DBFindMany('JobType', "from jobtype where deleted=0 and systempriority = '3' and issurvey order by name") : array();
+$surveytypes = getSystemSetting('_hassurvey', true) ? DBFindMany('NotificationType', "from notificationtype where deleted=0 and systempriority = '3' and type = 'survey' order by name") : array();
 $maxphones = getSystemSetting("maxphones", 3);
 $maxemails = getSystemSetting("maxemails", 2);
 $maxsms = getSystemSetting("maxsms", 2);
@@ -65,7 +65,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "add") || CheckFormSubmit($f, "
 		if( CheckFormSection($f, $s) )
 		{
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else if(QuickQuery("select count(*) from jobtype where id != '" . DBSafe(CheckFormSubmit($f, "delete")) . "' and issurvey and not deleted") < 1){
+		} else if(QuickQuery("select count(*) from notificationtype where id != '" . DBSafe(CheckFormSubmit($f, "delete")) . "' and type = 'survey' and not deleted") < 1){
 			error(_L("You must have at least one survey %s type",getJobTitle()));
 		} else if(QuickQuery("select count(*) from userjobtypes where jobtypeid = '" . DBSafe(CheckFormSubmit($f, 'delete')) . "'")){
 			error(_L("A user is still restricted to that %s type",getJobTitle()), _L("Please remove the restriction if you would like to delete that job type",getJobTitle()));
@@ -237,7 +237,7 @@ function putJobtypeForm($f, $s, $type, $maxphones, $maxemails, $maxsms, $jobtype
 		PutFormData($f, $s, "jobtype" . $type->id . "email" . $i, isset($jobtypeprefs[$type->id]["email"][$i]) ? $jobtypeprefs[$type->id]["email"][$i] : 0, "bool", 0, 1);
 	}
 	if(getSystemSetting("_hassms")){
-		if(!$type->issurvey){
+		if($type->type == 'job'){
 			for($i=0; $i<$maxsms; $i++){
 				PutFormData($f, $s, "jobtype" . $type->id . "sms" . $i, isset($jobtypeprefs[$type->id]["sms"][$i]) ? $jobtypeprefs[$type->id]["sms"][$i] :0 , "bool", 0, 1);
 			}
@@ -264,7 +264,7 @@ function getJobtypeForm($f, $s, $type, $maxphones, $maxemails, $maxsms){
 					. DBSafe(GetFormData($f, $s, "jobtype" . $type->id . "email" . $i)) . "')";
 	}
 	if(getSystemSetting("_hassms")){
-		if(!$type->issurvey){
+		if($type->type == 'job'){
 			for($i=0; $i<$maxsms; $i++){
 				$values[] = "('" . $type->id . "','sms','" . $i . "','"
 							. DBSafe(GetFormData($f, $s, "jobtype" . $type->id . "sms" . $i)) . "')";
@@ -283,7 +283,7 @@ function displayJobtypeForm($f, $s, $jobtypeid, $maxphones, $maxemails, $maxsms)
 		<td class="bottomBorder" >
 			<?
 				if($jobtypeid+0){
-					$type = new JobType($jobtypeid);
+					$type = new NotificationType($jobtypeid);
 				}
 				if(isset($type) && $type->systempriority == 1)
 					echo $type->name;
@@ -336,7 +336,7 @@ function displayJobtypeForm($f, $s, $jobtypeid, $maxphones, $maxemails, $maxsms)
 				</tr>
 <?
 				if(getSystemSetting("_hassms")){
-					if(!((isset($type) && $type->issurvey) || $jobtypeid == "_newsurvey_")){
+					if(!((isset($type) && $type->type == 'survey') || $jobtypeid == "_newsurvey_")){
 ?>
 					<tr>
 						<th class="bottomBorder">SMS</th>

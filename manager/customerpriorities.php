@@ -25,7 +25,7 @@ if (isset($_GET['delete'])) {
 	
 	$hasmorejobtypes = 1 < QuickQuery("select count(*) from jobtype where issurvey=? and deleted=0",$custdb, array($issurvey));
 	if ($hasmorejobtypes) {
-		QuickUpdate("update jobtype set deleted=1 where id=?",$custdb,array($_GET['delete']));
+		QuickUpdate("update notificationtype set deleted=1 where id=?",$custdb,array($_GET['delete']));
 	} else {
 		error("You cannot delete the last survey or the last non survey job type");
 	}
@@ -33,7 +33,7 @@ if (isset($_GET['delete'])) {
 }
 
 if (isset($_GET['undelete'])) {
-	QuickUpdate("update jobtype set deleted=0 where id=?",$custdb,array($_GET['undelete']));
+	QuickUpdate("update notificationtype set deleted=0 where id=?",$custdb,array($_GET['undelete']));
 	redirect();
 }
 
@@ -73,15 +73,15 @@ if(CheckFormSubmit($f, 'new')) {
 		} else {
 			if(GetFormData($f, $s, 'newname') != ""){
 				$name = GetFormData($f, $s, 'newname');
-				QuickUpdate("insert into jobtype(name, systempriority, issurvey) values
-							(?, ?, '0')", $custdb, array($name, $priority));
+				QuickUpdate("insert into notificationtype(name, systempriority, type) values
+							(?, ?, 'job')", $custdb, array($name, $priority));
 				redirect();
 			} else {
 				error("You cannot add a job type that has a blank name");
 			}
 
 			foreach ($jobtypes as $jobtype) {
-				QuickUpdate("update jobtype set name=? where id=?", $custdb, array(trim(GetFormData($f,$s,"name_". $jobtype["id"])),$jobtype["id"]));
+				QuickUpdate("update notificationtype set name=? where id=?", $custdb, array(trim(GetFormData($f,$s,"name_". $jobtype["id"])),$jobtype["id"]));
 			}
 
 			redirect();

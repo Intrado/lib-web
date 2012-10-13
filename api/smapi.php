@@ -1790,20 +1790,24 @@ class SMAPI {
 		// validate destination type
 		switch ($type) {
 			case "phone" :
-				$errors = Phone::validate($destination); 
-				if (count($errors)) {
-					$result['resultcode'] = 'invalidparam';
-					$result["resultdescription"] = "Invalid destination - must be valid phone number";
-					return $result;
-				}
 				$destination = Phone::parse($destination); // strip the junk down to 10 digits
+				if (strlen($destination) > 0) {
+					$errors = Phone::validate($destination); 
+					if (count($errors)) {
+						$result['resultcode'] = 'invalidparam';
+						$result["resultdescription"] = "Invalid destination - must be valid phone number";
+						return $result;
+					}
+				}
 				$maxsettingname = "maxphones";
 				break;
 			case "email" :
-				if (!validEmail($destination)) {
-					$result['resultcode'] = 'invalidparam';
-					$result["resultdescription"] = "Invalid destination - must be valid email address";
-					return $result;
+				if (strlen($destination) > 0) {
+					if (!validEmail($destination)) {
+						$result['resultcode'] = 'invalidparam';
+						$result["resultdescription"] = "Invalid destination - must be valid email address";
+						return $result;
+					}
 				}
 				$maxsettingname = "maxemails";
 				break;
@@ -1813,13 +1817,15 @@ class SMAPI {
 					$result["resultdescription"] = "Invalid type - sms disabled for account";
 					return $result;
 				}
-				$errors = Phone::validate($destination); 
-				if (count($errors)) {
-					$result['resultcode'] = 'invalidparam';
-					$result["resultdescription"] = "Invalid destination - must be valid phone number";
-					return $result;
-				}
 				$destination = Phone::parse($destination); // strip the junk down to 10 digits
+				if (strlen($destination) > 0) {
+					$errors = Phone::validate($destination); 
+					if (count($errors)) {
+						$result['resultcode'] = 'invalidparam';
+						$result["resultdescription"] = "Invalid destination - must be valid phone number";
+						return $result;
+					}
+				}
 				$maxsettingname = "maxsms";
 				break;
 			default :

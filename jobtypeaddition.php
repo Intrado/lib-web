@@ -8,7 +8,7 @@ include_once("inc/table.inc.php");
 include_once("inc/html.inc.php");
 include_once("inc/utils.inc.php");
 include_once("inc/form.inc.php");
-include_once("obj/JobType.obj.php");
+include_once("obj/NotificationType.obj.php");
 include_once("obj/Setting.obj.php");
 include_once("obj/Phone.obj.php");
 
@@ -48,26 +48,30 @@ if(CheckFormSubmit($f,$s))
 		if( CheckFormSection($f, $s) )
 		{
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else if(QuickQuery("select count(*) from jobtype where not deleted and name = '" . DBSafe(strtolower(GetFormData($f, $s, "jobtypename"))) . "'")){
+		} else if(QuickQuery("select count(*) from notificationtype where not deleted and name = '" . DBSafe(strtolower(GetFormData($f, $s, "jobtypename"))) . "'")){
 			error("That name is already in use");
 		} else {
 
-			$type = new JobType();
+			$type = new NotificationType();
 			$type->name = GetFormData($f, $s, "jobtypename");
 			$type->info = GetFormData($f, $s, "jobtypedesc");
 			$type->systempriority = 3;
 
-			$type->issurvey = GetFormData($f, $s, "issurvey");
-			if($type->issurvey && $type->systempriority != 3){
+			$issurvey = GetFormData($f, $s, "issurvey");
+			if($issurvey && $type->systempriority != 3){
 				error(_L("Survey %s types can only have a system priority of General",getJobTitle()));
 			} else {
+				if ($issurvey)
+					$type->type = 'survey';
+				else
+					$type->type = 'job';
 				$type->create();
 
 				$survey = "";
-				if($type->issurvey)
+				if($issurvey)
 					$survey = "survey";
 				foreach($max as $index => $maxvalue){
-					if($type->issurvey && $index == "sms")
+					if($issurvey && $index == "sms")
 						continue;
 					for($i=0; $i<$maxvalue; $i++){
 						QuickUpdate("insert into jobtypepref (jobtypeid, type, sequence, enabled)

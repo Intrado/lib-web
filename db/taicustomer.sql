@@ -197,3 +197,35 @@ $$$
 update setting set value='0.1/11' where name='_dbtaiversion'
 $$$
 -- END 0.1/11
+
+-- Default Topics 
+INSERT INTO tai_topic (`name`) VALUES 
+('Abuse'),('Alcohol'),('Body Image'),('Bullying'),('Cheating in School'),('Cutting/Self-Injury'),('Cyber Bullying'),('Dating Violence'),('Depression'),('Discrimination'),('Drugs'),('Eating Disorder'),('Family Problems'),('Fighting'),('Hazing'),('Health Problems'),('Peer Pressure'),('Pregnancy'),('Schoolwork Concerns'),('Sexual Harassment'),('Smoking'),('Stealing'),('Stress'),('Student/Teacher Relationship'),('Suicide'),('Threats'),('Vandalism'),('Weapons')
+$$$
+
+-- NOTE Version unchanged (0.1/11). Default topics only inserted in taicustomer and not in tai upgrade
+
+-- START 1.2
+
+-- $rev 1
+alter table tai_topicuser add notify tinyint(4) not null default 1
+$$$
+
+update setting set value='1.2/1' where name='_dbtaiversion'
+$$$
+
+-- END 1.2/1
+
+-- $rev 2
+INSERT INTO tai_topic (`name`) VALUES ('SMS Messages')
+$$$
+
+INSERT INTO setting (`name`,`value`) VALUES ('smsinboundtopicname','SMS Messages');
+$$$
+
+INSERT INTO `notificationtype` (`name`, `systempriority`, `info`, `deleted`, `type`) VALUES ('Topic Notifications', '3', 'Topic Notifications', '0', 'messaging');
+$$$
+
+update setting set value='1.2/2' where name='_dbtaiversion'
+$$$
+-- END 1.2/2
