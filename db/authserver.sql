@@ -676,4 +676,13 @@ UPDATE shortcodegroup SET isdefault = 1 WHERE id = 1;
 -- insert the default shortcode areacode lookup
 INSERT INTO `shortcodeareacode` (`shortcode`, `areacode`) VALUES ('85130', '');
 
+-- START 9.3/1
 
+CREATE TABLE `dmgroupsetting` (
+`dmgroupid` INT NOT NULL ,
+`name` VARCHAR( 50 ) NOT NULL ,
+`value` VARCHAR( 1024 ) NOT NULL ,
+PRIMARY KEY ( `dmgroupid` , `name` )
+) ENGINE = InnoDB;
+
+-- END 9.3/1

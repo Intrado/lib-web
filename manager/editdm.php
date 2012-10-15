@@ -110,6 +110,7 @@ $dmsettings = array(
 
 );
 $dmsettings = array_merge($dmsettings,QuickQueryList("select name,value from dmsetting where dmid=?",true,false,array($dmid)));
+//FIXME make a DBMO, don't pull out an entire object to a name indexed row
 $dminfo = QuickQueryRow("select name,dmgroupid, lastip, lastseen, customerid, enablestate, type, authorizedip, lastip,routetype, notes, dmuuid from dm where id=?", true,false,array($dmid));
 
 $helpstepnum = 1;
@@ -298,6 +299,24 @@ $buttons = array(submit_button(_L('Save'),"submit","tick"),
 				icon_button(_L('Cancel'),"cross",null,($dmType == 'customer'?"customerdms.php":"systemdms.php")));
 $form = new Form("editdm",$formdata,null,$buttons);
 
+
+$currentdmsettings = QuickQueryList("select name,value from dmsetting where dmid=?",true,false,array($dmid));
+$dmgroupsettings =  QuickQueryList("select name,value from dmgroupsetting where dmgroupid=?",true,false,array($dminfo['dmgroupid']));
+$resolvedsettings = array_merge($dmgroupsettings, $currentdmsettings);
+
+
+$resolvedsettings = array();
+
+foreach ($dmgroupsettings as $k => $v) {
+	$resolvedsettings[$k] = array($k, $v, 'group');
+}
+
+foreach ($currentdmsettings as $k => $v) {
+	$resolvedsettings[$k] = array($k, $v, 'dm');
+}
+
+ksort($resolvedsettings);
+
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data Handling
 ////////////////////////////////////////////////////////////////////////////////
@@ -424,6 +443,12 @@ document.observe('dom:loaded', function() {
 
 startWindow(_L('DM Settings: %s', escapehtml($dminfo["name"])) . ($dminfo["enablestate"]=="new"?_L(" (New)"):''));
 echo $form->render();
+endWindow();
+
+startWindow(_L('Resolved DM Settings'));
+echo '<table width="100%" cellpadding="3" cellspacing="1" class="list">';
+showTable($resolvedsettings, array("Setting","Value","Source"));
+echo '</table>';
 endWindow();
 
 startWindow(_L("DM Information"));
