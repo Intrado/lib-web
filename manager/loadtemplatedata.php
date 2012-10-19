@@ -118,7 +118,7 @@ if ($useSmsMessagelinkInboundnumber) {
 } else {
 	$appendinbound = '';
 }
-$templates['messagelink']['en']['sms']['body'] = '${displayname} sent a msg. To listen ${messagelink}' . $appendinbound . '\nFor info txt HELP';
+$templates['messagelink']['en']['sms']['body'] = '${displayname} sent a msg. To listen ${messagelink}' . $appendinbound . ' For info txt HELP';
 
 // messagelink english html
 $templates['messagelink']['en']['html']['subject'] = '${displayname} sent a new message';
