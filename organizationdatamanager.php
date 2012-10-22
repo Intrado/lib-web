@@ -81,9 +81,16 @@ if (isset($_GET["delete"]) && isset($_GET["orgid"])) {
 												where not u.deleted and r.organizationid = o.id)",
 											false, array($org["id"]));
 		
+		$childorganisationassociationorgid = QuickQuery("select o.id
+											from organization o
+											where o.id = ?
+											and exists
+											(select *
+											from organization oo
+											where not oo.deleted and oo.parentorganizationid = o.id)",
+											false, array($org["id"]));
 		
-		
-		if ($listentryorgid || $userassociationorgid || $persondatavaluesorgid || $personassociationorgid || $userroleassociationorgid)
+		if ($listentryorgid || $userassociationorgid || $persondatavaluesorgid || $personassociationorgid || $userroleassociationorgid || $childorganisationassociationorgid)
 			$associatedorgid = true;
 		else
 			$associatedorgid = false;
@@ -139,6 +146,12 @@ if (isset($_GET['deleteunassociated'])) {
 											(r.userid = u.id)
 											where not u.deleted	group by r.organizationid");
 	
+	$childorganisationassociationorgid = QuickQuery("select o.id
+											from organization o
+											where exists
+											(select * from organization oo
+											where not oo.deleted and oo.parentorganizationid = o.id)");
+	
 	$associatedorgids = array();
 	foreach ($listentryorgids as $orgid)
 		$associatedorgids[$orgid] = true;
@@ -149,6 +162,8 @@ if (isset($_GET['deleteunassociated'])) {
 	foreach ($personassociationorgids as $orgid)
 		$associatedorgids[$orgid] = true;
 	foreach ($userroleassociationorgid as $orgid)
+		$associatedorgids[$orgid] = true;
+	foreach ($childorganisationassociationorgid as $orgid)
 		$associatedorgids[$orgid] = true;
 	
 	// if there are any associated org ids, query out the un-associated ones. Otherwise just get all the un-deleted ones.
