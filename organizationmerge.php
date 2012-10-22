@@ -89,9 +89,13 @@ class ValOrgs extends Validator {
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
 
-// get all the current non deleted orgs (except the source org)
-$data = QuickQueryList("select id, orgkey from organization where id != ? and not deleted order by orgkey, id", true, false, array($sourceOrg->id));
 
+// get all the current non deleted orgs (except the source org)
+if ($sourceOrg->parentorganizationid) {
+	$data = QuickQueryList("select id, orgkey from organization where id != ? and not deleted and parentorganizationid = ? order by orgkey, id", true, false, array($sourceOrg->id, $sourceOrg->parentorganizationid));
+} else {
+	$data = QuickQueryList("select id, orgkey from organization where id != ? and not deleted and parentorganizationid is null order by orgkey, id", true, false, array($sourceOrg->id));
+}
 $formdata = array(
 	"mergeorg" => array(
 		"label" => _L('Organization Target'),
