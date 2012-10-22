@@ -256,6 +256,9 @@ include("nav.inc.php");
 				}
 				?>
 			</div>
+
+				<div class="window_title_start"></div>
+				<div class="window_title_end"></div>
 			</div>
 			
 			<div class="window_body_wrap cf">
@@ -353,7 +356,10 @@ include("nav.inc.php");
 		if ($USER->authorize('sendphone') || $USER->authorize('sendemail') || $USER->authorize('sendsms')) {
 ?>
 		<div class="window broadcasts">
-			<div class="window_title_wrap"><h2><?= getJobsTitle()?></h2></div>
+			<div class="window_title_wrap"><h2><?= getJobsTitle()?></h2>
+				<div class="window_title_start"></div>
+				<div class="window_title_end"></div>
+			</div>
 			
 			<div class="window_body_wrap">
 			
@@ -422,7 +428,7 @@ include("nav.inc.php");
 		if ($USER->authorize('sendphone') || $USER->authorize('sendemail') || $USER->authorize('sendsms')) {
 ?>
 		<div class="bigbtn">
-		<a class="bigbtn" href="message_sender.php?new"><span><?= _L("New %s",getJobTitle())?></span></a>
+			<a class="bigbtn" href="message_sender.php?new"><span><?= _L("New %s",getJobTitle())?></span><b></b></a>
 		</div>
 		
 <? 
