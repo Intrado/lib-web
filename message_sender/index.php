@@ -17,6 +17,9 @@
 				<li class="step3"><a id="tab_3"><span class="icon"></span> Review &amp; Send</a></li>
 			</ul>
 
+			<div class="window_title_start"></div>
+			<div class="window_title_end"></div>
+
 		</div>
 		
 		<div class="window_body_wrap">
