@@ -150,11 +150,12 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$sourcepdvid = QuickQuery("select id from persondatavalues where fieldnum = 'oid' and value = ?", false, array($source->id));
 			$destpdvid = QuickQuery("select id from persondatavalues where fieldnum = 'oid' and value = ?", false, array($dest->id));
 			// if the source org exists in persondatavalues, remove it
-			if ($sourcepdvid)
+			if ($sourcepdvid) {
 				QuickUpdate("delete from persondatavalues where id = ?", false, array($sourcepdvid));
-			// if the dest org doesn't exist in persondatavalues, add it
-			if (!$destpdvid) {
-				QuickUpdate("insert into persondatavalues values (null, 'oid', ?, 0, 1)", false, array($dest->id));
+				// if the dest org doesn't exist in persondatavalues, add it
+				if (!$destpdvid) {
+					QuickUpdate("insert into persondatavalues values (null, 'oid', ?, 0, 1)", false, array($dest->id));
+				}
 			}
 			
 			$source->deleted = 1;
