@@ -4,6 +4,20 @@ require_once("../inc/form.inc.php");
 require_once("../inc/html.inc.php");
 require_once("../inc/table.inc.php");
 
+// Dis-asssociate Customer ID
+if (isset($_GET['disassociate']) && $_GET['disassociate']) {
+	$customerid = $_GET['disassociate'] + 0;
+
+	$result = portalDisassociateCustomer($customerid);
+	if ($result['result'] != "") {
+		error("An error occurred, please try again");
+		$error = 1;
+	} else {
+		redirect("choosecustomer.php");
+	}
+}
+
+// find customerassociations
 $error = 0;
 $result = portalGetCustomerAssociations();
 if($result['result'] == ""){
@@ -13,6 +27,7 @@ if($result['result'] == ""){
 	$customeridlist = array();
 }
 
+// redirect if only one customer
 if(isset($customeridlist) && !(count($customeridlist) > 1)){
 	if(count($customeridlist) == 1){
 		$_SESSION['customerid'] = $customeridlist[0];
@@ -32,6 +47,7 @@ if(isset($customeridlist) && !(count($customeridlist) > 1)){
 	redirect("start.php");
 }
 
+// Choose Customer ID
 if(isset($_GET['customerid']) && $_GET['customerid']){
 	$_SESSION['customerid'] = $_GET['customerid']+0;
 	$_SESSION['custname'] = $customerlist[$_SESSION['customerid']];
@@ -46,6 +62,7 @@ if(isset($_GET['customerid']) && $_GET['customerid']){
 		redirect("start.php");
 	}
 }
+
 
 $PAGE = ":";
 $TITLE = _L("Select an Account");
@@ -64,7 +81,10 @@ startWindow(_L("Select Account"));
 			$class = "";
 			if($alt++ % 2)
 				$class="class=\"listAlt\"";
-			?><tr><td <?=$class?> ><a href="choosecustomer.php?customerid=<?=$index?>"/><?=escapehtml($customername)?></a></td></tr><br><?
+			?><tr>
+				<td <?=$class?> ><a href="choosecustomer.php?customerid=<?=$index?>"/><?=escapehtml($customername)?></a></td>
+				<td <?=$class?> ><a href="choosecustomer.php?disassociate=<?=$index?>"/><?=_L("Dis-associate")?></a></td>
+			</tr><br><?
 		}
 ?>
 	</table>

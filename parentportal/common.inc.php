@@ -22,9 +22,9 @@ if(!isset($ppNotLoggedIn)){
 	// we are logged in
 
 	$logout = "?logout=1";
-	if (isset($_SESSION['customerurl'])) {
-		$logout += "&u=".urlencode($_SESSION['customerurl']);
-	}
+	//if (isset($_SESSION['customerurl'])) {
+	//	$logout += "&u=".urlencode($_SESSION['customerurl']);
+	//}
 	if ($SETTINGS['feature']['force_ssl'] && !isset($_SERVER["HTTPS"])){
 		//index page will redirect to ssl
 		redirect("index.php".$logout);
