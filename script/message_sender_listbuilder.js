@@ -506,7 +506,7 @@
 
                             // Add school if hasorg
                             if (modal.ruleSettings.hasorg === true) {
-                                modal.ruleSettings.fieldmaps.organization = {fieldnum: 'organization', name: 'School', options: 'organization', type: 'association'};
+                                modal.ruleSettings.fieldmaps.organization = {fieldnum: 'organization', name: modal.ruleSettings.orgname, options: 'organization', type: 'association'};
                             };
 
                             // Explode the criteria options and set the type

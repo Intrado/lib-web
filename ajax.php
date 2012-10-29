@@ -328,6 +328,7 @@ function handleRequest() {
 				'reldateOptions' => $RELDATE_OPTIONS,
 				'fieldmaps' => cleanObjects(FieldMap::getAllAuthorizedFieldMaps()),
 				'hasorg' => QuickQuery('select 1 from organization where not deleted limit 1') == 1,
+				'orgname' => getSystemSetting('organizationfieldname','School'),
 				'languagefield' => FieldMap::getLanguageField(),
 				'languagemap' => Language::getLanguageMap()
 			);
