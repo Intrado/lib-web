@@ -686,3 +686,9 @@ PRIMARY KEY ( `dmgroupid` , `name` )
 ) ENGINE = InnoDB;
 
 -- END 9.4/1
+
+-- 9.4 release
+
+-- never used
+ALTER TABLE `portalcustomer` DROP `userid`;
+
