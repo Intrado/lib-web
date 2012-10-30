@@ -11,7 +11,7 @@ include_once("../obj/User.obj.php");
 ////////////////////////////////////////////////////////////////////////////////
 
 if (isset($_GET["delete"])) {
-	if ($_GET["customerid"] && $_GET["threadid"]) {
+	if (isset($_GET["customerid"]) && isset($_GET["threadid"])) {
 		loadManagerConnectionData();
 		$custdb = getPooledCustomerConnection($_GET["customerid"]);
 		

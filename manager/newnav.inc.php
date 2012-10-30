@@ -59,8 +59,8 @@ $NAVTREE = array (
 	array("TalkAboutIt","taicustomers.php",NULL,$MAINTAB=="tai",array(
 	array("Customers","taicustomers.php",NULL,$SUBTAB=="customers"),
 	array("Inbox","taiinbox.php",NULL,$SUBTAB=="inbox"),
-	array("Requests","tairevealrequests.php",NULL,$SUBTAB=="requests")
-
+	array("Requests","tairevealrequests.php",NULL,$SUBTAB=="requests"),
+	array("SMS Numbers","taismsnumbers.php",NULL,$SUBTAB=="smsnumbers")
 	)),
 	array("Tools",NULL,NULL,$MAINTAB=="tools",array(
 	array("SwiftSync","diskagents.php",NULL,$SUBTAB=="swiftsync"),
