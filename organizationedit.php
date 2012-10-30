@@ -95,8 +95,8 @@ $formdata = array(
 );
 
 $helpsteps = array (
-	_L('Organizations may be arranged in a hierarchy. Optionally select a perent organization to link the new organisation in the hierarchy.'),	
-	_L('Enter a new name for this organization. It should clearly indicate what the organization is.')
+	_L('Organizations may be arranged in a hierarchy. Optionally select a parent organization to link the new organization in the hierarchy.'),	
+	_L('Enter a new name for this organization. It should clearly indicate what the organization is. The name must be unique within the system.')
 );
 
 $buttons = array(submit_button(_L('Save'),"submit","tick"),
