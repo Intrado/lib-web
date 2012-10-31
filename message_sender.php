@@ -1286,11 +1286,13 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				case "facebook":
 					// get the destinations for facebook
 					if ($postdata["socialmediafacebookpage"]) {
+						$fbpages = array();
 						foreach (json_decode($postdata["socialmediafacebookpage"]) as $pageid) {
 							if ($pageid == "me")
 								$pageid = $USER->getSetting("fb_user_id");
-							$job->updateJobPost("facebook", $pageid);
+							$fbpages[] = $pageid;
 						}
+						$job->updateJobPost("facebook", $fbpages);
 					}
 					break;
 				case "twitter":
