@@ -184,6 +184,15 @@ $TITLE = _L('Edit Query');
 include_once("nav.inc.php");
 
 startWindow(_L('Edit Query'));
+?>
+<p>Allows writing custom queries to be run on each customer. Results will be shown in an html table or CSV download. The customer ID is prepended to each CSV row.</p>
+<p>You can specify custom arguments:</p>
+<ul>
+<li>_$<i>n</i>_ where <i>n</i> is the argument number (starting at 1). Don't forget to update Num Args appropriately.</li>
+<li>_$CUSTOMERID_ is replaced with the customer id.</li>
+</ul>
+<p>Be sure to include a description of your query and each argument in the notes field.</p>
+<?
 echo $form->render();
 endWindow();
 include_once("navbottom.inc.php");

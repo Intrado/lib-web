@@ -120,6 +120,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 		
+		session_write_close(); //don't lock session
+		set_time_limit(900); //15 minutes
 		
 		$savecsv = $postdata["savecsv"];
 		$enabledmode = isset($postdata["customerenabledmode"])?$postdata["customerenabledmode"]:false;
@@ -156,7 +158,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		while($row = DBGetRow($res)){
 			$data[] = $row;
 		}
-			
+		
 		class Foo123 { var $name;
 		} //dummy class used to fill in something when no col data exists
 			
