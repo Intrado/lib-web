@@ -6,6 +6,8 @@ include ("../jpgraph/jpgraph_bar.php");
 if(!$MANAGERUSER->authorized("aspcallgraphs"))
 	exit("Not Authorized");
 
+session_write_close();
+
 $table = $SETTINGS['aspcalls']['callstable'];
 $query = "
 select left(startdate,10) as day,

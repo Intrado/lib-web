@@ -6,6 +6,8 @@ include ("../jpgraph/jpgraph_bar.php");
 if(!$MANAGERUSER->authorized("aspcallgraphs"))
 	exit("Not Authorized");
 
+session_write_close();
+
 $startdate = isset($_GET['startdate']) ? $_GET['startdate'] : date("Y-m-d", time() - 60*60*24*30); //default 30 days
 $enddate = isset($_GET['enddate']) ? $_GET['enddate'] : date("Y-m-d");
 

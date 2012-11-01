@@ -39,6 +39,7 @@ if (strlen($phone) == 10) {
 				(d.id=dmid) 
 			where startdate between '$sd' and '$ed' 
 			and phone = '$phone'
+			order by startdate
 	";
 	$conn = SetupASPDB();
 	$data = QueryAll($query, $conn);
