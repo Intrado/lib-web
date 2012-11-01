@@ -29,7 +29,7 @@ $dmfiltersql = $dmid ? "and dmid='".mysql_real_escape_string($dmid)."'" : "";
 
 $table = $SETTINGS['aspcalls']['callstable']; 
 $query = "
-select round(minute(startdate) + hour(startdate) *60) as minofday,
+select round((minute(startdate) + hour(startdate) *60)/5) as minofday,
 sum(result='answered') as answered,
 sum(result='machine') as machine,
 sum(result='busy') as busy,
@@ -37,7 +37,8 @@ sum(result='noanswer') as noanswer,
 sum(result='badnumber') as noanswer,
 sum(result='fail') as noanswer,
 sum(result='trunkbusy') as trunkbusy,
-sum(result='unknown') as unknown
+sum(result='unknown') as unknown,
+sum(result='hangup') as hangup
 
 from $table 
 where startdate between '$startdate' and '$enddate'
@@ -50,21 +51,23 @@ $qdata = QueryAll($query, $conn);
 $data = array();
 $titles = array();
 foreach ($qdata as $row) {
-	$data["A"][$row[0]] = $row[1] / $days;
-	$data["M"][$row[0]] = $row[2] / $days;
-	$data["B"][$row[0]] = -$row[3] / $days;
-	$data["N"][$row[0]] = -$row[4] / $days;
-	$data["X"][$row[0]] = -$row[5] / $days;
-	$data["F"][$row[0]] = -$row[6] / $days;
-	$data["C"][$row[0]] = -$row[7] / $days;
-	$data["U"][$row[0]] = -$row[8] / $days;
+	$data["A"][$row[0]] = $row[1]/5 / $days;
+	$data["M"][$row[0]] = $row[2]/5 / $days;
+	$data["H"][$row[0]] = $row[9]/5 / $days;
+	$data["B"][$row[0]] = $row[3]/5 / $days;
+	$data["N"][$row[0]] = $row[4]/5 / $days;
+	$data["X"][$row[0]] = $row[5]/5 / $days;
+	$data["F"][$row[0]] = $row[6]/5 / $days;
+	$data["C"][$row[0]] = $row[7]/5 / $days;
+	$data["U"][$row[0]] = $row[8]/5 / $days;
 }
 
 
-for ($x = $starthour*60; $x <= $endhour * 60; $x++) {
+for ($x = $starthour*60; $x <= ($endhour * 60)/5; $x++) {
 	$titles[] = $x;
 	@$data["A"][$x] += 0;
 	@$data["M"][$x] += 0;
+	@$data["H"][$x] += 0;
 	@$data["B"][$x] += 0;
 	@$data["N"][$x] += 0;
 	@$data["X"][$x] += 0;
@@ -77,6 +80,7 @@ for ($x = $starthour*60; $x <= $endhour * 60; $x++) {
 $cpcolors = array(
 	"A" => "lightgreen",
 	"M" => "#1DC10",
+	"H" => "purple",
 	"B" => "orange",
 	"N" => "tan",
 	"X" => "black",
@@ -86,6 +90,7 @@ $cpcolors = array(
 );
 
 function TimeCallback($val) {
+	$val *= 5;
 	$mins = $val % 60;
 	$hours = floor($val/60);
 	return sprintf("%02d:%02d",$hours,$mins);
@@ -97,7 +102,7 @@ $graph = new Graph(1200, 650,"auto");
 if ($dm)
 	$graph->SetScale("textlin");
 else
-	$graph->SetScale("textlin",-4000,8000);
+	$graph->SetScale("textlin",0,20000);
 $graph->SetFrame(false);
 
 //$graph->SetShadow();
@@ -106,45 +111,52 @@ $graph->img->SetMargin(60,90,20,70);
 $b1plot = new LinePlot($data["A"]);
 $b1plot->SetFillColor($cpcolors["A"]);
 $b1plot->SetLegend("Answered");
-//$b1plot->SetLineWeight(0);
+$b1plot->SetLineWeight(0);
 
 $b2plot = new LinePlot($data["M"]);
 $b2plot->SetFillColor($cpcolors["M"]);
 $b2plot->SetLegend("Machine");
-//$b2plot->SetLineWeight(0);
+$b2plot->SetLineWeight(0);
+
+
+$b9plot = new LinePlot($data["H"]);
+$b9plot->SetFillColor($cpcolors["H"]);
+$b9plot->SetLegend("Hangup");
+$b9plot->SetLineWeight(0);
+
 
 $b3plot = new LinePlot($data["X"]);
 $b3plot->SetFillColor($cpcolors["X"]);
 $b3plot->SetLegend("Disconnect");
-//$b3plot->SetLineWeight(0);
+$b3plot->SetLineWeight(0);
 
 $b4plot = new LinePlot($data["F"]);
 $b4plot->SetFillColor($cpcolors["F"]);
 $b4plot->SetLegend("Fail");
-//$b4plot->SetLineWeight(0);
+$b4plot->SetLineWeight(0);
 
 $b5plot = new LinePlot($data["B"]);
 $b5plot->SetFillColor($cpcolors["B"]);
 $b5plot->SetLegend("Busy");
-//$b5plot->SetLineWeight(0);
+$b5plot->SetLineWeight(0);
 
 $b6plot = new LinePlot($data["N"]);
 $b6plot->SetFillColor($cpcolors["N"]);
 $b6plot->SetLegend("No Answer");
-//$b6plot->SetLineWeight(0);
+$b6plot->SetLineWeight(0);
 
 $b7plot = new LinePlot($data["C"]);
 $b7plot->SetFillColor($cpcolors["C"]);
 $b7plot->SetLegend("Congestion");
-//$b7plot->SetLineWeight(0);
+$b7plot->SetLineWeight(0);
 
 $b8plot = new LinePlot($data["U"]);
 $b8plot->SetFillColor($cpcolors["U"]);
 $b8plot->SetLegend("Unknown");
-//$b8plot->SetLineWeight(0);
+$b8plot->SetLineWeight(0);
 
 // Create the accumulated graph
-$accplot = new AccLinePlot(array($b5plot, $b6plot, $b4plot, $b3plot, $b7plot, $b8plot,$b2plot,$b1plot));
+$accplot = new AccLinePlot(array($b5plot, $b6plot, $b4plot, $b3plot, $b7plot, $b8plot,$b9plot,$b2plot,$b1plot));
 
 // Add the plot to the graph
 $graph->Add($accplot);
@@ -156,7 +168,7 @@ $graph->title->Set("By Time $startdate to $enddate, $starthour:00-$endhour:00 $d
 $graph->xaxis->SetLabelFormatCallback('TimeCallback');
 
 $graph->xaxis->SetLabelAngle(90);
-$graph->xaxis->SetTextLabelInterval(30);
+$graph->xaxis->SetTextLabelInterval(30/5);
 $graph->xaxis->SetPos("min");
 $graph->yaxis->title->Set("");
 $graph->yaxis->HideFirstTickLabel();

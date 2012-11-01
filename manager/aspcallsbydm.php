@@ -19,7 +19,8 @@ sum(result='noanswer') as noanswer,
 sum(result='badnumber') as noanswer,
 sum(result='fail') as noanswer,
 sum(result='trunkbusy') as trunkbusy,
-sum(result='unknown') as unknown
+sum(result='unknown') as unknown,
+sum(result='hangup') as hangup
 
 from $table
 where startdate between '$startdate' and '$enddate'
@@ -36,6 +37,7 @@ foreach ($qdata as $row) {
 
 	$data["A"][] = $row[1];
 	$data["M"][] = $row[2];
+	$data["H"][] = $row[9];
 	$data["B"][] = -$row[3];
 	$data["N"][] = -$row[4];
 	$data["X"][] = -$row[5];
@@ -48,6 +50,7 @@ foreach ($qdata as $row) {
 $cpcolors = array(
 	"A" => "lightgreen",
 	"M" => "#1DC10",
+	"H" => "purple",
 	"B" => "orange",
 	"N" => "tan",
 	"X" => "black",
@@ -67,11 +70,15 @@ $graph->img->SetMargin(60,90,20,70);
 
 $b1plot = new BarPlot($data["A"]);
 $b1plot->SetFillColor($cpcolors["A"]);
-
 $b1plot->SetLegend("Answered");
+
 $b2plot = new BarPlot($data["M"]);
 $b2plot->SetFillColor($cpcolors["M"]);
 $b2plot->SetLegend("Machine");
+
+$b9plot = new BarPlot($data["H"]);
+$b9plot->SetFillColor($cpcolors["H"]);
+$b9plot->SetLegend("Hangup");
 
 $b3plot = new BarPlot($data["X"]);
 $b3plot->SetFillColor($cpcolors["X"]);
@@ -99,7 +106,7 @@ $b8plot->SetFillColor($cpcolors["U"]);
 $b8plot->SetLegend("Unknown");
 
 // Create the grouped bar plot
-$gbplot = new AccBarPlot(array($b6plot,$b5plot,$b4plot,$b3plot,$b8plot,$b7plot,$b2plot,$b1plot));
+$gbplot = new AccBarPlot(array($b6plot,$b5plot,$b4plot,$b3plot,$b8plot,$b7plot,$b9plot,$b2plot,$b1plot));
 $gbplot->SetWidth(0.7);
 
 
