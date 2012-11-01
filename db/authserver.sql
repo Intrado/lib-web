@@ -676,6 +676,11 @@ UPDATE shortcodegroup SET isdefault = 1 WHERE id = 1;
 -- insert the default shortcode areacode lookup
 INSERT INTO `shortcodeareacode` (`shortcode`, `areacode`) VALUES ('85130', '');
 
+-- --------Release ASP_9-3-6
+
+-- add field to store details about the login (10-26-2012)
+ALTER TABLE `portaluseridentification` ADD `details` TEXT CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '';
+
 -- START 9.4/1
 
 CREATE TABLE `dmgroupsetting` (
@@ -691,4 +696,3 @@ PRIMARY KEY ( `dmgroupid` , `name` )
 
 -- never used
 ALTER TABLE `portalcustomer` DROP `userid`;
-
