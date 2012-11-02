@@ -728,8 +728,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		
 		saveRequiredFields($custdb,$customerid,$postdata);
 		
-		
-		$query = "update customer set (inboundnumber,oem,oemid) values (?,?,?)		where id = ?";
+		$query = "update customer set inboundnumber=?,oem=?,oemid=? where id = ?";
 		
 		QuickUpdate($query,false,array(
 				$postdata["inboundnumber"],
