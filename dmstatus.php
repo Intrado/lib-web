@@ -43,7 +43,7 @@ buttons(icon_button("Back","fugue/arrow_180",null,"dms.php"));
 
 ?>
 <script type="text/javascript">
-	var dmid = <?=$dmid?>;
+	var apiEndpoint = 'api/2/deliverymechanisms/' + <?=$dmid?>;
 </script>
 <script type='text/javascript' src='script/dmstatus.js'></script>
 

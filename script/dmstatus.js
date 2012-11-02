@@ -39,7 +39,7 @@ function dateDiff(startdate, enddate) {
 
 function doajax()
 {
-	new Ajax.Request('api/2/deliverymechanisms/' + dmid, { method:'get',
+	new Ajax.Request(apiEndpoint, { method:'get',
 		onSuccess: function(result) {
 			jsonresult = result.responseJSON;
 			var status = jsonresult.postStatus.evalJSON(true);
