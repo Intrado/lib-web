@@ -82,25 +82,34 @@ $formdata["category"] = array(
 
 foreach($languages as $language) {
 	$code = $language[2];
-	$formdata[$code] = array(
-		"label" => $language[1],
-		"value" => "",
-		"validators" => array(array("ValLength","min" => 0,"max" => 150)),
-		"control" => array("TextField","size" => 50, "maxlength" => 150),
-		"helpstep" => 2
-	);
+	$value = "";
 	if(isset($languagemessages[$code]) && $languagemessages[$code] != "") {
 		// Populate the form with message data and complete with default data
-		$formdata[$code]["value"] = $languagemessages[$code];
+		$value = $languagemessages[$code];
 	} else {
 		$filename = "messagedata/" . $code . "/targetedmessage.php";
 		if(file_exists($filename))
 			include_once($filename);
-
+	
 		if(isset($messagedatacache[$code]) && isset($messagedatacache[$code][$targetedmesssage[0]])) {
-			$formdata[$code]["value"] = $messagedatacache[$code][$targetedmesssage[0]];
+			$value = $messagedatacache[$code][$targetedmesssage[0]];
 		} // else no default data found value is set to empty
 	}
+	
+	// if has overridemessagegroupid
+	if (isset($targetedmesssage[1])) {
+		$editlink = "classroommessageeditlanguage.php?mgid={$targetedmesssage[1]}&languagecode=$code";
+		if (isset($targetedmesssage[0]))
+			$editlink .= "&targetmessagekey={$targetedmesssage[0]}";
+	} else {
+		$editlink = "classroommessageoverride.php?languagecode=$code";
+	}
+	
+	$formdata[$code] = array(
+			"label" => $language[1],
+			"control" => array("FormHtml","html"=>'<p class="translate_text">'.escapehtml($value) . icon_button("Edit", "pencil",false,$editlink) . '</p>'),
+			"helpstep" => 2
+	);
 }
 
 $helpsteps = array (
@@ -133,88 +142,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			Query("BEGIN");
 			if($targetedmesssage[0]) {
 				QuickUpdate("update targetedmessage set targetedmessagecategoryid = ? where messagekey = ?",false,array($postdata["category"],$targetedmesssage[0]));
-			}
-
-			$messagegroupid = false;
-			//save data here
-			foreach($languages as $language) {
-				$code = $language[2];
-				$newvalue = $postdata[$code];
-				$message = false;
-				$isasdefault = isset($messagedatacache[$code]) && 
-								isset($messagedatacache[$code][$targetedmesssage[0]]) &&
-								$messagedatacache[$code][$targetedmesssage[0]] == $newvalue;
-				
-				if($targetedmesssage[1]) {
-					$message = DBFind("Message", "from message where messagegroupid = ? and languagecode = ?",false, array($targetedmesssage[1],$code));
-					$messagegroupid = $targetedmesssage[1];
-				} else {
-					if($isasdefault) {
-							// There is a default value for this message/language and the value has not changed
-							continue;
-					} else {
-						if($newvalue != '' && !$messagegroupid) {
-							// create a new message group
-
-							$messagegroup = new MessageGroup();
-							$messagegroup->userid =  $USER->id;
-							$messagegroup->name = "Custom Classroom";
-							$messagegroup->description = '';
-							$messagegroup->modified = date("Y-m-d H:i:s", time());
-							$messagegroup->deleted = 1;
-							$messagegroup->permanent = 1;
-							$messagegroup->create();
-							$messagegroupid = $messagegroup->id;
-
-							if(isset($targetedmesssage[0])) {
-								QuickUpdate("update targetedmessage set overridemessagegroupid = ? where messagekey = ?",false,array($messagegroupid,$targetedmesssage[0]));
-							} else {
-								QuickUpdate("insert into targetedmessage (messagekey,targetedmessagecategoryid,overridemessagegroupid) values (?,?,?)",false,array("custom-" .  $messagegroupid,$postdata["category"],$messagegroupid));
-							}
-						}
-					}
-				}
-				if($messagegroupid) {
-					if($message === false) {
-						if ($newvalue != '' || !$isasdefault) {
-							// create a new message
-							$message = new Message();
-							$message->messagegroupid = $messagegroupid;
-							$message->userid = $USER->id;
-							$message->name = "Custom Classroom";
-							$message->description = '';
-							$message->type = 'email';
-							$message->subtype = 'plain';
-							$message->data = '';
-							$message->modifydate = date("Y-m-d H:i:s", time());
-							$message->autotranslate = 'none';
-							$message->languagecode = $code;
-							$message->create();
-	
-							$messagepart = new MessagePart();
-							$messagepart->messageid = $message->id;
-							$messagepart->type = 'T';
-							$messagepart->txt = $newvalue;
-							$messagepart->sequence = 0;
-							$messagepart->create();
-						}
-					} else {
-						if ($newvalue == '' || $isasdefault) {
-							QuickQuery("BEGIN");
-							QuickQuery("delete from message where id = ?",false,array($message->id));
-							QuickQuery("delete from messagepart where messageid = ?",false,array($message->id));
-							QuickQuery("COMMIT");
-						} else {
-							$message->modifydate = date("Y-m-d H:i:s", time());
-							$message->update();
-							$messagepart = DBFind("MessagePart","from messagepart where messageid = ? and sequence = 0",false,array($message->id));
-							if($messagepart) {
-								$messagepart->txt = $newvalue;
-								$messagepart->update();
-							}
-						}
-					}
-				}
 			}
 
 
