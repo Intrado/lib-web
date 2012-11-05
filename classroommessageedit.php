@@ -55,8 +55,7 @@ if($id) {
 
 if(isset($targetedmesssage[1])) {
 	$languagemessages = QuickQueryList("select m.languagecode, p.txt from message m, messagepart p
-			where m.messagegroupid = ? and
-					m.id = p.messageid", true,false,array($targetedmesssage[1]));
+			where m.messagegroupid = ? and m.id = p.messageid and m.type='email'", true,false,array($targetedmesssage[1]));
 }
 
 $categories = QuickQueryList("select id, name from targetedmessagecategory where deleted = 0",true);
@@ -102,7 +101,7 @@ foreach($languages as $language) {
 		if (isset($targetedmesssage[0]))
 			$editlink .= "&targetmessagekey={$targetedmesssage[0]}";
 	} else {
-		$editlink = "classroommessageoverride.php?languagecode=$code";
+		$editlink = "classroommessageoverride.php?languagecode=$code&messagekey={$targetedmesssage[0]}&categoryid=$targetedmesssage[2]";
 	}
 	
 	$formdata[$code] = array(
