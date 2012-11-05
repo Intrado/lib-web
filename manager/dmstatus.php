@@ -5,7 +5,6 @@ include_once("../inc/form.inc.php");
 include_once("../inc/table.inc.php");
 include_once("../obj/Phone.obj.php");
 include_once("../inc/html.inc.php");
-include_once("../inc/memcache.inc.php");
 $dmType = '';
 
 if (!$MANAGERUSER->authorized("editdm") && !$MANAGERUSER->authorized("systemdm"))
@@ -27,19 +26,15 @@ if(isset($_GET['dmid'])){
 	list($dmuuid,$dmType,$dmName,$notes) = QuickQueryRow("select dmuuid,type,name,notes from dm where id=?",false,false,array($dmid));
 }
 
-init_memcache();
-global $mcache;
-$jsonstats = $mcache->get("dmpoststatus/".$dmuuid);
-
-include_once("../dmstatusdata.inc.php");
-
-
 //////////////////////////////////////////////////////////////////////
 // DISPLAY
 
 include_once("nav.inc.php");
 
 ?>
+<script type="text/javascript">
+	var apiEndpoint = '/manager/api/2/deliverymechanisms/<?=addslashes($dmuuid)?>';
+</script>
 <script type='text/javascript' src='../script/dmstatus.js'></script>
 
 Current Status for:
@@ -49,19 +44,12 @@ Current Status for:
 </table>
 <?
 
-if ($status == NULL) {
-	echo "There is no status available at this time.";
-} else {
 ?>
 <table width="100%"><tr><td valign="top">
 <?
 echo "<BR><b>SYSTEM STATISTICS</b><BR><BR>";
 //startWindow("System Statistics");
-echo "<div id='systemstats'>";
-	foreach($statusgroups as $groupname => $groupdata) {
-		showStatusGroup($groupname, $groupdata);
-	}
-echo "</div>";
+include_once("../dmstatusdata.inc.php");
 //endWindow();
 ?>
 </td><td valign="top">
@@ -78,6 +66,5 @@ echo "<div id='completedresources'></div>";
 ?>
 </td></tr></table>
 <?
-} // end else status is not null
 include_once("navbottom.inc.php");
 ?>

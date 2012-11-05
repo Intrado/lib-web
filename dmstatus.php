@@ -28,8 +28,7 @@ if (isset($_GET['dmid'])) {
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-$dmname = QuickQuery("select name from custdm where dmid=?",false,false,array($dmid));
-
+list($dmname,$dmuuid) = QuickQueryRow("select name, dmuuid from custdm where dmid=?",false,false,array($dmid));
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
@@ -43,7 +42,7 @@ buttons(icon_button("Back","fugue/arrow_180",null,"dms.php"));
 
 ?>
 <script type="text/javascript">
-	var apiEndpoint = 'api/2/deliverymechanisms/' + <?=$dmid?>;
+	var apiEndpoint = 'api/2/deliverymechanisms/<?=addslashes($dmuuid)?>';
 </script>
 <script type='text/javascript' src='script/dmstatus.js'></script>
 
