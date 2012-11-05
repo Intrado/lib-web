@@ -195,7 +195,8 @@ function tai_setup($customerid) {
 				($schoolmessengeruser->accessid, 'tai_canrequestidentityreveal', 1), 
 				($schoolmessengeruser->accessid, 'tai_canmanagesurveys', 1), 
 				($schoolmessengeruser->accessid, 'tai_canmanagelockouts', 1), 
-				($schoolmessengeruser->accessid, 'tai_canmanageactivationcodes', 1)";
+				($schoolmessengeruser->accessid, 'tai_canmanageactivationcodes', 1),
+				($schoolmessengeruser->accessid, 'tai_canmodifydisplayname', 1)";
 	QuickUpdate($query)
 		or dieWithError(" SQL: " . $query);
 	
