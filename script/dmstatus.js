@@ -39,33 +39,23 @@ function dateDiff(startdate, enddate) {
 
 function doajax()
 {
-	new Ajax.Request('dmstatus.php?ajax', { method:'get',
+	new Ajax.Request(apiEndpoint, { method:'get',
 		onSuccess: function(result) {
-			var status = result.responseJSON;
+			jsonresult = result.responseJSON;
+			var status = jsonresult.postStatus.evalJSON(true);
 			var avg;
 			var fieldname;
 			var dispatchers = new Array();
 			var dindex = 0;
 			var dname;
 			var key;
-			
+
 			for (key in status[0]) {
 				if (key.indexOf("comerr") >= 0) {
 					dname = key.substr(7);
 					dispatchers[dindex++] = dname;
 				}
 			}
-			/*
-			for (dindex in dispatchers) {
-				dname = dispatchers[dindex];
-				fieldname = "comerr-" + dname;
-				$(fieldname).update(status[0][fieldname]);
-				fieldname = "comtimeout-" + dname;
-				$(fieldname).update(status[0][fieldname]);
-				fieldname = "comreadtimeout-" + dname;
-				$(fieldname).update(status[0][fieldname]);
-			}
-			*/
 			
 			// TODO set locale
 			var starttime = new Date(parseInt(status[0]['startuptime']));
@@ -95,6 +85,7 @@ function doajax()
 			$('resthrotsched').update(status[0]['resthrotsched']);
 			$('resthroterr').update(status[0]['resthroterr']);
 			$('restotal').update(status[0]['restotal']);
+
 			// call results
 			$('A').update(status[0]['A']);
 			$('M').update(status[0]['M']);
@@ -208,17 +199,21 @@ function doajax()
 				$('completedresources').update(completedresources);
 			else
 				$('completedresources').update("");
-				
-			for (dindex in dispatchers) {
-				dname = dispatchers[dindex];
-				fieldname = "comerr-" + dname;
-				$(fieldname).update(status[0][fieldname]);
-				fieldname = "comtimeout-" + dname;
-				$(fieldname).update(status[0][fieldname]);
-				fieldname = "comreadtimeout-" + dname;
-				$(fieldname).update(status[0][fieldname]);
-			}
 
+			var dispatchersHtml = "";
+			dispatchers.each(function(value, dindex) {
+				dname = dispatchers[dindex];
+				dispatchersHtml +=
+					"<b>Communication Activity - " + dname + "</b>" +
+					"<table width='100%'><tr><td width='30%'>" +
+					"Connection Failures:" +
+					"</td><td><div>" + status[0]["comerr-" + dname] + "</div></td></tr><tr><td width='30%'>" +
+					"Connection Timeouts:" +
+					"</td><td><div>" + status[0]["comtimeout-" + dname] + "</div></td></tr><tr><td width='30%'>" +
+					"Read Timeouts:" +
+					"</td><td><div>" + status[0]["comreadtimeout-" + dname] + "</div></td></tr></table>";
+			});
+			$("dispatchers").innerHTML = dispatchersHtml;
 		}
 	});
 }
@@ -229,7 +224,7 @@ setTimeout('window.location="index.php"', 30*60*1000);
 // draw initial values
 doajax();
 
-// refresh every 10 seconds (poststatus from dm comes every 15 seconds)
-new PeriodicalExecuter(doajax, 10);
+// refresh every 15 seconds (poststatus from dm comes every 15 seconds)
+new PeriodicalExecuter(doajax, 15);
 
 
