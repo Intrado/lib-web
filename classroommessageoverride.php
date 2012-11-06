@@ -139,6 +139,9 @@ if (!$targetedmessage) {
 	$targetedmessage->targetedmessagecategoryid = $category->id;
 	$targetedmessage->overridemessagegroupid = $messagegroup->id;
 	$targetedmessage->create();
+} else {
+	$targetedmessage->overridemessagegroupid = $messagegroup->id;
+	$targetedmessage->update();
 }
 
 Query("COMMIT");

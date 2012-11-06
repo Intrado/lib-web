@@ -52,34 +52,17 @@ if (!$USER->authorize("sendphone"))
 setEditMessageSession();
 
 // get the messagegroup and/or the message
-if (isset($_SESSION['editmessage']['messageid']))
-	$message = new Message($_SESSION['editmessage']['messageid']);
-else
-	$message = false;
-
-// set the message bits
-if ($message) {
-	// if the user doesn't own this message, unauthorized!
-	if (!userOwns("message", $message->id))
-		redirect('unauthorized.php');
+if (isset($_SESSION['editmessage']['messagegroupid']) && 
+		isset($_SESSION['editmessage']['languagecode'])) {
 	
-	// get the parent message group for this message
-	$messagegroup = new MessageGroup($message->messagegroupid);
-	// use the message's language code
-	$languagecode = $message->languagecode;
-	
+	$messagegroup = new MessageGroup($_SESSION['editmessage']['messagegroupid']);
+	$languagecode = $_SESSION['editmessage']['languagecode'];
+	$message = DBFind("Message", "from message where messagegroupid=? and languagecode=? and type='phone' and subtype='voice'",false,array($messagegroup->id,$languagecode));
 } else {
-	// not editing an existing message, check session data for new message bits
-	if (isset($_SESSION['editmessage']['messagegroupid']) && 
-			isset($_SESSION['editmessage']['languagecode'])) {
-		
-		$messagegroup = new MessageGroup($_SESSION['editmessage']['messagegroupid']);
-		$languagecode = $_SESSION['editmessage']['languagecode'];
-	} else {
-		// missing session data!
-		redirect('unauthorized.php');
-	}
+	// missing session data!
+	redirect('unauthorized.php');
 }
+
 
 // if the user doesn't own the parent message group, unauthorized!
 if (!userOwns("messagegroup", $messagegroup->id))
