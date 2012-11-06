@@ -696,3 +696,6 @@ PRIMARY KEY ( `dmgroupid` , `name` )
 
 -- never used
 ALTER TABLE `portalcustomer` DROP `userid`;
+
+-- text fields cannot have a default value, NULL should be allowed
+ALTER TABLE `portaluseridentification` CHANGE `details` `details` TEXT CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL;
