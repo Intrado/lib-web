@@ -26,47 +26,37 @@ require_once("obj/TargetedMessageCategory.obj.php");
 
 ///////////////////////////////////////////////////////////////////////////////
 // Authorization:/
-//////////////////////////////////////////////////////////////////////////////
-
+///////////////////////////////////////////////////////////////////////////////
 if (!getSystemSetting('_hastargetedmessage', false) || !$USER->authorize('manageclassroommessaging')) {
 	redirect('unauthorized.php');
 }
 
-if (!isset($_GET['languagecode']) || !isset($_GET['categoryid'])) {
+if (!isset($_GET['messagekey']) || !isset($_GET['languagecode'])) {
 	redirect('unauthorized.php');
 }
-
-
 
 Query("BEGIN");
-
-$category = DBFind("targetedmessagecategory", "from targetedmessagecategory where id=? and not deleted",false,array($_GET['categoryid']));
-if (!$category) {
-	redirect('unauthorized.php');
-}
 
 $language = DBFind("language", "from language where code=?",false,array($_GET['languagecode']));
 if (!$language) {
 	redirect('unauthorized.php');
 }
 
-
 $messagegroup = null;
-$targetedmessage = null;
 
 // Find override messagegroup
-if (isset($_GET['messagekey'])) {
-	$targetedmessage = DBFind("targetedmessage","from targetedmessage where messagekey = ? and enabled and not deleted",false,array($_GET['messagekey']));
-	if ($targetedmessage) {
-		if ($targetedmessage->overridemessagegroupid) {
-			$messagegroup = new MessageGroup($targetedmessage->overridemessagegroupid);
-		}
-	} else {
-		notice("Unknown Classroom Message");
-		redirect("ClassroomEdit");
-	}	
-} 
+$targetedmessage = DBFind("targetedmessage","from targetedmessage where messagekey = ? and enabled and not deleted",false,array($_GET['messagekey']));
+if ($targetedmessage) {
+	if ($targetedmessage->overridemessagegroupid) {
+		$messagegroup = new MessageGroup($targetedmessage->overridemessagegroupid);
+	}
+} else {
+	notice("Unknown Classroom Message");
+	redirect("classroommessagemanager.php");
+}
 
+$emailmessage = null;
+$phonemessage = null;
 // If messagegroup was not found create default override messagegroup
 if (!$messagegroup) {
 	$defaultmessagetext = "";
@@ -89,60 +79,60 @@ if (!$messagegroup) {
 	$messagegroup->permanent = 1;
 	$messagegroup->create();
 
-	// create a new email message
-	$message = new Message();
-	$message->messagegroupid = $messagegroup->id;
-	$message->userid = $USER->id;
-	$message->name = "Custom Classroom";
-	$message->description = '';
-	$message->type = 'email';
-	$message->subtype = 'plain';
-	$message->data = '';
-	$message->modifydate = date("Y-m-d H:i:s", time());
-	$message->autotranslate = 'none';
-	$message->languagecode = $language->code;
-	$message->create();
-	
-	$messagepart = new MessagePart();
-	$messagepart->messageid = $message->id;
-	$messagepart->type = 'T';
-	$messagepart->txt = $defaultmessagetext;
-	$messagepart->sequence = 0;
-	$messagepart->create();
-	
-	// create a new phone message
-	$message = new Message();
-	$message->messagegroupid = $messagegroup->id;
-	$message->userid = $USER->id;
-	$message->name = "Custom Classroom";
-	$message->description = '';
-	$message->type = 'phone';
-	$message->subtype = 'voice';
-	$message->data = '';
-	$message->modifydate = date("Y-m-d H:i:s", time());
-	$message->autotranslate = 'none';
-	$message->languagecode = $language->code;
-	$message->create();
-	
-	$messagepart = new MessagePart();
-	$messagepart->messageid = $message->id;
-	$messagepart->type = 'T';
-	$messagepart->txt = $defaultmessagetext;
-	$messagepart->voiceid = Voice::getPreferredVoice($language->code, "female");
-	$messagepart->sequence = 0;
-	$messagepart->create();
+} else {
+	$emailmessage = DBFind("Message", "from message where messagegroupid = ? and type = 'email'",false,array($messagegroup->id));
+	$phonemessage = DBFind("Message", "from message where messagegroupid = ? and type = 'phone'",false,array($messagegroup->id));
 }
 
-if (!$targetedmessage) {
-	$targetedmessage = new TargetedMessage();
-	$targetedmessage->messagekey = "custom-" .  $messagegroup->id;
-	$targetedmessage->targetedmessagecategoryid = $category->id;
-	$targetedmessage->overridemessagegroupid = $messagegroup->id;
-	$targetedmessage->create();
-} else {
-	$targetedmessage->overridemessagegroupid = $messagegroup->id;
-	$targetedmessage->update();
+if (!$emailmessage) {
+	// create a new email message
+	$emailmessage = new Message();
+	$emailmessage->messagegroupid = $messagegroup->id;
+	$emailmessage->userid = $USER->id;
+	$emailmessage->name = "Custom Classroom";
+	$emailmessage->description = '';
+	$emailmessage->type = 'email';
+	$emailmessage->subtype = 'plain';
+	$emailmessage->data = '';
+	$emailmessage->modifydate = date("Y-m-d H:i:s", time());
+	$emailmessage->autotranslate = 'none';
+	$emailmessage->languagecode = $language->code;
+	$emailmessage->create();
+	
+	$emailmessagepart = new MessagePart();
+	$emailmessagepart->messageid = $emailmessage->id;
+	$emailmessagepart->type = 'T';
+	$emailmessagepart->txt = $defaultmessagetext;
+	$emailmessagepart->sequence = 0;
+	$emailmessagepart->create();
 }
+
+if (!$phonemessage) {
+	// create a new phone message
+	$phonemessage = new Message();
+	$phonemessage->messagegroupid = $messagegroup->id;
+	$phonemessage->userid = $USER->id;
+	$phonemessage->name = "Custom Classroom";
+	$phonemessage->description = '';
+	$phonemessage->type = 'phone';
+	$phonemessage->subtype = 'voice';
+	$phonemessage->data = '';
+	$phonemessage->modifydate = date("Y-m-d H:i:s", time());
+	$phonemessage->autotranslate = 'none';
+	$phonemessage->languagecode = $language->code;
+	$phonemessage->create();
+	
+	$phonemessagepart = new MessagePart();
+	$phonemessagepart->messageid = $phonemessage->id;
+	$phonemessagepart->type = 'T';
+	$phonemessagepart->txt = $defaultmessagetext;
+	$phonemessagepart->voiceid = Voice::getPreferredVoice($language->code, "female");
+	$phonemessagepart->sequence = 0;
+	$phonemessagepart->create();
+}
+
+$targetedmessage->overridemessagegroupid = $messagegroup->id;
+$targetedmessage->update();
 
 Query("COMMIT");
 
