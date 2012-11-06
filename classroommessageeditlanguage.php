@@ -57,7 +57,8 @@ if (isset($_SESSION['editmessage']['messagegroupid']) &&
 	
 	$messagegroup = new MessageGroup($_SESSION['editmessage']['messagegroupid']);
 	$languagecode = $_SESSION['editmessage']['languagecode'];
-	$message = DBFind("Message", "from message where messagegroupid=? and languagecode=? and type='phone' and subtype='voice'",false,array($messagegroup->id,$languagecode));
+	$phonemessage = DBFind("Message", "from message where messagegroupid=? and languagecode=? and type='phone' and subtype='voice'",false,array($messagegroup->id,$languagecode));
+	$emailmessage = DBFind("Message", "from message where messagegroupid=? and languagecode=? and type='email' and subtype='plain'",false,array($messagegroup->id,$languagecode));
 } else {
 	// missing session data!
 	redirect('unauthorized.php');
@@ -78,13 +79,15 @@ if (!$USER->authorize("sendmulti") && $languagecode != Language::getDefaultLangu
 
 PreviewModal::HandleRequestWithPhoneText($messagegroup->id);
 
-$text = "";
+$phonemessagetext = "";
+$emailmessagetext = "";
+
 $gender = $messagegroup->preferredgender;
-if ($message) {
-	$parts = DBFindMany("MessagePart", "from messagepart where messageid = ? order by sequence", false, array($message->id));
-	$text = Message::format($parts);
+if ($phonemessage) {
+	$phonemessageparts = DBFindMany("MessagePart", "from messagepart where messageid = ? order by sequence", false, array($phonemessage->id));
+	$phonemessagetext = Message::format($phonemessageparts);
 	// find the gender
-	foreach ($parts as $part) {
+	foreach ($phonemessageparts as $part) {
 		if ($part->voiceid) {
 			$voice = new Voice($part->voiceid);
 			$gender = $voice->gender;
@@ -93,20 +96,37 @@ if ($message) {
 	}
 }
 
+if ($emailmessage) {
+	$emailmessageparts = DBFindMany("MessagePart", "from messagepart where messageid = ? order by sequence", false, array($emailmessage->id));
+	$emailmessagetext = Message::format($emailmessageparts);
+}
+
 $language = Language::getName($languagecode);
 
 // get user default gender selection if none assigned
 if (!$gender)
 	$gender = $USER->getSetting('defaultgender', "female");
 
-$formdata = array($messagegroup->name. " (". $language. ")");
 
 // upload audio needs this session data
 $_SESSION['messagegroupid'] = $messagegroup->id;
 
 
-$formdata = array($messagegroup->name. " (". $language. ")");
-	
+$formdata = array();
+
+$formdata[] = _L("Email");
+$formdata["emailmessage"] = array(
+		"label" => _L("Message"),
+		"fieldhelp" => _L("Enter your phone message in this field. Click on the 'Guide' button for help with the different options which are available to you."),
+		"value" => $emailmessagetext,
+		"validators" => array(
+				array("ValRequired")
+		),
+		"control" => array("TextArea","rows" => 3),
+		"helpstep" => 1);
+
+$formdata[] = _L("Phone");
+
 $ttslanguages = Voice::getTTSLanguageMap();
 if (!isset($ttslanguages[$languagecode])) {
 	$html = _L('<ul>
@@ -120,10 +140,10 @@ if (!isset($ttslanguages[$languagecode])) {
 		"helpstep" => 1);
 }
 
-$formdata["message"] = array(
-		"label" => _L("Advanced Message"),
+$formdata["phonemessage"] = array(
+		"label" => _L("Message"),
 		"fieldhelp" => _L("Enter your phone message in this field. Click on the 'Guide' button for help with the different options which are available to you."),
-		"value" => $text,
+		"value" => $phonemessagetext,
 		"validators" => array(
 			array("ValRequired"),
 			array("ValMessageBody", "messagegroupid" => $messagegroup->id),
@@ -187,7 +207,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 		
 		// if they didn't change anything, don't do anything
-		if ($postdata['message'] == $text && $postdata['gender'] == $gender) {
+		if ($postdata['phonemessage'] == $phonemessagetext && 
+			$postdata['emailmessage'] == $emailmessagetext &&
+			$postdata['gender'] == $gender) {
 			// DO NOT UPDATE MESSAGE!
 		} else if ($button != 'inpagesubmit'){
 			Query("BEGIN");
@@ -200,45 +222,77 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$messagegroup->update(array("data","modified"));
 			
 			// if this is an edit for an existing message
-			if ($message) {
+			if ($phonemessage) {
 				// delete existing messages
 				QuickUpdate("delete from message 
 						where messagegroupid = ?
 						and type = 'phone'
 						and languagecode = ?
-						and id != ?", false, array($messagegroup->id, $languagecode, $message->id));
+						and id != ?", false, array($messagegroup->id, $languagecode, $phonemessage->id));
 			} else {
 				// new message
-				$message = new Message();
+				$phonemessage = new Message();
 			}
 			
-			$message->messagegroupid = $messagegroup->id;
-			$message->type = "phone";
-			$message->subtype = "voice";
-			$message->autotranslate = ($languagecode == "en")?'none':'overridden';
-			$message->name = $messagegroup->name;
-			$message->description = Language::getName($languagecode);
-			$message->userid = $USER->id;
-			$message->modifydate = date("Y-m-d H:i:s");
-			$message->languagecode = $languagecode;
+			$phonemessage->messagegroupid = $messagegroup->id;
+			$phonemessage->type = "phone";
+			$phonemessage->subtype = "voice";
+			$phonemessage->autotranslate = ($languagecode == "en")?'none':'overridden';
+			$phonemessage->name = $messagegroup->name;
+			$phonemessage->description = Language::getName($languagecode);
+			$phonemessage->userid = $USER->id;
+			$phonemessage->modifydate = date("Y-m-d H:i:s");
+			$phonemessage->languagecode = $languagecode;
 			
-			if ($message->id)
-				$message->update();
+			if ($phonemessage->id)
+				$phonemessage->update();
 			else
-				$message->create();
+				$phonemessage->create();
 						
 			// create the message parts
-			$message->recreateParts($postdata['message'], null, $postdata['gender']);
+			$phonemessage->recreateParts($postdata['phonemessage'], null, $postdata['gender']);
 			
 			// Hack to correct the voice id for non tts languages
 			if (!isset($ttslanguages[$languagecode])) {
 				// get all T and V message parts, update the voiceid to represent the selected gender
-				$parts = DBFindMany("MessagePart", "from messagepart where messageid = ? and type in ('V','T')", false, array($message->id));
-				foreach ($parts as $part) {
+				$phonemessageparts = DBFindMany("MessagePart", "from messagepart where messageid = ? and type in ('V','T')", false, array($phonemessage->id));
+				foreach ($phonemessageparts as $part) {
 					$part->voiceid = Voice::getPreferredVoice("en", $postdata['gender']);
 					$part->update();
 				}
 			}
+			
+			// if this is an edit for an existing message
+			if ($emailmessage) {
+				// delete existing messages
+				QuickUpdate("delete from message
+						where messagegroupid = ?
+						and type = 'email' 
+						and subtype = 'plain' 
+						and languagecode = ?
+						and id != ?", false, array($messagegroup->id, $languagecode, $emailmessage->id));
+			} else {
+				// new message
+				$emailmessage = new Message();
+			}
+				
+			$emailmessage->messagegroupid = $messagegroup->id;
+			$emailmessage->type = "email";
+			$emailmessage->subtype = "plain";
+			$emailmessage->autotranslate = ($languagecode == "en")?'none':'overridden';
+			$emailmessage->name = $messagegroup->name;
+			$emailmessage->description = Language::getName($languagecode);
+			$emailmessage->userid = $USER->id;
+			$emailmessage->modifydate = date("Y-m-d H:i:s");
+			$emailmessage->languagecode = $languagecode;
+				
+			if ($emailmessage->id)
+				$emailmessage->update();
+			else
+				$emailmessage->create();
+			
+			// create the message parts
+			$emailmessage->recreateParts($postdata['emailmessage'], null, false);
 			
 			$messagegroup->updateDefaultLanguageCode();
 			
@@ -262,7 +316,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "notifications:messages";
-$TITLE = "Advanced Phone Message Editor";
+$TITLE = "Classroom Message Editor";
 
 include_once("nav.inc.php");
 
@@ -276,7 +330,7 @@ include_once("nav.inc.php");
 <?
 PreviewModal::includePreviewScript();
 
-startWindow($messagegroup->name);
+startWindow("{$messagegroup->name} ({$language})");
 echo $form->render();
 endWindow();
 include_once("navbottom.inc.php");
