@@ -13,6 +13,7 @@ require_once("obj/FormItem.obj.php");
 require_once("obj/MessageGroup.obj.php");
 require_once("obj/Message.obj.php");
 require_once("obj/MessagePart.obj.php");
+require_once("obj/TargetedMessage.obj.php");
 
 
 
@@ -48,14 +49,14 @@ $languages = QuickQueryMultiRow("select id,name,code from language");
 $values = array();
 
 if($id) {
-	$targetedmesssage = QuickQueryRow("select messagekey, overridemessagegroupid, targetedmessagecategoryid from targetedmessage where id=?",false,false,array($id));
+	$targetedmesssage = DBFind("TargetedMessage", "from targetedmessage where id=?",false,array($id));
 } else {
 	$targetedmesssage = false;
 }
 
-if(isset($targetedmesssage[1])) {
+if(isset($targetedmesssage->overridemessagegroupid)) {
 	$languagemessages = QuickQueryList("select m.languagecode, p.txt from message m, messagepart p
-			where m.messagegroupid = ? and m.id = p.messageid and m.type='email'", true,false,array($targetedmesssage[1]));
+			where m.messagegroupid = ? and m.id = p.messageid and m.type='email'", true,false,array($targetedmesssage->overridemessagegroupid));
 }
 
 $categories = QuickQueryList("select id, name from targetedmessagecategory where deleted = 0",true);
@@ -67,10 +68,10 @@ if(!isset($messagedatacache)) {
 	$messagedatacache = array();
 }
 
-
+error_log(json_encode($targetedmesssage));
 $formdata["category"] = array(
 	"label" => _L("Category"),
-	"value" => isset($targetedmesssage[2])?$targetedmesssage[2]:"",
+	"value" => isset($targetedmesssage->targetedmessagecategoryid)?$targetedmesssage->targetedmessagecategoryid:"",
 	"validators" => array(
 		array("ValRequired"),
 		array("ValInArray", "values" => array_keys($categories))
@@ -90,18 +91,18 @@ foreach($languages as $language) {
 		if(file_exists($filename))
 			include_once($filename);
 	
-		if(isset($messagedatacache[$code]) && isset($messagedatacache[$code][$targetedmesssage[0]])) {
-			$value = $messagedatacache[$code][$targetedmesssage[0]];
+		if(isset($messagedatacache[$code]) && isset($messagedatacache[$code][$targetedmesssage->messagekey])) {
+			$value = $messagedatacache[$code][$targetedmesssage->messagekey];
 		} // else no default data found value is set to empty
 	}
 	
 	// if has overridemessagegroupid
-	if (isset($targetedmesssage[1])) {
-		$editlink = "classroommessageeditlanguage.php?mgid={$targetedmesssage[1]}&languagecode=$code";
-		if (isset($targetedmesssage[0]))
-			$editlink .= "&targetmessagekey={$targetedmesssage[0]}";
+	if (isset($targetedmesssage->overridemessagegroupid)) {
+		$editlink = "classroommessageeditlanguage.php?mgid={$targetedmesssage->overridemessagegroupid}&languagecode=$code";
+		if (isset($targetedmesssage->messagekey))
+			$editlink .= "&targetmessagekey={$targetedmesssage->messagekey}";
 	} else {
-		$editlink = "classroommessageoverride.php?languagecode=$code&messagekey={$targetedmesssage[0]}&categoryid=$targetedmesssage[2]";
+		$editlink = "classroommessageoverride.php?languagecode=$code&messagekey={$targetedmesssage->messagekey}&categoryid=$targetedmesssage->targetedmessagecategoryid";
 	}
 	
 	$formdata[$code] = array(
@@ -139,7 +140,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 			$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 			Query("BEGIN");
-			if($targetedmesssage[0]) {
+			if($targetedmesssage->messagekey) {
 				QuickUpdate("update targetedmessage set targetedmessagecategoryid = ? where messagekey = ?",false,array($postdata["category"],$targetedmesssage[0]));
 			}
 
