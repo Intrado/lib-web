@@ -278,18 +278,47 @@ class User extends DBMappedObject {
 	 * @return unknown_type
 	 */
 	function canSeePerson ($personid) {
-		$query = "select 1 from person where id=? and not deleted and userid=? and type in ('addressbook','manualadd','upload') \n";
-		if (QuickQuery($query,false,array($personid,$this->id))) {
-			return true;
-		}
-		
+		$query = "from person where id = ?";
+		$person = DBFind('Person', $query, false, array($personid));
+		if (!$person)
+			return false; // person not found
+		if ($person->deleted > 0)
+			return false; // person deleted
+		if ($person->userid == $this->id)
+			return true; // person belongs to this user (addressbook, manualadd, upload)
+	
+		// build the query
 		$joinsql = $this->getPersonAssociationJoinSql(array(), array(), "p");
 		$rulesql = $this->getRuleSql(array(), "p");
 		$query = "select 1 from person p \n"
 				."	$joinsql \n"
 				."	where p.id=? and not p.deleted and (p.userid=? or (1 $rulesql))  \n";
 		
-		return QuickQuery($query,false,array($personid,$this->id));
+		// can see this person
+		$cansee = QuickQuery($query, false, array($personid,$this->id));
+		
+		// if guardian, must check the children
+		if (!$cansee && ("guardianauto" == $person->type || "guardiancm" == $person->type)) {
+			// find the children of this guardian
+			$query = "select personid from personguardian where guardianpersonid = ?";
+			$childPersonids = QuickQueryList($query, false, false, array($personid));
+			foreach ($childPersonids as $childid) {
+				// build the query
+				$joinsql = $this->getPersonAssociationJoinSql(array(), array(), "p");
+				$rulesql = $this->getRuleSql(array(), "p");
+				$query = "select 1 from person p \n"
+						."	$joinsql \n"
+						."	where p.id=? and not p.deleted and (p.userid=? or (1 $rulesql))  \n";
+		
+				// can see this child
+				$cansee = QuickQuery($query, false, array($childid, $this->id));
+				if ($cansee)
+					return true; // can see child, allow see guardian, return now no need to search other children
+			}
+			return false; // no children found to view so do not allow guardian view
+		} else {
+			return $cansee;
+		}
 	}
 	
 	//see if the login is used
