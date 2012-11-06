@@ -87,11 +87,11 @@ if($ajax === true) {
 
 	$total = QuickQuery("select FOUND_ROWS()");
 
-	$customtxt = QuickQueryList("select t.id, p.txt from targetedmessage t, message m, messagepart p
-										where t.targetedmessagecategoryid = ? and t.deleted = 0 and
-											t.overridemessagegroupid = m.messagegroupid and
-											m.languagecode = 'en' and
-											p.messageid = m.id and p.sequence = 0",true,false,array($getcategory));
+	$query = "select t.id, p.txt from targetedmessage t 
+				inner join message m on (t.overridemessagegroupid = m.messagegroupid)
+				inner join messagepart p on (p.messageid = m.id) 
+				where not t.deleted and m.languagecode = 'en' and m.type='email' and p.sequence = 0";
+	$customtxt = QuickQueryList($query,true,false,array($getcategory));
 
 	$numpages = ceil($total/$limit);
 	$curpage = ceil($start/$limit) + 1;
