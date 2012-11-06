@@ -14,6 +14,9 @@ require_once("obj/MessageGroup.obj.php");
 require_once("obj/Message.obj.php");
 require_once("obj/MessagePart.obj.php");
 require_once("obj/TargetedMessage.obj.php");
+require_once("obj/Language.obj.php");
+require_once("obj/TargetedMessageCategory.obj.php");
+
 
 
 
@@ -24,7 +27,6 @@ if (!getSystemSetting('_hastargetedmessage', false) || !$USER->authorize('manage
 	redirect('unauthorized.php');
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
@@ -32,125 +34,59 @@ if (!getSystemSetting('_hastargetedmessage', false) || !$USER->authorize('manage
 if (isset($_GET['id'])) {
 	if($_GET['id'] == "new") {
 		$_SESSION["targetedmessageid"] = null;
+		if (isset($_GET['categoryid'])) {
+			$_SESSION["targetedmessagecategoryid"] = $_GET['categoryid'];
+		}
 	} else {
 		$_SESSION["targetedmessageid"] = $_GET['id'] + 0;
 	}
 	redirect("classroommessageedit.php");
 }
 
-$id = $_SESSION["targetedmessageid"];
 
-////////////////////////////////////////////////////////////////////////////////
-// Form Data
-////////////////////////////////////////////////////////////////////////////////
+$targetedmessage = null;
+$targetedmessagecategory = null;
 
-$value = "";
-$languages = QuickQueryMultiRow("select id,name,code from language");
-$values = array();
-
-if($id) {
-	$targetedmesssage = DBFind("TargetedMessage", "from targetedmessage where id=?",false,array($id));
+if(isset($_SESSION["targetedmessageid"])) {
+	$targetedmessage = DBFind("TargetedMessage", "from targetedmessage where id=?",false,array($_SESSION["targetedmessageid"]));
+	if (!$targetedmessage) {
+		redirect('unauthorized.php');
+	}
+	$targetedmessagecategory = new TargetedMessageCategory($targetedmessage->targetedmessagecategoryid);
 } else {
-	$targetedmesssage = false;
+	// New Custome Targeted Message, Create blank MessageGroup and Targeted Message
+	if (isset($_SESSION["targetedmessagecategoryid"])) {
+		$targetedmessagecategory = DBFind("targetedmessagecategory", "from targetedmessagecategory where id=? and not deleted",false,array($_SESSION["targetedmessagecategoryid"]));
+	
+		if(!$targetedmessagecategory) {
+			redirect('unauthorized.php');
+		}
+	}
+	
+	$messagegroup = new MessageGroup();
+	$messagegroup->userid = $USER->id;
+	$messagegroup->name = "Custom Classroom";
+	$messagegroup->description = '';
+	$messagegroup->modified = date("Y-m-d H:i:s", time());
+	$messagegroup->deleted = 1;
+	$messagegroup->permanent = 1;
+	$messagegroup->create();
+	
+	$targetedmessage = new TargetedMessage();
+	$targetedmessage->messagekey = "custom-" .  $messagegroup->id;
+	$targetedmessage->targetedmessagecategoryid = $targetedmessagecategory->id;
+	$targetedmessage->overridemessagegroupid = $messagegroup->id;
+	$targetedmessage->create();
 }
 
-if(isset($targetedmesssage->overridemessagegroupid)) {
+
+if(isset($targetedmessage->overridemessagegroupid)) {
 	$languagemessages = QuickQueryList("select m.languagecode, p.txt from message m, messagepart p
-			where m.messagegroupid = ? and m.id = p.messageid and m.type='email'", true,false,array($targetedmesssage->overridemessagegroupid));
+			where m.messagegroupid = ? and m.id = p.messageid and m.type='email'", true,false,array($targetedmessage->overridemessagegroupid));
 }
-
-$categories = QuickQueryList("select id, name from targetedmessagecategory where deleted = 0",true);
-$categories = $categories?(array("" => "-- Select a Category --") + $categories):array("" => "-- Select a Category --");
-
-$formdata = array();
 
 if(!isset($messagedatacache)) { 
 	$messagedatacache = array();
-}
-
-error_log(json_encode($targetedmesssage));
-$formdata["category"] = array(
-	"label" => _L("Category"),
-	"value" => isset($targetedmesssage->targetedmessagecategoryid)?$targetedmesssage->targetedmessagecategoryid:"",
-	"validators" => array(
-		array("ValRequired"),
-		array("ValInArray", "values" => array_keys($categories))
-	),
-	"control" => array("SelectMenu","values" => $categories),
-	"helpstep" => 1
-);
-
-foreach($languages as $language) {
-	$code = $language[2];
-	$value = "";
-	if(isset($languagemessages[$code]) && $languagemessages[$code] != "") {
-		// Populate the form with message data and complete with default data
-		$value = $languagemessages[$code];
-	} else {
-		$filename = "messagedata/" . $code . "/targetedmessage.php";
-		if(file_exists($filename))
-			include_once($filename);
-	
-		if(isset($messagedatacache[$code]) && isset($messagedatacache[$code][$targetedmesssage->messagekey])) {
-			$value = $messagedatacache[$code][$targetedmesssage->messagekey];
-		} // else no default data found value is set to empty
-	}
-	
-	// if has overridemessagegroupid
-	if (isset($targetedmesssage->overridemessagegroupid)) {
-		$editlink = "classroommessageeditlanguage.php?mgid={$targetedmesssage->overridemessagegroupid}&languagecode=$code";
-		if (isset($targetedmesssage->messagekey))
-			$editlink .= "&targetmessagekey={$targetedmesssage->messagekey}";
-	} else {
-		$editlink = "classroommessageoverride.php?languagecode=$code&messagekey={$targetedmesssage->messagekey}&categoryid=$targetedmesssage->targetedmessagecategoryid";
-	}
-	
-	$formdata[$code] = array(
-			"label" => $language[1],
-			"control" => array("FormHtml","html"=>'<p class="translate_text">'.escapehtml($value) . icon_button("Edit", "pencil",false,$editlink) . '</p>'),
-			"helpstep" => 2
-	);
-}
-
-$helpsteps = array (
-	_L('Select which category this message belongs in. This should allow teachers to find the message easily.'),
-	_L('Type the message as it should appear in your Classroom Messaging email. You will need to enter the translated versions of the message. If you are unable to enter a translated version, English will be used by default.')
-);
-
-$buttons = array(submit_button(_L('Save'),"submit","tick"),
-	icon_button(_L('Cancel'),"cross",null,"classroommessagemanager.php"));
-$form = new Form("classroom",$formdata,$helpsteps,$buttons);
-
-////////////////////////////////////////////////////////////////////////////////
-// Form Data Handling
-////////////////////////////////////////////////////////////////////////////////
-
-//check and handle an ajax request (will exit early)
-//or merge in related post data
-$form->handleRequest();
-
-$datachange = false;
-$errors = false;
-//check for form submission
-if ($button = $form->getSubmit()) { //checks for submit and merges in post data
-	$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response
-
-	if ($form->checkForDataChange()) {
-		$datachange = true;
-	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
-			$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
-			Query("BEGIN");
-			if($targetedmesssage->messagekey) {
-				QuickUpdate("update targetedmessage set targetedmessagecategoryid = ? where messagekey = ?",false,array($postdata["category"],$targetedmesssage[0]));
-			}
-
-
-			Query("COMMIT");
-			if ($ajax)
-				$form->sendTo("classroommessagemanager.php");
-			else
-				redirect("classroommessagemanager.php");
-		}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -162,7 +98,33 @@ $TITLE = _L('Classroom Message Edit');
 include_once("nav.inc.php");
 
 startWindow(_L('Language Variations for Classroom Message'));
-echo $form->render();
+$languages = Language::getLanguageMap();
+error_log(json_encode($messagedatacache));
+foreach($languages as $code => $languagename) {
+	$value = "";
+
+	if ($targetedmessage->overridemessagegroupid) {
+		$editlink = "classroommessageeditlanguage.php?mgid={$targetedmessage->overridemessagegroupid}&languagecode=$code&targetmessagekey={$targetedmessage->messagekey}";
+	} else {
+		$editlink = "classroommessageoverride.php?languagecode=$code&targetmessagekey={$targetedmessage->messagekey}";
+	}
+	
+	if(isset($languagemessages[$code]) && $languagemessages[$code] != "") {
+		$value = $languagemessages[$code];
+	} else {			
+		// Try to find default value
+		$filename = "messagedata/" . $code . "/targetedmessage.php";
+		if(file_exists($filename))
+			include_once($filename);
+		
+		if(isset($messagedatacache[$code]) && isset($messagedatacache[$code][$targetedmessage->messagekey])) {
+			$value = $messagedatacache[$code][$targetedmessage->messagekey];
+		}
+	}
+	echo $languagename  . '<p class="translate_text">'.escapehtml($value) . icon_button("Edit", "pencil",false,$editlink) . '</p> <br/>';
+}
+
+echo icon_button(_L('Done'),"tick",null,"classroommessagemanager.php");
 endWindow();
 include_once("navbottom.inc.php");
 ?>
