@@ -116,7 +116,7 @@ $languages = array($defaultcode => $defaultlanguage) + $languages;
 foreach($languages as $code => $languagename) {
 	$value = "";
 
-	if ($targetedmessage->overridemessagegroupid) {
+	if (isset($targetedmessage->overridemessagegroupid)) {
 		$editlink = "classroommessageeditlanguage.php?mgid={$targetedmessage->overridemessagegroupid}&languagecode=$code&targetmessagekey={$targetedmessage->messagekey}";
 	} else {
 		$editlink = "classroommessageoverride.php?languagecode=$code&targetmessagekey={$targetedmessage->messagekey}";
@@ -141,19 +141,22 @@ foreach($languages as $code => $languagename) {
 			"label" => $languagename,
 			"value" => $value,
 			"validators" => array(),
-			"control" => array("TargetedLanguageEdit","editlink"=>$editlink),
-			"helpstep" => 1
+			"control" => array("TargetedLanguageEdit","editlink"=>$editlink)
 	);
 	
 	if ($code == $defaultcode) {
 		$formdata[$code]["validators"][] = array("ValRequired");
+		$formdata[$code]["helpstep"] = 1;
 		$formdata[] = _L("Other languages");
+	} else {
+		$formdata[$code]["helpstep"] = 2;
 	}
 
 	//echo $languagename  . '<p class="translate_text">'.escapehtml($value) . icon_button("Edit", "pencil",false,$editlink) . '</p> <br/>';
 }
 $helpsteps = array (
-		_L('Type the message as it should appear in your Classroom Messaging email. You will need to enter the translated versions of the message. If you are unable to enter a translated version, English will be used by default.')
+		_L('English will be used by default.'),
+		_L('If you are unable to enter a translated version, English will be used by default.')
 );
 
 $buttons = array(submit_button(_L('Save'),"submit","tick"),
