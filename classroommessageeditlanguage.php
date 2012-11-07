@@ -32,6 +32,7 @@ require_once("obj/ValMessageBody.val.php");
 require_once("obj/PhoneMessageEditor.fi.php");
 require_once("obj/PreviewButton.fi.php");
 require_once("obj/ValTtsText.val.php");
+require_once("obj/TargetedMessage.obj.php");
 
 // appserver and thrift includes
 require_once("inc/appserver.inc.php");
@@ -42,9 +43,9 @@ require_once("inc/editmessagecommon.inc.php");
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
 global $USER;
-if (!$USER->authorize("sendphone"))
+if (!getSystemSetting('_hastargetedmessage', false) || !$USER->authorize('manageclassroommessaging')) {
 	redirect('unauthorized.php');
-
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Action/Request Processing
@@ -65,8 +66,9 @@ if (isset($_SESSION['editmessage']['messagegroupid']) &&
 }
 
 
-// if the user doesn't own the parent message group, unauthorized!
-if (!userOwns("messagegroup", $messagegroup->id))
+$targetedmessage = DBFind("TargetedMessage", "from targetedmessage where overridemessagegroupid=?",false,array($messagegroup->id));
+// Message group must be connected to a targeted message to be able to edit here since we can not use userowns
+if (!$targetedmessage)
 	redirect('unauthorized.php');
 
 // invalid language code specified?
