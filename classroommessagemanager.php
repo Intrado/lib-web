@@ -334,9 +334,10 @@ document.observe('dom:loaded', function() {
 			"content": $(conentid).remove()
 		});
 	});
-	var first = categoryinfo.keys().first();
-	tabs.show_section('lib-' + first);
-	updatecategory(first);
+	var selectedcategory = <?= isset($_GET["category"])?"{$_GET["category"]}":"categoryinfo.keys().first()" ?>;
+	console.log(selectedcategory);
+	tabs.show_section('lib-' + selectedcategory);
+	updatecategory(selectedcategory);
 
 	tabs.container.observe('Tabs:ClickTitle', function(event) {
 		activepage = 0;
