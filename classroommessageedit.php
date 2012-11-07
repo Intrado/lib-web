@@ -93,6 +93,7 @@ if(isset($_SESSION["targetedmessageid"])) {
 	$targetedmessage->overridemessagegroupid = $messagegroup->id;
 	$targetedmessage->deleted = 1;// Undelete once valid
 	$targetedmessage->create();
+	$_SESSION["targetedmessageid"] = $targetedmessage->id;
 }
 
 
@@ -183,13 +184,16 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 		Query("BEGIN");
-
+		
+		// Undelete targeted message since it is now valid
+		$targetedmessage->deleted = 0;
+		$targetedmessage->update();
 
 		Query("COMMIT");
 		if ($ajax)
-			$form->sendTo("classroommessagemanager.php");
+			$form->sendTo("classroommessagemanager.php?category=" . $targetedmessagecategory->id);
 		else
-			redirect("classroommessagemanager.php");
+			redirect("classroommessagemanager.php?category=" . $targetedmessagecategory->id);
 	}
 }
 
