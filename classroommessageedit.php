@@ -27,6 +27,21 @@ if (!getSystemSetting('_hastargetedmessage', false) || !$USER->authorize('manage
 	redirect('unauthorized.php');
 }
 
+
+class TargetedLanguageEdit extends FormItem {
+	function render ($value) {
+		$n = $this->form->name."_".$this->name;
+		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'"/>';
+		
+		$value = SmartTruncate($value, 30);
+		
+		$str .= '<input id="'.$n.'-display" name="'.$n.'-display" type="text" value="'.escapehtml($value).'" size="30" maxlength="30" disabled />';
+		
+		$str .= icon_button("Edit", "pencil",false,$this->args["editlink"])  . icon_button("Reset", "cross",false,$this->args["editlink"]);		
+		return $str;
+	}
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
@@ -76,6 +91,7 @@ if(isset($_SESSION["targetedmessageid"])) {
 	$targetedmessage->messagekey = "custom-" .  $messagegroup->id;
 	$targetedmessage->targetedmessagecategoryid = $targetedmessagecategory->id;
 	$targetedmessage->overridemessagegroupid = $messagegroup->id;
+	$targetedmessage->deleted = 1;// Undelete once valid
 	$targetedmessage->create();
 }
 
@@ -89,6 +105,91 @@ if(!isset($messagedatacache)) {
 	$messagedatacache = array();
 }
 
+$formdata = array(_L("Default language"));
+
+$languages = Language::getLanguageMap();
+$defaultcode = Language::getDefaultLanguageCode();
+$defaultlanguage = Language::getName(Language::getDefaultLanguageCode());
+unset($languages[$defaultcode]);
+$languages = array($defaultcode => $defaultlanguage) + $languages;
+
+foreach($languages as $code => $languagename) {
+	$value = "";
+
+	if ($targetedmessage->overridemessagegroupid) {
+		$editlink = "classroommessageeditlanguage.php?mgid={$targetedmessage->overridemessagegroupid}&languagecode=$code&targetmessagekey={$targetedmessage->messagekey}";
+	} else {
+		$editlink = "classroommessageoverride.php?languagecode=$code&targetmessagekey={$targetedmessage->messagekey}";
+	}
+
+	if(isset($languagemessages[$code]) && $languagemessages[$code] != "") {
+		$value = $languagemessages[$code];
+	} else {
+		// Try to find default value
+		$filename = "messagedata/" . $code . "/targetedmessage.php";
+		if(file_exists($filename))
+			include_once($filename);
+
+		if(isset($messagedatacache[$code]) && isset($messagedatacache[$code][$targetedmessage->messagekey])) {
+			$value = $messagedatacache[$code][$targetedmessage->messagekey];
+		}
+	}
+
+	
+	
+	$formdata[$code] = array(
+			"label" => $languagename,
+			"value" => $value,
+			"validators" => array(),
+			"control" => array("TargetedLanguageEdit","editlink"=>$editlink),
+			"helpstep" => 1
+	);
+	
+	if ($code == $defaultcode) {
+		$formdata[$code]["validators"][] = array("ValRequired");
+		$formdata[] = _L("Other languages");
+	}
+
+	//echo $languagename  . '<p class="translate_text">'.escapehtml($value) . icon_button("Edit", "pencil",false,$editlink) . '</p> <br/>';
+}
+$helpsteps = array (
+		_L('Type the message as it should appear in your Classroom Messaging email. You will need to enter the translated versions of the message. If you are unable to enter a translated version, English will be used by default.')
+);
+
+$buttons = array(submit_button(_L('Save'),"submit","tick"),
+		icon_button(_L('Cancel'),"cross",null,"classroommessagemanager.php"));
+$form = new Form("classroom",$formdata,$helpsteps,$buttons);
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Form Data Handling
+////////////////////////////////////////////////////////////////////////////////
+
+//check and handle an ajax request (will exit early)
+//or merge in related post data
+$form->handleRequest();
+
+$datachange = false;
+$errors = false;
+//check for form submission
+if ($button = $form->getSubmit()) { //checks for submit and merges in post data
+	$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response
+
+	if ($form->checkForDataChange()) {
+		$datachange = true;
+	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
+		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
+		Query("BEGIN");
+
+
+		Query("COMMIT");
+		if ($ajax)
+			$form->sendTo("classroommessagemanager.php");
+		else
+			redirect("classroommessagemanager.php");
+	}
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
@@ -98,33 +199,13 @@ $TITLE = _L('Classroom Message Edit');
 include_once("nav.inc.php");
 
 startWindow(_L('Language Variations for Classroom Message'));
-$languages = Language::getLanguageMap();
-error_log(json_encode($messagedatacache));
-foreach($languages as $code => $languagename) {
-	$value = "";
 
-	if ($targetedmessage->overridemessagegroupid) {
-		$editlink = "classroommessageeditlanguage.php?mgid={$targetedmessage->overridemessagegroupid}&languagecode=$code&targetmessagekey={$targetedmessage->messagekey}";
-	} else {
-		$editlink = "classroommessageoverride.php?languagecode=$code&targetmessagekey={$targetedmessage->messagekey}";
-	}
-	
-	if(isset($languagemessages[$code]) && $languagemessages[$code] != "") {
-		$value = $languagemessages[$code];
-	} else {			
-		// Try to find default value
-		$filename = "messagedata/" . $code . "/targetedmessage.php";
-		if(file_exists($filename))
-			include_once($filename);
-		
-		if(isset($messagedatacache[$code]) && isset($messagedatacache[$code][$targetedmessage->messagekey])) {
-			$value = $messagedatacache[$code][$targetedmessage->messagekey];
-		}
-	}
-	echo $languagename  . '<p class="translate_text">'.escapehtml($value) . icon_button("Edit", "pencil",false,$editlink) . '</p> <br/>';
-}
 
-echo icon_button(_L('Done'),"tick",null,"classroommessagemanager.php");
+echo $form->render();
+
+
+
+//echo icon_button(_L('Done'),"tick",null,"classroommessagemanager.php");
 endWindow();
 include_once("navbottom.inc.php");
 ?>
