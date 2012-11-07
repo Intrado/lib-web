@@ -161,7 +161,7 @@ $helpsteps = array (
 );
 
 $buttons = array(submit_button(_L('Save'),"submit","tick"),
-		icon_button(_L('Cancel'),"cross",null,"classroommessagemanager.php"));
+		icon_button(_L('Cancel'),"cross",null,"classroommessagemanager.php?category=" . $targetedmessagecategory->id));
 $form = new Form("classroom",$formdata,$helpsteps,$buttons);
 
 
