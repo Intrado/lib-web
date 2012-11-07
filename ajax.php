@@ -147,9 +147,20 @@ function handleRequest() {
 			
 			$messagegroupid = $_GET['messagegroupid'] + 0;
 			
-			if (!userOwns("messagegroup", $messagegroupid))
-				return false;
-
+			if (!userOwns("messagegroup", $messagegroupid)) {
+				// Messagegroup can be connected to a targeted message 
+				
+				// Check if user has classroom managment permission
+				if (!getSystemSetting('_hastargetedmessage', false) || !$USER->authorize('manageclassroommessaging')) {
+					return false;
+				}
+				
+				// Check targetedmessage link
+				if (!QuickQuery("select 1 from targetedmessage where overridemessagegroupid=?",false,array($messagegroupid))) {
+					return false;
+				}
+			}	
+			
 			$audiofileids = MessageGroup::getReferencedAudioFileIDs($messagegroupid);
 			if (count($audiofileids) > 0)
 				return QuickQueryMultiRow('select id, name, messagegroupid from audiofile where not deleted and id in ('.implode(',', $audiofileids).') order by recorddate desc', true, false);
