@@ -186,7 +186,7 @@ $helpsteps = array(_L("<p>You can use a variety of techniques to build your mess
 	"<br><br><i><b>Note:</b> Some languages are only available in one gender. In those cases, selecting a different gender will result in the same message playback.</i>"),
 	_L("Click the preview button to hear a preview of your message."));
 		
-$buttons = array(submit_button(_L('Done'),"submit","tick"));
+$buttons = array(submit_button(_L('Save'),"submit","tick"),icon_button(_L("Cancel"), "cross",null,"classroommessageedit.php"));
 $form = new Form("phoneadvanced",$formdata,$helpsteps,$buttons,"vertical");
 
 ////////////////////////////////////////////////////////////////////////////////
