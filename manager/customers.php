@@ -90,7 +90,8 @@ function fmt_actions($row, $index) {
 		$actions .= '<a href="customerdms.php?cid=' . $row[0] . '" title="DMs"><img src="mimg/s-rdms.png" border=0></a>';
 	if ($MANAGERUSER->authorizedAny(array("ffield2gfield","billablecalls","edittemplate","runqueries")))
 		$actions .= '<a href="advancedcustomeractions.php?cid=' . $row[0] . '" title="Advanced Actions"><img src="mimg/s-config.png" border=0></a>';
-    $actions .= '<a href="customerdetails.php?customerid='. $row[0] . '" title="Customer details"><img src="img/icons/chart_bar.png" border=0></a>';
+	if ($MANAGERUSER->authorized("aspreportgraphs"))
+    	$actions .= '<a href="customerdetails.php?customerid='. $row[0] . '" title="Customer details"><img src="img/icons/chart_bar.png" border=0></a>';
 	$actions .= '</div>';
 	return $actions;
 }
