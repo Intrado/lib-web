@@ -48,8 +48,8 @@ if (isset($_GET['timer']) || isset($_SESSION['timer'])) {
 
 $NAVTREE = array (
 	array("Customers","allcustomers.php",NULL,$MAINTAB=="overview",array()),
-	array("Commsuite","commsuitecustomers.php",NULL,$MAINTAB=="commsuite",array(
-	array("Customers","commsuitecustomers.php",NULL,$SUBTAB=="customers"),
+	array("Commsuite","customers.php",NULL,$MAINTAB=="commsuite",array(
+	array("Customers","customers.php",NULL,$SUBTAB=="customers"),
 	array("Import&nbsp;Alerts","importalerts.php",NULL,$SUBTAB=="importalerts"),
 	array("Active&nbsp;Jobs","customeractivejobs.php",NULL,$SUBTAB=="activejobs"),
 	array("Locked&nbsp;Users","lockedusers.php","lockedusers",$SUBTAB=="lockedusers"),

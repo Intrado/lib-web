@@ -696,7 +696,7 @@ $formdata["brandtheme"] = array(
 
 
 $thispage = "customeredit.php";
-$returntopage = isset($_SESSION["newnav"])?"commsuitecustomers.php":"customers.php";
+$returntopage = "customers.php";
 
 $buttons = array(submit_button(_L("Save"),"save","tick"),submit_button(_L("Save and Return"),"done","tick"),
 				icon_button(_L('Cancel'),"cross",null,$returntopage));
