@@ -33,13 +33,17 @@ if(isset($_GET['partnum'])) {
 			$audiopart = audioFileGetForFormat($contentid, "mp3");
 			break;
 	}
-	header("HTTP/1.0 200 OK");
-	header("Content-Type: $audiopart->contenttype");
-	header('Pragma: private');
-	header('Cache-control: private, must-revalidate');
-	header("Content-Length: " . strlen($audiopart->data));
-	header("Connection: close");
-	echo $audiopart->data;
+	if (!$audiopart) {
+		header("HTTP/1.0 404 Not Found");
+	} else {
+		header("HTTP/1.0 200 OK");
+		header("Content-Type: $audiopart->contenttype");
+		header('Pragma: private');
+		header('Cache-control: private, must-revalidate');
+		header("Content-Length: " . strlen($audiopart->data));
+		header("Connection: close");
+		echo $audiopart->data;
+	}
 } else {
 	$messagepartdtos = array();
 	$parts = $_SESSION["previewmessage"]["parts"];
@@ -68,15 +72,20 @@ if(isset($_GET['partnum'])) {
 	}
 	
 	$audiofull = phoneMessageGetMp3AudioFile($messagepartdtos);
-	header("HTTP/1.0 200 OK");
-	header("Content-Type: $audiofull->contenttype");
-	if (isset($_GET['download']))
-		header("Content-disposition: attachment; filename=message.mp3");
-	header('Pragma: private');
-	header('Cache-control: private, must-revalidate');
-	header("Content-Length: " . strlen($audiofull->data));
-	header("Connection: close");
-	echo $audiofull->data;
+	
+	if (!$audiofull) {
+		header("HTTP/1.0 200 OK");
+		header("Content-Type: $audiofull->contenttype");
+		if (isset($_GET['download']))
+			header("Content-disposition: attachment; filename=message.mp3");
+		header('Pragma: private');
+		header('Cache-control: private, must-revalidate');
+		header("Content-Length: " . strlen($audiofull->data));
+		header("Connection: close");
+		echo $audiofull->data;
+	} else {
+		header("HTTP/1.0 404 Not Found");
+	}
 }
 
 ?>
