@@ -74,6 +74,8 @@ if(isset($_GET['partnum'])) {
 	$audiofull = phoneMessageGetMp3AudioFile($messagepartdtos);
 	
 	if (!$audiofull) {
+		header("HTTP/1.0 404 Not Found");
+	} else {
 		header("HTTP/1.0 200 OK");
 		header("Content-Type: $audiofull->contenttype");
 		if (isset($_GET['download']))
@@ -83,8 +85,6 @@ if(isset($_GET['partnum'])) {
 		header("Content-Length: " . strlen($audiofull->data));
 		header("Connection: close");
 		echo $audiofull->data;
-	} else {
-		header("HTTP/1.0 404 Not Found");
 	}
 }
 
