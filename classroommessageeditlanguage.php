@@ -169,7 +169,7 @@ $formdata["preview"] = array(
 		"validators" => array(),
 		"control" => array("PreviewButton",
 			"language" => $languagecode,
-			"texttarget" => "message",
+			"texttarget" => "phonemessage",
 			"gendertarget" => "gender",
 		),
 		"helpstep" => 3);
@@ -252,7 +252,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$phonemessage->create();
 						
 			// create the message parts
-			$phonemessage->recreateParts($postdata['phonemessage'], null, $postdata['gender']);
+			$audiofileids = MessageGroup::getReferencedAudioFileIDs($messagegroup->id);
+				
+			$phonemessage->recreateParts($postdata['phonemessage'], null, $postdata['gender'],$audiofileids);
 			
 			// Hack to correct the voice id for non tts languages
 			if (!isset($ttslanguages[$languagecode])) {
