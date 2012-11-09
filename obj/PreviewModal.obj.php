@@ -128,7 +128,11 @@ class PreviewModal {
 		exit();
 	}
 	
-	// Constructs and returns a PreviewModal object besed on sourcetext from agument or located in session.
+	/**
+	 * Constructs and returns a PreviewModal object besed on sourcetext from agument or located in session.
+	 * Make sure user has access to to messagegroup before passing in $messagegroupid
+	 * @param $messagegroupid (optional)
+	 */
 	static function HandleRequestWithPhoneText($messagegroupid = false) {
 		$modal = new PreviewModal();
 		$modal->playable = true;

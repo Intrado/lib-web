@@ -180,9 +180,14 @@ class MessageGroup extends DBMappedObject {
 		return $summaries[$messagegroupid];
 	}
 
-	// Returns an array of audiofile ids for ones assigned
-	// to this messagegroup plus ones that are referenced in message parts
-	// for messages of this messagegroup.
+
+	/**
+	 * Returns an array of audiofile ids for ones assigned
+	 * to this messagegroup plus ones that are referenced in message parts
+	 * for messages of this messagegroup.
+	 * Make sure user has access to to messagegroup before passing in $messagegroupid
+	 * @param int $messagegroupid 
+	 */
 	static function getReferencedAudioFileIDs($messagegroupid) {
 		
 		static $audiofileids = array();
