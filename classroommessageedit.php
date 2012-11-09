@@ -32,11 +32,7 @@ class TargetedLanguageEdit extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
 		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'"/>';
-		
-		$value = SmartTruncate($value, 30);
-		
-		$str .= '<input id="'.$n.'-display" name="'.$n.'-display" type="text" value="'.escapehtml($value).'" size="30" maxlength="30" disabled />&nbsp;';
-		
+		$str .= '<input id="'.$n.'-display" name="'.$n.'-display" type="text" value="'.escapehtml($value).'" disabled />&nbsp;';
 		$str .= icon_button("Edit", "pencil",false,$this->args["editLink"]);
 		
 		if ($this->args["hasDefaultValue"]) {
