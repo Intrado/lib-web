@@ -35,9 +35,13 @@ class TargetedLanguageEdit extends FormItem {
 		
 		$value = SmartTruncate($value, 30);
 		
-		$str .= '<input id="'.$n.'-display" name="'.$n.'-display" type="text" value="'.escapehtml($value).'" size="30" maxlength="30" disabled />';
+		$str .= '<input id="'.$n.'-display" name="'.$n.'-display" type="text" value="'.escapehtml($value).'" size="30" maxlength="30" disabled />&nbsp;';
 		
-		$str .= icon_button("Edit", "pencil",false,$this->args["editlink"])  . icon_button("Reset", "cross",false,$this->args["editlink"]);		
+		$str .= icon_button("Edit", "pencil",false,$this->args["editLink"]);
+		
+		if ($this->args["hasDefaultValue"]) {
+			$str .= icon_button("Reset to Default", "arrow_undo",false,"classroommessageedit.php?reset={$this->name}");
+		}
 		return $str;
 	}
 }
@@ -96,6 +100,20 @@ if(isset($_SESSION["targetedmessageid"])) {
 	$_SESSION["targetedmessageid"] = $targetedmessage->id;
 }
 
+if (isset($_GET["reset"])) {
+	if (isset($targetedmessage->overridemessagegroupid)) {
+		// Delete all messages and messageparts related to the delete request
+		QuickUpdate("delete m.* ,mp.*
+				from message m,messagepart mp 
+				where
+				m.messagegroupid=? and m.languagecode = ? and
+				m.id = mp.messageid",
+				false,
+				array($targetedmessage->overridemessagegroupid,$_GET["reset"]));
+		//$messagegroup->updateDefaultLanguageCode();
+		notice(_L("%s is now set to default",Language::getName($_GET["reset"])));
+	}
+}
 
 if(isset($targetedmessage->overridemessagegroupid)) {
 	$languagemessages = QuickQueryList("select m.languagecode, p.txt from message m, messagepart p
@@ -123,34 +141,38 @@ foreach($languages as $code => $languagename) {
 		$editlink = "classroommessageoverride.php?languagecode=$code&targetmessagekey={$targetedmessage->messagekey}";
 	}
 
-	if(isset($languagemessages[$code]) && $languagemessages[$code] != "") {
+	$filename = "messagedata/" . $code . "/targetedmessage.php";
+	if(file_exists($filename))
+		include_once($filename);
+	$hasDefaultValue = isset($messagedatacache[$code]) && isset($messagedatacache[$code][$targetedmessage->messagekey]);
+	$isCustomized = false;
+	
+	if (isset($languagemessages[$code]) && $languagemessages[$code] != "") {
 		$value = $languagemessages[$code];
+		$isCustomized = true;
 	} else {
-		// Try to find default value
-		$filename = "messagedata/" . $code . "/targetedmessage.php";
-		if(file_exists($filename))
-			include_once($filename);
-
-		if(isset($messagedatacache[$code]) && isset($messagedatacache[$code][$targetedmessage->messagekey])) {
-			$value = $messagedatacache[$code][$targetedmessage->messagekey];
-		}
+		$value = $hasDefaultValue?$messagedatacache[$code][$targetedmessage->messagekey]:"";
 	}
-
 	
 	
-	$formdata[$code] = array(
+	
+	if ($code == $defaultcode) {
+		$formdata[$code] = array(
+			"label" => $languagename,
+			"value" => $value,
+			"validators" => array(array("ValRequired")),
+			"control" => array("TargetedLanguageEdit","editLink"=>$editlink,"hasDefaultValue" => $hasDefaultValue && $isCustomized),
+			"helpstep" => 1
+		);
+		$formdata[] = _L("Other languages");
+	} else {
+		$formdata[$code] = array(
 			"label" => $languagename,
 			"value" => $value,
 			"validators" => array(),
-			"control" => array("TargetedLanguageEdit","editlink"=>$editlink)
-	);
-	
-	if ($code == $defaultcode) {
-		$formdata[$code]["validators"][] = array("ValRequired");
-		$formdata[$code]["helpstep"] = 1;
-		$formdata[] = _L("Other languages");
-	} else {
-		$formdata[$code]["helpstep"] = 2;
+			"control" => array("TargetedLanguageEdit","editLink"=>$editlink,"hasDefaultValue" => $isCustomized),
+			"helpstep" => 2
+		);
 	}
 
 	//echo $languagename  . '<p class="translate_text">'.escapehtml($value) . icon_button("Edit", "pencil",false,$editlink) . '</p> <br/>';
