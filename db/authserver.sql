@@ -688,7 +688,7 @@ CREATE TABLE `dmgroupsetting` (
 `name` VARCHAR( 50 ) NOT NULL ,
 `value` VARCHAR( 1024 ) NOT NULL ,
 PRIMARY KEY ( `dmgroupid` , `name` )
-) ENGINE = InnoDB;
+) ENGINE = InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci ;
 
 -- END 9.4/1
 
