@@ -34,56 +34,10 @@ require_once("obj/JobList.obj.php");
 if (!getSystemSetting('_hastargetedmessage', false) || !$USER->authorize('manageclassroommessaging'))
 	redirect("unauthorized.php");
 
-
-
-
-class TemplateEdit extends FormItem {
-	function render ($value) {
-		$n = $this->form->name."_".$this->name;
-		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'"/>';
-		$str .= icon_button("Edit Email", "pencil",false,false,'style="background-image:-moz-linear-gradient(center top , #D8F7DE, #00D245);"');
-	
-		$str .= icon_button("Add Phone", "add",false,false,'class="ophone complete"');
-		return $str;
-	}
-}
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
-
-// always try to find the alert job
 $job = DBFind("Job", "from job where type = 'alert' and status = 'repeating'", false, array());
-
-// if there is one, look up it's schedule
-if ($job)
-	$schedule = DBFind("Schedule", "from schedule where id = ?", false, array($job->scheduleid));
-else
-	$schedule = new Schedule();
-
-// get scheduled days of week into a format useable by the form item
-$dowvalues = array();
-$data = explode(",", $schedule->daysofweek);
-for ($x = 1; $x < 8; $x++)
-	$dowvalues[$x-1] = in_array($x,$data);
-
-$defaulttime = date("g:i a", strtotime("5:00 pm"));
-if($USER->getCallLate() < date("g:i a", strtotime($defaulttime . " + 1 hour")))
-	$defaulttime = $USER->getCallEarly();
-$dowvalues[7] = ($schedule->time?date("g:i a", strtotime($schedule->time)):$defaulttime);
-
-// Prepare Job JobType data
-$userjobtypes = JobType::getUserJobTypes();
-$jobtypes = array();
-$jobtips = array();
-foreach ($userjobtypes as $id => $jobtype) {
-	// don't show systempriority 1 job types
-	if ($jobtype->systempriority > 1) {
-		$jobtypes[$id] = $jobtype->name;
-		$jobtips[$id] = escapehtml($jobtype->info);
-	}
-}
 
 // get this jobs messagegroup and it's messages
 $messagesbylangcode = array();
@@ -105,75 +59,101 @@ $defaultcode = Language::getDefaultLanguageCode();
 $defaultlanguage = Language::getName(Language::getDefaultLanguageCode());
 $languagemap = Language::getLanguageMap();
 
-// get all active user logins
-$activeusers = QuickQueryList("select id, login from user where not deleted and enabled and login != 'schoolmessenger'", true, false, array());
-
-// Do job template form stuff
-$formdata = array(
-	_L("%s Template",getJobTitle()),
-	"name" => array(
-		"label" => _L('Template Name'),
-		"fieldhelp" => _L("Enter a name for Classroom Messaging %s.",getJobsTitle()),
-		"value" => ($job)?$job->name:"",
-		"validators" => array(
-			array("ValRequired"),
-			array("ValDuplicateNameCheck","type" => "job"),
-			array("ValLength","max" => 30)
-		),
-		"control" => array("TextField","size" => 30, "maxlength" => 30),
-		"helpstep" => 1
-	),
-	"jobtype" => array(
-		"label" => _L("Type/Category"),
-		"fieldhelp" => _L("Select the option that best describes the type of %s you are sending.",getJobTitle()),
-		"value" => ($job)?$job->jobtypeid:"",
-		"validators" => array(
-			array("ValRequired"),
-			array("ValInArray", "values" => array_keys($jobtypes))
-		),
-		"control" => array("RadioButton", "values" => $jobtypes, "hover" => $jobtips),
-		"helpstep" => 2
-	),
-	"schedule" => array(
-		"label" => _L("Days to run"),
-		"fieldhelp" => _L("Select which days Classroom Messages should be sent."),
-		"value" => $dowvalues,
-		"validators" => array(
-			array("ValRequired"),
-			array("ValWeekRepeatItem")
-		),
-		"control" => array("WeekRepeatItem","timevalues" => newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $USER->getCallLate())),
-		"helpstep" => 3
-	),
-	"owner" => array(
-		"label" => _L("Owner"),
-		"fieldhelp" => _L("Select the user account Classroom Message jobs should run under."),
-		"value" => ($job)?$job->userid:$USER->id,
-		"validators" => array(
-			array("ValRequired"),
-			array("ValInArray", "values" => array_keys($activeusers))
-		),
-		"control" => array("SelectMenu", "values" => ($activeusers?array("-- Select One --") + $activeusers:array("-- Select One --"))),
-		"helpstep" => 4
-	)
-);
-
 // Do message template form stuff
 $formdata[] = _L("Message Template");
-$formdata["template"] = array(
-		"label" => _L("Template"),
-		"value" => "",
-		"validators" => array(array("ValRequired")),
-		"control" => array("TemplateEdit"),
-		"helpstep" => 5
+
+// set the subject, from email, from name
+$formdata["fromname"] = array(
+	"label" => _L('From Name'),
+	"fieldhelp" => _L('Recipients will see this name as the sender of the email.'),
+	"value" => (isset($messagesbylangcode[$defaultcode])?$messagesbylangcode[$defaultcode]->fromname:$USER->firstname . " " . $USER->lastname),
+	"validators" => array(
+			array("ValRequired"),
+			array("ValLength","max" => 50)
+			),
+	"control" => array("TextField","size" => 25, "maxlength" => 50),
+	"helpstep" => 1
 );
 
+$formdata["fromemail"] = array(
+	"label" => _L("From Email"),
+	"fieldhelp" => _L('This is the address the email is coming from. Recipients will also be able to reply to this address.'),
+	"value" => (isset($messagesbylangcode[$defaultcode])?$messagesbylangcode[$defaultcode]->fromemail:$USER->email),
+	"validators" => array(
+		array("ValRequired"),
+		array("ValLength","max" => 255),
+		array("ValEmail", "domain" => getSystemSetting('emaildomain'))
+		),
+	"control" => array("TextField","max"=>255,"size"=>35),
+	"helpstep" => 1
+);
+
+// get the message parts for this message if it exists
+$message = false;
+if (isset($messagesbylangcode[$defaultcode])) {
+	$message = $messagesbylangcode[$defaultcode];
+	$parts = DBFindMany("MessagePart","from messagepart where messageid=? order by sequence", false, array($message->id));
+}
+
+// set the default language first and make it required
+$formdata[] = $defaultlanguage;
+$formdata[$defaultcode . "-subject"] = array(
+	"label" => _L("Subject"),
+	"fieldhelp" => _L('The Subject will appear as the subject line of the email.'),
+	"value" => ($message)?$message->subject:"",
+	"validators" => array(
+		array("ValRequired"),
+		array("ValLength","max" => 255)
+	),
+	"control" => array("TextField","max"=>255,"size"=>45),
+	"helpstep" => 2
+);
+$formdata[$defaultcode . "-body"] = array(
+	"label" => _L("Message Body"),
+	"fieldhelp" => _L("Enter a template message which Classroom Messages will be appended to."),
+	"value" => ($message)?$message->format($parts):"",
+	"validators" => array(
+		array("ValRequired")),
+	"control" => array("TextArea", "rows" => 10, "cols" => 60),
+	"helpstep" => 2
+);
+
+// unset the default language so it doesn't get overwritten below
+if (isset($languagemap[$defaultcode]))
+	unset($languagemap[$defaultcode]);
+
+// create form items for all the customer's languages
+foreach ($languagemap as $code => $language) {
+	// get the message parts for this message if it exists
+	$message = false;
+	if (isset($messagesbylangcode[$code])) {
+		$message = $messagesbylangcode[$code];
+		$parts = DBFindMany("MessagePart","from messagepart where messageid=? order by sequence", false, array($message->id));
+	}
+	$formdata[] = $language;
+	$formdata[$code . "-subject"] = array(
+		"label" => _L("Subject"),
+		"fieldhelp" => _L('The Subject will appear as the subject line of the email.'),
+		"value" => ($message)?$message->subject:"",
+		"validators" => array(
+			array("ValLength","max" => 255)),
+		"control" => array("TextField","max"=>255,"size"=>45),
+		"helpstep" => 2
+	);
+	$formdata[$code . "-body"] = array(
+		"label" => _L("Message Body"),
+		"fieldhelp" => _L("Enter a template message which Classroom Messages will be appended too."),
+		"value" => ($message)?$message->format($parts):"",
+		"validators" => array(),
+		"control" => array("TextArea", "rows" => 10, "cols" => 60),
+		"helpstep" => 2
+	);
+}
+
 $helpsteps = array (
-	_L('The Template Name will be displayed in reports'),
-	_L('The %s Type determines where the system sends the message.',getJobTitle()),
-	_L('Select which days Classroom Messages should be sent.'),
-	_L('Select the user account that Classroom Messaging %s should be sent from.',getJobsTitle()),
-	_L('Edit Template')
+	_L('The From Name and From Email tell the recipient who the email came from.'),
+	_L('The Subject is the default subject for all Classroom Messages.<br><br>
+	In the Message Body section, enter a message which Classroom Messages will be appended to.')
 );
 
 $buttons = array(submit_button(_L('Save'),"submit","tick"),
@@ -206,36 +186,78 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		
 		// get existing job if it exists
 		$job = DBFind("Job", "from job where type = 'alert' and status = 'repeating'", false, array());
-		
-		// get the job's schedule or create a new one if there isn't any
+
+		// get the messagegroup or create a new one
 		if ($job)
-			$schedule = DBFind("Schedule", "from schedule where id = ?", false, array($job->scheduleid));
-		if (!isset($schedule) || !$schedule)
-			$schedule = new Schedule();
+			$messagegroup = DBFind("MessageGroup", "from messagegroup where id = ? and type = 'classroomtemplate' and not deleted", false, array($job->messagegroupid));
+		if (!isset($messagegroup) || !$messagegroup)
+			$messagegroup = new MessageGroup();
 		
-		// update the schedule
-		$scheduledata = json_decode($postdata['schedule'],true);
-		$days = array();
-		$time = $USER->getCallEarly();
-		foreach ($scheduledata as $index => $data) {
-			if ($index == 7) {
-				$time = date("H:i", strtotime($data));
-			} else {
-				if ($data)
-					$days[] = $index + 1;
+		// update the message group
+		$messagegroup->userid = $job->userid;
+		$messagegroup->type = 'classroomtemplate';
+		$messagegroup->defaultlanguagecode = Language::getDefaultLanguageCode();
+		$messagegroup->name = $postdata['name'];
+		$messagegroup->description = "Classroom Messageing Template";
+		$messagegroup->modified = date("Y-m-d H:i:s");
+		$messagegroup->permanent = 1;
+		if ($messagegroup->id)
+			$messagegroup->update();
+		else
+			$messagegroup->create();
+		
+		// attempt to get all the messages for this message group and associate them by langcode in an array
+		$messagesbylangcode = array();
+		if ($messagegroup) {
+			$messages = DBFindMany("Message", "from message where messagegroupid = ?", false, array($messagegroup->id));
+			if ($messages) {
+				foreach ($messages as $id => $message){
+					$messagesbylangcode[$message->languagecode] = $message;
+					$messagesbylangcode[$message->languagecode]->readHeaders();
+				}
 			}
 		}
-		$schedule->userid = $owner;
-		$schedule->daysofweek = implode(",", $days);
-		$schedule->time = $time;
-		$schedule->nextrun = $schedule->calcNextRun();
+
+		// get the default language code
+		$defaultcode = Language::getDefaultLanguageCode();
 		
-		if ($schedule->id)
-			$schedule->update();
-		else
-			$schedule->create();
-
-
+		// update, create or orphan all the message parts.
+		foreach(Language::getLanguageMap() as $code => $language) {
+			// if there is a message body specified for this language code, create/update a message
+			if ($postdata[$code . "-body"]) {
+				// if the message is already associated, reuse it. otherwise create a new one
+				if (isset($messagesbylangcode[$code])) {
+					$message = $messagesbylangcode[$code];
+				} else {
+					$message = new Message();
+				}
+				$message->messagegroupid = $messagegroup->id;
+				$message->userid = $owner;
+				$message->name = $messagegroup->name;
+				$message->description = $messagegroup->description;
+				$message->type = 'email';
+				$message->subtype = 'html';
+				$message->autotranslate = 'none';
+				$message->modifydate = date("Y-m-d H:i:s");
+				$message->languagecode = $code;
+				$message->subject = ($postdata[$code . '-subject'])?$postdata[$code . '-subject']:$postdata[$defaultcode . '-subject'];
+				$message->fromname = $postdata['fromname'];
+				$message->fromemail = $postdata['fromemail'];
+				$message->stuffHeaders();
+				$message->recreateParts($postdata[$code . "-body"], null, null);
+				if ($message->id)
+					$message->update();
+				else
+					$message->create();
+			// if no body, orphan any existing message for this language code
+			} else {
+				if (isset($messagesbylangcode[$code])) {
+					$messagesbylangcode[$code]->deleted = 1;
+					$messagesbylangcode[$code]->update();
+					QuickUpdate("update message set messagegroupid = null where id = ?", false, array($messagesbylangcode[$code]->id));
+				}
+			}
+		}
 		
 		// update or create the job
 		if (!$job)
