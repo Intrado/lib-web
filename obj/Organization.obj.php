@@ -1,6 +1,5 @@
 <?
 class Organization extends DBMappedObject {
-	var $parentorganizationid;
 	var $orgkey;
 	var $deleted = 0;
 	
@@ -9,7 +8,6 @@ class Organization extends DBMappedObject {
 		$this->_allownulls = false;
 		$this->_tablename = "organization";
 		$this->_fieldlist = array(
-			"parentorganizationid",
 			"orgkey",
 			"deleted"
 		);
