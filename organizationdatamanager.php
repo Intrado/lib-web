@@ -207,7 +207,7 @@ if (isset($_GET['deleteunassociated'])) {
 function fmt_actions ($row, $index) {
 	global $start;
 	return action_links(
-		action_link("Edit", "pencil", "organizationedit.php?orgid=". $row[$index]),
+		action_link("Rename", "pencil", "organizationrename.php?orgid=". $row[$index]),
 		action_link("Merge", "fugue/arrow_join", "organizationmerge.php?orgid=". $row[$index]),
 		action_link("Delete", "cross", "organizationdatamanager.php?orgid=". $row[$index] ."&delete&pagestart=$start","return confirm('". addslashes(_L('Are you sure you want to delete this organization?')) ."');"),
 		action_link("Associations", "fugue/clear_folders__arrow", "organizationassociation.php?orgid=". $row[$index]));
@@ -237,7 +237,7 @@ include_once("nav.inc.php");
 buttons(icon_button(_L("Done"), "fugue/tick", "document.location='settings.php';"));	
 startWindow(_L("Organizations"));
 ?>
-	<div class="feed_btn_wrap cf"><?= icon_button(_L('Add New Organization'),"add",null,"organizationedit.php?orgid=new") . icon_button(_L('Delete Un-associated'),"cross","if(confirm('". addslashes(_L('Are you sure you want to delete all un-associated organizations?')) ."')) document.location='organizationdatamanager.php?&deleteunassociated'") ?></div>
+	<div class="feed_btn_wrap cf"><?= icon_button(_L('Add New Organization'),"add",null,"organizationnew.php") . icon_button(_L('Delete Un-associated'),"cross","if(confirm('". addslashes(_L('Are you sure you want to delete all un-associated organizations?')) ."')) document.location='organizationdatamanager.php?&deleteunassociated'") ?></div>
 <?
 
 // if there are any organizations
