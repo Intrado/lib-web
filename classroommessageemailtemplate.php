@@ -259,98 +259,12 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			}
 		}
 		
-		// update or create the job
-		if (!$job)
-			$job = new Job();
-		$job->messagegroupid = $messagegroup->id;
-		$job->userid = $owner;
-		$job->scheduleid = $schedule->id;
-		$job->jobtypeid = $postdata['jobtype'];
-		$job->name = $postdata['name'];
-		$job->description = "Classroom Messaging Template";
-		$job->type = 'alert';
-		if (!$job->id)
-			$job->createdate = date("Y-m-d H:i:s");
-		$job->modifydate = date("Y-m-d H:i:s");
-		$job->startdate = date("Y-m-d", 86400);
-		$job->enddate = $job->startdate;
-		$job->starttime = date("H:i", strtotime($USER->getCallEarly()));
-		$job->endtime = date("H:i", strtotime($USER->getCallLate()));
-		$job->status = 'repeating';
-		$job->setOption("skipemailduplicates",0);
-		if ($job->id)
-			$job->update();
-		else
-			$job->create();
-		
-		// update or create the joblist
-		$joblist = DBFind("JobList", "from joblist where jobid = ?", false, array($job->id));
-		if (!$joblist)
-			$joblist = new JobList();
-		
-		// get the peoplelist or create a new one
-		if ($joblist)
-			$peoplelist = DBFind("PeopleList", "from list where id = ?", false, array($joblist->listid));
-		if (!isset($peoplelist) || !$peoplelist)
-			$peoplelist = new PeopleList();
-		
-		// get the list entry or create a new one
-		if ($peoplelist)
-			$listentry = DBFind("ListEntry", "from listentry where listid = ?", false, array($peoplelist->id));
-		if (!isset($listentry) || !$listentry)
-			$listentry = new ListEntry();
-		
-		// get the rule
-		if ($listentry)
-			$rule = DBFind("Rule", "from rule where id = ?", false, array($listentry->ruleid));
-		if (!isset($rule) || !$rule)
-			$rule = new Rule();
-		
-		// set all the rule, listentry, peoplelist, joblist values
-		$rule->logical = 'and';
-		$rule->fieldnum = 'alrt';
-		$rule->val = "";
-		
-		if ($rule->id)
-			$rule->update();
-		else
-			$rule->create();
-		
-		$peoplelist->userid = $owner;
-		$peoplelist->type = 'alert';
-		$peoplelist->name = $postdata['name'];
-		$peoplelist->description = "Classroom Messaging Template";
-		$peoplelist->modifydate = date("Y-m-d H:i:s");
-		$peoplelist->deleted = 0;
-		
-		if ($peoplelist->id)
-			$peoplelist->update();
-		else
-			$peoplelist->create();
-		
-		$listentry->listid = $peoplelist->id;
-		$listentry->type = 'rule';
-		$listentry->ruleid = $rule->id;
-		
-		if ($listentry->id)
-			$listentry->update();
-		else
-			$listentry->create();
-		
-		$joblist->jobid = $job->id;
-		$joblist->listid = $peoplelist->id;
-		
-		if ($joblist->id)
-			$joblist->update();
-		else
-			$joblist->create();
-		
 		Query("COMMIT");
 		
 		if ($ajax)
-			$form->sendTo("settings.php");
+			$form->sendTo("classroommessagetemplate.php");
 		else
-			redirect("settings.php");
+			redirect("classroommessagetemplate.php");
 	}
 }
 
