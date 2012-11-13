@@ -57,19 +57,20 @@ if ($targetedmessage) {
 
 $emailmessage = null;
 $phonemessage = null;
+$defaultmessagetext = "";
+
+if ($targetedmessage) {
+	$filename = "messagedata/" . $language->code . "/targetedmessage.php";
+	if(file_exists($filename))
+		include_once($filename);
+	
+	if(isset($messagedatacache[$language->code]) && isset($messagedatacache[$language->code][$targetedmessage->messagekey])) {
+		$defaultmessagetext = $messagedatacache[$language->code][$targetedmessage->messagekey];
+	} // else no default data found value is set to empty
+}
+
 // If messagegroup was not found create default override messagegroup
 if (!$messagegroup) {
-	$defaultmessagetext = "";
-	if ($targetedmessage) {
-		$filename = "messagedata/" . $language->code . "/targetedmessage.php";
-		if(file_exists($filename))
-			include_once($filename);
-			
-		if(isset($messagedatacache[$language->code]) && isset($messagedatacache[$language->code][$targetedmessage->messagekey])) {
-			$defaultmessagetext = $messagedatacache[$language->code][$targetedmessage->messagekey];
-		} // else no default data found value is set to empty
-	}
-	
 	$messagegroup = new MessageGroup();
 	$messagegroup->userid = $USER->id;
 	$messagegroup->name = "Custom Classroom";
@@ -80,8 +81,8 @@ if (!$messagegroup) {
 	$messagegroup->create();
 
 } else {
-	$emailmessage = DBFind("Message", "from message where messagegroupid = ? and type = 'email'",false,array($messagegroup->id));
-	$phonemessage = DBFind("Message", "from message where messagegroupid = ? and type = 'phone'",false,array($messagegroup->id));
+	$emailmessage = DBFind("Message", "from message where messagegroupid = ? and type = 'email' and languagecode=?",false,array($messagegroup->id,$language->code));
+	$phonemessage = DBFind("Message", "from message where messagegroupid = ? and type = 'phone' and languagecode=?",false,array($messagegroup->id,$language->code));
 }
 
 if (!$emailmessage) {
@@ -138,7 +139,6 @@ Query("COMMIT");
 
 setCurrentMessageGroup($messagegroup->id);
 $url = "classroommessageeditlanguage.php?mgid={$messagegroup->id}&languagecode={$language->code}";
-error_log($url);
 redirect($url);
 
 ?>
