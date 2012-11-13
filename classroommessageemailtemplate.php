@@ -11,21 +11,14 @@ require_once("obj/Validator.obj.php");
 require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
 require_once("obj/JobType.obj.php");
-require_once("obj/ValDuplicateNameCheck.val.php");
-require_once("obj/WeekRepeat.fi.php");
-require_once("obj/WeekRepeat.val.php");
 require_once("obj/Job.obj.php");
-require_once("obj/Schedule.obj.php");
 require_once("obj/Language.obj.php");
 require_once("obj/MessageGroup.obj.php");
 require_once("obj/Message.obj.php");
 require_once("obj/MessagePart.obj.php");
 require_once("obj/Voice.obj.php");
 require_once("obj/FieldMap.obj.php");
-require_once("obj/ListEntry.obj.php");
-require_once("obj/PeopleList.obj.php");
-require_once("obj/Rule.obj.php");
-require_once("obj/JobList.obj.php");
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -39,20 +32,24 @@ if (!getSystemSetting('_hastargetedmessage', false) || !$USER->authorize('manage
 ////////////////////////////////////////////////////////////////////////////////
 $job = DBFind("Job", "from job where type = 'alert' and status = 'repeating'", false, array());
 
+if (!$job)
+	redirect("classroommessagetemplate.php");
+
 // get this jobs messagegroup and it's messages
 $messagesbylangcode = array();
-if ($job) {
-	$messagegroup = DBFind("MessageGroup", "from messagegroup where id = ? and type = 'classroomtemplate'", false, array($job->messagegroupid));
-	if ($messagegroup) {
-		$messages = DBFindMany("Message", "from message where messagegroupid = ?", false, array($messagegroup->id));
-		if ($messages) {
-			foreach ($messages as $id => $message) {
-				$messagesbylangcode[$message->languagecode] = $message;
-				$messagesbylangcode[$message->languagecode]->readHeaders();
-			}
-		}
+
+$messagegroup = DBFind("MessageGroup", "from messagegroup where id = ? and type = 'classroomtemplate'", false, array($job->messagegroupid));
+if (!$messagegroup)
+	redirect("classroommessagetemplate.php");
+
+$messages = DBFindMany("Message", "from message where messagegroupid = ? and type='email'", false, array($messagegroup->id));
+if ($messages) {
+	foreach ($messages as $id => $message) {
+		$messagesbylangcode[$message->languagecode] = $message;
+		$messagesbylangcode[$message->languagecode]->readHeaders();
 	}
 }
+
 
 // get the customer default language data
 $defaultcode = Language::getDefaultLanguageCode();
@@ -157,8 +154,8 @@ $helpsteps = array (
 );
 
 $buttons = array(submit_button(_L('Save'),"submit","tick"),
-				icon_button(_L('Cancel'),"cross",null,"settings.php"));
-$form = new Form("templateform",$formdata,$helpsteps,$buttons);
+				icon_button(_L('Cancel'),"cross",null,"classroommessagetemplate.php"));
+$form = new Form("emailtemplateform",$formdata,$helpsteps,$buttons);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data Handling
@@ -181,42 +178,10 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		
 		Query("BEGIN");
 		
-		// get the owner specified by postdata
-		$owner = $postdata['owner'];
-		
-		// get existing job if it exists
-		$job = DBFind("Job", "from job where type = 'alert' and status = 'repeating'", false, array());
-
-		// get the messagegroup or create a new one
-		if ($job)
-			$messagegroup = DBFind("MessageGroup", "from messagegroup where id = ? and type = 'classroomtemplate' and not deleted", false, array($job->messagegroupid));
-		if (!isset($messagegroup) || !$messagegroup)
-			$messagegroup = new MessageGroup();
-		
 		// update the message group
-		$messagegroup->userid = $job->userid;
-		$messagegroup->type = 'classroomtemplate';
-		$messagegroup->defaultlanguagecode = Language::getDefaultLanguageCode();
-		$messagegroup->name = $postdata['name'];
-		$messagegroup->description = "Classroom Messageing Template";
 		$messagegroup->modified = date("Y-m-d H:i:s");
-		$messagegroup->permanent = 1;
-		if ($messagegroup->id)
-			$messagegroup->update();
-		else
-			$messagegroup->create();
-		
-		// attempt to get all the messages for this message group and associate them by langcode in an array
-		$messagesbylangcode = array();
-		if ($messagegroup) {
-			$messages = DBFindMany("Message", "from message where messagegroupid = ?", false, array($messagegroup->id));
-			if ($messages) {
-				foreach ($messages as $id => $message){
-					$messagesbylangcode[$message->languagecode] = $message;
-					$messagesbylangcode[$message->languagecode]->readHeaders();
-				}
-			}
-		}
+		$messagegroup->update();
+
 
 		// get the default language code
 		$defaultcode = Language::getDefaultLanguageCode();
@@ -232,7 +197,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					$message = new Message();
 				}
 				$message->messagegroupid = $messagegroup->id;
-				$message->userid = $owner;
+				$message->userid = $job->userid;
 				$message->name = $messagegroup->name;
 				$message->description = $messagegroup->description;
 				$message->type = 'email';
@@ -277,16 +242,13 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "admin:settings";
-$TITLE = _L('Classroom Messaging Template');
+$TITLE = _L('Classroom Messaging Email Template');
 
 include_once("nav.inc.php");
 
 // Optional Load Custom Form Validators
 ?>
 <script type="text/javascript" src="script/listform.js.php"></script>
-<script type="text/javascript">
-<? Validator::load_validators(array("ValDuplicateNameCheck","ValWeekRepeatItem")); ?>
-</script>
 <?
 
 startWindow(_L('Classroom Message delivery settings'));

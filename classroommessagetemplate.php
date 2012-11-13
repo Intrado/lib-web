@@ -41,9 +41,24 @@ class TemplateEdit extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
 		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'"/>';
-		$str .= icon_button("Edit Email", "pencil",false,false,'style="background-image:-moz-linear-gradient(center top , #D8F7DE, #00D245);"');
+		
+		//TODO create a proper css class 
+		$isSetStyle = 'style="background-image:-moz-linear-gradient(center top , #D8F7DE, #00D245);"';
+		
+		if ($this->args["hasEmail"]) {
+			$str .= icon_button(_L("Edit Email"), "pencil","return form_submit(event,'editemail');",false,$isSetStyle);
+		} else {
+			$str .= icon_button(_L("Add Email"), "add","return form_submit(event,'editemail');",false);
+		}
+		
+		if ($this->args["hasPhone"]) {
+			$str .= icon_button(_L("Edit Phone"), "pencil","return form_submit(event,'editphone');",false,$isSetStyle);
+		} else {
+			$str .= icon_button(_L("Add Phone"), "add","return form_submit(event,'editphone');",false);
+		}
+		
+		
 	
-		$str .= icon_button("Add Phone", "add",false,false,'class="ophone complete"');
 		return $str;
 	}
 }
@@ -85,20 +100,8 @@ foreach ($userjobtypes as $id => $jobtype) {
 	}
 }
 
-// get this jobs messagegroup and it's messages
-$messagesbylangcode = array();
-if ($job) {
-	$messagegroup = DBFind("MessageGroup", "from messagegroup where id = ? and type = 'classroomtemplate'", false, array($job->messagegroupid));
-	if ($messagegroup) {
-		$messages = DBFindMany("Message", "from message where messagegroupid = ?", false, array($messagegroup->id));
-		if ($messages) {
-			foreach ($messages as $id => $message) {
-				$messagesbylangcode[$message->languagecode] = $message;
-				$messagesbylangcode[$message->languagecode]->readHeaders();
-			}
-		}
-	}
-}
+
+
 
 // get the customer default language data
 $defaultcode = Language::getDefaultLanguageCode();
@@ -158,13 +161,22 @@ $formdata = array(
 	)
 );
 
+
+// get this jobs messagegroup and it's messages
+if ($job) {
+	$messagegroup = DBFind("MessageGroup", "from messagegroup where id = ? and type = 'classroomtemplate'", false, array($job->messagegroupid));
+}
+
 // Do message template form stuff
 $formdata[] = _L("Message Template");
 $formdata["template"] = array(
 		"label" => _L("Template"),
 		"value" => "",
-		"validators" => array(array("ValRequired")),
-		"control" => array("TemplateEdit"),
+		"validators" => array(),
+		"control" => array("TemplateEdit",
+				"hasEmail" => $messagegroup?$messagegroup->hasMessage("email"):false,
+				"hasPhone" => $messagegroup?$messagegroup->hasMessage("phone"):false
+				),
 		"helpstep" => 5
 );
 
@@ -204,6 +216,20 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		// get the owner specified by postdata
 		$owner = $postdata['owner'];
 		
+
+		
+		if (!$messagegroup) {
+			$messagegroup = new MessageGroup();
+			$messagegroup->userid = $owner;
+			$messagegroup->type = 'classroomtemplate';
+			$messagegroup->defaultlanguagecode = Language::getDefaultLanguageCode();
+			$messagegroup->name = $postdata['name'];
+			$messagegroup->description = "Classroom Messageing Template";
+			$messagegroup->modified = date("Y-m-d H:i:s");
+			$messagegroup->permanent = 1;
+			$messagegroup->create();
+		}
+		
 		// get existing job if it exists
 		$job = DBFind("Job", "from job where type = 'alert' and status = 'repeating'", false, array());
 		
@@ -235,8 +261,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		else
 			$schedule->create();
 
-
-		
 		// update or create the job
 		if (!$job)
 			$job = new Job();
@@ -324,6 +348,12 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$joblist->create();
 		
 		Query("COMMIT");
+		
+		if ($button == "editemail") {
+			$form->sendTo("classroommessageemailtemplate.php");
+		} else if ($button == "editphone") {
+			$form->sendTo("classroommessagephonetemplate.php");
+		}
 		
 		if ($ajax)
 			$form->sendTo("settings.php");
