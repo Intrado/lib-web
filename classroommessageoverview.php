@@ -57,7 +57,7 @@ function getoverridemessages($messages) {
 	if(!empty($overrideids)) {
 		 return QuickQueryList("select m.messagegroupid, p.txt from message m, messagepart p
 									where m.messagegroupid in (" . implode(",",$overrideids) . ") and
-									m.languagecode = 'en' and
+									m.languagecode = 'en' and m.type='email' and
 									p.messageid = m.id and p.sequence = 0",true);
 	}
 	return null;

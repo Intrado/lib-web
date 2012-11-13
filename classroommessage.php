@@ -184,7 +184,7 @@ if (isset($_GET['sectionid'])) {
 $customtxt = QuickQueryList("select t.id, p.txt from targetedmessage t, message m, messagepart p
 										where t.deleted = 0 and
 											t.overridemessagegroupid = m.messagegroupid and
-											m.languagecode = 'en' and
+											m.languagecode = 'en' and m.type='email' and 
 											p.messageid = m.id and p.sequence = 0",true);
 
 if (isset($_GET['search'])) {
