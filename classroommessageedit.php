@@ -131,11 +131,7 @@ $languages = array($defaultcode => $defaultlanguage) + $languages;
 foreach($languages as $code => $languagename) {
 	$value = "";
 
-	if (isset($targetedmessage->overridemessagegroupid)) {
-		$editlink = "classroommessageeditlanguage.php?mgid={$targetedmessage->overridemessagegroupid}&languagecode=$code&targetmessagekey={$targetedmessage->messagekey}";
-	} else {
-		$editlink = "classroommessageoverride.php?languagecode=$code&targetmessagekey={$targetedmessage->messagekey}";
-	}
+
 
 	$filename = "messagedata/" . $code . "/targetedmessage.php";
 	if(file_exists($filename))
@@ -150,7 +146,11 @@ foreach($languages as $code => $languagename) {
 		$value = $hasDefaultValue?$messagedatacache[$code][$targetedmessage->messagekey]:"";
 	}
 	
-	
+	if (isset($targetedmessage->overridemessagegroupid) && $isCustomized) {
+		$editlink = "classroommessageeditlanguage.php?mgid={$targetedmessage->overridemessagegroupid}&languagecode=$code";
+	} else {
+		$editlink = "classroommessageoverride.php?languagecode=$code&messagekey={$targetedmessage->messagekey}";
+	}
 	
 	if ($code == $defaultcode) {
 		$formdata[$code] = array(
