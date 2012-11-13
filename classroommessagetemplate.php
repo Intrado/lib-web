@@ -42,19 +42,18 @@ class TemplateEdit extends FormItem {
 		$n = $this->form->name."_".$this->name;
 		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'"/>';
 		
-		//TODO create a proper css class 
-		$isSetStyle = 'style="background-image:-moz-linear-gradient(center top , #D8F7DE, #00D245);"';
+		//$isSetStyle = 'style="background-image:-moz-linear-gradient(center top , #D8F7DE, #00D245);"';
 		
 		if ($this->args["hasEmail"]) {
-			$str .= icon_button(_L("Edit Email"), "pencil","return form_submit(event,'editemail');",false,$isSetStyle);
+			$str .= icon_button(_L("Edit Email"), "pencil","return form_submit(event,'editemail');");
 		} else {
-			$str .= icon_button(_L("Add Email"), "add","return form_submit(event,'editemail');",false);
+			$str .= icon_button(_L("Add Email"), "add","return form_submit(event,'editemail');");
 		}
 		
 		if ($this->args["hasPhone"]) {
-			$str .= icon_button(_L("Edit Phone"), "pencil","return form_submit(event,'editphone');",false,$isSetStyle);
+			$str .= icon_button(_L("Edit Phone"), "pencil","return form_submit(event,'editphone');");
 		} else {
-			$str .= icon_button(_L("Add Phone"), "add","return form_submit(event,'editphone');",false);
+			$str .= icon_button(_L("Add Phone"), "add","return form_submit(event,'editphone');");
 		}
 		
 		
