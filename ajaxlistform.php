@@ -81,10 +81,10 @@ function handleRequest() {
 	switch($_GET['type']) {
 		
 		case 'saveandrename':
-			if (!$USER->authorize('createlist') || !isset($_GET['listid']))
+			if (!$USER->authorize('createlist') || !isset($_REQUEST['listid']))
 				return false;
 			
-			$listid = $_GET['listid']+0;
+			$listid = $_REQUEST['listid']+0;
 
 			if (!userOwns('list', $listid))
 				return false;
@@ -133,10 +133,10 @@ function handleRequest() {
 			return $list->id;
 			
 		case 'addrule':
-			if (!$USER->authorize('createlist') || !isset($_POST['ruledata']) || !isset($_GET['listid']))
+			if (!$USER->authorize('createlist') || !isset($_POST['ruledata']) || !isset($_REQUEST['listid']))
 				return false;
 			
-			$listid = $_GET['listid']+0;
+			$listid = $_REQUEST['listid']+0;
 			
 			$data = json_decode($_POST['ruledata']);
 			if (empty($data) || !userOwns('list', $listid))
@@ -188,10 +188,10 @@ function handleRequest() {
 			return true;
 		
 		case 'deleterule':
-			if (!$USER->authorize('createlist') || !isset($_POST['fieldnum']) || !isset($_GET['listid']))
+			if (!$USER->authorize('createlist') || !isset($_POST['fieldnum']) || !isset($_REQUEST['listid']))
 				return false;
 				
-			$listid = $_GET['listid'] + 0;
+			$listid = $_REQUEST['listid'] + 0;
 			$fieldnum = $_POST['fieldnum'];
 			
 			if ($fieldnum == "" || !userOwns('list', $listid))
