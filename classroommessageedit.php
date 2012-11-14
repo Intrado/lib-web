@@ -33,10 +33,10 @@ class TargetedLanguageEdit extends FormItem {
 		$n = $this->form->name."_".$this->name;
 		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'"/>';
 		$str .= '<input id="'.$n.'-display" name="'.$n.'-display" type="text" value="'.escapehtml($value).'" disabled />&nbsp;';
-		$str .= icon_button("Edit", "pencil",false,$this->args["editLink"]);
+		$str .= icon_button(_L("Edit"), "pencil",false,$this->args["editLink"]);
 		
 		if ($this->args["hasDefaultValue"]) {
-			$str .= icon_button("Reset to Default", "arrow_undo",false,"classroommessageedit.php?reset={$this->name}");
+			$str .= icon_button(_L("Reset to Default"), "arrow_undo",false,"classroommessageedit.php?reset={$this->name}");
 		}
 		return $str;
 	}
@@ -106,7 +106,6 @@ if (isset($_GET["reset"])) {
 				m.id = mp.messageid",
 				false,
 				array($targetedmessage->overridemessagegroupid,$_GET["reset"]));
-		//$messagegroup->updateDefaultLanguageCode();
 		notice(_L("%s is now set to default",Language::getName($_GET["reset"])));
 	}
 }
@@ -129,10 +128,6 @@ unset($languages[$defaultcode]);
 $languages = array($defaultcode => $defaultlanguage) + $languages;
 
 foreach($languages as $code => $languagename) {
-	$value = "";
-
-
-
 	$filename = "messagedata/" . $code . "/targetedmessage.php";
 	if(file_exists($filename))
 		include_once($filename);
@@ -170,12 +165,10 @@ foreach($languages as $code => $languagename) {
 			"helpstep" => 2
 		);
 	}
-
-	//echo $languagename  . '<p class="translate_text">'.escapehtml($value) . icon_button("Edit", "pencil",false,$editlink) . '</p> <br/>';
 }
 $helpsteps = array (
-		_L('English will be used by default.'),
-		_L('If you are unable to enter a translated version, English will be used by default.')
+		_L('%s will be used by default.', $defaultlanguage),
+		_L('If you are unable to enter a translated version, %s will be used by default.',$defaultlanguage)
 );
 
 $buttons = array(submit_button(_L('Save'),"submit","tick"),
@@ -224,13 +217,7 @@ $TITLE = _L('Classroom Message Edit');
 include_once("nav.inc.php");
 
 startWindow(_L('Language Variations for Classroom Message'));
-
-
 echo $form->render();
-
-
-
-//echo icon_button(_L('Done'),"tick",null,"classroommessagemanager.php");
 endWindow();
 include_once("navbottom.inc.php");
 ?>
