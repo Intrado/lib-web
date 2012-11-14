@@ -13,6 +13,10 @@ require_once("obj/FormItem.obj.php");
 require_once("obj/MessageGroup.obj.php");
 require_once("obj/Message.obj.php");
 require_once("obj/MessagePart.obj.php");
+require_once("obj/TargetedMessage.obj.php");
+require_once("obj/Language.obj.php");
+require_once("obj/TargetedMessageCategory.obj.php");
+
 
 
 
@@ -24,6 +28,20 @@ if (!getSystemSetting('_hastargetedmessage', false) || !$USER->authorize('manage
 }
 
 
+class TargetedLanguageEdit extends FormItem {
+	function render ($value) {
+		$n = $this->form->name."_".$this->name;
+		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'"/>';
+		$str .= '<input id="'.$n.'-display" name="'.$n.'-display" type="text" value="'.escapehtml($value).'" disabled />&nbsp;';
+		$str .= icon_button("Edit", "pencil",false,$this->args["editLink"]);
+		
+		if ($this->args["hasDefaultValue"]) {
+			$str .= icon_button("Reset to Default", "arrow_undo",false,"classroommessageedit.php?reset={$this->name}");
+		}
+		return $str;
+	}
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
@@ -31,86 +49,139 @@ if (!getSystemSetting('_hastargetedmessage', false) || !$USER->authorize('manage
 if (isset($_GET['id'])) {
 	if($_GET['id'] == "new") {
 		$_SESSION["targetedmessageid"] = null;
+		if (isset($_GET['categoryid'])) {
+			$_SESSION["targetedmessagecategoryid"] = $_GET['categoryid'];
+		}
 	} else {
 		$_SESSION["targetedmessageid"] = $_GET['id'] + 0;
 	}
 	redirect("classroommessageedit.php");
 }
 
-$id = $_SESSION["targetedmessageid"];
 
-////////////////////////////////////////////////////////////////////////////////
-// Form Data
-////////////////////////////////////////////////////////////////////////////////
+$targetedmessage = null;
+$targetedmessagecategory = null;
 
-$value = "";
-$languages = QuickQueryMultiRow("select id,name,code from language");
-$values = array();
-
-if($id) {
-	$targetedmesssage = QuickQueryRow("select messagekey, overridemessagegroupid, targetedmessagecategoryid from targetedmessage where id=?",false,false,array($id));
+if(isset($_SESSION["targetedmessageid"])) {
+	$targetedmessage = DBFind("TargetedMessage", "from targetedmessage where id=?",false,array($_SESSION["targetedmessageid"]));
+	if (!$targetedmessage) {
+		redirect('unauthorized.php');
+	}
+	$targetedmessagecategory = new TargetedMessageCategory($targetedmessage->targetedmessagecategoryid);
 } else {
-	$targetedmesssage = false;
+	// New Custome Targeted Message, Create blank MessageGroup and Targeted Message
+	if (isset($_SESSION["targetedmessagecategoryid"])) {
+		$targetedmessagecategory = DBFind("targetedmessagecategory", "from targetedmessagecategory where id=? and not deleted",false,array($_SESSION["targetedmessagecategoryid"]));
+	
+		if(!$targetedmessagecategory) {
+			redirect('unauthorized.php');
+		}
+	}
+	
+	$messagegroup = new MessageGroup();
+	$messagegroup->userid = $USER->id;
+	$messagegroup->name = "Custom Classroom";
+	$messagegroup->description = '';
+	$messagegroup->modified = date("Y-m-d H:i:s", time());
+	$messagegroup->deleted = 1;
+	$messagegroup->permanent = 1;
+	$messagegroup->create();
+	
+	$targetedmessage = new TargetedMessage();
+	$targetedmessage->messagekey = "custom-" .  $messagegroup->id;
+	$targetedmessage->targetedmessagecategoryid = $targetedmessagecategory->id;
+	$targetedmessage->overridemessagegroupid = $messagegroup->id;
+	$targetedmessage->deleted = 1;// Undelete once valid
+	$targetedmessage->create();
+	$_SESSION["targetedmessageid"] = $targetedmessage->id;
 }
 
-if(isset($targetedmesssage[1])) {
+if (isset($_GET["reset"])) {
+	if (isset($targetedmessage->overridemessagegroupid)) {
+		// Delete all messages and messageparts related to the delete request
+		QuickUpdate("delete m.* ,mp.*
+				from message m,messagepart mp 
+				where
+				m.messagegroupid=? and m.languagecode = ? and
+				m.id = mp.messageid",
+				false,
+				array($targetedmessage->overridemessagegroupid,$_GET["reset"]));
+		//$messagegroup->updateDefaultLanguageCode();
+		notice(_L("%s is now set to default",Language::getName($_GET["reset"])));
+	}
+}
+
+if(isset($targetedmessage->overridemessagegroupid)) {
 	$languagemessages = QuickQueryList("select m.languagecode, p.txt from message m, messagepart p
-			where m.messagegroupid = ? and
-					m.id = p.messageid", true,false,array($targetedmesssage[1]));
+			where m.messagegroupid = ? and m.id = p.messageid and m.type='email'", true,false,array($targetedmessage->overridemessagegroupid));
 }
-
-$categories = QuickQueryList("select id, name from targetedmessagecategory where deleted = 0",true);
-$categories = $categories?(array("" => "-- Select a Category --") + $categories):array("" => "-- Select a Category --");
-
-$formdata = array();
 
 if(!isset($messagedatacache)) { 
 	$messagedatacache = array();
 }
 
+$formdata = array(_L("Default language"));
 
-$formdata["category"] = array(
-	"label" => _L("Category"),
-	"value" => isset($targetedmesssage[2])?$targetedmesssage[2]:"",
-	"validators" => array(
-		array("ValRequired"),
-		array("ValInArray", "values" => array_keys($categories))
-	),
-	"control" => array("SelectMenu","values" => $categories),
-	"helpstep" => 1
-);
+$languages = Language::getLanguageMap();
+$defaultcode = Language::getDefaultLanguageCode();
+$defaultlanguage = Language::getName(Language::getDefaultLanguageCode());
+unset($languages[$defaultcode]);
+$languages = array($defaultcode => $defaultlanguage) + $languages;
 
-foreach($languages as $language) {
-	$code = $language[2];
-	$formdata[$code] = array(
-		"label" => $language[1],
-		"value" => "",
-		"validators" => array(array("ValLength","min" => 0,"max" => 150)),
-		"control" => array("TextField","size" => 50, "maxlength" => 150),
-		"helpstep" => 2
-	);
-	if(isset($languagemessages[$code]) && $languagemessages[$code] != "") {
-		// Populate the form with message data and complete with default data
-		$formdata[$code]["value"] = $languagemessages[$code];
+foreach($languages as $code => $languagename) {
+	$value = "";
+
+
+
+	$filename = "messagedata/" . $code . "/targetedmessage.php";
+	if(file_exists($filename))
+		include_once($filename);
+	$hasDefaultValue = isset($messagedatacache[$code]) && isset($messagedatacache[$code][$targetedmessage->messagekey]);
+	$isCustomized = false;
+	
+	if (isset($languagemessages[$code]) && $languagemessages[$code] != "") {
+		$value = $languagemessages[$code];
+		$isCustomized = true;
 	} else {
-		$filename = "messagedata/" . $code . "/targetedmessage.php";
-		if(file_exists($filename))
-			include_once($filename);
-
-		if(isset($messagedatacache[$code]) && isset($messagedatacache[$code][$targetedmesssage[0]])) {
-			$formdata[$code]["value"] = $messagedatacache[$code][$targetedmesssage[0]];
-		} // else no default data found value is set to empty
+		$value = $hasDefaultValue?$messagedatacache[$code][$targetedmessage->messagekey]:"";
 	}
-}
+	
+	if (isset($targetedmessage->overridemessagegroupid) && $isCustomized) {
+		$editlink = "classroommessageeditlanguage.php?mgid={$targetedmessage->overridemessagegroupid}&languagecode=$code";
+	} else {
+		$editlink = "classroommessageoverride.php?languagecode=$code&messagekey={$targetedmessage->messagekey}";
+	}
+	
+	if ($code == $defaultcode) {
+		$formdata[$code] = array(
+			"label" => $languagename,
+			"value" => $value,
+			"validators" => array(array("ValRequired")),
+			"control" => array("TargetedLanguageEdit","editLink"=>$editlink,"hasDefaultValue" => $hasDefaultValue && $isCustomized),
+			"helpstep" => 1
+		);
+		$formdata[] = _L("Other languages");
+	} else {
+		$formdata[$code] = array(
+			"label" => $languagename,
+			"value" => $value,
+			"validators" => array(),
+			"control" => array("TargetedLanguageEdit","editLink"=>$editlink,"hasDefaultValue" => $isCustomized),
+			"helpstep" => 2
+		);
+	}
 
+	//echo $languagename  . '<p class="translate_text">'.escapehtml($value) . icon_button("Edit", "pencil",false,$editlink) . '</p> <br/>';
+}
 $helpsteps = array (
-	_L('Select which category this message belongs in. This should allow teachers to find the message easily.'),
-	_L('Type the message as it should appear in your Classroom Messaging email. You will need to enter the translated versions of the message. If you are unable to enter a translated version, English will be used by default.')
+		_L('English will be used by default.'),
+		_L('If you are unable to enter a translated version, English will be used by default.')
 );
 
 $buttons = array(submit_button(_L('Save'),"submit","tick"),
-	icon_button(_L('Cancel'),"cross",null,"classroommessagemanager.php"));
+		icon_button(_L('Cancel'),"cross",null,"classroommessagemanager.php?category=" . $targetedmessagecategory->id));
 $form = new Form("classroom",$formdata,$helpsteps,$buttons);
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data Handling
@@ -129,101 +200,19 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 	if ($form->checkForDataChange()) {
 		$datachange = true;
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
-			$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
-			Query("BEGIN");
-			if($targetedmesssage[0]) {
-				QuickUpdate("update targetedmessage set targetedmessagecategoryid = ? where messagekey = ?",false,array($postdata["category"],$targetedmesssage[0]));
-			}
+		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
+		Query("BEGIN");
+		
+		// Undelete targeted message since it is now valid
+		$targetedmessage->deleted = 0;
+		$targetedmessage->update();
 
-			$messagegroupid = false;
-			//save data here
-			foreach($languages as $language) {
-				$code = $language[2];
-				$newvalue = $postdata[$code];
-				$message = false;
-				$isasdefault = isset($messagedatacache[$code]) && 
-								isset($messagedatacache[$code][$targetedmesssage[0]]) &&
-								$messagedatacache[$code][$targetedmesssage[0]] == $newvalue;
-				
-				if($targetedmesssage[1]) {
-					$message = DBFind("Message", "from message where messagegroupid = ? and languagecode = ?",false, array($targetedmesssage[1],$code));
-					$messagegroupid = $targetedmesssage[1];
-				} else {
-					if($isasdefault) {
-							// There is a default value for this message/language and the value has not changed
-							continue;
-					} else {
-						if($newvalue != '' && !$messagegroupid) {
-							// create a new message group
-
-							$messagegroup = new MessageGroup();
-							$messagegroup->userid =  $USER->id;
-							$messagegroup->name = "Custom Classroom";
-							$messagegroup->description = '';
-							$messagegroup->modified = date("Y-m-d H:i:s", time());
-							$messagegroup->deleted = 1;
-							$messagegroup->permanent = 1;
-							$messagegroup->create();
-							$messagegroupid = $messagegroup->id;
-
-							if(isset($targetedmesssage[0])) {
-								QuickUpdate("update targetedmessage set overridemessagegroupid = ? where messagekey = ?",false,array($messagegroupid,$targetedmesssage[0]));
-							} else {
-								QuickUpdate("insert into targetedmessage (messagekey,targetedmessagecategoryid,overridemessagegroupid) values (?,?,?)",false,array("custom-" .  $messagegroupid,$postdata["category"],$messagegroupid));
-							}
-						}
-					}
-				}
-				if($messagegroupid) {
-					if($message === false) {
-						if ($newvalue != '' || !$isasdefault) {
-							// create a new message
-							$message = new Message();
-							$message->messagegroupid = $messagegroupid;
-							$message->userid = $USER->id;
-							$message->name = "Custom Classroom";
-							$message->description = '';
-							$message->type = 'email';
-							$message->subtype = 'plain';
-							$message->data = '';
-							$message->modifydate = date("Y-m-d H:i:s", time());
-							$message->autotranslate = 'none';
-							$message->languagecode = $code;
-							$message->create();
-	
-							$messagepart = new MessagePart();
-							$messagepart->messageid = $message->id;
-							$messagepart->type = 'T';
-							$messagepart->txt = $newvalue;
-							$messagepart->sequence = 0;
-							$messagepart->create();
-						}
-					} else {
-						if ($newvalue == '' || $isasdefault) {
-							QuickQuery("BEGIN");
-							QuickQuery("delete from message where id = ?",false,array($message->id));
-							QuickQuery("delete from messagepart where messageid = ?",false,array($message->id));
-							QuickQuery("COMMIT");
-						} else {
-							$message->modifydate = date("Y-m-d H:i:s", time());
-							$message->update();
-							$messagepart = DBFind("MessagePart","from messagepart where messageid = ? and sequence = 0",false,array($message->id));
-							if($messagepart) {
-								$messagepart->txt = $newvalue;
-								$messagepart->update();
-							}
-						}
-					}
-				}
-			}
-
-
-			Query("COMMIT");
-			if ($ajax)
-				$form->sendTo("classroommessagemanager.php");
-			else
-				redirect("classroommessagemanager.php");
-		}
+		Query("COMMIT");
+		if ($ajax)
+			$form->sendTo("classroommessagemanager.php?category=" . $targetedmessagecategory->id);
+		else
+			redirect("classroommessagemanager.php?category=" . $targetedmessagecategory->id);
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -235,7 +224,13 @@ $TITLE = _L('Classroom Message Edit');
 include_once("nav.inc.php");
 
 startWindow(_L('Language Variations for Classroom Message'));
+
+
 echo $form->render();
+
+
+
+//echo icon_button(_L('Done'),"tick",null,"classroommessagemanager.php");
 endWindow();
 include_once("navbottom.inc.php");
 ?>

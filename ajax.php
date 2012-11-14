@@ -147,9 +147,9 @@ function handleRequest() {
 			
 			$messagegroupid = $_GET['messagegroupid'] + 0;
 			
-			if (!userOwns("messagegroup", $messagegroupid))
+			if (!userCanSee("messagegroup", $messagegroupid))
 				return false;
-
+			
 			$audiofileids = MessageGroup::getReferencedAudioFileIDs($messagegroupid);
 			if (count($audiofileids) > 0)
 				return QuickQueryMultiRow('select id, name, messagegroupid from audiofile where not deleted and id in ('.implode(',', $audiofileids).') order by recorddate desc', true, false);
