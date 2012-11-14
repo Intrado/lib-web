@@ -307,9 +307,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		unset($_SESSION['editmessage']);
 		
 		if ($ajax)
-			$form->sendTo(getEditMessageSendTo($messagegroup->id));
+			$form->sendTo("classroommessageedit.php");
 		else
-			redirect(getEditMessageSendTo($messagegroup->id));
+			redirect("classroommessageedit.php");
 	}
 }
 
