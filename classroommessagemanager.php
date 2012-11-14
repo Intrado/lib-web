@@ -335,7 +335,6 @@ document.observe('dom:loaded', function() {
 		});
 	});
 	var selectedcategory = <?= isset($_GET["category"])?"{$_GET["category"]}":"categoryinfo.keys().first()" ?>;
-	console.log(selectedcategory);
 	tabs.show_section('lib-' + selectedcategory);
 	updatecategory(selectedcategory);
 
