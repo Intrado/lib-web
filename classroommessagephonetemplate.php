@@ -59,9 +59,6 @@ $defaultcode = Language::getDefaultLanguageCode();
 $defaultlanguage = Language::getName(Language::getDefaultLanguageCode());
 $languagemap = Language::getLanguageMap();
 
-// Do message template form stuff
-$formdata[] = _L("Message Template");
-
 // get the message parts for this message if it exists
 $message = false;
 if (isset($messagesbylangcode[$defaultcode])) {
@@ -70,10 +67,10 @@ if (isset($messagesbylangcode[$defaultcode])) {
 }
 
 // set the default language first and make it required
-$formdata[] = $defaultlanguage;
+$formdata[] = _L("Default Template");
 $formdata[$defaultcode . "-body"] = array(
-	"label" => _L("Message Body"),
-	"fieldhelp" => _L("Enter a template message which Classroom Messages will be appended to."),
+	"label" => $defaultlanguage,
+	"fieldhelp" => _L("Enter a default template message which Classroom Messages will be appended to."),
 	"value" => ($message)?$message->format($parts):"",
 	"validators" => array(
 		array("ValRequired")),
@@ -85,6 +82,8 @@ $formdata[$defaultcode . "-body"] = array(
 if (isset($languagemap[$defaultcode]))
 	unset($languagemap[$defaultcode]);
 
+$formdata[] = _L("Language Templates");
+
 // create form items for all the customer's languages
 foreach ($languagemap as $code => $language) {
 	// get the message parts for this message if it exists
@@ -93,19 +92,19 @@ foreach ($languagemap as $code => $language) {
 		$message = $messagesbylangcode[$code];
 		$parts = DBFindMany("MessagePart","from messagepart where messageid=? order by sequence", false, array($message->id));
 	}
-	$formdata[] = $language;
 	$formdata[$code . "-body"] = array(
-		"label" => _L("Message Body"),
-		"fieldhelp" => _L("Enter a template message which Classroom Messages will be appended too."),
+		"label" => $language,
+		"fieldhelp" => _L("Enter a %s template message which Classroom Messages will be appended to.",$language),
 		"value" => ($message)?$message->format($parts):"",
 		"validators" => array(),
 		"control" => array("TextArea", "rows" => 10, "cols" => 60),
-		"helpstep" => 1
+		"helpstep" => 2
 	);
 }
 
 $helpsteps = array (
-	_L('In the Message Body section, enter a message which Classroom Messages will be appended to.')
+	_L('In the %s Template section, enter a tempate which Classroom Messages will be appended to.', $defaultlanguage),
+	_L('For each lanugate, enter a template message to enable language specific Classroom Messages. If left empty the %s template will be used.',$defaultlanguage)		
 );
 
 $buttons = array(submit_button(_L('Save'),"submit","tick"),
@@ -191,11 +190,12 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "admin:settings";
-$TITLE = _L('Classroom Messaging Phone Template');
+$TITLE = "";
 
 include_once("nav.inc.php");
 
-startWindow(_L('Classroom Message delivery settings'));
+$TITLE = _L('Classroom Messaging Phone Template');
+startWindow($TITLE);
 echo $form->render();
 endWindow();
 include_once("navbottom.inc.php");

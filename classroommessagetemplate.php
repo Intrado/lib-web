@@ -35,15 +35,10 @@ if (!getSystemSetting('_hastargetedmessage', false) || !$USER->authorize('manage
 	redirect("unauthorized.php");
 
 
-
-
 class TemplateEdit extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
 		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'"/>';
-		
-		//$isSetStyle = 'style="background-image:-moz-linear-gradient(center top , #D8F7DE, #00D245);"';
-		
 		if ($this->args["hasEmail"]) {
 			$str .= icon_button(_L("Edit Email"), "pencil","return form_submit(event,'editemail');");
 		} else {
@@ -55,9 +50,6 @@ class TemplateEdit extends FormItem {
 		} else {
 			$str .= icon_button(_L("Add Phone"), "add","return form_submit(event,'editphone');");
 		}
-		
-		
-	
 		return $str;
 	}
 }
@@ -215,8 +207,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		// get the owner specified by postdata
 		$owner = $postdata['owner'];
 		
-
-		
 		if (!$messagegroup) {
 			$messagegroup = new MessageGroup();
 			$messagegroup->userid = $owner;
@@ -348,16 +338,19 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		
 		Query("COMMIT");
 		
-		if ($button == "editemail") {
-			$form->sendTo("classroommessageemailtemplate.php");
-		} else if ($button == "editphone") {
-			$form->sendTo("classroommessagephonetemplate.php");
+		switch ($button) {
+			case "editemail":
+				$form->sendTo("classroommessageemailtemplate.php");
+			case "editphone":
+				$form->sendTo("classroommessagephonetemplate.php");
+			default:
+				if ($ajax)
+					$form->sendTo("settings.php");
+				else
+					redirect("settings.php");
 		}
 		
-		if ($ajax)
-			$form->sendTo("settings.php");
-		else
-			redirect("settings.php");
+
 	}
 }
 
@@ -370,7 +363,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "admin:settings";
-$TITLE = _L('Classroom Messaging Template');
+$TITLE = "";
 
 include_once("nav.inc.php");
 
@@ -381,8 +374,8 @@ include_once("nav.inc.php");
 <? Validator::load_validators(array("ValDuplicateNameCheck","ValWeekRepeatItem")); ?>
 </script>
 <?
-
-startWindow(_L('Classroom Message delivery settings'));
+$TITLE = _L('Classroom Messaging Template');
+startWindow($TITLE);
 echo $form->render();
 endWindow();
 include_once("navbottom.inc.php");

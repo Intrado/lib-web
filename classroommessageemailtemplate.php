@@ -57,7 +57,7 @@ $defaultlanguage = Language::getName(Language::getDefaultLanguageCode());
 $languagemap = Language::getLanguageMap();
 
 // Do message template form stuff
-$formdata[] = _L("Message Template");
+$formdata[] = _L("Email Headers");
 
 // set the subject, from email, from name
 $formdata["fromname"] = array(
@@ -92,10 +92,12 @@ if (isset($messagesbylangcode[$defaultcode])) {
 	$parts = DBFindMany("MessagePart","from messagepart where messageid=? order by sequence", false, array($message->id));
 }
 
+$formdata[] = _L("Default Template");
+
 // set the default language first and make it required
-$formdata[] = $defaultlanguage;
+//$formdata[] = $defaultlanguage;
 $formdata[$defaultcode . "-subject"] = array(
-	"label" => _L("Subject"),
+	"label" => _L("%s Subject",$defaultlanguage),
 	"fieldhelp" => _L('The Subject will appear as the subject line of the email.'),
 	"value" => ($message)?$message->subject:"",
 	"validators" => array(
@@ -106,7 +108,7 @@ $formdata[$defaultcode . "-subject"] = array(
 	"helpstep" => 2
 );
 $formdata[$defaultcode . "-body"] = array(
-	"label" => _L("Message Body"),
+	"label" => _L("%s Template", $defaultlanguage),
 	"fieldhelp" => _L("Enter a template message which Classroom Messages will be appended to."),
 	"value" => ($message)?$message->format($parts):"",
 	"validators" => array(
@@ -119,6 +121,7 @@ $formdata[$defaultcode . "-body"] = array(
 if (isset($languagemap[$defaultcode]))
 	unset($languagemap[$defaultcode]);
 
+$formdata[] = _L("Language Templates");
 // create form items for all the customer's languages
 foreach ($languagemap as $code => $language) {
 	// get the message parts for this message if it exists
@@ -127,30 +130,30 @@ foreach ($languagemap as $code => $language) {
 		$message = $messagesbylangcode[$code];
 		$parts = DBFindMany("MessagePart","from messagepart where messageid=? order by sequence", false, array($message->id));
 	}
-	$formdata[] = $language;
 	$formdata[$code . "-subject"] = array(
-		"label" => _L("Subject"),
+		"label" => _L("%s Subject",$language),
 		"fieldhelp" => _L('The Subject will appear as the subject line of the email.'),
 		"value" => ($message)?$message->subject:"",
 		"validators" => array(
 			array("ValLength","max" => 255)),
 		"control" => array("TextField","max"=>255,"size"=>45),
-		"helpstep" => 2
+		"helpstep" => 3
 	);
 	$formdata[$code . "-body"] = array(
-		"label" => _L("Message Body"),
+		"label" => _L("%s Template",$language),
 		"fieldhelp" => _L("Enter a template message which Classroom Messages will be appended too."),
 		"value" => ($message)?$message->format($parts):"",
 		"validators" => array(),
 		"control" => array("TextArea", "rows" => 10, "cols" => 60),
-		"helpstep" => 2
+		"helpstep" => 3
 	);
 }
 
 $helpsteps = array (
 	_L('The From Name and From Email tell the recipient who the email came from.'),
-	_L('The Subject is the default subject for all Classroom Messages.<br><br>
-	In the Message Body section, enter a message which Classroom Messages will be appended to.')
+	_L('The %s Subject is the default subject for all Classroom Messages.<br><br>
+	In the %s Template section, enter a template which Classroom Messages will be appended to.',$defaultlanguage,$defaultlanguage),
+	_L('For each lanugate, enter a subject and a template message to enable language specific Classroom Messages. If left empty the %s template will be used.',$defaultlanguage)
 );
 
 $buttons = array(submit_button(_L('Save'),"submit","tick"),
@@ -242,16 +245,10 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "admin:settings";
-$TITLE = _L('Classroom Messaging Email Template');
-
+$TITLE = "";
 include_once("nav.inc.php");
-
-// Optional Load Custom Form Validators
-?>
-<script type="text/javascript" src="script/listform.js.php"></script>
-<?
-
-startWindow(_L('Classroom Message delivery settings'));
+$TITLE = _L('Classroom Messaging Email Template');
+startWindow($TITLE);
 echo $form->render();
 endWindow();
 include_once("navbottom.inc.php");
