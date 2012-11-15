@@ -152,7 +152,7 @@ $formdata["phonemessage"] = array(
 			array("ValLength","max" => 10000), // 10000 Characters is about 40 minutes of tts, considered to be more than enough
 			array("ValTtsText")
 		),
-		"control" => array("PhoneMessageEditor", "langcode" => $languagecode, "messagegroupid" => $messagegroup->id),
+		"control" => array("PhoneMessageEditor", "enablefieldinserts" => "limited", "langcode" => $languagecode, "messagegroupid" => $messagegroup->id),
 		"helpstep" => 1);
 $formdata["gender"] = array(
 		"label" => _L("Gender"),
