@@ -834,15 +834,17 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		setCustomerSystemSetting('_hasldap', $postdata["hasldap"]?'1':'0', $custdb);
 		setCustomerSystemSetting('_hasenrollment', $postdata["hasenrollment"]?'1':'0', $custdb);
 		
+		$phonetargetedmessage = false;
 		switch($postdata["hasclassroom"]) {
 			case "disabled":
 				setCustomerSystemSetting('_hasphonetargetedmessage','0', $custdb);
 				setCustomerSystemSetting('_hastargetedmessage','0', $custdb);
 				break;
 			case "emailandphone":
-				setCustomerSystemSetting('_hasphonetargetedmessage','1', $custdb);
+				$phonetargetedmessage = true;
 				//continue and enable _hastargetedmessage
 			case "emailonly":
+				setCustomerSystemSetting('_hasphonetargetedmessage',$phonetargetedmessage?'1':'0', $custdb);
 				setCustomerSystemSetting('_hastargetedmessage','1', $custdb);
 				break;
 		}
