@@ -195,7 +195,8 @@ function tai_setup($customerid) {
 				($schoolmessengeruser->accessid, 'tai_canrequestidentityreveal', 1), 
 				($schoolmessengeruser->accessid, 'tai_canmanagesurveys', 1), 
 				($schoolmessengeruser->accessid, 'tai_canmanagelockouts', 1), 
-				($schoolmessengeruser->accessid, 'tai_canmanageactivationcodes', 1)";
+				($schoolmessengeruser->accessid, 'tai_canmanageactivationcodes', 1),
+				($schoolmessengeruser->accessid, 'tai_canmodifydisplayname', 1)";
 	QuickUpdate($query)
 		or dieWithError(" SQL: " . $query);
 	
@@ -211,7 +212,7 @@ function tai_setup($customerid) {
 	$schoolmessengeruser->update();
 
 	// create root organization
-	$rootorgkey = "Customer"; // be paranoid and loop until unique orgkey found, may already exist
+	$rootorgkey = "District"; // be paranoid and loop until unique orgkey found, may already exist
 	$query = "select 1 from organization where orgkey like ?";
 	$i = 0;
 	while (QuickQuery($query, null, array("%" . $rootorgkey . "%"))) {

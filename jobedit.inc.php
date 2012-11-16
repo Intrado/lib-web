@@ -645,7 +645,7 @@ if ($submittedmode || $completedmode) {
 	$query = "select name from list where id in (" . repeatWithSeparator("?", ",", count($selectedlists)) . ")";
 	$listhtml = implode("<br/>",QuickQueryList($query,false,false,$selectedlists));
 	$formdata["lists"] = array(
-		"label" => _L('Lists'),
+		"label" => _L('List(s)'),
 		"fieldhelp" => _L('Select a list from your existing lists.'),
 		"control" => array("FormHtml","html" => $listhtml),
 		"helpstep" => ++$helpstepnum
@@ -779,7 +779,7 @@ if ($submittedmode || $completedmode) {
 } else {
 	$formdata[] = _L('List(s)');
 	$formdata["lists"] = array(
-		"label" => _L('Lists'),
+		"label" => _L('List(s)'),
 		"fieldhelp" => _L('Select a list from your existing lists.'),
 		"value" => ($selectedlists)?$selectedlists:array(),
 		"validators" => array(

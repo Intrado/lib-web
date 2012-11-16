@@ -229,3 +229,16 @@ $$$
 update setting set value='1.2/2' where name='_dbtaiversion'
 $$$
 -- END 1.2/2
+
+-- START 1.3
+
+-- $rev 1
+
+update setting set value='1.3/1' where name='_dbtaiversion'
+$$$
+
+-- END 1.3/1
+
+
+
+

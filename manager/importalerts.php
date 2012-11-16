@@ -14,7 +14,7 @@ if (!$MANAGERUSER->authorized("imports"))
 $displaysetting = "unacknowledged";
 
 if (isset($_REQUEST["view"]) && 
-	in_array($_REQUEST["view"],array("acknowledged","unacknowledged","unconfigured"))) {
+	in_array($_REQUEST["view"],array("acknowledged","unacknowledged","unconfigured","dismissed"))) {
 	$displaysetting = $_REQUEST["view"];
 }
 
@@ -65,12 +65,12 @@ while ($shardinfo = DBGetRow($shardresult)) {
 	Query("use aspshard", $sharddb);
 	$query = "select customerid,importalertruleid,importname,name,operation,testvalue,actualvalue,alerttime,notified,notes,acknowledged from importalert where type='manager' and acknowledged=?";
 	
-	if ($displaysetting == "unconfigured")
+	if ($displaysetting == "unconfigured" || $displaysetting == "dismissed")
 		$query .= " and name='unconfigured'";
 	else
 		$query .= " and name!='unconfigured'";
 	
-	$result = Query($query,$sharddb,array($displaysetting == "acknowledged"?1:0));
+	$result = Query($query,$sharddb,array($displaysetting == "acknowledged" || $displaysetting == "dismissed"?1:0));
 	
 	
 	while ($row = DBGetRow($result,true)) {
@@ -142,6 +142,8 @@ function fmt_actions($row, $index){
 /////////////////////////////
 // Display
 /////////////////////////////
+$TITLE = _L("Import Alerts");
+$PAGE = "commsuite:importalerts";
 
 include("nav.inc.php");
 
@@ -159,6 +161,7 @@ include("nav.inc.php");
 		<option value='acknowledged' <?=($displaysetting=='acknowledged')?"selected":""?>>Acknowledged</option>
 		<option value='unacknowledged' <?=($displaysetting=='unacknowledged')?"selected":""?>>Non Acknowledged</option>
 		<option value='unconfigured' <?=($displaysetting=='unconfigured')?"selected":""?>>Unconfigured</option>
+		<option value='dismissed' <?=($displaysetting=='dismissed')?"selected":""?>>Unconfigured (Acknowledged)</option>
 	</select>
 	</td>
 </tr>

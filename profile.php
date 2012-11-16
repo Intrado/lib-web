@@ -623,6 +623,14 @@ _L('Talk About It Controls'),
 		"control" => array("CheckBox"),
 		"helpstep" => 13
 	),
+	"taicanmodifydisplayname" => array(
+		"label" => _L('Modify Display Name'),
+		"fieldhelp" => _L('Allows users to modify display name'),
+		"value" => $obj->getValue("tai_canmodifydisplayname"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 13
+	),
 	"taicanmanagenews" => array(
 		"label" => _L('Manage News'),
 		"fieldhelp" => _L('Allows users to TODO '),
@@ -870,6 +878,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$obj->setPermission("tai_canviewreports", (bool)$postdata['taicanviewreports']);
 				$obj->setPermission("tai_canmanagenews", (bool)$postdata['taicanmanagenews']);
 				$obj->setPermission("tai_cansendanonymously", (bool)$postdata['taicansendanonymously']);
+				$obj->setPermission("tai_canmodifydisplayname", (bool)$postdata['taicanmodifydisplayname']);
 				$obj->setPermission("tai_canmanagetopics", (bool)$postdata['taicanmanagetopics']);
 				$obj->setPermission("tai_canbetopicrecipient", (bool)$postdata['taicanbetopicrecipient']);
 				$obj->setPermission("tai_canusecannedresponses", (bool)$postdata['taicanusecannedresponses']);

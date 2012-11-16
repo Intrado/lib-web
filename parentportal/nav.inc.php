@@ -152,9 +152,9 @@ header('Content-type: text/html; charset=UTF-8') ;
 								<li><a href="#" onclick="window.open('<?=isset($LOCALE)?"locale/$LOCALE/help/index.html":"help/index.html"?>', '_blank', 'width=750,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');"><?=_L("Help")?></a></li>
 <?
 	$logout = "index.php?logout=1";
-	if (isset($_SESSION['customerurl'])) {
-		$logout .= "&u=".urlencode($_SESSION['customerurl']);
-	}
+	//if (isset($_SESSION['customerurl'])) {
+	//	$logout .= "&u=".urlencode($_SESSION['customerurl']);
+	//}
 ?>
 								<li class="bl_last"><a href="<?=$logout?>" title="<?=_L("Logout")?>"><?=_L("Logout")?></a></li>
 								<li class="bl_right"></li>

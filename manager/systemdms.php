@@ -212,9 +212,18 @@ $resactin = 0;
 
 while($row = DBGetRow($result)){
 	$data[$row[0]] = $row;
-	//fake some blank data when memcache is unavailable
-	$data[$row[0]][13] = $mcache ? $mcache->get("dmpoststatus/".$row[7]) : "[{\"restotal\":0, \"resactout\": 0, \"resactin\":0}]";
-	$poststatus = json_decode($data[$row[0]][13]);
+
+	//fake some blank data when the api is unavailable
+	$poststatus = "[{\"restotal\":0, \"resactout\": 0, \"resactin\":0}]";
+	$fh = fopen("http://localhost/manager/api/2/deliverymechanisms/".$row[7], "r");
+	$apidata = stream_get_contents($fh);
+	fclose($fh);
+	if ($apidata) {
+		$dmdata = json_decode($apidata);
+		$poststatus = $dmdata->postStatus;
+	}
+	$data[$row[0]][13] = $poststatus;
+	$poststatus = json_decode($poststatus);
 	$poststatus = $poststatus[0];
 	$restotal += $poststatus->restotal;
 	$resactout += $poststatus->resactout;
@@ -267,6 +276,8 @@ $filterFormatters = array("status" => "fmt_dmstatus_nohtml",4 => "fmt_state");
 /////////////////////////////
 // Display
 /////////////////////////////
+$TITLE = _L("System&nbsp;DMs");
+$PAGE = "commsuite:systemdms";
 
 include_once("nav.inc.php");
 

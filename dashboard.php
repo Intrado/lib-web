@@ -256,6 +256,9 @@ include("nav.inc.php");
 				}
 				?>
 			</div>
+
+				<div class="window_title_start"></div>
+				<div class="window_title_end"></div>
 			</div>
 			
 			<div class="window_body_wrap cf">
@@ -353,7 +356,10 @@ include("nav.inc.php");
 		if ($USER->authorize('sendphone') || $USER->authorize('sendemail') || $USER->authorize('sendsms')) {
 ?>
 		<div class="window broadcasts">
-			<div class="window_title_wrap"><h2><?= getJobsTitle()?></h2></div>
+			<div class="window_title_wrap"><h2><?= getJobsTitle()?></h2>
+				<div class="window_title_start"></div>
+				<div class="window_title_end"></div>
+			</div>
 			
 			<div class="window_body_wrap">
 			
@@ -391,7 +397,23 @@ include("nav.inc.php");
 			</div>
 			
 			<div id="nocontenthelper" class="nocontent">
-				<?= _L("You haven't sent any %s.",getJobsTitle())?> <a href="message_sender.php?new"><?=_L("Create a %s",getJobTitle() )?></a>
+			<?  
+			Switch($requestValues["showactivity"]) {
+				case "me":
+					echo _L("You haven't sent any %s.",getJobsTitle()) . ' <a href="message_sender.php?new">' . _L("Create a %s",getJobTitle() ) . '</a>';
+					break;
+				case "everyone":
+					echo _L("No %s have been sent.",getJobsTitle()) . ' <a href="message_sender.php?new">' . _L("Create a %s",getJobTitle() ) . '</a>';
+					break;
+				default:
+					if (isset($useridList[$requestValues["showactivity"]])) {
+						echo _L("%s hasn't sent any %s.",$useridList[$requestValues["showactivity"]], getJobsTitle());
+					} else {
+						echo _L("No %s have been sent.",getJobsTitle()) . ' <a href="message_sender.php?new">' . _L("Create a %s",getJobTitle() ) . '</a>';
+					}
+					break;
+			} 
+			?>
 			</div>
 			</div><!-- /window_body_wrap -->
 		</div>
@@ -406,7 +428,7 @@ include("nav.inc.php");
 		if ($USER->authorize('sendphone') || $USER->authorize('sendemail') || $USER->authorize('sendsms')) {
 ?>
 		<div class="bigbtn">
-		<a class="bigbtn" href="message_sender.php?new"><span><?= _L("New %s",getJobTitle())?></span></a>
+			<a class="bigbtn" href="message_sender.php?new"><span><?= _L("New %s",getJobTitle())?></span><b></b></a>
 		</div>
 		
 <? 
@@ -445,9 +467,6 @@ include("nav.inc.php");
 
 
 <script type="text/javascript">
-<?
-$who = isset($_GET["showactivity"])?$_GET["showactivity"]:"me";
-?>
 var jobloads = 3;
 
 function updateTableTools(section, action, override, start, limit, count){
@@ -498,7 +517,7 @@ function updateTableTools(section, action, override, start, limit, count){
 		}
 		
 		$("more" + section).update(new Element("a",{href: "#", 
-			onclick: "ajax_obj_table_update('" + section + "','ajaxjob.php?action=" + action + "&who=<?=$who?>&start=" + start + "&limit=" + limit + "'," + override + ",updateTableTools.curry('" + section + "','" + action + "'," + override + "," + start + "," + limit + ")); return false;"
+			onclick: "ajax_obj_table_update('" + section + "','ajaxjob.php?action=" + action + "&who=<?=$requestValues["showactivity"]?>&start=" + start + "&limit=" + limit + "'," + override + ",updateTableTools.curry('" + section + "','" + action + "'," + override + "," + start + "," + limit + ")); return false;"
 			}).insert("<?= _L("Show More")?>"));
 	} else {
 		$("more" + section).update("");
@@ -507,9 +526,9 @@ function updateTableTools(section, action, override, start, limit, count){
 
 document.observe('dom:loaded', function() {
 	$("nocontenthelper").hide();
-	ajax_obj_table_update('activejobs','ajaxjob.php?action=activejobs&who=<?=$who?>&start=0&limit=10',true,updateTableTools.curry("activejobs","activejobs",true,0,10));
-	ajax_obj_table_update('scheduledjobs','ajaxjob.php?action=scheduledjobs&who=<?=$who?>&start=0&limit=10',false,updateTableTools.curry("scheduledjobs","scheduledjobs",false,0,10));
-	ajax_obj_table_update('completedjobs','ajaxjob.php?action=completedjobs&who=<?=$who?>&start=0&limit=5',false,updateTableTools.curry("completedjobs","completedjobs",false,0,5));
+	ajax_obj_table_update('activejobs','ajaxjob.php?action=activejobs&who=<?=$requestValues["showactivity"]?>&start=0&limit=10',true,updateTableTools.curry("activejobs","activejobs",true,0,10));
+	ajax_obj_table_update('scheduledjobs','ajaxjob.php?action=scheduledjobs&who=<?=$requestValues["showactivity"]?>&start=0&limit=10',false,updateTableTools.curry("scheduledjobs","scheduledjobs",false,0,10));
+	ajax_obj_table_update('completedjobs','ajaxjob.php?action=completedjobs&who=<?=$requestValues["showactivity"]?>&start=0&limit=5',false,updateTableTools.curry("completedjobs","completedjobs",false,0,5));
 });
 
 </script>

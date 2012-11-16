@@ -927,7 +927,7 @@ var RuleEditor = Class.create({
 		//var checkboxstyle = 'font-size:90%;';
 		//var divstyle = 'white-space:nowrap;';
 		
-		// Determine if values is an array or an object of value:title pairs.
+		// Determine if values is an array, only support array with object of {value:___,name:___} objcets
 		if (typeof(values.join) != 'undefined') { // values is an array.
 			var max = values.length;
 			if (max == 1) {
@@ -941,47 +941,18 @@ var RuleEditor = Class.create({
 				
 				var checkbox = new Element('input', {
 					'type': 'checkbox',
-					'value': value
+					'value': typeof(value.value) != 'undefined'?value.value:value
 				});
 				
 				var label = new Element('label', {
 					'for': checkbox.identify()
-				}).update(value.escapeHTML());
+				}).update((typeof(value.name) != 'undefined'?value.name:value).escapeHTML());
 				
 				multicheckbox.insert(
 					new Element('li').insert(checkbox).insert(label)
 				);
 			}
-		} else { // values is an object of value:title pairs.
-			var max = 0;
-			var value;
-			var title;
-			
-			for (value in values) {
-				title = values[value];
-				
-				var checkbox = new Element('input', {
-					'type': 'checkbox',
-					'value': value
-				});
-				
-				var label = new Element('label', {
-					'for': checkbox.identify()
-				}).update(title.escapeHTML());
-				
-				multicheckbox.insert(
-					new Element('li').insert(checkbox).insert(label)
-				);
-				
-				max++;
-			}
-			
-			if (max == 1) {
-				return new Element('select').insert(
-					new Element('option', {'value': value}).update(title.escapeHTML())
-				);
-			}
-		}
+		} 
 
 		return multicheckbox;
 	},

@@ -263,9 +263,10 @@
                             // data is true when we get some options back for this field
                             if (data) {
                                 var isOrg = modal.newRule.field.type === 'association';
-                                $.each(data, function(id, value){
-                                    var name = value === '' ? '&nbsp;' : value;
-                                    options = options + '<label class="checkbox"><input type="checkbox" value="' + (isOrg ? id : value) + '">' + name + '</label>';
+                                $.each(data, function(id,item){
+                                	var value = typeof(item.value) != 'undefined'?item.value:item;
+                                    var name = typeof(item.name) != 'undefined'?item.name:item;
+                                    options = options + '<label class="checkbox"><input type="checkbox" value="' + value + '">' + (name === '' ? '&nbsp;' : name) + '</label>';
                                 });
                             // no data, must be text or reldate
                             } else {
@@ -505,7 +506,7 @@
 
                             // Add school if hasorg
                             if (modal.ruleSettings.hasorg === true) {
-                                modal.ruleSettings.fieldmaps.organization = {fieldnum: 'organization', name: 'School', options: 'organization', type: 'association'};
+                                modal.ruleSettings.fieldmaps.organization = {fieldnum: 'organization', name: modal.ruleSettings.orgname, options: 'organization', type: 'association'};
                             };
 
                             // Explode the criteria options and set the type
@@ -666,9 +667,10 @@
                         }).done(function(orgsData){
                             if (orgsData) {
                                 modal.orgs = {};
-                                $.each(orgsData, function(id, name){
-                                    modal.orgs[id] = {name: name};
+                                $.each(orgsData, function(id,organization){
+                                    modal.orgs[organization.value] = organization;
                                 });
+                                modal.orgsData = orgsData;
                                 modal.buildSelect();
                             } else {
                                 // ajax failed
@@ -686,8 +688,8 @@
                 // Build the School picker
                 modal.buildSelect = function(){
                     var options = '';
-                    $.each(modal.orgs, function(orgId, orgData){
-                        options = options + '<option value="' + orgId + '">' + orgData.name + '</option>';
+                    $.each(modal.orgsData, function(id,orgData){
+                        options = options + '<option value="' + orgData.value + '">' + orgData.name + '</option>';
                     });
                     $orgSelect.html('<option value="">Select a School</option>' + options);
                 };

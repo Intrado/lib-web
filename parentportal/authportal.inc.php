@@ -124,6 +124,12 @@ function portalGetCustomerAssociations() {
 	} else {
 		$customerurl = "";
 	}
+	
+	// remove cookie to clear future logins
+	if (isset($_COOKIE['customerurl'])) {
+		setcookie('customerurl', '', time() - 3600);
+	}
+	
 	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($customerurl, 'string'));
 	$method = "PortalServer.portal_getCustomerAssociations";
 	$result = pearxmlrpc($method, $params);
@@ -219,6 +225,14 @@ function portalCreatePhoneActivation($customerid, $portaluserid, $pkeyList, $cre
 	$sessionid = session_id();
 	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($customerid, 'int'), new XML_RPC_Value($portaluserid, 'int'), new XML_RPC_Value($pkeyarray, 'array'), new XML_RPC_Value($createCode, 'boolean'));
 	$method = "PortalServer.portal_createPhoneActivation";
+	$result = pearxmlrpc($method, $params);
+	return $result;
+}
+
+function portalDisassociateCustomer($customerid) {
+	$sessionid = session_id();
+	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($customerid, 'int'));
+	$method = "PortalServer.portal_disassociateCustomer";
 	$result = pearxmlrpc($method, $params);
 	return $result;
 }

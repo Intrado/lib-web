@@ -89,9 +89,13 @@ class ValOrgs extends Validator {
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
 
-// get all the current non deleted orgs (except the source org)
-$data = QuickQueryList("select id, orgkey from organization where id != ? and not deleted order by orgkey, id", true, false, array($sourceOrg->id));
 
+// get all the current non deleted orgs (except the source org)
+if ($sourceOrg->parentorganizationid) {
+	$data = QuickQueryList("select id, orgkey from organization where id != ? and not deleted and parentorganizationid = ? order by orgkey, id", true, false, array($sourceOrg->id, $sourceOrg->parentorganizationid));
+} else {
+	$data = QuickQueryList("select id, orgkey from organization where id != ? and not deleted and parentorganizationid is null order by orgkey, id", true, false, array($sourceOrg->id));
+}
 $formdata = array(
 	"mergeorg" => array(
 		"label" => _L('Organization Target'),
@@ -150,11 +154,12 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$sourcepdvid = QuickQuery("select id from persondatavalues where fieldnum = 'oid' and value = ?", false, array($source->id));
 			$destpdvid = QuickQuery("select id from persondatavalues where fieldnum = 'oid' and value = ?", false, array($dest->id));
 			// if the source org exists in persondatavalues, remove it
-			if ($sourcepdvid)
+			if ($sourcepdvid) {
 				QuickUpdate("delete from persondatavalues where id = ?", false, array($sourcepdvid));
-			// if the dest org doesn't exist in persondatavalues, add it
-			if (!$destpdvid) {
-				QuickUpdate("insert into persondatavalues values (null, 'oid', ?, 0, 1)", false, array($dest->id));
+				// if the dest org doesn't exist in persondatavalues, add it
+				if (!$destpdvid) {
+					QuickUpdate("insert into persondatavalues values (null, 'oid', ?, 0, 1)", false, array($dest->id));
+				}
 			}
 			
 			$source->deleted = 1;

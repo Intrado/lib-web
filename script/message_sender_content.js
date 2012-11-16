@@ -150,7 +150,9 @@ var allowControl = {
 		// determine whether we show or hide the callerId
 		function callerIdDisplay() {
 			var callerIdnumber = false;
-			$("#msgsndr_optioncallerid").val(getDefaultCallerId());
+			var defaultCallerid = getDefaultCallerId();
+			$("#msgsndr_optioncallerid").val(defaultCallerid);
+
 			// If hascallback isn't enabled,
 			// check for orgOptions.requiredapprovedcallerid,
 			// then subsequently for userPermissions.setcallerid
@@ -176,7 +178,7 @@ var allowControl = {
 
 					// and append them as options to the select menu ...
 					$.each(userCallerIds, function(cIndex, cItem) {
-						$('#optioncallerid_select').append('<option value="' + cItem + '" ' + (userPrefs.callerid==cItem?'selected':'') + '>' + formatPhone(cItem) + '</option>');
+						$('#optioncallerid_select').append('<option value="' + cItem + '" ' + (defaultCallerid==cItem?'selected':'') + '>' + formatPhone(cItem) + '</option>');
 					});
 					
 					$('#optioncallerid_select').trigger("change");

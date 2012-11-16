@@ -74,10 +74,10 @@ if ($datatype == "person") {
 	//menu of guardian sequence
 	$guardiansequence = array();
 	//$guardiansequence[-1] = "- Unmapped -";
-	$guardiansequence[0] = "Student";
+	$guardiansequence[0] = _L("Contact");
 	$maxguardians = getSystemSetting("maxguardians", 0);
 	for ($i=1; $i<=$maxguardians; $i++) {
-		$guardiansequence[$i] = "Guardian $i";
+		$guardiansequence[$i] = _L("Guardian") . " " . $i;
 	}
 
 	//make a menu of all available fields

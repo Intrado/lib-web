@@ -185,34 +185,49 @@ function jobs_actionlinks ($obj) {
 	$deleted = $obj->deleted;
 	$type = $obj->type;
 
-	if ($type == "survey") {
-		$editbtn = action_link(_L("Edit"),"pencil","survey.php?id=$id");
-		$copybtn = ''; // no copy survey feature
+	if ($obj->userid != $USER->id) {
+		$editbtn = action_link(_L("View"),"magnifier","jobview.php?id=$id");
+		$copybtn = '';
+		$editrepeatingbtn = '';
+		$cancelbtn = '';
+		$reportbtn = '';
+		$monitorbtn = '';
+		$graphbtn = '';
+		$deletebtn = '';
+		$archivebtn = '';
+		$runrepeatbtn = '';
+		$viewresponses = '';
+		$unarchivebtn = '';
 	} else {
-		$editbtn = action_link(_L("Edit"),"pencil","job.php?id=$id");
-		$copybtn = action_link(_L("Copy"),"page_copy","jobs.php?copy=$id");
+		if ($type == "survey") {
+			$editbtn = action_link(_L("Edit"),"pencil","survey.php?id=$id");
+			$copybtn = ''; // no copy survey feature
+		} else {
+			$editbtn = action_link(_L("Edit"),"pencil","job.php?id=$id");
+			$copybtn = action_link(_L("Copy"),"page_copy","jobs.php?copy=$id");
+		}
+	
+		$editrepeatingbtn = action_link(_L("Edit"),"pencil","jobrepeating.php?id=$id");
+	
+		$cancelbtn = action_link(_L("Cancel"),"stop","jobs.php?cancel=$id", "return confirm('Are you sure you want to cancel this job?');");
+	
+		$reportbtn = action_link(_L("Report"),"layout", $type == "survey" ? "reportsurveysummary.php?jobid=$id" : "reportjobsummary.php?jobid=$id");
+	
+		$monitorbtn = action_link(_L("Monitor"), "chart_pie", "#", "popup('jobmonitor.php?jobid=$id', 650, 450);");
+	
+		$graphbtn = action_link(_L("Graph"), "chart_pie", "#", "popup('jobmonitor.php?jobid=$id&noupdate', 650, 450);");
+	
+		$deletebtn = action_link(_L("Delete"),"cross","jobs.php?delete=$id","return confirmDelete();");
+	
+		$archivebtn = action_link(_L("Archive"),"fugue/broom","jobs.php?archive=$id");
+	
+		$runrepeatbtn = action_link(_L("Run Now"),"page_go","jobs.php?runrepeating=$id&uuid=rr".uniqid(), "return confirm('Are you sure you want to run this job now?');");
+	
+		$viewresponses = action_link(_L("Responses"),"comment","replies.php?jobid=$id");
+	
+		$unarchivebtn = action_link(_L("Unarchive"),"fugue/broom__arrow","jobs.php?unarchive=$id");
+
 	}
-
-	$editrepeatingbtn = action_link(_L("Edit"),"pencil","jobrepeating.php?id=$id");
-
-	$cancelbtn = action_link(_L("Cancel"),"stop","jobs.php?cancel=$id", "return confirm('Are you sure you want to cancel this job?');");
-
-	$reportbtn = action_link(_L("Report"),"layout", $type == "survey" ? "reportsurveysummary.php?jobid=$id" : "reportjobsummary.php?jobid=$id");
-
-	$monitorbtn = action_link(_L("Monitor"), "chart_pie", "#", "popup('jobmonitor.php?jobid=$id', 650, 450);");
-
-	$graphbtn = action_link(_L("Graph"), "chart_pie", "#", "popup('jobmonitor.php?jobid=$id&noupdate', 650, 450);");
-
-	$deletebtn = action_link(_L("Delete"),"cross","jobs.php?delete=$id","return confirmDelete();");
-
-	$archivebtn = action_link(_L("Archive"),"fugue/broom","jobs.php?archive=$id");
-
-	$runrepeatbtn = action_link(_L("Run Now"),"page_go","jobs.php?runrepeating=$id&uuid=rr".uniqid(), "return confirm('Are you sure you want to run this job now?');");
-
-	$viewresponses = action_link(_L("Responses"),"comment","replies.php?jobid=$id");
-
-	$unarchivebtn = action_link(_L("Unarchive"),"fugue/broom__arrow","jobs.php?unarchive=$id");
-
 	switch ($status) {
 		case "new":
 		case "scheduled":

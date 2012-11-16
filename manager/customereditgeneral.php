@@ -15,7 +15,6 @@ require_once("../obj/Message.obj.php");
 require_once("../obj/MessagePart.obj.php");
 require_once("loadtemplatedata.php");
 require_once("createtemplates.php");
-require_once("inc/customersetup.inc.php");
 require_once("../inc/themes.inc.php");
 require_once("../obj/FormBrandTheme.obj.php");
 require_once("../obj/ValSmsText.val.php");
@@ -25,7 +24,11 @@ require_once("../obj/Person.obj.php");
 require_once("../obj/User.obj.php");
 require_once("../obj/Organization.obj.php");
 require_once("obj/ValUrlComponent.val.php");
-
+require_once("obj/ValUrl.val.php");
+require_once("obj/LogoRadioButton.fi.php");
+require_once("obj/LanguagesItem.fi.php");
+require_once("obj/ValInboundNumber.val.php");
+require_once("inc/customersetup.inc.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -48,6 +51,9 @@ if (!$MANAGERUSER->authorized("editcustomer")) {
 	unset($_SESSION['customerid']);
 	exit("Not Authorized");
 }
+
+
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -74,16 +80,73 @@ class CustomerProduct {
 
 // default settings
 $settings = array(
+	'_dmmethod' => '',
 	'timezone' => '',
 	'displayname' => '',
-	'urlcomponent' => ''
+	'organizationfieldname' => 'School',
+	'urlcomponent' => '',
+	'_logocontentid' => '',
+	'_logoclickurl' => '',
+	'_productname' => '',
+	'_supportemail' => '',
+	'_supportphone' => '',
+	'callerid' => '',
+	'defaultareacode' => '',
+	'inboundnumber' => '',
+	'maxguardians' => '0',
+	'maxphones' => '1',
+	'maxemails' => '1',
+	'emaildomain' => '',
+	'tinydomain' => '',
+	'softdeletemonths' => '6',
+	'harddeletemonths' => '24',
+	'disablerepeat' => '0',
+	'_hassurvey' => '0',
+	'surveyurl' => '',
+	'_hassms' => '0',
+	'maxsms' => '1',
+	'smscustomername' => '',
+	'enablesmsoptin' => '0',
+	'_hassmapi' => '0',
+	'_hascallback' => '0',
+	'callbackdefault' => 'inboundnumber',
+	'_hasldap' => '0',
+	'_hasenrollment' => '0',
+	'_hastargetedmessage' => '0',
+	'_hasselfsignup' => '',
+	'_hasportal' => '',
+	'_hasfacebook' => '0',
+	'_hastwitter' => '0',
+	'_hasfeed' => '0',
+	'autoreport_replyname' => 'SchoolMessenger',
+	'autoreport_replyemail' => 'autoreport@schoolmessenger.com',
+	'_renewaldate' => '',
+	'_callspurchased' => '',
+	'_maxusers' => '',
+	'_timeslice' => '450',
+	'loginlockoutattempts' => '5',
+	'logindisableattempts' => '0',
+	'loginlockouttime' => '5',
+	'_brandtheme' => 'newui',
+	'_brandprimary' => '3e693f',
+	'_brandratio' => '.2',
+	'_amdtype' => "ivr"
 );
 
-// $products = array(
-// 	'cs' => 0,
-// 	'tai' => 0,
-// );
-$products = array();
+$timezones = array(
+	"US/Alaska",
+	"US/Aleutian",
+	"US/Arizona",
+	"US/Central",
+	"US/East-Indiana",
+	"US/Eastern",
+	"US/Hawaii",
+	"US/Indiana-Starke",
+	"US/Michigan",
+	"US/Mountain",
+	"US/Pacific",
+	"US/Samoa"
+);
 
 $customerid = null;
 if (isset($_SESSION['customerid'])) {
@@ -101,105 +164,43 @@ if (isset($_SESSION['customerid'])) {
 	
 	$query = "select product, enabled from customerproduct where customerid=?";
 	$products = QuickQueryList($query,true,false,array($_SESSION['customerid']));
-	//$products = array_merge($products, QuickQueryList($query,true,false,array($_SESSION['customerid'])));
 }
 
 
-$timezones = array(
-	"US/Alaska",
-	"US/Aleutian",
-	"US/Arizona",
-	"US/Central",
-	"US/East-Indiana",
-	"US/Eastern",
-	"US/Hawaii",
-	"US/Indiana-Starke",
-	"US/Michigan",
-	"US/Mountain",
-	"US/Pacific",
-	"US/Samoa"
+$logos = array(); 
+if ($customerid && $settings['_logocontentid'] != '') {
+	$logos = array( "Saved" => 'No change - Preview: <div style="display:inline;"><img src="customerlogo.img.php?id=' . $customerid .'" width="70px" alt="" /></div>');
+}
+// Content for logo selector
+$logos += array( 	"AutoMessenger" => '<img src="mimg/auto_messenger.jpg" alt="AutoMessenger" title="AutoMessenger" />',
+					"SchoolMessenger" => '<img src="mimg/logo_small.gif" alt="SchoolMessenger" title="SchoolMessenger" />',
+					"Skylert" => '<img src="mimg/sky_alert.jpg" alt="Skylert" title="Skylert" />');
+
+// Locations and mimetype for default logos
+$defaultlogos = array(
+					"AutoMessenger" => array("filelocation" => "mimg/auto_messenger.jpg",
+											"filetype" => "image/jpeg"),
+					"SchoolMessenger" => array("filelocation" => "mimg/logo_small.gif",
+											"filetype" => "image/gif"),
+					"Skylert" => array("filelocation" => "mimg/sky_alert.jpg",
+										"filetype" => "image/jpeg")
 );
 
 
 $shards = QuickQueryList("select id, name from shard where not isfull order by id",true);
 
+$dmmethod = array('' => '--Choose a Method--', 'asp' => 'CommSuite (fully hosted)','hybrid' => 'CS + SmartCall + Emergency','cs' => 'CS + SmartCall (data only)');
+
+if ($customerid)
+	$shortcodegroupname = QuickQuery("select description from shortcodegroup where id = (select shortcodegroupid from customer where id = ?)", null, array($customerid));
+else
+	$shortcodegroupname = QuickQuery("select description from shortcodegroup where id = 1"); // hardcoded id=1 is the default group for new customers
+
+
 $helpstepnum = 1;
 $formdata = array(_L('Basics'));
 
-$formdata["enabled"] = array(
-	"label" => _L('Enabled'),
-	"fieldhelp" => "Unchecking this box will disable this customer!  All repeating jobs will be stopped.  All scheduled jobs must be canceled manually.",
-	"value" => isset($custinfo)?$custinfo["enabled"]:"",
-	"validators" => array(),
-	"control" => array("CheckBox"),
-	"helpstep" => $helpstepnum
-);
-
-//Unable to change shard on this form
-if (!$customerid) {
-	$formdata["shard"] = array(
-		"label" => _L('Shard'),
-		"value" => "",
-		"validators" => array(
-			array("ValRequired"),
-			array("ValInArray", "values" => array_keys($shards))
-			),
-		"control" => array("SelectMenu", "values" => array("" =>_L("-- Select a Shard --")) + $shards),
-		"helpstep" => $helpstepnum
-	);
-}
-
-$formdata["displayname"] = array(
-	"label" => _L('Display Name'),
-	"value" => $settings['displayname'],
-	"validators" => array(
-		array("ValRequired"),
-		array("ValLength","min" => 3,"max" => 50)
-	),
-	"control" => array("TextField","size" => 30, "maxlength" => 51),
-	"helpstep" => $helpstepnum
-);
-
-$formdata["urlcomponent"] =	array(
-	"label" => _L('URL Path'),
-	"value" => $settings['urlcomponent'],
-	"validators" => array(
-		array("ValRequired"),
-		array("ValLength","max" => 30),
-		array("ValUrlComponent", "customerid" => $customerid, "urlcomponent" => $settings['urlcomponent'])
-	),
-	"control" => array("TextField","size" => 30, "maxlength" => 51),
-	"helpstep" => $helpstepnum
-);
-
-$formdata["timezone"] = array(
-	"label" => _L('Time zone'),
-	"value" => $settings['timezone'],
-	"validators" => array(
-		array("ValRequired"),
-		array("ValInArray", "values" => $timezones)
-	),
-	"control" => array("SelectMenu", "values" => array_merge(array("" =>_L("-- Select a Timezone --")),array_combine($timezones,$timezones))),
-	"helpstep" => $helpstepnum
-);
-
-$formdata["nsid"] = array(
-	"label" => _L('NetSuite ID'),
-	"value" => isset($custinfo)?$custinfo["nsid"]:"",
-	"validators" => array(
-		array("ValLength","max" => 50)
-	),
-	"control" => array("TextField","maxlength"=>50,"size"=>4),
-	"helpstep" => $helpstepnum
-);
-
-$formdata["notes"] = array(
-	"label" => _L('Notes'),
-	"value" => isset($custinfo)?$custinfo["notes"]:"",
-	"validators" => array(),
-	"control" => array("TextArea", "rows" => 3, "cols" => 100),
-	"helpstep" => $helpstepnum
-);
+include("inc/customerRequiredFormItems.inc.php");
 
 $formdata[] = _L('Products');
 $formdata["commsuite"] = array(
@@ -218,8 +219,12 @@ $formdata["tai"] = array(
 	"helpstep" => $helpstepnum
 );
 
+
+$thispage = "customereditgeneral.php";
+$returntopage = "allcustomers.php";
+
 $buttons = array(submit_button(_L("Save"),"save","tick"),submit_button(_L("Save and Return"),"done","tick"),
-				icon_button(_L('Cancel'),"cross",null,"allcustomers.php"));
+				icon_button(_L('Cancel'),"cross",null,$returntopage));
 $form = new Form("newcustomer",$formdata,null,$buttons);
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -238,7 +243,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 	
 	if ($form->checkForDataChange()) {
 		$datachange = true;
-		} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
+	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 		Query("BEGIN");
 		// Craete new customer if It does not exist 
@@ -247,50 +252,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$customerid = $_SESSION['customerid'];
 		}
 		
-		$query = "update customer set
-								urlcomponent = ?,
-								enabled=?,
-								nsid=?,
-								notes=?
-								where id = ?";
-				
-		QuickUpdate($query,false,array(
-			$postdata["urlcomponent"],
-			$postdata["enabled"]?'1':'0',
-			$postdata["nsid"],
-			$postdata["notes"],
-			$customerid
-		));
-		
-		
-		// notify authserver to refresh the customer cache
-		refreshCustomer($customerid);
-		
-		$shardinfo = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword from shard s inner join customer c on (c.shardid = s.id) where c.id = ?", true,false,array($customerid));
-		$sharddb = DBConnect($shardinfo["dbhost"], $shardinfo["dbusername"], $shardinfo["dbpassword"], "aspshard");
-		if(!$sharddb) {
-			exit("Connection failed for customer: $customerid, shardhost: {$shardinfo["dbhost"]}");
-		}
-		
-		// if timezone changed (rare occurance, but we must update scheduled jobs and report records on the shard database)
-		if ($postdata["timezone"] != getCustomerSystemSetting('timezone', false, true, $custdb)) {
-			QuickUpdate("update qjob set timezone=? where customerid=?", $sharddb, array($postdata["timezone"],$customerid));
-			QuickUpdate("update qschedule set timezone=? where customerid=?", $sharddb,array($postdata["timezone"],$customerid));
-			QuickUpdate("update qreportsubscription set timezone=? where customerid=?", $sharddb,array($postdata["timezone"],$customerid));
-		}
-		
-		if (!$postdata["enabled"]) {
-			setCustomerSystemSetting("disablerepeat", "1", $custdb);
-			setCustomerSystemSetting("_customerenabled", "0", $custdb);
-			// Remove active import alerts but leave the alert rules since they will not trigger for disabled customers
-			QuickUpdate("delete from importalert where customerid=?", $sharddb, array($customerid));
-		} else {
-			setCustomerSystemSetting("_customerenabled", "1", $custdb);
-		}
-		
-		setCustomerSystemSetting('timezone', $postdata["timezone"], $custdb);
-		setCustomerSystemSetting('displayname', $postdata["displayname"], $custdb);
-		setCustomerSystemSetting('urlcomponent', $postdata["urlcomponent"], $custdb);
+		saveRequiredFields($custdb,$customerid,$postdata);
 		
 		if (!isset($products["cs"])) {
 			if ($postdata["commsuite"]) {
@@ -336,14 +298,14 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		Query("COMMIT");
 		if($button == "done") {
 			if ($ajax)
-				$form->sendTo("allcustomers.php");
+				$form->sendTo($returntopage);
 			else
-				redirect("allcustomers.php");
+				redirect($returntopage);
 		} else {
 			if ($ajax)
-				$form->sendTo("customereditgeneral.php");
+				$form->sendTo($thispage);
 			else
-				redirect("customereditgeneral.php");
+				redirect($thispage);
 		}
 	}
 }
@@ -367,6 +329,27 @@ include_once("nav.inc.php");
 <script type="text/javascript">
 
 document.observe('dom:loaded', function() {
+	$('newcustomer_logo').observe("change", function (event) {
+		var e = event.element();
+		var savedname = '<?= $settings['_productname'] ?>';
+		$('newcustomer_productname').value = (e.value && e.type == "radio" && e.value != "Other" && e.value != "Saved")?e.value:savedname;
+	});
+	
+	$('newcustomer_displayname').observe("change", function (event) {
+		var e = event.element();
+		if ($('newcustomer_hassms').checked) {
+			$('newcustomer_smscustomername').value = e.value;
+		}
+	});
+	$('newcustomer_hassms').observe("change", function (event) {
+		if ($('newcustomer_hassms').checked) {
+			$('newcustomer_enablesmsoptin').checked = 1;
+			$('newcustomer_smscustomername').value = $('newcustomer_displayname').value;
+		} else {
+			$('newcustomer_enablesmsoptin').checked = 0;
+			$('newcustomer_smscustomername').value = '';
+		}
+	});
 	$('newcustomer_enabled').observe("change", function (event) {
 		//var checkbox = event.Element();
 		var checkbox = $('newcustomer_enabled');
@@ -374,8 +357,7 @@ document.observe('dom:loaded', function() {
 			checkbox.checked = !confirm("Are you sure you want to DISABLE this customer?");
 	});
 });
-
-<? Validator::load_validators(array("ValUrlComponent"));?>
+<? Validator::load_validators(array("ValBrandTheme","ValInboundNumber","ValUrlComponent","ValSmsText","ValLanguages","ValUrl"));?>
 </script>
 <?
 

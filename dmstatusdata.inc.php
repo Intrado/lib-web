@@ -1,116 +1,171 @@
 <?
+?>
+<div id='systemstats'>
 
-// $jsonstats variable must be set
+	<b>General</b>
+	<table width="100%">
+		<tr><td width="30%">
+			Active State:
+		</td><td><div id='dmenabled'></div></td></tr>
+		<tr><td width="30%">
+			System Startup Time:
+		</td><td><div id='startuptime'></div></td></tr>
+		<tr><td width="30%">
+			Current System Time:
+		</td><td><div id='currenttime'></div></td></tr>
+		<tr><td width="30%">
+			System has been Running:
+		</td><td><div id='sysrunning'></div></td></tr>
+		<tr><td width="30%">
+			Total Clock Resets:
+		</td><td><div id='clockresetcount'></div></td></tr>
+	</table>
+	<div id="dispatchers"></div>
+	<b>Resource Allocation</b>
+	<table width="100%">
+		<tr><td width="30%">
+			Active Outbound:
+		</td><td><div id='resactout'></div></td></tr>
+		<tr><td width="30%">
+			Idle Outbound:
+		</td><td><div id='residleout'></div></td></tr>
+		<tr><td width="30%">
+			Active Inbound:
+		</td><td><div id='resactin'></div></td></tr>
+		<tr><td width="30%">
+			Idle Inbound:
+		</td><td><div id='residlein'></div></td></tr>
+		<tr><td width="30%">
+			Throttled by Schedule:
+		</td><td><div id='resthrotsched'></div></td></tr>
+		<tr><td width="30%">
+			Throttled due to Congestion:
+		</td><td><div id='resthroterr'></div></td></tr>
+		<tr><td width="30%">
+			Total Resources:
+		</td><td><div id='restotal'></div></td></tr>
+	</table>
+	<b>Call Results</b>
+	<table width="100%">
+		<tr><td width="30%">
+			Answered:
+		</td><td><div id='A'></div></td></tr>
+		<tr><td width="30%">
+			Machine:
+		</td><td><div id='M'></div></td></tr>
+		<tr><td width="30%">
+			Busy:
+		</td><td><div id='B'></div></td></tr>
+		<tr><td width="30%">
+			No Answer:
+		</td><td><div id='N'></div></td></tr>
+		<tr><td width="30%">
+			Disconnect:
+		</td><td><div id='X'></div></td></tr>
+		<tr><td width="30%">
+			Unknown:
+		</td><td><div id='F'></div></td></tr>
+		<tr><td width="30%">
+			Trunk Busy:
+		</td><td><div id='TB'></div></td></tr>
+		<tr><td width="30%">
+			Other:
+		</td><td><div id='failures'></div></td></tr>
+		<tr><td width="30%">
+			Inbound:
+		</td><td><div id='inboundcompletedcount'></div></td></tr>
+		<tr><td width="30%">
+			Total Ring Time:
+		</td><td><div id='dialtime'></div></td></tr>
+		<tr><td width="30%">
+			Total Call Time:
+		</td><td><div id='billtime'></div></td></tr>
+	</table>
+	<b>Cache Information</b>
+	<table width="100%">
+		<tr><td width="30%">
+			Location:
+		</td><td><div id='cachelocation'></div></td></tr>
+		<tr><td width="30%">
+			Max Size:
+		</td><td><div id='cachemax'></div></td></tr>
+		<tr><td width="30%">
+			Current Size:
+		</td><td><div id='cachesize'></div></td></tr>
+		<tr><td width="30%">
+			Current File Count:
+		</td><td><div id='cachefilecount'></div></td></tr>
+		<tr><td width="30%">
+			Deleted File Count:
+		</td><td><div id='cachedelcount'></div></td></tr>
+		<tr><td width="30%">
+			Total Hits:
+		</td><td><div id='cachehit'></div></td></tr>
+		<tr><td width="30%">
+			Total Misses:
+		</td><td><div id='cachemiss'></div></td></tr>
+	</table>
+	<b>Download Audio Content</b>
+	<table width="100%">
+		<tr><td width="30%">
+			Total Downloads:
+		</td><td><div id='getcontentapicount'></div></td></tr>
+		<tr><td width="30%">
+			Total Time:
+		</td><td><div id='getcontentapitime'></div></td></tr>
+		<tr><td width="30%">
+			Average Time:
+		</td><td><div id='getcontentapiavg'></div></td></tr>
+	</table>
+	<b>Upload Audio Content</b>
+	<table width="100%">
+		<tr><td width="30%">
+			Total Uploads:
+		</td><td><div id='putcontentapicount'></div></td></tr>
+		<tr><td width="30%">
+			Total Time:
+		</td><td><div id='putcontentapitime'></div></td></tr>
+		<tr><td width="30%">
+			Average Time:
+		</td><td><div id='putcontentapiavg'></div></td></tr>
+	</table>
+	<b>Text-to-Speech Content</b>
+	<table width="100%">
+		<tr><td width="30%">
+			Total Downloads:
+		</td><td><div id='ttsapicount'></div></td></tr>
+		<tr><td width="30%">
+			Total Time:
+		</td><td><div id='ttsapitime'></div></td></tr>
+		<tr><td width="30%">
+			Average Time:
+		</td><td><div id='ttsapiavg'></div></td></tr>
+	</table>
+	<b>Continue Task Request</b>
+	<table width="100%">
+		<tr><td width="30%">
+			Total Requests:
+		</td><td><div id='continueapicount'></div></td></tr>
+		<tr><td width="30%">
+			Total Time:
+		</td><td><div id='continueapitime'></div></td></tr>
+		<tr><td width="30%">
+			Average Time:
+		</td><td><div id='continueapiavg'></div></td></tr>
+	</table>
+	<b>System Details</b>
+	<table width="100%">
+		<tr><td width="30%">
+			Uptime:
+		</td><td><div id='uptime'></div></td></tr>
+		<tr><td width="30%">
+			Disk Usage:
+		</td><td><div id='diskspace'></div></td></tr>
+		<tr><td width="30%">
+			Memory Usage:
+		</td><td><div id='memory'></div></td></tr>
+	</table>
 
-
-
-$status = json_decode($jsonstats);
-$systemstats = $status[0];
-
-$dispatchers = array();
-foreach ($systemstats as $key => $value) {
-	if (strpos($key, "comerr") === 0) {
-		$dispatcher = substr($key, 7);
-		$dispatchers[] = $dispatcher;
-	}
-}
-
-$statusgroups = array();
-$statusgroups["General"] = array();
-$statusgroups["General"]['dmenabled'] = "Active State:";
-$statusgroups["General"]['startuptime'] = "System Startup Time:";
-$statusgroups["General"]['currenttime'] = "Current System Time:";
-$statusgroups['General']['sysrunning'] = "System has been Running:";
-$statusgroups["General"]['clockresetcount'] = "Total Clock Resets:";
-
-foreach ($dispatchers as $dname) {
-	$groupname = "Communication Activity - " . $dname;
-
-	$statusgroups[$groupname] = array();
-	$statusgroups[$groupname]['comerr-'.$dname] = "Connection Failures:";
-	$statusgroups[$groupname]['comtimeout-'.$dname] = "Connection Timeouts:";
-	$statusgroups[$groupname]['comreadtimeout-'.$dname] = "Read Timeouts:";
-}
-
-$statusgroups["Resource Allocation"] = array();
-$statusgroups["Resource Allocation"]['resactout'] = "Active Outbound:";
-$statusgroups["Resource Allocation"]["residleout"] = "Idle Outbound:";
-$statusgroups["Resource Allocation"]["resactin"] = "Active Inbound:";
-$statusgroups["Resource Allocation"]["residlein"] = "Idle Inbound:";
-$statusgroups["Resource Allocation"]["resthrotsched"] = "Throttled by Schedule:";
-$statusgroups["Resource Allocation"]["resthroterr"] = "Throttled due to Congestion:";
-$statusgroups["Resource Allocation"]["restotal"] = "Total Resources:";
-
-$statusgroups['Call Results'] = array();
-$statusgroups['Call Results']['A'] = "Answered:";
-$statusgroups['Call Results']['M'] = "Machine:";
-$statusgroups['Call Results']['B'] = "Busy:";
-$statusgroups['Call Results']['N'] = "No Answer:";
-$statusgroups['Call Results']['X'] = "Disconnect:";
-$statusgroups['Call Results']['F'] = "Unknown:";
-$statusgroups['Call Results']['TB'] = "Trunk Busy:";
-$statusgroups['Call Results']['failures'] = "Other:";
-$statusgroups['Call Results']['inboundcompletedcount'] = "Inbound:";
-$statusgroups['Call Results']['dialtime'] = "Total Ring Time:";
-$statusgroups['Call Results']['billtime'] = "Total Call Time:";
-
-$statusgroups['Cache Information'] = array();
-$statusgroups['Cache Information']['cachelocation'] = "Location:";
-$statusgroups['Cache Information']['cachemax'] = "Max Size:";
-$statusgroups['Cache Information']['cachesize'] = "Current Size:";
-$statusgroups['Cache Information']['cachefilecount'] = "Current File Count:";
-$statusgroups['Cache Information']['cachedelcount'] = "Deleted File Count:";
-$statusgroups['Cache Information']['cachehit'] = "Total Hits:";
-$statusgroups['Cache Information']['cachemiss'] = "Total Misses:";
-
-$statusgroups['Download Audio Content'] = array();
-$statusgroups['Download Audio Content']['getcontentapicount'] = "Total Downloads:";
-$statusgroups['Download Audio Content']['getcontentapitime'] = "Total Time:";
-$statusgroups['Download Audio Content']['getcontentapiavg'] = "Average Time:";
-
-$statusgroups['Upload Audio Content'] = array();
-$statusgroups['Upload Audio Content']['putcontentapicount'] = "Total Uploads:";
-$statusgroups['Upload Audio Content']['putcontentapitime'] = "Total Time:";
-$statusgroups['Upload Audio Content']['putcontentapiavg'] = "Average Time:";
-
-$statusgroups['Text-to-Speech Content'] = array();
-$statusgroups['Text-to-Speech Content']['ttsapicount'] = "Total Downloads:";
-$statusgroups['Text-to-Speech Content']['ttsapitime'] = "Total Time:";
-$statusgroups['Text-to-Speech Content']['ttsapiavg'] = "Average Time:";
-
-$statusgroups['Continue Task Request'] = array();
-$statusgroups['Continue Task Request']['continueapicount'] = "Total Requests:";
-$statusgroups['Continue Task Request']['continueapitime'] = "Total Time:";
-$statusgroups['Continue Task Request']['continueapiavg'] = "Average Time:";
-
-$statusgroups['System Details'] = array();
-$statusgroups['System Details']['uptime'] = "Uptime:";
-$statusgroups['System Details']['diskspace'] = "Disk Usage:";
-$statusgroups['System Details']['memory'] = "Memory Usage:";
-
-
-///////////////////////////////////////
-// FUNCTIONS
-
-// data is divID-label pairs
-function showStatusGroup($grouptitle, $data) {
-	echo '<b>' . $grouptitle . '</b>';
-	echo '<table width="100%">';
-	foreach ($data as $div => $label) {
-		echo '<tr><td width="20%">';
-		echo $label;
-		echo '</td><td><div id=\'' . $div . '\'></div></td></tr>';
-	}
-	echo '</table>';
-}
-
-//////////////////////////////////////
-// AJAX
-
-if (isset($_GET['ajax'])) {
-	header("Content-type: application/json");
-	echo $jsonstats;
-	exit;
-}
-
+</div>
+<?
 ?>

@@ -680,3 +680,22 @@ INSERT INTO `shortcodeareacode` (`shortcode`, `areacode`) VALUES ('85130', '');
 
 -- add field to store details about the login (10-26-2012)
 ALTER TABLE `portaluseridentification` ADD `details` TEXT CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '';
+
+-- START 9.4/1
+
+CREATE TABLE `dmgroupsetting` (
+`dmgroupid` INT NOT NULL ,
+`name` VARCHAR( 50 ) NOT NULL ,
+`value` VARCHAR( 1024 ) NOT NULL ,
+PRIMARY KEY ( `dmgroupid` , `name` )
+) ENGINE = InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci ;
+
+-- END 9.4/1
+
+-- 9.4 release
+
+-- never used
+ALTER TABLE `portalcustomer` DROP `userid`;
+
+-- text fields cannot have a default value, NULL should be allowed
+ALTER TABLE `portaluseridentification` CHANGE `details` `details` TEXT CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL;

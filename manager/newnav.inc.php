@@ -5,22 +5,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 
-// Temporary page mapping until it makes it into each page
-$PAGELOOKUP = array(
-	"customers.php" => array("title" => "Commsuite&nbsp;Customers","page" => "commsuite:customers"),
-	"importalerts.php" => array("title" => "Import&nbsp;Alerts","page" => "commsuite:importalerts"),
-	"customeractivejobs.php" => array("title" => "Active&nbsp;Jobs","page" => "commsuite:activejobs"),
-	"lockedusers.php" => array("title" => "Locked&nbsp;Users","page" => "commsuite:lockedusers"),
-	"customerdms.php" => array("title" => "SmartCall","page" => "commsuite:customerdms"),
-	"systemdms.php" => array("title" => "System&nbsp;DMs","page" => "commsuite:systemdms"),
-	"users.php" => array("title" => "Users","page" => "admin:users"),
-	"diskagents.php" => array("title" => "SwiftSync","page" => "tools:swiftsync")
-);
 $currentpage = substr($_SERVER["SCRIPT_NAME"],strrpos($_SERVER["SCRIPT_NAME"],"/")+1);
-if(isset($PAGELOOKUP[$currentpage])) {
-	$TITLE = $PAGELOOKUP[$currentpage]["title"];
-	$PAGE = $PAGELOOKUP[$currentpage]["page"];
-}
 
 $COLORSCHEMES = array(
 	"forest" => array("displayname" => "Forest",
@@ -36,7 +21,10 @@ $_SESSION['colorscheme']['_brandratio'] = ".2";
 $_SESSION['colorscheme']['_brandtheme1'] = $COLORSCHEMES["forest"]["_brandtheme1"];
 $_SESSION['colorscheme']['_brandtheme2'] = $COLORSCHEMES["forest"]["_brandtheme2"];
 
-
+if (!isset($TITLE))
+	$TITLE = "TODO: No Title";
+if (!isset($PAGE))
+	$PAGE = "nopage";
 $PAGETITLE = preg_replace('/\\<.+>/','',$TITLE);
 
 list($MAINTAB,$SUBTAB) = explode(":",$PAGE);
@@ -71,11 +59,12 @@ $NAVTREE = array (
 	array("TalkAboutIt","taicustomers.php",NULL,$MAINTAB=="tai",array(
 	array("Customers","taicustomers.php",NULL,$SUBTAB=="customers"),
 	array("Inbox","taiinbox.php",NULL,$SUBTAB=="inbox"),
-	array("Requests","tairevealrequests.php",NULL,$SUBTAB=="requests")
-
+	array("Requests","tairevealrequests.php",NULL,$SUBTAB=="requests"),
+	array("SMS Numbers","taismsnumbers.php",NULL,$SUBTAB=="smsnumbers")
 	)),
 	array("Tools",NULL,NULL,$MAINTAB=="tools",array(
-	array("SwiftSync","diskagents.php",NULL,$SUBTAB=="swiftsync")
+	array("SwiftSync","diskagents.php",NULL,$SUBTAB=="swiftsync"),
+	array("Queries","querylist.php",array("runqueries","editqueries"),$SUBTAB=="queries")
 	)),
 	array("Admin","users.php","superuser",$MAINTAB=="admin",array(
 	array("Users","users.php","superuser",$SUBTAB=="users")

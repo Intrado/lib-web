@@ -214,6 +214,11 @@ function handleRequest() {
 			if (!isset($_GET['fieldnum']))
 				return false;
 
+			class ValueNamePairDto {
+				var $value;
+				var $name;
+			}
+			
 			$fieldnum = $_GET['fieldnum'];
 
 			// if an f,g or c field was requested
@@ -262,7 +267,10 @@ function handleRequest() {
 					$languagecodes = QuickQueryList("select value from persondatavalues where fieldnum=? $limitsql order by value", false, false, array($_GET['fieldnum']));
 					$languagenames = array();
 					foreach ($languagecodes as $code) {
-						$languagenames[$code] = Language::getName($code);
+						$o = new ValueNamePairDto();
+						$o->value = $code;
+						$o->name = Language::getName($code);
+						$languagenames[] = $o;
 					}
 					return $languagenames;
 				} else {
@@ -271,7 +279,15 @@ function handleRequest() {
 				}
 			// if it's an organization field
 			} else if ($fieldnum == 'organization') {
-				return Organization::getAuthorizedOrgKeys();
+				$orgsassisiative = Organization::getAuthorizedOrgKeys();
+				$orgobjectarray = array();
+				foreach($orgsassisiative as $id => $name) {
+					$o = new ValueNamePairDto();
+					$o->value = $id;
+					$o->name = $name;
+					$orgobjectarray[] = $o;
+				}
+				return $orgobjectarray;
 			} else { // Unknown fieldnum, return false.
 				return false;
 			}
@@ -312,6 +328,7 @@ function handleRequest() {
 				'reldateOptions' => $RELDATE_OPTIONS,
 				'fieldmaps' => cleanObjects(FieldMap::getAllAuthorizedFieldMaps()),
 				'hasorg' => QuickQuery('select 1 from organization where not deleted limit 1') == 1,
+				'orgname' => getSystemSetting('organizationfieldname','School'),
 				'languagefield' => FieldMap::getLanguageField(),
 				'languagemap' => Language::getLanguageMap()
 			);

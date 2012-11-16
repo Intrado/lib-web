@@ -39,7 +39,7 @@ $templates['notification']['es']['html']['body'] = '
 ${body}<br><br><hr/>
 
 <p style="font-family:verdana; color:#6B6B6B; font-size:75%">
-				${displayname} le gustaría continuar comunicándose con usted por medio de correo electrónico.  Si usted prefiere ser borrado de nuestra lista, por favor contacte ${displayname} directamente.  Para dejar de recibir todos los mensajes de correo electrónico distribuidos por nuestro servicio de ${productname}, siga este enlace: <a href= "${unsubscribelink}">Unsubscribe</a>
+				${displayname} le gustaría continuar comunicándose con usted por medio de correo electrónico.  Si usted prefiere ser borrado de nuestra lista, por favor contacte ${displayname} directamente.  Para dejar de recibir todos los mensajes de correo electrónico distribuidos por nuestro servicio de ${productname}, haga clic en el siguiente botón: <a href= "${unsubscribelink}">Anular Subscripción</a>
 				</p>
 				<p style="font-family:verdana; color:#6B6B6B; font-size:75%">
 				${productname} es un servicio de notificación usado por los sistemas escolares más importantes de la nación para comunicarse con padres, estudiantes, y personal por medio de voz, texto, correo electrónico y medios de comunicación social.
@@ -52,7 +52,7 @@ ${body}
 
 
 ------
-${displayname} le gustaría continuar comunicándose con usted por medio de correo electrónico.  Si usted prefiere ser borrado de nuestra lista, por favor contacte ${displayname} directamente.  Para dejar de recibir todos los mensajes de correo electrónico distribuidos por nuestro servicio de ${productname}, siga este enlace:${unsubscribelink}
+${displayname} le gustaría continuar comunicándose con usted por medio de correo electrónico.  Si usted prefiere ser borrado de nuestra lista, por favor contacte ${displayname} directamente.  Para dejar de recibir todos los mensajes de correo electrónico distribuidos por nuestro servicio de ${productname}, haga clic en el siguiente botón: ${unsubscribelink}
  
 ${productname} es un servicio de notificación usado por los sistemas escolares más importantes de la nación para comunicarse con padres, estudiantes, y personal por medio de voz, texto, correo electrónico y medios de comunicación social.
 ';
@@ -90,7 +90,7 @@ $templates['emergency']['es']['html']['body'] = '
 ${body}<br><br><hr/>
 
 <p style="font-family:verdana; color:#6B6B6B; font-size:75%">
-				${displayname} le gustaría continuar comunicándose con usted por medio de correo electrónico.  Si usted prefiere ser borrado de nuestra lista, por favor contacte ${displayname} directamente.  Para dejar de recibir todos los mensajes de correo electrónico distribuidos por nuestro servicio de ${productname}, siga este enlace: <a href= "${unsubscribelink}">Unsubscribe</a>
+				${displayname} le gustaría continuar comunicándose con usted por medio de correo electrónico.  Si usted prefiere ser borrado de nuestra lista, por favor contacte ${displayname} directamente.  Para dejar de recibir todos los mensajes de correo electrónico distribuidos por nuestro servicio de ${productname}, haga clic en el siguiente botón: <a href= "${unsubscribelink}">Anular Subscripción</a>
 				</p>
 				<p style="font-family:verdana; color:#6B6B6B; font-size:75%">
 				${productname} es un servicio de notificación usado por los sistemas escolares más importantes de la nación para comunicarse con padres, estudiantes, y personal por medio de voz, texto, correo electrónico y medios de comunicación social.
@@ -103,7 +103,7 @@ ${body}
 
 
 ------
-${displayname} le gustaría continuar comunicándose con usted por medio de correo electrónico.  Si usted prefiere ser borrado de nuestra lista, por favor contacte ${displayname} directamente.  Para dejar de recibir todos los mensajes de correo electrónico distribuidos por nuestro servicio de ${productname}, siga este enlace:${unsubscribelink}
+${displayname} le gustaría continuar comunicándose con usted por medio de correo electrónico.  Si usted prefiere ser borrado de nuestra lista, por favor contacte ${displayname} directamente.  Para dejar de recibir todos los mensajes de correo electrónico distribuidos por nuestro servicio de ${productname}, haga clic en el siguiente botón: ${unsubscribelink}
  
 ${productname} es un servicio de notificación usado por los sistemas escolares más importantes de la nación para comunicarse con padres, estudiantes, y personal por medio de voz, texto, correo electrónico y medios de comunicación social.
 ';
@@ -118,7 +118,7 @@ if ($useSmsMessagelinkInboundnumber) {
 } else {
 	$appendinbound = '';
 }
-$templates['messagelink']['en']['sms']['body'] = '${displayname} sent a msg. To listen ${messagelink}' . $appendinbound . '\nFor info txt HELP';
+$templates['messagelink']['en']['sms']['body'] = '${displayname} sent a msg. To listen ${messagelink}' . $appendinbound . ' For info txt HELP';
 
 // messagelink english html
 $templates['messagelink']['en']['html']['subject'] = '${displayname} sent a new message';
@@ -259,7 +259,7 @@ $templates['messagelink']['es']['html']['body'] = '
 			<td valign="top" align="left" style="padding:5px; background-color:#FFFFFF;">
 
 				<p style="font-family:verdana; color:#6B6B6B; font-size:75%">
-				${displayname} le gustaría continuar comunicándose con usted por medio de correo electrónico.  Si usted prefiere ser borrado de nuestra lista, por favor contacte ${displayname} directamente.  Para dejar de recibir todos los mensajes de correo electrónico distribuidos por nuestro servicio de ${productname}, siga este enlace: <a href= "${unsubscribelink}">Unsubscribe</a>
+				${displayname} le gustaría continuar comunicándose con usted por medio de correo electrónico.  Si usted prefiere ser borrado de nuestra lista, por favor contacte ${displayname} directamente.  Para dejar de recibir todos los mensajes de correo electrónico distribuidos por nuestro servicio de ${productname}, haga clic en el siguiente botón: <a href= "${unsubscribelink}">Anular Subscripción</a>
 				</p>
 				<p style="font-family:verdana; color:#6B6B6B; font-size:75%">
 				${productname} es un servicio de notificación usado por los sistemas escolares más importantes de la nación para comunicarse con padres, estudiantes, y personal por medio de voz, texto, correo electrónico y medios de comunicación social.
@@ -290,7 +290,7 @@ ${displayname}
 
 
 ------
-${displayname} le gustaría continuar comunicándose con usted por medio de correo electrónico.  Si usted prefiere ser borrado de nuestra lista, por favor contacte ${displayname} directamente.  Para dejar de recibir todos los mensajes de correo electrónico distribuidos por nuestro servicio de ${productname}, siga este enlace:${unsubscribelink}
+${displayname} le gustaría continuar comunicándose con usted por medio de correo electrónico.  Si usted prefiere ser borrado de nuestra lista, por favor contacte ${displayname} directamente.  Para dejar de recibir todos los mensajes de correo electrónico distribuidos por nuestro servicio de ${productname}, haga clic en el siguiente botón: ${unsubscribelink}
  
 ${productname} es un servicio de notificación usado por los sistemas escolares más importantes de la nación para comunicarse con padres, estudiantes, y personal por medio de voz, texto, correo electrónico y medios de comunicación social.
 ';

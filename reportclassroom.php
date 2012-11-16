@@ -112,15 +112,14 @@ if($options['classroomreporttype'] == 'person') {
 						GROUP BY tm.messagekey
 						");
 	$overrideids = array();
-	$org = false;
 	$data = array();
 
 	while($row = DBGetRow($result)){
-		if($row[0] != $org) {
-			$org = $row[0];
-			$data[$org] = array();
+		$orgkey = $row[0];
+		if (!isset($data[$orgkey])) {
+			$data[$orgkey] = array();
 		}
-		$data[$org][] = $row;
+		$data[$orgkey][] = $row;
 		if($row[2]) {
 			$overrideids[] = $row[2];
 		}
