@@ -322,8 +322,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$job->modifydate = date("Y-m-d H:i:s");
 		$job->startdate = date("Y-m-d", 86400);
 		$job->enddate = $job->startdate;
-		$job->starttime = date("H:i", strtotime($USER->getCallEarly()));
-		$job->endtime = date("H:i", strtotime($USER->getCallLate()));
+		$job->starttime = "00:00";
+		$job->endtime = "23:59";
 		$job->status = 'repeating';
 		$job->setOption("skipemailduplicates",0);
 		if ($job->id)
