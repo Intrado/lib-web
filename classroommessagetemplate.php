@@ -39,18 +39,42 @@ class TemplateEdit extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
 		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'"/>';
+		
+		$emailheader = "<th>Email</th>";
+		$emailcomponent = "<td>";
 		if ($this->args["hasEmail"]) {
-			$str .= icon_button(_L("Edit Email"), "pencil","return form_submit(event,'editemail');");
+			$emailcomponent .= icon_button(_L("Edit Email"), "pencil","return form_submit(event,'editemail');");
+			$emailcomponent .= icon_button(_L("Remove Email"), "cross","return confirmDelete()?form_submit(event,'removeemail'):false;");
 		} else {
-			$str .= icon_button(_L("Add Email"), "add","return form_submit(event,'editemail');");
+			$emailcomponent .= icon_button(_L("Add Email"), "add","return form_submit(event,'editemail');");
 		}
+		$emailcomponent .= "</td>";
+		
+		$phoneheader = "";
+		$phonecomponent = "";
 		if (getSystemSetting('_hasphonetargetedmessage', false)) {
+			$phoneheader = "<th>Phone</th>";
+			$phonecomponent .= "<td>";
 			if ($this->args["hasPhone"]) {
-				$str .= icon_button(_L("Edit Phone"), "pencil","return form_submit(event,'editphone');");
+				$phonecomponent .= icon_button(_L("Edit Phone"), "pencil","return form_submit(event,'editphone');");
+				$phonecomponent .= icon_button(_L("Remove Phone"), "cross","return confirmDelete()?form_submit(event,'removephone'):false;");
 			} else {
-				$str .= icon_button(_L("Add Phone"), "add","return form_submit(event,'editphone');");
+				$phonecomponent .= icon_button(_L("Add Phone"), "add","return form_submit(event,'editphone');");
 			}
+			$phonecomponent .= "</td>";
 		}
+		
+		$str = 
+		"<table class='list' style='width:auto;'>
+			<tr>
+			$emailheader
+			$phoneheader
+			</tr>
+			<tr>
+			$emailcomponent 
+			$phonecomponent
+			</tr>
+		</table>";
 		return $str;
 	}
 }
@@ -161,16 +185,48 @@ if ($job) {
 
 // Do message template form stuff
 $formdata[] = _L("Message Template");
+
+
+$emailheader = "<th>Email</th>";
+$emailcomponent = "<td>";
+if ($messagegroup && $messagegroup->hasMessage("email")) {
+	$emailcomponent .= icon_button(_L("Edit Email"), "pencil","return form_submit(event,'editemail');");
+	$emailcomponent .= icon_button(_L("Remove Email"), "cross","return confirmDelete()?form_submit(event,'removeemail'):false;");
+} else {
+	$emailcomponent .= icon_button(_L("Add Email"), "add","return form_submit(event,'editemail');");
+}
+$emailcomponent .= "</td>";
+
+$phoneheader = "";
+$phonecomponent = "";
+if (getSystemSetting('_hasphonetargetedmessage', false)) {
+	$phoneheader = "<th>Phone</th>";
+	$phonecomponent .= "<td>";
+	if ($messagegroup && $messagegroup->hasMessage("phone")) {
+		$phonecomponent .= icon_button(_L("Edit Phone"), "pencil","return form_submit(event,'editphone');");
+		$phonecomponent .= icon_button(_L("Remove Phone"), "cross","return confirmDelete()?form_submit(event,'removephone'):false;");
+	} else {
+		$phonecomponent .= icon_button(_L("Add Phone"), "add","return form_submit(event,'editphone');");
+	}
+	$phonecomponent .= "</td>";
+}
+
 $formdata["template"] = array(
 		"label" => _L("Template"),
-		"value" => "",
-		"validators" => array(),
-		"control" => array("TemplateEdit",
-				"hasEmail" => $messagegroup?$messagegroup->hasMessage("email"):false,
-				"hasPhone" => $messagegroup?$messagegroup->hasMessage("phone"):false
-				),
+		"control" => array("FormHtml", "html" => 
+				"<table class='list' style='width:auto;'>
+					<tr>
+					$emailheader
+					$phoneheader
+					</tr>
+					<tr>
+					$emailcomponent
+					$phonecomponent
+					</tr>
+				</table>"),
 		"helpstep" => 5
 );
+
 
 $helpsteps = array (
 	_L('The Template Name will be displayed in reports'),
@@ -337,20 +393,38 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		else
 			$joblist->create();
 		
-		Query("COMMIT");
 		
+		if (strstr($button, "remove")) {
+			QuickUpdate("delete m.* ,mp.*
+					from messagegroup mg
+					inner join message m on (mg.id = m.messagegroupid)
+					inner join messagepart mp on (m.id = mp.messageid)
+					where
+					mg.type='classroomtemplate' and
+					m.type=?",
+				false, array(substr($button, 6)));
+		}
+		
+		Query("COMMIT");
+		$redirect = "settings.php";
 		switch ($button) {
+			case "removephone":
+			case "removeemail":
+				$redirect = "classroommessagetemplate.php";
+				break;
 			case "editemail":
-				$form->sendTo("classroommessageemailtemplate.php");
+				$redirect = "classroommessageemailtemplate.php";
+				break;
 			case "editphone":
 				if (getSystemSetting('_hasphonetargetedmessage', false))
-					$form->sendTo("classroommessagephonetemplate.php");
-			default:
-				if ($ajax)
-					$form->sendTo("settings.php");
-				else
-					redirect("settings.php");
+					$redirect = "classroommessagephonetemplate.php";
+				break;
 		}
+		
+		if ($ajax)
+			$form->sendTo($redirect);
+		else
+			redirect($redirect);
 		
 
 	}
