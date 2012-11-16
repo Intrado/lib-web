@@ -24,7 +24,7 @@ require_once("obj/Voice.obj.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-if (!getSystemSetting('_hastargetedmessage', false) || !$USER->authorize('manageclassroommessaging'))
+if (!getSystemSetting('_hastargetedmessage', false) || !getSystemSetting('_hasphonetargetedmessage', false) || !$USER->authorize('manageclassroommessaging'))
 	redirect("unauthorized.php");
 
 ////////////////////////////////////////////////////////////////////////////////

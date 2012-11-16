@@ -44,11 +44,12 @@ class TemplateEdit extends FormItem {
 		} else {
 			$str .= icon_button(_L("Add Email"), "add","return form_submit(event,'editemail');");
 		}
-		
-		if ($this->args["hasPhone"]) {
-			$str .= icon_button(_L("Edit Phone"), "pencil","return form_submit(event,'editphone');");
-		} else {
-			$str .= icon_button(_L("Add Phone"), "add","return form_submit(event,'editphone');");
+		if (getSystemSetting('_hasphonetargetedmessage', false)) {
+			if ($this->args["hasPhone"]) {
+				$str .= icon_button(_L("Edit Phone"), "pencil","return form_submit(event,'editphone');");
+			} else {
+				$str .= icon_button(_L("Add Phone"), "add","return form_submit(event,'editphone');");
+			}
 		}
 		return $str;
 	}
@@ -342,7 +343,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			case "editemail":
 				$form->sendTo("classroommessageemailtemplate.php");
 			case "editphone":
-				$form->sendTo("classroommessagephonetemplate.php");
+				if (getSystemSetting('_hasphonetargetedmessage', false))
+					$form->sendTo("classroommessagephonetemplate.php");
 			default:
 				if ($ajax)
 					$form->sendTo("settings.php");
