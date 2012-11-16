@@ -844,6 +844,17 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$phonetargetedmessage = true;
 				//continue and enable _hastargetedmessage
 			case "emailonly":
+				// Remove phone template to disable the already configured customers
+				if (!$phonetargetedmessage) {
+					QuickUpdate("delete m.* ,mp.*
+							from messagegroup mg 
+							inner join message m on (mg.id = m.messagegroupid)
+							inner join messagepart mp on (m.id = mp.messageid)
+							where
+							mg.type='classroomtemplate' and 
+							m.type='phone' and m.subtype='voice'",
+							$custdb);
+				}
 				setCustomerSystemSetting('_hasphonetargetedmessage',$phonetargetedmessage?'1':'0', $custdb);
 				setCustomerSystemSetting('_hastargetedmessage','1', $custdb);
 				break;
