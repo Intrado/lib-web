@@ -930,11 +930,6 @@ var RuleEditor = Class.create({
 		// Determine if values is an array, only support array with object of {value:___,name:___} objcets
 		if (typeof(values.join) != 'undefined') { // values is an array.
 			var max = values.length;
-			if (max == 1) {
-				return new Element('select').insert(
-					new Element('option', {'value': values[0]}).update(values[0].escapeHTML())
-				);
-			}
 			
 			for (var i = 0; i < max; ++i) {
 				var value = values[i];
