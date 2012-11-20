@@ -933,6 +933,11 @@ var RuleEditor = Class.create({
 			
 			for (var i = 0; i < max; ++i) {
 				var value = values[i];
+				if (max == 1) {
+					return new Element('select').insert(
+						new Element('option', {'value': (typeof(value.value) != 'undefined'?value.value:value)}).update(typeof(value.name) != 'undefined'?value.name:value.escapeHTML())
+					);
+				}
 				
 				var checkbox = new Element('input', {
 					'type': 'checkbox',
