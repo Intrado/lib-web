@@ -105,8 +105,7 @@
     <!-- create kona-{date}.zip file -->
     <target name="dist" depends="clean, init, build.txt">
         <zip destfile="${dist.dir}/kona-${file.suffix.date}.zip">
-            <fileset dir=".">
-                <excludesfile name=".gitignore" />
+            <zipfileset dir="." prefix="kona/">
                 <!-- the files related to creating the zip file -->
                 <exclude name="dist/" />
                 <exclude name="build.xml" />
@@ -129,7 +128,7 @@
                 <!-- IntelliJ project-related files -->
                 <exclude name="**/*.eml" />
                 <exclude name="**/*.iml" />
-            </fileset>
+            </zipfileset>
         </zip>
     </target>
 
