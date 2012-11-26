@@ -7,20 +7,29 @@
     <property name="build.txt.dir" location="." />
     <property name="build.txt.file" location="${build.txt.dir}/build.txt" />
 
-    <available file=".git" type="dir" property="git.present" />
-
     <target name="init">
-        <!-- Create the time stamp -->
+        <!-- Create the date stamp for the zip file filename -->
         <tstamp>
-            <format property="build.date" pattern="yyyy-MM-dd HH:mm:ss" />
             <format property="file.suffix.date" pattern="yyyy-MM-dd" />
         </tstamp>
         <!-- Create the build directory structure used by compile -->
         <mkdir dir="${dist.dir}" />
     </target>
 
-
     <!-- START build.txt calculation / file creation -->
+
+    <!-- make sure the folder is under Git version control -->
+    <available file=".git" type="dir" property="git.present" />
+
+    <!-- create the time/date stamp used in build.txt-->
+    <target name="build.txt.date.init">
+        <!-- Create the time stamp -->
+        <tstamp>
+            <format property="build.date" pattern="yyyy-MM-dd HH:mm:ss" />
+        </tstamp>
+    </target>
+
+    <!-- determine the tag name, if it is a tag -->
     <target name="git.calc.tag.name" if="git.present">
         <exec executable="git" outputproperty="git.tag" failifexecutionfails="false"
               errorproperty="git.tag.error">
@@ -45,6 +54,7 @@
         </condition>
     </target>
 
+    <!-- determine the short version of the hash -->
     <target name="git.calc.shorthash" if="git.present">
         <exec executable="git" outputproperty="git.shorthash" failifexecutionfails="true"
               errorproperty="git.shorthash.error">
@@ -55,7 +65,7 @@
         <echo message="shorthash = ${git.shorthash}" />
     </target>
 
-
+    <!-- determine the branch name -->
     <target name="git.calc.branch.name" if="git.present">
         <exec executable="git" outputproperty="git.branch" failifexecutionfails="false"
               errorproperty="git.branch.error">
@@ -67,7 +77,7 @@
         <echo message="branch = ${git.branch}" />
     </target>
 
-
+    <!-- determine how git would describe this build -->
     <target name="git.calc.describe" if="git.present">
         <exec executable="git" outputproperty="git.describe" failifexecutionfails="false"
               errorproperty="git.describe.error">
@@ -80,11 +90,13 @@
         <!--<echo message="git-describe.error = ${git.describe.error}" />-->
     </target>
 
-    <target name="build.date" depends="init" if="git.present">
+    <!-- create build.txt and write the build date into it -->
+    <target name="build.date" depends="build.txt.date.init" if="git.present">
         <echo message="build.date=${build.date}${line.separator}" />
         <echo file="${build.txt.file}" message="build.date=${build.date}${line.separator}" />
     </target>
 
+    <!-- write a formatted build.tag into build.txt, if the "tag" is based on a branch -->
     <target name="format.build.tag.from.branch" depends="git.calc.describe, git.calc.branch.name, git.calc.tag.name"
             if="git.is.not.tag">
         <echo message="build.tag=${git.branch}/${git.describe}${line.separator}" />
@@ -92,12 +104,14 @@
               message="build.tag=${git.branch}/${git.describe}${line.separator}" />
     </target>
 
+    <!-- write a formatted build.tag into build.txt, if the "tag" is based on a tag -->
     <target name="format.build.tag.from.tag" depends="git.calc.tag.name, git.calc.shorthash" if="git.is.tag">
         <echo message="build.tag=${git.tag} (${git.shorthash})${line.separator}" />
         <echo file="${build.txt.file}" append="true"
               message="build.tag=${git.tag} (${git.shorthash})${line.separator}" />
     </target>
 
+    <!-- create build.txt -->
     <target name="build.txt" depends="build.date, format.build.tag.from.branch, format.build.tag.from.tag" />
 
     <!-- END build.txt calculation / file creation -->
