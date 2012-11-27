@@ -5,7 +5,10 @@ include_once("inc/content.inc.php");
 include_once("inc/appserver.inc.php");
 include_once("obj/Content.obj.php");
 
-if ($USER->authorize("sendemail") === false) {
+if ($USER->authorize("sendemail") === false &&
+	!(getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost')) &&
+	!(getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost')) &&
+	!(getSystemSetting('_hasfeed', false) && $USER->authorize('feedpost'))) {
 	redirect('./');
 }
 
