@@ -93,7 +93,7 @@ function updateClassroomTemplate_9_4() {
 				<!-- $endBlock sections -->
 				<audio cmid="file://prompts/classroom/' . $code . '/wrapper-visit-district-website.wav" />
 		</message>
-</template>' . "\n\n";
+</template>';
 		
 		// create message
 		$message = new Message_9_4();
