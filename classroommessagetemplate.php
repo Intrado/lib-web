@@ -189,7 +189,7 @@ $formdata[] = _L("Message Template");
 
 $emailheader = "<th>Email</th>";
 $emailcomponent = "<td>";
-if ($messagegroup && $messagegroup->hasMessage("email")) {
+if (isset($messagegroup) && $messagegroup->hasMessage("email")) {
 	$emailcomponent .= icon_button(_L("Edit Email"), "pencil","return form_submit(event,'editemail');");
 	$emailcomponent .= icon_button(_L("Remove Email"), "cross","return confirmDelete()?form_submit(event,'removeemail'):false;");
 } else {
@@ -202,7 +202,7 @@ $phonecomponent = "";
 if (getSystemSetting('_hasphonetargetedmessage', false)) {
 	$phoneheader = "<th>Phone</th>";
 	$phonecomponent .= "<td>";
-	if ($messagegroup && $messagegroup->hasMessage("phone")) {
+	if (isset($messagegroup) && $messagegroup->hasMessage("phone")) {
 		$phonecomponent .= icon_button(_L("Edit Phone"), "pencil","return form_submit(event,'editphone');");
 		$phonecomponent .= icon_button(_L("Remove Phone"), "cross","return confirmDelete()?form_submit(event,'removephone'):false;");
 	} else {
@@ -264,7 +264,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		// get the owner specified by postdata
 		$owner = $postdata['owner'];
 		
-		if (!$messagegroup) {
+		if (!isset($messagegroup)) {
 			$messagegroup = new MessageGroup();
 			$messagegroup->userid = $owner;
 			$messagegroup->type = 'classroomtemplate';
