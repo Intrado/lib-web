@@ -142,7 +142,7 @@ class PreviewModal {
 			// save to session
 			$modal->uid = uniqid();
 			$voiceid = Voice::getPreferredVoice($_REQUEST["language"], $_REQUEST["gender"]);
-			$_SESSION["previewmessagesource"] = array("uid" => $modal->uid, "source" => $_REQUEST["text"], "voiceid" => $voiceid);
+			$_SESSION["previewmessagesource"] = array("uid" => $modal->uid, "source" => $_REQUEST["text"], "languagecode" => $_REQUEST["language"],"voiceid" => $voiceid);
 		} else if (isset($_SESSION["previewmessagesource"])) {
 			$modal->uid = $_SESSION["previewmessagesource"]["uid"];
 		} else {
@@ -165,7 +165,7 @@ class PreviewModal {
 		}
 		
 		$voice = new Voice($_SESSION["previewmessagesource"]["voiceid"]);
-		$modal->title = _L("%s Phone Message", Language::getName($voice->languagecode));
+		$modal->title = _L("%s Phone Message", Language::getName($_SESSION["previewmessagesource"]["languagecode"]));
 		if ($showmodal) {
 			$modal->includeModal();
 		} else if (count($modal->errors) == 0) {
