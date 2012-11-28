@@ -18,6 +18,9 @@ function upgrade_9_1 ($rev, $shardid, $customerid, $db) {
 			echo "|";
 			apply_sql("upgrades/db_9-1_pre.sql", $customerid, $db, 4);
 	}
+
+	// SM admin
+	apply_sql("../db/update_SMAdmin_access.sql", $customerid, $db);
 	
 	return true;
 }
