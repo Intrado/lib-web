@@ -11,9 +11,6 @@ function tai_upgrade_1_4 ($rev, $shardid, $customerid, $db) {
 
 	}
 	
-	// SM admin
-	apply_sql("../db/tai_update_SMAdmin_access.sql", $customerid, $db);
-	
 	return true;
 }
 
