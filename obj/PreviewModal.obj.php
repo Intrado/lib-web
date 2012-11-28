@@ -175,30 +175,18 @@ class PreviewModal {
 	}
 	
 	static function HandleRequestWithPhoneMediafile() {
-		$modal = new PreviewModal();
-		$modal->playable = true;
-		$showmodal = false;
-		if (isset($_REQUEST["previewmodal"]) && isset($_REQUEST["mediafile"])) {
-			$showmodal = true;
-			// save to session
-			$modal->uid = uniqid();
-			$_SESSION["previewmessagesource"] = array("uid" => $modal->uid, "mediafile" => $_REQUEST["mediafile"], "languagecode" => $_REQUEST["languagecode"] );
-		} else if (isset($_SESSION["previewmessagesource"])) {
-			$modal->uid = $_SESSION["previewmessagesource"]["uid"];
-		} else {
+		if (!isset($_REQUEST["previewmodal"]) || !isset($_REQUEST["mediafile"])) {
 			return;
 		}
-	
-		$modal->parts = array();//Message::parse($_SESSION["previewmessagesource"]["source"],$modal->errors,$_SESSION["previewmessagesource"]["voiceid"],false);
 
-		$_SESSION["previewmessage"] = array("uid" => $modal->uid, "parts" => array(), "mediafile" => $_SESSION["previewmessagesource"]["mediafile"]);
+		$modal = new PreviewModal();
+		$modal->uid = uniqid();
+		$modal->playable = true;
+		$modal->parts = array();		
+		$modal->title = _L("%s Phone Message", isset($_REQUEST["languagecode"])?Language::getName($_REQUEST["languagecode"]):"");
 		
-		$modal->title = _L("%s Phone Message", Language::getName($_SESSION["previewmessagesource"]["languagecode"]));
-		if ($showmodal) {
-			$modal->includeModal();
-		} else if (count($modal->errors) == 0) {
-			$modal->handleRequest();
-		}
+		$_SESSION["previewmessage"] = array("uid" => $modal->uid, "parts" => array(), "mediafile" => $_REQUEST["mediafile"]);
+		$modal->includeModal();
 		return;
 	}
 	
