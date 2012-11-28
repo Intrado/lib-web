@@ -49,6 +49,9 @@ function upgrade_8_3 ($rev, $shardid, $customerid, $db) {
 			}
 	}
 	
+	// SM admin
+	apply_sql("../db/update_SMAdmin_access.sql",$customerid,$db);
+	
 	return true;
 }
 
