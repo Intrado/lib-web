@@ -173,24 +173,7 @@ class PreviewModal {
 		}
 		return;
 	}
-	
-	static function HandleRequestWithPhoneMediafile() {
-		if (!isset($_REQUEST["previewmodal"]) || !isset($_REQUEST["mediafile"])) {
-			return;
-		}
-
-		$modal = new PreviewModal();
-		$modal->uid = uniqid();
-		$modal->playable = true;
-		$modal->parts = array();		
-		$modal->title = _L("%s Phone Message", isset($_REQUEST["languagecode"])?Language::getName($_REQUEST["languagecode"]):"");
 		
-		$_SESSION["previewmessage"] = array("uid" => $modal->uid, "parts" => array(), "mediafile" => $_REQUEST["mediafile"]);
-		$modal->includeModal();
-		return;
-	}
-	
-	
 	static function HandleRequestWithEmailText() {
 		if (!isset($_REQUEST["previewmodal"]) || 
 			!isset($_REQUEST["language"]) || 

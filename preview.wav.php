@@ -32,7 +32,30 @@ if(isset($_GET['id'])) {
 		Message::playAudio($message->id, $fields,"mp3");
 		exit();
 	}
-}
+} else if(isset($_GET['mediafile'])) {
+	$mediapath = "media/";
+	$mediafile = $_GET['mediafile'];
+	if(in_array($mediafile, array(
+			"DefaultIntro.wav",
+			"EmergencyIntro.wav",
+			"es/DefaultIntro.wav",
+			"es/EmergencyIntro.wav"
+		))) {
+		Message::playParts(array(),"mp3",$mediapath . $mediafile);		
+		exit();
+		
+	} else {
+		$mediafile = strrchr($mediafile,'/');
+		if($mediafile !== false) {
+			$mediafile = substr($mediafile,1);
+			if($mediafile == "DefaultIntro.wav" || $mediafile == "EmergencyIntro.wav") {
+				Message::playParts(array(),"mp3",$mediapath . $mediafile);				
+				exit();
+			}
+		}
+	}
+} 
+
 
 header("HTTP/1.0 200 OK");
 header("Content-Type: audio/mpeg");
