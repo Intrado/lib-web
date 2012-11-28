@@ -318,6 +318,8 @@ function update_customer($db, $customerid, $shardid) {
 	
 	if ($foundstartingversion !== false) { 
 		// upgrade success
+		apply_sql("../db/update_SMAdmin_access.sql", $customerid, $db);
+		
 		QuickUpdate("insert into setting (name,value) values ('_dbversion','$targetversion/$targetrev') on duplicate key update value=values(value)", $db);
 	} else {
 		//TODO ERROR !!!! running ancient upgrade_databases on newer db? didnt find current version
@@ -424,6 +426,8 @@ function update_taicustomer($db, $customerid, $shardid) {
 
 	if ($foundstartingversion !== false) {
 		// upgrade success
+		apply_sql("../db/tai_update_SMAdmin_access.sql", $customerid, $db);
+		
 		QuickUpdate("insert into setting (name,value) values ('_dbtaiversion','$targetversion/$targetrev') on duplicate key update value=values(value)", $db);
 	} else {
 		//TODO ERROR !!!! running ancient upgrade_databases on newer db? didnt find current version
