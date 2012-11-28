@@ -2103,7 +2103,10 @@ $$$
 update setting set value='9.4/1' where name='_dbversion'
 $$$
 
+-- END 9.4/1
+-- START 9.4/2
+
 update setting set value='9.4/2' where name='_dbversion'
 $$$
 
--- END 9.4/1
+-- END 9.4/2
