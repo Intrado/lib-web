@@ -16,7 +16,7 @@ if(!isset($_GET['uid']) && !isset($_SESSION["previewmessage"])) {
 	$hascorrectuid = isset($_SESSION["previewmessage"]["uid"]) && $_SESSION["previewmessage"]["uid"] == $uid;
 	$ismissingpart = isset($_GET['partnum']) && !isset($_SESSION["previewmessage"]["parts"][$_GET['partnum'] - 1]);
 	$ismediafile = isset($_SESSION["previewmessage"]["mediafile"]);
-	error_log(json_encode(array($hascorrectuid,$ismissingpart,$ismediafile)));
+
 	if (!$hascorrectuid || (!$ismediafile && $ismissingpart)) {
 		exit();
 	}
