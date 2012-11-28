@@ -76,7 +76,7 @@ var messagePreviewModal = function(messageid) {
 		style: 'text-align: center;'
 	});
 	var afterOpen = function(){
-		embedPlayer('preview.wav.php?id=' + messageid,'modal_player');
+		embedPlayer('preview.mp3.php?id=' + messageid,'modal_player');
 	};
 	var modalWrapper = new ModalWrapper("Audio Preview",content, afterOpen);
 	modalWrapper.open();
@@ -88,7 +88,7 @@ var mediafilePreviewModal = function(messageid) {
 		style: 'text-align: center;'
 	});
 	var afterOpen = function(){
-		embedPlayer('preview.wav.php?mediafile=' + messageid,'modal_player');
+		embedPlayer('preview.mp3.php?mediafile=' + messageid,'modal_player');
 	};
 	var modalWrapper = new ModalWrapper("Audio Preview",content, afterOpen);
 	modalWrapper.open();
