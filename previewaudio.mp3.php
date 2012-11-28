@@ -5,6 +5,8 @@ require_once("inc/securityhelper.inc.php");
 require_once("obj/MessagePart.obj.php");
 require_once("inc/appserver.inc.php");
 require_once("obj/Language.obj.php");
+require_once("obj/Message.obj.php");
+
 
 if(!isset($_GET['uid']) && !isset($_SESSION["previewmessage"])) {
 	exit();
@@ -13,8 +15,9 @@ if(!isset($_GET['uid']) && !isset($_SESSION["previewmessage"])) {
 	
 	$hascorrectuid = isset($_SESSION["previewmessage"]["uid"]) && $_SESSION["previewmessage"]["uid"] == $uid;
 	$ismissingpart = isset($_GET['partnum']) && !isset($_SESSION["previewmessage"]["parts"][$_GET['partnum'] - 1]);
-	
-	if (!$hascorrectuid || $ismissingpart) {
+	$ismediafile = isset($_SESSION["previewmessage"]["mediafile"]);
+	error_log(json_encode(array($hascorrectuid,$ismissingpart,$ismediafile)));
+	if (!$hascorrectuid || (!$ismediafile && $ismissingpart)) {
 		exit();
 	}
 }
@@ -44,6 +47,28 @@ if(isset($_GET['partnum'])) {
 		header("Connection: close");
 		echo $audiopart->data;
 	}
+} else if($ismediafile) {
+		$mediapath = "media/";
+		$mediafile = $_SESSION["previewmessage"]["mediafile"];
+		if(in_array($mediafile, array(
+				"DefaultIntro.wav",
+				"EmergencyIntro.wav",
+				"es/DefaultIntro.wav",
+				"es/EmergencyIntro.wav"
+			))) {
+			Message::playParts(array(),"mp3",$mediapath . $mediafile);		
+			exit();
+			
+		} else {
+			$mediafile = strrchr($mediafile,'/');
+			if($mediafile !== false) {
+				$mediafile = substr($mediafile,1);
+				if($mediafile == "DefaultIntro.wav" || $mediafile == "EmergencyIntro.wav") {
+					Message::playParts(array(),"mp3",$mediapath . $mediafile);				
+					exit();
+				}
+			}
+		}
 } else {
 	$messagepartdtos = array();
 	$parts = $_SESSION["previewmessage"]["parts"];
@@ -86,6 +111,6 @@ if(isset($_GET['partnum'])) {
 		header("Connection: close");
 		echo $audiofull->data;
 	}
-}
+} 
 
 ?>

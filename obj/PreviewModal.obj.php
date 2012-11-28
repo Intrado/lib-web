@@ -174,6 +174,34 @@ class PreviewModal {
 		return;
 	}
 	
+	static function HandleRequestWithPhoneMediafile() {
+		$modal = new PreviewModal();
+		$modal->playable = true;
+		$showmodal = false;
+		if (isset($_REQUEST["previewmodal"]) && isset($_REQUEST["mediafile"])) {
+			$showmodal = true;
+			// save to session
+			$modal->uid = uniqid();
+			$_SESSION["previewmessagesource"] = array("uid" => $modal->uid, "mediafile" => $_REQUEST["mediafile"], "languagecode" => $_REQUEST["languagecode"] );
+		} else if (isset($_SESSION["previewmessagesource"])) {
+			$modal->uid = $_SESSION["previewmessagesource"]["uid"];
+		} else {
+			return;
+		}
+	
+		$modal->parts = array();//Message::parse($_SESSION["previewmessagesource"]["source"],$modal->errors,$_SESSION["previewmessagesource"]["voiceid"],false);
+
+		$_SESSION["previewmessage"] = array("uid" => $modal->uid, "parts" => array(), "mediafile" => $_SESSION["previewmessagesource"]["mediafile"]);
+		
+		$modal->title = _L("%s Phone Message", Language::getName($_SESSION["previewmessagesource"]["languagecode"]));
+		if ($showmodal) {
+			$modal->includeModal();
+		} else if (count($modal->errors) == 0) {
+			$modal->handleRequest();
+		}
+		return;
+	}
+	
 	
 	static function HandleRequestWithEmailText() {
 		if (!isset($_REQUEST["previewmodal"]) || 
@@ -352,7 +380,11 @@ class PreviewModal {
 								}).update('Click here to download');
 								
 								$('download').update(downloadlink);
-								embedPlayer('previewaudio.mp3.php?uid=' + result.uid,'player',result.partscount);
+								if (result.partscount != 0)
+									embedPlayer('previewaudio.mp3.php?uid=' + result.uid,'player',result.partscount);
+								else {
+									embedPlayer('previewaudio.mp3.php?uid=' + result.uid,'player');
+								}
 							} else {
 								$('previewmessagefields').observe('Form:Submitted',function(e){
 									embedPlayer('previewaudio.mp3.php?uid=' + e.memo,'player',result.partscount);

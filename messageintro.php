@@ -17,6 +17,9 @@ require_once("obj/Message.obj.php");
 require_once("obj/Voice.obj.php");
 require_once("obj/MessagePart.obj.php");
 require_once("obj/AudioFile.obj.php");
+require_once("obj/Language.obj.php");
+require_once("inc/previewfields.inc.php");
+require_once("obj/PreviewModal.obj.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -25,6 +28,10 @@ require_once("obj/AudioFile.obj.php");
 if (!$USER->authorize('managesystem') || getSystemSetting("_amdtype","ivr") != "ivr") {
 	redirect('unauthorized.php');
 }
+
+
+PreviewModal::HandleRequestWithPhoneMediafile();
+PreviewModal::HandleRequestWithId();
 
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
@@ -60,6 +67,17 @@ class IntroSelect extends FormItem {
 		}	
 
 		$defaultrequest = isset($this->args['defaultfile']) ? ''.$this->args['defaultfile'].'' : "";		
+		
+		$str .= '<span>' . icon_button("Preview", "fugue/control","
+				var content = $('" . $n . "message').getValue();
+					if(content.substring(0,5) == 'intro') {
+						showPreview({previewid:content.substring(5),languagecode:'{$this->args['languagecode']}'});
+					} else if(content != '')
+						showPreview({previewid:content,languagecode:'{$this->args['languagecode']}'}); 
+					else
+						showPreview({mediafile:'" . urlencode($defaultrequest) . "',languagecode:'{$this->args['languagecode']}'});
+				return false;") . '</span>';
+/*		
 		$str .= '<span>' 
 				. icon_button(_L("Play"),"fugue/control","
 				var content = $('" . $n . "message').getValue();
@@ -69,7 +87,7 @@ class IntroSelect extends FormItem {
 						popup('previewmessage.php?id=' + content, 400, 400,'preview');
 					else
 						popup('previewmessage.php?mediafile=" . urlencode($defaultrequest) . "', 400, 400,'preview');") . '</span>';
-
+*/
 		$str .= '</div>';
 		
 		if($renderscript) {
@@ -410,7 +428,12 @@ $(id).value = Object.toJSON({
 }
 
 </script>
+<script type="text/javascript" language="javascript" src="script/niftyplayer.js.php"></script>
+
 <?
+PreviewModal::includePreviewScript();
+
+
 startWindow(_L("Intro Settings"));
 echo $form->render();
 endWindow();
