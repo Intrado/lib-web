@@ -78,17 +78,6 @@ class IntroSelect extends FormItem {
 					else
 						showPreview({mediafile:'" . urlencode($defaultrequest) . "',languagecode:'{$this->args['languagecode']}'});
 				return false;") . '</span>';
-/*		
-		$str .= '<span>' 
-				. icon_button(_L("Play"),"fugue/control","
-				var content = $('" . $n . "message').getValue();
-					if(content.substring(0,5) == 'intro') {
-						popup('previewmessage.php?id=' + content.substring(5), 400, 400,'preview');
-					} else if(content != '')
-						popup('previewmessage.php?id=' + content, 400, 400,'preview');
-					else
-						popup('previewmessage.php?mediafile=" . urlencode($defaultrequest) . "', 400, 400,'preview');") . '</span>';
-*/
 		$str .= '</div>';
 		
 		if($renderscript) {
