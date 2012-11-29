@@ -716,10 +716,10 @@ if ($submittedmode || $completedmode) {
 					"a report to the email address associated with your account when the %s ".
 					"is finished.<li>Max Attempts - This option lets you select the maximum ".
 					"number of times the system should try to contact a recipient. ".
-					"<li>Allow Reply - Check this if you want recipients to be able to ".
+					"<li>Voice Response - Check this if you want recipients to be able to ".
 					"record responses.<br><br><b>Note:</b>You will need to include instructions ".
 					"to press '0' to record a response in your message.<br><br> ".
-					"<li>Allow Confirmation - Select this option if you would like recipients ".
+					"<li>Call Confirmation - Select this option if you would like recipients ".
 					"to give a 'yes' or 'no' response to your message.<br><br> ".
 					"<b>Note:</b>You will need to include instructions ".
 					"to press '1' for 'yes' and '2' for 'no' in your message.</ul>",$jobTitle);
@@ -755,7 +755,7 @@ if ($submittedmode || $completedmode) {
 	);
 	if ($USER->authorize('leavemessage')) {
 		$formdata["replyoption"] = array(
-			"label" => _L('Allow Reply'),
+			"label" => _L('Voice Response'),
 			"fieldhelp" => _L("Select this option if recipients should be able to record replies. ".
 								"Make sure that the message instructs recipients to press '0' to record a response."),
 			"control" => array(
@@ -766,7 +766,7 @@ if ($submittedmode || $completedmode) {
 	}
 	if ($USER->authorize('messageconfirmation')) { 
 		$formdata["confirmoption"] = array(
-			"label" => _L('Allow Confirmation'),
+			"label" => _L('Call Confirmation'),
 			"fieldhelp" => _L("Select this option if you would like recipients to be able to respond to your message ".
 								"by pressing 1' for 'yes' or '2' for 'no'. ".
 								"You will need to instruct recipients to do this in your message."),
@@ -940,7 +940,7 @@ if ($submittedmode || $completedmode) {
 	);
 	if ($USER->authorize('leavemessage')) { 
 		$formdata["replyoption"] = array(
-			"label" => _L('Allow Reply'),
+			"label" => _L('Voice Response'),
 			"fieldhelp" => _L("Select this option if recipients should be able to record replies. ".
 								"Make sure that the message instructs recipients to press '0' to record a response."),
 			"value" => $job->isOption("leavemessage"),
@@ -951,7 +951,7 @@ if ($submittedmode || $completedmode) {
 	}
 	if ($USER->authorize('messageconfirmation')) { 
 		$formdata["confirmoption"] = array(
-			"label" => _L('Allow Confirmation'),
+			"label" => _L('Call Confirmation'),
 			"fieldhelp" => _L("Select this option if you would like recipients to be able to respond to your message ".
 								"by pressing 1' for 'yes' or '2' for 'no'. You will need to instruct recipients to do ".
 								"this in your message."),
