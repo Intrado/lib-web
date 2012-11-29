@@ -198,7 +198,7 @@ class ReadOnlyFacebookPage extends FormItem {
 					var id = account.id;
 					var name = account.name.escapeHTML();
 					if (account.category == undefined)
-						var category = "Wall Posting";
+						var category = "Timeline Posting";
 					else
 						var category = account.category.escapeHTML();
 					
@@ -345,7 +345,7 @@ class ValFacebookPageWithMessage extends Validator {
 			// check authorized pages to see if the ones selected are allowed
 			if ($pageid == "me") {
 				if (!$authwall)
-					return $this->label. " ". _L("has an invalid selection. Personal wall posting is disabled.");
+					return $this->label. " ". _L("has an invalid selection. Personal Facebook Timeline posting is disabled.");
 			} else if ($authpages && !in_array($pageid, $authpages)) {
 				return $this->label. " ". _L("has an invalid posting location selected. Page is not authorized.");
 			}
@@ -829,7 +829,7 @@ if ($submittedmode || $completedmode) {
 	$showrenew = (floor(($USER->getSetting("fb_expires_on", 0) - strtotime("now")) / (24*60*60)) < 59);
 	if (getSystemSetting("_hasfacebook") && $USER->authorize("facebookpost")) {
 		
-		// see if any of the pages are the user's wall
+		// see if any of the pages are the user's Timeline
 		$fbpages = array();
 		foreach ($job->getJobPosts("facebook") as $fbpageid => $posted) {
 			if ($fbpageid == $USER->getSetting("fb_user_id"))
@@ -838,7 +838,7 @@ if ($submittedmode || $completedmode) {
 				$fbpages[] = $fbpageid . ""; // make this a string
 		}
 		
-		$helpsteps[] = _L("<p>If you haven't connected a Facebook account, click the Connect to Facebook button. You'll be able to log into Facebook through a pop up window. Once you're connected, click the Save button.</p><p>After connecting your Facebook account, you will see a list of Facebook Pages where you are an administrator and a My Wall option which lets you post to your account's Wall. You may select any combination of options for your job.</p><p>If your system administrator has restricted users to posting only to authorized Facebook Pages, you may not see as many Pages or the option of posting to your Wall. Check with your system administrator if you are unsure of your district's social media policies. Additionally, please note that your account must also have permission within Facebook to post to authorized Pages.</p>");
+		$helpsteps[] = _L("<p>If you haven't connected a Facebook account, click the Connect to Facebook button. You'll be able to log into Facebook through a pop up window. Once you're connected, click the Save button.</p><p>After connecting your Facebook account, you will see a list of Facebook Pages where you are an administrator and a My Timeline option which lets you post to your account's Timeline. You may select any combination of options for your job.</p><p>If your system administrator has restricted users to posting only to authorized Facebook Pages, you may not see as many Pages or the option of posting to your Timeline. Check with your system administrator if you are unsure of your district's social media policies. Additionally, please note that your account must also have permission within Facebook to post to authorized Pages.</p>");
 		$formdata["fbpage"] = array(
 			"label" => _L('Facebook Page(s)'),
 			"fieldhelp" => _L("Select which Pages to post to. Please click the Guide button for more information about posting to Facebook."),
