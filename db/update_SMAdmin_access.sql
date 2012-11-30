@@ -1,7 +1,7 @@
 
 select @smaccessid:=id from access where name = 'SchoolMessenger Admin';
 $$$
-delete from permission where accessid = @smaccessid and name not like 'tai_';
+delete from permission where accessid = @smaccessid and name not like 'tai_%';
 $$$
 INSERT INTO `permission` (accessid,name,value) VALUES 
 						 (@smaccessid, 'loginweb', '1'),
