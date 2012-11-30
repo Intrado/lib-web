@@ -34,6 +34,52 @@ require_once("obj/JobList.obj.php");
 if (!getSystemSetting('_hastargetedmessage', false) || !$USER->authorize('manageclassroommessaging'))
 	redirect("unauthorized.php");
 
+
+class TemplateEdit extends FormItem {
+	function render ($value) {
+		$n = $this->form->name."_".$this->name;
+		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'"/>';
+		
+		$emailheader = "<th>Email</th>";
+		$emailcomponent = "<td>";
+		if ($this->args["hasEmail"]) {
+			$emailcomponent .= icon_button(_L("Edit Email"), "pencil","return form_submit(event,'editemail');");
+			$emailcomponent .= icon_button(_L("Remove Email"), "cross","return confirmDelete()?form_submit(event,'removeemail'):false;");
+		} else {
+			$emailcomponent .= icon_button(_L("Add Email"), "add","return form_submit(event,'editemail');");
+		}
+		$emailcomponent .= "</td>";
+		
+		$phoneheader = "";
+		$phonecomponent = "";
+		if (getSystemSetting('_hasphonetargetedmessage', false)) {
+			$phoneheader = "<th>Phone</th>";
+			$phonecomponent .= "<td>";
+			if ($this->args["hasPhone"]) {
+				$phonecomponent .= icon_button(_L("Edit Phone"), "pencil","return form_submit(event,'editphone');");
+				$phonecomponent .= icon_button(_L("Remove Phone"), "cross","return confirmDelete()?form_submit(event,'removephone'):false;");
+			} else {
+				$phonecomponent .= icon_button(_L("Add Phone"), "add","return form_submit(event,'editphone');");
+			}
+			$phonecomponent .= "</td>";
+		}
+		
+		$str = 
+		"<table class='list' style='width:auto;'>
+			<tr>
+			$emailheader
+			$phoneheader
+			</tr>
+			<tr>
+			$emailcomponent 
+			$phonecomponent
+			</tr>
+		</table>";
+		return $str;
+	}
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
@@ -70,20 +116,8 @@ foreach ($userjobtypes as $id => $jobtype) {
 	}
 }
 
-// get this jobs messagegroup and it's messages
-$messagesbylangcode = array();
-if ($job) {
-	$messagegroup = DBFind("MessageGroup", "from messagegroup where id = ? and type = 'classroomtemplate'", false, array($job->messagegroupid));
-	if ($messagegroup) {
-		$messages = DBFindMany("Message", "from message where messagegroupid = ?", false, array($messagegroup->id));
-		if ($messages) {
-			foreach ($messages as $id => $message) {
-				$messagesbylangcode[$message->languagecode] = $message;
-				$messagesbylangcode[$message->languagecode]->readHeaders();
-			}
-		}
-	}
-}
+
+
 
 // get the customer default language data
 $defaultcode = Language::getDefaultLanguageCode();
@@ -143,105 +177,63 @@ $formdata = array(
 	)
 );
 
+
+// get this jobs messagegroup and it's messages
+if ($job) {
+	$messagegroup = DBFind("MessageGroup", "from messagegroup where id = ? and type = 'classroomtemplate'", false, array($job->messagegroupid));
+}
+
 // Do message template form stuff
 $formdata[] = _L("Message Template");
 
-// set the subject, from email, from name
-$formdata["fromname"] = array(
-	"label" => _L('From Name'),
-	"fieldhelp" => _L('Recipients will see this name as the sender of the email.'),
-	"value" => (isset($messagesbylangcode[$defaultcode])?$messagesbylangcode[$defaultcode]->fromname:$USER->firstname . " " . $USER->lastname),
-	"validators" => array(
-			array("ValRequired"),
-			array("ValLength","max" => 50)
-			),
-	"control" => array("TextField","size" => 25, "maxlength" => 50),
-	"helpstep" => 5
-);
 
-$formdata["fromemail"] = array(
-	"label" => _L("From Email"),
-	"fieldhelp" => _L('This is the address the email is coming from. Recipients will also be able to reply to this address.'),
-	"value" => (isset($messagesbylangcode[$defaultcode])?$messagesbylangcode[$defaultcode]->fromemail:$USER->email),
-	"validators" => array(
-		array("ValRequired"),
-		array("ValLength","max" => 255),
-		array("ValEmail", "domain" => getSystemSetting('emaildomain'))
-		),
-	"control" => array("TextField","max"=>255,"size"=>35),
-	"helpstep" => 5
-);
-
-// get the message parts for this message if it exists
-$message = false;
-if (isset($messagesbylangcode[$defaultcode])) {
-	$message = $messagesbylangcode[$defaultcode];
-	$parts = DBFindMany("MessagePart","from messagepart where messageid=? order by sequence", false, array($message->id));
+$emailheader = "<th>Email</th>";
+$emailcomponent = "<td>";
+if ($messagegroup && $messagegroup->hasMessage("email")) {
+	$emailcomponent .= icon_button(_L("Edit Email"), "pencil","return form_submit(event,'editemail');");
+	$emailcomponent .= icon_button(_L("Remove Email"), "cross","return confirmDelete()?form_submit(event,'removeemail'):false;");
+} else {
+	$emailcomponent .= icon_button(_L("Add Email"), "add","return form_submit(event,'editemail');");
 }
+$emailcomponent .= "</td>";
 
-// set the default language first and make it required
-$formdata[] = $defaultlanguage;
-$formdata[$defaultcode . "-subject"] = array(
-	"label" => _L("Subject"),
-	"fieldhelp" => _L('The Subject will appear as the subject line of the email.'),
-	"value" => ($message)?$message->subject:"",
-	"validators" => array(
-		array("ValRequired"),
-		array("ValLength","max" => 255)
-	),
-	"control" => array("TextField","max"=>255,"size"=>45),
-	"helpstep" => 6
-);
-$formdata[$defaultcode . "-body"] = array(
-	"label" => _L("Message Body"),
-	"fieldhelp" => _L("Enter a template message which Classroom Messages will be appended to."),
-	"value" => ($message)?$message->format($parts):"",
-	"validators" => array(
-		array("ValRequired")),
-	"control" => array("TextArea", "rows" => 10, "cols" => 60),
-	"helpstep" => 6
-);
-
-// unset the default language so it doesn't get overwritten below
-if (isset($languagemap[$defaultcode]))
-	unset($languagemap[$defaultcode]);
-
-// create form items for all the customer's languages
-foreach ($languagemap as $code => $language) {
-	// get the message parts for this message if it exists
-	$message = false;
-	if (isset($messagesbylangcode[$code])) {
-		$message = $messagesbylangcode[$code];
-		$parts = DBFindMany("MessagePart","from messagepart where messageid=? order by sequence", false, array($message->id));
+$phoneheader = "";
+$phonecomponent = "";
+if (getSystemSetting('_hasphonetargetedmessage', false)) {
+	$phoneheader = "<th>Phone</th>";
+	$phonecomponent .= "<td>";
+	if ($messagegroup && $messagegroup->hasMessage("phone")) {
+		$phonecomponent .= icon_button(_L("Edit Phone"), "pencil","return form_submit(event,'editphone');");
+		$phonecomponent .= icon_button(_L("Remove Phone"), "cross","return confirmDelete()?form_submit(event,'removephone'):false;");
+	} else {
+		$phonecomponent .= icon_button(_L("Add Phone"), "add","return form_submit(event,'editphone');");
 	}
-	$formdata[] = $language;
-	$formdata[$code . "-subject"] = array(
-		"label" => _L("Subject"),
-		"fieldhelp" => _L('The Subject will appear as the subject line of the email.'),
-		"value" => ($message)?$message->subject:"",
-		"validators" => array(
-			array("ValLength","max" => 255)),
-		"control" => array("TextField","max"=>255,"size"=>45),
-		"helpstep" => 6
-	);
-	$formdata[$code . "-body"] = array(
-		"label" => _L("Message Body"),
-		"fieldhelp" => _L("Enter a template message which Classroom Messages will be appended too."),
-		"value" => ($message)?$message->format($parts):"",
-		"validators" => array(),
-		"control" => array("TextArea", "rows" => 10, "cols" => 60),
-		"helpstep" => 6
-	);
+	$phonecomponent .= "</td>";
 }
+
+$formdata["template"] = array(
+		"label" => _L("Template"),
+		"control" => array("FormHtml", "html" => 
+				"<table class='list' style='width:auto;'>
+					<tr>
+					$emailheader
+					$phoneheader
+					</tr>
+					<tr>
+					$emailcomponent
+					$phonecomponent
+					</tr>
+				</table>"),
+		"helpstep" => 5
+);
+
 
 $helpsteps = array (
 	_L('The Template Name will be displayed in reports'),
 	_L('The %s Type determines where the system sends the message.',getJobTitle()),
 	_L('Select which days Classroom Messages should be sent.'),
 	_L('Select the user account that Classroom Messaging %s should be sent from.',getJobsTitle()),
-	_L('The From Name and From Email tell the recipient who the email came from.'),
-	_L('The Subject is the default subject for all Classroom Messages.<br><br>
-	In the Message Body section, enter a message which Classroom Messages will be appended to.')
+	_L('Edit Template')
 );
 
 $buttons = array(submit_button(_L('Save'),"submit","tick"),
@@ -271,6 +263,18 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		
 		// get the owner specified by postdata
 		$owner = $postdata['owner'];
+		
+		if (!$messagegroup) {
+			$messagegroup = new MessageGroup();
+			$messagegroup->userid = $owner;
+			$messagegroup->type = 'classroomtemplate';
+			$messagegroup->defaultlanguagecode = Language::getDefaultLanguageCode();
+			$messagegroup->name = $postdata['name'];
+			$messagegroup->description = "Classroom Messageing Template";
+			$messagegroup->modified = date("Y-m-d H:i:s");
+			$messagegroup->permanent = 1;
+			$messagegroup->create();
+		}
 		
 		// get existing job if it exists
 		$job = DBFind("Job", "from job where type = 'alert' and status = 'repeating'", false, array());
@@ -303,78 +307,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		else
 			$schedule->create();
 
-		// get the messagegroup or create a new one
-		if ($job)
-			$messagegroup = DBFind("MessageGroup", "from messagegroup where id = ? and type = 'classroomtemplate' and not deleted", false, array($job->messagegroupid));
-		if (!isset($messagegroup) || !$messagegroup)
-			$messagegroup = new MessageGroup();
-		
-		// update the message group
-		$messagegroup->userid = $owner;
-		$messagegroup->type = 'classroomtemplate';
-		$messagegroup->defaultlanguagecode = Language::getDefaultLanguageCode();
-		$messagegroup->name = $postdata['name'];
-		$messagegroup->description = "Classroom Messageing Template";
-		$messagegroup->modified = date("Y-m-d H:i:s");
-		$messagegroup->permanent = 1;
-		if ($messagegroup->id)
-			$messagegroup->update();
-		else
-			$messagegroup->create();
-		
-		// attempt to get all the messages for this message group and associate them by langcode in an array
-		$messagesbylangcode = array();
-		if ($messagegroup) {
-			$messages = DBFindMany("Message", "from message where messagegroupid = ?", false, array($messagegroup->id));
-			if ($messages) {
-				foreach ($messages as $id => $message){
-					$messagesbylangcode[$message->languagecode] = $message;
-					$messagesbylangcode[$message->languagecode]->readHeaders();
-				}
-			}
-		}
-
-		// get the default language code
-		$defaultcode = Language::getDefaultLanguageCode();
-		
-		// update, create or orphan all the message parts.
-		foreach(Language::getLanguageMap() as $code => $language) {
-			// if there is a message body specified for this language code, create/update a message
-			if ($postdata[$code . "-body"]) {
-				// if the message is already associated, reuse it. otherwise create a new one
-				if (isset($messagesbylangcode[$code])) {
-					$message = $messagesbylangcode[$code];
-				} else {
-					$message = new Message();
-				}
-				$message->messagegroupid = $messagegroup->id;
-				$message->userid = $owner;
-				$message->name = $messagegroup->name;
-				$message->description = $messagegroup->description;
-				$message->type = 'email';
-				$message->subtype = 'html';
-				$message->autotranslate = 'none';
-				$message->modifydate = date("Y-m-d H:i:s");
-				$message->languagecode = $code;
-				$message->subject = ($postdata[$code . '-subject'])?$postdata[$code . '-subject']:$postdata[$defaultcode . '-subject'];
-				$message->fromname = $postdata['fromname'];
-				$message->fromemail = $postdata['fromemail'];
-				$message->stuffHeaders();
-				$message->recreateParts($postdata[$code . "-body"], null, null);
-				if ($message->id)
-					$message->update();
-				else
-					$message->create();
-			// if no body, orphan any existing message for this language code
-			} else {
-				if (isset($messagesbylangcode[$code])) {
-					$messagesbylangcode[$code]->deleted = 1;
-					$messagesbylangcode[$code]->update();
-					QuickUpdate("update message set messagegroupid = null where id = ?", false, array($messagesbylangcode[$code]->id));
-				}
-			}
-		}
-		
 		// update or create the job
 		if (!$job)
 			$job = new Job();
@@ -461,12 +393,40 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		else
 			$joblist->create();
 		
+		
+		if (strstr($button, "remove")) {
+			QuickUpdate("delete m.* ,mp.*
+					from messagegroup mg
+					inner join message m on (mg.id = m.messagegroupid)
+					inner join messagepart mp on (m.id = mp.messageid)
+					where
+					mg.type='classroomtemplate' and
+					m.type=?",
+				false, array(substr($button, 6)));
+		}
+		
 		Query("COMMIT");
+		$redirect = "settings.php";
+		switch ($button) {
+			case "removephone":
+			case "removeemail":
+				$redirect = "classroommessagetemplate.php";
+				break;
+			case "editemail":
+				$redirect = "classroommessageemailtemplate.php";
+				break;
+			case "editphone":
+				if (getSystemSetting('_hasphonetargetedmessage', false))
+					$redirect = "classroommessagephonetemplate.php";
+				break;
+		}
 		
 		if ($ajax)
-			$form->sendTo("settings.php");
+			$form->sendTo($redirect);
 		else
-			redirect("settings.php");
+			redirect($redirect);
+		
+
 	}
 }
 
@@ -479,7 +439,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "admin:settings";
-$TITLE = _L('Classroom Messaging Template');
+$TITLE = "";
 
 include_once("nav.inc.php");
 
@@ -490,8 +450,8 @@ include_once("nav.inc.php");
 <? Validator::load_validators(array("ValDuplicateNameCheck","ValWeekRepeatItem")); ?>
 </script>
 <?
-
-startWindow(_L('Classroom Message delivery settings'));
+$TITLE = _L('Classroom Messaging Template');
+startWindow($TITLE);
 echo $form->render();
 endWindow();
 include_once("navbottom.inc.php");

@@ -33,8 +33,8 @@ class PhoneMessageEditor extends FormItem {
 		
 		// data fields may be disabled, but default to enabled
 		$enableFieldInserts = true;
-		if (isset($this->args['enablefieldinserts']) && !$this->args['enablefieldinserts'])
-			$enableFieldInserts = false;
+		if (isset($this->args['enablefieldinserts']))
+			$enableFieldInserts = $this->args['enablefieldinserts'];
 		
 		$messagegroupid = (isset($this->args['messagegroupid'])?$this->args['messagegroupid']:false);
 		
@@ -80,34 +80,7 @@ class PhoneMessageEditor extends FormItem {
 				<div id="'.$n.'-library" name="'.$n.'-library" class="library"></div>
 			</div>';
 		
-		// Data field inserts
-		$datafieldinsert = '
-			<div class="controlcontainer">
-				<div>'._L("Data Fields").'</div>
-				<div>
-					<div class="datafields">
-						Default&nbsp;Value:<br />
-							<input id="'.$n.'datadefault" type="text" size="10" value=""/>
-					</div>
-					<div class="datafields">
-						Data&nbsp;Field:<br />
-						<select id="'.$n.'datafield">
-							<option value="">-- Select a Field --</option>';								
-		foreach(FieldMap::getAuthorizeFieldInsertNames() as $field) {
-			$datafieldinsert .= '<option value="' . $field . '">' . $field . '</option>';
-		}
-		$datafieldinsert .=	'</select>
-					</div>
-					<div class="datafieldsinsert">
-						'. icon_button(_L("Insert"),"fugue/arrow_turn_180","
-								sel = $('" . $n . "datafield');
-								if (sel.options[sel.selectedIndex].value != '') { 
-									 def = $('" . $n . "datadefault').value;
-									 textInsert('<<' + sel.options[sel.selectedIndex].text + (def ? ':' : '') + def + '>>', $('$n'));
-								}"). '					
-					</div>
-				</div>
-			</div>';
+
 		
 		// main containers
 		// NOTE: audio library and uploadaudio only work when a messagegroup id is provided
@@ -119,10 +92,47 @@ class PhoneMessageEditor extends FormItem {
 		
 		// load date inserts if allowed
 		if ($USER->authorize('starteasy') || $enableFieldInserts) {
-			$str .= '
-						<div class="fieldscontainer">
-							'.($enableFieldInserts?$datafieldinsert:"").'
-						</div>';
+			$str .= '<div class="fieldscontainer">';
+			if ($enableFieldInserts) {
+				// Data field inserts
+				$datafieldinsert = '
+					<div class="controlcontainer">
+					<div>'._L("Data Fields").'</div>
+					<div>
+					<div class="datafields">
+					Default&nbsp;Value:<br />
+					<input id="'.$n.'datadefault" type="text" size="10" value=""/>
+					</div>
+					<div class="datafields">
+					Data&nbsp;Field:<br />
+					<select id="'.$n.'datafield">
+						<option value="">-- Select a Field --</option>';
+				
+				if ($enableFieldInserts === "limited") {
+					foreach(FieldMap::getAuthorizedMapNamesLike('f') as $field) {
+						$datafieldinsert .= '<option value="' . $field . '">' . $field . '</option>';
+					}
+				} else {
+					foreach(FieldMap::getAuthorizeFieldInsertNames() as $field) {
+						$datafieldinsert .= '<option value="' . $field . '">' . $field . '</option>';
+					}
+				}
+				$datafieldinsert .=	'
+					</select>
+					</div>
+					<div class="datafieldsinsert">
+					'. icon_button(_L("Insert"),"fugue/arrow_turn_180","
+							sel = $('" . $n . "datafield');
+							if (sel.options[sel.selectedIndex].value != '') {
+							def = $('" . $n . "datadefault').value;
+							textInsert('<<' + sel.options[sel.selectedIndex].text + (def ? ':' : '') + def + '>>', $('$n'));
+					}"). '
+					</div>
+					</div>
+					</div>';
+				$str .= $datafieldinsert;
+			}
+			$str .= '</div>';
 		}
 		
 		// if there are additional tools available, show them to the right

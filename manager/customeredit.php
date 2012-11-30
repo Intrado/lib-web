@@ -207,6 +207,7 @@ $settings = array(
 	'_hasldap' => '0',
 	'_hasenrollment' => '0',
 	'_hastargetedmessage' => '0',
+	'_hasphonetargetedmessage' => '0',
 	'_hasselfsignup' => '',
 	'_hasportal' => '',
 	'_hasfacebook' => '0',
@@ -536,7 +537,7 @@ $formdata["portal"] = array(
 						"label" => _L('Portal'),
 						"value" => $settings['_hasportal']?"contactmanager":($settings['_hasselfsignup']?"selfsignup":"none"),
 						"validators" => array(),
-						"control" => array("RadioButton","values" => array("none" => "None", "contactmanager" => "Contact Manager", "selfsignup" => "Self-Signup")),
+						"control" => array("SelectMenu","values" => array("none" => "None", "contactmanager" => "Contact Manager", "selfsignup" => "Self-Signup")),
 						"helpstep" => $helpstepnum
 );
 
@@ -564,11 +565,11 @@ $formdata["hasenrollment"] = array(
 );
 
 $formdata["hasclassroom"] = array(
-						"label" => _L('Has Classroom Comments'),
-						"value" => $settings['_hastargetedmessage'],
-						"validators" => array(),
-						"control" => array("CheckBox"),
-						"helpstep" => $helpstepnum
+		"label" => _L('Classroom Comments'),
+		"value" => $settings['_hastargetedmessage']?($settings['_hasphonetargetedmessage']?"emailandphone":"emailonly"):"disabled",
+		"validators" => array(array("ValInArray", "values" => array("disabled","emailonly","emailandphone"))),
+		"control" => array("SelectMenu","values" => array("disabled" => "Disabled", "emailonly" => "Email Only", "emailandphone" => "Email and Phone")),
+		"helpstep" => $helpstepnum
 );
 
 $formdata["hasfacebook"] = array(
@@ -696,7 +697,7 @@ $formdata["brandtheme"] = array(
 
 
 $thispage = "customeredit.php";
-$returntopage = isset($_SESSION["newnav"])?"commsuitecustomers.php":"customers.php";
+$returntopage = "customers.php";
 
 $buttons = array(submit_button(_L("Save"),"save","tick"),submit_button(_L("Save and Return"),"done","tick"),
 				icon_button(_L('Cancel'),"cross",null,$returntopage));
@@ -832,7 +833,33 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		setCustomerSystemSetting('_hassurvey', $postdata["hassurvey"]?'1':'0', $custdb);
 		setCustomerSystemSetting('_hasldap', $postdata["hasldap"]?'1':'0', $custdb);
 		setCustomerSystemSetting('_hasenrollment', $postdata["hasenrollment"]?'1':'0', $custdb);
-		setCustomerSystemSetting('_hastargetedmessage', $postdata["hasclassroom"]?'1':'0', $custdb);
+		
+		$phonetargetedmessage = false;
+		switch($postdata["hasclassroom"]) {
+			case "disabled":
+				setCustomerSystemSetting('_hasphonetargetedmessage','0', $custdb);
+				setCustomerSystemSetting('_hastargetedmessage','0', $custdb);
+				break;
+			case "emailandphone":
+				$phonetargetedmessage = true;
+				//continue and enable _hastargetedmessage
+			case "emailonly":
+				// Remove phone template to disable the already configured customers
+				if (!$phonetargetedmessage) {
+					QuickUpdate("delete m.* ,mp.*
+							from messagegroup mg 
+							inner join message m on (mg.id = m.messagegroupid)
+							inner join messagepart mp on (m.id = mp.messageid)
+							where
+							mg.type='classroomtemplate' and 
+							m.type='phone' and m.subtype='voice'",
+							$custdb);
+				}
+				setCustomerSystemSetting('_hasphonetargetedmessage',$phonetargetedmessage?'1':'0', $custdb);
+				setCustomerSystemSetting('_hastargetedmessage','1', $custdb);
+				break;
+		}
+
 		setCustomerSystemSetting('_hasfacebook', $postdata["hasfacebook"]?'1':'0', $custdb);
 		setCustomerSystemSetting('_hastwitter', $postdata["hastwitter"]?'1':'0', $custdb);
 		setCustomerSystemSetting('_hasfeed', $postdata["hasfeed"]?'1':'0', $custdb);

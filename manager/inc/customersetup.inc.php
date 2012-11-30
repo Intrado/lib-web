@@ -177,28 +177,19 @@ function tai_setup($customerid) {
 				or dieWithError("Failed to execute statement \n$tablequery\n\nfor customerid $customerid");
 		}
 	}
-
+	
+	// load 'schoolmessenger' user permissions
+	$tablequeries = explode("$$$",file_get_contents("../db/tai_update_SMAdmin_access.sql"));
+	foreach ($tablequeries as $tablequery) {
+		if (trim($tablequery)) {
+			Query($tablequery)
+				or dieWithError("Failed to execute statement \n$tablequery\n\nfor $customerid", $customerid);
+		}
+	}
+	
 	// get schoolmessenger user
 	$query = "from user where login = 'schoolmessenger'";
 	$schoolmessengeruser = DBFind("User", $query);
-	
-	// permissions for schoolmessenger user
-	$query = "INSERT INTO permission (accessid, name, value) VALUES
-				($schoolmessengeruser->accessid, 'tai_canforwardthread', 1), 
-				($schoolmessengeruser->accessid, 'tai_canviewreports', 1), 
-				($schoolmessengeruser->accessid, 'tai_canmanagenews', 1), 
-				($schoolmessengeruser->accessid, 'tai_cansendanonymously', 1), 
-				($schoolmessengeruser->accessid, 'tai_canmanagetopics', 1), 
-				($schoolmessengeruser->accessid, 'tai_canbetopicrecipient', 1), 
-				($schoolmessengeruser->accessid, 'tai_canusecannedresponses', 1), 
-				($schoolmessengeruser->accessid, 'tai_canmanagecannedresponses', 1), 
-				($schoolmessengeruser->accessid, 'tai_canrequestidentityreveal', 1), 
-				($schoolmessengeruser->accessid, 'tai_canmanagesurveys', 1), 
-				($schoolmessengeruser->accessid, 'tai_canmanagelockouts', 1), 
-				($schoolmessengeruser->accessid, 'tai_canmanageactivationcodes', 1),
-				($schoolmessengeruser->accessid, 'tai_canmodifydisplayname', 1)";
-	QuickUpdate($query)
-		or dieWithError(" SQL: " . $query);
 	
 	// add person for user
 	$person = new Person();

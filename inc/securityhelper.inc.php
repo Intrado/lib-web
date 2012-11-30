@@ -81,6 +81,14 @@ function userCanSee ($type,$id) {
 			// User could subscribe to it...
 			if (userCanSubscribe("messagegroup", $messagegroupid))
 				return true;
+			
+			// Check targetedmessage link
+			if (getSystemSetting('_hastargetedmessage', false) && 
+				$USER->authorize('manageclassroommessaging') &&
+				QuickQuery("select 1 from targetedmessage where overridemessagegroupid=?",false,array($messagegroupid))) {
+				return true;
+			}
+			
 			// This message group has been used by a job this user owns...
 			$query = "select 1
 				from  messagegroup mg

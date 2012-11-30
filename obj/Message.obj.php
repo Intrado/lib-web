@@ -295,8 +295,8 @@ class Message extends DBMappedObject {
 							//if we have an array of audiofileids, scan for the named af in them
 							 if (is_array($audiofileids)) {
 								if (count($audiofileids) > 0) {
-									$query = "select id from audiofile where userid=? and name=? and deleted = 0 and id in (".implode(",", $audiofileids).")";
-									$audioid = QuickQuery($query, false, array($USER->id,$afname));
+									$query = "select id from audiofile where name=? and deleted = 0 and id in (".implode(",", $audiofileids).")";
+									$audioid = QuickQuery($query, false, array($afname));
 								}
 							//otherwise search all audiofiles, preferring recent files
 							} else {

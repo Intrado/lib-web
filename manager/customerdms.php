@@ -236,9 +236,6 @@ while($row = DBGetRow($result))
 	$data[$row[0]] = $row;
 
 if ($data) {
-	init_memcache();
-	global $mcache;
-	
 	// First, get a list of every shard, $shardinfo[], indexed by ID, storing dbhost, dbusername, and dbpassword.
 	$result = Query("select id, dbhost, dbusername, dbpassword, name from shard order by id");
 	$shardinfo = array();
@@ -265,9 +262,20 @@ if ($data) {
 				$query = "select dmid,name,telco_type,notes from custdm where dmid = ?";
 				$custdminfo = QuickQueryRow($query,true,$custdb, array($dmid));
 				if ($custdminfo) {
+					//fake some blank data when the api is unavailable
+					$poststatus = "[{\"restotal\":0, \"resactout\": 0, \"resactin\":0}]";
+					$fh = fopen("http://localhost/manager/api/2/deliverymechanisms/".$data[$dmid][9], "r");
+					$apidata = stream_get_contents($fh);
+					fclose($fh);
+					if ($apidata) {
+						$dmdata = json_decode($apidata);
+						if (isset($dmdata->postStatus))
+							$poststatus = $dmdata->postStatus;
+					}
+
 					$data[$dmid][3] = $custdminfo["name"];
 					$data[$dmid][12] = $custdminfo["telco_type"];
-					$data[$dmid][16] = $mcache->get("dmpoststatus/".$data[$dmid][9]);
+					$data[$dmid][16] = $poststatus;
 					$data[$dmid][17] = $custdminfo["notes"];
 				}
 			}

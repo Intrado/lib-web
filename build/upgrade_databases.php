@@ -56,7 +56,8 @@ $versions = array (
 	"tai" => array (
 		"0.1/11",
 		"1.2/2",
-		"1.3/1"
+		"1.3/1",
+		"1.4/1"
 		//etc
 	)
 	
@@ -317,6 +318,8 @@ function update_customer($db, $customerid, $shardid) {
 	
 	if ($foundstartingversion !== false) { 
 		// upgrade success
+		apply_sql("../db/update_SMAdmin_access.sql", $customerid, $db);
+		
 		QuickUpdate("insert into setting (name,value) values ('_dbversion','$targetversion/$targetrev') on duplicate key update value=values(value)", $db);
 	} else {
 		//TODO ERROR !!!! running ancient upgrade_databases on newer db? didnt find current version
@@ -365,6 +368,7 @@ function update_taicustomer($db, $customerid, $shardid) {
 	require_once("taiupgrades/db_0-1.php");
 	require_once("taiupgrades/db_1-2.php");
 	require_once("taiupgrades/db_1-3.php");
+	require_once("taiupgrades/db_1-4.php");
 
 	// for each version, upgrade to the next
 	$foundstartingversion = false;
@@ -409,6 +413,11 @@ function update_taicustomer($db, $customerid, $shardid) {
 					exit("Error upgrading DB; Shard: $shardid, Customer: $customerid, Rev: " . $rev);
 				}
 				break;
+			case "1.4":
+				if (!tai_upgrade_1_4($rev, $shardid, $customerid, $db)) {
+					exit("Error upgrading DB; Shard: $shardid, Customer: $customerid, Rev: " . $rev);
+				}
+				break;
 		}
 
 		$version = $targetversion;
@@ -417,6 +426,8 @@ function update_taicustomer($db, $customerid, $shardid) {
 
 	if ($foundstartingversion !== false) {
 		// upgrade success
+		apply_sql("../db/tai_update_SMAdmin_access.sql", $customerid, $db);
+		
 		QuickUpdate("insert into setting (name,value) values ('_dbtaiversion','$targetversion/$targetrev') on duplicate key update value=values(value)", $db);
 	} else {
 		//TODO ERROR !!!! running ancient upgrade_databases on newer db? didnt find current version

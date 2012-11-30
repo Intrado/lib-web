@@ -3,7 +3,7 @@ class TargetedMessage extends DBMappedObject {
 	var $messagekey;
 	var $targetedmessagecategoryid;
 	var $overridemessagegroupid;
-	var $enabled;
+	var $enabled = 1;
 	var $deleted = 0;
 
 	function TargetedMessage ($id = NULL) {
@@ -12,7 +12,9 @@ class TargetedMessage extends DBMappedObject {
 		$this->_fieldlist = array(
 			"messagekey",
 			"targetedmessagecategoryid",
-			"overridemessagegroupid"
+			"overridemessagegroupid",
+			"enabled",
+			"deleted"
 		);
 		
 		//call super's constructor

@@ -180,24 +180,28 @@ class MessageGroup extends DBMappedObject {
 		return $summaries[$messagegroupid];
 	}
 
-	// Returns an array of audiofile ids for ones assigned
-	// to this messagegroup plus ones that are referenced in message parts
-	// for messages of this messagegroup.
+
+	/**
+	 * Returns an array of audiofile ids for ones assigned
+	 * to this messagegroup plus ones that are referenced in message parts
+	 * for messages of this messagegroup.
+	 * Make sure user has access to to messagegroup before passing in $messagegroupid
+	 * @param int $messagegroupid 
+	 */
 	static function getReferencedAudioFileIDs($messagegroupid) {
-		global $USER;
 		
 		static $audiofileids = array();
 		
 		if (!isset($audiofileids[$messagegroupid])) {
 			// Merge with any audio files that are referenced in message parts.
-			$audiofileids[$messagegroupid] = QuickQueryList('select id from audiofile where userid=? and messagegroupid=? and not deleted', false, false, array($USER->id, $messagegroupid));
+			$audiofileids[$messagegroupid] = QuickQueryList('select id from audiofile where messagegroupid=? and not deleted', false, false, array($messagegroupid));
 			$audiofileids[$messagegroupid] = array_unique(array_merge($audiofileids[$messagegroupid],
 				QuickQueryList('
 					select distinct mp.audiofileid
 					from messagepart mp inner join message m
 						on (mp.messageid = m.id)
-					where m.messagegroupid = ? and m.userid = ? and mp.audiofileid is not NULL',
-					false, false, array($messagegroupid, $USER->id)
+					where m.messagegroupid = ? and mp.audiofileid is not NULL',
+					false, false, array($messagegroupid)
 				))
 			);
 		}

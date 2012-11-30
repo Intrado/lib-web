@@ -46,17 +46,21 @@ if (isset($_GET['enable']) && isset($_GET['id'])) {
 	exit();
 }
 
-$categories = QuickQueryMultiRow("select id, name, image from targetedmessagecategory where deleted = 0",true);
+
+$categories = DBFindMany("targetedmessagecategory", "from targetedmessagecategory where not deleted");
+
+
+
 $categoriesjson = array();
 
 foreach($categories as $category) {
 	$obj = null;
-	$obj->name = escapehtml($category["name"]);
-	if(isset($category["image"]) && isset($classroomcategoryicons[$category["image"]]))
-		$obj->img = "img/icons/" . $classroomcategoryicons[$category["image"]]  . ".gif";
+	$obj->name = escapehtml($category->name);
+	if(isset($category->image) && isset($classroomcategoryicons[$category->image]))
+		$obj->img = "img/icons/" . $classroomcategoryicons[$category->image]  . ".gif";
 	else
 		$obj->img = "img/pixel.gif";
-	$categoriesjson[$category["id"]] = $obj;
+	$categoriesjson[$category->id] = $obj;
 }
 
 $ajax = isset($_GET['ajax']);
@@ -87,11 +91,11 @@ if($ajax === true) {
 
 	$total = QuickQuery("select FOUND_ROWS()");
 
-	$customtxt = QuickQueryList("select t.id, p.txt from targetedmessage t, message m, messagepart p
-										where t.targetedmessagecategoryid = ? and t.deleted = 0 and
-											t.overridemessagegroupid = m.messagegroupid and
-											m.languagecode = 'en' and
-											p.messageid = m.id and p.sequence = 0",true,false,array($getcategory));
+	$query = "select t.id, p.txt from targetedmessage t 
+				inner join message m on (t.overridemessagegroupid = m.messagegroupid)
+				inner join messagepart p on (p.messageid = m.id) 
+				where not t.deleted and m.languagecode = 'en' and m.type='email' and p.sequence = 0";
+	$customtxt = QuickQueryList($query,true,false,array($getcategory));
 
 	$numpages = ceil($total/$limit);
 	$curpage = ceil($start/$limit) + 1;
@@ -157,23 +161,23 @@ echo icon_button(_L('Create Category'),"add",null,"classroommessagecategory.php?
 <?
 
 foreach($categories as $category) {
-	echo "<div id='lib-" . $category["id"] . "'>
+	echo "<div id='lib-{$category->id}'>
 			" .
 			action_links (
-				action_link("Edit", "pencil", "classroommessagecategory.php?id=" . $category["id"]),
-				action_link("Delete", "cross", null,"deletecategory('". $category["id"] . "');return false;")
+				action_link("Edit", "pencil", "classroommessagecategory.php?id={$category->id}"),
+				action_link("Delete", "cross", null,"deletecategory('{$category->id}');return false;")
 			)
 			. "
 			<h3>Messages</h3>
 			" .
-			icon_button(_L('Create Message'),"add",null,"classroommessageedit.php?id=new")
+			icon_button(_L('Create Message'),"add",null,"classroommessageedit.php?id=new&categoryid={$category->id}")
 			. "
-			<div id='pagewrappertop-" . $category["id"] . "'></div>
+			<div id='pagewrappertop-{$category->id}'></div>
 			<div style='clear:both;'></div>
-			<table id='items-" . $category["id"] . "'>
+			<table id='items-{$category->id}'>
 				<tr><td></td></tr>
 			</table>
-			<div id='pagewrapperbottom-" . $category["id"] . "'></div>
+			<div id='pagewrapperbottom-{$category->id}'></div>
 		</div>";
 }
 ?>
@@ -330,9 +334,9 @@ document.observe('dom:loaded', function() {
 			"content": $(conentid).remove()
 		});
 	});
-	var first = categoryinfo.keys().first();
-	tabs.show_section('lib-' + first);
-	updatecategory(first);
+	var selectedcategory = <?= isset($_GET["category"])?"{$_GET["category"]}":"categoryinfo.keys().first()" ?>;
+	tabs.show_section('lib-' + selectedcategory);
+	updatecategory(selectedcategory);
 
 	tabs.container.observe('Tabs:ClickTitle', function(event) {
 		activepage = 0;
