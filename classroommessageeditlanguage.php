@@ -122,14 +122,14 @@ $helpsteps = array();
 $formdata[] = _L("Email");
 $formdata["emailmessage"] = array(
 		"label" => _L("Message"),
-		"fieldhelp" => _L("Enter your phone message in this field. Click on the 'Guide' button for help with the different options which are available to you."),
+		"fieldhelp" => _L("Enter your classroom message in this field."),
 		"value" => $emailmessagetext,
 		"validators" => array(
 				array("ValRequired")
 		),
 		"control" => array("TextArea","rows" => 3),
 		"helpstep" => 1);
-$helpsteps[] = _L("");
+$helpsteps[] = _L("Enter your classroom message in this field.");
 
 if ($hasPhoneTargetedMessage) {
 
