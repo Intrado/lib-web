@@ -111,7 +111,6 @@ $PAGE = "account:account";
 $TITLE = _L("Account Information") . ": " . escapehtml($_SESSION['portaluser']['portaluser.firstname']) . " " . escapehtml($_SESSION['portaluser']['portaluser.lastname']);
 include_once("nav.inc.php");
 NewForm($f);
-buttons(submit($f, $s, _L('Save')), button(_L("Change Email"), NULL, "changeemail.php"), button(_L("Cancel"), NULL, "start.php"));
 
 startWindow(_L('User Information'));
 ?>
@@ -186,7 +185,8 @@ startWindow(_L('User Information'));
 	</table>
 
 <?
+buttons(submit($f, $s, _L('Save')), icon_button(_L("Change Email"),"cross", NULL, "changeemail.php"), icon_button(_L("Cancel"),"cross", NULL, "start.php"));
+
 endWindow();
-buttons();
 include_once("navbottom.inc.php");
 ?>

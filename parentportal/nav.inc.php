@@ -116,13 +116,15 @@ header('Content-type: text/html; charset=UTF-8') ;
 <!-- ********************************************************************* -->
 
 <div id="top_banner" class="banner cf">
-<?
-	if (isset($contactList) && $contactList) {
-?>
-			<div class="banner_logo"><? doLogo(); ?></div>
+	<div class="banner_logo">
+	<table class="logo"><tr><td><? doLogo() ?></td></tr></table>
+	<h1><?= getBrand();?></h1>
+
+	
+	
+	</div>
 
 <?
-	}
 		if (!isset($hidenav) || !$hidenav) {
 ?>
 			<div class="banner_custname"><?= isset($_SESSION['custname']) ? escapehtml($_SESSION['custname']) : ""; ?></div>
