@@ -45,7 +45,7 @@ if (!$language) {
 $messagegroup = null;
 
 // Find override messagegroup
-$targetedmessage = DBFind("targetedmessage","from targetedmessage where messagekey = ? and enabled and not deleted",false,array($_GET['messagekey']));
+$targetedmessage = DBFind("targetedmessage","from targetedmessage where messagekey = ?",false,array($_GET['messagekey']));
 if ($targetedmessage) {
 	if ($targetedmessage->overridemessagegroupid) {
 		$messagegroup = new MessageGroup($targetedmessage->overridemessagegroupid);
