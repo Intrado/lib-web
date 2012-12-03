@@ -7,7 +7,7 @@ header("Cache-Control: private");
 // skipcommon for login page, no session to keep
 if (!isset($_GET['skipcommon'])) {
 	include_once("common.inc.php");
-	//require_once("../inc/themes.inc.php");
+	require_once("../inc/themes.inc.php");
 	unset($_SESSION['colorscheme']);
 	//$_SESSION['colorscheme'] = $COLORSCHEMES["newui"];
 	//$_SESSION['colorscheme']["_brandtheme"] = "newui";
