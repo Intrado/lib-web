@@ -114,14 +114,13 @@ header('Content-type: text/html; charset=UTF-8') ;
 	</script>
 
 <!-- ********************************************************************* -->
+<div class="wrap"><!-- ends in navbottom.inc -->
 
-<div id="top_banner" class="banner cf">
+<div id="top_banner" class="banner">
+<div class="contain cf">
 	<div class="banner_logo">
-	<table class="logo"><tr><td><? doLogo() ?></td></tr></table>
-	<h1><?= getBrand();?></h1>
-
-	
-	
+	<table class="logo"><tr><td><img src="img/sm_white.gif" alt=""></td></tr></table>
+	<h1>Schoolmessenger</h1>
 	</div>
 
 <?
@@ -163,22 +162,27 @@ header('Content-type: text/html; charset=UTF-8') ;
 							</ul>
 						</div><!-- .banner_links_wrap -->
 
-			
-</div> <!-- #top_banner -->
+</div><!-- /container -->	
+</div><!--  end top_banner -->
 
-
-<div class="primary_nav cf">
+<div class="primary_nav">
+<div class="contain cf">
 	
 	<ul class="navtabs">
 		<? if (isset($contactList) && $contactList) echo $MAINTABS ?>
 	</ul>
 	
-</div><!-- .primary_nav -->
-
-
+</div><!-- /container -->
+</div><!-- primary_nav -->
+	
 
 <div class="content_wrap cf"><!-- starts main content wrapper, tag ends in navbottom.inc.php -->
 
-	<div class="pagetitle"><?= (isset($TITLE) ? $TITLE : "") ?></div>
-	<div class="pagetitlesubtext"><?= (isset($DESCRIPTION) ? $DESCRIPTION : "") ?></div>
 
+
+	<div class="container cf">
+	
+	
+		<div class="pagetitle"><?= (isset($TITLE) ? $TITLE : "") ?></div>
+		<div class="pagetitlesubtext"><?= (isset($DESCRIPTION) ? $DESCRIPTION : "") ?></div>
+	
