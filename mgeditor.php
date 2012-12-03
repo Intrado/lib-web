@@ -276,7 +276,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		if (isset($postdata['defaultlanguage']))
 			$messagegroup->defaultlanguagecode = $postdata['defaultlanguage'];
 		
-		$messagegroup->name = $postdata['name'];
+		$messagegroup->name = removeIllegalXmlChars($postdata['name']);
 		$messagegroup->description = $postdata['description'];
 		$messagegroup->userid = $USER->id;
 		$messagegroup->modified = date("Y-m-d H:i:s", time());
