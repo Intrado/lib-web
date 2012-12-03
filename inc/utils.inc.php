@@ -700,4 +700,9 @@ function getJobsTitle() {
 	return $job;
 }
 
+function removeIllegalXmlChars($data) {
+	// remove invalid ascii control characters (for xml encoding) from this data (bugs: 5659, 4873)
+	return preg_replace('/[\x00-\x08\x0b\x0c\x0e-\x1f]/', '', $data);
+}
+
 ?>
