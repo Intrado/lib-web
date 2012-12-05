@@ -33,7 +33,7 @@ if (!$USER->authorize('createlist') || !($USER->authorize('listuploadids') || $U
 ////////////////////////////////////////////////////////////////////////////////
 
 $list = new PeopleList(getCurrentList());
-$type = $_GET['type'] == "contacts" ? "contacts" : "ids";
+$type = (isset($_GET['type']) && $_GET['type'] == "contacts") ? "contacts" : "ids";
 $importid = QuickQuery("select id from import where listid='$list->id'");
 if ($importid) {
 	$import = new Import($importid);
@@ -80,6 +80,7 @@ if (count($importfields) == 0) {
 $f = "list";
 $s = "uploadpreview";
 $reloadform = 0;
+$errormsg = false;
 //process the list?
 if (CheckFormSubmit($f,'save') || CheckFormSubmit($f,'preview')) {
 	
@@ -146,7 +147,13 @@ if ($datauri && !CheckFormSubmit($f,'save')) {
 		$count = 5000;
 		$colcount = 0;
 		$lastrow = null;
-		while (($row = fgetcsv($fp,4096)) !== FALSE && $count--) {
+		while (($line = fgets($fp)) !== FALSE && $count--) {
+
+			// validate that the data is a valid utf8 character stream
+			if (!mb_check_encoding($line, "utf-8"))
+				continue;
+
+			$row = str_getcsv($line);
 			//skip duplicate or blank lines (can be created by excel)
 			if ($lastrow == $row || (count($row) == 1 && $row[0] == ""))
 				continue;
@@ -170,7 +177,7 @@ if( $reloadform )
 	
 	//create a field dropdown for each col
 	for ($i = 0; $i < $colcount; $i++) {
-		PutFormData($f, $s, "map" . $i, isset($datamap[$i]) ? $datamap[$i] : "", "array", null, array_keys($mapto));
+		PutFormData($f, $s, "map" . $i, isset($datamap[$i]) ? $datamap[$i] : "", "array", null, array_keys($maptofields));
 	}
 }
 

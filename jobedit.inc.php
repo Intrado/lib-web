@@ -995,7 +995,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
 		Query("BEGIN");
 		//save data here
-		$job->name = $postdata['name'];
+		$job->name = removeIllegalXmlChars($postdata['name']);
 		$job->description = $postdata['description'];
 		$job->modifydate = date("Y-m-d H:i:s", time());
 		$job->type = 'notification';

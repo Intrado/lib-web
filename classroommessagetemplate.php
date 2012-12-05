@@ -269,7 +269,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$messagegroup->userid = $owner;
 			$messagegroup->type = 'classroomtemplate';
 			$messagegroup->defaultlanguagecode = Language::getDefaultLanguageCode();
-			$messagegroup->name = $postdata['name'];
+			$messagegroup->name = removeIllegalXmlChars($postdata['name']);
 			$messagegroup->description = "Classroom Messageing Template";
 			$messagegroup->modified = date("Y-m-d H:i:s");
 			$messagegroup->permanent = 1;
@@ -314,7 +314,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$job->userid = $owner;
 		$job->scheduleid = $schedule->id;
 		$job->jobtypeid = $postdata['jobtype'];
-		$job->name = $postdata['name'];
+		$job->name = removeIllegalXmlChars($postdata['name']);
 		$job->description = "Classroom Messaging Template";
 		$job->type = 'alert';
 		if (!$job->id)
@@ -366,7 +366,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		
 		$peoplelist->userid = $owner;
 		$peoplelist->type = 'alert';
-		$peoplelist->name = $postdata['name'];
+		$peoplelist->name = removeIllegalXmlChars($postdata['name']);
 		$peoplelist->description = "Classroom Messaging Template";
 		$peoplelist->modifydate = date("Y-m-d H:i:s");
 		$peoplelist->deleted = 0;

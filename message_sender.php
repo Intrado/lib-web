@@ -927,7 +927,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
 		$job->userid = $USER->id;
 		$job->jobtypeid = $postdata["jobtype"];
-		$job->name = $postdata["name"];
+		$job->name = removeIllegalXmlChars($postdata["name"]);
 		$job->description = "Created with MessageSender";
 
 		$job->type = 'notification';
