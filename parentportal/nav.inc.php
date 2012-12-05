@@ -132,7 +132,8 @@ header('Content-type: text/html; charset=UTF-8') ;
 ?>
 
 						<div class="banner_links_wrap">
-							<ul class="banner_links cf">
+							<div class="banner_links_button"><?= icon_button("Account", "fugue/clipboard","$$('ul.banner_links').first().toggleClassName('minhide');") ?></div>
+							<ul class="banner_links cf minhide">
 								<li class="bl_left"></li>
 								<li><a href="account.php"><?=_L("My Account")?></a></li>
 <?
