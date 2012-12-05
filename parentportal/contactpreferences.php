@@ -169,8 +169,7 @@ if($PERSONID){
 }
 include_once("nav.inc.php");
 startWindow(_L("Contacts"));
-buttons(button(_L("Add A Contact"), null, "phoneactivation0.php"));
-
+echo icon_button(_L("Add Contact"),"add", null, "phoneactivation0.php");
 
 if(isset($contactList) && $contactList){
 
@@ -225,7 +224,9 @@ if($PERSONID){
 		<tr>
 			<td>
 <?
-	include_once("contactedit.php");
+	//include_once("contactedit.php");
+	include_once("contacteditmobile.php");
+	
 ?>
 			</td>
 		</tr>
