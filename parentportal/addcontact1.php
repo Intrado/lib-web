@@ -80,7 +80,7 @@ $TITLE = _L("Add A Contact");
 include_once("nav.inc.php");
 NewForm($f);
 
-startWindow(_L('Add'));
+startWindow(_L('Add Contact'));
 ?>
 <table>
 	<tr>
@@ -91,8 +91,8 @@ startWindow(_L('Add'));
 	</tr>
 </table>
 <?
+buttons(submit($f, $s, _L('Add')), icon_button(_L("Cancel"),"cross", NULL, "addcontact3.php"));
 endWindow();
-buttons(submit($f, $s, _L('Add')), button(_L("Cancel"), NULL, "addcontact3.php"));
 EndForm();
 include_once("navbottom.inc.php");
 ?>
