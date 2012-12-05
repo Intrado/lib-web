@@ -2103,3 +2103,12 @@ $$$
 update setting set value='9.4/1' where name='_dbversion'
 $$$
 -- END 9.4/1
+
+-- change default from 0 to null
+ALTER TABLE  `setting` CHANGE  `organizationid`  `organizationid` INT( 11 ) NULL DEFAULT NULL
+$$$
+
+update setting set value='9.4/2' where name='_dbversion'
+$$$
+-- END 9.4/2
+
