@@ -110,17 +110,7 @@ include_once("cmlogintop.inc.php");
 ?>
 <form method="POST" action="index.php<?echo $appendcustomerurl;?>" name="login">
 
-				<span class="language"> 
-				<?
-					// if no customerurl, need to include the ?, otherwise append with &
-					$urlparams = (strlen($appendcustomerurl) == 0) ? "?locale=" : $appendcustomerurl . "&locale=";
-					NewFormItem("login", "main", '_locale', 'selectstart', null, null, "id='locale' onchange='window.location.href=\"index.php" . $urlparams . "\"+this.options[this.selectedIndex].value'");
-					foreach($LOCALES as $loc => $lang){
-						NewFormItem("login", "main", '_locale', 'selectoption', $lang, $loc);
-					}
-					NewFormItem("login", "main", '_locale', 'selectend');
-				?>
-				</span>
+
 
 
 				<noscript><p><?=_L("It looks like you don't have JavaScript enabled! You must have JavaScript enabled for full use of this system. Please enable JavaScript in your browser or contact your system administrator for assistance.")?></p></noscript>
@@ -146,6 +136,18 @@ include_once("cmlogintop.inc.php");
 			
 			<div id="capslockwarning"  style="padding-left:3px; float:left; display:none; color:red;"><?=_L("Warning! Your Caps Lock key is on.")?></div>
 
+			<span class="language"> 
+			<?
+				// if no customerurl, need to include the ?, otherwise append with &
+				$urlparams = (strlen($appendcustomerurl) == 0) ? "?locale=" : $appendcustomerurl . "&locale=";
+				NewFormItem("login", "main", '_locale', 'selectstart', null, null, "id='locale' onchange='window.location.href=\"index.php" . $urlparams . "\"+this.options[this.selectedIndex].value'");
+				foreach($LOCALES as $loc => $lang){
+					NewFormItem("login", "main", '_locale', 'selectoption', $lang, $loc);
+				}
+				NewFormItem("login", "main", '_locale', 'selectend');
+			?>
+			</span>
+			
 			<fieldset>
 				<input type="submit" name="signin" value="<?=_L("Sign In")?>">
 			</fieldset>

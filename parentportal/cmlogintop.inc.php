@@ -6,10 +6,9 @@ header('Content-type: text/html; charset=UTF-8') ;
 <head>
 	<meta http-equiv="Content-type" value="text/html; charset=UTF-8" />
 	<title>Contact Manager<?=isset($TITLE) ? ": " . $TITLE : ""?></title>
-    
-	<link href='../css/css.inc.php' type='text/css' rel='stylesheet' media='screen'>
 	<link href='../css/login.css' type='text/css' rel='stylesheet' media='screen'>
-
+   	<link href='login.css' type='text/css' rel='stylesheet' media='screen'>
+	
 	<script src="../script/prototype.js" type="text/javascript" ></script>
 	<script src="../script/utils.js" type="text/javascript" ></script>
 </head>
@@ -67,7 +66,7 @@ if((isset($_COOKIE['embeddedpage']) && $_COOKIE['embeddedpage']) || isset($_GET[
 		<div id="window" class="window_body cf">
 			<h3 class="indexdisplayname">SchoolMessenger Contact Manager</h3>
 		
-			<div><img src="img/contactmanager_splash.jpg"></div>
+			<div class="contactmanagersplash"><img src="img/contactmanager_splash.jpg"></div>
 
 <?
 }
