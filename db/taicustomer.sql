@@ -276,15 +276,32 @@ $$$
 update setting set name = '_tai_notificationtypeid_report' where name = '_tai_notificationtypeid_unreadmessage'
 $$$
 
--- default first email and sms sequence to enabled
--- insert into jobtypepref select value, 'email', 0, 1 from setting where name = '_tai_notificationtypeid_report'
--- insert into jobtypepref select value, 'sms', 0, 1 from setting where name = '_tai_notificationtypeid_report'
--- insert into jobtypepref select value, 'email', 0, 1 from setting where name = '_tai_notificationtypeid_newmessage'
--- insert into jobtypepref select value, 'sms', 0, 1 from setting where name = '_tai_notificationtypeid_newmessage'
-
 update setting set value='1.5/1' where name='_dbtaiversion'
 $$$
 
 -- END 1.5/1
 
+-- default first email and sms sequence to enabled
+insert into jobtypepref select value, 'phone', 0, 1 from setting where name = '_tai_notificationtypeid_report'
+$$$
+
+insert into jobtypepref select value, 'email', 0, 1 from setting where name = '_tai_notificationtypeid_report'
+$$$
+
+insert into jobtypepref select value, 'sms', 0, 1 from setting where name = '_tai_notificationtypeid_report'
+$$$
+
+insert into jobtypepref select value, 'phone', 0, 1 from setting where name = '_tai_notificationtypeid_newmessage'
+$$$
+
+insert into jobtypepref select value, 'email', 0, 1 from setting where name = '_tai_notificationtypeid_newmessage'
+$$$
+
+insert into jobtypepref select value, 'sms', 0, 1 from setting where name = '_tai_notificationtypeid_newmessage'
+$$$
+
+update setting set value='1.5/2' where name='_dbtaiversion'
+$$$
+
+-- END 1.5/2
 

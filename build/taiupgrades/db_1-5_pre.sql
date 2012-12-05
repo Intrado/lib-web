@@ -13,3 +13,24 @@ $$$
 
 update setting set name = '_tai_notificationtypeid_report' where name = '_tai_notificationtypeid_unreadmessage'
 $$$
+
+-- $rev 2
+
+-- default first email and sms sequence to enabled
+insert into jobtypepref select value, 'phone', 0, 1 from setting where name = '_tai_notificationtypeid_report'
+$$$
+
+insert into jobtypepref select value, 'email', 0, 1 from setting where name = '_tai_notificationtypeid_report'
+$$$
+
+insert into jobtypepref select value, 'sms', 0, 1 from setting where name = '_tai_notificationtypeid_report'
+$$$
+
+insert into jobtypepref select value, 'phone', 0, 1 from setting where name = '_tai_notificationtypeid_newmessage'
+$$$
+
+insert into jobtypepref select value, 'email', 0, 1 from setting where name = '_tai_notificationtypeid_newmessage'
+$$$
+
+insert into jobtypepref select value, 'sms', 0, 1 from setting where name = '_tai_notificationtypeid_newmessage'
+$$$
