@@ -36,6 +36,7 @@ if (isset($_GET['orgid'])) {
 
 $originalorg = isset($originalorgid)?DBFind("Organization", "from organization where id = ? and not deleted", false, array($originalorgid)):null;
 
+$hasTai = getSystemSetting("_dbtaiversion",false) !== false;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Optional Form Items And Validators
@@ -74,29 +75,36 @@ if (isset($originalorgkey)) {
 	$namevalidators[] = array("ValOrgKey");
 }
 
-$formdata = array(
-		"parentorganization" => array(
-				"label" => _L('Parent Organization'),
-				"value" => isset($originalorg)?$originalorg->parentorganizationid:"",
-				"validators" => array(
-						array("ValInArray", "values" => array_keys($organizations))
-				),
-				"control" => array("SelectMenu", "values" => array("" =>_L("-- No Parent --")) + $organizations),
-				"helpstep" => 1
-		),
-		"orgkey" => array(
-				"label" => _L('Organization Name'),
-				"fieldhelp" => _L("Enter a unique name for the new organization."),
-				"value" => isset($originalorg)?$originalorg->orgkey:"",
-				"validators" => $namevalidators,
-				"control" => array("TextField","size" => 30, "maxlength" => 255),
-				"helpstep" => 2
-		)
-);
+$formdata = array();
+$helpsteps = array();
 
-$helpsteps = array (
-	_L('Organizations may be arranged in a hierarchy. Optionally select a parent organization to link the new organization in the hierarchy.'),	
-	_L('Enter a new name for this organization. It should clearly indicate what the organization is. The name must be unique within the system.')
+// To be enabled when needed
+if (false && $hasTai) {
+	
+	if (isset($originalorg) && $originalorg->parentorganizationid == null) {
+		// TODO could inform the user that he/she Is editing the name for root org and that the parent org picker is unavaliable
+	} else {
+		$helpsteps[] = _L('Organizations may be arranged in a hierarchy. Optionally select a parent organization to link the new organization in the hierarchy.');
+		$formdata["parentorganization"] = array(
+			"label" => _L('Parent Organization'),
+			"value" => isset($originalorg)?$originalorg->parentorganizationid:"",
+			"validators" => array(
+					array("ValRequired"),
+					array("ValInArray", "values" => array_keys($organizations))
+			),
+			"control" => array("SelectMenu", "values" => array("" =>_L("-- Select Parent --")) + $organizations),
+			"helpstep" => count($helpsteps)
+		);
+	}
+}
+$helpsteps[] = _L('Enter a new name for this organization. It should clearly indicate what the organization is. The name must be unique within the system.');
+$formdata["orgkey"] = array(
+	"label" => _L('Organization Name'),
+	"fieldhelp" => _L("Enter a unique name for the new organization."),
+	"value" => isset($originalorg)?$originalorg->orgkey:"",
+	"validators" => $namevalidators,
+	"control" => array("TextField","size" => 30, "maxlength" => 255),
+	"helpstep" => count($helpsteps)
 );
 
 $buttons = array(submit_button(_L('Save'),"submit","tick"),
@@ -122,22 +130,38 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 		
-		$parentorganizationid = $postdata['parentorganization'];
 		$orgkey = trim($postdata['orgkey']);
+		
+		if ($hasTai) {
+			// Only one root org is allowed, if editing the root org parentorganization should be null
+			$parentorganization = DBFind("Organization", "from organization where parentorganizationid is null and orgkey != ? and not deleted", false, array($orgkey));
+		} else {
+			$parentorganization = false;
+		}
 		Query("BEGIN");
 		
 		$existingorg = DBFind("Organization", "from organization where orgkey = ?", false, array($orgkey));
 		// if the org already exists make it our target org
 		if ($existingorg) {
+			
 			$org = $existingorg;
-			$org->parentorganizationid = $parentorganizationid;
+			$org->parentorganizationid = $parentorganization?$parentorganization->id:null;
 			$org->orgkey = $orgkey;
 			$org->deleted = 0;
+			$org->modifiedtimestamp = time();
 			$org->update();				
 		// if it's a new org then crete a new one
 		} else {
 			$org = new Organization();
-			$org->parentorganizationid = $parentorganizationid;
+			$isnewroot = isset($originalorg) && $originalorg->parentorganizationid == null;
+							
+			if ($isnewroot || !$parentorganization)	{
+				$org->parentorganizationid = null;
+			} else {
+				$org->parentorganizationid = $parentorganization->id;
+			}
+			$org->createdtimestamp = time();
+			$org->modifiedtimestamp = $org->createdtimestamp;
 			$org->orgkey = $orgkey;
 			$org->create();
 		}
@@ -148,7 +172,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				QuickUpdate("update userassociation set organizationid = ? where organizationid = ?", false, array($org->id, $originalorgid));
 				QuickUpdate("update personassociation set organizationid = ? where organizationid = ?", false, array($org->id, $originalorgid));
 				QuickUpdate("update listentry set organizationid = ? where organizationid = ?", false, array($org->id, $originalorgid));
-	
+				QuickUpdate("update organization set parentorganizationid = ? where parentorganizationid = ?", false, array($org->id, $originalorgid));
+				
 				// check persondatavalues and update/create/delete entries
 				$originalorgpdvid = QuickQuery("select id from persondatavalues where fieldnum = 'oid' and value = ?", false, array($originalorgid));
 				// if the original org exists in persondatavalues, remove it and insert the new org id
