@@ -66,7 +66,7 @@ if((isset($_COOKIE['embeddedpage']) && $_COOKIE['embeddedpage']) || isset($_GET[
 	<div class="window_body_wrap cf">
 	
 		<div id="window" class="window_body cf">
-			<h3 class="indexdisplayname">SchoolMessenger Contact Manager</h3>
+			<h3 class="indexdisplayname">Contact Manager</h3>
 		
 			<div class="contactmanagersplash"><img src="img/contactmanager_splash.jpg"></div>
 
