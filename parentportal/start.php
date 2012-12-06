@@ -77,9 +77,9 @@ if(isset($_SESSION['customerid']) && $_SESSION['customerid']){
 	}
 	
 	
-	$titles = array("0" => "##",
+	$titles = array(
 					"2" => _L("Date"),
-					"3" => "#" . _L("Job Name"),
+					"3" => "#" . _L("%s Name", getJobsTitle()),
 					"SentBy" => "#" . _L("Sent By"),
 					"Actions" => _L("Actions")
 				);
@@ -110,16 +110,16 @@ function message_action($row, $index){
 	$messagegroup = new MessageGroup($row[4]);
 
 	if ($messagegroup->hasMessage("phone")) {
-		$buttons[] = button(_L("Play"), "popup('previewmessage.php?jobid=" . $row[1] . "&personid=" . $row[7] . "&type=phone', 400, 500,'preview');",null);
+		$buttons[] = icon_button(_L("Play"),"fugue/control", "popup('previewmessage.php?jobid=" . $row[1] . "&personid=" . $row[7] . "&type=phone', 400, 500,'preview');",null);
 	}
 	if ($messagegroup->hasMessage("email")) {
-		$buttons[] = button(_L("Read Email"), "popup('previewmessage.php?jobid=" . $row[1] . "&personid=" . $row[7] . "&type=email', 400, 500,'preview');",null);
+		$buttons[] = icon_button(_L("Read Email"),"email_open", "popup('previewmessage.php?jobid=" . $row[1] . "&personid=" . $row[7] . "&type=email', 400, 500,'preview');",null);
 	}
 	if ($messagegroup->hasMessage("sms")) {
-		$buttons[] = button(_L("Read SMS"), "popup('previewmessage.php?jobid=" . $row[1] . "&personid=" . $row[7] . "&type=sms', 400, 500,'preview');",null);
+		$buttons[] = icon_button(_L("Read SMS"),"comment", "popup('previewmessage.php?jobid=" . $row[1] . "&personid=" . $row[7] . "&type=sms', 400, 500,'preview');",null);
 	}
 	
-	return "<table><tr><td>" . implode("</td><td>", $buttons) . "</td></tr></table>";
+	return "<ul class=\"message_view_actions cf\"><li>" . implode("</li><li>", $buttons) . "</li></ul>";
 }
 
 function format_date($row, $index){
