@@ -16,6 +16,5 @@ if (!isset($_GET['skipcommon'])) {
 
 
 require_once("../css/css.inc.php");
-require_once("css.inc.php");
 
 ?>
