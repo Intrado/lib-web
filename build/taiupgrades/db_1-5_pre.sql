@@ -34,3 +34,6 @@ $$$
 
 insert into jobtypepref select value, 'sms', 0, 1 from setting where name = '_tai_notificationtypeid_newmessage'
 $$$
+
+-- $rev 3
+-- no SQL changes, see db_1-5.php for template insertion code
