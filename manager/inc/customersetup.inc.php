@@ -72,6 +72,8 @@ function createnewcustomer($shardid) {
 	// TODO in the future this should only be done if commsuite is enabled
 	cs_setup($customerid, $custdb);
 	
+	$query = "INSERT INTO `customerproduct` (`customerid`,`product`,`createdtimestamp`,`modifiedtimestamp`,`enabled`) VALUES (?,'cs',?,?,1)";
+	QuickUpdate($query, false,array($customerid,time(),time()));
 		
 	// Set Session to make the save button stay on the page
 	$_SESSION['customerid']= $customerid;

@@ -254,6 +254,10 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		
 		saveRequiredFields($custdb,$customerid,$postdata);
 		
+		
+		$query = "select product, enabled from customerproduct where customerid=?";
+		$products = QuickQueryList($query,true,false,array($customerid));
+		
 		if (!isset($products["cs"])) {
 			if ($postdata["commsuite"]) {
 				// Add Commsuite to customer product from all new customers
