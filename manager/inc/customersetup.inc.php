@@ -223,6 +223,75 @@ function tai_setup($customerid) {
 	// create role for schoolmessenger user
 	$query = "INSERT INTO `role` (`userid`, `accessid`, `organizationid`) VALUES (?, ?, ?)";
 	QuickUpdate($query, null, array($schoolmessengeruser->id, $schoolmessengeruser->accessid, $org->id));
+
+	// create templates
+	$templates = loadTaiTemplateData();
+
+	// query existing templates,
+	$existingTemplateTypes = QuickQueryList("select type, type from template", true);
+
+	foreach ($templates as $template => $templateData) {
+		if (!isset($existingTemplateTypes[$template])) {
+			$mgid = createEmailMessages($template, $templateData);
+			if (!$mgid)
+				return false;
+			// create template record
+			if (!QuickUpdate("insert into template (type, messagegroupid) values (?, ?)", null, array($template, $mgid)))
+				return false;
+		}
+	}
+}
+
+function createEmailMessages($template, $messages) {
+	$messagegroup = new MessageGroup();
+	// create messagegroup
+	$messagegroup->userid = null;
+	$messagegroup->type = "systemtemplate";
+	$messagegroup->name = $template . " Template";
+	$messagegroup->description = "";
+	$messagegroup->modified = date('Y-m-d H:i:s');
+	$messagegroup->permanent = 1;
+	$messagegroup->deleted = 0;
+	$messagegroup->defaultlanguagecode = "en";
+	if (!$messagegroup->create())
+		return false;
+
+	// #################################################################
+	// create an email message for each subtype/languagecode
+	// for each subtype
+	foreach ($messages as $subtype => $msglang) {
+		// for each language code
+		foreach ($msglang as $langcode => $data) {
+			if ($data["body"]) {
+				$message = new Message();
+				$message->messagegroupid = $messagegroup->id;
+				$message->type = "email";
+				$message->subtype = $subtype;
+				$message->autotranslate = "none";
+				$message->name = $messagegroup->name;
+				$message->description = "Template: $template for language code: $langcode";
+				$message->userid = null;
+				$message->languagecode = $langcode;
+				$message->subject = $data["subject"];
+				$message->fromname = $data["fromname"];
+				$message->fromemail = $data["fromaddr"];
+				$message->stuffHeaders();
+				if (!$message->create())
+					return false;
+
+				$messagepart = new MessagePart();
+				$messagepart->messageid = $message->id;
+				$messagepart->type = "T";
+				$messagepart->txt = $data['body'];
+				$messagepart->sequence = 0;
+				if (!$messagepart->create())
+					return false;
+
+			} // end if this message has a body
+		} // for each language code
+	} // for each subtype
+
+	return $messagegroup->id;
 }
 
 ?>

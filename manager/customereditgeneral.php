@@ -29,6 +29,7 @@ require_once("obj/LogoRadioButton.fi.php");
 require_once("obj/LanguagesItem.fi.php");
 require_once("obj/ValInboundNumber.val.php");
 require_once("inc/customersetup.inc.php");
+require_once("loadtaitemplatedata.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
