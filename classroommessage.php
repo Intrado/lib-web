@@ -17,6 +17,8 @@ require_once("obj/TargetedMessage.obj.php");
 require_once("obj/FieldMap.obj.php");
 require_once("obj/Schedule.obj.php");
 require_once("inc/classroom.inc.php");
+require_once("obj/MessageGroup.obj.php");
+require_once("obj/Message.obj.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -301,7 +303,9 @@ if($sections) {
 						  <span id="nowedit-' . $categoryid . '" class="nowedit"></span>
 						  <div style="clear:both"></div>';
 					foreach($messages as $message) {
-
+						if (!$message->isValid())
+							continue;
+						
 						if(isset($message->overridemessagegroupid) && isset($customtxt[$message->id])) {
 							$title = $customtxt[$message->id];
 						} else if(isset($messagedatacache["en"]) && isset($messagedatacache["en"][$message->messagekey])) {

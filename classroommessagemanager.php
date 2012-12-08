@@ -12,6 +12,9 @@ require_once("inc/form.inc.php");
 require_once("inc/html.inc.php");
 require_once("inc/formatters.inc.php");
 require_once("obj/TargetedMessageCategory.obj.php");
+require_once("obj/TargetedMessage.obj.php");
+require_once("obj/MessageGroup.obj.php");
+require_once("obj/Message.obj.php");
 
 
 
@@ -110,9 +113,13 @@ if($ajax === true) {
 
 	while(!empty($items)) {
 		$item = array_shift($items);
-
-		if(isset($item["overridemessagegroupid"]) && isset($customtxt[$item["id"]])) {
+		$errornote = false;
+		if(isset($item["overridemessagegroupid"]) && isset($customtxt[$item["id"]])) { 
 			$title = $customtxt[$item["id"]];
+			$targetedmessage = new TargetedMessage($item["id"]);
+			if (!$targetedmessage->isValid()) {
+				$errornote = "Comment is missing phone component ";
+			}
 		} else if(isset($messagedatacache["en"]) && isset($messagedatacache["en"][$item["messagekey"]])) {
 				$title = $messagedatacache["en"][$item["messagekey"]];
 		} else {
@@ -122,6 +129,7 @@ if($ajax === true) {
 			"id" => $item["id"],
 			"enabled" => ($item["enabled"]==1),
 			"title" => escapehtml($title),
+			"error" => $errornote,
 			"deletable" => (substr($item["messagekey"],0,6) == "custom")
 		);
 	}
@@ -289,7 +297,7 @@ function updatecategory(category, actioninfo) {
 					if(i%2)
 						row.addClassName("listAlt");
 					row.insert(new Element('td',{align:"right"}).update('<input id="enable-' + item.id + '" type="checkbox" ' + (item.enabled?'checked':'') + ' onclick="updateenabled(this);return false;" />'));
-					row.insert(new Element('td').update(item.title));
+					row.insert(new Element('td').update(item.title + (item.error?"<span style='color:red'> - " + item.error + "<span>":"")));
 					row.insert(new Element('td',{style:"white-space: nowrap;"}).update(
 					'<a href="classroommessageedit.php?id=' + item.id + '"  class="actionlink" title="Edit" ><img src="img/icons/pencil.gif" alt="Edit">Edit</a>' + (item.deletable?'&nbsp;|&nbsp;<a id="delete-' + item.id + '" href="#"  class="actionlink" title="delete" onclick="deletemessage(' + category + ',this); return false;" ><img src="img/icons/cross.gif" alt="delete">Delete</a>':'') + '&nbsp;|&nbsp;<select id="move-' + item.id + '" onchange="move(' + category + ',this)"/>' + options + '</select>'
 					));
