@@ -9,10 +9,10 @@ function loadTaiTemplateData() {
 	////////////////////////////
 	// Unread Messages Report
 	////////////////////////////
-	$templates['tai_unreadmessagesreport']['html']['en']['subject'] = 'Unread Messages for: ${date}';
-	$templates['tai_unreadmessagesreport']['html']['en']['fromname'] = 'Talk About It (Reports)';
-	$templates['tai_unreadmessagesreport']['html']['en']['fromaddr'] = 'reports@letstai.com';
-	$templates['tai_unreadmessagesreport']['html']['en']['body'] = '
+	$templates['tai_unreadmessagesreport']['email']['html']['en']['subject'] = 'Unread Messages for: ${date}';
+	$templates['tai_unreadmessagesreport']['email']['html']['en']['fromname'] = 'Talk About It (Reports)';
+	$templates['tai_unreadmessagesreport']['email']['html']['en']['fromaddr'] = 'reports@letstai.com';
+	$templates['tai_unreadmessagesreport']['email']['html']['en']['body'] = '
 <!-- $beginBlock summary -->
 <!-- $beginBlock organization -->\'${okey}\' <!-- $endBlock organization -->
 0-24: ${interval0}
@@ -24,10 +24,10 @@ ${topicname}: ${topictotal}
 total: ${total}
 <!-- $endBlock summary -->';
 
-	$templates['tai_unreadmessagesreport']['plain']['en']['subject'] = 'Unread Messages for: ${date}';
-	$templates['tai_unreadmessagesreport']['plain']['en']['fromname'] = 'Talk About It (Reports)';
-	$templates['tai_unreadmessagesreport']['plain']['en']['fromaddr'] = 'reports@letstai.com';
-	$templates['tai_unreadmessagesreport']['plain']['en']['body'] = '
+	$templates['tai_unreadmessagesreport']['email']['plain']['en']['subject'] = 'Unread Messages for: ${date}';
+	$templates['tai_unreadmessagesreport']['email']['plain']['en']['fromname'] = 'Talk About It (Reports)';
+	$templates['tai_unreadmessagesreport']['email']['plain']['en']['fromaddr'] = 'reports@letstai.com';
+	$templates['tai_unreadmessagesreport']['email']['plain']['en']['body'] = '
 <!-- $beginBlock summary -->
 <!-- $beginBlock organization -->\'${okey}\' <!-- $endBlock organization -->
 0-24: ${interval0}
@@ -39,6 +39,9 @@ ${topicname}: ${topictotal}
 total: ${total}
 <!-- $endBlock summary -->';
 
+	$templates['tai_unreadmessagesreport']['sms']['plain']['en']['body'] =
+'Talk About It - Unread Messages Report for: ${date}
+There are currently ${total_all} total unread messages for your associated schools';
 
 	return $templates;
 }

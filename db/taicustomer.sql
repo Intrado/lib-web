@@ -305,3 +305,7 @@ $$$
 
 -- END 1.5/2
 
+-- START 1.5/3
+update setting set value='1.5/3' where name='_dbtaiversion'
+$$$
+-- END 1.5/3
