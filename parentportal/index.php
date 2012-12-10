@@ -136,7 +136,7 @@ include_once("cmlogintop.inc.php");
 			
 			<div id="capslockwarning"  style="padding-left:3px; float:left; display:none; color:red;"><?=_L("Warning! Your Caps Lock key is on.")?></div>
 
-			<span class="language"> 
+			<span class="language languagebottom"> 
 			<?
 				// if no customerurl, need to include the ?, otherwise append with &
 				$urlparams = (strlen($appendcustomerurl) == 0) ? "?locale=" : $appendcustomerurl . "&locale=";
