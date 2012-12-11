@@ -738,3 +738,7 @@ INSERT INTO `shortcodetext` (`shortcode`, `messagetype`, `text`)
   VALUES ('85130', 'INVALIDRECIPIENT', 
     'Sorry, invalid recipient. Please send NO, DIR, NEXT, or valid id');
 
+INSERT INTO `shortcodetext` (`shortcode`, `messagetype`, `text`) 
+  VALUES ('85130', 'EMPTYDIR', 
+    'Sorry, no recipients found');
+
