@@ -305,3 +305,9 @@ $$$
 
 -- END 1.5/2
 
+-- no SQL changes, see db_1-5.php for template insertion code
+
+update setting set value='1.5/3' where name='_dbtaiversion'
+$$$
+
+-- END 1.5/3
