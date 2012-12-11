@@ -133,9 +133,9 @@ include_once("cmlogintop.inc.php");
 				<input type="password" id="form_pass" name="password" size = "30" maxlength="50" onkeypress="capslockCheck(event)"/>
 				<input type="text" id="password_instructions" value='<?=_L("Password")?>' />
 				<em>Passwords are case-sensitive.</em>
+				<div id="capslockwarning"  style="padding-left:3px; float:left; display:none; color:red;"><?=_L("Warning! Your Caps Lock key is on.")?></div>
 			</fieldset>
 			
-			<div id="capslockwarning"  style="padding-left:3px; float:left; display:none; color:red;"><?=_L("Warning! Your Caps Lock key is on.")?></div>
 
 			<span class="language languagebottom"> 
 			<?
@@ -190,7 +190,9 @@ function capslockCheck(e){
 			$('capslockwarning').style.display = 'none';
 	}
 	blankFieldValue('form_email', '<?=_L("Email")?>');
-
+	$('form_email').focus();
+	$('form_email').blur();
+	
 	function blankPasswordFieldValue(passwordelement,textelement) {
 		$(passwordelement).hide();
 		$(textelement).show();
