@@ -124,13 +124,14 @@ include_once("cmlogintop.inc.php");
 ?>
 
 			<fieldset>
-				<label for="form_email"><?=_L("Email")?>:</label>
+				<label for="form_email" class="canhidelabel"><?=_L("Email")?>:</label>
 				<input type="text" id="form_email" name="login" size="30" maxlength="255" value="<?=escapehtml($login)?>"/>
 			</fieldset>
 
 			<fieldset>
-				<label for="form_pass"><?=str_replace(" ", "&nbsp;", _L("Password"))?>:</label>
+				<label for="form_pass" class="canhidelabel"><?=str_replace(" ", "&nbsp;", _L("Password"))?>:</label>
 				<input type="password" id="form_pass" name="password" size = "30" maxlength="50" onkeypress="capslockCheck(event)"/>
+				<input type="text" id="password_instructions" value='<?=_L("Password")?>' />
 				<em>Passwords are case-sensitive.</em>
 			</fieldset>
 			
@@ -188,7 +189,32 @@ function capslockCheck(e){
 		} else
 			$('capslockwarning').style.display = 'none';
 	}
+	blankFieldValue('form_email', '<?=_L("Email")?>');
 
+	function blankPasswordFieldValue(passwordelement,textelement) {
+		$(passwordelement).hide();
+		$(textelement).show();
+		$(textelement).setStyle({ color: "gray" });
+        
+		$(textelement).observe("focus", function() {
+           // alert('ds' +  $(passwordelement));
+			$(passwordelement).show();
+            $(passwordelement).focus();
+			
+            $(textelement).hide();
+            
+        });
+        $(passwordelement).observe("blur", function() {
+        	if ($(passwordelement).value == "") {
+        		$(passwordelement).hide();
+        		$(textelement).show();
+        	}
+        });
+	}
+	blankPasswordFieldValue('form_pass', 'password_instructions');
+
+</script>
+	
 </script>
 <noscript>
 	<?= escapehtml(_L("It looks like you don't have JavaScript enabled! You must have JavaScript enabled for full use of this system. Please enable JavaScript in your browser or contact your system administrator for assistance.")) ?>

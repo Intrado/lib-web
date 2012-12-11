@@ -1,5 +1,9 @@
 
 @media screen and (max-width: 600px) {
+	.window_body form label.canhidelabel {
+		display: none;
+	}
+	
 	.contactmanagersplash img {
 		display: none;
 	}
