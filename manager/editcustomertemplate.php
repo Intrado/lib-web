@@ -51,13 +51,13 @@ if ($messagegroup) {
 }
 
 // some types require subject/fromname/fromaddr
-if ($templatetype == "messagelink") {
+if (in_array($templatetype, array("messagelink", "tai_unreadmessagesreport"))) {
 	$showheaders = true;
 	// there should be only one message
 	$smsmessage = DBFind("Message", "from message where messagegroupid = ? and type = 'sms' and languagecode = 'en'", false, array($messagegroupid));
 	// only one part
 	$smsbody = QuickQuery("select txt from messagepart where messageid = ?", false, array($smsmessage->id));
-} else if ($templatetype == "subscriber-accountexpire" || $templatetype == "monitor" || $templatetype = "tai_unreadmessagesreport") {
+} else if ($templatetype == "subscriber-accountexpire" || $templatetype == "monitor") {
 	$showheaders = true;
 } else {
 	$showheaders = false;
