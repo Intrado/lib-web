@@ -1,8 +1,4 @@
-	
-	
-.banner_links_button {
-	display: none;
-}
+
 
 .message_view_actions { list-style: none; margin: 0; padding: 0; } 
 .message_view_actions li { display: inline; float: left; }
@@ -10,21 +6,32 @@
 
 .content_wrap { min-width: auto;}
 
-.pagetitle {
+.pagetitle,
+.banner_links_button,
+.message_view_action_button,
+.message_view_actionlinks {
 	display: none;
 }
+
 /************************************************************************************
 MOBILE
 *************************************************************************************/
 @media screen and (max-width: 600px) {
 	
-	.contactmanagersplash {
+	.contactmanagersplash,
+	.message_view_actions,
+	.banner_links.minhide,
+	.message_view_actionlinks.minhide,
+	.banner_links li.bl_left,
+	.banner_links li.bl_right {
 		display: none;
 	}
 	
-	.banner_logo {
-		/*background:none;*/
+	.banner_links_button,
+	.message_view_action_button {
+		display: block;
 	}
+	
 	.logo {
 		overflow:hidden;	
 	}
@@ -34,22 +41,7 @@ MOBILE
 		/*width: 400px; height: 300px;*/
 	}
 	.windowRowHeader.bottomBorder { width: 0px;display:none; }
-	
-	
-	.banner_links_button {
-		display: block;
-	}
-	.banner_links.minhide {
-		display: none;
-	}
-	
-	.banner_links li.bl_left {
-		display: none;
-	}
-	.banner_links li.bl_right {
-		display: none;
-	}
-		/* main nav */
+
 	.banner_links {
 		clear: both;
 		position: absolute;
