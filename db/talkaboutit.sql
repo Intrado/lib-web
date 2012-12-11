@@ -6,4 +6,15 @@ CREATE TABLE `smscustomer` (
  PRIMARY KEY (`customerid`,`smsnumber`)
 ) ENGINE=InnoDB;
 
+-- TAI 1.5
+
+CREATE TABLE `smsthreadstate` (
+ `smsnumber` varchar(10) NOT NULL,
+ `state` enum('init','message','dir','recipient') NOT NULL DEFAULT 'init',
+ `lasttimestamp` bigint(11) NOT NULL,
+ `message` text NOT NULL,
+ `staffnamepartial` varchar(160) DEFAULT NULL,
+ `directorypageindex` int(11) DEFAULT NULL,
+ PRIMARY KEY (`smsnumber`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
