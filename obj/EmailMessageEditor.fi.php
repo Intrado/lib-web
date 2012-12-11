@@ -117,7 +117,11 @@ class EmailMessageEditor extends FormItem {
 			$subtype = $this->args['subtype'];
 		
 		$str = '
-			<script type="text/javascript" src="script/ckeditor/ckeditor_basic.js"></script>
+			<script type="text/javascript" src="script/ckeditor/ckeditor.js"></script>
+			<script type="text/javascript">
+				// SMK added global var 2012-12-07 to selectively enabled uploaded image reduction scaling
+				var htmlEditorImageScale = 600; // Max dimension for scaling
+			</script>
 			<script type="text/javascript" src="script/htmleditor.js"></script>
 			<script type="text/javascript">
 				function setupHtmlTextArea(e, hidetoolbar) {

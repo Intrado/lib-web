@@ -109,7 +109,7 @@
 <script type="text/javascript" src="script/message_sender.facebook.js"></script>
 <script type="text/javascript" src="script/message_sender_listbuilder.js"></script>
 
-<script type="text/javascript" src="script/ckeditor/ckeditor_basic.js"></script>
+<script type="text/javascript" src="script/ckeditor/ckeditor.js"></script>
 <script type="text/javascript" src="script/htmleditor.js"></script>
 <script type="text/javascript" src="script/speller/spellChecker.js"></script>
 <script type="text/javascript" src="script/niftyplayer.js.php"></script>
