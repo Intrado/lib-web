@@ -20,5 +20,16 @@ class TargetedMessage extends DBMappedObject {
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}
+	
+	
+	// Targeted message may be invalid if message was customized and only the the email was defined
+	// and the phone was enabled
+	function isValid() {			
+		if ($this->overridemessagegroupid && getSystemSetting('_hasphonetargetedmessage', false)) {
+			$overridemessagegroup = new MessageGroup($this->overridemessagegroupid);
+			return $overridemessagegroup->hasDefaultMessage("phone", "voice");
+		}
+		return true;
+	}
 }
 ?>

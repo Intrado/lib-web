@@ -451,7 +451,7 @@ $formcssfilename = "themes/$theme/style.form.php";
 	if (is_readable($formcssfilename)) {
 		include_once($formcssfilename);
 	} else {
-		error_log("unable to find $formcssfilename, looks like this theme doesn't have custom form styling; theme: " . $theme . " cwd:" . getcwd());
+		//error_log("unable to find $formcssfilename, looks like this theme doesn't have custom form styling; theme: " . $theme . " cwd:" . getcwd());
 	}
 ?>
 

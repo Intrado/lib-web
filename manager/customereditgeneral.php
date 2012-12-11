@@ -29,6 +29,7 @@ require_once("obj/LogoRadioButton.fi.php");
 require_once("obj/LanguagesItem.fi.php");
 require_once("obj/ValInboundNumber.val.php");
 require_once("inc/customersetup.inc.php");
+require_once("loadtaitemplatedata.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -253,6 +254,10 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		}
 		
 		saveRequiredFields($custdb,$customerid,$postdata);
+		
+		
+		$query = "select product, enabled from customerproduct where customerid=?";
+		$products = QuickQueryList($query,true,false,array($customerid));
 		
 		if (!isset($products["cs"])) {
 			if ($postdata["commsuite"]) {

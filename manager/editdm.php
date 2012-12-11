@@ -393,7 +393,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$custdb = DBConnect($custinfo[0], $custinfo[1], $custinfo[2], "c_" . $newcustomerid);
 			
 			if(!QuickQuery("select count(*) from custdm where dmid=?", $custdb,array($dmid))){
-				QuickUpdate("insert into custdm (dmid, dmuuid, name, enablestate, telco_type,notes) values (?,?,?,?,?)", $custdb,
+				QuickUpdate("insert into custdm (dmid, dmuuid, name, enablestate, telco_type,notes) values (?,?,?,?,?,?)", $custdb,
 								array($dmid,$dminfo['dmuuid'],$dminfo['name'],$enablestate,$postdata["type"],$postdata["notes"]));
 			} else {
 				QuickUpdate("update custdm set enablestate=?,telco_type=?,notes=? where dmid=?",$custdb,
