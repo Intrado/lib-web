@@ -699,3 +699,42 @@ ALTER TABLE `portalcustomer` DROP `userid`;
 
 -- text fields cannot have a default value, NULL should be allowed
 ALTER TABLE `portaluseridentification` CHANGE `details` `details` TEXT CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL;
+
+-- 9.4.6 release TAI 1.5
+
+INSERT INTO `shortcodetext` (`shortcode`, `messagetype`, `text`) 
+  VALUES ('85130', 'TOPICNOTIFY', 
+    'You have a new Talk About It message waiting. Please go to Letstai.com to view message details');
+    
+INSERT INTO `shortcodetext` (`shortcode`, `messagetype`, `text`) 
+  VALUES ('85130', 'THANKSREGISTER', 
+    'Thanks for registering with Talk About It. To send a message anonymously, reply to this SMS or text to 85130');
+    
+INSERT INTO `shortcodetext` (`shortcode`, `messagetype`, `text`) 
+  VALUES ('85130', 'SORRYNOTFOUND', 
+    'Your # is not registered with Talk About It. To use this service, register your # at Letstai.com. If this is an emergency, call 911');
+    
+INSERT INTO `shortcodetext` (`shortcode`, `messagetype`, `text`) 
+  VALUES ('85130', 'ANONYMOUS', 
+    'Your message has been received. Thank you for using Talk About It');
+
+INSERT INTO `shortcodetext` (`shortcode`, `messagetype`, `text`) 
+  VALUES ('85130', 'ERROR', 
+    'Woops, your message CANNOT be delivered. Please try again. If this is an emergency, call 911');
+
+INSERT INTO `shortcodetext` (`shortcode`, `messagetype`, `text`) 
+  VALUES ('85130', 'LOCKOUT', 
+    'Woops, Talk About It is temporarily unavailable. Your message CANNOT be delivered. Please try later or try Letstai.com. If this is an emergency, call 911');
+
+INSERT INTO `shortcodetext` (`shortcode`, `messagetype`, `text`) 
+  VALUES ('85130', 'PROMPTDIR', 
+    'Reply with NO, DIR, or staff name');
+
+INSERT INTO `shortcodetext` (`shortcode`, `messagetype`, `text`) 
+  VALUES ('85130', 'HELP', 
+    'Help info here');
+
+INSERT INTO `shortcodetext` (`shortcode`, `messagetype`, `text`) 
+  VALUES ('85130', 'INVALIDRECIPIENT', 
+    'Sorry, invalid recipient. Please send NO, DIR, NEXT, or valid id');
+
