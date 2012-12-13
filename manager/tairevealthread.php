@@ -43,14 +43,9 @@ startWindow(_L('Identity Request: Thread %s on Customer: %s',$_GET['threadid'],$
 global $_dbcon;
 $savedbcon = $_dbcon;
 $_dbcon = $custdb;
-global $USER;
-$USER = new User(1);
-$_SESSION['access'] = new Access($USER->accessid);
-$fields = FieldMap::getAuthorizedFieldMaps();
+$fields = FieldMap::retrieveFieldMaps();
 // restore global db connection
 $_dbcon = $savedbcon;
-unset($_SESSION['access']);
-
 
 foreach($threadperson->_fieldlist as $field ){
 	if (isset($fields[$field]))

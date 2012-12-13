@@ -108,7 +108,7 @@ if (CheckFormSubmit($f, "Save")) {
 			// we only support sms in english
 			if (isset($smsmessage)) {
 				$smsbody = trim(GetFormData($f, $s, "sms_en"));
-				if (!strstr($smsbody, "\${messagelink}")) {
+				if ($templatetype == "messagelink" && !strstr($smsbody, "\${messagelink}")) {
 					error('Template must contain "${messagelink}" variable. SMS');
 					$haserror = true;
 				}
