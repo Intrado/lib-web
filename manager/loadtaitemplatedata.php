@@ -9,7 +9,7 @@ function loadTaiTemplateData() {
 	////////////////////////////
 	// Unread Messages Report
 	////////////////////////////
-	$templates['tai_unreadmessagesreport']['email']['html']['en']['subject'] = 'Unread Messages for: ${date}';
+	$templates['tai_unreadmessagesreport']['email']['html']['en']['subject'] = 'Unread Messages Report for: ${date}';
 	$templates['tai_unreadmessagesreport']['email']['html']['en']['fromname'] = 'Talk About It (Reports)';
 	$templates['tai_unreadmessagesreport']['email']['html']['en']['fromaddr'] = 'reports@letstai.com';
 	$templates['tai_unreadmessagesreport']['email']['html']['en']['body'] = '
@@ -60,7 +60,7 @@ function loadTaiTemplateData() {
 </body>
 </html>';
 
-	$templates['tai_unreadmessagesreport']['email']['plain']['en']['subject'] = 'Unread Messages for: ${date}';
+	$templates['tai_unreadmessagesreport']['email']['plain']['en']['subject'] = 'Unread Messages Report for: ${date}';
 	$templates['tai_unreadmessagesreport']['email']['plain']['en']['fromname'] = 'Talk About It (Reports)';
 	$templates['tai_unreadmessagesreport']['email']['plain']['en']['fromaddr'] = 'reports@letstai.com';
 	$templates['tai_unreadmessagesreport']['email']['plain']['en']['body'] = '
@@ -82,7 +82,10 @@ ${topicname}: ${topictotal}
 <!-- $endBlock topic -->
 -------------------------------------------------------------------------------
 
-<!-- $endBlock summary -->';
+<!-- $endBlock summary -->
+
+You are receiving this report because your contact settings have "Reports" enabled for this email address and the "Unread Message Report" enabled for automatic delivery.
+To manage your contact settings, or view a detailed version of this report, go to letstai.com and log in.';
 
 	$templates['tai_unreadmessagesreport']['sms']['plain']['en']['body'] =
 'Talk About It - Unread Messages Report for: ${date}
