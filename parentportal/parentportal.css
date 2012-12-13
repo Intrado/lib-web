@@ -4,7 +4,7 @@
 .message_view_actions li { display: inline; float: left; }
 
 
-.content_wrap { min-width: auto;}
+.content_wrap { min-width: 0px;}
 
 .pagetitle,
 .banner_links_button,
