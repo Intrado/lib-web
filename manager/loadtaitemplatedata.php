@@ -22,6 +22,7 @@ function loadTaiTemplateData() {
 <body style="background:#C7E3A2">
 <table width="540px"><tr><td>
 <div style="border:1px solid #8DC540;border-radius:8px 8px 8px 8px;box-shadow:0 2px 8px rgba(0, 0, 0, 0.15);background:white;padding:12px;margin:20px">
+    <p style="font-size:20px;font-style:italic;font-weight:bold;">Talk About It®</p>
     <p style="font-size:18px;font-weight:bold;">Unread Messages Report Summary</p>
     <p>Generated on ${date}</p>
     <!-- $beginBlock summary -->
@@ -64,6 +65,7 @@ function loadTaiTemplateData() {
 	$templates['tai_unreadmessagesreport']['email']['plain']['en']['fromname'] = 'Talk About It (Reports)';
 	$templates['tai_unreadmessagesreport']['email']['plain']['en']['fromaddr'] = 'reports@letstai.com';
 	$templates['tai_unreadmessagesreport']['email']['plain']['en']['body'] = '
+Talk About It(r)
 Unread Messages Report Summary
 Generated on ${date}
 
