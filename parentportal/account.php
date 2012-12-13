@@ -185,7 +185,7 @@ startWindow(_L('User Information'));
 	</table>
 
 <?
-buttons(submit($f, $s, _L('Save')), icon_button(_L("Change Email"),"cross", NULL, "changeemail.php"), icon_button(_L("Cancel"),"cross", NULL, "start.php"));
+buttons(submit($f, $s, _L('Save')), icon_button(_L("Change Email"),"email_edit", NULL, "changeemail.php"), icon_button(_L("Cancel"),"cross", NULL, "start.php"));
 
 endWindow();
 include_once("navbottom.inc.php");
