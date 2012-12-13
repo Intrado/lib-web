@@ -47,8 +47,10 @@ function NewFormItem ($form, $section, $item, $type, $option=40, $optionvalue="n
 
 
 	switch($type) {
+	case "tel":
+	case "email":	
 	case "text":
-		echo "<input $extrahtml type=\"text\" name=\"frm[" . $form . "][" . $section
+		echo "<input $extrahtml type=\"$type\" name=\"frm[" . $form . "][" . $section
 				. "][" . $item . "][value]\" value=\""
 				. escapehtml($_SESSION['formdata'][$form][$section][$item]['value']) . "\" size=\"$option\" "
 				. "maxlength=\"" . ($optionvalue === 'nooption' ? $option : $optionvalue) . "\">";
