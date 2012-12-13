@@ -82,6 +82,10 @@ MOBILE
 	{
 		width:100px;
 	}
+	input.smallonmobile {
+		width:100px;
+	}
+	
 	
 	.preference_wrap td {
 		
