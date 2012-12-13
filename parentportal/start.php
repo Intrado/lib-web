@@ -203,9 +203,6 @@ if(isset($contactList) && $contactList){
 <?
 		}
 		endWindow();
-?>
-		<br>
-<?
 	}
 } else {
 	startWindow("Getting Started", 'padding: 3px;');
