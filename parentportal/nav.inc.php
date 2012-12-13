@@ -122,8 +122,10 @@ header('Content-type: text/html; charset=UTF-8') ;
 
 <div id="top_banner" class="banner">
 <div class="contain cf">
+
+
 	<div class="banner_logo">
-	<table class="logo"><tr><td><img src="img/sm_white.gif" alt=""></td></tr></table>
+	<div class="logo"></div>
 	<h1>Schoolmessenger</h1>
 	</div>
 

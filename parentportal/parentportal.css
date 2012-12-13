@@ -41,6 +41,12 @@ input.emailpreference {
     padding: 0 15px 15px;
 }
 
+.banner_logo .logo {
+    background: url("img/sm_white.gif") repeat scroll 0 0 transparent;
+    height: 50px;
+    width: 250px;
+}
+
 /************************************************************************************
 MOBILE
 *************************************************************************************/
@@ -68,9 +74,10 @@ MOBILE
 	}
 
 	
-	.logo {
-		overflow:hidden;	
+	.banner_logo .logo {
+		width: 40px;
 	}
+
 	
 	.view_preference_content.minhide {
 		display: none;
@@ -143,6 +150,58 @@ MOBILE
 	#banner_links ul li {
 		margin: 3px 0 3px 15px;
 	}
+	
+	
+	
+	
+	
+	
+	/*Tweaks for new theme (works with old theme)*/
+	
+	.banner_links li a {
+ 	   color: black;
+	}
+	
+	.banner_logo {
+    	margin: 0;
+    	float:left;
+	}
+	.banner_logo h1 {
+   		font-size: 22px;
+    	margin: 5px;
+	}
+	.banner_custname {
+		position: relative;
+   		font-size: 11px;
+    	top: 0;
+    	overflow: hidden;
+   		white-space: nowrap;
+	}
+	.banner_links_wrap {
+    	display: block;
+    	margin: 0;
+    	padding:0;
+    	float:right;
+	}
+    
+    .primary_nav {
+	    padding: 0;
+	}
+
+    .navtabs li a {
+	    font-size: 12px;
+	    padding-top: 3px;
+	    padding-bottom: 3px;
+	}
+
+    h2 {
+    	font-size: 15px;
+    	line-height: 15px;
+	}
+	.content_wrap {
+   		padding: 0px 0 85px;
+	}
+	/*End Tweaks for new theme (works with old theme)*/
 	
 }
 
