@@ -62,7 +62,7 @@ if($PERSONID){
 					<td class="bottomBorder" >
 					<? 
 						if(!$lockedphones[$phone->sequence]){ 
-							NewFormItem($f, $s, "phone" . $phone->sequence, "text", 14,null, " id=\"phones{$phone->sequence}\" class=\"phonepreference\"");
+							NewFormItem($f, $s, "phone" . $phone->sequence, "tel", 14,null, " id=\"phones{$phone->sequence}\" class=\"phonepreference\"");
 						} else {
 							if($phone->phone)
 								echo Phone::format($phone->phone);
@@ -89,7 +89,7 @@ if($PERSONID){
 					<td class="bottomBorder" >
 						<? 
 							if(!$lockedemails[$email->sequence]){ 
-								NewFormItem($f, $s, "email" . $email->sequence, "text", 15, 100, " id=\"emails{$email->sequence}\" class=\"emailpreference\"");
+								NewFormItem($f, $s, "email" . $email->sequence, "email", 15, 100, " id=\"emails{$email->sequence}\" class=\"emailpreference\"");
 							} else {
 								if($email->email)
 									echo $email->email;
@@ -117,7 +117,7 @@ if($PERSONID){
 					<td class="bottomBorder" >
 						<? 
 							if(!$lockedsms[$sms->sequence]){
-								NewFormItem($f, $s, "sms" . $sms->sequence, "text", 14,null," id=\"smss{$sms->sequence}\" class=\"smspreference\"");
+								NewFormItem($f, $s, "sms" . $sms->sequence, "tel", 14,null," id=\"smss{$sms->sequence}\" class=\"smspreference\"");
 							} else {
 								if($sms->sms)
 									echo Phone::format($sms->sms);
