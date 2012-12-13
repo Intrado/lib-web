@@ -156,7 +156,7 @@ if($PERSONID){
 ///////////////////////////////////////////////////////////////////
 
 function contact_actions($obj, $index){
-	return "<a href='contactpreferences.php?id=" . urlencode($obj->pkey) . "#edit'>" . _L("Edit") . "</a>";
+	return action_link(_L("Edit"), "pencil","contactpreferences.php?id=" . urlencode($obj->pkey) . "#edit");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
