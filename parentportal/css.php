@@ -9,8 +9,12 @@ if (!isset($_GET['skipcommon'])) {
 	include_once("common.inc.php");
 	require_once("../inc/themes.inc.php");
 	unset($_SESSION['colorscheme']);
-	$_SESSION['colorscheme'] = $COLORSCHEMES["newui"];
-	$_SESSION['colorscheme']["_brandtheme"] = "newui";
+	
+	
+	if (isset($_SESSION['bluetheme'])) {
+		$_SESSION['colorscheme'] = $COLORSCHEMES["newui"];
+		$_SESSION['colorscheme']["_brandtheme"] = "newui";
+	}
 	session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 }
 
