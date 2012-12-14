@@ -151,21 +151,21 @@ MOBILE
 		margin: 3px 0 3px 15px;
 	}
 	
-	
-	
-	
-	
-	
 	/*Tweaks for new theme (works with old theme)*/
 	
 	.banner_links li a {
- 	   color: black;
+		text-shadow: none;
 	}
 	
 	.banner_logo {
     	margin: 0;
-    	float:left;
+    	position: absolute;
+    	top: 0;
 	}
+	.banner {
+    	height: 50px;
+	}
+	
 	.banner_logo h1 {
    		font-size: 22px;
     	margin: 5px;
@@ -185,7 +185,7 @@ MOBILE
 	}
     
     .primary_nav {
-	    padding: 0;
+	    padding: 0 0 0 5px;
 	}
 
     .navtabs li a {
@@ -201,6 +201,9 @@ MOBILE
 	.content_wrap {
    		padding: 0px 0 85px;
 	}
+	
+
+	
 	/*End Tweaks for new theme (works with old theme)*/
 	
 }
