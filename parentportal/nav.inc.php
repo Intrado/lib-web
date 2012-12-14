@@ -124,11 +124,6 @@ header('Content-type: text/html; charset=UTF-8') ;
 <div class="contain cf">
 
 
-	<div class="banner_logo">
-	<div class="logo"></div>
-	<h1>Schoolmessenger</h1>
-	</div>
-
 <?
 		if (!isset($hidenav) || !$hidenav) {
 ?>
@@ -137,8 +132,15 @@ header('Content-type: text/html; charset=UTF-8') ;
 		}
 ?>
 
+
+	<div class="banner_logo">
+	<div class="logo"></div>
+	<h1>Schoolmessenger</h1>
+	</div>
+
+
 						<div class="banner_links_wrap">
-							<div class="banner_links_button"><?= icon_button("Account", "fugue/clipboard","$$('ul.banner_links').first().toggleClassName('minhide');") ?></div>
+							<div class="banner_links_button"><?= icon_button(_L("Account"), "fugue/clipboard","$$('ul.banner_links').first().toggleClassName('minhide');return false;") ?></div>
 							<ul class="banner_links cf minhide">
 								<li class="bl_left"></li>
 								<li><a href="account.php"><?=_L("My Account")?></a></li>
