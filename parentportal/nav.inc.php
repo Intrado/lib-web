@@ -1,4 +1,8 @@
 <?
+if (isset($_REQUEST["blue"]))
+	$_SESSION['bluetheme'] = true;
+if (isset($_REQUEST["classroom"]))
+	unset($_SESSION['bluetheme']);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
