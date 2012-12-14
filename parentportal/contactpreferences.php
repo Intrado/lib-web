@@ -169,7 +169,7 @@ if($PERSONID){
 }
 include_once("nav.inc.php");
 startWindow(_L("Contacts"));
-echo icon_button(_L("Add Contact"),"add", null, "phoneactivation0.php");
+echo "&nbsp" . icon_button(_L("Add Contact"),"add", null, "phoneactivation0.php") . "<hr />";
 
 if(isset($contactList) && $contactList){
 
