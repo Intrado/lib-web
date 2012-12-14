@@ -23,7 +23,7 @@ if (((getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost'
 
 	if (is_array($result)) {
 		permitContent($result['contentid']);
-		$imgsrc = "viewimage.php?id=" . $result['contentid'];
+		$imgsrc = "$BASEURL/viewimage.php?id=" . $result['contentid'];
 	} else if (is_string($result)) {
 		$errormessage = $result;
 	}
