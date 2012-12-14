@@ -183,6 +183,9 @@ MOBILE
     	padding:0;
     	float:right;
 	}
+	.banner_links_button .btn {
+		padding: 1px;
+	}
     
     .primary_nav {
 	    padding: 0 0 0 5px;
