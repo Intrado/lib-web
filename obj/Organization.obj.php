@@ -1,15 +1,21 @@
 <?
 class Organization extends DBMappedObject {
+	var $parentorganizationid;
 	var $orgkey;
 	var $deleted = 0;
+	var $createdtimestamp;
+	var $modifiedtimestamp;
 	
 
 	function Organization ($id = NULL) {
-		$this->_allownulls = false;
+		$this->_allownulls = true;
 		$this->_tablename = "organization";
 		$this->_fieldlist = array(
+			"parentorganizationid",
 			"orgkey",
-			"deleted"
+			"deleted",
+			"createdtimestamp",
+			"modifiedtimestamp"
 		);
 
 		//call super's constructor

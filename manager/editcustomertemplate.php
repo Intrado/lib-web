@@ -51,7 +51,7 @@ if ($messagegroup) {
 }
 
 // some types require subject/fromname/fromaddr
-if ($templatetype == "messagelink") {
+if (in_array($templatetype, array("messagelink", "tai_unreadmessagesreport"))) {
 	$showheaders = true;
 	// there should be only one message
 	$smsmessage = DBFind("Message", "from message where messagegroupid = ? and type = 'sms' and languagecode = 'en'", false, array($messagegroupid));
@@ -108,7 +108,7 @@ if (CheckFormSubmit($f, "Save")) {
 			// we only support sms in english
 			if (isset($smsmessage)) {
 				$smsbody = trim(GetFormData($f, $s, "sms_en"));
-				if (!strstr($smsbody, "\${messagelink}")) {
+				if ($templatetype == "messagelink" && !strstr($smsbody, "\${messagelink}")) {
 					error('Template must contain "${messagelink}" variable. SMS');
 					$haserror = true;
 				}

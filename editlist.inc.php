@@ -6,6 +6,7 @@ require_once("inc/common.inc.php");
 require_once("inc/securityhelper.inc.php");
 require_once("inc/table.inc.php");
 require_once("inc/html.inc.php");
+require_once("inc/utils.inc.php");
 require_once("inc/form.inc.php");
 require_once("inc/date.inc.php");
 require_once("obj/Language.obj.php");
@@ -29,7 +30,6 @@ require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
 require_once("obj/FormRuleWidget.fi.php");
 require_once("obj/SectionWidget.fi.php");
-require_once("inc/rulesutils.inc.php");
 require_once("inc/formatters.inc.php");
 require_once("obj/JobType.obj.php");
 require_once("inc/list.inc.php");
@@ -350,7 +350,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 
-		$list->name = $postdata['name'];
+		$list->name = removeIllegalXmlChars($postdata['name']);
 		$list->description = $postdata['description'];
 		$list->modifydate = QuickQuery("select now()");
 		$list->userid = $USER->id;

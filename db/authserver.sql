@@ -699,3 +699,46 @@ ALTER TABLE `portalcustomer` DROP `userid`;
 
 -- text fields cannot have a default value, NULL should be allowed
 ALTER TABLE `portaluseridentification` CHANGE `details` `details` TEXT CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL;
+
+-- 9.4.6 release TAI 1.5
+
+INSERT INTO `shortcodetext` (`shortcode`, `messagetype`, `text`) 
+  VALUES ('85130', 'TOPICNOTIFY', 
+    'You have a new Talk About It message waiting. Please go to Letstai.com to view message details');
+    
+INSERT INTO `shortcodetext` (`shortcode`, `messagetype`, `text`) 
+  VALUES ('85130', 'THANKSREGISTER', 
+    'Thanks for registering with Talk About It. To send a message anonymously, reply to this SMS or text to 85130');
+    
+INSERT INTO `shortcodetext` (`shortcode`, `messagetype`, `text`) 
+  VALUES ('85130', 'SORRYNOTFOUND', 
+    'Your # is not registered with Talk About It. To use this service, register your # at Letstai.com. If this is an emergency, call 911');
+    
+INSERT INTO `shortcodetext` (`shortcode`, `messagetype`, `text`) 
+  VALUES ('85130', 'ANONYMOUS', 
+    'Your message has been delivered to %s. Thank you for using Talk About It. Visit Letstai.com to continue.');
+
+INSERT INTO `shortcodetext` (`shortcode`, `messagetype`, `text`) 
+  VALUES ('85130', 'ERROR', 
+    'Woops, your message CANNOT be delivered. Please try again. If this is an emergency, call 911');
+
+INSERT INTO `shortcodetext` (`shortcode`, `messagetype`, `text`) 
+  VALUES ('85130', 'LOCKOUT', 
+    'Woops, Talk About It is temporarily unavailable. Your message CANNOT be delivered. Please try later or visit Letstai.com. If this is an emergency, call 911');
+
+INSERT INTO `shortcodetext` (`shortcode`, `messagetype`, `text`) 
+  VALUES ('85130', 'PROMPTDIR', 
+    'To deliver your message to a particular staff member text the name or text DIR for the directory; otherwise text NO to deliver to any available staff.');
+
+INSERT INTO `shortcodetext` (`shortcode`, `messagetype`, `text`) 
+  VALUES ('85130', 'HELP', 
+    'Talk About It Help. Text in a message, then follow instructions to deliver to a particular staff member. Visit Letstai.com for additional info.');
+
+INSERT INTO `shortcodetext` (`shortcode`, `messagetype`, `text`) 
+  VALUES ('85130', 'INVALIDRECIPIENT', 
+    'Sorry, invalid recipient. Please text a valid ID number. Text DIR for a staff directory or NEXT for more staff.');
+
+INSERT INTO `shortcodetext` (`shortcode`, `messagetype`, `text`) 
+  VALUES ('85130', 'EMPTYDIR', 
+    'Sorry, no recipient match found. Text DIR for a staff directory.');
+

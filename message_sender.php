@@ -350,15 +350,20 @@ function getSchedule($postdata) {
 			$calllatesec = strtotime($calllate);
 			$accessCallearlysec = strtotime($accessCallearly);
 			$accessCalllatesec = strtotime($accessCalllate);
-				
-			//get calllate first from user pref, try to ensure it is at least an hour after start, up to access restriction
+
+			// make sure the calculated callearly is not before access profile
+			if ($callearlysec  < $accessCallearlysec)
+				$callearlysec = $accessCallearlysec;
+
+			// try to ensure calllate is at least an hour after start, up to access restriction
 			if ($callearlysec + 3600 > $calllatesec)
 				$calllatesec = $callearlysec + 3600;
 				
 			//make sure the calculated calllate is not past access profile
 			if ($calllatesec  > $accessCalllatesec)
 				$calllatesec = $accessCalllatesec;
-				
+
+			$callearly = date("g:i a", $callearlysec);
 			$calllate = date("g:i a", $calllatesec);
 				
 			$schedule = array(
@@ -922,7 +927,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
 		$job->userid = $USER->id;
 		$job->jobtypeid = $postdata["jobtype"];
-		$job->name = $postdata["name"];
+		$job->name = removeIllegalXmlChars($postdata["name"]);
 		$job->description = "Created with MessageSender";
 
 		$job->type = 'notification';

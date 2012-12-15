@@ -324,18 +324,18 @@ $formdata = array(
 		"helpstep" => 1
 	),
 	"authorizewall" => array(
-		"label" => _L('Authorize User Wall'),
-		"fieldhelp" => _L("Select this to give users the option of posting to their Facebook Wall."),
+		"label" => _L('Authorize User Timeline'),
+		"fieldhelp" => _L("Select this to give users the option of posting to their Facebook Timeline."),
 		"value" => $authorizewall,
 		"validators" => array(),
-		"control" => array("CheckBox", "label" => _L("Allow users to post to their Wall")),
+		"control" => array("CheckBox", "label" => _L("Allow users to post to their Timeline")),
 		"helpstep" => 2
 	)
 );
 
 $helpsteps = array (
 	_L('You may restrict users to posting to certain Facebook Pages by creating a list of authorized Pages. You will need to be an administrator on the Pages you wish to authorize. Additionally, users who may post to these Pages must have permission set on Facebook.'),
-	_L('This option allows users to have the option of posting to their Facebook Wall in addition to, or instead of, your authorized Pages.')
+	_L('This option allows users to have the option of posting to their Facebook Timeline in addition to, or instead of, your authorized Pages.')
 );
 
 $buttons = array(submit_button(_L('Save'),"submit","tick"), icon_button(_L('Cancel'),"cross",null,"settings.php"));

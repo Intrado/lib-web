@@ -71,7 +71,7 @@ class PhoneMessageRecorder extends FormItem {
 				playbtn.observe("click", function () {
 					var value = e.value.evalJSON();
 					if (value.m)
-						popup("previewmessage.php?id=" + value.m, 400, 400);
+						messagePreviewModal(value.m);
 					else if (value.af)
 						audioPreviewModal(value.af);
 				});

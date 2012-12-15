@@ -60,16 +60,17 @@ class IntroSelect extends FormItem {
 		}	
 
 		$defaultrequest = isset($this->args['defaultfile']) ? ''.$this->args['defaultfile'].'' : "";		
-		$str .= '<span>' 
-				. icon_button(_L("Play"),"fugue/control","
+		
+		$str .= '<span>' . icon_button("Preview", "fugue/control","
 				var content = $('" . $n . "message').getValue();
-					if(content.substring(0,5) == 'intro') {
-						popup('previewmessage.php?id=' + content.substring(5), 400, 400,'preview');
-					} else if(content != '')
-						popup('previewmessage.php?id=' + content, 400, 400,'preview');
-					else
-						popup('previewmessage.php?mediafile=" . urlencode($defaultrequest) . "', 400, 400,'preview');") . '</span>';
-
+				if(content.substring(0,5) == 'intro') {
+					messagePreviewModal(content.substring(5));
+				} else if(content != '')
+					messagePreviewModal(content);
+				else
+					mediafilePreviewModal('" . urlencode($defaultrequest) . "');
+				return false;") . '</span>';
+		
 		$str .= '</div>';
 		
 		if($renderscript) {
@@ -410,6 +411,8 @@ $(id).value = Object.toJSON({
 }
 
 </script>
+<script type="text/javascript" language="javascript" src="script/niftyplayer.js.php"></script>
+
 <?
 startWindow(_L("Intro Settings"));
 echo $form->render();

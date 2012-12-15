@@ -85,7 +85,7 @@ if (!$messagegroup) {
 	$phonemessage = DBFind("Message", "from message where messagegroupid = ? and type = 'phone' and languagecode=?",false,array($messagegroup->id,$language->code));
 }
 
-if (!$emailmessage) {
+if ($defaultmessagetext != "" && !$emailmessage) {
 	// create a new email message
 	$emailmessage = new Message();
 	$emailmessage->messagegroupid = $messagegroup->id;
@@ -108,7 +108,10 @@ if (!$emailmessage) {
 	$emailmessagepart->create();
 }
 
-if (!$phonemessage) {
+
+if (getSystemSetting('_hasphonetargetedmessage', false) &&
+	$defaultmessagetext != "" &&
+	!$phonemessage) {
 	// create a new phone message
 	$phonemessage = new Message();
 	$phonemessage->messagegroupid = $messagegroup->id;

@@ -168,6 +168,16 @@ class Message extends DBMappedObject {
 
 		if ($errors == NULL)
 			$errors = array();
+
+		// validate that the data is a valid utf8 character stream
+		if (!mb_check_encoding($data, "utf-8")) {
+			error_log("message data contains illegal character stream");
+			$errors[] = "Message data contains illegal character stream";
+			return array();
+		}
+
+		// Strip off any control characters that will cause the rendered xml to barf
+		$data = removeIllegalXmlChars($data);
 		
 		//make all fieldnames lower case so we can do a case-insensitive search later
 		//FIXME manager assumes that there is no authorization checking (and $USER is not set) when editing templates

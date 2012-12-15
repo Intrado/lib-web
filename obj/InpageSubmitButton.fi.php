@@ -24,15 +24,11 @@ class InpageSubmitButton extends FormItem {
 		$onclick = 'return form_submit(event,\''.escapehtml($submitvalue).'\');';
 		if (isset($this->args['confirm']) && $this->args['confirm'])
 			$onclick = 'if (confirm(\''.escapehtml($this->args['confirm']).'\')) { '.$onclick.' } else { return false; }';
-			
-		$str .= '<button class="btn" type="submit" name="submit" value="'.escapehtml($submitvalue).'" onmouseover="btn_rollover(this);" onmouseout="btn_rollout(this);" onclick="'.$onclick.'"><div class="btn_wrap cf"><span class="btn_left"></span><span class="btn_middle">';
 		
 		if (isset($this->args['icon']) && $this->args['icon'])
-			$str .= '<img src="img/icons/'.$this->args['icon'].'.gif" alt="">';
+			$str .= icon_button($this->args['name'],$this->args['icon'],$onclick);
 		else
-			$str .= '<img src="img/pixel.gif" alt="" height="16" width="1">';
-		
-		$str .= escapehtml($this->args['name']) . '</span><span class="btn_right"></span></div></button>';
+			$str .= button($this->args['name'],$onclick);
 		
 		return $str;
 	}

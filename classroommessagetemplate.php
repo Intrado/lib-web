@@ -189,7 +189,7 @@ $formdata[] = _L("Message Template");
 
 $emailheader = "<th>Email</th>";
 $emailcomponent = "<td>";
-if ($messagegroup && $messagegroup->hasMessage("email")) {
+if (isset($messagegroup) && $messagegroup->hasMessage("email")) {
 	$emailcomponent .= icon_button(_L("Edit Email"), "pencil","return form_submit(event,'editemail');");
 	$emailcomponent .= icon_button(_L("Remove Email"), "cross","return confirmDelete()?form_submit(event,'removeemail'):false;");
 } else {
@@ -202,7 +202,7 @@ $phonecomponent = "";
 if (getSystemSetting('_hasphonetargetedmessage', false)) {
 	$phoneheader = "<th>Phone</th>";
 	$phonecomponent .= "<td>";
-	if ($messagegroup && $messagegroup->hasMessage("phone")) {
+	if (isset($messagegroup) && $messagegroup->hasMessage("phone")) {
 		$phonecomponent .= icon_button(_L("Edit Phone"), "pencil","return form_submit(event,'editphone');");
 		$phonecomponent .= icon_button(_L("Remove Phone"), "cross","return confirmDelete()?form_submit(event,'removephone'):false;");
 	} else {
@@ -264,12 +264,12 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		// get the owner specified by postdata
 		$owner = $postdata['owner'];
 		
-		if (!$messagegroup) {
+		if (!isset($messagegroup)) {
 			$messagegroup = new MessageGroup();
 			$messagegroup->userid = $owner;
 			$messagegroup->type = 'classroomtemplate';
 			$messagegroup->defaultlanguagecode = Language::getDefaultLanguageCode();
-			$messagegroup->name = $postdata['name'];
+			$messagegroup->name = removeIllegalXmlChars($postdata['name']);
 			$messagegroup->description = "Classroom Messageing Template";
 			$messagegroup->modified = date("Y-m-d H:i:s");
 			$messagegroup->permanent = 1;
@@ -314,7 +314,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$job->userid = $owner;
 		$job->scheduleid = $schedule->id;
 		$job->jobtypeid = $postdata['jobtype'];
-		$job->name = $postdata['name'];
+		$job->name = removeIllegalXmlChars($postdata['name']);
 		$job->description = "Classroom Messaging Template";
 		$job->type = 'alert';
 		if (!$job->id)
@@ -322,8 +322,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$job->modifydate = date("Y-m-d H:i:s");
 		$job->startdate = date("Y-m-d", 86400);
 		$job->enddate = $job->startdate;
-		$job->starttime = date("H:i", strtotime($USER->getCallEarly()));
-		$job->endtime = date("H:i", strtotime($USER->getCallLate()));
+		$job->starttime = "00:00";
+		$job->endtime = "23:59";
 		$job->status = 'repeating';
 		$job->setOption("skipemailduplicates",0);
 		if ($job->id)
@@ -366,7 +366,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		
 		$peoplelist->userid = $owner;
 		$peoplelist->type = 'alert';
-		$peoplelist->name = $postdata['name'];
+		$peoplelist->name = removeIllegalXmlChars($postdata['name']);
 		$peoplelist->description = "Classroom Messaging Template";
 		$peoplelist->modifydate = date("Y-m-d H:i:s");
 		$peoplelist->deleted = 0;

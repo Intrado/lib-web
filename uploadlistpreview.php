@@ -33,7 +33,7 @@ if (!$USER->authorize('createlist') || !($USER->authorize('listuploadids') || $U
 ////////////////////////////////////////////////////////////////////////////////
 
 $list = new PeopleList(getCurrentList());
-$type = $_GET['type'] == "contacts" ? "contacts" : "ids";
+$type = (isset($_GET['type']) && $_GET['type'] == "contacts") ? "contacts" : "ids";
 $importid = QuickQuery("select id from import where listid='$list->id'");
 if ($importid) {
 	$import = new Import($importid);
@@ -57,12 +57,19 @@ $count = 0;
 $listpreviewdata = array();
 $notfound = 0;
 $notfounddata = array();
+$errormsg = false;
 
 if ($datauri && !CheckFormSubmit($f,'save')) {
 	if ($fp = fopen($datauri, "r")) {
 		$count = 5000;
 		$total = 0;
-		while (($row = fgetcsv($fp,4096)) !== FALSE) {
+		while (($line = fgets($fp)) !== FALSE) {
+
+			// validate that the data is a valid utf8 character stream
+			if (!mb_check_encoding($line, "utf-8"))
+				continue;
+
+			$row = str_getcsv($line);
 			$pkey = DBSafe(trim($row[0]));
 			if ($pkey == "")
 				continue;

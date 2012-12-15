@@ -72,6 +72,8 @@ function createnewcustomer($shardid) {
 	// TODO in the future this should only be done if commsuite is enabled
 	cs_setup($customerid, $custdb);
 	
+	$query = "INSERT INTO `customerproduct` (`customerid`,`product`,`createdtimestamp`,`modifiedtimestamp`,`enabled`) VALUES (?,'cs',?,?,1)";
+	QuickUpdate($query, false,array($customerid,time(),time()));
 		
 	// Set Session to make the save button stay on the page
 	$_SESSION['customerid']= $customerid;
@@ -221,6 +223,79 @@ function tai_setup($customerid) {
 	// create role for schoolmessenger user
 	$query = "INSERT INTO `role` (`userid`, `accessid`, `organizationid`) VALUES (?, ?, ?)";
 	QuickUpdate($query, null, array($schoolmessengeruser->id, $schoolmessengeruser->accessid, $org->id));
+
+	// create templates
+	$templates = loadTaiTemplateData();
+
+	// query existing templates,
+	$existingTemplateTypes = QuickQueryList("select type, type from template", true);
+
+	foreach ($templates as $template => $templateData) {
+		if (!isset($existingTemplateTypes[$template])) {
+			$mgid = createTemplateMessages($template, $templateData);
+			if (!$mgid)
+				return false;
+			// create template record
+			if (!QuickUpdate("insert into template (type, messagegroupid) values (?, ?)", null, array($template, $mgid)))
+				return false;
+		}
+	}
+}
+
+function createTemplateMessages($template, $messages) {
+	$messagegroup = new MessageGroup();
+	// create messagegroup
+	$messagegroup->userid = null;
+	$messagegroup->type = "systemtemplate";
+	$messagegroup->name = $template . " Template";
+	$messagegroup->description = "";
+	$messagegroup->modified = date('Y-m-d H:i:s');
+	$messagegroup->permanent = 1;
+	$messagegroup->deleted = 0;
+	$messagegroup->defaultlanguagecode = "en";
+	if (!$messagegroup->create())
+		return false;
+
+	// #################################################################
+	// create a message for each type/subtype/languagecode
+	foreach ($messages as $type => $msgdata) {
+		// for each subtype
+		foreach ($msgdata as $subtype => $msglang) {
+			// for each language code
+			foreach ($msglang as $langcode => $data) {
+				if ($data["body"]) {
+					$message = new Message();
+					$message->messagegroupid = $messagegroup->id;
+					$message->type = $type;
+					$message->subtype = $subtype;
+					$message->autotranslate = "none";
+					$message->name = $messagegroup->name;
+					$message->description = "Template: $template for language code: $langcode";
+					$message->userid = null;
+					$message->languagecode = $langcode;
+					if ($type == "email") {
+						$message->subject = $data["subject"];
+						$message->fromname = $data["fromname"];
+						$message->fromemail = $data["fromaddr"];
+						$message->stuffHeaders();
+					}
+					if (!$message->create())
+						return false;
+
+					$messagepart = new MessagePart();
+					$messagepart->messageid = $message->id;
+					$messagepart->type = "T";
+					$messagepart->txt = $data['body'];
+					$messagepart->sequence = 0;
+					if (!$messagepart->create())
+						return false;
+
+				} // end if this message has a body
+			} // for each language code
+		} // for each subtype
+	} // for each type
+
+	return $messagegroup->id;
 }
 
 ?>

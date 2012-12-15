@@ -2,6 +2,8 @@
 require_once("common.inc.php");
 require_once("../inc/table.inc.php");
 require_once("../obj/User.obj.php");
+require_once("../obj/Access.obj.php");
+require_once("../obj/Permission.obj.php");
 require_once("../obj/Person.obj.php");
 require_once("../obj/FieldMap.obj.php");
 require_once("../obj/Validator.obj.php");
@@ -37,13 +39,11 @@ startWindow(_L('Identity Request: Thread %s on Customer: %s',$_GET['threadid'],$
 <table>
 <?
 
-
+// Switch into Schoolmessenger User role on customer to grab fields
 global $_dbcon;
 $savedbcon = $_dbcon;
 $_dbcon = $custdb;
-global $USER;
-$USER = new User(1);
-$fields = FieldMap::getAuthorizedFieldMaps ();
+$fields = FieldMap::retrieveFieldMaps();
 // restore global db connection
 $_dbcon = $savedbcon;
 

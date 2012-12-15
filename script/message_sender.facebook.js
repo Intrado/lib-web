@@ -159,7 +159,7 @@ function updateFbPages(access_token, formitem, container, showrenew) {
 // get an account element with all the facebook page info, returns the checkbox
 function addFbPageElement(e, container, account, iswall) {
 	if (iswall) {
-		var name = "My Wall";
+		var name = "My Timeline";
 		var category = "";
 		var id = "me";
 	} else {

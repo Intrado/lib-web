@@ -198,7 +198,7 @@ class ReadOnlyFacebookPage extends FormItem {
 					var id = account.id;
 					var name = account.name.escapeHTML();
 					if (account.category == undefined)
-						var category = "Wall Posting";
+						var category = "Timeline Posting";
 					else
 						var category = account.category.escapeHTML();
 					
@@ -345,7 +345,7 @@ class ValFacebookPageWithMessage extends Validator {
 			// check authorized pages to see if the ones selected are allowed
 			if ($pageid == "me") {
 				if (!$authwall)
-					return $this->label. " ". _L("has an invalid selection. Personal wall posting is disabled.");
+					return $this->label. " ". _L("has an invalid selection. Personal Facebook Timeline posting is disabled.");
 			} else if ($authpages && !in_array($pageid, $authpages)) {
 				return $this->label. " ". _L("has an invalid posting location selected. Page is not authorized.");
 			}
@@ -716,10 +716,10 @@ if ($submittedmode || $completedmode) {
 					"a report to the email address associated with your account when the %s ".
 					"is finished.<li>Max Attempts - This option lets you select the maximum ".
 					"number of times the system should try to contact a recipient. ".
-					"<li>Allow Reply - Check this if you want recipients to be able to ".
+					"<li>Voice Response - Check this if you want recipients to be able to ".
 					"record responses.<br><br><b>Note:</b>You will need to include instructions ".
 					"to press '0' to record a response in your message.<br><br> ".
-					"<li>Allow Confirmation - Select this option if you would like recipients ".
+					"<li>Call Confirmation - Select this option if you would like recipients ".
 					"to give a 'yes' or 'no' response to your message.<br><br> ".
 					"<b>Note:</b>You will need to include instructions ".
 					"to press '1' for 'yes' and '2' for 'no' in your message.</ul>",$jobTitle);
@@ -755,7 +755,7 @@ if ($submittedmode || $completedmode) {
 	);
 	if ($USER->authorize('leavemessage')) {
 		$formdata["replyoption"] = array(
-			"label" => _L('Allow Reply'),
+			"label" => _L('Voice Response'),
 			"fieldhelp" => _L("Select this option if recipients should be able to record replies. ".
 								"Make sure that the message instructs recipients to press '0' to record a response."),
 			"control" => array(
@@ -766,7 +766,7 @@ if ($submittedmode || $completedmode) {
 	}
 	if ($USER->authorize('messageconfirmation')) { 
 		$formdata["confirmoption"] = array(
-			"label" => _L('Allow Confirmation'),
+			"label" => _L('Call Confirmation'),
 			"fieldhelp" => _L("Select this option if you would like recipients to be able to respond to your message ".
 								"by pressing 1' for 'yes' or '2' for 'no'. ".
 								"You will need to instruct recipients to do this in your message."),
@@ -829,7 +829,7 @@ if ($submittedmode || $completedmode) {
 	$showrenew = (floor(($USER->getSetting("fb_expires_on", 0) - strtotime("now")) / (24*60*60)) < 59);
 	if (getSystemSetting("_hasfacebook") && $USER->authorize("facebookpost")) {
 		
-		// see if any of the pages are the user's wall
+		// see if any of the pages are the user's Timeline
 		$fbpages = array();
 		foreach ($job->getJobPosts("facebook") as $fbpageid => $posted) {
 			if ($fbpageid == $USER->getSetting("fb_user_id"))
@@ -838,7 +838,7 @@ if ($submittedmode || $completedmode) {
 				$fbpages[] = $fbpageid . ""; // make this a string
 		}
 		
-		$helpsteps[] = _L("<p>If you haven't connected a Facebook account, click the Connect to Facebook button. You'll be able to log into Facebook through a pop up window. Once you're connected, click the Save button.</p><p>After connecting your Facebook account, you will see a list of Facebook Pages where you are an administrator and a My Wall option which lets you post to your account's Wall. You may select any combination of options for your job.</p><p>If your system administrator has restricted users to posting only to authorized Facebook Pages, you may not see as many Pages or the option of posting to your Wall. Check with your system administrator if you are unsure of your district's social media policies. Additionally, please note that your account must also have permission within Facebook to post to authorized Pages.</p>");
+		$helpsteps[] = _L("<p>If you haven't connected a Facebook account, click the Connect to Facebook button. You'll be able to log into Facebook through a pop up window. Once you're connected, click the Save button.</p><p>After connecting your Facebook account, you will see a list of Facebook Pages where you are an administrator and a My Timeline option which lets you post to your account's Timeline. You may select any combination of options for your job.</p><p>If your system administrator has restricted users to posting only to authorized Facebook Pages, you may not see as many Pages or the option of posting to your Timeline. Check with your system administrator if you are unsure of your district's social media policies. Additionally, please note that your account must also have permission within Facebook to post to authorized Pages.</p>");
 		$formdata["fbpage"] = array(
 			"label" => _L('Facebook Page(s)'),
 			"fieldhelp" => _L("Select which Pages to post to. Please click the Guide button for more information about posting to Facebook."),
@@ -940,7 +940,7 @@ if ($submittedmode || $completedmode) {
 	);
 	if ($USER->authorize('leavemessage')) { 
 		$formdata["replyoption"] = array(
-			"label" => _L('Allow Reply'),
+			"label" => _L('Voice Response'),
 			"fieldhelp" => _L("Select this option if recipients should be able to record replies. ".
 								"Make sure that the message instructs recipients to press '0' to record a response."),
 			"value" => $job->isOption("leavemessage"),
@@ -951,7 +951,7 @@ if ($submittedmode || $completedmode) {
 	}
 	if ($USER->authorize('messageconfirmation')) { 
 		$formdata["confirmoption"] = array(
-			"label" => _L('Allow Confirmation'),
+			"label" => _L('Call Confirmation'),
 			"fieldhelp" => _L("Select this option if you would like recipients to be able to respond to your message ".
 								"by pressing 1' for 'yes' or '2' for 'no'. You will need to instruct recipients to do ".
 								"this in your message."),
@@ -995,7 +995,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
 		Query("BEGIN");
 		//save data here
-		$job->name = $postdata['name'];
+		$job->name = removeIllegalXmlChars($postdata['name']);
 		$job->description = $postdata['description'];
 		$job->modifydate = date("Y-m-d H:i:s", time());
 		$job->type = 'notification';

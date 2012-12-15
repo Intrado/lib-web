@@ -175,23 +175,32 @@ if ($messagegroup->id) {
 	// is this message group valid? if not, does it have any messages?
 	$messages = $messagegroup->getMessages();
 	if (!$messagegroup->isValid() && count($messages)) {
-		
-		// Add up possible destination to plain text
-		$desinations = array();
-		if ($cansendphone)
-			$desinations[] = _L('Phone');
-		if ($cansendemail)
-			$desinations[] = _L('Email');
-		if ($cansendsms)
-			$desinations[] = _L('SMS');
-		$desttext = implode(", ", $desinations);
-		if($pos = strrpos($desttext,','))
-			$desttext = substr_replace($desttext,_L(" or"),$pos,1);
-		
-		if ($messagegroup->defaultlanguagecode) {
-			$invalidMessageWarning = _L("The message must contain a %s message in your default language, %s.",$desttext, Language::getName($messagegroup->defaultlanguagecode));	
+		if (
+			($cansendphone && $messagegroup->hasDefaultMessage("phone", "voice")) ||
+			($cansendemail && 
+			$messagegroup->hasDefaultMessage("email", "html") || $messagegroup->hasDefaultMessage("email", "plain"))
+			||
+			($cansendsms && $messagegroup->hasDefaultMessage("sms", "plain"))
+			) {
+			$invalidMessageWarning = _L("You must include a message in the default language (%s) for every message type that you intend to send.",Language::getName($messagegroup->defaultlanguagecode));
 		} else {
-			$invalidMessageWarning = _L("The message must contain a %s message in your default language, %s.",$desttext);
+			// Add up possible destination to plain text
+			$desinations = array();
+			if ($cansendphone)
+				$desinations[] = _L('Phone');
+			if ($cansendemail)
+				$desinations[] = _L('Email');
+			if ($cansendsms)
+				$desinations[] = _L('SMS');
+			$desttext = implode(", ", $desinations);
+			if($pos = strrpos($desttext,','))
+				$desttext = substr_replace($desttext,_L(" or"),$pos,1);
+			
+			if ($messagegroup->defaultlanguagecode) {
+				$invalidMessageWarning = _L("The message must contain a %s message in your default language, %s.",$desttext, Language::getName($messagegroup->defaultlanguagecode));	
+			} else {
+				$invalidMessageWarning = _L("The message must contain a %s message in your default language, %s.",$desttext);
+			}
 		}
 	}
 }
@@ -276,7 +285,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		if (isset($postdata['defaultlanguage']))
 			$messagegroup->defaultlanguagecode = $postdata['defaultlanguage'];
 		
-		$messagegroup->name = $postdata['name'];
+		$messagegroup->name = removeIllegalXmlChars($postdata['name']);
 		$messagegroup->description = $postdata['description'];
 		$messagegroup->userid = $USER->id;
 		$messagegroup->modified = date("Y-m-d H:i:s", time());

@@ -69,3 +69,27 @@ var audioPreviewModal = function(audiofileid) {
 	var modalWrapper = new ModalWrapper("Audio Preview",content, afterOpen);
 	modalWrapper.open();
 }
+
+var messagePreviewModal = function(messageid) {
+	var content = new Element('div',{
+		id: 'modal_player',
+		style: 'text-align: center;'
+	});
+	var afterOpen = function(){
+		embedPlayer('preview.mp3.php?id=' + messageid,'modal_player');
+	};
+	var modalWrapper = new ModalWrapper("Audio Preview",content, afterOpen);
+	modalWrapper.open();
+}
+
+var mediafilePreviewModal = function(messageid) {
+	var content = new Element('div',{
+		id: 'modal_player',
+		style: 'text-align: center;'
+	});
+	var afterOpen = function(){
+		embedPlayer('preview.mp3.php?mediafile=' + messageid,'modal_player');
+	};
+	var modalWrapper = new ModalWrapper("Audio Preview",content, afterOpen);
+	modalWrapper.open();
+}
