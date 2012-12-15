@@ -396,13 +396,12 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		
 		if (strstr($button, "remove")) {
 			QuickUpdate("delete m.* ,mp.*
-					from messagegroup mg
-					inner join message m on (mg.id = m.messagegroupid)
+					from message m
 					inner join messagepart mp on (m.id = mp.messageid)
 					where
-					mg.type='classroomtemplate' and
+					m.messagegroupid=? and
 					m.type=?",
-				false, array(substr($button, 6)));
+				false, array($job->messagegroupid, substr($button, 6)));
 		}
 		
 		Query("COMMIT");
