@@ -139,7 +139,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 
 	<div class="banner_logo">
 	<div class="logo"></div>
-	<h1>Schoolmessenger</h1>
+	<h1>SchoolMessenger</h1>
 	</div>
 
 
