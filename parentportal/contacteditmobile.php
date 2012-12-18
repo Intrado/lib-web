@@ -144,19 +144,8 @@ if($PERSONID){
 }
 ?>
 
-	<script>
-
-function removeBlankFields() {
-	$$('input.phonepreference, input.emailpreference, input.smspreference').each(function(item) {
-		if(item.getStyle('color') == "gray") {
-			item.stopObserving('change');
-			item.value = "";
-		}
-	});
-}
-
-
-
+<script type="text/javascript">
+	// initialize destiniation fields
 	document.observe('dom:loaded', function() {
 		$$('input.phonepreference').each(function(item) {
 			initiateDestination('<?=_L("Phone")?>',item);			
@@ -170,29 +159,49 @@ function removeBlankFields() {
 			initiateDestination('<?=_L("SMS")?>',item);			
 		});
 	});
-
+	
 	function initiateDestination(type,item) {
+		var prefswitch = $('t' + item.id + '_switch');
+
+
+		// Initiate the jobtypoe preference checkboxes debending on if the value fro the destination is set
+		// ie if the phone number is not set the options can not be set to on  
 		if (item.value == "") {
-			var prefswitch = $('t' + item.id + '_switch');
 			prefswitch.checked = false;
+			$$('#t' + item.id + '_content input').each(function(i) {
+				i.observe('click',updateSwitch.curry(item.id));
+				i.checked = false;
+			});
+		} else {
+			var isOn = false;
+			$$('#t' + item.id + '_content input').each(function(i) {
+				i.observe('click',updateSwitch.curry(item.id));
+				if (i.checked)
+					isOn = true;
+			});
+			prefswitch.checked = isOn;	
 		}
-		
+
+		// Set labels in blank field
 		blankFieldValue(item, type);
+
+		// toggle the on/off switch whne value is entered for the destination
 		item.observe('change',function(i) {
 			var prefswitch = $('t' + i.element().id + '_switch');
 			if (i.element().value == "") {
 				prefswitch.checked = false;
 			} else {
 				prefswitch.checked = true;
-				togglePreferences('t' + i.element().id, true);
 			}
+			togglePreferences('t' + i.element().id, prefswitch.checked);
 		});
 		item.focus();
 		item.blur();
 	}
 
 	
-	
+	// Toggle the jobtype preferences if blanking out or filling in the destination
+	// or ckicking the on off switch
 	function togglePreferences(id,checked) {
 		value = $(id.substring(1)).getStyle('color');
 		if (value == "gray") {
@@ -200,9 +209,36 @@ function removeBlankFields() {
 			return;
 		}
 		
-		var expr = '#' + id + '_content input';
-		$$(expr).each(function(item) {
+		$$('#' + id + '_content input').each(function(item) {
 			item.checked = checked;
 		});
 	}
-	</script>
+
+	// Update the on/off switch when jobtype preferences are checked or unchecked
+	function updateSwitch(id,event) {
+		// Disable checking options if no destination is provided
+		if ($(id).getStyle('color') == "gray") {
+			event.element().checked = false;
+			return;
+		}
+
+		// Update the on/off switch if any jobtye option is on or all are off
+		var prefswitch = $('t' + id + '_switch');
+		var isOn = false;
+		$$('#t' + id + '_content input').each(function(i) {
+			if (i.checked)
+				isOn = true;
+		});
+		prefswitch.checked = isOn;		
+	}
+
+	// Here is a little hack that wipes out the blank field label on submit
+	function removeBlankFields() {
+		$$('input.phonepreference, input.emailpreference, input.smspreference').each(function(item) {
+			if(item.getStyle('color') == "gray") {
+				item.stopObserving('change');
+				item.value = "";
+			}
+		});
+	}	
+</script>
