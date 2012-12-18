@@ -599,20 +599,9 @@ _L('Security & Administrator Controls'),
 
 $tai_formdata = array(
 _L('Talk About It Controls'),
-	"taicanforwardthread" => array(
-		"label" => _L('Forward Thread'),
-		"fieldhelp" => _L('Allows users to TODO '),
-		"value" => $obj->getValue("tai_canforwardthread"),
-		"validators" => array(),
-		"control" => array("CheckBox"),
-		"helpstep" => 13
-	),
-	"taicanviewreports" => array(
-		"label" => _L('View Reports'),
-		"fieldhelp" => _L('Allows users to TODO '),
-		"value" => $obj->getValue("tai_canviewreports"),
-		"validators" => array(),
-		"control" => array("CheckBox"),
+	"enabletaioptions" => array (
+		"label" => _L('Enable All'),
+		"control" => array("FormHtml", "html" => icon_button(_L('Enable All Talk About It Options'),"key",'checkAllTaiCheckboxes();')),
 		"helpstep" => 13
 	),
 	"taicansendanonymously" => array(
@@ -623,18 +612,58 @@ _L('Talk About It Controls'),
 		"control" => array("CheckBox"),
 		"helpstep" => 13
 	),
-	"taicanmodifydisplayname" => array(
-		"label" => _L('Modify Display Name'),
-		"fieldhelp" => _L('Allows users to modify display name'),
-		"value" => $obj->getValue("tai_canmodifydisplayname"),
+	"taicanbetopicrecipient" => array(
+		"label" => _L('Topic Recipient'),
+		"fieldhelp" => _L('Allows users to TODO '),
+		"value" => $obj->getValue("tai_canbetopicrecipient"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 13
+	),
+	"taicanforwardthread" => array(
+		"label" => _L('Forward Thread'),
+		"fieldhelp" => _L('Allows users to TODO '),
+		"value" => $obj->getValue("tai_canforwardthread"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 13
+	),
+	"taicanusecannedresponses" => array(
+		"label" => _L('Use Canned Responses'),
+		"fieldhelp" => _L('Allows users to TODO '),
+		"value" => $obj->getValue("tai_canusecannedresponses"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 13
+	),
+	"taicanrequestidentityreveal" => array(
+		"label" => _L('Request Identity Reveal'),
+		"fieldhelp" => _L('Allows users to TODO '),
+		"value" => $obj->getValue("tai_canrequestidentityreveal"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 13
+	),
+	"taicanviewreports" => array(
+		"label" => _L('View Reports'),
+		"fieldhelp" => _L('Allows users to view reports, systemwide activity report. TODO '),
+		"value" => $obj->getValue("tai_canviewreports"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
 		"helpstep" => 13
 	),
 	"taicanviewunreadmessagereport" => array(
 		"label" => _L('View Unread Message Reports'),
-		"fieldhelp" => _L('Allows users to view unread messages reports.'),
+		"fieldhelp" => _L('Allows users to view unread messages reports. Must also have View Reports permission.'),
 		"value" => $obj->getValue("tai_canviewunreadmessagereport"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 13
+	),
+	"taicanmodifydisplayname" => array(
+		"label" => _L('Modify Display Name'),
+		"fieldhelp" => _L('Allows users to modify display name'),
+		"value" => $obj->getValue("tai_canmodifydisplayname"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
 		"helpstep" => 13
@@ -655,34 +684,10 @@ _L('Talk About It Controls'),
 		"control" => array("CheckBox"),
 		"helpstep" => 13
 	),
-	"taicanbetopicrecipient" => array(
-		"label" => _L('Topic Recipient'),
-		"fieldhelp" => _L('Allows users to TODO '),
-		"value" => $obj->getValue("tai_canbetopicrecipient"),
-		"validators" => array(),
-		"control" => array("CheckBox"),
-		"helpstep" => 13
-	),
-	"taicanusecannedresponses" => array(
-		"label" => _L('Use Canned Responses'),
-		"fieldhelp" => _L('Allows users to TODO '),
-		"value" => $obj->getValue("tai_canusecannedresponses"),
-		"validators" => array(),
-		"control" => array("CheckBox"),
-		"helpstep" => 13
-	),
 	"taicanmanagecannedresponses" => array(
 		"label" => _L('Manage Canned Responses'),
 		"fieldhelp" => _L('Allows users to TODO '),
 		"value" => $obj->getValue("tai_canmanagecannedresponses"),
-		"validators" => array(),
-		"control" => array("CheckBox"),
-		"helpstep" => 13
-	),
-	"taicanrequestidentityreveal" => array(
-		"label" => _L('Request Identity Reveal'),
-		"fieldhelp" => _L('Allows users to TODO '),
-		"value" => $obj->getValue("tai_canrequestidentityreveal"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
 		"helpstep" => 13
@@ -957,6 +962,10 @@ function checkAllCheckboxes(domanagement){
 			//skip datafields
 			if (form[i].name.indexOf("datafields") != -1)
 				continue;
+				
+			//skip tai
+			if (form[i].name.startsWith("accessprofile_tai"))
+				continue;
 
 			//see if it's a management checkbox
 			if (managementoptions.some(function(v) {return form[i].name.indexOf(v) != -1})) {
@@ -968,6 +977,26 @@ function checkAllCheckboxes(domanagement){
 					if (!form[i].checked)
 						form[i].click();
 			}
+		}
+	}
+}
+
+function checkAllTaiCheckboxes() {
+
+	var form = document.forms[0].elements;
+	for (var i = 0; i < form.length; i++) {
+		if (form[i].type == "checkbox") {
+
+			//skip datafields
+			if (form[i].name.indexOf("datafields") != -1)
+				continue;
+			
+			//skip non-tai
+			if (!form[i].name.startsWith("accessprofile_tai"))
+				continue;
+
+			if (!form[i].checked)
+				form[i].click();
 		}
 	}
 }
