@@ -148,6 +148,7 @@
 
 
     <target name="clean">
+    		<echo message="dist.dir = ${dist.dir}" />
         <delete dir="${dist.dir}" />
         <delete file="${build.txt.file}" />
     </target>
