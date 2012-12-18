@@ -1,4 +1,8 @@
 <?
+if (isset($_REQUEST["blue"]))
+	$_SESSION['bluetheme'] = true;
+if (isset($_REQUEST["classroom"]))
+	unset($_SESSION['bluetheme']);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
@@ -84,7 +88,8 @@ header('Content-type: text/html; charset=UTF-8') ;
 <head>
 	<meta http-equiv="Content-type" value="text/html; charset=UTF-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+	
 	<title>Contact Manager: <?= $PAGETITLE ?></title>
 	
 	<script src='script/utils.js'></script>
@@ -96,6 +101,9 @@ header('Content-type: text/html; charset=UTF-8') ;
 
 	<link href="css.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print">
 	<link href="css.forms.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print" />
+  
+  	<link href='parentportal.css' type='text/css' rel='stylesheet' media='screen'>
+
 	<link href="css/prototip.css.php" type="text/css" rel="stylesheet">
 	<link href='css/style_print.css' type='text/css' rel='stylesheet' media='print'>
 
@@ -114,15 +122,13 @@ header('Content-type: text/html; charset=UTF-8') ;
 	</script>
 
 <!-- ********************************************************************* -->
+<div class="wrap"><!-- ends in navbottom.inc -->
 
-<div id="top_banner" class="banner cf">
-<?
-	if (isset($contactList) && $contactList) {
-?>
-			<div class="banner_logo"><? doLogo(); ?></div>
+<div id="top_banner" class="banner">
+<div class="contain cf">
+
 
 <?
-	}
 		if (!isset($hidenav) || !$hidenav) {
 ?>
 			<div class="banner_custname"><?= isset($_SESSION['custname']) ? escapehtml($_SESSION['custname']) : ""; ?></div>
@@ -130,8 +136,16 @@ header('Content-type: text/html; charset=UTF-8') ;
 		}
 ?>
 
+
+	<div class="banner_logo">
+	<div class="logo"></div>
+	<h1>SchoolMessenger</h1>
+	</div>
+
+
 						<div class="banner_links_wrap">
-							<ul class="banner_links cf">
+							<div class="banner_links_button"><?= icon_button(_L("Account"), "fugue/clipboard","$$('ul.banner_links').first().toggleClassName('minhide');return false;") ?></div>
+							<ul class="banner_links cf minhide">
 								<li class="bl_left"></li>
 								<li><a href="account.php"><?=_L("My Account")?></a></li>
 <?
@@ -161,22 +175,27 @@ header('Content-type: text/html; charset=UTF-8') ;
 							</ul>
 						</div><!-- .banner_links_wrap -->
 
-			
-</div> <!-- #top_banner -->
+</div><!-- /container -->	
+</div><!--  end top_banner -->
 
-
-<div class="primary_nav cf">
+<div class="primary_nav">
+<div class="contain cf">
 	
 	<ul class="navtabs">
 		<? if (isset($contactList) && $contactList) echo $MAINTABS ?>
 	</ul>
 	
-</div><!-- .primary_nav -->
-
-
+</div><!-- /container -->
+</div><!-- primary_nav -->
+	
 
 <div class="content_wrap cf"><!-- starts main content wrapper, tag ends in navbottom.inc.php -->
 
-	<div class="pagetitle"><?= (isset($TITLE) ? $TITLE : "") ?></div>
-	<div class="pagetitlesubtext"><?= (isset($DESCRIPTION) ? $DESCRIPTION : "") ?></div>
 
+
+	<div class="container cf">
+	
+	
+		<div class="pagetitle"><?= (isset($TITLE) ? $TITLE : "") ?></div>
+		<div class="pagetitlesubtext"><?= (isset($DESCRIPTION) ? $DESCRIPTION : "") ?></div>
+	

@@ -101,24 +101,25 @@ if($success){
 	endWindow();
 } else {
 	NewForm($f);
-	if(!$success)
-		buttons(submit($f, $s, _L('Submit')), button(_L("Cancel"), NULL, "start.php"));
+
 	startWindow(_L('Change Email'));
 ?>
 	<table>
 		<tr>
 			<td><?=_L("New Email Address")?>:</td>
-			<td><? NewFormItem($f, $s, "newemail", "text", "50", "100") ?> </td>
+			<td><? NewFormItem($f, $s, "newemail", "text", "50", "100"," class=\"smallonmobile\"") ?> </td>
 		</tr>
 		<tr>
 			<td><?=_L("Password")?>:</td>
-			<td><? NewFormItem($f, $s, "password", "password", "20", "100") ?> </td>
+			<td><? NewFormItem($f, $s, "password", "password", "20", "100"," class=\"smallonmobile\"") ?> </td>
 		</tr>
 	</table>
 	<br>
 <?
+	if(!$success)
+		buttons(submit($f, $s, _L('Save')), icon_button(_L("Cancel"),"cross", NULL, "start.php"));
+
 	endWindow();
-	buttons();
 	EndForm();
 }
 

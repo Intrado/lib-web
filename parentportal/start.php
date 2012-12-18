@@ -77,9 +77,9 @@ if(isset($_SESSION['customerid']) && $_SESSION['customerid']){
 	}
 	
 	
-	$titles = array("0" => "##",
+	$titles = array(
 					"2" => _L("Date"),
-					"3" => "#" . _L("Job Name"),
+					"3" => "#" . _L("%s Name", getJobsTitle()),
 					"SentBy" => "#" . _L("Sent By"),
 					"Actions" => _L("Actions")
 				);
@@ -108,18 +108,37 @@ function message_action($row, $index){
 	//index 7 is person id
 
 	$messagegroup = new MessageGroup($row[4]);
-
+	$actionlinks = array();
+	$buttons = array();
+	
 	if ($messagegroup->hasMessage("phone")) {
-		$buttons[] = button(_L("Play"), "popup('previewmessage.php?jobid=" . $row[1] . "&personid=" . $row[7] . "&type=phone', 400, 500,'preview');",null);
+		$title = _L("Play");
+		$icon = "fugue/control";
+		$onclick = "popup('previewmessage.php?jobid=" . $row[1] . "&personid=" . $row[7] . "&type=phone', 400, 500,'preview');";
+		
+		$buttons[] = icon_button($title,$icon,$onclick);
+		$actionlinks[] = action_link($title, $icon,null,$onclick);
 	}
 	if ($messagegroup->hasMessage("email")) {
-		$buttons[] = button(_L("Read Email"), "popup('previewmessage.php?jobid=" . $row[1] . "&personid=" . $row[7] . "&type=email', 400, 500,'preview');",null);
+		$title = _L("Read Email");
+		$icon = "email_open";
+		$onclick = "popup('previewmessage.php?jobid=" . $row[1] . "&personid=" . $row[7] . "&type=email', 400, 500,'preview');";
+				
+		$buttons[] = icon_button($title,$icon,$onclick);
+		$actionlinks[] = action_link($title, $icon,null,$onclick);
 	}
 	if ($messagegroup->hasMessage("sms")) {
-		$buttons[] = button(_L("Read SMS"), "popup('previewmessage.php?jobid=" . $row[1] . "&personid=" . $row[7] . "&type=sms', 400, 500,'preview');",null);
+		$title = _L("Read SMS");
+		$icon = "comment";
+		$onclick = "popup('previewmessage.php?jobid=" . $row[1] . "&personid=" . $row[7] . "&type=sms', 400, 500,'preview');";
+		
+		$buttons[] = icon_button($title,$icon,$onclick);
+		$actionlinks[] = action_link($title, $icon,null,$onclick);
 	}
 	
-	return "<table><tr><td>" . implode("</td><td>", $buttons) . "</td></tr></table>";
+	return "<ul class=\"message_view_actions cf\"><li>" . implode("</li><li>", $buttons) . "</li></ul>
+			<div  id=\"j$row[1]p$row[7]\" class=\"message_view_action_button\">" . action_link(_L("View"), "magnifier", null,null) . "</div>
+			<div id=\"j$row[1]p$row[7]_content\" class=\"message_view_actionlinks\">" . action_links($actionlinks) . "</div>";
 }
 
 function format_date($row, $index){
@@ -167,7 +186,7 @@ if(isset($contactList) && $contactList){
 		startWindow(escapehtml($person->$firstnameField) . " " . escapehtml($person->$lastnameField), 'padding: 3px;', true);
 		if (count($data) == 0) {
 ?>
-			<div id="feeditems"><?=_L("No Messages")?></div>
+			<div id="feeditems"><img src="img/largeicons/information.jpg" /><?=_L("No Messages")?></div>
 <?
 		} else {
 			$scroll="";
@@ -184,9 +203,6 @@ if(isset($contactList) && $contactList){
 <?
 		}
 		endWindow();
-?>
-		<br>
-<?
 	}
 } else {
 	startWindow("Getting Started", 'padding: 3px;');
@@ -202,9 +218,30 @@ if(isset($contactList) && $contactList){
 		<? echo button(_L("Click here to begin"), NULL, "phoneactivation0.php"); ?>
 	</td></tr>
 	</table>
-
+						
 <?
 	endWindow();
 }
+
+?>
+	<script>
+	document.observe('dom:loaded', function() {
+		$$('div.message_view_action_button').each(function(item) {
+			item.tip = new Tip(item.id, $(item.id + "_content").innerHTML, {
+				style: 'protogrey',
+				radius: 4,
+				border: 4,
+				hideOn: false,
+				hideAfter: 0.5,
+				stem: 'topRight',
+				hook: {  target: 'bottomMiddle', tip: 'topRight'  },
+				width: 'auto',
+				offset: { x: 0, y: -4 }
+			});
+		});
+	});
+	</script>
+
+<?
 include_once("navbottom.inc.php");
 ?>
