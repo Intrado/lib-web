@@ -7,10 +7,48 @@ header("Cache-Control: private");
 
 ?>
 
+// One cookie for all feed pages, data is a json encoded key/value string of page and order by preference
+function setFeedCookie(page,value) {
+	var values = $H(getFeedCookie().evalJSON(true));
+	values.set(page, value);
+	var exdate = new Date();
+	exdate.setDate(exdate.getDate() + 1);
+	document.cookie = "page_feed=" + escape(Object.toJSON(values)) + "; expires="+exdate.toUTCString();
+}
+
+// gets raw feed cookie, not to be used by any other functions than the feed cookie functions
+function getFeedCookie() {
+	var cookies=document.cookie.split(";");
+	var cookieName,i;
+	for (i=0; i < cookies.length; i++) {
+		cookieName = cookies[i].substr(0,cookies[i].indexOf('=')).replace(/^\s+|\s+$/g,'');
+		if (cookieName == "page_feed") {
+	   		return unescape(cookies[i].substr(cookies[i].indexOf("=")+1));
+	    }
+	}
+	return "{}";
+}
+
+// Returns the sort by preference for this page
+function getFeedCookieValue(page) {
+	return $H(getFeedCookie().evalJSON(true)).get(page);	
+}	
+
+
 function feed_page(url,event) {
 	activepage = event.element().value;
 	feed_applyfilter(url,currentfilter);
 }
+
+// Sets the order by filter if value not already set in feed cookie 
+function feed_applyDefaultFilter(url,orderby) {
+	var o = getFeedCookieValue(url);
+	if (typeof(o) == 'undefined') {
+		o = orderby;
+	}
+	feed_applyfilter(url,o)
+}
+
 
 function feed_applyfilter(url,filter) {
 	new Ajax.Request(url, {
@@ -118,6 +156,8 @@ function feed_applyfilter(url,filter) {
 					 color: '#000000',
 					 fontWeight: 'bold'
 				});
+				
+				setFeedCookie(url,filter);
 			}
 		}
 	});
