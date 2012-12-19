@@ -247,7 +247,7 @@ var filtes = <?= json_encode(array_keys($feedFilters))?>;
 var activepage = 0;
 var currentfilter = 'date';
 document.observe('dom:loaded', function() {
-	feed_applyfilter('<?=$_SERVER["REQUEST_URI"]?>','name');
+	feed_applyDefaultFilter('<?=$_SERVER["REQUEST_URI"]?>','name');
 });
 </script>
 <?
