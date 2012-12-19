@@ -218,13 +218,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 		
+		$changedEmail = $postdata['emailmessage'] != $emailmessagetext;
+		$changedPhone = $hasPhoneTargetedMessage && ($postdata['phonemessage'] != $phonemessagetext || $postdata['gender'] != $gender);
+		
 		// if they didn't change anything, don't do anything
-		if ($postdata['emailmessage'] == $emailmessagetext &&
-			!$hasPhoneTargetedMessage ||
-			($hasPhoneTargetedMessage && 
-				$postdata['phonemessage'] == $phonemessagetext && 
-				$postdata['gender'] == $gender)
-			) {
+		if (!$changedEmail && !$changedPhone) {
 			// DO NOT UPDATE MESSAGE!
 		} else if ($button != 'inpagesubmit'){
 			Query("BEGIN");
