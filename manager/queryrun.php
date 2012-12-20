@@ -67,7 +67,7 @@ $formdata["notes"] = array(
 );
 $counter = 0;
 for ($x = 0; $x < $managerquery->numargs; $x++) {
-	$formdata["arg" . ($x+1)] = array(
+	$formdata["arg" . $x] = array(
 			"label" => _L("Arg " . ($x+1)),
 			"value" => "",
 			"validators" => array(
