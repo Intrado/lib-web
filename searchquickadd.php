@@ -36,7 +36,6 @@ require_once("inc/reportutils.inc.php"); //used by list.inc.php
 require_once("inc/list.inc.php");
 require_once("ruleeditform.inc.php");
 
-$PAGETIME = microtime(true);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -49,136 +48,158 @@ if (!$USER->authorize('createlist')) {
 // Action/Request Processing
 ////////////////////////////////////////////////////////////////////////////////
 
+
+
+//handle list search mode switches (contactsearchformdata.inc.php)
+if (isset($_GET['listsearchmode'])) {
+
+	if ($_GET['listsearchmode'] == "rules" && !isset($_SESSION['listsearch']['rules'])) {
+		unset($_SESSION['listsearch']); //defaults to rules mode with no search criteria
+	}
+	
+	if ($_GET['listsearchmode'] == "individual" && !isset($_SESSION['listsearch']['individual'])) {
+		$_SESSION['listsearch'] = array ("individual" => array ("quickaddsearch" => ''));
+	}
+	
+	if ($_GET['listsearchmode'] == "sections" && !isset($_SESSION['listsearch']['sectionx'])) {
+		$_SESSION['listsearch'] = array ("sectionids" => array ());
+	}
+	
+	if ($_GET['listsearchmode'] == "showall" && !isset($_SESSION['listsearch']['showall'])) {
+		$_SESSION['listsearch'] = array("showall" => true);
+	}
+}
+
 //get the list to edit from the request params or session
-if (isset($_GET['id'])) {
-	setCurrentList($_GET['id']);
-	unset($_SESSION['listsearch']);
-	$_SESSION['listreferer'] = $_SERVER['HTTP_REFERER'];
+if (isset($_GET['new'])) {
+	
+	$quickpicklist = new PeopleList();
+	$quickpicklist->name = "QuickPick";
+	$quickpicklist->description = "Created in MessageSender";
+	$quickpicklist->deleted = 1;
+	$quickpicklist->modifydate = date("Y-m-d H:i:s");
+	$quickpicklist->userid = $USER->id;
+	$quickpicklist->type = 'person';
+	
+	$quickpicklist->create();
+	
+	setCurrentList($quickpicklist->id);
+	
+	// NOTE: maintaing previous behavior while removing errors from httpd log files. See bug:4605
+	$referer = (isset($_SERVER['HTTP_REFERER'])?$_SERVER['HTTP_REFERER']:NULL);
+	$_SESSION['listreferer'] = $referer;
 	redirect();
 }
 
-if (isset($_GET['showall']))
-	$_SESSION['listsearch'] = array("showall" => true);
-
 handle_list_checkbox_ajax(); //for handling check/uncheck from the list
 
-
-
 $list = new PeopleList($_SESSION['listid']);
-
-$renderedlist = new RenderedList2();
-$renderedlist->pagelimit = 100;
-$initedrenderedlist = false;
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
 
-$formdata = array(
-	"quickaddsearch" => array(
-		"label" => _L("Search"),
-		"value" => "",
-		"validators" => array(
-			array("ValLength","min" => 2, "max" => 255)
-		),
-		"control" => array("TextField", "size" => 30),
-		"helpstep" => 1
-	)
-);
+$renderedlist = new RenderedList2();
+$renderedlist->pagelimit = 100;
 
-$buttons = array(
-	submit_button(_L('Search'),"search","find"),
-	icon_button(_L('Done'),"tick",null, isset($_SESSION['listreferer']) ? $_SESSION['listreferer'] : "list.php")
-);
+// buttons must be defined before include 'contactsearchformdata.inc'
+$buttons = array();
 
-$form = new Form('quickaddsearch',$formdata,array(),$buttons);
+// variable for page redirect, used by include 'contactsearchformdata.inc'
+$redirectpage = "searchquickadd.php";
 
-////////////////////////////////////////////////////////////////////////////////
-// Form Data Handling
-////////////////////////////////////////////////////////////////////////////////
-
-$form->handleRequest();
-
-$datachange = false;
-$errors = false;
-
-//check for form submission
-if ($button = $form->getSubmit()) { //checks for submit and merges in post data
-	$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response	
-	
-	if ($form->checkForDataChange()) {
-		$datachange = true;
-	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
-		$postdata = $form->getData();		
-	
-		$renderedlist->initWithQuickAddSearch($postdata['quickaddsearch']);
-		$_SESSION['quickaddsearch'] = $postdata['quickaddsearch'];
-		
-		Query("COMMIT");
-		if ($ajax) {
-			//get a copy of rendered list output, return in a form modify json
-			
-			$renderedlisthtml = "";
-			if ($renderedlist->getTotal() > 0) {
-				ob_start();
-				$_GET['pagestart'] = 0; //override previous paging offsets which are still stuck in the GET query
-				showRenderedListTable($renderedlist, $list);
-				$renderedlisthtml = ob_get_clean();
-				ob_end_clean();
-			} else {
-				$renderedlisthtml = '<div style="margin: 15px;"><h2>No records match that search</h2>
-					<img src="img/bug_lightbulb.gif" alt="Tip" style="margin-right: 10px;">You may enter a name, phone number, email address, or ID #. 
-					You may also enter both a first and last name to narrow the search.</div>
-				';
-			}
-			if (isset($PAGETIME)) error_log(sprintf("<!-- %0.2f -->", microtime(true) - $PAGETIME)); 
-			$form->modifyElement("quickaddcontent", $renderedlisthtml);
-		} else {
-			//else fall through and display via regular post
-			$initedrenderedlist = true; //will show results in page
-		}
-	}
-}
-
-
-if (!$initedrenderedlist && isset($_SESSION['quickaddsearch']) && strlen($_SESSION['quickaddsearch']) >= 2) {
-	$initedrenderedlist = true;
-	$renderedlist->initWithQuickAddSearch($_SESSION['quickaddsearch']);
-}
-
+include_once("contactsearchformdata.inc.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 
-$PAGE = "notifications:lists";
-$TITLE = "List Quick Search: " . escapehtml($list->name);
-require_once("nav.inc.php");
+header('Content-type: text/html; charset=UTF-8') ;
+
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	
+	<script src="script/prototype.js" type="text/javascript"></script> <!-- updated to prototype 1.7 -->
+	<script src="script/scriptaculous.js" type="text/javascript"></script>
+	<script src="script/prototip.js.php" type="text/javascript"></script>
+	<script src="script/utils.js"></script>
+	<script src="script/sorttable.js"></script>
+	<script src="script/form.js.php" type="text/javascript"></script>
+	<script src="script/livepipe/livepipe.js" type="text/javascript"></script>
+	<script src="script/livepipe/window.js" type="text/javascript"></script>
+	<script src="script/modalwrapper.js" type="text/javascript"></script>
+	
+	<link href="css.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print" />
+	<link href="css.forms.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print" />
+	<link href="css/datepicker.css.php" type="text/css" rel="stylesheet" />
+	<link href="css/newui_datepicker.css" type="text/css" rel="stylesheet" />
+	<link href="css/prototip.css.php" type="text/css" rel="stylesheet" />
+	<link href="css/style_print.css" type="text/css" rel="stylesheet" media="print" />
+	
+	<!--[if IE 8]>
+		<script src="script/respond.min.js" type="text/javascript"></script>
+	<![endif]-->
+	
+</head>
 
 
-startWindow("Quick Search");
+<body style="margin: 0px; background-color: white;" onBeforeUnLoad="if(typeof(unloadsession) != 'undefined') {unloadsession();}">
+	<script>
+		var _brandtheme = "<?=getBrandTheme();?>";
+	</script>
+<? 
+//load validator for rules, handle rule add/delete to form submit (contactsearchformdata.inc.php)
+?>
+	<script type="text/javascript">
+		<? Validator::load_validators(array("ValSections", "ValRules")); ?>
+
+		function rulewidget_add_rule(event) {
+			$('listsearch_ruledata').value = Object.toJSON(event.memo.ruledata);
+			form_submit(event, 'addrule');
+		}
+
+		function rulewidget_delete_rule(event) {
+			$('listsearch_ruledata').value = event.memo.fieldnum;
+			form_submit(event, 'deleterule');
+		}
+
+		document.observe('dom:loaded', function() {
+			if (window.ruleWidget) {
+				ruleWidget.delayActions = true;
+				ruleWidget.container.observe('RuleWidget:AddRule', rulewidget_add_rule);
+				ruleWidget.container.observe('RuleWidget:DeleteRule', rulewidget_delete_rule);
+			}
+		});
+	</script>
+	
+<div class="content_wrap">
+<div class="content">
+<?
+startWindow("Search Options");
 
 echo $form->render();
 
-?>
-<div id="quickaddcontent">
-<? 
-if ($initedrenderedlist) { 
-	showRenderedListTable($renderedlist, $list);
-} else {
-?>
-<div style="margin: 15px;">
-<h2>Start typing in the search box to begin.</h2>
-<img src="img/bug_lightbulb.gif" alt="Tip" style="margin-right: 10px;">You may enter a name, phone number, email address, or ID #. You may also enter both a first and last name to narrow the search.
-</div>
-<?
-}
-?>
-</div>
-<?
-
 endWindow();
 
-require_once("navbottom.inc.php");
+startWindow("Search Results");
 ?>
+
+<div id="renderedlistcontent">
+<? 
+if ($hassomesearchcriteria)
+	showRenderedListTable($renderedlist, $list);
+else
+	echo "<h2>Select some search options to begin.</h2>";
+?>
+</div>
+<?
+endWindow();
+?>
+</div><!-- end content -->
+</div><!-- end content_wrap -->
+</body>
+</html>
