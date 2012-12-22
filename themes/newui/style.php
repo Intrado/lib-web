@@ -1164,3 +1164,27 @@ div.progressbar div.progress {
 .ie8 #cke_reusableckeditor input {
   border: none;
 }
+
+
+.quickpick {
+    height: 96%;
+    left: 5%;
+    margin: 1% 0 0;
+    padding: 0;
+    top: 0;
+    width: 90%;
+	max-height: none;
+}
+
+.quickpick iframe {
+    height: 96%;
+     width: 100%;
+    left: 5%;
+    margin: 1% 0 0;
+}
+
+.quickpick .modal-body {
+    height: 80%;
+    max-height: none;
+    padding: 0 0 0 15px;
+}

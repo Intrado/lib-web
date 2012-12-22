@@ -68,6 +68,7 @@
                 pickExisting: {$el: $('#add-recipients-existing_lists')},
                 newUsingRules: {$el: $('#add-recipients-rules')},
                 newUsingSections: {$el: $('#add-recipients-sections')},
+                newUsingQuickPick: {$el: $('#add-recipients-quickpick')},
                 saveList: {$el: $('#modal-save-list')}
             };
 
@@ -829,6 +830,19 @@
                         });
                     };
                     return false;
+                });
+            })();
+            
+            
+            
+            // MODAL > quickpick -------------------------------------
+
+            (function(){
+                var modal = base.modals.newUsingQuickPick;
+                var iframe = modal.$el.find('iframe');
+
+                modal.$el.on('show', function(){
+                	iframe.attr("src","searchquickadd.php?listsearchmode=individual&new");
                 });
             })();
 

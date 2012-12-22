@@ -8,6 +8,7 @@
 										<a href="#" id="listwidget_enrollment" class="btn dropdown-toggle hidden" data-toggle="dropdown"><span class="caret"></span></a>
 										<ul class="dropdown-menu">
 											<li><a href="#add-recipients-sections" data-toggle="modal">Use Sections</a></li>
+											<li><a href="#add-recipients-quickpick" data-toggle="modal">Quick Pick</a></li>
 										</ul>
 									</div>
 								</div>
@@ -108,6 +109,18 @@
 									</div>
 								</div>
 
+								<div id="add-recipients-quickpick" class="modal quickpick hide fade">
+									<div class="modal-header">
+										<a class="close" data-dismiss="modal">×</a>
+										<h3>Quick Add Recipients</h3>
+									</div>
+									<div class="modal-body">
+										<iframe id="quickpickiframe" src=""></iframe>
+									</div>
+									<div class="modal-footer">
+										<a href="#" class="btn" data-dismiss="modal">Done</a>
+									</div>
+								</div>
 								<!-- /hidden modals -->
 								<div id="msgsndr_listids_msg" class="box_validatorerror er" style="display:none"></div>
 
