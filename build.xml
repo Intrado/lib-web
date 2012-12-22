@@ -136,8 +136,10 @@
                 <exclude name="originals/" />
 
                 <!-- hidden files/folders (including .project) -->
-                <exclude name="**/.*" />
-                <exclude name="**/.*/" />
+                <exclude name="**/.g*" />
+                <exclude name="**/.g*/" />
+                <exclude name="**/.p*" />
+                <exclude name="**/.p*/" />    
 
                 <!-- IntelliJ project-related files -->
                 <exclude name="**/*.eml" />
