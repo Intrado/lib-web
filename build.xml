@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!-- Karen Test -->
+<!-- Cecil Test -->
 <project name="kona" default="dist">
 
     <property name="src.dir" location="." />
