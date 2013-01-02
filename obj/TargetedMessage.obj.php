@@ -27,7 +27,7 @@ class TargetedMessage extends DBMappedObject {
 	function isValid() {			
 		if ($this->overridemessagegroupid && getSystemSetting('_hasphonetargetedmessage', false)) {
 			$overridemessagegroup = new MessageGroup($this->overridemessagegroupid);
-			return $overridemessagegroup->hasDefaultMessage("phone", "voice");
+			return $overridemessagegroup->hasDefaultMessage("email", "plain")?$overridemessagegroup->hasDefaultMessage("phone", "voice"):true;
 		}
 		return true;
 	}
