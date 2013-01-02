@@ -128,53 +128,71 @@ $languagemap = Language::getLanguageMap();
 $activeusers = QuickQueryList("select id, login from user where not deleted and enabled and login != 'schoolmessenger'", true, false, array());
 
 // Do job template form stuff
-$formdata = array(
-	_L("%s Template",getJobTitle()),
-	"name" => array(
-		"label" => _L('Template Name'),
-		"fieldhelp" => _L("Enter a name for Classroom Messaging %s.",getJobsTitle()),
-		"value" => ($job)?$job->name:"",
-		"validators" => array(
-			array("ValRequired"),
-			array("ValDuplicateNameCheck","type" => "job"),
-			array("ValLength","max" => 30)
-		),
-		"control" => array("TextField","size" => 30, "maxlength" => 30),
-		"helpstep" => 1
+$formdata = array(_L("%s Template",getJobTitle()));
+$formdata["name"] = array(
+	"label" => _L('Template Name'),
+	"fieldhelp" => _L("Enter a name for Classroom Messaging %s.",getJobsTitle()),
+	"value" => ($job)?$job->name:"",
+	"validators" => array(
+		array("ValRequired"),
+		array("ValDuplicateNameCheck","type" => "job"),
+		array("ValLength","max" => 30)
 	),
-	"jobtype" => array(
-		"label" => _L("Type/Category"),
-		"fieldhelp" => _L("Select the option that best describes the type of %s you are sending.",getJobTitle()),
-		"value" => ($job)?$job->jobtypeid:"",
-		"validators" => array(
-			array("ValRequired"),
-			array("ValInArray", "values" => array_keys($jobtypes))
-		),
-		"control" => array("RadioButton", "values" => $jobtypes, "hover" => $jobtips),
-		"helpstep" => 2
+	"control" => array("TextField","size" => 30, "maxlength" => 30),
+	"helpstep" => 1
+);
+
+$formdata["jobtype"] = array(
+	"label" => _L("Type/Category"),
+	"fieldhelp" => _L("Select the option that best describes the type of %s you are sending.",getJobTitle()),
+	"value" => ($job)?$job->jobtypeid:"",
+	"validators" => array(
+		array("ValRequired"),
+		array("ValInArray", "values" => array_keys($jobtypes))
 	),
-	"schedule" => array(
-		"label" => _L("Days to run"),
-		"fieldhelp" => _L("Select which days Classroom Messages should be sent."),
-		"value" => $dowvalues,
-		"validators" => array(
-			array("ValRequired"),
-			array("ValWeekRepeatItem")
-		),
-		"control" => array("WeekRepeatItem","timevalues" => newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $USER->getCallLate())),
-		"helpstep" => 3
+	"control" => array("RadioButton", "values" => $jobtypes, "hover" => $jobtips),
+	"helpstep" => 2
+);
+
+$formdata["schedule"] = array(
+	"label" => _L("Days to run"),
+	"fieldhelp" => _L("Select which days Classroom Messages should be sent."),
+	"value" => $dowvalues,
+	"validators" => array(
+		array("ValRequired"),
+		array("ValWeekRepeatItem")
 	),
-	"owner" => array(
-		"label" => _L("Owner"),
-		"fieldhelp" => _L("Select the user account Classroom Message jobs should run under."),
-		"value" => ($job)?$job->userid:$USER->id,
-		"validators" => array(
+	"control" => array("WeekRepeatItem","timevalues" => newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $USER->getCallLate())),
+	"helpstep" => 3
+);
+		
+		
+// Prepare attempt data
+$maxattempts = first($ACCESS->getValue('callmax'), 1);
+$attempts = array_combine(range(1,$maxattempts),range(1,$maxattempts));
+$formdata["attempts"] = array(
+	"label" => _L('Max Attempts'),
+	"fieldhelp" => ("Select the maximum number of times the system should try to contact an individual."),
+	"value" => ($job)?$job->getOptionValue("maxcallattempts"):1,
+	"validators" => array(
 			array("ValRequired"),
-			array("ValInArray", "values" => array_keys($activeusers))
-		),
-		"control" => array("SelectMenu", "values" => ($activeusers?array("-- Select One --") + $activeusers:array("-- Select One --"))),
-		"helpstep" => 4
-	)
+			array("ValNumeric"),
+			array("ValNumber", "min" => 1, "max" => $maxattempts)
+	),
+	"control" => array("SelectMenu", "values" => $attempts),
+	"helpstep" => 4
+);
+		
+$formdata["owner"] = array(
+	"label" => _L("Owner"),
+	"fieldhelp" => _L("Select the user account Classroom Message jobs should run under."),
+	"value" => ($job)?$job->userid:$USER->id,
+	"validators" => array(
+		array("ValRequired"),
+		array("ValInArray", "values" => array_keys($activeusers))
+	),
+	"control" => array("SelectMenu", "values" => ($activeusers?array("-- Select One --") + $activeusers:array("-- Select One --"))),
+	"helpstep" => 5
 );
 
 
@@ -224,7 +242,7 @@ $formdata["template"] = array(
 					$phonecomponent
 					</tr>
 				</table>"),
-		"helpstep" => 5
+		"helpstep" => 6
 );
 
 
@@ -232,6 +250,7 @@ $helpsteps = array (
 	_L('The Template Name will be displayed in reports'),
 	_L('The %s Type determines where the system sends the message.',getJobTitle()),
 	_L('Select which days Classroom Messages should be sent.'),
+	_L('This option lets you select the maximum number of times the system should try to contact a recipient.'),
 	_L('Select the user account that Classroom Messaging %s should be sent from.',getJobsTitle()),
 	_L('Edit Template')
 );
@@ -326,6 +345,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$job->endtime = "23:59";
 		$job->status = 'repeating';
 		$job->setOption("skipemailduplicates",0);
+		$job->setOption("maxcallattempts", $postdata['attempts']);
+		
 		if ($job->id)
 			$job->update();
 		else
