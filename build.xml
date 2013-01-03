@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!-- pull the current --->
+<!-- pull the current -->
 <project name="kona" default="dist">
 
     <property name="src.dir" location="." />
