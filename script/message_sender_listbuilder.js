@@ -840,9 +840,34 @@
             (function(){
                 var modal = base.modals.newUsingQuickPick;
                 var iframe = modal.$el.find('iframe');
-
+                var listid;
+                
                 modal.$el.on('show', function(){
-                	iframe.attr("src","searchquickadd.php?listsearchmode=individual&new");
+                	iframe.attr("src","");
+                    $.ajax({
+                        url: 'ajaxlistform.php?type=createlist'
+                    }).done(function(newListId){
+                    	listid = newListId
+                    	iframe.attr("src","searchquickadd.php?listsearchmode=individual&id=" + listid);
+                    });
+                });
+                
+                var submitBtn = modal.$el.find('.btn-primary');
+                submitBtn.on('click', function(){
+                	  $.ajax({
+                          url: 'ajax.php?type=liststats&listids=["' + listid + '"]'
+                      }).done(function(data){
+                          base.pickedListIds.push(listid);
+                          base.updateParentElement();
+                          
+                          data[listid].name = 'Quick Pick';
+                          base.lists[listid] = {
+                              stats: $.extend({}, data[listid])
+                          };
+                          modal.$el.modal('hide');
+                          base.buildTable();
+                          base.highlightListRow(listid);
+                      });
                 });
             })();
 
