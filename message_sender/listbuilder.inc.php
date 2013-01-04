@@ -118,7 +118,7 @@
 										<iframe id="quickpickiframe" src=""></iframe>
 									</div>
 									<div class="modal-footer">
-										<a href="#" class="btn" data-dismiss="modal">Done</a>
+										<a href="#" class="btn btn-primary" data-dismiss="modal">Done</a>
 									</div>
 								</div>
 								<!-- /hidden modals -->

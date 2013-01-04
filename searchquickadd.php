@@ -70,6 +70,7 @@ if (isset($_GET['listsearchmode'])) {
 	}
 }
 
+
 //get the list to edit from the request params or session
 if (isset($_GET['new'])) {
 	
@@ -84,6 +85,13 @@ if (isset($_GET['new'])) {
 	$quickpicklist->create();
 	
 	setCurrentList($quickpicklist->id);
+	
+	// NOTE: maintaing previous behavior while removing errors from httpd log files. See bug:4605
+	$referer = (isset($_SERVER['HTTP_REFERER'])?$_SERVER['HTTP_REFERER']:NULL);
+	$_SESSION['listreferer'] = $referer;
+	redirect();
+} else if (isset($_GET['id'])) {
+	setCurrentList($_GET['id']);
 	
 	// NOTE: maintaing previous behavior while removing errors from httpd log files. See bug:4605
 	$referer = (isset($_SERVER['HTTP_REFERER'])?$_SERVER['HTTP_REFERER']:NULL);
@@ -175,7 +183,6 @@ header('Content-type: text/html; charset=UTF-8') ;
 			}
 		});
 	</script>
-	
 <div class="content_wrap">
 <div class="content">
 <?
