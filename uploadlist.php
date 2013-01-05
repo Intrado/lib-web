@@ -84,9 +84,9 @@ if (isset($_FILES['listcontents']) && $_FILES['listcontents']['tmp_name']) {
 			if ($import->upload($data)) {
 				//everything looks good, move on to next step
 				if ($type == "contacts")
-					redirect("uploadlistmap.php");
+					redirect("uploadlistmap.php" .  (isset($_GET["iframe"])?"?iframe=true":""));
 				else
-					redirect("uploadlistpreview.php");
+					redirect("uploadlistpreview.php" . (isset($_GET["iframe"])?"?iframe=true":""));
 			} else {
 				error('Unable to complete file upload. Please try again.');
 				$reloadform = 1;
@@ -123,9 +123,6 @@ include_once("nav.inc.php");
 
 NewForm($f);
 
-buttons(submit($f, 'upload','Preview'), icon_button(_L('Cancel'),"cross",null,'list.php'));
-
-
 startWindow('Upload Call List File');
 ?>
 <table border="0" cellpadding="3" cellspacing="0" width="100%">
@@ -161,13 +158,19 @@ startWindow('Upload Call List File');
 	</tr>
 
 </table>
-<?
+
+<br><div style="margin: 0 0 5px 5px;"><img src="img/bug_important.gif"> Please select a file to upload and then click Preview to continue.</div><?
+
+$buttons = array(submit($f, 'upload','Preview'));
+if (!isset($_GET["iframe"])) {
+	$buttons[] = icon_button(_L('Cancel'),"cross",null,'list.php');
+}
+call_user_func_array('buttons', $buttons);
+
+EndForm();
 endWindow();
 
-?><br><div style="margin-left: 10px;"><img src="img/bug_important.gif"> Please select a file to upload and then click Preview to continue.</div><?
 
-buttons();
-EndForm();
 
 include_once("navbottom.inc.php");
 
