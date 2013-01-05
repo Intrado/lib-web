@@ -69,6 +69,8 @@
                 newUsingRules: {$el: $('#add-recipients-rules')},
                 newUsingSections: {$el: $('#add-recipients-sections')},
                 newUsingQuickPick: {$el: $('#add-recipients-quickpick')},
+                newUsingUpload: {$el: $('#add-recipients-upload')},
+
                 saveList: {$el: $('#modal-save-list')}
             };
 
@@ -868,6 +870,57 @@
                           base.buildTable();
                           base.highlightListRow(listid);
                       });
+                });
+            })();
+            
+            // MODAL > uploadlist -------------------------------------
+
+            (function(){
+                var modal = base.modals.newUsingUpload;
+                var iframe = modal.$el.find('iframe');
+                var listid;
+                var submitBtn = modal.$el.find('.btn-primary');
+
+                modal.$el.on('show', function(){
+                	iframe.attr("src","");
+                    $.ajax({
+                        url: 'ajaxlistform.php?type=createlist'
+                    }).done(function(newListId){
+                    	listid = newListId
+                    	iframe.attr("src","uploadlist.php?iframe=true");
+                    });
+                });
+                
+                modal.validate = function(){
+                	var url = iframe.contents().get(0).location.href.toLowerCase();
+                	if (url == 'about:blank' || url.indexOf("uploadlist.php?iframe=true") >= 0) {
+                	 	console.log('disable ' + url);
+                        submitBtn.addClass('disabled');
+                    } else {
+                		console.log('enable ' + url);
+                        submitBtn.removeClass('disabled');
+                    };
+                };
+                
+                iframe.on('load', function() {modal.validate();});
+                
+                submitBtn.on('click', function(){
+            		  iframe.contents().find('input.btn_hide').first().trigger('click');
+            		  
+                	  $.ajax({
+                          url: 'ajax.php?type=liststats&listids=["' + listid + '"]'
+                      }).done(function(data){
+                          base.pickedListIds.push(listid);
+                          base.updateParentElement();
+                          
+                          data[listid].name = 'Uplaoded List';
+                          base.lists[listid] = {
+                              stats: $.extend({}, data[listid])
+                          };
+                          modal.$el.modal('hide');
+                          base.buildTable();
+                          base.highlightListRow(listid);
+                      });  
                 });
             })();
 
