@@ -1166,7 +1166,7 @@ div.progressbar div.progress {
 }
 
 
-.quickpick {
+.modaliframe {
     height: 96%;
     left: 5%;
     margin: 1% 0 0;
@@ -1176,14 +1176,14 @@ div.progressbar div.progress {
 	max-height: none;
 }
 
-.quickpick iframe {
+.modaliframe iframe {
     height: 96%;
      width: 100%;
     left: 5%;
     margin: 1% 0 0;
 }
 
-.quickpick .modal-body {
+.modaliframe .modal-body {
     height: 80%;
     max-height: none;
     padding: 0 0 0 15px;
