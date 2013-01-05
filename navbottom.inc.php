@@ -1,4 +1,11 @@
+<? 
 
+if (isset($_GET['iframe'])) {
+	include_once("iframebottom.inc.php");
+	return;
+}
+
+?>
 </div><!-- end for container starts in nav.inc.php -->
 </div><!-- end for content_wrap starts in nav.inc.php -->
 </div><!-- end for wrap starts in nav.inc.php -->
