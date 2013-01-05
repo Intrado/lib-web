@@ -195,8 +195,25 @@ include_once("nav.inc.php");
 
 NewForm($f);
 
-buttons(submit($f, 'save','Save'), submit($f, 'preview','Preview'),  button("Select Different File",NULL,"uploadlist.php"), icon_button(_L('Cancel'),"cross",null,'list.php'));
+?><div style="margin: 0 0 5px 5px;"><img src="img/bug_important.gif"> Please review your list then click Save.</div><?
 
+$buttons = array();
+if (!isset($_GET["iframe"])) {
+	$buttons[] = submit($f, 'save','Save');
+} else {
+	$buttons[] = '<input class="btn_hide" type="submit" value="submit" name="submit[' . $f . '][' . 'save' . ']" />';
+}
+$buttons[] = submit($f, 'preview','Preview',null,'magnifier');
+$buttons[] = icon_button("Select Different File","fugue/arrow_180", NULL,"uploadlist.php" . (isset($_GET["iframe"])?"?iframe=true":""));
+
+if (!isset($_GET["iframe"])) {
+	$buttons[] = icon_button(_L('Cancel'),"cross",null,'list.php');
+}
+call_user_func_array('buttons', $buttons);
+
+?>
+<br />
+<?
 
 startWindow('Upload Preview' . ($count <= 0 ? " - First 5000 Records" : ""));
 
@@ -272,9 +289,6 @@ if ($errormsg) {
 
 endWindow();
 
-?><br><div style="margin-left: 10px;"><img src="img/bug_important.gif"> Please review your list then click Save.</div><?
-
-buttons();
 EndForm();
 
 include_once("navbottom.inc.php");
