@@ -405,6 +405,9 @@ border-left: 1px solid #ddd; border-right: 1px solid #ddd; -webkit-border-radius
 .table-bordered a.save { background: url(themes/newui/savelist.png) left 0 no-repeat; display: inline-block; width: 18px; height: 18px; vertical-align: middle; }
 .table-bordered a.save:hover { background: url(themes/newui/savelist.png) left -22px no-repeat; }
 
+.table-bordered a.preview { background: url(themes/newui/previewlist.png) left 0 no-repeat; display: inline-block; width: 18px; height: 18px; vertical-align: middle; }
+.table-bordered a.preview:hover { background: url(themes/newui/previewlist.png) left -22px no-repeat; }
+
 .table-bordered td { border-bottom: 1px solid #ddd; }
 
 table.messages { width: 100%; margin: 0; font-size: 13px; line-height: 36px; border-bottom: 1px solid #ddd; border-left: 1px solid #ddd; border-right: 1px solid #ddd; }
@@ -759,7 +762,7 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
 	text-align: left;
 }
 .add-recipients table.lists tr.new td.flashed { background: none repeat scroll 0 0 #FFFFFF; }
-.add-recipients table.lists tr td:first-child { padding-right: 0; width: 55px; }
+.add-recipients table.lists tr td:first-child { padding-right: 0; width: 60px; }
 .add-recipients table.lists tr td { vertical-align: top; }
 
 .add-rule a.btn { padding: 7px 10px; color: #FFFFFF; font-weight: bold; text-shadow: 0 1px 1px rgba(0, 0, 0, 0.75); border-color: #366C19;
