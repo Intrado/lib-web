@@ -45,7 +45,7 @@ if (isset($_GET['id'])) {
 			$_SESSION['listid'] = $listid; //if the user owns the list and can edit lists, additionally set the listid so that the "in list" checkboxes work
 	}
 	$_SESSION['listreferer'] = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : 'list.php';
-	redirect();
+	redirect("showlist.php" . (isset($_GET["iframe"])?"?iframe=true":""));
 }
 
 handle_list_checkbox_ajax(); //for handling check/uncheck from the list
@@ -71,15 +71,19 @@ $TITLE = 'List Preview: ' . escapehtml($list->name);
 
 include_once("nav.inc.php");
 
-buttons(button('Refresh', '', $_SERVER["REQUEST_URI"] ), button("Done","",$_SESSION['listreferer']));
-
 startWindow("Preview");
+
+$buttons = array();
+if (!isset($_GET["iframe"])) {
+	$buttons[] = icon_button(_L("Done"),"tick",null,$_SESSION['listreferer']);
+}
+$buttons[] = icon_button(_L("Refresh"),"arrow_refresh",null, $_SERVER["REQUEST_URI"]);
+
+call_user_func_array('buttons', $buttons);
 
 showRenderedListTable($renderedlist, $list);
 
 endWindow();
-
-buttons(button('Refresh', '', $_SERVER["REQUEST_URI"] ), button("Done","","list.php"));
 
 include_once("navbottom.inc.php");
 ?>
