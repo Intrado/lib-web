@@ -124,9 +124,6 @@
 										<a href="#" class="btn btn-primary" data-dismiss="modal">Done</a>
 									</div>
 								</div>
-								<!-- /hidden modals -->
-								<div id="msgsndr_listids_msg" class="box_validatorerror er" style="display:none"></div>
-								
 								
 								<div id="add-recipients-upload" class="modal modaliframe hide fade">
 									<div class="modal-header">
@@ -141,8 +138,26 @@
 										<a href="#" class="btn btn-primary" data-dismiss="modal">Done</a>
 									</div>
 								</div>
+								
+								
+								<div id="modal-preview-list" class="modal modaliframe hide fade">
+									<div class="modal-header">
+										<a class="close" data-dismiss="modal">×</a>
+										<h3>Preview List</h3>
+									</div>
+									<div class="modal-body">
+										<iframe id="previewlistiframe" src=""></iframe>
+									</div>
+									<div class="modal-footer">
+										<a href="#" class="btn btn-primary" data-dismiss="modal">Done</a>
+									</div>
+								</div>
+								
 								<!-- /hidden modals -->
 								<div id="msgsndr_listids_msg" class="box_validatorerror er" style="display:none"></div>
+								
+								
+					
 
 <!-- from section_one -->
 				<fieldset>
