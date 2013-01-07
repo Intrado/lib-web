@@ -69,8 +69,9 @@
                 newUsingRules: {$el: $('#add-recipients-rules')},
                 newUsingSections: {$el: $('#add-recipients-sections')},
                 newUsingQuickPick: {$el: $('#add-recipients-quickpick')},
-                newUsingUpload: {$el: $('#add-recipients-upload')},
-
+                newUsingUpload: {$el: $('#add-recipients-upload')},  
+                
+                previewList: {$el: $('#modal-preview-list')},
                 saveList: {$el: $('#modal-save-list')}
             };
 
@@ -894,10 +895,8 @@
                 modal.validate = function(){
                 	var url = iframe.contents().get(0).location.href.toLowerCase();
                 	if (url == 'about:blank' || url.indexOf("uploadlist.php?iframe=true") >= 0) {
-                	 	console.log('disable ' + url);
                         submitBtn.addClass('disabled');
                     } else {
-                		console.log('enable ' + url);
                         submitBtn.removeClass('disabled');
                     };
                 };
@@ -913,7 +912,7 @@
                           base.pickedListIds.push(listid);
                           base.updateParentElement();
                           
-                          data[listid].name = 'Uplaoded List';
+                          data[listid].name = 'Uploaded List';
                           base.lists[listid] = {
                               stats: $.extend({}, data[listid])
                           };
@@ -924,6 +923,23 @@
                 });
             })();
 
+            
+            // MODAL > previewlist -------------------------------------
+            (function(){
+            	
+            	
+                var modal = base.modals.previewList;
+                var iframe = modal.$el.find('iframe');
+                var submitBtn = modal.$el.find('.btn-primary');
+
+                modal.$el.on('show', function(){
+                	iframe.attr("src","showlist.php?iframe=true&id=" + modal.listId);
+                });
+            })();
+            
+            
+            
+            
             // Wire up the table's list actions (remove and save) ---
 
             base.$el.find('.added-lists').on('click', '[data-list-id] .action', function(){
@@ -936,7 +952,12 @@
                 } else if ($action.hasClass('save')) {
                     base.modals.saveList.listId = listId;
                     base.modals.saveList.$el.modal('show');
+                } else if ($action.hasClass('preview')) {
+                    base.modals.previewList.listId = listId;
+                    base.modals.previewList.$el.modal('show');
                 };
+                
+                
 
                 // TODO: comment out tooltips for now. Have to find the issue with CSS causing positioning issues
                 //$action.tooltip('hide');
@@ -960,18 +981,20 @@
 
                     // Recalc total recipients
                     sum += base.lists[id].stats.total;
-
+                    
+                    rows += '<tr data-list-id="' + id + '"><td><a rel="tooltip" title="Remove List" class="action remove" href="#"><i class="icon-remove" title="Remove List"></i></a>'; 
                     // If this list is saved, no save icon, else, show save icon
-                    if (base.lists[id].isSaved) {
-                        rows = rows + '<tr data-list-id="' + id + '"><td><a rel="tooltip" title="Remove List" class="action remove" href="#"><i class="icon-remove" title="Remove List"></i></a></td><td>' + base.lists[id].stats.name + '</td><td>' + base.lists[id].stats.total + '</td></tr>';
-                    } else {
-                        rows = rows + '<tr data-list-id="' + id + '"><td><a rel="tooltip" title="Remove List" class="action remove" href="#"><i class="icon-remove" title="Remove List"></i></a><a rel="tooltip" title="Save List" class="action save" data-toggle="modal" href="#modal-save-list"><i class="icon-folder-open" title="Save List"></i></a></td><td>' + base.lists[id].stats.name + '</td><td>' + base.lists[id].stats.total + '</td></tr>';
-                    };
+                    if (!base.lists[id].isSaved) {
+                        rows += '<a rel="tooltip" title="Save List" class="action save" data-toggle="modal" href="#modal-save-list"><i class="icon-folder-open" title="Save List"></i></a>';
+                    }
+                    rows += '<a rel="tooltip" title="Preview List" class="action preview" data-toggle="modal" href="#modal-preview-list"><i title="Preveiw List"></i></a>';
+                    rows += '</td><td>' + base.lists[id].stats.name + '</td><td>' + base.lists[id].stats.total + '</td></tr>';
+                    
                 };
             });
 
             // Last row is the total
-            rows = rows + '<tr><td colspan="2">Total</td><td>' + sum + '</td></tr>';
+            rows += '<tr><td colspan="2">Total</td><td>' + sum + '</td></tr>';
             
             // Add the rows to the table
             $listTable.find('tbody').html(rows);
