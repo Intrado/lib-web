@@ -141,11 +141,7 @@
 								
 								
 								<div id="modal-preview-list" class="modal modaliframe hide fade">
-									<div class="modal-header">
-										<a class="close" data-dismiss="modal">×</a>
-										<h3>Preview List</h3>
-									</div>
-									<div class="modal-body">
+									<div class="modal-body preview">
 										<iframe id="previewlistiframe" src=""></iframe>
 									</div>
 									<div class="modal-footer">

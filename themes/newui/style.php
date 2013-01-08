@@ -1206,3 +1206,6 @@ div.progressbar div.progress {
     max-height: none;
     padding: 0 0 0 15px;
 }
+.modaliframe .preview {
+    height: 90%;
+}
