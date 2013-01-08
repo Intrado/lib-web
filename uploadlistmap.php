@@ -195,6 +195,8 @@ include_once("nav.inc.php");
 
 NewForm($f);
 
+startWindow('Upload Preview' . ($count <= 0 ? " - First 5000 Records" : ""));
+
 ?><div style="margin: 0 0 5px 5px;"><img src="img/bug_important.gif"> Please review your list then click Save.</div><?
 
 $buttons = array();
@@ -203,8 +205,9 @@ if (!isset($_GET["iframe"])) {
 } else {
 	$buttons[] = '<input class="btn_hide" type="submit" value="submit" name="submit[' . $f . '][' . 'save' . ']" />';
 }
-$buttons[] = submit($f, 'preview','Preview',null,'magnifier');
+
 $buttons[] = icon_button("Select Different File","fugue/arrow_180", NULL,"uploadlist.php" . (isset($_GET["iframe"])?"?iframe=true":""));
+$buttons[] = submit($f, 'preview','Preview',null,'magnifier');
 
 if (!isset($_GET["iframe"])) {
 	$buttons[] = icon_button(_L('Cancel'),"cross",null,'list.php');
@@ -214,8 +217,6 @@ call_user_func_array('buttons', $buttons);
 ?>
 <br />
 <?
-
-startWindow('Upload Preview' . ($count <= 0 ? " - First 5000 Records" : ""));
 
 if ($errormsg) {
 	echo '<div align="center">    ' . $errormsg;
@@ -227,7 +228,7 @@ if ($errormsg) {
 	}
 	$formatters = array(3 => "fmt_email");
 
-	if (count($listpreviewdata) >8) {
+	if (!isset($_GET["iframe"]) && count($listpreviewdata) >8) {
 		?><div class="scrollTableContainer"><?
 	}
 	echo '<table width="100%" cellpadding="3" cellspacing="1" class="list">';
