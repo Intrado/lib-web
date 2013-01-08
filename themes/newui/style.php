@@ -1209,3 +1209,10 @@ div.progressbar div.progress {
 .modaliframe .noheader {
     height: 90%;
 }
+
+.btn.list-progress,.btn.list-progress:hover{
+    background-color: #006DCC;
+    border: 1px solid #0039AB;
+    color: #FFFFFF;
+    text-align: center;
+}
