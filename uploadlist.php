@@ -161,7 +161,7 @@ startWindow('Upload Call List File');
 
 <br><div style="margin: 0 0 5px 5px;"><img src="img/bug_important.gif"> Please select a file to upload and then click Preview to continue.</div><?
 
-$buttons = array(submit($f, 'upload','Preview'));
+$buttons = array(submit($f, 'upload','Preview',null,'magnifier'));
 if (!isset($_GET["iframe"])) {
 	$buttons[] = icon_button(_L('Cancel'),"cross",null,'list.php');
 }
