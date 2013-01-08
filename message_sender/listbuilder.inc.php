@@ -131,7 +131,7 @@
 									</div>
 									<div class="modal-footer">
 										<a href="#" class="btn" data-dismiss="modal">Cancel</a>
-										<a href="#" class="btn btn-primary" data-dismiss="modal">Done</a>
+										<a href="#" class="btn btn-primary">Done</a>
 									</div>
 								</div>
 								

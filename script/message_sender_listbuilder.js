@@ -881,7 +881,8 @@
                 var iframe = modal.$el.find('iframe');
                 var listid;
                 var submitBtn = modal.$el.find('.btn-primary');
-
+                var inSubmit = false;
+                
                 modal.$el.on('show', function(){
                 	iframe.attr("src","");
                     $.ajax({
@@ -904,11 +905,27 @@
                 iframe.on('load', function() {modal.validate();});
                 
                 submitBtn.on('click', function(){
+                	if (inSubmit || submitBtn.hasClass('disabled')) {
+                		return;
+                	}
+                	inSubmit = true;
+                	
             		  iframe.contents().find('input.btn_hide').first().trigger('click');
+            		  //modal.$el.find('.call-progress').removeClass('hide');
             		  
+            		  submitBtn.addClass('call-progress');
+            		  submitBtn.addClass('list-progress');
+            		  submitBtn.removeClass('btn-primary');
+            		  var submitText = submitBtn.html();
+            		  submitBtn.html('Processing List');
                 	  $.ajax({
                           url: 'ajax.php?type=liststats&listids=["' + listid + '"]'
                       }).done(function(data){
+                    	  submitBtn.removeClass('call-progress');
+                    	  submitBtn.removeClass('list-progress');
+                    	  submitBtn.addClass('btn-primary');
+                    	  submitBtn.html(submitText);
+                    	  
                           base.pickedListIds.push(listid);
                           base.updateParentElement();
                           
@@ -919,6 +936,7 @@
                           modal.$el.modal('hide');
                           base.buildTable();
                           base.highlightListRow(listid);
+                          inSubmit = false;
                       });  
                 });
             })();
