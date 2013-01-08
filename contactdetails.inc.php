@@ -47,7 +47,7 @@ if (isset($_GET['id'])) {
 	//check to see if trying to viewcontact on a person this user created, and redirect to addressbook edit
 	$person = new Person($personid);
 	if ($person->userid == $USER->id)
-		redirect("addressedit.php?id=$personid&origin=preview");
+		redirect("addressedit.php?id=$personid&origin=preview$iFrameAppend");
 	
 	$_SESSION['currentpid'] = $personid;
 	if (!isset($_GET['ajax'])) 
