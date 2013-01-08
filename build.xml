@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-
+<!-- pull the current -->
 <project name="kona" default="dist">
 
     <property name="src.dir" location="." />
@@ -136,8 +136,10 @@
                 <exclude name="originals/" />
 
                 <!-- hidden files/folders (including .project) -->
-                <exclude name="**/.*" />
-                <exclude name="**/.*/" />
+                <exclude name="**/.g*" />
+                <exclude name="**/.g*/" />
+                <exclude name="**/.p*" />
+                <exclude name="**/.p*/" />    
 
                 <!-- IntelliJ project-related files -->
                 <exclude name="**/*.eml" />
@@ -148,6 +150,7 @@
 
 
     <target name="clean">
+    		<echo message="dist.dir = ${dist.dir}" />
         <delete dir="${dist.dir}" />
         <delete file="${build.txt.file}" />
     </target>
