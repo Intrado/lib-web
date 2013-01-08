@@ -846,7 +846,7 @@
                 var listid;
                 
                 modal.$el.on('show', function(){
-                	iframe.attr("src","");
+                	iframe.attr("src","blank.html");
                     $.ajax({
                         url: 'ajaxlistform.php?type=createlist'
                     }).done(function(newListId){
@@ -884,7 +884,7 @@
                 var inSubmit = false;
                 
                 modal.$el.on('show', function(){
-                	iframe.attr("src","");
+                	iframe.attr("src","blank.html");
                     $.ajax({
                         url: 'ajaxlistform.php?type=createlist'
                     }).done(function(newListId){
