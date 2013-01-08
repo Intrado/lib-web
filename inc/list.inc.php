@@ -8,7 +8,7 @@
  * @param $list
  * @return unknown_type
  */
-function showRenderedListTable($renderedlist, $list = false) {
+function showRenderedListTable($renderedlist, $list = false, $showinlist = true) {
 	global $PAGEINLISTMAP,$USER;
 	static $tableidcounter = 1;
 	
@@ -37,7 +37,7 @@ function showRenderedListTable($renderedlist, $list = false) {
 	$data = $renderedlist->getPageData();
 	$total = $renderedlist->getTotal();
 	
-	$showinlist = $list && $list->userid == $USER->id && $USER->authorize('createlist');
+	$showinlist = $showinlist && $list && $list->userid == $USER->id && $USER->authorize('createlist');
 	$showpersontip = !$list || ($list && $list->userid == $USER->id);
 	
 	if ($showinlist)
