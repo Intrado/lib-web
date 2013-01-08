@@ -81,7 +81,7 @@ $buttons[] = icon_button(_L("Refresh"),"arrow_refresh",null, $_SERVER["REQUEST_U
 
 call_user_func_array('buttons', $buttons);
 
-showRenderedListTable($renderedlist, $list);
+showRenderedListTable($renderedlist, $list, !isset($_GET["iframe"]));
 
 endWindow();
 
