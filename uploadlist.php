@@ -123,11 +123,17 @@ include_once("nav.inc.php");
 
 NewForm($f);
 
-startWindow('Upload Call List File');
+startWindow(_L('Upload List File'));
 ?>
 <table border="0" cellpadding="3" cellspacing="0" width="100%">
 	<tr>
-		<th align="right" class="windowRowHeader bottomBorder">Upload Type:</th>
+		<th align="right" class="bottomBorder">
+		<div class="formtitle">
+			<label class="formlabel" for="list_type">Type</label>
+			<img id="list_type_icon" class="formicon" src="img/icons/accept.gif" title="Valid" alt="Valid">
+		</div>
+		
+		</th>
 		<td class="bottomBorder">
 			<table  border="0" cellpadding="3" cellspacing="0">
 <?
@@ -151,17 +157,22 @@ startWindow('Upload Call List File');
 		</td>
 	</tr>
 	<tr valign="top">
-		<th align="right" class="windowRowHeader">Upload File:</th>
+		<th align="right" class="">
+			<div class="formtitle">
+				<label class="formlabel" for="list_file">File</label>
+				<img id="list_file_icon" src="img/icons/error.gif" title="Required Field" alt="Required Field" class="formicon">
+			</div>
+		</th>
 		<td>
-			<input type="file" name="listcontents" size="30">
+			<input id="list_file" type="file" name="listcontents" size="30">
 		</td>
 	</tr>
 
 </table>
 
-<br><div style="margin: 0 0 5px 5px;"><img src="img/bug_important.gif"> Please select a file to upload and then click Preview to continue.</div><?
-
-$buttons = array(submit($f, 'upload','Preview',null,'magnifier'));
+<br />
+<?
+$buttons = array(submit($f, 'upload',_L('Next'),null,'arrow_right'));
 if (!isset($_GET["iframe"])) {
 	$buttons[] = icon_button(_L('Cancel'),"cross",null,'list.php');
 }
@@ -170,6 +181,25 @@ call_user_func_array('buttons', $buttons);
 EndForm();
 endWindow();
 
+?> 
+<script type="text/javascript">
+// Lookalike validation for file upload
+$("list_file").observe("change", function(e) {
+	var icon = $("list_file_icon");
+	
+	if (e.element().value != "") {
+		icon.src = "img/icons/accept.gif";
+		icon.title = "Valid";
+		icon.alt = "Valid";	
+	} else {
+		icon.src = "img/icons/exclamation.gif";
+		icon.title = "Validation Error";
+		icon.alt = "Validation Error";	
+	}
+});
+</script>
+
+<?
 
 
 include_once("navbottom.inc.php");
