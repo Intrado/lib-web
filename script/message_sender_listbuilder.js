@@ -855,8 +855,20 @@
                     });
                 });
                 
+                modal.validate = function(){
+                	var url = iframe.contents().get(0).location.href.toLowerCase();
+                	if (url.indexOf("index.php") >= 0) {
+                		iframe.addClass("hide");
+                		alert('Your session has expired. Please log in again to continue.');
+                		window.location = "message_sender.php";
+                	}
+                };
+                
+                iframe.on('load', function() {modal.validate();});
+                
                 var submitBtn = modal.$el.find('.btn-primary');
-                submitBtn.on('click', function(){
+                submitBtn.on('click', function(e){
+                	  e.preventDefault();
                 	  $.ajax({
                           url: 'ajax.php?type=liststats&listids=["' + listid + '"]'
                       }).done(function(data){
@@ -882,6 +894,8 @@
                 var listid;
                 var submitBtn = modal.$el.find('.btn-primary');
                 var inSubmit = false;
+                var submitText = "Done";
+                
                 
                 modal.$el.on('show', function(){
                 	iframe.attr("src","blank.html");
@@ -895,6 +909,35 @@
                 
                 modal.validate = function(){
                 	var url = iframe.contents().get(0).location.href.toLowerCase();
+                	if (url.indexOf("index.php") >= 0) {
+                		iframe.addClass("hide");
+                		alert('Your session has expired. Please log in again to continue.');
+                		window.location = "message_sender.php";
+                	}
+                	
+                 	if (inSubmit) {
+                 		$.ajax({
+                            url: 'ajax.php?type=liststats&listids=["' + listid + '"]'
+                        }).done(function(data){
+                      	  submitBtn.removeClass('call-progress');
+                      	  submitBtn.removeClass('list-progress');
+                      	  submitBtn.addClass('btn-primary');
+                      	  submitBtn.html(submitText);
+                      	  
+                            base.pickedListIds.push(listid);
+                            base.updateParentElement();
+                            
+                            data[listid].name = 'Uploaded List';
+                            base.lists[listid] = {
+                                stats: $.extend({}, data[listid])
+                            };
+                            modal.$el.modal('hide');
+                            base.buildTable();
+                            base.highlightListRow(listid);
+                            inSubmit = false;
+                        }); 
+                	}
+                	
                 	if (url == 'about:blank' || url.indexOf("uploadlist.php?iframe=true") >= 0) {
                         submitBtn.addClass('disabled');
                     } else {
@@ -904,7 +947,8 @@
                 
                 iframe.on('load', function() {modal.validate();});
                 
-                submitBtn.on('click', function(){
+                submitBtn.on('click', function(e){
+              	    e.preventDefault();
                 	if (inSubmit || submitBtn.hasClass('disabled')) {
                 		return;
                 	}
@@ -916,36 +960,15 @@
             		  submitBtn.addClass('call-progress');
             		  submitBtn.addClass('list-progress');
             		  submitBtn.removeClass('btn-primary');
-            		  var submitText = submitBtn.html();
+            		  submitText = submitBtn.html();
             		  submitBtn.html('Processing List');
-                	  $.ajax({
-                          url: 'ajax.php?type=liststats&listids=["' + listid + '"]'
-                      }).done(function(data){
-                    	  submitBtn.removeClass('call-progress');
-                    	  submitBtn.removeClass('list-progress');
-                    	  submitBtn.addClass('btn-primary');
-                    	  submitBtn.html(submitText);
-                    	  
-                          base.pickedListIds.push(listid);
-                          base.updateParentElement();
-                          
-                          data[listid].name = 'Uploaded List';
-                          base.lists[listid] = {
-                              stats: $.extend({}, data[listid])
-                          };
-                          modal.$el.modal('hide');
-                          base.buildTable();
-                          base.highlightListRow(listid);
-                          inSubmit = false;
-                      });  
+                	   
                 });
             })();
 
             
             // MODAL > previewlist -------------------------------------
             (function(){
-            	
-            	
                 var modal = base.modals.previewList;
                 var iframe = modal.$el.find('iframe');
                 var submitBtn = modal.$el.find('.btn-primary');
@@ -953,6 +976,17 @@
                 modal.$el.on('show', function(){
                 	iframe.attr("src","showlist.php?iframe=true&id=" + modal.listId);
                 });
+                
+                modal.validate = function(){
+                	var url = iframe.contents().get(0).location.href.toLowerCase();
+                	if (url.indexOf("index.php") >= 0) {
+                		iframe.addClass("hide");
+                		alert('Your session has expired. Please log in again to continue.');
+                		window.location = "message_sender.php";
+                	}
+                };
+                
+                iframe.on('load', function() {modal.validate();});
             })();
             
             
