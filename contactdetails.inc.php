@@ -364,7 +364,7 @@ if (!isset($_GET['ajax'])) {
 		buttons(submit($f, $s, _L("Save"),null,'tick'),icon_button(_L("Cancel"),"cross", null, $_SESSION['contact_referer']));
 	} else {
 		buttons(icon_button(_L("Back"),"fugue/arrow_180", null, $_SESSION['contact_referer']),
-			$USER->authorize('managecontactdetailsettings') ? icon_button(_L("Edit"),"pencil", "if(confirm('You are about to edit contact data that may impact other people\'s lists.  Are you sure you want to continue?')) window.location='editcontact.php" . $iFrameAppend . " '") : ""
+			$USER->authorize('managecontactdetailsettings') ? icon_button(_L("Edit"),"pencil", "if(confirm('You are about to edit contact data that may impact other people\'s lists.  Are you sure you want to continue?')) window.location='editcontact.php" . $iFramePrepend . " '") : ""
 		);
 	}
 	echo "<br />";
