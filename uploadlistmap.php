@@ -197,8 +197,6 @@ NewForm($f);
 
 startWindow('Upload Preview' . ($count <= 0 ? " - First 5000 Records" : ""));
 
-?><div style="margin: 0 0 5px 5px;"><img src="img/bug_important.gif"> Please review your list then click Save.</div><?
-
 $buttons = array();
 if (!isset($_GET["iframe"])) {
 	$buttons[] = submit($f, 'save','Save');
