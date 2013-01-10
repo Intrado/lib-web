@@ -112,9 +112,9 @@ function showRenderedListTable($renderedlist, $list = false, $showinlist = true)
 	</div><!-- end table_controls -->
 <?
 
-	echo '<table id="'.$tableid.'" width="100%" cellpadding="3" cellspacing="1" class="list">';
+	echo '<div class="scrollTableContainer horizontalScrollTableContainer"><table id="'.$tableid.'" width="100%" cellpadding="3" cellspacing="1" class="list">';
 	showTable($data, $titles, $formatters, $repeatedcolumns, $groupby);
-	echo "\n</table>";
+	echo "\n</table></div>";
 	showPageMenu($total,$pagestart,$renderedlist->pagelimit);
 }
 

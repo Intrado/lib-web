@@ -397,6 +397,10 @@ div.scrollTableContainer {
 	overflow: auto; /* Turn on scrolling */
 	position: relative;
 }
+
+div.horizontalScrollTableContainer {
+	height: auto;
+}
 /* End of scrolling window style settings */
 
 
