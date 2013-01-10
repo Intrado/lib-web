@@ -71,7 +71,8 @@ $TITLE = 'List Preview: ' . escapehtml($list->name);
 
 include_once("nav.inc.php");
 
-startWindow("Preview");
+if (!isset($_GET["iframe"]))
+	startWindow("Preview");
 
 $buttons = array();
 if (!isset($_GET["iframe"])) {
@@ -83,7 +84,8 @@ call_user_func_array('buttons', $buttons);
 
 showRenderedListTable($renderedlist, $list, !isset($_GET["iframe"]));
 
-endWindow();
+if (!isset($_GET["iframe"]))
+	endWindow();
 
 include_once("navbottom.inc.php");
 ?>
