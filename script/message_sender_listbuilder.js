@@ -898,6 +898,8 @@
                 
                 
                 modal.$el.on('show', function(){
+                	submitBtn.addClass('disabled');
+                	modal.$el.addClass("uploadlistfileselector");
                 	iframe.attr("src","blank.html");
                     $.ajax({
                         url: 'ajaxlistform.php?type=createlist'
@@ -909,12 +911,35 @@
                 
                 modal.validate = function(){
                 	var url = iframe.contents().get(0).location.href.toLowerCase();
-                	if (url.indexOf("index.php") >= 0) {
+                	
+                	if (url == 'about:blank' || 
+                		url.indexOf("blank.html") >= 0 ||
+                		url.indexOf("uploadlist.php?iframe=true") >= 0) {
+                        submitBtn.addClass('disabled');
+                    } else {
+                        submitBtn.removeClass('disabled');
+                    };
+                };
+                
+                iframe.on('load', function() {
+                	var url = iframe.contents().get(0).location.href.toLowerCase();
+                	if (url == 'about:blank' || url.indexOf("blank.html") >= 0) {
+                		modal.validate();
+                		return;
+                	}
+                	
+                   	if (url.indexOf("index.php") >= 0) {
                 		iframe.addClass("hide");
                 		alert('Your session has expired. Please log in again to continue.');
                 		window.location = "message_sender.php";
                 	}
-                	
+                   	
+                   	if (url.indexOf("uploadlist.php?iframe=true") >= 0) {
+                       	modal.$el.addClass("uploadlistfileselector");
+                   	} else {
+                       	modal.$el.removeClass("uploadlistfileselector");
+
+                   	}
                  	if (inSubmit) {
                  		$.ajax({
                             url: 'ajax.php?type=liststats&listids=["' + listid + '"]'
@@ -937,15 +962,8 @@
                             inSubmit = false;
                         }); 
                 	}
-                	
-                	if (url == 'about:blank' || url.indexOf("uploadlist.php?iframe=true") >= 0) {
-                        submitBtn.addClass('disabled');
-                    } else {
-                        submitBtn.removeClass('disabled');
-                    };
-                };
-                
-                iframe.on('load', function() {modal.validate();});
+                	modal.validate();
+                });
                 
                 submitBtn.on('click', function(e){
               	    e.preventDefault();
