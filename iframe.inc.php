@@ -40,5 +40,5 @@ header('Content-type: text/html; charset=UTF-8') ;
 //load validator for rules, handle rule add/delete to form submit (contactsearchformdata.inc.php)
 ?>
 
-<div class="content_wrap">
+<div class="content_wrap iframe_content_wrap">
 <div class="content">

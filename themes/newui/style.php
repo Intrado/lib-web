@@ -1179,6 +1179,18 @@ div.progressbar div.progress {
 	max-height: none;
 }
 
+.uploadlistfileselector {
+    height: 300px;
+    margin: 15%;
+    width: 550px;
+}
+
+
+.iframe_content_wrap {
+    min-width: 500px;
+    padding: 20px 0;
+}
+
 .modaliframe iframe {
     height: 96%;
     width: 100%;
@@ -1189,6 +1201,11 @@ div.progressbar div.progress {
     max-height: none;
     padding: 0 1%;
 }
+
+.uploadlistfileselector .modal-body {
+	height: 65%;
+}
+
 .modaliframe .noheader {
     height: 90%;
 }

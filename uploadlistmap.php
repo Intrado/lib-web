@@ -199,21 +199,21 @@ include_once("nav.inc.php");
 
 NewForm($f);
 
-startWindow('Upload Preview' . ($count <= 0 ? " - First 5000 Records" : ""));
+if (!isset($_GET["iframe"])) {
+	startWindow('Upload Preview' . ($count <= 0 ? " - First 5000 Records" : ""));
+}
 
 $buttons = array();
 if (!isset($_GET["iframe"])) {
 	$buttons[] = submit($f, 'save','Save');
+	$buttons[] = icon_button(_L('Cancel'),"cross",null,'list.php');
 } else {
 	$buttons[] = '<input class="btn_hide" type="submit" value="submit" name="submit[' . $f . '][' . 'save' . ']" />';
 }
 
 $buttons[] = icon_button("Select Different File","fugue/arrow_180", NULL,"uploadlist.php" . (isset($_GET["iframe"])?"?iframe=true":""));
-$buttons[] = submit($f, 'preview','Preview',null,'magnifier');
+$buttons[] = submit($f, 'preview','Refresh Mapping',null,'arrow_refresh');
 
-if (!isset($_GET["iframe"])) {
-	$buttons[] = icon_button(_L('Cancel'),"cross",null,'list.php');
-}
 call_user_func_array('buttons', $buttons);
 
 ?>
@@ -289,8 +289,8 @@ if ($errormsg) {
 			?></div><?
 	}
 }
-
-endWindow();
+if (!isset($_GET["iframe"]))
+	endWindow();
 
 EndForm();
 

@@ -123,25 +123,34 @@ include_once("nav.inc.php");
 
 NewForm($f);
 
-startWindow(_L('Upload List File'));
+if (!isset($_GET["iframe"]))
+	startWindow(_L('Upload List File'));
 ?>
 <table border="0" cellpadding="3" cellspacing="0" width="100%">
 	<tr>
-		<th align="right" class="bottomBorder">
+		<th align="right">
 		<div class="formtitle">
 			<label class="formlabel" for="list_type">Type</label>
 			<img id="list_type_icon" class="formicon" src="img/icons/accept.gif" title="Valid" alt="Valid">
 		</div>
 		
 		</th>
-		<td class="bottomBorder">
+		<td>
 			<table  border="0" cellpadding="3" cellspacing="0">
 <?
 	if ($USER->authorize('listuploadcontacts')) {
+		if (!isset($_GET["iframe"]))
+			$infotext = "File format must be a Comma Separated Value (CSV) text file. Once uploaded, the files columns can be mapped to names, destinations, and insertable fields for use in messages.";
+		else
+			$infotext = "File format must be a Comma Separated Value (CSV) text file.";
+		
+		
 ?>
 				<tr>
 					<td class="upload_type"><label><? NewFormItem($f, $s, "type", "radio", null, "contacts"); ?>Contact&nbsp;data:</label></td>
-					<td class="upload_type">File format must be a Comma Separated Value (CSV) text file. Once uploaded, the files columns can be mapped to names, destinations, and insertable fields for use in messages.</td>
+					
+					
+					<td class="upload_type"><?= $infotext?></td>
 				<tr>
 <? } ?>
 <? if ($USER->authorize('listuploadids')) { ?>
@@ -171,15 +180,21 @@ startWindow(_L('Upload List File'));
 </table>
 
 <br />
+<div style="padding-left: 20px">
 <?
 $buttons = array(submit($f, 'upload',_L('Next'),null,'arrow_right'));
 if (!isset($_GET["iframe"])) {
 	$buttons[] = icon_button(_L('Cancel'),"cross",null,'list.php');
 }
 call_user_func_array('buttons', $buttons);
+?>
+</div>
+<?
 
 EndForm();
-endWindow();
+
+if (!isset($_GET["iframe"]))
+	endWindow();
 
 ?> 
 <script type="text/javascript">
