@@ -1195,9 +1195,9 @@ div.progressbar div.progress {
 }
 
 .uploadlistfileselector {
-    height: 300px;
+    height: 350px;
     margin: 15%;
-    width: 550px;
+    width: 600px;
 }
 
 
