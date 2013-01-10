@@ -128,7 +128,11 @@ if (CheckFormSubmit($f,'save') || CheckFormSubmit($f,'preview')) {
 					$import->refresh() && 
 					($import->status == "queued" || $import->status == "running"));
 				
-				redirect("list.php");
+				if (!isset($_GET["iframe"])) {
+					redirect("list.php");
+				} else {
+					exit();
+				}
 			}
 			//otherwise show preview again, with new mapping (need to reload form data?)
 		}
