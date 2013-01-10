@@ -1181,15 +1181,13 @@ div.progressbar div.progress {
 
 .modaliframe iframe {
     height: 96%;
-     width: 100%;
-    left: 5%;
-    margin: 1% 0 0;
+    width: 100%;
 }
 
 .modaliframe .modal-body {
     height: 80%;
     max-height: none;
-    padding: 0 0 0 15px;
+    padding: 0 1%;
 }
 .modaliframe .noheader {
     height: 90%;
