@@ -90,6 +90,7 @@ if (isset($_GET['template']) && $_GET['template'] && isset($_GET['subject']) && 
 		"lists" => (isset($_GET['lists'])?$_GET['lists']:"[]"),
 		"jobtypeid" => (isset($_GET['jobtypeid'])?$_GET['jobtypeid']:0),
 		"messagegroupid" => (isset($_GET['messagegroupid'])?$_GET['messagegroupid']:0));
+	$_SESSION['message_sender']["nonav"] = isset($_GET["nonav"]);
 	redirect();
 } else if (isset($_GET['new'])) {
 	unset($_SESSION['message_sender']);
@@ -1335,7 +1336,10 @@ $PAGE = "notifications:jobs";
 $TITLE = "";
 $MESSAGESENDER = true;
 
-include("nav.inc.php");
+if ($_SESSION['message_sender']["nonav"])
+	require_once("nonavtop.inc.php");
+else
+	require_once("nav.inc.php");
 // Load Custom Form Validators
 ?>
 <script type="text/javascript">
@@ -1390,4 +1394,8 @@ echo $form->renderJavascriptLibraries();
 echo $form->renderFormJavascript($posturl);
 echo $form->renderJavascript();
 
-include("navbottom.inc.php"); ?>
+if ($_SESSION['message_sender']["nonav"])
+	require_once("nonavbottom.inc.php");
+else
+	require_once("navbottom.inc.php");
+?>
