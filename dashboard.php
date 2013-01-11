@@ -529,6 +529,9 @@ document.observe('dom:loaded', function() {
 	ajax_obj_table_update('activejobs','ajaxjob.php?action=activejobs&who=<?=$requestValues["showactivity"]?>&start=0&limit=10',true,updateTableTools.curry("activejobs","activejobs",true,0,10));
 	ajax_obj_table_update('scheduledjobs','ajaxjob.php?action=scheduledjobs&who=<?=$requestValues["showactivity"]?>&start=0&limit=10',false,updateTableTools.curry("scheduledjobs","scheduledjobs",false,0,10));
 	ajax_obj_table_update('completedjobs','ajaxjob.php?action=completedjobs&who=<?=$requestValues["showactivity"]?>&start=0&limit=5',false,updateTableTools.curry("completedjobs","completedjobs",false,0,5));
+	// send a message to any listeners letting them know the page has been loaded
+	top.postMessage('{"custurl":"<?=$CUSTOMERURL?>", ' +
+			'"page":"<?=preg_replace('/.*\//', "", $_SERVER["SCRIPT_NAME"])?>", "user":"<?=$USER->login?>"}', '*');
 });
 
 </script>
