@@ -1197,7 +1197,7 @@ div.progressbar div.progress {
 }
 
 .modaliframe .modal-body {
-    height: 80%;
+    height: 85%;
     max-height: none;
     padding: 0 1%;
 }
