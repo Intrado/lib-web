@@ -1,6 +1,18 @@
 jQuery.noConflict();
 (function($) {
 
+	// monitor the main content div for resize and send a message with this information
+	var lastHeight;
+	setInterval(function() {
+		// content_wrap has a bunch of extra padding...
+		var newHeight = $('div.content_wrap').height() + 107;
+		if (newHeight != lastHeight) {
+			var msg = {};
+			msg["resize"] = lastHeight = newHeight;
+			top.postMessage($.toJSON(msg), '*');
+		}
+	}, 500);
+
 	$.ajaxSetup ({
 		cache: false
 	});
