@@ -77,7 +77,7 @@ if (isset($_GET['id'])) {
 	// NOTE: maintaing previous behavior while removing errors from httpd log files. See bug:4605
 	$referer = (isset($_SERVER['HTTP_REFERER'])?$_SERVER['HTTP_REFERER']:NULL);
 	$_SESSION['listreferer'] = $referer;
-	redirect();
+	redirect("search.php" . (isset($_GET["iframe"])?"?iframe=true":""));
 }
 
 handle_list_checkbox_ajax(); //for handling check/uncheck from the list
@@ -92,9 +92,9 @@ $renderedlist = new RenderedList2();
 $renderedlist->pagelimit = 100;
 
 // buttons must be defined before include 'contactsearchformdata.inc'
-$buttons = array(
-	icon_button(_L('Done'),"tick",null, isset($_SESSION['listreferer']) ? $_SESSION['listreferer'] : "list.php")
-);
+$buttons = array();
+if (!isset($_GET["iframe"]))
+	$buttons[] = icon_button(_L('Done'),"tick",null, isset($_SESSION['listreferer']) ? $_SESSION['listreferer'] : "list.php");
 
 // variable for page redirect, used by include 'contactsearchformdata.inc'
 $redirectpage = "search.php";

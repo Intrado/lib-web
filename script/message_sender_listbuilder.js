@@ -851,7 +851,7 @@
                         url: 'ajaxlistform.php?type=createlist'
                     }).done(function(newListId){
                     	listid = newListId
-                    	iframe.attr("src","searchquickadd.php?listsearchmode=individual&id=" + listid);
+                    	iframe.attr("src","search.php?iframe=true&listsearchmode=individual&id=" + listid);
                     });
                 });
                 
