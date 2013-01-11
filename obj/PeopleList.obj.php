@@ -119,7 +119,38 @@ class PeopleList extends DBMappedObject {
 		}
 		return $isSuccess;
 	}
-		
+
+	function createManualAddByPkeys($pkeys) {
+		if (!userOwns("list", $this->id))
+			return 0;
+
+		Query("BEGIN");
+		// find all the person ids
+		$personIds = QuickQueryList(
+			"select id from person where type = 'system' and pkey in (". repeatWithSeparator('?', ',', count($pkeys)). ")",
+			false, false, $pkeys);
+
+		$addIds = array();
+		if (count($personIds) > 0) {
+			$existingPersonIds = QuickQueryList(
+				"select p.id from person p, listentry le where p.id=le.personid and le.type = 'add' and p.userid is null and le.listid = ?",
+				false, false, array($this->id));
+
+			// only add new people
+			$addIds = array_diff($personIds, $existingPersonIds);
+
+			// TODO: Need a batch insert method for this?
+			if ($addIds > 0) {
+				$insertValues = ' ('. $this->id. ', "add", ?)';
+				QuickUpdate(
+					"insert into listentry (listid, type, personid) values ". repeatWithSeparator($insertValues, ",", $addIds),
+					false, $addIds);
+			}
+		}
+		Query("COMMIT");
+
+		return count($addIds);
+	}
 }
 
 ?>
