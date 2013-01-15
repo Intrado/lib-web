@@ -15,15 +15,34 @@
 	// extend jquery with json plugin
 	$('head').append('<script type="text/javascript" src="https://heckvm.testschoolmessenger.com/powerschool/script/jquery.json-2.3.min.js"></script>');
 
-	// TODO: detect multiple plugins and present the user with a choice of which to use
-	var ssoTarget = ssoUrl[0];
+	var container = $("#content-msgsndr");
+	// detect multiple plugins and present the user with a choice of which to use
 	if (ssoUrl.length > 1) {
-		console.log("multiple sso urls: " + ssoUrl);
+		container.html(
+			'<div id="selectplugin">' +
+				'<h1>New Broadcast</h1>' +
+				'<div class="box-round">' +
+					'<h2>Select a plugin</h2>' +
+					'<ul class="plugins">' +
+					'</ul>' +
+				'</div>' +
+			'</div>'
+		);
+		$.each(ssoUrl, function(id, url) {
+			// TODO: also get name and present that instead of the relative url to load
+			var li = $("<li><a href='#'>" + url + "</a></li>");
+			container.find("ul").append(li);
+			li.on("click", function(event) {
+				event.preventDefault();
+				var msgsndr = new MessageSender_embedded(url, pkeyList, container);
+				msgsndr.init();
+			})
+		})
+	} else {
+		// initialize the message sender object. It will auto-load into the form
+		var msgsndr = new MessageSender_embedded(ssoUrl[0], pkeyList, container);
+		msgsndr.init();
 	}
-
-	// initialize the message sender object. It will auto-load into the form
-	var msgsndr = new MessageSender_embedded(ssoTarget, pkeyList, $("#content-msgsndr"));
-	msgsndr.init();
 
 })(jQuery);
 
