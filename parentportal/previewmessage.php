@@ -150,7 +150,7 @@ include_once("popup.inc.php");
 
 NewForm($f);
 
-buttons(button(_L('Done'), 'window.close()'));
+buttons(icon_button(_L('Done'),"tick", 'window.close()'));
 
 
 startWindow(_L('Details'), 'padding: 3px;');
