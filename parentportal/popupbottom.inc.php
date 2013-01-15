@@ -1,5 +1,6 @@
 
 </div>
+</div>
 <?
 if(isset($ERRORS) && is_array($ERRORS)) {
 	foreach($ERRORS as $key => $value) {
