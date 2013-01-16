@@ -1,7 +1,7 @@
 <?
 
 
-function feed($buttons,$filters) {
+function feed($buttons,$sortoptions,$viewoptions = null) {
 ?>
 <div class="feed_btn_wrap cf">
 <?
@@ -11,19 +11,32 @@ function feed($buttons,$filters) {
 ?>
 </div>
 
-
 <div class="csec window_aside">
-		<h3 id="filterby">Sort By:</h3>
-		<ul id="allfilters" class="feedfilter">
-		
-		<?
-			foreach($filters as $key => $filter) {
-				echo "<li><a id=\"{$key}filter\" href=\"#\" onclick=\"feed_applyfilter('{$_SERVER["REQUEST_URI"]}','$key'); return false;\"><img src=\"{$filter["icon"]}\" />{$filter["name"]}</a></li>";
+		<? 
+		if ($viewoptions != null) {
+			?>
+			<h3><?= _L('Views:') ?></h3>
+			<ul class="feedfilter">
+			<?
+			foreach($viewoptions as $item) {
+				echo "<li><a href=\"#\" onclick=\"feed_applyview('{$_SERVER["REQUEST_URI"]}','$key'); return false;\"><img src=\"{$item["icon"]}\" />{$item["name"]}</a></li>";
 			}
+			echo '</ul>';
+		}
+		if ($sortoptions != null) {
+			?>
+			<h3><?= _L('Sort By:') ?></h3>
+			<ul id="allfilters" class="feedfilter">
+			<?
+			foreach($sortoptions as $key => $item) {				
+				echo "<li><a id=\"sortby_{$key}\" href=\"#\" onclick=\"feed_applysort('{$_SERVER["REQUEST_URI"]}','$key'); return false;\"><img src=\"{$item["icon"]}\" />{$item["name"]}</a></li>";
+			}
+			?>
+			</ul>
+			<?
+		}
 		?>
-		</ul>
 </div><!-- .cesc .window_aside -->
-	
 
 <div class="csec window_main">
 	

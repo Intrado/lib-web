@@ -277,23 +277,29 @@ startWindow(_L('My Messages'), 'padding: 3px;', false, true);
 $feedButtons = array(icon_button(_L('Add New Message'),"add",null,"mgeditor.php?id=new"));
 if ($USER->authorize('subscribe') && userCanSubscribe('messagegroup'))
 	$feedButtons[] = icon_button(_L('Subscribe to a Message'),"fugue/star", "document.location='messagegroupsubscribe.php'");
+$feedButtons[] = icon_button(_L('Add New Stationery'),"add",null,"mgeditor.php?id=new");
 
-$feedFilters = array(
+$sortoptions = array(
 	"name" => array("icon" => "img/largeicons/tiny20x20/pencil.jpg", "name" => "Name"),
 	"date" => array("icon" => "img/largeicons/tiny20x20/clock.jpg", "name" => "Date")
 );
+$viewoptions = array(
+	"messages" => array("icon" => "img/largeicons/tiny20x20/pencil.jpg", "name" => _L("Messages")),
+	"stationery" => array("icon" => "img/largeicons/tiny20x20/clock.jpg", "name" => _L("Stationery"))	
+);
 
-feed($feedButtons,$feedFilters);
+feed($feedButtons,$sortoptions,$viewoptions);
 ?>
 
 
 <script type="text/javascript" src="script/feed.js.php"></script>
 <script type="text/javascript">
-var filtes = <?= json_encode(array_keys($feedFilters))?>;
-var activepage = 0;
-var currentfilter = 'date';
+var feed_sortoptions = <?= json_encode(array_keys($sortoptions))?>;
+var feed_sortby = 'date';
+var feed_view = 'messages';
+
 document.observe('dom:loaded', function() {
-	feed_applyDefaultFilter('<?=$_SERVER["REQUEST_URI"]?>','name');
+	feed_applyDefault('<?=$_SERVER["REQUEST_URI"]?>','name','messages');
 });
 </script>
 <?

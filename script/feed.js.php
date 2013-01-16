@@ -6,6 +6,9 @@ header("Content-Type: text/javascript");
 header("Cache-Control: private");
 
 ?>
+var feed_activepage = 0;
+var feed_sortby = 'date';
+var feed_view = 'messages';
 
 // One cookie for all feed pages, data is a json encoded key/value string of page and order by preference
 function setFeedCookie(page,value) {
@@ -36,31 +39,39 @@ function getFeedCookieValue(page) {
 
 
 function feed_page(url,event) {
-	activepage = event.element().value;
-	feed_applyfilter(url,currentfilter);
+	feed_activepage = event.element().value;
+	feed_applysort(url,feed_sortby);
 }
 
-// Sets the order by filter if value not already set in feed cookie 
-function feed_applyDefaultFilter(url,orderby) {
+// Sets the sortby if value not already set in feed cookie 
+function feed_applyDefault(url,sortby,view) {
 	var o = getFeedCookieValue(url);
 	if (typeof(o) == 'undefined') {
-		o = orderby;
+		if (typeof(view) == 'undefined') {
+			o = sortby + ':' + view;
+		} else {
+			o = sortby;
+		}
 	}
-	feed_applyfilter(url,o)
+	options = o.split(':',2);
+	if (options.length == 2)
+		feed_applysort(url,options[0],options[1]);
+	if (options.length == 1)
+		feed_applysort(url,options[0]);
 }
 
 
-function feed_applyfilter(url,filter) {
+function feed_applysort(url,sortby,view) {
 	new Ajax.Request(url, {
 		method:'get',
-		parameters:{ajax:true,filter:filter,pagestart:activepage},
+		parameters:{ajax:true,filter:sortby,pagestart:feed_activepage},
 		onSuccess: function (response) {
 			var result = response.responseJSON;
 			if(result) {
 				$('feeditems').update(new Element('div', {'class': 'content_feed'}));
 				for (var i = 0; i < result.list.length; i++) {
 					var item = result.list[i];
-					var msg = new Element('div', {'class': 'feed_item cf'});
+					var msg = new Element('div', {'class': 'content_row'});
 
 					// insert icon
 					msg.insert(
@@ -140,24 +151,22 @@ function feed_applyfilter(url,filter) {
 				$('pagewrappertop').update(pagetop);
 				$('pagewrapperbottom').update(pagebottom);
 
-				currentfilter = filter
+				feed_sortby = sortby
 				$('selecttop').observe('change',feed_page.curry(url));
 				$('selectbottom').observe('change',feed_page.curry(url));
 
-				var filtercolor = $('filterby').getStyle('color');
-				if(!filtercolor)
-					filtercolor = '#000';
+				var sortbycolor = '#2A4470';
 
-				size = filtes.length;
+				size = feed_sortoptions.length;
 				for(i=0;i < size;i++){
-					$(filtes[i] + 'filter').setStyle({color: filtercolor, fontWeight: 'normal'});
+					$('sortby_' + feed_sortoptions[i]).setStyle({color: sortbycolor, fontWeight: 'normal'});
 				}
-				$(filter + 'filter').setStyle({
+				$('sortby_' + sortby).setStyle({
 					 color: '#000000',
 					 fontWeight: 'bold'
 				});
 				
-				setFeedCookie(url,filter);
+				setFeedCookie(url,sortby);
 			}
 		}
 	});
