@@ -215,8 +215,11 @@ $formdata["attachments"] = array(
 
 
 $messagecontrol = array("EmailMessageEditor", "subtype" => $subtype);
-if ($subtype == "plain" && $languagecode == "en")
+if ($subtype == "plain" && $languagecode == "en") {
 	$messagecontrol['spellcheck'] = true;
+}
+// SMK added 2013-01-04 - valid modes are 'plain', 'normal', 'full', and 'wysiwyg'
+$messagecontrol['editor_mode'] = 'wysiwyg'; // FIXME - should be "normal" for normal execution
 
 $helpsteps[] = _L("Email message body text goes here. Be sure to introduce yourself and give detailed information. For ".
 	"helpful message tips and ideas, click the Help link in the upper right corner of the screen.<br><br>If you would ".

@@ -1,5 +1,8 @@
 <?
-/* Advanced Email Message Editor form item
+
+/**
+ * Advanced Email Message Editor form item
+ *
  * Purpose is to provide the user with the tools
  * needed to create an email message containing
  * dynamic content.
@@ -11,14 +14,15 @@
  * 	FieldMap
  * 	
  * Nickolas Heckman
+ *
+ * @todo SMK notes 2013-01-02 prototype->jquery port is needed
  */
-
 class EmailMessageEditor extends FormItem {
 	
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
-				// subtype tells us if it's a plain or html email message
-		
+
+		// subtype tells us if it's a plain or html email message
 		$subtype = "html";
 		if (isset($this->args['subtype']))
 			$subtype = $this->args['subtype'];
@@ -42,6 +46,8 @@ class EmailMessageEditor extends FormItem {
 			<img src="img/icons/bullet_black.gif" />
 			<img src="img/icons/bullet_black.gif" />';
 				
+// SMK replaced with CKE plugin "mkfield" 2013-01-04
+/*
 		// Data field inserts
 		$datafieldinsert = '
 			<div class="controlcontainer">
@@ -72,6 +78,7 @@ class EmailMessageEditor extends FormItem {
 					</div>
 				</div>
 			</div>';
+*/
 		
 		// main containers
 		$str = '
@@ -82,10 +89,13 @@ class EmailMessageEditor extends FormItem {
 				<div class="maincontainerseperator">
 					'.$seperator.'
 				</div>
+			</div>';
+// SMK replaced with CKE plugin "mkfield" 2013-01-04
+/*
 				<div class="maincontainerright">
 					'.$datafieldinsert.'
 				</div>
-			</div>';
+*/
 		return $str;
 	}
 
@@ -111,38 +121,51 @@ class EmailMessageEditor extends FormItem {
 	
 	function renderJavascriptLibraries() {
 		global $USER;
-		
-		$subtype = "html";
-		if (isset($this->args['subtype']))
-			$subtype = $this->args['subtype'];
-		
-		$str = '
+
+		$subtype = (isset($this->args['subtype'])) ? $this->args['subtype'] : 'html';
+
+		// SMK added 2013-01-02 to be able to switch modalities for any FI of this type
+		$editor_mode = isset($this->args['editor_mode']) ? $this->args['editor_mode'] : 'plain';
+
+		// SMK added 2013-01-03 to make field definitions available to JS (CKE plugin mkfield)
+		if ($editor_mode != 'plain') {
+			$rcidata_fields = '';
+			foreach(FieldMap::getAuthorizeFieldInsertNames() as $field) {
+				if (strlen($rcidata_fields)) $rcidata_fields .= ',';
+				$rcidata_fields .= "\"{$field}\"";
+			}
+
+			$rcidataScript = <<<END
+				<script type="text/javascript" src="script/rcidata.js"></script>
+				<script type="text/javascript">
+					rcidata.set('customer_field_defs', Array({$rcidata_fields}));
+				</script>
+END;
+		}
+		else {
+			$rcidataScript = '';
+		}
+
+		$str = <<<END
+			<!-- editor mode: [{$editor_mode}] -->
+			{$rcidataScript}
 			<script type="text/javascript" src="script/ckeditor/ckeditor.js"></script>
 			<script type="text/javascript">
-				// SMK added global var 2012-12-07 to selectively enabled uploaded image reduction scaling
+				// SMK added global var 2012-12-07 to selectively enable uploaded image reduction scaling
 				var htmlEditorImageScale = 600; // Max dimension for scaling
 			</script>
-			<script type="text/javascript" src="script/htmleditor.js"></script>
+
+			<script type="text/javascript" src="script/rcieditor.js"></script>
 			<script type="text/javascript">
 				function setupHtmlTextArea(e, hidetoolbar) {
 					e = $(e);
 					
-					// add the ckeditor to the textarea
-					applyHtmlEditor(e, false, e.id+"-htmleditor", hidetoolbar);
-
-					// set up a keytimer to save content and validate
-					var htmlTextArea_keytimer = null;
-					registerHtmlEditorKeyListener(function (event) {
-						window.clearTimeout(htmlTextArea_keytimer);
-						var htmleditor = getHtmlEditorObject();
-						htmlTextArea_keytimer = window.setTimeout(function() {
-							saveHtmlEditorContent(htmleditor);
-							form_do_validation(htmleditor.currenttextarea.up("form"), htmleditor.currenttextarea);
-						}, 500);
-					});
+					// apply the ckeditor to the textarea
+					RCIEditor.applyEditor('{$editor_mode}', e, e.id + '-htmleditor');
 				}
-			</script>';
-		
+			</script>
+END;
+
 		if ($subtype == "plain" && isset($this->args['spellcheck']) && $this->args['spellcheck']) {
 			$str .= '<script src="script/speller/spellChecker.js"></script>';
 		}
