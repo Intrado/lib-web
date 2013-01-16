@@ -11,7 +11,7 @@ if (!isset($_GET['skipcommon'])) {
 	unset($_SESSION['colorscheme']);
 	
 	
-	if (isset($_SESSION['bluetheme'])) {
+	if (!isset($_SESSION['classroomtheme'])) {
 		$_SESSION['colorscheme'] = $COLORSCHEMES["newui"];
 		$_SESSION['colorscheme']["_brandtheme"] = "newui";
 	}
