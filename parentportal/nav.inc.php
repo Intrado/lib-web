@@ -1,8 +1,8 @@
 <?
-if (isset($_REQUEST["blue"]))
-	$_SESSION['bluetheme'] = true;
 if (isset($_REQUEST["classroom"]))
-	unset($_SESSION['bluetheme']);
+	$_SESSION['classroomtheme'] = true;
+if (isset($_REQUEST["blue"]))
+	unset($_SESSION['classroomtheme']);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
