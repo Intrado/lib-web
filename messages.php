@@ -74,26 +74,33 @@ $isajax = isset($_GET['ajax']);
 if($isajax === true) {
 	session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 
+	$mgtype = "notification";
+	if (isset($_GET['feed_view']) && $_GET['feed_view'] == "stationery") {
+		$mgtype = "stationery";	
+	}
+	
 	$start = 0 + (isset($_GET['pagestart']) ? $_GET['pagestart'] : 0);
 	$limit = 100;
 	$orderby = "modified desc";
 
-	$filter = "";
-	if (isset($_GET['filter'])) {
-		$filter = $_GET['filter'];
+	$sortby = "";
+	if (isset($_GET['feed_sortby'])) {
+		$sortby = $_GET['feed_sortby'];
 	}
-	switch ($filter) {
+	switch ($sortby) {
 		case "name":
 			$orderby = "digitsfirst, name";
 			break;
 	}
+	
+
 	
 	// get all the message group ids for this page
 	$msgGroupIds = QuickQueryList(
 		"(select SQL_CALC_FOUND_ROWS mg.id as id,modified, (mg.name +0) as digitsfirst,name
 		from messagegroup mg
 		where mg.userid = ? 
-			and mg.type = 'notification'
+			and mg.type = ?
 			and not mg.deleted)
 		UNION
 		(select mg.id as id,modified, (mg.name +0) as digitsfirst,name
@@ -105,7 +112,7 @@ if($isajax === true) {
 			and p.type = 'messagegroup'
 			and not mg.deleted)
 		order by $orderby, id
-		limit $start, $limit", false, false, array($USER->id, $USER->id));
+		limit $start, $limit", false, false, array($USER->id, $mgtype, $USER->id));
 
   	// total rows
 	$total = QuickQuery("select FOUND_ROWS()");
@@ -294,9 +301,6 @@ feed($feedButtons,$sortoptions,$viewoptions);
 
 <script type="text/javascript" src="script/feed.js.php"></script>
 <script type="text/javascript">
-var feed_sortoptions = <?= json_encode(array_keys($sortoptions))?>;
-var feed_sortby = 'date';
-var feed_view = 'messages';
 
 document.observe('dom:loaded', function() {
 	feed_applyDefault('<?=$_SERVER["REQUEST_URI"]?>','name','messages');

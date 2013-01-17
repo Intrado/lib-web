@@ -257,6 +257,8 @@ table.window_body { width: 100%; }
 .feedfilter {	margin: 0; padding: 0; list-style: none; }
 .feedfilter li { line-height: 20px; padding-top: 5px; }
 .feedfilter li a img { margin-top: -5px; margin-right: 5px; }
+.feedfilter li.feedselected a {color: #000000; font-weight: bold; }
+
 
 .caller_id { float: left; display: inline; width: 70.5%; }
 .approved_id { float: left; display: inline; width: 28.5%; margin: 0 0 0 1%; }

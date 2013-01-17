@@ -56,11 +56,11 @@ if($isajax === true) {
 	$limit = 5;
 	$orderby = "date desc";
 
-	$filter = "";
-	if (isset($_GET['filter'])) {
-		$filter = $_GET['filter'];
+	$sortby = "";
+	if (isset($_GET['feed_sortby'])) {
+		$sortby = $_GET['feed_sortby'];
 	}
-	switch ($filter) {
+	switch ($sortby) {
 		case "name":
 			$orderby = "digitsfirst, name";
 			break;
@@ -192,8 +192,8 @@ feed($feedButtons,$sortoptions);
 
 <script type="text/javascript" src="script/feed.js.php"></script>
 <script type="text/javascript">
-var feed_sortoptions = <?= json_encode(array_keys($sortoptions))?>;
-var feed_sortby = 'date';
+
+
 
 document.observe('dom:loaded', function() {
 	feed_applyDefault('<?=$_SERVER["REQUEST_URI"]?>','name');

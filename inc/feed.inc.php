@@ -16,20 +16,20 @@ function feed($buttons,$sortoptions,$viewoptions = null) {
 		if ($viewoptions != null) {
 			?>
 			<h3><?= _L('Views:') ?></h3>
-			<ul class="feedfilter">
+			<ul class="feedfilter feedviewoptions">
 			<?
-			foreach($viewoptions as $item) {
-				echo "<li><a href=\"#\" onclick=\"feed_applyview('{$_SERVER["REQUEST_URI"]}','$key'); return false;\"><img src=\"{$item["icon"]}\" />{$item["name"]}</a></li>";
+			foreach($viewoptions as $key => $item) {
+				echo "<li id=\"feed_view_{$key}\"><a href=\"#\" onclick=\"feed_applyview('{$_SERVER["REQUEST_URI"]}','$key'); return false;\"><img src=\"{$item["icon"]}\" />{$item["name"]}</a></li>";
 			}
 			echo '</ul>';
 		}
 		if ($sortoptions != null) {
 			?>
 			<h3><?= _L('Sort By:') ?></h3>
-			<ul id="allfilters" class="feedfilter">
+			<ul id="allfilters" class="feedfilter feedsortbyoptions">
 			<?
 			foreach($sortoptions as $key => $item) {				
-				echo "<li><a id=\"sortby_{$key}\" href=\"#\" onclick=\"feed_applysort('{$_SERVER["REQUEST_URI"]}','$key'); return false;\"><img src=\"{$item["icon"]}\" />{$item["name"]}</a></li>";
+				echo "<li id=\"feed_sortby_{$key}\"><a href=\"#\" onclick=\"feed_applysortby('{$_SERVER["REQUEST_URI"]}','$key'); return false;\"><img src=\"{$item["icon"]}\" />{$item["name"]}</a></li>";
 			}
 			?>
 			</ul>

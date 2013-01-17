@@ -7,8 +7,8 @@ header("Cache-Control: private");
 
 ?>
 var feed_activepage = 0;
-var feed_sortby = 'date';
-var feed_view = 'messages';
+
+var feed_view = '';
 
 // One cookie for all feed pages, data is a json encoded key/value string of page and order by preference
 function setFeedCookie(page,value) {
@@ -40,7 +40,7 @@ function getFeedCookieValue(page) {
 
 function feed_page(url,event) {
 	feed_activepage = event.element().value;
-	feed_applysort(url,feed_sortby);
+	feed_apply(url,feed_sortby);
 }
 
 // Sets the sortby if value not already set in feed cookie 
@@ -55,16 +55,31 @@ function feed_applyDefault(url,sortby,view) {
 	}
 	options = o.split(':',2);
 	if (options.length == 2)
-		feed_applysort(url,options[0],options[1]);
+		feed_apply(url,options[0],options[1]);
 	if (options.length == 1)
-		feed_applysort(url,options[0]);
+		feed_apply(url,options[0]);
 }
 
 
-function feed_applysort(url,sortby,view) {
+function feed_applysortby(url,sortby) {
+	feed_apply(url,sortby);
+}
+function feed_applyview(url,view) {
+	feed_apply(url,undefined,view);
+}
+
+function feed_apply(url,sortby,view) {
+	if (typeof(sortby) == 'undefined') {
+		sortby = feed_sortby;
+	}
+	
+	if (typeof(view) == 'undefined') {
+		view = feed_view;
+	}
+	
 	new Ajax.Request(url, {
 		method:'get',
-		parameters:{ajax:true,filter:sortby,pagestart:feed_activepage},
+		parameters:{ajax:true,feed_sortby:sortby,feed_view:view,pagestart:feed_activepage},
 		onSuccess: function (response) {
 			var result = response.responseJSON;
 			if(result) {
@@ -151,22 +166,26 @@ function feed_applysort(url,sortby,view) {
 				$('pagewrappertop').update(pagetop);
 				$('pagewrapperbottom').update(pagebottom);
 
-				feed_sortby = sortby
+				feed_sortby = sortby;
+				feed_view = view;
+				
 				$('selecttop').observe('change',feed_page.curry(url));
 				$('selectbottom').observe('change',feed_page.curry(url));
 
-				var sortbycolor = '#2A4470';
-
-				size = feed_sortoptions.length;
-				for(i=0;i < size;i++){
-					$('sortby_' + feed_sortoptions[i]).setStyle({color: sortbycolor, fontWeight: 'normal'});
-				}
-				$('sortby_' + sortby).setStyle({
-					 color: '#000000',
-					 fontWeight: 'bold'
+				$$('ul.feedsortbyoptions li').each(function(e) {
+					e.removeClassName('feedselected')
 				});
+								
+				$('feed_sortby_' + sortby).addClassName('feedselected')
 				
-				setFeedCookie(url,sortby);
+				$$('ul.feedviewoptions li').each(function(e) {
+					e.removeClassName('feedselected')
+				});
+								
+				$('feed_view_' + view).addClassName('feedselected')
+				
+				
+				setFeedCookie(url,sortby + ':' + view);
 			}
 		}
 	});
