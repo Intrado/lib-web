@@ -98,6 +98,13 @@ if (isset($_GET['id'])) {
 }
 
 $messagegroup = new MessageGroup(getCurrentMessageGroup());
+if($USER->authorize('sendemail') && $messagegroup->type == 'stationery' && !$messagegroup->deleted) {
+	$message = $messagegroup->getMessage("email", "html", $messagegroup->defaultlanguagecode);
+	if ($message)
+		redirect("editstationeryemail.php?id={$message->id}");
+	else
+		redirect("editstationeryemail.php?mgid={$messagegroup->id}&languagecode={$messagegroup->defaultlanguagecode}");
+}
 if($messagegroup->type != 'notification' || $messagegroup->deleted) {
 	unset($_SESSION['messagegroupid']);
 	redirect('unauthorized.php');
