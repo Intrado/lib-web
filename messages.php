@@ -155,7 +155,7 @@ if($isajax === true) {
 			$data->list[] = array("itemid" => "",
 										"defaultlink" => "",
 										"icon" => "img/largeicons/information.jpg",
-										"title" => _L("No Messages."),
+										"title" => $mgtype=="stationery"?_L("No Stationery."):_L("No Messages."),
 										"content" => "",
 										"tools" => "");
 	} else {
@@ -172,7 +172,7 @@ if($isajax === true) {
 			$publishmessage = '';
 			$publishaction = $item['publishaction'];
 			if ($publishaction == 'publish')
-			$publishmessage = _L('Changes to this message are published.');
+			$publishmessage = $item["type"] == "stationery"?_L('Changes to this stationery are published.'):_L('Changes to this message are published.');
 				
 			// tell the user it's a subscription. change the href to view instead of edit
 			if ($publishaction == 'subscribe') {

@@ -13,6 +13,8 @@ require_once("obj/FormItem.obj.php");
 require_once("obj/Wizard.obj.php");
 require_once("obj/Organization.obj.php");
 require_once("obj/Publish.obj.php");
+require_once("obj/MessageGroup.obj.php");
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -36,7 +38,7 @@ if (isset($_GET['type']) && isset($_GET['id'])) {
 		// check that the object requested isn't deleted and has a valid type for publishing
 		switch ($_GET['type']) {
 			case "messagegroup":
-				$valid = QuickQuery("select 1 from messagegroup where id = ? and type = 'notification' and not deleted", false, array($_GET['id']));
+				$valid = QuickQuery("select 1 from messagegroup where id = ? and type = 'notification' or type = 'stationery' and not deleted", false, array($_GET['id']));
 				break;
 			case "list":
 				$valid = QuickQuery("select 1 from list where id = ? and type in ('person', 'section') and not deleted", false, array($_GET['id']));
@@ -210,8 +212,10 @@ class PublishTargetWiz_confirm extends WizStep {
 		$localizedtype = "";
 		switch ($type) {
 			case "messagegroup":
+				$messagegroup = new MessageGroup($id); 
+				$name = $messagegroup->name;
 				$name = QuickQuery("select name from messagegroup where id = ?", false, array($id));
-				$localizedtype = _L("message");
+				$localizedtype = $messagegroup->type=='stationery'?_L("stationery"):_L("message");
 				break;
 			case "list":
 				$name = QuickQuery("select name from list where id = ?", false, array($id));
