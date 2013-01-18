@@ -1,6 +1,7 @@
 
-</div><!-- .content_wrap started in nav.inc.php -->
-
+</div><!-- end for container starts in nav.inc.php -->
+</div><!-- end for content_wrap starts in nav.inc.php -->
+</div><!-- end for wrap starts in nav.inc.php -->
 
 <div id="footer" class="cf">
 

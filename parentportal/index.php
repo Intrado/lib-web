@@ -125,7 +125,7 @@ include_once("cmlogintop.inc.php");
 
 			<fieldset>
 				<label for="form_email" class="canhidelabel"><?=_L("Email")?>:</label>
-				<input type="text" id="form_email" name="login" size="30" maxlength="255" value="<?=escapehtml($login)?>"/>
+				<input type="email" id="form_email" name="login" size="30" maxlength="255" value="<?=escapehtml($login)?>"/>
 			</fieldset>
 
 			<fieldset>

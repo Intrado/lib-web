@@ -72,22 +72,27 @@ startWindow(_L("Select Account"));
 ?>
 <div style="margin:5px">
 	<?=_L("You have contacts associated with more than one customer account.")?>
-	<br><?=_L("Please select the account you would like to access")?>:
-	<table cellpadding="3" cellspacing="1" class="list">
-		<tr><th class="listHeader"><?=_L("Customer Accounts")?></th></tr>
+	<br /><?=_L("Please select the account you would like to access")?>:
+	<br />
+	<ul style="margin:10px;">
 <?
-		$alt = 0;
+		$i = 0;
 		foreach($customerlist as $index => $customername){
-			$class = "";
-			if($alt++ % 2)
-				$class="class=\"listAlt\"";
-			?><tr>
-				<td <?=$class?> ><a href="choosecustomer.php?customerid=<?=$index?>"/><?=escapehtml($customername)?></a></td>
-				<td <?=$class?> ><a href="choosecustomer.php?disassociate=<?=$index?>"/><?=_L("Dis-associate")?></a></td>
-			</tr><br><?
+			if ($i == 0)
+			
+			?><li style="<?= (++$i != 1?"border-top: 1px solid gray;":"")?> "><a href="choosecustomer.php?customerid=<?=$index?>" style="font-size: 16px;margin:14px;"/><?=escapehtml($customername)?></a><div style="display:inline-block;">
+					<?= 
+					action_links(array(
+						action_link(_L("Continue to account"),"arrow_right","choosecustomer.php?customerid=$index"),
+						action_link(_L("Dis-associate"),"cross","choosecustomer.php?disassociate=$index","return confirm('" . _L("Are you sure you want to dis-associate account?") . "')")
+					)); 
+					?>
+					</div>
+			</li>
+			<?
 		}
 ?>
-	</table>
+	</ul>
 </div>
 <?
 endWindow();

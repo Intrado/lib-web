@@ -132,11 +132,11 @@ if(!$success){
 				}
 				NewFormItem("login", "main", '_locale', 'selectend');
 			?>
-			</span>
+			</span>	
 			<h3><?=$TITLE?></h3>
-					
-			<p><?=_L("Please complete this form to create your Contact Manager account.  A confirmation code will be sent to activate your new account so a valid email address is required.  Your password must be at least 5 characters long and cannot be similar to your first name, last name, or email address.")?></p>
 	
+			<p><?=_L("Please complete this form to create your Contact Manager account.  A confirmation code will be sent to activate your new account so a valid email address is required.  Your password must be at least 5 characters long and cannot be similar to your first name, last name, or email address.")?></p>
+
 			<fieldset>
 				<label for="form_user"><?=str_replace(" ", "&nbsp;", _L("Email"))?>:</label>
 				<input type="text" id="form_user" name="login" value="<?=escapehtml($login)?>" size="50" maxlength="255"/>
