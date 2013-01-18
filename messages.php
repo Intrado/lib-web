@@ -46,7 +46,7 @@ if (isset($_GET['delete'])) {
 		$_SESSION['messagegroupid'] = NULL;
 
 	$message = new MessageGroup($deleteid);
-	if (userOwns("messagegroup",$deleteid) && $message->type == 'notification') {
+	if (userOwns("messagegroup",$deleteid) && ($message->type == 'notification' || $message->type == 'stationery')) {
 		Query("BEGIN");
 		QuickUpdate("update messagegroup set deleted=1 where id=?",false,array($deleteid));
 		QuickUpdate("delete from publish where type = 'messagegroup' and messagegroupid = ?", false, array($deleteid));
@@ -120,8 +120,8 @@ if($isajax === true) {
 	// get all the message group display data needed for this page
 	if ($total) {
 		$mergeditems = QuickQueryMultiRow(
-			"select 'message' as type,'Saved' as status, 
-				mg.id as id, mg.name as name,mg.description, mg.modified as date, mg.deleted as deleted,
+			"select 
+				mg.id as id,mg.type, mg.name as name,mg.description, mg.modified as date, mg.deleted as deleted,
 				sum(m.type='phone') as phone,
 				sum(m.type='email') as email, 
 				sum(m.type='sms') as sms, 
@@ -227,8 +227,15 @@ if($isajax === true) {
 					action_link("View", "fugue/magnifier", 'messagegroupview.php?id=' . $itemid),
 					$publishactionlink);
 			}
-
-			$content = '<a href="' . $defaultlink . '" >' . $time .  ($item["description"] != ""?" - " . escapehtml($item["description"]):"") . ' - <b>' . ($types==""?_L("Empty Message"):$types) . '</b>' . '</a>';
+			
+			
+			if ($item["type"] == "notification") {
+				$types = ' - <b>' . ($types==""?_L("Empty Message"):$types) . '</b>';
+			} else {
+				$types = "";
+			}
+			
+			$content = '<a href="' . $defaultlink . '" >' . $time .  ($item["description"] != ""?" - " . escapehtml($item["description"]):"") . $types . '</a>';
 			
 			$data->list[] = array("itemid" => $itemid,
 										"defaultlink" => $defaultlink,
@@ -284,7 +291,7 @@ startWindow(_L('My Messages'), 'padding: 3px;', false, true);
 $feedButtons = array(icon_button(_L('Add New Message'),"add",null,"mgeditor.php?id=new"));
 if ($USER->authorize('subscribe') && userCanSubscribe('messagegroup'))
 	$feedButtons[] = icon_button(_L('Subscribe to a Message'),"fugue/star", "document.location='messagegroupsubscribe.php'");
-$feedButtons[] = icon_button(_L('Add New Stationery'),"add",null,"mgeditor.php?id=new");
+$feedButtons[] = icon_button(_L('Add New Stationery'),"add",null,"mglayoutselector.php");
 
 $sortoptions = array(
 	"name" => array("icon" => "img/largeicons/tiny20x20/pencil.jpg", "name" => "Name"),
