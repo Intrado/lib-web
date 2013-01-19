@@ -746,6 +746,6 @@ INSERT INTO `shortcodetext` (`shortcode`, `messagetype`, `text`)
 
 INSERT INTO `shortcodetext` (`shortcode`, `messagetype`, `text`) 
   VALUES ('85130', 'DIRINSTRUCT', 
-    'Text the staff number or NEXT for more');
+    'Text the (NUMBER) for staff recipient, or NEXT for more staff.');
     
 
