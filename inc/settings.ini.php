@@ -58,6 +58,16 @@ appsecret="3cf7cbf09b579450f5761e46c14a655c"
 consumerkey="TrOii2FpUUlCoyvgnbohnQ"
 consumersecret="L4RtNiOENkkbrsLdDOSAkE2O08aChqJ52e8McoFfJ4"
 
+[googleanalytics]
+; The tracking ID for the hosted system at asp.schoolmessenger.com is UA-36296468-1. 
+; Do not use this tracking ID for dev/qa as it will pollute the data.
+;trackingid="UA-36296468-1"
+; If you have a relatively small number of daily visitors to your site, such as 100,000 or fewer, you might want to adjust 
+; the sampling to a larger rate (in pct).
+; Analytics restricts Site Speed collection hits for a single property to the greater of 1% of visitors or 10K hits per day 
+; in order to ensure an equitable distribution of system resources for this feature. 
+samplerate=1
+
 [memcache]
 use_memcache_sessions=false
 memcache_session_expire_mins=30
