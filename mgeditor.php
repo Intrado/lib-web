@@ -480,6 +480,8 @@ function makeMessageGrid($messagegroup) {
 			} else {
 				$icon = "diagona/16/160";
 				$actions[] = action_link("New","pencil_add","editmessageemail.php?id=new&subtype=html&languagecode=$languagecode&mgid=".$messagegroup->id);
+				$actions[] = action_link("New from stationery","pencil_add","mgstationeryselector.php?type=email&subtype=html&languagecode=$languagecode&mgid=".$messagegroup->id);
+				
 			}
 			$linkrow[] = array('icon' => $icon,'title' => _L("%s HTML Email Message",$languagename), 'actions' => $actions);
 

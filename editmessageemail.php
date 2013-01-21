@@ -144,6 +144,17 @@ if ($message) {
 			$attachments[$msgattachment->contentid] = array("name" => $msgattachment->filename, "size" => $msgattachment->size);
 		}
 	}
+	
+	if (isset($_SESSION['editmessage']['stationeryid'])) {
+		$stationery = new MessageGroup($_SESSION['editmessage']['stationeryid']);
+		if ($stationery->type == "stationery" &&
+			$emailstationery = $stationery->getMessage("email", $subtype, "en")) {
+			$emailstationeryparts = DBFindMany("MessagePart", "from messagepart where messageid = ? order by sequence", false, array($emailstationery->id));
+				
+			
+			$text = Message::format($emailstationeryparts);
+		}
+	}
 }
 
 $language = Language::getName($languagecode);
