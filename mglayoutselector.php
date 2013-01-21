@@ -34,6 +34,46 @@ if (!$cansendemail) {
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
+class LayoutSelector extends FormItem {
+	function render ($value) {
+		$n = $this->form->name."_".$this->name;
+		// is the radioname data html formatted?
+		$ishtml = false;
+		if (isset($this->args['ishtml']) && $this->args['ishtml'])
+			$ishtml = true;
+		$str = '<div id='.$n.' class="radiobox">';
+		$hoverdata = array();
+		$counter = 1;
+		$autoselect = count($this->args['values']) == 1; //if there is only one value, autoselect it
+		foreach ($this->args['values'] as $radiovalue => $radioname) {
+			if ($radioname == "#-#") {
+				$str .= "<hr />\n";
+			} else {
+				$id = $n.'-'.$counter;
+				$str .= '<input id="'.$id.'" name="'.$n.'" type="radio" value="'.escapehtml($radiovalue).'" '.($value == $radiovalue || $autoselect ? 'checked' : '').' /><label id="'.$id.'-label" for="'.$id.'">'.($ishtml?$radioname:escapehtml($radioname)).'</label><br />';
+				if (isset($this->args['hover'])) {
+					$hoverdata[$id] = $this->args['hover'][$radiovalue];
+					$hoverdata[$id.'-label'] = $this->args['hover'][$radiovalue];
+				}
+				$counter++;
+			}
+		}
+		$str .= '</div>
+		
+		<script type="text/javascript">
+			// TODO, swap iframe value here
+		';
+		if (isset($this->args['hover']))
+			$str .= 'form_do_hover(' . json_encode($hoverdata) .');';
+		$str .= '</script>';
+		
+		
+		return $str;
+	}
+}
+
+
+
 
 $helpsteps = array();
 $formdata = array();
@@ -80,7 +120,7 @@ $formdata["layout"] = array(
 				array("ValRequired"),
 				array("ValInArray", "values" => array_keys($layouts))
 		),
-		"control" => array("RadioButton", "values" => $layouts),
+		"control" => array("LayoutSelector", "values" => $layouts),
 		"helpstep" => $helpstepnum++
 );
 
