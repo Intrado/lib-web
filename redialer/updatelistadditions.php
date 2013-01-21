@@ -22,23 +22,31 @@ require_once("../obj/Person.obj.php");
 
 $custid = $argv[1] +0;
 if ($custid == 0) {
-	echo "missing customer id, Usage: updatelistadditions customerid listid pkeys dbhost:port dbname dbuser dbpass \n";
+	echo "missing customer id, Usage: updatelistadditions customerid listid dbhost:port dbname dbuser dbpass \nStdin array of pkeys\n";
 	exit(-1);
 }
 
 $listid = $argv[2] +0;
 if ($listid == 0) {
-	echo "missing list id, Usage: updatelistadditions customerid listid pkeys dbhost:port dbname dbuser dbpass \n";
+	echo "missing list id, Usage: updatelistadditions customerid listid dbhost:port dbname dbuser dbpass \nStdin array of pkeys\n";
 	exit(-1);
 }
 
-$pkeys = explode(",", $argv[3]);
+// read pkeys from stdin, could be 100k or more
+//$pkeys = explode(",", trim(fgets(STDIN)));
+
+$pkeys = array();
+while (FALSE !== ($line = trim(fgets(STDIN)))) {
+//echo "got a line " . $line . "\n";
+	if (strlen($line) == 0) break;
+	$pkeys[] = $line;
+}
 
 // gather database connection info
-$db['host'] = $argv[4];
-$db['db'] = $argv[5];
-$db['user'] = $argv[6];
-@ $db['pass'] = $argv[7]; // password is last argument in case it is blank
+$db['host'] = $argv[3];
+$db['db'] = $argv[4];
+$db['user'] = $argv[5];
+@ $db['pass'] = $argv[6]; // password is last argument in case it is blank
 
 // 	now connect to the customer database
 global $_dbcon;
