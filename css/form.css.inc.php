@@ -191,6 +191,17 @@ position: relative;}
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px;
  -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
  
+.newform .formcontrol .radiobox.stationeryselector {
+	width:25%;
+}
+.newform .formcontrol .stationerypreview iframe {
+	height: 300px;
+	width: 70%;
+	border: 1px solid #E2E2E2;
+	border-radius: 3px;
+	background-color: #fff;
+}
+ 
  
  /* ----------------- rule widget --------------------*/
 
