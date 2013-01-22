@@ -133,7 +133,7 @@ $formdata["name"] = array(
 
 
 
-$messagecontrol = array("EmailMessageEditor", "subtype" => $subtype);
+$messagecontrol = array("EmailMessageEditor", "subtype" => $subtype, "editor_mode" => "full");
 if ($subtype == "plain" && $languagecode == "en")
 	$messagecontrol['spellcheck'] = true;
 
