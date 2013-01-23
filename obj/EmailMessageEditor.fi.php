@@ -20,7 +20,7 @@
 class EmailMessageEditor extends FormItem {
 	
 	function render ($value) {
-		$n = $this->form->name."_".$this->name;
+		$n = $this->form->name . '_' . $this->name;
 
 		// subtype tells us if it's a plain or html email message
 		$subtype = "html";
@@ -38,7 +38,26 @@ class EmailMessageEditor extends FormItem {
 		if ($subtype == "plain" && isset($this->args['spellcheck']) && $this->args['spellcheck']) {
 			$textarea .= '<div>' . action_link(_L("Spell Check"), "spellcheck", null, '(new spellChecker($(\''.$n.'\')) ).openChecker();') . '</div>';
 		}
-		$textarea .= '</div>';
+
+		// SMK added empty rcieditor_scratch div as a scratch space
+		// for the RCIEditor to work with for DOM processing
+		$textarea .= '
+				<div id="rcieditor_scratch" style="display: none;"></div>
+				<style>
+					span.cke_toolgroup {
+						height: 27px;
+					}
+
+					a.cke_dialog_tab {
+						height: 26px;
+					}
+
+					a.cke_button {
+						height: 25px;
+					}
+				</style>
+			</div>
+		';
 		
 		// this is the vertical seperator
 		$seperator = '
@@ -148,6 +167,10 @@ END;
 
 		$str = <<<END
 			<!-- editor mode: [{$editor_mode}] -->
+			<script type="text/javascript" src="script/jquery.1.7.2.min.js"></script>
+			<script type="text/javascript">
+				jQuery.noConflict();
+			</script>
 			{$rcidataScript}
 			<script type="text/javascript" src="script/ckeditor/ckeditor.js"></script>
 			<script type="text/javascript">
@@ -155,6 +178,7 @@ END;
 				var htmlEditorImageScale = 600; // Max dimension for scaling
 			</script>
 
+			<script type="text/javascript" src="script/json2.js"></script>
 			<script type="text/javascript" src="script/rcieditor.js"></script>
 			<script type="text/javascript">
 				function setupHtmlTextArea(e, hidetoolbar) {

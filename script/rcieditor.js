@@ -47,70 +47,71 @@ function registerHtmlEditorKeyListener(listener) {
 */
 
 
-RCIEditor = {
+function rcieditor() {
+	var self = this;
 
-	textarea: null,
+	self.textarea = null;
 
-	basename: 'rcicke',
+	self.basename = 'rcicke';
 
 	// Associative array support for settings;
 	// use of set/getter's is encouraged
-	settings: Array(),
+	self.settings = Array();
 
-	setSetting: function (name, value) {
-		this.settings[name] = value;
-	},
+	self.setSetting = function (name, value) {
+		self.settings[name] = value;
+	};
 
-	getSetting: function (name) {
-		return(this.settings[name]);
-	},
+	self.getSetting = function (name) {
+		return(self.settings[name]);
+	};
 
 	// In lieu of a constructor, this function will put us into a known good state
-	reset: function () {
+	self.reset = function () {
 		//console.log('reset fired!');
 
 		// TODO: confirm that imageScaling will not affect "attachments" uploaded on the same message page
-		this.setSetting('image_scaling', 0);
+		self.setSetting('image_scaling', 0);
 
 		// SMK added 2012-12-13 to get the base URL for requests that require absolute pathing
 		var baseUrl= new String(document.location);
 		baseUrl = baseUrl.substr(0, baseUrl.lastIndexOf('/') + 1);
-		this.setSetting('baseUrl', baseUrl);
-	},
+		self.setSetting('baseUrl', baseUrl);
+	};
 
 	// SMK added 2012-12-17 to activate CKE inline editing
-	applyEditor: function(editorMode, textarea, target) {
+	self.applyEditor = function(editorMode, textarea, target) {
 
 		// If CKEDITOR is not ready, check back here every second until it is
-		if ((typeof CKEDITOR == 'undefined') || !CKEDITOR) {
+		if ((typeof CKEDITOR == 'undefined') || (! CKEDITOR)) {
 
 			// We will try again in one second since CKE is not ready yet
-			window.setTimeout(function() { this.applyEditor(editorMode, textarea, target)}, 1000);
+			window.setTimeout(function() { self.applyEditor(editorMode, textarea, target); }, 1000);
 			return;
 		}
 
 		// stash away the editorMode for reference in other methods
-		this.setSetting('editorMode', editorMode);
+		self.setSetting('editorMode', editorMode);
 
 		// Re-extend with prototype in case we're on a jquery page
-		this.textarea = $(textarea);
+		self.textarea = $(textarea);
 
 		// Hide the text area form field until we are done initializing
-		this.textarea.hide();
+		self.textarea.hide();
 
-		this.setLoadingVisibility(true);
+		self.setLoadingVisibility(true);
 
 		// Here's the base name of the text element; we'll
 		// make several new elements with derived names
-		this.basename = this.textarea.id;
+		self.basename = self.textarea.id;
 
 		var cke = null;
 
 		if (editorMode == 'wysiwyg') {
 			// Add an IFRAME to the page that will load up the inline editor
 			cke = new Element('iframe', {
-				'id': this.basename + 'inline',
-				'src': this.getSetting('baseUrl') + 'script/rcieditor.php?t=' + target,
+				'id': self.basename + 'inline',
+				'src': self.getSetting('baseUrl') + 'script/rcieditor.php?t=' + target,
 				'style': 'width: 800px; height: 400px; border: 1px solid #999999;'
 			});
 
@@ -123,7 +124,7 @@ RCIEditor = {
 			// are different depending on the editorMode
 			var extraPlugins = 'aspell';
 			var extraButtons = ['PasteFromWord','SpellCheck'];
-			switch (this.getSetting('editorMode')) {
+			switch (self.getSetting('editorMode')) {
 
 				default:
 				case 'plain':
@@ -142,41 +143,47 @@ RCIEditor = {
 				case 'full':
 					// Add the mkField and mkBlock plugins
 					if (extraPlugins.length) extraPlugins += ',';
-					extraPlugins += 'mkfield,mkblock';
+					extraPlugins += 'mkfield,mkblock,thememgr';
 
 					// Add the mkfield button
 					extraButtons.push('mkField');
+
 					// Add the mkblock button
 					extraButtons.push('mkBlock');
+
 					// Add the thememgr button
-					// extraButtons.push('thememgr');
+					extraButtons.push('themeMgr');
 					break;
 			}
 
+			// Grab the scratch space to use for this kind of editor
+			//var scratch = $('rcieditor_scratch'); // prototype.js
+			var scratch = jQuery('#rcieditor_scratch'); // jquery.js
+			self.setSetting('rcieditor_scratch', scratch);
+
 			// Here's the first new element we'll make - its id is basename
-			cke = new Element('div', { 'id': this.basename });
+			cke = new Element('div', { 'id': self.basename });
 
 			// SMK added to selectively enable reduction scaling for uploaded images;
 			// page that includes CKE must set global var htmlEditorImageScalingEnable
 			// to true to enable scaling, otherwise scaling will be disabled by default;
 			// uploader.php will pass the argument on to f.handleFileUpload() which will
 			// ultimately be responsible for enforcement of this flag
-			var uploaderURI = this.getSetting('baseUrl') + 'uploadimage.php';
-			if ((max_size = parseInt(this.getSetting('image_scaling'))) > 0) {
+			var uploaderURI = self.getSetting('baseUrl') + 'uploadimage.php';
+			if ((max_size = parseInt(self.getSetting('image_scaling'))) > 0) {
 				//console.log('Image Scaling enabled!');
 				uploaderURI += '?scaleabove=' + max_size;
 			}
 
-
 			// Now attach CKE to the form element with the name basename
-			CKEDITOR.replace(this.basename, {
+			CKEDITOR.replace(self.basename, {
 				'customConfig': '', // Prevent ckeditor from trying to load an external configuration file, should improve startup time.
 				'disableNativeSpellChecker': false,
 				'browserContextMenuOnCtrl': true,
 				'width': '100%',
 				'height': '400px',
 				'filebrowserImageUploadUrl' : uploaderURI,
-				'toolbarStartupExpanded' : (! this.getSetting('hidetoolbar')),
+				'toolbarStartupExpanded' : (! self.getSetting('hidetoolbar')),
 				'extraPlugins': extraPlugins,
 				'toolbar': [
 					['Print','Source'],
@@ -192,7 +199,28 @@ RCIEditor = {
 					'instanceReady': function(event) {
 						//htmlEditorFinishAttachment(this);
 						RCIEditor.callbackEditorLoaded(this);
-					}.bindAsEventListener(this.textarea),
+
+/*
+console.log('extending iframe with Prototype.js! for editor: [' + this.id + ']');
+						// Get the iframe.document so that we can inject prototype.js into it
+						// ref: http://stackoverflow.com/questions/2107502/what-is-the-way-to-access-iframes-element-using-prototype-method
+						// ref: http://javascript.about.com/library/bldom07.htm
+						//var cke_iframe = $(this.id + '_contents').select('iframe')[0];
+						var cke_iframe = $('cke_1_contents').select('iframe')[0];
+						var cke_iframe_doc = (cke_iframe.contentDocument || cke_iframe.contentWindow.document); // for IE compat
+						var cke_iframe_win = (cke_iframe.contentWindow || cke_iframe.contentDocument.defaultView); // for IE compat
+
+						// Inject prototype.js into the iframe's head so that we can extend elements
+						// within the iframe; prototype.js cannot reach across documents without this
+						// ref: http://stackoverflow.com/questions/1230961/how-can-i-inject-javascript-including-prototype-js-in-other-sites-without-clut
+						var protoscript = cke_iframe_doc.createElement('script');
+						protoscript.setAttribute('type', 'text/JavaScript');
+						protoscript.setAttribute('src', '/newjackcity/script/prototype.js');
+						var cke_iframe_head = cke_iframe_doc.getElementsByTagName('head')[0];
+						cke_iframe_head.appendChild(protoscript);
+*/
+
+					}.bindAsEventListener(self.textarea),
 					'key': RCIEditor.eventListener,
 					'blur': RCIEditor.eventListener,
 					'saveSnapshot': RCIEditor.eventListener,
@@ -207,7 +235,7 @@ RCIEditor = {
 			// it will fire instanceReady() function when it is done.
 		}
 		// The second new element has the same id with a 'hider' suffix
-		var hider = new Element('div', {'id': this.basename + 'hider'});
+		var hider = new Element('div', {'id': self.basename + 'hider'});
 		hider.hide();
 
 		// The hider contains the CKEditor so that we
@@ -220,7 +248,7 @@ RCIEditor = {
 		} else {
 			document.body.insert(hider);
 		}
-	},
+	};
 
 	/**
 	 * This method is called onload from the IFRAMED wysiwyg editor
@@ -228,25 +256,25 @@ RCIEditor = {
 	 * the div that we want to load our textarea content into for the
 	 * inline editor to have at.
 	 */
-	callbackEditorLoaded: function(activeContainerId) {
+	self.callbackEditorLoaded = function(activeContainerId) {
 		//console.log('callbackEditorLoaded called');
 
-		this.setSetting('activeContainerId', activeContainerId);
+		self.setSetting('activeContainerId', activeContainerId);
 
-		this.setLoadingVisibility(false);
+		self.setLoadingVisibility(false);
 
-		if (this.getSetting('editorMode') == 'wysiwyg') {
+		if (self.getSetting('editorMode') == 'wysiwyg') {
 			/*
 			// SMK notes 2012-12-20 that the code below works to find the
 			// wysiwyg frame, but we don't seem to need it for anything...
-			if (fr = document.getElementById(this.basename + 'inline')) {
+			if (fr = document.getElementById(self.basename + 'inline')) {
 				t = fr.contentWindow.document.getElementById(activeContainerId);
 				if (! (wysiwygEditor = $(t))) {
 					console.log("Couldn't find the active editor's container ID [" + activeContainerId + ']');
 				}
 			}
 			else {
-				console.log("Couldn't find the iframe [" + this.basename + 'inline' + ']');
+				console.log("Couldn't find the iframe [" + self.basename + 'inline' + ']');
 			}
 			*/
 
@@ -256,13 +284,6 @@ RCIEditor = {
 
 			// 'plain', 'normal', and 'full' end up here...
 
-			// SMK added 2012-12-06 - The third new element is a CSS fix for
-			// generic div/span heights compressed by external page CSS
-			var ckecssoverrides = new Element('style');
-			var css_toolbars = 'span.cke_toolgroup { height: 27px; } a.cke_dialog_tab { height: 26px; } a.cke_button { height: 25px; }';
-			ckecssoverrides.innerHTML = css_toolbars;
-			this.textarea.up().insert(ckecssoverrides);
-
 /*
 // Finish our event listener for the CKE object
 registerHtmlEditorKeyListener(pendinghtmleditorkeylistener);
@@ -270,49 +291,49 @@ pendinghtmleditorkeylistener = null;
 */
 
 			// Hide our AJAXy loading indicator
-			this.setLoadingVisibility(false);
+			self.setLoadingVisibility(false);
 
-			var htmleditorobject = this.getHtmlEditorObject();
+			var htmleditorobject = self.getHtmlEditorObject();
 			if (! htmleditorobject) {
-				console.log('FAIL!');
+console.log('FAIL!');
 				return;
 			}
 
 /*
 // SMK note: this is strange code - maybe we can cut it. if there is no textarea, or the id is different than we think it should be then save it? the conditions and the resulting action appear to bear no relation to one another.
-if (! htmleditorobject.currenttextarea || htmleditorobject.currenttextarea.identify() != this.textarea.identify()) {
+if (! htmleditorobject.currenttextarea || htmleditorobject.currenttextarea.identify() != self.textarea.identify()) {
 saveHtmlEditorContent(htmleditorobject);
 }
 */
 
 			// A little data sanitizing for the raw textarea form content
-			var html = this.textarea.value.replace(/<</g, "&lt;&lt;").replace(/>>/g, "&gt;&gt;");
+			var html = self.textarea.value.replace(/<</g, "&lt;&lt;").replace(/>>/g, "&gt;&gt;");
 			htmleditorobject.instance.setData(html);
 
 			// The presence of the HtmlEditor classname signals
 			// f.getHtmlEditorObject() to use CKE instead of the bare textarea
-			this.textarea.hide().addClassName('HtmlEditor');
+			self.textarea.hide().addClassName('HtmlEditor');
 
 			// Initial validation - hopefully it checks out!
-			this.validate();
+			self.validate();
 		}
-	},
+	};
 
-	loadingVisible: false,
-	setLoadingVisibility: function (visible) {
+	self.loadingVisible = false;
+	self.setLoadingVisibility = function (visible) {
 		if (visible) {
-			if (this.loadingVisible || (! this.textarea)) {
+			if (self.loadingVisible || (! self.textarea)) {
 				return;
 			}
 
 			// Show an AJAXy loading indication
 			if (! $('htmleditorloadericon')) {
-				this.textarea.insert({'before': '<span class="HTMLEditorAjaxLoader" id="htmleditorloadericon"><img src="img/ajax-loader.gif"/> Please wait while the HTML editor loads. </span>'});
+				self.textarea.insert({'before': '<span class="HTMLEditorAjaxLoader" id="htmleditorloadericon"><img src="img/ajax-loader.gif"/> Please wait while the HTML editor loads. </span>'});
 			}
-			this.loadingVisible = true;
+			self.loadingVisible = true;
 		}
 		else {
-			if (! this.loadingVisible) {
+			if (! self.loadingVisible) {
 				return;
 			}
 
@@ -320,33 +341,33 @@ saveHtmlEditorContent(htmleditorobject);
 			if ($('htmleditorloadericon')) {
 				$('htmleditorloadericon').remove();
 			}
-			$(this.basename + 'hider').show();
-			this.loadingVisible = false;
+			$(self.basename + 'hider').show();
+			self.loadingVisible = false;
 		}
-	},
+	};
 
 	/**
 	 * Returns the textarea that the html editor is currently replacing
 	 */
-	getHtmlEditorObject: function () {
+	self.getHtmlEditorObject = function () {
 
-		do { // do this once...
+		try {
 
 			if ((typeof CKEDITOR == 'undefined') || !CKEDITOR) {
-				break;
+				throw 'CKEDITOR is not loaded';
 			}
 
 			if (typeof CKEDITOR.instances == 'undefined') {
-				break;
+				throw 'There are no CKEDITOR instances';
 			}
 
 			if (! CKEDITOR.instances) {
-				break;
+				throw 'There are no CKEDITOR instances';
 			}
 
 			var instance = false;
 			for (var i in CKEDITOR.instances) {
-				if (CKEDITOR.instances[i].name == this.basename) {
+				if (CKEDITOR.instances[i].name == self.basename) {
 					instance = CKEDITOR.instances[i];
 				}
 				else {
@@ -354,33 +375,37 @@ saveHtmlEditorContent(htmleditorobject);
 				}
 			}
 			if (! instance) {
-				break;
+				throw 'Could not locate our CKEDITOR instance';
 			}
 
-			var container = $('cke_' + this.basename);
+			var container_name = 'cke_' + self.basename;
+			var container = $(container_name);
 			if (! container) {
-				break;
+				throw 'Could not locate our container [' + container_name + ']';
 			}
 
-			// TODO - verify that we can just use this.textarea instead of locating it again here:
+			// TODO - verify that we can just use self.textarea instead of locating it again here:
 			var textarea = container.previous();
 			var textareauseshtmleditor = textarea && textarea.match('textarea.HtmlEditor');
 
 			return {'instance': instance, 'container': container, 'currenttextarea': textareauseshtmleditor ? textarea : null};
-		} while (false);
+		}
+		catch (msg) {
+console.log('ERROR in RCIEditor.getHtmlEditorObject(): ' + msg);
+		}
 
 		return null;
-	},
+	};
 
 	/**
 	 * Updates the textarea that the html editor replaces with the latest content.
 	 *
 	 * @return object containing the html editor instance and container, or null if not loaded
 	 */
-	saveHtmlEditorContent: function (existinghtmleditorobject) {
+	self.saveHtmlEditorContent = function (existinghtmleditorobject) {
 
-		// TODO: use this.textarea if possible instead of trying to find it again
-		var htmleditorobject = existinghtmleditorobject || this.getHtmlEditorObject();
+		// TODO: use self.textarea if possible instead of trying to find it again
+		var htmleditorobject = existinghtmleditorobject || self.getHtmlEditorObject();
 		if (!htmleditorobject) {
 			return null;
 		}
@@ -388,12 +413,12 @@ saveHtmlEditorContent(htmleditorobject);
 		var textarea = htmleditorobject.currenttextarea;
 		if (textarea) {
 			var content = htmleditorobject.instance.getData();
-			textarea.value = this.cleanContent(content);
+			textarea.value = self.cleanContent(content);
 			textarea.fire('HtmlEditor:SavedContent');
 		}
 		
 		return htmleditorobject;
-	},
+	};
 
 	/**
 	 * SMK extracted this portion of code from f.saveHtmlEditorContent() since that
@@ -401,7 +426,7 @@ saveHtmlEditorContent(htmleditorobject);
 	 * instance scenario for wysiwyg inline editing also needs to be able to do the
 	 * same type of cleanup.
 	 */
-	cleanContent: function (content) {
+	self.cleanContent = function (content) {
 		var tempdiv = new Element('div').insert(content);
 
 		// Unstyle any image elements having src="viewimage.php?id=.."
@@ -414,7 +439,7 @@ saveHtmlEditorContent(htmleditorobject);
 			}
 		}
 
-		var html = this.cleanFieldInserts(tempdiv.innerHTML).replace(/&lt;&lt;/g, '<<').replace(/&gt;&gt;/g, '>>');
+		var html = self.cleanFieldInserts(tempdiv.innerHTML).replace(/&lt;&lt;/g, '<<').replace(/&gt;&gt;/g, '>>');
 
 		// CKEditor inserts blank tags even if the user has deleted everything.
 		// check if there is an image or href tag... if not, strip the tags and see if there is any text
@@ -426,12 +451,12 @@ saveHtmlEditorContent(htmleditorobject);
 		}
 
 		return(html);
-	},
+	};
 
 	// Corrects any html tags that may be inside a data-field insert.
 	// Example: &lt;&lt;First <b>Name</b>&gt;&gt; becomes <b>&lt;&lt;First Name&gt;&gt;
 	// NOTE: It is assumed that the tokens are &lt;&lt; and &gt;&gt; instead of << and >>.
-	cleanFieldInserts: function (html) {
+	self.cleanFieldInserts = function (html) {
 		var regex = /&lt;(<.*?>)*?&lt;(.+?)&gt;(<.*?>)*?&gt;/g;
 		var matches = html.match(regex);
 		
@@ -460,32 +485,32 @@ saveHtmlEditorContent(htmleditorobject);
 			html = html.replace(matches[i], beforeinsert + '&lt;&lt;' + field + '&gt;&gt;' + afterinsert);
 		}
 		return html;
-	},
+	};
 
 	/*
 	//SMK notes that these appear to be unused. disabling temporarily to see if anything breaks before removal
-	hideHtmlEditor: function () {
-		if ($('cke_' + this.basename)) {
-			$(this.basename + 'hider').insert($('cke_' + this.basename));
+	self.hideHtmlEditor = function () {
+		if ($('cke_' + self.basename)) {
+			$(self.basename + 'hider').insert($('cke_' + self.basename));
 		}
-	},
+	};
 
-	clearHtmlEditorContent: function () {
+	self.clearHtmlEditorContent = function () {
 		var htmleditorobject;
-		if (! (htmleditorobject = this.htmlEditorIsReady())) {
+		if (! (htmleditorobject = self.htmlEditorIsReady())) {
 			return;
 		}
 		htmleditorobject.instance.setData('');
-	},
+	};
 	*/
 
-	htmlEditorIsReady: function () {
+	self.htmlEditorIsReady = function () {
 		var htmleditorobject;
-		if (! (htmleditorobject = this.getHtmlEditorObject())) {
+		if (! (htmleditorobject = self.getHtmlEditorObject())) {
 			return(false);
 		}
 		return(htmleditorobject);
-	},
+	};
 
 	/**
 	 * Events that trigger this listener are keystrokes, and content changes
@@ -494,33 +519,32 @@ saveHtmlEditorContent(htmleditorobject);
 	 * it from running promiscuously every time someone presses a key while
 	 * typing.
 	 */
-	eventTimer: null,
-	eventListener: function () {
+	self.eventTimer = null;
+	self.eventListener = function () {
 
 		// We got a new event so reset the timer
-		window.clearTimeout(this.eventTimer);
+		window.clearTimeout(self.eventTimer);
 
 		// Get the Editor that we're working with
 		var htmleditor = RCIEditor.getHtmlEditorObject();
 
 		// Set a new timer to fire the save/check
-		this.eventTimer = window.setTimeout(function() {
+		self.eventTimer = window.setTimeout(function() {
 
 			// Save the changes to the hidden textarea
 			RCIEditor.saveHtmlEditorContent(htmleditor);
 
 			// Run the form validation against the textarea
-			//form_do_validation(htmleditor.currenttextarea.up("form"), htmleditor.currenttextarea);
 			RCIEditor.validate();
 		}, 500);
-	},
+	};
 
-	validate: function() {
-		window.top.form_do_validation(this.textarea.up("form"), this.textarea);
-	}
+	self.validate = function() {
+		window.top.form_do_validation(self.textarea.up("form"), self.textarea);
+	};
 }
 
-RCIEditor.reset();
+RCIEditor = new rcieditor();
 
 /**
  * Legacy function wrappers - get rid of these once
