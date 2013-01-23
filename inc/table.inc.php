@@ -220,7 +220,7 @@ function showPageMenu ($total, $start, $perpage) {
 	$displayend = ($start + $perpage) > $total ? $total : ($start + $perpage);
 	$displaystart = ($total) ? $start +1 : 0;
 ?>
-<div class="pagenav" style="text-align:right;"> Showing <?= $displaystart ?>-<?= $displayend ?> of <?= $total ?> records<span class='noprint'> on <?= $numpages ?> pages</span>. <select class='noprint' onchange="location.href='?pagestart=' + this.value;">
+<div class="pagenav" style="text-align:right;"> Showing <?= $displaystart ?>-<?= $displayend ?> of <?= $total ?> records<span class='noprint'> on <?= $numpages ?> pages</span>. <select class='noprint' onchange="location.href='?pagestart=' + this.value + '<?= isset($_GET["iframe"])?"&iframe":"" ?>';">
 <?
 	for ($x = 0; $x < $numpages; $x++) {
 		$offset = $x * $perpage;

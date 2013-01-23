@@ -8,7 +8,7 @@
  * @param $list
  * @return unknown_type
  */
-function showRenderedListTable($renderedlist, $list = false) {
+function showRenderedListTable($renderedlist, $list = false, $showinlist = true) {
 	global $PAGEINLISTMAP,$USER;
 	static $tableidcounter = 1;
 	
@@ -37,7 +37,7 @@ function showRenderedListTable($renderedlist, $list = false) {
 	$data = $renderedlist->getPageData();
 	$total = $renderedlist->getTotal();
 	
-	$showinlist = $list && $list->userid == $USER->id && $USER->authorize('createlist');
+	$showinlist = $showinlist && $list && $list->userid == $USER->id && $USER->authorize('createlist');
 	$showpersontip = !$list || ($list && $list->userid == $USER->id);
 	
 	if ($showinlist)
@@ -112,9 +112,9 @@ function showRenderedListTable($renderedlist, $list = false) {
 	</div><!-- end table_controls -->
 <?
 
-	echo '<table id="'.$tableid.'" width="100%" cellpadding="3" cellspacing="1" class="list">';
+	echo '<div class="scrollTableContainer horizontalScrollTableContainer"><table id="'.$tableid.'" width="100%" cellpadding="3" cellspacing="1" class="list">';
 	showTable($data, $titles, $formatters, $repeatedcolumns, $groupby);
-	echo "\n</table>";
+	echo "\n</table></div>";
 	showPageMenu($total,$pagestart,$renderedlist->pagelimit);
 }
 
@@ -138,34 +138,18 @@ function show_field_visibility_selector ($tableid, $fields, $coloffset) {
 	
 ?>
 	<div style="display: none;" id="<?=$id?>">
-	<table class="list">
-		<tr class="listHeader">
-<?
-	foreach ($fields as $field) {
-?>
-		<th>
-<?
-		echo escapehtml($field->name);
-?>
-		</th>
-<?
-	}
-?>
-		</tr>
-		
-		<tr>
-<?
+	<ul>
+<?	
 	$column = 1;
 	foreach ($fields as $field) {
 		$checked = isset($_SESSION['fieldvisibility'][$field->fieldnum]) ? "checked" : "";
 ?>
-		<td align="center"><input type="checkbox" <?=$checked?> onclick="set_list_fieldvisibility(this, '<?= $field->fieldnum ?>', '<?=$tableid?>', <?=$coloffset + $column?>);" /></td>
+		<li><input type="checkbox" <?=$checked?> onclick="set_list_fieldvisibility(this, '<?= $field->fieldnum ?>', '<?=$tableid?>', <?=$coloffset + $column?>);" /><?= escapehtml($field->name)?></li>
 <?
 		$column++;
 	}
 ?>
-		</tr>
-	</table>
+	</ul>
 	</div>
 	<div style="cursor:pointer; white-space:nowrap;" id="<?=$id?>_icon"><img src="img/icons/cog.gif" alt="">&nbsp;Show/Hide&nbsp;Fields</div>
 	<script type="text/javascript"> new Tip("<?=$id?>_icon",$("<?=$id?>").innerHTML ,{
@@ -174,8 +158,8 @@ function show_field_visibility_selector ($tableid, $fields, $coloffset) {
 			border: 4,
 			hideOn: false,
 			hideAfter: 0.5,
-			stem: "bottomMiddle",
-			hook: { target: 'topMiddle', tip: 'bottomMiddle' },
+			stem: "topMiddle",
+			hook: { target: 'bottomMiddle', tip: 'topMiddle' },
 			offset: { x: 0, y: 0 },
 			width: 'auto'
 		});

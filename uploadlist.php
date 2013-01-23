@@ -84,9 +84,9 @@ if (isset($_FILES['listcontents']) && $_FILES['listcontents']['tmp_name']) {
 			if ($import->upload($data)) {
 				//everything looks good, move on to next step
 				if ($type == "contacts")
-					redirect("uploadlistmap.php");
+					redirect("uploadlistmap.php" .  (isset($_GET["iframe"])?"?iframe=true":""));
 				else
-					redirect("uploadlistpreview.php");
+					redirect("uploadlistpreview.php" . (isset($_GET["iframe"])?"?iframe=true":""));
 			} else {
 				error('Unable to complete file upload. Please try again.');
 				$reloadform = 1;
@@ -123,22 +123,34 @@ include_once("nav.inc.php");
 
 NewForm($f);
 
-buttons(submit($f, 'upload','Preview'), icon_button(_L('Cancel'),"cross",null,'list.php'));
-
-
-startWindow('Upload Call List File');
+if (!isset($_GET["iframe"]))
+	startWindow(_L('Upload List File'));
 ?>
 <table border="0" cellpadding="3" cellspacing="0" width="100%">
 	<tr>
-		<th align="right" class="windowRowHeader bottomBorder">Upload Type:</th>
-		<td class="bottomBorder">
+		<th align="right">
+		<div class="formtitle">
+			<label class="formlabel" for="list_type">Type</label>
+			<img id="list_type_icon" class="formicon" src="img/icons/accept.gif" title="Valid" alt="Valid">
+		</div>
+		
+		</th>
+		<td>
 			<table  border="0" cellpadding="3" cellspacing="0">
 <?
 	if ($USER->authorize('listuploadcontacts')) {
+		if (!isset($_GET["iframe"]))
+			$infotext = "File format must be a Comma Separated Value (CSV) text file. Once uploaded, the files columns can be mapped to names, destinations, and insertable fields for use in messages.";
+		else
+			$infotext = "File format must be a Comma Separated Value (CSV) text file.";
+		
+		
 ?>
 				<tr>
 					<td class="upload_type"><label><? NewFormItem($f, $s, "type", "radio", null, "contacts"); ?>Contact&nbsp;data:</label></td>
-					<td class="upload_type">File format must be a Comma Separated Value (CSV) text file. Once uploaded, the files columns can be mapped to names, destinations, and insertable fields for use in messages.</td>
+					
+					
+					<td class="upload_type"><?= $infotext?></td>
 				<tr>
 <? } ?>
 <? if ($USER->authorize('listuploadids')) { ?>
@@ -154,20 +166,56 @@ startWindow('Upload Call List File');
 		</td>
 	</tr>
 	<tr valign="top">
-		<th align="right" class="windowRowHeader">Upload File:</th>
+		<th align="right" class="">
+			<div class="formtitle">
+				<label class="formlabel" for="list_file">File</label>
+				<img id="list_file_icon" src="img/icons/error.gif" title="Required Field" alt="Required Field" class="formicon">
+			</div>
+		</th>
 		<td>
-			<input type="file" name="listcontents" size="30">
+			<input id="list_file" type="file" name="listcontents" size="30">
 		</td>
 	</tr>
 
 </table>
+
+<br />
+<div style="padding-left: 20px">
 <?
-endWindow();
+$buttons = array(submit($f, 'upload',_L('Next'),null,'arrow_right'));
+if (!isset($_GET["iframe"])) {
+	$buttons[] = icon_button(_L('Cancel'),"cross",null,'list.php');
+}
+call_user_func_array('buttons', $buttons);
+?>
+</div>
+<?
 
-?><br><div style="margin-left: 10px;"><img src="img/bug_important.gif"> Please select a file to upload and then click Preview to continue.</div><?
-
-buttons();
 EndForm();
+
+if (!isset($_GET["iframe"]))
+	endWindow();
+
+?> 
+<script type="text/javascript">
+// Lookalike validation for file upload
+$("list_file").observe("change", function(e) {
+	var icon = $("list_file_icon");
+	
+	if (e.element().value != "") {
+		icon.src = "img/icons/accept.gif";
+		icon.title = "Valid";
+		icon.alt = "Valid";	
+	} else {
+		icon.src = "img/icons/exclamation.gif";
+		icon.title = "Validation Error";
+		icon.alt = "Validation Error";	
+	}
+});
+</script>
+
+<?
+
 
 include_once("navbottom.inc.php");
 
