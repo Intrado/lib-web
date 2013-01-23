@@ -11,15 +11,16 @@ function CommSuiteApi(host, customer) {
 	var self = this;
 
 	var apiRoot = "https://" + host + "/" + customer + "/api/2/";
-	var sessionid = getCookie(customer + "_session");
+	var sessionid = false;
 	var userid = false;
 
 	/**
-	 * Initialize the API by cacheing some session information
+	 * Initialize the API by requesting the session information and caching the userid
 	 *
-	 * @param {function} callback
+	 * @param {Function} callback
 	 */
 	self.init = function(callback) {
+		sessionid = self.getCookie(customer + "_session");
 		self._genericRequest(apiRoot + "sessions/" + sessionid, "GET", {}, {}, function(resp, status, headers) {
 			if (resp.userId)
 				userid = resp.userId;
@@ -28,12 +29,30 @@ function CommSuiteApi(host, customer) {
 		});
 	};
 
-	self.createList = function(callback) {
-		// TODO call API to create a list
+	/**
+	 * Create a new list
+	 *
+	 * @param {Object} data
+	 * @param {Function} callback
+	 */
+	self.createList = function(data, callback) {
+		self._genericRequest(apiRoot + "users/" + userid + "/lists", "POST", {}, $.toJSON(data), callback);
 	};
 
-	self.listPkeys = function(listid, pkeyList, callback) {
-		// TODO call API to add pkeys to list
+	/**
+	 * Set the manual adds on the specified listId to those in the pkeyList
+	 *
+	 * @param {number} listId
+	 * @param {Object} pkeyList
+	 * @param {Function} callback
+	 */
+	self.setListPkeys = function(listId, pkeyList, callback) {
+		var listAdditions = { "additions": [] };
+		$.each(pkeyList, function(index, pkey) {
+			listAdditions.additions.push({ "pkey": pkey });
+		});
+
+		self._genericRequest(apiRoot + "users/" + userid + "/lists/" + listId + "/additions", "PUT", {}, $.toJSON(listAdditions), callback);
 	};
 
 	/**
@@ -47,7 +66,7 @@ function CommSuiteApi(host, customer) {
 	 * @private
 	 */
 	self._genericRequest = function(url, method, headers, data, callback) {
-		if (headers == undefined || headers == null)
+		if (headers == null || headers == null)
 			headers = {};
 
 		$.ajax({
@@ -61,7 +80,7 @@ function CommSuiteApi(host, customer) {
 					resp = {};
 				callback(resp, jqXHR.status, jqXHR.getAllResponseHeaders());
 			},
-			error: function(jqXHR, textStatus, errorThrown) {
+			error: function(jqXHR) {
 				var data = {};
 				try {
 					data = $.secureEvalJSON(jqXHR.responseText);
@@ -73,12 +92,18 @@ function CommSuiteApi(host, customer) {
 			}
 		});
 	};
-}
 
-function getCookie (name) {
-	var data = document.cookie.match ( '(^|;) ?' + name + '=([^;]*)(;|$)' );
-	if (data && data[2] && data[2] != "")
-		return (data[2]);
-	else
-		return false;
+	/**
+	 * gets the value of the specified cookie
+	 *
+	 * @param {string} name
+	 * @return {string|boolean}
+	 */
+	self.getCookie = function(name) {
+		var data = document.cookie.match ( '(^|;) ?' + name + '=([^;]*)(;|$)' );
+		if (data && data[2] && data[2] != "")
+			return (data[2]);
+		else
+			return false;
+	}
 }
