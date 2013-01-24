@@ -216,18 +216,6 @@ function handleRequest() {
 			summarizeListName($listid);
 			return true;
 
-		case 'addpkeys':
-			// pkeys should be a json encoded list of pkeys
-			if (!isset($_REQUEST["listid"]) || !isset($_REQUEST["pkeys"]))
-				return false;
-
-			$listid = $_REQUEST['listid'] + 0;
-			$list = new PeopleList($listid);
-			if (!$list->id || !userOwns("list", $list->id))
-				return false;
-
-			return $list->createManualAddByPkeys(json_decode($_REQUEST["pkeys"]));
-
 		default:
 			return false;
 	}
