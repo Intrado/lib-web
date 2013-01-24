@@ -33,7 +33,6 @@ function PmRpcProvider(pmHandler, csApi) {
 	 * @private
 	 */
 	self._onMessage = function(event) {
-		console.log("provider got message: " + event.data);
 		// TODO: check event.origin to be sure we are communicating with allowed domains?
 
 		var data = $.secureEvalJSON(event.data);
@@ -120,7 +119,6 @@ function PmRpcClient(pmHandler) {
 	 * @private
 	 */
 	self._onMessage = function(event) {
-		console.log("client got message: " + event.data);
 		var data = $.secureEvalJSON(event.data);
 		switch (data.status) {
 			case "ready":
