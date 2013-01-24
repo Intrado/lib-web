@@ -8,79 +8,8 @@
 	<script type="text/javascript" src="../script/jquery.json-2.3.min.js"></script>
 	<script type="text/javascript" src="../script/postmessagehandler.js"></script>
 	<script type="text/javascript" src="../script/commsuite_api.js"></script>
+	<script type="text/javascript" src="../script/postmessagerpchandler.js.js"></script>
 	<script type="text/javascript">
-		/**
-		 * postMessage requests, sent to commsuite rest api
-		 *
-		 * @param {PostMessageHandler} pmHandler
-		 * @param {CommSuiteApi} csApi
-		 * @constructor
-		 */
-		function PmRpcHandler(pmHandler, csApi) {
-			var self = this;
-			var pmHandler = pmHandler;
-			var csApi = csApi;
-			var methods = {};
-
-			/**
-			 * initialize the listener and the commsuite api, will emit a message when everything is ready, or an error
-			 */
-			self.init = function() {
-				// attach the message listener for rpc methods
-				pmHandler.attachListener(self.onMessage);
-
-				// initialize the commsuite api, this will emit a message to the parent indicating it's ready for rpc requests
-				csApi.init(function(data, status, headers) {
-					if (status == 200) {
-						pmHandler.postMessageAll({
-							"status": "ready"
-						});
-					} else {
-						pmHandler.postMessageAll({
-							"status": "error",
-							"error" : data.error
-						});
-					}
-				});
-			};
-
-			self.onMessage = function(event) {
-				// TODO: check event.origin to be sure we are communicating with allowed domains?
-
-				var data = $.secureEvalJSON(event.data);
-				// only certain request types are currently supported
-				switch (data.type) {
-					case "pkeyList":
-						methods.createListWithPkeys(data.listObject, data.pkeyList);
-						break;
-					default:
-						pmHandler.postMessageAll({ "status": "error", "error": "Unknown request type" });
-				}
-			};
-
-			/**
-			 * Create a list and populate it with the list of pkeys
-			 *
-			 * @param {Object} data
-			 * @param {Object} pkeyList
-			 */
-			methods.createListWithPkeys = function(data, pkeyList) {
-				csApi.createList(data, function(createRespData, createStatus, createHeaders) {
-					if (createStatus == 200) {
-						csApi.setListPkeys(createRespData.id, pkeyList, function(addRespData, addStatus, addHeaders) {
-							if (addStatus == 200) {
-								pmHandler.postMessageAll({ "status": addStatus, "listid": createRespData.id });
-							} else {
-								pmHandler.postMessageAll({ "status": "error", "error": addRespData.error });
-							}
-						});
-					} else {
-						pmHandler.postMessageAll({ "status": "error", "error": createRespData.error });
-					}
-				});
-			};
-		}
-
 		// execute
 		(function($){
 			// discover the base url and customer
@@ -95,7 +24,7 @@
 			var postMessageHandler = new PostMessageHandler(top);
 
 			// construct the rpc handler and initialize it
-			var pmRpcHandler = new PmRpcHandler(postMessageHandler, csApi);
+			var pmRpcHandler = new PmRpcProvider(postMessageHandler, csApi);
 			pmRpcHandler.init();
 		})(jQuery);
 	</script>
