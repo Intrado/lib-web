@@ -41,7 +41,7 @@ function PostMessageHandler(target) {
 	 * @return {PostMessageHandler} this
 	 */
 	self.postMessage = function(jsonData, domains) {
-		self.target.postMessage($.toJSON(jsonData), domains);
+		self.target.postMessage(jQuery.toJSON(jsonData), domains);
 		return self;
 	};
 
