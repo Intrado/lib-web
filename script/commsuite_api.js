@@ -36,7 +36,7 @@ function CommSuiteApi(host, customer) {
 	 * @param {Function} callback
 	 */
 	self.createList = function(data, callback) {
-		self._genericRequest(apiRoot + "users/" + userid + "/lists", "POST", {}, $.toJSON(data), callback);
+		self._genericRequest(apiRoot + "users/" + userid + "/lists", "POST", {}, data, callback);
 	};
 
 	/**
