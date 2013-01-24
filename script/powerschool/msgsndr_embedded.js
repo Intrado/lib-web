@@ -148,7 +148,7 @@ function MessageSender_embedded(ssoTarget, pkeyList, container) {
 		self.iframe.attr("src", self.baseUrl + "api/postmessage_rpc.html");
 
 		// then, create a list
-		self.updateProgress("createlist", "trying", "Authentication complete");
+		self.updateProgress("createlist", "trying", "Creating list and adding contacts...");
 		client.createList("PowerSchool Selection List", "List created from a PowerSchool selection", true, pkeyList, function(code, data) {
 			if (code == 200) {
 				self.updateProgress("createlist", "done", "List creation complete");
