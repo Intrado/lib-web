@@ -110,25 +110,15 @@ function handleRequest() {
 				if ($errormessage !== true)
 					return array('error' => $errormessage);
 			}
-
-			if (isset($_REQUEST['name']) && $_REQUEST['name'])
-				$name = $_REQUEST['name'];
-			else
-				$name = _L('Please Add Rules to This List');
-
-			if (isset($_REQUEST['description']) && $_REQUEST['description'])
-				$description = $_REQUEST['description'];
-			else
-				$description = _L('Created in MessageSender');
 			
 			// CREATE list
 			$list = new PeopleList(null);
 			$list->modifydate = date("Y-m-d H:i:s");
-			$list->description = $description;
+			$list->description = 'Created in MessageSender';
 			$list->userid = $USER->id;
-			$list->name = $name;
+			$list->name = _L('Please Add Rules to This List');
 			$list->deleted = 1;
-			$list->type = isset($_REQUEST['sectionids']) ? 'section' : 'person';
+			$list->type = isset($_POST['sectionids']) ? 'section' : 'person';
 			$list->update();
 			if (!$list->id)
 				return false;
@@ -139,7 +129,7 @@ function handleRequest() {
 				}
 				summarizeListName($list->id);
 			}
-
+			
 			return $list->id;
 			
 		case 'addrule':
@@ -215,7 +205,7 @@ function handleRequest() {
 			
 			summarizeListName($listid);
 			return true;
-
+			
 		default:
 			return false;
 	}
@@ -223,11 +213,6 @@ function handleRequest() {
 
 header('Content-Type: application/json');
 $data = handleRequest();
-$data = json_encode(!empty($data) ? $data : false). ")";
-
-if (isset($_REQUEST["callback"]) && $_REQUEST["callback"])
-	echo $_REQUEST["callback"]. "($data";
-else
-	echo $data;
+echo json_encode(!empty($data) ? $data : false);
 ?>
 
