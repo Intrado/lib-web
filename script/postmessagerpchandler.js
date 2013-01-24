@@ -7,8 +7,6 @@
  */
 function PmRpcProvider(pmHandler, csApi) {
 	var self = this;
-	var pmHandler = pmHandler;
-	var csApi = csApi;
 	var methods = {};
 
 	/**
@@ -35,6 +33,7 @@ function PmRpcProvider(pmHandler, csApi) {
 	 * @private
 	 */
 	self._onMessage = function(event) {
+		console.log("provider got message: " + event.data);
 		// TODO: check event.origin to be sure we are communicating with allowed domains?
 
 		var data = $.secureEvalJSON(event.data);
@@ -51,7 +50,7 @@ function PmRpcProvider(pmHandler, csApi) {
 	/**
 	 * Create a list and populate it with the list of pkeys
 	 *
-	 * @param {{requestBody:{Object}, pkeyList:{Object}, requestId:{string}}} data
+	 * @param {{requestBody: Object, pkeyList: Object, requestId: string}} data
 	 */
 	methods.createList = function(data) {
 		csApi.createList(data.requestBody, function(createRespData, createStatus, createHeaders) {
@@ -72,10 +71,10 @@ function PmRpcProvider(pmHandler, csApi) {
 	/**
 	 * Create a message object to send back to the parent
 	 *
-	 * @param requestData
-	 * @param responseStatus
-	 * @param responseData
-	 * @return {{responseCode: {number}, responseData: {Object}, requestId: {string}}}
+	 * @param {Object} requestData
+	 * @param {number} responseStatus
+	 * @param {Object} responseData
+	 * @return {{status: string, responseCode: number, responseData: Object, requestId: string}}
 	 * @private
 	 */
 	self._createMessageFromResponse = function(requestData, responseStatus, responseData) {
@@ -83,25 +82,25 @@ function PmRpcProvider(pmHandler, csApi) {
 			"status": "complete",
 			"responseCode": responseStatus,
 			"responseData": responseData,
-			"requestId": requestData.requestId
+			"requestId": requestData.requestId.toString()
 		};
 		if (responseStatus == 200)
 			response["status"] = "complete";
 		else
 			response["status"] = "error";
+		return response;
 	};
 }
 
 /**
  * Client for interacting with a remote api via postMessage
- * @param pmHandler
+ * @param {PostMessageHandler} pmHandler
  * @constructor
  */
 function PmRpcClient(pmHandler) {
 	var $ = jQuery;
 	var self = this;
-
-	var pmHandler = pmHandler;
+	var reqId = 0;
 
 	// for storing requests before the remote api is ready
 	// TODO: Fail all queued requests if we never receive "ready" from the remote system
@@ -121,6 +120,7 @@ function PmRpcClient(pmHandler) {
 	 * @private
 	 */
 	self._onMessage = function(event) {
+		console.log("client got message: " + event.data);
 		var data = $.secureEvalJSON(event.data);
 		switch (data.status) {
 			case "ready":
@@ -142,28 +142,37 @@ function PmRpcClient(pmHandler) {
 		}
 	};
 
+	/**
+	 * Create a list and populate it with the provided pkeys
+	 *
+	 * @param {string} name
+	 * @param {string} desc
+	 * @param {string} isDeleted
+	 * @param {Object} pkeyList
+	 * @param {function({string}responseCode, {Object}responseData)} callback
+	 */
 	self.createList = function(name, desc, isDeleted, pkeyList, callback) {
 		self._doRequest({
 			"type": "createPkeyList",
-			"requestId": $.guid++,
 			"requestBody": $.toJSON({
 				"name": name,
 				"description": desc,
 				"type": "person",
 				"isDeleted": isDeleted
-			}, callback),
+			}),
 			"pkeyList": pkeyList
-		});
+		}, callback);
 	};
 
 	/**
 	 * Execute request or queue it if we have not yet received a "ready" response from the provider
 	 *
-	 * @param request
-	 * @param callback
+	 * @param {Object} request
+	 * @param {function} callback
 	 * @private
 	 */
 	self._doRequest = function(request, callback) {
+		request["requestId"] = reqId++;
 		// keep track of which callbacks belong to which requests so we can execute them when the response comes back
 		callbacks[request.requestId] = callback;
 		if (!ready) {

@@ -32,7 +32,7 @@ function CommSuiteApi(host, customer) {
 	/**
 	 * Create a new list
 	 *
-	 * @param {Object} data
+	 * @param {Object|string} data
 	 * @param {Function} callback
 	 */
 	self.createList = function(data, callback) {
@@ -61,7 +61,7 @@ function CommSuiteApi(host, customer) {
 	 * @param {string} url
 	 * @param {string} method
 	 * @param {Object} headers
-	 * @param {Object} data
+	 * @param {Object|string} data
 	 * @param {function} callback
 	 * @private
 	 */

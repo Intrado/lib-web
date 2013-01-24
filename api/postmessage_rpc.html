@@ -8,7 +8,7 @@
 	<script type="text/javascript" src="../script/jquery.json-2.3.min.js"></script>
 	<script type="text/javascript" src="../script/postmessagehandler.js"></script>
 	<script type="text/javascript" src="../script/commsuite_api.js"></script>
-	<script type="text/javascript" src="../script/postmessagerpchandler.js.js"></script>
+	<script type="text/javascript" src="../script/postmessagerpchandler.js"></script>
 	<script type="text/javascript">
 		// execute
 		(function($){
@@ -24,8 +24,8 @@
 			var postMessageHandler = new PostMessageHandler(top);
 
 			// construct the rpc handler and initialize it
-			var pmRpcHandler = new PmRpcProvider(postMessageHandler, csApi);
-			pmRpcHandler.init();
+			var pmRpcProvider = new PmRpcProvider(postMessageHandler, csApi);
+			pmRpcProvider.init();
 		})(jQuery);
 	</script>
 </head>
