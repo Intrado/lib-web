@@ -129,6 +129,7 @@ function handleRequest() {
 				}
 				summarizeListName($list->id);
 			}
+			$_SESSION['listid'] = $list->id;
 			
 			return $list->id;
 			

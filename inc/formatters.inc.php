@@ -117,7 +117,7 @@ function fmt_renderedlist_destinations_link($row, $index) {
 	if ($personid == '')
 		return "";
 	else
-		return "<a href=\"viewcontact.php?id=$personid\" class=\"actionlink\">$destsummary</a>";
+		return "<a href=\"viewcontact.php?id=$personid" . (isset($_GET["iframe"])?"&iframe=true":"") .  "\" class=\"actionlink\">$destsummary</a>";
 }
 
 function fmt_languagecode ($row,$index) {
@@ -168,7 +168,7 @@ function fmt_persontip ($row, $index) {
 	if ($personid == '')
 		return "";
 	else
-		return "<a href=\"viewcontact.php?id=$personid\" class=\"actionlink\">" 
+		return "<a href=\"viewcontact.php?id=$personid" . (isset($_GET["iframe"])?"&iframe=true":"") . "\" class=\"actionlink\">" 
 				. "<img src=\"img/icons/diagona/16/049.gif\" /> $pkey</a>";
 }
 

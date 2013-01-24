@@ -18,3 +18,7 @@ CREATE TABLE `smsthreadstate` (
  PRIMARY KEY (`smsnumber`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- TAI 1.5.1
+
+ALTER TABLE `smsthreadstate` CHANGE `lasttimestamp` `lasttimestampms` BIGINT NOT NULL;
+

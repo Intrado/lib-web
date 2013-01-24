@@ -8,7 +8,7 @@ function newdisplayJobtypeForm($f, $s, $type, $sequence, $jobtypes){
 	<table class="preference_wrap"><tr><td>
 	<div class="onoffswitch">
     <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="<?= $id?>_switch" onclick="togglePreferences('<?= $id?>',this.checked);" checked />
-    <label class="onoffswitch-label" for="<?= "t{$type}s{$sequence}"?>_switch">
+    <label class="onoffswitch-label" for="<?= $id?>_switch" onclick="function () {// mobile safari doesn't obey lables unless emty function is inserted here}">
     <div class="onoffswitch-inner"></div>
     <div class="onoffswitch-switch"></div>
     </label>
