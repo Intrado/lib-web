@@ -2,54 +2,58 @@
  * application logic for embedded Message Sender, launched via custom page in PowerSchool
  *
  * Requires:
- * 	"ssoUrl" - js list with relative urls for single sign-on redirection locations (only SchoolMessenger plugins are valid!)
+ * 	"plugins" - js list of objects {ssoLink: {string}, registrationUrl: {string}, name: {string}} (only SchoolMessenger plugins are valid!)
  * 	"pkeyList" - js list of pkeys to add to a list
  * 	"content-msgsndr" - container somewhere in the document where the message sender will go
  *
  * 	@author: nrheckman
  */
 (function($){
-	// TODO: these urls need to be configurable via the plugin or it's going to be a pain for development and QA
+	var container = $("#content-msgsndr");
+	// detect multiple plugins and present the user with a choice of which to use
+	if (plugins.length > 1) {
+		container.html(
+			'<div id="selectplugin">' +
+				'<h1>New Broadcast</h1>' +
+				'<div class="box-round">' +
+				'<h2>Select a plugin</h2>' +
+				'<ul class="plugins">' +
+				'</ul>' +
+				'</div>' +
+				'</div>'
+		);
+		$.each(plugins, function(id, data) {
+			var li = $("<li><a href='#'>" + data.name + "</a></li>");
+			container.find("ul").append(li);
+			li.on("click", function(event) {
+				event.preventDefault();
+				doApp(data.registrationUrl, data.ssoLink, pkeyList, container);
+			})
+		})
+	} else {
+		doApp(plugins[0].registrationUrl, plugins[0].ssoLink, pkeyList, container);
+	}
+})(jQuery);
+
+function doApp(registrationUrl, ssoLink, pkeyList, container) {
+	var appUrl = registrationUrl.replace(/[a-zA-Z]+.php.*$/g, "");
+
 	// extend the styles
-	$('head').append('<link rel="stylesheet" href="https://heckvm.testschoolmessenger.com/powerschool/themes/powerschool/embedded.css" type="text/css" />');
+	jQuery('head').append('<link rel="stylesheet" href="' + appUrl + "themes/powerschool/embedded.css" + '" type="text/css" />');
 
 	// load all the required javascript libraries and then, once complete, begin the process
 	loadScripts([
-			"https://heckvm.testschoolmessenger.com/powerschool/script/jquery.json-2.3.min.js",
-			"https://heckvm.testschoolmessenger.com/powerschool/script/postmessagehandler.js",
-			"https://heckvm.testschoolmessenger.com/powerschool/script/postmessagerpchandler.js"
+			appUrl + "script/jquery.json-2.3.min.js",
+			appUrl + "script/postmessagehandler.js",
+			appUrl + "script/postmessagerpchandler.js"
 		],
 		function() {
-			var container = $("#content-msgsndr");
-			// detect multiple plugins and present the user with a choice of which to use
-			if (ssoUrl.length > 1) {
-				container.html(
-					'<div id="selectplugin">' +
-						'<h1>New Broadcast</h1>' +
-						'<div class="box-round">' +
-						'<h2>Select a plugin</h2>' +
-						'<ul class="plugins">' +
-						'</ul>' +
-						'</div>' +
-						'</div>'
-				);
-				$.each(ssoUrl, function(id, url) {
-					// TODO: also get name and present that instead of the relative url to load
-					var li = $("<li><a href='#'>" + url + "</a></li>");
-					container.find("ul").append(li);
-					li.on("click", function(event) {
-						event.preventDefault();
-						var msgsndr = new MessageSender_embedded(url, pkeyList, container);
-						msgsndr.init();
-					})
-				})
-			} else {
-				// initialize the message sender object. It will auto-load into the form
-				var msgsndr = new MessageSender_embedded(ssoUrl[0], pkeyList, container);
-				msgsndr.init();
-			}
-		})();
-})(jQuery);
+			// initialize the message sender object. It will auto-load into the form
+			var msgsndr = new MessageSender_embedded(ssoLink, pkeyList, container);
+			msgsndr.init();
+		}
+	)();
+}
 
 function loadScripts(scriptList, callback) {
 	return function() {
