@@ -304,5 +304,57 @@ function doStartSession() {
 	}
 }
 
+// **************************
+// portalauth methods
+
+function getPortalAuthAuthRequestTokenUrl($callbackUrl) {
+	$params = array(new XML_RPC_Value(session_id(), 'string'), new XML_RPC_Value($callbackUrl, 'string'));
+	$method = "AuthServer.getPortalAuthAuthRequestTokenUrl";
+	$result = pearxmlrpc($method, $params);
+	if ($result !== false) {
+		// success
+		return $result['url'];
+	}
+	return false;
+}
+
+function getPortalAuthLocation() {
+	$method = "AuthServer.getPortalAuthLocationUrl";
+	$result = pearxmlrpc($method, array());
+	if ($result !== false) {
+		// success
+		return $result;
+	}
+	return false;
+}
+
+function loginViaPortalAuth() {
+	$params = array(new XML_RPC_Value(session_id(), 'string'));
+	$method = "PortalServer.portal_loginViaPortalAuth";
+	$result = pearxmlrpc($method, $params);
+	if ($result !== false) {
+		// success
+		//if (doDBConnect($result)) return $result;
+		return $result;
+	}
+	return false;
+}
+
+//****************************************************************************************
+// anonymous session methods
+
+function newSession() {
+	$method = "AuthServer.newSession";
+	$result = pearxmlrpc($method, array());
+	if ($result !== false && $result["sessionID"] != "") {
+		//error_log_helper("set sessionid to ". $result["sessionID"]);
+		session_id($result["sessionID"]);
+
+		return true;
+	} else {
+		error_log_helper("Problem requesting newSession() - result: ". $result["result"]. " resultdetail: ". $result["resultdetail"]);
+	}
+	return false;
+}
 
 ?>
