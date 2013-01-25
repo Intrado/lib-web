@@ -1188,7 +1188,7 @@ div.progressbar div.progress {
 
 .iframe_content_wrap {
     min-width: 500px;
-    padding: 20px 0;
+    padding: 0;
 }
 
 .modaliframe iframe {
