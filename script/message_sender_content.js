@@ -280,6 +280,12 @@ var allowControl = {
 		//	$('#msgsndr_emailmessagefromemail').attr('value', userInfo.email);
 		//}
 
+		$('#msgsndr_emailstationerycontinue').on('click', function(e) {
+			e.preventDefault();
+			$('#stationery_email_view').hide();
+			$('#main_email_view').show();
+		});
+		
 		$('#msgsndr_previewemail').on('click', function(e) {
 			e.preventDefault();
 
@@ -530,6 +536,29 @@ function ContentManager() {
 			}
 			
 		}
+		
+		if(mode == "email") {
+			$('#stationery_email_view').show();
+			$('#main_email_view').hide();
+			
+			$('#stationeryselector').html("");
+			$.ajax({
+				url: '/'+orgPath+'/api/2/users/'+userid+'/messagegroups',
+				type: "GET",
+				data: {"start": 0, "limit": 1000,"type":"stationery"},
+				dataType: "json",
+				success: function(data) {
+					$.each(data.messageGroups, function(i,mg) {
+						$('#stationeryselector').append('<input id="stationery_' + mg.id + '" class="stationeryselector" type="radio" name="stationery" value="' + mg.id  + '" /><label for="stationery_' + mg.id + '">' + mg.name + '</label><br />');
+					});
+					$('#msgsndr').on('change', 'input.stationeryselector', function(event) {
+							$('#stationerypreview').attr('src','mglayoutpreview.php?stationery=' + event.target.value);
+					});
+				}		
+			});
+			
+		}
+		
 		
 		//SWITCH STEP
 		$(".msg_confirm").hide();

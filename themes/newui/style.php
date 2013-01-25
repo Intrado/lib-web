@@ -1160,6 +1160,20 @@ div.progressbar div.progress {
 	background: #306496;
 	height: 15px;
 }
+#stationeryselector{
+	float:left;
+}
+
+.radiobox.stationeryselector label,input { float: none;}
+
+.stationerypreview iframe {
+	height: 300px;
+	width: 70%;
+	border: 1px solid #E2E2E2;
+	border-radius: 3px;
+	background-color: #fff;
+	float:right;
+}
 
 .ie8 #cke_reusableckeditor input {
   border: none;
