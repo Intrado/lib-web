@@ -142,7 +142,7 @@ function MessageSender_embedded(ssoTarget, pkeyList, container) {
 	};
 
 	self._launchMessageSender = function() {
-		var msgsndrUrl = self.baseUrl + "message_sender.php?nonav&template=true&subject=" + encodeURIComponent(self.subject);
+		var msgsndrUrl = self.baseUrl + "message_sender.php?iframe&template=true&subject=" + encodeURIComponent(self.subject);
 
 		// first, set up the remote rpc provider in the iframe
 		self.iframe.attr("src", self.baseUrl + "api/postmessage_rpc.html");
