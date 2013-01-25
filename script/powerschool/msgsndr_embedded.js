@@ -177,7 +177,7 @@ function MessageSender_embedded(ssoTarget, pkeyList, container) {
 			$("#loadingmessage").remove();
 		}
 		// resize the iframe so the contents will fit, with a little extra...
-		self.iframe.attr("width", "100%").attr("height", (size + 20) + "px");
+		self.iframe.attr("width", "98%").attr("height", size + "px");
 	};
 
 	self.updateProgress = function(step, cls, text) {
