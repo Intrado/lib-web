@@ -174,12 +174,14 @@
 				<div id="stationery_email_view">
 					<div id="stationeryselector" class="radiobox stationeryselector"></div>
 					<div class="stationerypreview">
-						<iframe id="stationerypreview"  src="blank.html"></iframe>
+						<iframe id="stationerypreview"  src="mglayoutpreview.php"></iframe>
 					</div>
 					<div class="cf"></div>
-					<fieldset>
+					<fieldset class="form_actions">
 						<div class="controls">
-							<button id="msgsndr_emailstationerycontinue">Use Stationery</button>
+							<button id="msgsndr_emailstationerycontinue" class="btn_select" disabled="disabled">Use Stationery</button><img src="img/ajax-loader.gif" class="loading hide" />
+							<button id="msgsndr_emailnostationery">Skip Stationery</button>
+							<button id="msgsndr_emailcancelstationery" class="btn_cancel" data-nav=".oemail">Cancel</button>
 						</div>
 					</fieldset>
 				</div>
@@ -272,24 +274,6 @@
 
 				</div>
 			</div><!-- tab_panel -->
-			
-			
-			<!-- Add the stationery panel -->
-			<div id="msgsndr_tab_stationeryselect" class="tab_panel">
-
-				<input type="checkbox" class="hidden msgdata" id="msgsndr_hasemail" name="msgsndr_hasemail"/>
-
-				
-				<fieldset class="form_actions">
-					<div class="controls">
-					<button class="btn_save" disabled="disabled" data-nav=".oemail">Save Email Message</button><img src="img/ajax-loader.gif" class="loading hide" />
-					<img name="valspinner" class="hidden" src="img/ajax-loader.gif">
-					<button class="btn_discard" data-nav=".oemail">Discard</button>
-					</div>
-				</fieldset>
-
-			</div><!-- tab_panel -->
-			
 				
 			<!-- Add the sms panel -->
 			<div id="msgsndr_tab_sms" class="tab_panel">

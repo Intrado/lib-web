@@ -279,9 +279,23 @@ var allowControl = {
 		//if(userInfo.email != '') {
 		//	$('#msgsndr_emailmessagefromemail').attr('value', userInfo.email);
 		//}
-
+		
+		
+		$('#msgsndr_emailnostationery').on('click', function(e) {
+			e.preventDefault();
+			$('#stationery_email_view').hide();
+			$('#main_email_view').show();
+		});
+		
 		$('#msgsndr_emailstationerycontinue').on('click', function(e) {
 			e.preventDefault();
+			
+			var msgid = $('input[name=stationery]:checked', '#msgsndr').val();
+			
+			$.get('mglayoutpreview.php?stationeryid=' + msgid, function(data) {
+				$("#msgsndr_emailmessagetext").empty().append(data);
+			});
+			$('#msgsndr_emailmessagetext').val("Hello");
 			$('#stationery_email_view').hide();
 			$('#main_email_view').show();
 		});
@@ -538,10 +552,13 @@ function ContentManager() {
 		}
 		
 		if(mode == "email") {
+			$('#stationerypreview').attr('src','mglayoutpreview.php');
+			$('#msgsndr_emailstationerycontinue').attr("disabled","disabled");
 			$('#stationery_email_view').show();
 			$('#main_email_view').hide();
 			
 			$('#stationeryselector').html("");
+
 			$.ajax({
 				url: '/'+orgPath+'/api/2/users/'+userid+'/messagegroups',
 				type: "GET",
@@ -553,7 +570,9 @@ function ContentManager() {
 					});
 					$('#msgsndr').on('change', 'input.stationeryselector', function(event) {
 							$('#stationerypreview').attr('src','mglayoutpreview.php?stationery=' + event.target.value);
+							$('#msgsndr_emailstationerycontinue').removeAttr("disabled");
 					});
+					
 				}		
 			});
 			
@@ -586,8 +605,11 @@ function ContentManager() {
 		}
 	};
 
-	this.discardContent = function() {
-		var remove = confirm("Warning, this will remove the message from your broadcast. Are you sure you wish to do this?");
+	this.discardContent = function(doconfirm) {
+		var remove = true;
+		if (typeof(doconfirm) == 'undefined' || doconfirm == true) 
+			remove = confirm("Warning, this will remove the message from your broadcast. Are you sure you wish to do this?");
+		
 		if (remove) {
 			//RUN ON CANCEL EVENTS
 			$.each(eventManager.onContentDiscard, function(eIndex, eEvent) {
@@ -693,6 +715,12 @@ function ContentManager() {
 		event.preventDefault();
 		self.discardContent();
 	});
+	//BIND CONTENT CANCEL
+	$(".btn_cancel", "[id^=msgsndr_tab_]").on("click", function(event) {
+		event.preventDefault();
+		self.discardContent(false);
+	});
+	
 	
 	//BIND CONTENT SAVE
 	$(".btn_save", "[id^=msgsndr_tab_]").on("click", function(event) {
