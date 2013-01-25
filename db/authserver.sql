@@ -742,6 +742,11 @@ INSERT INTO `shortcodetext` (`shortcode`, `messagetype`, `text`)
   VALUES ('85130', 'EMPTYDIR', 
     'Sorry, no recipient match found. Text DIR for a staff directory.');
 
+-- TAI_1-5-1
+
+INSERT INTO `shortcodetext` (`shortcode`, `messagetype`, `text`) 
+  VALUES ('85130', 'DIRINSTRUCT', 
+    'Text the staff number or NEXT for more');
 
 -- ASP 9.6 powerschool signon to contact manager
 ALTER TABLE  `customerproduct` CHANGE  `product`  `product` ENUM(  'cs',  'tai',  'cm' )  NOT NULL;

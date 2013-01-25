@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
+	<title>postMessage RPC interface</title>
+
+	<script type="text/javascript" src="../script/jquery.1.7.2.min.js"></script>
+	<script type="text/javascript" src="../script/jquery.json-2.3.min.js"></script>
+	<script type="text/javascript" src="../script/postmessagehandler.js"></script>
+	<script type="text/javascript" src="../script/commsuite_api.js"></script>
+	<script type="text/javascript" src="../script/postmessagerpchandler.js"></script>
+	<script type="text/javascript">
+		// execute
+		(function($){
+			// discover the base url and customer
+			var pathArray = window.location.toString().split( '/' );
+			var host = pathArray[2];
+			var customer = pathArray[3];
+
+			// construct the commsuite api interface
+			var csApi = new CommSuiteApi(host, customer);
+
+			// construct the postMessage handler
+			var postMessageHandler = new PostMessageHandler(top);
+
+			// construct the rpc handler and initialize it
+			var pmRpcProvider = new PmRpcProvider(postMessageHandler, csApi);
+			pmRpcProvider.init();
+		})(jQuery);
+	</script>
+</head>
+<body><!-- No body... --></body>
+</html>

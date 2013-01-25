@@ -405,6 +405,9 @@ border-left: 1px solid #ddd; border-right: 1px solid #ddd; -webkit-border-radius
 .table-bordered a.save { background: url(themes/newui/savelist.png) left 0 no-repeat; display: inline-block; width: 18px; height: 18px; vertical-align: middle; }
 .table-bordered a.save:hover { background: url(themes/newui/savelist.png) left -22px no-repeat; }
 
+.table-bordered a.preview { background: url(themes/newui/previewlist.png) left 0 no-repeat; display: inline-block; width: 18px; height: 18px; vertical-align: middle; }
+.table-bordered a.preview:hover { background: url(themes/newui/previewlist.png) left -22px no-repeat; }
+
 .table-bordered td { border-bottom: 1px solid #ddd; }
 
 table.messages { width: 100%; margin: 0; font-size: 13px; line-height: 36px; border-bottom: 1px solid #ddd; border-left: 1px solid #ddd; border-right: 1px solid #ddd; }
@@ -759,7 +762,7 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
 	text-align: left;
 }
 .add-recipients table.lists tr.new td.flashed { background: none repeat scroll 0 0 #FFFFFF; }
-.add-recipients table.lists tr td:first-child { padding-right: 0; width: 55px; }
+.add-recipients table.lists tr td:first-child { padding-right: 0; width: 60px; }
 .add-recipients table.lists tr td { vertical-align: top; }
 
 .add-rule a.btn { padding: 7px 10px; color: #FFFFFF; font-weight: bold; text-shadow: 0 1px 1px rgba(0, 0, 0, 0.75); border-color: #366C19;
@@ -1163,4 +1166,53 @@ div.progressbar div.progress {
 
 .ie8 #cke_reusableckeditor input {
   border: none;
+}
+
+
+.modaliframe {
+    height: 96%;
+    left: 5%;
+    margin: 1% 0 0;
+    padding: 0;
+    top: 0;
+    width: 90%;
+	max-height: none;
+}
+
+.uploadlistfileselector {
+    height: 350px;
+    margin: 15%;
+    width: 600px;
+}
+
+
+.iframe_content_wrap {
+    min-width: 500px;
+    padding: 20px 0;
+}
+
+.modaliframe iframe {
+    height: 96%;
+    width: 100%;
+}
+
+.modaliframe .modal-body {
+    height: 85%;
+    max-height: none;
+    padding: 0 1%;
+}
+
+.uploadlistfileselector .modal-body {
+	height: 65%;
+}
+
+.modaliframe .noheader {
+    height: 90%;
+}
+
+.btn.list-progress,.btn.list-progress:hover{
+    background-color: #006DCC;
+    border: 1px solid #0039AB;
+    color: #FFFFFF;
+    text-align: center;
 }

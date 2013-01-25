@@ -68,6 +68,10 @@
                 pickExisting: {$el: $('#add-recipients-existing_lists')},
                 newUsingRules: {$el: $('#add-recipients-rules')},
                 newUsingSections: {$el: $('#add-recipients-sections')},
+                newUsingQuickPick: {$el: $('#add-recipients-quickpick')},
+                newUsingUpload: {$el: $('#add-recipients-upload')},  
+                
+                previewList: {$el: $('#modal-preview-list')},
                 saveList: {$el: $('#modal-save-list')}
             };
 
@@ -831,7 +835,181 @@
                     return false;
                 });
             })();
+            
+            
+            
+            // MODAL > quickpick -------------------------------------
 
+            (function(){
+                var modal = base.modals.newUsingQuickPick;
+                var iframe = modal.$el.find('iframe');
+                var listid;
+                
+                modal.$el.on('show', function(){
+                	iframe.attr("src","blank.html");
+                    $.ajax({
+                        url: 'ajaxlistform.php?type=createlist'
+                    }).done(function(newListId){
+                    	listid = newListId
+                    	iframe.attr("src","search.php?iframe=true&listsearchmode=individual&id=" + listid);
+                    });
+                });
+                
+                modal.validate = function(){
+                	var url = iframe.contents().get(0).location.href.toLowerCase();
+                	if (url.indexOf("index.php") >= 0) {
+                		iframe.addClass("hide");
+                		alert('Your session has expired. Please log in again to continue.');
+                		window.location = "message_sender.php";
+                	}
+                };
+                
+                iframe.on('load', function() {modal.validate();});
+                
+                var submitBtn = modal.$el.find('.btn-primary');
+                submitBtn.on('click', function(e){
+                	  e.preventDefault();
+                	  $.ajax({
+                          url: 'ajax.php?type=liststats&listids=["' + listid + '"]'
+                      }).done(function(data){
+                          base.pickedListIds.push(listid);
+                          base.updateParentElement();
+                          
+                          data[listid].name = 'Quick Pick';
+                          base.lists[listid] = {
+                              stats: $.extend({}, data[listid])
+                          };
+                          modal.$el.modal('hide');
+                          base.buildTable();
+                          base.highlightListRow(listid);
+                      });
+                });
+            })();
+            
+            // MODAL > uploadlist -------------------------------------
+
+            (function(){
+                var modal = base.modals.newUsingUpload;
+                var iframe = modal.$el.find('iframe');
+                var listid;
+                var submitBtn = modal.$el.find('.btn-primary');
+                var inSubmit = false;
+                var submitText = "Done";
+                
+                
+                modal.$el.on('show', function(){
+                	submitBtn.addClass('disabled');
+                	modal.$el.addClass("uploadlistfileselector");
+                	iframe.attr("src","blank.html");
+                    $.ajax({
+                        url: 'ajaxlistform.php?type=createlist'
+                    }).done(function(newListId){
+                    	listid = newListId
+                    	iframe.attr("src","uploadlist.php?iframe=true");
+                    });
+                });
+                
+                modal.validate = function(){
+                	var url = iframe.contents().get(0).location.href.toLowerCase();
+                	
+                	if (url == 'about:blank' || 
+                		url.indexOf("blank.html") >= 0 ||
+                		url.indexOf("uploadlist.php?iframe=true") >= 0) {
+                        submitBtn.addClass('disabled');
+                    } else {
+                        submitBtn.removeClass('disabled');
+                    };
+                };
+                
+                iframe.on('load', function() {
+                	var url = iframe.contents().get(0).location.href.toLowerCase();
+                	if (url == 'about:blank' || url.indexOf("blank.html") >= 0) {
+                		modal.validate();
+                		return;
+                	}
+                	
+                   	if (url.indexOf("index.php") >= 0) {
+                		iframe.addClass("hide");
+                		alert('Your session has expired. Please log in again to continue.');
+                		window.location = "message_sender.php";
+                	}
+                   	
+                   	if (url.indexOf("uploadlist.php?iframe=true") >= 0) {
+                       	modal.$el.addClass("uploadlistfileselector");
+                   	} else {
+                       	modal.$el.removeClass("uploadlistfileselector");
+
+                   	}
+                 	if (inSubmit) {
+                 		$.ajax({
+                            url: 'ajax.php?type=liststats&listids=["' + listid + '"]'
+                        }).done(function(data){
+                      	  submitBtn.removeClass('call-progress');
+                      	  submitBtn.removeClass('list-progress');
+                      	  submitBtn.addClass('btn-primary');
+                      	  submitBtn.html(submitText);
+                      	  
+                            base.pickedListIds.push(listid);
+                            base.updateParentElement();
+                            
+                            data[listid].name = 'Uploaded List';
+                            base.lists[listid] = {
+                                stats: $.extend({}, data[listid])
+                            };
+                            modal.$el.modal('hide');
+                            base.buildTable();
+                            base.highlightListRow(listid);
+                            inSubmit = false;
+                        }); 
+                	}
+                	modal.validate();
+                });
+                
+                submitBtn.on('click', function(e){
+              	    e.preventDefault();
+                	if (inSubmit || submitBtn.hasClass('disabled')) {
+                		return;
+                	}
+                	inSubmit = true;
+                	
+            		  iframe.contents().find('input.btn_hide').first().trigger('click');
+            		  //modal.$el.find('.call-progress').removeClass('hide');
+            		  
+            		  submitBtn.addClass('call-progress');
+            		  submitBtn.addClass('list-progress');
+            		  submitBtn.removeClass('btn-primary');
+            		  submitText = submitBtn.html();
+            		  submitBtn.html('Processing List');
+                	   
+                });
+            })();
+
+            
+            // MODAL > previewlist -------------------------------------
+            (function(){
+                var modal = base.modals.previewList;
+                var iframe = modal.$el.find('iframe');
+                var submitBtn = modal.$el.find('.btn-primary');
+
+                modal.$el.on('show', function(){
+                	iframe.attr("src","showlist.php?iframe=true&id=" + modal.listId);
+                });
+                
+                modal.validate = function(){
+                	var url = iframe.contents().get(0).location.href.toLowerCase();
+                	if (url.indexOf("index.php") >= 0) {
+                		iframe.addClass("hide");
+                		alert('Your session has expired. Please log in again to continue.');
+                		window.location = "message_sender.php";
+                	}
+                };
+                
+                iframe.on('load', function() {modal.validate();});
+            })();
+            
+            
+            
+            
             // Wire up the table's list actions (remove and save) ---
 
             base.$el.find('.added-lists').on('click', '[data-list-id] .action', function(){
@@ -844,7 +1022,12 @@
                 } else if ($action.hasClass('save')) {
                     base.modals.saveList.listId = listId;
                     base.modals.saveList.$el.modal('show');
+                } else if ($action.hasClass('preview')) {
+                    base.modals.previewList.listId = listId;
+                    base.modals.previewList.$el.modal('show');
                 };
+                
+                
 
                 // TODO: comment out tooltips for now. Have to find the issue with CSS causing positioning issues
                 //$action.tooltip('hide');
@@ -868,18 +1051,20 @@
 
                     // Recalc total recipients
                     sum += base.lists[id].stats.total;
-
+                    
+                    rows += '<tr data-list-id="' + id + '"><td><a rel="tooltip" title="Remove List" class="action remove" href="#"><i class="icon-remove" title="Remove List"></i></a>'; 
                     // If this list is saved, no save icon, else, show save icon
-                    if (base.lists[id].isSaved) {
-                        rows = rows + '<tr data-list-id="' + id + '"><td><a rel="tooltip" title="Remove List" class="action remove" href="#"><i class="icon-remove" title="Remove List"></i></a></td><td>' + base.lists[id].stats.name + '</td><td>' + base.lists[id].stats.total + '</td></tr>';
-                    } else {
-                        rows = rows + '<tr data-list-id="' + id + '"><td><a rel="tooltip" title="Remove List" class="action remove" href="#"><i class="icon-remove" title="Remove List"></i></a><a rel="tooltip" title="Save List" class="action save" data-toggle="modal" href="#modal-save-list"><i class="icon-folder-open" title="Save List"></i></a></td><td>' + base.lists[id].stats.name + '</td><td>' + base.lists[id].stats.total + '</td></tr>';
-                    };
+                    if (!base.lists[id].isSaved) {
+                        rows += '<a rel="tooltip" title="Save List" class="action save" data-toggle="modal" href="#modal-save-list"><i class="icon-folder-open" title="Save List"></i></a>';
+                    }
+                    rows += '<a rel="tooltip" title="Preview List" class="action preview" data-toggle="modal" href="#modal-preview-list"><i title="Preveiw List"></i></a>';
+                    rows += '</td><td>' + base.lists[id].stats.name + '</td><td>' + base.lists[id].stats.total + '</td></tr>';
+                    
                 };
             });
 
             // Last row is the total
-            rows = rows + '<tr><td colspan="2">Total</td><td>' + sum + '</td></tr>';
+            rows += '<tr><td colspan="2">Total</td><td>' + sum + '</td></tr>';
             
             // Add the rows to the table
             $listTable.find('tbody').html(rows);
