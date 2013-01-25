@@ -28,6 +28,12 @@ if (isset($_REQUEST["is_return"])) {
 		//$_SESSION['customerid'] = 0; // TODO support customerurl input
 		$_SESSION['userid'] = $loginDetails["userID"];
 		$_SESSION['portaluserid'] = $loginDetails["userID"];
+	
+		$_SESSION['colorscheme']['_brandtheme'] = "3dblue";
+		$_SESSION['colorscheme']['_brandprimary'] = "26477D";
+		$_SESSION['colorscheme']['_brandtheme1'] = "89A3CE";
+		$_SESSION['colorscheme']['_brandtheme2'] = "89A3CE";
+		$_SESSION['colorscheme']['_brandratio'] = ".3";
 
 		// send to the index.php page to get them properly loaded.
 		$redirectLoc = "index.php";
