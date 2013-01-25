@@ -6,28 +6,12 @@
  * using a mess of global variables. Suboptimal with respect to controlling the
  * appearance, however the mechanics all work which is the most important.
  *
+ * @todo test multiple theme rules on a single element; implement this as a JSON
+ * array if possible instead of || separator... it wasn't working for some reason...
+ *
  * SMK created 2013-01-16
  */
 CKEDITOR.dialog.add('thememgr', function ( editor ) {
-
-/*
-	//  Pull in the customer-defined field definitions
-	var fields = Array();
-	if (typeof rcidata === 'object') {
-		fields = rcidata.get('customer_field_defs');
-	}
-	else if (typeof window.top.rcidata === 'object') {
-		fields = window.top.rcidata.get('customer_field_defs');
-	}
-//	else {
-//		console.log('rcidata undefined.');
-//	}
-
-	var ftypes = Array(Array('-- Select a Field --', ''));
-	for (fi = 0; fi < fields.length; fi++) {
-		ftypes.push(Array(fields[fi]));
-	}
-*/
 
 	return {
 		title: 'Theme Manager',
@@ -44,25 +28,6 @@ CKEDITOR.dialog.add('thememgr', function ( editor ) {
 						type: 'html',
 						html: '<div id="thememgr_content"></div>'
 					}
-
-/*
-					// Default Value Entry
-					{
-						type: 'text',
-						size: 25,
-						id: 'fvalue',
-						label: 'Default Value:',
-						'default': ''
-					},
-
-					// Data Field Selection
-					{
-						type: 'select',
-						id: 'ftype',
-						label: 'Data Field:',
-						items: ftypes
-					}
-*/
 				]
 			}
 		],
@@ -89,7 +54,7 @@ CKEDITOR.dialog.add('thememgr', function ( editor ) {
 					throw 'Missing content div "thememgr_content" (??)';
 				}
 
-				var scratch = RCIEditor.getSetting('rcieditor_scratch');
+				var scratch = RCIEditor.getSetting('rcieditor_scratch'); // rcieditor.js
 				if (typeof scratch === 'undefined') {
 					throw 'scratch space could not be found';
 				}
@@ -98,107 +63,11 @@ CKEDITOR.dialog.add('thememgr', function ( editor ) {
 				var content = editor.getData();
 
 				// and stick it into the scratch space for the editor where we can do some
-				// DOM work on it; prototype.js can access it here, without painful iframe extension
-				//scratch.update(content); // prototype.js
-				scratch.empty().html(content); // jquery.js
+				// DOM work on it; jQuery can access it here, without painful iframe extension
+				scratch.empty().html(content);
 
 				// Scan for and get a list of all the rcithemed elements within the document
 				var rcitheme_data = self.theme_scan(scratch);
-
-// --------------
-/*
-				// Find elements within container that look something like these:
-				// ref: http://html5doctor.com/html5-custom-data-attributes/
-
-				// Element with legacy HTML attribute control
-				// OLD: <element data-rcitheme="attribute:bgcolor=color:Main Color 1" bgcolor="#999999">
-				// NEW: <element data-rcitheme="[(id:'Main Color 1',type:'color',tgt:'attribute',name:'bgcolor')]" bgcolor="#999999">
-
-				// Element with multiple style property controls
-				// OLD: <element data-rcitheme="style:background-color=color:Main Color 1,style:color=color:Main Color 2" style="font-weight: bold; color: #FFFFFF; background-color: #999999;">
-				// NEW: <element data-rcitheme="[{id:'Main Color 1',type:'color',tgt:'style',name:'background-color'},{id:'Main Color 2',type:'color',tgt:'style',name:'color'}]" style="font-weight: bold; color: #FFFFFF; background-color: #999999;">
-				//var themedElements = $(scratch).select('[data-rcitheme]'); // prototype.js
-				var themedElements = jQuery('[data-rcitheme]', scratch); // jquery.js
-
-				if (typeof themedElements === 'undefined') {
-					throw 'No themed elements in this document!';
-				}
-
-				var themedElementsCount = 0;
-
-				themedElements.each(function (ii) {
-					themedElementsCount++;
-
-					var rcitheme_prejson = jQuery(this).attr('data-rcitheme');
-					// Replace 's in the XML with "s which the JSON parser wants
-					var rcitheme_json = rcitheme_prejson.replace(/\'/g, '"');
-
-	console.log('rcitheme_json is [' + rcitheme_json + ']');
-
-					//var rcitheme = Array();
-					var rcitheme = [];
-
-					var rcitheme_json_parts = rcitheme_json.split('||');
-
-					if (! rcitheme_json_parts.length) return;
-
-					for (var jj = 0; jj < rcitheme_json_parts.length; jj++) {
-
-						// ref: http://www.json.org/js.html
-						//var rcitheme = eval('(' + rcitheme_json + ')');
-						// ref: https://github.com/douglascrockford/JSON-js
-						var rcitheme_json_part = JSON.parse(rcitheme_json_parts[jj], function (key, value) {
-		console.log('JSON.parse found key [' + key + '] = value [' + value + ']');
-							// return value ONLY if the key is in a list of supported keys
-							switch (key) {
-								case 'id':
-								case 'type':
-								case 'tgt':
-								case 'name':
-									return(value);
-							}
-							// FIXME: JSON2 doc says that if we return undefined/null the key/value
-							// pair will be deleted, yet when we do that here for unsupported keys,
-							// the entire JSON object comes out null contrary to the explanation. So
-							// for now, this function does nothing to filter unexpected keys out.
-							//return(null);
-							return(value);
-						});
-
-						rcitheme.push(rcitheme_json_part);
-					}
-
-					// RCI Theme JSON encoding must always be an array, even if it's only one item
-					if (typeof rcitheme === 'undefined') return;
-
-
-					//if (! rcitheme.length) return;
-					rcitheme = jQuery(rcitheme);
-					if (! rcitheme.size()) return;
-
-					for (var jj = 0; jj < rcitheme.size(); jj++) {
-						var rcitheme_item = rcitheme[jj];
-
-						// Do we already have a theme data entry for this theme id?
-						if (typeof rcitheme_data[rcitheme_item.id] !== 'undefined') {
-							// Then we don't need to add this one
-							return;
-						}
-
-						// Add this theme id to the theme data
-						switch (rcitheme_item.type) {
-							case 'color':
-								rcitheme_data.add_color(rcitheme_item.id);
-								break;
-						}
-					}
-				});
-
-				if (! themedElementsCount) {
-					throw 'No themed elements in this document!';
-				}
-*/
-// --------------
 
 				// If there are no theme data items
 				if (! rcitheme_data.count) {
@@ -218,7 +87,11 @@ CKEDITOR.dialog.add('thememgr', function ( editor ) {
 						for (var jj = 0; jj < rcitheme_data.color.size(); jj++) {
 							theme_color_options += '<option>' + rcitheme_data.color[jj] + '</option>';
 						}
-						ui_components.colors = '<select id="theme_color_id"><option value="" selected="selected"">Select a theme color to update...</option>' + theme_color_options + '</select>';
+						ui_components.colors = '<select id="theme_color_id">';
+						if (rcitheme_data.color.size() > 1) {
+							ui_components.colors += '<option value="" selected="selected"">Select a theme color to update...</option>';
+						}
+						ui_components.colors += theme_color_options + '</select>';
 					}
 					else {
 						// we shouldn't be able to get here - colors are our only option right now
@@ -230,15 +103,14 @@ CKEDITOR.dialog.add('thememgr', function ( editor ) {
 					var ui_views = '';
 					var ui_code = '';
 
-// TODO: add JS function for theme_show()
 					// Add some functions that we can use
-					var tscall = 'CKEDITOR.dialog.getCurrent().definition.theme_tab_switch';
+					var tscall = 'CKEDITOR.dialog.getCurrent().definition.theme_tab_show';
 
 					// Add tab/view for color selection
 					if (ui_components.colors.length) {
-						ui_tabs += '<span id="tab_colors" class="active" onclick="' + tscall + '(\'colors\');">&nbsp;&nbsp;COLORS&nbsp;&nbsp;</span>';
+						ui_tabs += '<span id="theme_tab_colors" class="inactive" onclick="' + tscall + '(\'colors\');">&nbsp;&nbsp;COLORS&nbsp;&nbsp;</span>';
 
-						ui_views += '<div id="view_colors">';
+						ui_views += '<div id="theme_view_colors" class="theme_view inactive">';
 						ui_views += '	<div class="viewstep"> 1) ' + ui_components.colors + '</div>';
 						ui_views += '	<div class="viewstep"> 2) ';
 						ui_views += '		Select Color: #<input id="theme_color_code" type="text" size="6" maxlength="6" onchange="CKEDITOR.dialog.getCurrent().definition.theme_color_preview_update();"/> <span id="theme_color_preview">&nbsp;</span>';
@@ -254,76 +126,81 @@ CKEDITOR.dialog.add('thememgr', function ( editor ) {
 									csnum++;
 								}
 							}
-								ui_views += '<br clear="all"/>';
+							ui_views += '<br clear="all"/>';
 						}
 						ui_views += '		</div>';
 						ui_views += '	</div>';
 						ui_views += '</div>';
 					}
 
+					/*
+					if (true) { // Add another tab like this:
+						ui_tabs += '<span id="theme_tab_sample" class="inactive" onclick="' + tscall + '(\'sample\');">&nbsp;&nbsp;SAMPLE&nbsp;&nbsp;</span>';
+						ui_views += '<div id="theme_view_sample" class="theme_view inactive">Sample tab content goes here!</div>';
+					}
+					*/
+
 					// Build UI output from all defined tabs/views
 					ui = '<div class="themetabs">' + ui_tabs + '</div><div class="themeviews">' + ui_views + '</div>';
 					ui += '<style>';
-					ui += '		div.themetabs > span > { font-size: 10px; color: #666666; font-weight: bold; margin: 5px 0px; }';
-					ui += '		div.themetabs > span.active { color: #FF6600; background-color: #EEEEEE; }';
-					ui += '		div.themeviews input { background-color: white; border: 1px solid #999999; padding-top: 10px; }';
-					ui += '		div.themeviews { background-color: #EEEEEE; }';
-					ui += '		div.themeviews > div#view_colors > div.viewstep > div.swatches > span { display: inline-block; float: left; margin: 0px; height: 10px; width: 10px; font-size: 1px; cursor: pointer; }';
-					ui += '		div.themeviews > div#view_colors > div.viewstep > span#theme_color_preview { position: relative; top: -10px; display: inline-block; height: 16px; width: 32px; font-size: 1px; border: 1px solid black; }';
+					ui += '		div.themetabs > span { font-size: 10px; font-weight: bold; margin: 5px 0px; }';
+					ui += '		div.themetabs > span.inactive { color: #666666; background-color: inherit; }';
+					ui += '		div.themetabs > span.active { color: #0066CC; background-color: #DDD; }';
+					ui += '		div.themeviews { background-color: #DDD; }';
+					ui += '		div.themeviews > div.inactive { display: none; }';
+					ui += '		div.themeviews > div.active { display: block; }';
+					ui += '		div.themeviews div.viewstep { padding: 5px 10px; }';
+					ui += '		div.themeviews input, div.themeviews select { background-color: white; border: 1px solid #999; }';
+
+					// tab-specific styles:
+					ui += '		div.themeviews > div#theme_view_colors > div.viewstep > div.swatches > span { display: inline-block; float: left; margin: 0px; height: 10px; width: 10px; font-size: 1px; cursor: pointer; }';
+					ui += '		div.themeviews > div#theme_view_colors > div.viewstep > span#theme_color_preview { position: relative; top: -10px; display: inline-block; height: 16px; width: 32px; font-size: 1px; border: 1px solid black; }';
 					ui += '</style>';
 				}
-
-
-//window.top.RCIEditor.themeScan(editor);
-
 			}
 			catch (msg) {
-console.log('ERROR [CKEditor.plugins.thememgr.onShow()]: ' + msg);
 				ui = 'There was an error: [' + msg + ']';
 			}
 
 			e.setHtml('<div>' + ui + '</div>');
+
+			self.theme_tab_show('colors');
 		},
 
 		// The last thing that happens
 		onOk: function() {
-/*
-			var ftype = this.getContentElement( 'general', 'ftype').getValue();
-			if (ftype.length) {
-				var fvalue = this.getContentElement( 'general', 'fvalue').getValue();
-				// TODO - any raw validation on ftype/fvalue before inserting it?
-				var field = '<<' + ftype;
-				if (fvalue.length) {
-					field += ':' + fvalue;
-				}
-				field += '>>';
-
-//console.log('Inserting: [' + field + ']');
-				editor.insertText(field);
-			}
-*/
 			var self = CKEDITOR.dialog.getCurrent().definition;
 
 			try {
-				// Get the selection that was made for a color id
-				var color_id = jQuery('#theme_color_id').val();
-				if (! color_id.length) {
-					throw 'No selection was made!';
-				}
 
-				// Get the selection that was made for a color code
-				var color_code = jQuery('#theme_color_code').val();
-				if (! color_code.length) {
-					throw 'No color was chosen!';
-				}
+				// Only the active theme_tab is used upon submission
+				switch (self.theme_tab_showing) {
+					case 'colors':
+						// Get the selection that was made for a color id
+						var color_id = jQuery('#theme_color_id').val();
+						if (! color_id.length) {
+							throw 'No selection was made!';
+						}
 
-				var scratch = RCIEditor.getSetting('rcieditor_scratch');
-				if (typeof scratch === 'undefined') {
-					throw 'scratch space could not be found';
-				}
+						// Get the selection that was made for a color code
+						var color_code = jQuery('#theme_color_code').val();
+						if (! color_code.length) {
+							throw 'No color was chosen!';
+						}
 
-console.log('Applying the color [' + color_code + '] to the document with themed element id [' + color_id + ']');
-				var res = self.theme_scan(scratch, color_id, color_code);
+						var scratch = RCIEditor.getSetting('rcieditor_scratch');
+						if (typeof scratch === 'undefined') {
+							throw 'scratch space could not be found';
+						}
+
+//console.log('Applying the color [' + color_code + '] to the document with themed element id [' + color_id + ']');
+						var res = self.theme_scan(scratch, color_id, '#' + color_code);
+						break;
+
+					// Add other tab submissions like so:
+					case 'sample':
+						break;
+				}
 
 				// For setting, we need to put our scratch area back into the document
 				if (res) {
@@ -344,6 +221,17 @@ console.log('Applying the color [' + color_code + '] to the document with themed
 		/**
 		 * Scan the container for themed elements and either collect or set data
 		 *
+		 * Find elements within container that look something like these:
+		 * ref: http://html5doctor.com/html5-custom-data-attributes/
+		 *
+		 * Element with legacy HTML attribute control
+		 * OLD: <element data-rcitheme="attribute:bgcolor=color:Main Color 1" bgcolor="#999999">
+		 * NEW: <element data-rcitheme="[(id:'Main Color 1',type:'color',tgt:'attribute',name:'bgcolor')]" bgcolor="#999999">
+		 *
+		 * Element with multiple style property controls
+		 * OLD: <element data-rcitheme="style:background-color=color:Main Color 1,style:color=color:Main Color 2" style="font-weight: bold; color: #FFFFFF; background-color: #999999;">
+		 * NEW: <element data-rcitheme="[{id:'Main Color 1',type:'color',tgt:'style',name:'background-color'},{id:'Main Color 2',type:'color',tgt:'style',name:'color'}]" style="font-weight: bold; color: #FFFFFF; background-color: #999999;">
+		 *
 		 * @param container jQuery element containing the document elements to scan
 		 * @param theme_id string Optional theme identifier to scan the document for
 		 * @param theme_value string Optional theme value to set the identifier to when found
@@ -353,146 +241,117 @@ console.log('Applying the color [' + color_code + '] to the document with themed
 		theme_scan: function(container, theme_id, theme_value) {
 
 			try {
-				var collecting = true;;
+
 				// Now are we collecting or setting?
-				if ((typeof theme_id !== 'undefined') && (typeof theme_value !== 'undefined')) {
-					// Setting!
-					collecting = false;
-				}
-console.log('theme_scan() mode is [' + (collecting ? 'collecting' : 'setting') + ']');
+				var collecting = ((typeof theme_id !== 'undefined') && (typeof theme_value !== 'undefined')) ? false : true; 
 
 				var rcitheme_data = {
 					count: 0,
 					color: Array(),
+
+					// Add support for other theme data types here as needed
 					add_color: function (id) {
 
 						// Prevent the addition of an empty string as a selection id
 						if (! id.length) return;
 
-						// TODO - prevent duplicate color id's from being added here
-console.log('Adding theme color [' + id + ']');
+						// Prevent insertion of duplicate theme color id's
+						for (var ii = 0; ii < this.count; ii++) {
+							if (this.color[ii] == id) return;
+						}
 						this.color.push(id);
 						this.count++;
 					}
 				};
 
-				// Find elements within container that look something like these:
-				// ref: http://html5doctor.com/html5-custom-data-attributes/
-
-				// Element with legacy HTML attribute control
-				// OLD: <element data-rcitheme="attribute:bgcolor=color:Main Color 1" bgcolor="#999999">
-				// NEW: <element data-rcitheme="[(id:'Main Color 1',type:'color',tgt:'attribute',name:'bgcolor')]" bgcolor="#999999">
-
-				// Element with multiple style property controls
-				// OLD: <element data-rcitheme="style:background-color=color:Main Color 1,style:color=color:Main Color 2" style="font-weight: bold; color: #FFFFFF; background-color: #999999;">
-				// NEW: <element data-rcitheme="[{id:'Main Color 1',type:'color',tgt:'style',name:'background-color'},{id:'Main Color 2',type:'color',tgt:'style',name:'color'}]" style="font-weight: bold; color: #FFFFFF; background-color: #999999;">
-				//var themedElements = $(scratch).select('[data-rcitheme]'); // prototype.js
-				var themedElements = jQuery('[data-rcitheme]', container); // jquery.js
+				// Find all elements in the container with the data-rcitheme attribute
+				var themedElements = jQuery('[data-rcitheme]', container);
 
 				if (typeof themedElements === 'undefined') {
 					throw 'No themed elements in this document!';
 				}
 
-				var themedElementsCount = 0;
-
+				// For each element that we found...
 				themedElements.each(function (ii) {
-					themedElementsCount++;
 
+					// Extend this element with jQuery
 					var themedElement = jQuery(this);
 
-					var rcitheme_prejson = themedElement.attr('data-rcitheme');
+					// Get the data-rcitheme attribute off the element
+					var data_rcitheme = themedElement.attr('data-rcitheme');
+					if (! data_rcitheme.length) return;
+
 					// Replace 's in the XML with "s which the JSON parser wants
-					var rcitheme_json = rcitheme_prejson.replace(/\'/g, '"');
+					data_rcitheme = data_rcitheme.replace(/\'/g, '"');
+					var rcitheme_json =  JSON.parse(data_rcitheme, function (key, value) {
 
-	console.log('rcitheme_json is [' + rcitheme_json + ']');
-
-					//var rcitheme = Array();
-					var rcitheme = [];
-
-					var rcitheme_json_parts = rcitheme_json.split('||');
-
-					if (! rcitheme_json_parts.length) return;
-
-					for (var jj = 0; jj < rcitheme_json_parts.length; jj++) {
-
-						// ref: http://www.json.org/js.html
-						//var rcitheme = eval('(' + rcitheme_json + ')');
-						// ref: https://github.com/douglascrockford/JSON-js
-						var rcitheme_json_part = JSON.parse(rcitheme_json_parts[jj], function (key, value) {
-		console.log('JSON.parse found key [' + key + '] = value [' + value + ']');
-							// return value ONLY if the key is in a list of supported keys
-							switch (key) {
-								case 'id':
-								case 'type':
-								case 'tgt':
-								case 'name':
-									return(value);
-							}
-							// FIXME: JSON2 doc says that if we return undefined/null the key/value
-							// pair will be deleted, yet when we do that here for unsupported keys,
-							// the entire JSON object comes out null contrary to the explanation. So
-							// for now, this function does nothing to filter unexpected keys out.
-							//return(null);
-							return(value);
-						});
-
-						// If we are collecting theme data...
-						if (collecting) {
-
-							// Then push this entry onto the queue
-							rcitheme.push(rcitheme_json_part);
+						// return value ONLY if the key is in a list of supported keys
+						switch (key) {
+							case 'id':
+							case 'type':
+							case 'tgt':
+							case 'name':
+								return(value);
 						}
-						else {
-							// Otherwise we are setting so let's do something with it
+						// FIXME: JSON2 doc says that if we return undefined/null the key/value
+						// pair will be deleted, yet when we do that here for unsupported keys,
+						// the entire JSON object comes out null contrary to the explanation. So
+						// for now, this function does nothing to filter unexpected keys out.
+						//return(null);
+						return(value);
+					});
 
-							// Does this one have the theme ID we're looking for?
-							if (rcitheme_json_part.id == theme_id) {
-console.log('Hey, found it! [' + theme_id + ']');
-// TODO - modify the attribute/property affiliated with this element based on the theme description
-
-								// What kind of target is the theme_value going to be stored into?
-								switch (rcitheme_json_part.tgt) {
-									case 'style':
-										// We're putting theme_value into the element's style attribute
-console.log('Setting themed element css [' + rcitheme_json_part.name + '] to [' + theme_value + '] current is [' + themedElement.css(rcitheme_json_part.name) + ']');
-										themedElement.css(rcitheme_json_part.name, '#' + theme_value);
-										break;
-
-									case 'attribute':
-										break;
-								}
-							}
-						}
+					// If the JSON was supplied as a single item rather than an array...
+					if (typeof rcitheme_json.size === 'undefined') {
+						// wrap the item as a single-node array
+						rcitheme_json = [ rcitheme_json ];
 					}
 
-					// The rest of this is only useful for collecting theme data to return
-					if (collecting) {
-						// RCI Theme JSON encoding must always be an array, even if it's only one item
-						if (typeof rcitheme === 'undefined') return;
+					// Each of the JSON objects in the resulting array  is a "theme item"
+					for (var jj = 0; jj < rcitheme_json.size(); jj++) {
+						var rcitheme_item = rcitheme_json[jj];
+						if (collecting) {
 
-
-						rcitheme = jQuery(rcitheme);
-						if (! rcitheme.size()) return;
-
-						for (var jj = 0; jj < rcitheme.size(); jj++) {
-							var rcitheme_item = rcitheme[jj];
-
-							// Add this theme id to the theme data
+							// Add support for other theme data types here as needed
 							switch (rcitheme_item.type) {
 								case 'color':
 									rcitheme_data.add_color(rcitheme_item.id);
 									break;
 							}
 						}
-					}
+						else {
+
+							// Otherwise we are setting; Does this one have the theme ID we're looking for?
+							if (rcitheme_item.id == theme_id) {
+
+								// Modify the attribute/property affiliated with this element based on the theme item's directives
+
+								// What kind of target is the theme_value going to be stored into?
+								switch (rcitheme_item.tgt) {
+
+									case 'style':
+
+										// We're putting theme_value into the element's style attribute'a named property
+										themedElement.css(rcitheme_item.name, theme_value);
+										break;
+
+									case 'attribute':
+
+										// We're putting theme_value into the element's named attribute
+										themedElement.attr(rcitheme_item.name, theme_value);
+										break;
+								}
+							}
+						}
+					};
 				});
 
 				// if we are collecting
 				if (collecting) {
 
 					// then we expect to have something to return
-					if (! themedElementsCount) {
-						throw 'No themed elements in this document!';
+					if (! rcitheme_data.count) {
+						throw 'No theme data in this document!';
 					}
 
 					return(rcitheme_data);
@@ -503,12 +362,36 @@ console.log('Setting themed element css [' + rcitheme_json_part.name + '] to [' 
 				}
 			}
 			catch (msg) {
-console.log('Soft error: [' + msg + ']');
+//console.log('Soft error: [' + msg + ']');
 			}
 		},
 
+		theme_tab_showing: '',
+
+		theme_tab_show: function(tabname) {
+
+			// Make sure the requested tab name is a valid one
+			var tab_el = jQuery('#theme_tab_' + tabname);
+			var view_el = jQuery('#theme_view_' + tabname);
+			if (! (tab_el && view_el)) return(false);
+
+			// If there's already a tab showing then hide it
+			if (this.theme_tab_showing.length) {
+				jQuery('#theme_view_' + this.theme_tab_showing).removeClass('active').addClass('inactive');
+				jQuery('#theme_tab_' + this.theme_tab_showing).removeClass('active').addClass('inactive');
+			}
+
+			// Now show and remember the requested tab
+			this.theme_tab_showing = tabname;
+			view_el.removeClass('inactive').addClass('active');
+			tab_el.removeClass('inactive').addClass('active');
+
+			return(true);
+		},
+
 		theme_color_swatch: function(num) {
-			var color_code = this.rgb2hex(jQuery('#theme_color_swatch_' + num).css('background-color'));
+			var color_code = this.color2hex(jQuery('#theme_color_swatch_' + num).css('background-color'));
+
 			jQuery('#theme_color_code').val(color_code);
 			this.theme_color_preview_update();
 		},
@@ -518,10 +401,22 @@ console.log('Soft error: [' + msg + ']');
 			jQuery('#theme_color_preview').css('background-color', '#' + color_code);
 		},
 
-		// ref: http://stackoverflow.com/questions/1740700/get-hex-value-rather-than-rgb-value-using-jquery
-		rgb2hex: function (rgb) {
-			rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
-			return(this.hex(rgb[1]) + this.hex(rgb[2]) + this.hex(rgb[3]));
+		color2hex: function (color_code) {
+
+			// In FF, the color code comes out as 'rgb(RRR, GGG, BBB)'
+			var rgb;
+			if (rgb = color_code.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/)) {
+				return(this.hex(rgb[1]) + this.hex(rgb[2]) + this.hex(rgb[3]));
+			}
+
+			// In IE, the color code comes out as '#RRGGBB'
+			else if (color_code.match(/^#/)) {
+				color_code = color_code.substring(1);
+				return(color_code);
+			}
+
+			// Some other encoding scheme?
+			return('000000');
 		},
 
 		hex: function (x) {
@@ -531,11 +426,3 @@ console.log('Soft error: [' + msg + ']');
 	};
 });
 
-function retarded() {
-	CKEDITOR.dialog.getCurrent().definition.rgb2hex('abc');
-/*
-	var cked = CKEDITOR.dialog.getCurrent();
-	console.log('cked is a ' + cked);
-	cked.definition.rgb2hex('abc');
-*/
-}

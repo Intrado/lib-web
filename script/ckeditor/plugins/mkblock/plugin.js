@@ -4,8 +4,7 @@ CKEDITOR.plugins.add( 'mkblock', {
 		editor.addCommand( 'makeBlock', {
 			exec: function( editor ) {
 				var selectedText = editor.getSelection().getSelectedText(); 
-				//editor.insertHtml('<div class="editableBlock"><p>');
-				editor.insertHtml('<div class="editableBlock" contenteditable="true"><p>');
+				editor.insertHtml('<div class="editableBlock"><p>');
 				editor.insertHtml(selectedText.length ? selectedText : 'This is editable text');
 				editor.insertHtml('</p></div>');
 			}

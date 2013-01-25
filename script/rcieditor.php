@@ -1,4 +1,14 @@
 <?
+/**
+ *
+ * @todo SMK notes 2013-01-24 that jquery conversion is still needed; initial attempts
+ * to replace prototype with jquery seem to cause some sort of conflict within ckeditor.js
+ * which causes CKEDITOR to no longer be able to see it's own '$' member for XML processing.
+ * It is possible that instantiating jQuery triggers this result despite running the noConflict().
+ * CHANGE LOG
+   * SMK created
+ */
+
 function scrub_ascii($string, $lower_accept = null, $upper_accept = null, $encode = 'js') {
 	if (! strlen($string)) return('');
 	if (is_null($lower_accept)) $lower_accept = 9;          // TAB
@@ -129,8 +139,6 @@ $target = scrub_ascii($parts[0], ord('A'), ord('z'));
 			}
 
 		</style>
-		<!-- TODO : look for jquery.js vs. prototype.js in the code below to convert -->
-		<!--script src="jquery.1.7.2.min.js"></script-->
 		<script src="prototype.js"></script>
 		<script src="console.js"></script>
 		<script src="ckeditor/ckeditor.js"></script>
@@ -148,6 +156,18 @@ $target = scrub_ascii($parts[0], ord('A'), ord('z'));
 
 					// Prevent ckeditor from trying to load an external configuration file
 					editor.config.customConfig = '';
+
+					// SMK added to selectively enable reduction scaling for uploaded images;
+					// page that includes CKE must set global var htmlEditorImageScalingEnable
+					// to true to enable scaling, otherwise scaling will be disabled by default;
+					// uploader.php will pass the argument on to f.handleFileUpload() which will
+					// ultimately be responsible for enforcement of this flag
+					var uploaderURI = window.top.RCIEditor.getSetting('baseUrl') + 'uploadimage.php';
+					var max_size;
+					if ((max_size = parseInt(window.top.RCIEditor.getSetting('image_scaling'))) > 0) {
+						uploaderURI += '?scaleabove=' + max_size;
+					}
+					editor.config.filebrowserImageUploadUrl = uploaderURI;
 
 					editor.config.extraPlugins = 'aspell,mkfield';
 					editor.config.toolbar = [
@@ -236,6 +256,7 @@ $target = scrub_ascii($parts[0], ord('A'), ord('z'));
 				//var content = textarea.html(); // jquery.js
 				var content = textarea.innerHTML; // prototype.js
 
+
 				// Convert content entities back to the real characters
 				content = content.replace(/&lt;/g, '<');
 				content = content.replace(/<</g, '&lt;&lt;');
@@ -249,7 +270,6 @@ $target = scrub_ascii($parts[0], ord('A'), ord('z'));
 
 				// Apply CKE inline editors for each wysiwygpage > div.contenteditable=true
 				//$('.editableBlock', wysiwygpage).each(function(index) { makeEditable(this, index); }); // jquery.js
-				//editableBlocks = $(wysiwygpage).select('[contenteditable="true"]'); // prototype.js (+3...)
 				var editableBlocks = $(wysiwygpage).select('.editableBlock'); // prototype.js (+3...)
 				for (var i = 0; i < editableBlocks.length; i++) {
 					makeEditable(editableBlocks[i], i);

@@ -2,7 +2,7 @@
  * For IE, console.log is not defined. Here we define it
  *
  * CHANGE LOG:
- *   SMK created 2013-01-08
+   * SMK created 2013-01-08
  */
 if (typeof console !== 'object') {
 	console = {
@@ -23,9 +23,10 @@ if (typeof console !== 'object') {
 		},
 
 		init: function() {
-			this.consolewin = window.open('', '', 'width=600,height=200,location=no,resizable=yes,scrollbars=yes');
+			this.consolewin = window.open('', 'consolewin', 'width=600,height=200,location=no,resizable=yes,scrollbars=yes');
 			var d = this.consolewin.document;
-			d.writeln('<html>');
+			d.open();
+			d.write('<html>');
 			d.writeln('	<head>');
 			d.writeln('		<style>');
 			d.writeln('			html,body { font-family: Arial; font-size: 10px; margin: 0px; padding: 0px; width: 100%; height: 100%;}');
@@ -40,6 +41,7 @@ if (typeof console !== 'object') {
 			d.writeln('		<div id="consoleoutput"></div>');
 			d.writeln('	</body>');
 			d.writeln('</html>');
+			d.close();
 			this.log('Console logging initialized!');
 		}
 	};
