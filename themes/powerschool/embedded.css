@@ -2,6 +2,7 @@ iframe::-webkit-scrollbar {
 	display: none;
 }
 iframe.embedded {
+	margin: 10px;
 	overflow-y: hidden;
 }
 ul.steps li.waiting{

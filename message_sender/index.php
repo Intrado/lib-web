@@ -75,11 +75,6 @@
 		
 	</div><!-- endwindow newbroadcast -->
 	
-
-	<div class="main_aside">
-		<?= addHelpSection();?>
-	</div><!-- end main_aside-->
-	
 </div><!-- end wrapper -->
 
 <? include("message_sender/modals.inc.php"); ?>

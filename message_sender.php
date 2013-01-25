@@ -90,10 +90,10 @@ if (isset($_GET['template']) && $_GET['template'] && isset($_GET['subject']) && 
 		"lists" => (isset($_GET['lists'])?$_GET['lists']:"[]"),
 		"jobtypeid" => (isset($_GET['jobtypeid'])?$_GET['jobtypeid']:0),
 		"messagegroupid" => (isset($_GET['messagegroupid'])?$_GET['messagegroupid']:0));
-	redirect();
+	redirect(isset($_REQUEST["iframe"])?"?iframe":"");
 } else if (isset($_GET['new'])) {
 	unset($_SESSION['message_sender']);
-	redirect();
+	redirect(isset($_REQUEST["iframe"])?"?iframe":"");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
