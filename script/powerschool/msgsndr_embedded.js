@@ -36,7 +36,7 @@
 })(jQuery);
 
 function doApp(registrationUrl, ssoLink, pkeyList, container) {
-	var appUrl = registrationUrl.replace(/[a-zA-Z]+.php.*$/g, "");
+	var appUrl = registrationUrl.replace(/\/api\/.*$/g, "") + "/";
 
 	// extend the styles
 	jQuery('head').append('<link rel="stylesheet" href="' + appUrl + "themes/powerschool/embedded.css" + '" type="text/css" />');
