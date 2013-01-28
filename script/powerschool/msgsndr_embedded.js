@@ -2,7 +2,7 @@
  * application logic for embedded Message Sender, launched via custom page in PowerSchool
  *
  * Requires:
- * 	"plugins" - js list of objects {ssoLink: {string}, registrationUrl: {string}, name: {string}} (only SchoolMessenger plugins are valid!)
+ * 	"plugin" - js object {ssoLink: {string}, registrationUrl: {string}, name: {string}} (only SchoolMessenger plugins are valid!)
  * 	"pkeyList" - js list of pkeys to add to a list
  * 	"content-msgsndr" - container somewhere in the document where the message sender will go
  *
@@ -10,50 +10,24 @@
  */
 (function($){
 	var container = $("#content-msgsndr");
-	// detect multiple plugins and present the user with a choice of which to use
-	if (plugins.length > 1) {
-		container.html(
-			'<div id="selectplugin">' +
-				'<h1>New Broadcast</h1>' +
-				'<div class="box-round">' +
-				'<h2>Select a plugin</h2>' +
-				'<ul class="plugins">' +
-				'</ul>' +
-				'</div>' +
-				'</div>'
-		);
-		$.each(plugins, function(id, data) {
-			var li = $("<li><a href='#'>" + data.name + "</a></li>");
-			container.find("ul").append(li);
-			li.on("click", function(event) {
-				event.preventDefault();
-				doApp(data.registrationUrl, data.ssoLink, pkeyList, container);
-			})
-		})
-	} else {
-		doApp(plugins[0].registrationUrl, plugins[0].ssoLink, pkeyList, container);
-	}
-})(jQuery);
-
-function doApp(registrationUrl, ssoLink, pkeyList, container) {
-	var appUrl = registrationUrl.replace(/\/api\/.*$/g, "") + "/";
+	var appUrl = plugin.registrationUrl.replace(/\/api\/.*$/g, "") + "/";
 
 	// extend the styles
 	jQuery('head').append('<link rel="stylesheet" href="' + appUrl + "themes/powerschool/embedded.css" + '" type="text/css" />');
 
 	// load all the required javascript libraries and then, once complete, begin the process
 	loadScripts([
-			appUrl + "script/jquery.json-2.3.min.js",
-			appUrl + "script/postmessagehandler.js",
-			appUrl + "script/postmessagerpchandler.js"
-		],
+		appUrl + "script/jquery.json-2.3.min.js",
+		appUrl + "script/postmessagehandler.js",
+		appUrl + "script/postmessagerpchandler.js"
+	],
 		function() {
 			// initialize the message sender object. It will auto-load into the form
-			var msgsndr = new MessageSender_embedded(ssoLink, pkeyList, container);
+			var msgsndr = new MessageSender_embedded(plugin.ssoLink, pkeyList, container);
 			msgsndr.init();
 		}
 	)();
-}
+})(jQuery);
 
 function loadScripts(scriptList, callback) {
 	return function() {
