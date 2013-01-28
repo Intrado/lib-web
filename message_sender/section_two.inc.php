@@ -172,10 +172,16 @@
 			<!-- Add the email panel -->
 			<div id="msgsndr_tab_email" class="tab_panel">
 				<div id="stationery_email_view">
-					<div id="stationeryselector" class="radiobox stationeryselector"></div>
-					<div class="stationerypreview">
+					<fieldset id="stationeryfield" class="stationeryselector">
+						<legend>Email Stationery:</legend>
+						<div id="stationeryselector" class="radiobox stationeryselector">
+					
+						</div>
+					</fieldset>
+					<fieldset id="stationerypreviewfield" class="stationerypreview">
+						<legend>Email Stationery Preview:</legend>
 						<iframe id="stationerypreview"  src="mglayoutpreview.php"></iframe>
-					</div>
+					</fieldset>
 					<div class="cf"></div>
 					<fieldset class="form_actions">
 						<div class="controls">

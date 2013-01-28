@@ -1163,20 +1163,35 @@ div.progressbar div.progress {
 	background: #306496;
 	height: 15px;
 }
-#stationeryselector{
-	float:left;
-	padding: 10px 0 0 10px;
+
+#stationeryfield {
+	border: 1px solid #CCCCCC;
+	border-radius: 5px 5px 5px 5px;
+	float: left;
+    margin: 0 5px 5px;
+    padding: 5px 10px 10px;
+    width: 26%;
+    height: 300px;
 }
 
 .radiobox.stationeryselector label,input { float: none;}
 
+#stationerypreviewfield {
+	border: 1px solid #CCCCCC;
+	border-radius: 5px 5px 5px 5px;
+	float: right;
+    margin: 0 5px 5px;
+    padding: 5px 10px 10px;
+    width: 70%;
+    height: 300px;
+}
+
 .stationerypreview iframe {
-	height: 300px;
-	width: 70%;
 	border: 1px solid #E2E2E2;
 	border-radius: 3px;
 	background-color: #fff;
-	float:right;
+	height: 100%;
+    width: 100%;
 }
 
 .ie8 #cke_reusableckeditor input {
