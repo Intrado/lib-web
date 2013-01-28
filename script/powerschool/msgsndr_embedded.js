@@ -70,6 +70,8 @@ function MessageSender_embedded(ssoTarget, pkeyList, container) {
 	var pmHandler = false;
 	var client = false;
 
+	var authenticationTimeoutMs = 30000;
+
 	/**
 	 * Initialize the container by:
 	 * 1. adding progress indication html
@@ -107,7 +109,7 @@ function MessageSender_embedded(ssoTarget, pkeyList, container) {
 		self.iframe.attr("src", ssoTarget);
 		authTimer = setTimeout(function() {
 			self._showError(["Authentication request timed out after 30 seconds", "Contact your system administrator for assistance"])
-		}, 30000);
+		}, authenticationTimeoutMs);
 
 		// set up the postMessage handler and rpc client
 		pmHandler = new PostMessageHandler(self.iframe[0].contentWindow);
