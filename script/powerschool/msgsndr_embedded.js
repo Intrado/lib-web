@@ -13,7 +13,7 @@
 	var appUrl = plugin.registrationUrl.replace(/\/api\/.*$/g, "") + "/";
 
 	// extend the styles
-	jQuery('head').append('<link rel="stylesheet" href="' + appUrl + "themes/powerschool/embedded.css" + '" type="text/css" />');
+	$('head').append('<link rel="stylesheet" href="' + appUrl + "themes/powerschool/embedded.css" + '" type="text/css" />');
 
 	// load all the required javascript libraries and then, once complete, begin the process
 	loadScripts([
@@ -29,6 +29,13 @@
 	)();
 })(jQuery);
 
+/**
+ * Loads requested list of script files sequentially, and then executes the callback
+ *
+ * @param {string[]} scriptList
+ * @param {function} callback
+ * @return {function}
+ */
 function loadScripts(scriptList, callback) {
 	return function() {
 		if (scriptList.length > 0) {
@@ -40,6 +47,17 @@ function loadScripts(scriptList, callback) {
 	}
 }
 
+/**
+ * Instance of an embedded message sender
+ * This will take over part of the dom (referenced by "container") and insert the message sender into it after:
+ * 1. Initiating a single sing on request via the "ssoTarget" url
+ * 2. Creating a list which contains the student/staff pkeys from "pkeyList"
+ *
+ * @param {string} ssoTarget
+ * @param {string[]} pkeyList
+ * @param {element} container
+ * @constructor
+ */
 function MessageSender_embedded(ssoTarget, pkeyList, container) {
 	var $ = jQuery;
 	var self = this;
@@ -52,6 +70,13 @@ function MessageSender_embedded(ssoTarget, pkeyList, container) {
 	var pmHandler = false;
 	var client = false;
 
+	/**
+	 * Initialize the container by:
+	 * 1. adding progress indication html
+	 * 2. begin the single sing on process by following the passed "ssoTarget" url in an iframe
+	 * 3. initializing the postMessage handler
+	 * 4. initializing the RPC client
+	 */
 	self.init = function() {
 		// insert loading content and message area
 		container.html(
@@ -90,6 +115,14 @@ function MessageSender_embedded(ssoTarget, pkeyList, container) {
 		pmHandler.attachListener(self._onMessage);
 	};
 
+	/**
+	 * handle message events a couple of different ways
+	 * 1. if it is a "resize" event, there will be resize data attached. This causes the iframe to resize so it fits the content
+	 * 2. if the current information indicates that the user has landed on "start.php" or "dashboard.php", start launching message sender
+	 *
+	 * @param {event} event
+	 * @private
+	 */
 	self._onMessage = function(event) {
 		// TODO: test origin for valid domains
 		//if(e.origin !== 'B'){ return; }
@@ -119,26 +152,47 @@ function MessageSender_embedded(ssoTarget, pkeyList, container) {
 		}
 	};
 
+	/**
+	 * Launch the message sender into the iframe
+	 * 1. create a new list and add the pkeys to it
+	 * 2. navigate the iframe to the message sender
+	 *
+	 * @private
+	 */
 	self._launchMessageSender = function() {
 		var msgsndrUrl = self.baseUrl + "message_sender.php?iframe&template=true&subject=" + encodeURIComponent(self.subject);
 
-		// first, set up the remote rpc provider in the iframe
-		self.iframe.attr("src", self.baseUrl + "api/postmessage_rpc.html");
+		// if the pkey list is not empty, create a list with the rpc client
+		if (pkeyList.length > 0) {
+			// first, set up the remote rpc provider in the iframe
+			self.iframe.attr("src", self.baseUrl + "api/postmessage_rpc.html");
 
-		// then, create a list
-		self.updateProgress("createlist", "trying", "Creating list and adding contacts...");
-		client.createList("PowerSchool Selection List", "List created from a PowerSchool selection", true, pkeyList, function(code, data) {
-			if (code == 200) {
-				self.updateProgress("createlist", "done", "List creation complete");
-				self.updateProgress("launchmsgsndr", "trying", "Launching application...");
-				// load the iframe with message_sender.php (indicate list to add and excluding nav)
-				self.iframe.attr("src", msgsndrUrl + "&lists=[" + data.id + "]");
-			} else {
-				self._showError(data.error);
-			}
-		});
+			// then, create a list
+			self.updateProgress("createlist", "trying", "Creating list and adding contacts...");
+			client.createList("PowerSchool Selection List", "List created from a PowerSchool selection", true, pkeyList, function(code, data) {
+				if (code == 200) {
+					self.updateProgress("createlist", "done", "List creation complete");
+					self.updateProgress("launchmsgsndr", "trying", "Launching application...");
+					// load the iframe with message_sender.php (indicate list to add and excluding nav)
+					self.iframe.attr("src", msgsndrUrl + "&lists=[" + data.id + "]");
+				} else {
+					self._showError(data.error);
+				}
+			});
+		} else {
+			// otherwise, just launch the message sender with no list
+			self.updateProgress("createlist", "done", "List creation complete");
+			self.updateProgress("launchmsgsndr", "trying", "Launching application...");
+			self.iframe.attr("src", msgsndrUrl);
+		}
 	};
 
+	/**
+	 * display the passed error text in the container
+	 *
+	 * @param {string} errorText
+	 * @private
+	 */
 	self._showError = function(errorText) {
 		// update whichever step is "trying" to "failed"
 		$("ul.steps .trying").removeClass().addClass("failed");
@@ -149,6 +203,13 @@ function MessageSender_embedded(ssoTarget, pkeyList, container) {
 		});
 	};
 
+	/**
+	 * resize the iframe to the specified height.
+	 * any height > 0 causes it to expand it's width to fill the container
+	 *
+	 * @param {number} size
+	 * @private
+	 */
 	self._resizeIframe = function(size) {
 		if (size > 0) {
 			// iframe is taking over the window, remove the loading bits
