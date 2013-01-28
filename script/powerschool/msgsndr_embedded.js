@@ -97,14 +97,17 @@ function MessageSender_embedded(ssoTarget, pkeyList, container) {
 
 		// detect if the browser can use HTML5 window.postMessage API (this is REQUIRED!)
 		if (top.postMessage == undefined) {
-			self._showError('This browser is incompatible with the application being accessed.<br>' +
-				'See <a href="http://caniuse.com/#feat=x-doc-messaging">Cross-document messaging compatibility</a> for a browser compatibility list.');
+			self._showError(['This browser is incompatible with the application being accessed.<br>' +
+				'See <a href="http://caniuse.com/#feat=x-doc-messaging">Cross-document messaging compatibility</a> for a browser compatibility list.']);
 			return;
 		}
 
 		container.append(self.iframe);
 		self.updateProgress("authenticate", "trying", "Authenticating...");
 		self.iframe.attr("src", ssoTarget);
+		authTimer = setTimeout(function() {
+			self._showError(["Authentication request timed out after 30 seconds", "Contact your system administrator for assistance"])
+		}, 30000);
 
 		// set up the postMessage handler and rpc client
 		pmHandler = new PostMessageHandler(self.iframe[0].contentWindow);
@@ -144,6 +147,8 @@ function MessageSender_embedded(ssoTarget, pkeyList, container) {
 				// we received all the necessary data to indicate pages are loading correctly (and a user is authenticated)
 				// if the page loaded is start.php or dashboard.php, precede to the message sender
 				if (data.page == "start.php" || data.page == "dashboard.php") {
+					clearTimeout(authTimer);
+
 					// Authentication completed
 					self.updateProgress("authenticate", "done", "Authentication complete");
 					self._launchMessageSender();
@@ -190,7 +195,7 @@ function MessageSender_embedded(ssoTarget, pkeyList, container) {
 	/**
 	 * display the passed error text in the container
 	 *
-	 * @param {string} errorText
+	 * @param {string[]} errorText
 	 * @private
 	 */
 	self._showError = function(errorText) {
