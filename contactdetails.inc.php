@@ -296,7 +296,7 @@ if(CheckFormSubmit($f,$s))
 				QuickUpdate("delete from personsetting where personid=".$personid." and name='portalphoneactivation'");
 				QuickUpdate("insert into personsetting (personid, name, value) values ($personid, 'portalphoneactivation', $portalphoneactivation)");
 
-				redirect($_SESSION['contact_referer']  . $iFramePrepend);
+				redirect($_SESSION['contact_referer']);
 			}
 		}
 	}
@@ -638,7 +638,7 @@ foreach ($fieldmaps as $map) {
 				<td class="bottomBorder"><?=escapehtml($guardian['f01'])?></td>
 				<td class="bottomBorder"><?=escapehtml($guardian['f02'])?></td>
 				<td class="bottomBorder"><?=escapehtml($guardian['name'])?></td>
-				<td class="bottomBorder"><a href="viewcontact.php?id=<?=$guardian['guardianpersonid']?>" />View</a></td>
+				<td class="bottomBorder"><a href="viewcontact.php?id=<?=$guardian['guardianpersonid'] . $iFrameAppend?>$iFrameAppend" />View</a></td>
 			</tr>
 <?
 			}

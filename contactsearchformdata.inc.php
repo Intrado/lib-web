@@ -112,11 +112,11 @@ else
 
 
 $togglehtml = '
-	<div class="searchoption"><input name="searchbymode" id="searchByRules" type="radio" '. ($searchmode == "rules" ? "checked" : "") . ' onclick="window.location=\'?listsearchmode=rules\'">
+	<div class="searchoption"><input name="searchbymode" id="searchByRules" type="radio" '. ($searchmode == "rules" ? "checked" : "") . ' onclick="window.location=\'?listsearchmode=rules' . (isset($_GET["iframe"])?"&iframe":"") . '\'">
 	<label for="searchByRules"> Search by Rules </label></div>
-	<div class="searchoption"><input name="searchbymode" id="searchByPerson" type="radio" '. ($searchmode == "individual" ? "checked" : "") . ' onclick="window.location=\'?listsearchmode=individual\'">
+	<div class="searchoption"><input name="searchbymode" id="searchByPerson" type="radio" '. ($searchmode == "individual" ? "checked" : "") . ' onclick="window.location=\'?listsearchmode=individual' . (isset($_GET["iframe"])?"&iframe":"") . '\'">
 	<label for="searchByPerson"> Search for Person </label></div>
-	<div class="searchoption"><input name="searchbymode" id="searchShowAll" type="radio" '. ($searchmode == "showall" ? "checked" : "") . ' onclick="window.location=\'?listsearchmode=showall\'">
+	<div class="searchoption"><input name="searchbymode" id="searchShowAll" type="radio" '. ($searchmode == "showall" ? "checked" : "") . ' onclick="window.location=\'?listsearchmode=showall' . (isset($_GET["iframe"])?"&iframe":"") . '\'">
 	<label for="searchShowAll"> Show All Contacts </label></div>';
 
 
@@ -124,7 +124,7 @@ $contactsearchbuttons = array();
 
 if (getSystemSetting('_hasenrollment')) {
 	$togglehtml .= '
-		<div class="searchoption"><input name="searchbymode" id="searchBySections" type="radio" '. ($searchmode == "sections" ? "checked" : "") . ' onclick="window.location=\'?listsearchmode=sections\'">
+		<div class="searchoption"><input name="searchbymode" id="searchBySections" type="radio" '. ($searchmode == "sections" ? "checked" : "") . ' onclick="window.location=\'?listsearchmode=sections' . (isset($_GET["iframe"])?"&iframe":"") . '\'">
 		<label for="searchBySections"> Search by Sections </label></div>';
 }
 
