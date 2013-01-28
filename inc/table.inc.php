@@ -247,7 +247,7 @@ function showSortMenu ($fields, $sortdata) {
 			$count = min(count($fields),3);
 			for ($x = 0; $x < $count; $x++) {
 				list($selectedfield,$desc) = isset($sortdata[$x]) ? $sortdata[$x] : array(false,false);
-				echo '<span><select onchange="location.href=\'?sort'.$x.'=\' + this.value;" name="sort'.$x.'"><option value="">- None -</option>';
+				echo '<span><select onchange="location.href=\'?sort'.$x.'=\' + this.value' . (isset($_GET["iframe"])?"&iframe":"") . ';" name="sort'.$x.'"><option value="">- None -</option>';
 				foreach ($fields as $field => $name) {
 					$selected = $field == $selectedfield ? "selected" : "";
 					echo '<option value="'.escapehtml($field).'" '.$selected .'>'.escapehtml($name).'</option>';
