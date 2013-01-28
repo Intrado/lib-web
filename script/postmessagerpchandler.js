@@ -101,8 +101,12 @@ function PmRpcClient(pmHandler) {
 	var self = this;
 	var reqId = 0;
 
+	var requestTimeoutMs = 60000;
+
+	// global for storing request timers
+	pmRpcClientTimers = {};
+
 	// for storing requests before the remote api is ready
-	// TODO: Fail all queued requests if we never receive "ready" from the remote system
 	var ready = false;
 	var queuedRequests = [];
 	// callback methods stored for async requests (key is requestid)
@@ -133,8 +137,11 @@ function PmRpcClient(pmHandler) {
 			default:
 				// execute the callback for this requestid (if its a function)
 				var callback = callbacks[data.requestId];
-				if (callback != null)
+				if (callback != null) {
+					clearTimeout(pmRpcClientTimers[data.requestId]);
+					delete pmRpcClientTimers[data.requestId];
 					delete callbacks[data.requestId];
+				}
 				if (callback instanceof Function)
 					callback(data.responseCode, data.responseData);
 		}
@@ -170,12 +177,23 @@ function PmRpcClient(pmHandler) {
 	 * @private
 	 */
 	self._doRequest = function(request, callback) {
-		request["requestId"] = reqId++;
+		var requestId = reqId++;
+		request["requestId"] = requestId;
 		// keep track of which callbacks belong to which requests so we can execute them when the response comes back
 		callbacks[request.requestId] = callback;
+
+		// add a timeout for this request, fail after requestTimeoutMs
+		pmRpcClientTimers[reqId] = setTimeout(function() {
+			delete pmRpcClientTimers[requestId];
+			delete callbacks[requestId];
+			callback(408, { "error": ["Request timeout"] });
+		}, requestTimeoutMs);
+
+		// if the provider isn't ready yet, queue the request
 		if (!ready) {
 			queuedRequests.push(request);
 		} else {
+			// otherwise, send it immediately
 			pmHandler.postMessageAll(request);
 		}
 	}
