@@ -70,6 +70,10 @@ function MessageSender_embedded(ssoTarget, pkeyList, container) {
 	var pmHandler = false;
 	var client = false;
 
+	var totalPkeys = pkeyList.length;
+	var totalAdded = 0;
+	var pkeysPerBatch = 5000;
+
 	var authenticationTimeoutMs = 30000;
 
 	/**
@@ -176,12 +180,15 @@ function MessageSender_embedded(ssoTarget, pkeyList, container) {
 
 			// then, create a list
 			self.updateProgress("createlist", "trying", "Creating list and adding contacts...");
-			client.createList("PowerSchool Selection List", "List created from a PowerSchool selection", true, pkeyList, function(code, data) {
+			client.createList("PowerSchool Selection List", "List created from a PowerSchool selection", true, function(code, data) {
 				if (code == 200) {
-					self.updateProgress("createlist", "done", "List creation complete");
-					self.updateProgress("launchmsgsndr", "trying", "Launching application...");
-					// load the iframe with message_sender.php (indicate list to add and excluding nav)
-					self.iframe.attr("src", msgsndrUrl + "&lists=[" + data.id + "]");
+					totalAdded = 0;
+					self._addListPkeys(data.id, pkeyList, function() {
+						self.updateProgress("createlist", "done", "List creation complete");
+						self.updateProgress("launchmsgsndr", "trying", "Launching application...");
+						// load the iframe with message_sender.php (indicate list to add and excluding nav)
+						self.iframe.attr("src", msgsndrUrl + "&lists=[" + data.id + "]");
+					})(code, data);
 				} else {
 					self._showError(data.error);
 				}
@@ -191,6 +198,29 @@ function MessageSender_embedded(ssoTarget, pkeyList, container) {
 			self.updateProgress("createlist", "done", "List creation complete");
 			self.updateProgress("launchmsgsndr", "trying", "Launching application...");
 			self.iframe.attr("src", msgsndrUrl);
+		}
+	};
+
+	self._addListPkeys = function(listid, pkeyList, callback) {
+		return function(status, data) {
+			if (status == 200) {
+				// TODO: test status
+				if (pkeyList.length > 0) {
+					var partialList = [];
+					for (var i = 0; i < pkeysPerBatch && pkeyList.length > 0; i++)
+						partialList.push(pkeyList.pop());
+
+					totalAdded += partialList.length;
+					// update the status with a counter, shows something is happening
+					self.updateProgress("createlist", "trying", "Creating list and adding contacts... (" + totalAdded + " / " + totalPkeys + ")");
+
+					client.addListPkeys(listid, partialList, self._addListPkeys(listid, pkeyList, callback));
+				} else {
+					callback();
+				}
+			} else {
+				self._showError(data.error);
+			}
 		}
 	};
 

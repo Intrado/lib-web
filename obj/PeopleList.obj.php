@@ -121,14 +121,23 @@ class PeopleList extends DBMappedObject {
 	}
 
 	function createManualAddByPkeys($pkeys) {
+		global $USER;
 		if (!userOwns("list", $this->id))
 			return 0;
 
 		Query("BEGIN");
-		// find all the person ids
-		$personIds = QuickQueryList(
-			"select id from person where type = 'system' and pkey in (". repeatWithSeparator('?', ',', count($pkeys)). ")",
-			false, false, $pkeys);
+		foreach ($pkeys as $pkey) {
+			if ($pkey == "")
+				continue;
+			// only allow system contacts (not guardians)
+			$p = DBFind("Person","from person where pkey=? and type='system'", false, array($pkey));
+			if ($p && $USER->canSeePerson($p->id)) {
+				//use associative array to dedupe pids
+				$temppersonids[$p->id] = 1;
+			}
+		}
+		//flip associative array
+		$personIds = array_keys($temppersonids);
 
 		$addIds = array();
 		if (count($personIds) > 0) {
