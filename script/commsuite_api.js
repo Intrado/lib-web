@@ -14,6 +14,8 @@ function CommSuiteApi(host, customer) {
 	var sessionid = false;
 	var userid = false;
 
+	var requestTimeout = 60000;
+
 	/**
 	 * Initialize the API by requesting the session information and caching the userid
 	 *
@@ -56,6 +58,22 @@ function CommSuiteApi(host, customer) {
 	};
 
 	/**
+	 * Add additional manual adds to the specified listId
+	 *
+	 * @param {number} listId
+	 * @param {string[]} pkeyList
+	 * @param {Function} callback
+	 */
+	self.addListPkeys = function(listId, pkeyList, callback) {
+		var listAdditions = { "additions": [] };
+		$.each(pkeyList, function(index, pkey) {
+			listAdditions.additions.push({ "pkey": pkey });
+		});
+
+		self._genericRequest(apiRoot + "users/" + userid + "/lists/" + listId + "/additions", "POST", {}, $.toJSON(listAdditions), callback);
+	};
+
+	/**
 	 * Make an ajax request
 	 *
 	 * @param {string} url
@@ -75,6 +93,7 @@ function CommSuiteApi(host, customer) {
 			headers: headers,
 			data: data,
 			dataType: "json",
+			timeout: requestTimeout,
 			success: function(resp, textStatus, jqXHR) {
 				if (resp == undefined || resp == null)
 					resp = {};

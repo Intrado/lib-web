@@ -37,33 +37,32 @@ function PmRpcProvider(pmHandler, csApi) {
 
 		var data = $.secureEvalJSON(event.data);
 		// only certain request types are currently supported
-		switch (data.type) {
-			case "createPkeyList":
-				methods.createList(data);
-				break;
-			default:
-				pmHandler.postMessageAll({ "status": "error", "error": "Unknown request type" });
+		if (methods[data.type] instanceof Function) {
+			methods[data.type](data);
+		} else {
+			pmHandler.postMessageAll({ "status": "error", "error": "Unknown request type" });
 		}
 	};
 
 	/**
-	 * Create a list and populate it with the list of pkeys
+	 * Create a list
 	 *
-	 * @param {{requestBody: Object, pkeyList: Object, requestId: string}} data
+	 * @param {{requestBody: Object, requestId: string}} data
 	 */
 	methods.createList = function(data) {
-		csApi.createList(data.requestBody, function(createRespData, createStatus, createHeaders) {
-			if (createStatus == 200) {
-				csApi.setListPkeys(createRespData.id, data.pkeyList, function(addRespData, addStatus, addHeaders) {
-					if (addStatus == 200) {
-						pmHandler.postMessageAll(self._createMessageFromResponse(data, addStatus, createRespData));
-					} else {
-						pmHandler.postMessageAll(self._createMessageFromResponse(data, addStatus, addRespData));
-					}
-				});
-			} else {
-				pmHandler.postMessageAll(self._createMessageFromResponse(data, createStatus, createRespData));
-			}
+		csApi.createList(data.requestBody, function(respData, status, headers) {
+			pmHandler.postMessageAll(self._createMessageFromResponse(data, status, respData));
+		});
+	};
+
+	/**
+	 * Add pkeys to a list
+	 *
+	 * @param {{listId: number, pkeyList: string[], requestId: {string}}} data
+	 */
+	methods.addListPkeys = function(data) {
+		csApi.addListPkeys(data.listId, data.pkeyList, function(respData, status, headers) {
+			pmHandler.postMessageAll(self._createMessageFromResponse(data, status, respData));
 		});
 	};
 
@@ -81,7 +80,7 @@ function PmRpcProvider(pmHandler, csApi) {
 			"status": "complete",
 			"responseCode": responseStatus,
 			"responseData": responseData,
-			"requestId": requestData.requestId.toString()
+			"requestId": requestData.requestId
 		};
 		if (responseStatus == 200)
 			response["status"] = "complete";
@@ -99,7 +98,7 @@ function PmRpcProvider(pmHandler, csApi) {
 function PmRpcClient(pmHandler) {
 	var $ = jQuery;
 	var self = this;
-	var reqId = 0;
+	var reqId = 1;
 
 	var requestTimeoutMs = 60000;
 
@@ -148,23 +147,36 @@ function PmRpcClient(pmHandler) {
 	};
 
 	/**
-	 * Create a list and populate it with the provided pkeys
+	 * Create a list
 	 *
 	 * @param {string} name
 	 * @param {string} desc
 	 * @param {string} isDeleted
-	 * @param {Object} pkeyList
-	 * @param {function({string}responseCode, {Object}responseData)} callback
+	 * @param {function(number, Object)} callback
 	 */
-	self.createList = function(name, desc, isDeleted, pkeyList, callback) {
+	self.createList = function(name, desc, isDeleted, callback) {
 		self._doRequest({
-			"type": "createPkeyList",
+			"type": "createList",
 			"requestBody": $.toJSON({
 				"name": name,
 				"description": desc,
 				"type": "person",
 				"isDeleted": isDeleted
-			}),
+			})
+		}, callback);
+	};
+
+	/**
+	 * Add pkeys to list with id of listId
+	 *
+	 * @param {number} listId
+	 * @param {string[]} pkeyList
+	 * @param {function(number, Object)} callback
+	 */
+	self.addListPkeys = function(listId, pkeyList, callback) {
+		self._doRequest({
+			"type": "addListPkeys",
+			"listId": listId,
 			"pkeyList": pkeyList
 		}, callback);
 	};
@@ -173,7 +185,7 @@ function PmRpcClient(pmHandler) {
 	 * Execute request or queue it if we have not yet received a "ready" response from the provider
 	 *
 	 * @param {Object} request
-	 * @param {function} callback
+	 * @param {function(number, Object)} callback
 	 * @private
 	 */
 	self._doRequest = function(request, callback) {
