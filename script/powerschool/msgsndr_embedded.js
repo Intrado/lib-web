@@ -203,19 +203,23 @@ function MessageSender_embedded(ssoTarget, pkeyList, container) {
 
 	self._addListPkeys = function(listid, pkeyList, callback) {
 		return function(status, data) {
-			// TODO: test status
-			if (pkeyList.length > 0) {
-				var partialList = [];
-				for (var i = 0; i < pkeysPerBatch && pkeyList.length > 0; i++)
-					partialList.push(pkeyList.pop());
+			if (status == 200) {
+				// TODO: test status
+				if (pkeyList.length > 0) {
+					var partialList = [];
+					for (var i = 0; i < pkeysPerBatch && pkeyList.length > 0; i++)
+						partialList.push(pkeyList.pop());
 
-				totalAdded += partialList.length;
-				// update the status with a counter, shows something is happening
-				self.updateProgress("createlist", "trying", "Creating list and adding contacts... (" + totalAdded + " / " + totalPkeys + ")");
+					totalAdded += partialList.length;
+					// update the status with a counter, shows something is happening
+					self.updateProgress("createlist", "trying", "Creating list and adding contacts... (" + totalAdded + " / " + totalPkeys + ")");
 
-				client.addListPkeys(listid, partialList, self._addListPkeys(listid, pkeyList, callback));
+					client.addListPkeys(listid, partialList, self._addListPkeys(listid, pkeyList, callback));
+				} else {
+					callback();
+				}
 			} else {
-				callback();
+				self._showError(data.error);
 			}
 		}
 	};
