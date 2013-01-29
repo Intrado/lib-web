@@ -96,19 +96,25 @@ startWindow(_L('%s Settings',getJobTitle()));
 	ViewOnlyItem("",$msg_grid);
 	?>
 </table>
-<? 
-if (isset($_SERVER['HTTP_REFERER'])) {
-	if (strpos($_SERVER['HTTP_REFERER'],"index.php") === false) {
-		$donelink = $_SERVER['HTTP_REFERER'];
-	} else {
-		$donelink = "start.php";
-	}
+<?
+if (isset($_GET['iframe'])) {
+?>
+	<br>
+	Click <a href="start.php" target="_blank">here</a> to manage jobs in SchoolMessenger</a>
+<?
 } else {
-	$donelink = "jobs.php";
+	if (isset($_SERVER['HTTP_REFERER'])) {
+		if (strpos($_SERVER['HTTP_REFERER'],"index.php") === false) {
+			$donelink = $_SERVER['HTTP_REFERER'];
+		} else {
+			$donelink = "start.php";
+		}
+	} else {
+		$donelink = "jobs.php";
+	}
+
+	echo icon_button(_L("Done"),"tick",null,$donelink);
 }
-
-echo icon_button(_L("Done"),"tick",null,$donelink);
-
 endWindow();
 include_once("navbottom.inc.php");
 
