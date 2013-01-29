@@ -462,7 +462,7 @@
                             modal.buildSubmit();
                         } else {
                             // FAIL
-                            console.log(success);
+                            //console.log(success);
                         };
                     });
                 };
@@ -623,7 +623,7 @@
                             modal.buildFields();
                             modal.buildSubmit();
                         } else {
-                            console.log('failed to delete rule');
+                            //console.log('failed to delete rule');
                         };
                     });
                     return false;
@@ -804,12 +804,27 @@
                     modal.validate();
                 });
 
-                modal.validate = function(){
-                    if ($name.val() !== '') {
-                        $submitBtn.removeClass('disabled');
+                modal.validate = function(msg){
+                	$submitBtn.text('Save List');
+                	invalid = false;
+                	if (typeof(msg) == 'string' && msg != '') {
+                		$("#savelistvalidation").html(msg);
+                		invalid = true;
+                	}
+                	
+                    if ($name.val() == '') {
+                    	$("#savelistvalidation").html("List name is required");
+                    	invalid = true;
+                    }
+                    
+                    if (invalid) {
+                    	$("#savelistvalidation").show();
+                    	$submitBtn.addClass('disabled');
                     } else {
-                        $submitBtn.addClass('disabled');
-                    };
+                    	$("#savelistvalidation").hide();
+                        $submitBtn.removeClass('disabled');
+                    }
+                    
                 };
 
                 $name.on('change keyup', modal.validate);
@@ -820,15 +835,18 @@
                         $.ajax({
                             url: 'ajaxlistform.php?type=saveandrename&listid=' + modal.listId,
                             data: {name: $name.val()}
-                        }).done(function(success){
-                            if (success) {
-                                base.lists[modal.listId].name = base.lists[modal.listId].stats.name = $name.val();
-                                base.lists[modal.listId].isSaved = true;
-                                modal.$el.modal('hide');
-                                base.buildTable();
+                        }).done(function(result){
+                        	if (result) {
+                        		if (result.error) {
+                        			modal.validate(result.error);
+                        		} else {
+	                                base.lists[modal.listId].name = base.lists[modal.listId].stats.name = $name.val();
+	                                base.lists[modal.listId].isSaved = true;
+	                                modal.$el.modal('hide');
+	                                base.buildTable();
+                        		}
                             } else {
-                                // Failed
-                                console.log('Saving failed.')
+                            	modal.validate('Saving failed.');
                             };
                         });
                     };
