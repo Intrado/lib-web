@@ -252,8 +252,9 @@ function MessageSender_embedded(ssoTarget, pkeyList, container) {
 			// iframe is taking over the window, remove the loading bits
 			$("#loadingmessage").remove();
 		}
-		// resize the iframe so the contents will fit, with a little extra...
-		self.iframe.attr("width", "98%").attr("height", size + "px");
+		// resize the iframe, taking the larger of the left nav, vs the iframe content
+		var psNavHeight = $('#nav-main').height();
+		self.iframe.attr("width", "98%").attr("height", Math.max(psNavHeight, size) + "px");
 	};
 
 	self.updateProgress = function(step, cls, text) {
