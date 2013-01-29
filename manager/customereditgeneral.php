@@ -205,8 +205,16 @@ include("inc/customerRequiredFormItems.inc.php");
 
 $formdata[] = _L('Products');
 $formdata["commsuite"] = array(
-	"label" => _L('Commsuite'),
+	"label" => _L('CommSuite'),
 	"value" => isset($products['cs'])?$products['cs']:0,
+	"validators" => array(),
+	"control" => array("CheckBox"),
+	"helpstep" => $helpstepnum
+);
+
+$formdata["contactmanager"] = array(
+	"label" => _L('Contact Manager'),
+	"value" => isset($products['cm'])?$products['cm']:0,
 	"validators" => array(),
 	"control" => array("CheckBox"),
 	"helpstep" => $helpstepnum
@@ -259,6 +267,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$query = "select product, enabled from customerproduct where customerid=?";
 		$products = QuickQueryList($query,true,false,array($customerid));
 		
+		// CommSuite
 		if (!isset($products["cs"])) {
 			if ($postdata["commsuite"]) {
 				// Add Commsuite to customer product from all new customers
@@ -269,6 +278,18 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			QuickUpdate("update customerproduct set enabled=?, modifiedtimestamp=? where customerid=? and product='cs'",false,array($postdata["commsuite"]?'1':'0',time(),$customerid));
 		}
 		
+		// Contact Manger
+		if (!isset($products["cm"])) {
+			if ($postdata["contactmanager"]) {
+				// Add Commsuite to customer product from all new customers
+				$query = "INSERT INTO `customerproduct` (`customerid`,`product`,`createdtimestamp`,`modifiedtimestamp`,`enabled`) VALUES (?,'cm',?,?,1)";
+				QuickUpdate($query, false,array($customerid,time(),time()));
+ 			}
+		} else {
+			QuickUpdate("update customerproduct set enabled=?, modifiedtimestamp=? where customerid=? and product='cm'",false,array($postdata["contactmanager"]?'1':'0',time(),$customerid));
+		}
+		
+		// Talk About It
 		if (!isset($products["tai"])) {
 			if ($postdata["tai"]) {
 				
