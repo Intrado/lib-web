@@ -44,6 +44,7 @@
 												<div class="controls">
 													<input class="input" type="text" value="Grade is 4; Gender is Male" />
 												</div>
+												<div id="savelistvalidation" class="box_validatorerror er" style="display:none"></div>
 											</div>
 										<!-- </form> -->
 									</div>

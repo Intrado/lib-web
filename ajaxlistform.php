@@ -89,8 +89,11 @@ function handleRequest() {
 			if (!userOwns('list', $listid))
 				return false;
 			
+			$name = substr($_REQUEST['name'],0,50);
+			if (QuickQuery('select id from list where deleted=0 and id!=? and name=? and userid=?', false, array($listid, $name, $USER->id)))
+				return array('error' => _L('There is already a list with this name'));;
+			
 			$list = new PeopleList($listid);
-
 			$list->deleted = 0;
 			$list->name = substr($_REQUEST['name'],0,50);
 			$list->update();
