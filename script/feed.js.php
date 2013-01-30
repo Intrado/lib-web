@@ -56,8 +56,9 @@ function feed_applyDefault(url,sortby,view) {
 	options = o.split(':',2);
 	if (options.length == 2)
 		feed_apply(url,options[0],options[1]);
-	if (options.length == 1)
-		feed_apply(url,options[0]);
+	if (options.length == 1) {
+		feed_apply(url,options[0],view);
+	}
 }
 
 
