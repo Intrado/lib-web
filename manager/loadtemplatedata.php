@@ -153,7 +153,7 @@ $templates['messagelink']['en']['html']['body'] = '
 				Please click below to listen to your message:
 				</p><p style="text-align: center;">
 				<br/><a href="${messagelink}">
-				<img src="http://asp.schoolmessenger.com/i/img/largeicons/phonetalking.jpg" alt="Click here to listen to your message." style="border:none;"/><br/>
+				<img src="https://s3.amazonaws.com/templateimages/phonetalking.jpg" alt="Click here to listen to your message." style="border:none;"/><br/>
 				Listen to your message</a>
 				</p><p>
 				Thank you,<br />${displayname}
@@ -241,7 +241,7 @@ $templates['messagelink']['es']['html']['body'] = '
 				Escuche este mensaje navegando al siguiente enlace:
 				</p><p style="text-align: center;">
 				<br/><a href="${messagelink}">
-				<img src="http://asp.schoolmessenger.com/i/img/largeicons/phonetalking.jpg" alt="Escuche este mensaje." style="border:none;"/><br/>
+				<img src="https://s3.amazonaws.com/templateimages/phonetalking.jpg" alt="Escuche este mensaje." style="border:none;"/><br/>
 				Escuche este mensaje</a>
 				</p><p>
 				Gracias,<br />${displayname}
@@ -529,7 +529,7 @@ $templates['monitor']['en']['html']['body'] = '
 <tr>
 <td valign="top" align="left" style="border-bottom: 1px solid #A5A5A5; padding:0px;padding-left:10px; background-color:#FFFFFF;">
 <p style="margin:0px;margin-top:10px;font-size:26px; color:#669900;">
-<img src="https://asp.schoolmessenger.com/i/img/largeicons/bell.jpg" alt="" style="vertical-align:top;border:none;"/> Monitor Alert  </p>
+<img src="https://s3.amazonaws.com/templateimages/bell.jpg" alt="" style="vertical-align:top;border:none;"/> Monitor Alert  </p>
 <p style="margin:10px;margin-top:-10px;padding-left:50px;font-size:20px; color:#6B6B6B">${monitoralert}</p></td></tr><tr><td valign="top" align="left" >
 
 <!-- $beginBlock job-active -->
@@ -546,7 +546,7 @@ Job from ${displayname}<br />
 </table>
 <p>Follow link for additional details:</p><p style="text-align: center;"><br/>
 <a href="${monitorlink}">
-<img src="https://asp.schoolmessenger.com/i/img/largeicons/letter.jpg" alt="Click here to" style="border:none;"/><br/>View Details</a>
+<img src="https://s3.amazonaws.com/templateimages/letter.jpg" alt="Click here to" style="border:none;"/><br/>View Details</a>
 </p>
 <!-- $endBlock job-active -->
 <!-- $beginBlock job-complete -->
@@ -563,7 +563,7 @@ Job from ${displayname}<br />
 </table>
 <p>Follow link for additional details:</p><p style="text-align: center;"><br/>
 <a href="${monitorlink}">
-<img src="https://asp.schoolmessenger.com/i/img/largeicons/letter.jpg" alt="Click here to" style="border:none;"/><br/>View Details</a>
+<img src="https://s3.amazonaws.com/templateimages/letter.jpg" alt="Click here to" style="border:none;"/><br/>View Details</a>
 </p>
 <!-- $endBlock job-complete -->
 <!-- $beginBlock job-firstpass -->
@@ -580,7 +580,7 @@ Job from ${displayname}<br />
 </table>
 <p>Follow link for additional details:</p><p style="text-align: center;"><br/>
 <a href="${monitorlink}">
-<img src="https://asp.schoolmessenger.com/i/img/largeicons/letter.jpg" alt="Click here to" style="border:none;"/><br/>View Details</a>
+<img src="https://s3.amazonaws.com/templateimages/letter.jpg" alt="Click here to" style="border:none;"/><br/>View Details</a>
 </p>
 <!-- $endBlock job-firstpass -->
 </td>
