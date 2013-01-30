@@ -103,7 +103,7 @@ class StationerySelector extends FormItem {
 			</div>
 			<script type=\"text/javascript\">
 			$('{$this->form->name}').on('change', 'input.stationeryselector', function(event) {
-			$('stationerypreview').src = 'mglayoutpreview.php?stationery=' + event.element().value;
+			$('stationerypreview').src = 'mgstationeryview.php?preview&stationery=' + event.element().value;
 		});
 		";
 		if (isset($this->args['hover']))

@@ -64,7 +64,7 @@ class LayoutSelector extends FormItem {
 		</div>
 		<script type=\"text/javascript\">
 			$('{$this->form->name}').on('change', 'input.stationeryselector', function(event) {	
-				$('stationerypreview').src = 'mglayoutpreview.php?layout=' + event.element().value;
+				$('stationerypreview').src = 'mgstationeryview.php?preview&layout=' + event.element().value;
 			});
 		";
 		if (isset($this->args['hover']))

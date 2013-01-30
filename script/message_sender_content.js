@@ -292,7 +292,7 @@ var allowControl = {
 			
 			var msgid = $('input[name=stationery]:checked', '#msgsndr').val();
 			
-			$.get('mglayoutpreview.php?stationeryid=' + msgid, function(data) {
+			$.get('mgstationeryview.php?stationeryid=' + msgid, function(data) {
 				$("#msgsndr_emailmessagetext").empty().append(data);
 			});
 			$('#stationery_email_view').hide();
@@ -555,7 +555,7 @@ function ContentManager() {
 				$('#msgsndr_emailnostationery').hide();
 			}
 			
-			$('#stationerypreview').attr('src','mglayoutpreview.php');
+			$('#stationerypreview').attr('src','mgstationeryview.php');
 			$('#msgsndr_emailstationerycontinue').attr("disabled","disabled");
 			$('#main_email_view').hide();
 			$('#stationery_email_view').hide();
@@ -579,7 +579,7 @@ function ContentManager() {
 					} else if (data.messageGroups.length == 1) {
 						var msgid = data.messageGroups.indexOf(0);
 						
-						$.get('mglayoutpreview.php?stationeryid=' + msgid, function(data) {
+						$.get('mgstationeryview.php?stationeryid=' + msgid, function(data) {
 							$("#msgsndr_emailmessagetext").empty().append(data);
 						});
 						$('#stationery_email_view').hide();
@@ -589,7 +589,7 @@ function ContentManager() {
 							$('#stationeryselector').append('<input id="stationery_' + mg.id + '" class="stationeryselector" type="radio" name="stationery" value="' + mg.id  + '" /><label for="stationery_' + mg.id + '">' + mg.name + '</label><br />');
 						});
 						$('#msgsndr').on('change', 'input.stationeryselector', function(event) {
-								$('#stationerypreview').attr('src','mglayoutpreview.php?stationery=' + event.target.value);
+								$('#stationerypreview').attr('src','mgstationeryview.php?preview&stationery=' + event.target.value);
 								$('#msgsndr_emailstationerycontinue').removeAttr("disabled");
 						});
 						$('#stationery_email_view').show();

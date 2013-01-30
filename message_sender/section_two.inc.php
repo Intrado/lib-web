@@ -180,7 +180,7 @@
 					</fieldset>
 					<fieldset id="stationerypreviewfield" class="stationerypreview">
 						<legend>Email Stationery Preview:</legend>
-						<iframe id="stationerypreview"  src="mglayoutpreview.php"></iframe>
+						<iframe id="stationerypreview"  src="mgstationeryview.php?preview"></iframe>
 					</fieldset>
 					<div class="cf"></div>
 					<fieldset class="form_actions">

@@ -1169,12 +1169,16 @@ div.progressbar div.progress {
 	border-radius: 5px 5px 5px 5px;
 	float: left;
     margin: 0 5px 5px;
-    padding: 5px 10px 10px;
+    padding: 10px 10px 0;
     width: 26%;
     height: 300px;
 }
 
 .radiobox.stationeryselector label,input { float: none;}
+.radiobox.stationeryselector {
+ 	height: 100%;
+	overflow:scroll;
+}
 
 #stationerypreviewfield {
 	border: 1px solid #CCCCCC;
