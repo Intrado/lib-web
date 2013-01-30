@@ -310,6 +310,22 @@ _L('Messaging Options'),
 		"control" => array("CheckBox"),
 		"helpstep" => 4
 	),
+	"createstationery" => array(
+			"label" => _L('Can Create Stationery'),
+			"fieldhelp" => _L('Allow users to create email stationery'),
+			"value" => $obj->getValue("createstationery"),
+			"validators" => array(),
+			"control" => array("CheckBox"),
+			"helpstep" => 4
+	),
+	"forcestationery" => array(
+			"label" => _L('Restrict to Stationery'),
+			"fieldhelp" => _L('Users can must use a stationery when creating a email message'),
+			"value" => $obj->getValue("forcestationery"),
+			"validators" => array(),
+			"control" => array("CheckBox"),
+			"helpstep" => 4
+	),
 _L('Advanced %s Options', getJobTitle()),
 	"createrepeat" => array(
 		"label" => _L('Create Repeating %s', getJobsTitle()),
@@ -861,7 +877,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$obj->setPermission("facebookpost", (bool)(isset($postdata['facebookpost'])?$postdata['facebookpost']:false));
 			$obj->setPermission("twitterpost", (bool)(isset($postdata['twitterpost'])?$postdata['twitterpost']:false));
 			$obj->setPermission("feedpost", (bool)(isset($postdata['feedpost'])?$postdata['feedpost']:false));
-				
+			$obj->setPermission("createstationery", (bool)(isset($postdata['createstationery'])?$postdata['createstationery']:false));
+			$obj->setPermission("forcestationery", (bool)(isset($postdata['forcestationery'])?$postdata['forcestationery']:false));
+			
 			if (getSystemSetting("_hasportal", false)) {
 				$obj->setPermission("portalaccess", (bool)$postdata['portalaccess']);
 				$obj->setPermission("generatebulktokens", (bool)$postdata['generatebulktokens']);
