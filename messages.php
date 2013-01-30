@@ -75,8 +75,9 @@ if($isajax === true) {
 	session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 
 	$mgtype = "notification";
-	if (isset($_GET['feed_view']) && $_GET['feed_view'] == "stationery") {
-		$mgtype = "stationery";	
+	if (isset($_GET['feed_view'])) {
+		if ($USER->authorize('createstationery') && $_GET['feed_view'] == "stationery")
+			$mgtype = "stationery";	
 	}
 	
 	$start = 0 + (isset($_GET['pagestart']) ? $_GET['pagestart'] : 0);
@@ -291,16 +292,20 @@ startWindow(_L('My Messages'), 'padding: 3px;', false, true);
 $feedButtons = array(icon_button(_L('Add New Message'),"add",null,"mgeditor.php?id=new"));
 if ($USER->authorize('subscribe') && userCanSubscribe('messagegroup'))
 	$feedButtons[] = icon_button(_L('Subscribe to a Message'),"fugue/star", "document.location='messagegroupsubscribe.php'");
-$feedButtons[] = icon_button(_L('Add New Stationery'),"add",null,"mglayoutselector.php");
+if ($USER->authorize('createstationery'))
+	$feedButtons[] = icon_button(_L('Add New Stationery'),"add",null,"mglayoutselector.php");
 
 $sortoptions = array(
 	"name" => array("icon" => "img/largeicons/tiny20x20/pencil.jpg", "name" => "Name"),
 	"date" => array("icon" => "img/largeicons/tiny20x20/clock.jpg", "name" => "Date")
 );
 $viewoptions = array(
-	"messages" => array("icon" => "img/largeicons/tiny20x20/pencil.jpg", "name" => _L("Messages")),
-	"stationery" => array("icon" => "img/largeicons/tiny20x20/clock.jpg", "name" => _L("Stationery"))	
+	"messages" => array("icon" => "img/largeicons/tiny20x20/pencil.jpg", "name" => _L("Messages"))
 );
+
+if ($USER->authorize('createstationery'))
+	$viewoptions["stationery"] = array("icon" => "img/largeicons/tiny20x20/clock.jpg", "name" => _L("Stationery"));
+
 
 feed($feedButtons,$sortoptions,$viewoptions);
 ?>

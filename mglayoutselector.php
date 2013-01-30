@@ -26,7 +26,7 @@ require_once("inc/appserver.inc.php");
 //////////////////////////////////////////////////////////////////////////////
 $cansendemail = $USER->authorize('sendemail');
 
-if (!$cansendemail) {
+if (!$cansendemail || !$USER->authorize('createstationery')) {
 	redirect('unauthorized.php');
 } 
 
