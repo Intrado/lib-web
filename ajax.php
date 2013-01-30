@@ -203,7 +203,7 @@ function handleRequest() {
 			foreach ($listids as $id) {
 				if (!userOwns('list', $id) && !isSubscribed("list", $id))
 					continue;
-				$query = "select modifydate, (select max(lastrun) from import where ownertype = 'system') as lastimport from list where id = ?";
+				$query = "select modifydate, (select max(lastrun) from import where ownertype = 'system') as lastimport,name from list where id = ?";
 				$expect = QuickQueryRow($query, true, false, array($id));
 				$stats[$id] = gen2cache(60*60*24, $expect, null, "generateListStats", $id);
 			}
