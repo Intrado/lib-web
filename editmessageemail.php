@@ -99,6 +99,8 @@ if (!in_array($languagecode, array_keys(Language::getLanguageMap())))
 if (!$USER->authorize("sendmulti") && $languagecode != Language::getDefaultLanguageCode())
 	redirect('unauthorized.php');
 
+if ($USER->authorize('forcestationery') && !isset($_SESSION['editmessage']['stationeryid']))
+	redirect('unauthorized.php');
 
 PreviewModal::HandleRequestWithEmailText();
 	

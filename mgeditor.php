@@ -479,7 +479,8 @@ function makeMessageGrid($messagegroup) {
 				$actions[] = action_link("Delete","cross","mgeditor.php?delete=$message->id","return confirmDelete();");
 			} else {
 				$icon = "diagona/16/160";
-				$actions[] = action_link("New","pencil_add","editmessageemail.php?id=new&subtype=html&languagecode=$languagecode&mgid=".$messagegroup->id);
+				if (!$USER->authorize('forcestationery'))
+					$actions[] = action_link("New","pencil_add","editmessageemail.php?id=new&subtype=html&languagecode=$languagecode&mgid=".$messagegroup->id);
 				$actions[] = action_link("New from stationery","pencil_add","mgstationeryselector.php?type=email&subtype=html&languagecode=$languagecode&mgid=".$messagegroup->id);
 				
 			}
