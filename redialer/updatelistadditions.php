@@ -6,6 +6,7 @@ mb_internal_encoding('UTF-8');
 
 require_once("../inc/db.inc.php");
 require_once("../inc/utils.inc.php");
+require_once("../inc/securityhelper.inc.php");
 require_once("../inc/memcache.inc.php");
 require_once("../inc/DBMappedObject.php");
 require_once("../inc/DBRelationMap.php");
@@ -74,7 +75,7 @@ $list = new PeopleList($listid);
 $USER = new User($list->userid);
 
 // add the people
-if ($doReplace)
+if ($doReplace == "true")
 	$numpeople = $list->updateManualAddByPkeys($pkeys);
 else
 	$numpeople = $list->createManualAddByPkeys($pkeys);

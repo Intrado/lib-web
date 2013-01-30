@@ -149,10 +149,10 @@ class PeopleList extends DBMappedObject {
 			$addIds = array_diff($personIds, $existingPersonIds);
 
 			// TODO: Need a batch insert method for this?
-			if ($addIds > 0) {
+			if (count($addIds) > 0) {
 				$insertValues = ' ('. $this->id. ', "add", ?)';
 				QuickUpdate(
-					"insert into listentry (listid, type, personid) values ". repeatWithSeparator($insertValues, ",", $addIds),
+					"insert into listentry (listid, type, personid) values ". repeatWithSeparator($insertValues, ",", count($addIds)),
 					false, $addIds);
 			}
 		}
