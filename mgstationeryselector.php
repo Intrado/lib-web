@@ -132,6 +132,13 @@ $query = "(select mg.id,mg.name as name,(mg.name +0) as digitsfirst	from message
 			order by digitsfirst, name";
 $stationery = QuickQueryList($query,true,false,array($USER->id, $USER->id));
 
+
+if (count($stationery) == 1) {
+	//fast forward with the sole stationery
+	$stationeryids =  array_keys($stationery);
+	redirect("editmessageemail.php?id=new&subtype={$subtype}&languagecode={$languagecode}&mgid={$messagegroup->id}&stationeryid={$stationeryids[0]}");
+}
+
 $formdata["stationery"] = array(
 		"label" => _L("Stationery"),
 		"fieldhelp" => _L("Select the stationery that is similar to the email that is desired. "),
