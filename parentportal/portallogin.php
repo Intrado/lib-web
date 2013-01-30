@@ -17,17 +17,14 @@ if (isset($_REQUEST["is_return"])) {
 //error_log("cscm logged in via portalauth, redirect to index");
 
 		// set a cookie to be used on session timeout to decide where to send the user on logout. NOTE: only good for the session
-//		$loginSrc = array("src" => "portal", "user" => $loginDetails["username"], "type" => $loginDetails["type"]);
-//		setcookie($CUSTOMERURL. "_login_src", json_encode($loginSrc));
-
-		// load the user's credentials and prepare the session
-//		loadCredentials($loginDetails["userID"]);
-//		loadDisplaySettings();
+		$loginSrc = array("src" => "portal", "user" => $loginDetails["username"], "type" => $loginDetails["type"]);
+		setcookie($CUSTOMERURL. "_cm_login_src", json_encode($loginSrc));
 
 		// set the sessiondata values that were already set during login but would be overwritten by php get/put session
 		//$_SESSION['customerid'] = 0; // TODO support customerurl input
 		$_SESSION['userid'] = $loginDetails["userID"];
 		$_SESSION['portaluserid'] = $loginDetails["userID"];
+		$_SESSION['userlogintype'] = $loginDetails["type"]; // "powerschool" or "local"
 	
 		$_SESSION['colorscheme']['_brandtheme'] = "3dblue";
 		$_SESSION['colorscheme']['_brandprimary'] = "26477D";

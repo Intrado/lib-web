@@ -169,7 +169,11 @@ if($PERSONID){
 }
 include_once("nav.inc.php");
 startWindow(_L("Contacts"));
-echo "&nbsp" . icon_button(_L("Add Contact"),"add", null, "phoneactivation0.php") . "<hr />";
+
+// do not display 'add a contact' button if login from powerschool
+if (!isset($_SESSION['userlogintype']) || ($_SESSION['userlogintype'] != 'powerschool')) {
+	echo "&nbsp" . icon_button(_L("Add Contact"),"add", null, "phoneactivation0.php") . "<hr />";
+}
 
 if(isset($contactList) && $contactList){
 
