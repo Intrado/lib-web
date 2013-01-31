@@ -111,9 +111,10 @@ if($isajax === true) {
 		where p.userid = ?
 			and p.action = 'subscribe'
 			and p.type = 'messagegroup'
-			and not mg.deleted)
+			and not mg.deleted
+			and mg.type = ?)
 		order by $orderby, id
-		limit $start, $limit", false, false, array($USER->id, $mgtype, $USER->id));
+		limit $start, $limit", false, false, array($USER->id, $mgtype, $USER->id,$mgtype));
 
   	// total rows
 	$total = QuickQuery("select FOUND_ROWS()");
