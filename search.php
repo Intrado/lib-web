@@ -97,7 +97,7 @@ if (!isset($_GET["iframe"]))
 	$buttons[] = icon_button(_L('Done'),"tick",null, isset($_SESSION['listreferer']) ? $_SESSION['listreferer'] : "list.php");
 
 // variable for page redirect, used by include 'contactsearchformdata.inc'
-$redirectpage = "search.php";
+$redirectpage = "search.php" . (isset($_GET["iframe"])?"?iframe":"");
 
 include_once("contactsearchformdata.inc.php");
 

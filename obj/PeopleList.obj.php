@@ -65,7 +65,7 @@ class PeopleList extends DBMappedObject {
 		return QuickQuery($query, false, array($this->id));
 	}
 	
-	function updateManualAddByPkeys($pkeys) {
+	function updateManualAddByPkeys($pkeys, $removeExisting = true) {
 		global $USER;
 		
 		// find all personids
@@ -85,13 +85,16 @@ class PeopleList extends DBMappedObject {
 		
 		// sync up the ids
 		$oldids = QuickQueryList("select p.id from person p, listentry le where p.id=le.personid and le.type='add' and p.userid is null and le.listid=$this->id");
-		$deleteids = array_diff($oldids, $personids);
 		$addids = array_diff($personids, $oldids);
 
-		if (count($deleteids) > 0) {
-			$query = "delete from listentry where personid in ('" . implode("','",$deleteids) . "') and listid = " . $this->id;
-			QuickUpdate($query);
+		if ($removeExisting) {
+			$deleteids = array_diff($oldids, $personids);
+			if (count($deleteids) > 0) {
+				$query = "delete from listentry where personid in ('" . implode("','",$deleteids) . "') and listid = " . $this->id;
+				QuickUpdate($query);
+			}
 		}
+
 		if (count($addids) > 0) {
 			$query = "insert into listentry (listid, type, personid) values ($this->id,'add','" . implode("'),($this->id,'add','",$addids) . "')";
 			QuickUpdate($query);
@@ -118,47 +121,6 @@ class PeopleList extends DBMappedObject {
 			$isSuccess = false;
 		}
 		return $isSuccess;
-	}
-
-	function createManualAddByPkeys($pkeys) {
-		global $USER;
-		if (!userOwns("list", $this->id))
-			return 0;
-
-		Query("BEGIN");
-		foreach ($pkeys as $pkey) {
-			if ($pkey == "")
-				continue;
-			// only allow system contacts (not guardians)
-			$p = DBFind("Person","from person where pkey=? and type='system'", false, array($pkey));
-			if ($p && $USER->canSeePerson($p->id)) {
-				//use associative array to dedupe pids
-				$temppersonids[$p->id] = 1;
-			}
-		}
-		//flip associative array
-		$personIds = array_keys($temppersonids);
-
-		$addIds = array();
-		if (count($personIds) > 0) {
-			$existingPersonIds = QuickQueryList(
-				"select p.id from person p, listentry le where p.id=le.personid and le.type = 'add' and p.userid is null and le.listid = ?",
-				false, false, array($this->id));
-
-			// only add new people
-			$addIds = array_diff($personIds, $existingPersonIds);
-
-			// TODO: Need a batch insert method for this?
-			if ($addIds > 0) {
-				$insertValues = ' ('. $this->id. ', "add", ?)';
-				QuickUpdate(
-					"insert into listentry (listid, type, personid) values ". repeatWithSeparator($insertValues, ",", $addIds),
-					false, $addIds);
-			}
-		}
-		Query("COMMIT");
-
-		return count($addIds);
 	}
 }
 

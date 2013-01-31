@@ -1321,10 +1321,14 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$job->runNow();
 
 		Query("COMMIT");
-		if ($ajax)
-			$form->sendTo("start.php");
-		else
+		if ($ajax) {
+			if (isset($_GET['iframe']))
+				$form->sendTo("jobview.php?iframe&id=". $job->id);
+			else
+				$form->sendTo("start.php");
+		} else {
 			redirect("start.php");
+		}
 	}
 }
 
