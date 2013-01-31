@@ -48,8 +48,8 @@ $layouts = array(
 		"onecolumn",
 		"twocolumns",
 		"threecolumns",
-		"1:2:3",
-		"2:3:2"
+		"1_2_3",
+		"2_3_2"
 );
 // Basic validation 
 if (isset($_GET['layout']) && in_array($_GET['layout'], $layouts))

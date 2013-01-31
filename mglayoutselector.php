@@ -112,8 +112,8 @@ $layouts = array(
 	"onecolumn" => _L("One Column"),
 	"twocolumns" => _L("Two Columns"),
 	"threecolumns" => _L("Three Columns"),
-	"1:2:3" => _L("1:2:3"),
-	"2:3:2" => _L("2:3:2")
+	"1_2_3" => _L("1:2:3"),
+	"2_3_2" => _L("2:3:2")
 );
 
 $formdata["layout"] = array(
