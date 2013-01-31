@@ -533,7 +533,9 @@ function rcieditor() {
 
 	self.validate = function() {
 //console.log('rcieditor::validate()');
-		window.top.form_do_validation(self.textarea.up('form'), self.textarea);
+		var form = document.getElementById(self.textarea.closest('form').attr('id'));
+		var field = document.getElementById(self.textarea.attr('id'));
+		form_do_validation(form, field);
 	};
 
 	self.reset();

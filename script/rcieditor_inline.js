@@ -252,14 +252,8 @@ function RCIEditorInline () {
 //console.log('rcieditorinline::doValidation() B');
 		if (! textarea) return(false);
 
-		var ta = jQuery(textarea);
-
-//console.log('rcieditorinline::doValidation() C');
 		// Interface with the legacy form validation
-// SMK @HERE 2013-01-30 disabled because this was causing some error within form.js.php:
-// firebug reports: TypeError: e.up is not a function [[ var name = $(e.up(".radiobox") || e.up(".multicheckbox") || e).id ; ]]
-		window.top.form_do_validation(ta.closest('form'), ta); // jquery.js
-		//window.top.form_do_validation(textarea.up('form'), textarea); // prototype.js
+		window.top.RCIEditor.validate();
 
 //console.log('rcieditorinline::doValidation() D');
 		return(true);
