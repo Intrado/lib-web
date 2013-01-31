@@ -75,10 +75,7 @@ $list = new PeopleList($listid);
 $USER = new User($list->userid);
 
 // add the people
-if ($doReplace == "true")
-	$numpeople = $list->updateManualAddByPkeys($pkeys);
-else
-	$numpeople = $list->createManualAddByPkeys($pkeys);
+$numpeople = $list->updateManualAddByPkeys($pkeys, ($doReplace == "true"));
 	
 $result['numpeople'] = $numpeople + 0;
 // success if all people added, else warning
