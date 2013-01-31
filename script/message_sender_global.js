@@ -114,19 +114,7 @@ jQuery.noConflict();
 	
 	// using helper functions in htmleditor.js, set up the ckeditor on the textarea with id "elementid"
 	applyCkEditor = function(elementid) {
-		// add the ckeditor to the textarea
-		applyHtmlEditor(elementid, true, elementid+"-htmleditor", userPrefs.hideemailtools);
-
-		// set up a keytimer to save content
-		var htmlTextArea_keytimer = null;
-		registerHtmlEditorKeyListener(function (event) {
-			window.clearTimeout(htmlTextArea_keytimer);
-			var htmleditor = getHtmlEditorObject();
-			htmlTextArea_keytimer = window.setTimeout(function() {
-				saveHtmlEditorContent(htmleditor);
-				obj_valManager.runValidateEventDriven(elementid);
-			}, 500);
-		});
+		RCIEditor.applyEditor('full', $('#' + elementid), elementid+ '-htmleditor');
 	};
 	
 	// stuff translation info into the specified hidden input field
