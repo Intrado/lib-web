@@ -20,7 +20,7 @@ require_once("obj/FieldMap.obj.php");
 require_once("inc/previewfields.inc.php");
 require_once("obj/PreviewModal.obj.php");
 require_once("inc/appserver.inc.php");
-
+require_once("obj/Publish.obj.php");
 
 require_once("inc/editmessagecommon.inc.php");
 
@@ -121,17 +121,31 @@ $formdata = array();
 $helpstepnum = 1;
 $helpsteps[] = _L("");
 
+
+
+
+// Get all possible published stationery
+///////////////////////////////////////////////////////
+$data = Publish::getSubscribableItems("messagegroup","stationery");
+$args = array($USER->id);
+
+$subscribesql = "";
+if (count($data["items"])) {
+	$subscribesql = " or mg.id in (" . repeatWithSeparator("?", ",", count($data["items"])) . ")";
+	foreach($data["items"] as $row) {
+		$args[] = $row["id"];
+	}
+}
+
+
+
 // get the user's owned and subscribed messages
 $stationery = array();
-$query = "(select mg.id,mg.name as name,(mg.name +0) as digitsfirst	from messagegroup mg
-			where mg.userid=? and mg.type = 'stationery' and not mg.deleted)
-			UNION
-			(select mg.id,mg.name as name,(mg.name +0) as digitsfirst from publish p
-			inner join messagegroup mg on (p.messagegroupid = mg.id)
-			where p.userid=? and p.action = 'subscribe'	and p.type = 'messagegroup'	and not mg.deleted)
-			order by digitsfirst, name";
-$stationery = QuickQueryList($query,true,false,array($USER->id, $USER->id));
+$query = "select mg.id,mg.name as name,(mg.name +0) as digitsfirst	from messagegroup mg
+where (mg.userid=? $subscribesql)
+ and mg.type = 'stationery' and not mg.deleted";
 
+$stationery = QuickQueryList($query,true,false,$args);
 
 if (count($stationery) == 1) {
 	//fast forward with the sole stationery
