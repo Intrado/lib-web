@@ -2,7 +2,6 @@
  * Multi-mode HTML editor
  *
  * EXTERNAL DEPENDENCIES
-   * prototype.js
    * jquery.js
    * json2.js
    * rcieditor_inline.js
@@ -19,7 +18,6 @@ function rcieditor() {
 
 	// Setting setter
 	self.setSetting = function (name, value) {
-//console.log('rcieditor::setSetting("' + name + '", "' + value + '")');
 		self.settings[name] = value;
 	};
 
@@ -30,19 +28,11 @@ function rcieditor() {
 
 	// In lieu of a constructor, this function will put us into a known good state
 	self.reset = function () {
-//console.log('rcieditor::reset()');
-
-		if (typeof $.noConflict === 'function') {
-			console.log('jQuery.noConflict()ing... again');
-			$.noConflict();
-		}
 
 		// Image scaling is disabled by default
 		self.setSetting('image_scaling', 0);
 
 		// Get the base URL for requests that require absolute pathing
-		//var baseUrl= new String(document.location);
-		//baseUrl = baseUrl.substr(0, baseUrl.lastIndexOf('/') + 1);
 		var baseUrl = '/newjackcity/';
 		self.setSetting('baseUrl', baseUrl);
 	};
@@ -59,7 +49,6 @@ function rcieditor() {
 	 * @return nothing
 	 */
 	self.applyEditor = function(editorMode, textarea, target) {
-//console.log('rcieditor::applyEditor()');
 
 		// If CKEDITOR is not ready, check back here every second until it is
 		if ((typeof CKEDITOR == 'undefined') || (! CKEDITOR)) {
@@ -72,15 +61,11 @@ function rcieditor() {
 		// stash away the editorMode for reference in other methods
 		self.setSetting('editorMode', editorMode);
 
-		// Re-extend with prototype in case we're on a jquery page
-		//this.textarea = $(textarea); // prototype.js
-		this.textarea = jQuery(textarea); // jquery.js
+		this.textarea = jQuery(textarea);
 
 		// Hide the text area form field until we are done initializing
 		self.textarea.hide();
-//console.log('rcieditor::applyEditor() A');
 		self.setLoadingVisibility(true);
-//console.log('rcieditor::applyEditor() B');
 
 		// base name of the text element; we'll make several new elements with derived names
 		self.basename = self.textarea.id;
@@ -88,10 +73,8 @@ function rcieditor() {
 		var cke = null;
 
 		if (editorMode == 'inline') {
-//console.log('rcieditor::applyEditor() C');
 			self.setSetting('image_scaling', 500);
 
-//console.log('rcieditor::applyEditor() D');
 			// Add an IFRAME to the page that will load up the inline editor
 			cke = new Element('iframe', {
 				'id': self.basename + 'inline',
@@ -99,7 +82,6 @@ function rcieditor() {
 				'style': 'width: 800px; height: 400px; border: 1px solid #999999;'
 			});
 
-//console.log('rcieditor::applyEditor() E');
 			// So now we have the inline editor component loading in an iframe;
 			// the next move is up to the iframe content to call back the next
 			// function below to get the two halves communicating cross-frame.
@@ -202,55 +184,37 @@ function rcieditor() {
 			// it will fire instanceReady() function when it is done.
 		}
 
-//console.log('rcieditor::applyEditor() F');
 		// The second new element has the same id with a 'hider' suffix
 		var hider = jQuery(new Element('div', { 'id': self.basename + 'hider' }));
 		hider.hide();
 
-//console.log('rcieditor::applyEditor() G');
 		// hider contains the CKEditor to show/hide the whole thing as needed
-		//hider.insert(cke); // prototype.js
-		hider.html(cke); // jquery.js
+		hider.html(cke);
 
-//console.log('rcieditor::applyEditor() H');
 		// And here will stick hider into the DOM
 		if (target != undefined) {
-//console.log('rcieditor::applyEditor() I');
-			//$(target).insert(hider); // prototype.js
 			var j = jQuery('#' + target);
-			j.html(hider); // jquery.js
-//console.log('rcieditor::applyEditor() J');
+			j.html(hider);
 		} else {
-//console.log('rcieditor::applyEditor() K');
-			//document.body.insert(hider); // prototype.js
-			jQuery(document.body).html(hider); // jquery.js
-//console.log('rcieditor::applyEditor() L');
+			jQuery(document.body).html(hider);
 		}
-//console.log('rcieditor::applyEditor() M');
 	};
 
 	/**
-	 * This method is called onload from the IFRAMED inline editor
+	 * This method is called onload from the IFRAME'd inline editor
 	 * page that was loaded by applyEditor(). The target is the ID of
 	 * the div that we want to load our textarea content into for the
 	 * inline editor to have at.
 	 */
 	self.callbackEditorLoaded = function(activeContainerId) {
-//console.log('rcieditor::callbackEditorLoaded()');
 		try {
 			self.setSetting('activeContainerId', activeContainerId);
 
 			// Hide our AJAXy loading indicator
-//console.log('rcieditor::callbackEditorLoaded() A');
 			self.setLoadingVisibility(false);
-//console.log('rcieditor::callbackEditorLoaded() B');
 
-			if (self.getSetting('editorMode') == 'inline') {
-				// 'inline' comes here, nothing really to do though
-//console.log('rcieditor::callbackEditorLoaded() C');
-			}
-			else {
-				// 'plain', 'normal', and 'full' end up here...
+			// 'plain', 'normal', and 'full'; nothing to do for 'inline' 
+			if (self.getSetting('editorMode') != 'inline') {
 				var htmleditorobject = self.getHtmlEditorObject();
 				if (! htmleditorobject) {
 					throw 'failed to get the htmleditorobject';
@@ -261,7 +225,6 @@ function rcieditor() {
 				htmleditorobject.instance.setData(html);
 
 				// The presence of the HtmlEditor classname signals
-				// f.getHtmlEditorObject() to use CKE instead of the bare textarea
 				self.textarea.hide().addClassName('HtmlEditor');
 
 				// Initial validation - hopefully it checks out!
@@ -269,9 +232,8 @@ function rcieditor() {
 			}
 		}
 		catch (msg) {
-//console.log('ERROR in RCIEditor.callbackEditorLoaded(): ' + msg);
+			//console.log('ERROR in RCIEditor.callbackEditorLoaded(): ' + msg);
 		}
-//console.log('rcieditor::callbackEditorLoaded() D');
 	};
 
 	/**
@@ -279,7 +241,6 @@ function rcieditor() {
 	 */
 	self.loadingVisible = false;
 	self.setLoadingVisibility = function (visible) {
-//console.log('rcieditor::setLoadingVisibility()');
 
 		// If we want to make it visible...
 		if (visible) {
@@ -337,7 +298,6 @@ function rcieditor() {
 	 * Returns the textarea that the html editor is currently replacing
 	 */
 	self.getHtmlEditorObject = function () {
-//console.log('rcieditor::getHtmlEditorObject()');
 
 		try {
 
@@ -358,17 +318,13 @@ function rcieditor() {
 				if (CKEDITOR.instances[i].name == self.basename) {
 					instance = CKEDITOR.instances[i];
 				}
-				//else {
-//console.log('CKEDITOR instance.name = [' + CKEDITOR.instances[i].name + ']');
-				//}
 			}
 			if (! instance) {
 				throw 'Could not locate our CKEDITOR instance';
 			}
 
 			var container_name = 'cke_' + self.basename;
-			//var container = $(container_name); // prototype.js
-			var container = jQuery(container_name); // jquery.js
+			var container = jQuery(container_name);
 
 			if (! container) {
 				throw 'Could not locate our container [' + container_name + ']';
@@ -380,7 +336,7 @@ function rcieditor() {
 			return {'instance': instance, 'container': container, 'currenttextarea': textareauseshtmleditor ? textarea : null};
 		}
 		catch (msg) {
-//console.log('ERROR in RCIEditor.getHtmlEditorObject(): ' + msg);
+			//console.log('ERROR in RCIEditor.getHtmlEditorObject(): ' + msg);
 		}
 
 		return null;
@@ -392,7 +348,6 @@ function rcieditor() {
 	 * @return object containing the html editor instance and container, or null if not loaded
 	 */
 	self.saveHtmlEditorContent = function (existinghtmleditorobject) {
-//console.log('rcieditor::saveHtmlEditorContent()');
 
 		var htmleditorobject = existinghtmleditorobject || self.getHtmlEditorObject();
 		if (!htmleditorobject) {
@@ -420,21 +375,10 @@ function rcieditor() {
 	 * type of cleanup.
 	 */
 	self.cleanContent = function (content) {
-		//var tempdiv = new Element('div').insert(content); // prototype.js
-		var tempdiv = jQuery(new Element('div')).empty().html(content); // jquery.js
+		var tempdiv = jQuery(new Element('div')).empty().html(content);
 
 		// Unstyle any image elements having src="viewimage.php?id=.."
-		/*
-		var images = tempdiv.select('img'); // prototype.js (+7)
-		for (var i = 0, count = images.length; i < count; i++) {
-			var image = images[i];
-			var matches = image.src.match(/viewimage\.php\?id=(\d+)/);
-			if (matches) {
-				image.replace('<img src="viewimage.php?id=' + matches[1] + '">');
-			}
-		}
-		*/
-		var images = jQuery('img', tempdiv).each(function () { // jquery.js (+6)
+		var images = jQuery('img', tempdiv).each(function () {
 			var src = jQuery(this).attr('src');
 			var matches = src.match(/viewimage\.php\?id=(\d+)/);
 			if (matches) {
@@ -442,16 +386,14 @@ function rcieditor() {
 			}
 		});
 
-		//var html = self.cleanFieldInserts(tempdiv.innerHTML).replace(/&lt;&lt;/g, '<<').replace(/&gt;&gt;/g, '>>'); // prototype.js
-		var html = self.cleanFieldInserts(tempdiv.html()).replace(/&lt;&lt;/g, '<<').replace(/&gt;&gt;/g, '>>'); // jquery.js
+		var html = self.cleanFieldInserts(tempdiv.html()).replace(/&lt;&lt;/g, '<<').replace(/&gt;&gt;/g, '>>');
 
 		// CKEditor inserts blank tags even if the user has deleted everything.
 		// check if there is an image or href tag... if not, strip the tags and see if there is any text
 		if (! html.match(/[img,href]/)) {
 
 			// strips all html tags, then strips whitespace. If there is nothing left... set the html to an empty string
-			//if (html.stripTags().strip().replace(/[&nbsp;,\n,\r,\t]/g, '') == '') { // prototype.js
-			if (self.trim(html.text()).replace(/[&nbsp;,\n,\r,\t]/g, '') == '') { // jquery.js
+			if (self.trim(html.text()).replace(/[&nbsp;,\n,\r,\t]/g, '') == '') {
 				html = '';
 			}
 		}
@@ -463,7 +405,6 @@ function rcieditor() {
 	// Example: &lt;&lt;First <b>Name</b>&gt;&gt; becomes <b>&lt;&lt;First Name&gt;&gt;
 	// NOTE: It is assumed that the tokens are &lt;&lt; and &gt;&gt; instead of << and >>.
 	self.cleanFieldInserts = function (html) {
-//console.log('rcieditor::cleanFieldInserts()');
 		var regex = /&lt;(<.*?>)*?&lt;(.+?)&gt;(<.*?>)*?&gt;/g;
 		var matches = html.match(regex);
 		
@@ -488,7 +429,6 @@ function rcieditor() {
 				afterinsert = closedtags.join('') + afterinsert;
 			}
 
-			//var field = field.stripTags().strip(); // prototype.js
 			field = self.trim(field);
 			html = html.replace(matches[i], beforeinsert + '&lt;&lt;' + field + '&gt;&gt;' + afterinsert);
 		}
@@ -496,7 +436,6 @@ function rcieditor() {
 	};
 
 	self.htmlEditorIsReady = function () {
-//console.log('rcieditor::htmlEditorIsReady()');
 		var htmleditorobject;
 		if (! (htmleditorobject = self.getHtmlEditorObject())) {
 			return(false);
@@ -532,7 +471,6 @@ function rcieditor() {
 	};
 
 	self.validate = function() {
-//console.log('rcieditor::validate()');
 		var form = document.getElementById(self.textarea.closest('form').attr('id'));
 		var field = document.getElementById(self.textarea.attr('id'));
 		form_do_validation(form, field);
@@ -543,33 +481,3 @@ function rcieditor() {
 
 RCIEditor = new rcieditor();
 
-/**
- * Legacy function wrappers - get rid of these once
- * all calls are converted to RCIEditor.applyEditor()
- */
-
-/*
-// SMK notes 2013-01-28 that anyone needing these older touch points can just use htmleditor.js instead
-function applyHtmlEditor (textarea, target, hidetoolbar) {
-	RCIEditor.reset();
-	RCIEditor.setSetting('hidetoolbar', hidetoolbar);
-	RCIEditor.applyEditor('plain', textarea, target);
-}
-
-function applyFullEditor (textarea, target, hidetoolbar) {
-	RCIEditor.reset();
-	RCIEditor.setSetting('hidetoolbar', hidetoolbar);
-	RCIEditor.applyEditor('full', textarea, target);
-}
-
-function applyNormalEditor (textarea, target, hidetoolbar) {
-	RCIEditor.reset();
-	RCIEditor.setSetting('hidetoolbar', hidetoolbar);
-	RCIEditor.applyEditor('normal', textarea, target);
-}
-
-function applyInlineEditor (textarea, target) {
-	RCIEditor.reset();
-	RCIEditor.applyEditor('inline', textarea, target);
-}
-*/

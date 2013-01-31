@@ -1,15 +1,9 @@
 /**
  * This is the inline editor JavaScript that services rcieditor_inline.php
  *
- * @todo SMK notes 2013-01-24 that jquery conversion is still needed; initial
- * attempts to replace prototype with jquery seem to cause some sort of conflict
- * within ckeditor.js which causes CKEDITOR to no longer be able to see it's own
- * '$' member for XML processing. It is possible that instantiating jQuery
- * triggers this result despite running the noConflict().
- *
  * EXTERNAL DEPENDENCIES
    * ckeditor.js
-   * prototype.js
+   * jquery-*.js
    * rcieditor.js
  */
 function RCIEditorInline () {
@@ -22,7 +16,6 @@ function RCIEditorInline () {
 	self.constructRetryTimeout = null;
 	self.construct = function () {
 
-//console.log('rcieditorinline::construct() A');
 		// If the CKEDITOR object isn't ready yet...
 		if ((typeof window.top.RCIEditor === 'undefined') || (typeof CKEDITOR === 'undefined')) {
 
@@ -34,10 +27,8 @@ function RCIEditorInline () {
 			if (self.constructRetryDelay < 1024) {
 				self.constructRetryTimeout = window.setTimeout(self.construct, self.constructRetryDelay);
 			}
-			// else console.log('RCIEditorInline construct failed: CKEDITOR object never became availabkle');
 		}
 
-//console.log('rcieditorinline::construct() B');
 		// This property tells CKEditor to not activate every element with contenteditable=true element.
 		CKEDITOR.disableAutoInline = true;
 
@@ -73,12 +64,9 @@ function RCIEditorInline () {
 					['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock']
 				];
 
-//console.log('rcieditorinline::construct() C');
 				self.doValidation();
-//console.log('rcieditorinline::construct() D');
 			});
 
-//console.log('rcieditorinline::construct() E');
 			editor.on('blur', self.captureChanges);
 			editor.on('key', function(event) {
 				/*
@@ -93,18 +81,12 @@ function RCIEditorInline () {
 					clearTimeout(self.captureTimeout);
 					self.captureTimeout = window.setTimeout(self.captureChanges, 500);
 				}
-				//else {
-				//	console.log('event data:');
-				//	console.log(event.data);
-				//	console.log('keycode to string = [' + String.fromCharCode(event.data.keyCode) + ']');
-				//}
 			});
 			editor.on('saveSnapshot', self.captureChanges);
 			editor.on('afterCommandExec', self.captureChanges);
 			editor.on('insertHtml', self.captureChanges);
 			editor.on('insertElement', self.captureChanges);
 
-//console.log('rcieditorinline::construct() F');
 		});
 	}
 
@@ -117,14 +99,12 @@ function RCIEditorInline () {
 		element.attr('tabindex', index);
 
 		// For some reason CKEDITOR.inline() does not like element if it is extended with jQuery or prototype
-//console.log('rcieditorinline::makeEditable() A');
 		// Get an UNextended copy of this same DOM element using the newid we assigned
 		// SMK notes this appears to be necessary, possibly because CKEDITOR is initialized seeing and expecting
 		// prototype.js extensions, but then the element is delivered with jQuery extensions, causing CKE to not
 		// be able to use the object since it doesn't align with its expectations.
 		var el = document.getElementById(newid);
 		CKEDITOR.inline(el);
-//console.log('rcieditorinline::makeEditable() B');
 	}
 
 	self.makeNonEditable = function (element) {
@@ -156,8 +136,7 @@ function RCIEditorInline () {
 		}
 
 		// Grab the contents of the textarea form element
-		var content = textarea.html(); // jquery.js
-		//var content = textarea.innerHTML; // prototype.js
+		var content = textarea.html();
 
 		// Convert content entities back to the real characters
 		content = content.replace(/&lt;/g, '<');
@@ -167,26 +146,18 @@ function RCIEditorInline () {
 		content = content.replace(/&amp;/g, '&');
 
 		// Inject the content from the textarea into the wysiwyg page div
-		wysiwygpage.empty().append(content); // jquery.js
-		//wysiwygpage.insert(content); // prototype.js
+		wysiwygpage.empty().append(content);
 
 		// Apply CKE inline editors for each wysiwygpage > div.contenteditable=true
-		jQuery('.editableBlock', wysiwygpage).each(function(index) { // jquery.js
-//console.log('Making editable [' + index + ']');
+		jQuery('.editableBlock', wysiwygpage).each(function(index) {
 			self.makeEditable(jQuery(this), index);
 		});
-		//var editableBlocks = $(wysiwygpage).select('.editableBlock'); // prototype.js (+3...)
-		//for (var i = 0; i < editableBlocks.length; i++) {
-		//	self.makeEditable(editableBlocks[i], i);
-		//}
 
 		// Fire the callback indicating initialization is done
 		window.frames.top.RCIEditor.callbackEditorLoaded('wysiwygpage');
 	}
 
-	//self.editorDirty = false;
 	self.captureChanges = function () {
-//console.log('rcieditorinline::captureChanges() A');
 
 		// (1) Get the wysiwygpage div DOM object from this page (below)
 		var wysiwygpage = 0;
@@ -194,37 +165,27 @@ function RCIEditorInline () {
 			return(false);
 		}
 
-//console.log('rcieditorinline::captureChanges() B');
 		// (2) Get the textarea DOM object from the parent window (frame)
 		var textarea = 0;
 		if (! (textarea = self.getTextarea())) {
 			return(false);
 		}
 
-//console.log('rcieditorinline::captureChanges() C');
 		// (3) Get the wysiwygpresave div DOM object from this page (below)
 		var wysiwygpresave = 0;
 		if (! (wysiwygpresave = self.getPresaveContainer())) {
 			return(false);
 		}
 
-//console.log('rcieditorinline::captureChanges() D');
 		// (4) Stick the wysiwyg page content into the presave container
-		wysiwygpresave.empty().html(wysiwygpage.html()); // jquery.js
-		//wysiwygpresave.update(wysiwygpage.innerHTML); // prototype.js
+		wysiwygpresave.empty().html(wysiwygpage.html());
 
 		// (5) Disable editing capabilities on all the presave editableBlocks
-		// jquery.js
 		jQuery('.editableBlock', wysiwygpresave).each(function(index) {
 			self.makeNonEditable(jQuery(this));
 		});
-		//var editableBlocks = $(wysiwygpresave).select('.editableBlock'); // prototype.js (+3...)
-		//for (var i = 0; i < editableBlocks.length; i++) {
-		//	self.makeNonEditable(editableBlocks[i]);
-		//}
 
 		// (6) Now grab the contents of the wysiwyg presave container
-		//content = window.top.RCIEditor.cleanContent(wysiwygpresave.html()); // jquery.js
 		var content = window.top.RCIEditor.cleanContent(wysiwygpresave.html()); // prototype.js
 
 		// (7) Convert real characters to content entities
@@ -233,37 +194,29 @@ function RCIEditorInline () {
 		content = content.replace(/>/g, '&gt;');
 
 		// (8) Inject the content from the wysiwyg page div into the textarea form element
-		textarea.empty().html(content); // jquery.js
-		//textarea.update(content); // prototype.js
+		textarea.empty().html(content);
 
 		// (9) Validate the changes as captured
-//console.log('captured!');
-//console.log('rcieditorinline::captureChanges() E');
 		return(self.doValidation(textarea));
 	}
 
 	self.doValidation = function (textarea) {
 
-//console.log('rcieditorinline::doValidation() A');
 		if (typeof textarea === 'undefined') {
 			textarea = self.getTextarea();
 		}
 
-//console.log('rcieditorinline::doValidation() B');
 		if (! textarea) return(false);
 
 		// Interface with the legacy form validation
 		window.top.RCIEditor.validate();
 
-//console.log('rcieditorinline::doValidation() D');
 		return(true);
 	}
 
 	self.getTextarea = function () {
 		var textarea = null;
-		if (! (textarea = jQuery('#' + self.editableTarget, window.top.document))) { // jquery.js
-		//if (! (textarea = $(window.top.document.getElementById(self.editableTarget)))) { // prototype.js
-			//console.log('failed to find target [' + self.editableTarget + ']');
+		if (! (textarea = jQuery('#' + self.editableTarget, window.top.document))) {
 			return(null);
 		}
 		return(textarea);
@@ -271,9 +224,7 @@ function RCIEditorInline () {
 
 	self.getPage = function () {
 		var wysiwygpage = null;
-		if (! (wysiwygpage = jQuery('#wysiwygpage'))) { // jquery.js
-		//if (! (wysiwygpage = $('wysiwygpage'))) { // prototype.js
-			//console.log('failed to find wysiwygpage');
+		if (! (wysiwygpage = jQuery('#wysiwygpage'))) {
 			return(null);
 		}
 		return(wysiwygpage);
@@ -281,9 +232,7 @@ function RCIEditorInline () {
 
 	self.getPresaveContainer = function () {
 		var wysiwygpresave = null;
-		if (! (wysiwygpresave = jQuery('#wysiwygpresave'))) { // jquery.js
-		//if (! (wysiwygpresave = $('wysiwygpresave'))) { // prototype.js
-			console.log('failed to find wysiwygpresave');
+		if (! (wysiwygpresave = jQuery('#wysiwygpresave'))) {
 			return(null);
 		}
 		return(wysiwygpresave);
