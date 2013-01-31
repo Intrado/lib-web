@@ -201,8 +201,24 @@ function form_do_validation (form, element, validationHander) {
 }
 
 function form_validation_display(element,resultcode, msgtext) {
-	e = $(element);
-	
+// SMK @HERE 2013-01-30
+var etype0 = typeof element;
+	if (typeof element.up == 'undefined') {
+//console.log('form.js.php::form_validation_display() call with undefined element.up for element [' + etype0 + '] first attempt');
+		element = $(element);
+	}
+
+	if (typeof element.up == 'undefined') {
+//console.log('form.js.php::form_validation_display() call with undefined element.up for element [' + etype0 + '] second attempt');
+		return;
+	}
+
+	// SMK added local scope "var" 2012-01-28 since e was going global and being fought over btwn jQuery and Prototype
+var etype1 = typeof element.up;
+	var e = $(element);
+var etype2 = typeof e.up;
+console.log('pre-type was [' + etype1 + '] and post-type was [' + etype2 + ']');
+
 	var style = resultcode;
 
 	//if radio button or multicheckbox, get the id of the container div
