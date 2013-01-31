@@ -375,7 +375,10 @@ table_left and table_right have the arrow controls, set to 8% width for 1024 scr
 .feed_item td { padding: 1em 0.5em; }
 
 
-
+/* RCIeditor */
+span.cke_toolgroup {height: 27px;}
+a.cke_dialog_tab {height: 26px;}
+a.cke_button {height: 25px;}
 
 
 /* +----------------------------------------------------------------+

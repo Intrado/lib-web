@@ -43,19 +43,6 @@ class EmailMessageEditor extends FormItem {
 		// for the RCIEditor to work with for DOM processing
 		$textarea .= '
 				<div id="rcieditor_scratch" style="display: none;"></div>
-				<style>
-					span.cke_toolgroup {
-						height: 27px;
-					}
-
-					a.cke_dialog_tab {
-						height: 26px;
-					}
-
-					a.cke_button {
-						height: 25px;
-					}
-				</style>
 			</div>
 		';
 		
