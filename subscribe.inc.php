@@ -41,14 +41,14 @@ function fmt_name ($row, $index) {
 	return "<div>". $row[$index] ."</div>";
 }
 function fmt_actions ($row, $index) {
-	global $subscribed;
+	global $data;
 	global $start;
 	global $SUBSCRIBETYPE;
 	$actionlinks = array();
 	if ($SUBSCRIBETYPE == 'messagegroup')
 		$actionlinks[] = action_link("View", "fugue/magnifier", "messagegroupview.php?id=" . $row[$index]);
-	if (isset($subscribed[$row['id']]))
-		$actionlinks[] = action_link("Un-Subscribe", "fugue/star__minus", $SUBSCRIBETYPE."subscribe.php?id=". $subscribed[$row[$index]] ."&remove&pagestart=$start");
+	if (isset($data["subscribed"][$row['id']]))
+		$actionlinks[] = action_link("Un-Subscribe", "fugue/star__minus", $SUBSCRIBETYPE."subscribe.php?id=". $data["subscribed"][$row[$index]] ."&remove&pagestart=$start");
 	else
 		$actionlinks[] = action_link("Subscribe", "fugue/star__plus", $SUBSCRIBETYPE."subscribe.php?id=". $row[$index] ."&subscribe&pagestart=$start");
 	return action_links($actionlinks);
@@ -68,107 +68,27 @@ $formatters = array(
 $start = 0 + (isset($_GET['pagestart']) ? $_GET['pagestart'] : 0);
 $limit = 100;
 
-$data = array();
-
-// look up the user's organization associations
-$userassociatedorgs = QuickQueryList("
-	(select ua.organizationid as oid
-	from userassociation ua
-	where ua.userid = ? and ua.type = 'organization')
-	UNION
-	(select s.organizationid as oid
-	from userassociation ua
-		left join section s on
-			(ua.sectionid = s.id)
-	where ua.userid = ?  and ua.type = 'section')",
-	false, false, array($USER->id, $USER->id));
-
-// build the argument array 
-$args = array($USER->id);
-
-// create the sql that limits results by orgs, or doesn't depending on user associations
-$orgrestrictionsql = "";
-if (count($userassociatedorgs) == 0) {
-	unset($userassociatedorgs);
-	$orgrestrictionsql = "(p.organizationid is null or p.organizationid = 0)";
-} else if (count($userassociatedorgs) == 1 && $userassociatedorgs[0] === null) {
-	// this user is restricted to sectionid 0 and has no additional associations that provide orgs
-	unset($userassociatedorgs);
-	$orgrestrictionsql = "p.organizationid is null";
-} else {
-	// user has org restrictions, add them to the args array but skip null org (in user org associations)
-	$orgcount = 0;
-	foreach ($userassociatedorgs as $index => $orgid) {
-		if ($orgid !== null) {
-			$orgcount++;
-			$args[] = $orgid;
-		}
-	}
-	$orgrestrictionsql = "(p.organizationid is null or p.organizationid in (" . DBParamListString($orgcount) ."))";
-}
-
-if ($SUBSCRIBETYPE == 'messagegroup') {
-
-	$data = QuickQueryMultiRow(
-		"select SQL_CALC_FOUND_ROWS 
-			p.id as pubid, mg.id as id, mg.name as name, mg.description as description, mg.modified as modified, u.login as owner
-		from publish p
-		inner join messagegroup mg on
-			(p.messagegroupid = mg.id and not mg.deleted)
-		inner join user u on
-			(p.userid = u.id)
-		where p.userid != ?
-			and action = 'publish'
-			and " .$orgrestrictionsql. "
-		group by id
-		order by name, pubid
-		limit $start, $limit", 
-		true, false, $args);
-
-	$total = QuickQuery("select FOUND_ROWS()");
-
-	// get all this user's subscribed ids
-	$subscribed = QuickQueryList("select messagegroupid, id from publish where action = 'subscribe' and type = 'messagegroup' and userid = ?", true, false, array($USER->id));
-	
-} else if ($SUBSCRIBETYPE == 'list') {
-
-	$data = QuickQueryMultiRow(
-		"select SQL_CALC_FOUND_ROWS 
-			p.id as pubid, l.id as id, l.name as name, l.description as description, l.modifydate as modified, u.login as owner
-		from publish p
-		inner join list l on
-			(p.listid = l.id and not l.deleted)
-		inner join user u on
-			(p.userid = u.id)
-		where p.userid != ?
-			and action = 'publish'
-			and " .$orgrestrictionsql. "
-		group by id
-		order by name, pubid
-		limit $start, $limit", 
-		true, false, $args);
-
-	$total = QuickQuery("select FOUND_ROWS()");
-
-	// get all this user's subscribed ids
-	$subscribed = QuickQueryList("select listid, id from publish where action = 'subscribe' and type = 'list' and userid = ?", true, false, array($USER->id));
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
+$data = null;
+
 switch ($SUBSCRIBETYPE) {
 	case "messagegroup":
 		$TITLE = escapehtml(_L("Manage Message Subscriptions"));
 		$subtab = 'messages';
 		$windowtitle = escapehtml(_L('Published Messages'));
 		$parent = 'messages.php';
+		$data = Publish::getSubscribableItems($SUBSCRIBETYPE,"notification",$start,$limit);
+		
 		break;
 	case "list":
 		$TITLE = escapehtml(_L("Manage List Subscriptions"));
 		$subtab = 'lists';
 		$windowtitle = escapehtml(_L('Published Lists'));
 		$parent = 'lists.php';
+		$data = Publish::getSubscribableItems($SUBSCRIBETYPE,null,$start,$limit);
 		break;
 }
 
@@ -182,14 +102,14 @@ startWindow($windowtitle);
 ?><div style="padding-top: 5px; padding-bottom: 5px; float: left;"><?
 	buttons(icon_button(_L("Done"), "fugue/tick", "document.location='$parent';"));
 ?></div><?
-if (count($data)) {
+if (count($data["items"])) {
 	?><div style="float: right"><?
-		showPageMenu($total, $start, $limit);
+		showPageMenu($data["total"], $start, $limit);
 	?></div><div style="clear:both"></div><?
 	?><table width="100%" cellpadding="3" cellspacing="1" class="list"><?
-	showTable($data, $titles, $formatters);
+	showTable($data["items"], $titles, $formatters);
 	?></table><?
-	showPageMenu($total, $start, $limit);
+	showPageMenu($data["total"], $start, $limit);
 } else {
 	?><div><img src='img/largeicons/information.jpg' /><?=escapehtml(_L("No items available at this time"))?></div><?
 }
