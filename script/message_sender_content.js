@@ -292,8 +292,9 @@ var allowControl = {
 			
 			var msgid = $('input[name=stationery]:checked', '#msgsndr').val();
 			
-			$.get('mgstationeryview.php?stationeryid=' + msgid, function(data) {
+			$.get('mgstationeryview.php?stationery=' + msgid, function(data) {
 				$("#msgsndr_emailmessagetext").empty().append(data);
+				applyCkEditor('msgsndr_emailmessagetext');
 			});
 			$('#stationery_email_view').hide();
 			$('#main_email_view').show();
@@ -579,8 +580,9 @@ function ContentManager() {
 					} else if (data.messageGroups.length == 1) {
 						var msgid = data.messageGroups.indexOf(0);
 						
-						$.get('mgstationeryview.php?stationeryid=' + msgid, function(data) {
+						$.get('mgstationeryview.php?stationery=' + msgid, function(data) {
 							$("#msgsndr_emailmessagetext").empty().append(data);
+							applyCkEditor('msgsndr_emailmessagetext');
 						});
 						$('#stationery_email_view').hide();
 						$('#main_email_view').show();
