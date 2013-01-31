@@ -68,7 +68,7 @@ function rcieditor() {
 		self.setLoadingVisibility(true);
 
 		// base name of the text element; we'll make several new elements with derived names
-		self.basename = self.textarea.id;
+		self.basename = self.textarea.attr('id');
 
 		var cke = null;
 
@@ -88,6 +88,7 @@ function rcieditor() {
 
 		}
 		else {
+
 			// For the full CKEditor, the toolbars/plugins
 			// are different depending on the editorMode
 			var extraPlugins = 'aspell';
@@ -178,6 +179,7 @@ function rcieditor() {
 					'insertElement': RCIEditor.eventListener,
 					'focus': RCIEditor.eventListener
 				}
+
 			});
 
 			// Now we are just waiting on CKE to finish its business;
@@ -212,20 +214,20 @@ function rcieditor() {
 
 			// Hide our AJAXy loading indicator
 			self.setLoadingVisibility(false);
+			// 'plain', 'normal', and 'full'; nothing to do for 'inline'
+			if (self.getSetting('editorMode') !== 'inline') {
 
-			// 'plain', 'normal', and 'full'; nothing to do for 'inline' 
-			if (self.getSetting('editorMode') != 'inline') {
+				// The presence of the HtmlEditor classname signals
+				self.textarea.hide().addClass('HtmlEditor');
+
 				var htmleditorobject = self.getHtmlEditorObject();
 				if (! htmleditorobject) {
 					throw 'failed to get the htmleditorobject';
 				}
 
 				// A little data sanitizing for the raw textarea form content
-				var html = self.textarea.value.replace(/<</g, "&lt;&lt;").replace(/>>/g, "&gt;&gt;");
+				var html = self.textarea.val().replace(/<</g, "&lt;&lt;").replace(/>>/g, "&gt;&gt;");
 				htmleditorobject.instance.setData(html);
-
-				// The presence of the HtmlEditor classname signals
-				self.textarea.hide().addClassName('HtmlEditor');
 
 				// Initial validation - hopefully it checks out!
 				self.validate();
@@ -330,13 +332,12 @@ function rcieditor() {
 				throw 'Could not locate our container [' + container_name + ']';
 			}
 
-			var textarea = container.previous();
-			var textareauseshtmleditor = textarea && textarea.match('textarea.HtmlEditor');
-
+			var textarea = container.prev();
+			var textareauseshtmleditor = textarea && textarea.hasClass('HtmlEditor');
 			return {'instance': instance, 'container': container, 'currenttextarea': textareauseshtmleditor ? textarea : null};
 		}
 		catch (msg) {
-			//console.log('ERROR in RCIEditor.getHtmlEditorObject(): ' + msg);
+			console.log('ERROR in RCIEditor.getHtmlEditorObject(): ' + msg);
 		}
 
 		return null;
@@ -355,9 +356,11 @@ function rcieditor() {
 		}
 		
 		var content = htmleditorobject.instance.getData();
-		self.textarea.value = self.cleanContent(content);
-		self.textarea.fire('HtmlEditor:SavedContent');
-		
+		self.textarea.val(self.cleanContent(content));
+		// FIXME - what is this fired event supposed to do? appears to connect to nothing.
+		//self.textarea.fire('HtmlEditor:SavedContent'); // prototype.js
+		//self.textarea.trigger('SavedContent'); // jquery.js
+
 		return htmleditorobject;
 	};
 
