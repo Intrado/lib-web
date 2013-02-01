@@ -293,8 +293,8 @@ var allowControl = {
 			var msgid = $('input[name=stationery]:checked', '#msgsndr').val();
 			
 			$.get('mgstationeryview.php?stationery=' + msgid, function(data) {
-				$("#msgsndr_emailmessagetext").empty().append(data);
-				applyCkEditor('msgsndr_emailmessagetext');
+				$("#msgsndr_emailmessagetext").val(data);
+				RCIEditor.refreshHtmlEditorContent();
 			});
 			$('#stationery_email_view').hide();
 			$('#main_email_view').show();
@@ -581,8 +581,8 @@ function ContentManager() {
 						var msgid = data.messageGroups.indexOf(0);
 						
 						$.get('mgstationeryview.php?stationery=' + msgid, function(data) {
-							$("#msgsndr_emailmessagetext").empty().append(data);
-							applyCkEditor('msgsndr_emailmessagetext');
+							$("#msgsndr_emailmessagetext").val(data);
+							RCIEditor.refreshHtmlEditorContent();
 						});
 						$('#stationery_email_view').hide();
 						$('#main_email_view').show();
