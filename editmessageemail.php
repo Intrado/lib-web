@@ -221,7 +221,7 @@ if ($subtype == "plain" && $languagecode == "en") {
 	$messagecontrol['spellcheck'] = true;
 }
 
-$messagecontrol['editor_mode'] = isset($_SESSION['editmessage']['stationeryid'])?'inline':'full';
+$messagecontrol['editor_mode'] = isset($_SESSION['editmessage']['stationeryid'])?'inline':'normal';
 
 $helpsteps[] = _L("Email message body text goes here. Be sure to introduce yourself and give detailed information. For ".
 	"helpful message tips and ideas, click the Help link in the upper right corner of the screen.<br><br>If you would ".
