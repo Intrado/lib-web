@@ -185,7 +185,7 @@ jQuery.noConflict();
 		
 		obj_permissionManager.onPermissionsLoaded(function() {
 			// CKEDITOR
-			applyCkEditor('msgsndr_emailmessagetext');
+			//applyCkEditor('msgsndr_emailmessagetext');
 			
 			$(document).ready(function() {
 				// subject
@@ -288,7 +288,7 @@ jQuery.noConflict();
 			}
 //            $(idSelector + " .msgdata").val('');
 
-			clearHtmlEditorContent();
+			RCIEditor.clearHtmlEditorContent();
 		});
 
 
@@ -331,13 +331,13 @@ jQuery.noConflict();
 
 							if (doOverwrite == true ) {
 								$('#msgsndr_emailmessagetext').val($(from).val());
-								applyCkEditor('msgsndr_emailmessagetext');
+								RCIEditor.refreshHtmlEditorContent();
 							} else {
 								return;
 							}
 						} else {
 							$('#msgsndr_emailmessagetext').val($(from).val());
-							applyCkEditor('msgsndr_emailmessagetext');	
+							RCIEditor.refreshHtmlEditorContent();	
 						}
 
 					});

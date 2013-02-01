@@ -280,9 +280,9 @@ var allowControl = {
 		//	$('#msgsndr_emailmessagefromemail').attr('value', userInfo.email);
 		//}
 		
-		
 		$('#msgsndr_emailnostationery').on('click', function(e) {
 			e.preventDefault();
+			applyCkEditor("msgsndr_emailmessagetext");
 			$('#stationery_email_view').hide();
 			$('#main_email_view').show();
 		});
@@ -294,11 +294,15 @@ var allowControl = {
 			
 			$.get('mgstationeryview.php?stationery=' + msgid, function(data) {
 				$("#msgsndr_emailmessagetext").val(data);
-				RCIEditor.refreshHtmlEditorContent();
+				applyCkEditor("msgsndr_emailmessagetext");
+				//RCIEditor.refreshHtmlEditorContent();
+				
 			});
 			$('#stationery_email_view').hide();
 			$('#main_email_view').show();
 		});
+		
+		
 		
 		$('#msgsndr_previewemail').on('click', function(e) {
 			e.preventDefault();

@@ -432,7 +432,7 @@ $.loadMessage = function loadMessage() {
 		});
 		
 		// ckEditor Message Content resets
-		clearHtmlEditorContent();
+		RCIEditor.clearHtmlEditorContent();
 	}
 
 	// load phone message asynchronously from the server
