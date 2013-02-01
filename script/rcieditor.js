@@ -365,6 +365,52 @@ function rcieditor() {
 	};
 
 	/**
+	 * The converse of saveHtmlEditorContent(), takes the current value of
+	 * the textarea and jams it into the editor; useful when outside code
+	 * modifies the textarea content and we need the editor to update.
+	 *
+	 * @param object existinghtmleditorobject  Optional, rarely used CKE
+	 * object other than the one we're using internally
+	 */
+	self.refreshHtmlEditorContent = function (existinghtmleditorobject) {
+
+		var htmleditorobject = existinghtmleditorobject || self.getHtmlEditorObject();
+		if (!htmleditorobject) {
+			return null;
+		}
+		
+		var content = self.textarea.val();
+		htmleditorobject.instance.setData(content);
+	};
+
+	/**
+	 * Completely clear the contents of the editor
+	 *
+	 * @param object existinghtmleditorobject  Optional, rarely used CKE
+	 * object other than the one we're using internally
+	 */
+	self.clearHtmlEditorContent = function (existinghtmleditorobject) {
+		self.setHtmlEditorContent('', existinghtmleditorobject);
+	};
+
+	/**
+	 * Set the contents of the editor; the textarea should be cleared by the editor
+	 *
+	 * @param object existinghtmleditorobject  Optional, rarely used CKE
+	 * object other than the one we're using internally
+	 */
+	self.setHtmlEditorContent = function (content, existinghtmleditorobject) {
+
+		var htmleditorobject = existinghtmleditorobject || self.getHtmlEditorObject();
+		if (!htmleditorobject) {
+			return null;
+		}
+		
+		htmleditorobject.instance.setData(content);
+		var content = self.textarea.val(content);
+	};
+
+	/**
 	 * Generic whitespace trimmer to use internally
 	 */
 	self.trim = function (str) {
@@ -395,9 +441,13 @@ function rcieditor() {
 		// check if there is an image or href tag... if not, strip the tags and see if there is any text
 		if (! html.match(/[img,href]/)) {
 
-			// strips all html tags, then strips whitespace. If there is nothing left... set the html to an empty string
-			if (self.trim(html.text()).replace(/[&nbsp;,\n,\r,\t]/g, '') == '') {
-				html = '';
+			// For plain text, jQuery does not seem to extend it the same (there won't be any tags anyway)
+			if (typeof html.text !== 'undefined') {
+
+				// strips all html tags, then strips whitespace. If there is nothing left... set the html to an empty string
+				if (self.trim(html.text()).replace(/[&nbsp;,\n,\r,\t]/g, '') == '') {
+					html = '';
+				}
 			}
 		}
 
