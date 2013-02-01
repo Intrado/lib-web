@@ -21,6 +21,8 @@ require_once("inc/previewfields.inc.php");
 require_once("obj/PreviewModal.obj.php");
 require_once("inc/appserver.inc.php");
 
+require_once("layouts/layouts.inc.php");
+
 ///////////////////////////////////////////////////////////////////////////////
 // Authorization:/
 //////////////////////////////////////////////////////////////////////////////
@@ -106,14 +108,6 @@ $formdata["description"] = array(
 	),
 	"control" => array("TextField","size" => 30, "maxlength" => 50),
 	"helpstep" => $helpstepnum++
-);
-
-$layouts = array(
-	"onecolumn" => _L("One Column"),
-	"twocolumns" => _L("Two Columns"),
-	"threecolumns" => _L("Three Columns"),
-	"1_2_3" => _L("1:2:3"),
-	"2_3_2" => _L("2:3:2")
 );
 
 $formdata["layout"] = array(

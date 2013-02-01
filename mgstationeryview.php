@@ -7,6 +7,7 @@ require_once("obj/MessagePart.obj.php");
 require_once("obj/Language.obj.php");
 require_once("obj/FieldMap.obj.php");
 require_once("obj/Voice.obj.php");
+require_once("layouts/layouts.inc.php");
 
 $isPreview = isset($_GET["preview"]);
 
@@ -44,15 +45,8 @@ if ($isPreview) {
 <?
 }
 
-$layouts = array(
-		"onecolumn",
-		"twocolumns",
-		"threecolumns",
-		"1_2_3",
-		"2_3_2"
-);
 // Basic validation 
-if (isset($_GET['layout']) && in_array($_GET['layout'], $layouts))
+if (isset($_GET['layout']) && in_array($_GET['layout'], array_keys($layouts)))
 	echo file_get_contents("layouts/{$_GET['layout']}.html");
 	
 if (isset($_GET['stationery'])) {
