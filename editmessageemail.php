@@ -115,6 +115,8 @@ $fromemail = $USER->email;
 $subject = "";
 $attachments = array();
 $text = "";
+$fromstationery = false;
+
 if ($message) {
 	// get the specific bits from the message if it exists
 	$parts = DBFindMany("MessagePart", "from messagepart where messageid = ? order by sequence", false, array($message->id));
@@ -125,6 +127,7 @@ if ($message) {
 	$fromname = $message->fromname;
 	$fromemail = $message->fromemail;
 	$subject = $message->subject;
+	$fromstationery = $message->fromstationery;
 	
 	// get the attachments
 	$msgattachments = DBFindMany("MessageAttachment", "from messageattachment where messageid = ?", false, array($message->id));
@@ -153,7 +156,7 @@ if ($message) {
 			$emailstationery = $stationery->getMessage("email", $subtype, "en")) {
 			$emailstationeryparts = DBFindMany("MessagePart", "from messagepart where messageid = ? order by sequence", false, array($emailstationery->id));
 				
-			
+			$fromstationery = true;
 			$text = Message::format($emailstationeryparts);
 		}
 	}
@@ -221,7 +224,7 @@ if ($subtype == "plain" && $languagecode == "en") {
 	$messagecontrol['spellcheck'] = true;
 }
 
-$messagecontrol['editor_mode'] = isset($_SESSION['editmessage']['stationeryid'])?'inline':'normal';
+$messagecontrol['editor_mode'] = $fromstationery?'inline':'normal';
 
 $helpsteps[] = _L("Email message body text goes here. Be sure to introduce yourself and give detailed information. For ".
 	"helpful message tips and ideas, click the Help link in the upper right corner of the screen.<br><br>If you would ".
@@ -284,7 +287,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
 		
 		// if they didn't change anything, don't do anything
-		if ($postdata['fromname'] == $fromname && 
+		if ($message &&
+				$postdata['fromname'] == $fromname && 
 				$postdata['from'] == $fromemail &&
 				$postdata['subject'] == $subject &&
 				json_decode($postdata['attachments'], true) == $attachments &&
@@ -321,6 +325,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$message->subject = $postdata["subject"];
 			$message->fromname = $postdata["fromname"];
 			$message->fromemail = $postdata["from"];
+			$message->fromstationery = isset($_SESSION['editmessage']['stationeryid'])?$_SESSION['editmessage']['stationeryid']:0;
 						
 			$message->stuffHeaders();
 			
