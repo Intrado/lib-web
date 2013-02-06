@@ -565,44 +565,68 @@ function ContentManager() {
 			$('#main_email_view').hide();
 			$('#stationery_email_view').hide();
 			$('#stationeryselector').html("");
-			$.ajax({
-				url: '/'+orgPath+'/api/2/users/'+userid+'/messagegroups',
-				type: "GET",
-				data: {"start": 0, "limit": 1000,"type":"stationery"},
-				dataType: "json",
-				success: function(data) {
-					
-					
-					if (data.messageGroups.length == 0) {
-						if (typeof(userPermissions.forcestationery) != 'undefined' && userPermissions.forcestationery == 1) {
-							$('#stationery_email_view').show();
-							$('#stationeryselector').append('No Stationery Available');
-						} else {
+			
+			
+			var fetchMessagesFromPaths = [
+				'/' + orgPath+'/api/2/users/'+userid+'/messagegroups',
+				'/' + orgPath+'/api/2/organizations/0/publications/messagegroups'
+			];
+			
+			var stationery = [];
+			var stationeryids = [];
+			
+			self.getStationery = function(paths) {
+				return function() {
+					var path = paths.pop();
+					if (typeof(path) != 'undefined') {
+						$.ajax({
+							url: path,
+							data: {"start": 0, "limit": 1000,"type":"stationery"},
+							async : false
+						}).done(function(data){
+							$.each(data.messageGroups,function(i,mg) {
+								if ($.inArray(mg.id, stationeryids) === -1) {
+									stationery.push(mg);
+									stationeryids.push(mg.id);
+								}
+							});
+							self.getStationery(paths)();
+						});
+					} else {
+						// All paths have been fetched, 
+						if (stationery.length == 0) {
+							if (typeof(userPermissions.forcestationery) != 'undefined' && userPermissions.forcestationery == 1) {
+								$('#stationery_email_view').show();
+								$('#stationeryselector').append('No Stationery Available');
+							} else {
+								$('#stationery_email_view').hide();
+								$('#main_email_view').show();
+							}
+						} else if (stationery.length == 1) {
+							var msgid = stationery.indexOf(0).id;
+							
+							$.get('mgstationeryview.php?stationery=' + msgid, function(data) {
+								$("#msgsndr_emailmessagetext").val(data);
+								RCIEditor.refreshHtmlEditorContent();
+							});
 							$('#stationery_email_view').hide();
 							$('#main_email_view').show();
-						}
-					} else if (data.messageGroups.length == 1) {
-						var msgid = data.messageGroups.indexOf(0);
-						
-						$.get('mgstationeryview.php?stationery=' + msgid, function(data) {
-							$("#msgsndr_emailmessagetext").val(data);
-							RCIEditor.refreshHtmlEditorContent();
-						});
-						$('#stationery_email_view').hide();
-						$('#main_email_view').show();
-					} else {
-						$.each(data.messageGroups, function(i,mg) {
-							$('#stationeryselector').append('<input id="stationery_' + mg.id + '" class="stationeryselector" type="radio" name="stationery" value="' + mg.id  + '" /><label for="stationery_' + mg.id + '">' + mg.name + '</label><br />');
-						});
-						$('#msgsndr').on('change', 'input.stationeryselector', function(event) {
-								$('#stationerypreview').attr('src','mgstationeryview.php?preview&stationery=' + event.target.value);
-								$('#msgsndr_emailstationerycontinue').removeAttr("disabled");
-						});
-						$('#stationery_email_view').show();
+						} else {	
+							$.each(stationery, function(i,mg) {
+								$('#stationeryselector').append('<input id="stationery_' + mg.id + '" class="stationeryselector" type="radio" name="stationery" value="' + mg.id  + '" /><label for="stationery_' + mg.id + '">' + mg.name + '</label><br />');
+							});
+							$('#msgsndr').on('change', 'input.stationeryselector', function(event) {
+									$('#stationerypreview').attr('src','mgstationeryview.php?preview&stationery=' + event.target.value);
+									$('#msgsndr_emailstationerycontinue').removeAttr("disabled");
+							});
+							$('#stationery_email_view').show();
+						}			
 					}
-				}		
-			});
+				}
+			}
 			
+			
+			self.getStationery(fetchMessagesFromPaths)();
 		}
 		
 		
