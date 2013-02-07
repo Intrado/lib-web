@@ -1,20 +1,30 @@
 /**
  * Multi-mode HTML editor
  *
+ * Note that as-written, this class is only good for one "editor" on a given page,
+ * whether it's a single, fullly chromed CKE instance, or grouped multiple-inline
+ * editor set - either way, it's for a single document. It would be possible to
+ * modify this to support multi-document editing, but many aspects would beed to
+ * become arrays/objects in order to handle the multiple instances.
+ *
  * EXTERNAL DEPENDENCIES
    * jquery.js
    * json2.js
    * rcieditor_inline.js
  */
-function rcieditor() {
+function RCIEditor(editor_mode, textarea_id, extra_data) {
 	var self = this;
 
-	self.textarea = null;
+	self.textarea = null; // The textarea ELEMENT, not the ID
+
+	self.container = null; // The container ELEMENT, to contain the editor, not the ID
+	self.editorMode = null;
 
 	self.basename = 'rcicke';
+	self.scratch_id = 'rcieditor_scratch';
 
 	// Associative array support for settings; use of set/getter's is encouraged
-	self.settings = Array();
+	self.settings = null;
 
 	// Setting setter
 	self.setSetting = function (name, value) {
@@ -26,15 +36,117 @@ function rcieditor() {
 		return(self.settings[name]);
 	};
 
-	// In lieu of a constructor, this function will put us into a known good state
+	self.construct = function (editor_mode, textarea_id, extra_data) {
+
+		// Reset all internal properties
+		self.reset();
+
+		// if the editor scratch space doesn't yet exist...
+		var scratch = jQuery('#' + self.scratch_id);
+		if (! scratch.length) {
+
+			// Define and add it to the DOM
+			// TODO - fixme: this is based on prototype.js (??)
+			scratch = new Element('div', {
+				'id': self.scratch_id,
+				'style': 'display: none;'
+			});
+
+			var body = jQuery('body');
+			body.append(scratch);
+		}
+
+		self.setSetting('extra_data', extra_data);
+
+		var container_id = textarea_id + '-htmleditor';
+		var res = self.applyEditor(editor_mode, textarea_id, container_id);
+		return(res);
+	};
+
+	self.deconstruct = function () {
+
+		// Show the loading spinner
+		self.setLoadingVisibility(true);
+
+		if (typeof self.textarea !== 'object') {
+			return(false);
+		}
+
+		// Tear down whatever editor is in place
+		switch (self.editorMode) {
+			case 'inline':
+				var iframe = jQuery('#' +  self.basename + 'inline');
+				iframe.remove();
+				return(true);
+
+			case 'plain':
+			case 'normal':
+			case 'full':
+				var htmleditorobject = self.getHtmlEditorObject();
+				if (! htmleditorobject) {
+					return(false);
+				}
+
+				htmleditorobject.instance.destroy();
+				return(true);
+
+			case null:
+				return(true);
+		}
+
+		// Only an unsupported editorMode will end up here:
+		return(false);
+	};
+
+	/**
+	 * Put us into a known good state
+	 */
 	self.reset = function () {
+
+		// reset misc. properties
+		self.textarea = null;
+		self.container = null;
+		self.editorMode = null;
+
+		// reset the settings array
+		self.settings = Array();
 
 		// Image scaling is disabled by default
 		self.setSetting('image_scaling', 0);
 
 		// Get the base URL for requests that require absolute pathing
-		var baseUrl = '/newjackcity/';
+		var t = window.top.location;
+		var tmp = new String(t);
+		var baseUrl = tmp.substr(0, tmp.lastIndexOf('/') + 1);
 		self.setSetting('baseUrl', baseUrl);
+	};
+
+	/**
+	 * Switch editor modes for this document.
+	 *
+	 * @param editorMode string One of either: 'inline', 'plain', 'normal', or 'full'
+	 */
+	self.changeMode = function (editorMode) {
+
+		// If we're already in this same mode
+		if (self.editorMode == editorMode) {
+
+			// Then there's nothing to do...
+			return(true);
+		}
+
+		// Remember these two things for context...
+		var textarea_id = self.textarea.attr('id');
+		var extra_data = self.getSetting('extra_data');
+
+		// Then tear down the existing editor
+		if (! self.deconstruct()) {
+			return(false);
+		}
+
+		// And make a new one
+		var res = self.construct(editorMode, textarea_id, extra_data);
+		return(res);
 	};
 
 	/**
@@ -42,33 +154,52 @@ function rcieditor() {
 	 *
 	 * SMK added 2012-12-17
 	 *
-	 * @param editorMode string One of either: 'inline', 'plain', 'normal', or 'full'
-	 * @param textarea string The id of the textarea form element we are attaching the editor to
-	 * @param target string The id of the container that the editor code will be injected into
+	 * @param editorMode string One of either: 'inline', 'plain', 'normal',
+	 * or 'full'
+	 * @param textarea string The id of the textarea form element we are
+	 * attaching the editor to
+	 * @param container string The id of the container that the editor code
+	 * will be injected into
 	 *
-	 * @return nothing
+	 * @return Mixed boolean true/false on success or failure or string
+	 * 'deferred' if execution deferred due to asynchronous dependencies not
+	 * being available
 	 */
-	self.applyEditor = function(editorMode, textarea, target) {
+	self.applyEditor = function(editorMode, textarea_id, container_id) {
+
+		// If we are already running
+		if (self.editorMode) {
+
+			// And we want to apply to the same textarea/container
+			if ((textarea_id == self.textarea.attr('id')) && (container_id == self.container.attr('id'))) {
+
+				// Then change the mode which will call us when ready
+				return(self.changeMode(editorMode));
+			}
+
+			// Applying to a different textarea/container is a totally different story
+			// (and is probably a bad request since we only support a single editor)
+			return(false);
+		}
 
 		// If CKEDITOR is not ready, check back here every second until it is
 		if ((typeof CKEDITOR == 'undefined') || (! CKEDITOR)) {
 
 			// We will try again in one second since CKE is not ready yet
-			window.setTimeout(function() { self.applyEditor(editorMode, textarea, target); }, 1000);
-			return;
+			window.setTimeout(function() { self.applyEditor(editorMode, textarea_id, container_id); }, 1000);
+			return('deferred');
 		}
 
-		// stash away the editorMode for reference in other methods
-		self.setSetting('editorMode', editorMode);
-
-		this.textarea = jQuery(textarea);
+		self.textarea = jQuery('#' + textarea_id);
+		self.container = jQuery('#' + container_id);
 
 		// Hide the text area form field until we are done initializing
 		self.textarea.hide();
 		self.setLoadingVisibility(true);
 
 		// base name of the text element; we'll make several new elements with derived names
-		self.basename = self.textarea.attr('id');
+		self.basename = textarea_id;
+		self.editorMode = editorMode;
 
 		var cke = null;
 
@@ -78,7 +209,7 @@ function rcieditor() {
 			// Add an IFRAME to the page that will load up the inline editor
 			cke = new Element('iframe', {
 				'id': self.basename + 'inline',
-				'src': self.getSetting('baseUrl') + 'rcieditor_inline.php?t=' + target,
+				'src': self.getSetting('baseUrl') + 'rcieditor_inline.php?t=' + container_id,
 				'style': 'width: 800px; height: 400px; border: 1px solid #999999;'
 			});
 
@@ -93,7 +224,7 @@ function rcieditor() {
 			// are different depending on the editorMode
 			var extraPlugins = 'aspell';
 			var extraButtons = ['PasteFromWord','SpellCheck'];
-			switch (self.getSetting('editorMode')) {
+			switch (self.editorMode) {
 
 				default:
 				case 'plain':
@@ -130,8 +261,8 @@ function rcieditor() {
 			}
 
 			// Grab the scratch space to use for this kind of editor
-			var scratch = jQuery('#rcieditor_scratch');
-			self.setSetting('rcieditor_scratch', scratch);
+			var scratch = jQuery('#' + self.scratch_id);
+			self.setSetting(self.scratch_id, scratch);
 
 			// Here's the first new element we'll make - its id is basename
 			cke = new Element('div', { 'id': self.basename });
@@ -169,15 +300,15 @@ function rcieditor() {
 				],
 				'on': {
 					'instanceReady': function(event) {
-						RCIEditor.callbackEditorLoaded(this);
+						self.callbackEditorLoaded(this);
 					}.bindAsEventListener(self.textarea),
-					'key': RCIEditor.eventListener,
-					'blur': RCIEditor.eventListener,
-					'saveSnapshot': RCIEditor.eventListener,
-					'afterCommandExec': RCIEditor.eventListener,
-					'insertHtml': RCIEditor.eventListener,
-					'insertElement': RCIEditor.eventListener,
-					'focus': RCIEditor.eventListener
+					'key': self.eventListener,
+					'blur': self.eventListener,
+					'saveSnapshot': self.eventListener,
+					'afterCommandExec': self.eventListener,
+					'insertHtml': self.eventListener,
+					'insertElement': self.eventListener,
+					'focus': self.eventListener
 				}
 
 			});
@@ -194,17 +325,14 @@ function rcieditor() {
 		hider.html(cke);
 
 		// And here will stick hider into the DOM
-		if (target != undefined) {
-			var j = jQuery('#' + target);
-			j.html(hider);
-		} else {
-			jQuery(document.body).html(hider);
-		}
+		self.container.html(hider);
+
+		return(true);
 	};
 
 	/**
 	 * This method is called onload from the IFRAME'd inline editor
-	 * page that was loaded by applyEditor(). The target is the ID of
+	 * page that was loaded by applyEditor(). The container is the ID of
 	 * the div that we want to load our textarea content into for the
 	 * inline editor to have at.
 	 */
@@ -215,7 +343,7 @@ function rcieditor() {
 			// Hide our AJAXy loading indicator
 			self.setLoadingVisibility(false);
 			// 'plain', 'normal', and 'full'; nothing to do for 'inline'
-			if (self.getSetting('editorMode') !== 'inline') {
+			if (self.editorMode !== 'inline') {
 
 				// The presence of the HtmlEditor classname signals
 				self.textarea.hide().addClass('HtmlEditor');
@@ -301,46 +429,40 @@ function rcieditor() {
 	 */
 	self.getHtmlEditorObject = function () {
 
-		try {
+		var res = null;
 
-			if ((typeof CKEDITOR == 'undefined') || !CKEDITOR) {
-				throw 'CKEDITOR is not loaded';
-			}
-
-			if (typeof CKEDITOR.instances == 'undefined') {
-				throw 'There are no CKEDITOR instances';
-			}
-
-			if (! CKEDITOR.instances) {
-				throw 'There are no CKEDITOR instances';
-			}
-
-			var instance = false;
-			for (var i in CKEDITOR.instances) {
-				if (CKEDITOR.instances[i].name == self.basename) {
-					instance = CKEDITOR.instances[i];
-				}
-			}
-			if (! instance) {
-				throw 'Could not locate our CKEDITOR instance';
-			}
-
-			var container_name = 'cke_' + self.basename;
-			var container = jQuery(container_name);
-
-			if (! container) {
-				throw 'Could not locate our container [' + container_name + ']';
-			}
-
-			var textarea = container.prev();
-			var textareauseshtmleditor = textarea && textarea.hasClass('HtmlEditor');
-			return {'instance': instance, 'container': container, 'currenttextarea': textareauseshtmleditor ? textarea : null};
-		}
-		catch (msg) {
-			console.log('ERROR in RCIEditor.getHtmlEditorObject(): ' + msg);
+		if ((typeof CKEDITOR == 'undefined') || !CKEDITOR) {
+			return res;
 		}
 
-		return null;
+		if (typeof CKEDITOR.instances == 'undefined') {
+			return res;
+		}
+
+		if (! CKEDITOR.instances) {
+			return res;
+		}
+
+		var instance = false;
+		for (var i in CKEDITOR.instances) {
+			if (CKEDITOR.instances[i].name == self.basename) {
+				instance = CKEDITOR.instances[i];
+			}
+		}
+		if (! instance) {
+			return res;
+		}
+
+		var container_name = 'cke_' + self.basename;
+		var container = jQuery(container_name);
+
+		if (! container) {
+			return res;
+		}
+
+		var textarea = container.prev();
+		var textareauseshtmleditor = textarea && textarea.hasClass('HtmlEditor');
+		return {'instance': instance, 'container': container, 'currenttextarea': textareauseshtmleditor ? textarea : null};
 	};
 
 	/**
@@ -407,7 +529,7 @@ function rcieditor() {
 		}
 		
 		htmleditorobject.instance.setData(content);
-		var content = self.textarea.val(content);
+		self.textarea.val(self.cleanContent(content));
 	};
 
 	/**
@@ -454,9 +576,12 @@ function rcieditor() {
 		return(html);
 	};
 
-	// Corrects any html tags that may be inside a data-field insert.
-	// Example: &lt;&lt;First <b>Name</b>&gt;&gt; becomes <b>&lt;&lt;First Name&gt;&gt;
-	// NOTE: It is assumed that the tokens are &lt;&lt; and &gt;&gt; instead of << and >>.
+	/**
+	 * Corrects any html tags that may be inside a data-field insert.
+	 *
+	 * Example: &lt;&lt;First <b>Name</b>&gt;&gt; becomes <b>&lt;&lt;First Name&gt;&gt;
+	 * NOTE: It is assumed that the tokens are &lt;&lt; and &gt;&gt; instead of << and >>.
+	 */
 	self.cleanFieldInserts = function (html) {
 		var regex = /&lt;(<.*?>)*?&lt;(.+?)&gt;(<.*?>)*?&gt;/g;
 		var matches = html.match(regex);
@@ -510,27 +635,35 @@ function rcieditor() {
 		window.clearTimeout(self.eventTimer);
 
 		// Get the Editor that we're working with
-		var htmleditor = RCIEditor.getHtmlEditorObject();
+		var htmleditor = self.getHtmlEditorObject();
 
 		// Set a new timer to fire the save/check
 		self.eventTimer = window.setTimeout(function() {
 
 			// Save the changes to the hidden textarea
-			RCIEditor.saveHtmlEditorContent(htmleditor);
+			self.saveHtmlEditorContent(htmleditor);
 
 			// Run the form validation against the textarea
-			RCIEditor.validate();
+			self.validate();
 		}, 500);
 	};
 
-	self.validate = function() {
-		var form = document.getElementById(self.textarea.closest('form').attr('id'));
-		var field = document.getElementById(self.textarea.attr('id'));
-		form_do_validation(form, field);
+	self.validator_fn = null;
+
+	self.setValidatorFunction = function (validator_fn) {
+		self.validator_fn = validator_fn;
 	};
 
-	self.reset();
-}
+	self.resetValidatorFunction = function () {
+		self.validator_fn = null;
+	}
 
-RCIEditor = new rcieditor();
+	self.validate = function() {
+		if (typeof self.validator_fn === 'function') {
+			self.validator_fn();
+		}
+	};
+
+	self.construct(editor_mode, textarea_id, extra_data);
+}
 

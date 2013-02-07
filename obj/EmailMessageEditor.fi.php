@@ -14,8 +14,6 @@
  * 	FieldMap
  * 	
  * Nickolas Heckman
- *
- * @todo SMK notes 2013-01-02 prototype->jquery port is needed
  */
 class EmailMessageEditor extends FormItem {
 	
@@ -39,10 +37,7 @@ class EmailMessageEditor extends FormItem {
 			$textarea .= '<div>' . action_link(_L("Spell Check"), "spellcheck", null, '(new spellChecker($(\''.$n.'\')) ).openChecker();') . '</div>';
 		}
 
-		// SMK added empty rcieditor_scratch div as a scratch space
-		// for the RCIEditor to work with for DOM processing
 		$textarea .= '
-				<div id="rcieditor_scratch" style="display: none;"></div>
 			</div>
 		';
 		
@@ -51,9 +46,7 @@ class EmailMessageEditor extends FormItem {
 			<img src="img/icons/bullet_black.gif" />
 			<img src="img/icons/bullet_black.gif" />
 			<img src="img/icons/bullet_black.gif" />';
-				
-// SMK replaced with CKE plugin "mkfield" 2013-01-04
-/*
+
 		// Data field inserts
 		$datafieldinsert = '
 			<div class="controlcontainer">
@@ -84,8 +77,7 @@ class EmailMessageEditor extends FormItem {
 					</div>
 				</div>
 			</div>';
-*/
-		
+
 		// main containers
 		$str = '
 			<div class="email">
@@ -95,13 +87,11 @@ class EmailMessageEditor extends FormItem {
 				<div class="maincontainerseperator">
 					'.$seperator.'
 				</div>
-			</div>';
-// SMK replaced with CKE plugin "mkfield" 2013-01-04
-/*
 				<div class="maincontainerright">
 					'.$datafieldinsert.'
 				</div>
-*/
+			</div>';
+
 		return $str;
 	}
 
@@ -130,52 +120,23 @@ class EmailMessageEditor extends FormItem {
 
 		$subtype = (isset($this->args['subtype'])) ? $this->args['subtype'] : 'html';
 
-		// SMK added 2013-01-02 to be able to switch modalities for any FI of this type
-		$editor_mode = isset($this->args['editor_mode']) ? $this->args['editor_mode'] : 'plain';
-
-		// SMK added 2013-01-03 to make field definitions available to JS (CKE plugin mkfield)
-		if ($editor_mode != 'plain') {
-			$rcidata_fields = '';
-			foreach(FieldMap::getAuthorizeFieldInsertNames() as $field) {
-				if (strlen($rcidata_fields)) $rcidata_fields .= ',';
-				$rcidata_fields .= "\"{$field}\"";
-			}
-
-			$rcidataScript = <<<END
-				<script type="text/javascript" src="script/rcidata.js"></script>
-				<script type="text/javascript">
-					rcidata.set('customer_field_defs', Array({$rcidata_fields}));
-				</script>
-END;
-		}
-		else {
-			$rcidataScript = '';
-		}
-
-		$str = <<<END
-			<!-- editor mode: [{$editor_mode}] -->
-			<script type="text/javascript" src="script/jquery.1.7.2.min.js"></script>
+		$str = '<script type="text/javascript" src="script/ckeditor/ckeditor.js"></script>
+			<script type="text/javascript" src="script/htmleditor.js"></script>
 			<script type="text/javascript">
-				jQuery.noConflict();
-			</script>
-			{$rcidataScript}
-			<script type="text/javascript" src="script/ckeditor/ckeditor.js"></script>
-			<script type="text/javascript">
-				// SMK added global var 2012-12-07 to selectively enable uploaded image reduction scaling
-				var htmlEditorImageScale = 600; // Max dimension for scaling
-			</script>
+				function setupHtmlTextArea(textarea, hidetoolbar) {
+/*
+					var e = $(textarea);
 
-			<script type="text/javascript" src="script/json2.js"></script>
-			<script type="text/javascript" src="script/rcieditor.js"></script>
-			<script type="text/javascript">
-				function setupHtmlTextArea(e, hidetoolbar) {
-					e = $(e);
-					
 					// apply the ckeditor to the textarea
-					RCIEditor.applyEditor('{$editor_mode}', e, e.id + '-htmleditor');
+					applyHtmlEditor("plain", e, e.id + "-htmleditor");
+
+					var form = $("' . $this->form->name . '");
+					var field = $(textarea);
+					form_do_validation(form, field);
+*/
+
 				}
-			</script>
-END;
+			</script>';
 
 		if ($subtype == "plain" && isset($this->args['spellcheck']) && $this->args['spellcheck']) {
 			$str .= '<script src="script/speller/spellChecker.js"></script>';

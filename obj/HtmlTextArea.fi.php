@@ -2,74 +2,76 @@
 
 /**
  * HtmlTextArea Form Item object
- *
- * @todo SMK notes 2013-01-02 that the code below needs prototype to jquery port
  */
 class HtmlTextArea extends FormItem {
 	function render ($value) {
 		global $USER;
-
-		// SMK added 2013-01-02 to be able to switch modalities for any FI of this type
-		$editor_mode = isset($this->args['editor_mode']) ? $this->args['editor_mode'] : 'normal';
 
 		$n = $this->form->name."_".$this->name;
 		if (! $value) {
 			$value = '';
 		}
 
-		$rows = isset($this->args['rows']) ? 'rows="'.$this->args['rows'].'"' : "";
-
-		switch ($mode) {
-			case 'wysiwyg':
-				// This editor mode is full WYSIWYG inline, requires
-				// click to edit divs with class="editableBlock"
-				$editorInitScript = 'script/wysiwygeditor.js';
-				$editorApplyFn = "applyWysiwygEditor(e, e.id + '-htmleditor')";
-				break;
-
-			case 'full':
-				// This editor mode is like normal but with
-				// extra tools for editing "stationery"
-				break;
-
-			case 'normal':
-			default:
-				// This is the original basic, full
-				// editor with no extra/special tools
-				$editorInitScript = 'script/htmleditor.js';
-				$editorApplyFn = "applyHtmlEditor(e, true, elemName + '-htmleditor',{$USER->getSetting('hideemailtools', 'false')})";
-				break;
-		}
+		$rows = isset($this->args['rows']) ? 'rows="' . $this->args['rows'] . '"' : "";
 
 		$v = escapehtml($value);
 
-		$str = <<<END
-			<textarea id="{$n}" name="{$n}" {$rows}/>{$v}</textarea>
-			<div id ="{$n}htmleditor"></div>
-			<script type="text/javascript" src="script/ckeditor/ckeditor.js"></script>
-			<script type="text/javascript" src="{$editorInitsScript}"></script>
+		// SMK @HERE 2013-02-04 FIXME - remove these mode-switching links when testing is complete.
+		//<span style="cursor: pointer;" onclick="rcieditor.changeMode(\'inline\');">Switch to inline mode</span><br/>
+		//<span style="cursor: pointer;" onclick="rcieditor.changeMode(\'full\');">Switch to full mode</span><br/>
+		$str = '<textarea id="' . $n . '" name="' . $n . '" ' . $rows . '/>' . $v . '</textarea>
+			<div id ="' . $n . '-htmleditor"></div>
+				<style>
+					span.cke_toolgroup {
+						height: 27px;
+					}
+
+					a.cke_dialog_tab {
+						height: 26px;
+					}
+
+					a.cke_button {
+						height: 25px;
+					}
+				</style>
+			</div>';
+		// SMK notes that there was a stray "</script>" tag here... appeared to be connected to nothing.
+		return $str;
+	}
+
+
+	function renderJavascriptLibraries() {
+		global $USER;
+
+		$n = $this->form->name."_".$this->name;
+
+		$subtype = (isset($this->args['subtype'])) ? $this->args['subtype'] : 'html';
+
+		// SMK added 2013-01-02 to be able to switch modalities for any FI of this type
+		$editor_mode = isset($this->args['editor_mode']) ? $this->args['editor_mode'] : 'plain';
+
+		// SMK added 2013-01-03 to make field definitions available to JS (CKE plugin mkfield)
+		$rcidata_fields = ($editor_mode != 'plain') ? json_encode(array_values(FieldMap::getAuthorizeFieldInsertNames())) : 'null';
+
+		$str = '<script type="text/javascript" src="script/ckeditor/ckeditor.js"></script>
+			<script type="text/javascript" src="script/rcieditor.js"></script>
 			<script type="text/javascript">
-				document.observe("dom:loaded",
-					function() {
-						var elemName = "{$n}";
-						var e = \$(elemName);
 
-						// add the ckeditor to the textarea
-						{$editorApplyFn};
-
-						// set up a keytimer to save content and validate
-						var htmlTextArea_keytimer = null;
-						registerHtmlEditorKeyListener(function (event) {
-							window.clearTimeout(htmlTextArea_keytimer);
-							var htmleditor = getHtmlEditorObject();
-							htmlTextArea_keytimer = window.setTimeout(function() {
-								saveHtmlEditorContent(htmleditor);
-								form_do_validation(htmleditor.currenttextarea.up("form"), htmleditor.currenttextarea);
-							}, 500);
-						});
+				// apply the ckeditor to the textarea
+				document.observe("dom:loaded", function() {
+					rcieditor = new RCIEditor("' . $editor_mode . '", "' . $n . '", ' . $rcidata_fields . ');
+					rcieditor.setValidatorFunction(function () {
+						var form = $("' . $this->form->name . '");
+						var field = $("'.$n.'");
+						form_do_validation(form, field);
 					});
-			</script>
-END;
+				});
+			</script>';
+
+		if ($subtype == "plain" && isset($this->args['spellcheck']) && $this->args['spellcheck']) {
+			$str .= '<script src="script/speller/spellChecker.js"></script>';
+		}
+
 		return $str;
 	}
 }
