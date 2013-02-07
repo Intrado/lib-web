@@ -295,7 +295,7 @@ var allowControl = {
 			$.get('mgstationeryview.php?stationery=' + msgid, function(data) {
 				$("#msgsndr_emailmessagetext").val(data);
 				applyCkEditor("msgsndr_emailmessagetext");
-				//RCIEditor.refreshHtmlEditorContent();
+				//rcieditor.refreshHtmlEditorContent();
 				
 			});
 			$('#stationery_email_view').hide();
@@ -609,7 +609,7 @@ function ContentManager() {
 								
 								$.get('mgstationeryview.php?stationery=' + msgid, function(data) {
 									$("#msgsndr_emailmessagetext").val(data);
-									RCIEditor.refreshHtmlEditorContent();
+									rcieditor.refreshHtmlEditorContent();
 								});
 								$('#stationery_email_view').hide();
 								$('#main_email_view').show();

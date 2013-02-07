@@ -288,7 +288,7 @@ jQuery.noConflict();
 			}
 //            $(idSelector + " .msgdata").val('');
 
-			RCIEditor.clearHtmlEditorContent();
+			rcieditor.clearHtmlEditorContent();
 		});
 
 
@@ -331,13 +331,13 @@ jQuery.noConflict();
 
 							if (doOverwrite == true ) {
 								$('#msgsndr_emailmessagetext').val($(from).val());
-								RCIEditor.refreshHtmlEditorContent();
+								rcieditor.refreshHtmlEditorContent();
 							} else {
 								return;
 							}
 						} else {
 							$('#msgsndr_emailmessagetext').val($(from).val());
-							RCIEditor.refreshHtmlEditorContent();	
+							rcieditor.refreshHtmlEditorContent();	
 						}
 
 					});
