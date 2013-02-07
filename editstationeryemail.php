@@ -29,7 +29,7 @@ require_once("obj/Validator.obj.php");
 require_once("obj/EmailAttach.val.php");
 require_once("obj/EmailAttach.fi.php");
 require_once("obj/ValMessageBody.val.php");
-require_once("obj/EmailMessageEditor.fi.php");
+require_once("obj/HtmlTextArea.fi.php");
 require_once("obj/PreviewButton.fi.php");
 require_once("obj/ValDuplicateNameCheck.val.php");
 
@@ -133,7 +133,7 @@ $formdata["name"] = array(
 
 
 
-$messagecontrol = array("EmailMessageEditor", "subtype" => $subtype, "editor_mode" => "full");
+$messagecontrol = array("HtmlTextArea", "subtype" => $subtype, "editor_mode" => "full");
 if ($subtype == "plain" && $languagecode == "en")
 	$messagecontrol['spellcheck'] = true;
 
