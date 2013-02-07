@@ -63,6 +63,13 @@ function RCIEditor(editor_mode, textarea_id, extra_data) {
 		return(res);
 	};
 
+	self.reconstruct = function (editor_mode, textarea_id, extra_data) {
+		if (self.deconstruct()) {
+			return(self.construct(editor_mode, textarea_id, extra_data));
+		}
+		return(false);
+	};
+
 	self.deconstruct = function () {
 
 		// Show the loading spinner

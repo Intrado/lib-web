@@ -113,8 +113,18 @@ jQuery.noConflict();
 	};
 	
 	// using helper functions in htmleditor.js, set up the ckeditor on the textarea with id "elementid"
-	applyCkEditor = function(elementid) {
-		RCIEditor.applyEditor('full', $('#' + elementid), elementid+ '-htmleditor');
+	applyCkEditor = function(elementid, editor_mode) {
+
+		if (typeof rcieditor === 'undefined') {
+			rcieditor = new RCIEditor(editor_mode, elementid);
+		}
+		else {
+			rcieditor.reconstruct(editor_mode, elementid);
+		}
+
+		rcieditor.setValidatorFunction(function () {
+			obj_valManager.runValidateEventDriven(elementid);
+		});
 	};
 	
 	// stuff translation info into the specified hidden input field
