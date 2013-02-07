@@ -433,6 +433,12 @@ function RCIEditor(editor_mode, textarea_id, extra_data) {
 		}
 	};
 
+	self.hideHtmlEditor = function () {
+		// hide the editor
+		jQuery('#' + self.basename + 'hider').hide();
+	};
+
+
 	/**
 	 * Returns the textarea that the html editor is currently replacing
 	 */
@@ -671,6 +677,14 @@ function RCIEditor(editor_mode, textarea_id, extra_data) {
 		if (typeof self.validator_fn === 'function') {
 			self.validator_fn();
 		}
+	};
+
+	self.registerHtmlEditorKeyListener = function (listener_fn) {
+
+		// TODO - this function is here only for compatibility with the legacy htmleditor.js interface;
+		// Anything that calls it should be rewritten to use the validator model instead which does not
+		// require the caller to provide its own key listened
+		self.setValidatorFunction(listener_fn);
 	};
 
 	self.construct(editor_mode, textarea_id, extra_data);
