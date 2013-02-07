@@ -585,7 +585,7 @@ $.loadMessage = function loadMessage() {
 		// first hide the element and show a loading message
 		var loadingMessage = "<div class='loadingmessage'><img src='img/ajax-loader.gif'/>&nbsp;Loading content, please wait...</div>";
 		if (ckeditor)
-			hideHtmlEditor();
+			rcieditor.hideHtmlEditor();
 		
 		element.hide();
 		element.after(loadingMessage);
