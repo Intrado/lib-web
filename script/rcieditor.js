@@ -357,8 +357,10 @@ function RCIEditor(editor_mode, textarea_id, extra_data) {
 				var html = self.textarea.val().replace(/<</g, "&lt;&lt;").replace(/>>/g, "&gt;&gt;");
 				htmleditorobject.instance.setData(html);
 
-				// Initial validation - hopefully it checks out!
-				self.validate();
+				// Initial validation, only if there is content in the HTML already...
+				if (html.length) {
+					self.validate();
+				}
 			}
 		}
 		catch (msg) {
