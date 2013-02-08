@@ -74,11 +74,18 @@ $isajax = isset($_GET['ajax']);
 if($isajax === true) {
 	session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 
-	$mgtype = "notification";
-	if (isset($_GET['feed_view'])) {
-		if ($USER->authorize('createstationery') && $_GET['feed_view'] == "stationery")
-			$mgtype = "stationery";	
-	}
+	$typesql = "";
+	$viewtype = isset($_GET['feed_view'])?$_GET['feed_view']:"notification";
+	if ($viewtype == "stationery" && $USER->authorize('createstationery')) {
+		$typesql = "and mg.type = ?";
+		$args = array($USER->id,$viewtype, $USER->id,$viewtype);
+	} else if ($viewtype == "all") {
+		$typesql = "";
+		$args = array($USER->id, $USER->id);
+	} else {
+		$typesql = "and mg.type = ?";
+		$args = array($USER->id,"notification", $USER->id,"notification");
+	}	
 	
 	$start = 0 + (isset($_GET['pagestart']) ? $_GET['pagestart'] : 0);
 	$limit = 100;
@@ -93,7 +100,6 @@ if($isajax === true) {
 			$orderby = "digitsfirst, name";
 			break;
 	}
-	
 
 	
 	// get all the message group ids for this page
@@ -101,7 +107,7 @@ if($isajax === true) {
 		"(select SQL_CALC_FOUND_ROWS mg.id as id,modified, (mg.name +0) as digitsfirst,name
 		from messagegroup mg
 		where mg.userid = ? 
-			and mg.type = ?
+			$typesql 
 			and not mg.deleted)
 		UNION
 		(select mg.id as id,modified, (mg.name +0) as digitsfirst,name
@@ -111,10 +117,10 @@ if($isajax === true) {
 		where p.userid = ?
 			and p.action = 'subscribe'
 			and p.type = 'messagegroup'
-			and not mg.deleted
-			and mg.type = ?)
+			and not mg.deleted 
+			$typesql)
 		order by $orderby, id
-		limit $start, $limit", false, false, array($USER->id, $mgtype, $USER->id,$mgtype));
+		limit $start, $limit", false, false, $args);
 
   	// total rows
 	$total = QuickQuery("select FOUND_ROWS()");
@@ -157,7 +163,7 @@ if($isajax === true) {
 			$data->list[] = array("itemid" => "",
 										"defaultlink" => "",
 										"icon" => "img/largeicons/information.jpg",
-										"title" => $mgtype=="stationery"?_L("No Stationery."):_L("No Messages."),
+										"title" => $viewtype=="stationery"?_L("No Stationery."):_L("No Messages."),
 										"content" => "",
 										"tools" => "");
 	} else {
@@ -193,12 +199,15 @@ if($isajax === true) {
 			$title = escapehtml($item["name"]);
 			$publishid = $item['publishid'];
 
-			if (getBrandTheme() == 'newui') { 
-				$icon = 'img/newui/letter.png';
+			if ($item["type"] == "stationery") {
+				$icon = 'img/newui/posts.png';
 			} else {
-				$icon = 'img/largeicons/letter.jpg';
+				if (getBrandTheme() == 'newui') { 
+					$icon = 'img/newui/letter.png';
+				} else {
+					$icon = 'img/largeicons/letter.jpg';
+				}
 			}
-			
 			// Users with published messages or subscribed messages will get a special action item
 			$publishactionlink = "";
 			switch ($publishaction) {
@@ -300,13 +309,14 @@ $sortoptions = array(
 	"name" => array("icon" => "img/largeicons/tiny20x20/pencil.jpg", "name" => "Name"),
 	"date" => array("icon" => "img/largeicons/tiny20x20/clock.jpg", "name" => "Date")
 );
-$viewoptions = array(
-	"messages" => array("icon" => "img/largeicons/tiny20x20/pencil.jpg", "name" => _L("Messages"))
-);
 
-if ($USER->authorize('createstationery'))
-	$viewoptions["stationery"] = array("icon" => "img/largeicons/tiny20x20/clock.jpg", "name" => _L("Stationery"));
-
+if ($USER->authorize('createstationery')) {
+	$viewoptions["all"] = array("icon" => "img/largeicons/tiny20x20/globe.jpg", "name" => _L("All"));
+	$viewoptions["messages"] = array("icon" => "img/newui/letter-small.png", "name" => _L("Messages"));
+	$viewoptions["stationery"] = array("icon" => "img/newui/posts-small.png", "name" => _L("Stationery"));
+} else {
+	$viewoptions["messages"] = array("icon" => "img/largeicons/tiny20x20/pencil.jpg", "name" => _L("Messages"));
+}
 
 feed($feedButtons,$sortoptions,$viewoptions);
 ?>
