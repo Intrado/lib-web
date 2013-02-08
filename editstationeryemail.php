@@ -116,7 +116,7 @@ if ($message) {
 $language = Language::getName($languagecode);
 
 $formdata = array();
-
+$helpstepnum = 1;
 $helpsteps[] = array(_L("Enter the name this email will appear as coming from."));
 $formdata["name"] = array(
 	"label" => _L('Name'),
@@ -128,9 +128,19 @@ $formdata["name"] = array(
 		array("ValLength","max" => 50)
 	),
 	"control" => array("TextField","size" => 25, "maxlength" => 50),
-	"helpstep" => 1
+	"helpstep" => $helpstepnum++
 );
 
+$formdata["description"] = array(
+		"label" => _L('Description'),
+		"fieldhelp" => _L('Enter a description of the stationery. This is optional, but can help identify the stationery later.'),
+		"value" => $messagegroup->description,
+		"validators" => array(
+				array("ValLength","min" => 0,"max" => 50)
+		),
+		"control" => array("TextField","size" => 30, "maxlength" => 50),
+		"helpstep" => $helpstepnum++
+);
 
 
 $messagecontrol = array("HtmlTextArea", "subtype" => $subtype, "editor_mode" => "full");
@@ -153,7 +163,7 @@ $formdata["message"] = array(
 		array("ValLength","max" => 256000)
 	),
 	"control" => $messagecontrol,
-	"helpstep" => 2
+	"helpstep" => $helpstepnum++
 );
 
 
@@ -181,15 +191,17 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		
 		// if they didn't change anything, don't do anything
 		if ($postdata['name'] == $messagegroup->name && 
-				$postdata['message'] == $text) {
+			$postdata['description'] == $messagegroup->description &&
+			$postdata['message'] == $text) {
 			// DO NOT UPDATE MESSAGE!
 		} else if ($button != 'inpagesubmit') {
 			Query("BEGIN");
 			
 			$messagegroup->name = removeIllegalXmlChars($postdata['name']);
+			$messagegroup->description = removeIllegalXmlChars($postdata['description']);
 			$messagegroup->modified = date("Y-m-d H:i:s", time());
 			
-			$messagegroup->update(array("name","modified"));
+			$messagegroup->update(array("name","description","modified"));
 			// if this is an edit for an existing message
 			if ($message) {
 				// delete existing messages
