@@ -985,6 +985,10 @@ function checkAllCheckboxes(domanagement){
 			if (form[i].name.startsWith("accessprofile_tai"))
 				continue;
 
+			//skip forcestationery since it is an inverse permission
+			if (form[i].name.indexOf("accessprofile_forcestationery") != -1)
+				continue;
+			
 			//see if it's a management checkbox
 			if (managementoptions.some(function(v) {return form[i].name.indexOf(v) != -1})) {
 				if (domanagement)
