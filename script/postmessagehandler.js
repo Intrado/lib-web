@@ -7,22 +7,19 @@
  * @constructor
  */
 function PostMessageHandler(target) {
-	var self = this;
-
-	self.target = target;
 
 	/**
 	 * Attach a message handler to the "message" event
 	 * @param {function} handler
 	 * @return {PostMessageHandler} this
 	 */
-	self.attachListener = function(handler) {
+	this.attachListener = function(handler) {
 		if (window.addEventListener == undefined)
 			window.attachEvent("onmessage", handler);
 		else
 			window.addEventListener("message", handler, false);
 
-		return self;
+		return this;
 	};
 
 	/**
@@ -30,8 +27,8 @@ function PostMessageHandler(target) {
 	 * @param {Object} jsonData
 	 * @return {PostMessageHandler} this
 	 */
-	self.postMessageAll = function(jsonData) {
-		return self.postMessage(jsonData, '*');
+	this.postMessageAll = function(jsonData) {
+		return this.postMessage(jsonData, '*');
 	};
 
 	/**
@@ -40,9 +37,9 @@ function PostMessageHandler(target) {
 	 * @param {Object} domains
 	 * @return {PostMessageHandler} this
 	 */
-	self.postMessage = function(jsonData, domains) {
-		self.target.postMessage(jQuery.toJSON(jsonData), domains);
-		return self;
+	this.postMessage = function(jsonData, domains) {
+		target.postMessage(jQuery.toJSON(jsonData), domains);
+		return this;
 	};
 
 }
