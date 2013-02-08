@@ -287,8 +287,8 @@ jQuery.noConflict();
 					"defaultphone" : userInfo.phoneFormatted });
 			}
 //            $(idSelector + " .msgdata").val('');
-
-			rcieditor.clearHtmlEditorContent();
+			if (typeof(rcieditor) != 'undefined') 
+				rcieditor.clearHtmlEditorContent();
 		});
 
 

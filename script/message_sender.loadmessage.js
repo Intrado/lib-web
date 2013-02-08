@@ -432,7 +432,8 @@ $.loadMessage = function loadMessage() {
 		});
 		
 		// ckEditor Message Content resets
-		rcieditor.clearHtmlEditorContent();
+		if (typeof(rcieditor) != 'undefined')
+			rcieditor.clearHtmlEditorContent();
 	}
 
 	// load phone message asynchronously from the server
