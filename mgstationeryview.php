@@ -18,7 +18,7 @@ if ($isPreview) {
 	    color: #a6a6a6;
 	    font-size: 100pt;
 	    height: 50%;
-	    left: -70px;
+	    left: 10px;
 	    margin: 0;
 	    position: absolute;
 	    top: 0;
@@ -36,6 +36,16 @@ if ($isPreview) {
 		border: 1px dashed #999999;
 		padding: 0px;
 	}
+	html {
+	    zoom: 0.60;
+	    -moz-transform: scale(0.60);
+	    -moz-transform-origin: 0 0;
+	    -o-transform: scale(0.60);
+	    -o-transform-origin: 0 0;
+	    -webkit-transform: scale(0.60);
+	    -webkit-transform-origin: 0 0;
+	}
+	
 	</style>
 	<div class="watermark">
 	<p>Preview</p>

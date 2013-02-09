@@ -52,7 +52,8 @@ class LayoutSelector extends FormItem {
 				$str .= "<hr />\n";
 			} else {
 				$id = $n.'-'.$counter;
-				$str .= '<input id="'.$id.'" name="'.$n.'" class="stationeryselector" type="radio" value="'.escapehtml($radiovalue).'" '.($value == $radiovalue || $autoselect ? 'checked' : '').' /><label id="'.$id.'-label" for="'.$id.'">'.($ishtml?$radioname:escapehtml($radioname)).'</label><br />';
+				$onclick = "$('stationerypreview').src = 'mgstationeryview.php?preview&layout=" .  escapehtml($radiovalue) .  "'";
+				$str .= '<input id="'.$id.'" name="'.$n.'" class="stationeryselector" type="radio" value="'.escapehtml($radiovalue).'" '.($value == $radiovalue || $autoselect ? 'checked' : '').' onclick="' . $onclick . '" /><label id="'.$id.'-label" for="'.$id.'">'.($ishtml?$radioname:escapehtml($radioname)).'</label><br />';
 				if (isset($this->args['hover'])) {
 					$hoverdata[$id] = $this->args['hover'][$radiovalue];
 					$hoverdata[$id.'-label'] = $this->args['hover'][$radiovalue];
@@ -65,9 +66,6 @@ class LayoutSelector extends FormItem {
 		<iframe id=\"stationerypreview\"  src=\"blank.html\"></iframe>
 		</div>
 		<script type=\"text/javascript\">
-			$('{$this->form->name}').on('change', 'input.stationeryselector', function(event) {	
-				$('stationerypreview').src = 'mgstationeryview.php?preview&layout=' + event.element().value;
-			});
 		";
 		if (isset($this->args['hover']))
 			$str .= 'form_do_hover(' . json_encode($hoverdata) .');';
