@@ -40,8 +40,8 @@ CKEDITOR.dialog.add('thememgr', function ( editor ) {
 			try {
 
 				// Check some prerequisites
-				if (typeof window.top.RCIEditor !== 'object') {
-					throw 'RCIEditor object not found; this plugin requires rcieditor.js to be included';
+				if (typeof window.top.rcieditor !== 'object') {
+					throw 'rcieditor object not found; this plugin requires rcieditor.js to be included';
 				}
 
 				var doc = this.getElement().getDocument(); // ckeditor.js
@@ -54,7 +54,7 @@ CKEDITOR.dialog.add('thememgr', function ( editor ) {
 					throw 'Missing content div "thememgr_content" (??)';
 				}
 
-				var scratch = RCIEditor.getSetting('rcieditor_scratch'); // rcieditor.js
+				var scratch = rcieditor.getSetting('rcieditor_scratch'); // rcieditor.js
 				if (typeof scratch === 'undefined') {
 					throw 'scratch space could not be found';
 				}
@@ -188,7 +188,7 @@ CKEDITOR.dialog.add('thememgr', function ( editor ) {
 							throw 'No color was chosen!';
 						}
 
-						var scratch = RCIEditor.getSetting('rcieditor_scratch');
+						var scratch = rcieditor.getSetting('rcieditor_scratch');
 						if (typeof scratch === 'undefined') {
 							throw 'scratch space could not be found';
 						}
