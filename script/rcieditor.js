@@ -39,7 +39,7 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data) {
 	};
 
 	this.construct = function (editor_mode, textarea_id, extra_data) {
-console.log('RCIEditor.construct()');
+//console.log('RCIEditor.construct()');
 
 		// Reset all internal properties
 		this.reset();
@@ -61,7 +61,7 @@ console.log('RCIEditor.construct()');
 	};
 
 	this.reconstruct = function (editor_mode, textarea_id, extra_data) {
-console.log('RCIEditor.reconstruct()');
+//console.log('RCIEditor.reconstruct()');
 		// If the editorMode is defined...
 		if (typeof this.editorMode !== 'undefined') {
 
@@ -72,7 +72,7 @@ console.log('RCIEditor.reconstruct()');
 	};
 
 	this.deconstruct = function () {
-console.log('RCIEditor.deconstruct()');
+//console.log('RCIEditor.deconstruct()');
 
 		try {
 
@@ -80,7 +80,7 @@ console.log('RCIEditor.deconstruct()');
 		this.setLoadingVisibility(true);
 
 		if (typeof this.textarea !== 'object') {
-throw('this.text area is not an object (??');
+//throw('this.text area is not an object (??');
 			return(false);
 		}
 
@@ -96,7 +96,7 @@ throw('this.text area is not an object (??');
 			case 'full':
 				var htmleditorobject = this.getHtmlEditorObject();
 				if (! htmleditorobject) {
-throw('could not find the htmleditorobject for deconstruction');
+//throw('could not find the htmleditorobject for deconstruction');
 					return(false);
 				}
 
@@ -108,11 +108,11 @@ throw('could not find the htmleditorobject for deconstruction');
 		}
 
 		// Only an unsupported editorMode will end up here:
-throw('unsupported mode found while decontrsucting: [' + this.editorMode + ']');
+//throw('unsupported mode found while decontrsucting: [' + this.editorMode + ']');
 		return(false);
 		}
 		catch (msg) {
-console.log('oops! [' + msg + ']');
+//console.log('oops! [' + msg + ']');
 			return(false);
 		}
 	};
@@ -121,7 +121,7 @@ console.log('oops! [' + msg + ']');
 	 * Put us into a known good state
 	 */
 	this.reset = function () {
-console.log('RCIEditor.reset()');
+//console.log('RCIEditor.reset()');
 
 		// reset misc. properties
 		this.textarea = null;
@@ -147,7 +147,7 @@ console.log('RCIEditor.reset()');
 	 * @param editorMode string One of either: 'inline', 'plain', 'normal', or 'full'
 	 */
 	this.changeMode = function (editorMode) {
-console.log('RCIEditor.changeMode()');
+//console.log('RCIEditor.changeMode()');
 
 		// If we're already in this same mode
 		if (this.editorMode == editorMode) {
@@ -187,7 +187,7 @@ console.log('RCIEditor.changeMode()');
 	 * being available
 	 */
 	this.applyEditor = function(editorMode, textarea_id, container_id) {
-console.log('RCIEditor.applyEditor()');
+//console.log('RCIEditor.applyEditor()');
 
 		// If we are already running
 		if (this.editorMode) {
@@ -308,7 +308,7 @@ console.log('RCIEditor.applyEditor()');
 				'filebrowserImageUploadUrl' : uploaderURI,
 				'toolbarStartupExpanded' : (! this.getSetting('hidetoolbar')),
 				'extraPlugins': extraPlugins,
-/*
+
 				'toolbar': [
 					['Print','Source'],
 					['Styles','Format','Font','FontSize'],
@@ -319,7 +319,7 @@ console.log('RCIEditor.applyEditor()');
 					['Bold','Italic','Underline','Strike','TextColor','BGColor','RemoveFormat'],
 					['NumberedList','BulletedList','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','Outdent','Indent']
 				],
-*/
+
 				'on': {
 					'instanceReady': function(event) {
 						that.callbackEditorLoaded(this);
