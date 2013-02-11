@@ -7,19 +7,20 @@
    * jquery-*.js
    * rcieditor.js
  */
-function RCIEditorInline () {
+(function ($) {
+window.RCIEditorInline = function () {
 	var self = this;
 
-	self.editableTarget = null;
-	self.captureTimeout = 0;
+	this.editableTarget = null;
+	this.captureTimeout = 0;
 
-	self.constructed = false;
-	self.constructRetryDelay = 16;
-	self.constructRetryTimeout = null;
+	this.constructed = false;
+	this.constructRetryDelay = 16;
+	this.constructRetryTimeout = null;
 
-	self.initialized = false;
-	self.initRetryDelay = 16;
-	self.initRetryTimeout = null;
+	this.initialized = false;
+	this.initRetryDelay = 16;
+	this.initRetryTimeout = null;
 
 	/**
 	 * Our pseudo-constructor executes when the script is loaded
@@ -31,20 +32,20 @@ function RCIEditorInline () {
 	 * associated with the various editableBlocks of the document, each will bear these same properties
 	 * and methods.
 	 */
-	self.construct = function () {
+	this.construct = function () {
 
 		// If the CKEDITOR object isn't ready yet...
 		if ((typeof window.top.rcieditor === 'undefined') || (typeof CKEDITOR === 'undefined')) {
 
 			// Try again after a few milli's
-			clearTimeout(self.constructRetryTimeout);
+			clearTimeout(this.constructRetryTimeout);
 
 			// Exponential decay on retry timing; we won't delay any longer than 1.6 seconds,
 			// but we will continue retrying on this interval as long as necessary.
-			if (self.constructRetryDelay < 16384) {
-				self.constructRetryDelay *= 2;
+			if (this.constructRetryDelay < 16384) {
+				this.constructRetryDelay *= 2;
 			}
-			self.constructRetryTimeout = window.setTimeout(self.construct, self.constructRetryDelay);
+			this.constructRetryTimeout = window.setTimeout(this.construct, this.constructRetryDelay);
 		}
 
 		// This property tells CKEditor to not activate every element with contenteditable=true element.
@@ -83,7 +84,6 @@ function RCIEditorInline () {
 				];
 			});
 
-			editor.on('blur', self.captureChanges);
 			editor.on('key', function(event) {
 
 				// The following keys we want to captureChanges() on because they just represent changes to the content;
@@ -91,18 +91,20 @@ function RCIEditorInline () {
 				// ref: http://www.webonweboff.com/tips/js/event_key_codes.aspx
 				var keyCode = event.data.keyCode & 255;
 				if ((keyCode >= 48) || (keyCode == 8) || (keyCode == 9) || (keyCode == 13) || (keyCode == 32) || (keyCode == 46)) {
-					clearTimeout(self.captureTimeout);
-					self.captureTimeout = window.setTimeout(self.captureChanges, 500);
+					clearTimeout(this.captureTimeout);
+					var that = this;
+					this.captureTimeout = window.setTimeout( (function () { that.captureChanges; }), 500);
 				}
 			});
-			editor.on('saveSnapshot', self.captureChanges);
-			editor.on('afterCommandExec', self.captureChanges);
-			editor.on('insertHtml', self.captureChanges);
-			editor.on('insertElement', self.captureChanges);
+			editor.on('blur', (function () { that.captureChanges; }) );
+			editor.on('saveSnapshot', (function () { that.captureChanges; }) );
+			editor.on('afterCommandExec', (function () { that.captureChanges; }) );
+			editor.on('insertHtml', (function () { that.captureChanges; }) );
+			editor.on('insertElement', (function () { that.captureChanges; }) );
 
 		});
 
-		self.constructed = true;
+		this.constructed = true;
 	}
 
 	/**
@@ -115,39 +117,39 @@ function RCIEditorInline () {
 	 * into this frame's body as the main content, and then attaches inline editors
 	 * to each of the editableBlock CLASS'ed DIV's.
 	 */
-	self.init = function (targetName) {
+	this.init = function (targetName) {
 
 		// If SELF object isn't ready yet...
-		if (! self.constructed) {
+		if (! this.constructed) {
 
 			// Try again after a few milli's
-			clearTimeout(self.initRetryTimeout);
+			clearTimeout(this.initRetryTimeout);
 
 			// Exponential decay on retry timing; we won't delay any longer than 1.6 seconds,
 			// but we will continue retrying on this interval as long as necessary.
-			if (self.initRetryDelay < 16384) {
-				self.initRetryDelay *= 2;
+			if (this.initRetryDelay < 16384) {
+				this.initRetryDelay *= 2;
 			}
-			self.initRetryTimeout = window.setTimeout(self.init, self.initRetryDelay);
+			this.initRetryTimeout = window.setTimeout(this.init, this.initRetryDelay);
 		}
-		self.initialized = true;
+		this.initialized = true;
 
 		if (targetName == "null") {
 			return(false);
 		}
 
 		// The ID attribute of the textarea that has the text we want to edit
-		self.editableTarget = targetName;
+		this.editableTarget = targetName;
 
 		// Get the textarea DOM object from the parent window (frame)
 		var textarea = 0;
-		if (! (textarea = self.getTextarea())) {
+		if (! (textarea = this.getTextarea())) {
 			return(false);
 		}
 
 		// Get the wysiwygpage div DOM object from this page (below)
 		var wysiwygpage = 0;
-		if (! (wysiwygpage = self.getPage())) {
+		if (! (wysiwygpage = this.getPage())) {
 			return(false);
 		}
 
@@ -168,8 +170,9 @@ function RCIEditorInline () {
 		wysiwygpage.html(content);
 
 		// Apply CKE inline editors for each wysiwygpage > div.contenteditable=true
-		jQuery('.editableBlock', wysiwygpage).each(function(index) {
-			self.makeEditable(jQuery(this), index);
+		var that = this;
+		$('.editableBlock', wysiwygpage).each(function(index) {
+			that.makeEditable($(this), index);
 		});
 
 		// Fire the callback indicating initialization is done
@@ -177,10 +180,10 @@ function RCIEditorInline () {
 
 		// Do an initial validation only once for the
 		// entire editor document instead of once per editor
-		self.captureChanges();
+		this.captureChanges();
 	}
 
-	self.makeEditable = function (element, index) {
+	this.makeEditable = function (element, index) {
 
 		// Add an ID for unique association
 		var newid = 'editableBlock' + index;
@@ -188,16 +191,16 @@ function RCIEditorInline () {
 		element.attr('contenteditable', 'true');
 		element.attr('tabindex', index);
 
-		// CKEDITOR.inline() does not like element if it is extended with jQuery or prototype
+		// CKEDITOR.inline() does not like element if it is extended with $ or prototype
 		// Get an UNextended copy of this same DOM element using the newid we assigned
 		// SMK notes this appears to be necessary, possibly because CKEDITOR is initialized seeing and expecting
-		// prototype.js extensions, but then the element is delivered with jQuery extensions, causing CKE to not
+		// prototype.js extensions, but then the element is delivered with $ extensions, causing CKE to not
 		// be able to use the object since it doesn't align with its expectations.
 		var el = document.getElementById(newid);
 		CKEDITOR.inline(el);
 	}
 
-	self.makeNonEditable = function (element) {
+	this.makeNonEditable = function (element) {
 
 		// Reverse out the element attributes that we added
 		// and also that CKE adds and leaves behind
@@ -209,23 +212,23 @@ function RCIEditorInline () {
 		element.attr('class', 'editableBlock');
 	}
 
-	self.captureChanges = function () {
+	this.captureChanges = function () {
 
 		// (1) Get the wysiwygpage div DOM object from this page (below)
 		var wysiwygpage = 0;
-		if (! (wysiwygpage = self.getPage())) {
+		if (! (wysiwygpage = this.getPage())) {
 			return(false);
 		}
 
 		// (2) Get the textarea DOM object from the parent window (frame)
 		var textarea = 0;
-		if (! (textarea = self.getTextarea())) {
+		if (! (textarea = this.getTextarea())) {
 			return(false);
 		}
 
 		// (3) Get the wysiwygpresave div DOM object from this page (below)
 		var wysiwygpresave = 0;
-		if (! (wysiwygpresave = self.getPresaveContainer())) {
+		if (! (wysiwygpresave = this.getPresaveContainer())) {
 			return(false);
 		}
 
@@ -233,8 +236,9 @@ function RCIEditorInline () {
 		wysiwygpresave.html(wysiwygpage.html());
 
 		// (5) Disable editing capabilities on all the presave editableBlocks
-		jQuery('.editableBlock', wysiwygpresave).each(function(index) {
-			self.makeNonEditable(jQuery(this));
+		var that = this;
+		$('.editableBlock', wysiwygpresave).each(function(index) {
+			that.makeNonEditable($(this));
 		});
 
 		// (6) Now grab the contents of the wysiwyg presave container
@@ -249,32 +253,33 @@ function RCIEditorInline () {
 		return(true);
 	}
 
-	self.getTextarea = function () {
+	this.getTextarea = function () {
 		var textarea = null;
-		if (! (textarea = jQuery('#' + self.editableTarget, window.top.document))) {
+		if (! (textarea = $('#' + this.editableTarget, window.top.document))) {
 			return(null);
 		}
 		return(textarea);
 	}
 
-	self.getPage = function () {
+	this.getPage = function () {
 		var wysiwygpage = null;
-		if (! (wysiwygpage = jQuery('#wysiwygpage'))) {
+		if (! (wysiwygpage = $('#wysiwygpage'))) {
 			return(null);
 		}
 		return(wysiwygpage);
 	}
 
-	self.getPresaveContainer = function () {
+	this.getPresaveContainer = function () {
 		var wysiwygpresave = null;
-		if (! (wysiwygpresave = jQuery('#wysiwygpresave'))) {
+		if (! (wysiwygpresave = $('#wysiwygpresave'))) {
 			return(null);
 		}
 		return(wysiwygpresave);
 	}
 
-	self.construct();
+	this.construct();
 }
+}) (jQuery);
 
 rcieditorinline = new RCIEditorInline();
 

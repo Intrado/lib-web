@@ -94,7 +94,7 @@ img:hover {
 
 /* SMK added 2012-12-14 so that we can see the boundaries of editable content blocks */
 div.editableBlock {
-	background-color: #FFFFCC;
-	border: 1px dotted #999999;
+	/*background-color: #FFFFCC;*/
+	border: 2px dashed #000000;
 }
 

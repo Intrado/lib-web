@@ -120,22 +120,10 @@ class EmailMessageEditor extends FormItem {
 
 		$subtype = (isset($this->args['subtype'])) ? $this->args['subtype'] : 'html';
 
-		$str = '<script type="text/javascript" src="script/ckeditor/ckeditor.js"></script>
-			<script type="text/javascript" src="script/htmleditor.js"></script>
-			<script type="text/javascript">
-				function setupHtmlTextArea(textarea, hidetoolbar) {
-/*
-					var e = $(textarea);
-
-					// apply the ckeditor to the textarea
-					applyHtmlEditor("plain", e, e.id + "-htmleditor");
-
-					var form = $("' . $this->form->name . '");
-					var field = $(textarea);
-					form_do_validation(form, field);
-*/
-
-				}
+		// SMK removed CKE from this FI since this is for text editing
+		// only; Use HtmlTextArea FI for the HTML editor (CKE)
+		$str = '<script type="text/javascript">
+				function setupHtmlTextArea(textarea, hidetoolbar) { }
 			</script>';
 
 		if ($subtype == "plain" && isset($this->args['spellcheck']) && $this->args['spellcheck']) {
