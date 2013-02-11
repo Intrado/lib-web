@@ -51,6 +51,7 @@ window.RCIEditorInline = function () {
 		// This property tells CKEditor to not activate every element with contenteditable=true element.
 		CKEDITOR.disableAutoInline = true;
 
+		var that = this;
 		CKEDITOR.on( 'instanceCreated', function( event ) {
 			var editor = event.editor;
 
@@ -92,7 +93,6 @@ window.RCIEditorInline = function () {
 				var keyCode = event.data.keyCode & 255;
 				if ((keyCode >= 48) || (keyCode == 8) || (keyCode == 9) || (keyCode == 13) || (keyCode == 32) || (keyCode == 46)) {
 					clearTimeout(this.captureTimeout);
-					var that = this;
 					this.captureTimeout = window.setTimeout( (function () { that.captureChanges; }), 500);
 				}
 			});
