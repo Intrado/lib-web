@@ -230,9 +230,9 @@ if ($subtype == 'plain') {
 } else {
 	// HTML emails will use CKEditor 4
 	// valid editor_mode's are 'plain', 'normal', 'full', and 'inline'
-	$messagecontrol = array("HtmlTextArea", "subtype" => $subtype, "rows" => 20, 'editor_mode' => 'full');
+	$messagecontrol = array("HtmlTextArea", "subtype" => $subtype, "rows" => 20);
+	$messagecontrol['editor_mode'] = $fromstationery ? 'inline' : 'normal';
 }
-$messagecontrol['editor_mode'] = $fromstationery?'inline':'normal';
 
 $helpsteps[] = _L("Email message body text goes here. Be sure to introduce yourself and give detailed information. For ".
 	"helpful message tips and ideas, click the Help link in the upper right corner of the screen.<br><br>If you would ".
