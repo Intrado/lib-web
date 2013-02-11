@@ -39,6 +39,7 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data) {
 	};
 
 	this.construct = function (editor_mode, textarea_id, extra_data) {
+console.log('RCIEditor.construct()');
 
 		// Reset all internal properties
 		this.reset();
@@ -60,18 +61,26 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data) {
 	};
 
 	this.reconstruct = function (editor_mode, textarea_id, extra_data) {
-		if (this.deconstruct()) {
-			return(this.construct(editor_mode, textarea_id, extra_data));
+console.log('RCIEditor.reconstruct()');
+		// If the editorMode is defined...
+		if (typeof this.editorMode !== 'undefined') {
+
+			// We need to deconstruct before we construct...
+			if (! this.deconstruct()) return(false);
 		}
-		return(false);
+		return(this.construct(editor_mode, textarea_id, extra_data));
 	};
 
 	this.deconstruct = function () {
+console.log('RCIEditor.deconstruct()');
+
+		try {
 
 		// Show the loading spinner
 		this.setLoadingVisibility(true);
 
 		if (typeof this.textarea !== 'object') {
+throw('this.text area is not an object (??');
 			return(false);
 		}
 
@@ -87,6 +96,7 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data) {
 			case 'full':
 				var htmleditorobject = this.getHtmlEditorObject();
 				if (! htmleditorobject) {
+throw('could not find the htmleditorobject for deconstruction');
 					return(false);
 				}
 
@@ -98,13 +108,20 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data) {
 		}
 
 		// Only an unsupported editorMode will end up here:
+throw('unsupported mode found while decontrsucting: [' + this.editorMode + ']');
 		return(false);
+		}
+		catch (msg) {
+console.log('oops! [' + msg + ']');
+			return(false);
+		}
 	};
 
 	/**
 	 * Put us into a known good state
 	 */
 	this.reset = function () {
+console.log('RCIEditor.reset()');
 
 		// reset misc. properties
 		this.textarea = null;
@@ -130,6 +147,7 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data) {
 	 * @param editorMode string One of either: 'inline', 'plain', 'normal', or 'full'
 	 */
 	this.changeMode = function (editorMode) {
+console.log('RCIEditor.changeMode()');
 
 		// If we're already in this same mode
 		if (this.editorMode == editorMode) {
@@ -169,6 +187,7 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data) {
 	 * being available
 	 */
 	this.applyEditor = function(editorMode, textarea_id, container_id) {
+console.log('RCIEditor.applyEditor()');
 
 		// If we are already running
 		if (this.editorMode) {
@@ -203,7 +222,6 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data) {
 
 		// base name of the text element; we'll make several new elements with derived names
 		this.basename = textarea_id;
-		this.editorMode = editorMode;
 
 		var cke = $('<div id="' + this.basename + '_box"></div>');
 
@@ -224,9 +242,11 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data) {
 			// are different depending on the editorMode
 			var extraPlugins = 'aspell';
 			var extraButtons = ['PasteFromWord','SpellCheck'];
-			switch (this.editorMode) {
+			switch (editorMode) {
 
 				default:
+					// If editorMode was not supplied, we need to set it
+					editorMode = 'plain';
 				case 'plain':
 					// Nothing extra to add for the plain legacy editor
 					break;
@@ -288,6 +308,7 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data) {
 				'filebrowserImageUploadUrl' : uploaderURI,
 				'toolbarStartupExpanded' : (! this.getSetting('hidetoolbar')),
 				'extraPlugins': extraPlugins,
+/*
 				'toolbar': [
 					['Print','Source'],
 					['Styles','Format','Font','FontSize'],
@@ -298,6 +319,7 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data) {
 					['Bold','Italic','Underline','Strike','TextColor','BGColor','RemoveFormat'],
 					['NumberedList','BulletedList','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','Outdent','Indent']
 				],
+*/
 				'on': {
 					'instanceReady': function(event) {
 						that.callbackEditorLoaded(this);
@@ -317,8 +339,10 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data) {
 			// it will fire instanceReady() function when it is done.
 		}
 
-		// The second new element has the same id with a 'hider' suffix
+		// Capture the editorMode
+		this.editorMode = editorMode;
 
+		// The second new element has the same id with a 'hider' suffix
 		var hider = $('<div id="' + this.basename + 'hider" style="display: none;"></div>');
 		hider.append(cke);
 		this.container.append(hider);
@@ -369,6 +393,7 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data) {
 	 */
 	this.loadingVisible = false;
 	this.setLoadingVisibility = function (visible) {
+console.log('RCIEditor.setLoadingVisibility()');
 
 		// If we want to make it visible...
 		if (visible) {
