@@ -100,6 +100,8 @@ if (!in_array($languagecode, array_keys(Language::getLanguageMap())))
 if (!$USER->authorize("sendmulti") && $languagecode != Language::getDefaultLanguageCode())
 	redirect('unauthorized.php');
 
+if ($USER->authorize('forcestationery') && !isset($_SESSION['editmessage']['stationeryid']))
+	redirect('unauthorized.php');
 
 PreviewModal::HandleRequestWithEmailText();
 	
@@ -114,6 +116,8 @@ $fromemail = $USER->email;
 $subject = "";
 $attachments = array();
 $text = "";
+$fromstationery = false;
+
 if ($message) {
 	// get the specific bits from the message if it exists
 	$parts = DBFindMany("MessagePart", "from messagepart where messageid = ? order by sequence", false, array($message->id));
@@ -124,6 +128,7 @@ if ($message) {
 	$fromname = $message->fromname;
 	$fromemail = $message->fromemail;
 	$subject = $message->subject;
+	$fromstationery = $message->fromstationery;
 	
 	// get the attachments
 	$msgattachments = DBFindMany("MessageAttachment", "from messageattachment where messageid = ?", false, array($message->id));
@@ -145,16 +150,24 @@ if ($message) {
 			$attachments[$msgattachment->contentid] = array("name" => $msgattachment->filename, "size" => $msgattachment->size);
 		}
 	}
+	
+	if (isset($_SESSION['editmessage']['stationeryid'])) {
+		$stationery = new MessageGroup($_SESSION['editmessage']['stationeryid']);
+		if ($stationery->type == "stationery" &&
+			$emailstationery = $stationery->getMessage("email", $subtype, "en")) {
+			$emailstationeryparts = DBFindMany("MessagePart", "from messagepart where messageid = ? order by sequence", false, array($emailstationery->id));
+				
+			$fromstationery = true;
+			$text = Message::format($emailstationeryparts);
+		}
+	}
 }
 
 $language = Language::getName($languagecode);
 
 $formdata = array($messagegroup->name. " (". $language. ")");
 
-
-// FROM ADDRESS
 $helpsteps[] = array(_L("Enter the name this email will appear as coming from."));
-
 $formdata["fromname"] = array(
 	"label" => _L('From Name'),
 	"fieldhelp" => _L('Recipients will see this name as the sender of the email.'),
@@ -167,10 +180,7 @@ $formdata["fromname"] = array(
 	"helpstep" => 1
 );
 
-
-// REPLY ADDRESS
 $helpsteps[] = array(_L("Enter the address where you would like to receive replies."));
-
 $formdata["from"] = array(
 	"label" => _L("From Email"),
 	"fieldhelp" => _L('This is the address the email is coming from. Recipients will also be able to reply to this address.'),
@@ -184,10 +194,7 @@ $formdata["from"] = array(
 	"helpstep" => 2
 );
 
-
-// MESSAGE SUBJECT
 $helpsteps[] = _L("Enter the subject of the email here.");
-
 $formdata["subject"] = array(
 	"label" => _L("Subject"),
 	"fieldhelp" => _L('The Subject will appear as the subject line of the email.'),
@@ -200,11 +207,8 @@ $formdata["subject"] = array(
 	"helpstep" => 3
 );
 
-
-// ATTACHMENTS
 $helpsteps[] = _L("You may attach up to three files that are up to 2MB each. For greater security, only certain types ".
 	"of files are accepted.<br><br><b>Note:</b> Some email accounts may not accept attachments above a certain size and may reject your message.");
-
 $formdata["attachments"] = array(
 	"label" => _L('Attachments'),
 	"fieldhelp" => _L("You may attach up to three files that are up to 2MB each. For greater security, certain file ".
@@ -218,27 +222,23 @@ $formdata["attachments"] = array(
 
 // MESSAGE BODY
 if ($subtype == 'plain') {
-
 	// For plain text emails, use a plain textarea
 	$messagecontrol = array("EmailMessageEditor", "subtype" => $subtype);
 	if ($languagecode == "en") {
 		$messagecontrol['spellcheck'] = true;
 	}
-}
-else {
-
+} else {
 	// HTML emails will use CKEditor 4
-	// SMK added 2013-01-04 - valid editor_mode's are 'plain', 'normal', 'full', and 'inline'
+	// valid editor_mode's are 'plain', 'normal', 'full', and 'inline'
 	$messagecontrol = array("HtmlTextArea", "subtype" => $subtype, "rows" => 20, 'editor_mode' => 'full');
 }
+$messagecontrol['editor_mode'] = $fromstationery?'inline':'normal';
 
-// FIXME - help steps should be updated to reflect changes to field inserts support as a plugin for CKE4
 $helpsteps[] = _L("Email message body text goes here. Be sure to introduce yourself and give detailed information. For ".
 	"helpful message tips and ideas, click the Help link in the upper right corner of the screen.<br><br>If you would ".
 	"like to insert dynamic data fields, such as the recipient's name, move the cursor to the location where the data ".
 	"should be inserted, select the data field, and click 'Insert'. It's a good idea to enter a default value in the ".
 	"Default Value field for each insert. This value will be displayed in the event of a recipient having no data in your chosen field.");
-
 $formdata["message"] = array(
 	"label" => _L("Email Message"),
 	"fieldhelp" => _L('Enter the message you would like to send. Helpful tips for successful messages can be found at ".
@@ -252,9 +252,6 @@ $formdata["message"] = array(
 	"control" => $messagecontrol,
 	"helpstep" => 5
 );
-
-
-// PREVIEW
 $helpsteps[] = _L("Click the preview button to view of your message.");
 
 $formdata["preview"] = array(
@@ -298,7 +295,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
 		
 		// if they didn't change anything, don't do anything
-		if ($postdata['fromname'] == $fromname && 
+		if ($message &&
+				$postdata['fromname'] == $fromname && 
 				$postdata['from'] == $fromemail &&
 				$postdata['subject'] == $subject &&
 				json_decode($postdata['attachments'], true) == $attachments &&
@@ -335,6 +333,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$message->subject = $postdata["subject"];
 			$message->fromname = $postdata["fromname"];
 			$message->fromemail = $postdata["from"];
+			$message->fromstationery = isset($_SESSION['editmessage']['stationeryid'])?$_SESSION['editmessage']['stationeryid']:0;
 						
 			$message->stuffHeaders();
 			
