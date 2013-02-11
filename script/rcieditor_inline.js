@@ -93,14 +93,14 @@ window.RCIEditorInline = function () {
 				var keyCode = event.data.keyCode & 255;
 				if ((keyCode >= 48) || (keyCode == 8) || (keyCode == 9) || (keyCode == 13) || (keyCode == 32) || (keyCode == 46)) {
 					clearTimeout(this.captureTimeout);
-					this.captureTimeout = window.setTimeout( (function () { that.captureChanges; }), 500);
+					this.captureTimeout = window.setTimeout( (function () { that.captureChanges(); }), 500);
 				}
 			});
-			editor.on('blur', (function () { that.captureChanges; }) );
-			editor.on('saveSnapshot', (function () { that.captureChanges; }) );
-			editor.on('afterCommandExec', (function () { that.captureChanges; }) );
-			editor.on('insertHtml', (function () { that.captureChanges; }) );
-			editor.on('insertElement', (function () { that.captureChanges; }) );
+			editor.on('blur', (function () { console.log('hrm!'); that.captureChanges(); }) );
+			editor.on('saveSnapshot', (function () { that.captureChanges(); }) );
+			editor.on('afterCommandExec', (function () { that.captureChanges(); }) );
+			editor.on('insertHtml', (function () { that.captureChanges(); }) );
+			editor.on('insertElement', (function () { that.captureChanges(); }) );
 
 		});
 
