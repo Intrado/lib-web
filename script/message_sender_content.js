@@ -282,7 +282,7 @@ var allowControl = {
 		
 		$('#msgsndr_emailnostationery').on('click', function(e) {
 			e.preventDefault();
-			applyCkEditor("msgsndr_emailmessagetext");
+			applyCkEditor("msgsndr_emailmessagetext","normal");
 			$('#stationery_email_view').hide();
 			$('#main_email_view').show();
 		});
@@ -294,7 +294,7 @@ var allowControl = {
 			
 			$.get('mgstationeryview.php?stationery=' + msgid, function(data) {
 				$("#msgsndr_emailmessagetext").val(data);
-				applyCkEditor("msgsndr_emailmessagetext");
+				applyCkEditor("msgsndr_emailmessagetext","inline");
 				//rcieditor.refreshHtmlEditorContent();
 				
 			});
