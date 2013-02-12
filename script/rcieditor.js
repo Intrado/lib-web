@@ -39,7 +39,7 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data) {
 	};
 
 	this.construct = function (editor_mode, textarea_id, extra_data) {
-//console.log('RCIEditor.construct()');
+console.log('RCIEditor.construct("' + editor_mode + '", "' + textarea_id + '"');
 
 		// Reset all internal properties
 		this.reset();
@@ -61,7 +61,7 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data) {
 	};
 
 	this.reconstruct = function (editor_mode, textarea_id, extra_data) {
-//console.log('RCIEditor.reconstruct()');
+console.log('RCIEditor.reconstruct()');
 		// If the editorMode is defined...
 		if (typeof this.editorMode !== 'undefined') {
 
@@ -72,7 +72,7 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data) {
 	};
 
 	this.deconstruct = function () {
-//console.log('RCIEditor.deconstruct()');
+console.log('RCIEditor.deconstruct()');
 
 		try {
 
@@ -87,13 +87,18 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data) {
 		// Tear down whatever editor is in place
 		switch (this.editorMode) {
 			case 'inline':
-				var iframe = $('#' +  this.basename + 'inline');
-				iframe.remove();
+
+				// We can get rid of the IFRAME'd inline editor
+				// just by emptying out the container
+console.log('...deconstructing inline');
+				var container =  $('#' +  this.basename + '-htmleditor');
+				container.empty();
 				return(true);
 
 			case 'plain':
 			case 'normal':
 			case 'full':
+console.log('...deconstructing full');
 				var htmleditorobject = this.getHtmlEditorObject();
 				if (! htmleditorobject) {
 //throw('could not find the htmleditorobject for deconstruction');
@@ -104,6 +109,7 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data) {
 				return(true);
 
 			case null:
+console.log('...deconstructing nothing (?)');
 				return(true);
 		}
 
@@ -121,7 +127,7 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data) {
 	 * Put us into a known good state
 	 */
 	this.reset = function () {
-//console.log('RCIEditor.reset()');
+console.log('RCIEditor.reset()');
 
 		// reset misc. properties
 		this.textarea = null;
@@ -147,7 +153,7 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data) {
 	 * @param editorMode string One of either: 'inline', 'plain', 'normal', or 'full'
 	 */
 	this.changeMode = function (editorMode) {
-//console.log('RCIEditor.changeMode()');
+console.log('RCIEditor.changeMode()');
 
 		// If we're already in this same mode
 		if (this.editorMode == editorMode) {
@@ -187,7 +193,12 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data) {
 	 * being available
 	 */
 	this.applyEditor = function(editorMode, textarea_id, container_id) {
-//console.log('RCIEditor.applyEditor()');
+console.log('RCIEditor.applyEditor()');
+
+		// Hide the text area form field until we are done initializing
+		this.textarea = $('#' + textarea_id);
+		this.textarea.hide();
+		this.setLoadingVisibility(true);
 
 		// If we are already running
 		if (this.editorMode) {
@@ -213,15 +224,17 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data) {
 			return('deferred');
 		}
 
-		this.textarea = $('#' + textarea_id);
-		this.container = $('#' + container_id);
-
-		// Hide the text area form field until we are done initializing
-		this.textarea.hide();
-		this.setLoadingVisibility(true);
-
 		// base name of the text element; we'll make several new elements with derived names
 		this.basename = textarea_id;
+		this.container = $('#' + container_id);
+
+		// The second new element has the same id with a 'hider' suffix
+		var hider = $('#' + this.basename + 'hider');
+		if (! hider.length) {
+
+			hider = $('<div id="' + this.basename + 'hider" style="display: none;"></div>');
+			this.container.append(hider);
+		}
 
 		var cke = $('<div id="' + this.basename + '_box"></div>');
 
@@ -342,10 +355,8 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data) {
 		// Capture the editorMode
 		this.editorMode = editorMode;
 
-		// The second new element has the same id with a 'hider' suffix
-		var hider = $('<div id="' + this.basename + 'hider" style="display: none;"></div>');
-		hider.append(cke);
-		this.container.append(hider);
+
+		hider.html(cke);
 
 		return(true);
 	};
