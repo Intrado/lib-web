@@ -16,10 +16,7 @@ class HtmlTextArea extends FormItem {
 
 		$v = escapehtml($value);
 
-		// SMK @HERE 2013-02-04 FIXME - remove these mode-switching links when testing is complete.
-		//<span style="cursor: pointer;" onclick="rcieditor.changeMode(\'inline\');">Switch to inline mode</span><br/>
-		//<span style="cursor: pointer;" onclick="rcieditor.changeMode(\'full\');">Switch to full mode</span><br/>
-		$str = '<textarea id="' . $n . '" name="' . $n . '" ' . $rows . '/>' . $v . '</textarea>
+		$str = '<textarea id="' . $n . '" name="' . $n . '" ' . $rows . ' style="display: none;"/>' . $v . '</textarea>
 			<div id ="' . $n . '-htmleditor"></div>
 				<style>
 					span.cke_toolgroup {
@@ -59,6 +56,7 @@ class HtmlTextArea extends FormItem {
 
 				// apply the ckeditor to the textarea
 				document.observe("dom:loaded", function() {
+alert("pause before RCIEditor instantiation!");
 					rcieditor = new RCIEditor("' . $editor_mode . '", "' . $n . '", ' . $rcidata_fields . ', ' . $USER->getSetting('hideemailtools', 'false') . ');
 					rcieditor.setValidatorFunction(function () {
 						var form = $("' . $this->form->name . '");
