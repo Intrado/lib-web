@@ -14,7 +14,7 @@
  */
 
 (function ($) {
-window.RCIEditor = function (editor_mode, textarea_id, extra_data) {
+window.RCIEditor = function (editor_mode, textarea_id, extra_data, hidetoolbar) {
 	var myself = this;
 
 	this.textarea = null; // The textarea ELEMENT, not the ID
@@ -38,7 +38,7 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data) {
 		return(this.settings[name]);
 	};
 
-	this.construct = function (editor_mode, textarea_id, extra_data) {
+	this.construct = function (editor_mode, textarea_id, extra_data, hidetoolbar) {
 
 		// Reset all internal properties
 		this.reset();
@@ -55,11 +55,11 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data) {
 		this.setSetting('extra_data', extra_data);
 
 		var container_id = textarea_id + '-htmleditor';
-		var res = this.applyEditor(editor_mode, textarea_id, container_id);
+		var res = this.applyEditor(editor_mode, textarea_id, container_id, hidetoolbar);
 		return(res);
 	};
 
-	this.reconstruct = function (editor_mode, textarea_id, extra_data) {
+	this.reconstruct = function (editor_mode, textarea_id, extra_data, hidetoolbar) {
 
 		// If the editorMode is defined...
 		if (typeof this.editorMode !== 'undefined') {
@@ -67,7 +67,7 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data) {
 			// We need to deconstruct before we construct...
 			if (! this.deconstruct()) return(false);
 		}
-		return(this.construct(editor_mode, textarea_id, extra_data));
+		return(this.construct(editor_mode, textarea_id, extra_data, hidetoolbar));
 	};
 
 	this.deconstruct = function () {
@@ -183,7 +183,7 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data) {
 	 * 'deferred' if execution deferred due to asynchronous dependencies not
 	 * being available
 	 */
-	this.applyEditor = function(editorMode, textarea_id, container_id) {
+	this.applyEditor = function(editorMode, textarea_id, container_id, hidetoolbar) {
 
 		// Hide the text area form field until we are done initializing
 		this.textarea = $('#' + textarea_id);
@@ -309,13 +309,13 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data) {
 				'width': '100%',
 				'height': '400px',
 				'filebrowserImageUploadUrl' : uploaderURI,
-				'toolbarStartupExpanded' : (! this.getSetting('hidetoolbar')),
+				'toolbarStartupExpanded' : (hidetoolbar ? false : true),
 				'toolbarCanCollapse' : true,
 				'extraPlugins': extraPlugins,
 
 				'toolbar_RCI' : [
 					{ name: 'r1g1', items : [ 'Print', 'Source' ] },
-					{ name: 'r1g2', items : [ '-', 'Undo', 'Redo'] },
+					{ name: 'r1g2', items : [ 'Undo', 'Redo'] },
 					{ name: 'r1g3', items : [ 'NumberedList', 'BulletedList', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', 'Outdent', 'Indent' ] },
 					{ name: 'r1g4', items : [ 'PasteFromWord', 'SpellCheck' ] },
 					{ name: 'r1g5', items : [ 'Link', 'Image', 'Table', 'HorizontalRule' ] },
@@ -697,7 +697,7 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data) {
 		this.setValidatorFunction(listener_fn);
 	};
 
-	this.construct(editor_mode, textarea_id, extra_data);
+	this.construct(editor_mode, textarea_id, extra_data, hidetoolbar);
 }
 }) (jQuery);
 

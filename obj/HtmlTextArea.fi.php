@@ -47,10 +47,10 @@ class HtmlTextArea extends FormItem {
 
 		$subtype = (isset($this->args['subtype'])) ? $this->args['subtype'] : 'html';
 
-		// SMK added 2013-01-02 to be able to switch modalities for any FI of this type
+		// Make editor able to switch modalities for any FI of this type
 		$editor_mode = isset($this->args['editor_mode']) ? $this->args['editor_mode'] : 'plain';
 
-		// SMK added 2013-01-03 to make field definitions available to JS (CKE plugin mkfield)
+		// Make field definitions available to JS (CKE plugin mkfield)
 		$rcidata_fields = ($editor_mode != 'plain') ? json_encode(array_values(FieldMap::getAuthorizeFieldInsertNames())) : 'null';
 
 		$str = '<script type="text/javascript" src="script/ckeditor/ckeditor.js"></script>
@@ -59,7 +59,7 @@ class HtmlTextArea extends FormItem {
 
 				// apply the ckeditor to the textarea
 				document.observe("dom:loaded", function() {
-					rcieditor = new RCIEditor("' . $editor_mode . '", "' . $n . '", ' . $rcidata_fields . ');
+					rcieditor = new RCIEditor("' . $editor_mode . '", "' . $n . '", ' . $rcidata_fields . ', ' . $USER->getSetting('hideemailtools', 'false') . ');
 					rcieditor.setValidatorFunction(function () {
 						var form = $("' . $this->form->name . '");
 						var field = $("'.$n.'");
