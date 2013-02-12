@@ -12,15 +12,16 @@ CKEDITOR.dialog.add('mkfield', function ( editor ) {
 
 	//  Pull in the customer-defined field definitions
 	var fields = Array();
-	if (typeof rcidata === 'object') {
-		fields = rcidata.get('customer_field_defs');
+	var rcie = null;
+	if (typeof rcieditor === 'object') {
+		rcie = rcieditor;
 	}
-	else if (typeof window.top.rcidata === 'object') {
-		fields = window.top.rcidata.get('customer_field_defs');
+	else if (typeof window.top.rcieditor === 'object') {
+		rcie = window.top.rcieditor;
 	}
-//	else {
-//		console.log('rcidata undefined.');
-//	}
+	if (rcie) {
+		fields = rcie.getSetting('extra_data');
+	}
 
 	var ftypes = Array(Array('-- Select a Field --', ''));
 	for (fi = 0; fi < fields.length; fi++) {
