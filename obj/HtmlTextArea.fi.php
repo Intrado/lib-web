@@ -56,7 +56,6 @@ class HtmlTextArea extends FormItem {
 
 				// apply the ckeditor to the textarea
 				document.observe("dom:loaded", function() {
-alert("pause before RCIEditor instantiation!");
 					rcieditor = new RCIEditor("' . $editor_mode . '", "' . $n . '", ' . $rcidata_fields . ', ' . $USER->getSetting('hideemailtools', 'false') . ');
 					rcieditor.setValidatorFunction(function () {
 						var form = $("' . $this->form->name . '");
