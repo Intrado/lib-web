@@ -39,7 +39,6 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data) {
 	};
 
 	this.construct = function (editor_mode, textarea_id, extra_data) {
-console.log('RCIEditor.construct("' + editor_mode + '", "' + textarea_id + '"');
 
 		// Reset all internal properties
 		this.reset();
@@ -61,7 +60,7 @@ console.log('RCIEditor.construct("' + editor_mode + '", "' + textarea_id + '"');
 	};
 
 	this.reconstruct = function (editor_mode, textarea_id, extra_data) {
-console.log('RCIEditor.reconstruct()');
+
 		// If the editorMode is defined...
 		if (typeof this.editorMode !== 'undefined') {
 
@@ -72,15 +71,11 @@ console.log('RCIEditor.reconstruct()');
 	};
 
 	this.deconstruct = function () {
-console.log('RCIEditor.deconstruct()');
-
-		try {
 
 		// Show the loading spinner
 		this.setLoadingVisibility(true);
 
 		if (typeof this.textarea !== 'object') {
-//throw('this.text area is not an object (??');
 			return(false);
 		}
 
@@ -90,7 +85,6 @@ console.log('RCIEditor.deconstruct()');
 
 				// We can get rid of the IFRAME'd inline editor
 				// just by emptying out the container
-console.log('...deconstructing inline');
 				var container =  $('#' +  this.basename + '-htmleditor');
 				container.empty();
 				return(true);
@@ -98,10 +92,8 @@ console.log('...deconstructing inline');
 			case 'plain':
 			case 'normal':
 			case 'full':
-console.log('...deconstructing full');
 				var htmleditorobject = this.getHtmlEditorObject();
 				if (! htmleditorobject) {
-//throw('could not find the htmleditorobject for deconstruction');
 					return(false);
 				}
 
@@ -117,25 +109,17 @@ console.log('...deconstructing full');
 				return(true);
 
 			case null:
-console.log('...deconstructing nothing (?)');
 				return(true);
 		}
 
 		// Only an unsupported editorMode will end up here:
-//throw('unsupported mode found while decontrsucting: [' + this.editorMode + ']');
 		return(false);
-		}
-		catch (msg) {
-//console.log('oops! [' + msg + ']');
-			return(false);
-		}
 	};
 
 	/**
 	 * Put us into a known good state
 	 */
 	this.reset = function () {
-console.log('RCIEditor.reset()');
 
 		// reset misc. properties
 		this.textarea = null;
@@ -161,7 +145,6 @@ console.log('RCIEditor.reset()');
 	 * @param editorMode string One of either: 'inline', 'plain', 'normal', or 'full'
 	 */
 	this.changeMode = function (editorMode) {
-console.log('RCIEditor.changeMode()');
 
 		// If we're already in this same mode
 		if (this.editorMode == editorMode) {
@@ -201,7 +184,6 @@ console.log('RCIEditor.changeMode()');
 	 * being available
 	 */
 	this.applyEditor = function(editorMode, textarea_id, container_id) {
-console.log('RCIEditor.applyEditor()');
 
 		// Hide the text area form field until we are done initializing
 		this.textarea = $('#' + textarea_id);
@@ -262,7 +244,7 @@ console.log('RCIEditor.applyEditor()');
 			// For the full CKEditor, the toolbars/plugins
 			// are different depending on the editorMode
 			var extraPlugins = 'aspell';
-			var extraButtons = ['PasteFromWord','SpellCheck'];
+			var extraButtons = []; //['PasteFromWord','SpellCheck'];
 			switch (editorMode) {
 
 				default:
@@ -328,18 +310,23 @@ console.log('RCIEditor.applyEditor()');
 				'height': '400px',
 				'filebrowserImageUploadUrl' : uploaderURI,
 				'toolbarStartupExpanded' : (! this.getSetting('hidetoolbar')),
+				'toolbarCanCollapse' : true,
 				'extraPlugins': extraPlugins,
 
-				'toolbar': [
-					['Print','Source'],
-					['Styles','Format','Font','FontSize'],
-					['Undo','Redo'],
+				'toolbar_RCI' : [
+					{ name: 'r1g1', items : [ 'Print', 'Source' ] },
+					{ name: 'r1g2', items : [ '-', 'Undo', 'Redo'] },
+					{ name: 'r1g3', items : [ 'NumberedList', 'BulletedList', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', 'Outdent', 'Indent' ] },
+					{ name: 'r1g4', items : [ 'PasteFromWord', 'SpellCheck' ] },
+					{ name: 'r1g5', items : [ 'Link', 'Image', 'Table', 'HorizontalRule' ] },
+					{ name: 'r1g6', items : [ 'ShowBlocks', 'Maximize' ] },
 					'/',
-					extraButtons,
-					['Link','Image','Table','HorizontalRule'],
-					['Bold','Italic','Underline','Strike','TextColor','BGColor','RemoveFormat'],
-					['NumberedList','BulletedList','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','Outdent','Indent']
+					{ name: 'r2g1', items : [ 'Bold', 'Italic', 'Underline', 'Strike', 'TextColor', 'BGColor', 'RemoveFormat' ] },
+					{ name: 'r2g2', items : [ 'Styles', 'Format', 'Font', 'FontSize' ] },
+					{ name: 'r2g3', items : extraButtons }
 				],
+
+				'toolbar' : 'RCI',
 
 				'on': {
 					'instanceReady': function(event) {
@@ -376,34 +363,30 @@ console.log('RCIEditor.applyEditor()');
 	 * inline editor to have at.
 	 */
 	this.callbackEditorLoaded = function(activeContainerId) {
-		try {
-			this.setSetting('activeContainerId', activeContainerId);
+		this.setSetting('activeContainerId', activeContainerId);
 
-			// Hide our AJAXy loading indicator
-			this.setLoadingVisibility(false);
-			// 'plain', 'normal', and 'full'; nothing to do for 'inline'
-			if (this.editorMode !== 'inline') {
+		// Hide our AJAXy loading indicator
+		this.setLoadingVisibility(false);
+		// 'plain', 'normal', and 'full'; nothing to do for 'inline'
+		if (this.editorMode !== 'inline') {
 
-				// The presence of the HtmlEditor classname signals
-				this.textarea.hide().addClass('HtmlEditor');
+			// The presence of the HtmlEditor classname signals
+			this.textarea.hide().addClass('HtmlEditor');
 
-				var htmleditorobject = this.getHtmlEditorObject();
-				if (! htmleditorobject) {
-					throw 'failed to get the htmleditorobject';
-				}
-
-				// A little data sanitizing for the raw textarea form content
-				var html = this.textarea.val().replace(/<</g, "&lt;&lt;").replace(/>>/g, "&gt;&gt;");
-				htmleditorobject.instance.setData(html);
-
-				// Initial validation, only if there is content in the HTML already...
-				if (html.length) {
-					this.validate();
-				}
+			var htmleditorobject = this.getHtmlEditorObject();
+			if (! htmleditorobject) {
+				// failed to get the htmleditorobject
+				return;
 			}
-		}
-		catch (msg) {
-			//console.log('ERROR in RCIEditor.callbackEditorLoaded(): ' + msg);
+
+			// A little data sanitizing for the raw textarea form content
+			var html = this.textarea.val().replace(/<</g, "&lt;&lt;").replace(/>>/g, "&gt;&gt;");
+			htmleditorobject.instance.setData(html);
+
+			// Initial validation, only if there is content in the HTML already...
+			if (html.length) {
+				this.validate();
+			}
 		}
 	};
 
@@ -412,7 +395,6 @@ console.log('RCIEditor.applyEditor()');
 	 */
 	this.loadingVisible = false;
 	this.setLoadingVisibility = function (visible) {
-console.log('RCIEditor.setLoadingVisibility()');
 
 		// If we want to make it visible...
 		if (visible) {
