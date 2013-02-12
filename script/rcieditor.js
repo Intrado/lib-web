@@ -105,7 +105,15 @@ console.log('...deconstructing full');
 					return(false);
 				}
 
+				// Capture the textarea content
+				var content = this.textarea.val();
+
+				// Let CKE do whatever it does while destroying itself
 				htmleditorobject.instance.destroy();
+
+				// And restore the textarea's content
+				this.textarea.val(content);
+
 				return(true);
 
 			case null:
