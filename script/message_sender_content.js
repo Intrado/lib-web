@@ -282,6 +282,7 @@ var allowControl = {
 		
 		$('#msgsndr_emailnostationery').on('click', function(e) {
 			e.preventDefault();
+			$("#msgsndr_emailmessagetext").val("");
 			applyCkEditor("msgsndr_emailmessagetext","normal");
 			$('#stationery_email_view').hide();
 			$('#main_email_view').show();
