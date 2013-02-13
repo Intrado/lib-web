@@ -196,7 +196,7 @@ position: relative;}
 	overflow: auto;
 }
 .newform .formcontrol .stationerypreview iframe {
-	height: 300px;
+	height: 600px;
 	width: 70%;
 	border: 1px solid #E2E2E2;
 	border-radius: 3px;

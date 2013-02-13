@@ -30,9 +30,18 @@ if ($isPreview) {
 		opacity: 0.5;
 	}
 	
+	.overlay {
+		position: fixed;
+		height: 100%;
+		width: 100%;
+		z-index: 1;
+		background:url("img/previewoverlay.png");
+	}
+	
+	
 	</style>
-	<div class="watermark">
-	<p>Preview</p>
+	<div class="overlay">
+	<p></p>
 	</div>
 	
 	<div>
