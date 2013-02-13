@@ -29,15 +29,6 @@ if ($isPreview) {
 		filter: alpha(opacity=50);
 		opacity: 0.5;
 	}
-	div.editableBlock {
-		border: none;
-		padding: 1px;
-		background-color: #FFFF99;
-		border: 1px dashed #999999;
-		padding: 0px;
-	}
-	
-
 	
 	</style>
 	<div class="watermark">
