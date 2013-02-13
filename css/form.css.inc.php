@@ -193,6 +193,7 @@ position: relative;}
  
 .newform .formcontrol .radiobox.stationeryselector {
 	width:25%;
+	overflow: auto;
 }
 .newform .formcontrol .stationerypreview iframe {
 	height: 300px;

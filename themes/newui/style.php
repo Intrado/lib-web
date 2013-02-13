@@ -1177,7 +1177,7 @@ div.progressbar div.progress {
 .radiobox.stationeryselector label,input { float: none;}
 .radiobox.stationeryselector {
  	height: 100%;
-	overflow:scroll;
+	overflow: auto;
 }
 
 #stationerypreviewfield {
