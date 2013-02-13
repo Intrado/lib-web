@@ -84,18 +84,22 @@ class StationerySelector extends FormItem {
 		$hoverdata = array();
 		$counter = 1;
 		$autoselect = count($this->args['values']) == 1; //if there is only one value, autoselect it
-		foreach ($this->args['values'] as $radiovalue => $radioname) {
-			if ($radioname == "#-#") {
-				$str .= "<hr />\n";
-			} else {
-				$id = $n.'-'.$counter;
-				$onclick = "$('stationerypreview').src = 'mgstationeryview.php?preview&stationery=" .  escapehtml($radiovalue) .  "'";
-				$str .= '<input id="'.$id.'" name="'.$n.'" class="stationeryselector" type="radio" value="'.escapehtml($radiovalue).'" '.($value == $radiovalue || $autoselect ? 'checked' : '').' onclick="' . $onclick . '" /><label id="'.$id.'-label" for="'.$id.'">'.($ishtml?$radioname:escapehtml($radioname)).'</label><br />';
-				if (isset($this->args['hover'])) {
-					$hoverdata[$id] = $this->args['hover'][$radiovalue];
-					$hoverdata[$id.'-label'] = $this->args['hover'][$radiovalue];
+		if (count($this->args['values']) == 0) {
+			$str .= _L("No Stationery Available");
+		} else {
+			foreach ($this->args['values'] as $radiovalue => $radioname) {
+				if ($radioname == "#-#") {
+					$str .= "<hr />\n";
+				} else {
+					$id = $n.'-'.$counter;
+					$onclick = "$('stationerypreview').src = 'mgstationeryview.php?preview&stationery=" .  escapehtml($radiovalue) .  "'";
+					$str .= '<input id="'.$id.'" name="'.$n.'" class="stationeryselector" type="radio" value="'.escapehtml($radiovalue).'" '.($value == $radiovalue || $autoselect ? 'checked' : '').' onclick="' . $onclick . '" /><label id="'.$id.'-label" for="'.$id.'">'.($ishtml?$radioname:escapehtml($radioname)).'</label><br />';
+					if (isset($this->args['hover'])) {
+						$hoverdata[$id] = $this->args['hover'][$radiovalue];
+						$hoverdata[$id.'-label'] = $this->args['hover'][$radiovalue];
+					}
+					$counter++;
 				}
-				$counter++;
 			}
 		}
 		$str .= "</div>
@@ -164,7 +168,7 @@ $formdata["stationery"] = array(
 );
 
 
-$buttons = array(submit_button(_L('Next'),"submit","arrow_right"));
+$buttons = array(submit_button(_L('Next'),"submit","arrow_right"),icon_button(_L('Cancel'),"cross",null,"mgeditor.php"));
 
 $form = new Form("mgstationeryselector",$formdata,$helpsteps,$buttons);
 
