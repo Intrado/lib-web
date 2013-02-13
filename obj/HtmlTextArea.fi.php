@@ -19,6 +19,7 @@ class HtmlTextArea extends FormItem {
 		$str = '<textarea id="' . $n . '" name="' . $n . '" ' . $rows . ' style="display: none;"/>' . $v . '</textarea>
 			<div id ="' . $n . '-htmleditor"></div>
 				<style>
+/*
 					span.cke_toolgroup {
 						height: 27px;
 					}
@@ -30,6 +31,7 @@ class HtmlTextArea extends FormItem {
 					a.cke_button {
 						height: 25px;
 					}
+*/
 				</style>
 			</div>';
 		// SMK notes that there was a stray "</script>" tag here... appeared to be connected to nothing.
