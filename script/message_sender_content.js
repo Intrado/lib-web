@@ -572,7 +572,7 @@ function ContentManager() {
 				
 				var fetchMessagesFromPaths = [
 					'/' + orgPath+'/api/2/users/'+userid+'/messagegroups',
-					'/' + orgPath+'/api/2/organizations/0/publications/messagegroups'
+					'/' + orgPath+'/api/2/organizations/' + orgid + '/publications/messagegroups'
 				];
 				
 				var stationery = [];
