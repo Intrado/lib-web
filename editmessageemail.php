@@ -252,6 +252,20 @@ $formdata["message"] = array(
 	"control" => $messagecontrol,
 	"helpstep" => 5
 );
+
+if ($subtype == 'html') {
+	$formdata["info"] = array(
+			"label" => "",
+			"control" => array("FormHtml","html"=>'
+					<div style="font-size: medium;">
+						<img src="img/icons/information.png" alt="Information"/>
+						Inserts field by clicking the 
+							<img src="script/ckeditor/plugins/mkfield/icons/mkfield.png" onclick="CKEDITOR.tools.callFunction(131,this);return false;")" alt="fields" />
+						button inside the editor
+					</div>'),
+			"helpstep" => 5
+	);
+}
 $helpsteps[] = _L("Click the preview button to view of your message.");
 
 $formdata["preview"] = array(
