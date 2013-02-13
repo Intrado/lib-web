@@ -602,15 +602,17 @@ function ContentManager() {
 									$('#stationery_email_view').show();
 									$('#stationeryselector').append('No Stationery Available');
 								} else {
+									$("#msgsndr_emailmessagetext").val("");
+									applyCkEditor("msgsndr_emailmessagetext","normal");
 									$('#stationery_email_view').hide();
 									$('#main_email_view').show();
 								}
 							} else if (stationery.length == 1) {
-								var msgid = stationery.indexOf(0).id;
+								var msgid = stationery[0].id;
 								
 								$.get('mgstationeryview.php?stationery=' + msgid, function(data) {
 									$("#msgsndr_emailmessagetext").val(data);
-									rcieditor.refreshHtmlEditorContent();
+									applyCkEditor("msgsndr_emailmessagetext","inline");
 								});
 								$('#stationery_email_view').hide();
 								$('#main_email_view').show();
