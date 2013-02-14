@@ -64,8 +64,21 @@ $target = scrub_ascii($parts[0], ord('A'), ord('z'));
 			div.editableBlock:hover {
 				cursor: pointer;
 			}
-			div.editableBlock:hover, div.cke_focus {
-				box-shadow: 0px 0px 1px #FFFFFF;
+			/*div.editableBlock:hover, div.cke_focus {*/
+			div.editableBlock, div.cke_focus {
+				box-shadow: 0 0 0 1px #FFFFFF;
+/*
+				filter: 
+					progid:DXImageTransform.Microsoft.Shadow(color=#ffffff,direction=0,strength=10), 
+					progid:DXImageTransform.Microsoft.Shadow(color=#ffffff,direction=45,strength=10), 
+					progid:DXImageTransform.Microsoft.Shadow(color=#ffffff,direction=90,strength=10), 
+					progid:DXImageTransform.Microsoft.Shadow(color=#ffffff,direction=135,strength=10), 
+					progid:DXImageTransform.Microsoft.Shadow(color=#ffffff,direction=180,strength=10), 
+					progid:DXImageTransform.Microsoft.Shadow(color=#ffffff,direction=225,strength=10), 
+					progid:DXImageTransform.Microsoft.Shadow(color=#ffffff,direction=270,strength=10), 
+					progid:DXImageTransform.Microsoft.Shadow(color=#ffffff,direction=315,strength=10); 
+*/
+
 				border: 1px dashed #000000;
 				padding: 0px;
 			}
@@ -84,7 +97,7 @@ $target = scrub_ascii($parts[0], ord('A'), ord('z'));
 				cursor: text;
 			}
 
-			/* Avoid pre-formatted overflows inline editable. */
+			<?/* Avoid pre-formatted overflows inline editable. */?>
 			.cke_editable_inline pre {
 				white-space: pre-wrap;
 				word-wrap: break-word;

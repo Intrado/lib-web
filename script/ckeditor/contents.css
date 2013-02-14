@@ -101,6 +101,6 @@ pre
 /* SMK added 2012-12-14 so that we can see the boundaries of editable content blocks */
 div.editableBlock {
 	border: 1px dashed #000000;
-	box-shadow: 0px 0px 1px #FFFFFF;
+	box-shadow: 0 0 0 1px #FFFFFF;
 }
 
