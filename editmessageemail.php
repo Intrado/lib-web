@@ -333,6 +333,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			} else {
 				// new message
 				$message = new Message();
+				// from stationery state can never change after initiated
+				$message->fromstationery = isset($_SESSION['editmessage']['stationeryid'])?$_SESSION['editmessage']['stationeryid']:0;
 			}
 			
 			$message->messagegroupid = $messagegroup->id;
@@ -347,7 +349,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$message->subject = $postdata["subject"];
 			$message->fromname = $postdata["fromname"];
 			$message->fromemail = $postdata["from"];
-			$message->fromstationery = isset($_SESSION['editmessage']['stationeryid'])?$_SESSION['editmessage']['stationeryid']:0;
 						
 			$message->stuffHeaders();
 			
