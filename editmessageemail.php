@@ -260,7 +260,7 @@ if ($subtype == 'html') {
 					<div style="font-size: medium;">
 						<img src="img/icons/information.png" alt="Information"/>
 						Inserts field by clicking the 
-							<img src="script/ckeditor/plugins/mkfield/icons/mkfield.png" onclick="CKEDITOR.tools.callFunction(131,this);return false;")" alt="fields" />
+							<img src="script/ckeditor/plugins/mkfield/icons/mkfield.png" onclick="CKEDITOR.tools.callFunction(131,this);return false;" alt="fields" />
 						button inside the editor
 					</div>'),
 			"helpstep" => 5

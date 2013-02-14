@@ -32,8 +32,7 @@ class HtmlTextArea extends FormItem {
 						height: 25px;
 					}
 */
-				</style>
-			</div>';
+				</style>';
 		// SMK notes that there was a stray "</script>" tag here... appeared to be connected to nothing.
 		return $str;
 	}

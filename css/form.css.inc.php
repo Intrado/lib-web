@@ -422,6 +422,7 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 .formcontrol .datafieldsinsert { margin: 20px 0 0; }
 .formcontrol .datafieldsinsert button { padding: 3px 10px; }
 
+.formcontrol .htmleditor,.htmleditor iframe { width: 100%; height: 400px; border: 1px solid #999999;}
 
 /* phone messages 
 -------------------*/
