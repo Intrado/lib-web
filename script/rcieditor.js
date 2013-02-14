@@ -232,7 +232,7 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data, hidetoolbar) 
 			this.setSetting('image_scaling', 500);
 
 			// Add an IFRAME to the page that will load up the inline editor
-			cke.html('<iframe src="' + this.getSetting('baseUrl') + 'rcieditor_inline.php?t=' + container_id + '" style="width: 800px; height: 400px; border: 1px solid #999999;"/>');
+			cke.html('<iframe src="' + this.getSetting('baseUrl') + 'rcieditor_inline.php?t=' + container_id + '" style="width: 100%; height: 400px; border: 1px solid #999999;"/>');
 
 			// So now we have the inline editor component loading in an iframe;
 			// the next move is up to the iframe content to call back the next
@@ -312,6 +312,7 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data, hidetoolbar) 
 				'toolbarStartupExpanded' : (hidetoolbar ? false : true),
 				'toolbarCanCollapse' : true,
 				'extraPlugins': extraPlugins,
+				'disableObjectResizing' : true, // disabled only because the message_parts data model cannot capture resized image attributes
 
 				'toolbar_RCI' : [
 					{ name: 'r1g1', items : [ 'Print', 'Source' ] },

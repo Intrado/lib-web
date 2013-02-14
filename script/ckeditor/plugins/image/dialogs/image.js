@@ -31,6 +31,7 @@ CKEDITOR.dialog.add( 'image', function( editor )
 			}
 			
 			imageElement.setAttribute('src', value);
+			imageElement.setAttribute('data-cke-saved-src', value);
 			
 			if (!this.imageElement) {
 				editor.insertElement(imageElement);
