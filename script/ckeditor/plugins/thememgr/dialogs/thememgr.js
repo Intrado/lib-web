@@ -159,6 +159,7 @@ CKEDITOR.dialog.add('thememgr', function ( editor ) {
 				}
 			}
 			catch (msg) {
+				console.log(msg);
 				ui = 'There was an error: [' + msg + ']';
 			}
 
@@ -223,15 +224,18 @@ CKEDITOR.dialog.add('thememgr', function ( editor ) {
 		 *
 		 * Find elements within container that look something like these:
 		 * ref: http://html5doctor.com/html5-custom-data-attributes/
+		 * 
+		 * The following data attributes are defined:
+		 * data-sm-i: controls which color name to use (id)
+		 * data-sm-a: this tells us to set the specified attribute
+		 * data-sm-s: this tells us to set the specified style
 		 *
 		 * Element with legacy HTML attribute control
-		 * OLD: <element data-rcitheme="attribute:bgcolor=color:Main Color 1" bgcolor="#999999">
-		 * NEW: <element data-rcitheme="[(id:'Main Color 1',type:'color',tgt:'attribute',name:'bgcolor')]" bgcolor="#999999">
+		 *     <element data-sm-i="Main Color 1" data-sm-a="bgcolor" bgcolor="#FFFFFF"> 
 		 *
-		 * Element with multiple style property controls
-		 * OLD: <element data-rcitheme="style:background-color=color:Main Color 1,style:color=color:Main Color 2" style="font-weight: bold; color: #FFFFFF; background-color: #999999;">
-		 * NEW: <element data-rcitheme="[{id:'Main Color 1',type:'color',tgt:'style',name:'background-color'},{id:'Main Color 2',type:'color',tgt:'style',name:'color'}]" style="font-weight: bold; color: #FFFFFF; background-color: #999999;">
-		 *
+		 * Element with style property control
+		 * 	    <element data-sm-i="Main Color 1" data-sm-s="background-color" style="background-color: #FFFFFF;"> 
+		 * 
 		 * @param container jQuery element containing the document elements to scan
 		 * @param theme_id string Optional theme identifier to scan the document for
 		 * @param theme_value string Optional theme value to set the identifier to when found
@@ -265,85 +269,31 @@ CKEDITOR.dialog.add('thememgr', function ( editor ) {
 				};
 
 				// Find all elements in the container with the data-rcitheme attribute
-				var themedElements = jQuery('[data-rcitheme]', container);
+				//if not in collecting mode, get only matching ids
+				var elements = jQuery(collecting ? '[data-sm-i]' : '[data-sm-i="' + theme_id + '"]', container);
 
-				if (typeof themedElements === 'undefined') {
+
+				if (typeof elements === 'undefined') {
 					throw 'No themed elements in this document!';
 				}
 
 				// For each element that we found...
-				themedElements.each(function (ii) {
+				elements.each(function () {
+					var e = jQuery(this);
 
-					// Extend this element with jQuery
-					var themedElement = jQuery(this);
+					var id = e.attr("data-sm-i"); //id
+					
+					if (collecting) {
+						rcitheme_data.add_color(id);
+					} else {
+						var style = e.attr("data-sm-s"); //style
+						var attribute = e.attr("data-sm-a"); //attribute
 
-					// Get the data-rcitheme attribute off the element
-					var data_rcitheme = themedElement.attr('data-rcitheme');
-					if (! data_rcitheme.length) return;
-
-					// Replace 's in the XML with "s which the JSON parser wants
-					data_rcitheme = data_rcitheme.replace(/\'/g, '"');
-					var rcitheme_json =  JSON.parse(data_rcitheme, function (key, value) {
-
-						// return value ONLY if the key is in a list of supported keys
-						switch (key) {
-							case 'id':
-							case 'type':
-							case 'tgt':
-							case 'name':
-								return(value);
-						}
-						// FIXME: JSON2 doc says that if we return undefined/null the key/value
-						// pair will be deleted, yet when we do that here for unsupported keys,
-						// the entire JSON object comes out null contrary to the explanation. So
-						// for now, this function does nothing to filter unexpected keys out.
-						//return(null);
-						return(value);
-					});
-
-					// If the JSON was supplied as a single item rather than an array...
-					if (typeof rcitheme_json.size === 'undefined') {
-						// wrap the item as a single-node array
-						rcitheme_json = [ rcitheme_json ];
+						if (style)
+							e.css(style, theme_value);
+						if (attribute)
+							e.attr(attribute, theme_value);
 					}
-
-					// Each of the JSON objects in the resulting array  is a "theme item"
-					for (var jj = 0; jj < rcitheme_json.size(); jj++) {
-						var rcitheme_item = rcitheme_json[jj];
-						if (collecting) {
-
-							// Add support for other theme data types here as needed
-							switch (rcitheme_item.type) {
-								case 'color':
-									rcitheme_data.add_color(rcitheme_item.id);
-									break;
-							}
-						}
-						else {
-
-							// Otherwise we are setting; Does this one have the theme ID we're looking for?
-							if (rcitheme_item.id == theme_id) {
-
-								// Modify the attribute/property affiliated with this element based on the theme item's directives
-
-								// What kind of target is the theme_value going to be stored into?
-								switch (rcitheme_item.tgt) {
-
-									case 'style':
-
-										// We're putting theme_value into the element's style attribute'a named property
-										themedElement.css(rcitheme_item.name, theme_value);
-										break;
-
-									case 'attribute':
-
-										// We're putting theme_value into the element's named attribute
-										themedElement.attr(rcitheme_item.name, theme_value);
-										break;
-								}
-							}
-						}
-					};
 				});
 
 				// if we are collecting
@@ -362,7 +312,8 @@ CKEDITOR.dialog.add('thememgr', function ( editor ) {
 				}
 			}
 			catch (msg) {
-//console.log('Soft error: [' + msg + ']');
+				console && console.log && console.log(msg);
+				throw 'An error occured in Theme Manager';
 			}
 		},
 
