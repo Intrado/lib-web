@@ -71,7 +71,7 @@ window.RCIEditorInline = function () {
 					uploaderURI += '?scaleabove=' + max_size;
 				}
 				editor.config.filebrowserImageUploadUrl = uploaderURI;
-
+				editor.config.disableObjectResizing = true; // disabled only because the message_parts data model cannot capture resized image attributes
 				editor.config.extraPlugins = 'aspell,mkfield';
 				editor.config.toolbar = [
 					['Undo','Redo'],
@@ -141,39 +141,10 @@ window.RCIEditorInline = function () {
 		// The ID attribute of the textarea that has the text we want to edit
 		this.editableTarget = targetName;
 
-		// Get the textarea DOM object from the parent window (frame)
-		var textarea = 0;
-		if (! (textarea = this.getTextarea())) {
+		// Pull the textarea into our editing space and light up the editors
+		if (! this.refresh()) {
 			return(false);
 		}
-
-		// Get the wysiwygpage div DOM object from this page (below)
-		var wysiwygpage = 0;
-		if (! (wysiwygpage = this.getPage())) {
-			return(false);
-		}
-
-		// Grab the contents of the textarea form element
-		//var content = textarea.html();
-		var content = textarea.val();
-
-		// Convert content entities back to the real characters, but the double angles '<<' and '>>'
-		// will be left in entity form in order to prevent the browser rendered from trying to do
-		// something "smart" with them (field inserts).
-		content = content.replace(/&lt;/g, '<');
-		content = content.replace(/<</g, '&lt;&lt;');
-		content = content.replace(/&gt;/g, '>');
-		content = content.replace(/>>/g, '&gt;&gt;');
-		content = content.replace(/&amp;/g, '&');
-
-		// Inject the content from the textarea into the wysiwyg page div
-		wysiwygpage.html(content);
-
-		// Apply CKE inline editors for each wysiwygpage > div.contenteditable=true
-		var that = this;
-		$('.editableBlock', wysiwygpage).each(function(index) {
-			that.makeEditable($(this), index);
-		});
 
 		// Fire the callback indicating initialization is done
 		window.frames.top.rcieditor.callbackEditorLoaded('wysiwygpage');
@@ -249,6 +220,44 @@ window.RCIEditorInline = function () {
 
 		// (8) Validate the changes as captured
 		window.top.rcieditor.validate();
+
+		return(true);
+	}
+
+	this.refresh = function () {
+
+		// Get the textarea DOM object from the parent window (frame)
+		var textarea = 0;
+		if (! (textarea = this.getTextarea())) {
+			return(false);
+		}
+
+		// Get the wysiwygpage div DOM object from this page (below)
+		var wysiwygpage = 0;
+		if (! (wysiwygpage = this.getPage())) {
+			return(false);
+		}
+
+		// Grab the contents of the textarea form element
+		var content = textarea.val();
+
+		// Convert content entities back to the real characters, but the double angles '<<' and '>>'
+		// will be left in entity form in order to prevent the browser rendered from trying to do
+		// something "smart" with them (field inserts).
+		content = content.replace(/&lt;/g, '<');
+		content = content.replace(/<</g, '&lt;&lt;');
+		content = content.replace(/&gt;/g, '>');
+		content = content.replace(/>>/g, '&gt;&gt;');
+		content = content.replace(/&amp;/g, '&');
+
+		// Inject the content from the textarea into the wysiwyg page div
+		wysiwygpage.html(content);
+
+		// Apply CKE inline editors for each wysiwygpage > div.contenteditable=true
+		var that = this;
+		$('.editableBlock', wysiwygpage).each(function(index) {
+			that.makeEditable($(this), index);
+		});
 
 		return(true);
 	}

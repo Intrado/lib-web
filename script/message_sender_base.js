@@ -329,17 +329,15 @@ jQuery.noConflict();
 						if ( $('#msgsndr_emailmessagetext').val() != '' ) {
 							var doOverwrite = confirm('You already have text in your email are you sure you wish to overwrite this?')
 
-							if (doOverwrite == true ) {
-								$('#msgsndr_emailmessagetext').val($(from).val());
-								rcieditor.refreshHtmlEditorContent();
-							} else {
+							if (doOverwrite != true ) {
 								return;
 							}
-						} else {
-							$('#msgsndr_emailmessagetext').val($(from).val());
-							rcieditor.refreshHtmlEditorContent();	
 						}
 
+						var content = $(from).val();
+						//$('#msgsndr_emailmessagetext').val(content);
+						//rcieditor.refreshHtmlEditorContent();
+						rcieditor.setHtmlEditorContentPrimary(content);
 					});
 				}
 

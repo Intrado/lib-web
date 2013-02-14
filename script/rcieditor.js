@@ -232,7 +232,7 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data, hidetoolbar) 
 			this.setSetting('image_scaling', 500);
 
 			// Add an IFRAME to the page that will load up the inline editor
-			cke.html('<iframe src="' + this.getSetting('baseUrl') + 'rcieditor_inline.php?t=' + container_id + '" style="width: 100%; height: 400px; border: 1px solid #999999;"/>');
+			cke.html('<iframe src="' + this.getSetting('baseUrl') + 'rcieditor_inline.php?t=' + container_id + '" name="' + this.basename + '_iframe" style="width: 100%; height: 400px; border: 1px solid #999999;"/>');
 
 			// So now we have the inline editor component loading in an iframe;
 			// the next move is up to the iframe content to call back the next
@@ -521,6 +521,11 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data, hidetoolbar) 
 	 */
 	this.refreshHtmlEditorContent = function (existinghtmleditorobject) {
 
+		// Refresh is neither supported nor necessary for inline mode
+		if (this.editorMode == 'inline') {
+			return(null);
+		}
+
 		var htmleditorobject = existinghtmleditorobject || this.getHtmlEditorObject();
 		if (!htmleditorobject) {
 			return null;
@@ -529,6 +534,44 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data, hidetoolbar) 
 		var content = this.textarea.val();
 		htmleditorobject.instance.setData(content);
 	};
+
+	/**
+	 * Sets the "primary" content for the editor to the supplied string; for the
+	 * full/regular editor, this means replacing the entire document. For the inline
+	 * editor, we will only replace the content in editableBlocks with an attribute
+	 * indicating that it is/they are primary, not the entire document.
+	 *
+	 * @return boolean true on success, else false
+	 */
+	this.setHtmlEditorContentPrimary = function (content) {
+		switch (this.editorMode) {
+			case 'inline':
+				// Textarea is NOT a blockelement that contains HTML; it is a form field with a value
+				// so we have to get the value of the field, convert it to jQuery, and then try to
+				// do DOM work within that value.
+				var value = $(this.textarea.val());
+				value.find('.primaryBlock').each(function () {
+					jQthis = $(this);
+					jQthis.html(content);
+				});
+				this.textarea.val(value.html());
+
+				// ref: http://stackoverflow.com/questions/1952359/calling-iframe-function
+				window.frames[this.basename + '_iframe'].window.rcieditorinline.refresh();
+				return(true);
+
+			case 'plain':
+			case 'normal':
+			case 'full':
+				this.textarea.val(content);
+				this.refreshHtmlEditorContent();
+				return(true);
+
+			default:
+				return(false);
+		}
+	};
+
 
 	/**
 	 * Completely clear the contents of the editor
