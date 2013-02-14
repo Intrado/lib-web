@@ -6,10 +6,8 @@
  * using a mess of global variables. Suboptimal with respect to controlling the
  * appearance, however the mechanics all work which is the most important.
  *
- * @todo test multiple theme rules on a single element; implement this as a JSON
- * array if possible instead of || separator... it wasn't working for some reason...
- *
  * SMK created 2013-01-16
+ * Modified 2013-02-14 by Ben Hencke - trimmed down required metadata
  */
 CKEDITOR.dialog.add('thememgr', function ( editor ) {
 
@@ -271,7 +269,6 @@ CKEDITOR.dialog.add('thememgr', function ( editor ) {
 				// Find all elements in the container with the data-rcitheme attribute
 				//if not in collecting mode, get only matching ids
 				var elements = jQuery(collecting ? '[data-sm-i]' : '[data-sm-i="' + theme_id + '"]', container);
-
 
 				if (typeof elements === 'undefined') {
 					throw 'No themed elements in this document!';
