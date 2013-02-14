@@ -180,7 +180,12 @@ window.RCIEditorInline = function () {
 		element.removeAttr('tabindex');
 		element.removeAttr('style');
 		element.removeAttr('spellcheck');
-		element.attr('class', 'editableBlock');
+		if (element.hasClass('primaryBlock')) {
+			element.attr('class', 'editableBlock primaryBlock');
+		}
+		else {
+			element.attr('class', 'editableBlock');
+		}
 	}
 
 	this.captureChanges = function () {
