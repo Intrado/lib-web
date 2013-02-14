@@ -66,19 +66,8 @@ $target = scrub_ascii($parts[0], ord('A'), ord('z'));
 			}
 			/*div.editableBlock:hover, div.cke_focus {*/
 			div.editableBlock, div.cke_focus {
-				box-shadow: 0 0 0 1px #FFFFFF;
-/*
-				filter: 
-					progid:DXImageTransform.Microsoft.Shadow(color=#ffffff,direction=0,strength=10), 
-					progid:DXImageTransform.Microsoft.Shadow(color=#ffffff,direction=45,strength=10), 
-					progid:DXImageTransform.Microsoft.Shadow(color=#ffffff,direction=90,strength=10), 
-					progid:DXImageTransform.Microsoft.Shadow(color=#ffffff,direction=135,strength=10), 
-					progid:DXImageTransform.Microsoft.Shadow(color=#ffffff,direction=180,strength=10), 
-					progid:DXImageTransform.Microsoft.Shadow(color=#ffffff,direction=225,strength=10), 
-					progid:DXImageTransform.Microsoft.Shadow(color=#ffffff,direction=270,strength=10), 
-					progid:DXImageTransform.Microsoft.Shadow(color=#ffffff,direction=315,strength=10); 
-*/
-
+				margin: 0px;
+				outline: #FFFFFF dashed 1px;
 				border: 1px dashed #000000;
 				padding: 0px;
 			}
@@ -93,8 +82,9 @@ $target = scrub_ascii($parts[0], ord('A'), ord('z'));
 			class is added to it, so we can style it differently.
 			*/?>
 			.cke_editable.cke_editable_inline.cke_focus {
-				outline: none;
+				outline: #FFFFFF dashed 1px;
 				cursor: text;
+				margin: 0px;
 			}
 
 			<?/* Avoid pre-formatted overflows inline editable. */?>
