@@ -1171,7 +1171,7 @@ div.progressbar div.progress {
     margin: 0 5px 5px;
     padding: 10px 10px 0;
     width: 26%;
-    height: 300px;
+    height: 600px;
 }
 
 .radiobox.stationeryselector label,input { float: none;}
@@ -1187,7 +1187,7 @@ div.progressbar div.progress {
     margin: 0 5px 5px;
     padding: 5px 10px 10px;
     width: 70%;
-    height: 300px;
+    height: 600px;
 }
 
 .stationerypreview iframe {

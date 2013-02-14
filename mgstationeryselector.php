@@ -80,7 +80,10 @@ class StationerySelector extends FormItem {
 		$ishtml = false;
 		if (isset($this->args['ishtml']) && $this->args['ishtml'])
 			$ishtml = true;
-		$str = '<div id='.$n.' class="radiobox stationeryselector">';
+		$str = '<div class="stationeryselector">
+				<fieldset id="stationeryfield">
+					<legend>Email Stationery:</legend>
+						<div id='.$n.' class="radiobox stationeryselector">';
 		$hoverdata = array();
 		$counter = 1;
 		$autoselect = count($this->args['values']) == 1; //if there is only one value, autoselect it
@@ -103,9 +106,15 @@ class StationerySelector extends FormItem {
 			}
 		}
 		$str .= "</div>
-			<div class=\"stationerypreview\">
-			<iframe id=\"stationerypreview\"  src=\"blank.html\"></iframe>
+			</fieldset>
 			</div>
+			<div class=\"stationerypreviewfield\">
+			<fieldset id=\"stationerypreviewfield\">
+				<legend>Email Stationery Preview:</legend>
+				<iframe id=\"stationerypreview\"  src=\"blank.html\"></iframe>
+			</fieldset>
+			</div>
+			
 			<script type=\"text/javascript\">
 		";
 		if (isset($this->args['hover']))

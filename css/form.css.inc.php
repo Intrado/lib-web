@@ -192,17 +192,44 @@ position: relative;}
  -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
  
 .newform .formcontrol .radiobox.stationeryselector {
-	width:25%;
+	width:100%;
 	overflow: auto;
 }
-.newform .formcontrol .stationerypreview iframe {
-	height: 600px;
-	width: 70%;
+
+.newform .stationeryselector fieldset {
+	border: 1px solid #CCCCCC;
+	border-radius: 5px 5px 5px 5px;
+	float: left;
+    margin: 0 5px 5px;
+    padding: 10px 10px 0;
+    width: 22%;
+    height: 600px;
+}
+
+.radiobox.stationeryselector label,input { float: none;}
+.radiobox.stationeryselector {
+ 	height: 100%;
+	overflow: auto;
+}
+
+.newform .stationerypreviewfield fieldset {
+	border: 1px solid #CCCCCC;
+	border-radius: 5px 5px 5px 5px;
+	float: right;
+    margin: 0 5px 5px;
+    padding: 5px 10px 10px;
+    width: 64%;
+    height: 600px;
+}
+
+.newform .formcontrol .stationerypreviewfield iframe {
 	border: 1px solid #E2E2E2;
 	border-radius: 3px;
 	background-color: #fff;
+	height: 100%;
+    width: 100%;
 }
- 
+
  
  /* ----------------- rule widget --------------------*/
 

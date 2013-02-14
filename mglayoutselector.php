@@ -43,7 +43,11 @@ class LayoutSelector extends FormItem {
 		$ishtml = false;
 		if (isset($this->args['ishtml']) && $this->args['ishtml'])
 			$ishtml = true;
-		$str = '<div id='.$n.' class="radiobox stationeryselector">';
+		$str = '
+				<div class="stationeryselector">
+					<fieldset id="stationeryfield">
+						<legend>Email Layout:</legend>
+				<div id='.$n.' class="radiobox stationeryselector">';
 		$hoverdata = array();
 		$counter = 1;
 		$autoselect = count($this->args['values']) == 1; //if there is only one value, autoselect it
@@ -62,9 +66,15 @@ class LayoutSelector extends FormItem {
 			}
 		}
 		$str .= "</div>
-		<div class=\"stationerypreview\">
-		<iframe id=\"stationerypreview\"  src=\"blank.html\"></iframe>
-		</div>
+			</fieldset>
+			</div>
+			<div class=\"stationerypreviewfield\">
+			<fieldset id=\"stationerypreviewfield\">
+				<legend>Email Layout Preview:</legend>
+
+				<iframe id=\"stationerypreview\"  src=\"blank.html\"></iframe>
+			</fieldset>	
+			</div>
 		<script type=\"text/javascript\">
 		";
 		if (isset($this->args['hover']))
