@@ -75,9 +75,9 @@ window.RCIEditorInline = function () {
 				editor.config.extraPlugins = 'aspell,mkfield';
 				editor.config.toolbar = [
 					['Undo','Redo'],
+					['PasteFromWord','SpellCheck','mkField'],
 					['Styles','Format','Font','FontSize'],
 					'/',
-					['PasteFromWord','SpellCheck','mkField'],
 					['Link','Image','Table','HorizontalRule'],
 					['Bold','Italic','Underline','Strike','TextColor','BGColor','RemoveFormat'],
 					['NumberedList','BulletedList','Outdent','Indent'],

@@ -62,22 +62,13 @@ $target = scrub_ascii($parts[0], ord('A'), ord('z'));
 			}
 
 			div.editableBlock:hover {
-				background-color: #FFFF99;
 				cursor: pointer;
-				border: 1px dashed #999999;
+			}
+			div.editableBlock:hover, div.cke_focus {
+				box-shadow: 0px 0px 1px #FFFFFF;
+				border: 1px dashed #000000;
 				padding: 0px;
 			}
-
-			div.cke_focus:hover {
-				border: none;
-				padding: 1px;
-			}
-
-			<?/*
-			CKEditor editables are automatically set with the
-			"cke_editable" class plus cke_editable_(inline|themed)
-			depending on the editor type.
-			 */?>
 
 			<?/* Style a bit the inline editables. */?>
 			.cke_editable.cke_editable_inline {
@@ -89,9 +80,7 @@ $target = scrub_ascii($parts[0], ord('A'), ord('z'));
 			class is added to it, so we can style it differently.
 			*/?>
 			.cke_editable.cke_editable_inline.cke_focus {
-				box-shadow: inset 0px 0px 20px 3px #ddd, inset 0 0 1px #000;
 				outline: none;
-				background: #eee;
 				cursor: text;
 			}
 
