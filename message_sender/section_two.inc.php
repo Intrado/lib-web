@@ -235,6 +235,7 @@
 					<div class="controls">
 						
 						<button id="paste_from_tts" class="paste-from" data-textarea="msgsndr_tts_message" disabled="disabled">Paste text from Phone</button>
+						<div class="cf"></div>
 						<div id="rcieditor_scratch" style="display: none;"></div>
 						<textarea id="msgsndr_emailmessagetext" name="msgsndr_emailmessagetext" class="required msgdata hide" data-ajax="true"></textarea>
 						<div id="msgsndr_emailmessagetext_msg" class="box_validatorerror er" style="display:none"></div>
