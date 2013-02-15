@@ -48,6 +48,12 @@ if (!isset($scheme['_supportphone']))
 	
 	<title><?=$CustomBrand?> <?=$TITLE?></title>
 	<link href='css/login.css' rel='stylesheet'>
+
+	<!-- iOS Webpage Icons for Web Clip -->
+	<link rel="apple-touch-icon" href="img/ios/apple-touch-icon-57x57.png" />
+	<link rel="apple-touch-icon" sizes="72x72" href="img/ios/apple-touch-icon-72x72.png" />
+	<link rel="apple-touch-icon" sizes="114x114" href="img/ios/apple-touch-icon-114x114.png" />
+	<link rel="apple-touch-icon" sizes="144x144" href="img/ios/apple-touch-icon-144x144.png" />
 	
 <script type="text/javascript">
 
