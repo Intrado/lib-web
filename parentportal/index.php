@@ -1,12 +1,32 @@
 <?
-if (!isset($_SESSION['_locale']))
-	$_SESSION['_locale'] = isset($_COOKIE['locale'])?$_COOKIE['locale']:"en_US";
+//if (!isset($_SESSION['_locale']))
+//	$_SESSION['_locale'] = isset($_COOKIE['locale'])?$_COOKIE['locale']:"en_US";
 
 $ppNotLoggedIn = 1;
 require_once("common.inc.php");
 require_once("../inc/html.inc.php");
 require_once("../inc/table.inc.php");
 require_once("../inc/form.inc.php");
+
+
+if (isset($_GET['logout'])) {
+	doStartSession(); // start the session to get the id
+	portalputSessionData(session_id(), ""); // write empty data to flush the user
+
+	@session_destroy();
+} else {
+	doStartSession(); // we must start the session to obtain the user information before trying to perform the following IF conditions
+	$sessionstarted = true;
+	if (isset($_SESSION['portaluserid'])) {
+		$redirpage = isset($_SESSION['lasturi']) ? $_SESSION['lasturi'] : 'choosecustomer.php'.$appendcustomerurl;
+		unset($_SESSION['lasturi']);
+		redirect($redirpage);
+    }
+}
+
+// redirect to portalauth
+redirect($SETTINGS['portalauth']['cmUrl']);
+// TODO is this it
 
 $appendcustomerurl = getAppendCustomerUrl();
 
