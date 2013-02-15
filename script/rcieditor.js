@@ -232,7 +232,7 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data, hidetoolbar) 
 			this.setSetting('image_scaling', 500);
 
 			// Add an IFRAME to the page that will load up the inline editor
-			cke.html('<iframe src="' + this.getSetting('baseUrl') + 'rcieditor_inline.php?t=' + container_id + '" name="' + this.basename + '_iframe" style="width: 100%; height: 400px; border: 1px solid #999999;"/>');
+			cke.html('<iframe src="' + this.getSetting('baseUrl') + 'rcieditor_inline.php?t=' + container_id + '" name="' + this.basename + '_iframe" style="width: 100%; height: 1000px; border: 1px solid #999999;"/>');
 
 			// So now we have the inline editor component loading in an iframe;
 			// the next move is up to the iframe content to call back the next
@@ -307,7 +307,7 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data, hidetoolbar) 
 				'disableNativeSpellChecker': false,
 				'browserContextMenuOnCtrl': true,
 				'width': '100%',
-				'height': '400px',
+				'height': '1000px',
 				'filebrowserImageUploadUrl' : uploaderURI,
 				'toolbarStartupExpanded' : (hidetoolbar ? false : true),
 				'toolbarCanCollapse' : true,
