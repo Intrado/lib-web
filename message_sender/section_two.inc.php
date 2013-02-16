@@ -171,27 +171,7 @@
 				
 			<!-- Add the email panel -->
 			<div id="msgsndr_tab_email" class="tab_panel">
-				<div id="stationery_email_view">
-					<fieldset id="stationeryfield" class="stationeryselector">
-						<legend>Email Stationery:</legend>
-						<div id="stationeryselector" class="radiobox stationeryselector">
-					
-						</div>
-					</fieldset>
-					<fieldset id="stationerypreviewfield" class="stationerypreview">
-						<legend>Email Stationery Preview:</legend>
-						<iframe id="stationerypreview"  src="mgstationeryview.php?preview"></iframe>
-					</fieldset>
-					<div class="cf"></div>
-					<fieldset class="form_actions">
-						<div class="controls">
-							<button id="msgsndr_emailstationerycontinue" class="btn_select" disabled="disabled">Use Stationery</button><img src="img/ajax-loader.gif" class="loading hide" />
-							<button id="msgsndr_emailnostationery">Skip Stationery</button>
-							<button id="msgsndr_emailcancelstationery" class="btn_cancel" data-nav=".oemail">Cancel</button>
-						</div>
-					</fieldset>
-				</div>
-				<div id="main_email_view">
+
 				<input type="checkbox" class="hidden msgdata" id="msgsndr_hasemail" name="msgsndr_hasemail"/>
 				<div id="msgsndr_hasemail_msg" class="box_validatorerror er" style="display:none"></div>
 
@@ -229,7 +209,28 @@
 						<div id="msgsndr_emailmessageattachment_msg" class="box_validatorerror er" style="display:none"></div>
 					</div>
 				</fieldset>
+				<div id="stationery_email_view">
+					<fieldset id="stationeryfield" class="stationeryselector">
+						<legend>Email Stationery:</legend>
+						<div id="stationeryselector" class="radiobox stationeryselector">
+					
+						</div>
+					</fieldset>
+					<fieldset id="stationerypreviewfield" class="stationerypreview">
+						<legend>Email Stationery Preview:</legend>
+						<iframe id="stationerypreview"  src="mgstationeryview.php?preview"></iframe>
+					</fieldset>
+					<div class="cf"></div>
+					<fieldset class="form_actions">
+						<div class="controls">
+							<button id="msgsndr_emailstationerycontinue" class="btn_select" disabled="disabled">Use Stationery</button><img src="img/ajax-loader.gif" class="loading hide" />
+							<button id="msgsndr_emailnostationery">Skip Stationery</button>
+							<button id="msgsndr_emailcancelstationery" class="btn_cancel" data-nav=".oemail">Cancel</button>
+						</div>
+					</fieldset>
+				</div>
 				
+				<div id="main_email_view">
 				<fieldset>
 					<label for="msgsndr_emailmessagetext">Body&nbsp;<img id="msgsndr_emailmessagetext_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>
 					<div class="controls">
