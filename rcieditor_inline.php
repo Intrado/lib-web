@@ -97,6 +97,19 @@ $target = scrub_ascii($parts[0], ord('A'), ord('z'));
 		<script type="text/javascript" src="<? echo $baseurl; ?>/script/jquery.1.7.2.min.js"></script>
 		<script type="text/javascript">
 			$.noConflict();
+			<?/* Note that this hack is to allow us to see the TextColor and BGCOlor buttons in the inline editor's 
+			     toolbar. If we do not call the setLoadingVisibility(false) then those two tools do not show up in
+			     the toolbar. This call MUSt occur immediately before ckeditor.js is loaded. Even if the call appears
+			     immediately after loading ckeditor.js, the toolbar items will not show up. So what voodoo exists within
+			     this magic function that has some effect on the ckeditor constructor method even before the object exists?
+			     little more than changing the visibile state of the iframe and the little ajax "please wait" loading
+			     indicator. It appears that CKE requires the iframe to be visible in the DOM at the time it is instantiated
+			     or else, it punishes us with having no access to these two items in the toolbar. This is probably
+			     unintended behavior and will be turned into a bug report by SMK on CKE's site.
+
+			     TODO: remove this hack if/when CKE fixes this issue.
+			*/?>
+			window.top.rcieditor.setLoadingVisibility(false);
 		</script>
 		<script type="text/javascript" src="<? echo $baseurl; ?>/script/ckeditor/ckeditor.js"></script>
 		<script type="text/javascript" src="<? echo $baseurl; ?>/script/rcieditor_inline.js"></script>

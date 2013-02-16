@@ -7,10 +7,29 @@
  * modify this to support multi-document editing, but many aspects would beed to
  * become arrays/objects in order to handle the multiple instances.
  *
+ * This multi-mode editor class container provides all the interfacing necessary
+ * to manage CKEditor from the outside by starting it up, filling it with content,
+ * refreshing, hooking into validation with event handling, tearing it down, and
+ * reinitializing to a different mode. The editor mode is "null" to start to indicate
+ * that it has not been initialized yet and returns to this state when deconstruct()ed.
+ * The modes 'plain', 'normal', and 'full' are all essentially the same full CKEditor
+ * but with differences in which custom plugins are added to the toolbar. The 'inline'
+ * mode is entirely different and requires an external PHP page to host the interior
+ * of an IFRAME with the document and inline mode CKEditor initiated into it. Note
+ * that it may be possible to fully populate the iframe from within this JS at the
+ * time of creation and eliminate the need for the external PHP.
+ *
+ * Note that this script is commonly included into pages that still have Prototype.js
+ * running on them and even though the code wraps jQuery into $, Prototype still extends
+ * common DOM objects. As such it is frequently necessary to seemingly redundantly cast
+ * newly created objects with jQuery - even when the object is freshly created by
+ * jQuery. These additional wrap calls will be come unnecessary when Prototype.js goes
+ * away, however they will not break anything.
+ *
  * EXTERNAL DEPENDENCIES
    * jquery.js
-   * json2.js
    * rcieditor_inline.js
+   * rcieditor_inline.php
  */
 
 (function ($) {
@@ -20,7 +39,7 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data, hidetoolbar) 
 	this.textarea = null; // The textarea ELEMENT, not the ID
 
 	this.container = null; // The container ELEMENT, to contain the editor, not the ID
-	this.editorMode = null;
+	this.editorMode = null; // Either null (uninitialized) or [plain|normal|full|inline]
 
 	this.basename = 'rcicke';
 	this.scratch_id = 'rcieditor_scratch';
@@ -28,16 +47,30 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data, hidetoolbar) 
 	// Associative array support for settings; use of set/getter's is encouraged
 	this.settings = null;
 
-	// Setting setter
 	this.setSetting = function (name, value) {
 		this.settings[name] = value;
 	};
 
-	// Setting getter
 	this.getSetting = function (name) {
 		return(this.settings[name]);
 	};
 
+	/**
+	 * This pseudo-constructor puts all the working initialization code into
+	 * a re-callable method
+	 *
+	 * @param string editor_mode [plain|normal|full|inline]
+	 * @param string textarea_id the HTML id attribute of the text area the
+	 * editor should be attached to
+	 * @param mixed extra_data Optional misc. additional data that will be
+	 * used internally. This is only used to pass in field insert data to the
+	 * mkfield plugin at this time, however it is generalized in nature and
+	 * could be used to pass in other data as well.
+	 * @param boolean hidetoolbar Optional initial expand/collapse state of
+	 * the toolbar; true to collapse, false to expand (default)
+	 *
+	 * @return boolean true on success, else false
+	 */
 	this.construct = function (editor_mode, textarea_id, extra_data, hidetoolbar) {
 
 		// Reset all internal properties
@@ -59,6 +92,11 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data, hidetoolbar) 
 		return(res);
 	};
 
+	/**
+	 * This reconstructor tears down an already constructed instance and
+	 * reinitializes it with new settings. The arguments are the same as the
+	 * consruct method.
+	 */
 	this.reconstruct = function (editor_mode, textarea_id, extra_data, hidetoolbar) {
 
 		// If the editorMode is defined...
@@ -70,6 +108,10 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data, hidetoolbar) 
 		return(this.construct(editor_mode, textarea_id, extra_data, hidetoolbar));
 	};
 
+	/**
+	 * This pseudo destructor tears down the editor interface, but leaves the main
+	 * object ready to continue working with a subsequent call to the construct method.
+	 */
 	this.deconstruct = function () {
 
 		// Show the loading spinner
@@ -117,9 +159,12 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data, hidetoolbar) 
 	};
 
 	/**
-	 * Put us into a known good state
+	 * Put us into a known good, default state
 	 */
 	this.reset = function () {
+
+		// clear the validator
+		this.resetValidatorFunction();
 
 		// reset misc. properties
 		this.textarea = null;
@@ -393,6 +438,8 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data, hidetoolbar) 
 
 	/**
 	 * Show or hide a spinning, AJAXy loading indicator
+	 *
+	 * @param boolean visible Visible state of the "Please wait" indicator, true to show, false to hide
 	 */
 	this.loadingVisible = false;
 	this.setLoadingVisibility = function (visible) {
@@ -443,6 +490,13 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data, hidetoolbar) 
 		}
 	};
 
+	/**
+	 * Attempts to hide the HTMLEditor while we are manipulating it
+	 *
+	 * FIXME: The new version of CKE (4.x) does not seem to be able to
+	 * insert itself into the "hider" div which prevents us from being
+	 * able to hide it!
+	 */
 	this.hideHtmlEditor = function () {
 		// hide the editor
 		$('#' + this.basename + 'hider').hide();
@@ -451,6 +505,8 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data, hidetoolbar) 
 
 	/**
 	 * Returns the textarea that the html editor is currently replacing
+	 * This should only be used internally, and should be largely unnecesary
+	 * now that we hold everything as object properties
 	 */
 	this.getHtmlEditorObject = function () {
 
@@ -493,6 +549,9 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data, hidetoolbar) 
 	/**
 	 * Updates the textarea that the html editor replaces with the latest content.
 	 *
+	 * @param object existinghtmleditorobject  Optional, rarely used CKE
+	 * object other than the one we're using internally
+	 *
 	 * @return object containing the html editor instance and container, or null if not loaded
 	 */
 	this.saveHtmlEditorContent = function (existinghtmleditorobject) {
@@ -523,23 +582,25 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data, hidetoolbar) 
 
 		// Refresh is neither supported nor necessary for inline mode
 		if (this.editorMode == 'inline') {
-			return(null);
+			return;
 		}
 
 		var htmleditorobject = existinghtmleditorobject || this.getHtmlEditorObject();
-		if (!htmleditorobject) {
-			return null;
+		if (htmleditorobject) {
+			var content = this.textarea.val();
+			htmleditorobject.instance.setData(content);
 		}
-		
-		var content = this.textarea.val();
-		htmleditorobject.instance.setData(content);
 	};
 
 	/**
-	 * Sets the "primary" content for the editor to the supplied string; for the
-	 * full/regular editor, this means replacing the entire document. For the inline
-	 * editor, we will only replace the content in editableBlocks with an attribute
-	 * indicating that it is/they are primary, not the entire document.
+	 * Sets the "primary" content for the editor to the supplied string; for
+	 * the full/regular editor, this means replacing the entire document.
+	 * For the inline editor, we will only replace the content in editable
+	 * Blocks with an attribute indicating that it is/they are primary, not
+	 * the entire document.
+	 *
+	 * @param string content The block of HTML content that we want to set the
+	 * textarea/editor to
 	 *
 	 * @return boolean true on success, else false
 	 */
@@ -549,12 +610,13 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data, hidetoolbar) 
 				// Textarea is NOT a blockelement that contains HTML; it is a form field with a value
 				// so we have to get the value of the field, convert it to jQuery, and then try to
 				// do DOM work within that value.
-				var value = $(this.textarea.val());
-				value.find('.primaryBlock').each(function () {
-					jQthis = $(this);
+				var scratch = $('#' + this.scratch_id);
+				scratch.html(this.textarea.val());
+				scratch.find('div.primaryBlock').each(function () {
+					var jQthis = $(this);
 					jQthis.html(content);
 				});
-				this.textarea.val(value.html());
+				this.textarea.val(scratch.html());
 
 				// ref: http://stackoverflow.com/questions/1952359/calling-iframe-function
 				window.frames[this.basename + '_iframe'].window.rcieditorinline.refresh();
@@ -590,18 +652,19 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data, hidetoolbar) 
 	 * object other than the one we're using internally
 	 */
 	this.setHtmlEditorContent = function (content, existinghtmleditorobject) {
-
 		var htmleditorobject = existinghtmleditorobject || this.getHtmlEditorObject();
-		if (!htmleditorobject) {
-			return null;
+		if (htmleditorobject) {
+			htmleditorobject.instance.setData(content);
+			this.textarea.val(this.cleanContent(content));
 		}
-		
-		htmleditorobject.instance.setData(content);
-		this.textarea.val(this.cleanContent(content));
 	};
 
 	/**
 	 * Generic whitespace trimmer to use internally
+	 *
+	 * @param string str the string that we want to trim whitespace off the head/tail of
+	 *
+	 * @return string the trimmed down string
 	 */
 	this.trim = function (str) {
 		return(str.replace(/^\s+|\s+$/g, ''));
@@ -612,6 +675,10 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data, hidetoolbar) 
 	 * function requires the presence of a single CKEDITOR instance, but the multi-
 	 * instance scenario for inline editing also needs to be able to do the same
 	 * type of cleanup.
+	 *
+	 * @param string content The content from the editor that we want to clean up
+	 *
+	 * @return string The cleaned up content ready for saving
 	 */
 	this.cleanContent = function (content) {
 		var tempdiv = $('<div></div>').html(content);
@@ -649,6 +716,10 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data, hidetoolbar) 
 	 *
 	 * Example: &lt;&lt;First <b>Name</b>&gt;&gt; becomes <b>&lt;&lt;First Name&gt;&gt;
 	 * NOTE: It is assumed that the tokens are &lt;&lt; and &gt;&gt; instead of << and >>.
+	 *
+	 * @param string html The HTML code from the editor that we want to clean up
+	 *
+	 * @return string The cleaned up HTML
 	 */
 	this.cleanFieldInserts = function (html) {
 		var regex = /&lt;(<.*?>)*?&lt;(.+?)&gt;(<.*?>)*?&gt;/g;
@@ -681,14 +752,6 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data, hidetoolbar) 
 		return html;
 	};
 
-	this.htmlEditorIsReady = function () {
-		var htmleditorobject;
-		if (! (htmleditorobject = this.getHtmlEditorObject())) {
-			return(false);
-		}
-		return(htmleditorobject);
-	};
-
 	/**
 	 * Events that trigger this listener are keystrokes, and content changes
 	 * within CKEditor. we wait for half a second before proceeding to grab
@@ -717,30 +780,48 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data, hidetoolbar) 
 		}, 500);
 	};
 
+	/**
+	 * Someone on the outside will be responsible for validating this form
+	 * whenever the content changes; this function and the associated
+	 * methods for managing it will be responsible for doing that work.
+	 *
+	 * @param function validator_fn The function to invoke whenever a content change occurs
+	 */
 	this.validator_fn = null;
-
 	this.setValidatorFunction = function (validator_fn) {
 		this.validator_fn = validator_fn;
 	};
 
+	/**
+	 * Disables a validator function that was previously set
+	 */
 	this.resetValidatorFunction = function () {
 		this.validator_fn = null;
 	}
 
+	/**
+	 * Called internally whenever a change occurs that needs validation; if
+	 * a validator function is set then it will be invoked, otherwise nada.
+	 */
 	this.validate = function() {
 		if (typeof this.validator_fn === 'function') {
 			this.validator_fn();
 		}
 	};
 
+	/**
+	 * this function is here only for compatibility with the legacy
+	 * htmleditor.js interface; anything that calls it should be rewritten
+	 * to use the validator model instead which does not require the caller
+	 * to provide its own key listened
+	 *
+	 * @todo Get rid of this method once all external calls to it are gone
+	 */
 	this.registerHtmlEditorKeyListener = function (listener_fn) {
-
-		// TODO - this function is here only for compatibility with the legacy htmleditor.js interface;
-		// Anything that calls it should be rewritten to use the validator model instead which does not
-		// require the caller to provide its own key listened
 		this.setValidatorFunction(listener_fn);
 	};
 
+	// Invoke out contstuct() method with the new() arguments supplied
 	this.construct(editor_mode, textarea_id, extra_data, hidetoolbar);
 }
 }) (jQuery);
