@@ -83,6 +83,7 @@ window.RCIEditorInline = function () {
 					['NumberedList','BulletedList','Outdent','Indent'],
 					['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock']
 				];
+
 			});
 
 			editor.on('key', function(event) {
