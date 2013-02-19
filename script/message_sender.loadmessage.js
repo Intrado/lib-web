@@ -511,6 +511,7 @@ $.loadMessage = function loadMessage() {
 						data.messageBody, true, false, null);
 				});
 		}
+		$('#stationery_email_view').hide();
 	}
 	
 	// load sms message
@@ -585,7 +586,7 @@ $.loadMessage = function loadMessage() {
 	this.loadMessagePartsFormatted = function(msgGrpId,msg,element,ckeditor,callback){
 		// first hide the element and show a loading message
 		var loadingMessage = "<div class='loadingmessage'><img src='img/ajax-loader.gif'/>&nbsp;Loading content, please wait...</div>";
-		if (ckeditor)
+		if (ckeditor && typeof(rcieditor) != 'undefined')
 			rcieditor.hideHtmlEditor();
 		
 		element.hide();
