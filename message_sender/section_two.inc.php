@@ -224,7 +224,7 @@
 					<fieldset class="form_actions">
 						<div class="controls">
 							<button id="msgsndr_emailstationerycontinue" class="btn_select" disabled="disabled">Use Stationery</button><img src="img/ajax-loader.gif" class="loading hide" />
-							<button id="msgsndr_emailcancelstationery" class="btn_cancel" data-nav=".oemail">Cancel</button>
+							<button id="msgsndr_emailcancelstationery" class="btn_discard" data-nav=".oemail">Discard</button>
 						</div>
 					</fieldset>
 				</div>
