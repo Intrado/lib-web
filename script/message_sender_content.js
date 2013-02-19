@@ -280,25 +280,21 @@ var allowControl = {
 		//	$('#msgsndr_emailmessagefromemail').attr('value', userInfo.email);
 		//}
 		
-		$('#msgsndr_emailnostationery').on('click', function(e) {
-			e.preventDefault();
-			$("#msgsndr_emailmessagetext").val("");
-			applyCkEditor("msgsndr_emailmessagetext","normal");
-			$('#stationery_email_view').hide();
-			$('#main_email_view').show();
-		});
+
 		
 		$('#msgsndr_emailstationerycontinue').on('click', function(e) {
 			e.preventDefault();
-			
 			var msgid = $('input[name=stationery]:checked', '#msgsndr').val();
-			
-			$.get('mgstationeryview.php?stationery=' + msgid, function(data) {
-				$("#msgsndr_emailmessagetext").val(data);
-				applyCkEditor("msgsndr_emailmessagetext","inline");
-				//rcieditor.refreshHtmlEditorContent();
-				
-			});
+			if (msgid == 0) {
+				applyCkEditor("msgsndr_emailmessagetext","normal");
+			} else {
+				$.get('mgstationeryview.php?stationery=' + msgid, function(data) {
+					$("#msgsndr_emailmessagetext").val(data);
+					applyCkEditor("msgsndr_emailmessagetext","inline");
+					//rcieditor.refreshHtmlEditorContent();
+					
+				});
+			}
 			$('#stationery_email_view').hide();
 			$('#main_email_view').show();
 		});
@@ -557,9 +553,6 @@ function ContentManager() {
 		}
 		
 		if(mode == "email") {
-			if (typeof(userPermissions.forcestationery) != 'undefined' && userPermissions.forcestationery == 1) {
-				$('#msgsndr_emailnostationery').hide();
-			}
 			if ($('input[name=msgsndr_hasemail]').attr("checked")) {
 				$('#main_email_view').show();
 			} else {
@@ -575,8 +568,10 @@ function ContentManager() {
 					'/' + orgPath+'/api/2/organizations/' + orgid + '/publications/messagegroups'
 				];
 				
-				var stationery = [];
-				var stationeryids = [];
+				var forcestationery = (typeof(userPermissions.forcestationery) != 'undefined' && userPermissions.forcestationery == 1);
+				var stationery = forcestationery?[]:[{id:0,name:"No Stationery"}];
+				var stationeryids = forcestationery?[]:[0];
+				var itemsempty = forcestationery?1:0;
 				
 				self.getStationery = function(paths) {
 					return function() {
@@ -588,6 +583,7 @@ function ContentManager() {
 								async : false
 							}).done(function(data){
 								$.each(data.messageGroups,function(i,mg) {
+									//Make sure stationery isn't inserted twice
 									if ($.inArray(mg.id, stationeryids) === -1) {
 										stationery.push(mg);
 										stationeryids.push(mg.id);
@@ -597,31 +593,41 @@ function ContentManager() {
 							});
 						} else {
 							// All paths have been fetched, 
-							if (stationery.length == 0) {
-								if (typeof(userPermissions.forcestationery) != 'undefined' && userPermissions.forcestationery == 1) {
-									$('#stationery_email_view').show();
-									$('#stationeryselector').append('No Stationery Available');
-								} else {
-									$("#msgsndr_emailmessagetext").val("");
-									applyCkEditor("msgsndr_emailmessagetext","normal");
-									$('#stationery_email_view').hide();
-									$('#main_email_view').show();
-								}
-							} else if (stationery.length == 1) {
-								var msgid = stationery[0].id;
-								
+							
+							
+							if (forcestationery && stationery.length == 0) {
+								// No Stationery Available, email editor is essentially disabled
+								$('#stationery_email_view').show();
+								$('#stationeryselector').append('No Stationery Available');
+							} else if ((forcestationery && stationery.length == 1)) {
+								// Restrict to stationery, Only one stationery, must use inline editor 
+								var msgid = stationery[stationery.length - 1].id;
 								$.get('mgstationeryview.php?stationery=' + msgid, function(data) {
 									$("#msgsndr_emailmessagetext").val(data);
 									applyCkEditor("msgsndr_emailmessagetext","inline");
 								});
 								$('#stationery_email_view').hide();
 								$('#main_email_view').show();
+							} else if (!forcestationery && stationery.length == 1) {
+								// Only the "blank" stationery available and user not restricted to stationery. proceed to normal editor
+								$("#msgsndr_emailmessagetext").val("");
+								applyCkEditor("msgsndr_emailmessagetext","normal");
+								$('#stationery_email_view').hide();
+								$('#main_email_view').show();
 							} else {	
+								// Show stationery selector
 								$.each(stationery, function(i,mg) {
 									$('#stationeryselector').append('<input id="stationery_' + mg.id + '" class="stationeryselector" type="radio" name="stationery" value="' + mg.id  + '" /><label for="stationery_' + mg.id + '">' + mg.name + '</label><br />');
+									if (mg.id == 0) {
+										$('#stationeryselector').append("<hr />");
+									}
 								});
 								$('#msgsndr').on('change', 'input.stationeryselector', function(event) {
-										$('#stationerypreview').attr('src','mgstationeryview.php?preview&stationery=' + event.target.value);
+										if (event.target.value != 0)
+											$('#stationerypreview').attr('src','mgstationeryview.php?preview&stationery=' + event.target.value);
+										else {
+											$('#stationerypreview').attr('src','blank.html');
+										}
 										$('#msgsndr_emailstationerycontinue').removeAttr("disabled");
 								});
 								$('#stationery_email_view').show();
