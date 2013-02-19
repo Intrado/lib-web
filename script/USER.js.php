@@ -15,12 +15,12 @@ header("Cache-Control: private");
 
 (function () {
 	user = function () {
-		this.id = <?= $USER->id; ?>;
-		this.firstname = '<?= $USER->firstname; ?>';
-		this.lastname = '<?= $USER->lastname; ?>';
-		this.login = '<?= $USER->login; ?>';
-		this.email = '<?= $USER->email; ?>';
-		this.phone = '<?= $USER->phone; ?>';
+		this.id = <?= intval($USER->id); ?>;
+		this.firstname = <? echo json_encode($USER->firstname); ?>;
+		this.lastname = <? echo json_encode($USER->lastname); ?>;
+		this.login = <? echo json_encode($USER->login); ?>;
+		this.email = <? echo json_encode($USER->email); ?>;
+		this.phone = <? echo json_encode($USER->phone); ?>;
 	}
 
 	window.top.USER = new user();
