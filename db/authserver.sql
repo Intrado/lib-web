@@ -751,3 +751,10 @@ INSERT INTO `shortcodetext` (`shortcode`, `messagetype`, `text`)
 -- ASP 9.6 powerschool signon to contact manager
 ALTER TABLE  `customerproduct` CHANGE  `product`  `product` ENUM(  'cs',  'tai',  'cm' )  NOT NULL;
 
+ALTER TABLE `portaluser`
+  DROP `zipcode`,
+  DROP `notify`,
+  DROP `notifysmstype`,
+  DROP `sms`;
+
+ALTER TABLE  `portaluseridentification` ADD  `confirmed` TINYINT NOT NULL DEFAULT  '0';
