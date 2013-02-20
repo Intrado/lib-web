@@ -1,9 +1,9 @@
 ;<?/* this prevents browsers from seeing anything
 
-;portalauth server
+;portalauth server be sure to end with the / slash
 [portalauth]
-cmUrl="https://csportal.testschoolmessenger.com/cm"
-accountUrl="https://csportal.testschoolmessenger.com/myaccount"
+cmUrl="https://csportal.testschoolmessenger.com/cm/"
+accountUrl="https://csportal.testschoolmessenger.com/myaccount/"
 
 ;authentication server connection information
 [authserver]
