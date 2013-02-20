@@ -7,9 +7,6 @@
  * available to handshake with the javascript.
  */
 
-// This gets the customer name to make all URL's/links relative to it
-$baseurl = dirname($_SERVER['SCRIPT_URL']);
-
 function scrub_ascii($string, $lower_accept = null, $upper_accept = null) {
 	if (! strlen($string)) return('');
 	if (is_null($lower_accept)) $lower_accept = 9;          // TAB
@@ -94,7 +91,7 @@ $target = scrub_ascii($parts[0], ord('A'), ord('z'));
 			}
 
 		</style>
-		<script type="text/javascript" src="<? echo $baseurl; ?>/script/jquery.1.7.2.min.js"></script>
+		<script type="text/javascript" src="script/jquery.1.7.2.min.js"></script>
 		<script type="text/javascript">
 			$.noConflict();
 			<?/* Note that this hack is to allow us to see the TextColor and BGCOlor buttons in the inline editor's 
@@ -107,26 +104,26 @@ $target = scrub_ascii($parts[0], ord('A'), ord('z'));
 			     or else, it punishes us with having no access to these two items in the toolbar. This is probably
 			     unintended behavior and will be turned into a bug report by SMK on CKE's site.
 
-			     TODO: remove this hack if/when CKE fixes this issue.
+			     TODO: remove this hack if/when CKE fixes this issue (http://dev.ckeditor.com/ticket/9802)
 			*/?>
 			window.top.rcieditor.setLoadingVisibility(false);
 		</script>
-		<script type="text/javascript" src="<? echo $baseurl; ?>/script/ckeditor/ckeditor.js"></script>
-		<script type="text/javascript" src="<? echo $baseurl; ?>/script/rcieditor_inline.js"></script>
+		<script type="text/javascript" src="script/ckeditor/ckeditor.js"></script>
+		<script type="text/javascript" src="script/rcieditor_inline.js"></script>
+		<script type="text/javascript">
+
+			// On document loaded function (see jQuery $.ready() method)
+			(function ($) {
+				$(function () {
+					rcieditorinline.init('<?= $target ?>');
+				});
+			}) (jQuery);
+		</script>
 	</head>
-	<body onload="rcieditorinline.init('<? echo $target; ?>');">
+	<body>
 		<div class="guidebox">
-			<div class="guidewidth">
-				<div class="guidewidthok">&nbsp;</div>
-			</div>
 			<div id="wysiwygpage"></div>
 			<div id="wysiwygpresave" style="display: none;"></div>
-			<div id="wysiwygcssoverrides">
-				<style>
-					.cke_hc .cke_button_label { display: none; }
-					.cke_hc .cke_button_icon { display: block; }
-				</style>
-			</div>
 		</div>
 	</body>
 </html>

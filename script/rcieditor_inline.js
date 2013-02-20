@@ -294,7 +294,8 @@ window.RCIEditorInline = function () {
 
 	this.construct();
 }
-}) (jQuery);
 
-rcieditorinline = new RCIEditorInline();
+window.rcieditorinline = new RCIEditorInline();
+
+}) (jQuery);
 
