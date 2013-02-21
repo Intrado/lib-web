@@ -125,7 +125,7 @@ class PublishTargetWiz_publishtarget extends WizStep {
 		if (isPublished($type, $id))
 			$values["nobody"] = _L("Un-publish This Item");
 		if (!$userrestrictions) {
-			$values["anyone"] = _L("Anyone May Subscribe");
+			$values["anyone"] = _L("Anyone");
 			$values["unrestricted"] = _L("Top Level Users");
 		}
 		
@@ -144,7 +144,7 @@ class PublishTargetWiz_publishtarget extends WizStep {
 			"helpstep" => 1
 		);
 
-		$helpsteps = array(_L("This step allows you to control who can subscribe to this item. <br><br><ul> <li>Unpublish this item - Makes this item no longer appear as a subscribable option. Users will no longer be able to create jobs with this item.<li>Anyone May Subscribe - Allow any user to subscribe to this item. <li>Top Level Users - Only users with no restrictions, such as system administrators, may subscribe.<li>One or more %s - Only specific users may subscribe.</ul>", getSystemSetting("organizationfieldname","Organization")));
+		$helpsteps = array(_L("This step allows you to control who can subscribe to this item. <br><br><ul> <li>Unpublish this item - Makes this item no longer appear as a subscribable option. Users will no longer be able to create jobs with this item.<li>Anyone - Allow any user to subscribe to this item. <li>Top Level Users - Only users with no restrictions, such as system administrators, may subscribe.<li>One or more %s - Only specific users may subscribe.</ul>", getSystemSetting("organizationfieldname","Organization")));
 
 		return new Form("publishtargetwiz-publishtarget",$formdata,$helpsteps);
 	}
