@@ -1164,16 +1164,6 @@ div.progressbar div.progress {
 	height: 15px;
 }
 
-#stationeryfield {
-	border: 1px solid #CCCCCC;
-	border-radius: 5px 5px 5px 5px;
-	float: left;
-    margin: 0 5px 5px;
-    padding: 10px 10px 0;
-    width: 26%;
-    height: 600px;
-}
-
 .radiobox.stationeryselector label,input { float: none;}
 .radiobox.stationeryselector {
  	height: 100%;
@@ -1183,11 +1173,11 @@ div.progressbar div.progress {
 #stationerypreviewfield {
 	border: 1px solid #CCCCCC;
 	border-radius: 5px 5px 5px 5px;
-	float: right;
-    margin: 0 5px 5px;
+	float: left;
+    margin: 20px 5px 5px;
     padding: 5px 10px 10px;
-    width: 70%;
     height: 600px;
+    width: 100%;
 }
 
 .stationerypreview iframe {

@@ -211,22 +211,17 @@
 				</fieldset>
 				<div id="stationery_email_view">
 					<fieldset id="stationeryfield" class="stationeryselector">
-						<legend>Email Stationery:</legend>
-						<div id="stationeryselector" class="radiobox stationeryselector">
-					
-						</div>
+						<label for="stationeryselector">Email Stationery</label>
+						<select id="stationeryselector" name="stationeryselector" >					
+						</select>
+						&nbsp;&nbsp;<button id="msgsndr_emailstationerycontinue" class="btn_select" disabled="disabled">Select</button><img src="img/ajax-loader.gif" class="loading hide" />
+						<fieldset id="stationerypreviewfield" class="stationerypreview">
+							<legend>Email Stationery Preview:</legend>
+							<iframe id="stationerypreview"  src="mgstationeryview.php?preview"></iframe>
+						</fieldset>
 					</fieldset>
-					<fieldset id="stationerypreviewfield" class="stationerypreview">
-						<legend>Email Stationery Preview:</legend>
-						<iframe id="stationerypreview"  src="mgstationeryview.php?preview"></iframe>
-					</fieldset>
+
 					<div class="cf"></div>
-					<fieldset class="form_actions">
-						<div class="controls">
-							<button id="msgsndr_emailstationerycontinue" class="btn_select" disabled="disabled">Use Stationery</button><img src="img/ajax-loader.gif" class="loading hide" />
-							<button id="msgsndr_emailcancelstationery" class="btn_discard" data-nav=".oemail">Discard</button>
-						</div>
-					</fieldset>
 				</div>
 				
 				<div id="main_email_view">
@@ -270,7 +265,7 @@
 					</fieldset>
  -->
 				</div>
-				
+				</div>
 				<fieldset class="form_actions">
 					<div class="controls">
 					<button class="btn_save" disabled="disabled" data-nav=".oemail">Save Email Message</button><img src="img/ajax-loader.gif" class="loading hide" />
@@ -278,8 +273,6 @@
 					<button class="btn_discard" data-nav=".oemail">Discard</button>
 					</div>
 				</fieldset>
-
-				</div>
 			</div><!-- tab_panel -->
 				
 			<!-- Add the sms panel -->

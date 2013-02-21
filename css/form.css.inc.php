@@ -197,13 +197,6 @@ position: relative;}
 }
 
 .newform .stationeryselector fieldset {
-	border: 1px solid #CCCCCC;
-	border-radius: 5px 5px 5px 5px;
-	float: left;
-    margin: 0 5px 5px;
-    padding: 10px 10px 0;
-    width: 22%;
-    height: 600px;
 }
 
 .radiobox.stationeryselector label,input { float: none;}
@@ -211,6 +204,10 @@ position: relative;}
  	height: 100%;
 	overflow: auto;
 }
+.stationeryselector select  {
+	float:left;
+}
+
 
 .newform .stationerypreviewfield fieldset {
 	border: 1px solid #CCCCCC;

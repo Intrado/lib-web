@@ -280,12 +280,13 @@ var allowControl = {
 		//	$('#msgsndr_emailmessagefromemail').attr('value', userInfo.email);
 		//}
 		
-
-		
-		$('#msgsndr_emailstationerycontinue').on('click', function(e) {
+		var stationerycontinue = function(e) {
 			e.preventDefault();
-			var msgid = $('input[name=stationery]:checked', '#msgsndr').val();
-			if (msgid == 0) {
+			var msgid = $('#stationeryselector').val();
+			if (typeof(msgid) == 'undefined') {
+				alert('ops, something went wrong');
+				return;
+			} else if (msgid == 0) {
 				applyCkEditor("msgsndr_emailmessagetext","normal");
 			} else {
 				$.get('mgstationeryview.php?stationery=' + msgid, function(data) {
@@ -297,8 +298,10 @@ var allowControl = {
 			}
 			$('#stationery_email_view').hide();
 			$('#main_email_view').show();
-		});
+		};
 		
+		$('#msgsndr_emailstationerycontinue').on('click', stationerycontinue);
+		$('#stationerypreview').on('click', stationerycontinue);
 		
 		
 		$('#msgsndr_previewemail').on('click', function(e) {
@@ -614,22 +617,33 @@ function ContentManager() {
 								applyCkEditor("msgsndr_emailmessagetext","normal");
 								$('#stationery_email_view').hide();
 								$('#main_email_view').show();
-							} else {	
+							} else {
+								$('#stationeryselector').append('<option value="">-- Select Stationery --</option><optgroup label="----">');
 								// Show stationery selector
 								$.each(stationery, function(i,mg) {
-									$('#stationeryselector').append('<input id="stationery_' + mg.id + '" class="stationeryselector" type="radio" name="stationery" value="' + mg.id  + '" /><label for="stationery_' + mg.id + '">' + mg.name + '</label><br />');
+									
+									$('#stationeryselector').append('<option value="' + mg.id + '">' + mg.name + '</option>');
+									//$('#stationeryselector').append('<input id="stationery_' + mg.id + '" class="stationeryselector" type="radio" name="stationery" value="' + mg.id  + '" /><label for="stationery_' + mg.id + '">' + mg.name + '</label><br />');
 									if (mg.id == 0) {
-										$('#stationeryselector').append("<hr />");
+										$('#stationeryselector').append('</optgroup><optgroup label="----">');
 									}
 								});
-								$('#msgsndr').on('change', 'input.stationeryselector', function(event) {
-										if (event.target.value != 0)
-											$('#stationerypreview').attr('src','mgstationeryview.php?preview&stationery=' + event.target.value);
+								$('#stationeryselector').append('</optgroup>');
+								$('#stationeryselector').change(function() {
+										var val = $(this).val();
+										
+										if (val != 0 && val != "")
+											$('#stationerypreview').attr('src','mgstationeryview.php?preview&stationery=' + $(this).val());
 										else {
 											$('#stationerypreview').attr('src','blank.html');
 										}
-										$('#msgsndr_emailstationerycontinue').removeAttr("disabled");
+										if (val != "")
+											$('#msgsndr_emailstationerycontinue').removeAttr("disabled");
+										else 
+											$('#msgsndr_emailstationerycontinue').attr('disabled', 'disabled');
+
 								});
+								
 								$('#stationery_email_view').show();
 							}			
 						}
