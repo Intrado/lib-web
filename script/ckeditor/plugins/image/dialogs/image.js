@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright (c) 2003-2009, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
@@ -23,17 +23,18 @@ CKEDITOR.dialog.add( 'image', function( editor )
 			this.getContentElement('tab1', 'uploadstatus').getElement().setText('');
 		},
 		onOk: function () {
-			var value = this.getContentElement('tab1', 'viewimageurl').getInputElement().getValue() || this.getContentElement('tab1', 'customurl').getInputElement().getValue(),
-				imageElement = this.imageElement || editor.document.createElement( 'img' );
+			var value = this.getContentElement('tab1', 'viewimageurl').getInputElement().getValue() || this.getContentElement('tab1', 'customurl').getInputElement().getValue();
+			var imageElement = this.imageElement || editor.document.createElement( 'img' );
 				
-			if (!value) {
-				return;
+			if (! value) {
+				alert("Please upload an image or select a URL!");
+				return(false);
 			}
 			
 			imageElement.setAttribute('src', value);
 			imageElement.setAttribute('data-cke-saved-src', value);
 			
-			if (!this.imageElement) {
+			if (! this.imageElement) {
 				editor.insertElement(imageElement);
 			}
 		},
