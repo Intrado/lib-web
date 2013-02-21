@@ -6,8 +6,18 @@
 var spellerObject;
 var controlWindowObj;
 
-if( parent.opener ) {
-	spellerObject = parent.opener.speller;
+function parentOpenerWindow() {
+	if (parent.opener) {
+	    return(parent.opener);
+	} else if (parent.parent && parent.parent.speller) {
+	    return(parent.parent);
+	}
+	return undefined;
+}
+
+var o = parentOpenerWindow();
+if (o) {
+	spellerObject = o.speller;
 }
 
 function ignore_word() {
@@ -53,11 +63,12 @@ function suggText() {
 }
 
 function init_spell() {
+
 	// By FredCK (fckLang attributes have been added to the HTML source of this page)
 	window.parent.parent.OnSpellerControlsLoad(this);
 	
 	var controlForm = document.spellcheck;
-	
+
 	// create a new controlWindow object
  	controlWindowObj = new controlWindow( controlForm );
 	// Let's take this out of the constructor, shall we?
