@@ -623,7 +623,6 @@ function ContentManager() {
 								$.each(stationery, function(i,mg) {
 									
 									$('#stationeryselector').append('<option value="' + mg.id + '">' + mg.name + '</option>');
-									//$('#stationeryselector').append('<input id="stationery_' + mg.id + '" class="stationeryselector" type="radio" name="stationery" value="' + mg.id  + '" /><label for="stationery_' + mg.id + '">' + mg.name + '</label><br />');
 									if (mg.id == 0) {
 										$('#stationeryselector').append('</optgroup><optgroup label="----">');
 									}
