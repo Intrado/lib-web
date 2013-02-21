@@ -281,13 +281,9 @@ function terminateSpell() {
 
 	// return back to the calling window
 //	this.spellCheckerWin.close();					// by FredCK
-/*
-// SMK disabled 2013-02-20 because it was causing an error in IE9 SCRIPT70
-// Permission Denied some such and doesn appear ti affect anything anyway
 	if ( typeof( this.OnFinished ) == 'function' ){	// by FredCK
 		this.OnFinished(numrepl) ;					// by FredCK
 	}
-*/
 	return true;
 }
 

@@ -7,6 +7,7 @@ CKEDITOR.dialog.add('aspell', function( editor )
 	var number = CKEDITOR.tools.getNextNumber(),
 		iframeId = 'cke_frame_' + number,
 		textareaId = 'cke_data_' + number,
+		scratchId = 'cke_scratch_' + number,
 		interval,
 		errorMsg = editor.lang.aspell.notAvailable;
 	
@@ -14,6 +15,8 @@ CKEDITOR.dialog.add('aspell', function( editor )
 	// Input for exchanging data CK<--->spellcheck
 		'<textarea name="'+textareaId+'" id="'+textareaId+
 		'" style="display: none;"></textarea>' +
+	// Scratch space for doing DOM work
+		'<div style="display: none;" id="' + scratchId + '"></div>' +
 	// Spellcheck iframe
 		'<iframe src="" style="width:485px; height:380px"' +
 		' frameborder="0" name="' + iframeId + '" id="' + iframeId + '"' +
@@ -74,11 +77,32 @@ CKEDITOR.dialog.add('aspell', function( editor )
 	
 	function oSpeller_OnFinished(dialog, numberOCorrections)
 	{
+console.log('finished!');
 		if (numberOCorrections > 0)
 		{
 			editor.focus();
 			editor.fire('saveSnapshot'); // Best way I could find to trigger undo steps.
-			dialog.getParentEditor().setData(document.getElementById(textareaId).value);
+
+			// Intermediate step to be able to restore altered data
+			var scratch = document.getElementById(scratchId);
+			scratch.innerHTML = document.getElementById(textareaId).value;
+			( function ($) {
+
+				// Get the base URL for requests that require absolute pathing
+				var t = window.top.location;
+				var tmp = new String(t);
+				var baseUrl = tmp.substr(0, tmp.lastIndexOf('/') + 1);
+
+				// Replace all placeholder icons with original images
+				$(scratch).find('img').each(function () {
+					var el = $(this); // reextend with jQuery in case prototype is fooling with our heads
+					el.attr('src', el.attr('data-aspell-saved-src'));
+					el.removeAttr('data-aspell-saved-src');
+				});
+			}) (jQuery);
+var data = scratch.innerHTML;
+console.log('setting [' + data + ']');
+			dialog.getParentEditor().setData(data);
 			editor.fire('saveSnapshot'); // But there's a blank one between!
 		}
 		dialog.hide();
@@ -133,10 +157,27 @@ CKEDITOR.dialog.add('aspell', function( editor )
 					src: editor.plugins.aspell.path+'spellerpages/spellChecker.js'
 			}}));
 			
-			// Get the data to be checked.
-			var sData = editor.getData();
+			// Intermediate step to be able to alter data coming
+			// into the spell checker instead of using the raw HTML
+			var scratch = document.getElementById(scratchId);
+			scratch.innerHTML = editor.getData();
+			( function ($) {
+
+				// Get the base URL for requests that require absolute pathing
+				var t = window.top.location;
+				var tmp = new String(t);
+				var baseUrl = tmp.substr(0, tmp.lastIndexOf('/') + 1);
+
+				// Replace all images with a placeholder icon
+				$(scratch).find('img').each(function () {
+					var el = $(this); // reextend with jQuery in case prototype is fooling with our heads
+					el.attr('data-aspell-saved-src', el.attr('src'));
+					el.attr('src', baseUrl + 'script/ckeditor/plugins/aspell/icons/viewimage.gif');
+				});
+			}) (jQuery);
+
 			//CKEDITOR.document.getById(textareaId).setValue(sData); <-- doesn't work for some reason
-			document.getElementById(textareaId).value = sData;
+			document.getElementById(textareaId).value = scratch.innerHTML;
 			
 			// Wait for spellcheck script to load, then execute
 			interval = window.setInterval(spellTime(this, errorMsg), 250);
