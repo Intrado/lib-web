@@ -36,7 +36,7 @@ CKEDITOR.dialog.add('aspell', function( editor )
 				// Create spellcheck object, set options/attributes
 				var oSpeller = new spellChecker(document.getElementById(textareaId));
 				oSpeller.spellCheckScript = editor.plugins.aspell.path+'spellerpages/server-scripts/spellchecker.php';
-				oSpeller.OnFinished = function (numChanges) { oSpeller_OnFinished(dialog, numChanges) };
+				oSpeller.OnFinished = function (numChanges) { oSpeller_OnFinished(dialog, numChanges); };
 				oSpeller.popUpUrl = editor.plugins.aspell.path+'spellerpages/spellchecker.html';
 				oSpeller.popUpName = iframeId;
 				oSpeller.popUpProps = null;
@@ -77,7 +77,6 @@ CKEDITOR.dialog.add('aspell', function( editor )
 	
 	function oSpeller_OnFinished(dialog, numberOCorrections)
 	{
-console.log('finished!');
 		if (numberOCorrections > 0)
 		{
 			editor.focus();
@@ -99,11 +98,12 @@ console.log('finished!');
 					el.attr('src', el.attr('data-aspell-saved-src'));
 					el.removeAttr('data-aspell-saved-src');
 				});
+				dialog.getParentEditor().setData(scratch.innerHTML);
+				// IE breaks on this cross-frame request; so we'll try to leave it off
+				if (! $.browser.msie) {
+					editor.fire('saveSnapshot'); // But there's a blank one between!
+				}
 			}) (jQuery);
-var data = scratch.innerHTML;
-console.log('setting [' + data + ']');
-			dialog.getParentEditor().setData(data);
-			editor.fire('saveSnapshot'); // But there's a blank one between!
 		}
 		dialog.hide();
 	}
