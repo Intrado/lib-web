@@ -21,6 +21,7 @@ require_once("inc/previewfields.inc.php");
 require_once("obj/PreviewModal.obj.php");
 require_once("inc/appserver.inc.php");
 require_once("obj/Publish.obj.php");
+require_once("obj/StationerySelector.fi.php");
 
 require_once("inc/editmessagecommon.inc.php");
 
@@ -73,60 +74,6 @@ if (!$USER->authorize("sendmulti") && $languagecode != Language::getDefaultLangu
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
-class StationerySelector extends FormItem {
-	function render ($value) {
-		$n = $this->form->name."_".$this->name;
-		// is the radioname data html formatted?
-		$ishtml = false;
-		if (isset($this->args['ishtml']) && $this->args['ishtml'])
-			$ishtml = true;
-		$str = '<div class="stationeryselector">
-				<fieldset id="stationeryfield">
-					<legend>Email Stationery:</legend>
-						<div id='.$n.' class="radiobox stationeryselector">';
-		$hoverdata = array();
-		$counter = 1;
-		$autoselect = count($this->args['values']) == 1; //if there is only one value, autoselect it
-		if (count($this->args['values']) == 0) {
-			$str .= _L("No Stationery Available");
-		} else {
-			foreach ($this->args['values'] as $radiovalue => $radioname) {
-				if ($radioname == "#-#") {
-					$str .= "<hr />\n";
-				} else {
-					$id = $n.'-'.$counter;
-					$onclick = "$('stationerypreview').src = 'mgstationeryview.php?preview&stationery=" .  escapehtml($radiovalue) .  "'";
-					$str .= '<input id="'.$id.'" name="'.$n.'" class="stationeryselector" type="radio" value="'.escapehtml($radiovalue).'" '.($value == $radiovalue || $autoselect ? 'checked' : '').' onclick="' . $onclick . '" /><label id="'.$id.'-label" for="'.$id.'">'.($ishtml?$radioname:escapehtml($radioname)).'</label><br />';
-					if (isset($this->args['hover'])) {
-						$hoverdata[$id] = $this->args['hover'][$radiovalue];
-						$hoverdata[$id.'-label'] = $this->args['hover'][$radiovalue];
-					}
-					$counter++;
-				}
-			}
-		}
-		$str .= "</div>
-			</fieldset>
-			</div>
-			<div class=\"stationerypreviewfield\">
-			<fieldset id=\"stationerypreviewfield\">
-				<legend>Email Stationery Preview:</legend>
-				<iframe id=\"stationerypreview\"  src=\"blank.html\"></iframe>
-			</fieldset>
-			</div>
-			
-			<script type=\"text/javascript\">
-		";
-		if (isset($this->args['hover']))
-			$str .= 'form_do_hover(' . json_encode($hoverdata) .');';
-		$str .= '</script>';
-	
-		return $str;
-	}
-}
-	
-	
-
 $helpsteps = array();
 $formdata = array();
 $helpstepnum = 1;

@@ -22,6 +22,7 @@ require_once("obj/PreviewModal.obj.php");
 require_once("inc/appserver.inc.php");
 
 require_once("layouts/layouts.inc.php");
+require_once("obj/StationerySelector.fi.php");
 
 ///////////////////////////////////////////////////////////////////////////////
 // Authorization:/
@@ -36,55 +37,6 @@ if (!$cansendemail || !$USER->authorize('createstationery')) {
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
-class LayoutSelector extends FormItem {
-	function render ($value) {
-		$n = $this->form->name."_".$this->name;
-		// is the radioname data html formatted?
-		$ishtml = false;
-		if (isset($this->args['ishtml']) && $this->args['ishtml'])
-			$ishtml = true;
-		$str = '
-				<div class="stationeryselector">
-					<fieldset id="stationeryfield">
-						<legend>Email Layout:</legend>
-				<div id='.$n.' class="radiobox stationeryselector">';
-		$hoverdata = array();
-		$counter = 1;
-		$autoselect = count($this->args['values']) == 1; //if there is only one value, autoselect it
-		foreach ($this->args['values'] as $radiovalue => $radioname) {
-			if ($radioname == "#-#") {
-				$str .= "<hr />\n";
-			} else {
-				$id = $n.'-'.$counter;
-				$onclick = "$('stationerypreview').src = 'mgstationeryview.php?preview&layout=" .  escapehtml($radiovalue) .  "'";
-				$str .= '<input id="'.$id.'" name="'.$n.'" class="stationeryselector" type="radio" value="'.escapehtml($radiovalue).'" '.($value == $radiovalue || $autoselect ? 'checked' : '').' onclick="' . $onclick . '" /><label id="'.$id.'-label" for="'.$id.'">'.($ishtml?$radioname:escapehtml($radioname)).'</label><br />';
-				if (isset($this->args['hover'])) {
-					$hoverdata[$id] = $this->args['hover'][$radiovalue];
-					$hoverdata[$id.'-label'] = $this->args['hover'][$radiovalue];
-				}
-				$counter++;
-			}
-		}
-		$str .= "</div>
-			</fieldset>
-			</div>
-			<div class=\"stationerypreviewfield\">
-			<fieldset id=\"stationerypreviewfield\">
-				<legend>Email Layout Preview:</legend>
-
-				<iframe id=\"stationerypreview\"  src=\"blank.html\"></iframe>
-			</fieldset>	
-			</div>
-		<script type=\"text/javascript\">
-		";
-		if (isset($this->args['hover']))
-			$str .= 'form_do_hover(' . json_encode($hoverdata) .');';
-		$str .= '</script>';
-		
-		
-		return $str;
-	}
-}
 
 
 
@@ -126,7 +78,7 @@ $formdata["layout"] = array(
 				array("ValRequired"),
 				array("ValInArray", "values" => array_keys($layouts))
 		),
-		"control" => array("LayoutSelector", "values" => $layouts),
+		"control" => array("StationerySelector", "layoutselector" => true, "values" => $layouts),
 		"helpstep" => $helpstepnum++
 );
 
