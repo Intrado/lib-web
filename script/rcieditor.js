@@ -32,8 +32,14 @@
    * rcieditor_inline.php
  */
 
+/*
+// Get the document domain to be the same for IE cross-frame operations
+var domain = document.location.hostname;
+document.domain = domain;
+*/
+
 (function ($) {
-window.RCIEditor = function (editor_mode, textarea_id, extra_data, hidetoolbar) {
+window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 	var myself = this;
 
 	this.textarea = null; // The textarea ELEMENT, not the ID
@@ -43,6 +49,8 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data, hidetoolbar) 
 
 	this.basename = 'rcicke';
 	this.scratch_id = 'rcieditor_scratch';
+
+	this.hidetoolbar = false;
 
 	// Associative array support for settings; use of set/getter's is encouraged
 	this.settings = null;
@@ -62,19 +70,16 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data, hidetoolbar) 
 	 * @param string editor_mode [plain|normal|full|inline]
 	 * @param string textarea_id the HTML id attribute of the text area the
 	 * editor should be attached to
-	 * @param mixed extra_data Optional misc. additional data that will be
-	 * used internally. This is only used to pass in field insert data to the
-	 * mkfield plugin at this time, however it is generalized in nature and
-	 * could be used to pass in other data as well.
 	 * @param boolean hidetoolbar Optional initial expand/collapse state of
 	 * the toolbar; true to collapse, false to expand (default)
 	 *
 	 * @return boolean true on success, else false
 	 */
-	this.construct = function (editor_mode, textarea_id, extra_data, hidetoolbar) {
+	this.construct = function (editor_mode, textarea_id, hidetoolbar) {
 
 		// Reset all internal properties
 		this.reset();
+		this.hidetoolbar = hidetoolbar;
 
 		// if the editor scratch space doesn't yet exist...
 		var scratch = $('#' + this.scratch_id);
@@ -84,8 +89,6 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data, hidetoolbar) 
 			scratch = $('<div id="' + this.scratch_id + '" style="display: none;"></div>');
 			$('body').append(scratch);
 		}
-
-		this.setSetting('extra_data', extra_data);
 
 		var container_id = textarea_id + '-htmleditor';
 		var res = this.applyEditor(editor_mode, textarea_id, container_id, hidetoolbar);
@@ -97,7 +100,7 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data, hidetoolbar) 
 	 * reinitializes it with new settings. The arguments are the same as the
 	 * consruct method.
 	 */
-	this.reconstruct = function (editor_mode, textarea_id, extra_data, hidetoolbar) {
+	this.reconstruct = function (editor_mode, textarea_id, hidetoolbar) {
 
 		// If the editorMode is defined...
 		if (typeof this.editorMode !== 'undefined') {
@@ -105,7 +108,7 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data, hidetoolbar) 
 			// We need to deconstruct before we construct...
 			if (! this.deconstruct()) return(false);
 		}
-		return(this.construct(editor_mode, textarea_id, extra_data, hidetoolbar));
+		return(this.construct(editor_mode, textarea_id, hidetoolbar));
 	};
 
 	/**
@@ -170,6 +173,7 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data, hidetoolbar) 
 		this.textarea = null;
 		this.container = null;
 		this.editorMode = null;
+		this.hidetoolbar = false;
 
 		// reset the settings array
 		this.settings = Array();
@@ -198,9 +202,9 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data, hidetoolbar) 
 			return(true);
 		}
 
-		// Remember these two things for context...
+		// Remember a couple things for context...
 		var textarea_id = this.textarea.attr('id');
-		var extra_data = this.getSetting('extra_data');
+		var hidetoolbar = this.hidetoolbar;
 
 		// Then tear down the existing editor
 		if (! this.deconstruct()) {
@@ -208,7 +212,7 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data, hidetoolbar) 
 		}
 
 		// And make a new one
-		var res = this.construct(editorMode, textarea_id, extra_data);
+		var res = this.construct(editorMode, textarea_id, hidetoolbar);
 		return(res);
 	};
 
@@ -274,10 +278,11 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data, hidetoolbar) 
 		var cke = $('<div id="' + this.basename + '_box"></div>');
 
 		if (editorMode == 'inline') {
-			this.setSetting('image_scaling', 500);
+			// SMK disabled image_scaling pending clarification of desired behavior
+			//this.setSetting('image_scaling', 500);
 
 			// Add an IFRAME to the page that will load up the inline editor
-			cke.html('<iframe src="' + this.getSetting('baseUrl') + 'rcieditor_inline.php?t=' + container_id + '" name="' + this.basename + '_iframe" style="width: 100%; height: 1000px; border: 1px solid #999999;"/>');
+			cke.html('<iframe src="' + this.getSetting('baseUrl') + 'rcieditor_inline.php?t=' + container_id + '" name="' + this.basename + '_iframe" style="width: 100%; height: 400px; border: 1px solid #999999;"/>');
 
 			// So now we have the inline editor component loading in an iframe;
 			// the next move is up to the iframe content to call back the next
@@ -300,7 +305,8 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data, hidetoolbar) 
 					break;
 
 				case 'normal':
-					this.setSetting('image_scaling', 500);
+					// SMK disabled image_scaling pending clarification of desired behavior
+					//this.setSetting('image_scaling', 500);
 
 					// Add the mkField plugin
 					if (extraPlugins.length) extraPlugins += ',';
@@ -311,7 +317,8 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data, hidetoolbar) 
 					break;
 
 				case 'full':
-					this.setSetting('image_scaling', 500);
+					// SMK disabled image_scaling pending clarification of desired behavior
+					//this.setSetting('image_scaling', 500);
 
 					// Add the mkField and mkBlock plugins
 					if (extraPlugins.length) extraPlugins += ',';
@@ -352,7 +359,7 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data, hidetoolbar) 
 				'disableNativeSpellChecker': false,
 				'browserContextMenuOnCtrl': true,
 				'width': '100%',
-				'height': '1000px',
+				'height': '400px',
 				'filebrowserImageUploadUrl' : uploaderURI,
 				'toolbarStartupExpanded' : (hidetoolbar ? false : true),
 				'toolbarCanCollapse' : true,
@@ -822,7 +829,7 @@ window.RCIEditor = function (editor_mode, textarea_id, extra_data, hidetoolbar) 
 	};
 
 	// Invoke out contstuct() method with the new() arguments supplied
-	this.construct(editor_mode, textarea_id, extra_data, hidetoolbar);
+	this.construct(editor_mode, textarea_id, hidetoolbar);
 }
 }) (jQuery);
 
