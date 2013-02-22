@@ -330,6 +330,9 @@
 							throw 'No theme data in this document!';
 						}
 
+						// Sort the theme elements by name
+						rcitheme_data.color.sort();
+
 						return(rcitheme_data);
 					}
 					else {
