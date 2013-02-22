@@ -566,10 +566,12 @@ function ContentManager() {
 				$('#stationeryselector').html("");
 				
 				
-				var fetchMessagesFromPaths = [
-					'/' + orgPath+'/api/2/users/'+userid+'/messagegroups',
-					'/' + orgPath+'/api/2/organizations/' + orgid + '/publications/messagegroups'
-				];
+				var fetchMessagesFromPaths = ['/' + orgPath+'/api/2/users/'+userid+'/messagegroups'];
+								
+				var getpublishedstationery = (typeof(userPermissions.subscribe) != 'undefined' && userPermissions.subscribe.indexOf("messagegroup") !== -1);
+				if (getpublishedstationery) {
+					fetchMessagesFromPaths[1] = '/' + orgPath+'/api/2/organizations/' + orgid + '/publications/messagegroups';
+				}
 				
 				var forcestationery = (typeof(userPermissions.forcestationery) != 'undefined' && userPermissions.forcestationery == 1);
 				var stationery = forcestationery?[]:[{id:0,name:"No Stationery"}];
