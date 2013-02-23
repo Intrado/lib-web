@@ -80,18 +80,23 @@ $helpstepnum = 1;
 $helpsteps[] = _L("");
 
 
+$args = array($USER->id);
+
+
 
 
 // Get all possible published stationery
 ///////////////////////////////////////////////////////
-$data = Publish::getSubscribableItems("messagegroup","stationery");
-$args = array($USER->id);
 
 $subscribesql = "";
-if (count($data["items"])) {
-	$subscribesql = " or mg.id in (" . repeatWithSeparator("?", ",", count($data["items"])) . ")";
-	foreach($data["items"] as $row) {
-		$args[] = $row["id"];
+$cansubscribe = in_array("messagegroup", explode("|", $ACCESS->getValue('subscribe')));
+if ($cansubscribe) {
+	$data = Publish::getSubscribableItems("messagegroup","stationery");
+	if (count($data["items"])) {
+		$subscribesql = " or mg.id in (" . repeatWithSeparator("?", ",", count($data["items"])) . ")";
+		foreach($data["items"] as $row) {
+			$args[] = $row["id"];
+		}
 	}
 }
 
