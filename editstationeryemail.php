@@ -116,8 +116,6 @@ if ($message) {
 $language = Language::getName($languagecode);
 
 $formdata = array();
-$helpstepnum = 1;
-$helpsteps[] = array(_L("Enter the name this email will appear as coming from."));
 $formdata["name"] = array(
 	"label" => _L('Name'),
 	"fieldhelp" => _L('Name '),
@@ -128,7 +126,6 @@ $formdata["name"] = array(
 		array("ValLength","max" => 50)
 	),
 	"control" => array("TextField","size" => 25, "maxlength" => 50),
-	"helpstep" => $helpstepnum++
 );
 
 $formdata["description"] = array(
@@ -139,7 +136,6 @@ $formdata["description"] = array(
 				array("ValLength","min" => 0,"max" => 50)
 		),
 		"control" => array("TextField","size" => 30, "maxlength" => 50),
-		"helpstep" => $helpstepnum++
 );
 
 
@@ -147,11 +143,6 @@ $messagecontrol = array("HtmlTextArea", "subtype" => $subtype, "editor_mode" => 
 if ($subtype == "plain" && $languagecode == "en")
 	$messagecontrol['spellcheck'] = true;
 
-$helpsteps[] = _L("Email stationery message body text goes here. Be sure to introduce yourself and give detailed information. For ".
-	"helpful message tips and ideas, click the Help link in the upper right corner of the screen.<br><br>If you would ".
-	"like to insert dynamic data fields, such as the recipient's name, move the cursor to the location where the data ".
-	"should be inserted, select the data field, and click 'Insert'. It's a good idea to enter a default value in the ".
-	"Default Value field for each insert. This value will be displayed in the event of a recipient having no data in your chosen field.");
 $formdata["message"] = array(
 	"label" => _L("Stationery"),
 	"fieldhelp" => _L('Edit the stationery. Helpful tips for successful messages can be found at ".
@@ -163,12 +154,11 @@ $formdata["message"] = array(
 		array("ValLength","max" => 256000)
 	),
 	"control" => $messagecontrol,
-	"helpstep" => $helpstepnum++
 );
 
 
 $buttons = array(submit_button(_L('Done'),"submit","tick"));
-$form = new Form("emaileedit",$formdata,$helpsteps,$buttons);
+$form = new Form("emaileedit",$formdata,null,$buttons);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data Handling
