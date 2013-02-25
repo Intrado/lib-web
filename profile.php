@@ -57,6 +57,16 @@ class ValDupeProfileName extends Validator {
 	}
 }
 
+class ValStationery extends Validator {
+	var $onlyserverside = true;
+
+	function validate ($value, $args, $requiredvalues) {
+		if ($requiredvalues["createstationery"] !== "true" && !in_array("messagegroup", $requiredvalues["subscribe"])) {
+			return _L("When restricted the user must either be able to either subscribe or create to stationery");
+		}
+ 		return true;
+	}
+}
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
@@ -305,7 +315,10 @@ _L('Messaging Options'),
 			"label" => _L('Restrict to Stationery'),
 			"fieldhelp" => _L('Users must use a stationery when creating an email message'),
 			"value" => $obj->getValue("forcestationery"),
-			"validators" => array(),
+			"validators" => array(
+					array("ValStationery")
+			),
+			"requires" => array("createstationery","subscribe"),
 			"control" => array("CheckBox"),
 			"helpstep" => 4
 	),
@@ -392,7 +405,7 @@ _L('Publish/Subscribe Options'),
 		"fieldhelp" => _L('Allows users to view and subscribe to published objects.'),
 		"value" => $subscribed,
 		"validators" => array(),
-		"control" => array("RestrictedValues", "values" => array("messagegroup"=>"Messages","list"=>"Lists"), "label" => _L("Allow subscribing to these types:")),
+		"control" => array("RestrictedValues", "values" => array("messagegroup"=>"Messages/Stationery","list"=>"Lists"), "label" => _L("Allow subscribing to these types:")),
 		"helpstep" => 7
 	),
 
@@ -941,7 +954,7 @@ include_once("nav.inc.php");
 </style>
 
 <script type="text/javascript">
-<? Validator::load_validators(array("ValDupeProfileName","ValTimeWindowCallEarly","ValTimeWindowCallLate")); ?>
+<? Validator::load_validators(array("ValDupeProfileName","ValTimeWindowCallEarly","ValTimeWindowCallLate","ValStationery")); ?>
 </script>
 
 <?
