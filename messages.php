@@ -300,10 +300,11 @@ include_once("nav.inc.php");
 
 startWindow(_L('My Messages'), 'padding: 3px;', false, true);
 $feedButtons = array(icon_button(_L('Add New Message'),"add",null,"mgeditor.php?id=new"));
-if ($USER->authorize('subscribe') && userCanSubscribe('messagegroup'))
-	$feedButtons[] = icon_button(_L('Subscribe to a Message'),"fugue/star", "document.location='messagegroupsubscribe.php'");
 if ($USER->authorize('createstationery'))
 	$feedButtons[] = icon_button(_L('Add New Stationery'),"add",null,"mglayoutselector.php");
+if ($USER->authorize('subscribe') && userCanSubscribe('messagegroup'))
+	$feedButtons[] = icon_button(_L('Subscribe to a Message'),"fugue/star", "document.location='messagegroupsubscribe.php'");
+
 
 $sortoptions = array(
 	"name" => array("icon" => "img/largeicons/tiny20x20/pencil.jpg", "name" => "Name"),
