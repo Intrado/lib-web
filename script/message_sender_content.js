@@ -585,17 +585,20 @@ function ContentManager() {
 							$.ajax({
 								url: path,
 								data: {"start": 0, "limit": 1000,"type":"stationery"},
-								async : false
-							}).done(function(data){
-								$.each(data.messageGroups,function(i,mg) {
-									//Make sure stationery isn't inserted twice
-									if ($.inArray(mg.id, stationeryids) === -1) {
-										stationery.push(mg);
-										stationeryids.push(mg.id);
-									}
-								});
-								self.getStationery(paths)();
-							});
+								async : false,
+								success: function(data){
+									$.each(data.messageGroups,function(i,mg) {
+										//Make sure stationery isn't inserted twice
+										if ($.inArray(mg.id, stationeryids) === -1) {
+											stationery.push(mg);
+											stationeryids.push(mg.id);
+										}
+									});
+								},
+								complete: function() {
+									self.getStationery(paths)();
+								}
+							});					
 						} else {
 							// All paths have been fetched, 
 							
