@@ -758,3 +758,12 @@ ALTER TABLE `portaluser`
   DROP `sms`;
 
 ALTER TABLE  `portaluseridentification` ADD  `confirmed` TINYINT NOT NULL DEFAULT  '0';
+
+-- all nonlocal types are autoconfirmed
+update portaluseridentification set confirmed = 1 where type != 'local';
+
+-- MUST run upgrade_customers prior to authserver upgrade - need customerproduct 'cm' inserted first
+-- all contact manager users are autoconfirmed
+update portaluseridentification pui set pui.confirmed = 1 where type = 'local' and pui.portaluserid in (select pc.portaluserid from portalcustomer pc join customerproduct cp on (pc.customerid = cp.customerid) where cp.product = 'cm' and cp.enabled);
+
+
