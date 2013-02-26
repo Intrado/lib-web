@@ -26,7 +26,7 @@ function PermissionManager() {
 			success : function(data) {
 				// set the orgid from the very first set of role permissions
 				orgid = data.roles[0].organization.id;
-
+				orgids = new Array();
 				self.configureRoles(data.roles); // Send Data over to the function setUp();
 			},
 			error: function() {
@@ -187,6 +187,7 @@ function PermissionManager() {
 				userPermissions[pItem.name] = pItem.value;
 			});
 			//}
+			orgids.push(rItem.organization.id)
 		});
 
 		if (userRoleId == false) {

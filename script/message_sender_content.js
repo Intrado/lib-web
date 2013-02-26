@@ -570,7 +570,10 @@ function ContentManager() {
 								
 				var getpublishedstationery = (typeof(userPermissions.subscribe) != 'undefined' && userPermissions.subscribe.indexOf("messagegroup") !== -1);
 				if (getpublishedstationery) {
-					fetchMessagesFromPaths[1] = '/' + orgPath+'/api/2/organizations/' + orgid + '/publications/messagegroups';
+					var index = 1;
+					$.each(orgids,function(i,id) {
+						fetchMessagesFromPaths[index++] = '/' + orgPath+'/api/2/organizations/' + id + '/publications/messagegroups';
+					});
 				}
 				
 				var forcestationery = (typeof(userPermissions.forcestationery) != 'undefined' && userPermissions.forcestationery == 1);
