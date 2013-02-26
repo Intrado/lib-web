@@ -51,7 +51,7 @@ class ValOrgKey extends Validator {
 		// look up this orgkey to see if it already exists
 		$org = DBFind("Organization", "from organization where orgkey = ? and not deleted", false, array($value));
 		if ($org)
-			return $this->label . " " . _L("This organization name already exists. Please enter a unique organizaton name");
+			return $this->label . " " . _L("This organization name already exists. Please enter a unique organization name");
 		return true;
 	}
 }
@@ -67,7 +67,7 @@ $namevalidators = array(
 	array("ValLength","min" => 1,"max" => 255)
 );
 
-// Remove current organization from parent organization list if editing. also validat original orgkey
+// Remove current organization from parent organization list if editing. also validate original orgkey
 if (isset($originalorgkey)) {
 	unset($organizations[$originalorgid]);
 	$namevalidators[] = array("ValOrgKey", "originalorgkey" => $originalorgkey);
@@ -143,9 +143,13 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$existingorg = DBFind("Organization", "from organization where orgkey = ?", false, array($orgkey));
 		// if the org already exists make it our target org
 		if ($existingorg) {
-			
 			$org = $existingorg;
-			$org->parentorganizationid = $parentorganization?$parentorganization->id:null;
+			$isnewroot = isset($originalorg) && $originalorg->parentorganizationid == null;
+			if ($isnewroot || !$parentorganization)	{
+				$org->parentorganizationid = null;
+			} else {
+				$org->parentorganizationid = $parentorganization->id;
+			}
 			$org->orgkey = $orgkey;
 			$org->deleted = 0;
 			$org->modifiedtimestamp = time();
@@ -154,7 +158,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		} else {
 			$org = new Organization();
 			$isnewroot = isset($originalorg) && $originalorg->parentorganizationid == null;
-							
 			if ($isnewroot || !$parentorganization)	{
 				$org->parentorganizationid = null;
 			} else {
@@ -169,6 +172,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		// if the original org and the new org are not the same, update associations and delete the original
 		if (isset($originalorg)) {
 			if ($org->id !== $originalorg->id) {
+				QuickUpdate("update role set organizationid = ? where organizationid = ?", false, array($org->id, $originalorgid));
 				QuickUpdate("update userassociation set organizationid = ? where organizationid = ?", false, array($org->id, $originalorgid));
 				QuickUpdate("update personassociation set organizationid = ? where organizationid = ?", false, array($org->id, $originalorgid));
 				QuickUpdate("update listentry set organizationid = ? where organizationid = ?", false, array($org->id, $originalorgid));
