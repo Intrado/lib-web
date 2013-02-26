@@ -63,6 +63,7 @@ class CallsReport extends ReportGenerator{
 					coalesce(mg.name, sq.name) as message,
 					coalesce(rc.phone,
 						rc.email,
+						rc.sms,
 						concat(
 							coalesce(rc.addr1,''), ' ',
 							coalesce(rc.addr2,''), ' ',
@@ -86,8 +87,10 @@ class CallsReport extends ReportGenerator{
 					where 1
 					$search
 					$rulesql
-					$userjoin
+					$userjoin 
 					";
+					
+		//error_log("CallsReport query " . $this->query);
 	}
 
 	function runHtml(){
