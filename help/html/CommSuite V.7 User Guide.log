@@ -182,6 +182,7 @@ Social_Media\Managing_Pages.htm
 Social_Media\Twitter.htm
 Stationery\Email_Stationery.htm
 Stationery\Email_Stationery_Overview.htm
+Stationery\Using_Stationery_in_Emails.htm
 Surveys\Important_Tips_for_Creating_Surveys.htm
 Surveys\Survey_Overview.htm
 System_Administration\Data_Imports\The_Import_Manager.htm
@@ -246,6 +247,7 @@ BlockedDestinations.jpg
 AllStaffList.jpg
 AddFeed.jpg
 FeedWidgetGen.jpg
+StationeryUsingInEmail.jpg
 AddSMS.jpg
 AddPhoneWizardTTS3.jpg
 BroadcastTemplatesBuilder.jpg
@@ -289,6 +291,7 @@ ReportsUsageStats.jpg
 EmailBlockedList.jpg
 AllSchoolList.jpg
 AdminSettingsDisableRepeati.jpg
+PasteFromWordButton.jpg
 ListQuickPick.jpg
 LinksNextToBroadcast.jpg
 ContactHistoryReportOptions.jpg
@@ -299,6 +302,8 @@ SelfSignup1.jpg
 SystemwideContactDetailIcon.gif
 ReportsTimeDistribution.gif
 SocialMediaLog.jpg
+StationeryEditingAnEmail.jpg
+StationeryImageButton.jpg
 StationeryMessageBuilderPub.jpg
 StationeryNewBannerText.jpg
 UploadListMapValues.jpg
@@ -475,6 +480,7 @@ whxdata\package_141.xml
 whxdata\package_142.xml
 whxdata\package_143.xml
 whxdata\package_144.xml
+whxdata\package_145.xml
 whxdata\packageindex.xml
 whxdata\synonym.xml
 whxdata\topictable_0.xml
@@ -651,6 +657,7 @@ whgdata\whlstf108.htm
 whgdata\whlstf109.htm
 whgdata\whlstf110.htm
 whgdata\whlstf111.htm
+whgdata\whlstf112.htm
 whgdata\whlstg0.htm
 CommSuite_User_Guide.htm
 CommSuite_User_Guide_csh.htm
