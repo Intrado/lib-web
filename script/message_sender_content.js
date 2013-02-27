@@ -904,3 +904,10 @@ function ContentManager() {
     	$("#msgsndr_emailmessagetexttranslate").parent().parent().removeClass("hide");
     }
 };
+
+function stationeryPrevewLoaded(area) {
+	jQuery('#stationerypreview').height(area.height() + 25);
+	area.bind('click', function(event) {
+		jQuery('#msgsndr_emailstationerycontinue').trigger('click');
+	});
+};
