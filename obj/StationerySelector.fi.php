@@ -24,6 +24,20 @@ class StationerySelector extends FormItem {
 
 		return $str;
 	}
+	
+	function renderJavascriptLibraries() {
+	
+		$str = "<script type=\"text/javascript\">
+						function stationeryPrevewLoaded(area) {
+								jQuery('#stationerypreview').height(area.height() + 25);
+								area.bind('click', function(event) {
+									// Trigger submit on click won't work in form
+									//jQuery('button[name=\"submit\"]').trigger(event);
+								});
+						}
+		</script>";
+		return $str;
+	}
 }
 
 ?>

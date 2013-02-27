@@ -1176,7 +1176,6 @@ div.progressbar div.progress {
 	float: left;
     margin: 20px 5px 5px;
     padding: 5px 10px 10px;
-    height: 600px;
     width: 100%;
 }
 
