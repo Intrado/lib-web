@@ -320,7 +320,7 @@ _L('Messaging Options'),
 	),
 	"forcestationery" => array(
 			"label" => _L('Restrict to Stationery'),
-			"fieldhelp" => _L('Users can must use a stationery when creating a email message'),
+			"fieldhelp" => _L('Users must use a stationery when creating an email message'),
 			"value" => $obj->getValue("forcestationery"),
 			"validators" => array(),
 			"control" => array("CheckBox"),
