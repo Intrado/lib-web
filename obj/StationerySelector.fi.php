@@ -29,7 +29,12 @@ class StationerySelector extends FormItem {
 	
 		$str = "<script type=\"text/javascript\">
 						function stationeryPrevewLoaded(area) {
-								jQuery('#stationerypreview').height(area.height() + 25);
+						
+								if(area.height() > 370) {
+									jQuery('#stationerypreview').height(area.height() + 30);
+								} else {
+									jQuery('#stationerypreview').height(400);
+								}
 								area.bind('click', function(event) {
 									// Trigger submit on click won't work in form
 									//jQuery('button[name=\"submit\"]').trigger(event);
