@@ -816,9 +816,9 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 		var textarea = this.container.parent().find("textarea");
 		if (typeof iframe != 'undefined' && typeof textarea != 'undefined') {
 			var height = iframe.contents().height();
-			if (height > 420) {
-				iframe.height(height + 20);
-				textarea.height(height + 20);
+			if (height > 400) {
+				iframe.height(height);
+				textarea.height(height);
 			} else {
 				iframe.height(400);
 				textarea.height(400);
