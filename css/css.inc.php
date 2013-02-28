@@ -806,9 +806,9 @@ div.autocomplete ul li {
 }
 
 .messagegrid { margin: 5px 0 0; font-family: "Helvetica Neue",helvetica,Arial,sans-serif; }
-.messagegrid th { color: #484848; font-size: 12px; text-align: left; }
-.messagegrid td { color: #484848; text-align: center; }
-.messagegrid .messagegridheader { padding: 2px; }
+.messagegrid th { color: #484848; font-size: 12px; text-align: center;}
+.messagegrid td { color: #484848; text-align: center;}
+.messagegrid .messagegridheader { padding: 2px 20px; }
 .messagegrid .messagegridheader img { margin: -3px 0 0 0; }
 .messagegrid .messagegridlanguage{ text-align: right; }
 
