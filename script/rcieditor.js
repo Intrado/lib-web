@@ -359,7 +359,7 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 				'disableNativeSpellChecker': false,
 				'browserContextMenuOnCtrl': true,
 				'width': '100%',
-				'height': '400px',
+				'height': 'auto',
 				'filebrowserImageUploadUrl' : uploaderURI,
 				'toolbarStartupExpanded' : (hidetoolbar ? false : true),
 				'toolbarCanCollapse' : true,
@@ -811,6 +811,20 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 	 * a validator function is set then it will be invoked, otherwise nada.
 	 */
 	this.validate = function() {
+		
+		var iframe = this.container.parent().find("iframe");
+		var textarea = this.container.parent().find("textarea");
+		if (typeof iframe != 'undefined' && typeof textarea != 'undefined') {
+			var height = iframe.contents().height();
+			if (height > 420) {
+				iframe.height(height + 20);
+				textarea.height(height + 20);
+			} else {
+				iframe.height(400);
+				textarea.height(400);
+			}
+		}
+		
 		if (typeof this.validator_fn === 'function') {
 			this.validator_fn();
 		}
