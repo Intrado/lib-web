@@ -185,9 +185,13 @@ var allowControl = {
 
 					// if the users setcallerid permission is defined, add the 'other' option 
 					if (typeof (userPermissions.setcallerid) != 'undefined' && userPermissions.setcallerid == 1) {
-						$('#optioncallerid_select').append('<option value="other" >Other</option>');
+						var isOther = $.inArray(defaultCallerid,userCallerIds) == -1;
+						$('#optioncallerid_select').append('<option value="other" '+ (isOther?'selected':'') +' >Other</option>');
+						if (isOther) {
+							$("#msgsndr_optioncallerid").removeClass('hidden');
+							$("#msgsndr_optioncallerid").val(formatPhone(defaultCallerid));
+						}
 					}
-
 				} else { 
 					// hide the callerid field 
 					
