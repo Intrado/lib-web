@@ -95,6 +95,23 @@ function update_jobtypeprefs($min, $max, $type, $custdb){
 ////////////////////////////////////////////////////////////////////////////////
 
 
+// Disable upgrading to phone classroom while active comments have been selected
+// If phone is enabled and comments are in a incomplete state. 
+class ValClassroom extends Validator {
+	var $onlyserverside = true;
+	
+	function validate ($value, $args) {
+		global $custdb;
+		
+		error_log("Val " . $value);
+		
+		if ($value != $args['currentsetting'] && $value == "emailandphone") {
+			if (QuickQuery("SELECT 1 FROM `alert` WHERE date = curdate()",$custdb))
+				return "Unable to set classroom to \"Email and Phone\" since there are active classroom alerts for today for this customer";
+		}
+		return true;
+	}
+}
 	
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
@@ -564,10 +581,13 @@ $formdata["hasenrollment"] = array(
 						"helpstep" => $helpstepnum
 );
 
+$classroomstate = $settings['_hastargetedmessage']?($settings['_hasphonetargetedmessage']?"emailandphone":"emailonly"):"disabled";
 $formdata["hasclassroom"] = array(
 		"label" => _L('Classroom Comments'),
-		"value" => $settings['_hastargetedmessage']?($settings['_hasphonetargetedmessage']?"emailandphone":"emailonly"):"disabled",
-		"validators" => array(array("ValInArray", "values" => array("disabled","emailonly","emailandphone"))),
+		"value" => $classroomstate,
+		"validators" => array(
+				array("ValInArray", "values" => array("disabled","emailonly","emailandphone")),
+				array("ValClassroom","currentsetting" => $classroomstate)),
 		"control" => array("SelectMenu","values" => array("disabled" => "Disabled", "emailonly" => "Email Only", "emailandphone" => "Email and Phone")),
 		"helpstep" => $helpstepnum
 );
@@ -946,7 +966,7 @@ document.observe('dom:loaded', function() {
 			checkbox.checked = !confirm("Are you sure you want to DISABLE this customer?");
 	});
 });
-<? Validator::load_validators(array("ValBrandTheme","ValInboundNumber","ValUrlComponent","ValSmsText","ValLanguages","ValUrl"));?>
+<? Validator::load_validators(array("ValBrandTheme","ValInboundNumber","ValUrlComponent","ValSmsText","ValLanguages","ValUrl","ValClassroom"));?>
 </script>
 <?
 

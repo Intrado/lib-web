@@ -113,19 +113,17 @@ jQuery.noConflict();
 	};
 	
 	// using helper functions in htmleditor.js, set up the ckeditor on the textarea with id "elementid"
-	applyCkEditor = function(elementid) {
-		// add the ckeditor to the textarea
-		applyHtmlEditor(elementid, true, elementid+"-htmleditor", userPrefs.hideemailtools);
+	applyCkEditor = function(elementid, editor_mode) {
 
-		// set up a keytimer to save content
-		var htmlTextArea_keytimer = null;
-		registerHtmlEditorKeyListener(function (event) {
-			window.clearTimeout(htmlTextArea_keytimer);
-			var htmleditor = getHtmlEditorObject();
-			htmlTextArea_keytimer = window.setTimeout(function() {
-				saveHtmlEditorContent(htmleditor);
-				obj_valManager.runValidateEventDriven(elementid);
-			}, 500);
+		if (typeof rcieditor === 'undefined') {
+			rcieditor = new RCIEditor(editor_mode, elementid);
+		}
+		else {
+			rcieditor.reconstruct(editor_mode, elementid);
+		}
+
+		rcieditor.setValidatorFunction(function () {
+			obj_valManager.runValidateEventDriven(elementid);
 		});
 	};
 	

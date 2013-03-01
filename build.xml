@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-
+<!-- pull the current -->
 <project name="kona" default="dist">
 
     <property name="src.dir" location="." />
@@ -99,9 +99,9 @@
     <!-- write a formatted build.tag into build.txt, if the "tag" is based on a branch -->
     <target name="format.build.tag.from.branch" depends="git.calc.describe, git.calc.branch.name, git.calc.tag.name"
             if="git.is.not.tag">
-        <echo message="build.tag=${git.branch}/${git.describe}${line.separator}" />
+        <echo message="build.tag=${git.branch}:${git.describe}${line.separator}" />
         <echo file="${build.txt.file}" append="true"
-              message="build.tag=${git.branch}/${git.describe}${line.separator}" />
+              message="build.tag=${git.branch}:${git.describe}${line.separator}" />
     </target>
 
     <!-- write a formatted build.tag into build.txt, if the "tag" is based on a tag -->
@@ -136,8 +136,10 @@
                 <exclude name="originals/" />
 
                 <!-- hidden files/folders (including .project) -->
-                <exclude name="**/.*" />
-                <exclude name="**/.*/" />
+                <exclude name="**/.g*" />
+                <exclude name="**/.g*/" />
+                <exclude name="**/.p*" />
+                <exclude name="**/.p*/" />    
 
                 <!-- IntelliJ project-related files -->
                 <exclude name="**/*.eml" />
@@ -148,6 +150,7 @@
 
 
     <target name="clean">
+    		<echo message="dist.dir = ${dist.dir}" />
         <delete dir="${dist.dir}" />
         <delete file="${build.txt.file}" />
     </target>

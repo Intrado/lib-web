@@ -45,7 +45,7 @@ if (isset($_GET['id'])) {
 	//if this was a preview, save the refering page url
 	$_SESSION['previewreferer'] = (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : NULL);
 	
-	redirect();
+	redirect($_SERVER["SCRIPT_NAME"] . (isset($_GET["iframe"])?"?iframe=true":""));
 }
 
 ////////////////////////////////////////////////////////////////////////////////

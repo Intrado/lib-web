@@ -19,6 +19,11 @@ function setEditMessageSession() {
 		// default behavior loads the "html" editor
 		if (isset($_GET['subtype']))
 			$_SESSION['editmessage']['subtype'] = $_GET['subtype'];
+		
+		if (isset($_GET['stationeryid'])) {
+			$_SESSION['editmessage']['stationeryid'] = $_GET['stationeryid'];
+			$_SESSION['editmessagereferer'] = "mgeditor.php";
+		}
 		redirect();
 	}
 }

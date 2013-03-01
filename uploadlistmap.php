@@ -128,7 +128,11 @@ if (CheckFormSubmit($f,'save') || CheckFormSubmit($f,'preview')) {
 					$import->refresh() && 
 					($import->status == "queued" || $import->status == "running"));
 				
-				redirect("list.php");
+				if (!isset($_GET["iframe"])) {
+					redirect("list.php");
+				} else {
+					exit();
+				}
 			}
 			//otherwise show preview again, with new mapping (need to reload form data?)
 		}
@@ -195,10 +199,26 @@ include_once("nav.inc.php");
 
 NewForm($f);
 
-buttons(submit($f, 'save','Save'), submit($f, 'preview','Preview'),  button("Select Different File",NULL,"uploadlist.php"), icon_button(_L('Cancel'),"cross",null,'list.php'));
+if (!isset($_GET["iframe"])) {
+	startWindow('Upload Preview' . ($count <= 0 ? " - First 5000 Records" : ""));
+}
 
+$buttons = array();
+if (!isset($_GET["iframe"])) {
+	$buttons[] = submit($f, 'save','Save');
+	$buttons[] = icon_button(_L('Cancel'),"cross",null,'list.php');
+} else {
+	$buttons[] = '<input class="btn_hide" type="submit" value="submit" name="submit[' . $f . '][' . 'save' . ']" />';
+}
 
-startWindow('Upload Preview' . ($count <= 0 ? " - First 5000 Records" : ""));
+$buttons[] = icon_button("Select Different File","fugue/arrow_180", NULL,"uploadlist.php" . (isset($_GET["iframe"])?"?iframe=true":""));
+$buttons[] = submit($f, 'preview','Refresh Mapping',null,'arrow_refresh');
+
+call_user_func_array('buttons', $buttons);
+
+?>
+<br />
+<?
 
 if ($errormsg) {
 	echo '<div align="center">    ' . $errormsg;
@@ -210,7 +230,7 @@ if ($errormsg) {
 	}
 	$formatters = array(3 => "fmt_email");
 
-	if (count($listpreviewdata) >8) {
+	if (!isset($_GET["iframe"]) && count($listpreviewdata) >8) {
 		?><div class="scrollTableContainer"><?
 	}
 	echo '<table width="100%" cellpadding="3" cellspacing="1" class="list">';
@@ -269,12 +289,9 @@ if ($errormsg) {
 			?></div><?
 	}
 }
+if (!isset($_GET["iframe"]))
+	endWindow();
 
-endWindow();
-
-?><br><div style="margin-left: 10px;"><img src="img/bug_important.gif"> Please review your list then click Save.</div><?
-
-buttons();
 EndForm();
 
 include_once("navbottom.inc.php");

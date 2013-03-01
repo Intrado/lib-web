@@ -1,17 +1,27 @@
-﻿/**
- * Aspell plug-in for CKeditor 3.0
+/**
+ * Aspell plug-in for CKeditor 4.0
  * Ported from FCKeditor 2.x by Christian Boisjoli, SilenceIT
+ * Ported from CKEditor 3.x by Sean M. Kelly, Reliance Communications, Inc.
  * Requires toolbar, aspell
  */
 
+//CKEDITOR.plugins.addExternal('rcidata', '/newjackcity/scripts/rcidata.js');
 CKEDITOR.plugins.add('aspell', {
+
+	// Local icon is needed now since it was removed from CKE 4 (SMK)
+	icons: 'spellcheck',
+
+	lang: 'af,en',
+
 	init: function (editor) {
+
 		// Create dialog-based command named "aspell"
 		editor.addCommand('aspell', new CKEDITOR.dialogCommand('aspell'));
 		
-		// Add button to toolbar. Not sure why only that name works for me.
+		// Add button to toolbar.
 		editor.ui.addButton('SpellCheck', {
-			label: editor.lang.spellCheck.toolbar,
+			//label: editor.lang[editor.langCode].spellCheck.toolbar,
+			label: editor.lang.aspell.toolbar,
 			command: 'aspell'
 		});
 		

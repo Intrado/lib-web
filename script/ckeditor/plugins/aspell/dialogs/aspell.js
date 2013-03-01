@@ -7,13 +7,16 @@ CKEDITOR.dialog.add('aspell', function( editor )
 	var number = CKEDITOR.tools.getNextNumber(),
 		iframeId = 'cke_frame_' + number,
 		textareaId = 'cke_data_' + number,
+		scratchId = 'cke_scratch_' + number,
 		interval,
-		errorMsg = editor.lang.spellCheck.notAvailable;
+		errorMsg = editor.lang.aspell.notAvailable;
 	
 	var spellHTML =
 	// Input for exchanging data CK<--->spellcheck
 		'<textarea name="'+textareaId+'" id="'+textareaId+
 		'" style="display: none;"></textarea>' +
+	// Scratch space for doing DOM work
+		'<div style="display: none;" id="' + scratchId + '"></div>' +
 	// Spellcheck iframe
 		'<iframe src="" style="width:485px; height:380px"' +
 		' frameborder="0" name="' + iframeId + '" id="' + iframeId + '"' +
@@ -33,7 +36,7 @@ CKEDITOR.dialog.add('aspell', function( editor )
 				// Create spellcheck object, set options/attributes
 				var oSpeller = new spellChecker(document.getElementById(textareaId));
 				oSpeller.spellCheckScript = editor.plugins.aspell.path+'spellerpages/server-scripts/spellchecker.php';
-				oSpeller.OnFinished = function (numChanges) { oSpeller_OnFinished(dialog, numChanges) };
+				oSpeller.OnFinished = function (numChanges) { oSpeller_OnFinished(dialog, numChanges); };
 				oSpeller.popUpUrl = editor.plugins.aspell.path+'spellerpages/spellchecker.html';
 				oSpeller.popUpName = iframeId;
 				oSpeller.popUpProps = null;
@@ -41,23 +44,24 @@ CKEDITOR.dialog.add('aspell', function( editor )
 				// Place language in global variable;
 				// A bit of a hack, but how does e.g. controls.html know which language to use?
 				FCKLang = {};
+
 				// spellChecker.js
-				FCKLang.DlgSpellNoChanges     = CKEDITOR.lang[editor.langCode].spellCheck.noChanges;
-				FCKLang.DlgSpellNoMispell     = CKEDITOR.lang[editor.langCode].spellCheck.noMispell;
-				FCKLang.DlgSpellOneChange     = CKEDITOR.lang[editor.langCode].spellCheck.oneChange;
-				FCKLang.DlgSpellManyChanges   = CKEDITOR.lang[editor.langCode].spellCheck.manyChanges;
+				FCKLang.DlgSpellNoChanges     = editor.lang.aspell.noChanges;
+				FCKLang.DlgSpellNoMispell     = editor.lang.aspell.noMispell;
+				FCKLang.DlgSpellOneChange     = editor.lang.aspell.oneChange;
+				FCKLang.DlgSpellManyChanges   = editor.lang.aspell.manyChanges;
 				// controls.html
-				FCKLang.DlgSpellNotInDic      = CKEDITOR.lang[editor.langCode].spellCheck.notInDic;
-				FCKLang.DlgSpellChangeTo      = CKEDITOR.lang[editor.langCode].spellCheck.changeTo;
-				FCKLang.DlgSpellBtnIgnore     = CKEDITOR.lang[editor.langCode].spellCheck.btnIgnore;
-				FCKLang.DlgSpellBtnIgnoreAll  = CKEDITOR.lang[editor.langCode].spellCheck.btnIgnoreAll;
-				FCKLang.DlgSpellBtnReplace    = CKEDITOR.lang[editor.langCode].spellCheck.btnReplace;
-				FCKLang.DlgSpellBtnReplaceAll = CKEDITOR.lang[editor.langCode].spellCheck.btnReplaceAll;
-				FCKLang.DlgSpellBtnUndo       = CKEDITOR.lang[editor.langCode].spellCheck.btnUndo;
+				FCKLang.DlgSpellNotInDic      = editor.lang.aspell.notInDic;
+				FCKLang.DlgSpellChangeTo      = editor.lang.aspell.changeTo;
+				FCKLang.DlgSpellBtnIgnore     = editor.lang.aspell.btnIgnore;
+				FCKLang.DlgSpellBtnIgnoreAll  = editor.lang.aspell.btnIgnoreAll;
+				FCKLang.DlgSpellBtnReplace    = editor.lang.aspell.btnReplace;
+				FCKLang.DlgSpellBtnReplaceAll = editor.lang.aspell.btnReplaceAll;
+				FCKLang.DlgSpellBtnUndo       = editor.lang.aspell.btnUndo;
 				// controlWindow.js
-				FCKLang.DlgSpellNoSuggestions = CKEDITOR.lang[editor.langCode].spellCheck.noSuggestions;
+				FCKLang.DlgSpellNoSuggestions = editor.lang.aspell.noSuggestions;
 				// spellchecker.html
-				FCKLang.DlgSpellProgress      = CKEDITOR.lang[editor.langCode].spellCheck.progress;
+				FCKLang.DlgSpellProgress      = editor.lang.aspell.progress;
 				// End language
 				
 				// Start spellcheck!
@@ -77,8 +81,29 @@ CKEDITOR.dialog.add('aspell', function( editor )
 		{
 			editor.focus();
 			editor.fire('saveSnapshot'); // Best way I could find to trigger undo steps.
-			dialog.getParentEditor().setData(document.getElementById(textareaId).value);
-			editor.fire('saveSnapshot'); // But there's a blank one between!
+
+			// Intermediate step to be able to restore altered data
+			var scratch = document.getElementById(scratchId);
+			scratch.innerHTML = document.getElementById(textareaId).value;
+			( function ($) {
+
+				// Get the base URL for requests that require absolute pathing
+				var t = window.top.location;
+				var tmp = new String(t);
+				var baseUrl = tmp.substr(0, tmp.lastIndexOf('/') + 1);
+
+				// Replace all placeholder icons with original images
+				$(scratch).find('img').each(function () {
+					var el = $(this); // reextend with jQuery in case prototype is fooling with our heads
+					el.attr('src', el.attr('data-aspell-saved-src'));
+					el.removeAttr('data-aspell-saved-src');
+				});
+				dialog.getParentEditor().setData(scratch.innerHTML);
+				// IE breaks on this cross-frame request; so we'll try to leave it off
+				if (! $.browser.msie) {
+					editor.fire('saveSnapshot'); // But there's a blank one between!
+				}
+			}) (jQuery);
 		}
 		dialog.hide();
 	}
@@ -93,7 +118,7 @@ CKEDITOR.dialog.add('aspell', function( editor )
 	}
 	
 	return {
-		title: editor.lang.spellCheck.title,
+		title: editor.lang.aspell.title,
 		minWidth: minW,
 		minHeight: minH,
 		buttons: [ CKEDITOR.dialog.cancelButton ],
@@ -132,10 +157,27 @@ CKEDITOR.dialog.add('aspell', function( editor )
 					src: editor.plugins.aspell.path+'spellerpages/spellChecker.js'
 			}}));
 			
-			// Get the data to be checked.
-			var sData = editor.getData();
+			// Intermediate step to be able to alter data coming
+			// into the spell checker instead of using the raw HTML
+			var scratch = document.getElementById(scratchId);
+			scratch.innerHTML = editor.getData();
+			( function ($) {
+
+				// Get the base URL for requests that require absolute pathing
+				var t = window.top.location;
+				var tmp = new String(t);
+				var baseUrl = tmp.substr(0, tmp.lastIndexOf('/') + 1);
+
+				// Replace all images with a placeholder icon
+				$(scratch).find('img').each(function () {
+					var el = $(this); // reextend with jQuery in case prototype is fooling with our heads
+					el.attr('data-aspell-saved-src', el.attr('src'));
+					el.attr('src', baseUrl + 'script/ckeditor/plugins/aspell/icons/viewimage.gif');
+				});
+			}) (jQuery);
+
 			//CKEDITOR.document.getById(textareaId).setValue(sData); <-- doesn't work for some reason
-			document.getElementById(textareaId).value = sData;
+			document.getElementById(textareaId).value = scratch.innerHTML;
 			
 			// Wait for spellcheck script to load, then execute
 			interval = window.setInterval(spellTime(this, errorMsg), 250);
@@ -153,7 +195,7 @@ CKEDITOR.dialog.add('aspell', function( editor )
 		contents: [
 			{
 				id: 'general',
-				label: editor.lang.spellCheck.title,
+				label: editor.lang.aspell.title,
 				padding: 0,
 				elements: [
 					{

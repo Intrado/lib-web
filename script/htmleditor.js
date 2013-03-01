@@ -1,33 +1,71 @@
 
+// Global vars added by SMK 2012-11-30 used as the base name for the ID's of the
+// CKE elements; CKE 4.x handles this differenly from 3.X
+var reusableckeditor_basename = 'reusableckeditor';
+var htmlEditorImageScale = 0;
+// TODO: confirm that imageScaling will not affect "attachments" uploaded on the same message page
+
+// SMK added 2012-12-13 to get the base URL for requests that require absolute pathing
+var htmlEditorBaseUrl = new String(document.location);
+htmlEditorBaseUrl = htmlEditorBaseUrl.substr(0, htmlEditorBaseUrl.lastIndexOf('/') + 1);
+
 // Returns the textarea that the html editor is currently replacing.
 function getHtmlEditorObject() {
-	if ((typeof CKEDITOR == 'undefined') || !CKEDITOR) {
-		return null;
-	}
 
-	var instance;
-	if ((typeof CKEDITOR.instances == 'undefined') || !CKEDITOR.instances || !(instance = CKEDITOR.instances['reusableckeditor']))
-		return null;
+	do { // do this once...
 
-	var container = $('cke_reusableckeditor');
-	
-	if (!container)
-		return null;
+		if ((typeof CKEDITOR == 'undefined') || !CKEDITOR) {
+			break;
+		}
 
-	var textarea = container.previous();
-	var textareauseshtmleditor = textarea && textarea.match('textarea.HtmlEditor');
-	
-	return {'instance': instance, 'container': container, 'currenttextarea': textareauseshtmleditor ? textarea : null};
+		//if ((typeof CKEDITOR.instances == 'undefined') || !CKEDITOR.instances || !(instance = CKEDITOR.instances['reusableckeditor'])) {
+		if (typeof CKEDITOR.instances == 'undefined') {
+			break;
+		}
+
+		if (! CKEDITOR.instances) {
+			break;
+		}
+
+		var instance = false;
+		for (var i in CKEDITOR.instances) {
+			if (CKEDITOR.instances[i].name == reusableckeditor_basename) {
+				instance = CKEDITOR.instances[i];
+			}
+			else console.log('CKEDITOR instance.name = [' + CKEDITOR.instances[i].name + ']');
+		}
+		if (! instance) {
+			break;
+		}
+
+		var container = $('cke_' + reusableckeditor_basename);
+		if (! container) {
+			break;
+		}
+
+		var textarea = container.previous();
+		var textareauseshtmleditor = textarea && textarea.match('textarea.HtmlEditor');
+
+		return {'instance': instance, 'container': container, 'currenttextarea': textareauseshtmleditor ? textarea : null};
+	} while (false);
+
+	return null;
 }
 
-var currenthtmleditorkeylistener = null; // Global variable used to keep track of the key listener so that it can be unregistered when registerHtmlEditorKeyListener() is called with a new listener.
-var pendinghtmleditorkeylistener = null; // Will register this listener when the instance is ready, 
+// Global variable used to keep track of the key listener so that it can be
+// unregistered when registerHtmlEditorKeyListener() is called with a new listener.
+var currenthtmleditorkeylistener = null;
+
+// Will register this listener when the instance is ready, 
+var pendinghtmleditorkeylistener = null;
+
 function registerHtmlEditorKeyListener(listener) {
-	var htmleditorobject = getHtmlEditorObject();
-	if (!htmleditorobject) {
+
+	// Will register this listener when the instance is ready
+	var htmleditorobject;
+	if (! (htmleditorobject = htmlEditorIsReady())) {
 		currenthtmleditorkeylistener = null;
-		pendinghtmleditorkeylistener = listener; // Will register this listener when the instance is ready, called in applyHtmlEditor().
-		
+		pendinghtmleditorkeylistener = listener;
 		return;
 	}
 	
@@ -38,7 +76,9 @@ function registerHtmlEditorKeyListener(listener) {
 		htmleditorobject.instance.removeListener('afterCommandExec', currenthtmleditorkeylistener);
 		htmleditorobject.instance.removeListener('insertHtml', currenthtmleditorkeylistener);
 		htmleditorobject.instance.removeListener('insertElement', currenthtmleditorkeylistener);
-		htmleditorobject.instance.removeListener('focus', currenthtmleditorkeylistener); // Needed for Link plugin's OK button.
+
+		// Needed for Link plugin's OK button:
+		htmleditorobject.instance.removeListener('focus', currenthtmleditorkeylistener);
 	}
 	
 	if (listener) {
@@ -48,7 +88,9 @@ function registerHtmlEditorKeyListener(listener) {
 		htmleditorobject.instance.on('afterCommandExec', listener);
 		htmleditorobject.instance.on('insertHtml', listener);
 		htmleditorobject.instance.on('insertElement', listener);
-		htmleditorobject.instance.on('focus', listener); // Needed for Link plugin's OK button.
+
+		// Needed for Link plugin's OK button:
+		htmleditorobject.instance.on('focus', listener);
 	}
 	
 	currenthtmleditorkeylistener = listener;
@@ -58,6 +100,7 @@ function registerHtmlEditorKeyListener(listener) {
 // Returns null if the html editor is not loaded.
 // Returns an object containing the html editor instance and also the html editor's container.
 function saveHtmlEditorContent(existinghtmleditorobject) {
+
 	var htmleditorobject = existinghtmleditorobject || getHtmlEditorObject();
 	if (!htmleditorobject) {
 		return null;
@@ -65,33 +108,43 @@ function saveHtmlEditorContent(existinghtmleditorobject) {
 	
 	var textarea = htmleditorobject.currenttextarea;
 	if (textarea) {
-		var tempdiv = new Element('div').insert(htmleditorobject.instance.getData());
-
-		// Unstyle any image elements having src="viewimage.php?id=.."
-		var images = tempdiv.select('img');
-		for (var i = 0, count = images.length; i < count; i++) {
-			var image = images[i];
-			var matches = image.src.match(/viewimage\.php\?id=(\d+)/);
-			if (matches) {
-				image.replace('<img src="viewimage.php?id=' + matches[1] + '">');
-			}
-		}
-
-		var html = cleanFieldInserts(tempdiv.innerHTML).replace(/&lt;&lt;/g, '<<').replace(/&gt;&gt;/g, '>>');
-
-		// CKEditor inserts blank tags even if the user has deleted everything.
-		// check if there is an image or href tag... if not, strip the tags and see if there is any text
-		if (!html.match(/[img,href]/)) {
-			// strips all html tags, then strips whitespace. If there is nothing left... set the html to an empty string
-			if (html.stripTags().strip().replace(/[&nbsp;,\n,\r,\t]/g, '') == '')
-				html = '';
-		}
-		
-		textarea.value = html;
+		var content = htmleditorobject.instance.getData();
+		textarea.value = cleanContent(content);
 		textarea.fire('HtmlEditor:SavedContent');
 	}
 	
 	return htmleditorobject;
+}
+
+// SMK extracted this portion of code from f.saveHtmlEditorContent() since that
+// function requires the presence of a single CKEDITOR instance, but the multi-
+// instance scenario for wysiwyg inline editing also needs to be able to do the
+// same type of cleanup.
+function cleanContent(content) {
+	var tempdiv = new Element('div').insert(content);
+
+	// Unstyle any image elements having src="viewimage.php?id=.."
+	var images = tempdiv.select('img');
+	for (var i = 0, count = images.length; i < count; i++) {
+		var image = images[i];
+		var matches = image.src.match(/viewimage\.php\?id=(\d+)/);
+		if (matches) {
+			image.replace('<img src="viewimage.php?id=' + matches[1] + '">');
+		}
+	}
+
+	var html = cleanFieldInserts(tempdiv.innerHTML).replace(/&lt;&lt;/g, '<<').replace(/&gt;&gt;/g, '>>');
+
+	// CKEditor inserts blank tags even if the user has deleted everything.
+	// check if there is an image or href tag... if not, strip the tags and see if there is any text
+	if (! html.match(/[img,href]/)) {
+
+		// strips all html tags, then strips whitespace. If there is nothing left... set the html to an empty string
+		if (html.stripTags().strip().replace(/[&nbsp;,\n,\r,\t]/g, '') == '')
+			html = '';
+	}
+
+	return(html);
 }
 
 // Corrects any html tags that may be inside a data-field insert.
@@ -127,15 +180,16 @@ function cleanFieldInserts(html) {
 }
 
 function hideHtmlEditor() {
-	if ($('cke_reusableckeditor'))
-		$('reusableckeditorhider').insert($('cke_reusableckeditor'));
+	if ($('cke_' + reusableckeditor_basename)) {
+		$(reusableckeditor_basename + 'hider').insert($('cke_' + reusableckeditor_basename));
+	}
 }
 
 function clearHtmlEditorContent() {
-	var htmleditorobject = getHtmlEditorObject();
-	if (!htmleditorobject)
+	var htmleditorobject;
+	if (! (htmleditorobject = htmlEditorIsReady())) {
 		return;
-	
+	}
 	htmleditorobject.instance.setData('');
 }
 
@@ -143,90 +197,137 @@ function clearHtmlEditorContent() {
 // NOTE: It is assumed that there be only a single html editor on the page; CKEditor is buggy with multiple instances.
 var htmleditorloadinterval = null;
 
-function applyHtmlEditor(textarea, dontwait,target,hidetoolbar) {
+function htmlEditorIsReady() {
+	var htmleditorobject;
+	if (! (htmleditorobject = getHtmlEditorObject())) {
+		return(false);
+	}
+	return(htmleditorobject);
+}
 
+function applyHtmlEditor(textarea, dontwait, target, hidetoolbar) {
+
+	// Re-extend with prototype in case we're on a jquery page
 	textarea = $(textarea);
-	hidetoolbar = !!hidetoolbar;
-	
-	var editorobject = getHtmlEditorObject();
-	if (!editorobject) {
-		if ($('reusableckeditor'))
-			return; // The editor instance is still loading.
 
-		textarea.hide();
-		if (!$('htmleditorloadericon'))
-			textarea.insert({'before': '<span class="HTMLEditorAjaxLoader" id="htmleditorloadericon"><img src="img/ajax-loader.gif"/> Please wait while the HTML editor loads. </span>'});
+	// Hide the text area form field until we are done initializing
+	textarea.hide();
 
-		var reusableckeditor = new Element('div', {'id':'reusableckeditor'});
+	// Show an AJAXy loading indication
+	if (! $('htmleditorloadericon')) {
+		textarea.insert({'before': '<span class="HTMLEditorAjaxLoader" id="htmleditorloadericon"><img src="img/ajax-loader.gif"/> Please wait while the HTML editor loads. </span>'});
+	}
 
-		if (!dontwait) {
-			document.observe('dom:loaded', function(event) {
-				applyHtmlEditor(this, true, target, hidetoolbar);
-			}.bindAsEventListener(textarea));
+	// Here's the base name of the text element; we'll make several new elements with derived names
+	reusableckeditor_basename = textarea.id;
+
+	// Here's the first new element we'll make - its id is basename
+	var reusableckeditor = new Element('div', {'id':reusableckeditor_basename});
+
+	// The second new element has the same id with a 'hider' suffix
+	var hider = new Element('div', {'id':reusableckeditor_basename + 'hider'});
+	hider.hide();
+
+	// The hider contains the reusable CKE
+	hider.insert(reusableckeditor);
+
+	// And here will stick hider into the DOM
+	if (target != undefined) {
+		$(target).insert(hider);
+	} else {
+		document.body.insert(hider);
+	}
+
+	// Now wait around for the CKE object to be accessible
+	htmlEditorWaitForCKE(textarea, dontwait, hidetoolbar);
+}
+
+function htmlEditorWaitForCKE(textarea, dontwait, hidetoolbar) {
+
+	// If CKEDITOR is not ready, check back here every second until it is
+        if ((typeof CKEDITOR == 'undefined') || !CKEDITOR) {
+		window.setTimeout(function() { htmlEditorWaitForCKE(textarea, false, hidetoolbar); }, (dontwait ? 10 : 1000));
+		return;
+        }
+
+	// SMK added to selectively enable reduction scaling for uploaded images;
+	// page that includes CKE must set global var htmlEditorImageScalingEnable
+	// to true to enable scaling, otherwise scaling will be disabled by default;
+	// uploader.php will pass the argument on to f.handleFileUpload() which will
+	// ultimately be responsible for enforcement of this flag
+	var uploaderURI = htmlEditorBaseUrl + 'uploadimage.php';
+	if ((typeof htmlEditorImageScale !== 'undefined') && (htmlEditorImageScale > 0)) {
+		//console.log('Image Scaling enabled!');
+		uploaderURI += '?scaleabove=' + parseInt(htmlEditorImageScale);
+	}
+
+	// Now attach CKE to the form element with the name basename
+	CKEDITOR.replace(reusableckeditor_basename, {
+		'customConfig': '', // Prevent ckeditor from trying to load an external configuration file, should improve startup time.
+		'disableNativeSpellChecker': false,
+		'browserContextMenuOnCtrl': true,
+		'width': '100%',
+		'height': '400px',
+		'filebrowserImageUploadUrl' : uploaderURI,
+		'toolbarStartupExpanded' : !hidetoolbar,
+		'extraPlugins': 'aspell,mkfield',
+		'toolbar': [
+			    ['Print','Source'],
+			    ['Undo','Redo'],
+			    ['PasteFromWord','SpellCheck','mkField'],
+			    ['Link','Image','Table','HorizontalRule'],
+			    '/',
+			    ['Bold','Italic','Underline','Strike','TextColor','BGColor','RemoveFormat'],
+			    ['NumberedList','BulletedList','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','Outdent','Indent'],
+			    '/',
+			    ['Styles','Format','Font','FontSize']
+			],
+		'on': {
+			'instanceReady': function(event) {
+				htmlEditorFinishAttachment(this);
+			}.bindAsEventListener(textarea)
 		}
+	});
 
-		htmleditorloadinterval = setInterval(function() {
+	// Now we are just waiting on CKE to finish its business;
+	// it will fire instanceReady() function when it is done.
+}
 
-			if (getHtmlEditorObject()) {
-				clearInterval(htmleditorloadinterval);
-				return;
-			}
-			var hider = new Element('div', {'id':'reusableckeditorhider'});
-			hider.hide();
-			hider.insert(reusableckeditor);
-			
-			if(target != undefined) {
-				$(target).insert(hider);
-			} else {
-				document.body.insert(hider);
-			}
-			
+function htmlEditorFinishAttachment(textarea) {
 
-			CKEDITOR.replace(reusableckeditor, {
-				'customConfig': '', // Prevent ckeditor from trying to load an external configuration file, should improve startup time.
-				'disableNativeSpellChecker': false,
-				'browserContextMenuOnCtrl': true,
-				'extraPlugins': 'aspell', //enable aspell port
-				'removePlugins': 'wsc,scayt,smiley,showblocks,flash,elementspath,save',
-				'toolbar': [
-				            ['Print','Source'],
-				            ['Undo','Redo'],
-				            ['PasteFromWord','SpellCheck'],
-				            ['Link','Image','Table','HorizontalRule'],
-				            '/',
-				            ['Bold','Italic','Underline','Strike','TextColor','BGColor','RemoveFormat'],
-				            ['NumberedList','BulletedList','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','Outdent','Indent'],
-				            '/',
-				            ['Styles','Format','Font','FontSize']
-				        ],
-				'disableObjectResizing': true,
-				'resize_enabled': false,
-				'width': '100%',
-				'height': '400px',
-				'filebrowserImageUploadUrl' : 'uploadimage.php',
-				'toolbarStartupExpanded' : !hidetoolbar,
-				'on': {
-					'instanceReady': function(event) {
-						this.previous('.HTMLEditorAjaxLoader').remove();
-						applyHtmlEditor(this);
-						registerHtmlEditorKeyListener(pendinghtmleditorkeylistener);
-						pendinghtmleditorkeylistener = null;
-						if ($('htmleditorloadericon'))
-							$('htmleditorloadericon').remove();
-					}.bindAsEventListener(textarea)
-				}
-			});
-			clearInterval(htmleditorloadinterval);
+	// SMK added 2012-12-06 - The third new element is a CSS fix for
+	// generic div/span heights compressed by external page CSS
+	var ckecssoverrides = new Element('style');
+	var css_toolbars = 'span.cke_toolgroup { height: 27px; } a.cke_dialog_tab { height: 26px; } a.cke_button { height: 25px; }';
+	ckecssoverrides.innerHTML = css_toolbars;
+	textarea.up().insert(ckecssoverrides);
 
-		}, dontwait ? 0 : 2000);
+	// Finish our event listener for the CKE object
+	registerHtmlEditorKeyListener(pendinghtmleditorkeylistener);
+	pendinghtmleditorkeylistener = null;
+
+	// Hide our AJAXy loading indicator
+	textarea.previous('.HTMLEditorAjaxLoader').remove();
+	if ($('htmleditorloadericon'))
+		$('htmleditorloadericon').remove();
+
+	var htmleditorobject = getHtmlEditorObject();
+	if (! htmleditorobject) {
+		console.log('FAIL!');
 		return;
 	}
 
-	if (!editorobject.currenttextarea || editorobject.currenttextarea.identify() != textarea.identify()) {
-		saveHtmlEditorContent(editorobject);
+	if (! htmleditorobject.currenttextarea || htmleditorobject.currenttextarea.identify() != textarea.identify()) {
+		saveHtmlEditorContent(htmleditorobject);
 	}
 
+	// A little data sanitizing for the raw textarea form content
 	var html = textarea.value.replace(/<</g, "&lt;&lt;").replace(/>>/g, "&gt;&gt;");
-	editorobject.instance.setData(html);
-	textarea.hide().addClassName('HtmlEditor').insert({'after':editorobject.container});
+	htmleditorobject.instance.setData(html);
+
+	// The presence of the HtmlEditor classname signals
+	// f.getHtmlEditorObject() to use CKE instead of the bare textarea
+	textarea.hide().addClassName('HtmlEditor');
+
 }
+

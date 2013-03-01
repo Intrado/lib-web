@@ -257,6 +257,8 @@ table.window_body { width: 100%; }
 .feedfilter {	margin: 0; padding: 0; list-style: none; }
 .feedfilter li { line-height: 20px; padding-top: 5px; }
 .feedfilter li a img { margin-top: -5px; margin-right: 5px; }
+.feedfilter li.feedselected a {color: #000000; font-weight: bold; }
+
 
 .caller_id { float: left; display: inline; width: 70.5%; }
 .approved_id { float: left; display: inline; width: 28.5%; margin: 0 0 0 1%; }
@@ -373,7 +375,10 @@ table_left and table_right have the arrow controls, set to 8% width for 1024 scr
 .feed_item td { padding: 1em 0.5em; }
 
 
-
+/* RCIeditor */
+span.cke_toolgroup {height: 27px;}
+a.cke_dialog_tab {height: 26px;}
+a.cke_button {height: 25px;}
 
 
 /* +----------------------------------------------------------------+
@@ -394,6 +399,10 @@ div.scrollTableContainer {
 	height: 220px; /* Set scrolling window size */
 	overflow: auto; /* Turn on scrolling */
 	position: relative;
+}
+
+div.horizontalScrollTableContainer {
+	height: auto;
 }
 /* End of scrolling window style settings */
 

@@ -51,11 +51,12 @@
                         }).done(function(dataListStats){
                             data.stats = $.extend(data.stats, dataListStats[id]);
                             base.unfetchedIds.splice(base.unfetchedIds.indexOf(id), 1);
-                            base.buildTable();
+                            
                         });
                     };
                 });
-
+                base.buildTable();
+                
                 // Enable the "pick from lists" button
                 if (hasLists)
                     base.$el.find('[href=#add-recipients-existing_lists]').removeClass('disabled');
@@ -68,6 +69,10 @@
                 pickExisting: {$el: $('#add-recipients-existing_lists')},
                 newUsingRules: {$el: $('#add-recipients-rules')},
                 newUsingSections: {$el: $('#add-recipients-sections')},
+                newUsingQuickPick: {$el: $('#add-recipients-quickpick')},
+                newUsingUpload: {$el: $('#add-recipients-upload')},  
+                
+                previewList: {$el: $('#modal-preview-list')},
                 saveList: {$el: $('#modal-save-list')}
             };
 
@@ -458,7 +463,7 @@
                             modal.buildSubmit();
                         } else {
                             // FAIL
-                            console.log(success);
+                            //console.log(success);
                         };
                     });
                 };
@@ -619,7 +624,7 @@
                             modal.buildFields();
                             modal.buildSubmit();
                         } else {
-                            console.log('failed to delete rule');
+                            //console.log('failed to delete rule');
                         };
                     });
                     return false;
@@ -800,12 +805,27 @@
                     modal.validate();
                 });
 
-                modal.validate = function(){
-                    if ($name.val() !== '') {
-                        $submitBtn.removeClass('disabled');
+                modal.validate = function(msg){
+                	$submitBtn.text('Save List');
+                	invalid = false;
+                	if (typeof(msg) == 'string' && msg != '') {
+                		$("#savelistvalidation").html(msg);
+                		invalid = true;
+                	}
+                	
+                    if ($name.val() == '') {
+                    	$("#savelistvalidation").html("List name is required");
+                    	invalid = true;
+                    }
+                    
+                    if (invalid) {
+                    	$("#savelistvalidation").show();
+                    	$submitBtn.addClass('disabled');
                     } else {
-                        $submitBtn.addClass('disabled');
-                    };
+                    	$("#savelistvalidation").hide();
+                        $submitBtn.removeClass('disabled');
+                    }
+                    
                 };
 
                 $name.on('change keyup', modal.validate);
@@ -816,22 +836,199 @@
                         $.ajax({
                             url: 'ajaxlistform.php?type=saveandrename&listid=' + modal.listId,
                             data: {name: $name.val()}
-                        }).done(function(success){
-                            if (success) {
-                                base.lists[modal.listId].name = base.lists[modal.listId].stats.name = $name.val();
-                                base.lists[modal.listId].isSaved = true;
-                                modal.$el.modal('hide');
-                                base.buildTable();
+                        }).done(function(result){
+                        	if (result) {
+                        		if (result.error) {
+                        			modal.validate(result.error);
+                        		} else {
+	                                base.lists[modal.listId].name = base.lists[modal.listId].stats.name = $name.val();
+	                                base.lists[modal.listId].isSaved = true;
+	                                modal.$el.modal('hide');
+	                                base.buildTable();
+                        		}
                             } else {
-                                // Failed
-                                console.log('Saving failed.')
+                            	modal.validate('Saving failed.');
                             };
                         });
                     };
                     return false;
                 });
             })();
+            
+            
+            
+            // MODAL > quickpick -------------------------------------
 
+            (function(){
+                var modal = base.modals.newUsingQuickPick;
+                var iframe = modal.$el.find('iframe');
+                var listid;
+                
+                modal.$el.on('show', function(){
+                	iframe.attr("src","blank.html");
+                    $.ajax({
+                        url: 'ajaxlistform.php?type=createlist'
+                    }).done(function(newListId){
+                    	listid = newListId
+                    	iframe.attr("src","search.php?iframe=true&listsearchmode=individual&id=" + listid);
+                    });
+                });
+                
+                modal.validate = function(){
+                	var url = iframe.contents().get(0).location.href.toLowerCase();
+                	if (url.indexOf("index.php") >= 0) {
+                		iframe.addClass("hide");
+                		alert('Your session has expired. Please log in again to continue.');
+                		window.location = "message_sender.php";
+                	}
+                };
+                
+                iframe.on('load', function() {modal.validate();});
+                
+                var submitBtn = modal.$el.find('.btn-primary');
+                submitBtn.on('click', function(e){
+                	  e.preventDefault();
+                	  $.ajax({
+                          url: 'ajax.php?type=liststats&listids=["' + listid + '"]'
+                      }).done(function(data){
+                          base.pickedListIds.push(listid);
+                          base.updateParentElement();
+                          
+                          data[listid].name = 'Quick Pick';
+                          base.lists[listid] = {
+                              stats: $.extend({}, data[listid])
+                          };
+                          modal.$el.modal('hide');
+                          base.buildTable();
+                          base.highlightListRow(listid);
+                      });
+                });
+            })();
+            
+            // MODAL > uploadlist -------------------------------------
+
+            (function(){
+                var modal = base.modals.newUsingUpload;
+                var iframe = modal.$el.find('iframe');
+                var listid;
+                var submitBtn = modal.$el.find('.btn-primary');
+                var inSubmit = false;
+                var submitText = "Done";
+                
+                
+                modal.$el.on('show', function(){
+                	submitBtn.addClass('disabled');
+                	modal.$el.addClass("uploadlistfileselector");
+                	iframe.attr("src","blank.html");
+                    $.ajax({
+                        url: 'ajaxlistform.php?type=createlist'
+                    }).done(function(newListId){
+                    	listid = newListId
+                    	iframe.attr("src","uploadlist.php?iframe=true");
+                    });
+                });
+                
+                modal.validate = function(){
+                	var url = iframe.contents().get(0).location.href.toLowerCase();
+                	
+                	if (url == 'about:blank' || 
+                		url.indexOf("blank.html") >= 0 ||
+                		url.indexOf("uploadlist.php?iframe=true") >= 0) {
+                        submitBtn.addClass('disabled');
+                    } else {
+                        submitBtn.removeClass('disabled');
+                    };
+                };
+                
+                iframe.on('load', function() {
+                	var url = iframe.contents().get(0).location.href.toLowerCase();
+                	if (url == 'about:blank' || url.indexOf("blank.html") >= 0) {
+                		modal.validate();
+                		return;
+                	}
+                	
+                   	if (url.indexOf("index.php") >= 0) {
+                		iframe.addClass("hide");
+                		alert('Your session has expired. Please log in again to continue.');
+                		window.location = "message_sender.php";
+                	}
+                   	
+                   	if (url.indexOf("uploadlist.php?iframe=true") >= 0) {
+                       	modal.$el.addClass("uploadlistfileselector");
+                   	} else {
+                       	modal.$el.removeClass("uploadlistfileselector");
+
+                   	}
+                 	if (inSubmit) {
+                 		$.ajax({
+                            url: 'ajax.php?type=liststats&listids=["' + listid + '"]'
+                        }).done(function(data){
+                      	  submitBtn.removeClass('call-progress');
+                      	  submitBtn.removeClass('list-progress');
+                      	  submitBtn.addClass('btn-primary');
+                      	  submitBtn.html(submitText);
+                      	  
+                            base.pickedListIds.push(listid);
+                            base.updateParentElement();
+                            
+                            data[listid].name = 'Uploaded List';
+                            base.lists[listid] = {
+                                stats: $.extend({}, data[listid])
+                            };
+                            modal.$el.modal('hide');
+                            base.buildTable();
+                            base.highlightListRow(listid);
+                            inSubmit = false;
+                        }); 
+                	}
+                	modal.validate();
+                });
+                
+                submitBtn.on('click', function(e){
+              	    e.preventDefault();
+                	if (inSubmit || submitBtn.hasClass('disabled')) {
+                		return;
+                	}
+                	inSubmit = true;
+                	
+            		  iframe.contents().find('input.btn_hide').first().trigger('click');
+            		  //modal.$el.find('.call-progress').removeClass('hide');
+            		  
+            		  submitBtn.addClass('call-progress');
+            		  submitBtn.addClass('list-progress');
+            		  submitBtn.removeClass('btn-primary');
+            		  submitText = submitBtn.html();
+            		  submitBtn.html('Processing List');
+                	   
+                });
+            })();
+
+            
+            // MODAL > previewlist -------------------------------------
+            (function(){
+                var modal = base.modals.previewList;
+                var iframe = modal.$el.find('iframe');
+                var submitBtn = modal.$el.find('.btn-primary');
+
+                modal.$el.on('show', function(){
+                	iframe.attr("src","showlist.php?iframe=true&id=" + modal.listId);
+                });
+                
+                modal.validate = function(){
+                	var url = iframe.contents().get(0).location.href.toLowerCase();
+                	if (url.indexOf("index.php") >= 0) {
+                		iframe.addClass("hide");
+                		alert('Your session has expired. Please log in again to continue.');
+                		window.location = "message_sender.php";
+                	}
+                };
+                
+                iframe.on('load', function() {modal.validate();});
+            })();
+            
+            
+            
+            
             // Wire up the table's list actions (remove and save) ---
 
             base.$el.find('.added-lists').on('click', '[data-list-id] .action', function(){
@@ -844,7 +1041,12 @@
                 } else if ($action.hasClass('save')) {
                     base.modals.saveList.listId = listId;
                     base.modals.saveList.$el.modal('show');
+                } else if ($action.hasClass('preview')) {
+                    base.modals.previewList.listId = listId;
+                    base.modals.previewList.$el.modal('show');
                 };
+                
+                
 
                 // TODO: comment out tooltips for now. Have to find the issue with CSS causing positioning issues
                 //$action.tooltip('hide');
@@ -856,33 +1058,55 @@
         // Build the "picked lists" table ---------------------------
 
         base.buildTable = function(){
-
-            var rows = '';
-            var sum = 0;
-
-            // Add each picked list to the table
-            $.each(base.pickedListIds, function(index, id) {
-
-                // Only do this if the list has stats
-                if (base.lists[id].stats.total !== undefined) {
-
-                    // Recalc total recipients
-                    sum += base.lists[id].stats.total;
-
-                    // If this list is saved, no save icon, else, show save icon
-                    if (base.lists[id].isSaved) {
-                        rows = rows + '<tr data-list-id="' + id + '"><td><a rel="tooltip" title="Remove List" class="action remove" href="#"><i class="icon-remove" title="Remove List"></i></a></td><td>' + base.lists[id].stats.name + '</td><td>' + base.lists[id].stats.total + '</td></tr>';
-                    } else {
-                        rows = rows + '<tr data-list-id="' + id + '"><td><a rel="tooltip" title="Remove List" class="action remove" href="#"><i class="icon-remove" title="Remove List"></i></a><a rel="tooltip" title="Save List" class="action save" data-toggle="modal" href="#modal-save-list"><i class="icon-folder-open" title="Save List"></i></a></td><td>' + base.lists[id].stats.name + '</td><td>' + base.lists[id].stats.total + '</td></tr>';
-                    };
-                };
-            });
-
-            // Last row is the total
-            rows = rows + '<tr><td colspan="2">Total</td><td>' + sum + '</td></tr>';
-            
-            // Add the rows to the table
-            $listTable.find('tbody').html(rows);
+			var sum = 0;
+			var rows = '';
+			
+			var tbody = $listTable.find('tbody');
+			tbody.html("");
+			
+			
+			self.addRow = function(id,name,total,isSaved) {
+				var row = '<tr data-list-id="' + id + '"><td><a rel="tooltip" title="Remove List" class="action remove" href="#"><i class="icon-remove" title="Remove List"></i></a>'; 
+				// If this list is saved, no save icon, else, show save icon
+				if (!isSaved) {
+					row += '<a rel="tooltip" title="Save List" class="action save" data-toggle="modal" href="#modal-save-list"><i class="icon-folder-open" title="Save List"></i></a>';
+				}
+				row += '<a rel="tooltip" title="Preview List" class="action preview" data-toggle="modal" href="#modal-preview-list"><i title="Preveiw List"></i></a>';
+				row += '</td><td>' + name + '</td><td>' + total + '</td></tr>';
+				
+				$listTable.find('tbody').append(row);
+			}
+			
+			
+			self.addRows = function(listids) {
+				return function() {
+					if (listids.length > 0) {
+						var listid = listids.pop();
+						if (base.lists && base.lists[listid] && base.lists[listid].stats.total !== undefined) {
+							var stat = base.lists[listid].stats;				
+							self.addRow(listid,stat.name,stat.total,stat.isSaved);
+							sum += stat.total;
+							// call self with listids
+							self.addRows(listids)();
+						} else {
+							$.ajax({
+								url: 'ajax.php?type=liststats&listids=["' + listid + '"]',
+								async : false
+							}).done(function(dataListStats){
+								var stat = dataListStats[listid];
+								self.addRow(listid,stat.name,stat.total,true);
+								sum += stat.total;
+								self.addRows(listids)();
+							});
+						}
+					}
+				}
+			}
+		
+			var listids = base.pickedListIds.clone();
+			self.addRows(listids)();
+	        
+			tbody.append('<tr><td colspan="2">Total</td><td>' + sum + '</td></tr>');
 
             // TODO: comment out tooltips for now. Have to find the issue with CSS causing positioning issues
             // Activate new tooltips

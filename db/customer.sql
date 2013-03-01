@@ -2112,3 +2112,18 @@ update setting set value='9.4/2' where name='_dbversion'
 $$$
 -- END 9.4/2
 
+-- START 9.5/1
+ALTER TABLE `messagegroup` CHANGE `type` `type` ENUM( 'notification', 'targetedmessage', 'classroomtemplate', 'systemtemplate', 'stationery' ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'notification'
+$$$
+
+update setting set value='9.5/1' where name='_dbversion'
+$$$
+-- END 9.5/1
+
+-- START 9.5/2
+ALTER TABLE `setting` CHANGE `name` `name` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '', CHANGE `value` `value` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL
+$$$
+
+update setting set value='9.5/2' where name='_dbversion'
+$$$
+-- END 9.5/2

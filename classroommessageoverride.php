@@ -109,32 +109,6 @@ if ($defaultmessagetext != "" && !$emailmessage) {
 }
 
 
-if (getSystemSetting('_hasphonetargetedmessage', false) &&
-	$defaultmessagetext != "" &&
-	!$phonemessage) {
-	// create a new phone message
-	$phonemessage = new Message();
-	$phonemessage->messagegroupid = $messagegroup->id;
-	$phonemessage->userid = $USER->id;
-	$phonemessage->name = "Custom Classroom";
-	$phonemessage->description = '';
-	$phonemessage->type = 'phone';
-	$phonemessage->subtype = 'voice';
-	$phonemessage->data = '';
-	$phonemessage->modifydate = date("Y-m-d H:i:s", time());
-	$phonemessage->autotranslate = 'none';
-	$phonemessage->languagecode = $language->code;
-	$phonemessage->create();
-	
-	$phonemessagepart = new MessagePart();
-	$phonemessagepart->messageid = $phonemessage->id;
-	$phonemessagepart->type = 'T';
-	$phonemessagepart->txt = $defaultmessagetext;
-	$phonemessagepart->voiceid = Voice::getPreferredVoice($language->code, "female");
-	$phonemessagepart->sequence = 0;
-	$phonemessagepart->create();
-}
-
 $targetedmessage->overridemessagegroupid = $messagegroup->id;
 $targetedmessage->update();
 

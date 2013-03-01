@@ -13,6 +13,11 @@
   <item name="Message Templates" url="Tips_for_Effective_Communication/Simple_Message_Templates.htm" />
   <item name="Communication Ideas" url="Tips_for_Effective_Communication/Communication_Ideas.htm" />
 </book>
+<book name="Email Stationery" >
+  <item name="Email Stationery Overview" url="Stationery/Email_Stationery_Overview.htm" />
+  <item name="Creating and Sharing Email Stationery" url="Stationery/Email_Stationery.htm" />
+  <item name="Using Stationery in Email" url="Stationery/Using_Stationery_in_Emails.htm" />
+</book>
 <book name="List Builder" >
   <item name="About List Builder" url="List_Builder/Overview.htm" />
   <item name="Create a List" url="List_Builder/Create_a_List.htm" />
@@ -36,7 +41,7 @@
 <book name="Publish and Subscribe" >
   <item name="Publish and Subscribe Overview" url="Publish_and_Subscribe/Publish_and_Subscribe_Overview.htm" />
 </book>
-<book name="Templates" >
+<book name="Broadcast Templates" >
   <item name="Broadcast Templates" url="Broadcasts/Broadcast_Templates.htm" />
 </book>
 <book name="Surveys" >
@@ -87,6 +92,13 @@
   <item name="Before Sending SMS Messages" url="SMS_Messaging/Before_You_Send_an_SMS.htm" />
   <item name="About SMS Messaging" url="SMS_Messaging/About_SMS_Messaging.htm" />
 </book>
+<book name="Classroom Messaging" >
+  <item name="Using Classroom Messaging" url="Classroom_Messaging/Classroom_Messaging_Overview.htm" />
+  <item name="Scheduling Classroom Messaging" url="Classroom_Messaging/Scheduling_Classroom_Messaging.htm" />
+  <item name="Managing Comments" url="Classroom_Messaging/Managing_Comments.htm" />
+  <item name="Creating Custom Comments" url="Classroom_Messaging/Creating_Custom_Comments.htm" />
+  <item name="Editing Classroom Comments" url="Classroom_Messaging/Editing_Classroom_Comments.htm" />
+</book>
 <book name="System Administration" >
   <book name="User Management" >
     <item name="Managing User Accounts" url="System_Administration/User_Management/Managing_User_Accounts.htm" />
@@ -112,9 +124,9 @@
   <book name="Data Imports" >
     <item name="The Import Manager" url="System_Administration/Data_Imports/The_Import_Manager.htm" />
   </book>
-  <book name="Self-Signup" >
-    <item name="Configuring the Self-Signup Feature" url="System_Administration/Subscriber_Feat/Configuring_the_Self-Signup_Feature.htm" />
-    <item name="Setting Up Self-Signup Fields" url="System_Administration/Subscriber_Feat/Setting_Up_Self-Signup_Fields.htm" />
+  <book name="Subscriber" >
+    <item name="Configuring the Subscriber Feature" url="System_Administration/Subscriber_Feat/Configuring_the_Self-Signup_Feature.htm" />
+    <item name="Setting Up Subscriber Fields" url="System_Administration/Subscriber_Feat/Setting_Up_Self-Signup_Fields.htm" />
   </book>
   <book name="SmartCall" >
     <item name="Using SmartCall" url="System_Administration/SmartCall/Using_SmartCall.htm" />

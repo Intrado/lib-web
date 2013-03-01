@@ -1,4 +1,4 @@
-﻿////////////////////////////////////////////////////
+////////////////////////////////////////////////////
 // spellChecker.js
 //
 // spellChecker object
@@ -238,6 +238,7 @@ function replaceAll() {
 }
 
 function terminateSpell() {
+
 	// called when we have reached the end of the spell checking.
 	var msg = "";		// by FredCK
 	var numrepl = this._getTotalReplaced();
@@ -280,9 +281,9 @@ function terminateSpell() {
 
 	// return back to the calling window
 //	this.spellCheckerWin.close();					// by FredCK
-	if ( typeof( this.OnFinished ) == 'function' )	// by FredCK
+	if ( typeof( this.OnFinished ) == 'function' ){	// by FredCK
 		this.OnFinished(numrepl) ;					// by FredCK
-
+	}
 	return true;
 }
 

@@ -148,18 +148,32 @@ if ($hasPhoneTargetedMessage) {
 			"helpstep" => 1);
 	}
 	
+	if (!$targetedmessage->isNewCustom()) {
+		$html = _L('<ul>
+				<li>When phone message is left blank it will be replaced by the default recording</li>
+				</ul>');
+		$formdata["blanknote"] = array(
+				"label" => _L("Default Message"),
+				"control" => array("FormHtml", "html" => $html),
+				"helpstep" => 2);
+	}
+	
+	
 	$formdata["phonemessage"] = array(
 			"label" => _L("Message"),
 			"fieldhelp" => _L("Enter your phone message in this field. Click on the 'Guide' button for help with the different options which are available to you."),
 			"value" => $phonemessagetext,
 			"validators" => array(
-				array("ValRequired"),
 				array("ValMessageBody", "messagegroupid" => $messagegroup->id),
 				array("ValLength","max" => 10000), // 10000 Characters is about 40 minutes of tts, considered to be more than enough
 				array("ValTtsText")
 			),
 			"control" => array("PhoneMessageEditor", "enablefieldinserts" => "limited", "langcode" => $languagecode, "messagegroupid" => $messagegroup->id),
 			"helpstep" => 2);
+	
+	if ($targetedmessage->isNewCustom()) {
+		$formdata["phonemessage"]["validators"][] = array("ValRequired");
+	}
 	
 	$helpsteps[] = _L("<p>You can use a variety of techniques to build your message in this screen, but ideally you should ".
 			"use this to assemble snippets of audio with dynamic data field inserts. You can use 'Call me to Record' to create your ".
@@ -218,13 +232,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 		
+		$changedEmail = $postdata['emailmessage'] != $emailmessagetext;
+		$changedPhone = $hasPhoneTargetedMessage && ($postdata['phonemessage'] != $phonemessagetext || $postdata['gender'] != $gender);
+		
 		// if they didn't change anything, don't do anything
-		if ($postdata['emailmessage'] == $emailmessagetext &&
-			!$hasPhoneTargetedMessage ||
-			($hasPhoneTargetedMessage && 
-				$postdata['phonemessage'] == $phonemessagetext && 
-				$postdata['gender'] == $gender)
-			) {
+		if (!$changedEmail && !$changedPhone) {
 			// DO NOT UPDATE MESSAGE!
 		} else if ($button != 'inpagesubmit'){
 			Query("BEGIN");
@@ -243,36 +255,40 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 							and id != ?", false, array($messagegroup->id, $languagecode, $phonemessage->id));
 				} else {
 					// new message
-					$phonemessage = new Message();
+					$phonemessage = new Message();					
 				}
 				
-				$phonemessage->messagegroupid = $messagegroup->id;
-				$phonemessage->type = "phone";
-				$phonemessage->subtype = "voice";
-				$phonemessage->autotranslate = ($languagecode == "en")?'none':'overridden';
-				$phonemessage->name = $messagegroup->name;
-				$phonemessage->description = Language::getName($languagecode);
-				$phonemessage->userid = $USER->id;
-				$phonemessage->modifydate = date("Y-m-d H:i:s");
-				$phonemessage->languagecode = $languagecode;
-				
-				if ($phonemessage->id)
-					$phonemessage->update();
-				else
-					$phonemessage->create();
-							
-				// create the message parts
-				$audiofileids = MessageGroup::getReferencedAudioFileIDs($messagegroup->id);
+				if ($postdata['phonemessage'] == "") {
+					$phonemessage->destroy();
+				} else {
+					$phonemessage->messagegroupid = $messagegroup->id;
+					$phonemessage->type = "phone";
+					$phonemessage->subtype = "voice";
+					$phonemessage->autotranslate = ($languagecode == "en")?'none':'overridden';
+					$phonemessage->name = $messagegroup->name;
+					$phonemessage->description = Language::getName($languagecode);
+					$phonemessage->userid = $USER->id;
+					$phonemessage->modifydate = date("Y-m-d H:i:s");
+					$phonemessage->languagecode = $languagecode;
 					
-				$phonemessage->recreateParts($postdata['phonemessage'], null, $postdata['gender'],$audiofileids);
-				
-				// Hack to correct the voice id for non tts languages
-				if (!isset($ttslanguages[$languagecode])) {
-					// get all T and V message parts, update the voiceid to represent the selected gender
-					$phonemessageparts = DBFindMany("MessagePart", "from messagepart where messageid = ? and type in ('V','T')", false, array($phonemessage->id));
-					foreach ($phonemessageparts as $part) {
-						$part->voiceid = Voice::getPreferredVoice("en", $postdata['gender']);
-						$part->update();
+					if ($phonemessage->id)
+						$phonemessage->update();
+					else
+						$phonemessage->create();
+								
+					// create the message parts
+					$audiofileids = MessageGroup::getReferencedAudioFileIDs($messagegroup->id);
+						
+					$phonemessage->recreateParts($postdata['phonemessage'], null, $postdata['gender'],$audiofileids);
+					
+					// Hack to correct the voice id for non tts languages
+					if (!isset($ttslanguages[$languagecode])) {
+						// get all T and V message parts, update the voiceid to represent the selected gender
+						$phonemessageparts = DBFindMany("MessagePart", "from messagepart where messageid = ? and type in ('V','T')", false, array($phonemessage->id));
+						foreach ($phonemessageparts as $part) {
+							$part->voiceid = Voice::getPreferredVoice("en", $postdata['gender']);
+							$part->update();
+						}
 					}
 				}
 			}

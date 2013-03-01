@@ -1,5 +1,8 @@
 <?
-/* Advanced Email Message Editor form item
+
+/**
+ * Advanced Email Message Editor form item
+ *
  * Purpose is to provide the user with the tools
  * needed to create an email message containing
  * dynamic content.
@@ -12,13 +15,12 @@
  * 	
  * Nickolas Heckman
  */
-
 class EmailMessageEditor extends FormItem {
 	
 	function render ($value) {
-		$n = $this->form->name."_".$this->name;
-				// subtype tells us if it's a plain or html email message
-		
+		$n = $this->form->name . '_' . $this->name;
+
+		// subtype tells us if it's a plain or html email message
 		$subtype = "html";
 		if (isset($this->args['subtype']))
 			$subtype = $this->args['subtype'];
@@ -34,14 +36,17 @@ class EmailMessageEditor extends FormItem {
 		if ($subtype == "plain" && isset($this->args['spellcheck']) && $this->args['spellcheck']) {
 			$textarea .= '<div>' . action_link(_L("Spell Check"), "spellcheck", null, '(new spellChecker($(\''.$n.'\')) ).openChecker();') . '</div>';
 		}
-		$textarea .= '</div>';
+
+		$textarea .= '
+			</div>
+		';
 		
 		// this is the vertical seperator
 		$seperator = '
 			<img src="img/icons/bullet_black.gif" />
 			<img src="img/icons/bullet_black.gif" />
 			<img src="img/icons/bullet_black.gif" />';
-				
+
 		// Data field inserts
 		$datafieldinsert = '
 			<div class="controlcontainer">
@@ -72,7 +77,7 @@ class EmailMessageEditor extends FormItem {
 					</div>
 				</div>
 			</div>';
-		
+
 		// main containers
 		$str = '
 			<div class="email">
@@ -86,6 +91,7 @@ class EmailMessageEditor extends FormItem {
 					'.$datafieldinsert.'
 				</div>
 			</div>';
+
 		return $str;
 	}
 
@@ -111,34 +117,15 @@ class EmailMessageEditor extends FormItem {
 	
 	function renderJavascriptLibraries() {
 		global $USER;
-		
-		$subtype = "html";
-		if (isset($this->args['subtype']))
-			$subtype = $this->args['subtype'];
-		
-		$str = '
-			<script type="text/javascript" src="script/ckeditor/ckeditor_basic.js"></script>
-			<script type="text/javascript" src="script/htmleditor.js"></script>
-			<script type="text/javascript">
-				function setupHtmlTextArea(e, hidetoolbar) {
-					e = $(e);
-					
-					// add the ckeditor to the textarea
-					applyHtmlEditor(e, false, e.id+"-htmleditor", hidetoolbar);
 
-					// set up a keytimer to save content and validate
-					var htmlTextArea_keytimer = null;
-					registerHtmlEditorKeyListener(function (event) {
-						window.clearTimeout(htmlTextArea_keytimer);
-						var htmleditor = getHtmlEditorObject();
-						htmlTextArea_keytimer = window.setTimeout(function() {
-							saveHtmlEditorContent(htmleditor);
-							form_do_validation(htmleditor.currenttextarea.up("form"), htmleditor.currenttextarea);
-						}, 500);
-					});
-				}
+		$subtype = (isset($this->args['subtype'])) ? $this->args['subtype'] : 'html';
+
+		// SMK removed CKE from this FI since this is for text editing
+		// only; Use HtmlTextArea FI for the HTML editor (CKE)
+		$str = '<script type="text/javascript">
+				function setupHtmlTextArea(textarea, hidetoolbar) { }
 			</script>';
-		
+
 		if ($subtype == "plain" && isset($this->args['spellcheck']) && $this->args['spellcheck']) {
 			$str .= '<script src="script/speller/spellChecker.js"></script>';
 		}

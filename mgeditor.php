@@ -98,6 +98,13 @@ if (isset($_GET['id'])) {
 }
 
 $messagegroup = new MessageGroup(getCurrentMessageGroup());
+if($USER->authorize('sendemail') && $messagegroup->type == 'stationery' && !$messagegroup->deleted) {
+	$message = $messagegroup->getMessage("email", "html", $messagegroup->defaultlanguagecode);
+	if ($message)
+		redirect("editstationeryemail.php?id={$message->id}");
+	else
+		redirect("editstationeryemail.php?mgid={$messagegroup->id}&languagecode={$messagegroup->defaultlanguagecode}");
+}
 if($messagegroup->type != 'notification' || $messagegroup->deleted) {
 	unset($_SESSION['messagegroupid']);
 	redirect('unauthorized.php');
@@ -472,7 +479,10 @@ function makeMessageGrid($messagegroup) {
 				$actions[] = action_link("Delete","cross","mgeditor.php?delete=$message->id","return confirmDelete();");
 			} else {
 				$icon = "diagona/16/160";
-				$actions[] = action_link("New","pencil_add","editmessageemail.php?id=new&subtype=html&languagecode=$languagecode&mgid=".$messagegroup->id);
+				if (!$USER->authorize('forcestationery'))
+					$actions[] = action_link("New","pencil_add","editmessageemail.php?id=new&subtype=html&languagecode=$languagecode&mgid=".$messagegroup->id);
+				$actions[] = action_link("New from stationery","pencil_add","mgstationeryselector.php?type=email&subtype=html&languagecode=$languagecode&mgid=".$messagegroup->id);
+				
 			}
 			$linkrow[] = array('icon' => $icon,'title' => _L("%s HTML Email Message",$languagename), 'actions' => $actions);
 

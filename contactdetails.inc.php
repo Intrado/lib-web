@@ -28,6 +28,9 @@ if(isset($method)){
 	exit();
 }
 
+$iFrameAppend = (isset($_GET["iframe"])?"&iframe=true":"");
+$iFramePrepend = (isset($_GET["iframe"])?"?iframe=true":"");
+
 if (isset($_GET['id'])) {
 	$personid = $_GET['id'] + 0;
 	if ($personid == "") {
@@ -44,11 +47,11 @@ if (isset($_GET['id'])) {
 	//check to see if trying to viewcontact on a person this user created, and redirect to addressbook edit
 	$person = new Person($personid);
 	if ($person->userid == $USER->id)
-		redirect("addressedit.php?id=$personid&origin=preview");
+		redirect("addressedit.php?id=$personid&origin=preview$iFrameAppend");
 	
 	$_SESSION['currentpid'] = $personid;
-	if (!isset($_GET['ajax']))
-		redirect();
+	if (!isset($_GET['ajax'])) 
+		redirect($_SERVER["SCRIPT_NAME"] . $iFramePrepend);
 } else if(isset($_SESSION['currentpid'])){
 	$personid = $_SESSION['currentpid'];
 } else {
@@ -58,7 +61,7 @@ if(getSystemSetting("_hasportal", false) && $USER->authorize("portalaccess")){
 	if(isset($_GET['create']) && $_GET['create']){
 		if(generatePersonTokens(array($personid))){
 			notice(_L("An activation code is now created for %s.", escapehtml(Person::getFullName($personid))));
-			redirect();
+			redirect($_SERVER["SCRIPT_NAME"] . $iFramePrepend);		
 		} else {
 			error("There was an error generating a new token");
 		}
@@ -69,7 +72,7 @@ if(getSystemSetting("_hasportal", false) && $USER->authorize("portalaccess")){
 		$count = revokePersonTokens(array($revokeid));
 		if($count){
 			notice(_L("The activation code for %s is now revoked.", escapehtml(Person::getFullName($revokeid))));
-			redirect();
+			redirect($_SERVER["SCRIPT_NAME"] . $iFramePrepend);
 		} else {
 			error("There was an error revoking this person's token");
 		}
@@ -82,7 +85,7 @@ if(getSystemSetting("_hasportal", false) && $USER->authorize("portalaccess")){
 			$portaluser = getPortalUsers(array($portaluserid));
 			$portalusername = $portaluser[$portaluserid]['portaluser.username'];
 			notice(_L("%1s is now dissociated from user %2s.", escapehtml(Person::getFullName($personid)), escapehtml($portalusername)));
-			redirect();
+			redirect($_SERVER["SCRIPT_NAME"] . $iFramePrepend);
 		} else {
 			error("An error occurred while disassociating the Portal User to this person");
 		}
@@ -354,15 +357,17 @@ $TITLE = "View Contact Information: " . escapehtml($contactFullName);
 
 if (!isset($_GET['ajax'])) {
 	include_once("nav.inc.php");
+	startWindow('Contact');
+	
 	NewForm($f);
 	if($method == "edit"){
-		buttons(submit($f, $s, "Done"));
+		buttons(submit($f, $s, _L("Save"),null,'tick'),icon_button(_L("Cancel"),"cross", null, $_SESSION['contact_referer']));
 	} else {
-		buttons(button("Done", null, $_SESSION['contact_referer']),
-
-			$USER->authorize('managecontactdetailsettings') ? button("Edit", "if(confirm('You are about to edit contact data that may impact other people\'s lists.  Are you sure you want to continue?')) window.location='editcontact.php'") : "");
+		buttons(icon_button(_L("Back"),"fugue/arrow_180", null, $_SESSION['contact_referer']),
+			$USER->authorize('managecontactdetailsettings') ? icon_button(_L("Edit"),"pencil", "if(confirm('You are about to edit contact data that may impact other people\'s lists.  Are you sure you want to continue?')) window.location='editcontact.php" . $iFramePrepend . " '") : ""
+		);
 	}
-	startWindow('Contact');
+	echo "<br />";
 } else {
 	echo "<div style='width:346px; height:200px; overflow:auto'>";
 }
@@ -633,7 +638,7 @@ foreach ($fieldmaps as $map) {
 				<td class="bottomBorder"><?=escapehtml($guardian['f01'])?></td>
 				<td class="bottomBorder"><?=escapehtml($guardian['f02'])?></td>
 				<td class="bottomBorder"><?=escapehtml($guardian['name'])?></td>
-				<td class="bottomBorder"><a href="viewcontact.php?id=<?=$guardian['guardianpersonid']?>" />View</a></td>
+				<td class="bottomBorder"><a href="viewcontact.php?id=<?=$guardian['guardianpersonid'] . $iFrameAppend?>$iFrameAppend" />View</a></td>
 			</tr>
 <?
 			}
@@ -670,7 +675,7 @@ foreach ($fieldmaps as $map) {
 						<td class="bottomBorder"><?=escapehtml($associate['portaluser.lastname'])?></td>
 						<td class="bottomBorder"><?=escapehtml($associate['portaluser.username'])?></td>
 						<td class="bottomBorder"><?=escapehtml($lastlogin)?></td>
-						<td class="bottomBorder"><a href="#" onclick="if(confirmDisassociate()) window.location='?disassociate=<?=$portaluserid?>'" />Disassociate</a></td>
+						<td class="bottomBorder"><a href="#" onclick="if(confirmDisassociate()) window.location='?disassociate=<?=$portaluserid . $iFrameAppend ?> '" />Disassociate</a></td>
 					</tr>
 <?
 				}
@@ -714,9 +719,9 @@ foreach ($fieldmaps as $map) {
 					<td>
 <?
 					if(!isset($_GET['ajax']) && $tokendata['token'] && strtotime($tokendata['expirationdate']) > strtotime("now"))
-						echo button("Generate Activation Code", "if(confirmGenerateActive()) window.location='?create=1'");
+						echo button("Generate Activation Code", "if(confirmGenerateActive()) window.location='?create=1{$iFrameAppend}'");
 					else if(!isset($_GET['ajax']))
-						echo button("Generate Activation Code", "if(confirmGenerate()) window.location='?create=1'");
+						echo button("Generate Activation Code", "if(confirmGenerate()) window.location='?create=1{$iFrameAppend}'");
 ?>
 					</td>
 <?
@@ -725,7 +730,7 @@ foreach ($fieldmaps as $map) {
 						<td>
 <?
 							if (!isset($_GET['ajax']))
-								echo button("Revoke Activation Code", "if(confirmRevoke()) window.location='?revoke=" . $personid . "'");
+								echo button("Revoke Activation Code", "if(confirmRevoke()) window.location='?revoke={$personid}{$iFrameAppend}'");
 ?>
 						</td>
 <?
@@ -776,8 +781,8 @@ foreach ($fieldmaps as $map) {
 
 
 if (!isset($_GET['ajax'])) {
-	endWindow();
 	buttons();
+	endWindow();
 	EndForm();
 
 	include_once("navbottom.inc.php");

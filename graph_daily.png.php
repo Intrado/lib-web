@@ -59,7 +59,8 @@ for($x=0; $x < 28; $x++){
 
 
 while ($row = DBGetRow($result)) {
-	$daysoffset = (strtotime("midnight") - strtotime($row[0])) / (60*60*24);
+	$daysoffset = date_diff(date_create(),date_create($row[0]))->format("%a");
+	
 	$newday = 28-$daysoffset-1;
 	
 	$data["A"][$newday] = $row[1];

@@ -5,9 +5,12 @@
 									<span>or</span>
 									<div class="btn-group">
 										<a href="#add-recipients-rules" class="btn" data-toggle="modal">Build a List Using Rules</a>
-										<a href="#" id="listwidget_enrollment" class="btn dropdown-toggle hidden" data-toggle="dropdown"><span class="caret"></span></a>
+										<a href="#" class="btn dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></a>
 										<ul class="dropdown-menu">
-											<li><a href="#add-recipients-sections" data-toggle="modal">Use Sections</a></li>
+											<li id="listwidget_enrollment" class="hidden"><a href="#add-recipients-sections" data-toggle="modal">Use Sections</a></li>
+											<li><a href="#add-recipients-quickpick" data-toggle="modal">Quick Pick</a></li>
+											<li><a href="#add-recipients-upload" data-toggle="modal">Upload List</a></li>
+											
 										</ul>
 									</div>
 								</div>
@@ -41,6 +44,7 @@
 												<div class="controls">
 													<input class="input" type="text" value="Grade is 4; Gender is Male" />
 												</div>
+												<div id="savelistvalidation" class="box_validatorerror er" style="display:none"></div>
 											</div>
 										<!-- </form> -->
 									</div>
@@ -108,8 +112,53 @@
 									</div>
 								</div>
 
+								<div id="add-recipients-quickpick" class="modal modaliframe hide fade">
+									<div class="modal-header">
+										<a class="close" data-dismiss="modal">×</a>
+										<h3>Quick Add Recipients</h3>
+									</div>
+									<div class="modal-body">
+										<iframe id="quickpickiframe" src=""></iframe>
+									</div>
+									<div class="modal-footer">
+										<a href="#" class="btn" data-dismiss="modal">Cancel</a>
+										<a href="#" class="btn btn-primary" data-dismiss="modal">Add Selected Recipients</a>
+									</div>
+								</div>
+								
+								<div id="add-recipients-upload" class="modal modaliframe uploadlistfileselector hide fade">
+									<div class="modal-header">
+										<a class="close" data-dismiss="modal">×</a>
+										<h3>Upload List</h3>
+									</div>
+									<div class="modal-body">
+										<iframe id="uploadiframe" src=""></iframe>
+									</div>
+									<div class="modal-footer">
+										<a href="#" class="btn" data-dismiss="modal">Cancel</a>
+										<a href="#" class="btn btn-primary disabled">Add Recipients</a>
+									</div>
+								</div>
+								
+								
+								<div id="modal-preview-list" class="modal modaliframe hide fade">
+									<div class="modal-header">
+										<a class="close" data-dismiss="modal">×</a>
+										<h3>Preview List</h3>
+									</div>
+									<div class="modal-body">
+										<iframe id="previewlistiframe" src=""></iframe>
+									</div>
+									<div class="modal-footer">
+										<a href="#" class="btn btn-primary" data-dismiss="modal">Done</a>
+									</div>
+								</div>
+								
 								<!-- /hidden modals -->
 								<div id="msgsndr_listids_msg" class="box_validatorerror er" style="display:none"></div>
+								
+								
+					
 
 <!-- from section_one -->
 				<fieldset>

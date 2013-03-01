@@ -26,10 +26,17 @@ class TargetedMessage extends DBMappedObject {
 	// and the phone was enabled
 	function isValid() {			
 		if ($this->overridemessagegroupid && getSystemSetting('_hasphonetargetedmessage', false)) {
-			$overridemessagegroup = new MessageGroup($this->overridemessagegroupid);
-			return $overridemessagegroup->hasDefaultMessage("phone", "voice");
+			$overridemessagegroup = new MessageGroup($this->overridemessagegroupid);			
+			
+			return $this->isNewCustom()?$overridemessagegroup->hasDefaultMessage("phone", "voice"):true;
 		}
 		return true;
 	}
+	
+	// Find out if this is a new custom targeted message, (one that does not have a default value)
+	function isNewCustom() {
+		return substr($this->messagekey, 0,7) == "custom-";
+	}
+	
 }
 ?>

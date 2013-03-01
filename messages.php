@@ -46,7 +46,7 @@ if (isset($_GET['delete'])) {
 		$_SESSION['messagegroupid'] = NULL;
 
 	$message = new MessageGroup($deleteid);
-	if (userOwns("messagegroup",$deleteid) && $message->type == 'notification') {
+	if (userOwns("messagegroup",$deleteid) && ($message->type == 'notification' || $message->type == 'stationery')) {
 		Query("BEGIN");
 		QuickUpdate("update messagegroup set deleted=1 where id=?",false,array($deleteid));
 		QuickUpdate("delete from publish where type = 'messagegroup' and messagegroupid = ?", false, array($deleteid));
@@ -74,26 +74,40 @@ $isajax = isset($_GET['ajax']);
 if($isajax === true) {
 	session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 
+	$typesql = "";
+	$viewtype = isset($_GET['feed_view'])?$_GET['feed_view']:"notification";
+	if ($viewtype == "stationery" && $USER->authorize('createstationery')) {
+		$typesql = "and mg.type = ?";
+		$args = array($USER->id,$viewtype, $USER->id,$viewtype);
+	} else if ($viewtype == "all") {
+		$typesql = "";
+		$args = array($USER->id, $USER->id);
+	} else {
+		$typesql = "and mg.type = ?";
+		$args = array($USER->id,"notification", $USER->id,"notification");
+	}	
+	
 	$start = 0 + (isset($_GET['pagestart']) ? $_GET['pagestart'] : 0);
 	$limit = 100;
 	$orderby = "modified desc";
 
-	$filter = "";
-	if (isset($_GET['filter'])) {
-		$filter = $_GET['filter'];
+	$sortby = "";
+	if (isset($_GET['feed_sortby'])) {
+		$sortby = $_GET['feed_sortby'];
 	}
-	switch ($filter) {
+	switch ($sortby) {
 		case "name":
 			$orderby = "digitsfirst, name";
 			break;
 	}
+
 	
 	// get all the message group ids for this page
 	$msgGroupIds = QuickQueryList(
 		"(select SQL_CALC_FOUND_ROWS mg.id as id,modified, (mg.name +0) as digitsfirst,name
 		from messagegroup mg
 		where mg.userid = ? 
-			and mg.type = 'notification'
+			$typesql 
 			and not mg.deleted)
 		UNION
 		(select mg.id as id,modified, (mg.name +0) as digitsfirst,name
@@ -103,9 +117,10 @@ if($isajax === true) {
 		where p.userid = ?
 			and p.action = 'subscribe'
 			and p.type = 'messagegroup'
-			and not mg.deleted)
+			and not mg.deleted 
+			$typesql)
 		order by $orderby, id
-		limit $start, $limit", false, false, array($USER->id, $USER->id));
+		limit $start, $limit", false, false, $args);
 
   	// total rows
 	$total = QuickQuery("select FOUND_ROWS()");
@@ -113,8 +128,8 @@ if($isajax === true) {
 	// get all the message group display data needed for this page
 	if ($total) {
 		$mergeditems = QuickQueryMultiRow(
-			"select 'message' as type,'Saved' as status, 
-				mg.id as id, mg.name as name,mg.description, mg.modified as date, mg.deleted as deleted,
+			"select 
+				mg.id as id,mg.type, mg.name as name,mg.description, mg.modified as date, mg.deleted as deleted,
 				sum(m.type='phone') as phone,
 				sum(m.type='email') as email, 
 				sum(m.type='sms') as sms, 
@@ -148,7 +163,7 @@ if($isajax === true) {
 			$data->list[] = array("itemid" => "",
 										"defaultlink" => "",
 										"icon" => "img/largeicons/information.jpg",
-										"title" => _L("No Messages."),
+										"title" => $viewtype=="stationery"?_L("No Stationery."):_L("No Messages."),
 										"content" => "",
 										"tools" => "");
 	} else {
@@ -165,7 +180,7 @@ if($isajax === true) {
 			$publishmessage = '';
 			$publishaction = $item['publishaction'];
 			if ($publishaction == 'publish')
-			$publishmessage = _L('Changes to this message are published.');
+			$publishmessage = $item["type"] == "stationery"?_L('Changes to this stationery are published.'):_L('Changes to this message are published.');
 				
 			// tell the user it's a subscription. change the href to view instead of edit
 			if ($publishaction == 'subscribe') {
@@ -184,12 +199,15 @@ if($isajax === true) {
 			$title = escapehtml($item["name"]);
 			$publishid = $item['publishid'];
 
-			if (getBrandTheme() == 'newui') { 
-				$icon = 'img/newui/letter.png';
+			if ($item["type"] == "stationery") {
+				$icon = 'img/newui/posts.png';
 			} else {
-				$icon = 'img/largeicons/letter.jpg';
+				if (getBrandTheme() == 'newui') { 
+					$icon = 'img/newui/letter.png';
+				} else {
+					$icon = 'img/largeicons/letter.jpg';
+				}
 			}
-			
 			// Users with published messages or subscribed messages will get a special action item
 			$publishactionlink = "";
 			switch ($publishaction) {
@@ -220,8 +238,15 @@ if($isajax === true) {
 					action_link("View", "fugue/magnifier", 'messagegroupview.php?id=' . $itemid),
 					$publishactionlink);
 			}
-
-			$content = '<a href="' . $defaultlink . '" >' . $time .  ($item["description"] != ""?" - " . escapehtml($item["description"]):"") . ' - <b>' . ($types==""?_L("Empty Message"):$types) . '</b>' . '</a>';
+			
+			
+			if ($item["type"] == "notification") {
+				$types = ' - <b>' . ($types==""?_L("Empty Message"):$types) . '</b>';
+			} else {
+				$types = "";
+			}
+			
+			$content = '<a href="' . $defaultlink . '" >' . $time .  ($item["description"] != ""?" - " . escapehtml($item["description"]):"") . $types . '</a>';
 			
 			$data->list[] = array("itemid" => $itemid,
 										"defaultlink" => $defaultlink,
@@ -275,25 +300,34 @@ include_once("nav.inc.php");
 
 startWindow(_L('My Messages'), 'padding: 3px;', false, true);
 $feedButtons = array(icon_button(_L('Add New Message'),"add",null,"mgeditor.php?id=new"));
+if ($USER->authorize('createstationery'))
+	$feedButtons[] = icon_button(_L('Add New Stationery'),"add",null,"mglayoutselector.php");
 if ($USER->authorize('subscribe') && userCanSubscribe('messagegroup'))
 	$feedButtons[] = icon_button(_L('Subscribe to a Message'),"fugue/star", "document.location='messagegroupsubscribe.php'");
 
-$feedFilters = array(
+
+$sortoptions = array(
 	"name" => array("icon" => "img/largeicons/tiny20x20/pencil.jpg", "name" => "Name"),
 	"date" => array("icon" => "img/largeicons/tiny20x20/clock.jpg", "name" => "Date")
 );
 
-feed($feedButtons,$feedFilters);
+if ($USER->authorize('createstationery')) {
+	$viewoptions["all"] = array("icon" => "img/largeicons/tiny20x20/globe.jpg", "name" => _L("All"));
+	$viewoptions["messages"] = array("icon" => "img/newui/letter-small.png", "name" => _L("Messages"));
+	$viewoptions["stationery"] = array("icon" => "img/newui/posts-small.png", "name" => _L("Stationery"));
+} else {
+	$viewoptions["messages"] = array("icon" => "img/largeicons/tiny20x20/pencil.jpg", "name" => _L("Messages"));
+}
+
+feed($feedButtons,$sortoptions,$viewoptions);
 ?>
 
 
 <script type="text/javascript" src="script/feed.js.php"></script>
 <script type="text/javascript">
-var filtes = <?= json_encode(array_keys($feedFilters))?>;
-var activepage = 0;
-var currentfilter = 'date';
+
 document.observe('dom:loaded', function() {
-	feed_applyfilter('<?=$_SERVER["REQUEST_URI"]?>','name');
+	feed_applyDefault('<?=$_SERVER["REQUEST_URI"]?>','name','messages');
 });
 </script>
 <?

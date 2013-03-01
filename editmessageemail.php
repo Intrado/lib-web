@@ -31,6 +31,7 @@ require_once("obj/EmailAttach.val.php");
 require_once("obj/EmailAttach.fi.php");
 require_once("obj/ValMessageBody.val.php");
 require_once("obj/EmailMessageEditor.fi.php");
+require_once("obj/HtmlTextArea.fi.php");
 require_once("obj/PreviewButton.fi.php");
 
 // appserver and thrift includes
@@ -99,6 +100,8 @@ if (!in_array($languagecode, array_keys(Language::getLanguageMap())))
 if (!$USER->authorize("sendmulti") && $languagecode != Language::getDefaultLanguageCode())
 	redirect('unauthorized.php');
 
+if ($USER->authorize('forcestationery') && !isset($_SESSION['editmessage']['stationeryid']))
+	redirect('unauthorized.php');
 
 PreviewModal::HandleRequestWithEmailText();
 	
@@ -113,6 +116,8 @@ $fromemail = $USER->email;
 $subject = "";
 $attachments = array();
 $text = "";
+$fromstationery = false;
+
 if ($message) {
 	// get the specific bits from the message if it exists
 	$parts = DBFindMany("MessagePart", "from messagepart where messageid = ? order by sequence", false, array($message->id));
@@ -123,6 +128,7 @@ if ($message) {
 	$fromname = $message->fromname;
 	$fromemail = $message->fromemail;
 	$subject = $message->subject;
+	$fromstationery = $message->fromstationery;
 	
 	// get the attachments
 	$msgattachments = DBFindMany("MessageAttachment", "from messageattachment where messageid = ?", false, array($message->id));
@@ -142,6 +148,17 @@ if ($message) {
 		foreach ($msgattachments as $msgattachment) {
 			permitContent($msgattachment->contentid);
 			$attachments[$msgattachment->contentid] = array("name" => $msgattachment->filename, "size" => $msgattachment->size);
+		}
+	}
+	
+	if (isset($_SESSION['editmessage']['stationeryid'])) {
+		$stationery = new MessageGroup($_SESSION['editmessage']['stationeryid']);
+		if ($stationery->type == "stationery" &&
+			$emailstationery = $stationery->getMessage("email", $subtype, "en")) {
+			$emailstationeryparts = DBFindMany("MessagePart", "from messagepart where messageid = ? order by sequence", false, array($emailstationery->id));
+				
+			$fromstationery = true;
+			$text = Message::format($emailstationeryparts);
 		}
 	}
 }
@@ -203,9 +220,19 @@ $formdata["attachments"] = array(
 );
 
 
-$messagecontrol = array("EmailMessageEditor", "subtype" => $subtype);
-if ($subtype == "plain" && $languagecode == "en")
-	$messagecontrol['spellcheck'] = true;
+// MESSAGE BODY
+if ($subtype == 'plain') {
+	// For plain text emails, use a plain textarea
+	$messagecontrol = array("EmailMessageEditor", "subtype" => $subtype);
+	if ($languagecode == "en") {
+		$messagecontrol['spellcheck'] = true;
+	}
+} else {
+	// HTML emails will use CKEditor 4
+	// valid editor_mode's are 'plain', 'normal', 'full', and 'inline'
+	$messagecontrol = array("HtmlTextArea", "subtype" => $subtype, "rows" => 20);
+	$messagecontrol['editor_mode'] = $fromstationery ? 'inline' : 'normal';
+}
 
 $helpsteps[] = _L("Email message body text goes here. Be sure to introduce yourself and give detailed information. For ".
 	"helpful message tips and ideas, click the Help link in the upper right corner of the screen.<br><br>If you would ".
@@ -225,6 +252,20 @@ $formdata["message"] = array(
 	"control" => $messagecontrol,
 	"helpstep" => 5
 );
+
+if ($subtype == 'html') {
+	$formdata["info"] = array(
+			"label" => "",
+			"control" => array("FormHtml","html"=>'
+					<div style="font-size: medium;">
+						<img src="img/icons/information.png" alt="Information"/>
+						Inserts field by clicking the 
+							<img src="script/ckeditor/plugins/mkfield/icons/mkfield.png" onclick="CKEDITOR.tools.callFunction(131,this);return false;" alt="fields" />
+						button inside the editor
+					</div>'),
+			"helpstep" => 5
+	);
+}
 $helpsteps[] = _L("Click the preview button to view of your message.");
 
 $formdata["preview"] = array(
@@ -268,7 +309,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
 		
 		// if they didn't change anything, don't do anything
-		if ($postdata['fromname'] == $fromname && 
+		if ($message &&
+				$postdata['fromname'] == $fromname && 
 				$postdata['from'] == $fromemail &&
 				$postdata['subject'] == $subject &&
 				json_decode($postdata['attachments'], true) == $attachments &&
@@ -291,6 +333,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			} else {
 				// new message
 				$message = new Message();
+				// from stationery state can never change after initiated
+				$message->fromstationery = isset($_SESSION['editmessage']['stationeryid'])?$_SESSION['editmessage']['stationeryid']:0;
 			}
 			
 			$message->messagegroupid = $messagegroup->id;
