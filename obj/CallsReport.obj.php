@@ -63,6 +63,7 @@ class CallsReport extends ReportGenerator{
 					coalesce(mg.name, sq.name) as message,
 					coalesce(rc.phone,
 						rc.email,
+						rc.sms,
 						concat(
 							coalesce(rc.addr1,''), ' ',
 							coalesce(rc.addr2,''), ' ',
@@ -72,7 +73,8 @@ class CallsReport extends ReportGenerator{
 							) as destination,
 					rc.attemptdata as attemptdata,
 					coalesce(if(rc.result='X' and rc.numattempts<3,'F',rc.result), rp.status) as status,
-					rc.sequence as sequence
+					rc.sequence as sequence,
+					rc.starttime as lastattempt
 					$orgfieldquery
 					$fieldquery
 					$gfieldquery
@@ -86,8 +88,10 @@ class CallsReport extends ReportGenerator{
 					where 1
 					$search
 					$rulesql
-					$userjoin
+					$userjoin 
 					";
+					
+		//error_log("CallsReport query " . $this->query);
 	}
 
 	function runHtml(){
@@ -118,7 +122,7 @@ class CallsReport extends ReportGenerator{
 			foreach($tmp as $attempt){
 				$line = array();
 				if($attempt == ""){
-					$time = "";
+					$time = $row[9];
 					$res = $row[7];
 				} else {
 					list($time, $res) = explode(":", $attempt);
@@ -135,11 +139,11 @@ class CallsReport extends ReportGenerator{
 				$line[] = $time;
 				$line[] = $res;
 				$line[] = $row[8];
-				$line[] = $row[9];
+				$line[] = $row[10];
 				//generatefields returns a string beginning with a comma so the count of generatefields is 1 plus the count of f-fields
 				// TODO hardcode 27 ffields+gfields ugh...
 				for($i=0; $i<=27; $i++){
-					$line[] = $row[10+$i];
+					$line[] = $row[11+$i];
 				}
 				$data[] = $line;
 				$attemptnum++;
