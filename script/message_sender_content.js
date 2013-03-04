@@ -570,7 +570,10 @@ function ContentManager() {
 								
 				var getpublishedstationery = (typeof(userPermissions.subscribe) != 'undefined' && userPermissions.subscribe.indexOf("messagegroup") !== -1);
 				if (getpublishedstationery) {
-					fetchMessagesFromPaths[1] = '/' + orgPath+'/api/2/organizations/' + orgid + '/publications/messagegroups';
+					var index = 1;
+					$.each(orgids,function(i,id) {
+						fetchMessagesFromPaths[index++] = '/' + orgPath+'/api/2/organizations/' + id + '/publications/messagegroups';
+					});
 				}
 				
 				var forcestationery = (typeof(userPermissions.forcestationery) != 'undefined' && userPermissions.forcestationery == 1);
@@ -585,17 +588,20 @@ function ContentManager() {
 							$.ajax({
 								url: path,
 								data: {"start": 0, "limit": 1000,"type":"stationery"},
-								async : false
-							}).done(function(data){
-								$.each(data.messageGroups,function(i,mg) {
-									//Make sure stationery isn't inserted twice
-									if ($.inArray(mg.id, stationeryids) === -1) {
-										stationery.push(mg);
-										stationeryids.push(mg.id);
-									}
-								});
-								self.getStationery(paths)();
-							});
+								async : false,
+								success: function(data){
+									$.each(data.messageGroups,function(i,mg) {
+										//Make sure stationery isn't inserted twice
+										if ($.inArray(mg.id, stationeryids) === -1) {
+											stationery.push(mg);
+											stationeryids.push(mg.id);
+										}
+									});
+								},
+								complete: function() {
+									self.getStationery(paths)();
+								}
+							});					
 						} else {
 							// All paths have been fetched, 
 							
@@ -900,4 +906,11 @@ function ContentManager() {
     	$("#msgsndr_phonemessagetexttranslate").parent().removeClass("hide");
     	$("#msgsndr_emailmessagetexttranslate").parent().parent().removeClass("hide");
     }
+};
+
+function stationeryPrevewLoaded(area) {
+	jQuery('#stationerypreview').height(area.height() + 25);
+	area.bind('click', function(event) {
+		jQuery('#msgsndr_emailstationerycontinue').trigger('click');
+	});
 };

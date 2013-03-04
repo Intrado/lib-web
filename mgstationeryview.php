@@ -13,6 +13,15 @@ $isPreview = isset($_GET["preview"]);
 
 if ($isPreview) {
 ?>
+<!DOCTYPE html>
+<html>
+    <script type="text/javascript" src="script/jquery.1.7.2.min.js"></script>
+    <script type="text/javascript">
+   		$().ready(function() {
+   			if (typeof(parent.stationeryPrevewLoaded) != 'undefined') 
+   	   			parent.stationeryPrevewLoaded($('body'))
+    	});
+	</script>
 	<style type="text/css">
 	.watermark {
 	    color: #a6a6a6;
@@ -40,11 +49,14 @@ if ($isPreview) {
 	
 	
 	</style>
-	<div class="overlay">
+	<body>
+	
+	<div id="overlay" class="overlay">
 	<p></p>
 	</div>
 	
 	<div>
+	
 <?
 }
 
@@ -71,7 +83,9 @@ if (isset($_GET['stationery'])) {
 
 if ($isPreview) {
 ?>
-</div>
+	</div>
+	</body>
+</html>
 <? 
 }
 ?>

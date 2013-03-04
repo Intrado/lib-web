@@ -216,7 +216,6 @@ position: relative;}
     margin: 0 5px 5px;
     padding: 5px 10px 10px;
     width: 64%;
-    height: 600px;
 }
 
 .newform .formcontrol .stationerypreviewfield iframe {
