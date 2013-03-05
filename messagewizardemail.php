@@ -60,6 +60,10 @@ if (isset($_GET['subtype']) && $_GET['subtype']) {
 	if (!in_array($_GET['subtype'], array("plain", "html")))
 		redirect('unauthorized.php');
 	
+	// Mini wizard is unavailable when restricted to use stationery
+	if ($USER->authorize('forcestationery') && $_GET['subtype'] == "html")
+		redirect('unauthorized.php');
+	
 	$_SESSION['wizard_message_subtype'] = $_GET['subtype'];		
 }
 

@@ -399,7 +399,11 @@ function makeMessageGrid($messagegroup) {
 	}
 	
 	if ($USER->authorize('sendemail')) {
-		$columnlabels[] = 'HTML Email <a href="messagewizardemail.php?new&subtype=html&mgid=' . $messagegroup->id . '"><img src="img/icons/add.png" alt="Add" title="Add New HTML Email Message"/></a>';
+		if (!$USER->authorize('forcestationery'))
+			$columnlabels[] = 'HTML Email <a href="messagewizardemail.php?new&subtype=html&mgid=' . $messagegroup->id . '"><img src="img/icons/add.png" alt="Add" title="Add New HTML Email Message"/></a>';
+		else {
+			$columnlabels[] = 'HTML Email';
+		}
 		$columnlabels[] = 'Plain Email <a href="messagewizardemail.php?new&subtype=plain&mgid=' .$messagegroup->id . '"><img src="img/icons/add.png" alt="Add" title="Add New Plain Email Message" /></a>';
 	}
 	
