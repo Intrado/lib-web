@@ -198,15 +198,26 @@ class MsgWiz_emailText extends WizStep {
 			"helpstep" => 4
 		);
 
+		// MESSAGE BODY
 		$formdata["message"] = array(
 			"label" => _L("Email Message"),
 			"fieldhelp" => _L('Enter the message you would like to send. Helpful tips for successful messages can be found at the Help link in the upper right corner.'),
 			"value" => $msgdata->text,
 			"validators" => $messagevalidators,
-			"control" => array("EmailMessageEditor", "subtype" => $subtype),
 			"helpstep" => 5
 		);
-		
+		switch ($subtype) {
+			case 'plain':
+				$formdata['message']["control"] = array("EmailMessageEditor", "subtype" => $subtype);
+				break;
+
+			case 'html':
+				// HTML emails will use CKEditor 4; valid editor_mode's are 'plain', 'normal', 'full', and 'inline'
+				$formdata['message']["control"] = array("HtmlTextArea", "subtype" => $subtype, 'rows' => 20, 'editor_mode' => 'normal');
+				break;
+		}
+
+		// PREVIEW BUTTON
 		$langcode = (isset($postdata["/create/language"]["language"])?$postdata["/create/language"]["language"]:Language::getDefaultLanguageCode());
 		if ($langcode == "autotranslate")
 			$langcode = "en";

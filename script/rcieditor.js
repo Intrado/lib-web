@@ -92,9 +92,12 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 		this.setSetting('image_scaling', 0);
 
 		// Get the base URL for requests that require absolute pathing
-		var t = window.top.location;
-		var tmp = new String(t);
-		var baseUrl = tmp.substr(0, tmp.lastIndexOf('/') + 1);
+		var t = window.top.location;                                    // Get the full URL
+		var tmp = new String(t);                                        // Convert it to a String object
+		var u = tmp.split('?');                                         // Split at the '?' if there is one
+		var path = u[0];                                                // Strip off the query_string
+		var baseUrl = path.substr(0, path.lastIndexOf('/') + 1);        // Get everything thru the last '/'
+
 		this.setSetting('baseUrl', baseUrl);
 		this.hidetoolbar = hidetoolbar;
 
