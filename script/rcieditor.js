@@ -341,7 +341,6 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 			// TODO - see if there's a way to get this CKE to insert itself into hider element
 			CKEDITOR.replace(this.basename, {
 				'customConfig': '',
-				'enterMode' : CKEDITOR.ENTER_BR,
 				'disableNativeSpellChecker': false,
 				'browserContextMenuOnCtrl': true,
 				'width': '100%',
@@ -351,6 +350,8 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 				'toolbarCanCollapse' : true,
 				'extraPlugins': extraPlugins,
 				'disableObjectResizing' : true, // disabled only because the message_parts data model cannot capture resized image attributes
+				'pasteFromWordRemoveFontStyles' : false,
+				'pasteFromWordRemoveStyles' : false,
 
 				'toolbar_RCI' : [
 					{ name: 'r1g1', items : [ 'Print', 'Source' ] },

@@ -67,6 +67,8 @@ window.RCIEditorInline = function () {
 					uploaderURI += '?scaleabove=' + max_size;
 				}
 				editor.config.filebrowserImageUploadUrl = uploaderURI;
+				editor.config.pasteFromWordRemoveFontStyles = false;
+				editor.config.pasteFromWordRemoveStyles = false;
 				editor.config.disableObjectResizing = true; // disabled only because the message_parts data model cannot capture resized image attributes
 				editor.config.extraPlugins = 'aspell,mkfield';
 				editor.config.toolbar = [
