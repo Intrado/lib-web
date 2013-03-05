@@ -225,7 +225,14 @@ class PreviewModal {
 			$modalcontent = $this->form->render();
 		}
 		header('Content-Type: application/json');
-		echo json_encode(array("playable" => $this->playable,"title" => $this->title, "hasinserts" => $this->hasfieldinserts, "errors" => $this->errors, "form" => $modalcontent, "uid" => $this->uid, "partscount" => count($this->parts)));
+		echo json_encode(array(
+			"playable" => $this->playable,
+			"title" => $this->title, 
+			"hasinserts" => $this->hasfieldinserts, 
+			"errors" => $this->errors, 
+			"content" => $modalcontent, 
+			"uid" => $this->uid, 
+			"partscount" => count($this->parts)));
 		exit();
 	}
 	
@@ -344,7 +351,7 @@ class PreviewModal {
 							});
 							body.append(list);
 						} else if (result.playable == true) {
-							body.html(result.form);
+							body.html(result.content);
 							$('<div/>', {
 								id: 'previewplayer',
 								style: 'text-align:center;'
@@ -369,7 +376,7 @@ class PreviewModal {
 								});
 							}
 						} else {
-							body.html(result.form);
+							body.html(result.content);
 						}
 					} else {
 						header.html('Error');
