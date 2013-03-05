@@ -40,27 +40,26 @@ document.domain = domain;
 
 (function ($) {
 window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
-	var myself = this;
-
 	this.textarea = null; // The textarea ELEMENT, not the ID
-
 	this.container = null; // The container ELEMENT, to contain the editor, not the ID
 	this.editorMode = null; // Either null (uninitialized) or [plain|normal|full|inline]
-
 	this.basename = 'rcicke';
-	this.scratch_id = 'rcieditor_scratch';
-
 	this.hidetoolbar = false;
 
-	// Associative array support for settings; use of set/getter's is encouraged
-	this.settings = null;
+	// Associative array support for settings; use of set/getter's is required
+	var settings = null;
+
+	this.clearSettings = function () {
+		settings = Array();
+	};
 
 	this.setSetting = function (name, value) {
-		this.settings[name] = value;
+		settings[name] = value;
 	};
 
 	this.getSetting = function (name) {
-		return(this.settings[name]);
+		if (typeof(settings[name]) !== "undefined") 
+		return((typeof(settings[name]) !== "undefined") ? settings[name] : false);
 	};
 
 	/**
@@ -77,19 +76,29 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 	 */
 	this.construct = function (editor_mode, textarea_id, hidetoolbar) {
 
-		// Reset all internal properties
-		this.reset();
+		// (1) Reset all internal properties
+		this.resetValidatorFunction();
+
+		// reset misc. properties
+		this.textarea = null;
+		this.container = null;
+		this.editorMode = null;
+		this.hidetoolbar = false;
+
+		// reset the settings array
+		this.clearSettings();
+
+		// Image scaling is disabled by default
+		this.setSetting('image_scaling', 0);
+
+		// Get the base URL for requests that require absolute pathing
+		var t = window.top.location;
+		var tmp = new String(t);
+		var baseUrl = tmp.substr(0, tmp.lastIndexOf('/') + 1);
+		this.setSetting('baseUrl', baseUrl);
 		this.hidetoolbar = hidetoolbar;
 
-		// if the editor scratch space doesn't yet exist...
-		var scratch = $('#' + this.scratch_id);
-		if (! scratch.length) {
-
-			// Define and add it to the DOM
-			scratch = $('<div id="' + this.scratch_id + '" style="display: none;"></div>');
-			$('body').append(scratch);
-		}
-
+		// (2) Apply the editor to the chosen textarea
 		var container_id = textarea_id + '-htmleditor';
 		var res = this.applyEditor(editor_mode, textarea_id, container_id, hidetoolbar);
 		return(res);
@@ -120,10 +129,6 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 		// Show the loading spinner
 		this.setLoadingVisibility(true);
 
-		if (typeof this.textarea !== 'object') {
-			return(false);
-		}
-
 		// Tear down whatever editor is in place
 		switch (this.editorMode) {
 			case 'inline':
@@ -131,6 +136,10 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 				// We can get rid of the IFRAME'd inline editor
 				// just by emptying out the container
 				var container =  $('#' +  this.basename + '-htmleditor');
+				if (! container.length) {
+					return(false);
+				}
+
 				container.empty();
 				return(true);
 
@@ -142,7 +151,11 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 					return(false);
 				}
 
-				// Capture the textarea content
+				if (typeof this.textarea !== 'object') {
+					return(false);
+				}
+
+				// Capture the textarea content to prevent CKE from further altering it
 				var content = this.textarea.val();
 
 				// Let CKE do whatever it does while destroying itself
@@ -153,39 +166,16 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 
 				return(true);
 
+			// An attempt to deconstruct an unconstructed object;
+			// caller is unaware of our status, but we'll let it
+			// slide so that reconstruct() method can be called any
+			// time without penalty:
 			case null:
 				return(true);
 		}
 
 		// Only an unsupported editorMode will end up here:
 		return(false);
-	};
-
-	/**
-	 * Put us into a known good, default state
-	 */
-	this.reset = function () {
-
-		// clear the validator
-		this.resetValidatorFunction();
-
-		// reset misc. properties
-		this.textarea = null;
-		this.container = null;
-		this.editorMode = null;
-		this.hidetoolbar = false;
-
-		// reset the settings array
-		this.settings = Array();
-
-		// Image scaling is disabled by default
-		this.setSetting('image_scaling', 0);
-
-		// Get the base URL for requests that require absolute pathing
-		var t = window.top.location;
-		var tmp = new String(t);
-		var baseUrl = tmp.substr(0, tmp.lastIndexOf('/') + 1);
-		this.setSetting('baseUrl', baseUrl);
 	};
 
 	/**
@@ -249,8 +239,7 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 				return(this.changeMode(editorMode));
 			}
 
-			// Applying to a different textarea/container is a totally different story
-			// (and is probably a bad request since we only support a single editor)
+			// Applying to a different textarea/container is not allowed
 			return(false);
 		}
 
@@ -267,10 +256,9 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 		this.basename = textarea_id;
 		this.container = $('#' + container_id);
 
-		// The second new element has the same id with a 'hider' suffix
+		// The first new element has the same id with a 'hider' suffix
 		var hider = $('#' + this.basename + 'hider');
 		if (! hider.length) {
-
 			hider = $('<div id="' + this.basename + 'hider" style="display: none;"></div>');
 			this.container.append(hider);
 		}
@@ -278,11 +266,11 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 		var cke = $('<div id="' + this.basename + '_box"></div>');
 
 		if (editorMode == 'inline') {
-			// SMK disabled image_scaling pending clarification of desired behavior
+			// FIXME SMK disabled image_scaling pending clarification of desired behavior
 			//this.setSetting('image_scaling', 500);
 
 			// Add an IFRAME to the page that will load up the inline editor
-			cke.html('<iframe src="' + this.getSetting('baseUrl') + 'rcieditor_inline.php?t=' + container_id + '" name="' + this.basename + '_iframe" style="width: 100%; height: 400px; border: 1px solid #999999;"/>');
+			cke.html('<iframe src="' + this.getSetting('baseUrl') + 'rcieditor_inline.php?t=' + this.basename + '" name="' + this.basename + '_iframe" style="width: 100%; height: 400px; border: 1px solid #999999;"/>');
 
 			// So now we have the inline editor component loading in an iframe;
 			// the next move is up to the iframe content to call back the next
@@ -305,7 +293,7 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 					break;
 
 				case 'normal':
-					// SMK disabled image_scaling pending clarification of desired behavior
+					// FIXME SMK disabled image_scaling pending clarification of desired behavior
 					//this.setSetting('image_scaling', 500);
 
 					// Add the mkField plugin
@@ -317,7 +305,7 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 					break;
 
 				case 'full':
-					// SMK disabled image_scaling pending clarification of desired behavior
+					// FIXME SMK disabled image_scaling pending clarification of desired behavior
 					//this.setSetting('image_scaling', 500);
 
 					// Add the mkField and mkBlock plugins
@@ -335,13 +323,7 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 					break;
 			}
 
-			// Grab the scratch space to use for this kind of editor
-			var scratch = $('#' + this.scratch_id);
-			this.setSetting(this.scratch_id, scratch);
-
 			// SMK added to selectively enable reduction scaling for uploaded images;
-			// page that includes CKE must set global var htmlEditorImageScalingEnable
-			// to true to enable scaling, otherwise scaling will be disabled by default;
 			// uploader.php will pass the argument on to f.handleFileUpload() which will
 			// ultimately be responsible for enforcement of this flag
 			var uploaderURI = this.getSetting('baseUrl') + 'uploadimage.php';
@@ -356,10 +338,11 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 			// TODO - see if there's a way to get this CKE to insert itself into hider element
 			CKEDITOR.replace(this.basename, {
 				'customConfig': '',
+				'enterMode' : CKEDITOR.ENTER_BR,
 				'disableNativeSpellChecker': false,
 				'browserContextMenuOnCtrl': true,
 				'width': '100%',
-				'height': 'auto',
+				'height': '400px',
 				'filebrowserImageUploadUrl' : uploaderURI,
 				'toolbarStartupExpanded' : (hidetoolbar ? false : true),
 				'toolbarCanCollapse' : true,
@@ -403,7 +386,6 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 		// Capture the editorMode
 		this.editorMode = editorMode;
 
-
 		hider.html(cke);
 
 		return(true);
@@ -420,26 +402,38 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 
 		// Hide our AJAXy loading indicator
 		this.setLoadingVisibility(false);
-		// 'plain', 'normal', and 'full'; nothing to do for 'inline'
-		if (this.editorMode !== 'inline') {
 
-			// The presence of the HtmlEditor classname signals
-			this.textarea.hide().addClass('HtmlEditor');
+		// Just trigger a validation event if there is something to look at
+		var html = this.textarea.val();
+		switch (this.editorMode) {
 
-			var htmleditorobject = this.getHtmlEditorObject();
-			if (! htmleditorobject) {
-				// failed to get the htmleditorobject
-				return;
-			}
+			case 'inline':
+				// Nothing special to do for inline mode at this time
+				break;
 
-			// A little data sanitizing for the raw textarea form content
-			var html = this.textarea.val().replace(/<</g, "&lt;&lt;").replace(/>>/g, "&gt;&gt;");
-			htmleditorobject.instance.setData(html);
+			case 'plain':
+			case 'normal':
+			case 'full':
 
-			// Initial validation, only if there is content in the HTML already...
-			if (html.length) {
-				this.validate();
-			}
+				// The presence of the HtmlEditor classname signals
+				this.textarea.hide().addClass('HtmlEditor');
+
+				var htmleditorobject = this.getHtmlEditorObject();
+				if (! htmleditorobject) {
+					// failed to get the htmleditorobject
+					return;
+				}
+
+				// A little data sanitizing for the raw textarea form content
+				htmleditorobject.instance.setData(html.replace(/<</g, "&lt;&lt;").replace(/>>/g, "&gt;&gt;"));
+				break;
+		}
+
+		// Initial validation, only if there is content in the HTML already;
+		// this allows the FI validation icon to show required field state instead
+		// of an initial error condition if the user hasn't entered anything yet.
+		if (html.length) {
+			this.validate();
 		}
 	};
 
@@ -517,18 +511,16 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 	 */
 	this.getHtmlEditorObject = function () {
 
-		var res = null;
-
-		if ((typeof CKEDITOR == 'undefined') || !CKEDITOR) {
-			return res;
+		if ((typeof(CKEDITOR) == 'undefined') || !CKEDITOR) {
+			return(false);
 		}
 
-		if (typeof CKEDITOR.instances == 'undefined') {
-			return res;
+		if (typeof(CKEDITOR.instances) == 'undefined') {
+			return(false);
 		}
 
 		if (! CKEDITOR.instances) {
-			return res;
+			return(false);
 		}
 
 		var instance = false;
@@ -538,19 +530,20 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 			}
 		}
 		if (! instance) {
-			return res;
+			return(false);
 		}
 
-		var container_name = 'cke_' + this.basename;
-		var container = $(container_name);
-
+		var container = $('#cke_' + this.basename);
 		if (! container) {
-			return res;
+			return(false);
 		}
 
 		var textarea = container.prev();
-		var textareauseshtmleditor = textarea && textarea.hasClass('HtmlEditor');
-		return {'instance': instance, 'container': container, 'currenttextarea': textareauseshtmleditor ? textarea : null};
+		return({
+			'instance': instance,
+			'container': container,
+			'currenttextarea': (textarea && textarea.hasClass('HtmlEditor')) ? textarea : null
+		});
 	};
 
 	/**
@@ -562,19 +555,15 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 	 * @return object containing the html editor instance and container, or null if not loaded
 	 */
 	this.saveHtmlEditorContent = function (existinghtmleditorobject) {
-
 		var htmleditorobject = existinghtmleditorobject || this.getHtmlEditorObject();
 		if (!htmleditorobject) {
-			return null;
+			return(false);
 		}
 		
 		var content = htmleditorobject.instance.getData();
 		this.textarea.val(this.cleanContent(content));
-		// FIXME - what is this fired event supposed to do? appears to connect to nothing.
-		//this.textarea.fire('HtmlEditor:SavedContent'); // prototype.js
-		//this.textarea.trigger('SavedContent'); // jquery.js
 
-		return htmleditorobject;
+		return(true);
 	};
 
 	/**
@@ -615,16 +604,16 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 		switch (this.editorMode) {
 			case 'inline':
 				// Textarea is NOT a blockelement that contains HTML; it is a form field with a value
-				// so we have to get the value of the field, convert it to jQuery, and then try to
-				// do DOM work within that value.
-				var scratch = $('#' + this.scratch_id);
-				scratch.html(this.textarea.val());
-				scratch.find('div.primaryBlock').each(function () {
+				// so we have to get the value of the field, stick it in jquery space temporarily,
+				// manipulated it, and then put it back into the textarea again:
+				var tempdiv = $('<div></div>').html(this.textarea.val());
+				$('.primaryBlock', tempdiv).each(function () {
 					var jQthis = $(this);
 					jQthis.html(content);
 				});
-				this.textarea.val(scratch.html());
+				this.textarea.val(tempdiv.html());
 
+				// Now make the inline editor's view refresh itself to capture the change
 				// ref: http://stackoverflow.com/questions/1952359/calling-iframe-function
 				window.frames[this.basename + '_iframe'].window.rcieditorinline.refresh();
 				return(true);
@@ -641,7 +630,6 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 		}
 	};
 
-
 	/**
 	 * Completely clear the contents of the editor
 	 *
@@ -649,7 +637,11 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 	 * object other than the one we're using internally
 	 */
 	this.clearHtmlEditorContent = function (existinghtmleditorobject) {
-		this.setHtmlEditorContent('', existinghtmleditorobject);
+		var htmleditorobject = existinghtmleditorobject || this.getHtmlEditorObject();
+		if (! htmleditorobject) {
+			return(false);
+		}
+		return(this.setHtmlEditorContent('', htmleditorobject));
 	};
 
 	/**
@@ -660,10 +652,12 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 	 */
 	this.setHtmlEditorContent = function (content, existinghtmleditorobject) {
 		var htmleditorobject = existinghtmleditorobject || this.getHtmlEditorObject();
-		if (htmleditorobject) {
-			htmleditorobject.instance.setData(content);
-			this.textarea.val(this.cleanContent(content));
+		if (! htmleditorobject) {
+			return(false);
 		}
+		htmleditorobject.instance.setData(content);
+		this.textarea.val(this.cleanContent(content));
+		return(true);
 	};
 
 	/**
@@ -783,7 +777,7 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 			that.saveHtmlEditorContent();
 
 			// Run the form validation against the textarea
-			myself.validate();
+			that.validate();
 		}, 500);
 	};
 
@@ -811,20 +805,6 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 	 * a validator function is set then it will be invoked, otherwise nada.
 	 */
 	this.validate = function() {
-		
-		var iframe = this.container.parent().find("iframe");
-		var textarea = this.container.parent().find("textarea");
-		if (typeof iframe != 'undefined' && typeof textarea != 'undefined') {
-			var height = iframe.contents().height();
-			if (height > 400) {
-				iframe.height(height);
-				textarea.height(height);
-			} else {
-				iframe.height(400);
-				textarea.height(400);
-			}
-		}
-		
 		if (typeof this.validator_fn === 'function') {
 			this.validator_fn();
 		}

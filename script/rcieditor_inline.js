@@ -7,10 +7,7 @@
    * jquery-*.js
    * rcieditor.js
  */
-(function ($) {
 window.RCIEditorInline = function () {
-	var self = this;
-
 	this.editableTarget = null;
 	this.captureTimeout = 0;
 
@@ -18,7 +15,6 @@ window.RCIEditorInline = function () {
 	this.constructRetryDelay = 16;
 	this.constructRetryTimeout = null;
 
-	this.initialized = false;
 	this.initRetryDelay = 16;
 	this.initRetryTimeout = null;
 
@@ -40,15 +36,15 @@ window.RCIEditorInline = function () {
 			// Try again after a few milli's
 			clearTimeout(this.constructRetryTimeout);
 
-			// Exponential decay on retry timing; we won't delay any longer than 1.6 seconds,
+			// Exponential decay on retry timing; we won't delay any longer than ~2 seconds,
 			// but we will continue retrying on this interval as long as necessary.
-			if (this.constructRetryDelay < 16384) {
+			if (this.constructRetryDelay < 2048) {
 				this.constructRetryDelay *= 2;
 			}
 			this.constructRetryTimeout = window.setTimeout(this.construct, this.constructRetryDelay);
 		}
 
-		// This property tells CKEditor to not activate every element with contenteditable=true element.
+		// This property tells CKEditor to not automatically activate every element with contenteditable=true element.
 		CKEDITOR.disableAutoInline = true;
 
 		var that = this;
@@ -126,14 +122,13 @@ window.RCIEditorInline = function () {
 			// Try again after a few milli's
 			clearTimeout(this.initRetryTimeout);
 
-			// Exponential decay on retry timing; we won't delay any longer than 1.6 seconds,
+			// Exponential decay on retry timing; we won't delay any longer than ~2 seconds,
 			// but we will continue retrying on this interval as long as necessary.
-			if (this.initRetryDelay < 16384) {
+			if (this.initRetryDelay < 2048) {
 				this.initRetryDelay *= 2;
 			}
 			this.initRetryTimeout = window.setTimeout(this.init, this.initRetryDelay);
 		}
-		this.initialized = true;
 
 		if (targetName == "null") {
 			return(false);
@@ -141,6 +136,9 @@ window.RCIEditorInline = function () {
 
 		// The ID attribute of the textarea that has the text we want to edit
 		this.editableTarget = targetName;
+		if (! this.getTextarea()) {
+			return(false);
+		}
 
 		// Pull the textarea into our editing space and light up the editors
 		if (! this.refresh()) {
@@ -149,12 +147,52 @@ window.RCIEditorInline = function () {
 
 		// Fire the callback indicating initialization is done
 		window.frames.top.rcieditor.callbackEditorLoaded('wysiwygpage');
-
-		// Do an initial validation only once for the
-		// entire editor document instead of once per editor
-		this.captureChanges();
 	}
 
+	/**
+	 * Fill this inline editor's page up with content sourced from a textarea in parent
+	 */
+	this.refresh = function () {
+
+		// Get the textarea DOM object from the parent window (frame)
+		var textarea = 0;
+		if (! (textarea = this.getTextarea())) {
+			return(false);
+		}
+
+		// Get the wysiwygpage div DOM object from this page (below)
+		var wysiwygpage = 0;
+		if (! (wysiwygpage = this.getPage())) {
+			return(false);
+		}
+
+		// Grab the contents of the textarea form element
+		var content = textarea.val();
+
+		// Convert content entities back to the real characters, but the double angles '<<' and '>>'
+		// will be left in entity form in order to prevent the browser rendered from trying to do
+		// something "smart" with them (field inserts).
+		content = content.replace(/&lt;/g, '<');
+		content = content.replace(/<</g, '&lt;&lt;');
+		content = content.replace(/&gt;/g, '>');
+		content = content.replace(/>>/g, '&gt;&gt;');
+		content = content.replace(/&amp;/g, '&');
+
+		// Inject the content from the textarea into the wysiwyg page div
+		wysiwygpage.html(content);
+
+		// Apply CKE inline editors for each wysiwygpage > div.contenteditable=true
+		var that = this;
+		$('.editableBlock', wysiwygpage).each(function(index) {
+			that.makeEditable($(this), index);
+		});
+
+		return(true);
+	}
+
+	/**
+	 * Take a given element and make it editable with CKEditor on-click
+	 */
 	this.makeEditable = function (element, index) {
 
 		// Add an ID for unique association
@@ -163,15 +201,15 @@ window.RCIEditorInline = function () {
 		element.attr('contenteditable', 'true');
 		element.attr('tabindex', index);
 
-		// CKEDITOR.inline() does not like element if it is extended with $ or prototype
+		// CKEDITOR.inline() does not like element if it is a jQuery object
 		// Get an UNextended copy of this same DOM element using the newid we assigned
-		// SMK notes this appears to be necessary, possibly because CKEDITOR is initialized seeing and expecting
-		// prototype.js extensions, but then the element is delivered with $ extensions, causing CKE to not
-		// be able to use the object since it doesn't align with its expectations.
 		var el = document.getElementById(newid);
 		CKEDITOR.inline(el);
 	}
 
+	/**
+	 * Strip any CKE-editable artifacts off an element so that it only contains the essentials
+	 */
 	this.makeNonEditable = function (element) {
 
 		// Reverse out the element attributes that we added
@@ -181,14 +219,16 @@ window.RCIEditorInline = function () {
 		element.removeAttr('tabindex');
 		element.removeAttr('style');
 		element.removeAttr('spellcheck');
-		if (element.hasClass('primaryBlock')) {
-			element.attr('class', 'editableBlock primaryBlock');
-		}
-		else {
-			element.attr('class', 'editableBlock');
-		}
+
+		// CKE adds one or more class names to the element; instead of removing those (whose
+		// names may be subject to change in future CKE versions), we'll just reassert the
+		// class names that we DO know which will make anything else go away:
+		element.attr('class', 'editableBlock' + (element.hasClass('primaryBlock') ? ' primaryBlock' : ''));
 	}
 
+	/**
+	 * Any time changes occur on this editable page, capture them into the parent's textarea
+	 */
 	this.captureChanges = function () {
 
 		// (1) Get the wysiwygpage div DOM object from this page (below)
@@ -230,64 +270,40 @@ window.RCIEditorInline = function () {
 		return(true);
 	}
 
-	this.refresh = function () {
-
-		// Get the textarea DOM object from the parent window (frame)
-		var textarea = 0;
-		if (! (textarea = this.getTextarea())) {
-			return(false);
-		}
-
-		// Get the wysiwygpage div DOM object from this page (below)
-		var wysiwygpage = 0;
-		if (! (wysiwygpage = this.getPage())) {
-			return(false);
-		}
-
-		// Grab the contents of the textarea form element
-		var content = textarea.val();
-
-		// Convert content entities back to the real characters, but the double angles '<<' and '>>'
-		// will be left in entity form in order to prevent the browser rendered from trying to do
-		// something "smart" with them (field inserts).
-		content = content.replace(/&lt;/g, '<');
-		content = content.replace(/<</g, '&lt;&lt;');
-		content = content.replace(/&gt;/g, '>');
-		content = content.replace(/>>/g, '&gt;&gt;');
-		content = content.replace(/&amp;/g, '&');
-
-		// Inject the content from the textarea into the wysiwyg page div
-		wysiwygpage.html(content);
-
-		// Apply CKE inline editors for each wysiwygpage > div.contenteditable=true
-		var that = this;
-		$('.editableBlock', wysiwygpage).each(function(index) {
-			that.makeEditable($(this), index);
-		});
-
-		return(true);
-	}
-
+	/**
+	 * Find the textarea in parent with the element id that we were initialized with
+	 */
 	this.getTextarea = function () {
-		var textarea = null;
-		if (! (textarea = $('#' + this.editableTarget, window.top.document))) {
-			return(null);
+		var textarea = false;
+		var name = this.editableTarget;
+		if (! ((textarea = $('#' + name, window.top.document)) && (textarea.length))) {
+			console.log('Internal error RCIEditorInline::getTextarea()');
+			return(false);
 		}
 		return(textarea);
 	}
 
+	/**
+	 * Find the container on this document that will hold the editable "page" document to present
+	 */
 	this.getPage = function () {
-		var wysiwygpage = null;
-		if (! (wysiwygpage = $('#wysiwygpage'))) {
-			return(null);
+		var wysiwygpage = false;
+		if (! ((wysiwygpage = $('#wysiwygpage')) && (wysiwygpage.length))) {
+			console.log('Internal error RCIEditorInline::getPage()');
+			return(false);
 		}
 		return(wysiwygpage);
 	}
 
+	/**
+	 * Find the container on this document that will be used as a temporary location to strip editor
+	 * artifacts out of the page just before pushing the contents back to the parent's textarea
+	 */
 	this.getPresaveContainer = function () {
-		var wysiwygpresave = null;
-		if (! (wysiwygpresave = $('#wysiwygpresave'))) {
-			return(null);
+		var wysiwygpresave = false;
+		if (! ((wysiwygpresave = $('#wysiwygpresave')) && (wysiwygpresave.length))) {
+			console.log('Internal error RCIEditorInline::getPresaveContainer()');
+			return(false);
 		}
 		return(wysiwygpresave);
 	}
@@ -296,6 +312,4 @@ window.RCIEditorInline = function () {
 }
 
 window.rcieditorinline = new RCIEditorInline();
-
-}) (jQuery);
 
