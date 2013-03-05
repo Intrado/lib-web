@@ -645,6 +645,7 @@ function form_handle_submit(form,event) {
 				$(res.name).update(res.content);
 			} else if ("fireevent" == res.status) {
 				form.fire("Form:Submitted", res.memo);
+				jQuery('#' + form.id).trigger("Form:Submitted", [res.memo]); // Trigger jquery since jquery and prototype events aren't the same
 			}
 			} catch (e) { alert(e.message + "\n" + response.responseText)}
 			formvars.submitting = false;

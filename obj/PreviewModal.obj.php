@@ -305,78 +305,81 @@ class PreviewModal {
 		$posturl .= mb_strpos($posturl,"?") !== false ? "&" : "?";
 		$posturl .= "previewmodal=true";
 		?>
+		
+		<div class="modal hide fade" id="prevewmodal">
+			<div class="modal-header"></div>
+            <div class="modal-body"></div>
+            <div class="modal-footer"></div>
+		</div>
 		<script type="text/javascript" src="script/datepicker.js"></script>
+	    <script src="script/bootstrap-modal.js" type="text/javascript"></script>
 		<script type='text/javascript' language='javascript'>
 		var showPreview = function(post_parameters,get_parameters){
-			var modal = new ModalWrapper("Loading...",false,false);
-			modal.window_contents.update(new Element('img',{src: 'img/ajax-loader.gif'}));
-			modal.open();
+			var $ = jQuery;
+			$('#prevewmodal').modal();
+			
+			var header = $('#prevewmodal').find(".modal-header");
+			var body = $('#prevewmodal').find(".modal-body");
+			var footer = $('#prevewmodal').find(".modal-header");
+
+			$('#prevewmodal').find(".modal-body").html('<img src="img/ajax-loader.gif" alt="Please Wait..."/>Loading...')
+			
 			
 			new Ajax.Request('<?= $posturl?>' + (get_parameters?'&' + get_parameters:''), {
 				'method': 'post',
 				'parameters': post_parameters,
 				'onSuccess': function(response) {
-					modal.window_title.update("");
+					header.html("");
 					if (response.responseJSON) {
 						var result = response.responseJSON;
-						modal.window_title.update(result.title);
+						header.html(result.title);
 						
 						if (result.errors != undefined && result.errors.size() > 0) {
-							modal.window_title.update('Unable to Preview');
+							header.html('Unable to Preview');
 							
-							modal.window_contents.update("The following error(s) occured:");
-							var list = new Element('ul');
+							body.html("The following error(s) occured:");
+							var list = $('<ul/>');
 							result.errors.each(function(error) {
-								list.insert(new Element('li').update(error));
+								list.append('<li>' + error + '</li>');
 							});
-							modal.window_contents.insert(list);
+							body.append(list);
 						} else if (result.playable == true) {
-							modal.window_contents.update(result.form);
-							
-							var player = new Element('div',{
-								id: 'player',
+							body.html(result.form);
+							$('<div/>', {
+								id: 'previewplayer',
 								style: 'text-align:center;'
-							});
-							var download = new Element('div',{
-								id: 'download',
-								style: 'text-align:center;'
-							});
-							modal.window_contents.insert(player);
-							modal.window_contents.insert(download);
+							}).appendTo(body);
+
+							$('<div/>', {
+							    id: 'previewdownload',
+							    style: 'text-align:center;'
+							}).appendTo(body);
 							
-							
-							if (result.hasinserts ==  false) {
-								var downloadlink = new Element('a',{
-									href: 'previewaudio.mp3.php?download=true&uid=' + result.uid
-								}).update('Click here to download');
-								
-								$('download').update(downloadlink);
+							if (result.hasinserts == false) {
+								$('#previewdownload').html('<a href="previewaudio.mp3.php?download=true&uid=' + result.uid + '">Click here to download</a>');
 								if (result.partscount != 0)
-									embedPlayer('previewaudio.mp3.php?uid=' + result.uid,'player',result.partscount);
+									embedPlayer('previewaudio.mp3.php?uid=' + result.uid,'previewplayer',result.partscount);
 								else {
-									embedPlayer('previewaudio.mp3.php?uid=' + result.uid,'player');
+									embedPlayer('previewaudio.mp3.php?uid=' + result.uid,'previewplayer');
 								}
 							} else {
-								$('previewmessagefields').observe('Form:Submitted',function(e){
-									embedPlayer('previewaudio.mp3.php?uid=' + e.memo,'player',result.partscount);
-									var download = new Element('a',{
-										href: 'previewaudio.mp3.php?download=true&uid=' + e.memo
-									}).update('Click here to download');
-									$('download').update(download);
+								$('#previewmessagefields').on('Form:Submitted',function(e,memo){
+									embedPlayer('previewaudio.mp3.php?uid=' + memo,'previewplayer',result.partscount);
+									$('#previewdownload').html('<a href="previewaudio.mp3.php?download=true&uid=' + memo + '">Click here to download</a>');
 								});
 							}
 						} else {
-							modal.window_contents.update(result.form);
+							body.html(result.form);
 						}
 					} else {
-						modal.window_title.update('Error');
-						modal.window_contents.update('Unable to preview this message');
+						header.html('Error');
+						body.html('Unable to preview this message');
 					}
 				},
 				
 				'onFailure': function() {
-					modal.window_title.update('Error');
-					modal.window_contents.update('Unable to preview this message');
+					header.html('Error');
+					body.html('Unable to preview this message');
 				}
 			});
 			
