@@ -2127,3 +2127,13 @@ $$$
 update setting set value='9.5/2' where name='_dbversion'
 $$$
 -- END 9.5/2
+
+-- START 9.5/3
+
+-- bug CS-4311
+insert into setting (name, value) values ('_dbupgrade_inprogress', 'none')
+$$$
+
+update setting set value='9.5/3' where name='_dbversion'
+$$$
+-- END 9.5/2
