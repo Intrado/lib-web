@@ -2,6 +2,7 @@
  * @license Copyright (c) 2003-2013, CKSource - Frederico Knabben. All rights reserved.
  * For licensing, see LICENSE.html or http://ckeditor.com/license
  * SMK converted from standard BlockQuote to RCI editableBlock handling
+ * SMK added support to toggle nonEditableBlock <-> editableBlock to minimize DOM insertion/removal
  */
 
 (function() {
@@ -68,7 +69,6 @@
 					var thisblock = block;
 					do {
 						if (thisblock.hasClass('nonEditableBlock')) {
-console.log('editabling it!');
 							thisblock.removeClass('nonEditableBlock');
 							thisblock.addClass('editableBlock');
 							gotit = true;
@@ -122,7 +122,6 @@ console.log('editabling it!');
 					// If any of the selected blocks is an editableBlock, remove it to prevent nesting
 					while ( tmp.length > 0 ) {
 						block = tmp.shift();
-						//if ( (block.getName() == 'div') && (block.hasClass('editableBlock')) ) {
 						if ( block.hasClass('editableBlock') ) {
 							var docFrag = new CKEDITOR.dom.documentFragment( editor.document );
 							while ( block.getFirst() ) {
@@ -136,54 +135,38 @@ console.log('editabling it!');
 					}
 
 					// Now we have all the blocks to be included...
-					// See if we can get away with simply making our parent editable
-/*
-					// SMK @HERE 2013-02-27
-					//for (var key in CKEDITOR.dtd.$editable) {
-					//	console.log('editable: ' + key);
-					//}
-					console.log('looking at: [' + block.getOuterHtml() + ']');
-					var directlyEditable = block.is(CKEDITOR.dtd.$editable);
-					if (directlyEditable) {
-console.log('this one is editable!');
-						block.addClass('editableBlock');
+					var bqBlock = editor.document.createElement( 'div' );
+					bqBlock.addClass('editableBlock');
+					bqBlock.addClass('dynamicBlock');
+					bqBlock.insertBefore( paragraphs[ 0 ] );
+					while ( paragraphs.length > 0 ) {
+						block = paragraphs.shift();
+						bqBlock.append( block );
 					}
-					else {
-console.log('not editable, sorry charlie!');
-*/
-						var bqBlock = editor.document.createElement( 'div' );
-						bqBlock.addClass('editableBlock');
-						bqBlock.addClass('dynamicBlock');
-						bqBlock.insertBefore( paragraphs[ 0 ] );
-						while ( paragraphs.length > 0 ) {
-							block = paragraphs.shift();
-							bqBlock.append( block );
-						}
-//					}
 				}
 
 			} else if ( state == CKEDITOR.TRISTATE_ON ) {
 				var moveOutNodes = [];
 				var database = {};
 
+				var gotit = false;
 				while ( ( block = iterator.getNextParagraph() ) ) {
 					var bqParent = null, bqChild = null;
 
 					// If the selection is inside the editableBlock being removed...
 					var thisblock = block;
-					var gotit = false;
 					do {
 						if (thisblock.hasClass('editableBlock')) {
 
 							// If this block was added by us dynamically...
 							if (thisblock.hasClass('dynamicBlock')) {
-console.log('removing it!');
+
 								// Then remove it altogether; the 'true' makes it remove
 								// the container but preserve the inner content
 								thisblock.remove(true);
 							}
 							else {
-console.log('noneditabling it!');
+
 								// Otherwise, it was preexisting and just made
 								// editable, so just remove the editable class
 								thisblock.removeClass('editableBlock');
@@ -194,12 +177,10 @@ console.log('noneditabling it!');
 						}
 					} while (thisblock = thisblock.getParent());
 					if (gotit) break;
-console.log('got here');
 
 					// Otherwise scan back down through the hierarchy until we find the first container that needs to be grabbed
 					while ( block.getParent() ) {
 
-						//if ( (block.getParent().getName() == 'div') && (block.getParent().hasClass('editableBlock')) ) {
 						if ( block.getParent().hasClass('editableBlock') ) {
 							bqParent = block.getParent();
 							bqChild = block;
@@ -208,78 +189,53 @@ console.log('got here');
 						block = block.getParent();
 					}
 
-					// Remember the blocks that were recorded down in the moveOutNodes array
-					// to prevent duplicates.
+					// Remember the blocks that were recorded down in the moveOutNodes array to prevent duplicates.
 					if ( bqParent && bqChild && !bqChild.getCustomData( 'div' + '_moveout' ) ) {
 						moveOutNodes.push( bqChild );
 						CKEDITOR.dom.element.setMarker( database, bqChild, 'div' + '_moveout', true );
 					}
 				}
 
-				CKEDITOR.dom.element.clearAllMarkers( database );
+				if (! gotit) {
+					CKEDITOR.dom.element.clearAllMarkers( database );
 
-				var movedNodes = [], processedBlockquoteBlocks = [];
+					var movedNodes = [], processedBlockquoteBlocks = [];
 
-				database = {};
-				while ( moveOutNodes.length > 0 ) {
-					var node = moveOutNodes.shift();
-					bqBlock = node.getParent();
+					database = {};
+					while ( moveOutNodes.length > 0 ) {
+						var node = moveOutNodes.shift();
+						bqBlock = node.getParent();
 
-					// If the node is located at the beginning or the end, just take it out
-					// without splitting. Otherwise, split the blockquote node and move the
-					// paragraph in between the two blockquote nodes.
-					if ( !node.getPrevious() )
-						node.remove().insertBefore( bqBlock );
-					else if ( !node.getNext() )
-						node.remove().insertAfter( bqBlock );
-					else {
-						node.breakParent( node.getParent() );
-						processedBlockquoteBlocks.push( node.getNext() );
-					}
-
-					// Remember the blockquote node so we can clear it later (if it becomes empty).
-					if ( !bqBlock.getCustomData( 'div' + '_processed' ) ) {
-						processedBlockquoteBlocks.push( bqBlock );
-						CKEDITOR.dom.element.setMarker( database, bqBlock, 'div' + '_processed', true );
-					}
-
-					movedNodes.push( node );
-				}
-
-				CKEDITOR.dom.element.clearAllMarkers( database );
-
-				// Clear blockquote nodes that have become empty.
-				for ( i = processedBlockquoteBlocks.length - 1; i >= 0; i-- ) {
-					bqBlock = processedBlockquoteBlocks[ i ];
-					if ( noBlockLeft( bqBlock ) )
-						bqBlock.remove();
-				}
-
-/*
-				if ( editor.config.enterMode == CKEDITOR.ENTER_BR ) {
-					var firstTime = true;
-					while ( movedNodes.length ) {
-						node = movedNodes.shift();
-
-						if ( node.getName() == 'div' ) {
-							docFrag = new CKEDITOR.dom.documentFragment( editor.document );
-							var needBeginBr = firstTime && node.getPrevious() && !( node.getPrevious().type == CKEDITOR.NODE_ELEMENT && node.getPrevious().isBlockBoundary() );
-							if ( needBeginBr )
-								docFrag.append( editor.document.createElement( 'br' ) );
-
-							var needEndBr = node.getNext() && !( node.getNext().type == CKEDITOR.NODE_ELEMENT && node.getNext().isBlockBoundary() );
-							while ( node.getFirst() )
-								node.getFirst().remove().appendTo( docFrag );
-
-							if ( needEndBr )
-								docFrag.append( editor.document.createElement( 'br' ) );
-
-							docFrag.replace( node );
-							firstTime = false;
+						// If the node is located at the beginning or the end, just take it out
+						// without splitting. Otherwise, split the blockquote node and move the
+						// paragraph in between the two blockquote nodes.
+						if ( !node.getPrevious() )
+							node.remove().insertBefore( bqBlock );
+						else if ( !node.getNext() )
+							node.remove().insertAfter( bqBlock );
+						else {
+							node.breakParent( node.getParent() );
+							processedBlockquoteBlocks.push( node.getNext() );
 						}
+
+						// Remember the blockquote node so we can clear it later (if it becomes empty).
+						if ( !bqBlock.getCustomData( 'div' + '_processed' ) ) {
+							processedBlockquoteBlocks.push( bqBlock );
+							CKEDITOR.dom.element.setMarker( database, bqBlock, 'div' + '_processed', true );
+						}
+
+						movedNodes.push( node );
+					}
+
+					CKEDITOR.dom.element.clearAllMarkers( database );
+
+					// Clear blockquote nodes that have become empty.
+					for ( i = processedBlockquoteBlocks.length - 1; i >= 0; i-- ) {
+						bqBlock = processedBlockquoteBlocks[ i ];
+						if ( noBlockLeft( bqBlock ) )
+							bqBlock.remove();
 					}
 				}
-*/
 			}
 
 			selection.selectBookmarks( bookmarks );
