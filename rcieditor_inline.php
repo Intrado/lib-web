@@ -25,16 +25,16 @@
 				margin: 0px;
 			}
 
-			div.editableBlock {
+			.editableBlock {
 				border: none;
 				padding: 1px;
 			}
 
-			div.editableBlock:hover {
+			.editableBlock:hover {
 				cursor: pointer;
 			}
-			/*div.editableBlock:hover, div.cke_focus {*/
-			div.editableBlock, div.cke_focus {
+
+			.editableBlock, div.cke_focus {
 				margin: 0px;
 				outline: #FFFFFF dashed 1px;
 				border: 1px dashed #000000;

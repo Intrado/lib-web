@@ -46,6 +46,14 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 	this.basename = 'rcicke';
 	this.hidetoolbar = false;
 
+	// Lifted from utils.js so that we don't need to include that whole thing as an external dep.
+	this.getBaseUrl = function() {
+		var url = window.location.protocol + "//" + window.location.host + window.location.pathname;
+		var baseUrl = url.substr(0, url.lastIndexOf('/') + 1);        // Get everything thru the last '/'
+		return(baseUrl);
+	};
+
+
 	// Associative array support for settings; use of set/getter's is required
 	var settings = null;
 
@@ -92,26 +100,7 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 		this.setSetting('image_scaling', 0);
 
 		// Get the base URL for requests that require absolute pathing
-		var t = window.top.location;                                    // Get the full URL
-		var tmp = new String(t);                                        // Convert it to a String object
-		var u = tmp.split('?');                                         // Split at the '?' if there is one
-		var path = u[0];                                                // Strip off the query_string
-		var baseUrl = path.substr(0, path.lastIndexOf('/') + 1);        // Get everything thru the last '/'
-
-		this.setSetting('baseUrl', baseUrl);
-		this.hidetoolbar = hidetoolbar;
-
-		// Image scaling is disabled by default
-		this.setSetting('image_scaling', 0);
-
-		// Get the base URL for requests that require absolute pathing
-		var t = window.top.location;                                    // Get the full URL
-		var tmp = new String(t);                                        // Convert it to a String object
-		var u = tmp.split('?');                                         // Split at the '?' if there is one
-		var path = u[0];                                                // Strip off the query_string
-		var baseUrl = path.substr(0, path.lastIndexOf('/') + 1);        // Get everything thru the last '/'
-
-		this.setSetting('baseUrl', baseUrl);
+		this.setSetting('baseUrl', this.getBaseUrl());
 		this.hidetoolbar = hidetoolbar;
 
 		// (2) Apply the editor to the chosen textarea

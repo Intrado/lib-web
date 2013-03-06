@@ -23,11 +23,7 @@
 ( function ($) {
 
 	// Get the base URL for AJAX API requests
-	var t = window.top.location;					// Get the full URL
-	var tmp = new String(t);					// Convert it to a String object
-	var u = tmp.split('?');						// Split at the '?' if there is one
-	var path = u[0];						// Strip off the query_string
-	var baseUrl = path.substr(0, path.lastIndexOf('/') + 1);	// Get everything thru the last '/'
+	var baseUrl = window.top.rcieditor.getBaseUrl();
 
 	// Formulate the AJAX API request URL with this session's user ID
 	var req = baseUrl + 'api/2/users/' + window.top.USER.id + '/roles/0/accessprofile/fieldmaps/';
