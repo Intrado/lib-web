@@ -311,3 +311,12 @@ update setting set value='1.5/3' where name='_dbtaiversion'
 $$$
 
 -- END 1.5/3
+
+-- bug CS-4311
+insert into setting (name, value) values ('_dbtaiupgrade_inprogress', 'none')
+$$$
+
+update setting set value='1.5/4' where name='_dbtaiversion'
+$$$
+
+-- END 1.5/4
