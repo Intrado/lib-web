@@ -28,7 +28,7 @@ class StationerySelector extends FormItem {
 	function renderJavascriptLibraries() {
 	
 		$str = "<script type=\"text/javascript\">
-						function stationeryPrevewLoaded(area) {
+						function messagePrevewLoaded(area) {
 						
 								if(area.height() > 370) {
 									jQuery('#stationerypreview').height(area.height() + 30);

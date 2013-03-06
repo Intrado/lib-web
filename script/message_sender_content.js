@@ -912,7 +912,7 @@ function ContentManager() {
     }
 };
 
-function stationeryPrevewLoaded(area) {
+function messagePrevewLoaded(area) {
 	if(area.height() > 370) {
 		jQuery('#stationerypreview').height(area.height() + 30);
 	} else {
