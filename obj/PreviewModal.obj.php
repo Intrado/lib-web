@@ -82,7 +82,7 @@ class PreviewModal {
 				switch ($message->subtype) {
 					case "html":
 						$modal->title = _L("%s HTML Email Message" , Language::getName($message->languagecode));
-						$modal->text .= $email->emailbody;
+						$modal->text .= "<iframe src=\"messageview.php?messageid={$message->id}" . (isset($_REQUEST["jobtypeid"])?"&jobtypeid={$_REQUEST["jobtypeid"]}":"") . "\"></iframe>";//$email->emailbody;
 						break;
 					case "plain":
 						$modal->title = _L("%s Plain Email Message" , Language::getName($message->languagecode));
@@ -313,16 +313,25 @@ class PreviewModal {
 		$posturl .= "previewmodal=true";
 		?>
 		
-		<div class="modal hide fade" id="prevewmodal">
-			<div class="modal-header"></div>
-            <div class="modal-body"></div>
-            <div class="modal-footer"></div>
-		</div>
-		<script type="text/javascript" src="script/datepicker.js"></script>
-	    <script src="script/bootstrap-modal.js" type="text/javascript"></script>
+
+
 		<script type='text/javascript' language='javascript'>
+		
+		function messagePrevewLoaded(area) {
+			var $ = jQuery;		
+			if(area.height() > 370) {
+				$('#prevewmodal').find('iframe').height(area.height() + 30);
+			} else {
+				$('#prevewmodal').find('iframe').height(400);
+			}
+			$('html, body').animate({ scrollTop: 0 }, 'fast');
+			$('#prevewmodal').animate({ width: '100%' }, 'fast');
+		}
+
+		
 		var showPreview = function(post_parameters,get_parameters){
 			var $ = jQuery;
+			
 			$('#prevewmodal').modal();
 			
 			var header = $('#prevewmodal').find(".modal-header");

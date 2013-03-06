@@ -232,6 +232,8 @@ header('Content-type: text/html; charset=UTF-8') ;
                 jQuery.noConflict();
         </script>
         <script type="text/javascript" src="script/json2.js"></script>
+	<script type="text/javascript" src="script/datepicker.js"></script>
+	<script src="script/bootstrap-modal.js" type="text/javascript"></script>
 	
 	<link href="css.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print" />
 	<link href="css.forms.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print" />
@@ -274,7 +276,15 @@ header('Content-type: text/html; charset=UTF-8') ;
 <!-- ********************************************************************* -->
 
 <div class="wrap"><!-- ends in navbottom.inc -->
-
+	<div class="previewmodal-wrap">
+	<div class="previewmodal-wrapcell">
+		<div class="modal hide fade preview-modal" id="prevewmodal">
+			<div class="modal-header"></div>
+            <div class="modal-body"></div>
+            <div class="modal-footer"></div>
+		</div>
+	</div>
+	</div>
 <div id="top_banner" class="banner">
 <div class="contain cf">
 
