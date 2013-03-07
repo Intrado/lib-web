@@ -229,10 +229,16 @@
 					<label for="msgsndr_emailmessagetext">Body&nbsp;<img id="msgsndr_emailmessagetext_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>
 					<div class="controls">
 						
-						<button id="paste_from_tts" class="paste-from" data-textarea="msgsndr_tts_message" disabled="disabled">Paste text from Phone</button>
+						<!--button id="paste_from_tts" class="paste-from" data-textarea="msgsndr_tts_message" disabled="disabled">Paste text from Phone</button-->
 						<div class="cf"></div>
 						<div id="rcieditor_scratch" style="display: none;"></div>
 						<textarea id="msgsndr_emailmessagetext" name="msgsndr_emailmessagetext" class="required msgdata hide" data-ajax="true"></textarea>
+						<style type="text/css">
+							/* SMK added 2013-03-07 to force this button's label to show in the toolbar */
+							.cke_button__pastefromphone_label {
+								display: inline-block;
+							}
+						</style>
 						<div id="msgsndr_emailmessagetext_msg" class="box_validatorerror er" style="display:none"></div>
 						<div id="msgsndr_emailmessagetext-htmleditor"></div>
 					</div>

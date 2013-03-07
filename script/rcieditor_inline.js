@@ -18,6 +18,8 @@ window.RCIEditorInline = function () {
 	this.initRetryDelay = 16;
 	this.initRetryTimeout = null;
 
+	this.activeEditorId = null;
+
 	/**
 	 * Our pseudo-constructor executes when the script is loaded
 	 *
@@ -50,6 +52,7 @@ window.RCIEditorInline = function () {
 		var that = this;
 		CKEDITOR.on( 'instanceCreated', function( event ) {
 			var editor = event.editor;
+			var rcieditor = window.top.rcieditor;
 
 			editor.on( 'configLoaded', function() {
 
@@ -61,27 +64,49 @@ window.RCIEditorInline = function () {
 				// to true to enable scaling, otherwise scaling will be disabled by default;
 				// uploader.php will pass the argument on to f.handleFileUpload() which will
 				// ultimately be responsible for enforcement of this flag
-				var uploaderURI = window.top.rcieditor.getSetting('baseUrl') + 'uploadimage.php';
+				var uploaderURI = rcieditor.getSetting('baseUrl') + 'uploadimage.php';
 				var max_size;
-				if ((max_size = parseInt(window.top.rcieditor.getSetting('image_scaling'))) > 0) {
+				if ((max_size = parseInt(rcieditor.getSetting('image_scaling'))) > 0) {
 					uploaderURI += '?scaleabove=' + max_size;
 				}
+
+
+
+				// Custom toolbar buttons
+				var extraPlugins = ['aspell'];
+				var extraButtons = [];
+
+				// Activate whatever tools are enabled according to rcieditor
+				var custom_tools = [ 'mkField', 'mkBlock', 'themeMgr', 'pasteFromPhone' ];
+				custom_tools.forEach(function (toolname) {
+					var lowertool = toolname.toLowerCase();
+					if (rcieditor.getSetting('tool_' + lowertool)) {
+						extraPlugins.push(lowertool);
+						extraButtons.push(toolname);
+					}
+				});
+
+
 				editor.config.filebrowserImageUploadUrl = uploaderURI;
 				editor.config.pasteFromWordRemoveFontStyles = false;
 				editor.config.pasteFromWordRemoveStyles = false;
 				editor.config.disableObjectResizing = true; // disabled only because the message_parts data model cannot capture resized image attributes
-				editor.config.extraPlugins = 'aspell,mkfield';
+				editor.config.extraPlugins = extraPlugins.join();
 				editor.config.toolbar = [
 					['Undo','Redo'],
-					['PasteFromWord','SpellCheck','mkField'],
-					['Styles','Format','Font','FontSize'],
-					'/',
+					['NumberedList','BulletedList','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','Outdent','Indent'],
+					['PasteFromWord','SpellCheck'],
 					['Link','Image','Table','HorizontalRule'],
+					'/',
 					['Bold','Italic','Underline','Strike','TextColor','BGColor','RemoveFormat'],
-					['NumberedList','BulletedList','Outdent','Indent'],
-					['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock']
+					['Styles','Format','Font','FontSize'],
+					extraButtons
 				];
 
+			});
+
+			editor.on('focus', function(event) {
+				that.activeEditorId = this.name;
 			});
 
 			editor.on('key', function(event) {
@@ -95,11 +120,14 @@ window.RCIEditorInline = function () {
 					this.captureTimeout = window.setTimeout( (function () { that.captureChanges(); }), 500);
 				}
 			});
-			editor.on('blur', (function () { that.captureChanges(); }) );
-			editor.on('saveSnapshot', (function () { that.captureChanges(); }) );
-			editor.on('afterCommandExec', (function () { that.captureChanges(); }) );
-			editor.on('insertHtml', (function () { that.captureChanges(); }) );
-			editor.on('insertElement', (function () { that.captureChanges(); }) );
+			editor.on('blur', function () {
+				that.activeEditorId = null;
+				that.captureChanges();
+			});
+			editor.on('saveSnapshot', function () { that.captureChanges(); });
+			editor.on('afterCommandExec', function () { that.captureChanges(); });
+			editor.on('insertHtml', function () { that.captureChanges(); });
+			editor.on('insertElement', function () { that.captureChanges(); });
 
 		});
 

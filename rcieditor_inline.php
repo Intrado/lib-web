@@ -61,7 +61,6 @@
 				white-space: pre-wrap;
 				word-wrap: break-word;
 			}
-
 		</style>
 		<script type="text/javascript" src="script/jquery.1.7.2.min.js"></script>
 		<script type="text/javascript">
@@ -94,6 +93,12 @@
 			<div id="wysiwygpage"></div>
 			<div id="wysiwygpresave" style="display: none;"></div>
 		</div>
+		<style type="text/css">
+			<?/* SMK added 2013-03-07 to force this button's label to show in the toolbar */?>
+			.cke_button__pastefromphone_label {
+				display: inline-block;
+			}
+		</style>
 	</body>
 </html>
 
