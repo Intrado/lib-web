@@ -90,6 +90,20 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 			$('body').append(scratch);
 		}
 
+		// Image scaling is disabled by default
+		this.setSetting('image_scaling', 0);
+
+		// Get the base URL for requests that require absolute pathing
+		var t = window.top.location;                                    // Get the full URL
+		var tmp = new String(t);                                        // Convert it to a String object
+		var u = tmp.split('?');                                         // Split at the '?' if there is one
+		var path = u[0];                                                // Strip off the query_string
+		var baseUrl = path.substr(0, path.lastIndexOf('/') + 1);        // Get everything thru the last '/'
+
+		this.setSetting('baseUrl', baseUrl);
+		this.hidetoolbar = hidetoolbar;
+
+		// (2) Apply the editor to the chosen textarea
 		var container_id = textarea_id + '-htmleditor';
 		var res = this.applyEditor(editor_mode, textarea_id, container_id, hidetoolbar);
 		return(res);
@@ -365,6 +379,8 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 				'toolbarCanCollapse' : true,
 				'extraPlugins': extraPlugins,
 				'disableObjectResizing' : true, // disabled only because the message_parts data model cannot capture resized image attributes
+				'pasteFromWordRemoveFontStyles' : false,
+				'pasteFromWordRemoveStyles' : false,
 
 				'toolbar_RCI' : [
 					{ name: 'r1g1', items : [ 'Print', 'Source' ] },

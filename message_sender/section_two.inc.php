@@ -217,7 +217,7 @@
 						&nbsp;&nbsp;<button id="msgsndr_emailstationerycontinue" class="btn_select" disabled="disabled">Select</button><img src="img/ajax-loader.gif" class="loading hide" />
 						<fieldset id="stationerypreviewfield" class="stationerypreview">
 							<legend>Email Stationery Preview:</legend>
-							<iframe id="stationerypreview"  src="mgstationeryview.php?preview"></iframe>
+							<iframe id="stationerypreview"  src="blank.html"></iframe>
 						</fieldset>
 					</fieldset>
 

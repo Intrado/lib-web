@@ -8,12 +8,12 @@
  *
  * We use the API to pull field maps for this user. We use the USER class to pull
  * the active session user's ID from PHP, and then we use jQuery to request the
- * fieldmap for this user as a JSON structure from the API. We then reformat the
+  + req + ']'* fieldmap for this user as a JSON structure from the API. We then reformat the
  * JSON data into an array of field names needed by CKEditor's UI constructs to
  * assemble a SELECT box with the field names in it.
  *
  * EXTERNAL DEPENDENCIES
-   * jquery
+   * jquery.js
    * API
    * USER.js.php
  *
@@ -23,9 +23,13 @@
 ( function ($) {
 
 	// Get the base URL for AJAX API requests
-	var t = window.top.location;
-	var tmp = new String(t);
-	var baseUrl = tmp.substr(0, tmp.lastIndexOf('/') + 1);
+	var t = window.top.location;					// Get the full URL
+	var tmp = new String(t);					// Convert it to a String object
+	var u = tmp.split('?');						// Split at the '?' if there is one
+	var path = u[0];						// Strip off the query_string
+	var baseUrl = path.substr(0, path.lastIndexOf('/') + 1);	// Get everything thru the last '/'
+
+	// Formulate the AJAX API request URL with this session's user ID
 	var req = baseUrl + 'api/2/users/' + window.top.USER.id + '/roles/0/accessprofile/fieldmaps/';
 
 	// Make an AJAX request to the API to pull the fieldmap JSON;
@@ -37,6 +41,7 @@
 		url: req,
 		data: '',
 		success: function (data) {
+
 			var ftypes = Array(Array('-- Select a Field --', ''));
 			$(data).each(function () {
 
@@ -54,7 +59,6 @@
 					title: 'Field Insert',
 					minWidth: 400,
 					minHeight: 60,
-
 					contents: [
 						{
 							id: 'general',

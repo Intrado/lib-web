@@ -37,3 +37,7 @@ $$$
 
 -- $rev 3
 -- no SQL changes, see db_1-5.php for template insertion code
+
+-- $rev 4
+-- empty, run to insert setting _dbupgrade_inprogress bug CS-4311
+

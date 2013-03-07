@@ -18,6 +18,9 @@ function tai_upgrade_1_5 ($rev, $shardid, $customerid, $db) {
 			echo "|";
 			apply_sql("taiupgrades/db_1-5_pre.sql", $customerid, $db, 3);
 			createTemplates_1_5_3();
+		case 3:
+			echo "|";
+			apply_sql("taiupgrades/db_1-5_pre.sql", $customerid, $db, 4);
 
 	}
 	
