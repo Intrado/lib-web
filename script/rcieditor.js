@@ -30,6 +30,7 @@
    * jquery.js
    * rcieditor_inline.js
    * rcieditor_inline.php
+   * "message sender" -> for the pasteFromPhone plugin availability
  */
 
 /*
@@ -107,6 +108,9 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 		this.setSetting('tool_mkblock', false);
 		this.setSetting('tool_thememgr', false);
 		this.setSetting('tool_pastefromphone', false);
+
+		// Make a generic, reusable text clipboard
+		this.setSetting('clipboard', '');
 
 		// Get the base URL for requests that require absolute pathing
 		this.setSetting('baseUrl', this.getBaseUrl());
@@ -277,7 +281,11 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 
 			case 'msinline':
 				// Message Sender's inline mode also add's pasteFromPhone
-				this.setSetting('tool_pastefromphone', true);
+				var tts_message = $('#msgsndr_tts_message');
+				if (tts_message && tts_message.length && tts_message.val().length) {
+					// But only if it has something to put into the clipboard
+					this.setSetting('tool_pastefromphone', true);
+				}
 			case 'inline':
 				// Add the mkField tool only
 				this.setSetting('tool_mkfield', true);
@@ -285,7 +293,11 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 
 			case 'msnormal':
 				// Message Sender's normal mode also add's pasteFromPhone
-				this.setSetting('tool_pastefromphone', true);
+				var tts_message = $('#msgsndr_tts_message');
+				if (tts_message && tts_message.length && tts_message.val().length) {
+					// But only if it has something to put into the clipboard
+					this.setSetting('tool_pastefromphone', true);
+				}
 			case 'normal':
 				// Add the mkField tool only
 				this.setSetting('tool_mkfield', true);
