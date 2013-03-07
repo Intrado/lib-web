@@ -123,10 +123,21 @@ jQuery.noConflict();
 			rcieditor.reconstruct(editor_mode, elementid);
 		}
 
-		// Grab the Phone's TTS message and stick it into the editor's clipboard
-		var message = $('#msgsndr_tts_message');
-		if (message && message.length && message.val().length) {
-			rcieditor.setSetting('clipboard', message.val());
+		var phonemessagetype = $('#msgsndr_phonemessagetype');
+		if (phonemessagetype && phonemessagetype.length && (phonemessagetype.val() == 'text')) {
+			// Grab the Phone's TTS message and stick it into the editor's clipboard
+			var message = $('#msgsndr_tts_message');
+			if (message && message.length && message.val().length) {
+				rcieditor.setSetting('clipboard', message.val());
+			}
+		}
+		else if (phonemessagetype && phonemessagetype.length && (phonemessagetype.val() == 'callme')) {
+
+			// Grab the Phone's "callme" scratch message and stick it into the editor's clipboard
+			var message = $('#msgsndr_form_scratch');
+			if (message && message.length && message.val().length) {
+				rcieditor.setSetting('clipboard', message.val());
+			}
 		}
 
 		// Set up a validator
