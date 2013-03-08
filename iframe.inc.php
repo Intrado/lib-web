@@ -48,4 +48,13 @@ header('Content-type: text/html; charset=UTF-8') ;
 ?>
 
 <div class="content_wrap iframe_content_wrap cf">
-<div class="content">
+	<div class="previewmodal-wrap">
+		<div class="previewmodal-wrapcell">
+			<div class="modal hide fade preview-modal" id="prevewmodal">
+				<div class="modal-header"></div>
+				<div class="modal-body"></div>
+				<div class="modal-footer"></div>
+			</div>
+		</div>
+	</div>
+	<div class="content">
