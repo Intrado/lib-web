@@ -10,6 +10,13 @@
  */
 (function($){
 	var container = $("#content-msgsndr");
+
+	// test that plugin and pkList are set
+	if (!container || typeof plugin === 'undefined' || typeof pkeyList === 'undefined') {
+		// display an error
+		alert("Cannot load application, missing one or more document resources: 'content-msgsndr', 'plugin', 'pkeyList'");
+		return;
+	}
 	var appUrl = plugin.registrationUrl.replace(/\/api\/.*$/g, "") + "/";
 
 	// extend the styles
@@ -55,17 +62,17 @@ function loadScripts(scriptList, callback) {
  *
  * @param {string} ssoTarget
  * @param {string[]} pkeyList
- * @param {element} container
+ * @param {Element} container
  * @constructor
  */
 function MessageSender_embedded(ssoTarget, pkeyList, container) {
 	var $ = jQuery;
-	var self = this;
+	container = $(container);
 
 	// TODO: get appropriate subject
-	self.subject = "New Message for...";
-	self.baseUrl = false;
-	self.iframe = $('<iframe class="embedded" height="1px" width="1px" frameborder="0" scrolling="no">');
+	this.subject = "New Message for...";
+	this.baseUrl = false;
+	this.iframe = $('<iframe class="embedded" height="1px" width="1px" frameborder="0" scrolling="no">');
 
 	var pmHandler = false;
 	var client = false;
@@ -83,7 +90,7 @@ function MessageSender_embedded(ssoTarget, pkeyList, container) {
 	 * 3. initializing the postMessage handler
 	 * 4. initializing the RPC client
 	 */
-	self.init = function() {
+	this.init = function() {
 		// insert loading content and message area
 		container.html(
 			'<div id="loadingmessage">' +
@@ -103,25 +110,28 @@ function MessageSender_embedded(ssoTarget, pkeyList, container) {
 
 		// detect if the browser can use HTML5 window.postMessage API (this is REQUIRED!)
 		if (top.postMessage == undefined) {
-			self._showError(['This browser is incompatible with the application being accessed.<br>' +
+			this._showError(['This browser is incompatible with the application being accessed.<br>' +
 				'See <a href="http://caniuse.com/#feat=x-doc-messaging">Cross-document messaging compatibility</a> for a browser compatibility list.']);
 			return;
 		}
 
-		container.append(self.iframe);
-		self.updateProgress("authenticate", "trying", "Authenticating...");
-		self.iframe.attr("src", ssoTarget);
+		container.append(this.iframe);
+		this.updateProgress("authenticate", "trying", "Authenticating...");
+		this.iframe.attr("src", ssoTarget);
+		var that = this;
 		authTimer = setTimeout(function() {
-			self._showError(["Authentication request timed out after 30 seconds", "Contact your system administrator for assistance"])
+			that._showError("Authentication request timed out after 30 seconds", "Contact your system administrator for assistance");
 		}, authenticationTimeoutMs);
 
 		// set up the postMessage handler and rpc client
-		pmHandler = new PostMessageHandler(self.iframe[0].contentWindow);
+		pmHandler = new PostMessageHandler(this.iframe[0].contentWindow);
 		client = new PmRpcClient(pmHandler);
 		client.init();
 
 		// attach a message listener for communication cross domains
-		pmHandler.attachListener(self._onMessage);
+		pmHandler.attachListener(function(event) {
+			that._onMessage(event);
+		});
 	};
 
 	/**
@@ -132,23 +142,23 @@ function MessageSender_embedded(ssoTarget, pkeyList, container) {
 	 * @param {event} event
 	 * @private
 	 */
-	self._onMessage = function(event) {
+	this._onMessage = function(event) {
 		// TODO: test origin for valid domains
 		//if(e.origin !== 'B'){ return; }
 
 		var data = $.secureEvalJSON(event.data);
-		if (data.error != undefined && data.error) {
+		if (data.error) {
 			// got an error!
-			self._showError(data.error);
+			this._showError(data.error);
 		} else {
 			// resize the iframe
 			if (data.resize != undefined && data.resize)
-				self._resizeIframe(data.resize);
+				this._resizeIframe(data.resize);
 
 			// check if we should load a new page
 			if (data.custurl != undefined && data.custurl && data.user != undefined && data.user && data.page != undefined && data.page) {
 				// update the baseUrl with the origin
-				self.baseUrl = event.origin + "/" + data.custurl + "/";
+				this.baseUrl = event.origin + "/" + data.custurl + "/";
 
 				// we received all the necessary data to indicate pages are loading correctly (and a user is authenticated)
 				// if the page loaded is start.php or dashboard.php, precede to the message sender
@@ -156,8 +166,8 @@ function MessageSender_embedded(ssoTarget, pkeyList, container) {
 					clearTimeout(authTimer);
 
 					// Authentication completed
-					self.updateProgress("authenticate", "done", "Authentication complete");
-					self._launchMessageSender();
+					this.updateProgress("authenticate", "done", "Authentication complete");
+					this._launchMessageSender();
 				}
 			}
 		}
@@ -170,38 +180,40 @@ function MessageSender_embedded(ssoTarget, pkeyList, container) {
 	 *
 	 * @private
 	 */
-	self._launchMessageSender = function() {
-		var msgsndrUrl = self.baseUrl + "message_sender.php?iframe&template=true&subject=" + encodeURIComponent(self.subject);
+	this._launchMessageSender = function() {
+		var msgsndrUrl = this.baseUrl + "message_sender.php?iframe&template=true&subject=" + encodeURIComponent(this.subject);
 
 		// if the pkey list is not empty, create a list with the rpc client
 		if (pkeyList.length > 0) {
 			// first, set up the remote rpc provider in the iframe
-			self.iframe.attr("src", self.baseUrl + "api/postmessage_rpc.html");
+			this.iframe.attr("src", this.baseUrl + "api/postmessage_rpc.html");
 
 			// then, create a list
-			self.updateProgress("createlist", "trying", "Creating list and adding contacts...");
+			this.updateProgress("createlist", "trying", "Creating list and adding contacts...");
+			var that = this;
 			client.createList("PowerSchool Selection List", "List created from a PowerSchool selection", true, function(code, data) {
 				if (code == 200) {
 					totalAdded = 0;
-					self._addListPkeys(data.id, pkeyList, function() {
-						self.updateProgress("createlist", "done", "List creation complete");
-						self.updateProgress("launchmsgsndr", "trying", "Launching application...");
+					that._addListPkeys(data.id, pkeyList, function() {
+						that.updateProgress("createlist", "done", "List creation complete");
+						that.updateProgress("launchmsgsndr", "trying", "Launching application...");
 						// load the iframe with message_sender.php (indicate list to add and excluding nav)
-						self.iframe.attr("src", msgsndrUrl + "&lists=[" + data.id + "]");
+						that.iframe.attr("src", msgsndrUrl + "&lists=[" + data.id + "]");
 					})(code, data);
 				} else {
-					self._showError(data.error);
+					that._showError(data.error);
 				}
 			});
 		} else {
 			// otherwise, just launch the message sender with no list
-			self.updateProgress("createlist", "done", "List creation complete");
-			self.updateProgress("launchmsgsndr", "trying", "Launching application...");
-			self.iframe.attr("src", msgsndrUrl);
+			this.updateProgress("createlist", "done", "List creation complete");
+			this.updateProgress("launchmsgsndr", "trying", "Launching application...");
+			this.iframe.attr("src", msgsndrUrl);
 		}
 	};
 
-	self._addListPkeys = function(listid, pkeyList, callback) {
+	this._addListPkeys = function(listid, pkeyList, callback) {
+		var that = this;
 		return function(status, data) {
 			if (status == 200) {
 				// TODO: test status
@@ -212,14 +224,14 @@ function MessageSender_embedded(ssoTarget, pkeyList, container) {
 
 					totalAdded += partialList.length;
 					// update the status with a counter, shows something is happening
-					self.updateProgress("createlist", "trying", "Creating list and adding contacts... (" + totalAdded + " / " + totalPkeys + ")");
+					that.updateProgress("createlist", "trying", "Creating list and adding contacts... (" + totalAdded + " / " + totalPkeys + ")");
 
-					client.addListPkeys(listid, partialList, self._addListPkeys(listid, pkeyList, callback));
+					client.addListPkeys(listid, partialList, that._addListPkeys(listid, pkeyList, callback));
 				} else {
 					callback();
 				}
 			} else {
-				self._showError(data.error);
+				that._showError(data.error);
 			}
 		}
 	};
@@ -227,10 +239,17 @@ function MessageSender_embedded(ssoTarget, pkeyList, container) {
 	/**
 	 * display the passed error text in the container
 	 *
-	 * @param {string[]} errorText
+	 * @param {Object} errorText
 	 * @private
 	 */
-	self._showError = function(errorText) {
+	this._showError = function(errorText) {
+		// ensure an error is reported and that the data is an appropriate structure
+		if (errorText) {
+			if (!(errorText instanceof Array))
+				errorText = [errorText];
+		} else {
+			errorText = ["An error occurred, but the reason was not reported. Seek assistance from your system administrator."];
+		}
 		// update whichever step is "trying" to "failed"
 		$("ul.steps .trying").removeClass().addClass("failed");
 		// display error message(s)
@@ -247,17 +266,17 @@ function MessageSender_embedded(ssoTarget, pkeyList, container) {
 	 * @param {number} size
 	 * @private
 	 */
-	self._resizeIframe = function(size) {
+	this._resizeIframe = function(size) {
 		if (size > 0) {
 			// iframe is taking over the window, remove the loading bits
 			$("#loadingmessage").remove();
 		}
 		// resize the iframe, taking the larger of the left nav, vs the iframe content
 		var psNavHeight = $('#nav-main').height();
-		self.iframe.attr("width", "98%").attr("height", Math.max(psNavHeight, size) + "px");
+		this.iframe.attr("width", "98%").attr("height", Math.max(psNavHeight, size) + "px");
 	};
 
-	self.updateProgress = function(step, cls, text) {
+	this.updateProgress = function(step, cls, text) {
 		$("#" + step).removeClass().addClass(cls).html(text);
 	};
 }
