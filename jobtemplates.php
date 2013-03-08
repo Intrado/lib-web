@@ -56,11 +56,11 @@ if($isajax === true) {
 	$limit = 5;
 	$orderby = "date desc";
 
-	$filter = "";
-	if (isset($_GET['filter'])) {
-		$filter = $_GET['filter'];
+	$sortby = "";
+	if (isset($_GET['feed_sortby'])) {
+		$sortby = $_GET['feed_sortby'];
 	}
-	switch ($filter) {
+	switch ($sortby) {
 		case "name":
 			$orderby = "digitsfirst, name";
 			break;
@@ -181,22 +181,22 @@ include_once("nav.inc.php");
 startWindow(_L("%s Templates", getJobTitle()));
 
 $feedButtons = array(icon_button(_L('Add New Template'),"add","location.href='jobtemplate.php?id=new'"));
-$feedFilters = array(
+$sortoptions = array(
 	"name" => array("icon" => "img/largeicons/tiny20x20/pencil.jpg", "name" => "Name"),
 	"date" => array("icon" => "img/largeicons/tiny20x20/clock.jpg", "name" => "Date")
 );
 
-feed($feedButtons,$feedFilters);
+feed($feedButtons,$sortoptions);
 ?>
 
 
 <script type="text/javascript" src="script/feed.js.php"></script>
 <script type="text/javascript">
-var filtes = <?= json_encode(array_keys($feedFilters))?>;
-var activepage = 0;
-var currentfilter = 'date';
+
+
+
 document.observe('dom:loaded', function() {
-	feed_applyDefaultFilter('<?=$_SERVER["REQUEST_URI"]?>','name');
+	feed_applyDefault('<?=$_SERVER["REQUEST_URI"]?>','name');
 });
 </script>
 <?

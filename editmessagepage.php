@@ -27,6 +27,7 @@ require_once("obj/Validator.obj.php");
 require_once("obj/ValMessageBody.val.php");
 require_once("obj/EmailAttach.val.php");
 require_once("obj/EmailAttach.fi.php");
+require_once("obj/HtmlTextArea.fi.php");
 
 require_once("inc/editmessagecommon.inc.php");
 
@@ -73,67 +74,6 @@ if ($message) {
 if (!userOwns("messagegroup", $messagegroup->id))
 	redirect('unauthorized.php');
 
-////////////////////////////////////////////////////////////////////////////////
-// Optional Form Items And Validators
-////////////////////////////////////////////////////////////////////////////////
-class HtmlTextArea extends FormItem {
-	
-	function render ($value) {
-		$n = $this->form->name."_".$this->name;
-		$str = '
-			<style>
-				.controlcontainer {
-					margin-bottom: 10px;
-					white-space: nowrap;
-				}
-				.controlcontainer .messagearea {
-					width: 100%
-				}
-			</style>
-			<div class="controlcontainer">
-				<textarea id="'.$n.'" name="'.$n.'" class="messagearea"/>'.escapehtml($value).'</textarea>
-				<div id="'.$n.'-htmleditor"></div>
-			</div>';
-		return $str;
-	}
-	
-	function renderJavascript($value) {
-		global $USER;
-		$n = $this->form->name."_".$this->name;
-		
-		// set up the controls in the form and initialize any event listeners
-		$str = 'setupHtmlTextArea("'.$n.'",'.$USER->getSetting("hideemailtools","false").');';
-			
-		return $str;
-	}
-	
-	function renderJavascriptLibraries() {
-		global $USER;
-		$str = '
-			<script type="text/javascript" src="script/ckeditor/ckeditor_basic.js"></script>
-			<script type="text/javascript" src="script/htmleditor.js"></script>
-			<script type="text/javascript">
-				function setupHtmlTextArea(e, hidetoolbar) {
-					e = $(e);
-					
-					// add the ckeditor to the textarea
-					applyHtmlEditor(e, false, e.id+"-htmleditor", hidetoolbar);
-
-					// set up a keytimer to save content and validate
-					var htmlTextArea_keytimer = null;
-					registerHtmlEditorKeyListener(function (event) {
-						window.clearTimeout(htmlTextArea_keytimer);
-						var htmleditor = getHtmlEditorObject();
-						htmlTextArea_keytimer = window.setTimeout(function() {
-							saveHtmlEditorContent(htmleditor);
-							form_do_validation(htmleditor.currenttextarea.up("form"), htmleditor.currenttextarea);
-						}, 500);
-					});
-				}
-			</script>';
-		return $str;
-	}
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data Handling
@@ -152,35 +92,43 @@ if ($message) {
 
 $language = Language::getName(Language::getDefaultLanguageCode());
 
-$formdata = array(
-	$messagegroup->name. " (". $language. ")",
-	"message" => array(
-		"label" => _L("Page Message"),
-		"fieldhelp" => _L("Enter the message that you would like to have appear on the web page."),
-		"value" => $text,
-		"validators" => array(
-			array("ValRequired"),
-			array("ValMessageBody", "messagegroupid" => $messagegroup->id)),
-		"control" => array("HtmlTextArea"),
-		"helpstep" => 1
-	),
-	"attachments" => array(
-		"label" => _L('Attachments'),
-		"fieldhelp" => _L("You may attach up to five files that are up to 50MB each. For greater security, certain file types are not permitted."),
-		"value" => ($attachments?json_encode($attachments):"{}"),
-		"validators" => array(array("ValEmailAttach", "maxattachments" => 5)),
-		"control" => array("EmailAttach", "maxattachmentsize" => 50*1024*1024),
-		"helpstep" => 2
-	)
-);
+$helpsteps = array();
+$formdata = array($messagegroup->name. " (". $language. ")");
 
-$helpsteps = array(_L("<p>Page messages allow you to share messages which are too large for social media sites. You may use this feature to create".
+
+// PAGE BODY
+$helpsteps[] = _L("<p>Page messages allow you to share messages which are too large for social media sites. You may use this feature to create".
 	" a web page with your message and then post a link to the web page on your social media pages.".
 	"</p><p>Page messages may be viewed by anyone who can view your social media pages. For that reason, dynamic data fields may not be included.".
-	" You may include audio in your Page message by adding Page Media from the Message Editor."),
-	_L("<p>You may attach up to five files, such as PDFs, to your Page for recipients to download.".
+	" You may include audio in your Page message by adding Page Media from the Message Editor.");
+
+$formdata["message"] = array(
+	"label" => _L("Page Message"),
+	"fieldhelp" => _L("Enter the message that you would like to have appear on the web page."),
+	"value" => $text,
+	"validators" => array(
+		array("ValRequired"),
+		array("ValMessageBody", "messagegroupid" => $messagegroup->id)
+	),
+	"control" => array("HtmlTextArea", 'editor_mode' => 'plain'),
+	"helpstep" => 1
+);
+
+
+// ATTACHMENTS
+$helpsteps[] = _L("<p>You may attach up to five files, such as PDFs, to your Page for recipients to download.".
 	" People who view your page will be able to download these files from links that are automatically ".
-	"generated in the Page.</p><p>Files may not exceed 50MB in size.</p>"));
+	"generated in the Page.</p><p>Files may not exceed 50MB in size.</p>");
+
+$formdata["attachments"] = array(
+	"label" => _L('Attachments'),
+	"fieldhelp" => _L("You may attach up to five files that are up to 50MB each. For greater security, certain file types are not permitted."),
+	"value" => ($attachments?json_encode($attachments):"{}"),
+	"validators" => array(array("ValEmailAttach", "maxattachments" => 5)),
+	"control" => array("EmailAttach", "maxattachmentsize" => 50*1024*1024),
+	"helpstep" => 2
+);
+
 		
 $buttons = array(submit_button(_L('Done'),"submit","tick"));
 $form = new Form("pagemessage",$formdata,$helpsteps,$buttons,"vertical");

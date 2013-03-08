@@ -201,8 +201,10 @@ function form_do_validation (form, element, validationHander) {
 }
 
 function form_validation_display(element,resultcode, msgtext) {
-	e = $(element);
-	
+
+	// SMK added local scope "var" 2012-01-28 since e was going global and being fought over btwn jQuery and Prototype
+	var e = $(element);
+
 	var style = resultcode;
 
 	//if radio button or multicheckbox, get the id of the container div
@@ -643,6 +645,7 @@ function form_handle_submit(form,event) {
 				$(res.name).update(res.content);
 			} else if ("fireevent" == res.status) {
 				form.fire("Form:Submitted", res.memo);
+				jQuery('#' + form.id).trigger("Form:Submitted", [res.memo]); // Trigger jquery since jquery and prototype events aren't the same
 			}
 			} catch (e) { alert(e.message + "\n" + response.responseText)}
 			formvars.submitting = false;

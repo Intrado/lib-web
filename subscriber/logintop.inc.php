@@ -34,6 +34,12 @@ header('Content-type: text/html; charset=UTF-8') ;
 	<link href="css/prototip.css.php" type="text/css" rel="stylesheet">
 	<link href='css/style_print.css' type='text/css' rel='stylesheet' media='print'>
 	<link href='css.php?skipcommon' type='text/css' rel='stylesheet' media='screen'>
+
+	<!-- iOS Webpage Icons for Web Clip -->
+	<link rel="apple-touch-icon" href="img/ios/apple-touch-icon-57x57.png" />
+	<link rel="apple-touch-icon" sizes="72x72" href="img/ios/apple-touch-icon-72x72.png" />
+	<link rel="apple-touch-icon" sizes="114x114" href="img/ios/apple-touch-icon-114x114.png" />
+	<link rel="apple-touch-icon" sizes="144x144" href="img/ios/apple-touch-icon-144x144.png" />
 </head>
 
 <?

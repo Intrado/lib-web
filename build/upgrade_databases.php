@@ -51,6 +51,7 @@ $versions = array (
 		"9.3/1",
 		"9.4/2",
 		"9.5/2",
+		"9.5/3",
 		"9.6/1"
 		//etc
 	),
@@ -60,7 +61,8 @@ $versions = array (
 		"1.2/2",
 		"1.3/1",
 		"1.4/1",
-		"1.5/3"
+		"1.5/3",
+		"1.5/4"
 		//etc
 	)
 	
@@ -198,17 +200,23 @@ function update_customer($db, $customerid, $shardid) {
 	}
 	
 	//only allow one instance of the updater per customer to run at a time
-	//only allow one instance of the updater per customer to run at a time
-	if (QuickQuery("select value from setting where name = '_dbupgrade_inprogress' and organizationid is null")) {
-		Query("rollback",$db);
-		echo "an upgrade is already in process, skipping\n";
-		return;
+	$inprogress_value = QuickQuery("select value from setting where name = '_dbupgrade_inprogress' for update");
+	if (!$inprogress_value) {
+		// ok to continue
+		QuickUpdate("insert into setting (name, value) values ('_dbupgrade_inprogress', '$updater')", $db);
+		Query("commit", $db);
+		Query("begin", $db);
+	} else if ($inprogress_value == "none") {
+		// ok to continue
+		QuickUpdate("update setting set value = '$updater' where name = '_dbupgrade_inprogress'", $db);
+		Query("commit", $db);
+		Query("begin", $db);
 	} else {
-		QuickUpdate("insert into setting (name,value) values ('_dbupgrade_inprogress','$updater')",$db);
-		Query("commit",$db);
-		Query("begin",$db);
+		// another process is running, skip this customer
+		Query("rollback", $db);
+		echo "an upgrade is already in progress, skipping\n";
+		return;
 	}
-
 	
 	// require the necessary version upgrade scripts	
 	require_once("upgrades/db_7-5.php");
@@ -343,8 +351,8 @@ function update_customer($db, $customerid, $shardid) {
 	} else {
 		//TODO ERROR !!!! running ancient upgrade_databases on newer db? didnt find current version
 	}
-	QuickUpdate("delete from setting where name='_dbupgrade_inprogress'",$db);
-	Query("commit",$db);
+	QuickUpdate("update setting set value = 'none' where name = '_dbupgrade_inprogress'", $db);
+	Query("commit", $db);
 	
 	echo "\n";
 }
@@ -371,14 +379,22 @@ function update_taicustomer($db, $customerid, $shardid) {
 	}
 
 	//only allow one instance of the updater per customer to run at a time
-	if (QuickQuery("select value from setting where name = '_dbtaiupgrade_inprogress' and organizationid is null")) {
-		Query("rollback",$db);
-		echo "an upgrade is already in process, skipping\n";
-		return;
+	$inprogress_value = QuickQuery("select value from setting where name = '_dbtaiupgrade_inprogress' for update");
+	if (!$inprogress_value) {
+		// ok to continue
+		QuickUpdate("insert into setting (name, value) values ('_dbtaiupgrade_inprogress', '$updater')", $db);
+		Query("commit", $db);
+		Query("begin", $db);
+	} else if ($inprogress_value == "none") {
+		// ok to continue
+		QuickUpdate("update setting set value = '$updater' where name = '_dbtaiupgrade_inprogress'", $db);
+		Query("commit", $db);
+		Query("begin", $db);
 	} else {
-		QuickUpdate("insert into setting (name,value) values ('_dbtaiupgrade_inprogress','$updater')",$db);
-		Query("commit",$db);
-		Query("begin",$db);
+		// another process is running, skip this customer
+		Query("rollback", $db);
+		echo "an upgrade is already in progress, skipping\n";
+		return;
 	}
 	
 
@@ -459,8 +475,8 @@ function update_taicustomer($db, $customerid, $shardid) {
 	} else {
 		//TODO ERROR !!!! running ancient upgrade_databases on newer db? didnt find current version
 	}
-	QuickUpdate("delete from setting where name='_dbtaiupgrade_inprogress'",$db);
-	Query("commit",$db);
+	QuickUpdate("update setting set value = 'none' where name = '_dbtaiupgrade_inprogress'", $db);
+	Query("commit", $db);
 
 	echo "\n";
 }

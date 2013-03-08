@@ -257,6 +257,8 @@ table.window_body { width: 100%; }
 .feedfilter {	margin: 0; padding: 0; list-style: none; }
 .feedfilter li { line-height: 20px; padding-top: 5px; }
 .feedfilter li a img { margin-top: -5px; margin-right: 5px; }
+.feedfilter li.feedselected a {color: #000000; font-weight: bold; }
+
 
 .caller_id { float: left; display: inline; width: 70.5%; }
 .approved_id { float: left; display: inline; width: 28.5%; margin: 0 0 0 1%; }
@@ -373,7 +375,10 @@ table_left and table_right have the arrow controls, set to 8% width for 1024 scr
 .feed_item td { padding: 1em 0.5em; }
 
 
-
+/* RCIeditor */
+span.cke_toolgroup {height: 27px;}
+a.cke_dialog_tab {height: 26px;}
+a.cke_button {height: 25px;}
 
 
 /* +----------------------------------------------------------------+
@@ -800,10 +805,43 @@ div.autocomplete ul li {
 	cursor:hand;  
 }
 
+
+div.previewmodal-wrap {
+	display: table;
+    position: absolute; 
+    height: 100%;
+    width: 100%;
+}
+div.previewmodal-wrapcell {
+	display: table-cell;
+	vertical-align: middle;	
+}
+
+div.preview-modal {
+    height: auto;
+    left: auto;
+    margin: auto;
+    max-height: 80%;
+    max-width: 80%;
+    padding: 0;
+    position: relative;
+    top: auto;
+    width: 600px;
+}
+
+div.preview-modal .modal-body  {
+	max-height: 90%; 
+	padding: 15px; 
+	overflow: auto;
+}
+div.preview-modal iframe {
+	width: 100%;
+}
+
 .messagegrid { margin: 5px 0 0; font-family: "Helvetica Neue",helvetica,Arial,sans-serif; }
-.messagegrid th { color: #484848; font-size: 12px; text-align: left; }
-.messagegrid td { color: #484848; text-align: center; }
-.messagegrid .messagegridheader { padding: 2px; }
+.messagegrid th { color: #484848; font-size: 12px; text-align: center;}
+.messagegrid td { color: #484848; text-align: center;}
+.messagegrid .messagegridheader { padding: 2px 20px; }
 .messagegrid .messagegridheader img { margin: -3px 0 0 0; }
 .messagegrid .messagegridlanguage{ text-align: right; }
 

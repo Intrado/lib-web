@@ -23,7 +23,8 @@ class Message extends DBMappedObject {
 	var $fromname;
 	var $fromemail;
 	var $overrideplaintext = 0; // When type === 'email' and subtype === 'plain', indicates message is custom.
-
+	var $fromstationery = 0;
+	
 	function Message ($id = NULL) {
 		$this->_allownulls = true;
 		$this->_tablename = "message";
@@ -37,7 +38,7 @@ class Message extends DBMappedObject {
 		$data = sane_parsestr($this->data);
 		foreach($data as $key => $value)
 		{
-			if ($key == 'overrideplaintext')
+			if ($key == 'overrideplaintext' || $key == 'fromstationery')
 				$value = $value + 0;
 				
 			$this->$key = $value;
@@ -48,7 +49,8 @@ class Message extends DBMappedObject {
 		if($this->type == 'email') {
 			$this->data = 'subject=' . urlencode($this->subject) .
 				'&fromname=' .  urlencode($this->fromname) .
-				'&fromemail=' . urlencode($this->fromemail);
+				'&fromemail=' . urlencode($this->fromemail) .
+				'&fromstationery=' . urlencode($this->fromstationery);
 				
 			if ($this->subtype == 'plain')
 				$this->data .= '&overrideplaintext=' . urlencode($this->overrideplaintext);

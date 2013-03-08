@@ -185,9 +185,13 @@ var allowControl = {
 
 					// if the users setcallerid permission is defined, add the 'other' option 
 					if (typeof (userPermissions.setcallerid) != 'undefined' && userPermissions.setcallerid == 1) {
-						$('#optioncallerid_select').append('<option value="other" >Other</option>');
+						var isOther = $.inArray(defaultCallerid,userCallerIds) == -1;
+						$('#optioncallerid_select').append('<option value="other" '+ (isOther?'selected':'') +' >Other</option>');
+						if (isOther) {
+							$("#msgsndr_optioncallerid").removeClass('hidden');
+							$("#msgsndr_optioncallerid").val(formatPhone(defaultCallerid));
+						}
 					}
-
 				} else { 
 					// hide the callerid field 
 					
@@ -279,7 +283,30 @@ var allowControl = {
 		//if(userInfo.email != '') {
 		//	$('#msgsndr_emailmessagefromemail').attr('value', userInfo.email);
 		//}
-
+		
+		var stationerycontinue = function(e) {
+			e.preventDefault();
+			var msgid = $('#stationeryselector').val();
+			if (typeof(msgid) == 'undefined') {
+				alert('ops, something went wrong');
+				return;
+			} else if (msgid == 0) {
+				applyCkEditor("msgsndr_emailmessagetext","msnormal");
+			} else {
+				$.get('mgstationeryview.php?stationery=' + msgid, function(data) {
+					$("#msgsndr_emailmessagetext").val(data);
+					applyCkEditor("msgsndr_emailmessagetext","msinline");
+					
+				});
+			}
+			$('#stationery_email_view').hide();
+			$('#main_email_view').show();
+		};
+		
+		$('#msgsndr_emailstationerycontinue').on('click', stationerycontinue);
+		$('#stationerypreview').on('click', stationerycontinue);
+		
+		
 		$('#msgsndr_previewemail').on('click', function(e) {
 			e.preventDefault();
 
@@ -531,6 +558,114 @@ function ContentManager() {
 			
 		}
 		
+		if(mode == "email") {
+			if ($('input[name=msgsndr_hasemail]').attr("checked")) {
+				$('#main_email_view').show();
+			} else {
+				$('#stationerypreview').attr('src','mgstationeryview.php');
+				$('#msgsndr_emailstationerycontinue').attr("disabled","disabled");
+				$('#main_email_view').hide();
+				$('#stationery_email_view').hide();
+				$('#stationeryselector').html("");
+				
+				
+				var fetchMessagesFromPaths = ['/' + orgPath+'/api/2/users/'+userid+'/messagegroups'];
+								
+				var getpublishedstationery = (typeof(userPermissions.subscribe) != 'undefined' && userPermissions.subscribe.indexOf("messagegroup") !== -1);
+				if (getpublishedstationery) {
+					var index = 1;
+					$.each(orgids,function(i,id) {
+						fetchMessagesFromPaths[index++] = '/' + orgPath+'/api/2/organizations/' + id + '/publications/messagegroups';
+					});
+				}
+				
+				var forcestationery = (typeof(userPermissions.forcestationery) != 'undefined' && userPermissions.forcestationery == 1);
+				var stationery = forcestationery?[]:[{id:0,name:"No Stationery"}];
+				var stationeryids = forcestationery?[]:[0];
+				var itemsempty = forcestationery?1:0;
+				
+				self.getStationery = function(paths) {
+					return function() {
+						var path = paths.pop();
+						if (typeof(path) != 'undefined') {
+							$.ajax({
+								url: path,
+								data: {"start": 0, "limit": 1000,"type":"stationery"},
+								async : false,
+								success: function(data){
+									$.each(data.messageGroups,function(i,mg) {
+										//Make sure stationery isn't inserted twice
+										if ($.inArray(mg.id, stationeryids) === -1) {
+											stationery.push(mg);
+											stationeryids.push(mg.id);
+										}
+									});
+								},
+								complete: function() {
+									self.getStationery(paths)();
+								}
+							});					
+						} else {
+							// All paths have been fetched, 
+							
+							
+							if (forcestationery && stationery.length == 0) {
+								// No Stationery Available, email editor is essentially disabled
+								$('#stationery_email_view').show();
+								$('#stationeryselector').append('No Stationery Available');
+							} else if ((forcestationery && stationery.length == 1)) {
+								// Restrict to stationery, Only one stationery, must use inline editor 
+								var msgid = stationery[stationery.length - 1].id;
+								$.get('mgstationeryview.php?stationery=' + msgid, function(data) {
+									$("#msgsndr_emailmessagetext").val(data);
+									applyCkEditor("msgsndr_emailmessagetext","msinline");
+								});
+								$('#stationery_email_view').hide();
+								$('#main_email_view').show();
+							} else if (!forcestationery && stationery.length == 1) {
+								// Only the "blank" stationery available and user not restricted to stationery. proceed to normal editor
+								$("#msgsndr_emailmessagetext").val("");
+								applyCkEditor("msgsndr_emailmessagetext","msnormal");
+								$('#stationery_email_view').hide();
+								$('#main_email_view').show();
+							} else {
+								$('#stationeryselector').append('<option value="">-- Select Stationery --</option><optgroup label="----">');
+								// Show stationery selector
+								$.each(stationery, function(i,mg) {
+									
+									$('#stationeryselector').append('<option value="' + mg.id + '">' + mg.name + '</option>');
+									if (mg.id == 0) {
+										$('#stationeryselector').append('</optgroup><optgroup label="----">');
+									}
+								});
+								$('#stationeryselector').append('</optgroup>');
+								$('#stationeryselector').change(function() {
+										var val = $(this).val();
+										
+										if (val != 0 && val != "")
+											$('#stationerypreview').attr('src','mgstationeryview.php?preview&stationery=' + $(this).val());
+										else {
+											$('#stationerypreview').attr('src','blank.html');
+										}
+										if (val != "")
+											$('#msgsndr_emailstationerycontinue').removeAttr("disabled");
+										else 
+											$('#msgsndr_emailstationerycontinue').attr('disabled', 'disabled');
+
+								});
+								
+								$('#stationery_email_view').show();
+							}			
+						}
+					}
+				}
+				
+				
+				self.getStationery(fetchMessagesFromPaths)();
+			}
+		}
+		
+		
 		//SWITCH STEP
 		$(".msg_confirm").hide();
 		
@@ -557,8 +692,11 @@ function ContentManager() {
 		}
 	};
 
-	this.discardContent = function() {
-		var remove = confirm("Warning, this will remove the message from your broadcast. Are you sure you wish to do this?");
+	this.discardContent = function(doconfirm) {
+		var remove = true;
+		if (typeof(doconfirm) == 'undefined' || doconfirm == true) 
+			remove = confirm("Warning, this will remove the message from your broadcast. Are you sure you wish to do this?");
+		
 		if (remove) {
 			//RUN ON CANCEL EVENTS
 			$.each(eventManager.onContentDiscard, function(eIndex, eEvent) {
@@ -664,6 +802,12 @@ function ContentManager() {
 		event.preventDefault();
 		self.discardContent();
 	});
+	//BIND CONTENT CANCEL
+	$(".btn_cancel", "[id^=msgsndr_tab_]").on("click", function(event) {
+		event.preventDefault();
+		self.discardContent(false);
+	});
+	
 	
 	//BIND CONTENT SAVE
 	$(".btn_save", "[id^=msgsndr_tab_]").on("click", function(event) {
@@ -765,4 +909,15 @@ function ContentManager() {
     	$("#msgsndr_phonemessagetexttranslate").parent().removeClass("hide");
     	$("#msgsndr_emailmessagetexttranslate").parent().parent().removeClass("hide");
     }
+};
+
+function messagePrevewLoaded(area) {
+	if(area.height() > 370) {
+		jQuery('#stationerypreview').height(area.height() + 30);
+	} else {
+		jQuery('#stationerypreview').height(400);
+	}
+	area.bind('click', function(event) {
+		jQuery('#msgsndr_emailstationerycontinue').trigger('click');
+	});
 };

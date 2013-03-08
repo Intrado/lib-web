@@ -14,6 +14,8 @@ require_once("obj/Access.obj.php");
 require_once("obj/Permission.obj.php");
 require_once("obj/FieldMap.obj.php");
 require_once("obj/RestrictedValues.fi.php");
+require_once("obj/ValTimeWindowCallEarly.val.php");
+require_once("obj/ValTimeWindowCallLate.val.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -42,25 +44,6 @@ if (isset($_GET['id'])) {
 // Custom Form Controls And Validators
 ////////////////////////////////////////////////////////////////////////////////
 
-class ValJobWindowTime extends Validator {
-	var $onlyserverside = true;
-
-	function validate ($value, $args, $requiredvalues) {
-		$value = strtotime($value);
-		$value2 = strtotime($requiredvalues[$args['field']]);
-
-		//only check if both times parse
-		if ($value != -1 && $value !== false && $value2 != -1 && $value2 !== false) {
-			if ($args['op'] == "later" && $value <= $value2)
-				return _L('%1$s must be later than %2$s',$this->label, $args['fieldlabel']);
-			if ($args['op'] == "earlier" && $value >= $value2)
-				return _L('%1$s must be earlier than %2$s',$this->label, $args['fieldlabel']);
-		}
-
-		return true;
-	}
-}
-
 class ValDupeProfileName extends Validator {
 	var $onlyserverside = true;
 
@@ -74,6 +57,16 @@ class ValDupeProfileName extends Validator {
 	}
 }
 
+class ValStationery extends Validator {
+	var $onlyserverside = true;
+
+	function validate ($value, $args, $requiredvalues) {
+		if ($requiredvalues["createstationery"] !== "true" && !in_array("messagegroup", $requiredvalues["subscribe"])) {
+			return _L("When restricted the user must either be able to either subscribe or create to stationery");
+		}
+ 		return true;
+	}
+}
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
@@ -201,7 +194,7 @@ _L('Messaging Options'),
 		"requires" => array("calllate"),
 		"validators" => array(
 			array("ValInArray","values" => array_keys($calltimes)),
-			array("ValJobWindowTime","field" => "calllate", "fieldlabel" => _L('Can\'t Schedule After'), "op" => "earlier")
+			array("ValTimeWindowCallEarly","noProfile" => true)
 		),
 		"control" => array("SelectMenu", "values" => $calltimes),
 		"helpstep" => 4
@@ -213,7 +206,7 @@ _L('Messaging Options'),
 		"requires" => array("callearly"),
 		"validators" => array(
 			array("ValInArray","values" => array_keys($calltimes)),
-			array("ValJobWindowTime","field" => "callearly", "fieldlabel" => _L('Can\'t Schedule Before'), "op" => "later")
+			array("ValTimeWindowCallLate","noProfile" => true)
 		),
 		"control" => array("SelectMenu", "values" => $calltimes),
 		"helpstep" => 4
@@ -310,6 +303,25 @@ _L('Messaging Options'),
 		"control" => array("CheckBox"),
 		"helpstep" => 4
 	),
+	"createstationery" => array(
+			"label" => _L('Can Create Stationery'),
+			"fieldhelp" => _L('Allow users to create email stationery'),
+			"value" => $obj->getValue("createstationery"),
+			"validators" => array(),
+			"control" => array("CheckBox"),
+			"helpstep" => 4
+	),
+	"forcestationery" => array(
+			"label" => _L('Restrict to Stationery'),
+			"fieldhelp" => _L('Users must use a stationery when creating an email message'),
+			"value" => $obj->getValue("forcestationery"),
+			"validators" => array(
+					array("ValStationery")
+			),
+			"requires" => array("createstationery","subscribe"),
+			"control" => array("CheckBox"),
+			"helpstep" => 4
+	),
 _L('Advanced %s Options', getJobTitle()),
 	"createrepeat" => array(
 		"label" => _L('Create Repeating %s', getJobsTitle()),
@@ -393,7 +405,7 @@ _L('Publish/Subscribe Options'),
 		"fieldhelp" => _L('Allows users to view and subscribe to published objects.'),
 		"value" => $subscribed,
 		"validators" => array(),
-		"control" => array("RestrictedValues", "values" => array("messagegroup"=>"Messages","list"=>"Lists"), "label" => _L("Allow subscribing to these types:")),
+		"control" => array("RestrictedValues", "values" => array("messagegroup"=>"Messages/Stationery","list"=>"Lists"), "label" => _L("Allow subscribing to these types:")),
 		"helpstep" => 7
 	),
 
@@ -861,7 +873,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$obj->setPermission("facebookpost", (bool)(isset($postdata['facebookpost'])?$postdata['facebookpost']:false));
 			$obj->setPermission("twitterpost", (bool)(isset($postdata['twitterpost'])?$postdata['twitterpost']:false));
 			$obj->setPermission("feedpost", (bool)(isset($postdata['feedpost'])?$postdata['feedpost']:false));
-				
+			$obj->setPermission("createstationery", (bool)(isset($postdata['createstationery'])?$postdata['createstationery']:false));
+			$obj->setPermission("forcestationery", (bool)(isset($postdata['forcestationery'])?$postdata['forcestationery']:false));
+			
 			if (getSystemSetting("_hasportal", false)) {
 				$obj->setPermission("portalaccess", (bool)$postdata['portalaccess']);
 				$obj->setPermission("generatebulktokens", (bool)$postdata['generatebulktokens']);
@@ -940,7 +954,7 @@ include_once("nav.inc.php");
 </style>
 
 <script type="text/javascript">
-<? Validator::load_validators(array("ValDupeProfileName","ValJobWindowTime")); ?>
+<? Validator::load_validators(array("ValDupeProfileName","ValTimeWindowCallEarly","ValTimeWindowCallLate","ValStationery")); ?>
 </script>
 
 <?
@@ -967,6 +981,10 @@ function checkAllCheckboxes(domanagement){
 			if (form[i].name.startsWith("accessprofile_tai"))
 				continue;
 
+			//skip forcestationery since it is an inverse permission
+			if (form[i].name.indexOf("accessprofile_forcestationery") != -1)
+				continue;
+			
 			//see if it's a management checkbox
 			if (managementoptions.some(function(v) {return form[i].name.indexOf(v) != -1})) {
 				if (domanagement)

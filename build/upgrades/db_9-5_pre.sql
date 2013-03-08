@@ -6,3 +6,7 @@ $$$
 -- $rev 2
 ALTER TABLE `setting` CHANGE `name` `name` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '', CHANGE `value` `value` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL
 $$$
+
+-- $rev 3
+-- empty, run to insert setting _dbupgrade_inprogress bug CS-4311
+

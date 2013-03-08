@@ -191,6 +191,41 @@ position: relative;}
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px;
  -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
  
+.newform .formcontrol .radiobox.stationeryselector {
+	width:100%;
+	overflow: auto;
+}
+
+.newform .stationeryselector fieldset {
+}
+
+.radiobox.stationeryselector label,input { float: none;}
+.radiobox.stationeryselector {
+ 	height: 100%;
+	overflow: auto;
+}
+.stationeryselector select  {
+	float:left;
+}
+
+
+.newform .stationerypreviewfield fieldset {
+	border: 1px solid #CCCCCC;
+	border-radius: 5px 5px 5px 5px;
+	float: right;
+    margin: 0 5px 5px;
+    padding: 5px 10px 10px;
+    width: 64%;
+}
+
+.newform .formcontrol .stationerypreviewfield iframe {
+	border: 1px solid #E2E2E2;
+	border-radius: 3px;
+	background-color: #fff;
+	height: 100%;
+    width: 100%;
+}
+
  
  /* ----------------- rule widget --------------------*/
 
@@ -383,6 +418,7 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 .formcontrol .datafieldsinsert { margin: 20px 0 0; }
 .formcontrol .datafieldsinsert button { padding: 3px 10px; }
 
+.formcontrol .htmleditor,.htmleditor iframe { width: 100%; height: 400px; border: 1px solid #999999;}
 
 /* phone messages 
 -------------------*/

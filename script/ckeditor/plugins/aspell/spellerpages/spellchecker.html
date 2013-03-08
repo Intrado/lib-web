@@ -4,6 +4,15 @@
 var wordWindow = null;
 var controlWindow = null;
 
+function openerWindow() {
+	if (opener) {
+	    return opener;
+	} else if (parent && parent.speller) {
+	    return parent
+	}
+	return undefined;
+}
+
 function init_spell( spellerWindow ) {
 
 	if( spellerWindow ) {
@@ -16,7 +25,8 @@ function init_spell( spellerWindow ) {
 
 	if( controlWindow && wordWindow ) {
 		// populate the speller object and start it off!
-		var speller = opener.speller;
+		var o = openerWindow();
+		var speller = o.speller;
 		wordWindow.speller = speller;
 		speller.startCheck( wordWindow, controlWindow );
 	}
@@ -39,8 +49,9 @@ function postWords() {
 	bodyDoc.write('<html>');
 	bodyDoc.write('<meta http-equiv="Content-Type" content="text/html; charset=utf-8">');
 	bodyDoc.write('<link rel="stylesheet" type="text/css" href="spellerStyle.css"/>');
-	if (opener) {
-		var speller = opener.speller;
+	var o = openerWindow();
+	if (o) {
+		var speller = o.speller;
 		bodyDoc.write('<body class="normalText" onLoad="document.forms[0].submit();">');
 		bodyDoc.write('<p>' + window.parent.FCKLang.DlgSpellProgress + '<\/p>');		// by FredCK
 		bodyDoc.write('<form action="'+speller.spellCheckScript+'" method="post">');

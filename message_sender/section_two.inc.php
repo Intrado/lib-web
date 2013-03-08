@@ -209,14 +209,36 @@
 						<div id="msgsndr_emailmessageattachment_msg" class="box_validatorerror er" style="display:none"></div>
 					</div>
 				</fieldset>
+				<div id="stationery_email_view">
+					<fieldset id="stationeryfield" class="stationeryselector">
+						<label for="stationeryselector">Email Stationery</label>
+						<select id="stationeryselector" name="stationeryselector" >					
+						</select>
+						&nbsp;&nbsp;<button id="msgsndr_emailstationerycontinue" class="btn_select" disabled="disabled">Select</button><img src="img/ajax-loader.gif" class="loading hide" />
+						<fieldset id="stationerypreviewfield" class="stationerypreview">
+							<legend>Email Stationery Preview:</legend>
+							<iframe id="stationerypreview"  src="blank.html"></iframe>
+						</fieldset>
+					</fieldset>
+
+					<div class="cf"></div>
+				</div>
 				
+				<div id="main_email_view">
 				<fieldset>
 					<label for="msgsndr_emailmessagetext">Body&nbsp;<img id="msgsndr_emailmessagetext_icon" class="formicon" src="img/pixel.gif" title="" alt=""></label>
 					<div class="controls">
 						
-						<button id="paste_from_tts" class="paste-from" data-textarea="msgsndr_tts_message" disabled="disabled">Paste text from Phone</button>
-
+						<!--button id="paste_from_tts" class="paste-from" data-textarea="msgsndr_tts_message" disabled="disabled">Paste text from Phone</button-->
+						<div class="cf"></div>
+						<div id="rcieditor_scratch" style="display: none;"></div>
 						<textarea id="msgsndr_emailmessagetext" name="msgsndr_emailmessagetext" class="required msgdata hide" data-ajax="true"></textarea>
+						<style type="text/css">
+							/* SMK added 2013-03-07 to force this button's label to show in the toolbar */
+							.cke_button__pastefromphone_label {
+								display: inline-block;
+							}
+						</style>
 						<div id="msgsndr_emailmessagetext_msg" class="box_validatorerror er" style="display:none"></div>
 						<div id="msgsndr_emailmessagetext-htmleditor"></div>
 					</div>
@@ -249,7 +271,7 @@
 					</fieldset>
  -->
 				</div>
-				
+				</div>
 				<fieldset class="form_actions">
 					<div class="controls">
 					<button class="btn_save" disabled="disabled" data-nav=".oemail">Save Email Message</button><img src="img/ajax-loader.gif" class="loading hide" />
@@ -257,7 +279,6 @@
 					<button class="btn_discard" data-nav=".oemail">Discard</button>
 					</div>
 				</fieldset>
-
 			</div><!-- tab_panel -->
 				
 			<!-- Add the sms panel -->

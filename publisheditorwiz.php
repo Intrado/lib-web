@@ -13,6 +13,8 @@ require_once("obj/FormItem.obj.php");
 require_once("obj/Wizard.obj.php");
 require_once("obj/Organization.obj.php");
 require_once("obj/Publish.obj.php");
+require_once("obj/MessageGroup.obj.php");
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -36,7 +38,7 @@ if (isset($_GET['type']) && isset($_GET['id'])) {
 		// check that the object requested isn't deleted and has a valid type for publishing
 		switch ($_GET['type']) {
 			case "messagegroup":
-				$valid = QuickQuery("select 1 from messagegroup where id = ? and type = 'notification' and not deleted", false, array($_GET['id']));
+				$valid = QuickQuery("select 1 from messagegroup where id = ? and type = 'notification' or type = 'stationery' and not deleted", false, array($_GET['id']));
 				break;
 			case "list":
 				$valid = QuickQuery("select 1 from list where id = ? and type in ('person', 'section') and not deleted", false, array($_GET['id']));
@@ -123,7 +125,7 @@ class PublishTargetWiz_publishtarget extends WizStep {
 		if (isPublished($type, $id))
 			$values["nobody"] = _L("Un-publish This Item");
 		if (!$userrestrictions) {
-			$values["anyone"] = _L("Anyone May Subscribe");
+			$values["anyone"] = _L("Anyone");
 			$values["unrestricted"] = _L("Top Level Users");
 		}
 		
@@ -142,7 +144,7 @@ class PublishTargetWiz_publishtarget extends WizStep {
 			"helpstep" => 1
 		);
 
-		$helpsteps = array(_L("This step allows you to control who can subscribe to this item. <br><br><ul> <li>Unpublish this item - Makes this item no longer appear as a subscribable option. Users will no longer be able to create jobs with this item.<li>Anyone May Subscribe - Allow any user to subscribe to this item. <li>Top Level Users - Only users with no restrictions, such as system administrators, may subscribe.<li>One or more %s - Only specific users may subscribe.</ul>", getSystemSetting("organizationfieldname","Organization")));
+		$helpsteps = array(_L("This step allows you to control who can subscribe to this item. <br><br><ul> <li>Unpublish this item - Makes this item no longer appear as a subscribable option. Users will no longer be able to create jobs with this item.<li>Anyone - Allow any user to subscribe to this item. <li>Top Level Users - Only users with no restrictions, such as system administrators, may subscribe.<li>One or more %s - Only specific users may subscribe.</ul>", getSystemSetting("organizationfieldname","Organization")));
 
 		return new Form("publishtargetwiz-publishtarget",$formdata,$helpsteps);
 	}
@@ -210,8 +212,10 @@ class PublishTargetWiz_confirm extends WizStep {
 		$localizedtype = "";
 		switch ($type) {
 			case "messagegroup":
+				$messagegroup = new MessageGroup($id); 
+				$name = $messagegroup->name;
 				$name = QuickQuery("select name from messagegroup where id = ?", false, array($id));
-				$localizedtype = _L("message");
+				$localizedtype = $messagegroup->type=='stationery'?_L("stationery"):_L("message");
 				break;
 			case "list":
 				$name = QuickQuery("select name from list where id = ?", false, array($id));

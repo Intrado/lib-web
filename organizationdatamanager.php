@@ -146,7 +146,7 @@ if (isset($_GET['deleteunassociated'])) {
 											(r.userid = u.id)
 											where not u.deleted	group by r.organizationid");
 	
-	$childorganisationassociationorgid = QuickQuery("select o.id
+	$childorganisationassociationorgid = QuickQueryList("select o.id
 											from organization o
 											where exists
 											(select * from organization oo
@@ -223,6 +223,17 @@ $start = 0 + (isset($_GET['pagestart']) ? $_GET['pagestart'] : 0);
 $limit = 100;
 
 $data = QuickQueryMultiRow("select SQL_CALC_FOUND_ROWS id, orgkey from organization where not deleted order by orgkey, id limit $start, $limit", true);
+
+// TAI has a single root organization we want to display as the special case
+$rootOrgId = QuickQuery("select id from organization where (select 1 from setting where name like '_dbtaiversion') and parentorganizationid is null and not deleted");
+if ($rootOrgId) {
+	for ($i = 0; $i < count($data); $i++) {
+		if ($data[$i]['id'] == $rootOrgId) {
+			$data[$i]['orgkey'] = $data[$i]['orgkey'] . " (Root)";
+			break;
+		}
+	}
+}
 
 $total = QuickQuery("select FOUND_ROWS()");
 

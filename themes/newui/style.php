@@ -301,7 +301,7 @@ border-color: transparent transparent transparent #222; border-width: 27px; bord
 .window_panel .audioleft { border-radius: 5px 0 0 5px; margin: 0; }
 .window_panel .audioright { border-radius: 0 5px 5px 0; margin-left: -1px; }
 
-.window_panel .btn_confirm, #send_now_broadcast { color: #fff; border: 1px solid #0039ab; 
+.window_panel .btn_confirm, #send_now_broadcast, .btn_select { color: #fff; border: 1px solid #0039ab; 
 	background-color: #006DCC;
 	background-image: -webkit-gradient(linear, left top, left bottom, from(#0088CC), to(#0044CC)); 
   background-image: -webkit-linear-gradient(top, #0088CC, #0044CC); 
@@ -309,9 +309,9 @@ border-color: transparent transparent transparent #222; border-width: 27px; bord
   background-image:     -ms-linear-gradient(top, #0088CC, #0044CC); 
   background-image:      -o-linear-gradient(top, #0088CC, #0044CC); 
   background-image:         linear-gradient(top, #0088CC, #0044CC);}
-.window_panel .btn_confirm:hover, #send_now_broadcast:hover { background: #0044cc; color: #fff; }
-.window_panel .btn_confirm:active, #send_now_broadcast:active { background: #0037a4; color: #f4f4f4; }
-.window_panel .btn_confirm span.icon { background: url(themes/newui/arrow.png) right 2px no-repeat; }
+.window_panel .btn_confirm:hover, #send_now_broadcast:hover, .btn_select:hover { background: #0044cc; color: #fff; }
+.window_panel .btn_confirm:active, #send_now_broadcast:active, .btn_select:active { background: #0037a4; color: #f4f4f4; }
+.window_panel .btn_confirm span.icon, .btn_select span.icon { background: url(themes/newui/arrow.png) right 2px no-repeat; }
 
 .window_panel .btn_save { color: #676003; border: 1px solid #dcd13e; 
 	background-color: #fff568;
@@ -1163,6 +1163,29 @@ div.progressbar div.progress {
 	color: black;
 	background: #306496;
 	height: 15px;
+}
+
+.radiobox.stationeryselector label,input { float: none;}
+.radiobox.stationeryselector {
+ 	height: 100%;
+	overflow: auto;
+}
+
+#stationerypreviewfield {
+	border: 1px solid #CCCCCC;
+	border-radius: 5px 5px 5px 5px;
+	float: left;
+    margin: 20px 5px 5px;
+    padding: 5px 10px 10px;
+    width: 100%;
+}
+
+.stationerypreview iframe {
+	border: 1px solid #E2E2E2;
+	border-radius: 3px;
+	background-color: #fff;
+	height: 100%;
+    width: 100%;
 }
 
 .ie8 #cke_reusableckeditor input {

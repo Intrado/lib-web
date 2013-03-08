@@ -165,6 +165,16 @@ if (isset($personid)) {
 		$isGuardian = true;
 	} else {
 		$isGuardian = false;
+		// used to redirect guardian view back to the student view
+		$_SESSION['guardian_of_personid'] = $personid;
+	}
+	// set page to redirect back to
+	if ($isGuardian) {
+		// return to last viewed student, assume that is how we got to viewing this guardian
+		$backTo = "viewcontact.php?id=" . $_SESSION['guardian_of_personid'];
+	} else {
+		// return to page that launched into student view
+		$backTo = $_SESSION['contact_referer'];
 	}
 	
 	$associateids = QuickQueryList("select portaluserid from portalperson where personid = '" . $personid . "' order by portaluserid");
@@ -296,7 +306,7 @@ if(CheckFormSubmit($f,$s))
 				QuickUpdate("delete from personsetting where personid=".$personid." and name='portalphoneactivation'");
 				QuickUpdate("insert into personsetting (personid, name, value) values ($personid, 'portalphoneactivation', $portalphoneactivation)");
 
-				redirect($_SESSION['contact_referer']);
+				redirect($backTo);
 			}
 		}
 	}
@@ -360,10 +370,12 @@ if (!isset($_GET['ajax'])) {
 	startWindow('Contact');
 	
 	NewForm($f);
+	
 	if($method == "edit"){
-		buttons(submit($f, $s, _L("Save"),null,'tick'),icon_button(_L("Cancel"),"cross", null, $_SESSION['contact_referer']));
+		buttons(submit($f, $s, _L("Save"),null,'tick'),
+				icon_button(_L("Cancel"),"cross", null, $backTo));
 	} else {
-		buttons(icon_button(_L("Back"),"fugue/arrow_180", null, $_SESSION['contact_referer']),
+		buttons(icon_button(_L("Back"),"fugue/arrow_180", null, $backTo),
 			$USER->authorize('managecontactdetailsettings') ? icon_button(_L("Edit"),"pencil", "if(confirm('You are about to edit contact data that may impact other people\'s lists.  Are you sure you want to continue?')) window.location='editcontact.php" . $iFramePrepend . " '") : ""
 		);
 	}

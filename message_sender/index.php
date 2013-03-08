@@ -80,7 +80,6 @@
 <? include("message_sender/modals.inc.php"); ?>
 
 <!-- get jQuery and jquery plugins -->
-<script type="text/javascript" src="script/jquery.1.7.2.min.js"></script>
 <script type="text/javascript" src="script/jquery.json-2.3.min.js"></script>
 <script type="text/javascript" src="script/jquery-datepicker.js"></script>
 <script type="text/javascript" src="script/jquery.timer.js"></script>
@@ -88,7 +87,6 @@
 <script type="text/javascript" src="script/jquery.easycall.js"></script>
 <script type="text/javascript" src="script/jquery.translate.js"></script>
 
-<script type="text/javascript" src="script/bootstrap-modal.js"></script>
 <script type="text/javascript" src="script/bootstrap-dropdown.js"></script>
 
 <script type="text/javascript" src="script/message_sender_global.js"></script>
@@ -104,8 +102,9 @@
 <script type="text/javascript" src="script/message_sender.facebook.js"></script>
 <script type="text/javascript" src="script/message_sender_listbuilder.js"></script>
 
-<script type="text/javascript" src="script/ckeditor/ckeditor_basic.js"></script>
-<script type="text/javascript" src="script/htmleditor.js"></script>
+<script type="text/javascript" src="script/ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="script/USER.js.php"></script>
+<script type="text/javascript" src="script/rcieditor.js"></script>
 <script type="text/javascript" src="script/speller/spellChecker.js"></script>
 <script type="text/javascript" src="script/niftyplayer.js.php"></script>
 <script type="text/javascript" src="script/datepicker.js"></script>
