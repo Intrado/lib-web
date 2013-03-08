@@ -76,7 +76,7 @@
 
 			     TODO: remove this hack if/when CKE fixes this issue (http://dev.ckeditor.com/ticket/9802)
 			*/?>
-			window.top.rcieditor.setLoadingVisibility(false);
+			window.parent.rcieditor.setLoadingVisibility(false);
 		</script>
 		<script type="text/javascript" src="script/ckeditor/ckeditor.js"></script>
 		<script type="text/javascript" src="script/rcieditor_inline.js"></script>
