@@ -338,9 +338,37 @@ class PreviewModal {
 			var body = $('#prevewmodal').find(".modal-body");
 			var footer = $('#prevewmodal').find(".modal-header");
 
-			$('#prevewmodal').find(".modal-body").html('<img src="img/ajax-loader.gif" alt="Please Wait..."/>Loading...')
 			
+			if (post_parameters && typeof(post_parameters) != 'undefined' && typeof(post_parameters.subtype) != 'undefined' ) {
+				console.log("Is Email:" + post_parameters.subtype);
+				if (post_parameters.subtype == "html")
+					header.html("HTML Email Message")
+				else
+					header.html("Plain Email Message");
+				body.html("<b>From:</b> " + post_parameters.fromname
+						 + " &lt;" + post_parameters.from
+						 +  "&gt;<br /><b>Subject:</b> " + post_parameters.subject
+						 + "<br /><hr />");
+				var iframe = $("<iframe/>", {src: "blank.html"});
+				iframe.appendTo(body);
+				iframe.load(function(){
+					var iframecontent = iframe.contents().find('body');
+					iframecontent.append(post_parameters.text);
+					if(iframecontent.height() > 370) {
+						iframe.height(iframecontent.height() + 30);
+					} else {
+						iframe.height(400);
+					}
+				});
 			
+				$('html, body').animate({ scrollTop: 0 }, 'fast');
+				$('#prevewmodal').animate({ width: '100%' }, 'fast');
+				return;
+			} 
+
+
+			
+			$('#prevewmodal').find(".modal-body").html('<img src="img/ajax-loader.gif" alt="Please Wait..."/> Loading...')
 			new Ajax.Request('<?= $posturl?>' + (get_parameters?'&' + get_parameters:''), {
 				'method': 'post',
 				'parameters': post_parameters,
