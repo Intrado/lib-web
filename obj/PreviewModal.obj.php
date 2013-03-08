@@ -318,29 +318,32 @@ class PreviewModal {
 		<script type='text/javascript' language='javascript'>
 		
 		function messagePrevewLoaded(area) {
-			var $ = jQuery;		
+			var $ = jQuery;
+			var modal = $('#prevewmodal');
 			if(area.height() > 370) {
-				$('#prevewmodal').find('iframe').height(area.height() + 30);
+				modal.find('iframe').height(area.height() + 30);
 			} else {
-				$('#prevewmodal').find('iframe').height(400);
+				modal.find('iframe').height(400);
 			}
 			$('html, body').animate({ scrollTop: 0 }, 'fast');
-			$('#prevewmodal').animate({ width: '100%' }, 'fast');
+			modal.animate({ width: '100%' }, 'fast');
 		}
 
 		
 		var showPreview = function(post_parameters,get_parameters){
 			var $ = jQuery;
-			
-			$('#prevewmodal').modal();
-			
+
+			var modal = $('#prevewmodal');
+			modal.modal();
+
 			var header = $('#prevewmodal').find(".modal-header");
 			var body = $('#prevewmodal').find(".modal-body");
 			var footer = $('#prevewmodal').find(".modal-header");
-
+			modal.on('hide',function() {
+				body.html("");
+			});
 			
 			if (post_parameters && typeof(post_parameters) != 'undefined' && typeof(post_parameters.subtype) != 'undefined' ) {
-				console.log("Is Email:" + post_parameters.subtype);
 				if (post_parameters.subtype == "html")
 					header.html("HTML Email Message")
 				else
@@ -362,13 +365,13 @@ class PreviewModal {
 				});
 			
 				$('html, body').animate({ scrollTop: 0 }, 'fast');
-				$('#prevewmodal').animate({ width: '100%' }, 'fast');
+				modal.animate({ width: '100%' }, 'fast');
 				return;
 			} 
 
 
 			
-			$('#prevewmodal').find(".modal-body").html('<img src="img/ajax-loader.gif" alt="Please Wait..."/> Loading...')
+			modal.find(".modal-body").html('<img src="img/ajax-loader.gif" alt="Please Wait..."/> Loading...')
 			new Ajax.Request('<?= $posturl?>' + (get_parameters?'&' + get_parameters:''), {
 				'method': 'post',
 				'parameters': post_parameters,
