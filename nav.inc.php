@@ -231,7 +231,6 @@ header('Content-type: text/html; charset=UTF-8') ;
     <script type="text/javascript">
          jQuery.noConflict();
     </script>
-    <script type="text/javascript" src="script/json2.js"></script>
 	<script type="text/javascript" src="script/datepicker.js"></script>
 	<script src="script/bootstrap-modal.js" type="text/javascript"></script>
 	
