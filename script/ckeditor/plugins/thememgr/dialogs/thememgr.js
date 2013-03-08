@@ -59,7 +59,7 @@
 						throw '';
 					}
 
-					if (typeof window.top.rcieditor !== 'object') {
+					if (typeof window.parent.rcieditor !== 'object') {
 						// rcieditor object not found; this plugin requires rcieditor.js to be included
 						alert('Oops! Internal Error (3)');
 						throw '';

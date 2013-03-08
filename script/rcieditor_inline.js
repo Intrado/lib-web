@@ -33,7 +33,7 @@ window.RCIEditorInline = function () {
 	this.construct = function () {
 
 		// If the CKEDITOR object isn't ready yet...
-		if ((typeof window.top.rcieditor === 'undefined') || (typeof CKEDITOR === 'undefined')) {
+		if ((typeof window.parent.rcieditor === 'undefined') || (typeof CKEDITOR === 'undefined')) {
 
 			// Try again after a few milli's
 			clearTimeout(this.constructRetryTimeout);
@@ -52,7 +52,7 @@ window.RCIEditorInline = function () {
 		var that = this;
 		CKEDITOR.on( 'instanceCreated', function( event ) {
 			var editor = event.editor;
-			var rcieditor = window.top.rcieditor;
+			var rcieditor = window.parent.rcieditor;
 
 			editor.on( 'configLoaded', function() {
 
@@ -289,13 +289,13 @@ window.RCIEditorInline = function () {
 		});
 
 		// (6) Now grab the contents of the wysiwyg presave container
-		var content = window.top.rcieditor.cleanContent(wysiwygpresave.html());
+		var content = window.parent.rcieditor.cleanContent(wysiwygpresave.html());
 
 		// (7) Inject the content from the wysiwyg page div into the textarea form element
 		textarea.val(content);
 
 		// (8) Validate the changes as captured
-		window.top.rcieditor.validate();
+		window.parent.rcieditor.validate();
 
 		return(true);
 	}
@@ -306,7 +306,7 @@ window.RCIEditorInline = function () {
 	this.getTextarea = function () {
 		var textarea = false;
 		var name = this.editableTarget;
-		if (! ((textarea = $('#' + name, window.top.document)) && (textarea.length))) {
+		if (! ((textarea = $('#' + name, window.parent.document)) && (textarea.length))) {
 			console.log('Internal error RCIEditorInline::getTextarea()');
 			return(false);
 		}

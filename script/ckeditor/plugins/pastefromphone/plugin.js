@@ -3,7 +3,7 @@ CKEDITOR.plugins.add( 'pastefromphone', {
 	init: function( editor ) {
 		editor.addCommand( 'pasteFromPhone', {
 			exec: function( editor ) {
-				var message = window.top.rcieditor.getSetting('clipboard');
+				var message = window.parent.rcieditor.getSetting('clipboard');
 				if (message && message.length) {
 					editor.insertText(message);
 				}

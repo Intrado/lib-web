@@ -23,10 +23,10 @@
 ( function ($) {
 
 	// Get the base URL for AJAX API requests
-	var baseUrl = window.top.rcieditor.getBaseUrl();
+	var baseUrl = window.parent.rcieditor.getBaseUrl();
 
 	// Formulate the AJAX API request URL with this session's user ID
-	var req = baseUrl + 'api/2/users/' + window.top.USER.id + '/roles/0/accessprofile/fieldmaps/';
+	var req = baseUrl + 'api/2/users/' + window.parent.USER.id + '/roles/0/accessprofile/fieldmaps/';
 
 	// Make an AJAX request to the API to pull the fieldmap JSON;
 	// Make our AJAX request synchronous, otherwise CKE will think
