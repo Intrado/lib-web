@@ -109,6 +109,8 @@ if (!$maxsms = getSystemSetting("maxsms"))
 if (isset($personid)) {
 	// editing existing person
 	$data = DBFind("Person", "from person where id = " . $personid);
+	// block access to students contact data? (is complicated flag for Nate)
+	$blockDataAccess = $data->getSetting("block_data_access");
 	$query = "select group_concat(oz.orgkey separator ', ') from organization oz join personassociation pa on (pa.organizationid = oz.id) where personid=?";
 	$organization = QuickQuery($query, false, array($personid));
 	$address = DBFind("Address", "from address where personid = " . $personid);
@@ -260,6 +262,9 @@ if(CheckFormSubmit($f,$s))
 		} else {
 			//submit changes
 			$error = false;
+			if(GetFormData($f, $s, "block_data_access") || $blockDataAccess != GetFormData($f, $s, "block_data_access")){
+				$data->setSetting("block_data_access", GetFormData($f, $s, "block_data_access"));
+			}
 			foreach($contacttypes as $type){
 				if ($error) continue;
 				if (!isset($types[$type])) continue;
@@ -317,6 +322,7 @@ if(CheckFormSubmit($f,$s))
 if( $reloadform )
 {
 	ClearFormData($f);
+	PutFormData($f, $s, "block_data_access", $blockDataAccess, "bool", 0, 1);
 	foreach($contacttypes as $type){
 		if(!isset($types[$type])) continue;
 		foreach($types[$type] as $item){
@@ -560,8 +566,20 @@ foreach ($fieldmaps as $map) {
 			</table>
 		<td>
 	</tr>
-
 <?
+	if(getSystemSetting("_hasportal", false) && $USER->authorize("portalaccess")){
+?>
+	<tr class="listheader"><th colspan="2"><b style="font-size: 14px"><?=_L("Contact Manager")?></b></th></tr>
+	<tr>
+		<th align="right" class="windowRowHeader bottomBorder"><?=_L("Limit Access:")?></th>
+		<td class="bottomBorder">
+			<?echo NewFormItem($f, $s, "block_data_access", "checkbox", 0, 1, $FORMDISABLE);?>
+			<?=_L("Disallow associations from viewing/modifying above contact detail data.");?>
+		</td>
+	</tr>
+<?
+	}
+
 	if (getSystemSetting('_hasenrollment', false) && !$isGuardian) {
 ?>
 	<tr>
