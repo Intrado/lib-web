@@ -32,6 +32,8 @@
 				}
 			],
 
+			scratch: 0,
+
 			rcitheme_data: {},
 
 			// The color being chosen for the color chooser
@@ -65,6 +67,7 @@
 						throw '';
 					}
 
+/*
 					var scratch = rcieditor.getSetting('rcieditor_scratch'); // rcieditor.js
 					if (typeof scratch === 'undefined') {
 
@@ -72,16 +75,18 @@
 						alert('Oops! Internal Error (5)');
 						throw '';
 					}
+*/
+					myself.scratch = $('<div></div>');
 
 					// grab the entire contents of the document being edited
 					var content = editor.getData();
 
 					// and stick it into the scratch space for the editor where we can do some
 					// DOM work on it; jQuery can access it here, without painful iframe extension
-					scratch.empty().html(content);
+					myself.scratch.empty().html(content);
 
 					// Scan for and get a list of all the rcithemed elements within the document
-					myself.rcitheme_data = myself.theme_scan(scratch);
+					myself.rcitheme_data = myself.theme_scan(myself.scratch);
 
 					// If there are no theme data items
 					if (! myself.rcitheme_data.count) {
@@ -257,6 +262,7 @@
 
 				try {
 
+/*
 					// Get a hold of the scratch buffer
 					var scratch = rcieditor.getSetting('rcieditor_scratch');
 					if (typeof scratch === 'undefined') {
@@ -267,7 +273,7 @@
 						// Then throw an empty message to allow the dialog to close
 						throw '';
 					}
-
+*/
 					// Only the active theme_tab is used upon submission
 					switch (myself.theme_tab_showing) {
 						case 'colors':
@@ -288,7 +294,7 @@
 								throw 'No color was chosen!';
 							}
 
-							var res = myself.theme_scan(scratch, color_id, '#' + color_code);
+							var res = myself.theme_scan(myself.scratch, color_id, '#' + color_code);
 							break;
 
 						case 'newcolors':
@@ -296,7 +302,7 @@
 								var bgcolor = $('#theme_view_newcolors_swatch_' + jj).css('background-color');
 								if (bgcolor != 'transparent') {
 									var color_code = myself.color2hex(bgcolor);
-									var res = myself.theme_scan(scratch, myself.rcitheme_data.color[jj], '#' + color_code);
+									var res = myself.theme_scan(myself.scratch, myself.rcitheme_data.color[jj], '#' + color_code);
 									if (! res) break;
 								}
 							}
@@ -309,7 +315,7 @@
 
 					// For setting, we need to put our scratch area back into the document
 					if (res) {
-						var content = scratch.html();
+						var content = myself.scratch.html();
 						editor.setData(content);
 					}
 
