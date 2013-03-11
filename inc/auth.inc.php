@@ -19,11 +19,11 @@ function pearxmlrpc($method, $params, $returndata = false) {
 	while (!$isAlive && $timetostop > time()) {
 		$resp = $cli->send($msg, 9); //9 second timeout will let us timeout and try 3 times within a 30 second limit, though the 4th attempt could succeed at 36s
 		if (!$resp) {
-			$msg = $method . ' communication error: "' . $cli->errstr . '". Have been trying for ' . (time() - $starttime) . 's attempt ' . $attempt;
+			$errmsg = $method . ' communication error: "' . $cli->errstr . '". Have been trying for ' . (time() - $starttime) . 's attempt ' . $attempt;
 			if (function_exists("error_log_helper"))
-				error_log_helper($msg);
+				error_log_helper($errmsg);
 			else
-				error_log($msg);
+				error_log($errmsg);
 
 			usleep(900000); //in case of immediate failure (instead of timeout), sleep a bit to avoid flooding
 		} else {
