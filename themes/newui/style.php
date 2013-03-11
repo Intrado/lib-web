@@ -1183,7 +1183,7 @@ div.progressbar div.progress {
 	border: 1px solid #E2E2E2;
 	border-radius: 3px;
 	background-color: #fff;
-	height: 100%;
+	height: 400px;
     width: 100%;
 }
 
