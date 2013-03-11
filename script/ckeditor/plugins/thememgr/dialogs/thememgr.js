@@ -8,6 +8,7 @@
  *
  * SMK created 2013-01-16
  * Modified 2013-02-14 by Ben Hencke - trimmed down required metadata
+ * SMK eliminated external "scratch" div dependency 2013-03-11
  */
 
 (function ($) {
@@ -67,15 +68,7 @@
 						throw '';
 					}
 
-/*
-					var scratch = rcieditor.getSetting('rcieditor_scratch'); // rcieditor.js
-					if (typeof scratch === 'undefined') {
-
-						// scratch space could not be found
-						alert('Oops! Internal Error (5)');
-						throw '';
-					}
-*/
+					// Initialize scratch space as a jQuery object that we can manipulate
 					myself.scratch = $('<div></div>');
 
 					// grab the entire contents of the document being edited
@@ -104,55 +97,17 @@
 						var ui_views = '';
 						var ui_code = '';
 
+						// Add some functions that we can use
+						var tscall = 'CKEDITOR.dialog.getCurrent().definition.theme_tab_show';
+
 						// If there are any theme colors
 						if (myself.rcitheme_data.color.size()) {
-
-							// Then add the color selector
-							var theme_color_options = '';
-							for (var jj = 0; jj < myself.rcitheme_data.color.size(); jj++) {
-								theme_color_options += '<option>' + myself.rcitheme_data.color[jj] + '</option>';
-							}
-							ui_components.colors = '<select id="theme_color_id">';
-							if (myself.rcitheme_data.color.size() > 1) {
-								ui_components.colors += '<option value="" selected="selected"">Select a theme color to update...</option>';
-							}
-							ui_components.colors += theme_color_options + '</select>';
-
-							// Add some functions that we can use
-							var tscall = 'CKEDITOR.dialog.getCurrent().definition.theme_tab_show';
-
-							// Add tab/view for color selection
-							if (ui_components.colors.length) {
-								ui_tabs += '<span id="theme_tab_colors" class="inactive" onclick="' + tscall + '(\'colors\');">&nbsp;&nbsp;COLORS&nbsp;&nbsp;</span>';
-
-								ui_views += '<div id="theme_view_colors" class="theme_view inactive">';
-								ui_views += '	<div class="viewstep"> 1) ' + ui_components.colors + '</div>';
-								ui_views += '	<div class="viewstep"> 2) ';
-								ui_views += '		Select Color: #<input id="theme_color_code" type="text" size="6" maxlength="6" onchange="CKEDITOR.dialog.getCurrent().definition.theme_color_preview_update();"/> <span id="theme_color_preview">&nbsp;</span>';
-								ui_views += '		<div class="swatches">';
-
-								var cscall = 'CKEDITOR.dialog.getCurrent().definition.theme_color_swatch';
-								var csnum = 0;
-								for (var rr = 0; rr < 256; rr += 0x33) {
-									for (var gg = 0; gg < 256; gg += 0x33) {
-										for (var bb = 0; bb < 256; bb += 0x33) {
-											var rgb = myself.hex(rr) + myself.hex(gg) + myself.hex(bb);
-											ui_views += '<span id="theme_color_swatch_' + csnum + '" style="background-color: #' + rgb + ';" onclick="' + cscall + '(' + csnum + ');">&nbsp;</span>';
-											csnum++;
-										}
-									}
-									ui_views += '<br clear="all"/>';
-								}
-								ui_views += '		</div>';
-								ui_views += '	</div>';
-								ui_views += '</div>';
-							}
 
 							// Add (another) tab/view for color selection
 							var choosercall = 'CKEDITOR.dialog.getCurrent().definition.theme_color_chooser_show';
 							var chooserexit = 'CKEDITOR.dialog.getCurrent().definition.theme_color_chooser_exit';
 							var chooserpick = 'CKEDITOR.dialog.getCurrent().definition.theme_color_chooser_pick';
-							ui_tabs += '<span id="theme_tab_newcolors" class="inactive" onclick="' + tscall + '(\'newcolors\');">&nbsp;&nbsp;NEW COLORS&nbsp;&nbsp;</span>';
+							ui_tabs += '<span id="theme_tab_newcolors" class="inactive" onclick="' + tscall + '(\'newcolors\');">&nbsp;&nbsp;COLORS&nbsp;&nbsp;</span>';
 							ui_views += '<div id="theme_view_newcolors" class="theme_view inactive">';
 							ui_views += '<div id="theme_view_newcolors_hider" style="display: none;">&nbsp;</div>';
 							for (var jj = 0; jj < myself.rcitheme_data.color.size(); jj++) {
@@ -262,18 +217,6 @@
 
 				try {
 
-/*
-					// Get a hold of the scratch buffer
-					var scratch = rcieditor.getSetting('rcieditor_scratch');
-					if (typeof scratch === 'undefined') {
-
-						// This is an internal error, not the user's problem; let them know...
-						alert('Oops! Internal Error (1)');
-
-						// Then throw an empty message to allow the dialog to close
-						throw '';
-					}
-*/
 					// Only the active theme_tab is used upon submission
 					switch (myself.theme_tab_showing) {
 						case 'colors':
