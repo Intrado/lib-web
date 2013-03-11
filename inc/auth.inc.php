@@ -25,7 +25,7 @@ function pearxmlrpc($method, $params, $returndata = false) {
 			else
 				error_log($msg);
 
-			sleep(1); //in case of immediate failure (instead of timeout), sleep a bit to avoid flooding
+			usleep(900000); //in case of immediate failure (instead of timeout), sleep a bit to avoid flooding
 		} else {
 			$isAlive = true;
 		}
