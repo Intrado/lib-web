@@ -9,6 +9,9 @@ include_once("inc/form.inc.php");
 require_once("inc/table.inc.php");
 require_once("inc/utils.inc.php");
 require_once("inc/formatters.inc.php");
+require_once("obj/Publish.obj.php");
+require_once("obj/MessageGroup.obj.php");
+require_once("obj/PeopleList.obj.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -103,7 +106,41 @@ if (isset($_GET['delete'])) {
 		$_SESSION['userid'] = NULL;
 
 	$usr = new User($deleteid);
-
+	$hasPublishedItems = QuickQuery("
+			select 1 from publish where userid = ? and action = 'publish' limit 1",
+		false, array($deleteid));
+	
+	if ($hasPublishedItems) {
+		$publishedMessagegroup = DBFindMany("Publish","
+				from publish where userid = ? and action = 'publish' and type = 'messagegroup'",
+				false, array($deleteid));
+		$items = "";
+		if (count($publishedMessagegroup)) {
+			$names = array();
+			foreach($publishedMessagegroup as $id => $publish) {
+				$messagegroup = new MessageGroup($publish->messagegroupid);
+				$names[] = $messagegroup->name;
+			}
+			$items .= "<br />" . _L("Message(s): ") . "<b>" . implode(", ", $names) . "</b>";
+		}
+		$publishedLists = DBFindMany("Publish","
+				from publish where userid = ? and action = 'publish' and type = 'list'",
+				false, array($deleteid));
+		if (count($publishedLists)) {
+			$names = array();
+			foreach($publishedLists as $id => $publish) {
+				$list = new PeopleList($publish->listid);
+				$names[] = $list->name;
+			}
+			$items .= "<br />" . _L("List(s): ") . "<b>" . implode(", ", $names) . "</b>";
+		}
+		
+		notice("<div class='alertmessage'>" . 
+				_L("Unable to delete user: %s. User is currently publishing \n", "<b>" . escapehtml($usr->login) . "</b>") . $items .
+				"</div>");
+		redirect();
+	}
+	
 	QuickQuery('BEGIN');
 		QuickUpdate("update user set enabled=0, deleted=1 where id=?", false, array($deleteid));
 		QuickUpdate("delete from schedule where id in (select scheduleid from job where status='repeating' and userid=?)", false, array($deleteid));
