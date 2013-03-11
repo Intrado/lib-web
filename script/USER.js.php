@@ -2,6 +2,7 @@
 
 /**
  * Bring PHP USER data into the client via JavaScript (read only)
+ * created by SMK
  */
 
 require_once("../inc/subdircommon.inc.php");
@@ -23,6 +24,6 @@ header("Cache-Control: private");
 		this.phone = <? echo json_encode($USER->phone); ?>;
 	}
 
-	window.top.USER = new user();
+	window.parent.USER = new user();
 }) ();
 

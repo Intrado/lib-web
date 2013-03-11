@@ -805,6 +805,39 @@ div.autocomplete ul li {
 	cursor:hand;  
 }
 
+
+div.previewmodal-wrap {
+	display: table;
+    position: absolute; 
+    height: 100%;
+    width: 100%;
+}
+div.previewmodal-wrapcell {
+	display: table-cell;
+	vertical-align: middle;	
+}
+
+div.preview-modal {
+    height: auto;
+    left: auto;
+    margin: auto;
+    max-height: 80%;
+    max-width: 80%;
+    padding: 0;
+    position: relative;
+    top: auto;
+    width: 600px;
+}
+
+div.preview-modal .modal-body  {
+	max-height: 90%; 
+	padding: 15px; 
+	overflow: auto;
+}
+div.preview-modal iframe {
+	width: 100%;
+}
+
 .messagegrid { margin: 5px 0 0; font-family: "Helvetica Neue",helvetica,Arial,sans-serif; }
 .messagegrid th { color: #484848; font-size: 12px; text-align: center;}
 .messagegrid td { color: #484848; text-align: center;}

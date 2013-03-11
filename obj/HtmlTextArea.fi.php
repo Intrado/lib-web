@@ -18,7 +18,15 @@ class HtmlTextArea extends FormItem {
 
 		$str = '<textarea id="' . $n . '" name="' . $n . '" ' . $rows . ' style="display: none;"/>' . $v . '</textarea>
 			<div id ="' . $n . '-htmleditor"></div>';
-		// SMK notes that there was a stray "</script>" tag here... appeared to be connected to nothing.
+
+		// SMK added 2013-03-07 to force this button's label to show in the toolbar
+		$str .= '
+		<style type="text/css">
+			.cke_button__pastefromphone_label {
+				display: inline-block;
+			}
+		</style>';
+
 		return $str;
 	}
 

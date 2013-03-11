@@ -115,6 +115,7 @@ jQuery.noConflict();
 	// using helper functions in htmleditor.js, set up the ckeditor on the textarea with id "elementid"
 	applyCkEditor = function(elementid, editor_mode) {
 
+		// Either instantiate or reconstruct the rcieditor object as needed
 		if (typeof rcieditor === 'undefined') {
 			rcieditor = new RCIEditor(editor_mode, elementid);
 		}
@@ -122,6 +123,24 @@ jQuery.noConflict();
 			rcieditor.reconstruct(editor_mode, elementid);
 		}
 
+		var phonemessagetype = $('#msgsndr_phonemessagetype');
+		if (phonemessagetype && phonemessagetype.length && (phonemessagetype.val() == 'text')) {
+			// Grab the Phone's TTS message and stick it into the editor's clipboard
+			var message = $('#msgsndr_tts_message');
+			if (message && message.length && message.val().length) {
+				rcieditor.setSetting('clipboard', message.val());
+			}
+		}
+		else if (phonemessagetype && phonemessagetype.length && (phonemessagetype.val() == 'callme')) {
+
+			// Grab the Phone's "callme" scratch message and stick it into the editor's clipboard
+			var message = $('#msgsndr_form_scratch');
+			if (message && message.length && message.val().length) {
+				rcieditor.setSetting('clipboard', message.val());
+			}
+		}
+
+		// Set up a validator
 		rcieditor.setValidatorFunction(function () {
 			obj_valManager.runValidateEventDriven(elementid);
 		});

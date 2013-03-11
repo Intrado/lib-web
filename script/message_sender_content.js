@@ -291,12 +291,11 @@ var allowControl = {
 				alert('ops, something went wrong');
 				return;
 			} else if (msgid == 0) {
-				applyCkEditor("msgsndr_emailmessagetext","normal");
+				applyCkEditor("msgsndr_emailmessagetext","msnormal");
 			} else {
 				$.get('mgstationeryview.php?stationery=' + msgid, function(data) {
 					$("#msgsndr_emailmessagetext").val(data);
-					applyCkEditor("msgsndr_emailmessagetext","inline");
-					//rcieditor.refreshHtmlEditorContent();
+					applyCkEditor("msgsndr_emailmessagetext","msinline");
 					
 				});
 			}
@@ -619,14 +618,14 @@ function ContentManager() {
 								var msgid = stationery[stationery.length - 1].id;
 								$.get('mgstationeryview.php?stationery=' + msgid, function(data) {
 									$("#msgsndr_emailmessagetext").val(data);
-									applyCkEditor("msgsndr_emailmessagetext","inline");
+									applyCkEditor("msgsndr_emailmessagetext","msinline");
 								});
 								$('#stationery_email_view').hide();
 								$('#main_email_view').show();
 							} else if (!forcestationery && stationery.length == 1) {
 								// Only the "blank" stationery available and user not restricted to stationery. proceed to normal editor
 								$("#msgsndr_emailmessagetext").val("");
-								applyCkEditor("msgsndr_emailmessagetext","normal");
+								applyCkEditor("msgsndr_emailmessagetext","msnormal");
 								$('#stationery_email_view').hide();
 								$('#main_email_view').show();
 							} else {
@@ -912,7 +911,7 @@ function ContentManager() {
     }
 };
 
-function stationeryPrevewLoaded(area) {
+function messagePrevewLoaded(area) {
 	if(area.height() > 370) {
 		jQuery('#stationerypreview').height(area.height() + 30);
 	} else {

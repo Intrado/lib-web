@@ -126,10 +126,10 @@ if (!empty($_POST) && empty($_FILES['audio'])) {
 
 <form id="uploadform" style='margin:0;padding:0'action="uploadaudio.php?formname=<?=$_GET['formname']?>&itemname=<?=$_GET['itemname']?>" method="post" enctype="multipart/form-data" onsubmit="" >
 	<!-- TODO: Might need maximum size -->
-	<input id="audio" name="audio" type="file" onChange="window.top.window.startAudioUpload('<?=$_GET['itemname']?>');this.form.submit();"/>	
+	<input id="audio" name="audio" type="file" onChange="window.parent.window.startAudioUpload('<?=$_GET['itemname']?>');this.form.submit();"/>	
 </form>
 <script language="javascript" type="text/javascript">
-	window.top.window.stopAudioUpload('<?=$audioid?>','<?= addslashes($audioname) ?>',<?=json_encode($errormessage)?>, '<?=$_GET['formname']?>', '<?=$_GET['itemname']?>');
+	window.parent.window.stopAudioUpload('<?=$audioid?>','<?= addslashes($audioname) ?>',<?=json_encode($errormessage)?>, '<?=$_GET['formname']?>', '<?=$_GET['itemname']?>');
 </script> 
 </body>
 </html>

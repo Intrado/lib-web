@@ -86,6 +86,8 @@ if ($message) {
 		// missing session data!
 		redirect('unauthorized.php');
 	}
+	if ($subtype == "html" && $USER->authorize('forcestationery') && !isset($_SESSION['editmessage']['stationeryid']))
+		redirect('unauthorized.php');
 }
 
 // if the user doesn't own the parent message group, unauthorized!
@@ -100,8 +102,6 @@ if (!in_array($languagecode, array_keys(Language::getLanguageMap())))
 if (!$USER->authorize("sendmulti") && $languagecode != Language::getDefaultLanguageCode())
 	redirect('unauthorized.php');
 
-if ($USER->authorize('forcestationery') && !isset($_SESSION['editmessage']['stationeryid']))
-	redirect('unauthorized.php');
 
 PreviewModal::HandleRequestWithEmailText();
 	
