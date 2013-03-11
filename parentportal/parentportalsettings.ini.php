@@ -3,7 +3,7 @@
 ;portalauth server be sure to end with the / slash
 [portalauth]
 cmUrl="https://csportal.testschoolmessenger.com/cm/"
-accountUrl="https://csportal.testschoolmessenger.com/myaccount/"
+accountUrl="https://csportal.testschoolmessenger.com/myaccount/#loginmethods"
 
 ;authentication server connection information
 [authserver]
