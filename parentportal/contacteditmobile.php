@@ -8,7 +8,7 @@ function newdisplayJobtypeForm($f, $s, $type, $sequence, $jobtypes){
 	<table class="preference_wrap"><tr><td>
 	<div class="onoffswitch">
     <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="<?= $id?>_switch" onclick="togglePreferences('<?= $id?>',this.checked);" checked />
-    <label class="onoffswitch-label" for="<?= $id?>_switch" onclick="function () {// mobile safari doesn't obey lables unless emty function is inserted here}">
+    <label class="onoffswitch-label" for="<?= $id?>_switch" onclick="function () {<?// mobile safari doesn't obey lables unless emty function is inserted here?>}">
     <div class="onoffswitch-inner"></div>
     <div class="onoffswitch-switch"></div>
     </label>
@@ -48,6 +48,7 @@ if($PERSONID){
 
 	NewForm($f);
 ?>
+	<div class="jobtypepreferences">
 	<table cellpadding="3" cellspacing="1" width="100%">
 <?
 		$type = "phone";
@@ -135,7 +136,9 @@ if($PERSONID){
 			}
 ?>
 	</table>
+	
 	<div><? NewFormItem($f, $s, "savetoall", "checkbox"); ?> <?=_L("Save To All Contacts")?></div>
+	</div>
 	<br>
 	
 <?

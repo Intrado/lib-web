@@ -219,19 +219,11 @@ endWindow();
 if($PERSONID){
 ?><a name="edit"></a><?
 	startWindow(escapehtml($person->$firstnamefield) . " " . escapehtml($person->$lastnamefield), 'padding: 3px;');
-?>
-	<table width="100%">
-		<tr>
-			<td>
-<?
+
 	//include_once("contactedit.php");
 	include_once("contacteditmobile.php");
 	
-?>
-			</td>
-		</tr>
-	</table>
-<?
+
 	endWindow();
 }
 include_once("navbottom.inc.php");
