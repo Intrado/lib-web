@@ -161,10 +161,6 @@
 						ui += '		div.themeviews div.viewstep { padding: 5px 10px; }';
 						ui += '		div.themeviews input, div.themeviews select { background-color: white; border: 1px solid #999; }';
 
-						// Colors Tab:
-						ui += '		div#theme_view_colors > div.viewstep > div.swatches > span { display: inline-block; float: left; margin: 0px; height: 10px; width: 10px; font-size: 1px; cursor: pointer; }';
-						ui += '		div#theme_view_colors > div.viewstep > span#theme_color_preview { position: relative; top: -10px; display: inline-block; height: 16px; width: 32px; font-size: 1px; border: 1px solid black; }';
-
 						// New Colors Tab
 						ui += '		div#theme_view_newcolors { position: relative; height: 120px; }';
 						ui += '		div#theme_view_newcolors_hider { position: absolute; top: 0px; left: 0px; z-index: 1; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }';
