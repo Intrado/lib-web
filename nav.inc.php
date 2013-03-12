@@ -82,7 +82,7 @@ $NAVTREE = array (
 		array("Templates","jobtemplates.php",($_SESSION['colorscheme']['_brandtheme'] == "newui" ? array('sendemail', 'sendphone', "sendsms") : array("dummy")),$SUBTAB=="templates"),
 		array("Posts","posts.php",getSystemSetting("_hasfeed", false) ? "feedpost" : "dummy",$SUBTAB=="post"),
 		array("Classroom","classroommessageoverview.php",getSystemSetting("_hastargetedmessage", false) ? "targetedmessage" : "dummy",$SUBTAB=="classroom"),
-		array("Surveys","surveys.php",getSystemSetting("_hassurvey", true) ? "survey" : "dummy",$SUBTAB=="survey"),
+		array("Surveys","surveys.php",$USER->canSendSurvey() ? "survey" : "dummy",$SUBTAB=="survey"),
 		array("Responses","replies.php?reset=1","leavemessage",$SUBTAB=="responses")
 		)),
 	array("Reports","reports.php",array('createreport',"viewsystemreports", "viewusagestats","viewcalldistribution"),$MAINTAB=="reports",array(
