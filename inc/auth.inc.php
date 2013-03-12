@@ -17,7 +17,8 @@ function pearxmlrpc($method, $params, $returndata = false) {
 	
 	// retry authserver for a while, maybe mid-restart
 	while (!$isAlive && $timetostop > time()) {
-		$resp = $cli->send($msg, 9); //9 second timeout will let us timeout and try 3 times within a 30 second limit, though the 4th attempt could succeed at 36s
+		$timeout = 90; //this timeout must exceed the authserver's configured lockTimeout setting to avoid a cascading backlog of disconnected requests
+		$resp = $cli->send($msg, $timeout); 
 		if (!$resp) {
 			$errmsg = $method . ' communication error: "' . $cli->errstr . '". Have been trying for ' . (time() - $starttime) . 's attempt ' . $attempt;
 			if (function_exists("error_log_helper"))
@@ -25,7 +26,7 @@ function pearxmlrpc($method, $params, $returndata = false) {
 			else
 				error_log($errmsg);
 
-			usleep(900000); //in case of immediate failure (instead of timeout), sleep a bit to avoid flooding
+			sleep(1); //in case of immediate failure (instead of timeout), sleep a bit to avoid flooding
 		} else {
 			$isAlive = true;
 		}
