@@ -634,7 +634,6 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 				// manipulated it, and then put it back into the textarea again:
 				if (rcieditorinline.activeEditorId) {
 					var tempdiv = $('<div></div>').html(this.textarea.val());
-					//$('.primaryBlock', tempdiv).each(function () {
 					$('#' + rcieditorinline.activeEditorId, tempdiv).each(function () {
 
 						var jQthis = $(this);
