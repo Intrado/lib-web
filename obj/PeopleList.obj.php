@@ -65,7 +65,7 @@ class PeopleList extends DBMappedObject {
 		return QuickQuery($query, false, array($this->id));
 	}
 	
-	function updateManualAddByPkeys($pkeys) {
+	function updateManualAddByPkeys($pkeys, $removeExisting = true) {
 		global $USER;
 		
 		// find all personids
@@ -85,13 +85,16 @@ class PeopleList extends DBMappedObject {
 		
 		// sync up the ids
 		$oldids = QuickQueryList("select p.id from person p, listentry le where p.id=le.personid and le.type='add' and p.userid is null and le.listid=$this->id");
-		$deleteids = array_diff($oldids, $personids);
 		$addids = array_diff($personids, $oldids);
 
-		if (count($deleteids) > 0) {
-			$query = "delete from listentry where personid in ('" . implode("','",$deleteids) . "') and listid = " . $this->id;
-			QuickUpdate($query);
+		if ($removeExisting) {
+			$deleteids = array_diff($oldids, $personids);
+			if (count($deleteids) > 0) {
+				$query = "delete from listentry where personid in ('" . implode("','",$deleteids) . "') and listid = " . $this->id;
+				QuickUpdate($query);
+			}
 		}
+
 		if (count($addids) > 0) {
 			$query = "insert into listentry (listid, type, personid) values ($this->id,'add','" . implode("'),($this->id,'add','",$addids) . "')";
 			QuickUpdate($query);
@@ -119,7 +122,6 @@ class PeopleList extends DBMappedObject {
 		}
 		return $isSuccess;
 	}
-		
 }
 
 ?>

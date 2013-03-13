@@ -90,10 +90,10 @@ if (isset($_GET['template']) && $_GET['template'] && isset($_GET['subject']) && 
 		"lists" => (isset($_GET['lists'])?$_GET['lists']:"[]"),
 		"jobtypeid" => (isset($_GET['jobtypeid'])?$_GET['jobtypeid']:0),
 		"messagegroupid" => (isset($_GET['messagegroupid'])?$_GET['messagegroupid']:0));
-	redirect();
+	redirect(isset($_REQUEST["iframe"])?"?iframe":"");
 } else if (isset($_GET['new'])) {
 	unset($_SESSION['message_sender']);
-	redirect();
+	redirect(isset($_REQUEST["iframe"])?"?iframe":"");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1321,10 +1321,14 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$job->runNow();
 
 		Query("COMMIT");
-		if ($ajax)
-			$form->sendTo("start.php");
-		else
+		if ($ajax) {
+			if (isset($_GET['iframe']))
+				$form->sendTo("jobview.php?iframe&id=". $job->id);
+			else
+				$form->sendTo("start.php");
+		} else {
 			redirect("start.php");
+		}
 	}
 }
 

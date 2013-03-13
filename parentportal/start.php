@@ -211,12 +211,24 @@ if(isset($contactList) && $contactList){
 	<tr><td>
 		<?=_L("The Contact Manager allows you to customize your message delivery preferences and enables you to review past messages.")?>
 	</td></tr>
-
+<?
+if (isset($_SESSION['userlogintype']) && ($_SESSION['userlogintype'] == 'powerschool')) {
+?>
+	<tr><td>
+		<?=_L("Your account is not associated with any students. Please contact your school to inform them that your students are missing from the SchoolMessenger product.")?>
+	</td></tr>
+	<tr><td class="bottomBorder">&nbsp;</td></tr>
+<?
+} else {
+?>
 	<tr><td class="bottomBorder">&nbsp;</td></tr>
 
 	<tr><td>
 		<? echo button(_L("Click here to begin"), NULL, "phoneactivation0.php"); ?>
 	</td></tr>
+<?
+}
+?>
 	</table>
 						
 <?

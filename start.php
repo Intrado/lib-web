@@ -774,7 +774,15 @@ $activityfeed .= '</div> <!-- .csec .window_main -->';
 			}
 	?>
 </div><!-- .csec .secwindow -->
-	
+
+<script type="text/javascript">
+	document.observe('dom:loaded', function() {
+		// send a message to any listeners letting them know the page has been loaded
+		top.postMessage('{"custurl":"<?=$CUSTOMERURL?>", ' +
+				'"page":"<?=preg_replace('/.*\//', "", $_SERVER["SCRIPT_NAME"])?>", "user":"<?=$USER->login?>"}', '*');
+	});
+</script>
+
 <?
 include_once("navbottom.inc.php");
 ?>

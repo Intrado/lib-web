@@ -106,6 +106,11 @@ function copyContactData($mainpid, $otherpids = array(), $locked){
 	$mainContactPrefs = getContactPrefs($mainpid);
 
 	foreach($otherpids as $pid){
+		$person = new Person($pid);
+		// if parents are not allowed access to data for this person record, skip it
+		if ($person->getSetting("block_data_access", false, true))
+			continue;
+
 		$phones = DBFindMany("Phone", "from phone where personid = '" . $pid . "'");
 		$temp = array();
 		foreach($phones as $phone){

@@ -51,7 +51,7 @@ function fmt_actions($row,$index) {
 
 $titles = array(
 		"1" => "Type",
-		"2" => "Domain",
+		"2" => "FQDN",
 		"actions" => "Actions");
 
 $formatters = array(
@@ -72,7 +72,7 @@ $formdata = array(
 		"helpstep" => 1
 	),
 	"domain" => array(
-		"label" => _L('Domain'),
+		"label" => _L('FQDN'),
 		"value" => "",
 		"validators" => array(
 			array("ValRequired"),

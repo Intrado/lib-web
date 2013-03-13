@@ -60,54 +60,6 @@ function pearxmlrpc($method, $params) {
 }
 
 
-function portalCreateAccount($username, $password, $firstname, $lastname, $zipcode, $notifyType, $notifysmsType, $sms, $preferences) {
-	$customerurl = "";
-	if (isset($_GET['u'])) {
-		$customerurl = $_GET['u'];
-	}
-	$params = array(new XML_RPC_Value(trim($username), 'string'), new XML_RPC_Value(trim($password), 'string'),
-			new XML_RPC_Value(trim($firstname), 'string'), new XML_RPC_Value(trim($lastname), 'string'),
-			new XML_RPC_Value(trim($zipcode), 'string'), new XML_RPC_Value(trim($notifyType), 'string'),
-			new XML_RPC_Value(trim($notifysmsType), 'string'), new XML_RPC_Value($sms, 'string'),
-			new XML_RPC_Value($customerurl, 'string'), new XML_RPC_Value(json_encode($preferences), 'string'));
-	$method = "PortalServer.portal_createAccount";
-	$result = pearxmlrpc($method, $params);
-	return $result; // we do nothing for success/fail
-}
-
-
-function portalActivateAccount($activationtoken, $password) {
-	$params = array(new XML_RPC_Value(trim($activationtoken), 'string'), new XML_RPC_Value(trim($password), 'string'));
-	$method = "PortalServer.portal_activateAccount";
-	$result = pearxmlrpc($method, $params);
-	if ($result['result'] == "") {
-		// account activated
-		session_id($result['sessionID']); // set the session id
-	}
-	return $result;
-}
-
-
-function portalPreactivateForgottenPassword($activationtoken) {
-	$params = array(new XML_RPC_Value(trim($activationtoken), 'string'));
-	$method = "PortalServer.portal_preactivateForgottenPassword";
-	$result = pearxmlrpc($method, $params);
-	return $result;
-}
-
-
-function portalLogin($username, $password) {
-	$params = array(new XML_RPC_Value(trim($username), 'string'), new XML_RPC_Value(trim($password), 'string'));
-	$method = "PortalServer.portal_login";
-	$result = pearxmlrpc($method, $params);
-	if ($result['result'] == "") {
-		// login success
-		session_id($result['sessionID']); // set the session id
-	}
-	return $result;
-}
-
-
 function portalGetCustomerAssociations() {
 	$sessionid = session_id();
 	
@@ -164,18 +116,6 @@ function portalAssociatePerson($token, $validationdata) {
 }
 
 
-function portalForgotPassword($username) {
-	$customerurl = "";
-	if (isset($_GET['u'])) {
-		$customerurl = $_GET['u'];
-	}
-	$params = array(new XML_RPC_Value(trim($username), 'string'), new XML_RPC_Value($customerurl, 'string'));
-	$method = "PortalServer.portal_forgotPassword";
-	$result = pearxmlrpc($method, $params);
-	return $result;
-}
-
-
 function portalGetPortalUser() {
 	$sessionid = session_id();
 	$params = array(new XML_RPC_Value($sessionid, 'string'));
@@ -186,34 +126,18 @@ function portalGetPortalUser() {
 }
 
 
-function portalUpdatePortalUser($firstname, $lastname, $zipcode, $notifyType, $notifysmsType, $sms, $preferences) {
+function portalUpdateUserPreferences($email, $sms, $preferences) {
 	$sessionid = session_id();
-	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value(trim($firstname), 'string'),
-			new XML_RPC_Value(trim($lastname), 'string'), new XML_RPC_Value(trim($zipcode), 'string'),
-			new XML_RPC_Value(trim($notifyType), 'string'), new XML_RPC_Value(trim($notifysmsType), 'string'),
-			new XML_RPC_Value($sms, 'string'), new XML_RPC_Value(json_encode($preferences), 'string'));
-	$method = "PortalServer.portal_updateMyPortalUser";
+	$params = array(new XML_RPC_Value($sessionid, 'string'),
+		new XML_RPC_Value($email, 'string'),
+		new XML_RPC_Value($sms, 'string'),
+		new XML_RPC_Value(json_encode($preferences), 'string'));
+		
+	$method = "PortalServer.portal_updateMyPortalUserPreferences";
 	$result = pearxmlrpc($method, $params);
 	return $result;
 }
 
-
-function portalUpdatePortalUserPassword($newpassword, $oldpassword) {
-	$sessionid = session_id();
-	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value(trim($newpassword), 'string'), new XML_RPC_Value(trim($oldpassword), 'string'));
-	$method = "PortalServer.portal_updateMyPortalUserPassword";
-	$result = pearxmlrpc($method, $params);
-	return $result;
-}
-
-
-function portalUpdatePortalUsername($username, $password) {
-	$sessionid = session_id();
-	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value(trim($password), 'string'), new XML_RPC_Value(trim($username), 'string'));
-	$method = "PortalServer.portal_updateMyPortalUsername";
-	$result = pearxmlrpc($method, $params);
-	return $result;
-}
 
 function portalCreatePhoneActivation($customerid, $portaluserid, $pkeyList, $createCode) {
 	sleep(2); // slow down any DOS attack
@@ -229,6 +153,7 @@ function portalCreatePhoneActivation($customerid, $portaluserid, $pkeyList, $cre
 	return $result;
 }
 
+
 function portalDisassociateCustomer($customerid) {
 	$sessionid = session_id();
 	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($customerid, 'int'));
@@ -236,6 +161,7 @@ function portalDisassociateCustomer($customerid) {
 	$result = pearxmlrpc($method, $params);
 	return $result;
 }
+
 
 function portalGetSessionData($id) {
 	$params = array(new XML_RPC_Value($id, 'string'));
@@ -304,5 +230,57 @@ function doStartSession() {
 	}
 }
 
+// **************************
+// portalauth methods
+
+function getPortalAuthAuthRequestTokenUrl($callbackUrl) {
+	$params = array(new XML_RPC_Value(session_id(), 'string'), new XML_RPC_Value($callbackUrl, 'string'));
+	$method = "AuthServer.getPortalAuthAuthRequestTokenUrl";
+	$result = pearxmlrpc($method, $params);
+	if ($result !== false) {
+		// success
+		return $result['url'];
+	}
+	return false;
+}
+
+function getPortalAuthLocation() {
+	$method = "AuthServer.getPortalAuthLocationUrl";
+	$result = pearxmlrpc($method, array());
+	if ($result !== false) {
+		// success
+		return $result;
+	}
+	return false;
+}
+
+function loginViaPortalAuth() {
+	$params = array(new XML_RPC_Value(session_id(), 'string'));
+	$method = "PortalServer.portal_loginViaPortalAuth";
+	$result = pearxmlrpc($method, $params);
+	if ($result !== false) {
+		// success
+		//if (doDBConnect($result)) return $result;
+		return $result;
+	}
+	return false;
+}
+
+//****************************************************************************************
+// anonymous session methods
+
+function newSession() {
+	$method = "AuthServer.newSession";
+	$result = pearxmlrpc($method, array());
+	if ($result !== false && $result["sessionID"] != "") {
+		//error_log_helper("set sessionid to ". $result["sessionID"]);
+		session_id($result["sessionID"]);
+
+		return true;
+	} else {
+		error_log_helper("Problem requesting newSession() - result: ". $result["result"]. " resultdetail: ". $result["resultdetail"]);
+	}
+	return false;
+}
 
 ?>

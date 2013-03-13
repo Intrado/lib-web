@@ -2,32 +2,40 @@
 /**
  * Handle login requests via portalauth through AuthServer
  *
- * User: nrheckman
- * Date: 8/13/12
- * Time: 9:32 AM
+ * Date: 1/24/2013
  */
-$isindexpage = true;
-require_once("inc/common.inc.php");
-require_once("inc/DBMappedObject.php");
-require_once("obj/User.obj.php");
-require_once("obj/Access.obj.php");
+
+$ppNotLoggedIn = true;
+require_once("common.inc.php");
 
 if (isset($_REQUEST["is_return"])) {
-	doStartSession();
+//error_log("portallogin isreturn");
+	doStartSession(); // start session to send sessionid to login
 	// useing the access token, request that authserver create a session for whoever is logged into portal
-	$loginDetails = loginViaPortalAuth($CUSTOMERURL, $_SERVER["REMOTE_ADDR"]);
+	$loginDetails = loginViaPortalAuth();
 	if ($loginDetails && isset($loginDetails["userID"]) && $loginDetails["userID"] > 0) {
+//error_log("cscm logged in via portalauth, redirect to index");
+
 		// set a cookie to be used on session timeout to decide where to send the user on logout. NOTE: only good for the session
 		$loginSrc = array("src" => "portal", "user" => $loginDetails["username"], "type" => $loginDetails["type"]);
-		setcookie($CUSTOMERURL. "_login_src", json_encode($loginSrc));
+		setcookie($CUSTOMERURL. "_cm_login_src", json_encode($loginSrc));
 
-		// load the user's credentials and prepare the session
-		loadCredentials($loginDetails["userID"]);
-		loadDisplaySettings();
+		// set the sessiondata values that were already set during login but would be overwritten by php get/put session
+		//$_SESSION['customerid'] = 0; // TODO support customerurl input
+		$_SESSION['userid'] = $loginDetails["userID"];
+		$_SESSION['portaluserid'] = $loginDetails["userID"];
+		$_SESSION['userlogintype'] = $loginDetails["type"]; // "powerschool" or "local"
+	
+		$_SESSION['colorscheme']['_brandtheme'] = "3dblue";
+		$_SESSION['colorscheme']['_brandprimary'] = "26477D";
+		$_SESSION['colorscheme']['_brandtheme1'] = "89A3CE";
+		$_SESSION['colorscheme']['_brandtheme2'] = "89A3CE";
+		$_SESSION['colorscheme']['_brandratio'] = ".3";
 
 		// send to the index.php page to get them properly loaded.
 		$redirectLoc = "index.php";
 	} else {
+//error_log("portallogin return, no details, redir to ... um");
 		$portalAuthLocation = getPortalAuthLocation();
 		if ($portalAuthLocation != false) {
 			// if we get a valid location back from authserver for the commsuite app's login form, send the user there with an error code
@@ -38,6 +46,7 @@ if (isset($_REQUEST["is_return"])) {
 		}
 	}
 } else {
+//error_log("portallogin create new anonymous session");
 	// create a brand new session
 	newSession();
 	doStartSession();

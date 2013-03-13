@@ -128,9 +128,10 @@ function SubmitManager() {
 					} else if ("success" == res.status && res.nexturl) {
 						$('#msgsndr_submit_title').html("Broadcast Sent!");recipientTrack
 						$('#msgsndr_submit_message').html(
-								"Your broadcast, <strong>\""+$("#msgsndr_name").val()+"\"</strong> is being sent to <strong>"+recipientTrack+" recipient(s)</strong>. "+
-								"You can track its status on the <a href='start.php'>dashboard</a>.");
-							
+							"Your broadcast, <strong>\""+$("#msgsndr_name").val()+"\"</strong> is being sent to <strong>"+recipientTrack+" recipient(s)</strong>. ");
+						if ("start.php" == res.nexturl)
+							$('#msgsndr_submit_message').append("You can track its status on the <a href='start.php'>dashboard</a>.");
+
 						$('#msgsndr_submit_confirmbutton').on('click', function(event) {
 							window.location = res.nexturl;
 						});

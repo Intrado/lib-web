@@ -7,7 +7,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 <head>
 	<meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-	
+
 	<script src="script/prototype.js" type="text/javascript"></script> <!-- updated to prototype 1.7 -->
 	<script src="script/scriptaculous.js" type="text/javascript"></script>
 	<script src="script/prototip.js.php" type="text/javascript"></script>
@@ -17,7 +17,14 @@ header('Content-type: text/html; charset=UTF-8') ;
 	<script src="script/livepipe/livepipe.js" type="text/javascript"></script>
 	<script src="script/livepipe/window.js" type="text/javascript"></script>
 	<script src="script/modalwrapper.js" type="text/javascript"></script>
-	
+	<script type="text/javascript" src="script/jquery.1.7.2.min.js"></script>
+	<script type="text/javascript">
+		jQuery.noConflict();
+	</script>
+	<script type="text/javascript" src="script/json2.js"></script>
+	<script type="text/javascript" src="script/datepicker.js"></script>
+	<script src="script/bootstrap-modal.js" type="text/javascript"></script>
+
 	<link href="css.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print" />
 	<link href="css.forms.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print" />
 	<link href="css/datepicker.css.php" type="text/css" rel="stylesheet" />
@@ -40,5 +47,14 @@ header('Content-type: text/html; charset=UTF-8') ;
 //load validator for rules, handle rule add/delete to form submit (contactsearchformdata.inc.php)
 ?>
 
-<div class="content_wrap iframe_content_wrap">
-<div class="content">
+<div class="content_wrap iframe_content_wrap cf">
+	<div class="previewmodal-wrap">
+		<div class="previewmodal-wrapcell">
+			<div class="modal hide fade preview-modal" id="prevewmodal">
+				<div class="modal-header"></div>
+				<div class="modal-body"></div>
+				<div class="modal-footer"></div>
+			</div>
+		</div>
+	</div>
+	<div class="content">

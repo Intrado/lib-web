@@ -5,14 +5,14 @@ require_once("../inc/form.inc.php");
 require_once("../inc/table.inc.php");
 require_once("../obj/Phone.obj.php");
 
-$error_failedupdate = "There was an error updating your information";
-$error_failedupdatepassword = "There was an error updating your password";
-$error_badpassword = "The old password provided is invalid";
+$error_failedupdate = _L("There was an error updating your information");
+
 $f="portaluser";
 $s="main";
 $reloadform = 0;
 $error = 0;
-$notifysms = 0;
+$notifyemailCheckbox = 0;
+$notifysmsCheckbox = 0;
 
 if(CheckFormSubmit($f,$s))
 {
@@ -27,62 +27,33 @@ if(CheckFormSubmit($f,$s))
 		MergeSectionFormData($f, $s);
 
 		//do check
-		$firstname = TrimFormData($f,$s,"firstname");
-		$lastname = TrimFormData($f,$s,"lastname");
-		$zipcode = TrimFormData($f,$s,"zipcode");
-		$oldpassword = TrimFormData($f,$s,"oldpassword");
-		$newpassword1 = TrimFormData($f, $s, "newpassword1");
-		$newpassword2 = TrimFormData($f, $s, "newpassword2");
-		$notify = TrimFormData($f, $s, "notify");
-		$notifysms = TrimFormData($f, $s, "notifysms");
-		$sms = TrimFormData($f, $s, "sms");
-		$_SESSION['portaluser']['portaluser.preferences']['_locale'] = getFormData($f, $s, "_locale");
+		$notifyemailCheckbox = TrimFormData($f, $s, "notifyemailCheckbox");
+		$notifyemail = TrimFormData($f, $s, "email");
+		$notifysmsCheckbox = TrimFormData($f, $s, "notifysmsCheckbox");
+		$notifysms = TrimFormData($f, $s, "sms");
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else if(strlen($zipcode) < 5){
-			error("ZIP Code must be at least 5 digits long");
-		} else if(strlen($newpassword1) > 0 && strlen($newpassword1) < 5){
-			error("Passwords must be at least 5 characters long");
-		} else if($newpassword1 && $passworderror = validateNewPassword($_SESSION['portaluser']['portaluser.username'], $newpassword1, $firstname, $lastname)){
-			error($passworderror);
-		} else if($newpassword1 != $newpassword2){
-			error('Password confirmation does not match');
-		} else if ($notifysms && $phoneerror = Phone::validate($sms)) {
+		} else if ($notifysmsCheckbox && $phoneerror = Phone::validate($notifysms)) {
 			error($phoneerror);
+		} else if ($notifyemailCheckbox && !validEmail($notifyemail)) {
+			error(_L("Email is not a valid format"));
 		} else {
+		
 			//submit changes
+			
+			if (!$notifyemailCheckbox)
+				$notifyemail = "";
+			if (!$notifysmsCheckbox)
+				$notifysms = "";
 
-			if ($notify){
-				$notifyType = "message";
-			} else {
-				$notifyType = "none";
-			}
-			if ($notifysms){
-				$notifysmsType = "message";
-				$sms = Phone::parse($sms);
-			} else {
-				$notifysmsType = "none";
-				$sms = "";
-			}
-			$result = portalUpdatePortalUser($firstname, $lastname, $zipcode, $notifyType, $notifysmsType, $sms, $_SESSION['portaluser']['portaluser.preferences']);
-			if($result['result'] != ""){
-				$updateuser = false;
-				error($error_failedupdate);
-				$error = 1;
-			}
-			if($newpassword1){
-				$result = portalUpdatePortalUserPassword($newpassword1, $oldpassword);
-				if($result['result'] != ""){
-					$updateuser = false;
-					$error = 1;
-					if(strpos($result['resultdetail'], "oldpassword") !== false){
-						error($error_badpassword);
-					} else {
-						error($error_failedupdatepassword);
-					}
-				}
-			}
-			if(!$error){
+			$_SESSION['portaluser']['portaluser.preferences']['_locale'] = getFormData($f, $s, "_locale");
+			$_SESSION['portaluser']['portaluser.notifyemail'] = $notifyemail;
+			$_SESSION['portaluser']['portaluser.notifysms'] = $notifysms;
+
+			$preferences = $_SESSION['portaluser']['portaluser.preferences'];
+			portalUpdateUserPreferences($notifyemail, $notifysms, $preferences);
+			
+			if (!$error) {
 				redirect("start.php");
 			}
 		}
@@ -94,17 +65,15 @@ if(CheckFormSubmit($f,$s))
 if( $reloadform )
 {
 	ClearFormData($f);
-	PutFormData($f, $s, "firstname", $_SESSION['portaluser']['portaluser.firstname'], "text", "1", "100", true);
-	PutFormData($f, $s, "lastname", $_SESSION['portaluser']['portaluser.lastname'], "text", "1", "100", true);
-	PutFormData($f, $s, "newpassword1", "", "text");
-	PutFormData($f, $s, "newpassword2", "", "text");
-	PutFormData($f, $s, "oldpassword", "", "text");
-	PutFormData($f, $s, "zipcode", $_SESSION['portaluser']['portaluser.zipcode'], "number", "0", "99999", true);
 	PutFormData($f, $s, "_locale", $_SESSION['portaluser']['portaluser.preferences']['_locale'], "text", "nomin", "nomax");
-	PutFormData($f, $s, "notify",  ($_SESSION['portaluser']['portaluser.notifytype'] == "message") ? 1 : 0, "bool", 0, 1);
-	PutFormData($f, $s, "notifysms",  ($_SESSION['portaluser']['portaluser.notifysmstype'] == "message") ? 1 : 0, "bool", 0, 1);
-	PutFormData($f, $s, "sms", Phone::format($_SESSION['portaluser']['portaluser.sms']), "phone", "2", "20"); // 20 is the max to accomodate formatting chars
-	$notifysms = ($_SESSION['portaluser']['portaluser.notifysmstype'] == "message") ? 1 : 0;
+	
+	$notifyemailCheckbox = ($_SESSION['portaluser']['portaluser.notifyemail'] == "") ? 0 : 1;
+	PutFormData($f, $s, "notifyemailCheckbox", $notifyemailCheckbox, "bool", 0, 1);
+	PutFormData($f, $s, "email", $_SESSION['portaluser']['portaluser.notifyemail'], "email", "2", "100");
+	
+	$notifysmsCheckbox = ($_SESSION['portaluser']['portaluser.notifysms'] == "") ? 0 : 1;
+	PutFormData($f, $s, "notifysmsCheckbox", $notifysmsCheckbox, "bool", 0, 1);
+	PutFormData($f, $s, "sms", Phone::format($_SESSION['portaluser']['portaluser.notifysms']), "phone", "2", "20"); // 20 is the max to accomodate formatting chars
 }
 
 $PAGE = "account:account";
@@ -118,38 +87,20 @@ startWindow(_L('User Information'));
 		<tr>
 			<th valign="top" width="70" class="windowRowHeader bottomBorder" align="right" valign="top" style="padding-top: 6px;"><?=_L("Account Info")?>:</th>
 			<td class="bottomBorder">
-				<table border="0" cellpadding="1" cellspacing="0">
+				<table border="0" cellpadding="3" cellspacing="0">
 					<tr>
-						<td align="right"><?=_L("Email")?>:</td>
+						<td align="right"><?=_L("Username")?>:</td>
 						<td><?= escapehtml($_SESSION['portaluser']['portaluser.username']) ?></td>
 					</tr>
 					<tr>
 						<td align="right"><?=_L("First Name")?>:</td>
-						<td><? NewFormItem($f,$s, 'firstname', 'text', 20,100); ?></td>
+						<td><?= escapehtml($_SESSION['portaluser']['portaluser.firstname']) ?></td>
 					</tr>
 					<tr>
 						<td align="right"><?=_L("Last Name")?>:</td>
-						<td><? NewFormItem($f,$s, 'lastname', 'text', 20,100); ?></td>
+						<td><?= escapehtml($_SESSION['portaluser']['portaluser.lastname']) ?></td>
 					</tr>
-					<tr>
-						<td align="right"><?=_L("ZIP Code")?>:</td>
-						<td><? NewFormItem($f, $s, 'zipcode', 'text', '5'); ?></td>
-					</tr>
-					<tr>
-						<td align="right">*<?=_L("Old Password")?>:</td>
-						<td><? NewFormItem($f,$s, 'oldpassword', 'password', 20,50); ?></td>
-					</tr>
-					<tr>
-						<td align="right">*<?=_L("New Password")?>:</td>
-						<td><? NewFormItem($f,$s, 'newpassword1', 'password', 20,50); ?></td>
-					</tr>
-					<tr>
-						<td align="right">*<?=_L("Confirm New Password")?>:</td>
-						<td><? NewFormItem($f,$s, 'newpassword2', 'password', 20,50); ?></td>
-					</tr>
-
 				</table>
-				<div>*<?=_L("Only required for changing your password")?></div>
 			</td>
 		</tr>
 		<tr>
@@ -168,15 +119,21 @@ startWindow(_L('User Information'));
 							?>
 						</td>
 					</tr>
+					
 					<tr>
-						<td colspan="2"><? NewFormItem($f,$s, 'notify', 'checkbox'); ?>&nbsp;<?=_L("Email me when I have a new phone message.")?></td>
+						<td colspan="2"><? NewFormItem($f,$s, 'notifyemailCheckbox', 'checkbox', null, "", "id=\"emailcheck\" onclick=\"document.getElementById('emailbox').disabled=!this.checked\""); ?>&nbsp;<?=_L("Email me when I have a new phone message.")?></td>
 					</tr>
 					<tr>
-						<td colspan="2"><? NewFormItem($f,$s, 'notifysms', 'checkbox', null, "", "id=\"smscheck\" onclick=\"document.getElementById('smsbox').disabled=!this.checked\""); ?>&nbsp;<?=_L("Text me when I have a new phone message.")?></td>
+						<td align="right"><?=_L("Email")?>:</td>
+						<td><? NewFormItem($f,$s, 'email', 'text', 20, 20, "id=\"emailbox\" ". ($notifyemailCheckbox ? "" : "disabled=\"true\"")); ?></td>
+					</tr>
+
+					<tr>
+						<td colspan="2"><? NewFormItem($f,$s, 'notifysmsCheckbox', 'checkbox', null, "", "id=\"smscheck\" onclick=\"document.getElementById('smsbox').disabled=!this.checked\""); ?>&nbsp;<?=_L("Text me when I have a new phone message.")?></td>
 					</tr>
 					<tr>
-						<td align="right"><?=_L("Mobile Phone for SMS Text")?>:</td>
-						<td><? NewFormItem($f,$s, 'sms', 'text', 20, 20, "id=\"smsbox\" ". ($notifysms ? "" : "disabled=\"true\"")); ?></td>
+						<td align="right"><?=_L("Mobile Phone for Text Message")?>:</td>
+						<td><? NewFormItem($f,$s, 'sms', 'text', 20, 20, "id=\"smsbox\" ". ($notifysmsCheckbox ? "" : "disabled=\"true\"")); ?></td>
 					</tr>
 
 				</table>
@@ -185,7 +142,7 @@ startWindow(_L('User Information'));
 	</table>
 
 <?
-buttons(submit($f, $s, _L('Save')), icon_button(_L("Change Email"),"email_edit", NULL, "changeemail.php"), icon_button(_L("Cancel"),"cross", NULL, "start.php"));
+buttons(submit($f, $s, _L('Save')), icon_button(_L("Manage Account"),"email_edit", NULL, $SETTINGS['portalauth']['accountUrl']), icon_button(_L("Cancel"),"cross", NULL, "start.php"));
 
 endWindow();
 include_once("navbottom.inc.php");
