@@ -1884,7 +1884,7 @@ class SMAPI {
 		}
 		$destrecord->$type = $destination;
 		// if sms, optin via authserver (minor hack to insert into global optin list so jobs will send to these sms numbers)
-		if ("sms" == $type && !$editlock) {
+		if ("sms" == $type && !$editlock && strlen($destination) > 0) {
 			blocksms($destination, "optin", "Automated optin via SMAPI");
 		}
 		
