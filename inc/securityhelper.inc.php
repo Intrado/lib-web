@@ -313,7 +313,8 @@ function getFbAuthorizedPages() {
 	$dbdata = QuickQueryMultiRow("select value from setting where name like 'fbauthorizedpage%'");
 	$pages = array();
 	foreach ($dbdata as $row)
-		$pages[] = $row[0];
+		if ($row[0] != "")
+			$pages[] = $row[0];
 	return $pages;
 }
 
@@ -327,8 +328,10 @@ function setFbAuthorizedPages($pages) {
 		$args = array();
 		$count = 0;
 		foreach ($pages as $page) {
-			$args[] = "fbauthorizedpage" . $count++;
-			$args[] = $page;
+			if ($page != "") {
+				$args[] = "fbauthorizedpage" . $count++;
+				$args[] = $page;
+			}
 		}
 		
 		$query = "insert into setting (name,value) values " . repeatWithSeparator("(?,?)", ",", count($pages));
