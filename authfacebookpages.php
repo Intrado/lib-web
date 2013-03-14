@@ -118,7 +118,7 @@ class FacebookAuthPages extends FormItem {
 					$(e + accountid).remove();
 					
 					var currentpages = $(e).value.evalJSON();
-					delete currentpages[currentpages.indexOf(accountid)];
+					currentpages.splice(currentpages.indexOf(accountid),1);
 					$(e).value = Object.toJSON(currentpages);
 					
 					// add the page we just removed to the new pages list
