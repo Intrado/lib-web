@@ -6,15 +6,17 @@
  * @constructor
  */
 function PmRpcProvider(pmHandler, csApi) {
-	var self = this;
 	var methods = {};
 
 	/**
 	 * initialize the listener and the commsuite api, will emit a message when everything is ready, or an error
 	 */
-	self.init = function() {
+	this.init = function() {
 		// attach the message listener for rpc methods
-		pmHandler.attachListener(self._onMessage);
+		var that = this;
+		pmHandler.attachListener(function(event) {
+			that._onMessage(event);
+		});
 
 		// initialize the commsuite api, this will emit a message to the parent indicating it's ready for rpc requests
 		csApi.init(function(data, status, headers) {
@@ -32,13 +34,13 @@ function PmRpcProvider(pmHandler, csApi) {
 	 * @param {Event} event
 	 * @private
 	 */
-	self._onMessage = function(event) {
+	this._onMessage = function(event) {
 		// TODO: check event.origin to be sure we are communicating with allowed domains?
 
 		var data = $.secureEvalJSON(event.data);
 		// only certain request types are currently supported
 		if (methods[data.type] instanceof Function) {
-			methods[data.type](data);
+			methods[data.type](data, this);
 		} else {
 			pmHandler.postMessageAll({ "status": "error", "error": "Unknown request type" });
 		}
@@ -48,10 +50,11 @@ function PmRpcProvider(pmHandler, csApi) {
 	 * Create a list
 	 *
 	 * @param {{requestBody: Object, requestId: string}} data
+	 * @param that
 	 */
-	methods.createList = function(data) {
+	methods.createList = function(data, that) {
 		csApi.createList(data.requestBody, function(respData, status, headers) {
-			pmHandler.postMessageAll(self._createMessageFromResponse(data, status, respData));
+			pmHandler.postMessageAll(that._createMessageFromResponse(data, status, respData));
 		});
 	};
 
@@ -59,10 +62,11 @@ function PmRpcProvider(pmHandler, csApi) {
 	 * Add pkeys to a list
 	 *
 	 * @param {{listId: number, pkeyList: string[], requestId: {string}}} data
+	 * @param that
 	 */
-	methods.addListPkeys = function(data) {
+	methods.addListPkeys = function(data, that) {
 		csApi.addListPkeys(data.listId, data.pkeyList, function(respData, status, headers) {
-			pmHandler.postMessageAll(self._createMessageFromResponse(data, status, respData));
+			pmHandler.postMessageAll(that._createMessageFromResponse(data, status, respData));
 		});
 	};
 
@@ -75,7 +79,7 @@ function PmRpcProvider(pmHandler, csApi) {
 	 * @return {{status: string, responseCode: number, responseData: Object, requestId: string}}
 	 * @private
 	 */
-	self._createMessageFromResponse = function(requestData, responseStatus, responseData) {
+	this._createMessageFromResponse = function(requestData, responseStatus, responseData) {
 		var response = {
 			"status": "complete",
 			"responseCode": responseStatus,
@@ -97,7 +101,6 @@ function PmRpcProvider(pmHandler, csApi) {
  */
 function PmRpcClient(pmHandler) {
 	var $ = jQuery;
-	var self = this;
 	var reqId = 1;
 
 	var requestTimeoutMs = 60000;
@@ -111,8 +114,8 @@ function PmRpcClient(pmHandler) {
 	// callback methods stored for async requests (key is requestid)
 	var callbacks = {};
 
-	self.init = function() {
-		pmHandler.attachListener(self._onMessage);
+	this.init = function() {
+		pmHandler.attachListener(this._onMessage);
 	};
 
 	/**
@@ -121,7 +124,7 @@ function PmRpcClient(pmHandler) {
 	 * @param event
 	 * @private
 	 */
-	self._onMessage = function(event) {
+	this._onMessage = function(event) {
 		var data = $.secureEvalJSON(event.data);
 		switch (data.status) {
 			case "ready":
@@ -154,8 +157,8 @@ function PmRpcClient(pmHandler) {
 	 * @param {string} isDeleted
 	 * @param {function(number, Object)} callback
 	 */
-	self.createList = function(name, desc, isDeleted, callback) {
-		self._doRequest({
+	this.createList = function(name, desc, isDeleted, callback) {
+		this._doRequest({
 			"type": "createList",
 			"requestBody": $.toJSON({
 				"name": name,
@@ -173,8 +176,8 @@ function PmRpcClient(pmHandler) {
 	 * @param {string[]} pkeyList
 	 * @param {function(number, Object)} callback
 	 */
-	self.addListPkeys = function(listId, pkeyList, callback) {
-		self._doRequest({
+	this.addListPkeys = function(listId, pkeyList, callback) {
+		this._doRequest({
 			"type": "addListPkeys",
 			"listId": listId,
 			"pkeyList": pkeyList
@@ -188,7 +191,7 @@ function PmRpcClient(pmHandler) {
 	 * @param {function(number, Object)} callback
 	 * @private
 	 */
-	self._doRequest = function(request, callback) {
+	this._doRequest = function(request, callback) {
 		var requestId = reqId++;
 		request["requestId"] = requestId;
 		// keep track of which callbacks belong to which requests so we can execute them when the response comes back
