@@ -235,7 +235,7 @@ function doStartSession() {
 
 function getPortalAuthAuthRequestTokenUrl($callbackUrl) {
 	$params = array(new XML_RPC_Value(session_id(), 'string'), new XML_RPC_Value($callbackUrl, 'string'));
-	$method = "AuthServer.getPortalAuthAuthRequestTokenUrl";
+	$method = "PortalServer.portal_getPortalAuthAuthRequestTokenUrl";
 	$result = pearxmlrpc($method, $params);
 	if ($result !== false) {
 		// success
@@ -245,7 +245,7 @@ function getPortalAuthAuthRequestTokenUrl($callbackUrl) {
 }
 
 function getPortalAuthLocation() {
-	$method = "AuthServer.getPortalAuthLocationUrl";
+	$method = "PortalServer.portal_getPortalAuthLocationUrl";
 	$result = pearxmlrpc($method, array());
 	if ($result !== false) {
 		// success
@@ -270,7 +270,7 @@ function loginViaPortalAuth() {
 // anonymous session methods
 
 function newSession() {
-	$method = "AuthServer.newSession";
+	$method = "PortalServer.portal_newSession";
 	$result = pearxmlrpc($method, array());
 	if ($result !== false && $result["sessionID"] != "") {
 		//error_log_helper("set sessionid to ". $result["sessionID"]);
