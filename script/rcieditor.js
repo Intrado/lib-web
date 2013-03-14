@@ -335,7 +335,7 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 		else {
 
 			// Activate whatever tools are enabled based on mode
-			var custom_tools = [ 'mkField', 'mkBlock', 'themeMgr', 'pasteFromPhone' ];
+			var custom_tools = $([ 'mkField', 'mkBlock', 'themeMgr', 'pasteFromPhone' ]);
 			var that = this;
 			// SMK notes that array.forEach() is not supported on IE8, so we'll use jQuery to iterate instead
 			custom_tools.each(function (index) {
