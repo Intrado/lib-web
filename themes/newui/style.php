@@ -1213,6 +1213,13 @@ div.progressbar div.progress {
 .iframe_content_wrap {
     min-width: 500px;
     padding: 0;
+	margin: 6px !important;
+}
+
+.iframe_content_wrap .msg_confirm {
+	background: white;
+	border: 0px;
+	margin: 0px;
 }
 
 .modaliframe iframe {
