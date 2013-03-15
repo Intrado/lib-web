@@ -651,7 +651,6 @@ function sessionKeepAliveWarning(timeout) {
 	setTimeout(function() {
 		var $ = jQuery;
 		$('.modal.in').modal('hide');
-		$('html, body').animate({ scrollTop: 0 }, 'fast');
 		
 		var modal = $('#prevewmodal');
 		modal.modal();
@@ -660,7 +659,7 @@ function sessionKeepAliveWarning(timeout) {
 		var footer = $('#prevewmodal').find(".modal-header");
 
 		header.html("Automatic Logout");
-		var content = $('<div>',{class : 'keepalive'});
+		var content = $('<div>',{'class' : 'keepalive'});
 		content.append($('<img>',{src : 'img/icons/lock.png',alt : 'Warning' }));
 		content.append($('<span>',{text : 'Your session is about to close due to inactivity.' }));
 		
@@ -668,7 +667,11 @@ function sessionKeepAliveWarning(timeout) {
 		content.append($('<p>',{style : 'margin: 10px 0'}).html(button));
 
 		body.html(content);
-		var didRefresh = false;
+		var viewportHeight = $(window).height();
+		var height = modal.height();
+		height = height > viewportHeight?viewportHeight:height;
+		$("div.previewmodal-wrapcell").css("top", Math.floor((1 - height/viewportHeight) * 100 / 2) + "%")
+		
 		var refreshSession = function() {
 			content.html($('<img>', {src:"img/ajax-loader.gif", alt: "Refreshing Session"}));
 			new Ajax.Request('ajax.php',{

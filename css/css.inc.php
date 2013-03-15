@@ -808,13 +808,15 @@ div.autocomplete ul li {
 
 div.previewmodal-wrap {
 	display: table;
-    position: absolute; 
+    position: fixed; 
     height: 100%;
     width: 100%;
 }
 div.previewmodal-wrapcell {
-	display: table-cell;
-	vertical-align: middle;	
+    display: table-cell;
+    position: fixed;
+    vertical-align: middle;
+    width: 100%;
 }
 
 div.preview-modal {
