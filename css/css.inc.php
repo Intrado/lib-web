@@ -806,20 +806,20 @@ div.autocomplete ul li {
 }
 
 
-div.previewmodal-wrap {
+div.default-modal-wrap {
 	display: table;
     position: fixed; 
     height: 100%;
     width: 100%;
 }
-div.previewmodal-wrapcell {
+div.default-modal-wrapcell {
     display: table-cell;
     position: fixed;
     vertical-align: middle;
     width: 100%;
 }
 
-div.preview-modal {
+div.default-modal {
     height: auto;
     left: auto;
     margin: auto;
@@ -831,13 +831,23 @@ div.preview-modal {
     width: 600px;
 }
 
-div.preview-modal .modal-body  {
+div.default-modal .modal-body  {
 	max-height: 90%; 
 	padding: 15px; 
 	overflow: auto;
 }
-div.preview-modal iframe {
+div.default-modal iframe {
 	width: 100%;
+}
+
+div.default-modal button.close {
+    background: none repeat scroll 0 0 transparent;
+    border: 0 none;
+    cursor: pointer;
+    padding: 0;
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 20px;
 }
 
 .messagegrid { margin: 5px 0 0; font-family: "Helvetica Neue",helvetica,Arial,sans-serif; }

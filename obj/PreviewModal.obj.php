@@ -319,7 +319,7 @@ class PreviewModal {
 		
 		function messagePrevewLoaded(area) {
 			var $ = jQuery;
-			var modal = $('#prevewmodal');
+			var modal = $('#defaultmodal');
 			if(area.height() > 370) {
 				modal.find('iframe').height(area.height() + 30);
 			} else {
@@ -333,17 +333,17 @@ class PreviewModal {
 			var viewportHeight = $(window).height();
 			var height = modal.height();
 			height = height > viewportHeight?viewportHeight:height;
-			$("div.previewmodal-wrapcell").css("top", Math.floor((1 - height/viewportHeight) * 100 / 2) + "%")
+			$("div.default-modal-wrapcell").css("top", Math.floor((1 - height/viewportHeight) * 100 / 2) + "%")
 		}
 		var showPreview = function(post_parameters,get_parameters){
 			var $ = jQuery;
 
-			var modal = $('#prevewmodal');
+			var modal = $('#defaultmodal');
 			modal.modal();
 
-			var header = $('#prevewmodal').find(".modal-header");
-			var body = $('#prevewmodal').find(".modal-body");
-			var footer = $('#prevewmodal').find(".modal-header");
+			var header = $('#defaultmodal').find(".modal-header h3");
+			var body = $('#defaultmodal').find(".modal-body");
+			var footer = $('#defaultmodal').find(".modal-header");
 			
 			modal.one('hide',function() {
 				body.html("");

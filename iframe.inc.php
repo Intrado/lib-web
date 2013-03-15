@@ -48,13 +48,16 @@ header('Content-type: text/html; charset=UTF-8') ;
 ?>
 
 <div class="content_wrap iframe_content_wrap cf">
-	<div class="previewmodal-wrap">
-		<div class="previewmodal-wrapcell">
-			<div class="modal hide fade preview-modal" id="prevewmodal">
-				<div class="modal-header"></div>
-				<div class="modal-body"></div>
-				<div class="modal-footer"></div>
+	<div class="default-modal-wrap">
+	<div class="default-modal-wrapcell">
+		<div class="modal hide fade default-modal" id="defaultmodal">
+			<div class="modal-header">
+				<button class="close" aria-hidden="true" data-dismiss="modal" type="button">x</button>
+				<h3></h3>
 			</div>
+            <div class="modal-body"></div>
+            <div class="modal-footer"></div>
 		</div>
+	</div>
 	</div>
 	<div class="content">
