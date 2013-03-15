@@ -703,13 +703,7 @@ function sessionKeepAliveWarning(timeout) {
 		modal.one('hide',function() {
 			new Ajax.Request('ajax.php',{
 				method:'get',
-				parameters:{type: 'keepalive'},
-				onSuccess: function (response) {
-					//HACK: check to see if we hit the login page (due to logout)
-					if (response.responseText.indexOf(" Login</title>") != -1) {
-						window.location = "index.php";
-					} 
-				}
+				parameters:{type: 'keepalive'}
 			});
 			sessionKeepAliveWarning(timeout);
 		})
