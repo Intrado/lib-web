@@ -325,11 +325,16 @@ class PreviewModal {
 			} else {
 				modal.find('iframe').height(400);
 			}
-			$('html, body').animate({ scrollTop: 0 }, 'fast');
-			modal.animate({ width: '100%' }, 'fast');
+			setModalTop(modal);
 		}
 
-		
+		var setModalTop = function(modal) {
+			var $ = jQuery;
+			var viewportHeight = $(window).height();
+			var height = modal.height();
+			height = height > viewportHeight?viewportHeight:height;
+			$("div.previewmodal-wrapcell").css("top", Math.floor((1 - height/viewportHeight) * 100 / 2) + "%")
+		}
 		var showPreview = function(post_parameters,get_parameters){
 			var $ = jQuery;
 
@@ -339,9 +344,11 @@ class PreviewModal {
 			var header = $('#prevewmodal').find(".modal-header");
 			var body = $('#prevewmodal').find(".modal-body");
 			var footer = $('#prevewmodal').find(".modal-header");
-			modal.on('hide',function() {
+			
+			modal.one('hide',function() {
 				body.html("");
 			});
+
 			
 			if (post_parameters && typeof(post_parameters) != 'undefined' && typeof(post_parameters.subtype) != 'undefined' ) {
 				if (post_parameters.subtype == "html")
@@ -362,10 +369,9 @@ class PreviewModal {
 					} else {
 						iframe.height(400);
 					}
+
+					setModalTop(modal);
 				});
-			
-				$('html, body').animate({ scrollTop: 0 }, 'fast');
-				modal.animate({ width: '100%' }, 'fast');
 				return;
 			} 
 
@@ -427,6 +433,9 @@ class PreviewModal {
 				'onFailure': function() {
 					header.html('Error');
 					body.html('Unable to preview this message');
+				},
+				'onComplete': function() {
+					setModalTop(modal);
 				}
 			});
 			
