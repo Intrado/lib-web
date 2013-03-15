@@ -652,11 +652,11 @@ function sessionKeepAliveWarning(timeout) {
 		var $ = jQuery;
 		$('.modal.in').modal('hide');
 		
-		var modal = $('#prevewmodal');
+		var modal = $('#defaultmodal');
 		modal.modal();
-		var header = $('#prevewmodal').find(".modal-header");
-		var body = $('#prevewmodal').find(".modal-body");
-		var footer = $('#prevewmodal').find(".modal-header");
+		var header = $('#defaultmodal').find(".modal-header h3");
+		var body = $('#defaultmodal').find(".modal-body");
+		var footer = $('#defaultmodal').find(".modal-header");
 
 		header.html("Automatic Logout");
 		var content = $('<div>',{'class' : 'keepalive'});
@@ -670,7 +670,7 @@ function sessionKeepAliveWarning(timeout) {
 		var viewportHeight = $(window).height();
 		var height = modal.height();
 		height = height > viewportHeight?viewportHeight:height;
-		$("div.previewmodal-wrapcell").css("top", Math.floor((1 - height/viewportHeight) * 100 / 2) + "%")
+		$("div.default-modal-wrapcell").css("top", Math.floor((1 - height/viewportHeight) * 100 / 2) + "%")
 		
 		var refreshSession = function() {
 			content.html($('<img>', {src:"img/ajax-loader.gif", alt: "Refreshing Session"}));
