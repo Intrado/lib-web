@@ -163,7 +163,7 @@ if($isajax === true) {
 			$data->list[] = array("itemid" => "",
 										"defaultlink" => "",
 										"icon" => "img/largeicons/information.jpg",
-										"title" => $viewtype=="stationery"?_L("No Stationery."):_L("No Messages."),
+										"title" => ($viewtype=="stationery" && $USER->authorize('createstationery'))?_L("No Stationery."):_L("No Messages."),
 										"content" => "",
 										"tools" => "");
 	} else {
