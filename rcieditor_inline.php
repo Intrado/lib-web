@@ -5,6 +5,11 @@
  * @todo Do we need to do anything special to session-protect this page? Seems
  * like not because it doesn't do anything useful without a parent window page
  * available to handshake with the javascript.
+ *
+ * Note that we use PHP's json_encode() to take query string data and convert it
+ * into a nice, JS-safe string that we don't have to worry about code injection.
+ *
+ * SMK created soometime around 2013-01-05
  */
 ?>
 <!DOCTYPE html>
@@ -62,6 +67,18 @@
 				word-wrap: break-word;
 			}
 		</style>
+		<script type="text/javascript">
+		<?
+			// Set the document.domain according to the d argument
+			// passed on the query string so that the parent window can
+			// access us and vice versa
+			if ($domain = json_encode($_REQUEST['d'])) {
+				// This should only end up setting the document.domain under
+				// IE where this setting is not initialized (for some reason?)
+				print "if (document.domain != {$domain}) {\ndocument.domain = {$domain};\nconsole.log('Setting document.domain to [{$domain}]'); \n}\n";
+			}
+		?>
+		</script>
 		<script type="text/javascript" src="script/jquery.1.7.2.min.js"></script>
 		<script type="text/javascript">
 			<?/* Note that this hack is to allow us to see the TextColor and BGCOlor buttons in the inline editor's 
@@ -81,7 +98,6 @@
 		<script type="text/javascript" src="script/ckeditor/ckeditor.js"></script>
 		<script type="text/javascript" src="script/rcieditor_inline.js"></script>
 		<script type="text/javascript">
-
 			// On document loaded function (see jQuery $.ready() method)
 			$(function () {
 				rcieditorinline.init(<?= json_encode($_REQUEST['t']); ?>);

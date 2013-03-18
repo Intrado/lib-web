@@ -323,7 +323,7 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 
 			// Add an IFRAME to the page that will load up the inline editor
 			cke.html('<iframe ' +
-					'src="' + this.getSetting('baseUrl') + 'rcieditor_inline.php?t=' + this.basename + '" ' +
+					'src="' + this.getSetting('baseUrl') + 'rcieditor_inline.php?t=' + this.basename + '&d=' + document.domain + '" ' +
 					'name="' + this.basename + '_iframe" ' +
 					'style="width: 100%; height: 400px; border: 1px solid #999999;"/>'
 			);

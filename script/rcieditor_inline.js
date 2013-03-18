@@ -79,7 +79,7 @@ window.RCIEditorInline = function () {
 				// Activate whatever tools are enabled according to rcieditor
 				var custom_tools = $([ 'mkField', 'mkBlock', 'themeMgr', 'pasteFromPhone' ]);
 				// SMK notes that array.forEach() is not supported on IE8, so we'll use jQuery to iterate instead
-				custom_tools.each(function (index) {
+				$(custom_tools).each(function (index) {
 					var toolname = custom_tools[index];
 					var lowertool = toolname.toLowerCase();
 					if (rcieditor.getSetting('tool_' + lowertool)) {
@@ -178,7 +178,8 @@ window.RCIEditorInline = function () {
 		}
 
 		// Fire the callback indicating initialization is done
-		window.frames.top.rcieditor.callbackEditorLoaded('wysiwygpage');
+		//window.frames.parent.rcieditor.callbackEditorLoaded('wysiwygpage');
+		window.parent.rcieditor.callbackEditorLoaded('wysiwygpage');
 	}
 
 	/**
