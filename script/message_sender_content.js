@@ -57,12 +57,7 @@ var allowControl = {
 				}
 			});
 
-			var clean_text = pretranslate_cleaner(txtField);
-console.log('before=[' + txtField + ']');
-console.log(' after=[' + clean_text + ']');
-
-			//$.translate(txtField, selectedTtslangCodes, function(data) {
-			$.translate(clean_text, selectedTtslangCodes, function(data) {
+			$.translate(txtField, selectedTtslangCodes, function(data) {
 				$.each(data.responseData, function(transIndex, transData) {
 					var e = $('#tts_translated_' + transData.code);
 					e.val(transData.translatedText);
@@ -71,22 +66,6 @@ console.log(' after=[' + clean_text + ']');
 				});
 			});
 		};
-
-		// SMK @HERE 2013-03-12
-		function pretranslate_cleaner(text) {
-			var clean_text = text.replace(/\n/g, ' ');	// newlines turn into spaces
-			clean_text = clean_text.replace(/\r/g, ' ');	// and so do carriage returns
-			clean_text = clean_text.replace(/<!--([^-]+)-->/g, '');	// XML comments go away completely
-			clean_text = clean_text.replace(/\s+/g, ' ');	// Multiple white space condense to a single space
-
-// SMK @HERE 2013-03-14 ... something "funny" here. "5 > 2" became "5> 2" which seems like inverse behavior from what is expected...
-			clean_text = clean_text.replace(/> /g, '>');	// trailing white space after an element goes away
-			clean_text = clean_text.replace(/ </g, '<');	// so does leading white space before an element
-
-			clean_text = clean_text.replace(/^\s/g, '');	// Leading white space
-			clean_text = clean_text.replace(/\s$/g, '');	// trailing white space
-			return(clean_text);
-		}
 
 		$('#tts_translate').on('click', '.show_hide_english', function(e) {
 			e.preventDefault();
@@ -364,6 +343,24 @@ console.log(' after=[' + clean_text + ']');
 
 		});
 
+		function pretranslate_cleaner(text) {
+			var clean_text = text.replace(/\n/g, ' ');	// newlines turn into spaces
+			clean_text = clean_text.replace(/\r/g, ' ');	// and so do carriage returns
+			clean_text = clean_text.replace(/<!--([^-]+)-->/g, '');	// XML comments go away completely
+			clean_text = clean_text.replace(/&lt;!--([^-]+)--&gt;/g, '');	// XML comments go away completely
+			clean_text = clean_text.replace(/\s+/g, ' ');	// Multiple white space condense to a single space
+			clean_text = clean_text.replace(/>\s/g, '>');	// trailing white space after an element goes away
+			clean_text = clean_text.replace(/&gt;\s/g, '&gt;');// trailing white space after an element goes away
+			clean_text = clean_text.replace(/\s</g, '<');	// so does leading white space before an element
+			clean_text = clean_text.replace(/\s&lt;/g, '&lt;');// so does leading white space before an element
+			clean_text = clean_text.replace(/\s&nbsp;/g, '&nbsp;');// Spaces before non-breaking spaces go away
+			clean_text = clean_text.replace(/&nbsp;\s/g, '&nbsp;');// Spaces after non-breaking spaces go away
+			clean_text = clean_text.replace(/(&nbsp;)+/g, '&nbsp;');	// Multiple non-breaking spaces condense to a single
+			clean_text = clean_text.replace(/^\s/g, '');	// Trim leading white space
+			clean_text = clean_text.replace(/\s$/g, '');	// Trim trailing white space
+			return(clean_text);
+		}
+
 		function eTranslate() {
 			var txtField = $("#msgsndr_emailmessagetext").val();
 
@@ -372,7 +369,7 @@ console.log(' after=[' + clean_text + ']');
 			// add loading icon to label
 			$('#email_translate fieldset > label[for^=email_]').append('<img src="img/ajax-loader.gif" class="loading" />');
 
-			$.translate(txtField, elangCodes, function(data) {
+			$.translate(pretranslate_cleaner(txtField), elangCodes, function(data) {
 				$.each(data.responseData, function(transIndex, transData) {
 					var e = $('#email_translated_' + transData.code);
 					e.html(transData.translatedText.replace(/<</g, "&lt;&lt;").replace(/>>/g,"&gt;&gt;"));
