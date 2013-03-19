@@ -97,7 +97,7 @@ if (!$USER->authorize("sendmulti") && $languagecode != Language::getDefaultLangu
 	redirect('unauthorized.php');
 
 
-PreviewModal::HandleRequestWithEmailText();
+PreviewModal::HandleRequestWithStationeryText();
 	
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
@@ -156,6 +156,16 @@ $formdata["message"] = array(
 		array("ValLength","max" => 256000)
 	),
 	"control" => $messagecontrol,
+);
+
+$formdata["preview"] = array(
+		"label" => "",
+		"value" => "",
+		"validators" => array(),
+		"control" => array("PreviewButton",
+				"subtype" => "html",
+				"texttarget" => "message",
+		),
 );
 
 

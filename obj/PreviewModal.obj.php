@@ -213,6 +213,35 @@ class PreviewModal {
 		$modal->includeModal();
 	}
 	
+	static function HandleRequestWithStationeryText() {
+		if (!isset($_REQUEST["previewmodal"]) ||
+				!isset($_REQUEST["subtype"]) ||
+				!isset($_REQUEST["text"]))
+			return;
+			
+		$modal = new PreviewModal();
+		$message = new Message();
+		$message->type = "email";
+		$message->subtype = $_REQUEST["subtype"];
+	
+		$parts = Message::parse($_REQUEST["text"],$modal->errors);
+		if (count($modal->errors) == 0) {
+			$email = emailMessageViewForMessageParts($message,$parts,3);
+		}
+		switch ($_REQUEST["subtype"]) {
+			case "html":
+				$modal->title = _L("%s HTML Email Message", Language::getName($message->languagecode));
+				$modal->text = $email->emailbody;
+				break;
+			case "plain":
+				$modal->title = _L("%s Plain Email Message", Language::getName($message->languagecode));
+				$modal->text = nl2br(escapehtml($email->emailbody));
+				break;
+		}
+	
+		$modal->includeModal();
+	}
+	
 	
 	
 	// Includeds the javascript necessary to open the modal and renderes the form if there are any field insters
@@ -320,11 +349,7 @@ class PreviewModal {
 		function messagePrevewLoaded(area) {
 			var $ = jQuery;
 			var modal = $('#defaultmodal');
-			if(area.height() > 370) {
-				modal.find('iframe').height(area.height() + 30);
-			} else {
-				modal.find('iframe').height(400);
-			}
+			modal.height("80%");
 			setModalTop(modal);
 		}
 
@@ -348,34 +373,6 @@ class PreviewModal {
 			modal.one('hide',function() {
 				body.html("");
 			});
-
-			
-			if (post_parameters && typeof(post_parameters) != 'undefined' && typeof(post_parameters.subtype) != 'undefined' ) {
-				if (post_parameters.subtype == "html")
-					header.html("HTML Email Message")
-				else
-					header.html("Plain Email Message");
-				body.html("<b>From:</b> " + post_parameters.fromname
-						 + " &lt;" + post_parameters.from
-						 +  "&gt;<br /><b>Subject:</b> " + post_parameters.subject
-						 + "<br /><hr />");
-				var iframe = $("<iframe/>", {src: "blank.html"});
-				iframe.appendTo(body);
-				iframe.load(function(){
-					var iframecontent = iframe.contents().find('body');
-					iframecontent.append(post_parameters.text);
-					if(iframecontent.height() > 370) {
-						iframe.height(iframecontent.height() + 30);
-					} else {
-						iframe.height(400);
-					}
-
-					setModalTop(modal);
-				});
-				return;
-			} 
-
-
 			
 			modal.find(".modal-body").html('<img src="img/ajax-loader.gif" alt="Please Wait..."/> Loading...')
 			new Ajax.Request('<?= $posturl?>' + (get_parameters?'&' + get_parameters:''), {
@@ -422,7 +419,18 @@ class PreviewModal {
 								});
 							}
 						} else {
-							body.html(result.content);
+							if (post_parameters && typeof(post_parameters) != 'undefined' && typeof(post_parameters.subtype) != 'undefined' ) {
+								var iframe = $("<iframe/>", {src: "blank.html"});
+								body.html(iframe);
+								iframe.load(function(){
+									var iframecontent = iframe.contents().find('body');
+									iframecontent.append(result.content);
+									modal.height("100%");
+				 					setModalTop(modal);
+								});
+							} else {
+								body.html(result.content);
+							}
 						}
 					} else {
 						header.html('Error');
