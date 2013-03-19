@@ -56,7 +56,6 @@ header('Content-type: text/html; charset=UTF-8') ;
 				<h3></h3>
 			</div>
             <div class="modal-body"></div>
-            <div class="modal-footer"></div>
 		</div>
 	</div>
 	</div>

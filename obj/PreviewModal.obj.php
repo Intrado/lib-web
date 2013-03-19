@@ -77,15 +77,15 @@ class PreviewModal {
 					permitContent($part->imagecontentid);
 				}
 				
-				$email = messagePreviewForPriority($message->id, $jobpriority); // returns commsuite_EmailMessageView object
-				$modal->text = $modal->formatEmailHeader($email);
 				switch ($message->subtype) {
 					case "html":
 						$modal->title = _L("%s HTML Email Message" , Language::getName($message->languagecode));
-						$modal->text .= "<iframe src=\"messageview.php?messageid={$message->id}" . (isset($_REQUEST["jobtypeid"])?"&jobtypeid={$_REQUEST["jobtypeid"]}":"") . "\"></iframe>";//$email->emailbody;
+						$modal->text = "<iframe src=\"messageview.php?messageid={$message->id}" . (isset($_REQUEST["jobtypeid"])?"&jobtypeid={$_REQUEST["jobtypeid"]}":"") . "\"></iframe>";//$email->emailbody;
 						break;
 					case "plain":
 						$modal->title = _L("%s Plain Email Message" , Language::getName($message->languagecode));
+						$email = messagePreviewForPriority($message->id, $jobpriority); // returns commsuite_EmailMessageView object
+						$modal->text = $modal->formatEmailHeader($email);
 						$modal->text .= nl2br(escapehtml($email->emailbody));
 						break;
 				}
@@ -350,6 +350,7 @@ class PreviewModal {
 			var $ = jQuery;
 			var modal = $('#defaultmodal');
 			modal.height("80%");
+			modal.width("100%");
 			setModalTop(modal);
 		}
 
@@ -365,10 +366,10 @@ class PreviewModal {
 
 			var modal = $('#defaultmodal');
 			modal.modal();
-
+			modal.height("auto");
+			modal.width("600px");
 			var header = $('#defaultmodal').find(".modal-header h3");
 			var body = $('#defaultmodal').find(".modal-body");
-			var footer = $('#defaultmodal').find(".modal-header");
 			
 			modal.one('hide',function() {
 				body.html("");
@@ -426,6 +427,7 @@ class PreviewModal {
 									var iframecontent = iframe.contents().find('body');
 									iframecontent.append(result.content);
 									modal.height("100%");
+									modal.width("100%");
 				 					setModalTop(modal);
 								});
 							} else {
