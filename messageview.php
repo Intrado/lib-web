@@ -39,6 +39,7 @@ function displayMessage() {
 	}
 
 	$email = messagePreviewForPriority($message->id, $jobpriority); // returns commsuite_EmailMessageView object
+ 	echo "<b>From:</b> $email->emailfromname &lt;$email->emailfromaddress&gt;<br /><b>Subject:</b> $email->emailsubject<br /><hr />";
 	echo $email->emailbody;
 }
 

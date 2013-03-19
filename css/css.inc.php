@@ -829,7 +829,7 @@ div.default-modal {
     padding: 0;
     position: relative;
     top: auto;
-    width: 600px;
+    width: auto;
     
 }
 

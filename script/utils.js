@@ -654,9 +654,10 @@ function sessionKeepAliveWarning(timeout) {
 		
 		var modal = $('#defaultmodal');
 		modal.modal();
+		modal.height("auto");
+		modal.width("600px");
 		var header = $('#defaultmodal').find(".modal-header h3");
 		var body = $('#defaultmodal').find(".modal-body");
-		var footer = $('#defaultmodal').find(".modal-header");
 
 		header.html("Automatic Logout");
 		var content = $('<div>',{'class' : 'keepalive'});
