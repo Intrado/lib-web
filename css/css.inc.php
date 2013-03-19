@@ -817,6 +817,7 @@ div.default-modal-wrapcell {
     position: fixed;
     vertical-align: middle;
     width: 100%;
+    height: 100%;
 }
 
 div.default-modal {
@@ -829,15 +830,18 @@ div.default-modal {
     position: relative;
     top: auto;
     width: 600px;
+    
 }
 
 div.default-modal .modal-body  {
-	max-height: 90%; 
+	max-height: 80%; 
+	height: 80%;
 	padding: 15px; 
 	overflow: auto;
 }
 div.default-modal iframe {
 	width: 100%;
+	height: 100%;
 }
 
 div.default-modal button.close {
