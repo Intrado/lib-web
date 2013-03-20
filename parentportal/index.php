@@ -66,9 +66,8 @@ if (isset($_GET['logout'])) {
 			$_SESSION['colorscheme']['_brandtheme2'] = "89A3CE";
 			$_SESSION['colorscheme']['_brandratio'] = ".3";
 
-			$redirpage = isset($_SESSION['lasturi']) ? $_SESSION['lasturi'] : 'choosecustomer.php' . getAppendCustomerUrl();
+			$redirectLoc = isset($_SESSION['lasturi']) ? $_SESSION['lasturi'] : 'choosecustomer.php' . getAppendCustomerUrl();
 			unset($_SESSION['lasturi']);
-			redirect($redirpage);
 		} else {
 			$redirectLoc = getLoginUrl($params);
 		}
