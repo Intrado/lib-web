@@ -150,6 +150,7 @@ function MessageSender_embedded(ssoTarget, pkeyList, container) {
 		if (data.error) {
 			// got an error!
 			this._showError(data.error);
+			clearTimeout(authTimer);
 		} else {
 			// resize the iframe
 			if (data.resize != undefined && data.resize)
