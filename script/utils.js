@@ -668,10 +668,12 @@ function sessionKeepAliveWarning(timeout) {
 		content.append($('<p>',{style : 'margin: 10px 0'}).html(button));
 
 		body.html(content);
-		var viewportHeight = $(window).height();
-		var height = modal.height();
-		height = height > viewportHeight?viewportHeight:height;
-		$("div.default-modal-wrapcell").css("top", Math.floor((1 - height/viewportHeight) * 100 / 2) + "%")
+		$("div.default-modal").css("margin-left", -(modal.width()/2));
+		$("div.default-modal").css("margin-top", -(modal.height()/2));
+		// Hide modal on resize since it will no longer be centered.
+		$(window).one('resize',function() {
+			modal.modal('hide');
+		});
 		
 		var refreshSession = function() {
 			content.html($('<img>', {src:"img/ajax-loader.gif", alt: "Refreshing Session"}));
