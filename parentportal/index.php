@@ -19,6 +19,8 @@ if (isset($_GET['logout'])) {
 
 	@session_destroy();
 
+	$redirectLoc = getLoginUrl();
+
 	// check for the "cm_login_src" cookie. If this exists, send the user to the appropriate login location
 	if (isset($_COOKIE["cm_login_src"]) && $_COOKIE["cm_login_src"]) {
 		$loginDetails = json_decode($_COOKIE["cm_login_src"], true);
@@ -33,10 +35,10 @@ if (isset($_GET['logout'])) {
 		if ($src == "portal" && $type == "powerschool") {
 			echo '<script type="text/javascript">
 				window.close();
+				// if window.close fails (FF on direct nav)
+				setTimeout(function() { window.location = "'. $redirectLoc .'"; }, 1000);
 			</script>';
 			exit;
-		} else {
-			$redirectLoc = getLoginUrl();
 		}
 	}
 } else {
