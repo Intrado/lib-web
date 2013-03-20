@@ -81,7 +81,12 @@ if (isset($_GET['logout'])) {
 			$port = "";
 		else
 			$port = ":$port";
-		$redirectLoc = getPortalAuthAuthRequestTokenUrl($http. $_SERVER['SERVER_NAME']. $port. $_SERVER['REQUEST_URI']. "?is_return");
+
+		if ($params)
+			$isReturnParam = "&is_return";
+		else
+			$isReturnParam = "?is_return";
+		$redirectLoc = getPortalAuthAuthRequestTokenUrl($http. $_SERVER['SERVER_NAME']. $port. $_SERVER['REQUEST_URI']. $isReturnParam);
 	}
 }
 redirect($redirectLoc);
