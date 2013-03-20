@@ -275,18 +275,13 @@ header('Content-type: text/html; charset=UTF-8') ;
 <!-- ********************************************************************* -->
 
 <div class="wrap"><!-- ends in navbottom.inc -->
-	<div class="default-modal-wrap">
-	<div class="default-modal-wrapcell">
-		<div class="modal hide fade default-modal" id="defaultmodal">
-			<div class="modal-header">
-				<button class="close" aria-hidden="true" data-dismiss="modal" type="button">x</button>
-				<h3></h3>
-			</div>
-            <div class="modal-body"></div>
-		</div>
+<div class="modal hide fade default-modal" id="defaultmodal">
+	<div class="modal-header">
+		<button class="close" aria-hidden="true" data-dismiss="modal" type="button">x</button>
+		<h3></h3>
 	</div>
-	</div>
-	
+	<div class="modal-body"></div>
+</div>
 <div id="top_banner" class="banner">
 <div class="contain cf">
 

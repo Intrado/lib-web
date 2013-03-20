@@ -351,15 +351,18 @@ class PreviewModal {
 			var modal = $('#defaultmodal');
 			modal.height("80%");
 			modal.width("100%");
-			setModalTop(modal);
+			centerModal(modal);
 		}
 
-		var setModalTop = function(modal) {
+		var centerModal = function(modal) {
 			var $ = jQuery;
-			var viewportHeight = $(window).height();
-			var height = modal.height();
-			height = height > viewportHeight?viewportHeight:height;
-			$("div.default-modal-wrapcell").css("top", Math.floor((1 - height/viewportHeight) * 100 / 2) + "%")
+			$("div.default-modal").css("margin-top", -(modal.height()/2));
+			$("div.default-modal").css("margin-left", -(modal.width()/2));
+
+			// Hide modal on resize since it will no longer be centered.
+			$(window).one('resize',function() {
+				modal.modal('hide');
+			});
 		}
 		var showPreview = function(post_parameters,get_parameters){
 			var $ = jQuery;
@@ -428,7 +431,7 @@ class PreviewModal {
 									iframecontent.append(result.content);
 									modal.height("100%");
 									modal.width("100%");
-				 					setModalTop(modal);
+				 					centerModal(modal);
 								});
 							} else {
 								body.html(result.content);
@@ -445,7 +448,7 @@ class PreviewModal {
 					body.html('Unable to preview this message');
 				},
 				'onComplete': function() {
-					setModalTop(modal);
+					centerModal(modal);
 				}
 			});
 			
