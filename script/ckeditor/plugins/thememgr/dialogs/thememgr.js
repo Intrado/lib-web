@@ -112,8 +112,13 @@
 							ui_views += '<div id="theme_view_newcolors_hider" style="display: none;">&nbsp;</div>';
 							for (var jj = 0; jj < myself.rcitheme_data.color.size(); jj++) {
 								ui_views += '<div class="coloritem" onclick="' + choosercall + '(' + jj + ');">';
-								ui_views += '	<div class="swatch" id="theme_view_newcolors_swatch_' + jj + '">&nbsp;</div>';
-								ui_views += 	myself.rcitheme_data.color[jj];
+								var value = '';
+								var themeid = myself.rcitheme_data.color[jj];
+								if (myself.rcitheme_data.value[themeid].length) {
+									value = ' style="background-color: #' + myself.rcitheme_data.value[themeid] + ';"';
+								}
+								ui_views += '	<div class="swatch" id="theme_view_newcolors_swatch_' + jj + '"' + value + '>&nbsp;</div>';
+								ui_views += 	themeid;
 								ui_views += '</div>';
 							}
 							ui_views += '<div id="theme_view_newcolors_chooser" style="display: none;">';
@@ -198,6 +203,7 @@
 			theme_color_chooser_pick: function(num) {
 				var color_code = this.color2hex($('#theme_newcolors_swatch_' + num).css('background-color'));
 				$('#theme_view_newcolors_swatch_'+ this.choosingcolor).css('background-color', '#' + color_code);
+				$('#theme_view_newcolors_swatch_'+ this.choosingcolor).attr('data-modified', 1);
 				this.theme_color_chooser_exit();
 			},
 
@@ -215,31 +221,11 @@
 
 					// Only the active theme_tab is used upon submission
 					switch (myself.theme_tab_showing) {
-						case 'colors':
-
-							// Get the selection that was made for a color id
-							var color = $('#theme_color_id')
-							if (! color.length) {
-								throw ''; // Theme form is not showing, so there's nothing to do/report
-							}
-							var color_id = color.val();
-							if (! color_id.length) {
-								throw 'No selection was made!';
-							}
-
-							// Get the selection that was made for a color code
-							var color_code = $('#theme_color_code').val();
-							if (! color_code.length) {
-								throw 'No color was chosen!';
-							}
-
-							var res = myself.theme_scan(myself.scratch, color_id, '#' + color_code);
-							break;
-
 						case 'newcolors':
 							for (var jj = 0; jj < myself.rcitheme_data.color.size(); jj++) {
-								var bgcolor = $('#theme_view_newcolors_swatch_' + jj).css('background-color');
-								if (bgcolor != 'transparent') {
+								var el = $('#theme_view_newcolors_swatch_' + jj);
+								var bgcolor = el.css('background-color');
+								if (parseInt(el.attr('data-modified')) && (bgcolor != 'transparent')) {
 									var color_code = myself.color2hex(bgcolor);
 									var res = myself.theme_scan(myself.scratch, myself.rcitheme_data.color[jj], '#' + color_code);
 									if (! res) break;
@@ -298,6 +284,7 @@
 			theme_scan: function(container, theme_id, theme_value) {
 
 				try {
+					var myself = CKEDITOR.dialog.getCurrent().definition;
 
 					// Now are we collecting or setting?
 					var collecting = ((typeof theme_id !== 'undefined') && (typeof theme_value !== 'undefined')) ? false : true; 
@@ -305,9 +292,10 @@
 					var rcitheme_data = {
 						count: 0,
 						color: Array(),
+						value: Array(),
 
 						// Add support for other theme data types here as needed
-						add_color: function (id) {
+						add_color: function (id, value) {
 
 							// Prevent the addition of an empty string as a selection id
 							if (! id.length) return;
@@ -318,6 +306,7 @@
 							}
 							this.color.push(id);
 							this.count++;
+							this.value[id] = value;
 						}
 					};
 
@@ -334,17 +323,17 @@
 						var e = $(this);
 
 						var id = e.attr("data-sm-i"); //id
+						var style = e.attr("data-sm-s"); //style
+						var attribute = e.attr("data-sm-a"); //attribute
 						
 						if (collecting) {
-							rcitheme_data.add_color(id);
+							var value = '';
+							if (style) value = e.css(style);
+							else if (attribute) value = e.attr(attribute);
+							rcitheme_data.add_color(id, myself.color2hex(value));
 						} else {
-							var style = e.attr("data-sm-s"); //style
-							var attribute = e.attr("data-sm-a"); //attribute
-
-							if (style)
-								e.css(style, theme_value);
-							if (attribute)
-								e.attr(attribute, theme_value);
+							if (style) e.css(style, theme_value);
+							if (attribute) e.attr(attribute, theme_value);
 						}
 					});
 
