@@ -59,7 +59,7 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 	var settings = null;
 
 	this.clearSettings = function () {
-		settings = Array();
+		settings = {};
 	};
 
 	this.setSetting = function (name, value) {
