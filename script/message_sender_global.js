@@ -189,6 +189,7 @@ jQuery.noConflict();
 
 	timezoneOffset = function(timestamp, format) {
 
+		var timestamp = timestamp/1000;
 		var offset = orgOptions.timezoneOffset;
 
 		function getMins(hours,mins) {

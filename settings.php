@@ -69,7 +69,7 @@ if ($USER->authorize('managesystem')) {
 	$linkLists[] = $jobLinks;
 	$linkLists[] = $labelLinks;
 }
-// features - if contact manager, or self-signup, or smartcall appliance, or classroom
+// features - if contact manager, or subscriber(self-signup), or smartcall appliance, or classroom
 if ((getSystemSetting('_hasportal', false) && $USER->authorize('portalaccess') && $USER->authorize('managesystem')) ||
 	(getSystemSetting('_hasselfsignup', false) && ($USER->authorize('metadata') || $USER->authorize('managesystem'))) ||
 	($USER->authorize('managesystem') && getSystemSetting('_dmmethod', "")!='asp') ||
@@ -84,10 +84,10 @@ if ((getSystemSetting('_hasportal', false) && $USER->authorize('portalaccess') &
 	}
 	if (getSystemSetting('_hasselfsignup', false)) {
 		if ($USER->authorize('managesystem')) {
-			$featureLinks[] = "<a href='subscribersettings.php'>Self-Signup Settings</a>";
+			$featureLinks[] = "<a href='subscribersettings.php'>Subscriber Settings</a>";
 		}
 		if ($USER->authorize('metadata')) {
-			$featureLinks[] = "<a href='subscriberfields.php'>Self-Signup Fields</a>";
+			$featureLinks[] = "<a href='subscriberfields.php'>Subscriber Fields</a>";
 		}
 	}
 	if ($USER->authorize('managesystem') && getSystemSetting('_dmmethod', "")!='asp') {

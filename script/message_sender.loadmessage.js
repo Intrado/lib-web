@@ -206,7 +206,7 @@ $.loadMessage = function loadMessage() {
 						return;
 					self.msgGroups.push(mg);
 					// format the date from the modifiedTimestamp value
-					var msgDate = timezoneOffset(mg.modifiedTimestamp,'MM/DD/YYYY');
+					var msgDate = timezoneOffset(mg.modifiedTimestampMs,'MM/DD/YYYY');
 					// var msgDate = moment(mg.modifiedTimestamp*1000).format('MM/DD/YYYY ZZ');
 					// loop through the typeSummary array to see what message parts are included
 					var msgPhone = msgEmail = msgSms =  msgPost = '';

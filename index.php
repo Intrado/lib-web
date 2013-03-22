@@ -57,6 +57,8 @@ if (isset($_GET['login'])) {
 	}
 
 } else if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
+	// clear the login source cookie
+	setcookie($CUSTOMERURL. "_login_src", "");
 	$f_login = trim(get_magic_quotes_gpc() ? stripslashes($_POST['login']) : $_POST['login']);
 	$f_pass = get_magic_quotes_gpc() ? stripslashes($_POST['password']) : $_POST['password'];
 	$userid = doLogin($f_login, $f_pass, $CUSTOMERURL, $_SERVER['REMOTE_ADDR']);
