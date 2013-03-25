@@ -298,8 +298,8 @@ jQuery.noConflict();
 					"phonemaxdigits": (orgOptions.easycallmax?orgOptions.easycallmax:10),
 					"defaultphone" : userInfo.phoneFormatted });
 			}
-//            $(idSelector + " .msgdata").val('');
-			if (typeof(rcieditor) != 'undefined') 
+			
+			if (contentMode == "email" && typeof(rcieditor) != 'undefined') 
 				rcieditor.clearHtmlEditorContent();
 		});
 
