@@ -112,8 +112,8 @@
 	startServerTime = moment("<? print_r(date("Y-m-d G:i")); ?>", "YYYY-MM-DD HH:mm").unix();
 	serverDate = "<? print_r(date("Y,m,d,")); ?>";
 	startClientTime = Math.round((new Date()).getTime() / 1000);
-	fieldinsert_list = <?= json_encode(FieldMap::getAuthorizeFieldInsertNames()); ?>;
 	<? global $USER; ?>
 	rcieditor_hidetoolbar = <?= ($USER->getSetting('hideemailtools', 'false') ? 'true' : 'false'); ?>;
+	rcieditor_fieldinsert_list = <?= json_encode(FieldMap::getAuthorizeFieldInsertNames()); ?>;
 </script>
 
