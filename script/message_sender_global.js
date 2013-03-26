@@ -115,29 +115,39 @@ jQuery.noConflict();
 	// using helper functions in htmleditor.js, set up the ckeditor on the textarea with id "elementid"
 	applyCkEditor = function(elementid, editor_mode) {
 
+		// override settings we're going to send to the editor
+		var overrideSettings = {
+			'fieldinsert_list': fieldinsert_list,
+			'hidetoolbar': rcieditor_hidetoolbar
+		};
+
+		// If either TTS or Scratch boxes have text in them (depending on mode) then fill up the clipboard
+		var phonemessagetype = $('#msgsndr_phonemessagetype');
+		if (phonemessagetype && phonemessagetype.length) {
+			if (phonemessagetype.val() == 'text') {
+				// Grab the Phone's TTS message and stick it into the editor's clipboard
+				var message = $('#msgsndr_tts_message');
+				if (message && message.length && message.val().length) {
+					overrideSettings['tool_pastefromphone'] = true;
+					overrideSettings['clipboard'] = message.val();
+				}
+			}
+			else if (phonemessagetype.val() == 'callme') {
+				// Grab the Phone's "callme" scratch message and stick it into the editor's clipboard
+				var message = $('#msgsndr_form_scratch');
+				if (message && message.length && message.val().length) {
+					overrideSettings['tool_pastefromphone'] = true;
+					overrideSettings['clipboard'] = message.val();
+				}
+			}
+		}
+
 		// Either instantiate or reconstruct the rcieditor object as needed
 		if (typeof rcieditor === 'undefined') {
-			rcieditor = new RCIEditor(editor_mode, elementid);
+			rcieditor = new RCIEditor(editor_mode, elementid, overrideSettings);
 		}
 		else {
-			rcieditor.reconstruct(editor_mode, elementid);
-		}
-
-		var phonemessagetype = $('#msgsndr_phonemessagetype');
-		if (phonemessagetype && phonemessagetype.length && (phonemessagetype.val() == 'text')) {
-			// Grab the Phone's TTS message and stick it into the editor's clipboard
-			var message = $('#msgsndr_tts_message');
-			if (message && message.length && message.val().length) {
-				rcieditor.setSetting('clipboard', message.val());
-			}
-		}
-		else if (phonemessagetype && phonemessagetype.length && (phonemessagetype.val() == 'callme')) {
-
-			// Grab the Phone's "callme" scratch message and stick it into the editor's clipboard
-			var message = $('#msgsndr_form_scratch');
-			if (message && message.length && message.val().length) {
-				rcieditor.setSetting('clipboard', message.val());
-			}
+			rcieditor.reconstruct(editor_mode, elementid, overrideSettings);
 		}
 
 		// Set up a validator

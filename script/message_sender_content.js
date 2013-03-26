@@ -291,11 +291,11 @@ var allowControl = {
 				alert('ops, something went wrong');
 				return;
 			} else if (msgid == 0) {
-				applyCkEditor("msgsndr_emailmessagetext","msnormal");
+				applyCkEditor("msgsndr_emailmessagetext","normal");
 			} else {
 				$.get('mgstationeryview.php?stationery=' + msgid, function(data) {
 					$("#msgsndr_emailmessagetext").val(data);
-					applyCkEditor("msgsndr_emailmessagetext","msinline");
+					applyCkEditor("msgsndr_emailmessagetext","inline");
 					
 				});
 			}
@@ -625,7 +625,7 @@ function ContentManager() {
 							} else if (!forcestationery && stationery.length == 1) {
 								// Only the "blank" stationery available and user not restricted to stationery. proceed to normal editor
 								$("#msgsndr_emailmessagetext").val("");
-								applyCkEditor("msgsndr_emailmessagetext","msnormal");
+								applyCkEditor("msgsndr_emailmessagetext","normal");
 								$('#stationery_email_view').hide();
 								$('#main_email_view').show();
 							} else {
