@@ -36,11 +36,14 @@ while ($row = DBGetRow($result)) {
 $titles = array('Template', 'actions' => 'Actions');
 $formatters = array("actions" => "fmt_actions");
 
+$TITLE = 'Customer Templates';
+$PAGE = 'commsuite:customers';
 
 include_once("nav.inc.php");
 
+startWindow(_L('Edit Email Templates for Customer: ' . $custinfo[3]));
+
 ?>
-<h3>Edit Email Templates for Customer: <?= $custinfo[3]?></h3>
 <table class="list sortable" id="customer_templates_table">
 <?
 	showTable($templates, $titles, $formatters);
@@ -55,5 +58,7 @@ include_once("nav.inc.php");
 	}
 </script>
 <?
+endWindow();
+
 include_once("navbottom.inc.php");
 ?>
