@@ -281,6 +281,8 @@ $PAGE = "commsuite:systemdms";
 
 include_once("nav.inc.php");
 
+startWindow(_L('System DMs'));
+
 ?>
 <form id="viewoptions" method="GET" action="systemdms.php">
 <table>
@@ -351,5 +353,7 @@ if (count($data)) {
 } else {
 	echo "<div class='destlabel'><img src='img/largeicons/information.jpg' align='middle'> " . _L("No Records Found") . "<div>";
 }
+endWindow();
+
 include_once("navbottom.inc.php");
 ?>

@@ -311,10 +311,14 @@ $formatters = array("0" => "fmt_custid",
 		"16" => "fmt_hasdm");
 
 $lockedTitles = array(0, "status", "actions");
+
 $TITLE = _L("Commsuite Customers");
 $PAGE = "commsuite:customers";
 
 include_once("nav.inc.php");
+
+startWindow(_L('Commsuite Customers'));
+
 ?>
 
 <script>
@@ -395,9 +399,9 @@ else
 <div>Red cells indicate that the customer has more users than they should</div>
 <div>Green cells indicate customers with active jobs</div>
 <?
+endWindow();
+
 include_once("navbottom.inc.php");
-
-
 ?>
 
 

@@ -330,6 +330,7 @@ $PAGE = "commsuite:customerdms";
 
 include_once("nav.inc.php");
 
+startWindow(_L('SmartCall'));
 ?>
 <form method="GET" name="viewoptions" id="viewoptions" action="customerdms.php">
 <table>
@@ -403,5 +404,7 @@ if (count($data)) {
 </script>
 
 <?
+endWindow();
+
 include_once("navbottom.inc.php");
 ?>

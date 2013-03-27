@@ -103,6 +103,8 @@ $TITLE = _L("Locked Users");
 $PAGE =  "commsuite:lockedusers";
 include("nav.inc.php");
 
+startWindow(_L('Locked Users'));
+
 ?>
 <table class=list>
 <?
@@ -110,5 +112,7 @@ showTable($lockedusers, $titles, $formatters);
 ?>
 </table>
 <?
+endWindow();
+
 include("navbottom.inc.php");
 ?>
