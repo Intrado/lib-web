@@ -1328,6 +1328,12 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 	}
 }
 
+if (isset($_GET['jsonformdata'])) {
+	header("Content-Type: application/json");
+	echo json_encode(array("snum" => $form->serialnum, "formdata" => $form->formdata));
+	exit();
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
