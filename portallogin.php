@@ -44,20 +44,5 @@ if (isset($_REQUEST["is_return"])) {
 	$http = ($_SERVER["HTTPS"]?"https://":"http://");
 	$redirectLoc = getPortalAuthAuthRequestTokenUrl($http. $_SERVER['SERVER_NAME']. $_SERVER['REQUEST_URI']. "?is_return");
 }
-
-$TITLE = "Portal Authentication Login";
-include_once("logintop.inc.php");
-?>
-
-<div><h2>Please wait while an attempt is made to log you in...</h2></div>
-
-<script type="text/javascript">
-	!function ($) {
-		window.location = "<?=addslashes($redirectLoc)?>";
-	}(window.jQuery);
-</script>
-<script type="text/javascript" src="script/jquery.1.7.2.min.js"></script>
-
-<?
-include_once("loginbottom.inc.php");
+redirect($redirectLoc);
 ?>

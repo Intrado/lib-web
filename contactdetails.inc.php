@@ -109,6 +109,8 @@ if (!$maxsms = getSystemSetting("maxsms"))
 if (isset($personid)) {
 	// editing existing person
 	$data = DBFind("Person", "from person where id = " . $personid);
+	// block access to students contact data? (is complicated flag for Nate)
+	$blockDataAccess = $data->getSetting("block_data_access");
 	$query = "select group_concat(oz.orgkey separator ', ') from organization oz join personassociation pa on (pa.organizationid = oz.id) where personid=?";
 	$organization = QuickQuery($query, false, array($personid));
 	$address = DBFind("Address", "from address where personid = " . $personid);
@@ -260,6 +262,9 @@ if(CheckFormSubmit($f,$s))
 		} else {
 			//submit changes
 			$error = false;
+			if(GetFormData($f, $s, "block_data_access") || $blockDataAccess != GetFormData($f, $s, "block_data_access")){
+				$data->setSetting("block_data_access", GetFormData($f, $s, "block_data_access"));
+			}
 			foreach($contacttypes as $type){
 				if ($error) continue;
 				if (!isset($types[$type])) continue;
@@ -317,6 +322,7 @@ if(CheckFormSubmit($f,$s))
 if( $reloadform )
 {
 	ClearFormData($f);
+	PutFormData($f, $s, "block_data_access", $blockDataAccess, "bool", 0, 1);
 	foreach($contacttypes as $type){
 		if(!isset($types[$type])) continue;
 		foreach($types[$type] as $item){
@@ -560,7 +566,6 @@ foreach ($fieldmaps as $map) {
 			</table>
 		<td>
 	</tr>
-
 <?
 	if (getSystemSetting('_hasenrollment', false) && !$isGuardian) {
 ?>
@@ -660,8 +665,23 @@ foreach ($fieldmaps as $map) {
 	</tr>	
 <?		
 	} // end guardians
-	
-	if(getSystemSetting("_hasportal", false) && $USER->authorize("portalaccess") && $associates && !$isGuardian){
+
+	//***************************************************************************************************************************
+	// Contact Manager settings
+	//***************************************************************************************************************************
+
+	if(getSystemSetting("_hasportal", false) && $USER->authorize("portalaccess")){
+		?>
+		<tr class="listheader"><th align="left" colspan="2"><b style="font-size: 16px"><?=_L("Contact Manager")?></b></th></tr>
+		<tr>
+			<th align="right" class="windowRowHeader bottomBorder"><?=_L("Limit Access:")?></th>
+			<td class="bottomBorder">
+				<?echo NewFormItem($f, $s, "block_data_access", "checkbox", 0, 1, $FORMDISABLE);?>
+				<?=_L("Disallow associations from viewing/modifying above contact detail data.");?>
+			</td>
+		</tr>
+<?
+		if($associates && !$isGuardian){
 ?>
 	<tr>
 		<th align="right" class="windowRowHeader bottomBorder">Associations:</th>
@@ -675,20 +695,20 @@ foreach ($fieldmaps as $map) {
 					<th align="left"><b>Actions<b></th>
 				</tr>
 <?
-				foreach($associates as $portaluserid => $associate){
-					if($associate['portaluser.lastlogin']){
-						$lastlogin = date("M j, Y g:i a", $associate['portaluser.lastlogin'] / 1000);
-					} else {
-						$lastlogin = "Never";
-					}
+			foreach($associates as $portaluserid => $associate){
+				if($associate['portaluser.lastlogin']){
+					$lastlogin = date("M j, Y g:i a", $associate['portaluser.lastlogin'] / 1000);
+				} else {
+					$lastlogin = "Never";
+				}
 ?>
-					<tr>
-						<td class="bottomBorder"><?=escapehtml($associate['portaluser.firstname'])?></td>
-						<td class="bottomBorder"><?=escapehtml($associate['portaluser.lastname'])?></td>
-						<td class="bottomBorder"><?=escapehtml($associate['portaluser.username'])?></td>
-						<td class="bottomBorder"><?=escapehtml($lastlogin)?></td>
-						<td class="bottomBorder"><a href="#" onclick="if(confirmDisassociate()) window.location='?disassociate=<?=$portaluserid . $iFrameAppend ?> '" />Disassociate</a></td>
-					</tr>
+				<tr>
+					<td style="padding-right:5px;"><?=escapehtml($associate['portaluser.firstname'])?></td>
+					<td style="padding-right:5px;"><?=escapehtml($associate['portaluser.lastname'])?></td>
+					<td style="padding-right:5px;"><?=escapehtml($associate['portaluser.username'])?></td>
+					<td style="padding-right:5px;"><?=escapehtml($lastlogin)?></td>
+					<td><a href="#" onclick="if(confirmDisassociate()) window.location='?disassociate=<?=$portaluserid . $iFrameAppend ?> '" />Disassociate</a></td>
+				</tr>
 <?
 				}
 ?>
@@ -696,8 +716,8 @@ foreach ($fieldmaps as $map) {
 		</td>
 	</tr>
 <?
-	}
-	if(getSystemSetting("_hasportal", false) && $USER->authorize("portalaccess") && !$isGuardian){
+		}
+		if(!$isGuardian){
 ?>
 	<tr>
 		<th align="right" class="windowRowHeader">Activation Code Information:</th>
@@ -730,33 +750,34 @@ foreach ($fieldmaps as $map) {
 				<tr>
 					<td>
 <?
-					if(!isset($_GET['ajax']) && $tokendata['token'] && strtotime($tokendata['expirationdate']) > strtotime("now"))
-						echo button("Generate Activation Code", "if(confirmGenerateActive()) window.location='?create=1{$iFrameAppend}'");
-					else if(!isset($_GET['ajax']))
-						echo button("Generate Activation Code", "if(confirmGenerate()) window.location='?create=1{$iFrameAppend}'");
+			if(!isset($_GET['ajax']) && $tokendata['token'] && strtotime($tokendata['expirationdate']) > strtotime("now"))
+				echo button("Generate Activation Code", "if(confirmGenerateActive()) window.location='?create=1{$iFrameAppend}'");
+			else if(!isset($_GET['ajax']))
+				echo button("Generate Activation Code", "if(confirmGenerate()) window.location='?create=1{$iFrameAppend}'");
 ?>
 					</td>
 <?
-					if($tokendata['token']){
+			if($tokendata['token']){
 ?>
 						<td>
 <?
-							if (!isset($_GET['ajax']))
-								echo button("Revoke Activation Code", "if(confirmRevoke()) window.location='?revoke={$personid}{$iFrameAppend}'");
+				if (!isset($_GET['ajax']))
+					echo button("Revoke Activation Code", "if(confirmRevoke()) window.location='?revoke={$personid}{$iFrameAppend}'");
 ?>
 						</td>
 <?
-					}
+			}
 ?>
 				</tr>
 			</table>
 		</td>
 	</tr>
 <?
+		}
 	}
 ?>
 </table>
-<script>
+<script type="text/javascript">
 	function confirmDisassociate(){
 		return confirm('Are you sure you want to disassociate this Contact Manager User?');
 	}

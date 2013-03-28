@@ -1,6 +1,18 @@
 jQuery.noConflict();
 (function($) {
 
+	// monitor the main content div for resize and send a message with this information
+	var lastHeight;
+	setInterval(function() {
+		// content_wrap has a bunch of extra padding...
+		var newHeight = $('div.content_wrap').height();
+		if (newHeight != lastHeight) {
+			var msg = {};
+			msg["resize"] = lastHeight = newHeight;
+			top.postMessage($.toJSON(msg), '*');
+		}
+	}, 500);
+
 	$.ajaxSetup ({
 		cache: false
 	});
@@ -286,8 +298,8 @@ jQuery.noConflict();
 					"phonemaxdigits": (orgOptions.easycallmax?orgOptions.easycallmax:10),
 					"defaultphone" : userInfo.phoneFormatted });
 			}
-//            $(idSelector + " .msgdata").val('');
-			if (typeof(rcieditor) != 'undefined') 
+			
+			if (contentMode == "email" && typeof(rcieditor) != 'undefined') 
 				rcieditor.clearHtmlEditorContent();
 		});
 

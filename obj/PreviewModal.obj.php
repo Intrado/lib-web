@@ -35,25 +35,26 @@ class PreviewModal {
 		
 		$id = $_REQUEST["previewid"] + 0;
 		$message = DBFind("Message", "from message where id = ?", false, array($id));
+
 		
+		// Validate Message and Permisions 
 		if (!$message) 
-			return;
+			exit();
 		
-		// Allow preview of message if message is associated with a job that is viewable
-		if (isset($_REQUEST["jobid"])) {
-			$isAssociated = QuickQuery("select 1 from job j inner join messagegroup mg on (mg.id = j.messagegroupid) where j.id=? and mg.id=?",false,array($_REQUEST["jobid"],$message->messagegroupid));
-			if (!$isAssociated) {
-				return;
-			} else {
-				if(!userCanSee("job", $_REQUEST["jobid"])) {
-					return;
+		if (!userCanSee("message", $id)) {
+			// Allow preview of message if message is associated with a job that is viewable
+			if (isset($_REQUEST["jobid"])) {
+				$isAssociated = QuickQuery("select 1 from job j inner join messagegroup mg on (mg.id = j.messagegroupid) where j.id=? and mg.id=?",false,array($_REQUEST["jobid"],$message->messagegroupid));
+				$canViewMessage = $isAssociated && userCanSee("job", $_REQUEST["jobid"]);
+				if (!$canViewMessage) {
+					exit() ;
 				}
-			}
-		} else {
-			if(!userCanSee("message", $id)) {
-				return;
+			} else {
+				exit();
 			}
 		}
+		// End of Validate
+		
 		$modal = new PreviewModal();
 		switch($message->type) {
 			case "phone":
@@ -77,15 +78,15 @@ class PreviewModal {
 					permitContent($part->imagecontentid);
 				}
 				
-				$email = messagePreviewForPriority($message->id, $jobpriority); // returns commsuite_EmailMessageView object
-				$modal->text = $modal->formatEmailHeader($email);
 				switch ($message->subtype) {
 					case "html":
 						$modal->title = _L("%s HTML Email Message" , Language::getName($message->languagecode));
-						$modal->text .= "<iframe src=\"messageview.php?messageid={$message->id}" . (isset($_REQUEST["jobtypeid"])?"&jobtypeid={$_REQUEST["jobtypeid"]}":"") . "\"></iframe>";//$email->emailbody;
+						$modal->text = "<iframe src=\"messageview.php?messageid={$message->id}" . (isset($_REQUEST["jobtypeid"])?"&jobtypeid={$_REQUEST["jobtypeid"]}":"") . "\"></iframe>";//$email->emailbody;
 						break;
 					case "plain":
 						$modal->title = _L("%s Plain Email Message" , Language::getName($message->languagecode));
+						$email = messagePreviewForPriority($message->id, $jobpriority); // returns commsuite_EmailMessageView object
+						$modal->text = $modal->formatEmailHeader($email);
 						$modal->text .= nl2br(escapehtml($email->emailbody));
 						break;
 				}
@@ -213,6 +214,35 @@ class PreviewModal {
 		$modal->includeModal();
 	}
 	
+	static function HandleRequestWithStationeryText() {
+		if (!isset($_REQUEST["previewmodal"]) ||
+				!isset($_REQUEST["subtype"]) ||
+				!isset($_REQUEST["text"]))
+			return;
+			
+		$modal = new PreviewModal();
+		$message = new Message();
+		$message->type = "email";
+		$message->subtype = $_REQUEST["subtype"];
+	
+		$parts = Message::parse($_REQUEST["text"],$modal->errors);
+		if (count($modal->errors) == 0) {
+			$email = emailMessageViewForMessageParts($message,$parts,3);
+		}
+		switch ($_REQUEST["subtype"]) {
+			case "html":
+				$modal->title = _L("%s HTML Email Message", Language::getName($message->languagecode));
+				$modal->text = $email->emailbody;
+				break;
+			case "plain":
+				$modal->title = _L("%s Plain Email Message", Language::getName($message->languagecode));
+				$modal->text = nl2br(escapehtml($email->emailbody));
+				break;
+		}
+	
+		$modal->includeModal();
+	}
+	
 	
 	
 	// Includeds the javascript necessary to open the modal and renderes the form if there are any field insters
@@ -319,57 +349,35 @@ class PreviewModal {
 		
 		function messagePrevewLoaded(area) {
 			var $ = jQuery;
-			var modal = $('#prevewmodal');
-			if(area.height() > 370) {
-				modal.find('iframe').height(area.height() + 30);
-			} else {
-				modal.find('iframe').height(400);
-			}
-			$('html, body').animate({ scrollTop: 0 }, 'fast');
-			modal.animate({ width: '100%' }, 'fast');
+			var modal = $('#defaultmodal');
+			modal.height("80%");
+			modal.width("100%");
+			centerModal(modal);
 		}
 
-		
+		var centerModal = function(modal) {
+			var $ = jQuery;
+			$("div.default-modal").css("margin-top", -(modal.height()/2));
+			$("div.default-modal").css("margin-left", -(modal.width()/2));
+
+			// Hide modal on resize since it will no longer be centered.
+			$(window).one('resize',function() {
+				modal.modal('hide');
+			});
+		}
 		var showPreview = function(post_parameters,get_parameters){
 			var $ = jQuery;
 
-			var modal = $('#prevewmodal');
+			var modal = $('#defaultmodal');
 			modal.modal();
-
-			var header = $('#prevewmodal').find(".modal-header");
-			var body = $('#prevewmodal').find(".modal-body");
-			var footer = $('#prevewmodal').find(".modal-header");
-			modal.on('hide',function() {
+			modal.height("auto");
+			modal.width("600px");
+			var header = $('#defaultmodal').find(".modal-header h3");
+			var body = $('#defaultmodal').find(".modal-body");
+			
+			modal.one('hide',function() {
 				body.html("");
 			});
-			
-			if (post_parameters && typeof(post_parameters) != 'undefined' && typeof(post_parameters.subtype) != 'undefined' ) {
-				if (post_parameters.subtype == "html")
-					header.html("HTML Email Message")
-				else
-					header.html("Plain Email Message");
-				body.html("<b>From:</b> " + post_parameters.fromname
-						 + " &lt;" + post_parameters.from
-						 +  "&gt;<br /><b>Subject:</b> " + post_parameters.subject
-						 + "<br /><hr />");
-				var iframe = $("<iframe/>", {src: "blank.html"});
-				iframe.appendTo(body);
-				iframe.load(function(){
-					var iframecontent = iframe.contents().find('body');
-					iframecontent.append(post_parameters.text);
-					if(iframecontent.height() > 370) {
-						iframe.height(iframecontent.height() + 30);
-					} else {
-						iframe.height(400);
-					}
-				});
-			
-				$('html, body').animate({ scrollTop: 0 }, 'fast');
-				modal.animate({ width: '100%' }, 'fast');
-				return;
-			} 
-
-
 			
 			modal.find(".modal-body").html('<img src="img/ajax-loader.gif" alt="Please Wait..."/> Loading...')
 			new Ajax.Request('<?= $posturl?>' + (get_parameters?'&' + get_parameters:''), {
@@ -416,7 +424,19 @@ class PreviewModal {
 								});
 							}
 						} else {
-							body.html(result.content);
+							if (post_parameters && typeof(post_parameters) != 'undefined' && typeof(post_parameters.subtype) != 'undefined' ) {
+								var iframe = $("<iframe/>", {src: "blank.html"});
+								body.html(iframe);
+								iframe.load(function(){
+									var iframecontent = iframe.contents().find('body');
+									iframecontent.append(result.content);
+									modal.height("100%");
+									modal.width("100%");
+				 					centerModal(modal);
+								});
+							} else {
+								body.html(result.content);
+							}
 						}
 					} else {
 						header.html('Error');
@@ -427,6 +447,9 @@ class PreviewModal {
 				'onFailure': function() {
 					header.html('Error');
 					body.html('Unable to preview this message');
+				},
+				'onComplete': function() {
+					centerModal(modal);
 				}
 			});
 			

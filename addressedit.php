@@ -101,7 +101,7 @@ function isprefset ($type,$seq,$jobtypeid) {
 }
 
 $jobtypes = JobType::getUserJobTypes(false);
-if (getSystemSetting('_hassurvey', true) && $USER->authorize('survey'))
+if ($USER->canSendSurvey())
 	$jobtypes = array_merge($jobtypes, JobType::getUserJobTypes(true));
 
 $jobtypenames = array();

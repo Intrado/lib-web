@@ -75,11 +75,6 @@
 		
 	</div><!-- endwindow newbroadcast -->
 	
-
-	<div class="main_aside">
-		<?= addHelpSection();?>
-	</div><!-- end main_aside-->
-	
 </div><!-- end wrapper -->
 
 <? include("message_sender/modals.inc.php"); ?>
@@ -108,7 +103,6 @@
 <script type="text/javascript" src="script/message_sender_listbuilder.js"></script>
 
 <script type="text/javascript" src="script/ckeditor/ckeditor.js"></script>
-<script type="text/javascript" src="script/USER.js.php"></script>
 <script type="text/javascript" src="script/rcieditor.js"></script>
 <script type="text/javascript" src="script/speller/spellChecker.js"></script>
 <script type="text/javascript" src="script/niftyplayer.js.php"></script>
@@ -118,4 +112,8 @@
 	startServerTime = moment("<? print_r(date("Y-m-d G:i")); ?>", "YYYY-MM-DD HH:mm").unix();
 	serverDate = "<? print_r(date("Y,m,d,")); ?>";
 	startClientTime = Math.round((new Date()).getTime() / 1000);
+	<? global $USER; ?>
+	rcieditor_hidetoolbar = <?= ($USER->getSetting('hideemailtools', 'false') ? 'true' : 'false'); ?>;
+	rcieditor_fieldinsert_list = <?= json_encode(FieldMap::getAuthorizeFieldInsertNames()); ?>;
 </script>
+

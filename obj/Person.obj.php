@@ -66,6 +66,44 @@ class Person extends DBMappedObject {
 		return DBFindMany("Sms", "from sms where personid = '" . $this->id . "'");
 	}
 
+	function getSetting ($name, $defaultvalue = false, $refresh = false) {
+		static $settings = null;
+
+		if ($settings === null || $refresh) {
+			$settings = array();
+			if ($res = Query("select name,value from personsetting where personid='$this->id'")) {
+				while ($row = DBGetRow($res)) {
+					$settings[$row[0]] = $row[1];
+				}
+			}
+		}
+
+		if (isset($settings[$name]))
+			return $settings[$name];
+		else
+			return $defaultvalue;
+	}
+
+	function setSetting ($name, $value) {
+		$old = $this->getSetting($name,false,true);
+
+		if ($old === false) {
+			$settings[$name] = $value;
+			if ($value)
+				QuickUpdate("insert into personsetting (personid,name,value) values (?, ?, ?)",
+					false, array($this->id, $name, $value));
+		} else {
+			if ($value !== false && $value !== '' && $value !== null) {
+				QuickUpdate("update personsetting set value=? where personid=? and name=?",
+					false, array($value, $this->id, $name));
+			} else {
+				QuickUpdate("delete from personsetting where personid=? and name=?",
+					false, array($this->id, $name));
+
+			}
+		}
+	}
+
 }
 
 ?>

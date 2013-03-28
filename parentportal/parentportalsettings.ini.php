@@ -1,5 +1,10 @@
 ;<?/* this prevents browsers from seeing anything
 
+;portalauth server be sure to end with the / slash
+[portalauth]
+cmUrl="https://csportal.testschoolmessenger.com/cm/"
+accountUrl="https://csportal.testschoolmessenger.com/myaccount/#loginmethods"
+
 ;authentication server connection information
 [authserver]
 host="localhost:8088"

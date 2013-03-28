@@ -29,7 +29,7 @@ require_once("obj/PhoneMessageRecorder.val.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-if (!getSystemSetting('_hassurvey', true) || !$USER->authorize('survey') || !$USER->authorize('sendphone','sendemail')) {
+if (!$USER->canSendSurvey()) {
 	redirect('unauthorized.php');
 }
 

@@ -1,227 +1,93 @@
 <?
-if (!isset($_SESSION['_locale']))
-	$_SESSION['_locale'] = isset($_COOKIE['locale'])?$_COOKIE['locale']:"en_US";
-
 $ppNotLoggedIn = 1;
 require_once("common.inc.php");
-require_once("../inc/html.inc.php");
-require_once("../inc/table.inc.php");
-require_once("../inc/form.inc.php");
 
-$appendcustomerurl = getAppendCustomerUrl();
-
-$changeuser = false;
-$forgot = false;
-if(isset($_GET['c'])){
-	$changeuser = true;
-	include("activate.php");
-	exit();
-} else if(isset($_GET['f'])){
-	$forgot = true;
-	include("activate.php");
-	exit();
-} else if(isset($_GET['n'])){
-	include("activate.php");
-	exit();
+function getLoginUrl() {
+	$portalAuthLocation = getPortalAuthLocation($params = "");
+	if ($portalAuthLocation != false) {
+		// if we get a valid location back from portalserver for the cm app's login form, send the user there to login again
+		return $portalAuthLocation["url"]. $portalAuthLocation["login"]. $params;
+	}
+	// Nothing much we can do, portalserver doesn't know where to send them! Just go to unauthorized.php
+	return "unauthorized.php";
 }
 
-if(isset($_GET['embedded'])){
-	setcookie('embeddedpage', "1");
-	redirect();
-}
-if(isset($_GET['deleteembedded'])){
-	setcookie('embeddedpage');
-	redirect();
-}
-
+// did they logout?
 if (isset($_GET['logout'])) {
 	doStartSession(); // start the session to get the id
 	portalputSessionData(session_id(), ""); // write empty data to flush the user
 
 	@session_destroy();
-}
 
-if (isset($_GET['locale'])) {
-	setcookie('locale', $_GET['locale']);
-	redirect();
-}
+	$redirectLoc = getLoginUrl();
 
-if (isset($_GET['deletelocale'])) {
-	setcookie('locale', '');
-	redirect();
-}
+	// check for the "cm_login_src" cookie. If this exists, send the user to the appropriate login location
+	if (isset($_COOKIE["cm_login_src"]) && $_COOKIE["cm_login_src"]) {
+		$loginDetails = json_decode($_COOKIE["cm_login_src"], true);
+		// clear the cookie
+		setcookie("cm_login_src", "");
 
-// force ssl
-if ($SETTINGS['feature']['has_ssl'] && $SETTINGS['feature']['force_ssl'] && !isset($_SERVER["HTTPS"])) {
-	$secureurl = "https://" . $_SERVER["SERVER_NAME"] . "/index.php".$appendcustomerurl;
-	// forward all params
-	if (count($_GET) > 0) {
-		if ($appendcustomerurl == "")
-			$secureurl .= "?" . http_build_query($_GET);
-		else
-			$secureurl .= "&" . http_build_query($_GET);
-	}
-	redirect($secureurl);
-}
+		$src = $loginDetails["src"];
+		$user = $loginDetails["user"];
+		$type = $loginDetails["type"];
 
-$login="";
-$badlogin=false;
-$id = false;
-$sessionstarted = false;
-
-if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
-
-	$login = get_magic_quotes_gpc() ? stripslashes($_POST['login']) : $_POST['login'];
-	$password = get_magic_quotes_gpc() ? stripslashes($_POST['password']) : $_POST['password'];
-
-	$result = portalLogin($login, $password);
-	if($result['result'] == "")
-		$id = $result['userID'];
-	else
-		$badlogin = true;
-
-} else if (!isset($_GET['logout'])){
-	doStartSession(); // we must start the session to obtain the user information before trying to perform the following IF conditions
-	$sessionstarted = true;
-	if (isset($_SESSION['portaluserid'])) {
-		$redirpage = isset($_SESSION['lasturi']) ? $_SESSION['lasturi'] : 'choosecustomer.php'.$appendcustomerurl;
-		unset($_SESSION['lasturi']);
-		redirect($redirpage);
-    }
-}
-if($id){
-	if (!$sessionstarted)
-		doStartSession();
-	$_SESSION['portaluserid'] = $id;
-	$_SESSION['colorscheme']['_brandtheme'] = "3dblue";
-	$_SESSION['colorscheme']['_brandprimary'] = "26477D";
-	$_SESSION['colorscheme']['_brandtheme1'] = "89A3CE";
-	$_SESSION['colorscheme']['_brandtheme2'] = "89A3CE";
-	$_SESSION['colorscheme']['_brandratio'] = ".3";
-	
-	redirect("choosecustomer.php".$appendcustomerurl);
-}
-
-PutFormData("login", "main", "_locale", isset($LOCALE)?$LOCALE:"en_US", "text", "nomin", "nomax");
-
-$TITLE= _L("Sign In");
-
-include_once("cmlogintop.inc.php");
-?>
-<form method="POST" action="index.php<?echo $appendcustomerurl;?>" name="login">
-
-
-
-
-				<noscript><p><?=_L("It looks like you don't have JavaScript enabled! You must have JavaScript enabled for full use of this system. Please enable JavaScript in your browser or contact your system administrator for assistance.")?></p></noscript>
-
-<?
-				if ($badlogin) {
-				?>
-					<p style="color: red;"><?=_L("Incorrect username/password. Please try again.")?></p>
-				<?
-				}
-?>
-
-			<fieldset>
-				<label for="form_email" class="canhidelabel"><?=_L("Email")?>:</label>
-				<input type="email" id="form_email" name="login" size="30" maxlength="255" value="<?=escapehtml($login)?>"/>
-			</fieldset>
-
-			<fieldset>
-				<label for="form_pass" class="canhidelabel"><?=str_replace(" ", "&nbsp;", _L("Password"))?>:</label>
-				<input type="password" id="form_pass" name="password" size = "30" maxlength="50" onkeypress="capslockCheck(event)"/>
-				<input type="text" id="password_instructions" value='<?=_L("Password")?>' />
-				<em>Passwords are case-sensitive.</em>
-				<div id="capslockwarning"  style="padding-left:3px; float:left; display:none; color:red;"><?=_L("Warning! Your Caps Lock key is on.")?></div>
-			</fieldset>
-			
-
-			<span class="language languagebottom"> 
-			<?
-				// if no customerurl, need to include the ?, otherwise append with &
-				$urlparams = (strlen($appendcustomerurl) == 0) ? "?locale=" : $appendcustomerurl . "&locale=";
-				NewFormItem("login", "main", '_locale', 'selectstart', null, null, "id='locale' onchange='window.location.href=\"index.php" . $urlparams . "\"+this.options[this.selectedIndex].value'");
-				foreach($LOCALES as $loc => $lang){
-					NewFormItem("login", "main", '_locale', 'selectoption', $lang, $loc);
-				}
-				NewFormItem("login", "main", '_locale', 'selectend');
-			?>
-			</span>
-			
-			<fieldset>
-				<input type="submit" name="signin" value="<?=_L("Sign In")?>">
-			</fieldset>
-			
-			<p class="right"><a href="forgotpassword.php<?echo $appendcustomerurl;?>"><?=_L("Forgot your password? Click Here")?></a></p>
-
-
-			<p><?=_L("First time accessing the SchoolMessenger Contact Manager?")?>	
-			<a href="newportaluser.php<?echo $appendcustomerurl;?>"><b><?=_L("Sign up now")?></b></a></p>
-
-
-</form>
-
-
-<script type="text/javascript">
-document.getElementById('form_email').focus();
-
-function capslockCheck(e){
-		var keypressed;
-		var shiftkey;
-
-		if(e.keyCode)
-			keypressed = e.keyCode;
-		else
-			keypressed = e.which;
-
-		if(e.shiftKey) {
-			shiftkey = true;
-		} else {
-			if(keypressed == 16) {
-				shiftkey = true;
-			} else {
-				shiftkey = false;
-			}
+		// if they came from powerschool, close the window
+		if ($src == "portal" && $type == "powerschool") {
+			echo '<script type="text/javascript">
+				window.close();
+				// if window.close fails (FF on direct nav)
+				setTimeout(function() { window.location = "'. $redirectLoc .'"; }, 1000);
+			</script>';
+			exit;
 		}
-		if(((keypressed >= 65 && keypressed <= 90) && !shiftkey) || ((keypressed >= 97 && keypressed <= 122) && shiftkey)){
-			$('capslockwarning').style.display = 'block';
-		} else
-			$('capslockwarning').style.display = 'none';
 	}
-	blankFieldValue('form_email', '<?=_L("Email")?>');
-	$('form_email').focus();
-	$('form_email').blur();
-	
-	function blankPasswordFieldValue(passwordelement,textelement) {
-		$(passwordelement).hide();
-		$(textelement).show();
-		$(textelement).setStyle({ color: "gray" });
-        
-		$(textelement).observe("focus", function() {
-           // alert('ds' +  $(passwordelement));
-			$(passwordelement).show();
-            $(passwordelement).focus();
-			
-            $(textelement).hide();
-            
-        });
-        $(passwordelement).observe("blur", function() {
-        	if ($(passwordelement).value == "") {
-        		$(passwordelement).hide();
-        		$(textelement).show();
-        	}
-        });
+} else {
+	// forward any params to portalauth
+	$params = http_build_query($_GET);
+
+	if (isset($_REQUEST["is_return"])) {
+		doStartSession(); // start session to send sessionid to login
+		// useing the access token, request that authserver create a session for whoever is logged into portal
+		$loginDetails = loginViaPortalAuth();
+		if ($loginDetails && isset($loginDetails["userID"]) && $loginDetails["userID"] > 0) {
+
+			// set a cookie to be used on session timeout to decide where to send the user on logout. NOTE: only good for the session
+			$loginSrc = array("src" => "portal", "user" => $loginDetails["username"], "type" => $loginDetails["type"]);
+			setcookie("cm_login_src", json_encode($loginSrc));
+
+			// set the sessiondata values that were already set during login but would be overwritten by php get/put session
+			$_SESSION['userid'] = $loginDetails["userID"];
+			$_SESSION['portaluserid'] = $loginDetails["userID"];
+			$_SESSION['userlogintype'] = $loginDetails["type"]; // "powerschool" or "local"
+
+			$_SESSION['colorscheme']['_brandtheme'] = "3dblue";
+			$_SESSION['colorscheme']['_brandprimary'] = "26477D";
+			$_SESSION['colorscheme']['_brandtheme1'] = "89A3CE";
+			$_SESSION['colorscheme']['_brandtheme2'] = "89A3CE";
+			$_SESSION['colorscheme']['_brandratio'] = ".3";
+
+			$redirectLoc = isset($_SESSION['lasturi']) ? $_SESSION['lasturi'] : 'choosecustomer.php' . getAppendCustomerUrl();
+			unset($_SESSION['lasturi']);
+		} else {
+			$redirectLoc = getLoginUrl($params);
+		}
+	} else {
+		// create a brand new session
+		newSession();
+		doStartSession();
+		$http = ($_SERVER["HTTPS"]?"https://":"http://");
+		$port = $_SERVER["SERVER_PORT"];
+		if ($port == "80" || $port == "443")
+			$port = "";
+		else
+			$port = ":$port";
+
+		if ($params)
+			$isReturnParam = "&is_return";
+		else
+			$isReturnParam = "?is_return";
+		$redirectLoc = getPortalAuthAuthRequestTokenUrl($http. $_SERVER['SERVER_NAME']. $port. $_SERVER['REQUEST_URI']. $isReturnParam);
 	}
-	blankPasswordFieldValue('form_pass', 'password_instructions');
-
-</script>
-	
-</script>
-<noscript>
-	<?= escapehtml(_L("It looks like you don't have JavaScript enabled! You must have JavaScript enabled for full use of this system. Please enable JavaScript in your browser or contact your system administrator for assistance.")) ?>
-</noscript>
-
-<?
-include("cmloginbottom.inc.php");
+}
+redirect($redirectLoc);
 ?>

@@ -291,11 +291,11 @@ var allowControl = {
 				alert('ops, something went wrong');
 				return;
 			} else if (msgid == 0) {
-				applyCkEditor("msgsndr_emailmessagetext","msnormal");
+				applyCkEditor("msgsndr_emailmessagetext","normal");
 			} else {
 				$.get('mgstationeryview.php?stationery=' + msgid, function(data) {
 					$("#msgsndr_emailmessagetext").val(data);
-					applyCkEditor("msgsndr_emailmessagetext","msinline");
+					applyCkEditor("msgsndr_emailmessagetext","inline");
 					
 				});
 			}
@@ -343,6 +343,24 @@ var allowControl = {
 
 		});
 
+		function pretranslate_cleaner(text) {
+			var clean_text = text.replace(/\n/g, ' ');	// newlines turn into spaces
+			clean_text = clean_text.replace(/\r/g, ' ');	// and so do carriage returns
+			clean_text = clean_text.replace(/<!--([^-]+)-->/g, '');	// XML comments go away completely
+			clean_text = clean_text.replace(/&lt;!--([^-]+)--&gt;/g, '');	// XML comments go away completely
+			clean_text = clean_text.replace(/\s+/g, ' ');	// Multiple white space condense to a single space
+			clean_text = clean_text.replace(/>\s/g, '>');	// trailing white space after an element goes away
+			clean_text = clean_text.replace(/&gt;\s/g, '&gt;');// trailing white space after an element goes away
+			clean_text = clean_text.replace(/\s</g, '<');	// so does leading white space before an element
+			clean_text = clean_text.replace(/\s&lt;/g, '&lt;');// so does leading white space before an element
+			clean_text = clean_text.replace(/\s&nbsp;/g, '&nbsp;');// Spaces before non-breaking spaces go away
+			clean_text = clean_text.replace(/&nbsp;\s/g, '&nbsp;');// Spaces after non-breaking spaces go away
+			clean_text = clean_text.replace(/(&nbsp;)+/g, '&nbsp;');	// Multiple non-breaking spaces condense to a single
+			clean_text = clean_text.replace(/^\s/g, '');	// Trim leading white space
+			clean_text = clean_text.replace(/\s$/g, '');	// Trim trailing white space
+			return(clean_text);
+		}
+
 		function eTranslate() {
 			var txtField = $("#msgsndr_emailmessagetext").val();
 
@@ -351,7 +369,7 @@ var allowControl = {
 			// add loading icon to label
 			$('#email_translate fieldset > label[for^=email_]').append('<img src="img/ajax-loader.gif" class="loading" />');
 
-			$.translate(txtField, elangCodes, function(data) {
+			$.translate(pretranslate_cleaner(txtField), elangCodes, function(data) {
 				$.each(data.responseData, function(transIndex, transData) {
 					var e = $('#email_translated_' + transData.code);
 					e.html(transData.translatedText.replace(/<</g, "&lt;&lt;").replace(/>>/g,"&gt;&gt;"));
@@ -625,7 +643,7 @@ function ContentManager() {
 							} else if (!forcestationery && stationery.length == 1) {
 								// Only the "blank" stationery available and user not restricted to stationery. proceed to normal editor
 								$("#msgsndr_emailmessagetext").val("");
-								applyCkEditor("msgsndr_emailmessagetext","msnormal");
+								applyCkEditor("msgsndr_emailmessagetext","normal");
 								$('#stationery_email_view').hide();
 								$('#main_email_view').show();
 							} else {

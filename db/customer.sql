@@ -2136,4 +2136,12 @@ $$$
 
 update setting set value='9.5/3' where name='_dbversion'
 $$$
--- END 9.5/2
+-- END 9.5/3
+
+-- START 9.6/1
+-- no schema only insert into authserver.customerproduct
+
+update setting set value='9.6/1' where name='_dbversion'
+$$$
+-- END 9.6/1
+

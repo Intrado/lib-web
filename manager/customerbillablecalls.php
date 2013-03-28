@@ -27,12 +27,15 @@ function fmt_dollars ($row,$index) {
 	return "&nbsp;";
 }
 
+$TITLE = 'Billable Calls Report';
+$PAGE = 'commsuite:customers';
 
 include_once("nav.inc.php");
 $custurl = QuickQuery("select c.urlcomponent from customer c where c.id = ?", false, array($cid));
-?>
 
-<h2>Billable calls report for: <?=$custurl ?></h2>
+startWindow(_L('Billable calls report for: ' . $custurl));
+
+?>
 
 <form method=post>
 <label>Start date:<input type=text name=startdate value="<?=date("Y-m-d",time() - 30*24*60*60)?>"></label>
@@ -116,5 +119,6 @@ if (!isset($_POST['startdate'])) {
 
 }
 
+endWindow();
 
 include_once("navbottom.inc.php");

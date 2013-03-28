@@ -7,6 +7,7 @@ require_once("obj/MessagePart.obj.php");
 require_once("obj/Language.obj.php");
 require_once("obj/FieldMap.obj.php");
 require_once("obj/Voice.obj.php");
+require_once("obj/JobType.obj.php");
 
 
 require_once("inc/appserver.inc.php");
@@ -38,6 +39,7 @@ function displayMessage() {
 	}
 
 	$email = messagePreviewForPriority($message->id, $jobpriority); // returns commsuite_EmailMessageView object
+ 	echo "<b>From:</b> $email->emailfromname &lt;$email->emailfromaddress&gt;<br /><b>Subject:</b> $email->emailsubject<br /><hr />";
 	echo $email->emailbody;
 }
 

@@ -125,17 +125,18 @@ if($isajax === true) {
 			$actions = array();
 			$messagegroup = new MessageGroup($mgid);
 			if (userOwns("messagegroup", $messagegroup->id)) {
+				if ($messagegroup->hasMessage("post","feed"))
+					$actions[] = action_link("Edit", "pencil", 'editmessagefeed.php?postedit&id=' . $messagegroup->getMessage("post", "feed", "en")->id);
 				if ($messagegroup->hasMessage("post","page") && $pageposted)
 					$actions[] = action_link("Page", "layout_sidebar", 'editmessagepage.php?postedit&id=' . $messagegroup->getMessage("post", "page", "en")->id);
 				if ($messagegroup->hasMessage("post","voice") && $pageposted)
 					$actions[] = action_link("Media", "../nifty_play", 'editmessagepostvoice.php?postedit&id=' . $messagegroup->getMessage("post", "voice", "en")->id);
-				if ($messagegroup->hasMessage("post","feed"))
-					$actions[] = action_link("Feed", "rss", 'editmessagefeed.php?postedit&id=' . $messagegroup->getMessage("post", "feed", "en")->id);
 			} else {
 				$actions[] = action_link("View", "fugue/magnifier", 'messagegroupview.php?id=' . $mgid);
 			}
 			if ($messagegroup->hasMessage("post","feed")) {
-				$actions[] = action_link("Feed Categories", "pencil", 'editjobfeedcategory.php?postedit&id=' . $jobid);
+				$actions[] = action_link("Feed Categories", "rss", 'editjobfeedcategory.php?postedit&id=' . $jobid);
+				$actions[] = action_link("Rename", "tag_blue_edit", 'job.php?id=' . $jobid);
 			}
 			$tools = action_links ($actions);
 			
@@ -151,7 +152,11 @@ if($isajax === true) {
 			else
 				$categories = "";
 			
-			$defaultlink = "job.php?id=".$post["jobid"];
+			if (userOwns("messagegroup", $messagegroup->id)) {
+				$defaultlink = 'editmessagefeed.php?postedit&id=' . $messagegroup->getMessage("post", "feed", "en")->id;
+			} else {
+				$defaultlink = 'messagegroupview.php?id=' . $mgid;
+			}
 			$content = '<a href="' . $defaultlink . '" >' . $time .  ($post["description"] != ""?" - " . escapehtml($post["description"]):"") . '</a>';
 			
 			$data->list[] = array(

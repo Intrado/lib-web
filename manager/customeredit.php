@@ -103,7 +103,7 @@ class ValClassroom extends Validator {
 	function validate ($value, $args) {
 		global $custdb;
 		
-		error_log("Val " . $value);
+		//error_log("Val " . $value);
 		
 		if ($value != $args['currentsetting'] && $value == "emailandphone") {
 			if (QuickQuery("SELECT 1 FROM `alert` WHERE date = curdate()",$custdb))
@@ -848,6 +848,21 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			default:
 				setCustomerSystemSetting('_hasportal', 0, $custdb);
 				setCustomerSystemSetting('_hasselfsignup', 0, $custdb);
+		}
+		//handle authserver.customerproduct table
+		$customerProductFieldMap = QuickQueryRow("select * from customerproduct where customerid = ? and product = 'cm'", true, false, array($customerid));
+		if ($postdata["portal"] == "contactmanager") {
+			if ($customerProductFieldMap === false) {
+				// insert and enable cm
+				$query = "INSERT INTO `customerproduct` (`customerid`,`product`,`createdtimestamp`,`modifiedtimestamp`,`enabled`) VALUES (?,'cm',?,?,1)";
+				QuickUpdate($query, false, array($customerid, time(), time()));
+			} else if ($customerProductFieldMap['enabled'] == 0) {
+				// enable cm
+				QuickUpdate("update customerproduct set enabled = 1, modifiedtimestamp = ? where customerid = ? and product = 'cm'", false, array(time(), $customerid));
+			} // else ignore, already enabled cm
+		} else {
+			// disable cm
+			QuickUpdate("update customerproduct set enabled = 0, modifiedtimestamp = ? where customerid = ? and product = 'cm'", false, array(time(), $customerid));
 		}
 		
 		setCustomerSystemSetting('_hassurvey', $postdata["hassurvey"]?'1':'0', $custdb);

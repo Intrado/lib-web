@@ -3,8 +3,11 @@ require_once("common.inc.php");
 require_once("../inc/form.inc.php");
 require_once("../inc/html.inc.php");
 require_once("../inc/utils.inc.php");
+require_once("../inc/table.inc.php");
 require_once("../obj/Phone.obj.php");
 require_once("../inc/themes.inc.php");
+
+
 
 if (!$MANAGERUSER->authorizedAny(array("ffield2gfield","billablecalls","editcustomer")))
 	exit("Not Authorized");
@@ -16,9 +19,13 @@ $cid = $_GET['cid'] + 0;
 
 $custurl = QuickQuery("select c.urlcomponent from customer c where c.id = ?", false, array($cid));
 
+$TITLE = "Advanced Customer Actions";
+$PAGE = "commsuite:customers";
+
 include_once("nav.inc.php");
+
+startWindow(_L('Advanced Customer Actions for customer: ' . $custurl));
 ?>
-<h2>Advanced Actions for customer: <?=$custurl?></h2>
 
 <ul>
 
@@ -44,5 +51,7 @@ include_once("nav.inc.php");
 
 </ul>
 <?
+endWindow();
+
 include_once("navbottom.inc.php");
 ?>

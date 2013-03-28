@@ -147,8 +147,15 @@ header('Content-type: text/html; charset=UTF-8') ;
 							<div class="banner_links_button"><?= icon_button(_L("Account"), "fugue/clipboard","$$('ul.banner_links').first().toggleClassName('minhide');return false;") ?></div>
 							<ul class="banner_links cf minhide">
 								<li class="bl_left"></li>
+<?
+	// do not display 'my account' link of login via powerschool
+	if (!isset($_SESSION['userlogintype']) || ($_SESSION['userlogintype'] != 'powerschool')) {
+?>
 								<li><a href="account.php"><?=_L("My Account")?></a></li>
 <?
+    } // end if display 'my account'
+    
+    // check if multi customer
 	$result = portalGetCustomerAssociations();
 	if ($result['result'] == "") {
 		$customerlist = $result['custmap'];

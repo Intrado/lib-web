@@ -649,43 +649,68 @@ function curDate() {
 
 function sessionKeepAliveWarning(timeout) {
 	setTimeout(function() {
-		var keepalivemodal = new ModalWrapper("Automatic Logout",false,false);
-	
-		var content = new Element('div', {'class': 'keepalive'});
-		content.appendChild(new Element('img', {src:"img/icons/lock.png", alt: "Warning"}));
-		content.appendChild(new Element('span').update("Your session is about to close due to inactivity."));
-		content.appendChild(new Element('p', {style: "margin: 10px 0"}).update(icon_button("Refresh Session","tick")
-			.observe("click", function() {
-				content.update(new Element('img', {src:"img/ajax-loader.gif", alt: "Refreshing Session"}));
-				new Ajax.Request('ajax.php',{
-					method:'get',
-					parameters:{type: 'keepalive'},
-					onSuccess: function (response) {
-						//HACK: check to see if we hit the login page (due to logout)
-						if (response.responseText.indexOf(" Login</title>") != -1) {
-							content.update();
-							content.appendChild(new Element('img', {src:"img/icons/error.png", alt: "Error"}));
-							content.appendChild(new Element('span')
-								.update("Your session was not refreshed because your session has expired or logged out."));
-						} else {
-							content.update();
-							content.appendChild(new Element('img', {src:"img/icons/accept.png", alt: "OK"}));
-							content.appendChild(new Element('span')
-								.update("Your session was refreshed successfully."));
-							setTimeout(function() {
-								keepalivemodal.modal.close();
-							}, 4000);
-							sessionKeepAliveWarning(timeout);
-						}
-					},
-					onFailure: function () {
-						content.update("An error occured trying to refresh your session.");
+		var $ = jQuery;
+		$('.modal.in').modal('hide');
+		
+		var modal = $('#defaultmodal');
+		modal.modal();
+		modal.height("auto");
+		modal.width("600px");
+		var header = $('#defaultmodal').find(".modal-header h3");
+		var body = $('#defaultmodal').find(".modal-body");
+
+		header.html("Automatic Logout");
+		var content = $('<div>',{'class' : 'keepalive'});
+		content.append($('<img>',{src : 'img/icons/lock.png',alt : 'Warning' }));
+		content.append($('<span>',{text : 'Your session is about to close due to inactivity.' }));
+		
+		var button = icon_button("Refresh Session","tick");
+		content.append($('<p>',{style : 'margin: 10px 0'}).html(button));
+
+		body.html(content);
+		$("div.default-modal").css("margin-left", -(modal.width()/2));
+		$("div.default-modal").css("margin-top", -(modal.height()/2));
+		// Hide modal on resize since it will no longer be centered.
+		$(window).one('resize',function() {
+			modal.modal('hide');
+		});
+		
+		var refreshSession = function() {
+			content.html($('<img>', {src:"img/ajax-loader.gif", alt: "Refreshing Session"}));
+			new Ajax.Request('ajax.php',{
+				method:'get',
+				parameters:{type: 'keepalive'},
+				onSuccess: function (response) {
+					//HACK: check to see if we hit the login page (due to logout)
+					if (response.responseText.indexOf(" Login</title>") != -1) {
+						content.html("");
+						content.append($('<img>', {src:"img/icons/error.png", alt: "Error"}));
+						content.append($('<span>', {text : 'Your session was not refreshed because your session has expired or logged out.'}));
+					} else {
+						content.html("");
+						content.append($('<img>', {src:"img/icons/accept.png", alt: "OK"}));
+						content.append($('<span>', {text : 'Your session was refreshed successfully.'}));
+						setTimeout(function() {
+							modal.modal('hide')
+						}, 4000);
+						
 					}
-				});
-			})
-		));
-	
-		keepalivemodal.window_contents.update(content);
-		keepalivemodal.open();
+				},
+				onFailure: function () {
+					content.html("An error occured trying to refresh your session.");
+				}
+			});
+		}
+		
+		// Dismissing the modal shows activity so do a request to keep session alive, and reset timer, logout if expired 
+		modal.one('hide',function() {
+			new Ajax.Request('ajax.php',{
+				method:'get',
+				parameters:{type: 'keepalive'}
+			});
+			sessionKeepAliveWarning(timeout);
+		})
+		
+		button.on('click',refreshSession);
 	}, timeout);
 }

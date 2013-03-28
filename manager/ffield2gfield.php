@@ -118,15 +118,16 @@ if( $reloadform )
 
 $custurl = QuickQuery("select c.urlcomponent from customer c where c.id = ?", false, array($currentid));
 
+$TITLE = "F field to G field migration";
+$PAGE = "commsuite:customers";
+
 include_once("nav.inc.php");
+
+startWindow(_L('F field to G field migration for customer: ' . $custurl));
 
 //custom newform declaration to catch if manager password is submitted
 NewForm($f);
-?>
-<h2>F field to G field migration for customer: <?=$custurl?></h2>
 
-<br>
-<? 
 NewFormItem($f, $s, "ffield", "selectstart", null, null, "");
 NewFormItem($f, $s, "ffield", "selectoption", "Select f-field", "");
 foreach($ffields as $fieldnum => $name){
@@ -153,4 +154,6 @@ EndForm();
 ?>
 <br>
 <?
+endWindow();
+
 include_once("navbottom.inc.php");

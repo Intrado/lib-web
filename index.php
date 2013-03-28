@@ -57,6 +57,8 @@ if (isset($_GET['login'])) {
 	}
 
 } else if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
+	// clear the login source cookie
+	setcookie($CUSTOMERURL. "_login_src", "");
 	$f_login = trim(get_magic_quotes_gpc() ? stripslashes($_POST['login']) : $_POST['login']);
 	$f_pass = get_magic_quotes_gpc() ? stripslashes($_POST['password']) : $_POST['password'];
 	$userid = doLogin($f_login, $f_pass, $CUSTOMERURL, $_SERVER['REMOTE_ADDR']);
@@ -122,9 +124,15 @@ if ($userid && $userid != -1) {
 				// get the location of portalauth
 				$portalAuthLocation = getPortalAuthLocation();
 
-				// check if it was a powerschool login and send to the powerschool portalauth servlet
+				// check if it was a powerschool login, send to the powerschool portalauth servlet
 				if ($type == 'powerschool') {
-					redirect($portalAuthLocation["url"]. "/portalauth/powerschool?customerurl=". urlencode($CUSTOMERURL). "&openid_identifier=". urlencode($user));
+					// unless it's a logout request, then close the window (PowerSchool implementation of OpenID doesn't allow re-auth)
+					if (isset($_GET['logout'])) {
+						$closewindow = true;
+					} else {
+						redirect($portalAuthLocation["url"]. "/portalauth/powerschool?customerurl=".
+							urlencode($CUSTOMERURL). "&openid_identifier=". urlencode($user));
+					}
 				}
 			}
 		}
@@ -180,6 +188,11 @@ include_once("logintop.inc.php");
 if (!($custname === false)) { 
 ?>
 	<script type="text/javascript">
+<?
+	// If the window should be closed (powerschool session logout request currently)
+	if (isset($closewindow) && $closewindow)
+		echo "window.close();"
+?>
 
 	new getObj('form_login').obj.focus();
 

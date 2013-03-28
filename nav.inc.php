@@ -82,7 +82,7 @@ $NAVTREE = array (
 		array("Templates","jobtemplates.php",($_SESSION['colorscheme']['_brandtheme'] == "newui" ? array('sendemail', 'sendphone', "sendsms") : array("dummy")),$SUBTAB=="templates"),
 		array("Posts","posts.php",getSystemSetting("_hasfeed", false) ? "feedpost" : "dummy",$SUBTAB=="post"),
 		array("Classroom","classroommessageoverview.php",getSystemSetting("_hastargetedmessage", false) ? "targetedmessage" : "dummy",$SUBTAB=="classroom"),
-		array("Surveys","surveys.php",getSystemSetting("_hassurvey", true) ? "survey" : "dummy",$SUBTAB=="survey"),
+		array("Surveys","surveys.php",$USER->canSendSurvey() ? "survey" : "dummy",$SUBTAB=="survey"),
 		array("Responses","replies.php?reset=1","leavemessage",$SUBTAB=="responses")
 		)),
 	array("Reports","reports.php",array('createreport',"viewsystemreports", "viewusagestats","viewcalldistribution"),$MAINTAB=="reports",array(
@@ -275,16 +275,13 @@ header('Content-type: text/html; charset=UTF-8') ;
 <!-- ********************************************************************* -->
 
 <div class="wrap"><!-- ends in navbottom.inc -->
-	<div class="previewmodal-wrap">
-	<div class="previewmodal-wrapcell">
-		<div class="modal hide fade preview-modal" id="prevewmodal">
-			<div class="modal-header"></div>
-            <div class="modal-body"></div>
-            <div class="modal-footer"></div>
-		</div>
+<div class="modal hide fade default-modal" id="defaultmodal">
+	<div class="modal-header">
+		<button class="close" aria-hidden="true" data-dismiss="modal" type="button">x</button>
+		<h3></h3>
 	</div>
-	</div>
-	
+	<div class="modal-body"></div>
+</div>
 <div id="top_banner" class="banner">
 <div class="contain cf">
 

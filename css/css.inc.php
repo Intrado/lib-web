@@ -806,36 +806,82 @@ div.autocomplete ul li {
 }
 
 
-div.previewmodal-wrap {
-	display: table;
-    position: absolute; 
-    height: 100%;
-    width: 100%;
-}
-div.previewmodal-wrapcell {
-	display: table-cell;
-	vertical-align: middle;	
+/*----- Bootstrap modal styles -----*/
+
+.modal-backdrop { background-color: #000000; bottom: 0; left: 0; position: fixed; right: 0; top: 0; opacity: 0.8; z-index: 1040; filter: alpha(opacity=80); }
+
+.modal { position: fixed; left: 50%; top: 50%; max-height: 500px; width: 700px; margin: -250px 0 0 -350px; padding: 0; background-clip: padding-box;  background-color: #FFFFFF; 
+border: 1px solid rgba(0, 0, 0, 0.3); -webkit-border-radius: 6px; border-radius: 6px; box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3); z-index: 1050; }
+
+.modal-header { position: relative; background: #fdfdfd; font-size: 21px; margin: 0; padding: 15px; border-bottom: 1px solid #ddd; -webkit-border-radius: 6px 6px 0 0; border-radius: 6px 6px 0 0; }
+
+.modal-body { max-height: 300px; padding: 15px; overflow: auto; }
+.modal-body .existing-lists label { float: none; display: block; width: 100%; margin: 0; padding: 8px; text-align: left; line-height: 22px; border-top: 1px solid #ddd; }
+.modal-body .existing-lists label:hover { background: #f5f5f5; }
+.modal-body .existing-lists label:first-child { border: none; }
+.modal-body .existing-lists input[type="checkbox"] { margin: 0 5px 0 0; }
+.modal-body .existing-lists span { float: none; padding: 0 5px; }
+.modal-body .add-rule .btn { float: none; width: 200px; }
+
+.modal-footer { position: relative; background: #f5f5f5; font-size: 21px; margin: 0; padding: 15px; text-align: right; border-top: 1px solid #ddd; -webkit-border-radius: 0 0 6px 6px; border-radius: 0 0 6px 6px; }
+.modal-footer .btn { float: none; display: inline-block; }
+.modal-footer .btn-primary { color: #fff; border: 1px solid #0039ab; 
+	background-color: #006DCC;
+	background-image: -webkit-gradient(linear, left top, left bottom, from(#0088CC), to(#0044CC)); 
+  background-image: -webkit-linear-gradient(top, #0088CC, #0044CC); 
+  background-image:    -moz-linear-gradient(top, #0088CC, #0044CC); 
+  background-image:     -ms-linear-gradient(top, #0088CC, #0044CC); 
+  background-image:      -o-linear-gradient(top, #0088CC, #0044CC); 
+  background-image:         linear-gradient(top, #0088CC, #0044CC);}
+.modal-footer .btn-primary:hover { background: #0044cc; color: #fff; }
+.modal-footer .btn-primary:active { background: #0037a4; color: #f4f4f4; }
+.modal-footer .disabled, .modal-footer button[disabled], .modal-body .disabled, .add-btns .disabled { background: #999; color: #fff; border: 1px solid #777; opacity: 0.7; cursor: default; }
+.modal-footer .disabled:hover, .modal-footer button[disabled], .modal-body .disabled:hover, .add-btns .disabled:hover { background: #999; color: #fff; }
+.modal-footer .disabled:active, .modal-footer button[disabled], .modal-body .disabled:active, .add-btns .disabled:active { background: #999; color: #fff; -webkit-box-shadow: inset 0px 1px 0px 0px rgba(255,255,255,0.3); box-shadow: inset 0px 1px 0px 0px rgba(255,255,255,0.3); }
+
+
+.modal .close { position: absolute; top: 18px; right: 15px; color: #999; font-size: 14px; }
+.modal .close:hover { color: #666; text-decoration: none; }
+.modal ul { list-style-type: none; margin: 0; padding: 15px; }
+.modal ul li { padding: 10px 0; border-bottom: 1px solid #eee; }
+.modal ul li:last-child { border: none; }
+.modal ul li label { padding: 0 0 0 5px; }
+.modal .msg_confirm { margin: 0; padding: 15px; }
+
+.modal_content { padding: 15px; }
+.modal_content input[type="text"] { padding: 5px 8px; font-size: 14px; line-height: 19px; border-radius: 5px 0 0 5px; border: 1px solid #ccc; }
+.modal_content input[type="text"]:focus { border: 1px solid #58acef; outline: 0px; box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(82, 168, 236, 0.6); }
+.modal_content input.btn { border-radius: 0 5px 5px 0; border-left: none; }
+
+
+
+
+
+div.default-modal {
+	display: none;
+	max-height: 80%; 
+	max-width: 80%; 
 }
 
-div.preview-modal {
-    height: auto;
-    left: auto;
-    margin: auto;
-    max-height: 80%;
-    max-width: 80%;
-    padding: 0;
-    position: relative;
-    top: auto;
-    width: 600px;
-}
-
-div.preview-modal .modal-body  {
-	max-height: 90%; 
+div.default-modal .modal-body  {
+	max-height: 80%; 
+	height: 80%;
 	padding: 15px; 
 	overflow: auto;
 }
-div.preview-modal iframe {
+div.default-modal iframe {
 	width: 100%;
+	height: 100%;
+}
+
+div.default-modal button.close {
+    background: none repeat scroll 0 0 transparent;
+    border: 0 none;
+    cursor: pointer;
+    padding: 0;
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 20px;
 }
 
 .messagegrid { margin: 5px 0 0; font-family: "Helvetica Neue",helvetica,Arial,sans-serif; }
@@ -964,6 +1010,7 @@ select#reldate { margin: 0 10px 0 0; }
 /*----- fixes the column layout wrapping in main content window -----*/
 .ie7 .window_aside { margin: 0 1.8% 0 0; }
 .ie7 .window_main { float: right; margin: 0; }
+.ie7 .modal-backdrop { background: none; }
 
 /*----- IE7 classes re-adds the rounded corners for ie7-----*/
 
