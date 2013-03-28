@@ -7,22 +7,22 @@ header("Content-Type: text/css");
 header("Cache-Control: private");
 
 $COLORSCHEMES = array(
-	"forest" => array(
-		"displayname" => "Forest",
-		"_brandprimary" => "0D8336", /* mid green */
-		"_brandtheme1" => "13a545",
-		"_brandtheme2" => "484848",
+	"aspmanager" => array(
+		"displayname" => "ASPManager",
+		"_brandprimary" => "336699", /* mid green */
+		"_brandtheme1" => "6699CC",
+		"_brandtheme2" => "99CCFF",
 		"_brandratio" => ".2"
 	)
 );
 if (isset($_GET["newnav"])) {
 
 	$_SESSION['colorscheme'] = array();
-	$_SESSION['colorscheme']['_brandtheme'] = "forest";
-	$_SESSION['colorscheme']['_brandprimary'] = $COLORSCHEMES["forest"]["_brandprimary"];
-	$_SESSION['colorscheme']['_brandratio'] = $COLORSCHEMES["forest"]["_brandratio"];
-	$_SESSION['colorscheme']['_brandtheme1'] = $COLORSCHEMES["forest"]["_brandtheme1"];
-	$_SESSION['colorscheme']['_brandtheme2'] = $COLORSCHEMES["forest"]["_brandtheme2"];
+	$_SESSION['colorscheme']['_brandtheme'] = "aspmanager";
+	$_SESSION['colorscheme']['_brandprimary'] = $COLORSCHEMES["aspmanager"]["_brandprimary"];
+	$_SESSION['colorscheme']['_brandratio'] = $COLORSCHEMES["aspmanager"]["_brandratio"];
+	$_SESSION['colorscheme']['_brandtheme1'] = $COLORSCHEMES["aspmanager"]["_brandtheme1"];
+	$_SESSION['colorscheme']['_brandtheme2'] = $COLORSCHEMES["aspmanager"]["_brandtheme2"];
 }
 
 include_once("css/css.inc.php");
