@@ -1,4 +1,7 @@
+# Mac-specific files
 Thumbs.db
 .DS_Store
+
+
 build.txt
 dist/
