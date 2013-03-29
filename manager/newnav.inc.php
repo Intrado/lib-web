@@ -213,8 +213,6 @@ header('Content-type: text/html; charset=UTF-8') ;
 		<h1>SchoolMessenger</h1>
 	</div>  
 	
-	<div class="banner_custname">Manager</div>
-	
 	<div class="banner_links_wrap">
 		<ul class="banner_links cf">
 			<li class="bl_left"></li>
