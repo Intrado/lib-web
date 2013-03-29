@@ -72,6 +72,13 @@ $associatedorgdata = QuickQueryMultiRow("(select SQL_CALC_FOUND_ROWS l.id as id,
 												(u.id = ua.userid)
 										where not u.deleted and ua.type = 'organization' and ua.organizationid = ?)
 										union
+										(select u.id as id, 'User Role' as type, concat(u.lastname, ', ', u.firstname) as name, u.login as login,
+											u.importid as userimportid, u.id as userid, '' as userenabled
+										from user u
+											inner join role r on
+												(u.id = r.userid)
+										where not u.deleted and r.organizationid = ?)
+										union
 										(select '' as id, 'Subscriber Field' as type, o.orgkey as name, '' as login,
 											'' as userimportid, '' as userid, '' as userenabled
 										from persondatavalues pdv
@@ -91,7 +98,7 @@ $associatedorgdata = QuickQueryMultiRow("(select SQL_CALC_FOUND_ROWS l.id as id,
 											from organization where not deleted and parentorganizationid = ?)
 										order by login, type
 										limit $start, $limit",
-										true, false, array($orgid, $orgid, $orgid, $orgid, $orgid));
+										true, false, array($orgid, $orgid, $orgid, $orgid, $orgid, $orgid));
 
 $total = QuickQuery("select FOUND_ROWS()");
 

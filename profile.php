@@ -14,6 +14,8 @@ require_once("obj/Access.obj.php");
 require_once("obj/Permission.obj.php");
 require_once("obj/FieldMap.obj.php");
 require_once("obj/RestrictedValues.fi.php");
+require_once("obj/ValTimeWindowCallEarly.val.php");
+require_once("obj/ValTimeWindowCallLate.val.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -41,25 +43,6 @@ if (isset($_GET['id'])) {
 ////////////////////////////////////////////////////////////////////////////////
 // Custom Form Controls And Validators
 ////////////////////////////////////////////////////////////////////////////////
-
-class ValJobWindowTime extends Validator {
-	var $onlyserverside = true;
-
-	function validate ($value, $args, $requiredvalues) {
-		$value = strtotime($value);
-		$value2 = strtotime($requiredvalues[$args['field']]);
-
-		//only check if both times parse
-		if ($value != -1 && $value !== false && $value2 != -1 && $value2 !== false) {
-			if ($args['op'] == "later" && $value <= $value2)
-				return _L('%1$s must be later than %2$s',$this->label, $args['fieldlabel']);
-			if ($args['op'] == "earlier" && $value >= $value2)
-				return _L('%1$s must be earlier than %2$s',$this->label, $args['fieldlabel']);
-		}
-
-		return true;
-	}
-}
 
 class ValDupeProfileName extends Validator {
 	var $onlyserverside = true;
@@ -211,7 +194,7 @@ _L('Messaging Options'),
 		"requires" => array("calllate"),
 		"validators" => array(
 			array("ValInArray","values" => array_keys($calltimes)),
-			array("ValJobWindowTime","field" => "calllate", "fieldlabel" => _L('Can\'t Schedule After'), "op" => "earlier")
+			array("ValTimeWindowCallEarly","noProfile" => true)
 		),
 		"control" => array("SelectMenu", "values" => $calltimes),
 		"helpstep" => 4
@@ -223,7 +206,7 @@ _L('Messaging Options'),
 		"requires" => array("callearly"),
 		"validators" => array(
 			array("ValInArray","values" => array_keys($calltimes)),
-			array("ValJobWindowTime","field" => "callearly", "fieldlabel" => _L('Can\'t Schedule Before'), "op" => "later")
+			array("ValTimeWindowCallLate","noProfile" => true)
 		),
 		"control" => array("SelectMenu", "values" => $calltimes),
 		"helpstep" => 4
@@ -330,7 +313,7 @@ _L('Messaging Options'),
 	),
 	"forcestationery" => array(
 			"label" => _L('Restrict to Stationery'),
-			"fieldhelp" => _L('Users can must use a stationery when creating a email message'),
+			"fieldhelp" => _L('Users must use a stationery when creating an email message'),
 			"value" => $obj->getValue("forcestationery"),
 			"validators" => array(
 					array("ValStationery")
@@ -971,7 +954,7 @@ include_once("nav.inc.php");
 </style>
 
 <script type="text/javascript">
-<? Validator::load_validators(array("ValDupeProfileName","ValJobWindowTime","ValStationery")); ?>
+<? Validator::load_validators(array("ValDupeProfileName","ValTimeWindowCallEarly","ValTimeWindowCallLate","ValStationery")); ?>
 </script>
 
 <?

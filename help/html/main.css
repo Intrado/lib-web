@@ -8,14 +8,14 @@ a:link {
 	font-family: helvetica, Arial sans-serif;
 	color: #336799;
 	font-size: 10pt;
-	text-decoration:none;
+	text-decoration:underline;
 	font-weight: bold;
 }
 a:visited {
 	font-family: helvetica, Arial sans-serif;
 	color: #C73B0F;
 	font-size: 10pt;
-	text-decoration:none;
+	text-decoration:underline;
 	font-weight: bold;
 }
 a:hover {
@@ -31,6 +31,7 @@ a:active {
 	color: #1A3D5E;
 	font-size: 10pt;
 	font-weight: bold;
+	text-decoration:underline;
 
 }
 

@@ -157,13 +157,12 @@ function embedPlayer(url,target,parts) {
 			'</object>');
 	} else {
 <?
-		$android = strpos($_SERVER['HTTP_USER_AGENT'],"Android");
-		if($android) {
+		$safari = strpos($_SERVER['HTTP_USER_AGENT'],"Safari");
+		if($safari) {
 ?>
-			$(target).update("Unable to play message. Please install Flash for Android 2.2 or higher or click the link to download the message.");
+			$(target).update('<audio src="' + url +'" controls="controls" autoplay="autoplay"></audio>');
 <?		} else { ?>
 			$(target).update('<object classid="clsid:22D6F312-B0F6-11D0-94AB-0080C74C7E95" width="165" height="45"><param name="type" value="audio/mpeg" /><param name="src" value="'+ url +'" /><param name="autostart" value="true" /><object type="audio/mpeg" data="'+ url +'" width="165" height="45" autoplay="true"></object></object>');
-			$(target).insert("<br /><a href='http://get.adobe.com/flashplayer/'>Click here to install or upgrade your Flash&reg; player</a>");
 <?		} ?>
 	}
 }

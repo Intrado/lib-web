@@ -441,6 +441,16 @@ class User extends DBMappedObject {
 		else
 			return $profile; //no pref, use profile
 	}
+	
+	/**
+	 * Returns true only if user has all the permissions to send a survey
+	 * @return boolean
+	 */
+	function canSendSurvey() {
+		$hasSurvey = getSystemSetting('_hassurvey', true) && $this->authorize('survey');
+		$hasPhoneOrEmail = $this->authorize('sendphone') || $this->authorize('sendemail');
+		return $hasSurvey && $hasPhoneOrEmail;
+	}
 }
 
 ?>

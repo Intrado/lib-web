@@ -131,9 +131,9 @@ var AudioLibraryWidget = Class.create({
 			var audiofilelinktablecell = audiofilelink.up('td');
 			
 			// Reset the table cell, keeping only the audio file link.
-			audiofilelinktablecell.update(
-				audiofilelink.update(newname.escapeHTML()).show()
-			);
+			audiofilelink.update(newname.escapeHTML()).show()
+			audiofilelink.siblings().each(function(item) {item.remove()});
+			
 			
 			// Update the cached audio file's name.
 			audiofile.name = newname;

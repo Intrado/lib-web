@@ -24,7 +24,8 @@ require_once("inc/twitteroauth/OAuth.php");
 require_once("inc/twitteroauth/twitteroauth.php");
 require_once("obj/Twitter.obj.php");
 require_once("obj/CallerID.fi.php");
-
+require_once("obj/ValTimeWindowCallEarly.val.php");
+require_once("obj/ValTimeWindowCallLate.val.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
@@ -312,9 +313,11 @@ $formdata["callearly"] = array(
 	"value" => $USER->getCallEarly(),
 	"validators" => array(
 		array("ValRequired"),
-		array("ValInArray", "values" => array_keys($startvalues))
+		array("ValInArray", "values" => array_keys($startvalues)),
+		array("ValTimeWindowCallEarly")
 	),
 	"control" => array("SelectMenu", "values"=>$startvalues),
+	"requires" => array("calllate"),
 	"helpstep" => 2
 );
 $endvalues = newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $USER->getCallLate());
@@ -324,9 +327,11 @@ $formdata["calllate"] = array(
 	"value" => $USER->getCallLate(),
 	"validators" => array(
 		array("ValRequired"),
-		array("ValInArray", "values" => array_keys($endvalues))
+		array("ValInArray", "values" => array_keys($endvalues)),
+		array("ValTimeWindowCallLate")
 	),
 	"control" => array("SelectMenu", "values"=>$endvalues),
+	"requires" => array("callearly"),
 	"helpstep" => 2
 );
 
@@ -603,7 +608,7 @@ include_once("nav.inc.php");
 
 ?>
 <script type="text/javascript">
-<? Validator::load_validators(array("ValLogin","ValPassword","ValBrandTheme", "ValAccesscode", "ValPin","ValCallerID")); ?>
+<? Validator::load_validators(array("ValLogin","ValPassword","ValBrandTheme", "ValAccesscode", "ValPin","ValCallerID","ValTimeWindowCallEarly","ValTimeWindowCallLate")); ?>
 </script>
 <?
 

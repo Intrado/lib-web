@@ -35,7 +35,7 @@ require_once("obj/SurveyQuestionnaire.obj.php");
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
 
-if (!getSystemSetting('_hassurvey', true) || !$USER->authorize('survey')) {
+if (!$USER->canSendSurvey()) {
 	redirect('unauthorized.php');
 }
 

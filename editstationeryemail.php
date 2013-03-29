@@ -28,7 +28,8 @@ require_once("obj/FormItem.obj.php");
 require_once("obj/Validator.obj.php");
 require_once("obj/EmailAttach.val.php");
 require_once("obj/EmailAttach.fi.php");
-require_once("obj/ValMessageBody.val.php");
+//require_once("obj/ValMessageBody.val.php");
+require_once("obj/ValStationeryBody.val.php");
 require_once("obj/HtmlTextArea.fi.php");
 require_once("obj/PreviewButton.fi.php");
 require_once("obj/ValDuplicateNameCheck.val.php");
@@ -96,7 +97,7 @@ if (!$USER->authorize("sendmulti") && $languagecode != Language::getDefaultLangu
 	redirect('unauthorized.php');
 
 
-PreviewModal::HandleRequestWithEmailText();
+PreviewModal::HandleRequestWithStationeryText();
 	
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
@@ -150,10 +151,21 @@ $formdata["message"] = array(
 	"value" => $text,
 	"validators" => array(
 		array("ValRequired"),
-		array("ValMessageBody", "messagegroupid" => $messagegroup->id),
+		//array("ValMessageBody", "messagegroupid" => $messagegroup->id),
+		array("ValStationeryBody", "messagegroupid" => $messagegroup->id),
 		array("ValLength","max" => 256000)
 	),
 	"control" => $messagecontrol,
+);
+
+$formdata["preview"] = array(
+		"label" => "",
+		"value" => "",
+		"validators" => array(),
+		"control" => array("PreviewButton",
+				"subtype" => "html",
+				"texttarget" => "message",
+		),
 );
 
 
@@ -251,7 +263,8 @@ include_once("nav.inc.php");
 // Optional Load Custom Form Validators
 ?>
 <script type="text/javascript">
-<? Validator::load_validators(array("ValDuplicateNameCheck","ValMessageBody", "ValEmailAttach")); ?>
+<? /*Validator::load_validators(array("ValDuplicateNameCheck","ValMessageBody", "ValEmailAttach")); */?>
+<? Validator::load_validators(array("ValDuplicateNameCheck","ValStationeryBody", "ValEmailAttach")); ?>
 </script>
 
 <?

@@ -17,11 +17,15 @@
 
 .jobtypepreferences li {
     display: inline;
-    float:left;
+    float:none;
     white-space: nowrap;
     border-right: 1px solid #CCCCCC;
     padding: 0 10px 0 10px;
     
+}
+div.jobtypepreferences {
+	overflow: hidden;
+	overflow-x: scroll;
 }
 
 .nowrap {

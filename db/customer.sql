@@ -2136,4 +2136,16 @@ $$$
 
 update setting set value='9.5/3' where name='_dbversion'
 $$$
--- END 9.5/2
+-- END 9.5/3
+
+-- START 9.6/1
+-- no schema only insert into authserver.customerproduct
+
+update setting set value='9.6/1' where name='_dbversion'
+$$$
+-- END 9.6/1
+
+-- Fix any settings which were inserted earlier.
+-- NOTE: This does not belong in an upgrade script! Only effects new customers where _dbversion and fbauthorizewall have been inserted above
+update setting set organizationid = null
+$$$

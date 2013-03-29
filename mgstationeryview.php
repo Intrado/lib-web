@@ -18,8 +18,8 @@ if ($isPreview) {
     <script type="text/javascript" src="script/jquery.1.7.2.min.js"></script>
     <script type="text/javascript">
    		$().ready(function() {
-   			if (typeof(parent.stationeryPrevewLoaded) != 'undefined') 
-   	   			parent.stationeryPrevewLoaded($('body'))
+   			if (typeof(parent.messagePrevewLoaded) != 'undefined') 
+   	   			parent.messagePrevewLoaded($('body'))
     	});
 	</script>
 	<style type="text/css">

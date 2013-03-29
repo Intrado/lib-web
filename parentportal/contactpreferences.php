@@ -50,102 +50,106 @@ if(isset($_SESSION['customerid']) && $_SESSION['customerid']){
 
 if($PERSONID){
 
-	$maxphones = getSystemSetting("maxphones", 3);
-	$maxemails = getSystemSetting("maxemails", 2);
-	$maxsms = getSystemSetting("maxsms", 2);
-	$tempphones = resequence($person->getPhones(), "sequence");
-	$phones = array();
-	for ($i=0; $i<$maxphones; $i++) {
-		if(!isset($tempphones[$i])){
-			$phones[$i] = new Phone();
-			$phones[$i]->sequence = $i;
-			$phones[$i]->personid = $PERSONID;
-		} else {
-			$phones[$i] = $tempphones[$i];
-		}
-	}
-	$tempemails = resequence($person->getEmails(), "sequence");
-	$emails = array();
-	for ($i=0; $i<$maxemails; $i++) {
-		if(!isset($tempemails[$i])){
-			$emails[$i] = new Email();
-			$emails[$i]->sequence = $i;
-			$emails[$i]->personid = $PERSONID;
-		} else {
-			$emails[$i] = $tempemails[$i];
-		}
-	}
-	if(getSystemSetting("_hassms")){
-		$tempsmses = resequence($person->getSmses(), "sequence");
-		$smses = array();
-		for ($i=0; $i<$maxsms; $i++) {
-			if(!isset($tempsmses[$i])){
-				$smses[$i] = new Sms();
-				$smses[$i]->sequence = $i;
-				$smses[$i]->personid = $PERSONID;
+	$blockDataAccess = $person->getSetting("block_data_access");
+
+	if (!$blockDataAccess) {
+		$maxphones = getSystemSetting("maxphones", 3);
+		$maxemails = getSystemSetting("maxemails", 2);
+		$maxsms = getSystemSetting("maxsms", 2);
+		$tempphones = resequence($person->getPhones(), "sequence");
+		$phones = array();
+		for ($i=0; $i<$maxphones; $i++) {
+			if(!isset($tempphones[$i])){
+				$phones[$i] = new Phone();
+				$phones[$i]->sequence = $i;
+				$phones[$i]->personid = $PERSONID;
 			} else {
-				$smses[$i] = $tempsmses[$i];
+				$phones[$i] = $tempphones[$i];
 			}
 		}
-	} else {
-		$smses = array();
-	}
-	$locked = getLockedDestinations($maxphones, $maxemails, $maxsms);
-	$lockedphones = $locked['phones'];
-	$lockedemails = $locked['emails'];
-	$lockedsms = $locked['sms'];
-
-	$contactprefs = getContactPrefs($PERSONID);
-	$defaultcontactprefs = getDefaultContactPrefs();
-
-	/****************** main message section ******************/
-
-	$f = "contactpreferences";
-	$s = "main";
-	$reloadform = 0;
-
-
-	if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "all"))
-	{
-		//check to see if formdata is valid
-		if(CheckFormInvalid($f))
-		{
-			error(_L('Form was edited in another window, reloading data'));
-			$reloadform = 1;
-		}
-		else
-		{
-			MergeSectionFormData($f, $s);
-
-			//do check
-			if( CheckFormSection($f, $s) ) {
-				error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
+		$tempemails = resequence($person->getEmails(), "sequence");
+		$emails = array();
+		for ($i=0; $i<$maxemails; $i++) {
+			if(!isset($tempemails[$i])){
+				$emails[$i] = new Email();
+				$emails[$i]->sequence = $i;
+				$emails[$i]->personid = $PERSONID;
 			} else {
-				if ($error = checkPriorityPhone($f, $s, $phones)) {
-					error(_L("You must have at least one phone number that can receive calls for these job types: ") . implode(", ", $error));
+				$emails[$i] = $tempemails[$i];
+			}
+		}
+		if(getSystemSetting("_hassms")){
+			$tempsmses = resequence($person->getSmses(), "sequence");
+			$smses = array();
+			for ($i=0; $i<$maxsms; $i++) {
+				if(!isset($tempsmses[$i])){
+					$smses[$i] = new Sms();
+					$smses[$i]->sequence = $i;
+					$smses[$i]->personid = $PERSONID;
 				} else {
-					getsetContactFormData($f, $s, $PERSONID, $phones, $emails, $smses, $jobtypes, $locked);
-
-					if(GetFormData($f, $s, "savetoall")){
-						//Fetch all person id's associated with this user on this customer
-						//then remove the current person id from the list
-						$otherContacts = getContactIDs($_SESSION['portaluserid']);
-						unset($otherContacts[array_search($PERSONID, $otherContacts)]);
-						copyContactData($PERSONID, $otherContacts, $locked);
-					}
-					redirect();
+					$smses[$i] = $tempsmses[$i];
 				}
 			}
+		} else {
+			$smses = array();
 		}
-	} else {
-		$reloadform = 1;
-	}
+		$locked = getLockedDestinations($maxphones, $maxemails, $maxsms);
+		$lockedphones = $locked['phones'];
+		$lockedemails = $locked['emails'];
+		$lockedsms = $locked['sms'];
 
-	if( $reloadform )
-	{
-		ClearFormData($f);
-		PutFormData($f, $s, "savetoall", "1", "bool", 0, 1);
-		putContactPrefFormData($f, $s, $contactprefs, $defaultcontactprefs, $phones, $emails, $smses, $jobtypes, $locked);
+		$contactprefs = getContactPrefs($PERSONID);
+		$defaultcontactprefs = getDefaultContactPrefs();
+
+		/****************** main message section ******************/
+
+		$f = "contactpreferences";
+		$s = "main";
+		$reloadform = 0;
+
+
+		if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "all"))
+		{
+			//check to see if formdata is valid
+			if(CheckFormInvalid($f))
+			{
+				error(_L('Form was edited in another window, reloading data'));
+				$reloadform = 1;
+			}
+			else
+			{
+				MergeSectionFormData($f, $s);
+
+				//do check
+				if( CheckFormSection($f, $s) ) {
+					error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
+				} else {
+					if ($error = checkPriorityPhone($f, $s, $phones)) {
+						error(_L("You must have at least one phone number that can receive calls for these job types: ") . implode(", ", $error));
+					} else {
+						getsetContactFormData($f, $s, $PERSONID, $phones, $emails, $smses, $jobtypes, $locked);
+
+						if(GetFormData($f, $s, "savetoall")){
+							//Fetch all person id's associated with this user on this customer
+							//then remove the current person id from the list
+							$otherContacts = getContactIDs($_SESSION['portaluserid']);
+							unset($otherContacts[array_search($PERSONID, $otherContacts)]);
+							copyContactData($PERSONID, $otherContacts, $locked);
+						}
+						redirect();
+					}
+				}
+			}
+		} else {
+			$reloadform = 1;
+		}
+
+		if( $reloadform )
+		{
+			ClearFormData($f);
+			PutFormData($f, $s, "savetoall", "1", "bool", 0, 1);
+			putContactPrefFormData($f, $s, $contactprefs, $defaultcontactprefs, $phones, $emails, $smses, $jobtypes, $locked);
+		}
 	}
 }
 
@@ -169,7 +173,11 @@ if($PERSONID){
 }
 include_once("nav.inc.php");
 startWindow(_L("Contacts"));
-echo "&nbsp" . icon_button(_L("Add Contact"),"add", null, "phoneactivation0.php") . "<hr />";
+
+// do not display 'add a contact' button if login from powerschool
+if (!isset($_SESSION['userlogintype']) || ($_SESSION['userlogintype'] != 'powerschool')) {
+	echo "&nbsp" . icon_button(_L("Add Contact"),"add", null, "phoneactivation0.php") . "<hr />";
+}
 
 if(isset($contactList) && $contactList){
 
@@ -224,9 +232,14 @@ if($PERSONID){
 		<tr>
 			<td>
 <?
-	//include_once("contactedit.php");
-	include_once("contacteditmobile.php");
-	
+	if ($blockDataAccess) {
+?>
+		Access to contact detail data has been restricted by the site administrator for <?=$_SESSION['custname']?>.<br>
+		Contact <?=$_SESSION['custname']?> to make changes to this data.
+<?
+	} else {
+		include_once("contacteditmobile.php");
+	}
 ?>
 			</td>
 		</tr>

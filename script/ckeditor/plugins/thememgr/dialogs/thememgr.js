@@ -8,6 +8,7 @@
  *
  * SMK created 2013-01-16
  * Modified 2013-02-14 by Ben Hencke - trimmed down required metadata
+ * SMK eliminated external "scratch" div dependency 2013-03-11
  */
 
 (function ($) {
@@ -32,10 +33,17 @@
 				}
 			],
 
+			scratch: 0,
+
+			rcitheme_data: {},
+
+			// The color being chosen for the color chooser
+			choosingcolor: -1,
+
 			// The first thing that happens
 			onShow: function() {
 				var ui = '';
-				var self = CKEDITOR.dialog.getCurrent().definition;
+				var myself = CKEDITOR.dialog.getCurrent().definition;
 
 				try {
 
@@ -54,58 +62,35 @@
 						throw '';
 					}
 
-					if (typeof window.top.rcieditor !== 'object') {
+					if (typeof window.parent.rcieditor !== 'object') {
 						// rcieditor object not found; this plugin requires rcieditor.js to be included
 						alert('Oops! Internal Error (3)');
 						throw '';
 					}
 
-					var scratch = rcieditor.getSetting('rcieditor_scratch'); // rcieditor.js
-					if (typeof scratch === 'undefined') {
-
-						// scratch space could not be found
-						alert('Oops! Internal Error (5)');
-						throw '';
-					}
+					// Initialize scratch space as a jQuery object that we can manipulate
+					myself.scratch = $('<div></div>');
 
 					// grab the entire contents of the document being edited
 					var content = editor.getData();
 
 					// and stick it into the scratch space for the editor where we can do some
 					// DOM work on it; jQuery can access it here, without painful iframe extension
-					scratch.empty().html(content);
+					myself.scratch.empty().html(content);
 
 					// Scan for and get a list of all the rcithemed elements within the document
-					var rcitheme_data = self.theme_scan(scratch);
+					myself.rcitheme_data = myself.theme_scan(myself.scratch);
 
 					// If there are no theme data items
-					if (! rcitheme_data.count) {
+					if (! myself.rcitheme_data.count) {
 						ui = 'This stationery has not been enabled with theme properties.';	
 					}
 					else {
+
 						// Break the list of theme items up by type; we only have a color selection type for now
 						var ui_components = {
 							colors: ''
 						};
-
-						// If there are any theme colors
-						if (rcitheme_data.color.size()) {
-
-							// Then add the color selector
-							var theme_color_options = '';
-							for (var jj = 0; jj < rcitheme_data.color.size(); jj++) {
-								theme_color_options += '<option>' + rcitheme_data.color[jj] + '</option>';
-							}
-							ui_components.colors = '<select id="theme_color_id">';
-							if (rcitheme_data.color.size() > 1) {
-								ui_components.colors += '<option value="" selected="selected"">Select a theme color to update...</option>';
-							}
-							ui_components.colors += theme_color_options + '</select>';
-						}
-						else {
-							// we shouldn't be able to get here - colors are our only option right now
-							ui = 'no theme selection output';
-						}
 
 						// A collections of tab/views that we will put our ui components into
 						var ui_tabs = '';
@@ -115,31 +100,46 @@
 						// Add some functions that we can use
 						var tscall = 'CKEDITOR.dialog.getCurrent().definition.theme_tab_show';
 
-						// Add tab/view for color selection
-						if (ui_components.colors.length) {
-							ui_tabs += '<span id="theme_tab_colors" class="inactive" onclick="' + tscall + '(\'colors\');">&nbsp;&nbsp;COLORS&nbsp;&nbsp;</span>';
+						// If there are any theme colors
+						if (myself.rcitheme_data.color.size()) {
 
-							ui_views += '<div id="theme_view_colors" class="theme_view inactive">';
-							ui_views += '	<div class="viewstep"> 1) ' + ui_components.colors + '</div>';
-							ui_views += '	<div class="viewstep"> 2) ';
-							ui_views += '		Select Color: #<input id="theme_color_code" type="text" size="6" maxlength="6" onchange="CKEDITOR.dialog.getCurrent().definition.theme_color_preview_update();"/> <span id="theme_color_preview">&nbsp;</span>';
-							ui_views += '		<div class="swatches">';
-
-							var cscall = 'CKEDITOR.dialog.getCurrent().definition.theme_color_swatch';
+							// Add (another) tab/view for color selection
+							var choosercall = 'CKEDITOR.dialog.getCurrent().definition.theme_color_chooser_show';
+							var chooserexit = 'CKEDITOR.dialog.getCurrent().definition.theme_color_chooser_exit';
+							var chooserpick = 'CKEDITOR.dialog.getCurrent().definition.theme_color_chooser_pick';
+							ui_tabs += '<span id="theme_tab_newcolors" class="inactive" onclick="' + tscall + '(\'newcolors\');">&nbsp;&nbsp;COLORS&nbsp;&nbsp;</span>';
+							ui_views += '<div id="theme_view_newcolors" class="theme_view inactive">';
+							ui_views += '<div id="theme_view_newcolors_hider" style="display: none;">&nbsp;</div>';
+							for (var jj = 0; jj < myself.rcitheme_data.color.size(); jj++) {
+								ui_views += '<div class="coloritem" onclick="' + choosercall + '(' + jj + ');">';
+								ui_views += '	<div class="swatch" id="theme_view_newcolors_swatch_' + jj + '">&nbsp;</div>';
+								ui_views += 	myself.rcitheme_data.color[jj];
+								ui_views += '</div>';
+							}
+							ui_views += '<div id="theme_view_newcolors_chooser" style="display: none;">';
+							ui_views += '<span style="color: white; margin-left: 5px;">Choose a color to apply</span>';
+							ui_views += '<span class="chooserexit" onclick="' + chooserexit + '();">X</span>';
+							ui_views += '<div class="chooserswatches">';
 							var csnum = 0;
 							for (var rr = 0; rr < 256; rr += 0x33) {
 								for (var gg = 0; gg < 256; gg += 0x33) {
 									for (var bb = 0; bb < 256; bb += 0x33) {
-										var rgb = self.hex(rr) + self.hex(gg) + self.hex(bb);
-										ui_views += '<span id="theme_color_swatch_' + csnum + '" style="background-color: #' + rgb + ';" onclick="' + cscall + '(' + csnum + ');">&nbsp;</span>';
+										var rgb = myself.hex(rr) + myself.hex(gg) + myself.hex(bb);
+										ui_views += '<div class="chooser_swatch" id="theme_newcolors_swatch_' + csnum + '" style="background-color: #' + rgb + ';" onclick="' + chooserpick + '(' + csnum + ');">&nbsp;</div>';
 										csnum++;
 									}
 								}
-								ui_views += '<br clear="all"/>';
+								//ui_views += '<br clear="all"/>';
 							}
-							ui_views += '		</div>';
-							ui_views += '	</div>';
 							ui_views += '</div>';
+							ui_views += '</div>';
+							ui_views += '<br clear="all"/>';
+							ui_views += '</div>';
+
+						}
+						else {
+							// we shouldn't be able to get here - colors are our only option right now
+							ui = 'no theme selection output';
 						}
 
 						/*
@@ -152,7 +152,7 @@
 						// Build UI output from all defined tabs/views
 						ui = '<div class="themetabs">' + ui_tabs + '</div><div class="themeviews">' + ui_views + '</div>';
 						ui += '<style>';
-						ui += '		div.themetabs > span { font-size: 10px; font-weight: bold; margin: 5px 0px; }';
+						ui += '		div.themetabs > span { font-size: 10px; font-weight: bold; margin: 5px 0px; cursor: pointer; }';
 						ui += '		div.themetabs > span.inactive { color: #666666; background-color: inherit; }';
 						ui += '		div.themetabs > span.active { color: #0066CC; background-color: #DDD; }';
 						ui += '		div.themeviews { background-color: #DDD; }';
@@ -161,9 +161,16 @@
 						ui += '		div.themeviews div.viewstep { padding: 5px 10px; }';
 						ui += '		div.themeviews input, div.themeviews select { background-color: white; border: 1px solid #999; }';
 
-						// tab-specific styles:
-						ui += '		div.themeviews > div#theme_view_colors > div.viewstep > div.swatches > span { display: inline-block; float: left; margin: 0px; height: 10px; width: 10px; font-size: 1px; cursor: pointer; }';
-						ui += '		div.themeviews > div#theme_view_colors > div.viewstep > span#theme_color_preview { position: relative; top: -10px; display: inline-block; height: 16px; width: 32px; font-size: 1px; border: 1px solid black; }';
+						// New Colors Tab
+						ui += '		div#theme_view_newcolors { position: relative; height: 120px; }';
+						ui += '		div#theme_view_newcolors_hider { position: absolute; top: 0px; left: 0px; z-index: 1; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }';
+						ui += '		div#theme_view_newcolors > div.coloritem { cursor: pointer; }';
+						ui += '		div#theme_view_newcolors > div.coloritem:hover { background-color: #99CCFF; font-weight: bold; }';
+						ui += '		div#theme_view_newcolors > div.coloritem > div.swatch { float: left; width: 12px; height: 12px; margin: 0px 3px; font-size: 1px; border: 1px solid #666; cursor: pointer; }';
+						ui += '		div#theme_view_newcolors_chooser { position: absolute; top: 7px; right: 10px; z-index: 2; border: 1px solid #666; background-color: #999; }';
+						ui += '		div#theme_view_newcolors_chooser > span.chooserexit { position: absolute; top: 2px; right: 2px; width: 12px; height: 12px; border: 1px solid #FFF; font-weight: bold; background-color: #666; color: white; text-align: center; cursor: pointer; }';
+						ui += '		div#theme_view_newcolors_chooser > div.chooserswatches { width: 360px; height: 60px; padding: 0px; margin: 5px; border: 1px solid #666; }';
+						ui += '		div#theme_view_newcolors_chooser > div.chooserswatches > div.chooser_swatch { float: left; margin: 0px; height: 10px; width: 10px; font-size: 1px; cursor: pointer; }';
 						ui += '</style>';
 					}
 				}
@@ -179,28 +186,36 @@
 
 				e.setHtml('<div>' + ui + '</div>');
 
-				self.theme_tab_show('colors');
+				myself.theme_tab_show('newcolors');
+			},
+
+			theme_color_chooser_show: function(num) {
+				this.choosingcolor = num;
+				$('#theme_view_newcolors_hider').css('display', 'block');
+				$('#theme_view_newcolors_chooser').css('display', 'block');
+			},
+
+			theme_color_chooser_pick: function(num) {
+				var color_code = this.color2hex($('#theme_newcolors_swatch_' + num).css('background-color'));
+				$('#theme_view_newcolors_swatch_'+ this.choosingcolor).css('background-color', '#' + color_code);
+				this.theme_color_chooser_exit();
+			},
+
+			theme_color_chooser_exit: function() {
+				$('#theme_view_newcolors_chooser').css('display', 'none');
+				$('#theme_view_newcolors_hider').css('display', 'none');
+				this.choosingcolor = -1;
 			},
 
 			// The last thing that happens
 			onOk: function() {
-				var self = CKEDITOR.dialog.getCurrent().definition;
+				var myself = CKEDITOR.dialog.getCurrent().definition;
 
 				try {
 
 					// Only the active theme_tab is used upon submission
-					switch (self.theme_tab_showing) {
+					switch (myself.theme_tab_showing) {
 						case 'colors':
-
-							var scratch = rcieditor.getSetting('rcieditor_scratch');
-							if (typeof scratch === 'undefined') {
-
-								// This is an internal error, not the user's problem; let them know...
-								alert('Oops! Internal Error (1)');
-
-								// Then throw an empty message to allow the dialog to close
-								throw '';
-							}
 
 							// Get the selection that was made for a color id
 							var color = $('#theme_color_id')
@@ -218,7 +233,18 @@
 								throw 'No color was chosen!';
 							}
 
-							var res = self.theme_scan(scratch, color_id, '#' + color_code);
+							var res = myself.theme_scan(myself.scratch, color_id, '#' + color_code);
+							break;
+
+						case 'newcolors':
+							for (var jj = 0; jj < myself.rcitheme_data.color.size(); jj++) {
+								var bgcolor = $('#theme_view_newcolors_swatch_' + jj).css('background-color');
+								if (bgcolor != 'transparent') {
+									var color_code = myself.color2hex(bgcolor);
+									var res = myself.theme_scan(myself.scratch, myself.rcitheme_data.color[jj], '#' + color_code);
+									if (! res) break;
+								}
+							}
 							break;
 
 						// Add other tab submissions like so:
@@ -228,7 +254,7 @@
 
 					// For setting, we need to put our scratch area back into the document
 					if (res) {
-						var content = scratch.html();
+						var content = myself.scratch.html();
 						editor.setData(content);
 					}
 

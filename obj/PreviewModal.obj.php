@@ -35,25 +35,26 @@ class PreviewModal {
 		
 		$id = $_REQUEST["previewid"] + 0;
 		$message = DBFind("Message", "from message where id = ?", false, array($id));
+
 		
+		// Validate Message and Permisions 
 		if (!$message) 
-			return;
+			exit();
 		
-		// Allow preview of message if message is associated with a job that is viewable
-		if (isset($_REQUEST["jobid"])) {
-			$isAssociated = QuickQuery("select 1 from job j inner join messagegroup mg on (mg.id = j.messagegroupid) where j.id=? and mg.id=?",false,array($_REQUEST["jobid"],$message->messagegroupid));
-			if (!$isAssociated) {
-				return;
-			} else {
-				if(!userCanSee("job", $_REQUEST["jobid"])) {
-					return;
+		if (!userCanSee("message", $id)) {
+			// Allow preview of message if message is associated with a job that is viewable
+			if (isset($_REQUEST["jobid"])) {
+				$isAssociated = QuickQuery("select 1 from job j inner join messagegroup mg on (mg.id = j.messagegroupid) where j.id=? and mg.id=?",false,array($_REQUEST["jobid"],$message->messagegroupid));
+				$canViewMessage = $isAssociated && userCanSee("job", $_REQUEST["jobid"]);
+				if (!$canViewMessage) {
+					exit() ;
 				}
-			}
-		} else {
-			if(!userCanSee("message", $id)) {
-				return;
+			} else {
+				exit();
 			}
 		}
+		// End of Validate
+		
 		$modal = new PreviewModal();
 		switch($message->type) {
 			case "phone":
@@ -77,15 +78,15 @@ class PreviewModal {
 					permitContent($part->imagecontentid);
 				}
 				
-				$email = messagePreviewForPriority($message->id, $jobpriority); // returns commsuite_EmailMessageView object
-				$modal->text = $modal->formatEmailHeader($email);
 				switch ($message->subtype) {
 					case "html":
 						$modal->title = _L("%s HTML Email Message" , Language::getName($message->languagecode));
-						$modal->text .= $email->emailbody;
+						$modal->text = "<iframe src=\"messageview.php?messageid={$message->id}" . (isset($_REQUEST["jobtypeid"])?"&jobtypeid={$_REQUEST["jobtypeid"]}":"") . "\"></iframe>";//$email->emailbody;
 						break;
 					case "plain":
 						$modal->title = _L("%s Plain Email Message" , Language::getName($message->languagecode));
+						$email = messagePreviewForPriority($message->id, $jobpriority); // returns commsuite_EmailMessageView object
+						$modal->text = $modal->formatEmailHeader($email);
 						$modal->text .= nl2br(escapehtml($email->emailbody));
 						break;
 				}
@@ -213,6 +214,35 @@ class PreviewModal {
 		$modal->includeModal();
 	}
 	
+	static function HandleRequestWithStationeryText() {
+		if (!isset($_REQUEST["previewmodal"]) ||
+				!isset($_REQUEST["subtype"]) ||
+				!isset($_REQUEST["text"]))
+			return;
+			
+		$modal = new PreviewModal();
+		$message = new Message();
+		$message->type = "email";
+		$message->subtype = $_REQUEST["subtype"];
+	
+		$parts = Message::parse($_REQUEST["text"],$modal->errors);
+		if (count($modal->errors) == 0) {
+			$email = emailMessageViewForMessageParts($message,$parts,3);
+		}
+		switch ($_REQUEST["subtype"]) {
+			case "html":
+				$modal->title = _L("%s HTML Email Message", Language::getName($message->languagecode));
+				$modal->text = $email->emailbody;
+				break;
+			case "plain":
+				$modal->title = _L("%s Plain Email Message", Language::getName($message->languagecode));
+				$modal->text = nl2br(escapehtml($email->emailbody));
+				break;
+		}
+	
+		$modal->includeModal();
+	}
+	
 	
 	
 	// Includeds the javascript necessary to open the modal and renderes the form if there are any field insters
@@ -225,7 +255,14 @@ class PreviewModal {
 			$modalcontent = $this->form->render();
 		}
 		header('Content-Type: application/json');
-		echo json_encode(array("playable" => $this->playable,"title" => $this->title, "hasinserts" => $this->hasfieldinserts, "errors" => $this->errors, "form" => $modalcontent, "uid" => $this->uid, "partscount" => count($this->parts)));
+		echo json_encode(array(
+			"playable" => $this->playable,
+			"title" => $this->title, 
+			"hasinserts" => $this->hasfieldinserts, 
+			"errors" => $this->errors, 
+			"content" => $modalcontent, 
+			"uid" => $this->uid, 
+			"partscount" => count($this->parts)));
 		exit();
 	}
 	
@@ -305,78 +342,114 @@ class PreviewModal {
 		$posturl .= mb_strpos($posturl,"?") !== false ? "&" : "?";
 		$posturl .= "previewmodal=true";
 		?>
-		<script type="text/javascript" src="script/datepicker.js"></script>
+		
+
+
 		<script type='text/javascript' language='javascript'>
+		
+		function messagePrevewLoaded(area) {
+			var $ = jQuery;
+			var modal = $('#defaultmodal');
+			modal.height("80%");
+			modal.width("100%");
+			centerModal(modal);
+		}
+
+		var centerModal = function(modal) {
+			var $ = jQuery;
+			$("div.default-modal").css("margin-top", -(modal.height()/2));
+			$("div.default-modal").css("margin-left", -(modal.width()/2));
+
+			// Hide modal on resize since it will no longer be centered.
+			$(window).one('resize',function() {
+				modal.modal('hide');
+			});
+		}
 		var showPreview = function(post_parameters,get_parameters){
-			var modal = new ModalWrapper("Loading...",false,false);
-			modal.window_contents.update(new Element('img',{src: 'img/ajax-loader.gif'}));
-			modal.open();
+			var $ = jQuery;
+
+			var modal = $('#defaultmodal');
+			modal.modal();
+			modal.height("auto");
+			modal.width("600px");
+			var header = $('#defaultmodal').find(".modal-header h3");
+			var body = $('#defaultmodal').find(".modal-body");
 			
+			modal.one('hide',function() {
+				body.html("");
+			});
+			
+			modal.find(".modal-body").html('<img src="img/ajax-loader.gif" alt="Please Wait..."/> Loading...')
 			new Ajax.Request('<?= $posturl?>' + (get_parameters?'&' + get_parameters:''), {
 				'method': 'post',
 				'parameters': post_parameters,
 				'onSuccess': function(response) {
-					modal.window_title.update("");
+					header.html("");
 					if (response.responseJSON) {
 						var result = response.responseJSON;
-						modal.window_title.update(result.title);
+						header.html(result.title);
 						
 						if (result.errors != undefined && result.errors.size() > 0) {
-							modal.window_title.update('Unable to Preview');
+							header.html('Unable to Preview');
 							
-							modal.window_contents.update("The following error(s) occured:");
-							var list = new Element('ul');
+							body.html("The following error(s) occured:");
+							var list = $('<ul/>');
 							result.errors.each(function(error) {
-								list.insert(new Element('li').update(error));
+								list.append('<li>' + error + '</li>');
 							});
-							modal.window_contents.insert(list);
+							body.append(list);
 						} else if (result.playable == true) {
-							modal.window_contents.update(result.form);
-							
-							var player = new Element('div',{
-								id: 'player',
+							body.html(result.content);
+							$('<div/>', {
+								id: 'previewplayer',
 								style: 'text-align:center;'
-							});
-							var download = new Element('div',{
-								id: 'download',
-								style: 'text-align:center;'
-							});
-							modal.window_contents.insert(player);
-							modal.window_contents.insert(download);
+							}).appendTo(body);
+
+							$('<div/>', {
+							    id: 'previewdownload',
+							    style: 'text-align:center;'
+							}).appendTo(body);
 							
-							
-							if (result.hasinserts ==  false) {
-								var downloadlink = new Element('a',{
-									href: 'previewaudio.mp3.php?download=true&uid=' + result.uid
-								}).update('Click here to download');
-								
-								$('download').update(downloadlink);
+							if (result.hasinserts == false) {
+								$('#previewdownload').html('<a href="previewaudio.mp3.php?download=true&uid=' + result.uid + '">Click here to download</a>');
 								if (result.partscount != 0)
-									embedPlayer('previewaudio.mp3.php?uid=' + result.uid,'player',result.partscount);
+									embedPlayer('previewaudio.mp3.php?uid=' + result.uid,'previewplayer',result.partscount);
 								else {
-									embedPlayer('previewaudio.mp3.php?uid=' + result.uid,'player');
+									embedPlayer('previewaudio.mp3.php?uid=' + result.uid,'previewplayer');
 								}
 							} else {
-								$('previewmessagefields').observe('Form:Submitted',function(e){
-									embedPlayer('previewaudio.mp3.php?uid=' + e.memo,'player',result.partscount);
-									var download = new Element('a',{
-										href: 'previewaudio.mp3.php?download=true&uid=' + e.memo
-									}).update('Click here to download');
-									$('download').update(download);
+								$('#previewmessagefields').on('Form:Submitted',function(e,memo){
+									embedPlayer('previewaudio.mp3.php?uid=' + memo,'previewplayer',result.partscount);
+									$('#previewdownload').html('<a href="previewaudio.mp3.php?download=true&uid=' + memo + '">Click here to download</a>');
 								});
 							}
 						} else {
-							modal.window_contents.update(result.form);
+							if (post_parameters && typeof(post_parameters) != 'undefined' && typeof(post_parameters.subtype) != 'undefined' ) {
+								var iframe = $("<iframe/>", {src: "blank.html"});
+								body.html(iframe);
+								iframe.load(function(){
+									var iframecontent = iframe.contents().find('body');
+									iframecontent.append(result.content);
+									modal.height("100%");
+									modal.width("100%");
+				 					centerModal(modal);
+								});
+							} else {
+								body.html(result.content);
+							}
 						}
 					} else {
-						modal.window_title.update('Error');
-						modal.window_contents.update('Unable to preview this message');
+						header.html('Error');
+						body.html('Unable to preview this message');
 					}
 				},
 				
 				'onFailure': function() {
-					modal.window_title.update('Error');
-					modal.window_contents.update('Unable to preview this message');
+					header.html('Error');
+					body.html('Unable to preview this message');
+				},
+				'onComplete': function() {
+					centerModal(modal);
 				}
 			});
 			

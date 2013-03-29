@@ -35,7 +35,8 @@ h4 { font-size: 12px; line-height: 22px; color: #235563; text-shadow: 0 1px 0 #f
 .contain { position: relative; margin: 0 1%; }
 .popup_container { position: relative; margin: 0 auto; padding: 0 10px; }
 
-.newbroadcast, .main_activity { float: left; display: inline; width: 76.5%; margin: 5px 0 15px 0; }
+.newbroadcast {display: inline; margin: 5px 0 15px 0; }
+.main_activity { float: left; display: inline; width: 76.5%; margin: 5px 0 15px 0; }
 .main_aside { float: right; display: inline; width: 21%; margin: 5px 0 0; }
 
 
@@ -1183,7 +1184,7 @@ div.progressbar div.progress {
 	border: 1px solid #E2E2E2;
 	border-radius: 3px;
 	background-color: #fff;
-	height: 100%;
+	height: 400px;
     width: 100%;
 }
 
@@ -1211,7 +1212,14 @@ div.progressbar div.progress {
 
 .iframe_content_wrap {
     min-width: 500px;
-    padding: 20px 0;
+    padding: 0;
+	margin: 6px !important;
+}
+
+.iframe_content_wrap .msg_confirm {
+	background: white;
+	border: 0px;
+	margin: 0px;
 }
 
 .modaliframe iframe {

@@ -1,70 +1,92 @@
-﻿/*Created with Adobe RoboHelp.*/
-/*Created with Adobe RoboHelp.*/
-/*Created with Adobe RoboHelp.*/
-} A {
-	font-family: "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;
-	color: #365F8D;
+/*Created with Adobe RoboHelp 9.*/
+SPAN.maincontent {
 	font-size: 10pt;
-	text-decoration: underline;
+	font-family: helvetica, Arial sans-serif;
+}
+
+body { margin: 30px 30px 30px 30px; }
+
+a:link {
+	font-family: helvetica, Arial sans-serif;
+	color: #336799;
+	font-size: 10pt;
+	text-decoration:underline;
+	font-weight: bold;
+}
+a:visited {
+	font-family: helvetica, Arial sans-serif;
+	color: #C73B0F;
+	font-size: 10pt;
+	text-decoration:underline;
+	font-weight: bold;
 }
 a:hover {
-	font-family: "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;
-	color: #4274aa;
+	font-family: helvetica, Arial sans-serif;
+	color: #208fff;
 	font-size: 10pt;
-	text-decoration: underline;
+	font-weight: bold;
+	text-decoration:underline;
+
 }
-body {
-	font-family: "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;
-	color: #595959;
-	background: #f0f0f0;
-	text-align: left;
+a:active {
+	font-family: helvetica, Arial sans-serif;
+	color: #1A3D5E;
 	font-size: 10pt;
-	background-color: #ffffff;
+	font-weight: bold;
+	text-decoration:underline;
+
 }
-a:link,
-a:visited {
-	color: #365F8D;
+
+SPAN.glosstext {
 	font-size: 10pt;
-	text-decoration: underline;
+	font-family: helvetica, Arial sans-serif;
 }
-#mainscreen {
-	width: 100%;
-	border: 1px solid #c0c0c0;
-	text-align: left;
-	background: #365F8D;
-}
-td {
+SPAN.expandtext {
 	font-size: 10pt;
-	font-family: "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;
+	font-family: helvetica, Arial sans-serif;
 }
-object id="RelatedTopics" {
-	font-size: small;
-	font-family: "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;
-	color: #365F8D;
-	text-decoration: underline;
+BODY {
+	font-family: helvetica, Arial sans-serif;
+	font-size: 10pt;
+	color: #585858;
 }
-A.popupspot {
+OL,
+UL {
+	font-size: 10pt;
+	font-family: helvetica, Arial sans-serif;
+}
+P {
+	font-size: 10pt;
+	color: #000000;
+}
+
+p.important {
+	font-size: 10pt;
+	color: #386C9C;
+	font-style: italic;
+
+}
+
+LI.p {
+	font-size: 10pt;
 }
 H1 {
-	font-size: 18pt;
+	font-size: 16pt;
+	color: #386C9C;
 }
-LI.H1 {
-	font-size: 18pt;
+H4{
+	font-size: 12pt;
+	color: #469EB9;
+}
+H3{
+	font-size: 11pt;
+	color: #316597;
+}
+LI.h1 {
+	font-size: 15pt;
 }
 
-P {
-	margin-left: 40px;
 }
-LI.P {
+LI.h4 {
+	font-weight: bold;
 }
-/* 
-dark blue #365F8D
-light blue #D4DDE2
-shaded cell #E8E8E8
-border #B3B3B3
-
-selected blue #0E3293
-
-*/
-
-

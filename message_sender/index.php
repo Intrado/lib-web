@@ -75,17 +75,11 @@
 		
 	</div><!-- endwindow newbroadcast -->
 	
-
-	<div class="main_aside">
-		<?= addHelpSection();?>
-	</div><!-- end main_aside-->
-	
 </div><!-- end wrapper -->
 
 <? include("message_sender/modals.inc.php"); ?>
 
 <!-- get jQuery and jquery plugins -->
-<script type="text/javascript" src="script/jquery.1.7.2.min.js"></script>
 <script type="text/javascript" src="script/jquery.json-2.3.min.js"></script>
 <script type="text/javascript" src="script/jquery-datepicker.js"></script>
 <script type="text/javascript" src="script/jquery.timer.js"></script>
@@ -93,7 +87,6 @@
 <script type="text/javascript" src="script/jquery.easycall.js"></script>
 <script type="text/javascript" src="script/jquery.translate.js"></script>
 
-<script type="text/javascript" src="script/bootstrap-modal.js"></script>
 <script type="text/javascript" src="script/bootstrap-dropdown.js"></script>
 
 <script type="text/javascript" src="script/message_sender_global.js"></script>

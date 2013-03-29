@@ -82,7 +82,7 @@ $NAVTREE = array (
 		array("Templates","jobtemplates.php",($_SESSION['colorscheme']['_brandtheme'] == "newui" ? array('sendemail', 'sendphone', "sendsms") : array("dummy")),$SUBTAB=="templates"),
 		array("Posts","posts.php",getSystemSetting("_hasfeed", false) ? "feedpost" : "dummy",$SUBTAB=="post"),
 		array("Classroom","classroommessageoverview.php",getSystemSetting("_hastargetedmessage", false) ? "targetedmessage" : "dummy",$SUBTAB=="classroom"),
-		array("Surveys","surveys.php",getSystemSetting("_hassurvey", true) ? "survey" : "dummy",$SUBTAB=="survey"),
+		array("Surveys","surveys.php",$USER->canSendSurvey() ? "survey" : "dummy",$SUBTAB=="survey"),
 		array("Responses","replies.php?reset=1","leavemessage",$SUBTAB=="responses")
 		)),
 	array("Reports","reports.php",array('createreport',"viewsystemreports", "viewusagestats","viewcalldistribution"),$MAINTAB=="reports",array(
@@ -227,11 +227,12 @@ header('Content-type: text/html; charset=UTF-8') ;
 	<script src="script/livepipe/livepipe.js" type="text/javascript"></script>
 	<script src="script/livepipe/window.js" type="text/javascript"></script>
 	<script src="script/modalwrapper.js" type="text/javascript"></script>
-        <script type="text/javascript" src="script/jquery.1.7.2.min.js"></script>
-        <script type="text/javascript">
-                jQuery.noConflict();
-        </script>
-        <script type="text/javascript" src="script/json2.js"></script>
+    <script type="text/javascript" src="script/jquery.1.7.2.min.js"></script>
+    <script type="text/javascript">
+         jQuery.noConflict();
+    </script>
+	<script type="text/javascript" src="script/datepicker.js"></script>
+	<script src="script/bootstrap-modal.js" type="text/javascript"></script>
 	
 	<link href="css.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print" />
 	<link href="css.forms.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print" />
@@ -274,7 +275,13 @@ header('Content-type: text/html; charset=UTF-8') ;
 <!-- ********************************************************************* -->
 
 <div class="wrap"><!-- ends in navbottom.inc -->
-
+<div class="modal hide fade default-modal" id="defaultmodal">
+	<div class="modal-header">
+		<button class="close" aria-hidden="true" data-dismiss="modal" type="button">x</button>
+		<h3></h3>
+	</div>
+	<div class="modal-body"></div>
+</div>
 <div id="top_banner" class="banner">
 <div class="contain cf">
 

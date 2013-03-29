@@ -88,9 +88,8 @@ CKEDITOR.dialog.add('aspell', function( editor )
 			( function ($) {
 
 				// Get the base URL for requests that require absolute pathing
-				var t = window.top.location;
-				var tmp = new String(t);
-				var baseUrl = tmp.substr(0, tmp.lastIndexOf('/') + 1);
+				var url = window.parent.location.protocol + "//" + window.parent.location.host + window.parent.location.pathname;
+				var baseUrl = url.substr(0, url.lastIndexOf('/') + 1);        // Get everything thru the last '/'
 
 				// Replace all placeholder icons with original images
 				$(scratch).find('img').each(function () {
@@ -164,7 +163,7 @@ CKEDITOR.dialog.add('aspell', function( editor )
 			( function ($) {
 
 				// Get the base URL for requests that require absolute pathing
-				var t = window.top.location;
+				var t = window.parent.location;
 				var tmp = new String(t);
 				var baseUrl = tmp.substr(0, tmp.lastIndexOf('/') + 1);
 
