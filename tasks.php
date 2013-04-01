@@ -79,11 +79,7 @@ if (isset($_GET['delete'])) {
 			}
 		} // end if fullsync import
 
-		//delete mappings
-		QuickUpdate("delete from importfield where importid=?",false,array($id));
-		QuickUpdate("delete from importjob where importid=?",false,array($id));
-		QuickUpdate("delete from importlogentry where importid=?",false,array($id));
-		QuickUpdate("delete from importmicroupdate where importid=?",false,array($id));
+		// NOTE do not hard delete import related data - feature request to someday soft delete imports CS-4473
 		
 		// import alert rules will be deleted when checked. 
 		
