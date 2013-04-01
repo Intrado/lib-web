@@ -75,7 +75,7 @@ if (isset($_GET['logout'])) {
 		// create a brand new session
 		newSession();
 		doStartSession();
-		$http = ($_SERVER["HTTPS"]?"https://":"http://");
+		$http = (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"]) ? "https://" : "http://";
 		$port = $_SERVER["SERVER_PORT"];
 		if ($port == "80" || $port == "443")
 			$port = "";
