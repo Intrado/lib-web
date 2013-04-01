@@ -20,7 +20,7 @@
 
 ( function ($) {
 
-console.log("mkfield's domain is: [" + document.domain);
+if (console) console.log("mkfield's domain is: [" + document.domain);
 
 	var ftypes = Array(Array('-- Select a Field --', ''));
 

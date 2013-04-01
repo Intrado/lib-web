@@ -40,7 +40,8 @@
 // that of CKEditor's iframe which prevents it from communicating back to
 // window.parent.rcieditor...
 document.domain = window.location.host;
-console.log("rcieditor's domain is: [" + document.domain);
+if (console) console.log("rcieditor's domain is: [" + document.domain);
+
 
 window.RCIEditor = function (editor_mode, textarea_id, overrideSettings) {
 	var textarea = null;	// The textarea ELEMENT, not the ID
