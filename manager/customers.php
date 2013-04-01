@@ -75,9 +75,10 @@ function fmt_actions($row, $index) {
 		
 	global $MANAGERUSER;
 	$actions = '<div class="actionlinks">';
+	$actions .= '<a href="customerinfo.php?id=' . $row[0] . '" title="Info"><img src="img/icons/information.png" border="0"/></a>';
 	if ($MANAGERUSER->authorized("editcustomer"))
 		$actions .= '<a href="customeredit.php?id=' . $row[0] .'" title="Edit"><img src="mimg/s-edit.png" border=0></a>';
-		$actions .= '<a href="customerimages.php?id=' . $row[0] .'" alt="images" title="images"><img src="img/icons/image_edit.png" border=0></a>';
+	$actions .= '<a href="customerimages.php?id=' . $row[0] .'" alt="images" title="images"><img src="img/icons/image_edit.png" border=0></a>';
 	if ($MANAGERUSER->authorized("users"))
 		$actions .= '<a href="userlist.php?customer=' . $row[0] . '" title="Users"><img src="mimg/s-users.png" border=0></a>';
 	if ($MANAGERUSER->authorized("imports"))
@@ -122,6 +123,11 @@ function fmt_smsoptin($row, $index){
 // request handling
 ////////////////////////////////////////////////////////////////////////////////
 
+// SEARCH - SMK reworked 2013-03-28 so that if the search criteria was supplied,
+// then deleted and press enter, the page displays as it does by default
+// (showing favorites) instead of the less friendly "hiding search results"
+// message
+
 // FAVORITES
 if (isset($_GET["addfavorites"])) {
 	$MANAGERUSER->addFavCustomer($_GET["addfavorites"]);
@@ -135,14 +141,37 @@ if (isset($_GET["clearfavorites"])) {
 }
 
 
-// SHOW DISABLED
-if (isset($_GET["showdisabled"]))
-	$sqltoggledisabled = "and not enabled";
-else
+// SHOW DISABLED - SMK reworked 2013-03-28 so that disabled customers may be
+// added to the current search criteria, but do not become the exclusive search
+// result - if this is not the desired behavior then the "Show" options really
+// should be converted into radio-style toggles.
+if (isset($_GET["showdisabled"])) {
+	//$sqltoggledisabled = "and not enabled";
+}
+else {
 	$sqltoggledisabled = "and enabled";
+}
+
+$shownone = true;
+if (isset($_GET["search"]) || isset($_GET["showall"]) || isset($_GET["showdisabled"]) || $MANAGERUSER->preference("favcustomers"))
+	$shownone = false;
+
+$sqlsearch = "1"; // default to everything
+if (isset($_GET["search"])) {
+	$safesearch =  DBSafe(trim($_GET["search"]));
+	if ($safesearch == "") {
+		$sqlsearch = "1"; // Expect no customers.
+	} else
+		$sqlsearch = "(id='$safesearch' or urlcomponent like '%$safesearch%' or inboundnumber='$safesearch')";
+}
 
 $favidsql = "";
-if (!isset($_GET["search"]) && !isset($_GET["showall"]) && !isset($_GET["showdisabled"])) {
+if (
+	(! (isset($_GET["search"]) && strlen($_GET["search"]))) &&
+	(! isset($_GET["showall"])) &&
+	(! isset($_GET["showdisabled"])) &&
+	($sqlsearch == '1')
+) {
 	//Favorite customers
 	if ($MANAGERUSER->preference("favcustomers")) {
 		$favidsql = "and id in (" . implode(",",$MANAGERUSER->preference("favcustomers")) . ")";
@@ -150,20 +179,6 @@ if (!isset($_GET["search"]) && !isset($_GET["showall"]) && !isset($_GET["showdis
 	}
 }
 
-$shownone = true;
-if (isset($_GET["search"]) || isset($_GET["showall"]) || isset($_GET["showdisabled"]) || $MANAGERUSER->preference("favcustomers"))
-	$shownone = false;
-
-// SEARCH
-$sqlsearch = "1"; // default to everything
-if (isset($_GET["search"])) {
-	$safesearch =  DBSafe(trim($_GET["search"]));
-	if ($safesearch == "") {
-		$sqlsearch = "0"; // Expect no customers.
-		$shownone = true;
-	} else
-		$sqlsearch = "(id='$safesearch' or urlcomponent like '%$safesearch%' or inboundnumber='$safesearch')";
-}
 ////////////////////////////////////////////////////////////////////////////////
 // data handling
 ////////////////////////////////////////////////////////////////////////////////
@@ -262,10 +277,13 @@ foreach ($customers as $cust) {
 }
 
 if (isset($_GET["ajax"])) {
-	$titles = array("0" => "#ID",
-			"1" => "#URL",
-			"15" => "#Inbound",
-			"5" => "#Notes");
+	$titles = array(
+		"0" => "#ID",
+		"21" => "#Shard",
+		"1" => "#URL",
+		"15" => "#Inbound",
+		"5" => "#Notes"
+	);
 
 	$formatters = array("1" => "fmt_custurl");
 
@@ -276,47 +294,53 @@ if (isset($_GET["ajax"])) {
 	exit();
 }
 
-$titles = array("0" => "#ID",
-		"21" => "@#Shard",
-		"url" => "#Name",
-		"3" => "#Product Name",
-		"4" => "#Timezone",
-		"6" => "#Status",
-		"15" => "@#Inbound",
-		"16" => "@#Has SC DM",
-		"11" => "#DM Method",
-		"23" => "@#SMS Opt-in",
-		"10" => "#Features",
-		"7" => "#Max Users",
-		"8" => "#Users",
-		"9" => "#Jobs",
-		"17" => "@#Timeslice",
-		"18" => "@#Email Domain",
-		"19" => "@#AutoReport Name",
-		"20" => "@#AutoReport Addr",
-		"Actions" => "Actions",
-		"5" => "#NOTES: ",
-		"12" => "@#OEM",
-		"13" => "#OEM ID",
-		"14" => "#NetSuite");
+$titles = array(
+	"0" => "#ID",
+	"21" => "#Shard",
+	"url" => "#Name",
+	"3" => "@#Product Name",
+	"4" => "@#Timezone",
+	"6" => "@#Status",
+	"15" => "@#Inbound",
+	"16" => "@#Has SC DM",
+	"11" => "@#DM Method",
+	"23" => "@#SMS Opt-in",
+	"10" => "@#Features",
+	"7" => "@#Max Users",
+	"8" => "@#Users",
+	"9" => "@#Jobs",
+	"17" => "@#Timeslice",
+	"18" => "@#Email Domain",
+	"19" => "@#AutoReport Name",
+	"20" => "@#AutoReport Addr",
+	"Actions" => "Actions",
+	"5" => "#NOTES: ",
+	"12" => "@#OEM",
+	"13" => "@#OEM ID",
+	"14" => "@#NetSuite"
+);
 
-$formatters = array("0" => "fmt_custid",
-		"url" => "fmt_custurl",
-		"6" => "fmt_status",
-		"8" => "fmt_users",
-		"9" => "fmt_jobcount",
-		"Actions" => "fmt_actions",
-		"11" => "fmt_dmmethod",
-		"23" => "fmt_smsoptin",
-		"16" => "fmt_hasdm");
+$formatters = array(
+	"0" => "fmt_custid",
+	"url" => "fmt_custurl",
+	"6" => "fmt_status",
+	"8" => "fmt_users",
+	"9" => "fmt_jobcount",
+	"Actions" => "fmt_actions",
+	"11" => "fmt_dmmethod",
+	"23" => "fmt_smsoptin",
+	"16" => "fmt_hasdm"
+);
 
 $lockedTitles = array(0, "status", "actions");
+
 $TITLE = _L("Commsuite Customers");
 $PAGE = "commsuite:customers";
 
 include_once("nav.inc.php");
 
-startWindow(_L("Customers"));
+startWindow(_L('Customer Search'));
+
 ?>
 
 <script>
@@ -362,25 +386,33 @@ function keyuptimer (e, t, ignoreenterkey, fn, args) {
 
 <form id="search" autocomplete="off" action="customers.php" method="get">
 	<? if (isset($_GET["showdisabled"]))
-		print "<input type='hidden' name='showdisabled' value='1'/>";
+		print '<input type="hidden" name="showdisabled" value="1"/>';
 	?>
 	<input id="searchvalue" name="search" type="text" onkeyup="keyuptimer(event, 300, true, submitform, 'searchvalue');" size="30" value="<?=isset($_GET["search"]) ? escapehtml($_GET["search"]) : ""?>"/><button type="submit">Search</button> Search ID, URL Path Name, or Inbound Number
 	<div id="searchpreview">
 	</div>
 </form>
 
-<input id="showdisabled" type="checkbox" onclick="window.location='customers.php?' + (this.checked ? 'showdisabled&' : '') <? if(isset($_GET["showall"])) print "+ 'showall'"; else if (isset($_GET["search"])) print "+ 'search=" . escapehtml($_GET['search']) . "'"; ?>;" <?= isset($_GET['showdisabled']) ? "checked" : ""?>>
-<label for="showdisabled">Show Disabled</label>
+<?
+endWindow();
+startWindow(_L('Commsuite Customers'));
+?>
+
+Show: 
 
 <?
 if (!isset($_GET["showall"]))
-	print "<a class='cust_link' href='customers.php?showall'>Show All Customers</a> ";
+	print '<a class="cust_link" href="customers.php?showall">All Customers</a> | ';
 else if ($MANAGERUSER->preference("favcustomers")) {
-	echo "<a href='customers.php'> <img src='mimg/fav.png' border=0/>Show Favorites</a>";
-	echo "<a style='margin-left: 4px' href='?clearfavorites'><i>Clear Favorites</i></a>";
+	echo '<a href="customers.php"> <!--img src="mimg/fav.png" border=0/-->Favorites</a> | ';
+	echo '<a style="margin-left: 4px" href="?clearfavorites"><i>Clear Favorites</i></a> | ';
 }
+?>
 
-show_column_selector('customers_table', $titles, $lockedTitles);
+<label for="showdisabled">Include Disabled</label> <input id="showdisabled" type="checkbox" onclick="window.location='customers.php?' + (this.checked ? 'showdisabled&' : '') <? if(isset($_GET["showall"])) print "+ 'showall'"; else if (isset($_GET["search"])) print "+ 'search=" . escapehtml($_GET['search']) . "'"; ?>;" <?= isset($_GET['showdisabled']) ? "checked" : ""?>>
+
+<?
+//show_column_selector('customers_table', $titles, $lockedTitles);
 ?>
 <hr />
 <table class="list sortable" id="customers_table">
@@ -392,16 +424,10 @@ else
 ?>
 </table>
 
-<!-- Legend -->
-<div>Pink cells indicate that only the system user account has been created</div>
-<div>Red cells indicate that the customer has more users than they should</div>
-<div>Green cells indicate customers with active jobs</div>
 <?
 endWindow();
 
 include_once("navbottom.inc.php");
-
-
 ?>
 
 
