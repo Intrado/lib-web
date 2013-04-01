@@ -20,6 +20,8 @@
 
 ( function ($) {
 
+console.log("mkfield's domain is: [" + document.domain);
+
 	var ftypes = Array(Array('-- Select a Field --', ''));
 
 	// The list of field names is passed into RCIEditor constructor's
