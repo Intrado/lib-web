@@ -33,7 +33,10 @@ if (isset($_GET['delete'])) {
 	$import = new Import($id);
 
 	Query("BEGIN");
-		switch ($import->datatype) {
+		// NOTE delete an import logic should be identical to what if you re-run the same import without any data in it
+		// only fullsync imports should delete data
+		if ($import->updatemethod == "full") {
+			switch ($import->datatype) {
 			case "person" :
 				// delete all personguardian with this importid
 				QuickUpdate("delete from personguardian where importid=?", false, array($id));
@@ -57,8 +60,9 @@ if (isset($_GET['delete'])) {
 				}
 			break;
 			case "user" :
-				// delete all userassociation with this importid
+				// delete all association with this importid
 				QuickUpdate("delete from userassociation where importid=?", false, array($id));
+				QuickUpdate("delete from role where importid=?", false, array($id));
 				// disable all users with this importid and set importid to null
 				QuickUpdate("update user set enabled=0, lastimport=now(), importid=null where importid=?", false, array($id));
 			break;
@@ -72,10 +76,10 @@ if (isset($_GET['delete'])) {
 				// delete all personassociation with this importid
 				QuickUpdate("delete from personassociation where importid=?", false, array($id));
 			break;
-		}
+			}
+		} // end if fullsync import
 
-		//delete mappings
-		QuickUpdate("delete from importfield where importid=?",false,array($id));
+		// NOTE do not hard delete import related data - feature request to someday soft delete imports CS-4473
 		
 		// import alert rules will be deleted when checked. 
 		
