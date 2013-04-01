@@ -200,7 +200,7 @@ function update_customer($db, $customerid, $shardid) {
 	//only allow one instance of the updater per customer to run at a time
 	$inprogress_value = QuickQuery("select value from setting where name = '_dbupgrade_inprogress' for update");
 	if (!$inprogress_value) {
-		// ok to continue
+		// ok to continue, this is for older instances where _dbupgrade_inprogress was created and deleted each upgrade. It is now persistent
 		QuickUpdate("insert into setting (name, value) values ('_dbupgrade_inprogress', '$updater')", $db);
 		Query("commit", $db);
 		Query("begin", $db);
@@ -339,7 +339,8 @@ function update_customer($db, $customerid, $shardid) {
 	
 	if ($foundstartingversion !== false) { 
 		// upgrade success
-		apply_sql("../db/update_SMAdmin_access.sql", $customerid, $db);
+		//NOTE: never apply any SQL directly in this file, it is not safe to it will function across versions or are even appropriate
+		//apply_sql("../db/update_SMAdmin_access.sql", $customerid, $db);
 		
 		if (QuickQuery("select value from setting where name = '_dbversion' and organizationid is null")) {
 			QuickUpdate("update setting set value = '$targetversion/$targetrev' where name = '_dbversion' and organizationid is null", $db);
