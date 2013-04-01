@@ -34,6 +34,13 @@
  */
 
 (function ($) {
+
+// SMK added 2013-04-01 to see if being in an iframe (powerschool) is a problem
+// for cross-domain and if this fixes it. It seems like our domain is not matching
+// that of CKEditor's iframe which prevents it from communicating back to
+// window.parent.rcieditor...
+document.domain = window.location.host;
+
 window.RCIEditor = function (editor_mode, textarea_id, overrideSettings) {
 	var textarea = null;	// The textarea ELEMENT, not the ID
 	var container = null;	// The container ELEMENT, to contain the editor, not the ID
