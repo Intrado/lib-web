@@ -35,6 +35,8 @@
 
 			scratch: 0,
 
+			rcie: null,
+
 			rcitheme_data: {},
 
 			// The color being chosen for the color chooser
@@ -62,7 +64,14 @@
 						throw '';
 					}
 
-					if (typeof window.parent.rcieditor !== 'object') {
+					// Depending on iframe/containment of the editor, rcieditor may be
+					// here or up one parent level; grab a refernece to it either way
+					if (typeof(rcieditor) == 'object') {
+						myself.rcie = rcieditor;
+					}
+					else myself.rcie = window.parent.rcieditor;
+
+					if (typeof(myself.rcie) !== 'object') {
 						// rcieditor object not found; this plugin requires rcieditor.js to be included
 						alert('Oops! Internal Error (3)');
 						throw '';
