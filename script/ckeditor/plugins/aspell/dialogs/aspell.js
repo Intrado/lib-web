@@ -88,12 +88,7 @@ CKEDITOR.dialog.add('aspell', function( editor )
 			var scratch = document.getElementById(scratchId);
 			scratch.innerHTML = document.getElementById(textareaId).value;
 			( function ($) {
-
-console.log('aspell domain is: [' + document.domain + ']');
-console.log('aspell window.location is: [' + window.location + ']');
-
 				// Get the base URL for requests that require absolute pathing
-				//var url = window.parent.location.protocol + "//" + window.parent.location.host + window.parent.location.pathname;
 				var url = window.location.protocol + "//" + window.location.host + window.location.pathname;
 				var baseUrl = url.substr(0, url.lastIndexOf('/') + 1);        // Get everything thru the last '/'
 
