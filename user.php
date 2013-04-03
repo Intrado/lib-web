@@ -588,7 +588,7 @@ if ($userimportorgs) {
 $userorgs = QuickQueryList("select organizationid from userassociation ua 
 		left join import i on (i.id = ua.importid) 
 		where ua.userid = ? and ua.type = 'organization' 
-		and (ua.importid is null or i.updatemethod != 'full')", false, false, array($edituser->id));
+		and (ua.importid is null or i.updatemethod is null or i.updatemethod != 'full')", false, false, array($edituser->id));
 // if there are no orgs. don't show the form item
 if ($orgs) {
 	$formdata["organizationids"] = array(
@@ -905,7 +905,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		}
 		
 		// add user associations for organizations
-		QuickUpdate("delete ua from userassociation ua left join import i on (i.id = ua.importid) where ua.userid = ? and ua.type = 'organization' and ua.organizationid != 0 and (ua.importid is null or i.updatemethod != 'full')", false, array($edituser->id));
+		QuickUpdate("delete ua from userassociation ua left join import i on (i.id = ua.importid) where ua.userid = ? and ua.type = 'organization' and ua.organizationid != 0 and (ua.importid is null or i.updatemethod is null or i.updatemethod != 'full')", false, array($edituser->id));
 		if (isset($postdata['organizationids']))
 			foreach ($postdata['organizationids'] as $orgid)
 				QuickUpdate("insert into userassociation (userid, type, organizationid) values (?, 'organization', ?)", false, array($edituser->id, $orgid));
