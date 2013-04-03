@@ -266,8 +266,9 @@ window.RCIEditor = function (editor_mode, textarea_id, overrideSettings) {
 
 		// For the full CKEditor, the toolbars/plugins
 		// are different depending on the editorMode
-		var extraPlugins = ['aspell'];
 		var extraButtons = [];
+		var extraPlugins = [];
+		extraPlugins.push('aspell'); // We always want the spell checker added
 		switch (setEditorMode) {
 
 			default:
