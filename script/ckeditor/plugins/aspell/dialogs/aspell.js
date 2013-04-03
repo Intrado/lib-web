@@ -82,10 +82,14 @@ CKEDITOR.dialog.add('aspell', function( editor )
 			editor.focus();
 			editor.fire('saveSnapshot'); // Best way I could find to trigger undo steps.
 
+			// TODO: get rid of the real scratch div and just use a temporary jQuery scratch object as in rcieditor.js
+
 			// Intermediate step to be able to restore altered data
 			var scratch = document.getElementById(scratchId);
 			scratch.innerHTML = document.getElementById(textareaId).value;
 			( function ($) {
+
+console.log('aspell domain is: [' + document.domain + ']');
 
 				// Get the base URL for requests that require absolute pathing
 				var url = window.parent.location.protocol + "//" + window.parent.location.host + window.parent.location.pathname;
