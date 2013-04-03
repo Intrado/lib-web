@@ -6,6 +6,10 @@
  * Date: 8/13/12
  * Time: 9:32 AM
  */
+
+// set a header for the privacy policy so IE will accept the session cookie
+header('P3P: policyref="/w3c/p3p.xml", CP="NOI DSP COR CUR ADM DEV OUR BUS"');
+
 $isindexpage = true;
 require_once("inc/common.inc.php");
 require_once("inc/DBMappedObject.php");
