@@ -19,12 +19,12 @@
  */
 
 ( function ($) {
-
 	var ftypes = Array(Array('-- Select a Field --', ''));
 
 	// The list of field names is passed into RCIEditor constructor's
 	// overrideSettings as 'type:name' pairs array; iterate over them...
-	var data = window.parent.rcieditor.getSetting('fieldinsert_list');
+	//var data = window.parent.rcieditor.getSetting('fieldinsert_list');
+	var data = rcieditor.getSetting('fieldinsert_list');
 	for (var field in data) {
 		ftypes.push(Array(data[field]));
 	}

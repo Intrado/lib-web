@@ -163,9 +163,8 @@ CKEDITOR.dialog.add('aspell', function( editor )
 			( function ($) {
 
 				// Get the base URL for requests that require absolute pathing
-				var t = window.parent.location;
-				var tmp = new String(t);
-				var baseUrl = tmp.substr(0, tmp.lastIndexOf('/') + 1);
+				var url = window.location.protocol + "//" + window.location.host + window.location.pathname;
+				var baseUrl = url.substr(0, url.lastIndexOf('/') + 1);        // Get everything thru the last '/'
 
 				// Replace all images with a placeholder icon
 				$(scratch).find('img').each(function () {
