@@ -34,6 +34,9 @@
  */
 
 (function ($) {
+
+console.log('good greif');
+
 window.RCIEditor = function (editor_mode, textarea_id, overrideSettings) {
 	var textarea = null;	// The textarea ELEMENT, not the ID
 	var container = null;	// The container ELEMENT, to contain the editor, not the ID
