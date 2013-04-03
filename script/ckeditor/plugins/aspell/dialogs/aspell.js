@@ -90,6 +90,7 @@ CKEDITOR.dialog.add('aspell', function( editor )
 			( function ($) {
 
 console.log('aspell domain is: [' + document.domain + ']');
+console.log('aspell window.location is: [' + window.location + ']');
 
 				// Get the base URL for requests that require absolute pathing
 				var url = window.parent.location.protocol + "//" + window.parent.location.host + window.parent.location.pathname;
