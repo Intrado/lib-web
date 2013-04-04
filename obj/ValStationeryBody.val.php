@@ -16,7 +16,7 @@ class ValStationeryBody extends Validator {
 		// ref: http://dtbaker.com.au/random-bits/preg_match-across-multiple-lines.html
 		// ref: http://php.net/manual/en/reference.pcre.pattern.modifiers.php
 		//testreg = '<blah><div style="whatever" class="editableBlock primaryBlock">This <strong>is</strong> editable</div></blah>';
-		if (! preg_match('(<(\w+)(.*?)class=["]*editableBlock(.*)</\1>)ms', $text, $matches)) {
+		if (! preg_match('(<(\w+)(.*?)class="?editableBlock(.*)</\1>)ms', $text, $matches)) {
 			return('No editable blocks found!');
 		}
 
