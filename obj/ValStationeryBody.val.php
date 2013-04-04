@@ -20,12 +20,13 @@ class ValStationeryBody extends Validator {
 			return('No editable blocks found!');
 		}
 
-	
+		//FIXME ValStationeryBody shouldn't be doing anything with audio files, they aren't supported in HTML email
 		if (isset($args['messagegroupid']))
 			$audiofileids = MessageGroup::getReferencedAudioFileIDs($args['messagegroupid']);
 		
 		$message = new Message();
 		$errors = array();
+		//FIXME ValStationeryBody shouldn't be doing anything with audio files, they aren't supported in HTML email
 		$parts = $message->parse($text,$errors, null, isset($audiofileids) ? $audiofileids : null); // Fill in with voice id later
 		if (count($errors) > 0)	{
 			$str = "There was an error parsing the message: ";
@@ -37,6 +38,7 @@ class ValStationeryBody extends Validator {
 			return $str;
 		}
 		
+		//FIXME ValStationeryBody shouldn't be doing anything with the "phone" type, it isn't supported in HTML email
 		if (isset($args['type']) && $args['type'] == 'phone') {
 			if ((isset($translationdata) && $translationdata->enabled) || (isset($args['autotranslator']) && $args['autotranslator'])) {
 				foreach ($parts as $part) {
