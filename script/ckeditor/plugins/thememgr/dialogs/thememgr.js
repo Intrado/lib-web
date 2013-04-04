@@ -178,7 +178,7 @@
 						// New Colors Tab
 						ui += '		div#theme_view_newcolors { position: relative; height: 120px; }';
 						ui += '		div#theme_view_newcolors_hider { position: absolute; top: 0px; left: 0px; z-index: 1; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }';
-						ui += '		div#theme_view_newcolors > div.coloritem { cursor: pointer; }';
+						ui += '		div#theme_view_newcolors > div.coloritem { cursor: pointer; clear: both; height: 16px; }';
 						ui += '		div#theme_view_newcolors > div.coloritem:hover { background-color: #99CCFF; font-weight: bold; }';
 						ui += '		div#theme_view_newcolors > div.coloritem > div.swatch { float: left; width: 12px; height: 12px; margin: 0px 3px; font-size: 1px; border: 1px solid #666; cursor: pointer; }';
 						ui += '		div#theme_view_newcolors_chooser { position: absolute; top: 7px; right: 10px; z-index: 2; border: 1px solid #666; background-color: #999; }';
