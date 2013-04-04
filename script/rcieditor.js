@@ -347,6 +347,7 @@ window.RCIEditor = function (editor_mode, textarea_id, overrideSettings) {
 			// TODO - see if there's a way to get this CKE to insert itself into hider element
 			CKEDITOR.replace(basename, {
 				'customConfig': '',
+				'allowedContent': true,
 				'disableNativeSpellChecker': false,
 				'browserContextMenuOnCtrl': true,
 				'width': '100%',
