@@ -19,12 +19,19 @@
  */
 
 ( function ($) {
-
 	var ftypes = Array(Array('-- Select a Field --', ''));
+
+	// Depending on iframe/containment of the editor, rcieditor may be
+	// here or up one parent level; grab a refernece to it either way
+	var rcie;
+	if (typeof(rcieditor) == 'object') {
+		rcie = rcieditor;
+	}
+	else rcie = window.parent.rcieditor;
 
 	// The list of field names is passed into RCIEditor constructor's
 	// overrideSettings as 'type:name' pairs array; iterate over them...
-	var data = window.parent.rcieditor.getSetting('fieldinsert_list');
+	var data = rcie.getSetting('fieldinsert_list');
 	for (var field in data) {
 		ftypes.push(Array(data[field]));
 	}

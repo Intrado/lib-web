@@ -1,4 +1,8 @@
 <?
+
+// set a header for the privacy policy so IE will accept the session cookie
+header('P3P: policyref="/w3c/p3p.xml", CP="NOI DSP COR CUR ADM DEV OUR BUS"');
+
 $ppNotLoggedIn = 1;
 require_once("common.inc.php");
 

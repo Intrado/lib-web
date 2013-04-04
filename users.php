@@ -197,6 +197,8 @@ function fmt_actions_enabled_account ($account,$name) {
 
 	$id = $account['id'];
 	$importid = $account['importid'];
+	if (strcmp($account['importupdatemethod'], 'full'))
+		$importid = 0; // only fullsync imports manage users, else allow edit full user data
 	$login = $account['login'];
 	$userldap = $account['ldap'];
 
@@ -217,9 +219,9 @@ function fmt_actions_enabled_account ($account,$name) {
 function fmt_actions_disabled_account ($account,$name) {
 	global $newusers, $hasldap;
 	
-	$editviewaction = "Edit";
 	$importid = $account['importid'];
-	if ($importid > 0) $editviewaction = "View";
+	if (strcmp($account['importupdatemethod'], 'full'))
+	$importid = 0; // only fullsync imports manage users, else allow edit full user data
 	$id = $account['id'];
 	$userldap = $account['ldap'];
 
@@ -309,7 +311,7 @@ function show_user_table($containerID) {
 	$limitstart = isset($_SESSION['ajaxtablepagestart'][$containerID]) ? $_SESSION['ajaxtablepagestart'][$containerID] : 0;
 
 	// RUN QUERY
-	$data = QuickQueryMultiRow("select SQL_CALC_FOUND_ROWS u.*,a.name as profilename from user u left join access a on (u.accessid = a.id) where $criteriaSQL $filterSQL order by $orderbySQL limit $limitstart,$perpage", true, false, $args);
+	$data = QuickQueryMultiRow("select SQL_CALC_FOUND_ROWS u.*, a.name as profilename, i.updatemethod as importupdatemethod from user u left join access a on (u.accessid = a.id) left join import i on (i.id = u.importid) where $criteriaSQL $filterSQL order by $orderbySQL limit $limitstart,$perpage", true, false, $args);
 	$numUsers = QuickQuery("select FOUND_ROWS()");
 
 	$tooltip = addslashes(_L("Search by First Name, Last Name, Username, or Access Profile. Press ENTER to apply the search word."));

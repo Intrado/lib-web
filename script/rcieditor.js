@@ -266,8 +266,9 @@ window.RCIEditor = function (editor_mode, textarea_id, overrideSettings) {
 
 		// For the full CKEditor, the toolbars/plugins
 		// are different depending on the editorMode
-		var extraPlugins = ['aspell'];
 		var extraButtons = [];
+		var extraPlugins = [];
+		extraPlugins.push('aspell'); // We always want the spell checker added
 		switch (setEditorMode) {
 
 			default:
@@ -346,6 +347,7 @@ window.RCIEditor = function (editor_mode, textarea_id, overrideSettings) {
 			// TODO - see if there's a way to get this CKE to insert itself into hider element
 			CKEDITOR.replace(basename, {
 				'customConfig': '',
+				'allowedContent': true,
 				'disableNativeSpellChecker': false,
 				'browserContextMenuOnCtrl': true,
 				'width': '100%',

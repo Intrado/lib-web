@@ -15,6 +15,7 @@
 <!DOCTYPE html>
 <html>
 	<meta charset="utf-8"/>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 	<head>
 		<style type="text/css">
 
