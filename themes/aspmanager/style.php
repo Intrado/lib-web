@@ -2,21 +2,21 @@
 
 /*----- basic colours for theme -----*/
 body { background: #ededed; }
-a, a:visited, label { color: #336699; }
+a, a:visited, label { color: #CC9933; }
 a:hover { color: #6699CC; }
 
 
 /*----- Banner, adds in the green background and moves the client name to sit next to the logo image -----*/
 
-.banner { padding: 0 25px 15px 25px; border-top: 5px solid #363636; 
+.banner { padding: 0 5px 5px 5px; border-top: 5px solid #363636; 
 background-color: #CCCCCC; 
-background-image: -webkit-gradient(linear, left top, left bottom, from(#FFFFFF), to(#336699)); 
-  background-image: -webkit-linear-gradient(top, #FFFFFF, #336699); 
-  background-image:    -moz-linear-gradient(top, #FFFFFF, #336699); 
-  background-image:     -ms-linear-gradient(top, #FFFFFF, #336699); 
-  background-image:      -o-linear-gradient(top, #FFFFFF, #336699); 
-  background-image:         linear-gradient(top, #FFFFFF, #336699); }
-.banner_logo { margin: 15px 0 0; }
+background-image: -webkit-gradient(linear, left top, left bottom, from(#FFFFFF), to(#CC9933)); 
+  background-image: -webkit-linear-gradient(top, #FFFFFF, #CC9933); 
+  background-image:    -moz-linear-gradient(top, #FFFFFF, #CC9933); 
+  background-image:     -ms-linear-gradient(top, #FFFFFF, #CC9933); 
+  background-image:      -o-linear-gradient(top, #FFFFFF, #CC9933); 
+  background-image:         linear-gradient(top, #FFFFFF, #CC9933); }
+.banner_logo { margin: 5px 0 0; }
 .banner_logo a { background: #fff; padding: 6px; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box;}
 .banner_links { background: #363636; float: right; display: inline; padding: 5px 3px 8px 3px; list-style-type: none; 
@@ -32,7 +32,7 @@ background-image: -webkit-gradient(linear, left top, left bottom, from(#FFFFFF),
 
 /*----- Navigation, adds orange bg colour and styles up the primary links and navshortcut dropdown -----*/
 
-.primary_nav { width: 100%; padding: 10px 0; background-color: #336699;
+.primary_nav { width: 100%; padding: 3px 0; background-color: #CC9933;
   background-image: -webkit-gradient(linear, left top, left bottom, from(#666666), to(#CCCCCC)); 
   background-image: -webkit-linear-gradient(top, #666666, #CCCCCC); 
   background-image:    -moz-linear-gradient(top, #666666, #CCCCCC); 
@@ -50,7 +50,7 @@ background-image: -webkit-gradient(linear, left top, left bottom, from(#FFFFFF),
 	
 .navtabs { margin: 0 0 0 25px; }
 .navtabs li { margin-right: 15px;}
-.navtabs a { display: block; padding: 8px 17px; font: 15px Verdana, arial, sans-serif; color: #fff; text-decoration: none; 
+.navtabs a { display: block; padding: 1px 5px; font: 15px Verdana, arial, sans-serif; color: #fff; text-decoration: none; 
 -webkit-border-radius: 8px; -moz-border-radius: 8px; border-radius: 8px; 
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
 .navtabs li a:hover, 
