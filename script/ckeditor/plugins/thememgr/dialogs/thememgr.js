@@ -209,17 +209,18 @@
 				$('#theme_view_newcolors_chooser').css('display', 'block');
 			},
 
-			theme_color_chooser_pick: function(num) {
-				var color_code = this.color2hex($('#theme_newcolors_swatch_' + num).css('background-color'));
-				$('#theme_view_newcolors_swatch_'+ this.choosingcolor).css('background-color', '#' + color_code);
-				$('#theme_view_newcolors_swatch_'+ this.choosingcolor).attr('data-modified', 1);
-				this.theme_color_chooser_exit();
-			},
-
 			theme_color_chooser_exit: function() {
 				$('#theme_view_newcolors_chooser').css('display', 'none');
 				$('#theme_view_newcolors_hider').css('display', 'none');
 				this.choosingcolor = -1;
+			},
+
+			theme_color_chooser_pick: function(num) {
+				var color_code = this.color2hex($('#theme_newcolors_swatch_' + num).css('background-color'));
+				var el = $('#theme_view_newcolors_swatch_'+ this.choosingcolor);
+				el.css('background-color', '#' + color_code);
+				el.attr('data-modified', '1');
+				this.theme_color_chooser_exit();
 			},
 
 			// The last thing that happens
