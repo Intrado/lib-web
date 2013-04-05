@@ -204,16 +204,18 @@
 				$('#theme_view_newcolors_chooser').css('display', 'block');
 			},
 
-			theme_color_chooser_pick: function(num) {
-				var color_code = this.color2hex($('#theme_newcolors_swatch_' + num).css('background-color'));
-				$('#theme_view_newcolors_swatch_'+ this.choosingcolor).css('background-color', '#' + color_code);
-				this.theme_color_chooser_exit();
-			},
-
 			theme_color_chooser_exit: function() {
 				$('#theme_view_newcolors_chooser').css('display', 'none');
 				$('#theme_view_newcolors_hider').css('display', 'none');
 				this.choosingcolor = -1;
+			},
+
+			theme_color_chooser_pick: function(num) {
+				var color_code = this.color2hex($('#theme_newcolors_swatch_' + num).css('background-color'));
+				var el = $('#theme_view_newcolors_swatch_'+ this.choosingcolor);
+				el.css('background-color', '#' + color_code);
+				el.attr('data-modified', '1');
+				this.theme_color_chooser_exit();
 			},
 
 			// The last thing that happens
@@ -224,30 +226,12 @@
 
 					// Only the active theme_tab is used upon submission
 					switch (myself.theme_tab_showing) {
-						case 'colors':
-
-							// Get the selection that was made for a color id
-							var color = $('#theme_color_id')
-							if (! color.length) {
-								throw ''; // Theme form is not showing, so there's nothing to do/report
-							}
-							var color_id = color.val();
-							if (! color_id.length) {
-								throw 'No selection was made!';
-							}
-
-							// Get the selection that was made for a color code
-							var color_code = $('#theme_color_code').val();
-							if (! color_code.length) {
-								throw 'No color was chosen!';
-							}
-
-							var res = myself.theme_scan(myself.scratch, color_id, '#' + color_code);
-							break;
 
 						case 'newcolors':
 							for (var jj = 0; jj < myself.rcitheme_data.color.size(); jj++) {
-								var bgcolor = $('#theme_view_newcolors_swatch_' + jj).css('background-color');
+								var el = $('#theme_view_newcolors_swatch_' + jj);
+								if (! parseInt(el.attr('data-modified'))) continue;
+								var bgcolor = el.css('background-color');
 								if (bgcolor != 'transparent') {
 									var color_code = myself.color2hex(bgcolor);
 									var res = myself.theme_scan(myself.scratch, myself.rcitheme_data.color[jj], '#' + color_code);
