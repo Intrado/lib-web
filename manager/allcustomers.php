@@ -193,7 +193,7 @@ $formatters = array(
 $lockedTitles = array("actions");
 
 $TITLE = "Overview";
-$PAGE = "overview:all";
+$PAGE = "overview:customerlist";
 
 include_once("nav.inc.php");
 
