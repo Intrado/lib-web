@@ -70,10 +70,7 @@ $NAVTREE = array (
 		array("SMS&nbsp;Numbers","taismsnumbers.php",NULL,$SUBTAB=="smsnumbers")
 	)),
 	array("Tools", NULL, NULL, ($MAINTAB == "tools"), get_authorized_tools()),
-	array('Advanced', 'advancedactions.php', NULL, ($MAINTAB == 'advanced'), get_authorized_advanced()),
-	array("Admin","users.php","superuser",$MAINTAB=="admin",array(
-		array("Users","users.php","superuser",$SUBTAB=="users")
-	))
+	array('Advanced', NULL, NULL, ($MAINTAB == 'advanced'), get_authorized_advanced())
 );
 
 
@@ -108,8 +105,10 @@ function get_authorized_advanced() {
 
 	$menu = Array();
 
-	//	$menu[] = array('', '.php', NULL, ($SUBTAB == 'subtab'));
-	$menu[] = array('Action&nbsp;List', 'advancedactions.php', NULL, ($SUBTAB == 'actions'));
+	if ($MANAGERUSER->authorized('runqueries') || $MANAGERUSER->authorized('editqueries')) {
+		// TODO - find and document what the inner array does (runqueries/editqueries)
+		$menu[] = array('Queries', 'querylist.php', array('runqueries', 'editqueries'), ($SUBTAB == 'queries'));
+	}
 
 	if ($MANAGERUSER->authorized('billablecalls')) { 
 		$menu[] = array('Billable&nbsp;Calls', 'billablecalls.php', NULL, ($SUBTAB == 'billable'));
@@ -127,17 +126,12 @@ function get_authorized_advanced() {
 		$menu[] = array('Job&nbsp;List', 'emergencyjobs.php', NULL, ($SUBTAB == 'joblist'));
 	}
 
-	if ($MANAGERUSER->authorized('runqueries') || $MANAGERUSER->authorized('editqueries')) {
-		// TODO - find and document what the inner array does (runqueries/editqueries)
-		$menu[] = array('Queries', 'querylist.php', array('runqueries', 'editqueries'), ($SUBTAB == 'queries'));
-	}
-
 	if ($MANAGERUSER->authorized('tollfreenumbers')) {
 		$menu[] = array('Toll&nbsp;Free&nbsp;#s', 'tollfreenumbers.php', NULL, ($SUBTAB == 'tollfree'));
 	}
 
 	if (isset($SETTINGS['servermanagement']['manageservers']) && $SETTINGS['servermanagement']['manageservers'] && $MANAGERUSER->authorized('manageserver')) {
-		$menu[] = array('Manage&nbsp;Servers', 'serverlist.php', NULL, ($SUBTAB == 'servers'));
+		$menu[] = array('Servers', 'serverlist.php', NULL, ($SUBTAB == 'servers'));
 	}
 
 	if ($MANAGERUSER->authorized('systemdm')) {
@@ -145,7 +139,7 @@ function get_authorized_advanced() {
 	}
 
 	if ($MANAGERUSER->authorized('superuser')) { 
-		$menu[] = array('Edit&nbsp;Users', 'users.php', NULL, ($SUBTAB == 'users'));
+		$menu[] = array('Users', 'users.php', NULL, ($SUBTAB == 'users'));
 	}
 
 	if ($MANAGERUSER->authorizedAny(array('logcollector', 'aspcallgraphs'))) {
