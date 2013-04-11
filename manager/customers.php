@@ -75,14 +75,10 @@ function fmt_actions($row, $index) {
 		
 	global $MANAGERUSER;
 	$actions = '<div class="actionlinks">';
-<<<<<<< HEAD
 
 	// SMK disabled access to the newly forming customer info page 2013-04-11 until we have time to come back around to it
 	//$actions .= '<a href="customerinfo.php?id=' . $row[0] . '" title="Info"><img src="img/icons/information.png" border="0"/></a>';
 
-=======
-	$actions .= '<a href="customerinfo.php?id=' . $row[0] . '" title="Info"><img src="img/icons/information.png" border="0"/></a>';
->>>>>>> Initial customizations on multi-product customer view
 	if ($MANAGERUSER->authorized("editcustomer"))
 		$actions .= '<a href="customeredit.php?id=' . $row[0] .'" title="Edit"><img src="mimg/s-edit.png" border=0></a>';
 	$actions .= '<a href="customerimages.php?id=' . $row[0] .'" alt="images" title="images"><img src="img/icons/image_edit.png" border=0></a>';
