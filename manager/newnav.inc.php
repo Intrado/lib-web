@@ -47,27 +47,30 @@ if (isset($_GET['timer']) || isset($_SESSION['timer'])) {
 
 
 $NAVTREE = array (
-	array("Customers","allcustomers.php",NULL,$MAINTAB=="overview",array()),
+	array("Customers","allcustomers.php",NULL,$MAINTAB=="overview",array(
+		array("Customer&nbsp;List","allcustomers.php",NULL,$SUBTAB=="customerlist"),
+		array("New&nbsp;Customer","customeredit.php?id=new",NULL,$SUBTAB=="newcustomer")
+	)),
 	array("Commsuite","customers.php",NULL,$MAINTAB=="commsuite",array(
-	array("Customers","customers.php",NULL,$SUBTAB=="customers"),
-	array("Import&nbsp;Alerts","importalerts.php",NULL,$SUBTAB=="importalerts"),
-	array("Active&nbsp;Jobs","customeractivejobs.php",NULL,$SUBTAB=="activejobs"),
-	array("Locked&nbsp;Users","lockedusers.php","lockedusers",$SUBTAB=="lockedusers"),
-	array("SmartCall","customerdms.php?clear",NULL,$SUBTAB=="customerdms"),
-	array("System&nbsp;DMs","systemdms.php",NULL,$SUBTAB=="systemdms"),
+		array("Customers","customers.php",NULL,$SUBTAB=="customers"),
+		array("Import&nbsp;Alerts","importalerts.php",NULL,$SUBTAB=="importalerts"),
+		array("Active&nbsp;Jobs","customeractivejobs.php",NULL,$SUBTAB=="activejobs"),
+		array("Locked&nbsp;Users","lockedusers.php","lockedusers",$SUBTAB=="lockedusers"),
+		array("SmartCall","customerdms.php?clear",NULL,$SUBTAB=="customerdms"),
+		array("System&nbsp;DMs","systemdms.php",NULL,$SUBTAB=="systemdms"),
 	)),
 	array("TalkAboutIt","taicustomers.php",NULL,$MAINTAB=="tai",array(
-	array("Customers","taicustomers.php",NULL,$SUBTAB=="customers"),
-	array("Inbox","taiinbox.php",NULL,$SUBTAB=="inbox"),
-	array("Requests","tairevealrequests.php",NULL,$SUBTAB=="requests"),
-	array("SMS Numbers","taismsnumbers.php",NULL,$SUBTAB=="smsnumbers")
+		array("Customers","taicustomers.php",NULL,$SUBTAB=="customers"),
+		array("Inbox","taiinbox.php",NULL,$SUBTAB=="inbox"),
+		array("Requests","tairevealrequests.php",NULL,$SUBTAB=="requests"),
+		array("SMS&nbsp;Numbers","taismsnumbers.php",NULL,$SUBTAB=="smsnumbers")
 	)),
 	array("Tools",NULL,NULL,$MAINTAB=="tools",array(
-	array("SwiftSync","diskagents.php",NULL,$SUBTAB=="swiftsync"),
-	array("Queries","querylist.php",array("runqueries","editqueries"),$SUBTAB=="queries")
+		array("SwiftSync","diskagents.php",NULL,$SUBTAB=="swiftsync"),
+		array("Queries","querylist.php",array("runqueries","editqueries"),$SUBTAB=="queries")
 	)),
 	array("Admin","users.php","superuser",$MAINTAB=="admin",array(
-	array("Users","users.php","superuser",$SUBTAB=="users")
+		array("Users","users.php","superuser",$SUBTAB=="users")
 	))
 );
 
