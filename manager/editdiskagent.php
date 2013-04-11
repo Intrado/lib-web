@@ -205,7 +205,12 @@ $formatters = array(
 	"actions" => "fmt_editdiskagent_actions"
 	);
 
+$TITLE = _L('SwiftSync Settings');
+$PAGE = 'tools:swiftsync';
+
 include_once("nav.inc.php");
+
+startWindow($TITLE);
 
 //custom newform declaration to catch if manager password is submitted
 NewForm($f);
@@ -266,5 +271,8 @@ Customers this SwiftSync is associated with:<BR>
 </table>
 <?
 EndForm();
+
+endWindow();
+
 include_once("navbottom.inc.php");
 ?>

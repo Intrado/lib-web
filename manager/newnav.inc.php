@@ -45,6 +45,10 @@ if (isset($_GET['timer']) || isset($_SESSION['timer'])) {
 //tree format:
 //[[title,default link,access,selected,[[sub title,sub link,sub access,sub selected],...],...]
 
+// TODO - can we remove sections of the menu definition which are outside the scope of the current
+// request? ex. if we are in the CUSTOMERS section of the site, the menu never shows anything about
+// the selections below the TOOLS section; it should simply suffice to add TOOLS to the upper level
+// and leave the inner levels out
 
 $NAVTREE = array (
 	array("Customers","allcustomers.php",NULL,$MAINTAB=="overview",array(
@@ -65,15 +69,91 @@ $NAVTREE = array (
 		array("Requests","tairevealrequests.php",NULL,$SUBTAB=="requests"),
 		array("SMS&nbsp;Numbers","taismsnumbers.php",NULL,$SUBTAB=="smsnumbers")
 	)),
-	array("Tools",NULL,NULL,$MAINTAB=="tools",array(
-		array("SwiftSync","diskagents.php",NULL,$SUBTAB=="swiftsync"),
-		array("Queries","querylist.php",array("runqueries","editqueries"),$SUBTAB=="queries")
-	)),
+	array("Tools", NULL, NULL, ($MAINTAB == "tools"), get_authorized_tools()),
+	array('Advanced', 'advancedactions.php', NULL, ($MAINTAB == 'advanced'), get_authorized_advanced()),
 	array("Admin","users.php","superuser",$MAINTAB=="admin",array(
 		array("Users","users.php","superuser",$SUBTAB=="users")
 	))
 );
 
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Menu Building Functions
+////////////////////////////////////////////////////////////////////////////////
+
+// Build the Tools menu
+function get_authorized_tools() {
+	global $MANAGERUSER, $SUBTAB, $SETTINGS;
+
+	$menu = Array();
+
+	if ($MANAGERUSER->authorized("diskagent")) {
+		$menu[] = array('SwiftSync', 'diskagents.php', NULL, ($SUBTAB == 'swiftsync'));
+	}
+
+	if ($MANAGERUSER->authorized("customercontacts")) {
+		$menu[] = array('Contact&nbsp;Search', 'customercontactsearch.php', NULL, ($SUBTAB == 'contacts'));
+	}
+
+	if ($MANAGERUSER->authorized("smsblock")) {
+		$menu[] = array('SMS&nbsp;Block', 'smsblock.php', NULL, ($SUBTAB == 'smsblock'));
+	}
+	return($menu);
+}
+
+// Build the Advanced menu
+function get_authorized_advanced() {
+	global $MANAGERUSER, $SUBTAB, $SETTINGS;
+
+	$menu = Array();
+
+	//	$menu[] = array('', '.php', NULL, ($SUBTAB == 'subtab'));
+	$menu[] = array('Action&nbsp;List', 'advancedactions.php', NULL, ($SUBTAB == 'actions'));
+
+	if ($MANAGERUSER->authorized('billablecalls')) { 
+		$menu[] = array('Billable&nbsp;Calls', 'billablecalls.php', NULL, ($SUBTAB == 'billable'));
+	}
+
+	if ($MANAGERUSER->authorized('bouncedemailsearch')) {
+		$menu[] = array('Bounced&nbsp;Email', 'bouncedemailsearch.php', NULL, ($SUBTAB == 'email'));
+	}
+
+	if ($MANAGERUSER->authorized('passwordcheck')) {
+		$menu[] = array('Bad&nbsp;Passwords', 'passwordcheck.php', NULL, ($SUBTAB == 'badpasswd'));
+	}
+
+	if ($MANAGERUSER->authorized('emergencyjobs')) {
+		$menu[] = array('Job&nbsp;List', 'emergencyjobs.php', NULL, ($SUBTAB == 'joblist'));
+	}
+
+	if ($MANAGERUSER->authorized('runqueries') || $MANAGERUSER->authorized('editqueries')) {
+		// TODO - find and document what the inner array does (runqueries/editqueries)
+		$menu[] = array('Queries', 'querylist.php', array('runqueries', 'editqueries'), ($SUBTAB == 'queries'));
+	}
+
+	if ($MANAGERUSER->authorized('tollfreenumbers')) {
+		$menu[] = array('Toll&nbsp;Free&nbsp;#s', 'tollfreenumbers.php', NULL, ($SUBTAB == 'tollfree'));
+	}
+
+	if (isset($SETTINGS['servermanagement']['manageservers']) && $SETTINGS['servermanagement']['manageservers'] && $MANAGERUSER->authorized('manageserver')) {
+		$menu[] = array('Manage&nbsp;Servers', 'serverlist.php', NULL, ($SUBTAB == 'servers'));
+	}
+
+	if ($MANAGERUSER->authorized('systemdm')) {
+		$menu[] = array('DM&nbsp;Blocking', 'dmgroupblock.php', NULL, ($SUBTAB == 'dmblocking'));
+	}
+
+	if ($MANAGERUSER->authorized('superuser')) { 
+		$menu[] = array('Edit&nbsp;Users', 'users.php', NULL, ($SUBTAB == 'users'));
+	}
+
+	if ($MANAGERUSER->authorizedAny(array('logcollector', 'aspcallgraphs'))) {
+		$menu[] = array('Graphs&nbsp;&amp;&nbsp;Logs', 'aspcallsindex.php', NULL, ($SUBTAB == 'graphlogs'));
+	}
+
+	return($menu);
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display Functions

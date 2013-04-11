@@ -201,12 +201,12 @@ function fmt_status($row, $index) {
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
-$PAGE = "manager:smsinbound";
+$PAGE = "tools:smsblock";
 $TITLE = _L('Inbound SMS');
 
 include_once("nav.inc.php");
 
-startWindow(_L('Inbound SMS'));
+startWindow($TITLE);
 echo $form->render();
 endWindow();
 
