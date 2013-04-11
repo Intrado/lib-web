@@ -9,41 +9,45 @@ require_once("../inc/utils.inc.php");
 require_once("../obj/Validator.obj.php");
 require_once("../obj/Form.obj.php");
 require_once("../obj/FormItem.obj.php");
-require_once("Server.obj.php");
-require_once("Service.obj.php");
+
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-if (!$SETTINGS['servermanagement']['manageservers'] || !$MANAGERUSER->authorized("manageserver"))
+
+if (! isset($_GET['customerid']) && !$MANAGERUSER->authorized("newcustomer"))
 	exit("Not Authorized");
+
+if (!$MANAGERUSER->authorized("editcustomer")) {
+	unset($_SESSION['customerid']);
+	exit("Not Authorized");
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Action/Request Processing
 ////////////////////////////////////////////////////////////////////////////////
-if (isset($_GET['id'])) {
-	$_SESSION['serviceedit'] = array();
-	$_SESSION['serviceedit']['serviceid'] = $_GET['id'] + 0;
-	redirect();
+
+if (isset($_GET['customerid'])) {
+	//...
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Form 
+// Display
 ////////////////////////////////////////////////////////////////////////////////
-if (isset($_SESSION['serviceedit']['serviceid'])) {
-	$serviceid = $_SESSION['serviceedit']['serviceid'];
-} else {
-	$serviceid = false;
-}
-$service = new Service($serviceid);
+$PAGE = "template:template";
+$TITLE = _L('Template (No Form)');
 
-switch ($service->type) {
-	case "commsuite":
-		require_once("serviceeditcommsuite.php");
-		break;
-	case "kona":
-		require_once("serviceeditkona.php");
-		break;
-	default:
-		exit("Unknown service type!");
-}
+include_once("nav.inc.php");
+
+startWindow(_L('Template (No Form'));
+?>
+
+<h2>Great Things Follow</h2>
+<hr size="1"/>
+<ul>
+	<li/> This is a great thing<br/>
+</ul>
+
+<?
+endWindow();
+include_once("navbottom.inc.php");
 ?>

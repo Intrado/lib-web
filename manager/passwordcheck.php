@@ -76,17 +76,12 @@ $badpasswords = array("1qaz2wsx","abc123","admin1","admin123","admin2","admin3",
 
 $badpassquery = "password in (password('" . implode("'), password('",$badpasswords) . "')) or password in (old_password('" . implode("'), old_password('",$badpasswords) . "'))";
 
+$TITLE = _L('Bad Password Check');
+$PAGE = 'advanced:badpasswd';
 
 include_once("nav.inc.php");
-?>
 
-<h2>Bad Password Check</h2>
-
-<hr></hr>
-
-<?
-
-
+startWindow($TITLE);
 
 
 // With the list of customers ready, connect to each customer's shard and retrieve a bunch of helpful information about the customer.
@@ -200,4 +195,7 @@ function resetpassword(customerid,userid) {
 </script>
 
 <?
+
+endWindow();
+
 include_once("navbottom.inc.php");

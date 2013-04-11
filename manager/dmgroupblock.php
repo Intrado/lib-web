@@ -60,7 +60,13 @@ function fmt_dmgroupblock_actions($row, $index){
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
+
+$TITLE = _L('DM Group Blocking');
+$PAGE = 'advanced:dmblocking';
+
 include("nav.inc.php");
+
+startWindow($TITLE);
 
 ?>
 <form action="dmgroupblock.php" method="post">
@@ -87,5 +93,8 @@ showTable($dmgroupblocks, $titles, $formatters);
 ?>
 </table>
 <?
+
+endWindow();
+
 include("navbottom.inc.php");
 ?>

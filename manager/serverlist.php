@@ -89,6 +89,10 @@ $cmdformatters = array("retval" => "fmt_retval");
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
+
+$TITLE = _L('Server List');
+$PAGE = 'advanced:servers';
+
 include_once("nav.inc.php");
 
 if (isset($_SESSION['servicebulkrestart'])) {
@@ -101,8 +105,11 @@ if (isset($_SESSION['servicebulkrestart'])) {
 	endWindow();
 	unset($_SESSION['servicebulkrestart']);
 }
-startWindow(_L('Server List'));
-?><table class='list sortable' id='serverlist_preview'>
+startWindow($TITLE);
+?>
+
+<table class='list sortable' id='serverlist_preview'>
+
 <?
 showTable($data, $titles, $formatters);
 ?></table>

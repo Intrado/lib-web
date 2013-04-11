@@ -84,7 +84,7 @@ if ($MANAGERUSER->queries == "unrestricted") {
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $TITLE = _L('Queries');
-$PAGE = "tools:queries";
+$PAGE = "advanced:queries";
 include_once("nav.inc.php");
 
 if ($cid) {
