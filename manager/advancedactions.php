@@ -5,11 +5,17 @@ require_once("../inc/html.inc.php");
 require_once("../inc/utils.inc.php");
 require_once("../obj/Phone.obj.php");
 require_once("../inc/themes.inc.php");
+require_once("../inc/table.inc.php");
 
 if (!$MANAGERUSER->authorizedAny(array("billablecalls","bouncedemailsearch","passwordcheck", "emergencyjobs", "runqueries", "tollfreenumbers", "manageserver", "systemdm", "superuser","aspcallgraphs", "logcollector")))
 	exit("Not Authorized");
 
+$TITLE = _L("Advanced Actions");
+$PAGE = "advanced:actions";
+
 include_once("nav.inc.php");
+
+startWindow(_L('Advanced Actions'));
 ?>
 
 <ul>
@@ -57,5 +63,7 @@ include_once("nav.inc.php");
 
 </ul>
 <?
+endWindow();
+
 include_once("navbottom.inc.php");
 ?>

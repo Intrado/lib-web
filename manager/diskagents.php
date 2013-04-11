@@ -269,6 +269,8 @@ $PAGE = "tools:swiftsync";
 
 include_once("nav.inc.php");
 
+startWindow($TITLE);
+
 ?>
 
 <form method="POST" action="diskagents.php">
@@ -387,5 +389,8 @@ if (file_exists("swiftsyncbuild.txt")) {
 	<div>Latest Version: <?=file_get_contents("swiftsyncbuild.txt");?></div>
 <?
 }
+
+endWindow();
+
 include_once("navbottom.inc.php");
 ?>

@@ -20,7 +20,7 @@ if(!$MANAGERUSER->authorizedAny(array("aspcallgraphs", "logcollector")))
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
-$PAGE = "template:template";
+$PAGE = "advanced:graphlogs";
 $TITLE = _L('View ASP Graphs / Log Collector');
 
 include_once("nav.inc.php");

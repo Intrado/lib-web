@@ -43,11 +43,13 @@ function fmt_dollars ($row,$index) {
 	return "&nbsp;";
 }
 
+$TITLE = _L('Billable Calls');
+$PAGE = 'advanced:billable';
 
 include_once("nav.inc.php");
-?>
 
-<h2>Billable calls report for all customers</h2>
+startWindow($TITLE);
+?>
 
 <form method=post>
 <label>Start date:<input type=text name=startdate value="<?=date("Y-m-d",time() - 7*24*60*60)?>"></label>
@@ -160,5 +162,6 @@ if (!isset($_POST['startdate'])) {
 
 }
 
+endWindow();
 
 include_once("navbottom.inc.php");

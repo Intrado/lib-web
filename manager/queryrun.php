@@ -268,7 +268,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $TITLE = _L('Queries');
-$PAGE = "tools:queries";
+$PAGE = "advanced:queries";
 
 include_once("nav.inc.php");
 
