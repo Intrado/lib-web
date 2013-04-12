@@ -81,29 +81,43 @@
             (function(){
                 
                 var modal = base.modals.pickExisting,
-                    selectedListIds = [],
-                    rows = '',
-                    $el = $('#add-recipients-existing_lists'),
                     $addButton = base.modals.pickExisting.$el.find('.btn-primary');
 
                 // Modal is opened
                 modal.$el.on('show', function(){
                     
                     // Build the rows
-                    rows = '';
-                    $.each(base.lists, function(id, data) {
-                        if (data.isSaved === true) {
-                            // If the list hasn't been picked, make it checkable, else, show disabled
-                            if ($.inArray(id, base.pickedListIds) === -1) {
-                                rows = rows + '<label class="checkbox" data-list-id="' + id + '"><input type="checkbox" value="' + id + '"> ' + data.name + ' <span class="count">(' + (data.stats.total === undefined ? '--' : data.stats.total) + ')</span></label>';
-                            } else {
-                                rows = rows + '<label class="checkbox" data-list-id="' + id + '" class="disabled"><input type="checkbox" value="' + id + '" checked="checked" disabled> ' + data.name + ' <span class="count">(' + data.stats.total + ')</span></label>';
-                            };
-                        };
-                    });
-                    
-                    // Put rows in table
-                    modal.$el.find('.existing-lists').html(rows);
+					var listOfLists = modal.$el.find('.existing-lists').html("");
+					rows = [];
+					$.each(base.lists, function(id, data) {
+					if (data.isSaved === true) {
+							var newRow = $('<label class="checkbox" data-list-id="' + id + '">' +
+								'<input type="checkbox" value="' + id + '">' +
+								'<span class="name" />' +
+								'<span class="count">(' + (data.stats.total === undefined ? '--' : data.stats.total) + ')</span>' +
+								'</label>');
+							// add the name, escaping html
+							newRow.find(".name").text(data.name);
+							// If the list has been picked, make it disabled
+							if ($.inArray(id, base.pickedListIds) !== -1) {
+								newRow.find("label .checkbox").attr("data-list-id", id).addClass("disabled");
+								newRow.find("input").attr("checked", "checked").attr("disabled", "disabled");
+							}
+							var unSortedName = data.name.toLowerCase();
+							var isAdded = false;
+							listOfLists.children("label").each(function () {
+								var sortedRow = $(this);
+								var sortedName = sortedRow.find(".name").text().toLowerCase();
+								if (unSortedName < sortedName) {
+									sortedRow.before(newRow);
+									isAdded = true;
+									return false;
+								}
+							});
+							if (!isAdded)
+								listOfLists.append(newRow);
+						}
+					});
 
                     // Start the rolling fetch
                     modal.rollingFetch();
