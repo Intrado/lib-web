@@ -37,7 +37,7 @@ function fmt_play_link($row, $index){
 }
 
 $TITLE = _L('Jobs for All Customers');
-$PAGE = 'advanced:joblist';
+$PAGE = 'reports:joblist';
 
 include_once("nav.inc.php");
 
