@@ -1,4 +1,4 @@
-/*----- Forest theme site, uses css.inc.php as basic layout example can be seen in example.css -----*/
+/*----- ASPManager theme site, uses css.inc.php as basic layout example can be seen in example.css -----*/
 
 /*----- basic colours for theme -----*/
 body { background: #ededed; }
@@ -10,12 +10,12 @@ a:hover { color: #6699CC; }
 
 .banner { padding: 0 25px 15px 25px; border-top: 5px solid #363636; 
 background-color: #CCCCCC; 
-background-image: -webkit-gradient(linear, left top, left bottom, from(#CCCCCC), to(#336699)); 
-  background-image: -webkit-linear-gradient(top, #CCCCCC, #336699); 
-  background-image:    -moz-linear-gradient(top, #CCCCCC, #336699); 
-  background-image:     -ms-linear-gradient(top, #CCCCCC, #336699); 
-  background-image:      -o-linear-gradient(top, #CCCCCC, #336699); 
-  background-image:         linear-gradient(top, #CCCCCC, #336699); }
+background-image: -webkit-gradient(linear, left top, left bottom, from(#FFFFFF), to(#336699)); 
+  background-image: -webkit-linear-gradient(top, #FFFFFF, #336699); 
+  background-image:    -moz-linear-gradient(top, #FFFFFF, #336699); 
+  background-image:     -ms-linear-gradient(top, #FFFFFF, #336699); 
+  background-image:      -o-linear-gradient(top, #FFFFFF, #336699); 
+  background-image:         linear-gradient(top, #FFFFFF, #336699); }
 .banner_logo { margin: 15px 0 0; }
 .banner_logo a { background: #fff; padding: 6px; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box;}
