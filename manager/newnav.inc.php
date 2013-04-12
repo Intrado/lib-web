@@ -55,22 +55,15 @@ $NAVTREE = array (
 		array("Customer&nbsp;List","allcustomers.php",NULL,$SUBTAB=="customerlist"),
 		array("New&nbsp;Customer","customeredit.php?id=new",NULL,$SUBTAB=="newcustomer")
 	)),
-	array("Commsuite","customers.php",NULL,$MAINTAB=="commsuite",array(
-		array("Customers","customers.php",NULL,$SUBTAB=="customers"),
-		array("Import&nbsp;Alerts","importalerts.php",NULL,$SUBTAB=="importalerts"),
-		array("Active&nbsp;Jobs","customeractivejobs.php",NULL,$SUBTAB=="activejobs"),
-		array("Locked&nbsp;Users","lockedusers.php","lockedusers",$SUBTAB=="lockedusers"),
-		array("SmartCall","customerdms.php?clear",NULL,$SUBTAB=="customerdms"),
-		array("System&nbsp;DMs","systemdms.php",NULL,$SUBTAB=="systemdms"),
-	)),
+	array("Commsuite","customers.php",NULL,$MAINTAB=="commsuite", get_authorized_commsuite()),
 	array("TalkAboutIt","taicustomers.php",NULL,$MAINTAB=="tai",array(
 		array("Customers","taicustomers.php",NULL,$SUBTAB=="customers"),
 		array("Inbox","taiinbox.php",NULL,$SUBTAB=="inbox"),
 		array("Requests","tairevealrequests.php",NULL,$SUBTAB=="requests"),
 		array("SMS&nbsp;Numbers","taismsnumbers.php",NULL,$SUBTAB=="smsnumbers")
 	)),
-	array("Tools", NULL, NULL, ($MAINTAB == "tools"), get_authorized_tools()),
-	array('Advanced', NULL, NULL, ($MAINTAB == 'advanced'), get_authorized_advanced())
+	array('Tools', NULL, NULL, ($MAINTAB == 'advanced'), get_authorized_advanced()),
+	array('Reports', NULL, NULL, ($MAINTAB == 'reports'), get_authorized_reports())
 );
 
 
@@ -79,23 +72,63 @@ $NAVTREE = array (
 // Menu Building Functions
 ////////////////////////////////////////////////////////////////////////////////
 
-// Build the Tools menu
-function get_authorized_tools() {
+
+// Build the Reports menu
+function get_authorized_commsuite() {
 	global $MANAGERUSER, $SUBTAB, $SETTINGS;
 
 	$menu = Array();
 
+	// TODO - add the authorization checks for this block of actions:
+	$menu[] = array("Customers","customers.php",NULL,$SUBTAB=="customers");
+	$menu[] = array("Import&nbsp;Alerts","importalerts.php",NULL,$SUBTAB=="importalerts");
+	$menu[] = array("Active&nbsp;Jobs","customeractivejobs.php",NULL,$SUBTAB=="activejobs");
+	$menu[] = array("Locked&nbsp;Users","lockedusers.php","lockedusers",$SUBTAB=="lockedusers");
+	$menu[] = array("SmartCall","customerdms.php?clear",NULL,$SUBTAB=="customerdms");
+	$menu[] = array("System&nbsp;DMs","systemdms.php",NULL,$SUBTAB=="systemdms");
+
+	if ($MANAGERUSER->authorized('systemdm')) {
+		$menu[] = array('DM&nbsp;Blocking', 'dmgroupblock.php', NULL, ($SUBTAB == 'dmblocking'));
+	}
+
 	if ($MANAGERUSER->authorized("diskagent")) {
 		$menu[] = array('SwiftSync', 'diskagents.php', NULL, ($SUBTAB == 'swiftsync'));
+	}
+
+	return($menu);
+}
+
+
+// Build the Reports menu
+function get_authorized_reports() {
+	global $MANAGERUSER, $SUBTAB, $SETTINGS;
+
+	$menu = Array();
+
+	if ($MANAGERUSER->authorized('billablecalls')) { 
+		$menu[] = array('Billable&nbsp;Calls', 'billablecalls.php', NULL, ($SUBTAB == 'billable'));
+	}
+
+	if ($MANAGERUSER->authorized('emergencyjobs')) {
+		$menu[] = array('Completed&nbsp;Jobs', 'emergencyjobs.php', NULL, ($SUBTAB == 'joblist'));
+	}
+
+	if ($MANAGERUSER->authorizedAny(array('logcollector', 'aspcallgraphs'))) {
+		$menu[] = array('Graphs&nbsp;&amp;&nbsp;Logs', 'aspcallsindex.php', NULL, ($SUBTAB == 'graphlogs'));
 	}
 
 	if ($MANAGERUSER->authorized("customercontacts")) {
 		$menu[] = array('Contact&nbsp;Search', 'customercontactsearch.php', NULL, ($SUBTAB == 'contacts'));
 	}
 
-	if ($MANAGERUSER->authorized("smsblock")) {
-		$menu[] = array('SMS&nbsp;Block', 'smsblock.php', NULL, ($SUBTAB == 'smsblock'));
+	if ($MANAGERUSER->authorized('bouncedemailsearch')) {
+		$menu[] = array('User&nbsp;Email', 'bouncedemailsearch.php', NULL, ($SUBTAB == 'email'));
 	}
+
+	if ($MANAGERUSER->authorized('passwordcheck')) {
+		$menu[] = array('Bad&nbsp;Passwords', 'passwordcheck.php', NULL, ($SUBTAB == 'badpasswd'));
+	}
+
 	return($menu);
 }
 
@@ -110,40 +143,20 @@ function get_authorized_advanced() {
 		$menu[] = array('Queries', 'querylist.php', array('runqueries', 'editqueries'), ($SUBTAB == 'queries'));
 	}
 
-	if ($MANAGERUSER->authorized('billablecalls')) { 
-		$menu[] = array('Billable&nbsp;Calls', 'billablecalls.php', NULL, ($SUBTAB == 'billable'));
-	}
-
-	if ($MANAGERUSER->authorized('bouncedemailsearch')) {
-		$menu[] = array('Bounced&nbsp;Email', 'bouncedemailsearch.php', NULL, ($SUBTAB == 'email'));
-	}
-
-	if ($MANAGERUSER->authorized('passwordcheck')) {
-		$menu[] = array('Bad&nbsp;Passwords', 'passwordcheck.php', NULL, ($SUBTAB == 'badpasswd'));
-	}
-
-	if ($MANAGERUSER->authorized('emergencyjobs')) {
-		$menu[] = array('Job&nbsp;List', 'emergencyjobs.php', NULL, ($SUBTAB == 'joblist'));
-	}
-
-	if ($MANAGERUSER->authorized('tollfreenumbers')) {
-		$menu[] = array('Toll&nbsp;Free&nbsp;#s', 'tollfreenumbers.php', NULL, ($SUBTAB == 'tollfree'));
-	}
-
 	if (isset($SETTINGS['servermanagement']['manageservers']) && $SETTINGS['servermanagement']['manageservers'] && $MANAGERUSER->authorized('manageserver')) {
 		$menu[] = array('Servers', 'serverlist.php', NULL, ($SUBTAB == 'servers'));
 	}
 
-	if ($MANAGERUSER->authorized('systemdm')) {
-		$menu[] = array('DM&nbsp;Blocking', 'dmgroupblock.php', NULL, ($SUBTAB == 'dmblocking'));
-	}
-
 	if ($MANAGERUSER->authorized('superuser')) { 
-		$menu[] = array('Users', 'users.php', NULL, ($SUBTAB == 'users'));
+		$menu[] = array('Manager&nbsp;Users', 'users.php', NULL, ($SUBTAB == 'users'));
 	}
 
-	if ($MANAGERUSER->authorizedAny(array('logcollector', 'aspcallgraphs'))) {
-		$menu[] = array('Graphs&nbsp;&amp;&nbsp;Logs', 'aspcallsindex.php', NULL, ($SUBTAB == 'graphlogs'));
+	if ($MANAGERUSER->authorized("smsblock")) {
+		$menu[] = array('SMS&nbsp;Block', 'smsblock.php', NULL, ($SUBTAB == 'smsblock'));
+	}
+
+	if ($MANAGERUSER->authorized('tollfreenumbers')) {
+		$menu[] = array('Toll&nbsp;Free&nbsp;#s', 'tollfreenumbers.php', NULL, ($SUBTAB == 'tollfree'));
 	}
 
 	return($menu);
@@ -223,7 +236,7 @@ function doCrumb ($firstactivetablink, $activemaintabtitle, $title) {
 }
 
 function doLogo () {
-	echo '<img src="manager.png" alt="" onclick="window.location=\'allcustomers.php?newnav=false\'" >';
+	echo '<img src="manager.png" alt="" onclick="window.location=\'allcustomers.php?newnav=true\'" >';
 }
 
 function setBodyClass () {

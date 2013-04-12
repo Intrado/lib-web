@@ -127,7 +127,7 @@ function fmt_block_status($status){
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 
-$PAGE = 'tools:smsblock';
+$PAGE = 'advanced:smsblock';
 $TITLE = _L('SMS Block');
 
 include_once("nav.inc.php");
