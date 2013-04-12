@@ -308,7 +308,7 @@ $titles = array(
 	"16" => "@#Has SC DM",
 	"11" => "@#DM Method",
 	"23" => "@#SMS Opt-in",
-	"10" => "@#Features",
+	"10" => "#Features",
 	"7" => "@#Max Users",
 	"8" => "@#Users",
 	"9" => "@#Jobs",
@@ -320,7 +320,7 @@ $titles = array(
 	"5" => "#NOTES: ",
 	"12" => "@#OEM",
 	"13" => "@#OEM ID",
-	"14" => "@#NetSuite"
+	"14" => "#NetSuite"
 );
 
 $formatters = array(
