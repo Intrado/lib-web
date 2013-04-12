@@ -236,7 +236,6 @@
 								var el = $('#theme_view_newcolors_swatch_' + jj);
 								var bgcolor = el.css('background-color');
 								if (parseInt(el.attr('data-modified')) && (bgcolor != 'transparent')) {
-
 									var color_code = myself.color2hex(bgcolor);
 									var res = myself.theme_scan(myself.scratch, myself.rcitheme_data.color[jj], '#' + color_code);
 									if (! res) break;
