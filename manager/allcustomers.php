@@ -8,7 +8,7 @@ if (isset($_GET["newnav"])) {
 		$_SESSION["newnav"] = true;
 	} else {
 		unset($_SESSION["newnav"]);
-		redirect("index.php");
+		redirect("customers.php");
 	}
 }
 
