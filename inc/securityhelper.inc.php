@@ -95,6 +95,15 @@ function userCanSee ($type,$id) {
 				inner join job j on (j.messagegroupid = mg.id)
 				where mg.id = ?
 				and j.userid = ?";
+			if (QuickQuery($query, false, array($messagegroupid, $USER->id))) {
+				return true;
+			}
+			// else check jobs of this user's viewable users
+			$query = "select 1
+				from  messagegroup mg
+				inner join job j on (j.messagegroupid = mg.id)
+				where mg.id = ?
+				and j.userid in (select subordinateuserid from userlink where userid = ?)";
 			return QuickQuery($query, false, array($messagegroupid, $USER->id));
 		case "job":
 			$job = new Job($id);
