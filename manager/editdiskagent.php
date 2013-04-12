@@ -206,7 +206,7 @@ $formatters = array(
 	);
 
 $TITLE = _L('SwiftSync Settings');
-$PAGE = 'tools:swiftsync';
+$PAGE = 'commsuite:swiftsync';
 
 include_once("nav.inc.php");
 

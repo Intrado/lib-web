@@ -24,7 +24,7 @@ function fmt_custurl($row, $index){
 		return escapehtml(escapehtml($CUSTOMERINFO[$row[0]]['urlcomponent']));
 }
 $TITLE = _L('Bounced Email Search');
-$PAGE = 'advanced:email';
+$PAGE = 'reports:email';
 
 include_once("nav.inc.php");
 

@@ -62,7 +62,7 @@ function fmt_dmgroupblock_actions($row, $index){
 ////////////////////////////////////////////////////////////////////////////////
 
 $TITLE = _L('DM Group Blocking');
-$PAGE = 'advanced:dmblocking';
+$PAGE = 'commsuite:dmblocking';
 
 include("nav.inc.php");
 

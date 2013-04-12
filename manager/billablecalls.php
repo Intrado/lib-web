@@ -44,7 +44,7 @@ function fmt_dollars ($row,$index) {
 }
 
 $TITLE = _L('Billable Calls');
-$PAGE = 'advanced:billable';
+$PAGE = 'reports:billable';
 
 include_once("nav.inc.php");
 
