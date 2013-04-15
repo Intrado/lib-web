@@ -82,6 +82,9 @@ if($reloadform){
 	PutFormData($f, $s, "submit", "");
 }
 
+$TITLE = _L('DM Upload');
+$PAGE = 'commsuite:customerdms';
+
 include_once("nav.inc.php");
 ?>
 <div>Upload File for:

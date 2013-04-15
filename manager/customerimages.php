@@ -98,6 +98,9 @@ if(isset($_POST['submit'])) {
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 
+$TITLE = _L('Customer Images');
+$PAGE = 'commsuite:customers';
+
 include_once("nav.inc.php");
 $displayname = getCustomerSystemSetting('displayname', false, true, $custdb);
 $custurl = QuickQuery("select urlcomponent from customer where id = ?", false, array($customerid));	

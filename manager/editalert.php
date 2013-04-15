@@ -119,6 +119,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $TITLE = _L('Edit Alert Notes for Import: %s', $alert["importname"]);
+$PAGE = 'commsuite:importalerts';
 
 include_once("nav.inc.php");
 

@@ -29,7 +29,7 @@ mysql_select_db($SETTINGS['aspreports']['db'], $conn);
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $TITLE = "Customer Details";
-$PAGE = "commsuite";
+$PAGE = "commsuite:customers";
 include_once("nav.inc.php");
 
 startWindow(_L('Billable Calls'));
