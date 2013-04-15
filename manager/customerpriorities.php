@@ -3,6 +3,7 @@ include_once("common.inc.php");
 include_once("../inc/form.inc.php");
 include_once("../inc/html.inc.php");
 include_once("../inc/utils.inc.php");
+require_once("../inc/table.inc.php");
 
 if (!$MANAGERUSER->authorized("editpriorities"))
 	exit("Not Authorized");
@@ -123,7 +124,12 @@ function getPriorityName($systempriority){
 // Display
 //////////////////////////////////////////
 
+$TITLE = _L('Customer Priorities');
+$PAGE = 'commsuite:customers';
+
 include("nav.inc.php");
+
+startWindow($TITLE);
 
 NewForm($f);
 ?>
@@ -175,6 +181,8 @@ NewForm($f);
 
 </table>
 <? NewFormItem($f, 'new', 'Save', 'submit')?>
+<br/>
+<br/>
 <div style="color:green">
 <p>If you want to add more general or survey types, please log into the customer and use the Job Type Management page. <b>You must have a minimum of one survey jobtype and one non-survey jobtype regardless of whether or not the customer has survey enabled.</b>
 <p>If you are adding a High Priority Job Type, make sure it qualifies as a High Priority.  This would include things like "Attendance" or "Food Services".
@@ -183,6 +191,9 @@ NewForm($f);
 </div>
 <?
 EndForm();
+
+endWindow();
+
 include_once("navbottom.inc.php");
 
 ?>

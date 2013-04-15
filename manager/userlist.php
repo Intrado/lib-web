@@ -55,7 +55,12 @@ function fmt_custurl($row, $index){
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 
+$TITLE = _L('Customer User List');
+$PAGE = 'commsuite:customers';
+
 include_once("nav.inc.php");
+
+startWindow($TITLE);
 
 if($custdb = DBConnect($cust[0], $cust[1], $cust[2], "c_$customerid")){
 	$displayname = QuickQuery("select value from setting where name = 'displayname'", $custdb);
@@ -94,6 +99,9 @@ $formatters = array("url" => "fmt_custurl",
 ?>
 </table>
 <?
+
+endWindow();
+
 include_once("navbottom.inc.php");
 
 ?>
