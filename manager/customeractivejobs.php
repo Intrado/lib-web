@@ -53,22 +53,25 @@ if ($jobfilter->settings['dispatchtype'] == 'customer'){
 	$extrasql .= " and j.dispatchtype = 'system' ";
 }
 
+$nexttimes = array();
+
 foreach ($shards as $shardid => $sharddb) {
 	Query("use aspshard", $sharddb);
 	// TODO remove 'phone' leftover from qjobtask.type field
 	$query = "select j.systempriority, j.customerid, j.id, 'phone', jt.attempts, jt.sequence,
-					jt.status, j.phonetaskcount, j.timeslices, count(*)
+					jt.status, j.phonetaskcount, j.timeslices, count(*), min(jt.nextattempttime)
 			from qjobtask jt
 			straight_join qjob j on (j.id = jt.jobid and j.customerid = jt.customerid)
 			where 1 $extrasql
 			group by jt.status, jt.customerid, jt.jobid, jt.attempts, jt.sequence
 			order by j.systempriority, j.customerid, j.id, jt.attempts, jt.sequence
 			";
+error_log($query);
 	$res = Query($query,$sharddb,$extraargs);
 	while ($row = DBGetRow($res)) {
 
 		$calldata[$row[0]][$row[1]][$row[2]][$row[3]][$row[4]][$row[5]][$row[6]] = $row[9];
-
+		$nexttimes["{$row[1]}.{$row[2]}"] = $row[10];
 		$activejobs[$row[1]][$row[2]]["phonetaskcount"] = $row[7];
 		@$activejobs[$row[1]][$row[2]]["phonetaskremaining"] += $row[9];
 
@@ -98,6 +101,22 @@ function fmt_number ($row,$index) {
 function fmt_custurl($row, $index){
 	$url = "<a href=\"customerlink.php?id=" . $row[0] ."\" target=\"_blank\">" . $row[1] . "</a>";
 	return $url;
+}
+
+function fmt_nexttime_countdown($row, $index) {
+
+	// Data *should* be a count of milliseconds as stored in the DB
+	$data = $row[$index];
+	// The "total" row will have -1 supplied here so that we show nothing
+	if ($data == -1) return('');
+
+	$seconds = intval($data / 1000);
+	$timeleft = $seconds - time();
+	$days = intval($timeleft / 86400);
+	$timeleft %= 86400;
+	$res = '';
+	if ($days) $res .= "{$days} Days + ";
+	return($res . gmdate('H:i:s', $timeleft));
 }
 
 //index 2 is jobid
@@ -175,7 +194,8 @@ foreach($jobfilter->settings['priorities'] as $pri) {
 									$sequencecalldata['progress'],
 									$sequencecalldata['pending'],
 									$sequencecalldata['waiting'],
-									$customerid
+									$customerid,
+									$nexttimes["{$customerid}.{$jobid}"]
 								);
 							$pridata[] = $row;
 	
@@ -206,7 +226,9 @@ foreach($jobfilter->settings['priorities'] as $pri) {
 			$pritotals["assigned"],
 			$pritotals["progress"],
 			$pritotals["pending"],
-			$pritotals["waiting"]
+			$pritotals["waiting"],
+			"",
+			-1
 		);
 		$pridata[] = $totalsrow;
 		$data[$pri] = $pridata;
@@ -233,7 +255,7 @@ if (count($data)) {
 		"Assigned",
 		"Progress",
 		"Pending",
-		"Waiting",
+		"Waiting"
 	);
 	$formatters = array (
 		0 => "fmt_html",
@@ -267,7 +289,8 @@ if (count($data)) {
 		"Progress",
 		"Pending",
 		"Waiting",
-		"Play Message"
+		"Play Message",
+		"Next Time"
 	);
 	$formatters = array (
 		0 => "fmt_html",
@@ -280,7 +303,8 @@ if (count($data)) {
 		11 => "fmt_number",
 		12 => "fmt_number",
 		13 => "fmt_number",
-		14 => "fmt_play_activejobs"
+		14 => "fmt_play_activejobs",
+		15 => 'fmt_nexttime_countdown'
 	);
 	foreach($data as $pri => $pridata) {
 		echo "<div style=\"margin-top:10px;border: 3px solid $pricolors[$pri];\"><h2>$prinames[$pri]</h2><hr />";
