@@ -180,6 +180,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $TITLE = _L('Edit Query');
+$PAGE = 'advanced:queries';
 
 include_once("nav.inc.php");
 
