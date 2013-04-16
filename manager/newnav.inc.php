@@ -206,19 +206,6 @@ function doNavTabs ($navtree) {
 	}
 }
 
-function doShortcuts ($shortcuts) {
-	global $USER;
-	if ($USER->authorize("startshort")) {
-		foreach ($shortcuts as $name => $value) {
-			if (strpos($name,"<b>") === 0) {
-				?><div class="shortcuttitle"><?= $name ?></div><?
-			} else {
-				?><a href="<?= escapehtml($value) ?>"><?= $name ?></a><?
-			}
-		}
-	}
-}
-
 function doCrumb ($firstactivetablink, $activemaintabtitle, $title) {
 	$crumb = array ("Start" => "start.php");
 	if ($firstactivetablink)
@@ -317,18 +304,6 @@ header('Content-type: text/html; charset=UTF-8') ;
 
 <script type="text/javascript">
 Event.observe(window, 'load', function() {
-	new Tip('shortcutmenu', $('shortcuts'), {
-		style: 'default',
-		radius: 4,
-		border: 4,
-		target: 'shortcutmenu',
-		hideOn: false,
-		hideAfter: 0.5,
-		hook: { target: 'bottomRight', tip: 'topRight' },
-		offset: { x: 6, y: 0 },
-		width: 'auto'
-	});
-	
 	sessionKeepAliveWarning(<?=$SESSION_WARNING_TIME?>);
 });
 </script>
