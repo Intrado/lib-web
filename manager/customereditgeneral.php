@@ -199,11 +199,8 @@ else
 
 
 $helpstepnum = 1;
-$formdata = array(_L('Basics'));
 
-include("inc/customerRequiredFormItems.inc.php");
-
-$formdata[] = _L('Products');
+$formdata = array(_L('Products'));
 $formdata["commsuite"] = array(
 	"label" => _L('CommSuite'),
 	"value" => isset($products['cs'])?$products['cs']:0,
@@ -212,6 +209,7 @@ $formdata["commsuite"] = array(
 	"helpstep" => $helpstepnum
 );
 
+/*
 $formdata["contactmanager"] = array(
 	"label" => _L('Contact Manager'),
 	"value" => isset($products['cm'])?$products['cm']:0,
@@ -219,7 +217,7 @@ $formdata["contactmanager"] = array(
 	"control" => array("CheckBox"),
 	"helpstep" => $helpstepnum
 );
-
+*/
 $formdata["tai"] = array(
 	"label" => _L('Talk About It'),
 	"value" => isset($products['tai'])?$products['tai']:0,
@@ -228,6 +226,10 @@ $formdata["tai"] = array(
 	"helpstep" => $helpstepnum
 );
 
+
+$formdata[] = _L('Basics');
+
+include("inc/customerRequiredFormItems.inc.php");
 
 $thispage = "customereditgeneral.php";
 $returntopage = "allcustomers.php";
@@ -387,7 +389,7 @@ document.observe('dom:loaded', function() {
 </script>
 <?
 
-startWindow($customerid?_L('Edit Customer'):_L('New Customer'));
+startWindow($TITLE);
 echo $form->render();
 endWindow();
 include_once("navbottom.inc.php");
