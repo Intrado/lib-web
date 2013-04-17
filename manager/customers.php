@@ -2,6 +2,15 @@
 require_once("common.inc.php");
 require_once("../inc/table.inc.php");
 
+if (isset($_GET["newnav"])) {
+	if ($_GET["newnav"] == "true") {
+		$_SESSION["newnav"] = true;
+	} else {
+		unset($_SESSION["newnav"]);
+		redirect("customers.php");
+	}
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // formatters
 ////////////////////////////////////////////////////////////////////////////////

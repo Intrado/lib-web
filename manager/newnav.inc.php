@@ -44,60 +44,120 @@ if (isset($_GET['timer']) || isset($_SESSION['timer'])) {
 
 //tree format:
 //[[title,default link,access,selected,[[sub title,sub link,sub access,sub selected],...],...]
+$NAVTREE = array();
 
-// TODO - can we remove sections of the menu definition which are outside the scope of the current
-// request? ex. if we are in the CUSTOMERS section of the site, the menu never shows anything about
-// the selections below the TOOLS section; it should simply suffice to add TOOLS to the upper level
-// and leave the inner levels out
+// Removes sections of the menu definition which are outside the scope of the
+// current request; e.g. if we are in the CUSTOMERS section of the site, the
+// menu never shows anything about the selections below the TOOLS section; it
+// should simply suffice to add TOOLS to the upper level and leave the inner
+// levels out; also trims down the menu to only things that the user has
+// permission to access (each permission check should match the checks performed
+// in the associated PHP page).
 
-$NAVTREE = array (
-	array("Customers","allcustomers.php",NULL,$MAINTAB=="overview",array(
-		array("Customer&nbsp;List","allcustomers.php",NULL,$SUBTAB=="customerlist"),
-		array("New&nbsp;Customer","customeredit.php?id=new",NULL,$SUBTAB=="newcustomer")
-	)),
-	array("Commsuite","customers.php",NULL,$MAINTAB=="commsuite", get_authorized_commsuite()),
-	array("TalkAboutIt","taicustomers.php",NULL,$MAINTAB=="tai",array(
-		array("Customers","taicustomers.php",NULL,$SUBTAB=="customers"),
-		array("Inbox","taiinbox.php",NULL,$SUBTAB=="inbox"),
-		array("Requests","tairevealrequests.php",NULL,$SUBTAB=="requests"),
-		array("SMS&nbsp;Numbers","taismsnumbers.php",NULL,$SUBTAB=="smsnumbers")
-	)),
-	array('Tools', NULL, NULL, ($MAINTAB == 'advanced'), get_authorized_advanced()),
-	array('Reports', NULL, NULL, ($MAINTAB == 'reports'), get_authorized_reports())
-);
+if (count($menu = get_authorized_commsuite())) {
+	$first_page = $menu[0][1];
+	$active = ($MAINTAB == 'commsuite');
+	$NAVTREE[] = array('Commsuite', $first_page, NULL, $active, ($active ? $menu : NULL));
+}
 
+if (count($menu = get_authorized_talkaboutit())) {
+	$first_page = $menu[0][1];
+	$active = ($MAINTAB == 'tai');
+	$NAVTREE[] = array('TalkAboutIt', $first_page, NULL, $active, ($active ? $menu : NULL));
+}
+
+if (count($menu = get_authorized_advanced())) {
+	$first_page = $menu[0][1];
+	$active = ($MAINTAB == 'advanced');
+	$NAVTREE[] = array('Tools', $first_page, NULL, $active, ($active ? $menu : NULL));
+}
+
+if (count($menu = get_authorized_reports())) {
+	$first_page = $menu[0][1];
+	$active = ($MAINTAB == 'reports');
+	$NAVTREE[] = array('Reports', $first_page, NULL, $active, ($active ? $menu : NULL));
+}
+
+if (count($menu = get_authorized_customers())) {
+	$first_page = $menu[0][1];
+	$active = ($MAINTAB == 'overview');
+	$NAVTREE[] = array('Customers', $first_page, NULL, $active, ($active ? $menu : NULL));
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Menu Building Functions
 ////////////////////////////////////////////////////////////////////////////////
 
-
-// Build the Reports menu
-function get_authorized_commsuite() {
+// Build the TalkAboutIt menu
+function get_authorized_talkaboutit() {
 	global $MANAGERUSER, $SUBTAB, $SETTINGS;
 
 	$menu = Array();
 
-	// TODO - add the authorization checks for this block of actions:
-	$menu[] = array("Customers","customers.php",NULL,$SUBTAB=="customers");
-	$menu[] = array("Import&nbsp;Alerts","importalerts.php",NULL,$SUBTAB=="importalerts");
-	$menu[] = array("Active&nbsp;Jobs","customeractivejobs.php",NULL,$SUBTAB=="activejobs");
-	$menu[] = array("Locked&nbsp;Users","lockedusers.php","lockedusers",$SUBTAB=="lockedusers");
-	$menu[] = array("SmartCall","customerdms.php?clear",NULL,$SUBTAB=="customerdms");
-	$menu[] = array("System&nbsp;DMs","systemdms.php",NULL,$SUBTAB=="systemdms");
+	// FIXME - There are no apparenet explicit permissions required for TAI administration
 
-	if ($MANAGERUSER->authorized('systemdm')) {
-		$menu[] = array('DM&nbsp;Blocking', 'dmgroupblock.php', NULL, ($SUBTAB == 'dmblocking'));
-	}
+	$menu[] = array('Customers', 'taicustomers.php', NULL, ($SUBTAB == 'customers'));
+	$menu[] = array('Inbox', 'taiinbox.php', NULL, ($SUBTAB == 'inbox'));
+	$menu[] = array('Requests', 'tairevealrequests.php', NULL, ($SUBTAB=='requests'));
+	$menu[] = array('SMS&nbsp;Numbers', 'taismsnumbers.php', NULL, ($SUBTAB == 'smsnumbers'));
 
-	if ($MANAGERUSER->authorized("diskagent")) {
-		$menu[] = array('SwiftSync', 'diskagents.php', NULL, ($SUBTAB == 'swiftsync'));
+	return($menu);
+}
+
+// Build the Customers menu
+function get_authorized_customers() {
+	global $MANAGERUSER, $SUBTAB, $SETTINGS;
+
+	$menu = Array();
+
+	$menu[] = array('Customer&nbsp;List', 'allcustomers.php', NULL, ($SUBTAB == 'customerlist'));
+
+	if ($MANAGERUSER->authorized('newcustomer') && $MANAGERUSER->authorized('editcustomer')) {
+		$menu[] = array('New&nbsp;Customer', 'customeredit.php?id=new', NULL, ($SUBTAB == 'newcustomer'));
 	}
 
 	return($menu);
 }
 
+// Build the Commsuite menu
+function get_authorized_commsuite() {
+	global $MANAGERUSER, $SUBTAB, $SETTINGS;
+
+	$menu = Array();
+
+	$menu[] = array('Customers', 'customers.php', NULL, ($SUBTAB == 'customers'));
+
+	if ($MANAGERUSER->authorized('imports')) {
+		$menu[] = array('Import&nbsp;Alerts', 'importalerts.php', NULL, ($SUBTAB == 'importalerts'));
+	}
+
+	if ($MANAGERUSER->authorized('activejobs')) {
+		$menu[] = array('Active&nbsp;Jobs', 'customeractivejobs.php' ,NULL, ($SUBTAB == 'activejobs'));
+	}
+
+	if ($MANAGERUSER->authorized('lockedusers')) {
+		$menu[] = array('Locked&nbsp;Users', 'lockedusers.php', 'lockedusers', ($SUBTAB == 'lockedusers'));
+	}
+
+	if ($MANAGERUSER->authorized('editdm')) {
+		$menu[] = array('SmartCall', 'customerdms.php?clear', NULL, ($SUBTAB == 'customerdms'));
+	}
+
+	if ($MANAGERUSER->authorized('systemdm')) {
+		$menu[] = array('System&nbsp;DMs', 'systemdms.php', NULL, ($SUBTAB == 'systemdms'));
+	}
+
+	if ($MANAGERUSER->authorized('systemdm')) {
+		$menu[] = array('DM&nbsp;Blocking', 'dmgroupblock.php', NULL, ($SUBTAB == 'dmblocking'));
+	}
+
+	if ($MANAGERUSER->authorized('diskagent')) {
+		$menu[] = array('SwiftSync', 'diskagents.php', NULL, ($SUBTAB == 'swiftsync'));
+	}
+
+	return($menu);
+}
 
 // Build the Reports menu
 function get_authorized_reports() {
@@ -132,7 +192,7 @@ function get_authorized_reports() {
 	return($menu);
 }
 
-// Build the Advanced menu
+// Build the Advanced (tools) menu
 function get_authorized_advanced() {
 	global $MANAGERUSER, $SUBTAB, $SETTINGS;
 
@@ -223,7 +283,7 @@ function doCrumb ($firstactivetablink, $activemaintabtitle, $title) {
 }
 
 function doLogo () {
-	echo '<img src="manager.png" alt="" onclick="window.location=\'allcustomers.php?newnav=true\'" >';
+	echo '<img src="manager.png" alt="" onclick="window.location=\'customers.php\'" >';
 }
 
 function setBodyClass () {

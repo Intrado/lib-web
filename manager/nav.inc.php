@@ -62,8 +62,8 @@ if (isset($_GET['monitor'])) {
 <!-- ********************************************************************* -->
 
 <div class="manager_logo">
-	<img src="manager.png" alt="ASP Manager"  onclick="window.location='allcustomers.php?newnav=true'"/>
-	<div style="float:right;margin:5px"><a href="allcustomers.php?newnav=true">Beta Manager</a></div>
+	<img src="manager.png" alt="ASP Manager"  onclick="window.location='customers.php?newnav=true'"/>
+	<div style="float:right;margin:5px"><a href="customers.php?newnav=true">Beta Manager</a></div>
 </div>
 
 
