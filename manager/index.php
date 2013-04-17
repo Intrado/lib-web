@@ -24,7 +24,7 @@ if ($SETTINGS['feature']['has_ssl']) {
 $badlogin=false;
 
 if(isset($_SESSION["aspadminuserid"])) {
-	redirect("allcustomers.php?newnav=true");
+	redirect("customers.php?newnav=true");
 }
 
 if(isset($_POST["submit"])) {
@@ -40,7 +40,7 @@ if(isset($_POST["submit"])) {
 		$autologoutminutes = isset($SETTINGS['feature']['autologoutminutes']) ? $SETTINGS['feature']['autologoutminutes'] : 30;
 		$_SESSION['expiretime'] = time() + 60*$autologoutminutes; //30 minutes
 	
-		redirect("/$login/manager/allcustomers.php?newnav=true");
+		redirect("/$login/manager/customers.php?newnav=true");
 	} else {
 		$badlogin = true;
 	}
