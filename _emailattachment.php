@@ -78,8 +78,8 @@ if (is_array($result)) {
 	</style>
 	<script type="text/javascript">
 	function load() {
-		if (typeof(stopUpload) != "undefined") {
-			stopUpload('<?=$contentid?>','<?= addslashes($filename) ?>','<?= $size ?>','<?= isset($errormessage)?addslashes($errormessage):'' ?>', '<?=$_GET['formname']?>', '<?=$_GET['itemname']?>');
+		if (window.parent.window.stopUpload != undefined) {
+			window.parent.window.stopUpload('<?=$contentid?>','<?= addslashes($filename) ?>','<?= $size ?>','<?= isset($errormessage)?addslashes($errormessage):'' ?>', '<?=$_GET['formname']?>', '<?=$_GET['itemname']?>');
 		}
 	}
 	</script>
