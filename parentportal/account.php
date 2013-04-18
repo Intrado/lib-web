@@ -125,7 +125,7 @@ startWindow(_L('User Information'));
 					</tr>
 					<tr>
 						<td align="right"><?=_L("Email")?>:</td>
-						<td><? NewFormItem($f,$s, 'email', 'text', 20, 20, "id=\"emailbox\" ". ($notifyemailCheckbox ? "" : "disabled=\"true\"")); ?></td>
+						<td><? NewFormItem($f,$s, 'email', 'text', 40, 100, "id=\"emailbox\" ". ($notifyemailCheckbox ? "" : "disabled=\"true\"")); ?></td>
 					</tr>
 
 					<tr>
@@ -133,7 +133,7 @@ startWindow(_L('User Information'));
 					</tr>
 					<tr>
 						<td align="right"><?=_L("Mobile Phone for Text Message")?>:</td>
-						<td><? NewFormItem($f,$s, 'sms', 'text', 20, 20, "id=\"smsbox\" ". ($notifysmsCheckbox ? "" : "disabled=\"true\"")); ?></td>
+						<td><? NewFormItem($f,$s, 'sms', 'text', 40, 20, "id=\"smsbox\" ". ($notifysmsCheckbox ? "" : "disabled=\"true\"")); ?></td>
 					</tr>
 
 				</table>

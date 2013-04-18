@@ -1,7 +1,31 @@
 <?
+////////////////////////////////////////////////////////////////////////////////
+// Includes
+////////////////////////////////////////////////////////////////////////////////
 require_once("common.inc.php");
+require_once("../inc/table.inc.php");
+require_once("../inc/html.inc.php");
+require_once("../inc/utils.inc.php");
+require_once("../obj/Validator.obj.php");
+require_once("../obj/Form.obj.php");
+require_once("../obj/FormItem.obj.php");
+
+////////////////////////////////////////////////////////////////////////////////
+// Authorization
+////////////////////////////////////////////////////////////////////////////////
+
 if(!$MANAGERUSER->authorizedAny(array("aspcallgraphs", "logcollector")))
 	exit("Not Authorized");
+
+////////////////////////////////////////////////////////////////////////////////
+// Display
+////////////////////////////////////////////////////////////////////////////////
+$PAGE = "reports:graphlogs";
+$TITLE = _L('View ASP Graphs / Log Collector');
+
+include_once("nav.inc.php");
+
+startWindow(_L('View ASP Graphs / Log Collector'));
 ?>
 
 <? if($MANAGERUSER->authorized("aspcallgraphs")) { ?>
@@ -38,3 +62,7 @@ if(!$MANAGERUSER->authorizedAny(array("aspcallgraphs", "logcollector")))
 <a href="aspcallssearch.php">Call search</a>
 <? } ?>
 
+<?
+endWindow();
+include_once("navbottom.inc.php");
+?>

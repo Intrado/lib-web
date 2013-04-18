@@ -33,19 +33,13 @@
    * "message sender" -> for the pasteFromPhone plugin availability
  */
 
-/*
-// Get the document domain to be the same for IE cross-frame operations
-var domain = document.location.hostname;
-document.domain = domain;
-*/
-
 (function ($) {
-window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
-	this.textarea = null; // The textarea ELEMENT, not the ID
-	this.container = null; // The container ELEMENT, to contain the editor, not the ID
-	this.editorMode = null; // Either null (uninitialized) or [plain|normal|full|inline]
-	this.basename = 'rcicke';
-	this.hidetoolbar = false;
+window.RCIEditor = function (editor_mode, textarea_id, overrideSettings) {
+	var textarea = null;	// The textarea ELEMENT, not the ID
+	var container = null;	// The container ELEMENT, to contain the editor, not the ID
+	var editorMode = null;	// Either null (uninitialized) or [plain|normal|full|inline]
+	var basename = 'rcicke';
+	var customsettings = {};
 
 	// Lifted from utils.js so that we don't need to include that whole thing as an external dep.
 	this.getBaseUrl = function() {
@@ -53,7 +47,6 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 		var baseUrl = url.substr(0, url.lastIndexOf('/') + 1);        // Get everything thru the last '/'
 		return(baseUrl);
 	};
-
 
 	// Associative array support for settings; use of set/getter's is required
 	var settings = null;
@@ -79,23 +72,22 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 	 * @param string editor_mode [plain|normal|full|inline]
 	 * @param string textarea_id the HTML id attribute of the text area the
 	 * editor should be attached to
-	 * @param boolean hidetoolbar Optional initial expand/collapse state of
-	 * the toolbar; true to collapse, false to expand (default)
+	 * @param overrideSettings array of name/value setting pairs to override
+	 * defaults upon initialization
 	 */
-	this.reconstruct = function (editor_mode, textarea_id, hidetoolbar) {
+	this.reconstruct = function (editor_mode, textarea_id, overrideSettings) {
 
 		// (1) If the editorMode is defined...
-		if (this.editorMode) {
+		if (editorMode) {
 
 			// We need to deconstruct before we construct...
 			if (! this.deconstruct()) return(false);
 		}
 
 		// (2) Reset all internal properties
-		this.textarea = null;
-		this.container = null;
-		this.editorMode = null;
-		this.hidetoolbar = false;
+		textarea = null;
+		container = null;
+		editorMode = null;
 
 		// reset the settings array
 		this.clearSettings();
@@ -108,20 +100,21 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 		this.setSetting('tool_mkblock', false);
 		this.setSetting('tool_thememgr', false);
 		this.setSetting('tool_pastefromphone', false);
+		this.setSetting('hidetoolbar', false);
+		this.setSetting('fieldinsert_list', {});
 
 		// Make a generic, reusable text clipboard
 		this.setSetting('clipboard', '');
 
 		// Get the base URL for requests that require absolute pathing
 		this.setSetting('baseUrl', this.getBaseUrl());
-		this.hidetoolbar = hidetoolbar;
 
 		// Clear any validator that was set
 		this.resetValidatorFunction();
 
 		// (3) Apply the editor to the chosen textarea
 		var container_id = textarea_id + '-htmleditor';
-		return(this.applyEditor(editor_mode, textarea_id, container_id, hidetoolbar));
+		return(this.applyEditor(editor_mode, textarea_id, container_id, overrideSettings));
 	};
 
 	/**
@@ -134,22 +127,20 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 		this.setLoadingVisibility(true);
 
 		// Tear down whatever editor is in place
-		switch (this.editorMode) {
-			case 'msinline':
+		switch (editorMode) {
 			case 'inline':
 
 				// We can get rid of the IFRAME'd inline editor
 				// just by emptying out the container
-				var container =  $('#' +  this.basename + '-htmleditor');
-				if (! container.length) {
+				var tmpcontainer =  $('#' +  basename + '-htmleditor');
+				if (! tmpcontainer.length) {
 					return(false);
 				}
 
-				container.empty();
+				tmpcontainer.empty();
 				return(true);
 
 			case 'plain':
-			case 'msnormal':
 			case 'normal':
 			case 'full':
 				var htmleditorobject = this.getHtmlEditorObject();
@@ -157,18 +148,18 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 					return(false);
 				}
 
-				if (typeof this.textarea !== 'object') {
+				if (typeof textarea !== 'object') {
 					return(false);
 				}
 
 				// Capture the textarea content to prevent CKE from further altering it
-				var content = this.textarea.val();
+				var content = textarea.val();
 
 				// Let CKE do whatever it does while destroying itself
 				htmleditorobject.instance.destroy();
 
 				// And restore the textarea's content
-				this.textarea.val(content);
+				textarea.val(content);
 
 				return(true);
 
@@ -189,21 +180,21 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 	 *
 	 * @param editorMode string One of either: 'inline', 'plain', 'normal', or 'full'
 	 */
-	this.changeMode = function (editorMode) {
+	this.changeMode = function (newEditorMode) {
 
 		// If we're already in this same mode
-		if (this.editorMode == editorMode) {
+		if (editorMode == newEditorMode) {
 
 			// Then there's nothing to do...
 			return(true);
 		}
 
 		// Remember a couple things for context...
-		var textarea_id = this.textarea.attr('id');
-		var hidetoolbar = this.hidetoolbar;
+		var textarea_id = textarea.attr('id');
+		var overrideSettings = customSettings;
 
 		// And remake ourselves
-		var res = this.reconstruct(editorMode, textarea_id, hidetoolbar);
+		var res = this.reconstruct(newEditorMode, textarea_id, overrideSettings);
 		return(res);
 	};
 
@@ -212,32 +203,34 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 	 *
 	 * SMK added 2012-12-17
 	 *
-	 * @param editorMode string One of either: 'inline', 'plain', 'normal',
+	 * @param setEditorMode string One of either: 'inline', 'plain', 'normal',
 	 * or 'full'
-	 * @param textarea string The id of the textarea form element we are
+	 * @param textarea_id string The id of the textarea form element we are
 	 * attaching the editor to
-	 * @param container string The id of the container that the editor code
+	 * @param container_id string The id of the container that the editor code
 	 * will be injected into
+	 * @param overrideSettings array of name/value setting pairs to override
+	 * defaults upon initialization
 	 *
 	 * @return Mixed boolean true/false on success or failure or string
 	 * 'deferred' if execution deferred due to asynchronous dependencies not
 	 * being available
 	 */
-	this.applyEditor = function(editorMode, textarea_id, container_id, hidetoolbar) {
+	this.applyEditor = function(setEditorMode, textarea_id, container_id, overrideSettings) {
 
 		// Hide the text area form field until we are done initializing
-		this.textarea = $('#' + textarea_id);
-		this.textarea.hide();
+		textarea = $('#' + textarea_id);
+		textarea.hide();
 		this.setLoadingVisibility(true);
 
 		// If we are already running
-		if (this.editorMode) {
+		if (editorMode) {
 
 			// And we want to apply to the same textarea/container
-			if ((textarea_id == this.textarea.attr('id')) && (container_id == this.container.attr('id'))) {
+			if ((textarea_id == textarea.attr('id')) && (container_id == container.attr('id'))) {
 
 				// Then change the mode which will call us when ready
-				return(this.changeMode(editorMode));
+				return(this.changeMode(setEditorMode));
 			}
 
 			// Applying to a different textarea/container is not allowed
@@ -249,55 +242,47 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 
 			// We will try again in one second since CKE is not ready yet
 			var that = this;
-			window.setTimeout(function() { that.applyEditor(editorMode, textarea_id, container_id); }, 1000);
+			window.setTimeout(function() { that.applyEditor(setEditorMode, textarea_id, container_id, overrideSettings); }, 1000);
 			return('deferred');
 		}
 
-		// base name of the text element; we'll make several new elements with derived names
-		this.basename = textarea_id;
-		this.container = $('#' + container_id);
-
-		// The first new element has the same id with a 'hider' suffix
-		var hider = $('#' + this.basename + 'hider');
-		if (! hider.length) {
-			hider = $('<div id="' + this.basename + 'hider" style="display: none;"></div>');
-			this.container.append(hider);
+		// Override some settings
+		for (var setting in overrideSettings) {
+			this.setSetting(setting, overrideSettings[setting]);
 		}
 
-		var cke = $('<div id="' + this.basename + '_box"></div>');
+		// base name of the text element; we'll make several new elements with derived names
+		basename = textarea_id;
+		container = $('#' + container_id);
+
+		// The first new element has the same id with a 'hider' suffix
+		var hider = $('#' + basename + 'hider');
+		if (! hider.length) {
+			hider = $('<div id="' + basename + 'hider" style="display: none;"></div>');
+			container.append(hider);
+		}
+
+		var cke = $('<div id="' + basename + '_box"></div>');
 
 		// For the full CKEditor, the toolbars/plugins
 		// are different depending on the editorMode
-		var extraPlugins = ['aspell'];
 		var extraButtons = [];
-		switch (editorMode) {
+		var extraPlugins = [];
+		extraPlugins.push('aspell'); // We always want the spell checker added
+		switch (setEditorMode) {
 
 			default:
 				// If editorMode was not supplied, we need to set it
-				editorMode = 'plain';
+				setEditorMode = 'plain';
 			case 'plain':
 				// Nothing extra to add for the plain legacy editor
 				break;
 
-			case 'msinline':
-				// Message Sender's inline mode also add's pasteFromPhone
-				var tts_message = $('#msgsndr_tts_message');
-				if (tts_message && tts_message.length && tts_message.val().length) {
-					// But only if it has something to put into the clipboard
-					this.setSetting('tool_pastefromphone', true);
-				}
 			case 'inline':
 				// Add the mkField tool only
 				this.setSetting('tool_mkfield', true);
 				break;
 
-			case 'msnormal':
-				// Message Sender's normal mode also add's pasteFromPhone
-				var tts_message = $('#msgsndr_tts_message');
-				if (tts_message && tts_message.length && tts_message.val().length) {
-					// But only if it has something to put into the clipboard
-					this.setSetting('tool_pastefromphone', true);
-				}
 			case 'normal':
 				// Add the mkField tool only
 				this.setSetting('tool_mkfield', true);
@@ -317,14 +302,14 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 				break;
 		}
 
-		if ((editorMode == 'inline') || (editorMode == 'msinline')) {
+		if (setEditorMode == 'inline') {
 			// FIXME SMK disabled image_scaling pending clarification of desired behavior
 			//this.setSetting('image_scaling', 500);
 
 			// Add an IFRAME to the page that will load up the inline editor
 			cke.html('<iframe ' +
-					'src="' + this.getSetting('baseUrl') + 'rcieditor_inline.php?t=' + this.basename + '&d=' + document.domain + '" ' +
-					'name="' + this.basename + '_iframe" ' +
+					'src="' + this.getSetting('baseUrl') + 'rcieditor_inline.php?t=' + basename + '&d=' + document.domain + '" ' +
+					'name="' + basename + '_iframe" ' +
 					'style="width: 100%; height: 400px; border: 1px solid #999999;"/>'
 			);
 
@@ -335,10 +320,10 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 		else {
 
 			// Activate whatever tools are enabled based on mode
-			var custom_tools = $([ 'mkField', 'mkBlock', 'themeMgr', 'pasteFromPhone' ]);
+			var custom_tools = [ 'mkField', 'mkBlock', 'themeMgr', 'pasteFromPhone' ];
 			var that = this;
 			// SMK notes that array.forEach() is not supported on IE8, so we'll use jQuery to iterate instead
-			custom_tools.each(function (index) {
+			$(custom_tools).each(function (index) {
 				var toolname = custom_tools[index];
 				var lowertool = toolname.toLowerCase();
 				if (that.getSetting('tool_' + lowertool)) {
@@ -360,14 +345,15 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 
 			// Now attach CKE to the form element with the name basename
 			// TODO - see if there's a way to get this CKE to insert itself into hider element
-			CKEDITOR.replace(this.basename, {
+			CKEDITOR.replace(basename, {
 				'customConfig': '',
+				'allowedContent': true,
 				'disableNativeSpellChecker': false,
 				'browserContextMenuOnCtrl': true,
 				'width': '100%',
 				'height': '400px',
 				'filebrowserImageUploadUrl' : uploaderURI,
-				'toolbarStartupExpanded' : (hidetoolbar ? false : true),
+				'toolbarStartupExpanded' : (this.getSetting('hidetoolbar') ? false : true),
 				'toolbarCanCollapse' : true,
 				'extraPlugins': extraPlugins.join(),
 				'disableObjectResizing' : true, // disabled only because the message_parts data model cannot capture resized image attributes
@@ -409,7 +395,8 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 		}
 
 		// Capture the editorMode
-		this.editorMode = editorMode;
+		editorMode = setEditorMode;
+		customsettings = overrideSettings;
 
 		hider.html(cke);
 
@@ -429,8 +416,8 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 		this.setLoadingVisibility(false);
 
 		// Just trigger a validation event if there is something to look at
-		var html = this.textarea.val();
-		switch (this.editorMode) {
+		var html = textarea.val();
+		switch (editorMode) {
 
 			case 'inline':
 				// Nothing special to do for inline mode at this time
@@ -441,7 +428,7 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 			case 'full':
 
 				// The presence of the HtmlEditor classname signals
-				this.textarea.hide().addClass('HtmlEditor');
+				textarea.hide().addClass('HtmlEditor');
 
 				var htmleditorobject = this.getHtmlEditorObject();
 				if (! htmleditorobject) {
@@ -474,7 +461,7 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 		if (visible) {
 
 			// If we're already visible or we have no textarea to work with
-			if (this.loadingVisible || (! this.textarea)) {
+			if (this.loadingVisible || (! textarea)) {
 
 				// Then there's nothing to do
 				return;
@@ -487,11 +474,11 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 				var htmleditorloadericon = $('<span id="htmleditorloadericon"><img src="img/ajax-loader.gif"/> Please wait while the HTML editor loads.</span>');
 
 				// jam it into the textarea's parent so that it appears over the top
-				htmleditorloadericon.insertBefore(this.textarea);
+				htmleditorloadericon.insertBefore(textarea);
 			}
 
 			// And hide the editor (redundant if pre-hidden, but lets us call arbitrarily
-                        $('#' + this.basename + 'hider').hide();
+                        $('#' + basename + 'hider').hide();
 
 			this.loadingVisible = true;
 		}
@@ -510,7 +497,7 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 			$('#htmleditorloadericon').remove();
 
 			// And show the editor
-                        $('#' + this.basename + 'hider').show();
+                        $('#' + basename + 'hider').show();
 
 			this.loadingVisible = false;
 		}
@@ -525,7 +512,7 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 	 */
 	this.hideHtmlEditor = function () {
 		// hide the editor
-		$('#' + this.basename + 'hider').hide();
+		$('#' + basename + 'hider').hide();
 	};
 
 
@@ -550,7 +537,7 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 
 		var instance = false;
 		for (var i in CKEDITOR.instances) {
-			if (CKEDITOR.instances[i].name == this.basename) {
+			if (CKEDITOR.instances[i].name == basename) {
 				instance = CKEDITOR.instances[i];
 			}
 		}
@@ -558,15 +545,15 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 			return(false);
 		}
 
-		var container = $('#cke_' + this.basename);
-		if (! container) {
+		var tmpcontainer = $('#cke_' + basename);
+		if (! tmpcontainer) {
 			return(false);
 		}
 
-		var textarea = container.prev();
+		var textarea = tmpcontainer.prev();
 		return({
 			'instance': instance,
-			'container': container,
+			'container': tmpcontainer,
 			'currenttextarea': (textarea && textarea.hasClass('HtmlEditor')) ? textarea : null
 		});
 	};
@@ -586,7 +573,7 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 		}
 		
 		var content = htmleditorobject.instance.getData();
-		this.textarea.val(this.cleanContent(content));
+		textarea.val(this.cleanContent(content));
 
 		return(true);
 	};
@@ -602,13 +589,13 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 	this.refreshHtmlEditorContent = function (existinghtmleditorobject) {
 
 		// Refresh is neither supported nor necessary for inline mode
-		if (this.editorMode == 'inline') {
+		if (editorMode == 'inline') {
 			return;
 		}
 
 		var htmleditorobject = existinghtmleditorobject || this.getHtmlEditorObject();
 		if (htmleditorobject) {
-			var content = this.textarea.val();
+			var content = textarea.val();
 			htmleditorobject.instance.setData(content);
 		}
 	};
@@ -626,22 +613,22 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 	 * @return boolean true on success, else false
 	 */
 	this.setHtmlEditorContentPrimary = function (content) {
-		switch (this.editorMode) {
+		switch (editorMode) {
 			case 'inline':
 
-				var rcieditorinline = window.frames[this.basename + '_iframe'].window.rcieditorinline;
+				var rcieditorinline = window.frames[basename + '_iframe'].window.rcieditorinline;
 
 				// Textarea is NOT a blockelement that contains HTML; it is a form field with a value
 				// so we have to get the value of the field, stick it in jquery space temporarily,
 				// manipulated it, and then put it back into the textarea again:
 				if (rcieditorinline.activeEditorId) {
-					var tempdiv = $('<div></div>').html(this.textarea.val());
+					var tempdiv = $('<div></div>').html(textarea.val());
 					$('#' + rcieditorinline.activeEditorId, tempdiv).each(function () {
 
 						var jQthis = $(this);
 						jQthis.html(content);
 					});
-					this.textarea.val(tempdiv.html());
+					textarea.val(tempdiv.html());
 
 					// Now make the inline editor's view refresh itself to capture the change
 					// ref: http://stackoverflow.com/questions/1952359/calling-iframe-function
@@ -656,7 +643,7 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 			case 'plain':
 			case 'normal':
 			case 'full':
-				this.textarea.val(content);
+				textarea.val(content);
 				this.refreshHtmlEditorContent();
 				return(true);
 
@@ -691,7 +678,7 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 			return(false);
 		}
 		htmleditorobject.instance.setData(content);
-		this.textarea.val(this.cleanContent(content));
+		textarea.val(this.cleanContent(content));
 		return(true);
 	};
 
@@ -858,7 +845,7 @@ window.RCIEditor = function (editor_mode, textarea_id, hidetoolbar) {
 	};
 
 	// Invoke out contstuct() method with the new() arguments supplied
-	this.reconstruct(editor_mode, textarea_id, hidetoolbar);
+	this.reconstruct(editor_mode, textarea_id, overrideSettings);
 }
 }) (jQuery);
 

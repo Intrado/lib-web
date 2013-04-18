@@ -53,7 +53,7 @@ $users = DBFindMany("AspAdminUser", "from aspadminuser where deleted=? order by 
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $TITLE = _L("Users");
-$PAGE = "admin:users";
+$PAGE = "advanced:users";
 
 include_once("nav.inc.php");
 

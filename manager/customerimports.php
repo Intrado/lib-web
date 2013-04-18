@@ -150,6 +150,9 @@ $formatters = array(
 // Display
 /////////////////////////////
 
+$TITLE = _L('Customer Imports');
+$PAGE = 'commsuite:customers';
+
 include("nav.inc.php");
 
 $displayname = getCustomerSystemSetting('displayname', false, true, $custdb);

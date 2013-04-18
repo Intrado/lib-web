@@ -23,11 +23,13 @@ function fmt_custurl($row, $index){
 	else
 		return escapehtml(escapehtml($CUSTOMERINFO[$row[0]]['urlcomponent']));
 }
+$TITLE = _L('Bounced Email Search');
+$PAGE = 'reports:email';
 
 include_once("nav.inc.php");
-?>
 
-<h2>Bounced email search</h2>
+startWindow($TITLE);
+?>
 
 <form method=post>
 <label>Email (or partial):<input type=text name=email value=""></label>
@@ -108,5 +110,6 @@ if (!isset($_POST['email'])) {
 
 }
 
+endWindow();
 
 include_once("navbottom.inc.php");

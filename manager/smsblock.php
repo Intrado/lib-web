@@ -127,8 +127,13 @@ function fmt_block_status($status){
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 
+$PAGE = 'advanced:smsblock';
+$TITLE = _L('SMS Block');
+
 include_once("nav.inc.php");
 //Only require manager password if user can block
+
+startWindow($TITLE);
 
 if(!$number){
 	NewForm($f);
@@ -214,6 +219,9 @@ EndForm();
 <br>
 
 <?
+
+endWindow();
+
 include_once("navbottom.inc.php");
 
 ?>

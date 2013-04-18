@@ -44,33 +44,183 @@ if (isset($_GET['timer']) || isset($_SESSION['timer'])) {
 
 //tree format:
 //[[title,default link,access,selected,[[sub title,sub link,sub access,sub selected],...],...]
+$NAVTREE = array();
+
+// Removes sections of the menu definition which are outside the scope of the
+// current request; e.g. if we are in the CUSTOMERS section of the site, the
+// menu never shows anything about the selections below the TOOLS section; it
+// should simply suffice to add TOOLS to the upper level and leave the inner
+// levels out; also trims down the menu to only things that the user has
+// permission to access (each permission check should match the checks performed
+// in the associated PHP page).
+
+if (count($menu = get_authorized_commsuite())) {
+	$first_page = $menu[0][1];
+	$active = ($MAINTAB == 'commsuite');
+	$NAVTREE[] = array('Commsuite', $first_page, NULL, $active, ($active ? $menu : NULL));
+}
+
+if (count($menu = get_authorized_talkaboutit())) {
+	$first_page = $menu[0][1];
+	$active = ($MAINTAB == 'tai');
+	$NAVTREE[] = array('TalkAboutIt', $first_page, NULL, $active, ($active ? $menu : NULL));
+}
+
+if (count($menu = get_authorized_advanced())) {
+	$first_page = $menu[0][1];
+	$active = ($MAINTAB == 'advanced');
+	$NAVTREE[] = array('Tools', $first_page, NULL, $active, ($active ? $menu : NULL));
+}
+
+if (count($menu = get_authorized_reports())) {
+	$first_page = $menu[0][1];
+	$active = ($MAINTAB == 'reports');
+	$NAVTREE[] = array('Reports', $first_page, NULL, $active, ($active ? $menu : NULL));
+}
+
+if (count($menu = get_authorized_customers())) {
+	$first_page = $menu[0][1];
+	$active = ($MAINTAB == 'overview');
+	$NAVTREE[] = array('Customers', $first_page, NULL, $active, ($active ? $menu : NULL));
+}
 
 
-$NAVTREE = array (
-	array("Customers","allcustomers.php",NULL,$MAINTAB=="overview",array()),
-	array("Commsuite","customers.php",NULL,$MAINTAB=="commsuite",array(
-	array("Customers","customers.php",NULL,$SUBTAB=="customers"),
-	array("Import&nbsp;Alerts","importalerts.php",NULL,$SUBTAB=="importalerts"),
-	array("Active&nbsp;Jobs","customeractivejobs.php",NULL,$SUBTAB=="activejobs"),
-	array("Locked&nbsp;Users","lockedusers.php","lockedusers",$SUBTAB=="lockedusers"),
-	array("SmartCall","customerdms.php?clear",NULL,$SUBTAB=="customerdms"),
-	array("System&nbsp;DMs","systemdms.php",NULL,$SUBTAB=="systemdms"),
-	)),
-	array("TalkAboutIt","taicustomers.php",NULL,$MAINTAB=="tai",array(
-	array("Customers","taicustomers.php",NULL,$SUBTAB=="customers"),
-	array("Inbox","taiinbox.php",NULL,$SUBTAB=="inbox"),
-	array("Requests","tairevealrequests.php",NULL,$SUBTAB=="requests"),
-	array("SMS Numbers","taismsnumbers.php",NULL,$SUBTAB=="smsnumbers")
-	)),
-	array("Tools",NULL,NULL,$MAINTAB=="tools",array(
-	array("SwiftSync","diskagents.php",NULL,$SUBTAB=="swiftsync"),
-	array("Queries","querylist.php",array("runqueries","editqueries"),$SUBTAB=="queries")
-	)),
-	array("Admin","users.php","superuser",$MAINTAB=="admin",array(
-	array("Users","users.php","superuser",$SUBTAB=="users")
-	))
-);
+////////////////////////////////////////////////////////////////////////////////
+// Menu Building Functions
+////////////////////////////////////////////////////////////////////////////////
 
+// Build the TalkAboutIt menu
+function get_authorized_talkaboutit() {
+	global $MANAGERUSER, $SUBTAB, $SETTINGS;
+
+	$menu = Array();
+
+	// FIXME - There are no apparenet explicit permissions required for TAI administration
+
+	$menu[] = array('Customers', 'taicustomers.php', NULL, ($SUBTAB == 'customers'));
+	$menu[] = array('Inbox', 'taiinbox.php', NULL, ($SUBTAB == 'inbox'));
+	$menu[] = array('Requests', 'tairevealrequests.php', NULL, ($SUBTAB=='requests'));
+	$menu[] = array('SMS&nbsp;Numbers', 'taismsnumbers.php', NULL, ($SUBTAB == 'smsnumbers'));
+
+	return($menu);
+}
+
+// Build the Customers menu
+function get_authorized_customers() {
+	global $MANAGERUSER, $SUBTAB, $SETTINGS;
+
+	$menu = Array();
+
+	$menu[] = array('Customer&nbsp;List', 'allcustomers.php', NULL, ($SUBTAB == 'customerlist'));
+
+	if ($MANAGERUSER->authorized('newcustomer') && $MANAGERUSER->authorized('editcustomer')) {
+		$menu[] = array('New&nbsp;Customer', 'customeredit.php?id=new', NULL, ($SUBTAB == 'newcustomer'));
+	}
+
+	return($menu);
+}
+
+// Build the Commsuite menu
+function get_authorized_commsuite() {
+	global $MANAGERUSER, $SUBTAB, $SETTINGS;
+
+	$menu = Array();
+
+	$menu[] = array('Customers', 'customers.php', NULL, ($SUBTAB == 'customers'));
+
+	if ($MANAGERUSER->authorized('imports')) {
+		$menu[] = array('Import&nbsp;Alerts', 'importalerts.php', NULL, ($SUBTAB == 'importalerts'));
+	}
+
+	if ($MANAGERUSER->authorized('activejobs')) {
+		$menu[] = array('Active&nbsp;Jobs', 'customeractivejobs.php' ,NULL, ($SUBTAB == 'activejobs'));
+	}
+
+	if ($MANAGERUSER->authorized('lockedusers')) {
+		$menu[] = array('Locked&nbsp;Users', 'lockedusers.php', 'lockedusers', ($SUBTAB == 'lockedusers'));
+	}
+
+	if ($MANAGERUSER->authorized('editdm')) {
+		$menu[] = array('SmartCall', 'customerdms.php?clear', NULL, ($SUBTAB == 'customerdms'));
+	}
+
+	if ($MANAGERUSER->authorized('systemdm')) {
+		$menu[] = array('System&nbsp;DMs', 'systemdms.php', NULL, ($SUBTAB == 'systemdms'));
+	}
+
+	if ($MANAGERUSER->authorized('systemdm')) {
+		$menu[] = array('DM&nbsp;Blocking', 'dmgroupblock.php', NULL, ($SUBTAB == 'dmblocking'));
+	}
+
+	if ($MANAGERUSER->authorized('diskagent')) {
+		$menu[] = array('SwiftSync', 'diskagents.php', NULL, ($SUBTAB == 'swiftsync'));
+	}
+
+	return($menu);
+}
+
+// Build the Reports menu
+function get_authorized_reports() {
+	global $MANAGERUSER, $SUBTAB, $SETTINGS;
+
+	$menu = Array();
+
+	if ($MANAGERUSER->authorized('billablecalls')) { 
+		$menu[] = array('Billable&nbsp;Calls', 'billablecalls.php', NULL, ($SUBTAB == 'billable'));
+	}
+
+	if ($MANAGERUSER->authorized('emergencyjobs')) {
+		$menu[] = array('Completed&nbsp;Jobs', 'emergencyjobs.php', NULL, ($SUBTAB == 'joblist'));
+	}
+
+	if ($MANAGERUSER->authorizedAny(array('logcollector', 'aspcallgraphs'))) {
+		$menu[] = array('Graphs&nbsp;&amp;&nbsp;Logs', 'aspcallsindex.php', NULL, ($SUBTAB == 'graphlogs'));
+	}
+
+	if ($MANAGERUSER->authorized("customercontacts")) {
+		$menu[] = array('Contact&nbsp;Search', 'customercontactsearch.php', NULL, ($SUBTAB == 'contacts'));
+	}
+
+	if ($MANAGERUSER->authorized('bouncedemailsearch')) {
+		$menu[] = array('User&nbsp;Email', 'bouncedemailsearch.php', NULL, ($SUBTAB == 'email'));
+	}
+
+	if ($MANAGERUSER->authorized('passwordcheck')) {
+		$menu[] = array('Bad&nbsp;Passwords', 'passwordcheck.php', NULL, ($SUBTAB == 'badpasswd'));
+	}
+
+	return($menu);
+}
+
+// Build the Advanced (tools) menu
+function get_authorized_advanced() {
+	global $MANAGERUSER, $SUBTAB, $SETTINGS;
+
+	$menu = Array();
+
+	if ($MANAGERUSER->authorized('runqueries') || $MANAGERUSER->authorized('editqueries')) {
+		// TODO - find and document what the inner array does (runqueries/editqueries)
+		$menu[] = array('Queries', 'querylist.php', array('runqueries', 'editqueries'), ($SUBTAB == 'queries'));
+	}
+
+	if (isset($SETTINGS['servermanagement']['manageservers']) && $SETTINGS['servermanagement']['manageservers'] && $MANAGERUSER->authorized('manageserver')) {
+		$menu[] = array('Servers', 'serverlist.php', NULL, ($SUBTAB == 'servers'));
+	}
+
+	if ($MANAGERUSER->authorized('superuser')) { 
+		$menu[] = array('Manager&nbsp;Users', 'users.php', NULL, ($SUBTAB == 'users'));
+	}
+
+	if ($MANAGERUSER->authorized("smsblock")) {
+		$menu[] = array('SMS&nbsp;Block', 'smsblock.php', NULL, ($SUBTAB == 'smsblock'));
+	}
+
+	if ($MANAGERUSER->authorized('tollfreenumbers')) {
+		$menu[] = array('Toll&nbsp;Free&nbsp;#s', 'tollfreenumbers.php', NULL, ($SUBTAB == 'tollfree'));
+	}
+
+	return($menu);
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display Functions
@@ -116,19 +266,6 @@ function doNavTabs ($navtree) {
 	}
 }
 
-function doShortcuts ($shortcuts) {
-	global $USER;
-	if ($USER->authorize("startshort")) {
-		foreach ($shortcuts as $name => $value) {
-			if (strpos($name,"<b>") === 0) {
-				?><div class="shortcuttitle"><?= $name ?></div><?
-			} else {
-				?><a href="<?= escapehtml($value) ?>"><?= $name ?></a><?
-			}
-		}
-	}
-}
-
 function doCrumb ($firstactivetablink, $activemaintabtitle, $title) {
 	$crumb = array ("Start" => "start.php");
 	if ($firstactivetablink)
@@ -146,7 +283,7 @@ function doCrumb ($firstactivetablink, $activemaintabtitle, $title) {
 }
 
 function doLogo () {
-	echo '<img src="manager.png" alt="" onclick="window.location=\'allcustomers.php?newnav=false\'" >';
+	echo '<img src="manager.png" alt="" onclick="window.location=\'customers.php\'" >';
 }
 
 function setBodyClass () {
@@ -213,8 +350,6 @@ header('Content-type: text/html; charset=UTF-8') ;
 		<h1>SchoolMessenger</h1>
 	</div>  
 	
-	<div class="banner_custname">Manager</div>
-	
 	<div class="banner_links_wrap">
 		<ul class="banner_links cf">
 			<li class="bl_left"></li>
@@ -229,18 +364,6 @@ header('Content-type: text/html; charset=UTF-8') ;
 
 <script type="text/javascript">
 Event.observe(window, 'load', function() {
-	new Tip('shortcutmenu', $('shortcuts'), {
-		style: 'default',
-		radius: 4,
-		border: 4,
-		target: 'shortcutmenu',
-		hideOn: false,
-		hideAfter: 0.5,
-		hook: { target: 'bottomRight', tip: 'topRight' },
-		offset: { x: 6, y: 0 },
-		width: 'auto'
-	});
-	
 	sessionKeepAliveWarning(<?=$SESSION_WARNING_TIME?>);
 });
 </script>

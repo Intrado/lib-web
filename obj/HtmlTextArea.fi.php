@@ -41,14 +41,21 @@ class HtmlTextArea extends FormItem {
 		// Make editor able to switch modalities for any FI of this type
 		$editor_mode = isset($this->args['editor_mode']) ? $this->args['editor_mode'] : 'plain';
 
+		// A set of settings overrides to pass into the constructor,
+		// necessary because the constructor actually initializes and
+		// shows CKEditor, so everything needed must be passed in.
+		$overridesettings = Array(
+			'hidetoolbar' => ($USER->getSetting('hideemailtools', 'false') ? 'true' : 'false'),
+			'fieldinsert_list' => FieldMap::getAuthorizeFieldInsertNames()
+		);
+
 		$str = '<script type="text/javascript" src="script/ckeditor/ckeditor.js"></script>
-			<script type="text/javascript" src="script/USER.js.php"></script>
 			<script type="text/javascript" src="script/rcieditor.js"></script>
 			<script type="text/javascript">
 
 				// apply the ckeditor to the textarea
 				document.observe("dom:loaded", function() {
-					rcieditor = new RCIEditor("' . $editor_mode . '", "' . $n . '", ' . $USER->getSetting('hideemailtools', 'false') . ');
+					rcieditor = new RCIEditor("' . $editor_mode . '", "' . $n . '", ' . json_encode($overridesettings) . ');
 					rcieditor.setValidatorFunction(function () {
 						var form = $("' . $this->form->name . '");
 						var field = $("'.$n.'");

@@ -29,6 +29,9 @@ if(isset($_GET['dmid'])){
 //////////////////////////////////////////////////////////////////////
 // DISPLAY
 
+$TITLE = _L('DM Status');
+$PAGE = 'commsuite:systemdms';
+
 include_once("nav.inc.php");
 
 ?>

@@ -14,90 +14,76 @@
  *
  * EXTERNAL DEPENDENCIES
    * jquery.js
-   * API
-   * USER.js.php
  *
  * SMK created 2013-01-03
  */
 
 ( function ($) {
+	var ftypes = Array(Array('-- Select a Field --', ''));
 
-	// Get the base URL for AJAX API requests
-	var baseUrl = window.parent.rcieditor.getBaseUrl();
+	// Depending on iframe/containment of the editor, rcieditor may be
+	// here or up one parent level; grab a refernece to it either way
+	var rcie;
+	if (typeof(rcieditor) == 'object') {
+		rcie = rcieditor;
+	}
+	else rcie = window.parent.rcieditor;
 
-	// Formulate the AJAX API request URL with this session's user ID
-	var req = baseUrl + 'api/2/users/' + window.parent.USER.id + '/roles/0/accessprofile/fieldmaps/';
+	// The list of field names is passed into RCIEditor constructor's
+	// overrideSettings as 'type:name' pairs array; iterate over them...
+	var data = rcie.getSetting('fieldinsert_list');
+	for (var field in data) {
+		ftypes.push(Array(data[field]));
+	}
 
-	// Make an AJAX request to the API to pull the fieldmap JSON;
-	// Make our AJAX request synchronous, otherwise CKE will think
-	// that the requested dialog is undefined if we return directly
-	$.ajax({
-		dataType: "json",
-		async: false,
-		url: req,
-		data: '',
-		success: function (data) {
+	// We can't add the dialog until we have the fieldmap request back
+	CKEDITOR.dialog.add('mkfield', function ( editor ) {
 
-			var ftypes = Array(Array('-- Select a Field --', ''));
-			$(data).each(function () {
+		return {
+			title: 'Field Insert',
+			minWidth: 400,
+			minHeight: 60,
+			contents: [
+				{
+					id: 'general',
+					label: 'Field Insert',
+					padding: 0,
+					elements: [
 
-				// filter out "C" and "G" field types which are invalid here
-				if ((this.fieldnum[0] == 'c') || (this.fieldnum[0] == 'g')) {
-					return;
-				}
-				ftypes.push(Array(this.name));
-			});
-
-			// We can't add the dialog until we have the fieldmap request back
-			CKEDITOR.dialog.add('mkfield', function ( editor ) {
-
-				return {
-					title: 'Field Insert',
-					minWidth: 400,
-					minHeight: 60,
-					contents: [
+						// Default Value Entry
 						{
-							id: 'general',
-							label: 'Field Insert',
-							padding: 0,
-							elements: [
+							type: 'text',
+							size: 25,
+							id: 'fvalue',
+							label: 'Default Value:',
+							'default': ''
+						},
 
-								// Default Value Entry
-								{
-									type: 'text',
-									size: 25,
-									id: 'fvalue',
-									label: 'Default Value:',
-									'default': ''
-								},
-
-								// Data Field Selection
-								{
-									type: 'select',
-									id: 'ftype',
-									label: 'Data Field:',
-									items: ftypes
-								}
-							]
+						// Data Field Selection
+						{
+							type: 'select',
+							id: 'ftype',
+							label: 'Data Field:',
+							items: ftypes
 						}
-					],
+					]
+				}
+			],
 
-					onOk: function() {
-						var ftype = this.getContentElement( 'general', 'ftype').getValue();
-						if (ftype.length) {
-							var fvalue = this.getContentElement( 'general', 'fvalue').getValue();
-							// TODO - any raw validation on ftype/fvalue before inserting it?
-							var field = '<<' + ftype;
-							if (fvalue.length) {
-								field += ':' + fvalue;
-							}
-							field += '>>';
-							editor.insertText(field);
-						}
+			onOk: function() {
+				var ftype = this.getContentElement( 'general', 'ftype').getValue();
+				if (ftype.length) {
+					var fvalue = this.getContentElement( 'general', 'fvalue').getValue();
+					// TODO - any raw validation on ftype/fvalue before inserting it?
+					var field = '<<' + ftype;
+					if (fvalue.length) {
+						field += ':' + fvalue;
 					}
-				};
-			});
-		}
+					field += '>>';
+					editor.insertText(field);
+				}
+			}
+		};
 	});
 }) (jQuery);
 

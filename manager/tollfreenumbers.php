@@ -97,6 +97,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $TITLE = _L('Toll Free Numbers');
+$PAGE = 'advanced:tollfree';
 
 include_once("nav.inc.php");
 ?>
@@ -104,7 +105,6 @@ include_once("nav.inc.php");
 <? Validator::load_validators(array("ValMultiplePhones")); ?>
 </script>
 <?
-buttons(icon_button("Done", "tick",false,"advancedactions.php","style='margin-bottom:6px'"));
 startWindow(_L('Add Toll Free Numbers'));
 echo $form->render();
 endWindow();

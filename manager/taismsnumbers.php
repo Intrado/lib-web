@@ -47,6 +47,8 @@ startWindow($TITLE);
 
 ?>
 
+Find the TAI CUSTOMER that has been associated with this SMS number:<br/><br/>
+
 <form id="search" autocomplete="off" action="taismsnumbers.php" method="get">
 	<input id="searchvalue" name="search" type="text" size="30" value="<?=isset($_GET["search"]) ? escapehtml($_GET["search"]) : ""?>"/><button type="submit">Search</button> Search Customer ID or SMS Number
 	<div id="searchpreview">

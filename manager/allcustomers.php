@@ -8,7 +8,7 @@ if (isset($_GET["newnav"])) {
 		$_SESSION["newnav"] = true;
 	} else {
 		unset($_SESSION["newnav"]);
-		redirect("index.php");
+		redirect("customers.php");
 	}
 }
 
@@ -193,7 +193,7 @@ $formatters = array(
 $lockedTitles = array("actions");
 
 $TITLE = "Overview";
-$PAGE = "overview:all";
+$PAGE = "overview:customerlist";
 
 include_once("nav.inc.php");
 

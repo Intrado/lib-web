@@ -3,7 +3,15 @@ CKEDITOR.plugins.add( 'pastefromphone', {
 	init: function( editor ) {
 		editor.addCommand( 'pasteFromPhone', {
 			exec: function( editor ) {
-				var message = window.parent.rcieditor.getSetting('clipboard');
+				// Depending on iframe/containment of the editor, rcieditor may be
+				// here or up one parent level; grab a refernece to it either way
+				var rcie;
+				if (typeof(rcieditor) == 'object') {
+					rcie = rcieditor;
+				}
+				else rcie = window.parent.rcieditor;
+
+				var message = rcie.getSetting('clipboard');
 				if (message && message.length) {
 					editor.insertText(message);
 				}

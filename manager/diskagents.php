@@ -265,9 +265,11 @@ $formatters = array(2 => "fmt_customerUrls",
 // Display
 /////////////////////////////
 $TITLE = _L("SwiftSync");
-$PAGE = "tools:swiftsync";
+$PAGE = "commsuite:swiftsync";
 
 include_once("nav.inc.php");
+
+startWindow($TITLE);
 
 ?>
 
@@ -387,5 +389,8 @@ if (file_exists("swiftsyncbuild.txt")) {
 	<div>Latest Version: <?=file_get_contents("swiftsyncbuild.txt");?></div>
 <?
 }
+
+endWindow();
+
 include_once("navbottom.inc.php");
 ?>

@@ -137,10 +137,13 @@ function fmt_customer_url($row, $index){
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
-$PAGE = "template:template";
-$TITLE = "template";
+$PAGE = "reports:contacts";
+$TITLE = _L('Customer Contact Search');
 
 include_once("nav.inc.php");
+
+startWindow($TITLE);
+
 NewForm($f);
 ?>
 <div>Contact Search</div>
@@ -177,5 +180,8 @@ NewForm($f);
 </table>
 <?
 EndForm();
+
+endWindow();
+
 include_once("navbottom.inc.php");
 ?>

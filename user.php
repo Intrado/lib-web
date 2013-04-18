@@ -20,6 +20,7 @@ require_once("obj/FormRuleWidget.fi.php");
 require_once("obj/InpageSubmitButton.fi.php");
 require_once("obj/RestrictedValues.fi.php");
 require_once("obj/CallerID.fi.php");
+require_once("obj/Import.obj.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -49,7 +50,12 @@ if ($makeNewUser) {
 ////////////////////////////////////////////////////////////////////////////////
 $edituser = new User($id);
 
-$readonly = $edituser->importid != null;
+$readonly = false;
+if ($edituser->importid != null) {
+	$import = new Import($edituser->importid);
+	if (!strcmp('full', $import->updatemethod))
+		$readonly = true; // only full sync user imports manage user data, set readonly on this page
+}
 $ldapuser = $edituser->ldap;
 $profilename = QuickQuery("select name from access where id=?", false, array($edituser->accessid));
 
@@ -564,7 +570,8 @@ $userimportorgs = QuickQueryList("
 	from userassociation ua
 		inner join organization o on
 			(ua.organizationid = o.id)
-	where ua.userid = ? and ua.importid is not NULL order by orgkey", false, false, array($edituser->id));
+		left join import i on (i.id = ua.importid) 
+	where ua.userid = ? and i.updatemethod = 'full' order by orgkey", false, false, array($edituser->id));
 if ($userimportorgs) {
 	$html = '<div style="border: 1px dotted gray; padding: 3px;">';
 	foreach ($userimportorgs as $okey)
@@ -578,7 +585,10 @@ if ($userimportorgs) {
 }
 
 // get user organization associations that arn't created by an import
-$userorgs = QuickQueryList("select organizationid from userassociation where userid = ? and type = 'organization' and importid is null", false, false, array($edituser->id));
+$userorgs = QuickQueryList("select organizationid from userassociation ua 
+		left join import i on (i.id = ua.importid) 
+		where ua.userid = ? and ua.type = 'organization' 
+		and (ua.importid is null or i.updatemethod is null or i.updatemethod != 'full')", false, false, array($edituser->id));
 // if there are no orgs. don't show the form item
 if ($orgs) {
 	$formdata["organizationids"] = array(
@@ -895,7 +905,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		}
 		
 		// add user associations for organizations
-		QuickUpdate("delete from userassociation where userid = ? and importid is null and type = 'organization' and organizationid != 0", false, array($edituser->id));
+		QuickUpdate("delete ua from userassociation ua left join import i on (i.id = ua.importid) where ua.userid = ? and ua.type = 'organization' and ua.organizationid != 0 and (ua.importid is null or i.updatemethod is null or i.updatemethod != 'full')", false, array($edituser->id));
 		if (isset($postdata['organizationids']))
 			foreach ($postdata['organizationids'] as $orgid)
 				QuickUpdate("insert into userassociation (userid, type, organizationid) values (?, 'organization', ?)", false, array($edituser->id, $orgid));

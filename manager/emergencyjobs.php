@@ -36,11 +36,13 @@ function fmt_play_link($row, $index){
 	return $url;
 }
 
+$TITLE = _L('Jobs for All Customers');
+$PAGE = 'reports:joblist';
 
 include_once("nav.inc.php");
-?>
 
-<h2>Jobs for all customers</h2>
+startWindow($TITLE);
+?>
 
 <form method=post>
 <label>Priority:<select multiple name="types[]">
@@ -165,5 +167,6 @@ if (!isset($_POST['startdate'])) {
 
 }
 
+endWindow();
 
 include_once("navbottom.inc.php");
