@@ -161,7 +161,7 @@ if (isset($_GET["showdisabled"])) {
 	//$sqltoggledisabled = "and not enabled";
 }
 else {
-	$sqltoggledisabled = "and enabled";
+	$sqltoggledisabled = "and c.enabled";
 }
 
 $shownone = true;
@@ -174,7 +174,7 @@ if (isset($_GET["search"])) {
 	if ($safesearch == "") {
 		$sqlsearch = "1"; // Expect no customers.
 	} else
-		$sqlsearch = "(id='$safesearch' or urlcomponent like '%$safesearch%' or inboundnumber='$safesearch')";
+		$sqlsearch = "(c.id='$safesearch' or c.urlcomponent like '%$safesearch%' or c.inboundnumber='$safesearch')";
 }
 
 $favidsql = "";
@@ -186,7 +186,7 @@ if (
 ) {
 	//Favorite customers
 	if ($MANAGERUSER->preference("favcustomers")) {
-		$favidsql = "and id in (" . implode(",",$MANAGERUSER->preference("favcustomers")) . ")";
+		$favidsql = "and c.id in (" . implode(",",$MANAGERUSER->preference("favcustomers")) . ")";
 		$sqltoggledisabled = ""; //dont filter out disabled favorites
 	}
 }
@@ -205,8 +205,12 @@ while($row = DBGetRow($res)){
 	$shardinfo[$row[0]] = array($row[1], $row[2], $row[3], $row[4]);
 }
 
-// Secondly, get a list of customers.
-$query = "select id, shardid, urlcomponent, oem, oemid, nsid, notes, enabled, inboundnumber from customer where $sqlsearch $sqltoggledisabled $favidsql order by id";
+// Secondly, get a list of customers with CommSuite product
+$query = "select c.id, c.shardid, c.urlcomponent, c.oem, c.oemid, c.nsid, c.notes, c.enabled, c.inboundnumber from customer c inner join customerproduct p on (p.customerid = c.id and p.product = 'cs' and p.enabled) where $sqlsearch $sqltoggledisabled $favidsql order by c.id";
+
+
+error_log($query);
+
 $customerquery = Query($query);
 $customers = array();
 if (!$shownone) {
