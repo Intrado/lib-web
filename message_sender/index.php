@@ -113,7 +113,7 @@
 	serverDate = "<? print_r(date("Y,m,d,")); ?>";
 	startClientTime = Math.round((new Date()).getTime() / 1000);
 	<? global $USER; ?>
-	rcieditor_hidetoolbar = <?= ($USER->getSetting('hideemailtools', 'false') ? 'true' : 'false'); ?>;
+	rcieditor_hidetoolbar = <?= ($USER->getSetting('hideemailtools', false) ? 'true' : 'false'); ?>;
 	rcieditor_fieldinsert_list = <?= json_encode(FieldMap::getAuthorizeFieldInsertNames()); ?>;
 </script>
 
