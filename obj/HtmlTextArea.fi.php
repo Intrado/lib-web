@@ -45,7 +45,7 @@ class HtmlTextArea extends FormItem {
 		// necessary because the constructor actually initializes and
 		// shows CKEditor, so everything needed must be passed in.
 		$overridesettings = Array(
-			'hidetoolbar' => ($USER->getSetting('hideemailtools', 'false') ? 'true' : 'false'),
+			'hidetoolbar' => ($USER->getSetting('hideemailtools', false) ? true : false),
 			'fieldinsert_list' => FieldMap::getAuthorizeFieldInsertNames()
 		);
 
