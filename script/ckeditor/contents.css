@@ -97,15 +97,3 @@ pre
 	white-space: pre-wrap; /* CSS 2.1 */
 	word-wrap: break-word; /* IE7 */
 }
-
-.marker {
-    background-color: Yellow;
-}
-
-/* SMK added 2012-12-14 so that we can see the boundaries of editable content blocks */
-.editableBlock {
-	outline: #FFFFFF dashed 1px;
-	border: 1px dashed #000000;
-	box-shadow: 0 0 0 1px #FFFFFF;
-}
-
