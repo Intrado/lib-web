@@ -5,10 +5,7 @@ include_once("inc/content.inc.php");
 include_once("inc/appserver.inc.php");
 include_once("obj/Content.obj.php");
 
-if ($USER->authorize("sendemail") === false &&
-	!(getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost')) &&
-	!(getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost')) &&
-	!(getSystemSetting('_hasfeed', false) && $USER->authorize('feedpost'))) {
+if ($USER->authorize("sendemail") === false) {
 	redirect('./');
 }
 
@@ -78,8 +75,8 @@ if (is_array($result)) {
 	</style>
 	<script type="text/javascript">
 	function load() {
-		if (typeof(stopUpload) != "undefined") {
-			stopUpload('<?=$contentid?>','<?= addslashes($filename) ?>','<?= $size ?>','<?= isset($errormessage)?addslashes($errormessage):'' ?>', '<?=$_GET['formname']?>', '<?=$_GET['itemname']?>');
+		if (window.top.window.stopUpload != undefined) {
+			window.top.window.stopUpload('<?=$contentid?>','<?= addslashes($filename) ?>','<?= $size ?>','<?= isset($errormessage)?addslashes($errormessage):'' ?>', '<?=$_GET['formname']?>', '<?=$_GET['itemname']?>');
 		}
 	}
 	</script>
@@ -87,7 +84,7 @@ if (is_array($result)) {
 <body onload="load()">
 <form id="uploadform" action="_emailattachment.php?formname=<?=$_GET['formname']?>&itemname=<?=$_GET['itemname']?>" method="post" enctype="multipart/form-data" onsubmit="" >
 	<input type="hidden" name="MAX_FILE_SIZE" value="<?= $maxattachmentsize ?>">
-	<input id="emailattachment" name="emailattachment" type="file" onChange="window.parent.window.startUpload();this.form.submit();"/>	
+	<input id="emailattachment" name="emailattachment" type="file" onChange="window.top.window.startUpload();this.form.submit();"/>	
 </form>
 </body>
 </html>
