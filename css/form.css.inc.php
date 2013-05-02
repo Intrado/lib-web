@@ -545,3 +545,9 @@ $formcssfilename = "themes/$theme/style.form.php";
 	.newui .newform .formtitle .formlabel { padding: 0 10px 5px 0; text-align: left; }
 	.newui .formfieldarea .underneathmsg { font-size: 13px; padding: 0; }
 }
+
+/* Override for ASPManager's service properties textarea */
+#serverpropertiesform_propsfile {
+	width: 98%;
+}
+
