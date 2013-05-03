@@ -1,3 +1,4 @@
+
 /* wrap $ for compatability */
 function getObj (name) {
 	this.obj = $(name);
@@ -315,6 +316,8 @@ function submitForm (formname,section,value) {
 // Ajax cache with request function
 var cachedajaxgetdata = new Array();
 function cachedAjaxGet(uri,ajaxhandler,ajaxhandlerarg,usecache) {
+	window.parent.kickSession();
+
 	usecache = typeof(usecache) != 'undefined' ? usecache : true;
 	if(usecache) {
 		var returnvalue = cachedajaxgetdata[uri];
@@ -647,8 +650,24 @@ function curDate() {
    return monthname + ' ' + monthday + ', ' + year + " " + hour + ':' + minute + ':' + second + " " + ap;
 }
 
+// Global timer variables
+sessionTimeout = 0;
+sessionObserver = false;
+sessionLifetime = 0;
+
 function sessionKeepAliveWarning(timeout) {
-	setTimeout(function() {
+
+	sessionLifetime = timeout;
+
+	// If there is already a timeout function running
+	if (sessionTimeout !== 0) {
+
+		// Then clear it so that we can reset it
+		clearTimeout(sessionTimeout);
+		sessionTimeout = 0;
+	}
+
+	sessionTimeout = setTimeout(function() {
 		var $ = jQuery;
 		$('.modal.in').modal('hide');
 		
@@ -709,8 +728,12 @@ function sessionKeepAliveWarning(timeout) {
 				parameters:{type: 'keepalive'}
 			});
 			sessionKeepAliveWarning(timeout);
-		})
+		});
 		
 		button.on('click',refreshSession);
 	}, timeout);
+}
+
+function kickSession() {
+	sessionKeepAliveWarning(sessionLifetime);
 }
