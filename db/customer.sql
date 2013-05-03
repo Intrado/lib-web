@@ -2149,3 +2149,16 @@ $$$
 -- NOTE: This does not belong in an upgrade script! Only effects new customers where _dbversion and fbauthorizewall have been inserted above
 update setting set organizationid = null
 $$$
+
+-- START 9.7/1
+CREATE TABLE IF NOT EXISTS `reportemailtracking` (
+	`jobid` int(11) NOT NULL,
+	`personid` int(11) NOT NULL,
+	`sequence` tinyint(4) NOT NULL,
+	`timestampms` bigint(20) NOT NULL,
+	`numrequests` int(11) NOT NULL,
+	`requestduration` text NOT NULL,
+	UNIQUE KEY `jobid` (`jobid`,`personid`,`sequence`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+$$$
+-- END 9.7/1
