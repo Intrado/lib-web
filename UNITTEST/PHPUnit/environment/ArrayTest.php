@@ -1,4 +1,13 @@
 <?php
+
+/**
+ * ArrayTest.php - PHPUnit sample test of the PHP Array object class
+ *
+ * @package unittests
+ * @author Sean M. Kelly, <skelly@schoolmessenger.com>
+ * @version 1.0
+ */
+
 class ArrayTest extends PHPUnit_Framework_TestCase {
 	public function testNewArrayIsEmpty() {
 		// Create the Array fixture.
