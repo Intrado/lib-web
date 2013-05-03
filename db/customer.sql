@@ -2161,4 +2161,7 @@ CREATE TABLE IF NOT EXISTS `reportemailtracking` (
 	UNIQUE KEY `jobid` (`jobid`,`personid`,`sequence`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 $$$
+
+update setting set value='9.7/1' where name='_dbversion'
+$$$
 -- END 9.7/1
