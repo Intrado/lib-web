@@ -153,7 +153,8 @@
 					}
 				});
 				var prependSpan = $('<span />', {'class':'add-on'});
-                prependSpan.append($('<img />', {'src':'../themes/newui/phone.png'}));
+                //prependSpan.append($('<span class="phone-icon"></span>'));
+                prependSpan.append($('<img />', {'src':'themes/newui/phone.png'}));
 				// button to start the calling session
                 var callbutton = $('<button />', { "class": "btn btn-danger", "value": "Call Now to Record"});
 				callbutton.append($('<i />', { "class": "icon-hand-left icon-white" })).append(" &nbsp;Call Now to Record");
