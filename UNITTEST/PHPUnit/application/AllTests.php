@@ -19,7 +19,8 @@ class application_AllTests {
 
 		// List of test classes to include; TODO: expand as needed:
 		$classes = Array(
-			'ValTranslationLengthTest'
+			'ValTranslationLengthTest',
+			'FailSampleTest'
 		);
 
 		$classdir = dirname(__FILE__);
