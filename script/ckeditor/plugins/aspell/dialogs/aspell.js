@@ -2,6 +2,10 @@
 var FCKLang;
 var OnSpellerControlsLoad;
 
+// Get the base URL for requests that require absolute pathing
+var url = window.location.protocol + "//" + window.location.host + window.location.pathname;
+var aspellBaseUrl = url.substr(0, url.lastIndexOf('/') + 1);        // Get everything thru the last '/'
+
 CKEDITOR.dialog.add('aspell', function( editor )
 {
 	var number = CKEDITOR.tools.getNextNumber(),
@@ -82,15 +86,10 @@ CKEDITOR.dialog.add('aspell', function( editor )
 			editor.focus();
 			editor.fire('saveSnapshot'); // Best way I could find to trigger undo steps.
 
-			// TODO: get rid of the real scratch div and just use a temporary jQuery scratch object as in rcieditor.js
-
 			// Intermediate step to be able to restore altered data
 			var scratch = document.getElementById(scratchId);
 			scratch.innerHTML = document.getElementById(textareaId).value;
 			( function ($) {
-				// Get the base URL for requests that require absolute pathing
-				var url = window.location.protocol + "//" + window.location.host + window.location.pathname;
-				var baseUrl = url.substr(0, url.lastIndexOf('/') + 1);        // Get everything thru the last '/'
 
 				// Replace all placeholder icons with original images
 				$(scratch).find('img').each(function () {
@@ -163,15 +162,11 @@ CKEDITOR.dialog.add('aspell', function( editor )
 			scratch.innerHTML = editor.getData();
 			( function ($) {
 
-				// Get the base URL for requests that require absolute pathing
-				var url = window.location.protocol + "//" + window.location.host + window.location.pathname;
-				var baseUrl = url.substr(0, url.lastIndexOf('/') + 1);        // Get everything thru the last '/'
-
 				// Replace all images with a placeholder icon
 				$(scratch).find('img').each(function () {
 					var el = $(this); // reextend with jQuery in case prototype is fooling with our heads
 					el.attr('data-aspell-saved-src', el.attr('src'));
-					el.attr('src', baseUrl + 'script/ckeditor/plugins/aspell/icons/viewimage.gif');
+					el.attr('src', aspellBaseUrl + 'script/ckeditor/plugins/aspell/icons/viewimage.gif');
 				});
 			}) (jQuery);
 
