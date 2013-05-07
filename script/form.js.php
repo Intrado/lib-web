@@ -175,6 +175,9 @@ function form_do_validation (form, element, validationHander) {
 					} else {
 						validationHander(element,"valid","");
 					}
+					if (kickSession instanceof Function) {
+						kickSession();
+					}
 				},
 				onFailure: function(response) { 
 					validationHander(element,"neterror",response.responseText);

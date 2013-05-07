@@ -316,7 +316,6 @@ function submitForm (formname,section,value) {
 // Ajax cache with request function
 var cachedajaxgetdata = new Array();
 function cachedAjaxGet(uri,ajaxhandler,ajaxhandlerarg,usecache) {
-	window.parent.kickSession();
 
 	usecache = typeof(usecache) != 'undefined' ? usecache : true;
 	if(usecache) {
@@ -329,6 +328,10 @@ function cachedAjaxGet(uri,ajaxhandler,ajaxhandlerarg,usecache) {
 	new Ajax.Request(uri, {
 		method:'get',
 		onSuccess: function (result) {
+
+			// Kick the client side session timer any time we touch the server to make them match
+			kickSession();
+
 			//don't save results unless we're using cache
 			if (usecache) {
 				cachedajaxgetdata[uri] = result;
@@ -652,7 +655,6 @@ function curDate() {
 
 // Global timer variables
 sessionTimeout = 0;
-sessionObserver = false;
 sessionLifetime = 0;
 
 function sessionKeepAliveWarning(timeout) {
@@ -735,5 +737,9 @@ function sessionKeepAliveWarning(timeout) {
 }
 
 function kickSession() {
-	sessionKeepAliveWarning(sessionLifetime);
+	if (sessionLifetime) {
+		sessionKeepAliveWarning(sessionLifetime);
+	} else if (window.parent.sessionLifetime) {
+		window.parent.sessionKeepAliveWarning(window.parent.sessionLifetime);
+	}
 }
