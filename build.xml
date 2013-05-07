@@ -127,12 +127,13 @@
                 <!-- all settings files that shouldn't be included -->
                 <exclude name="**/*settings.ini.php" />
 
-                <!-- extra files/folders currently in kona folder not for distribution -->
+                <!-- extra files/folders`currently in kona folder not for distribution -->
                 <exclude name="test.php" />
                 <exclude name="testjobtask.php" />
                 <exclude name="_template.php" />
                 <exclude name="changelog.txt" />
                 <exclude name="test/" />
+                <exclude name="UNITTEST/" />
                 <exclude name="originals/" />
 
                 <!-- hidden files/folders (including .project) -->
