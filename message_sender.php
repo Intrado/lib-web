@@ -315,77 +315,6 @@ class ValConditionalOnValue extends Validator {
 PreviewModal::HandleRequestWithPhoneText();
 PreviewModal::HandleRequestWithEmailText();
 
-// get the user requested schedule out of postdata
-function getSchedule($postdata) {
-	global $ACCESS;
-	global $USER;
-	
-	$type = $postdata["scheduletype"];
-	$maxjobdays = $postdata["optionmaxjobdays"];
-	$callearly = $postdata['schedulecallearly'];
-	$calllate = $postdata['schedulecalllate'];
-	$date = $postdata['scheduledate'];
-	
-	$schedule = array();
-	
-	if (!$maxjobdays)
-		$maxjobdays = 1;
-	
-	switch ($type) {
-		case "now":
-			//get the callearly and calllate defaults
-			$callearly = date("g:i a");
-			$calllate = $USER->getCallLate();
-				
-			//get access profile settings
-			$accessCallearly = $ACCESS->getValue("callearly");
-			if (!$accessCallearly)
-				$accessCallearly = "12:00 am";
-			$accessCalllate = $ACCESS->getValue("calllate");
-			if (!$accessCalllate)
-				$accessCalllate = "11:59 pm";
-				
-			//convert everything to timestamps for comparisons
-			$callearlysec = strtotime($callearly);
-			$calllatesec = strtotime($calllate);
-			$accessCallearlysec = strtotime($accessCallearly);
-			$accessCalllatesec = strtotime($accessCalllate);
-
-			// make sure the calculated callearly is not before access profile
-			if ($callearlysec  < $accessCallearlysec)
-				$callearlysec = $accessCallearlysec;
-
-			// try to ensure calllate is at least an hour after start, up to access restriction
-			if ($callearlysec + 3600 > $calllatesec)
-				$calllatesec = $callearlysec + 3600;
-				
-			//make sure the calculated calllate is not past access profile
-			if ($calllatesec  > $accessCalllatesec)
-				$calllatesec = $accessCalllatesec;
-
-			$callearly = date("g:i a", $callearlysec);
-			$calllate = date("g:i a", $calllatesec);
-				
-			$schedule = array(
-					"maxjobdays" => $maxjobdays,
-					"date" => date('m/d/Y'),
-					"callearly" => $callearly,
-					"calllate" => $calllate
-			);
-			break;
-		case "schedule":
-			$schedule = array(
-			"maxjobdays" => $maxjobdays,
-			"date" => date('m/d/Y', strtotime($date)),
-			"callearly" => $callearly,
-			"calllate" => $calllate
-			);
-			break;
-		default:
-			break;
-	}
-	return $schedule;
-}
 
 $userjobtypes = JobType::getUserJobTypes(false);
 $jobtypes = array();
@@ -913,16 +842,124 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 	if ($form->checkForDataChange()) {
 		$datachange = true;
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
-		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 
 		// invalidate the current messagesender so this form can't be re-submitted multiple times
 		unset($_SESSION['_messagesender']);
 
 		Query("BEGIN");
 
-		// ============================================================================================================================
+		// Get a Message Sender Processor
+		$msp = new MessageSenderProcessor();
+
+		// The post handler will return a job that's ready to use if all went to plan
+		$postdata = $form->getData();
+		$job = $msp->doPost($postdata);
+		
+		// run the job
+		$job->runNow();
+
+		Query("COMMIT");
+		if ($ajax) {
+			if (isset($_GET['iframe']))
+				$form->sendTo("jobview.php?iframe&id=". $job->id);
+			else
+				$form->sendTo("start.php");
+		} else {
+			redirect("start.php");
+		}
+	}
+}
+
+if (isset($_GET['jsonformdata'])) {
+	header("Content-Type: application/json");
+	echo json_encode(array("snum" => $form->serialnum, "formdata" => $form->formdata));
+	exit();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Display
+////////////////////////////////////////////////////////////////////////////////
+$PAGE = "notifications:jobs";
+$TITLE = "";
+$MESSAGESENDER = true;
+
+include("nav.inc.php");
+// Load Custom Form Validators
+?>
+<script type="text/javascript">
+<?Validator::load_validators(array("ValInArray", "ValDuplicateNameCheck", "ValHasMessage",
+	"ValMessageBody", "ValEasycall", "ValLists", "ValTranslation", "ValEmailAttach",
+	"ValTimeWindowCallLate", "ValTimeWindowCallEarly", "ValSmsText", "valPhone",
+	"ValMessageBody", "ValMessageGroup", "ValMessageTypeSelect", "ValFacebookPage",
+	"ValTranslationCharacterLimit","ValTimePassed","ValTtsText","ValCallerID",
+	"ValTextAreaAndSubjectWithCheckbox", "ValConditionalOnValue"));?>
+
+	// get php data into js vars
+	var userid = <? print_r($_SESSION['user']->id); ?>;
+	var fbAppId = <? print_r($SETTINGS['facebook']['appid']); ?>;
+	var twitterReservedChars = <? print_r(mb_strlen(" http://". getSystemSetting("tinydomain"). "/") + 6); ?>;
+	
+	// get template settings (if loading from template, they will be set in session data)
+	var subject = <?echo (isset($_SESSION['message_sender']['template']['subject'])?("'". str_replace("'", "\'", $_SESSION['message_sender']['template']['subject']). "'"):"''")?>;
+	var lists = <?echo (isset($_SESSION['message_sender']['template']['lists'])?$_SESSION['message_sender']['template']['lists']:'[]')?>;
+	var jtid = <?echo (isset($_SESSION['message_sender']['template']['jobtypeid'])?$_SESSION['message_sender']['template']['jobtypeid']:0)?>;
+	var mgid = <?echo (isset($_SESSION['message_sender']['template']['messagegroupid'])?$_SESSION['message_sender']['template']['messagegroupid']:0)?>;
+	
+</script>
+
+<?PreviewModal::includePreviewScript();?>
+
+<form id="<?=$form->name?>" name="<?=$form->name?>" action="/default/message_sender.php?form=msgsndr" method="POST" ><?
+
+include("message_sender/index.php");
+
+// cheat and create the hidden translation fields now
+?><div style="display:none"><?
+foreach ($ttslanguages as $code => $language) {
+	$fieldname = "msgsndr_phonemessagetexttranslate". $code. "text";
+	?><input type="hidden" name="<?=$fieldname?>" id="<?=$fieldname?>"><?
+}
+foreach ($translationlanguages as $code => $language) {
+	$fieldname = "msgsndr_emailmessagetexttranslate". $code. "text";
+	?><input type="hidden" name="<?=$fieldname?>" id="<?=$fieldname?>"><?
+}
+?></div>
+</form><?
+
+$posturl = $_SERVER['REQUEST_URI'];
+$posturl .= mb_strpos($posturl,"?") !== false ? "&" : "?";
+$posturl .= "form=". $form->name;
+
+// render the items to get form data, but discard the html
+$discard = $form->renderFormItems();
+$discard = "";
+// render form javascript
+echo $form->renderJavascriptLibraries();
+echo $form->renderFormJavascript($posturl);
+echo $form->renderJavascript();
+
+include("navbottom.inc.php");
+
+class MessageSenderProcessor {
+
+	// If test_mode is true then we can change our behavior to support
+	// some type of output verbosity for test automation to see the result 
+	private $test_mode = false;
+
+	public function set_test_mode($mode) {
+		if (is_bool($mode)) $this->test_mode = $mode;
+	}
+
+	public function get_test_mode() {
+		return($this->test_mode);
+	}
+
+	public function doPost($postdata) {
+		global $USER;
+
+		// =============================================================
 		// Job, create a new one
-		// ============================================================================================================================
+		// =============================================================
 		$job = Job::jobWithDefaults();
 
 		$job->userid = $USER->id;
@@ -933,7 +970,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$job->type = 'notification';
 		$job->modifydate = $job->createdate = date("Y-m-d H:i:s");
 
-		$schedule = getSchedule($postdata);
+		$schedule = $this->getSchedule($postdata);
 		
 		$job->scheduleid = null;
 		if ($schedule['date'])
@@ -962,9 +999,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
 		$job->update();
 
-		// ============================================================================================================================
+		// =============================================================
 		// Lists, get listids and create an addme list
-		// ============================================================================================================================
+		// =============================================================
 		$joblists = json_decode($postdata["listids"]);
 
 		// if there is "addme" data in the list selection, create a person and list with the contact details
@@ -1062,15 +1099,15 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		// keep track of the text message data we are going to create messages for
 		// format $messages[<type>][<subtype>][<langcode>][<autotranslate>] => array($msgdata)
 		$messages = array(
-				'phone' => array(),
-				'email' => array(),
-				'sms' => array(),
-				'post' => array()
+			'phone' => array(),
+			'email' => array(),
+			'sms' => array(),
+			'post' => array()
 		);
 		
-		// ============================================================================================================================
+		// =============================================================
 		// Phone Message (callme, text, translations)
-		// ============================================================================================================================
+		// =============================================================
 		$jobpostmessage = array();
 		if (isset($postdata["hasphone"]) && $postdata["hasphone"] && $USER->authorize("sendphone")) {
 			switch ($postdata["phonemessagetype"]) {
@@ -1160,9 +1197,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			} // end switch phone message type
 		} // end if hasphone
 
-		// ============================================================================================================================
+		// =============================================================
 		// Email Message (text, translations)
-		// ============================================================================================================================
+		// =============================================================
 		if (isset($postdata["hasemail"]) && $postdata["hasemail"] && $USER->authorize("sendemail")) {
 			// this is the default 'en' message so it's autotranslate value is 'none'
 			$messages['email']['html']['en']['none']['text'] = $postdata["emailmessagetext"];
@@ -1196,15 +1233,15 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			}
 		}
 
-		// ============================================================================================================================
+		// =============================================================
 		// SMS Message
-		// ============================================================================================================================
+		// =============================================================
 		if (isset($postdata["hassms"]) && $postdata["hassms"] && $USER->authorize("sendsms"))
 			$messages['sms']['plain']['en']['none']['text'] = $postdata["smsmessagetext"];
 
-		// ============================================================================================================================
+		// =============================================================
 		// Social Media Message(s)
-		// ============================================================================================================================
+		// =============================================================
 		if (isset($postdata["hasfacebook"]) && $postdata["hasfacebook"] && $USER->authorize("facebookpost"))
 			$messages['post']['facebook']['en']['none']['text'] = $postdata["socialmediafacebookmessage"];
 
@@ -1281,9 +1318,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			} // for each subtype
 		} // for each message type
 
-		// ============================================================================================================================
+		// =============================================================
 		// Job Post Destinations (facebook, twitter, feed, page)
-		// ============================================================================================================================
+		// =============================================================
 		// store the jobpost messages
 		$createdpostpage = false;
 		foreach ($jobpostmessage as $subtype) {
@@ -1317,87 +1354,80 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			}
 		}
 
-		// run the job
-		$job->runNow();
+		return($job);
+	}
 
-		Query("COMMIT");
-		if ($ajax) {
-			if (isset($_GET['iframe']))
-				$form->sendTo("jobview.php?iframe&id=". $job->id);
-			else
-				$form->sendTo("start.php");
-		} else {
-			redirect("start.php");
+	// get the user requested schedule out of postdata
+	private function getSchedule($postdata) {
+		global $ACCESS;
+		global $USER;
+		
+		$type = $postdata["scheduletype"];
+		$maxjobdays = $postdata["optionmaxjobdays"];
+		$callearly = $postdata['schedulecallearly'];
+		$calllate = $postdata['schedulecalllate'];
+		$date = $postdata['scheduledate'];
+		
+		$schedule = array();
+		
+		if (!$maxjobdays)
+			$maxjobdays = 1;
+		
+		switch ($type) {
+			case "now":
+				//get the callearly and calllate defaults
+				$callearly = date("g:i a");
+				$calllate = $USER->getCallLate();
+					
+				//get access profile settings
+				$accessCallearly = $ACCESS->getValue("callearly");
+				if (!$accessCallearly)
+					$accessCallearly = "12:00 am";
+				$accessCalllate = $ACCESS->getValue("calllate");
+				if (!$accessCalllate)
+					$accessCalllate = "11:59 pm";
+					
+				//convert everything to timestamps for comparisons
+				$callearlysec = strtotime($callearly);
+				$calllatesec = strtotime($calllate);
+				$accessCallearlysec = strtotime($accessCallearly);
+				$accessCalllatesec = strtotime($accessCalllate);
+
+				// make sure the calculated callearly is not before access profile
+				if ($callearlysec  < $accessCallearlysec)
+					$callearlysec = $accessCallearlysec;
+
+				// try to ensure calllate is at least an hour after start, up to access restriction
+				if ($callearlysec + 3600 > $calllatesec)
+					$calllatesec = $callearlysec + 3600;
+					
+				//make sure the calculated calllate is not past access profile
+				if ($calllatesec  > $accessCalllatesec)
+					$calllatesec = $accessCalllatesec;
+
+				$callearly = date("g:i a", $callearlysec);
+				$calllate = date("g:i a", $calllatesec);
+					
+				$schedule = array(
+						"maxjobdays" => $maxjobdays,
+						"date" => date('m/d/Y'),
+						"callearly" => $callearly,
+						"calllate" => $calllate
+				);
+				break;
+			case "schedule":
+				$schedule = array(
+				"maxjobdays" => $maxjobdays,
+				"date" => date('m/d/Y', strtotime($date)),
+				"callearly" => $callearly,
+				"calllate" => $calllate
+				);
+				break;
+			default:
+				break;
 		}
+		return $schedule;
 	}
 }
 
-if (isset($_GET['jsonformdata'])) {
-	header("Content-Type: application/json");
-	echo json_encode(array("snum" => $form->serialnum, "formdata" => $form->formdata));
-	exit();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Display
-////////////////////////////////////////////////////////////////////////////////
-$PAGE = "notifications:jobs";
-$TITLE = "";
-$MESSAGESENDER = true;
-
-include("nav.inc.php");
-// Load Custom Form Validators
 ?>
-<script type="text/javascript">
-<?Validator::load_validators(array("ValInArray", "ValDuplicateNameCheck", "ValHasMessage",
-	"ValMessageBody", "ValEasycall", "ValLists", "ValTranslation", "ValEmailAttach",
-	"ValTimeWindowCallLate", "ValTimeWindowCallEarly", "ValSmsText", "valPhone",
-	"ValMessageBody", "ValMessageGroup", "ValMessageTypeSelect", "ValFacebookPage",
-	"ValTranslationCharacterLimit","ValTimePassed","ValTtsText","ValCallerID",
-	"ValTextAreaAndSubjectWithCheckbox", "ValConditionalOnValue"));?>
-
-	// get php data into js vars
-	var userid = <? print_r($_SESSION['user']->id); ?>;
-	var fbAppId = <? print_r($SETTINGS['facebook']['appid']); ?>;
-	var twitterReservedChars = <? print_r(mb_strlen(" http://". getSystemSetting("tinydomain"). "/") + 6); ?>;
-	
-	// get template settings (if loading from template, they will be set in session data)
-	var subject = <?echo (isset($_SESSION['message_sender']['template']['subject'])?("'". str_replace("'", "\'", $_SESSION['message_sender']['template']['subject']). "'"):"''")?>;
-	var lists = <?echo (isset($_SESSION['message_sender']['template']['lists'])?$_SESSION['message_sender']['template']['lists']:'[]')?>;
-	var jtid = <?echo (isset($_SESSION['message_sender']['template']['jobtypeid'])?$_SESSION['message_sender']['template']['jobtypeid']:0)?>;
-	var mgid = <?echo (isset($_SESSION['message_sender']['template']['messagegroupid'])?$_SESSION['message_sender']['template']['messagegroupid']:0)?>;
-	
-</script>
-
-<?PreviewModal::includePreviewScript();?>
-
-<form id="<?=$form->name?>" name="<?=$form->name?>" action="/default/message_sender.php?form=msgsndr" method="POST" ><?
-
-include("message_sender/index.php");
-
-// cheat and create the hidden translation fields now
-?><div style="display:none"><?
-foreach ($ttslanguages as $code => $language) {
-	$fieldname = "msgsndr_phonemessagetexttranslate". $code. "text";
-	?><input type="hidden" name="<?=$fieldname?>" id="<?=$fieldname?>"><?
-}
-foreach ($translationlanguages as $code => $language) {
-	$fieldname = "msgsndr_emailmessagetexttranslate". $code. "text";
-	?><input type="hidden" name="<?=$fieldname?>" id="<?=$fieldname?>"><?
-}
-?></div>
-</form><?
-
-$posturl = $_SERVER['REQUEST_URI'];
-$posturl .= mb_strpos($posturl,"?") !== false ? "&" : "?";
-$posturl .= "form=". $form->name;
-
-// render the items to get form data, but discard the html
-$discard = $form->renderFormItems();
-$discard = "";
-// render form javascript
-echo $form->renderJavascriptLibraries();
-echo $form->renderFormJavascript($posturl);
-echo $form->renderJavascript();
-
-include("navbottom.inc.php"); ?>
