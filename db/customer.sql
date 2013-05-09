@@ -2165,3 +2165,11 @@ $$$
 update setting set value='9.7/1' where name='_dbversion'
 $$$
 -- END 9.7/1
+
+-- START 9.7/2
+ALTER TABLE `reportemailtracking` CHANGE `requestduration` `requestduration` BIGINT NOT NULL
+$$$
+
+update setting set value='9.7/2' where name='_dbversion'
+$$$
+-- END 9.7/2

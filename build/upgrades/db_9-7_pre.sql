@@ -11,3 +11,7 @@ CREATE TABLE IF NOT EXISTS `reportemailtracking` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 $$$
 
+-- $rev 2
+
+ALTER TABLE `reportemailtracking` CHANGE `requestduration` `requestduration` BIGINT NOT NULL
+$$$
