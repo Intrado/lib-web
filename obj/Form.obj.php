@@ -467,8 +467,10 @@ class Form {
 	}
 
 	//sends repsonse to an ajax call that will redirect the browser to a url
-	function sendTo ($url) {
-		$result = array("status" => "success", "nexturl" => $url);
+	// SMK added optional 'extra' argument to give us a chance to inject
+	// some extra data into the JSON for the client to have access to
+	function sendTo ($url, $extra=Array()) {
+		$result = array_merge(array("status" => "success", "nexturl" => $url), $extra);
 		header("Content-Type: application/json");
 		echo json_encode($result);
 		exit();

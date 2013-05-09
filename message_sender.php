@@ -862,8 +862,17 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		if ($ajax) {
 			if (isset($_GET['iframe']))
 				$form->sendTo("jobview.php?iframe&id=". $job->id);
-			else
+			else {
+				// If we're in test mode and the MSP indicates a problem...
+				if (! $msp->check_result()) {
+					// Add some diagnostic info to the final return AJAX
+					$diagnostics = array(
+						'mismaps' => $msp->get_mismaps()
+					);
+					$form->sendTo("start.php", $diagnostics);
+				}
 				$form->sendTo("start.php");
+			}
 		} else {
 			redirect("start.php");
 		}
@@ -942,6 +951,14 @@ include("navbottom.inc.php");
 
 class MessageSenderProcessor {
 
+	// Any fields improperly mapped between UI and
+	// server will have name/value pairs added here
+	private $test_mismaps = Array();
+
+	// If the job name is formatted as "test mode ###", then test_mode will
+	// automatically be enabled, and test_number here will take the value of ###
+	private $test_number = -1;
+
 	// If test_mode is true then we can change our behavior to support
 	// some type of output verbosity for test automation to see the result 
 	private $test_mode = false;
@@ -965,6 +982,13 @@ class MessageSenderProcessor {
 		$job->userid = $USER->id;
 		$job->jobtypeid = $postdata["jobtype"];
 		$job->name = removeIllegalXmlChars($postdata["name"]);
+
+		// Support for automagically enabling test mode
+		if (preg_match('/^test mode (\d+)$/', $postdata['name'], $matches)) {
+			$this->test_mode = true;
+			$this->test_number = intval($matches[1]);
+		}
+
 		$job->description = "Created with MessageSender";
 
 		$job->type = 'notification';
@@ -1203,9 +1227,11 @@ class MessageSenderProcessor {
 		if (isset($postdata["hasemail"]) && $postdata["hasemail"] && $USER->authorize("sendemail")) {
 			// this is the default 'en' message so it's autotranslate value is 'none'
 			$messages['email']['html']['en']['none']['text'] = $postdata["emailmessagetext"];
+			$this->test_textfield('emailmessagetext', $postdata['emailmessagetext']);
 			$messages['email']['html']['en']['none']["fromname"] = $postdata["emailmessagefromname"];
 			$messages['email']['html']['en']['none']["from"] = $postdata["emailmessagefromemail"];
 			$messages['email']['html']['en']['none']["subject"] = $postdata["emailmessagesubject"];
+			$this->test_textfield('emailmessagesubject', $postdata['emailmessagesubject']);
 			$attachments = isset($postdata["emailmessageattachment"])?json_decode($postdata["emailmessageattachment"]):array();
 			$messages['email']['html']['en']['none']['attachments'] = $attachments;
 				
@@ -1426,7 +1452,49 @@ class MessageSenderProcessor {
 			default:
 				break;
 		}
-		return $schedule;
+		return($schedule);
+	}
+
+	/**
+	 * This basic test wants the value to contain "field_name ###"
+	 * such that ### matches $this->test_number; this verifies
+	 * that the user put the name of this text field into the
+	 * field's value, that the value supplied was freshly
+	 * provided from this invocation (i.e. was not some garbage/
+	 * leftover data from the previous), and that the field in
+	 * the UI form correctly mapped to this server-side field.
+	 */
+	private function test_textfield($field_name, $value) {
+
+		// if test mode is not enabled, or we don't have a test
+		// number to work with then there's nothing to do here
+		if (! ($this->test_mode && ($this->test_number >= 0))) return;
+
+		if (preg_match("/{$field_name} {$this->test_number}/", $value)) return;
+
+		// Otherwise there was a mismatch, and so we need to flag
+		// an issue in the return results
+		$this->test_mismaps[$field_name] = $value;
+	}
+
+	public function check_result() {
+
+		// If we are not in test mode then return a passing result so
+		// that the caller doesn't try to add any diagnostic output
+		if (! $this->test_mode) return(true);
+
+		// Otherwise, with test mode enabled, we
+		// fail if there were any mismapped fields
+		if (count($this->test_mismaps)) return(false);
+
+		// TODO - Add any other fail case conditions here
+
+		// Barring any of the previous failures, this looks like a pass!
+		return(true);
+	}
+
+	public function get_mismaps() {
+		return($this->test_mismaps);
 	}
 }
 
