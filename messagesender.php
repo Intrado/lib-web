@@ -1,6 +1,158 @@
 <?php
     // This file will be duplicated in the Kona project as 'messagesender.php', but is living here for documentation purposes.
     require_once("inc/common.inc.php");
+
+    // Required to load validations
+    require_once("obj/FormItem.obj.php");
+    require_once("obj/Validator.obj.php");
+    require_once("obj/ValSmsText.val.php");
+    require_once("obj/ValTtsText.val.php");
+    require_once("obj/TextAreaAndSubjectWithCheckbox.val.php");
+    require_once("obj/ValFacebookPage.val.php");
+    require_once("obj/ValLists.val.php");
+    require_once("obj/ValTimeWindowCallEarly.val.php");
+    require_once("obj/ValTimeWindowCallLate.val.php");
+    require_once("obj/ValMessageBody.val.php");
+    require_once("obj/ValMessageGroup.val.php");
+    require_once("obj/EmailAttach.val.php");
+    require_once("obj/ValMessageBody.val.php");
+    require_once("obj/TraslationItem.fi.php");
+    require_once("obj/CallerID.fi.php");
+    require_once("obj/ValDuplicateNameCheck.val.php");
+
+
+    // FIXME: Copy-pasted from message_sender.php
+
+class ValEasycall extends Validator {
+        var $onlyserverside = true;
+        function validate ($value, $args) {
+                global $USER;
+                if (!$USER->authorize("starteasy"))
+                        return "$this->label "._L("is not allowed for this user account");
+                $values = json_decode($value);
+                if (!$values || $values == json_decode("{}"))
+                                return "$this->label "._L("has messages that are not recorded");
+                                        foreach ($values as $langcode => $afid) {
+                                                        $audiofile = DBFind("AudioFile", "from audiofile a where a.id = ? and (a.userid = ?
+                                                or exists (select 1 from publish p where p.userid = ? and p.action = 'subscribe' and p.type = 'messagegroup' and p.messagegroupid = a.messagegroupid))
+                                                ", "a", array($afid, $USER->id,$USER->id));
+                        if (!$audiofile)
+                                return "$this->label "._L("has invalid or missing messages");
+                }
+                return true;
+        }
+}
+
+class ValHasMessage extends Validator {
+        var $onlyserverside = true;
+
+        function validate ($value, $args) {
+                global $USER;
+                if ($value == 'pick') {
+                        // find if there are any message groups the user owns or subscribes to
+                        $hasowned = QuickQuery("
+                                        select 1
+                                        from messagegroup mg
+                                        where not mg.deleted and mg.userid = ?
+                                        limit 1", false, array($USER->id));
+                        $hassubscribed = QuickQuery("
+                                        select 1
+                                        from publish p
+                                                                        where p.userid = ? and action = 'subscribe' and type = 'messagegroup'
+                                        limit 1", false, array($USER->id));
+                        if (!$hasowned && !$hassubscribed)
+                                return "$this->label: ". _L('You have no saved or subscribed messages.');
+                }
+                return true;
+        }
+}
+
+class ValMessageTypeSelect extends Validator {
+
+        function validate ($value, $args) {
+                // MUST contain one of phone, email or sms
+                if (!array_intersect(array('phone','email','sms'), $value))
+                        return "$this->label ". _L('requires one message of type Phone, Email or SMS Text.');
+                return true;
+        }
+
+        function getJSValidator () {
+                return '
+                function (name, label, value, args) {
+                var isvalid = false;
+                $A(value).each(function (val) {
+                if (val == "phone" || val == "email" || val == "sms")
+                isvalid = true;
+        });
+        if (!isvalid)
+        return label + " '. _L("requires one message of type Phone, Email or SMS Text.") .'";
+        return true;
+        }
+        ';
+        }
+}
+
+class ValTranslationCharacterLimit extends Validator {
+        function validate ($value, $args, $requiredvalues) {
+                $textlength = strlen($requiredvalues[$args['field']]);
+                if ($textlength > 5000)
+                        return "$this->label is unavalable if the message is more than 5000 characters. The message is currently $textlength characters.";
+                return true;
+        }
+        function getJSValidator () {
+                return
+                'function (name, label, value, args, requiredvalues) {
+                //alert("valLength");
+                var textlength = requiredvalues[args["field"]].length;
+                if (textlength > 5000)
+                return this.label +" is unavalable if the message is more than 5000 characters. The message is currently " + textlength + " characters.";
+                return true;
+        }';
+        }
+}
+
+class ValTimePassed extends Validator {
+        var $onlyserverside = true;
+        function validate ($value, $args, $requiredvalues) {
+                $timediff = (time() - strtotime($requiredvalues[$args['field']] . " " . $value));
+                if ($timediff > 0)
+                        return "$this->label: ". _L('Must be in the future.');
+                return true;
+        }
+}
+
+
+class ValConditionalOnValue extends Validator {
+        var $conditionalrequired = true;
+        function validate ($value, $args, $requiredvalues) {
+                $required = true;
+                foreach ($args['fields'] as $field => $testvalue) {
+                        if ($requiredvalues[$field] != $testvalue)
+                                $required = false;
+                }
+                if ($required && !$value)
+                        return "$this->label is required.";
+
+                return true;
+        }
+
+        function getJSValidator () {
+                return '
+                        function (name, label, value, args, requiredvalues) {
+                                var required = true;
+                                $H(args.fields).each(function (field, testvalue) {
+                                        if (requiredvalues[field] != testvalue)
+                                                required = false;
+                                });
+                                                        if (required && !value)
+                                        return this.label + " is required.";
+
+                                return true;
+                        }';
+        }
+}
+  // End copy-paste from message_sender.php
+
 ?>
 
 <!doctype html>
@@ -16,6 +168,14 @@
     <link rel="stylesheet" href="messagesender/stylesheets/app.css">
     <script type="text/javascript" src="messagesender/javascripts/vendor.js"></script>
     <script type="text/javascript" src="messagesender/javascripts/app.js"></script>
+
+
+    <script type="text/javascript">
+      // load required validators into document.validators
+
+      <? Validator::load_validators(array("ValCallerID", "ValConditionalOnValue", "ValConditionallyRequired", "ValDate", "ValDomain", "ValDomainList", "ValDuplicateNameCheck", "ValEasycall", "ValEmail", "ValEmailAttach", "ValEmailList", "ValFacebookPage", "ValFieldConfirmation", "ValHasMessage", "ValInArray", "ValLength", "ValLists", "ValMessageBody", "ValMessageGroup", "ValMessageTypeSelect", "ValNumber", "ValNumeric", "ValPhone", "ValRequired", "ValSmsText", "ValTextAreaAndSubjectWithCheckbox", "ValTimeCheck", "ValTimePassed", "ValTimeWindowCallEarly", "ValTimeWindowCallLate", "ValTranslation", "ValTranslationCharacterLimit", "ValTtsText", "valPhone")); ?>
+    </script>
+
     <script type="text/javascript">
         (function() {
             window.BOOTSTRAP_DATA = {};
@@ -45,9 +205,10 @@
                 features      = fetch('/settings/features');
                 options       = fetch('/settings/options');
                 facebookPages = fetch('/settings/facebookpages');
+                formData = $.getJSON("message_sender.php?jsonformdata=true")
 
-                $.when(languages, features, options, facebookPages)
-                    .done(function(languagesRes, featuresRes, optionsRes, facebookPagesRes) {
+                $.when(languages, features, options, facebookPages, formData)
+                    .done(function(languagesRes, featuresRes, optionsRes, facebookPagesRes, formData) {
                         org.languages = languagesRes[0].languages;
                         org.settings  = {
                             features:       featuresRes[0].features,
@@ -56,6 +217,15 @@
                             facebookAppID:  <?= $SETTINGS['facebook']['appid'] ?>
                         }
                         window.BOOTSTRAP_DATA.user = userResponse;
+
+                        window.BOOTSTRAP_DATA.form = {
+                            snum: formData[0].snum,
+                            schema: formData[0].formdata,
+                            name: "msgsndr",
+                            url: window.location.protocol + "//" + window.location.host + "/" + window.location.pathname.split('/')[1] + "/message_sender.php",
+                            validators: document.validators
+                        };
+
                         window.require('initialize');
                     });
             });
