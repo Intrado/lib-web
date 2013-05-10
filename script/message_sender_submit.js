@@ -132,6 +132,19 @@ function SubmitManager() {
 						if ("start.php" == res.nexturl)
 							$('#msgsndr_submit_message').append("You can track its status on the <a href='start.php'>dashboard</a>.");
 
+						// If test mode was used for the form submission, there might be postdata to show
+						if (typeof(res.postdata) !== "undefined") {
+							diagbox = '<br/><div style="display: none;"><textarea id="test_mode_postdata">';
+							if (typeof(JSON) === 'object') {
+								diagbox += JSON.stringify(res.postdata);
+							}
+							else {
+								diagbox += '{"error":"JSON object is undefined"}';
+							}
+							diagbox += '</textarea></div>';
+							$('#msgsndr_submit_message').append(diagbox);
+						}
+
 						$('#msgsndr_submit_confirmbutton').on('click', function(event) {
 							window.location = res.nexturl;
 						});
