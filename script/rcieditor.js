@@ -431,7 +431,6 @@
             // Hide our AJAXy loading indicator
             this.setLoadingVisibility(false);
             $(this).trigger('ckeditor:instanceReady', true);
-            console.log('callbackEditorLoaded called,  ##  ckeditor:instanceReady should fire');
 
             // Just trigger a validation event if there is something to look at
             var html = textarea.val();
