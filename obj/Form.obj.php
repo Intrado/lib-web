@@ -470,7 +470,8 @@ class Form {
 	// SMK added optional 'extra' argument to give us a chance to inject
 	// some extra data into the JSON for the client to have access to
 	function sendTo ($url, $extra=Array()) {
-		$result = array_merge(array("status" => "success", "nexturl" => $url), $extra);
+		$default = array("status" => "success", "nexturl" => $url);
+		$result = is_array($extra) ? array_merge($default, $extra) : $default;
 		header("Content-Type: application/json");
 		echo json_encode($result);
 		exit();

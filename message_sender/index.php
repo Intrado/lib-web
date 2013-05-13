@@ -24,7 +24,8 @@
 		
 		<div class="window_body_wrap">
 
-		<input type="hidden" name=msgsndr-formsnum value="<?=$form->serialnum?>" />
+		<input type="hidden" name="msgsndr-formsnum" value="<?=$form->serialnum?>" />
+		<input type="hidden" name="testmode" value="<?= (isset($_REQUEST['testmode']) ? 1 : 0) ?>" />
 
 			<!-- ============== Loading ============== -->
 				

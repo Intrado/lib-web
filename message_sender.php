@@ -340,19 +340,7 @@ $feedcategoryids = array();
 foreach ($fcids as $fcid)
 	$feedcategoryids[$fcid] = $fcid;
 
-$formdata = Array();
-
-// Activate testmode if the URL has "testmode=1" added to it
-if (isset($_REQUEST['testmode']) && (intval($_REQUEST['testmode']) == 1)) {
-	$formdata['testmode'] = array(
-		'label' => 'testmode',
-		'value' => '1',
-		'control' => array('HiddenField'),
-		'helpstep' => 1
-	);
-}
-
-$formdata = array_merge($formdata, array(
+$formdata = array(
 		"uuid" => array(
 				"label" => "uuid",
 				"value" => $_SESSION['_messagesender']['uuid'],
@@ -489,7 +477,7 @@ $formdata = array_merge($formdata, array(
 				"requires" => array("phonemessagetext"),
 				"helpstep" => 1
 		)
-));
+);
 
 foreach ($ttslanguages as $code => $language) {
 	$formdata["phonemessagetexttranslate". $code. "text"] = array(
@@ -867,27 +855,31 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$postdata = $form->getData();
 
 		// If testmode=1 was added to the POST data then we can activate test mode that way
-		if (isset($postdata['testmode']) && (intval($postdata['testmode']) == 1)) {
+		if (isset($_REQUEST['testmode']) && (intval($_REQUEST['testmode']) == 1)) {
 			$msp->set_test_mode(true);
 		}
-		$job = $msp->doPost($postdata);
+
+		$job = $msp->doPost($postdata, $displayingCallerid);
 		
 		// run the job
 		$job->runNow();
 
 		Query("COMMIT");
+
 		if ($ajax) {
-			if (isset($_GET['iframe']))
+			if (isset($_GET['iframe'])) {
 				$form->sendTo("jobview.php?iframe&id=". $job->id);
+			}
+
+			// If we're in test mode
+			else if ($msp->get_test_mode()) {
+				// Add some diagnostic info to the final return AJAX
+				$diagnostics = array(
+					'postdata' => $postdata
+				);
+				$form->sendTo("start.php", $diagnostics);
+			}
 			else {
-				// If we're in test mode
-				if ($msp->get_test_mode()) {
-					// Add some diagnostic info to the final return AJAX
-					$diagnostics = array(
-						'postdata' => $postdata
-					);
-					$form->sendTo("start.php", $diagnostics);
-				}
 				$form->sendTo("start.php");
 			}
 		} else {
@@ -980,7 +972,7 @@ class MessageSenderProcessor {
 		return($this->test_mode);
 	}
 
-	public function doPost($postdata) {
+	public function doPost($postdata, $displayingCallerid) {
 		global $USER;
 
 		// =============================================================
@@ -1235,11 +1227,9 @@ class MessageSenderProcessor {
 		if (isset($postdata["hasemail"]) && $postdata["hasemail"] && $USER->authorize("sendemail")) {
 			// this is the default 'en' message so it's autotranslate value is 'none'
 			$messages['email']['html']['en']['none']['text'] = $postdata["emailmessagetext"];
-			$this->test_textfield('emailmessagetext', $postdata['emailmessagetext']);
 			$messages['email']['html']['en']['none']["fromname"] = $postdata["emailmessagefromname"];
 			$messages['email']['html']['en']['none']["from"] = $postdata["emailmessagefromemail"];
 			$messages['email']['html']['en']['none']["subject"] = $postdata["emailmessagesubject"];
-			$this->test_textfield('emailmessagesubject', $postdata['emailmessagesubject']);
 			$attachments = isset($postdata["emailmessageattachment"])?json_decode($postdata["emailmessageattachment"]):array();
 			$messages['email']['html']['en']['none']['attachments'] = $attachments;
 				

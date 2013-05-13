@@ -111,7 +111,7 @@ function SubmitManager() {
 							window.location="index.php?logout=1";
 						} else {
 							$('#msgsndr_submit_title').html("Submit Error");
-							$('#msgsndr_submit_message').html("There was a problem submitting the form. Please try again.");
+							$('#msgsndr_submit_message').html("There was a problem submitting the form. Please try again. (1)");
 						}
 						$('#msgsndr_submit_confirmation').modal('show');
 					} else if ("fail" == res.status) {
@@ -166,7 +166,7 @@ function SubmitManager() {
 				if (spinner) {
 					spinner.hide();
 				}
-				alert('There was a problem submitting the form. Please try again.'); //TODO better error handling
+				alert('There was a problem submitting the form. Please try again. (2)'); //TODO better error handling
 				formvars.submitting = false;
 			}
 		});
