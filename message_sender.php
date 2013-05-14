@@ -60,13 +60,6 @@ require_once("obj/TraslationItem.fi.php");
 require_once("obj/CallerID.fi.php");
 require_once("obj/ValDuplicateNameCheck.val.php");
 
-// Preview
-require_once("inc/previewfields.inc.php");
-require_once("obj/PreviewModal.obj.php");
-require_once("inc/appserver.inc.php");
-PreviewModal::HandleRequestWithPhoneText();
-PreviewModal::HandleRequestWithEmailText();
-
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
@@ -311,9 +304,6 @@ class ValConditionalOnValue extends Validator {
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
-
-PreviewModal::HandleRequestWithPhoneText();
-PreviewModal::HandleRequestWithEmailText();
 
 
 $userjobtypes = JobType::getUserJobTypes(false);
@@ -904,57 +894,10 @@ $MESSAGESENDER = true;
 include("nav.inc.php");
 // Load Custom Form Validators
 ?>
-<script type="text/javascript">
-<?Validator::load_validators(array("ValInArray", "ValDuplicateNameCheck", "ValHasMessage",
-	"ValMessageBody", "ValEasycall", "ValLists", "ValTranslation", "ValEmailAttach",
-	"ValTimeWindowCallLate", "ValTimeWindowCallEarly", "ValSmsText", "valPhone",
-	"ValMessageBody", "ValMessageGroup", "ValMessageTypeSelect", "ValFacebookPage",
-	"ValTranslationCharacterLimit","ValTimePassed","ValTtsText","ValCallerID",
-	"ValTextAreaAndSubjectWithCheckbox", "ValConditionalOnValue"));?>
 
-	// get php data into js vars
-	var userid = <? print_r($_SESSION['user']->id); ?>;
-	var fbAppId = <? print_r($SETTINGS['facebook']['appid']); ?>;
-	var twitterReservedChars = <? print_r(mb_strlen(" http://". getSystemSetting("tinydomain"). "/") + 6); ?>;
-	
-	// get template settings (if loading from template, they will be set in session data)
-	var subject = <?echo (isset($_SESSION['message_sender']['template']['subject'])?("'". str_replace("'", "\'", $_SESSION['message_sender']['template']['subject']). "'"):"''")?>;
-	var lists = <?echo (isset($_SESSION['message_sender']['template']['lists'])?$_SESSION['message_sender']['template']['lists']:'[]')?>;
-	var jtid = <?echo (isset($_SESSION['message_sender']['template']['jobtypeid'])?$_SESSION['message_sender']['template']['jobtypeid']:0)?>;
-	var mgid = <?echo (isset($_SESSION['message_sender']['template']['messagegroupid'])?$_SESSION['message_sender']['template']['messagegroupid']:0)?>;
-	
-</script>
+<iframe id="messagesender_frame" src="messagesender.php" width="100%" height="100%"></iframe>
 
-<?PreviewModal::includePreviewScript();?>
-
-<form id="<?=$form->name?>" name="<?=$form->name?>" action="/default/message_sender.php?form=msgsndr" method="POST" ><?
-
-include("message_sender/index.php");
-
-// cheat and create the hidden translation fields now
-?><div style="display:none"><?
-foreach ($ttslanguages as $code => $language) {
-	$fieldname = "msgsndr_phonemessagetexttranslate". $code. "text";
-	?><input type="hidden" name="<?=$fieldname?>" id="<?=$fieldname?>"><?
-}
-foreach ($translationlanguages as $code => $language) {
-	$fieldname = "msgsndr_emailmessagetexttranslate". $code. "text";
-	?><input type="hidden" name="<?=$fieldname?>" id="<?=$fieldname?>"><?
-}
-?></div>
-</form><?
-
-$posturl = $_SERVER['REQUEST_URI'];
-$posturl .= mb_strpos($posturl,"?") !== false ? "&" : "?";
-$posturl .= "form=". $form->name;
-
-// render the items to get form data, but discard the html
-$discard = $form->renderFormItems();
-$discard = "";
-// render form javascript
-echo $form->renderJavascriptLibraries();
-echo $form->renderFormJavascript($posturl);
-echo $form->renderJavascript();
+<?
 
 include("navbottom.inc.php");
 

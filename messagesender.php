@@ -240,6 +240,14 @@ class ValConditionalOnValue extends Validator
                         window.BOOTSTRAP_DATA.user = userResponse;
 
                         window.BOOTSTRAP_DATA.form = {
+                            template: {
+                                // get template settings (if loading from template, they will be set in session data)
+                                subject: <?echo (isset($_SESSION['message_sender']['template']['subject'])?("'". str_replace("'", "\'", $_SESSION['message_sender']['template']['subject']). "'"):"''")?>,
+                                lists: <?echo (isset($_SESSION['message_sender']['template']['lists'])?$_SESSION['message_sender']['template']['lists']:'[]')?>,
+                                jtid: <?echo (isset($_SESSION['message_sender']['template']['jobtypeid'])?$_SESSION['message_sender']['template']['jobtypeid']:0)?>,
+                                mgid: <?echo (isset($_SESSION['message_sender']['template']['messagegroupid'])?$_SESSION['message_sender']['template']['messagegroupid']:0)?>
+
+                            },
                             snum:formData[0].snum,
                             schema:formData[0].formdata,
                             name:"msgsndr",
