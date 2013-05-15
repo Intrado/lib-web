@@ -40,6 +40,8 @@ require_once("obj/FacebookPage.fi.php");
 require_once("obj/TwitterAuth.fi.php");
 require_once("inc/twitteroauth/OAuth.php");
 require_once("inc/twitteroauth/twitteroauth.php");
+require_once("obj/Object.obj.php");
+require_once("obj/Session.obj.php");
 require_once("obj/Twitter.obj.php");
 require_once("obj/CallerID.fi.php");
 require_once("obj/FeedCategory.obj.php");
@@ -854,7 +856,8 @@ if ($submittedmode || $completedmode) {
 	// if the user account may post to twitter, but has no valid twitter access token
 	if (getSystemSetting("_hastwitter") && $USER->authorize("twitterpost")) {
 		// get this here so twitter failures only effect users with twitter access
-		$tw = new Twitter($USER->getSetting("tw_access_token"));
+		$sess = new Session();
+		$tw = new Twitter($USER->getSetting("tw_access_token"), $sess);
 		$helpsteps[] = _L("If your message group contains a Twitter post, you must be connected to a Twitter account. If you haven't already added your Twitter account, click the Add Twitter Account button and log in through the pop up window.");
 		$formdata["twitter"] = array(
 			"label" => _L('Twitter Authorization'),

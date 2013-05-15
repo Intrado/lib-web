@@ -10,12 +10,15 @@ class TwitterAuth extends FormItem {
 		// if you set value on the form item you will get errors submitting the form
 		
 		$n = $this->form->name."_".$this->name;
-		
-		$twitter = new Twitter($USER->getSetting("tw_access_token", false));
+
+		$sess = new Session();
+		$twitter = new Twitter($USER->getSetting("tw_access_token", false), $sess);
 		$validToken = $twitter->hasValidAccessToken();
+
+
 		
 		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($validToken).'"/>';
-		
+
 		// main details div
 		$str .= '<div id="'. $n. 'twdetails">';
 		
@@ -67,7 +70,7 @@ class TwitterAuth extends FormItem {
 			function twLoadUserData(element) {
 				element = $(element);
 				element.update(new Element("img", { src: "img/ajax-loader.gif" }));
-				
+
 				new Ajax.Request("ajaxtwitter.php", {
 					method:"get",
 					parameters: {

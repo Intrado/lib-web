@@ -5,6 +5,8 @@
 require_once("inc/common.inc.php");
 require_once("inc/twitteroauth/OAuth.php");
 require_once("inc/twitteroauth/twitteroauth.php");
+require_once("obj/Object.obj.php");
+require_once("obj/Session.obj.php");
 require_once("obj/Twitter.obj.php");
 
 global $SETTINGS;
@@ -17,9 +19,16 @@ if (!getSystemSetting('_hastwitter', false) || !$USER->authorize('twitterpost'))
 if (isset($_GET['oauth_token']) && isset($_GET['oauth_verifier']) && isset($_SESSION['twitterRequestToken'])) {
 	
 	// create a twitter connection with the temporary auth tokens stored in session data
-	$twitter = new Twitter(json_encode(array(
-		"oauth_token" => $_SESSION['twitterRequestToken']['oauth_token'],
-		"oauth_token_secret" => $_SESSION['twitterRequestToken']['oauth_token_secret'])));
+	$sess = new Session();
+	$twitter = new Twitter(
+		json_encode(
+			array(
+				"oauth_token" => $_SESSION['twitterRequestToken']['oauth_token'],
+				"oauth_token_secret" => $_SESSION['twitterRequestToken']['oauth_token_secret']
+			)
+		)
+		, $sess
+	);
 	
 	// get the access token and store it in the DB for this user
 	$twAccessToken = $twitter->getAccessToken($_GET['oauth_verifier']);
@@ -34,7 +43,8 @@ if (isset($_GET['oauth_token']) && isset($_GET['oauth_verifier']) && isset($_SES
 	
 } else {
 	// can't get an authorize url with a valid access token so create a temp connection w/o one
-	$unauthconnection = new Twitter();
+	$sess = new Session();
+	$unauthconnection = new Twitter(false, $sess);
 		
 	// get a temporary request token
 	$thispage = ((isset($_SERVER["HTTPS"]))?"https://":"http://"). $_SERVER["SERVER_NAME"]. $_SERVER["REQUEST_URI"];

@@ -19,6 +19,8 @@ require_once("inc/twitteroauth/OAuth.php");
 require_once("inc/twitteroauth/twitteroauth.php");
 require_once("obj/RenderedList.obj.php");
 require_once("obj/ListForm.obj.php");
+require_once("obj/Object.obj.php");
+require_once("obj/Session.obj.php");
 require_once("obj/Twitter.obj.php");
 require_once("inc/help.inc.php");
 

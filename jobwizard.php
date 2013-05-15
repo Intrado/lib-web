@@ -56,6 +56,8 @@ require_once("obj/ValFacebookPage.val.php");
 require_once("obj/TwitterAuth.fi.php");
 require_once("inc/twitteroauth/OAuth.php");
 require_once("inc/twitteroauth/twitteroauth.php");
+require_once("obj/Object.obj.php");
+require_once("obj/Session.obj.php");
 require_once("obj/Twitter.obj.php");
 require_once("obj/HtmlRadioButtonBigCheck.fi.php");
 require_once("obj/TextAreaPhone.fi.php");

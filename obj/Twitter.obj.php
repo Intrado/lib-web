@@ -1,46 +1,83 @@
 <?
 
 class Twitter extends TwitterOAuth {
-	
-	function Twitter ($jsonAccessToken = false) {
+
+	protected $sess;
+	protected $sesskey = 'twitter_userdata';
+
+	public function __construct($jsonAccessToken = false, $sess = 0) {
 		global $SETTINGS;
-		
+
+		if (is_object($sess)) {
+			$this->sess = $sess;
+		}
+
 		if ($jsonAccessToken) {
 			$twitterdata = json_decode($jsonAccessToken);
-			TwitterOAuth::__construct(
+			parent::__construct(
 				$SETTINGS['twitter']['consumerkey'], 
 				$SETTINGS['twitter']['consumersecret'],
 				$twitterdata->oauth_token,
 				$twitterdata->oauth_token_secret);
 		} else {
 			// no access. get generic connection
-			TwitterOAuth::__construct(
+			parent::__construct(
 				$SETTINGS['twitter']['consumerkey'], 
 				$SETTINGS['twitter']['consumersecret']);
 		}
 	}
 	
-	function hasValidAccessToken() {
-		try {
-			$userData = $this->getUserData();
-			if (isset($userData->screen_name))
-				return true;
-		} catch (Exception $e) {
-			// nothing
+	public function hasValidAccessToken() {
+		$userData = $this->getUserData();
+		$result = isset($userData->screen_name) ? true : false;
+
+		// If the result was negative...
+		if (! $result) {
+
+			// And we were using cached data
+			if (is_object($this->sess) && $this->sess->check($this->sesskey)) {
+
+				// Blow away the cache and try again - maybe something in the cache broke!
+				$this->sess->del($this->sesskey);
+				$userData = $this->getUserData();
+				$result = isset($userData->screen_name) ? true : false;
+			}
 		}
-		return false;
+		return($result);
 	}
-	
-	function getUserData() {
-		try {
-			return $this->get('account/verify_credentials');
-		} catch (Exception $e) {
-			return false;
+
+	public function getUserData() {
+
+		// Try to get userData from the session data cache
+		$userData = 0;
+
+		if (is_object($this->sess) && $this->sess->check($this->sesskey)) {
+			$userData = $this->sess->get($this->sesskey);
 		}
+
+		if (! $userData) {
+			try {
+
+				// Otherwise get the userData fresh from Twitter
+				$userData = $this->get('account/verify_credentials');
+
+				// And add it to the user session cache
+				if (is_object($this->sess)) {
+					$this->sess->set($this->sesskey, $userData);
+				}
+
+			} catch (Exception $e) {
+				// TODO - add a general exception catcher/logger class
+				// nothing
+				return false;
+			}
+		}
+
+		return($userData);
 	}
 	
 	// tweet a message to the user's status
-	function tweet($message) {
+	public function tweet($message) {
 		
 		$response = false;
 		try {
@@ -50,10 +87,7 @@ class Twitter extends TwitterOAuth {
 			return false;
 		}
 		
-		if ($response)
-			return true;
-		else
-			return false;
+		return($response ? true : false);
 	}
 }
 ?>
