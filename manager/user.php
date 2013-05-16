@@ -85,12 +85,12 @@ class QueriesItem extends FormItem {
 				restrictcheckbox = $(restrictcheckbox);
 				if (checkbox.checked)
 						restrictcheckbox.checked = false;
-				var checks = new Array();
+				var checks = [];
 				$("checks").descendants().each(function(e) {
 					if (e.checked)
 						checks.push(e.value);
 				});		
-				$("'.$n.'").value = checks.toJSON();
+				$("'.$n.'").value = Object.toJSON(checks);
 			}';
 	}
 }
