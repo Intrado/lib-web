@@ -10,6 +10,8 @@
  * Note that this is an ACCESSOR class for an existing session data model and
  * does not itself create or destroy sessions (at this time). We could move all
  * our session management code into here...
+ *
+ * see: UNITTEST/PHPUnit/application/SessionTest.php
 */
 class Session extends Object {
 

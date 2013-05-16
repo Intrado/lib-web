@@ -8,8 +8,10 @@
  * Please expand as needed/useful; this shouldn't end up being a library of
  * miscellaneous functionality, but rather things that are specific to debug and
  * support of the application and which have broad reaching significance.
+ *
+ * see: UNITTEST/PHPUnit/application/ObjectTest.php
  */
-class Object {
+abstract class Object {
 
 	private $classname = '';
 

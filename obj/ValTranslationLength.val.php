@@ -1,6 +1,10 @@
 <?
 
-/* Specialize version of ValLengh for translation purposes*/
+/**
+ * Specialized version of ValLengh for translation purposes
+ *
+ * see: UNITTEST/PHPUnit/application/ValTranslationLengthTest.php
+ */
 class ValTranslationLength extends Validator {
 	function validate ($value, $args) {
 		if (mb_strlen($value) > 5000)

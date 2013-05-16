@@ -28,6 +28,9 @@ class SessionTest extends PHPUnit_Framework_TestCase {
 		try {
 			// This should cause an exception accessing an undefined key
 			$tmp = $sess->get($key);
+
+			// FAIL: We should have thrown an exception above and not gotten here
+			$this->assertFalse(true);
 		}
 		catch (Exception $ex) {
 			// If we can catch it, then we're good!
@@ -53,6 +56,9 @@ class SessionTest extends PHPUnit_Framework_TestCase {
 		try {
 			// This should cause an exception accessing an undefined key
 			$tmp = $sess->get($key);
+
+			// FAIL: We should have thrown an exception above and not gotten here
+			$this->assertFalse(true);
 		}
 		catch (Exception $ex) {
 			// If we can catch it, then we're good!
