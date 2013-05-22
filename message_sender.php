@@ -897,7 +897,7 @@ include("nav.inc.php");
 // Load Custom Form Validators
 ?>
 
-<iframe id="messagesender_frame" src="messagesender.php" width="100%" height="100%"></iframe>
+<iframe id="messagesender_frame" src="messagesender.php" width="100%" height="1000px"></iframe>
 
 <?
 
