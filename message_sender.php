@@ -1053,6 +1053,7 @@ class MessageSenderProcessor {
 		$messagegroup->userid = $USER->id;
 		if (isset($postdata["optionsavemessage"]) && $postdata["optionsavemessage"]) {
 			$messagegroup->name = $postdata["optionsavemessagename"];
+			$messagegroup->permanent = 1;
 			$messagegroup->deleted = 0;
 		} else {
 			$messagegroup->name = $job->name;
