@@ -11,8 +11,7 @@ class TwitterAuth extends FormItem {
 		
 		$n = $this->form->name."_".$this->name;
 
-		$sess = new Session();
-		$twitter = new Twitter($USER->getSetting("tw_access_token", false), $sess);
+		$twitter = new Twitter($USER->getSetting("tw_access_token", false));
 		$validToken = $twitter->hasValidAccessToken();
 
 
@@ -70,7 +69,6 @@ class TwitterAuth extends FormItem {
 			function twLoadUserData(element) {
 				element = $(element);
 				element.update(new Element("img", { src: "img/ajax-loader.gif" }));
-
 				new Ajax.Request("ajaxtwitter.php", {
 					method:"get",
 					parameters: {
@@ -79,21 +77,17 @@ class TwitterAuth extends FormItem {
 					onSuccess: function(r) {
 						var data = r.responseJSON;
 						if (data) {
-							var e = new Element("div").insert(
-									new Element("div").setStyle({ float: "left" }).insert(
-										new Element("img", { 
-											src: data.profile_image_url_https,
-											width: "48",
-											height: "48" })
-									)
-								).insert(
-									new Element("div").setStyle({ float: "left", padding: "7px" }).insert(
-										new Element("div").setStyle({ "fontWeight": "bold" }).update(data.screen_name.escapeHTML())
-									).insert(
-										new Element("div").setStyle({ color: "grey" }).update(data.name.escapeHTML())
-									)
-								);
-							
+							var profile_image = new Element("img", { 
+								src: data.profile_image_url_https,
+								width: "48",
+								height: "48"
+							})
+							var profile_image_box = new Element("div").setStyle({ float: "left" }).insert(profile_image);
+							var e = new Element("div").insert(profile_image_box);
+							var screen_name = new Element("div").setStyle({ "fontWeight": "bold" }).update(data.screen_name.escapeHTML());
+							var name = new Element("div").setStyle({ color: "grey" }).update(data.name.escapeHTML());
+							var profile_box = new Element("div").setStyle({ float: "left", padding: "7px" }).insert(screen_name).insert(name);
+							e.insert(profile_box);
 							element.update(e);
 						} else {
 							element.update();

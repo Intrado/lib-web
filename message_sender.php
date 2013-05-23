@@ -19,8 +19,6 @@ require_once("inc/twitteroauth/OAuth.php");
 require_once("inc/twitteroauth/twitteroauth.php");
 require_once("obj/RenderedList.obj.php");
 require_once("obj/ListForm.obj.php");
-require_once("obj/Object.obj.php");
-require_once("obj/Session.obj.php");
 require_once("obj/Twitter.obj.php");
 require_once("inc/help.inc.php");
 
@@ -928,11 +926,6 @@ class MessageSenderProcessor {
 		$job->userid = $USER->id;
 		$job->jobtypeid = $postdata["jobtype"];
 		$job->name = removeIllegalXmlChars($postdata["name"]);
-
-		// If the broadcast "subject" starts with "test mode" we can activate test mode that way
-		if (preg_match('/^test mode/', $postdata['name'])) {
-			$this->test_mode = true;
-		}
 
 		$job->description = "Created with MessageSender";
 

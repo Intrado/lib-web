@@ -22,8 +22,6 @@ require_once("inc/facebook.inc.php");
 require_once("obj/TwitterAuth.fi.php");
 require_once("inc/twitteroauth/OAuth.php");
 require_once("inc/twitteroauth/twitteroauth.php");
-require_once('obj/Object.obj.php');
-require_once('obj/Session.obj.php');
 require_once("obj/Twitter.obj.php");
 require_once("obj/CallerID.fi.php");
 require_once("obj/ValTimeWindowCallEarly.val.php");
@@ -58,8 +56,7 @@ if ($checkpassword) {
 
 // if oauth_token is set, this is a redirect back from twitter authorization
 if (isset($_GET['oauth_token']) && isset($_GET['oauth_verifier']) && isset($_SESSION['twitterRequestToken'])) {
-	$sess = new Session();
-	$twitter = new Twitter($_SESSION['twitterRequestToken']['oauth_token'], $sess);
+	$twitter = new Twitter($_SESSION['twitterRequestToken']['oauth_token']);
 	$twAccessToken = $twitter->getAccessToken($_GET['oauth_verifier']);
 	$USER->setSetting("tw_access_token", json_encode($twAccessToken));
 	unset($_SESSION['twitterRequestToken']);

@@ -3,8 +3,6 @@
 require_once("inc/common.inc.php");
 require_once("inc/twitteroauth/OAuth.php");
 require_once("inc/twitteroauth/twitteroauth.php");
-require_once("obj/Object.obj.php");
-require_once("obj/Session.obj.php");
 require_once("obj/Twitter.obj.php");
 
 global $SETTINGS;
@@ -21,8 +19,7 @@ if (!isset($_GET['type']) && !isset($_POST['type']))
 $type = isset($_GET['type'])?$_GET['type']:$_POST['type'];
 
 // get twitter connection
-$sess = new Session();
-$twitter = new Twitter($USER->getSetting("tw_access_token", false), $sess);
+$twitter = new Twitter($USER->getSetting("tw_access_token", false));
 
 $twitter->decode_json = false;
 
