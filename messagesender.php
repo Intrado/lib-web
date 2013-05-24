@@ -171,8 +171,6 @@ class ValConditionalOnValue extends Validator
     }
 }
 
-// End copy-paste from message_sender.php
-
 ?>
 
 <!doctype html>
@@ -189,82 +187,6 @@ class ValConditionalOnValue extends Validator
     <link rel="stylesheet" href="messagesender/stylesheets/app.css">
     <script type="text/javascript" src="messagesender/javascripts/vendor.js"></script>
     <script type="text/javascript" src="messagesender/javascripts/app.js"></script>
-
-
-    <script type="text/javascript">
-        // load required validators into document.validators
-
-        <? Validator::load_validators(array("ValCallerID", "ValConditionalOnValue", "ValConditionallyRequired", "ValDate", "ValDomain", "ValDomainList", "ValDuplicateNameCheck", "ValEasycall", "ValEmail", "ValEmailAttach", "ValEmailList", "ValFacebookPage", "ValFieldConfirmation", "ValHasMessage", "ValInArray", "ValLength", "ValLists", "ValMessageBody", "ValMessageGroup", "ValMessageTypeSelect", "ValNumber", "ValNumeric", "ValPhone", "ValRequired", "ValSmsText", "ValTextAreaAndSubjectWithCheckbox", "ValTimeCheck", "ValTimePassed", "ValTimeWindowCallEarly", "ValTimeWindowCallLate", "ValTranslation", "ValTranslationCharacterLimit", "ValTtsText", "valPhone")); ?>
-    </script>
-
-    <script type="text/javascript">
-        (function () {
-            window.BOOTSTRAP_DATA = {};
-            var orgID = -1;
-            var languages, features, options, facebookPages, initUserResponse;
-
-            var fetch = function (url) {
-                return $.ajax({
-                    url:'api/2/organizations/' + orgID + url,
-                    type:'GET',
-                    dataType:'json'
-                });
-            };
-
-            var user = $.ajax({
-                url:'api/2/users/' + <?= $USER->id ?> +'?expansions=roles/jobtypes,roles/feedcategories,roles/callerids,preferences,tokens',
-                type:'GET',
-                dataType:'json'
-            });
-
-            user.done(function (userResponse) {
-                var roles = userResponse.roles[0];
-                var org = roles.organization;
-                orgID = org.id;
-
-                languages = fetch('/languages');
-                features = fetch('/settings/features');
-                options = fetch('/settings/options');
-                facebookPages = fetch('/settings/facebookpages');
-                formData = $.getJSON("message_sender.php?jsonformdata=true")
-
-                $.when(languages, features, options, facebookPages, formData)
-                    .done(function (languagesRes, featuresRes, optionsRes, facebookPagesRes, formData) {
-                        org.languages = languagesRes[0].languages;
-                        org.settings = {
-                            features:featuresRes[0].features,
-                            options:optionsRes[0].options,
-                            facebookpages:facebookPagesRes[0].facebookPages,
-                            facebookAppID:  <?= $SETTINGS['facebook']['appid'] ?>
-                        }
-                        window.BOOTSTRAP_DATA.user = userResponse;
-
-                        window.BOOTSTRAP_DATA.form = {
-                            template: {
-                                // get template settings (if loading from template, they will be set in session data)
-                                subject: <?echo (isset($_SESSION['message_sender']['template']['subject'])?("'". str_replace("'", "\'", $_SESSION['message_sender']['template']['subject']). "'"):"''")?>,
-                                lists: <?echo (isset($_SESSION['message_sender']['template']['lists'])?$_SESSION['message_sender']['template']['lists']:'[]')?>,
-                                jtid: <?echo (isset($_SESSION['message_sender']['template']['jobtypeid'])?$_SESSION['message_sender']['template']['jobtypeid']:0)?>,
-                                mgid: <?echo (isset($_SESSION['message_sender']['template']['messagegroupid'])?$_SESSION['message_sender']['template']['messagegroupid']:0)?>
-
-                            },
-                            snum:formData[0].snum,
-                            schema:formData[0].formdata,
-                            name:"msgsndr",
-                            url:window.location.protocol + "//" + window.location.host + "/" + window.location.pathname.split('/')[1] + "/message_sender.php",
-                            validators:document.validators
-                        };
-
-                        window.require('initialize');
-                    });
-            });
-
-            user.fail(function (userResponse) {
-                console.log('error creating bootstrap data:', userResponse);
-            });
-
-        })();
-    </script>
 </head>
 <body class="newui" id="ms">
 <div id="messagesender-shell"></div>
@@ -278,6 +200,78 @@ class ValConditionalOnValue extends Validator
 <script type="text/javascript" src="script/rcieditor.js"></script>
 <script type="text/javascript" src="script/speller/spellChecker.js"></script>
 <script type="text/javascript" src="script/niftyplayer.js.php"></script>
+
+<script type="text/javascript">
+	$(function () {
+		window.BOOTSTRAP_DATA = {};
+		var orgID = -1;
+		var languages, features, options, facebookPages, initUserResponse;
+
+		var fetch = function (url) {
+			return $.ajax({
+				url:'api/2/organizations/' + orgID + url,
+				type:'GET',
+				dataType:'json'
+			});
+		};
+
+		var user = $.ajax({
+			url:'api/2/users/' + <?= $USER->id ?> +'?expansions=roles/jobtypes,roles/feedcategories,roles/callerids,preferences,tokens',
+			type:'GET',
+			dataType:'json'
+		});
+
+		user.done(function (userResponse) {
+			var roles = userResponse.roles[0];
+			var org = roles.organization;
+			orgID = org.id;
+
+			languages = fetch('/languages');
+			features = fetch('/settings/features');
+			options = fetch('/settings/options');
+			facebookPages = fetch('/settings/facebookpages');
+			formData = $.getJSON("message_sender.php?jsonformdata=true")
+
+			$.when(languages, features, options, facebookPages, formData)
+				.done(function (languagesRes, featuresRes, optionsRes, facebookPagesRes, formData) {
+					org.languages = languagesRes[0].languages;
+					org.settings = {
+						features:featuresRes[0].features,
+						options:optionsRes[0].options,
+						facebookpages:facebookPagesRes[0].facebookPages,
+						facebookAppID:  <?= $SETTINGS['facebook']['appid'] ?>
+					}
+					window.BOOTSTRAP_DATA.user = userResponse;
+
+					window.BOOTSTRAP_DATA.form = {
+						template: {
+							// get template settings (if loading from template, they will be set in session data)
+							subject: <?echo (isset($_SESSION['message_sender']['template']['subject'])?("'". str_replace("'", "\'", $_SESSION['message_sender']['template']['subject']). "'"):"''")?>,
+							lists: <?echo (isset($_SESSION['message_sender']['template']['lists'])?$_SESSION['message_sender']['template']['lists']:'[]')?>,
+							jtid: <?echo (isset($_SESSION['message_sender']['template']['jobtypeid'])?$_SESSION['message_sender']['template']['jobtypeid']:0)?>,
+							mgid: <?echo (isset($_SESSION['message_sender']['template']['messagegroupid'])?$_SESSION['message_sender']['template']['messagegroupid']:0)?>
+
+						},
+						snum:formData[0].snum,
+						schema:formData[0].formdata,
+						name:"msgsndr",
+						url:window.location.protocol + "//" + window.location.host + "/" + window.location.pathname.split('/')[1] + "/message_sender.php",
+						validators:document.validators
+					};
+
+					window.require('initialize');
+				});
+		});
+
+		user.fail(function (userResponse) {
+			console.log('error creating bootstrap data:', userResponse);
+		});
+
+		// load required validators into document.validators
+		<? Validator::load_validators(array("ValCallerID", "ValConditionalOnValue", "ValConditionallyRequired", "ValDate", "ValDomain", "ValDomainList", "ValDuplicateNameCheck", "ValEasycall", "ValEmail", "ValEmailAttach", "ValEmailList", "ValFacebookPage", "ValFieldConfirmation", "ValHasMessage", "ValInArray", "ValLength", "ValLists", "ValMessageBody", "ValMessageGroup", "ValMessageTypeSelect", "ValNumber", "ValNumeric", "ValPhone", "ValRequired", "ValSmsText", "ValTextAreaAndSubjectWithCheckbox", "ValTimeCheck", "ValTimePassed", "ValTimeWindowCallEarly", "ValTimeWindowCallLate", "ValTranslation", "ValTranslationCharacterLimit", "ValTtsText", "valPhone")); ?>
+	});
+	
+</script>
 
 </body>
 </html>
