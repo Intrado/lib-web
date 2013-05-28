@@ -205,6 +205,7 @@ class ValConditionalOnValue extends Validator
 	$(function () {
 		window.BOOTSTRAP_DATA = {};
 		var orgID = -1;
+        var userBaseUrl = 'api/2/users/' + <?= $USER->id ?>;
 		var languages, features, options, facebookPages, initUserResponse;
 
 		var fetch = function (url) {
@@ -216,7 +217,7 @@ class ValConditionalOnValue extends Validator
 		};
 
 		var user = $.ajax({
-			url:'api/2/users/' + <?= $USER->id ?> +'?expansions=roles/jobtypes,roles/feedcategories,roles/callerids,preferences,tokens',
+			url: userBaseUrl +'?expansions=roles/jobtypes,roles/feedcategories,roles/callerids,preferences,tokens',
 			type:'GET',
 			dataType:'json'
 		});
@@ -230,10 +231,11 @@ class ValConditionalOnValue extends Validator
 			features = fetch('/settings/features');
 			options = fetch('/settings/options');
 			facebookPages = fetch('/settings/facebookpages');
-			formData = $.getJSON("message_sender.php?jsonformdata=true")
+            fieldmaps = $.getJSON(userBaseUrl + '/roles/' + orgID + '/accessprofile/fieldmaps');
+			formData = $.getJSON("message_sender.php?jsonformdata=true");
 
-			$.when(languages, features, options, facebookPages, formData)
-				.done(function (languagesRes, featuresRes, optionsRes, facebookPagesRes, formData) {
+			$.when(languages, features, options, facebookPages, fieldmaps, formData)
+				.done(function (languagesRes, featuresRes, optionsRes, facebookPagesRes, fieldmaps, formData) {
 					org.languages = languagesRes[0].languages;
 					org.settings = {
 						features:featuresRes[0].features,
@@ -241,6 +243,7 @@ class ValConditionalOnValue extends Validator
 						facebookpages:facebookPagesRes[0].facebookPages,
 						facebookAppID:  <?= $SETTINGS['facebook']['appid'] ?>
 					}
+                    roles.accessProfile['fieldmaps'] = fieldmaps[0];
 					window.BOOTSTRAP_DATA.user = userResponse;
 
 					window.BOOTSTRAP_DATA.form = {
