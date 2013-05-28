@@ -262,7 +262,7 @@ class ValConditionalOnValue extends Validator
 						validators:document.validators
 					};
 
-					window.require('initialize');
+					window.globals.require('initialize');
 				});
 		});
 
