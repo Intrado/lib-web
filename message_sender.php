@@ -839,7 +839,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		Query("BEGIN");
 
 		// Get a Message Sender Processor
-		$msp = new MessageSenderProcessor();
+		$msp = new MessageSenderProcessor($displayingCallerid, $ttslanguages, $translationlanguages);
 
 		// The post handler will return a job that's ready to use if all went to plan
 		$postdata = $form->getData();
@@ -849,7 +849,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$msp->set_test_mode(true);
 		}
 
-		$job = $msp->doPost($postdata, $displayingCallerid);
+		$job = $msp->doPost($postdata);
 		
 		// run the job
 		$job->runNow();
@@ -902,11 +902,20 @@ include("nav.inc.php");
 include("navbottom.inc.php");
 
 class MessageSenderProcessor {
+	private $displayingCallerid;
+	private $ttslanguages;
+	private $translationlanguages;
 
 	// If test_mode is true then we can change our behavior to support
 	// some type of output verbosity for test automation to see the result 
 	private $test_mode = false;
 
+	function MessageSenderProcessor($dispCallerId, $ttsLangs, $translationLangs) {
+		$this->displayingCallerid = $dispCallerId;
+		$this->ttslanguages = $ttsLangs;
+		$this->translationlanguages = $translationLangs;
+	}
+	
 	public function set_test_mode($mode) {
 		if (is_bool($mode)) $this->test_mode = $mode;
 	}
@@ -915,7 +924,7 @@ class MessageSenderProcessor {
 		return($this->test_mode);
 	}
 
-	public function doPost($postdata, $displayingCallerid) {
+	public function doPost($postdata) {
 		global $USER;
 
 		// =============================================================
@@ -956,7 +965,7 @@ class MessageSenderProcessor {
 		$job->setSetting("skipemailduplicates", (isset($postdata["optionskipduplicate"]) && $postdata["optionskipduplicate"])?1:0);
 
 		// set jobsetting 'callerid'
-		if ($displayingCallerid && $postdata["optioncallerid"])
+		if ($this->displayingCallerid && $postdata["optioncallerid"])
 			$job->setSetting('callerid', $postdata["optioncallerid"]);
 
 		$job->update();
@@ -1141,7 +1150,7 @@ class MessageSenderProcessor {
 						$messages['post']['voice']['en']['none'] = $messages['phone']['voice']['en']['none'];
 						
 					// check for and retrieve translations
-					foreach ($ttslanguages as $code => $language) {
+					foreach ($this->ttslanguages as $code => $language) {
 						if (isset($postdata["phonemessagetexttranslate". $code. "text"]))
 							$translatedmessage = json_decode($postdata["phonemessagetexttranslate". $code. "text"], true);
 						if ($translatedmessage["enabled"]) {
@@ -1174,7 +1183,7 @@ class MessageSenderProcessor {
 				
 			// check for and retrieve translations
 			if (isset($postdata["emailmessagetexttranslate"]) && $postdata["emailmessagetexttranslate"]) {
-				foreach ($translationlanguages as $code => $language) {
+				foreach ($this->translationlanguages as $code => $language) {
 					if (isset($postdata["emailmessagetexttranslate". $code. "text"])) {
 						$translatedmessage = json_decode($postdata["emailmessagetexttranslate". $code. "text"], true);
 						if ($translatedmessage["enabled"]) {
