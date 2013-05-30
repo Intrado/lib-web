@@ -42,12 +42,23 @@ $queryid = isset($_SESSION['queryid'])?$_SESSION['queryid']:false;
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
 
-
+// If a query ID was specified
 if ($queryid) {
+	// Load up the query we want
 	$managerquery = DBFind("AspAdminQuery", "from aspadminquery where id=?",false,array($queryid));
 } else {
+	// Otherwise we're going to create a new query, so start a blank one
 	$managerquery = new AspAdminQuery();
 }
+
+// Get the product filter options
+$res = Query("select distinct `product` from `customerproduct`;");
+$prodlist = array( 'any' => 'any');
+while ($row = DBGetRow($res)) $prodlist[$row[0]] = $row[0];
+// Now $prodlist = [Array ( ['any'] => 'any' ['cs'] => 'cs' ['tai'] => 'tai' ) ]
+
+// Determine which product filter option will be selected in the form
+$prodfilterselect = (strlen($tmp = $managerquery->getProductFilter())) ? $tmp : 'any';
 
 $helpstepnum = 1;
 $helpsteps = array("TODO");
@@ -118,6 +129,17 @@ $formdata["usemaster"] = array(
 	"helpstep" => $helpstepnum
 );
 
+$formdata["prodfilter"] = array(
+	"label" => _L('Product Filter'),
+	"value" => $prodfilterselect,
+	"validators" => array(
+		array("ValRequired")
+	),
+	"control" => array("SelectMenu","values" => $prodlist),
+	"helpstep" => $helpstepnum
+);
+
+
 
 $buttons = array(submit_button(_L('Save'),"submit","tick"),
 				icon_button(_L('Cancel'),"cross",null,"querylist.php"));
@@ -148,7 +170,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$managerquery->notes = $postdata["notes"];
 		$managerquery->query = $postdata["query"];
 		$managerquery->numargs = $postdata["numargs"];
-		
+
 		if ($postdata["singlecustomer"])
 			$managerquery->setOption("singlecustomer");
 		else
@@ -158,12 +180,31 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$managerquery->setOption("usemaster");
 		else
 			$managerquery->unsetOption("usemaster");
-		
+
+		// Is the product filter anything other than 'any'?
+		if ($postdata["prodfilter"] != 'any') {
+
+			// Is the requested product filter legitimate?
+			if (isset($prodlist[$postdata["prodfilter"]])) {
+
+				// Set the requested product filter
+				$managerquery->setProductFilter($postdata["prodfilter"]);
+			}
+			else {
+				// Otherwise ensure that none is set
+				$managerquery->unsetProductFilter();
+			}
+		}
+		else {
+			// Otherwise ensure that none is set
+			$managerquery->unsetProductFilter();
+		}
+
 		if ($queryid)
 			$managerquery->update();
 		else
 			$managerquery->create();
-		
+
 		Query("COMMIT");
 		if ($ajax)
 			$form->sendTo("querylist.php");
