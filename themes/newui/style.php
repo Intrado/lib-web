@@ -663,6 +663,7 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
 .easycallerrorcontainer span.easycallerrortext { margin: 0 5px 0 0; font-size: 14px; line-height: 18px; font-weight: bold; }
 .easycallerrorcontainer { background: #ec4848; width: 96%; margin: 5px 0 0; padding: 5px 8px; font-size: 1em; color: #fff; -webkit-border-radius: 5px; border-radius: 5px; }
 .easycallpreviewcontainer { margin-bottom: 5px }
+#msgsndr_recording_preview .modal_content { text-align: center; }
 
 /*----- list picker styles, taken from mockup -----*/
 

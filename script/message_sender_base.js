@@ -169,6 +169,28 @@ jQuery.noConflict();
 		$(".btn_discard", "[id^=msgsndr_tab_]").removeAttr("disabled");
 	});
 
+	$("#msgsndr_phonemessagecallme").on("easycall:preview", function(event, data) {
+		var previewModal = $('#msgsndr_recording_preview');
+		previewModal.find('#msgsndr_recording_message').html(
+			"<object width=\"165\" height=\"38\" align=\"\" class=\"niftyPlayer\" " +
+					"codebase=\"https://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=8,0,0,0\" " +
+					"classid=\"clsid:D27CDB6E-AE6D-11cf-96B8-444553540000\">" +
+				"<param value=\"../media/niftyplayer.swf?file=../audio.wav.php/mediaplayer_preview.wav?id=" + data.recordingId + "&as=1\" name=\"movie\">" +
+				"<param value=\"high\" name=\"quality\">" +
+				"<param value=\"#FFFFFF\" name=\"bgcolor\">" +
+				"<embed width=\"165\" height=\"38\" align=\"\" pluginspage=\"https://get.adobe.com/flashplayer\" " +
+					"type=\"application/x-shockwave-flash\" name=\"niftyPlayer\" bgcolor=\"#FFFFFF\" quality=\"high\" " +
+					"src=\"media/niftyplayer.swf?file=audio.wav.php/mediaplayer_preview.wav?id=" + data.recordingId + "&as=1\">" +
+			"</object>" +
+			"<div class=\"download_audio_button_container\">" +
+				"<a class=\"btn\" type=\"button\" href=\"audio.wav.php/download_preview.wav?id=" + data.recordingId + "&download=true\">" +
+					"Download " + data.language + " Audio File &nbsp;<i class=\"icon-download-alt\"></i>" +
+				"</a>" +
+			"</div>"
+		);
+		previewModal.modal('show');
+	});
+
 	$(function() {
 		// hide a few items
 		$('.close, .facebook, .twitter, .feed, .error, div[id^="msgsndr_tab"]').hide();
@@ -508,7 +530,7 @@ jQuery.noConflict();
 		obj_valManager.runValidateEventDriven("msgsndr_scheduledate");
 
 		// modal windows -- script/bootstrap-modal.js
-		$('#msgsndr_choose_list, #msgsndr_build_list, #msgsndr_saved_message, #schedule_options, #msgsndr_submit_confirmation, #msgsndr_loading_saved_message').modal({
+		$('#msgsndr_choose_list, #msgsndr_build_list, #msgsndr_saved_message, #schedule_options, #msgsndr_submit_confirmation, #msgsndr_loading_saved_message, #msgsndr_recording_preview').modal({
 			show : false
 		});
 

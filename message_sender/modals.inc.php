@@ -90,3 +90,14 @@
 		<button id="msgsndr_submit_confirmbutton" class="btn-primary" data-dismiss="modal">Ok</button>
 	</div>
 </div>
+
+<!-- preview audio recording modal -->
+<div id="msgsndr_recording_preview" class="modal hide">
+	<div class="modal-header"></div>
+	<div class="modal_content">
+		<p id="msgsndr_recording_message"></p>
+	</div>
+	<div class="modal-footer">
+		<button id="msgsndr_recording_confirmbutton" class="btn-primary" data-dismiss="modal">Close</button>
+	</div>
+</div>
