@@ -15,9 +15,9 @@ $allowOldMessageSender = getSystemSetting('_allowoldmessagesender', false);
 $userOldMessageSender = $USER->getSetting('_allowoldmessagesender', false);
 
 if ($allowOldMessageSender && $userOldMessageSender) {
-	$redirectUrl = 'message_sender.php';
+	$redirectUrl = 'message_sender_old.php';
 } else {
-	$redirectUrl = 'messagesender.php';
+	$redirectUrl = 'message_sender.php';
 }
 
 $queryString = (isset($_SERVER['QUERY_STRING']) && $_SERVER['QUERY_STRING']) ? "?" . $_SERVER['QUERY_STRING'] : "";

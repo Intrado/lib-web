@@ -893,7 +893,7 @@
                 	if (url.indexOf("index.php") >= 0) {
                 		iframe.addClass("hide");
                 		alert('Your session has expired. Please log in again to continue.');
-                		window.location = "message_sender.php";
+                		window.location = "message_sender_old.php";
                 	}
                 };
                 
@@ -964,7 +964,7 @@
                    	if (url.indexOf("index.php") >= 0) {
                 		iframe.addClass("hide");
                 		alert('Your session has expired. Please log in again to continue.');
-                		window.location = "message_sender.php";
+                		window.location = "message_sender_old.php";
                 	}
                    	
                    	if (url.indexOf("uploadlist.php?iframe=true") >= 0) {
@@ -1033,7 +1033,7 @@
                 	if (url.indexOf("index.php") >= 0) {
                 		iframe.addClass("hide");
                 		alert('Your session has expired. Please log in again to continue.');
-                		window.location = "message_sender.php";
+                		window.location = "message_sender_old.php";
                 	}
                 };
                 

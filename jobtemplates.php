@@ -135,7 +135,7 @@ if($isajax === true) {
 			);
 			
 			$actionlinks = array(
-				action_link(_L("New %s",getJobTitle()), "add", 'message_sender.php?template=true&' . http_build_query($templateoptions)),
+				action_link(_L("New %s",getJobTitle()), "add", 'newbroadcast.php?template=true&' . http_build_query($templateoptions)),
 				action_link(_L("Edit"), "pencil", 'jobtemplate.php?id=' . $jobid)
 			);
 			

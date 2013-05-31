@@ -705,7 +705,7 @@ include_once("nav.inc.php");
 				}
 				if($hasnewjob) {
 					if ($THEME == 'newui') { 
-					?> <div class="newjob"><a href="message_sender.php">New Notification</a></div> <?
+					?> <div class="newjob"><a href="newbroadcast.php">New Notification</a></div> <?
 					} else {
 					?> <div class="newjob"><a href="jobwizard.php?new&amp;jobtype=normal">New Notification</a></div> <?	
 					}
