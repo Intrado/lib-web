@@ -42,7 +42,7 @@ function contentGet ($cmid, $base64 = false) {
 
 function contentGetForCustomerId ($customerid, $contentid) {
 	$filedata = commsuite_contentGetForCustomerId($customerid, $contentid);
-	return array($filedata->contenttype, $filedata->data);
+	return(is_object($filedata) ? array($filedata->contenttype, $filedata->data) : array(null, null));
 }
 
 // TODO: refactor to use appserver API at some point

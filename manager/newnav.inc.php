@@ -245,7 +245,7 @@ function doNavTabs ($navtree) {
 		if ($maintab[2] == NULL || $MANAGERUSER->authorized($maintab[2])) {
 			//do the subtabs first, if there are any
 			$maintablink = false;
-			foreach ($maintab[4] as $subtab) {
+			if (is_array($maintab[4]) && count($maintab[4])) foreach ($maintab[4] as $subtab) {
 				if ($subtab[2] == NULL || $MANAGERUSER->authorized($subtab[2])) {
 					//set the maintablink to the first enabled subtab's link
 					if ($maintablink === false)

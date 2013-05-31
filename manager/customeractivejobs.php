@@ -66,7 +66,6 @@ foreach ($shards as $shardid => $sharddb) {
 			group by jt.status, jt.customerid, jt.jobid, jt.attempts, jt.sequence
 			order by j.systempriority, j.customerid, j.id, jt.attempts, jt.sequence
 			";
-error_log($query);
 	$res = Query($query,$sharddb,$extraargs);
 	while ($row = DBGetRow($res)) {
 
