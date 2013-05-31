@@ -296,8 +296,9 @@ border-color: transparent transparent transparent #222; border-width: 27px; bord
   background-image:     -ms-linear-gradient(top, #E84F1F, #A93611); 
   background-image:      -o-linear-gradient(top, #E84F1F, #A93611); 
   background-image:         linear-gradient(top, #E84F1F, #A93611); }
+.window_panel .record.btn { float: none; }
 .window_panel .record:hover { background: #a93611; color: #fff; }
-.window_panel .record span.icon, .call-progress span.icon { background: url(themes/newui/record.png) 0 center no-repeat; margin: 2px 3px 0 0; }
+.window_panel .record i.icon-white, .call-progress span.icon { background: url(themes/newui/record.png) 0 center no-repeat; margin: 2px 3px 0 0; }
 .window_panel .audioleft { border-radius: 5px 0 0 5px; margin: 0; }
 .window_panel .audioright { border-radius: 0 5px 5px 0; margin-left: -1px; }
 
@@ -661,6 +662,7 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
 .easycallerrorcontainer { /*padding: 2px; background: pink;*/ }
 .easycallerrorcontainer span.easycallerrortext { margin: 0 5px 0 0; font-size: 14px; line-height: 18px; font-weight: bold; }
 .easycallerrorcontainer { background: #ec4848; width: 96%; margin: 5px 0 0; padding: 5px 8px; font-size: 1em; color: #fff; -webkit-border-radius: 5px; border-radius: 5px; }
+.easycallpreviewcontainer { margin-bottom: 5px }
 
 /*----- list picker styles, taken from mockup -----*/
 
@@ -842,6 +844,7 @@ li.notactive { display: none; }
 .window_panel textarea:focus { border: 1px solid #58acef; outline: 0px; box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(82, 168, 236, 0.6); }
 .window_panel label { float: left; display: inline; width: 140px; margin: 0 10px 0 0; padding: 6px 0; font-size: 14px; line-height: 18px; text-align: right; }
 .window_panel input.small { float: left; width: 135px; }
+.window_panel input.easycallphoneinput { width: 135px; }
 .window_panel textarea { /*max-width: 300px; min-width: 300px;*/ width: 96%; min-height: 100px; }
 .window_panel select { font-size: 14px; padding: 4px 5px; }
 .window_panel option { width: 300px; }

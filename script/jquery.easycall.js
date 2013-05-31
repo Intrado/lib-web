@@ -153,10 +153,9 @@
                     }
                 });
                 var prependSpan = $('<span />', {'class':'add-on'});
-                //prependSpan.append($('<span class="phone-icon"></span>'));
-                prependSpan.append($('<img />', {'src':'themes/newui/phone.png'}));
+                prependSpan.append($('<span class="phone-icon"></span>'));
                 // button to start the calling session
-                var callbutton = $('<button />', { "class":"btn btn-success", "value":"Call Now to Record"});
+                var callbutton = $('<button />', { "class":"record btn btn-success", "value":"Call Now to Record"});
                 callbutton.append($('<i />', { "class":"icon-hand-left icon-white" })).append(" &nbsp;Call Now to Record");
 
                 if (hasmenu) {
@@ -241,7 +240,7 @@
                 var $this = $(this);
 
                 var container = $('<div />', { "class":"easycallprogresscontainer"});
-                var languagetitle = $('<div />', { "class":"easycalllanguagetitlewhite", "text":$this.data('easyCall').languages[code] });
+                var languagetitle = $('<div />', { "class":"easycalllanguagetitle", "text":$this.data('easyCall').languages[code] });
                 var progresstext = $('<div />', { "class":"call-progress" });
                 progresstext.append($('<span />', { "class":"icon" })).append($('<span />', { "class":"easycallprogresstext" }))
 
