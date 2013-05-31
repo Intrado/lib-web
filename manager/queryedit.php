@@ -52,9 +52,13 @@ if ($queryid) {
 }
 
 // Get the product filter options
+// TODO: If the following table scan causes problems, do something
+// else... (low row count for now should be fine though)
 $res = Query("select distinct `product` from `customerproduct`;");
 $prodlist = array( 'any' => 'any');
-while ($row = DBGetRow($res)) $prodlist[$row[0]] = $row[0];
+while ($row = DBGetRow($res)) {
+	$prodlist[$row[0]] = $row[0];
+}
 // Now $prodlist = [Array ( ['any'] => 'any' ['cs'] => 'cs' ['tai'] => 'tai' ) ]
 
 // Determine which product filter option will be selected in the form
@@ -133,7 +137,8 @@ $formdata["prodfilter"] = array(
 	"label" => _L('Product Filter'),
 	"value" => $prodfilterselect,
 	"validators" => array(
-		array("ValRequired")
+		array("ValRequired"),
+		array("ValInArray", "values" => $prodlist)
 	),
 	"control" => array("SelectMenu","values" => $prodlist),
 	"helpstep" => $helpstepnum
@@ -184,16 +189,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		// Is the product filter anything other than 'any'?
 		if ($postdata["prodfilter"] != 'any') {
 
-			// Is the requested product filter legitimate?
-			if (isset($prodlist[$postdata["prodfilter"]])) {
-
-				// Set the requested product filter
-				$managerquery->setProductFilter($postdata["prodfilter"]);
-			}
-			else {
-				// Otherwise ensure that none is set
-				$managerquery->unsetProductFilter();
-			}
+			// Set the requested product filter
+			$managerquery->setProductFilter($postdata["prodfilter"]);
 		}
 		else {
 			// Otherwise ensure that none is set
