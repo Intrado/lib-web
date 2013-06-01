@@ -901,10 +901,11 @@ include("nav.inc.php");
 	(function($) {
 		// monitor the main content div for resize and send a message with this information
 		var lastHeight;
+		var msFrame = $('#messagesender_frame');
 		setInterval(function() {
-			// content_wrap has a bunch of extra padding...
-			var newHeight = $('#messagesender_frame').height();
+			var newHeight = (msFrame.contents().find('#messagesender-shell').height() + 16);
 			if (newHeight != lastHeight) {
+				msFrame.height(newHeight);
 				var msg = {};
 				msg["resize"] = lastHeight = newHeight;
 				top.postMessage(JSON.stringify(msg), '*');
