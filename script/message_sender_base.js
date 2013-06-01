@@ -180,11 +180,11 @@ jQuery.noConflict();
 				'<param value="#FFFFFF" name="bgcolor">' +
 				'<embed width="165" height="38" align="" pluginspage="https://get.adobe.com/flashplayer" ' +
 					'type="application/x-shockwave-flash" name="niftyPlayer" bgcolor="#FFFFFF" quality="high" ' +
-					'src="media/niftyplayer.swf?file=audio.wav.php/mediaplayer_preview.wav?id=' + data.recordingId + '&as=1" />' +
+					'src="media/niftyplayer.swf?file=audio.wav.php/mediaplayer_preview.wav?id=' + data.recordingId + '&as=1">' +
 			'</object>' +
 			'<div class="download_audio_button_container">' +
 				'<a class="btn" type="button" href="audio.wav.php/download_preview.wav?id=' + data.recordingId + '&download=true">' +
-					'Download ' + data.language + ' Audio File &nbsp;<i class="icon-download-alt"></i>' +
+					'Download ' + data.language + ' Audio File&nbsp;<i class="icon-download-alt"></i>' +
 				'</a>' +
 			'</div>'
 		);
