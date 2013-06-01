@@ -898,7 +898,7 @@ include("nav.inc.php");
 <iframe id="messagesender_frame" src="messagesender.php" width="100%" height="1000px" frameborder="0" scrolling="no"></iframe>
 
 <script type="text/javascript">
-	(function($) {
+	jQuery(function($) {
 		// monitor the main content div for resize and send a message with this information
 		var lastHeight;
 		var msFrame = $('#messagesender_frame');

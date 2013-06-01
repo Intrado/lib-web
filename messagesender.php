@@ -203,6 +203,14 @@ class ValConditionalOnValue extends Validator
 
 <script type="text/javascript">
 	$(function () {
+		
+		// initialize with a loading message
+		$('#messagesender-shell').html(
+			'<div class="loading">' +
+				'Loading, please wait...' +
+			'</div>'
+		);
+		
 		window.BOOTSTRAP_DATA = {};
 		var orgID = -1;
         var userBaseUrl = 'api/2/users/' + <?= $USER->id ?>;
