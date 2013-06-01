@@ -48,9 +48,8 @@
 
                 // load existing values from attached input
                 var elementval = $(element).val();
-                if (elementval == "")
-                    elementdata = {};
-                else
+				var elementdata = {};
+                if (elementval !== undefined && elementval !== null && elementval !== "" && elementval !== "undefined")
                     elementdata = $.secureEvalJSON(elementval);
                 $.each(elementdata, function (code) {
                     // do a sanity check, then stuff the value in the recordings list
