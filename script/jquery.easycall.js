@@ -189,32 +189,25 @@
                 return container;
             },
 
-            createPreviewContainer:function (languageCode) {
+            createPreviewContainer:function (code) {
                 var $this = $(this);
-                var language = $this.data('easyCall').languages[languageCode];
-                var recordingId = $this.data('easyCall').recording[languageCode];
+                var language = $this.data('easyCall').languages[code];
+                var recordingId = $this.data('easyCall').recording[code];
 
                 var container = $('<div />', { "class":"easycallpreviewcontainer"});
                 var btnGroupContainer = $('<div />', { "class":"btn-group"});
                 var languagetitle = $('<div />', { "class":"easycalllanguagetitle"});
                 languagetitle.append(' &nbsp;').append(language);
-                var previewbutton = $('<button />', { "class":"easycallpreviewbutton btn", "href":"#ctr_play_audio_modal", "data-language":language, "data-language":languageCode, "data-recordingId":recordingId, "data-toggle":"modal", "title":"Play audio of " + language + " language voice recording", "rel":"tooltip" });
+                var previewbutton = $('<button />', { "class":"easycallpreviewbutton btn", "href":"#ctr_play_audio_modal", "data-language":language, "data-language":code, "data-recordingId":recordingId, "data-toggle":"modal", "title":"Play audio of " + language + " language voice recording", "rel":"tooltip" });
                 previewbutton.html('<i class="icon-play"></i> &nbsp;Play Audio');
                 var removebutton = $('<button />', { "class":"easycallrerecordbutton btn" });
 
-                var flashPlayerContent = function () {
-                    return "<object width=\"165\" height=\"38\" align=\"\" class=\"niftyPlayer\" codebase=\"https://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=8,0,0,0\" classid=\"clsid:D27CDB6E-AE6D-11cf-96B8-444553540000\">\n    <param value=\"../media/niftyplayer.swf?file=../audio.wav.php/mediaplayer_preview.wav?id=" + recordingId + "&as=1\" name=\"movie\">\n    <param value=\"high\" name=\"quality\">\n    <param value=\"#FFFFFF\" name=\"bgcolor\">\n    <embed width=\"165\" height=\"38\" align=\"\" pluginspage=\"https://get.adobe.com/flashplayer\" type=\"application/x-shockwave-flash\" name=\"niftyPlayer\" bgcolor=\"#FFFFFF\" quality=\"high\" src=\"../media/niftyplayer.swf?file=../audio.wav.php/mediaplayer_preview.wav?id=" + recordingId + "&as=1\">\n</object>\n<div class=\"download_audio_button_container\">\n    <a class=\"btn\" type=\"button\" href=\"../audio.wav.php/download_preview.wav?id=" + recordingId + "&download=true\">Download " + language + " Audio File &nbsp;<i class=\"icon-download-alt\"></i></a>\n</div>";
-                };
-
                 previewbutton.on('click', function () {
-					$this.data('easyCall').element.trigger("easycall:preview", { recordingId: recordingId, languageCode: languageCode, language: language });
-					// FIXME: decouple this from the dom where possible by using the above event
-                    $('#ctr_modal_body').html(flashPlayerContent());
-                    $('.ctr_language').html(language);
+					$this.data('easyCall').element.trigger("easycall:preview", { recordingId: recordingId, languageCode: code, language: language });
                 });
 
 
-                if (languageCode == $this.data('easyCall').defaultcode)
+                if (code == $this.data('easyCall').defaultcode)
                     removebutton.attr({"title":"Re-record " + language + " language voice recording", "rel":"tooltip"}).append($('<i />', {"class":"icon-repeat"})).append(' &nbsp;').append($('<span />', { "text":"Re-record" }));
                 else
                     removebutton.attr({"title":"Remove " + language + " language voice recording", "rel":"tooltip"}).append($('<i />', {"class":"icon-trash"})).append(' &nbsp;').append($('<span />', { "text":"Remove" }));
@@ -229,7 +222,7 @@
                     // Confirm deletion of recording
                     var removerecording = confirm("Are you sure you want to delete this recording?");
                     if (removerecording)
-                        method.resetToCallMeContainer(languageCode);
+                        method.resetToCallMeContainer(code);
                 });
 
                 container.append(languagetitle).append(btnGroupContainer.append(previewbutton).append(removebutton)).append($('<div style="clear:both"/>'));
