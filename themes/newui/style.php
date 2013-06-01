@@ -1251,3 +1251,10 @@ div.progressbar div.progress {
     color: #FFFFFF;
     text-align: center;
 }
+
+iframe::-webkit-scrollbar {
+	display: none;
+}
+iframe.embedded {
+	overflow-y: hidden;
+}
