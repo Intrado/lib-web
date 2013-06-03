@@ -138,7 +138,7 @@ $formdata["prodfilter"] = array(
 	"value" => $prodfilterselect,
 	"validators" => array(
 		array("ValRequired"),
-		array("ValInArray", "values" => $prodlist)
+		array("ValInArray", "values" => array_keys($prodlist))
 	),
 	"control" => array("SelectMenu","values" => $prodlist),
 	"helpstep" => $helpstepnum
