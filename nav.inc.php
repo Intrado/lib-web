@@ -1,5 +1,9 @@
 <?
 
+// calculate the session warning timeout popup
+$SESSION_WARNING_TIME = isset($SETTINGS['feature']['session_warning_time']) ?
+	$SETTINGS['feature']['session_warning_time']*1000 : 1200000;
+
 if (isset($_GET['iframe'])) {
 	include_once("iframe.inc.php");
 	return;
@@ -14,9 +18,6 @@ list($MAINTAB,$SUBTAB) = explode(":",$PAGE);
 
 $FIRSTACTIVETABLINK = "";
 $ACTIVEMAINTABTITLE = "";
-
-$SESSION_WARNING_TIME = isset($SETTINGS['feature']['session_warning_time']) ? 
-	$SETTINGS['feature']['session_warning_time']*1000 : 1200000;
 
 $SHORTCUTS = array();
 

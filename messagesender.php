@@ -1,5 +1,4 @@
-<?php
-// This file will be duplicated in the Kona project as 'messagesender.php', but is living here for documentation purposes.
+<?
 require_once("inc/common.inc.php");
 
 // Required to load validations
@@ -200,6 +199,8 @@ class ValConditionalOnValue extends Validator
 <script type="text/javascript" src="script/rcieditor.js"></script>
 <script type="text/javascript" src="script/speller/spellChecker.js"></script>
 <script type="text/javascript" src="script/niftyplayer.js.php"></script>
+<!-- need utils to define session warning functions so the updates can bubble up to the responsible window -->
+<script type="text/javascript" src="script/utils.js"></script>
 
 <script type="text/javascript">
 	$(function () {

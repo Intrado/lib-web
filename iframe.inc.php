@@ -35,6 +35,10 @@ header('Content-type: text/html; charset=UTF-8') ;
 	<!--[if IE 8]>
 		<script src="script/respond.min.js" type="text/javascript"></script>
 	<![endif]-->
+
+	<script type="text/javascript">
+		sessionKeepAliveWarning(<?=$SESSION_WARNING_TIME?>);
+	</script>
 	
 </head>
 
