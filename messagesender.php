@@ -195,7 +195,7 @@ class ValConditionalOnValue extends Validator
 <script type="text/javascript" src="script/jquery.timer.js"></script>
 <script type="text/javascript" src="script/jquery.moment.js"></script>
 <script type="text/javascript" src="script/jquery.easycall.js"></script>
-<script type="text/javascript" src="script/message_sender.emailattach.js"></script>
+<script type="text/javascript" src="script/messagesender.emailattach.js"></script>
 <script type="text/javascript" src="script/ckeditor/ckeditor.js"></script>
 <script type="text/javascript" src="script/rcieditor.js"></script>
 <script type="text/javascript" src="script/speller/spellChecker.js"></script>
