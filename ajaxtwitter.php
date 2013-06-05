@@ -31,8 +31,16 @@ switch ($type) {
 		break;
 		
 	case "store_access_token":
-		if (isset($_POST['access_token']))
-			$USER->setSetting("tw_access_token", (($_POST['access_token'] == "false")?false:$_POST['access_token']));
+		if (isset($_POST['access_token'])) {
+
+			if ($_POST['access_token'] == 'false') {
+				$twitter->purgeCachedUserData();
+				$USER->setSetting("tw_access_token", false);
+			}
+			else {
+				$USER->setSetting("tw_access_token", $_POST['access_token']);
+			}
+		}
 	
 	default:
 		echo false;
