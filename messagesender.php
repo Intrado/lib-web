@@ -189,7 +189,11 @@ class ValConditionalOnValue extends Validator
     <script type="text/javascript" src="messagesender/javascripts/app.js"></script>
 </head>
 <body class="newui" id="ms">
-<div id="messagesender-shell"></div>
+    <iframe class="topnav-frame" src="messagesender_topnav.php"></iframe>
+
+    <div id="messagesender-shell"></div>
+
+    <iframe class="bottomnav-frame" src="messagesender_bottomnav.php"></iframe>
 
 <script type="text/javascript" src="script/jquery.json-2.3.min.js"></script>
 <script type="text/javascript" src="script/jquery.timer.js"></script>

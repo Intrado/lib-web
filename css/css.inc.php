@@ -1064,6 +1064,31 @@ if (is_readable($themecssfilename)) {
 
 ?>
 
+
+#ms .content_wrap div.cf {
+  height: 0px;
+}
+
+#ms .content_wrap {
+  display: none;
+}
+
+#ms #footer {
+  display: block;
+  height: 100%;
+}
+
+#ms #footer .contain {
+  height: 500px;
+}
+
+#termsinfo {
+  background-color: green;
+  height: 200px;
+  width: 200px;
+  color: red;
+}
+
 /* +----------------------------------------------------------------+
    | Print styles                                                   |
    +----------------------------------------------------------------+ */
