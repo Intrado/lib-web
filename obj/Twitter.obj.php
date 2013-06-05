@@ -48,6 +48,7 @@ class Twitter extends TwitterOAuth {
 
 		// If the result was negative, purge the cache and try again
 		if ((! $result) && $this->purgeCachedUserData()) {
+			$userData = $this->getUserData();
 			$result = isset($userData->screen_name) ? true : false;
 		}
 
