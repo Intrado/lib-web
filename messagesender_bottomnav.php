@@ -17,13 +17,19 @@ $MESSAGESENDER = true;
     <script type="text/javascript" src="script/jquery.1.7.2.min.js"></script>
     <script type="text/javascript">
         jQuery.noConflict();
+
+		// resize the iframe so that the content fits
+		jQuery(window).load(function() {
+			var height = jQuery(".wrap").height();
+			jQuery(window.frameElement).height(height);
+		});
     </script>
     <link href="css.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print" />
     <link href="css.forms.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print" />
 </head>
 <body class="newui" id="ms">
 
-    <div>
+    <div class="wrap">
     <div>
     <div>
 

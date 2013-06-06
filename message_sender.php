@@ -74,7 +74,7 @@ if (!$USER->authorize('sendphone') && !$USER->authorize('sendemail') && !$USER->
 // if initialization requires new uuid...
 if (!isset($_SESSION['_messagesender']['uuid'])) {
 	$_SESSION['_messagesender'] = array();
-		$_SESSION['_messagesender']['uuid'] = "ms".uniqid();
+	$_SESSION['_messagesender']['uuid'] = "ms".uniqid();
 }
 if (isset($_GET['template']) && $_GET['template'] && isset($_GET['subject']) && $_GET['subject']) {
 	$_SESSION['message_sender'] = array();
@@ -159,7 +159,7 @@ class MessageSenderForm extends Form {
 		if (isset($this->formdata["optionsavemessage"]["value"]) && $this->formdata["optionsavemessage"]["value"]) {
 			$this->markRequired("optionsavemessagename");
 		}
-		
+
 		// if this job will be sent "now", remove the schedule date/time validators
 		if ($this->formdata["scheduletype"]["value"] == "now") {
 			$this->formdata["scheduledate"]['validators'] = array();
@@ -251,13 +251,13 @@ class ValTranslationCharacterLimit extends Validator {
 	}
 	function getJSValidator () {
 		return
-		'function (name, label, value, args, requiredvalues) {
-		//alert("valLength");
-		var textlength = requiredvalues[args["field"]].length;
-		if (textlength > 5000)
-		return this.label +" is unavalable if the message is more than 5000 characters. The message is currently " + textlength + " characters.";
-		return true;
-	}';
+			'function (name, label, value, args, requiredvalues) {
+			//alert("valLength");
+			var textlength = requiredvalues[args["field"]].length;
+			if (textlength > 5000)
+			return this.label +" is unavalable if the message is more than 5000 characters. The message is currently " + textlength + " characters.";
+			return true;
+		}';
 	}
 }
 
@@ -281,10 +281,10 @@ class ValConditionalOnValue extends Validator {
 		}
 		if ($required && !$value)
 			return "$this->label is required.";
-		
+
 		return true;
 	}
-	
+
 	function getJSValidator () {
 		return '
 			function (name, label, value, args, requiredvalues) {
@@ -331,479 +331,479 @@ foreach ($fcids as $fcid)
 	$feedcategoryids[$fcid] = $fcid;
 
 $formdata = array(
-		"uuid" => array(
-				"label" => "uuid",
-				"value" => $_SESSION['_messagesender']['uuid'],
-				"control" => array("HiddenField"),
-				"helpstep" => 1
+	"uuid" => array(
+		"label" => "uuid",
+		"value" => $_SESSION['_messagesender']['uuid'],
+		"control" => array("HiddenField"),
+		"helpstep" => 1
+	),
+	"name" => array(
+		"label" => "Subject",
+		"value" => "",
+		"validators" => array(
+			array("ValRequired"),
+			array("ValDuplicateNameCheck", "type" => "job"),
+			array("ValLength","max" => 50)
 		),
-		"name" => array(
-				"label" => "Subject",
-				"value" => "",
-				"validators" => array(
-						array("ValRequired"),
-						array("ValDuplicateNameCheck", "type" => "job"),
-						array("ValLength","max" => 50)
-				),
-				"control" => array("TextField"),
-				"helpstep" => 1
+		"control" => array("TextField"),
+		"helpstep" => 1
+	),
+	"jobtype" => array(
+		"label" => "Type",
+		"value" => "",
+		"validators" => array(
+			array("ValRequired"),
+			array("ValInArray", "values" => array_keys($jobtypes))
 		),
-		"jobtype" => array(
-				"label" => "Type",
-				"value" => "",
-				"validators" => array(
-						array("ValRequired"),
-						array("ValInArray", "values" => array_keys($jobtypes))
-				),
-				"control" => array("SelectMenu", "values" => $jobtypes),
-				"helpstep" => 1
+		"control" => array("SelectMenu", "values" => $jobtypes),
+		"helpstep" => 1
+	),
+	//=========================================================================================
+	"LIST DATA",
+	//=========================================================================================
+	"addme" => array(
+		"label" => "Add Myself",
+		"value" => "",
+		"validators" => array(// None, just toggles logic for addme fields
 		),
-		//=========================================================================================
-		"LIST DATA",
-		//=========================================================================================
-		"addme" => array(
-				"label" => "Add Myself",
-				"value" => "",
-				"validators" => array(// None, just toggles logic for addme fields
-				),
-				"control" => array("CheckBox"),
-				"helpstep" => 1
+		"control" => array("CheckBox"),
+		"helpstep" => 1
+	),
+	"addmephone" => array(
+		"label" => "Phone",
+		"value" => "",
+		"validators" => array(
+			array("ValPhone")
 		),
-		"addmephone" => array(
-				"label" => "Phone",
-				"value" => "",
-				"validators" => array(
-						array("ValPhone")
-				),
-				"control" => array("TextField"),
-				"helpstep" => 1
+		"control" => array("TextField"),
+		"helpstep" => 1
+	),
+	"addmeemail" => array(
+		"label" => "Email",
+		"value" => "",
+		"validators" => array(
+			array("ValEmail")
 		),
-		"addmeemail" => array(
-				"label" => "Email",
-				"value" => "",
-				"validators" => array(
-						array("ValEmail")
-				),
-				"control" => array("TextField"),
-				"helpstep" => 1
+		"control" => array("TextField"),
+		"helpstep" => 1
+	),
+	"addmesms" => array(
+		"label" => "SMS",
+		"value" => "",
+		"validators" => array(
+			array("ValPhone")
 		),
-		"addmesms" => array(
-				"label" => "SMS",
-				"value" => "",
-				"validators" => array(
-						array("ValPhone")
-				),
-				"control" => array("TextField"),
-				"helpstep" => 1
+		"control" => array("TextField"),
+		"helpstep" => 1
+	),
+	"listids" => array(
+		"label" => "List(s)",
+		"value" => "",
+		"validators" => array(
+			array("ValLists", "allowempty" => true)
 		),
-		"listids" => array(
-				"label" => "List(s)",
-				"value" => "",
-				"validators" => array(
-						array("ValLists", "allowempty" => true)
-				),
-				"control" => array("TextField"),
-				"helpstep" => 1
+		"control" => array("TextField"),
+		"helpstep" => 1
+	),
+	//=========================================================================================
+	"PHONE MESSAGE",
+	//=========================================================================================
+	"hasphone" => array(
+		"label" => "Phone",
+		"value" => "",
+		"validators" => array(
 		),
-		//=========================================================================================
-		"PHONE MESSAGE",
-		//=========================================================================================
-		"hasphone" => array(
-				"label" => "Phone",
-				"value" => "",
-				"validators" => array(
-				),
-				"control" => array("CheckBox"),
-				"helpstep" => 1
+		"control" => array("CheckBox"),
+		"helpstep" => 1
+	),
+	"phonemessagetype" => array(
+		"label" => "Phone Type",
+		"value" => "",
+		"validators" => array(
+			array("ValInArray", "values" => array("callme","text"))
 		),
-		"phonemessagetype" => array(
-				"label" => "Phone Type",
-				"value" => "",
-				"validators" => array(
-						array("ValInArray", "values" => array("callme","text"))
-				),
-				"control" => array("RadioButton", "values" => array("callme" => "callme", "text" => "text")),
-				"helpstep" => 1
+		"control" => array("RadioButton", "values" => array("callme" => "callme", "text" => "text")),
+		"helpstep" => 1
+	),
+	"phonemessagepost" => array(
+		"label" => "Audio Link",
+		"value" => "",
+		"validators" => array(// NOTE: Will need complicated validation based on user permissions and message contents (has dynamic parts?)
 		),
-		"phonemessagepost" => array(
-				"label" => "Audio Link",
-				"value" => "",
-				"validators" => array(// NOTE: Will need complicated validation based on user permissions and message contents (has dynamic parts?)
-				),
-				"control" => array("CheckBox"),
-				"helpstep" => 1
+		"control" => array("CheckBox"),
+		"helpstep" => 1
+	),
+	"phonemessagecallme" => array(
+		"label" => "Call Me",
+		"value" => "",
+		"validators" => array(
+			array("ValConditionalOnValue", "fields" => array("hasphone" => "on", "phonemessagetype" => "callme")),
+			array("ValEasycall")
 		),
-		"phonemessagecallme" => array(
-				"label" => "Call Me",
-				"value" => "",
-				"validators" => array(
-						array("ValConditionalOnValue", "fields" => array("hasphone" => "on", "phonemessagetype" => "callme")),
-						array("ValEasycall")
-				),
-				"requires" => array("hasphone","phonemessagetype"),
-				"control" => array("TextField"),
-				"helpstep" => 1
+		"requires" => array("hasphone","phonemessagetype"),
+		"control" => array("TextField"),
+		"helpstep" => 1
+	),
+	"phonemessagetext" => array(
+		"label" => "Message",
+		"value" => "",
+		"validators" => array(
+			array("ValConditionalOnValue", "fields" => array("hasphone" => "on", "phonemessagetype" => "text")),
+			array("ValMessageBody"),
+			array("ValTtsText"),
+			array("ValLength","max" => 10000) // 10000 Characters is about 40 minutes of tts, considered to be more than enough
 		),
-		"phonemessagetext" => array(
-				"label" => "Message",
-				"value" => "",
-				"validators" => array(
-						array("ValConditionalOnValue", "fields" => array("hasphone" => "on", "phonemessagetype" => "text")),
-						array("ValMessageBody"),
-						array("ValTtsText"),
-						array("ValLength","max" => 10000) // 10000 Characters is about 40 minutes of tts, considered to be more than enough
-				),
-				"requires" => array("hasphone","phonemessagetype"),
-				"control" => array("TextField"),
-				"helpstep" => 1
+		"requires" => array("hasphone","phonemessagetype"),
+		"control" => array("TextField"),
+		"helpstep" => 1
+	),
+	"phonemessagetexttranslate" => array(
+		"label" => "Translate",
+		"value" => "",
+		"validators" => array(
+			array("ValTranslationCharacterLimit", "field" => "phonemessagetext")
 		),
-		"phonemessagetexttranslate" => array(
-				"label" => "Translate",
-				"value" => "",
-				"validators" => array(
-						array("ValTranslationCharacterLimit", "field" => "phonemessagetext")
-				),
-				"control" => array("CheckBox"),
-				"requires" => array("phonemessagetext"),
-				"helpstep" => 1
-		)
+		"control" => array("CheckBox"),
+		"requires" => array("phonemessagetext"),
+		"helpstep" => 1
+	)
 );
 
 foreach ($ttslanguages as $code => $language) {
 	$formdata["phonemessagetexttranslate". $code. "text"] = array(
-			"label" => "phonemessagetexttranslate". $code. "text",
-			"value" => "",
-			"validators" => array(
-					array("ValTranslation")
-			),
-			"control" => array("TextField"),
-			"helpstep" => 1
+		"label" => "phonemessagetexttranslate". $code. "text",
+		"value" => "",
+		"validators" => array(
+			array("ValTranslation")
+		),
+		"control" => array("TextField"),
+		"helpstep" => 1
 	);
 }
 
 $formdata = array_merge($formdata, array(
-		//=========================================================================================
-		"EMAIL MESSAGE",
-		//=========================================================================================
-		"hasemail" => array(
-				"label" => "Email",
-				"value" => "",
-				"validators" => array(
-				),
-				"control" => array("CheckBox"),
-				"helpstep" => 1
+	//=========================================================================================
+	"EMAIL MESSAGE",
+	//=========================================================================================
+	"hasemail" => array(
+		"label" => "Email",
+		"value" => "",
+		"validators" => array(
 		),
-		"emailmessagefromname" => array(
-				"label" => "Name",
-				"value" => "",
-				"validators" => array(
-						array("ValConditionallyRequired", "field" => "hasemail"),
-						array("ValLength","max" => 50)
-				),
-				"requires" => array("hasemail"),
-				"control" => array("TextField"),
-				"helpstep" => 1
+		"control" => array("CheckBox"),
+		"helpstep" => 1
+	),
+	"emailmessagefromname" => array(
+		"label" => "Name",
+		"value" => "",
+		"validators" => array(
+			array("ValConditionallyRequired", "field" => "hasemail"),
+			array("ValLength","max" => 50)
 		),
-		"emailmessagefromemail" => array(
-				"label" => "Email",
-				"value" => "",
-				"validators" => array(
-						array("ValConditionallyRequired", "field" => "hasemail"),
-						array("ValLength","max" => 255),
-						array("ValEmail", "domain" => getSystemSetting('emaildomain'))
-				),
-				"requires" => array("hasemail"),
-				"control" => array("TextField"),
-				"helpstep" => 1
+		"requires" => array("hasemail"),
+		"control" => array("TextField"),
+		"helpstep" => 1
+	),
+	"emailmessagefromemail" => array(
+		"label" => "Email",
+		"value" => "",
+		"validators" => array(
+			array("ValConditionallyRequired", "field" => "hasemail"),
+			array("ValLength","max" => 255),
+			array("ValEmail", "domain" => getSystemSetting('emaildomain'))
 		),
-		"emailmessagesubject" => array(
-				"label" => "Subject",
-				"value" => "",
-				"validators" => array(
-						array("ValConditionallyRequired", "field" => "hasemail"),
-						array("ValLength","max" => 255)
-				),
-				"requires" => array("hasemail"),
-				"control" => array("TextField"),
-				"helpstep" => 1
+		"requires" => array("hasemail"),
+		"control" => array("TextField"),
+		"helpstep" => 1
+	),
+	"emailmessagesubject" => array(
+		"label" => "Subject",
+		"value" => "",
+		"validators" => array(
+			array("ValConditionallyRequired", "field" => "hasemail"),
+			array("ValLength","max" => 255)
 		),
-		"emailmessageattachment" => array(
-				"label" => "Attachment(s)",
-				"value" => "",
-				"validators" => array(
-						array("ValEmailAttach")
-				),
-				"control" => array("TextField"),
-				"helpstep" => 1
+		"requires" => array("hasemail"),
+		"control" => array("TextField"),
+		"helpstep" => 1
+	),
+	"emailmessageattachment" => array(
+		"label" => "Attachment(s)",
+		"value" => "",
+		"validators" => array(
+			array("ValEmailAttach")
 		),
-		"emailmessagetext" => array(
-				"label" => "Body",
-				"value" => "",
-				"validators" => array(
-						array("ValConditionallyRequired", "field" => "hasemail"),
-						array("ValMessageBody"),
-						array("ValLength","max" => 256000)
-				),
-				"requires" => array("hasemail"),
-				"control" => array("TextField"),
-				"helpstep" => 1
+		"control" => array("TextField"),
+		"helpstep" => 1
+	),
+	"emailmessagetext" => array(
+		"label" => "Body",
+		"value" => "",
+		"validators" => array(
+			array("ValConditionallyRequired", "field" => "hasemail"),
+			array("ValMessageBody"),
+			array("ValLength","max" => 256000)
 		),
-		"emailmessagetexttranslate" => array(
-				"label" => "Translate",
-				"value" => "",
-				"validators" => array(
-						array("ValTranslationCharacterLimit", "field" => "emailmessagetext")
-				),
-				"control" => array("CheckBox"),
-				"requires" => array("emailmessagetext"),
-				"helpstep" => 1
-		)
+		"requires" => array("hasemail"),
+		"control" => array("TextField"),
+		"helpstep" => 1
+	),
+	"emailmessagetexttranslate" => array(
+		"label" => "Translate",
+		"value" => "",
+		"validators" => array(
+			array("ValTranslationCharacterLimit", "field" => "emailmessagetext")
+		),
+		"control" => array("CheckBox"),
+		"requires" => array("emailmessagetext"),
+		"helpstep" => 1
+	)
 ));
 
 foreach ($translationlanguages as $code => $language) {
 	$formdata["emailmessagetexttranslate". $code. "text"] = array(
-			"label" => "emailmessagetexttranslate". $code. "text",
-			"value" => "",
-			"validators" => array(
-					array("ValTranslation") // NOTE: I "think" this will work for email. May need to write a new validator...
-			),
-			"control" => array("TextField"),
-			"helpstep" => 1
+		"label" => "emailmessagetexttranslate". $code. "text",
+		"value" => "",
+		"validators" => array(
+			array("ValTranslation") // NOTE: I "think" this will work for email. May need to write a new validator...
+		),
+		"control" => array("TextField"),
+		"helpstep" => 1
 	);
 }
 
 $formdata = array_merge($formdata, array(
-		//=========================================================================================
-		"SMS MESSAGE",
-		//=========================================================================================
-		"hassms" => array(
-				"label" => "SMS",
-				"value" => "",
-				"validators" => array(
-				),
-				"control" => array("CheckBox"),
-				"helpstep" => 1
+	//=========================================================================================
+	"SMS MESSAGE",
+	//=========================================================================================
+	"hassms" => array(
+		"label" => "SMS",
+		"value" => "",
+		"validators" => array(
 		),
-		"smsmessagetext" => array(
-				"label" => "Message",
-				"value" => "",
-				"validators" => array(
-						array("ValConditionallyRequired", "field" => "hassms"),
-						array("ValLength","max"=>160),
-						array("ValSmsText")
-				),
-				"requires" => array("hassms"),
-				"control" => array("TextField"),
-				"helpstep" => 1
+		"control" => array("CheckBox"),
+		"helpstep" => 1
+	),
+	"smsmessagetext" => array(
+		"label" => "Message",
+		"value" => "",
+		"validators" => array(
+			array("ValConditionallyRequired", "field" => "hassms"),
+			array("ValLength","max"=>160),
+			array("ValSmsText")
 		),
-		//=========================================================================================
-		"SOCIAL MESSAGE",
-		//=========================================================================================
-		"hasfacebook" => array(
-				"label" => "Facebook",
-				"value" => "",
-				"validators" => array(
-				),
-				"control" => array("CheckBox"),
-				"helpstep" => 1
+		"requires" => array("hassms"),
+		"control" => array("TextField"),
+		"helpstep" => 1
+	),
+	//=========================================================================================
+	"SOCIAL MESSAGE",
+	//=========================================================================================
+	"hasfacebook" => array(
+		"label" => "Facebook",
+		"value" => "",
+		"validators" => array(
 		),
-		"socialmediafacebookmessage" => array(
-				"label" => "Message",
-				"value" => "",
-				"validators" => array(
-						array("ValConditionallyRequired", "field" => "hasfacebook"),
-						array("ValLength","max"=>420)
-				),
-				"requires" => array("hasfacebook"),
-				"control" => array("TextField"),
-				"helpstep" => 1
+		"control" => array("CheckBox"),
+		"helpstep" => 1
+	),
+	"socialmediafacebookmessage" => array(
+		"label" => "Message",
+		"value" => "",
+		"validators" => array(
+			array("ValConditionallyRequired", "field" => "hasfacebook"),
+			array("ValLength","max"=>420)
 		),
-		"hastwitter" => array(
-				"label" => "Twitter",
-				"value" => "",
-				"validators" => array(
-				),
-				"control" => array("CheckBox"),
-				"helpstep" => 1
+		"requires" => array("hasfacebook"),
+		"control" => array("TextField"),
+		"helpstep" => 1
+	),
+	"hastwitter" => array(
+		"label" => "Twitter",
+		"value" => "",
+		"validators" => array(
 		),
-		"socialmediatwittermessage" => array(
-				"label" => "Message",
-				"value" => "",
-				"validators" => array(
-						array("ValConditionallyRequired", "field" => "hastwitter"),
-						array("ValLength","max"=>(140 - $twitterreservedchars))
-				),
-				"requires" => array("hastwitter"),
-				"control" => array("TextField"),
-				"helpstep" => 1
+		"control" => array("CheckBox"),
+		"helpstep" => 1
+	),
+	"socialmediatwittermessage" => array(
+		"label" => "Message",
+		"value" => "",
+		"validators" => array(
+			array("ValConditionallyRequired", "field" => "hastwitter"),
+			array("ValLength","max"=>(140 - $twitterreservedchars))
 		),
-		"hasfeed" => array(
-				"label" => "Feed",
-				"value" => "",
-				"validators" => array(
-				),
-				"control" => array("CheckBox"),
-				"helpstep" => 1
+		"requires" => array("hastwitter"),
+		"control" => array("TextField"),
+		"helpstep" => 1
+	),
+	"hasfeed" => array(
+		"label" => "Feed",
+		"value" => "",
+		"validators" => array(
 		),
-		"socialmediafeedmessage" => array(
-				"label" => "Message",
-				"value" => "",
-				"validators" => array(
-						array("ValConditionallyRequired", "field" => "hasfeed"),
-						array("ValTextAreaAndSubjectWithCheckbox","requiresubject" => true),
-						array("ValLength","max"=>32000)
-				),
-				"requires" => array("hasfeed"),
-				"control" => array("TextField"),
-				"helpstep" => 1
+		"control" => array("CheckBox"),
+		"helpstep" => 1
+	),
+	"socialmediafeedmessage" => array(
+		"label" => "Message",
+		"value" => "",
+		"validators" => array(
+			array("ValConditionallyRequired", "field" => "hasfeed"),
+			array("ValTextAreaAndSubjectWithCheckbox","requiresubject" => true),
+			array("ValLength","max"=>32000)
 		),
-		"socialmediafacebookpage" => array(
-				"label" => "Page(s)",
-				"value" => "",
-				"validators" => array(
-						//array("ValConditionallyRequired", "field" => "hasfacebook"),
-						array("ValFacebookPage", "authpages" => getFbAuthorizedPages(), "authwall" => getSystemSetting("fbauthorizewall"))
-				),
-				//"requires" => array("hasfacebook"),
-				"control" => array("TextField"),
-				"helpstep" => 1
+		"requires" => array("hasfeed"),
+		"control" => array("TextField"),
+		"helpstep" => 1
+	),
+	"socialmediafacebookpage" => array(
+		"label" => "Page(s)",
+		"value" => "",
+		"validators" => array(
+			//array("ValConditionallyRequired", "field" => "hasfacebook"),
+			array("ValFacebookPage", "authpages" => getFbAuthorizedPages(), "authwall" => getSystemSetting("fbauthorizewall"))
 		),
-		"socialmediafeedcategory" => array( // TODO: this is currently a multi-checkbox
-				"label" => "Category",
-				"value" => "",
-				"validators" => array(
-						//array("ValConditionallyRequired", "field" => "hasfeed"),
-						array("ValInArray", "values" => array_keys($feedcategoryids))
-				),
-				//"requires" => array("hasfeed"),
-				"control" => array("MultiCheckBox", "values" => $feedcategoryids),
-				"helpstep" => 1
+		//"requires" => array("hasfacebook"),
+		"control" => array("TextField"),
+		"helpstep" => 1
+	),
+	"socialmediafeedcategory" => array( // TODO: this is currently a multi-checkbox
+		"label" => "Category",
+		"value" => "",
+		"validators" => array(
+			//array("ValConditionallyRequired", "field" => "hasfeed"),
+			array("ValInArray", "values" => array_keys($feedcategoryids))
 		),
-		//=========================================================================================
-		"JOB OPTIONS",
-		//=========================================================================================
-		"optionmaxjobdays" => array(
-				"label" => "Day(s)",
-				"value" => "",
-				"validators" => array(
-						array("ValConditionallyRequired", "field" => "hasphone"),
-						array("ValInArray", "values" => range(1,$ACCESS->getValue('maxjobdays', 7)))
-				),
-				"requires" => array("hasphone"),
-				"control" => array("TextField"),
-				"helpstep" => 1
+		//"requires" => array("hasfeed"),
+		"control" => array("MultiCheckBox", "values" => $feedcategoryids),
+		"helpstep" => 1
+	),
+	//=========================================================================================
+	"JOB OPTIONS",
+	//=========================================================================================
+	"optionmaxjobdays" => array(
+		"label" => "Day(s)",
+		"value" => "",
+		"validators" => array(
+			array("ValConditionallyRequired", "field" => "hasphone"),
+			array("ValInArray", "values" => range(1,$ACCESS->getValue('maxjobdays', 7)))
 		),
-		"optionautoreport" => array(
-				"label" => "Auto Report",
-				"value" => "",
-				"validators" => array(
-				),
-				"control" => array("CheckBox"),
-				"helpstep" => 1
+		"requires" => array("hasphone"),
+		"control" => array("TextField"),
+		"helpstep" => 1
+	),
+	"optionautoreport" => array(
+		"label" => "Auto Report",
+		"value" => "",
+		"validators" => array(
 		),
-		"optionleavemessage" => array(
-				"label" => "Response",
-				"value" => "",
-				"validators" => array(// NOTE: no validation, will be ignored if the user can't use this option
-				),
-				"control" => array("CheckBox"),
-				"helpstep" => 1
+		"control" => array("CheckBox"),
+		"helpstep" => 1
+	),
+	"optionleavemessage" => array(
+		"label" => "Response",
+		"value" => "",
+		"validators" => array(// NOTE: no validation, will be ignored if the user can't use this option
 		),
-		"optionmessageconfirmation" => array(
-				"label" => "Confirmation",
-				"value" => "",
-				"validators" => array(// NOTE: no validation, will be ignored if the user can't use this option
-				),
-				"control" => array("CheckBox"),
-				"helpstep" => 1
+		"control" => array("CheckBox"),
+		"helpstep" => 1
+	),
+	"optionmessageconfirmation" => array(
+		"label" => "Confirmation",
+		"value" => "",
+		"validators" => array(// NOTE: no validation, will be ignored if the user can't use this option
 		),
-		"optionskipduplicate" => array( // NOTE: using same setting for both skipduplicates and skipemailduplicates?
-				"label" => "Skip Duplicate",
-				"value" => "",
-				"validators" => array(// NOTE: no validation, will be ignored if the user can't use this option
-				),
-				"control" => array("CheckBox"),
-				"helpstep" => 1
+		"control" => array("CheckBox"),
+		"helpstep" => 1
+	),
+	"optionskipduplicate" => array( // NOTE: using same setting for both skipduplicates and skipemailduplicates?
+		"label" => "Skip Duplicate",
+		"value" => "",
+		"validators" => array(// NOTE: no validation, will be ignored if the user can't use this option
 		),
-		"optioncallerid" => array(
-				"label" => "Caller ID",
-				"value" => "",
-				"validators" => array(
-						array("ValConditionallyRequired", "field" => "hasphone"),
-						array("ValLength","min" => 0,"max" => 20),
-						array("ValPhone"),
-						array("ValCallerID")
-				),
-				"requires" => array("hasphone"),
-				"control" => array("TextField"),
-				"helpstep" => 1
+		"control" => array("CheckBox"),
+		"helpstep" => 1
+	),
+	"optioncallerid" => array(
+		"label" => "Caller ID",
+		"value" => "",
+		"validators" => array(
+			array("ValConditionallyRequired", "field" => "hasphone"),
+			array("ValLength","min" => 0,"max" => 20),
+			array("ValPhone"),
+			array("ValCallerID")
 		),
-		"optionsavemessage" => array(
-				"label" => "Save Message",
-				"value" => "",
-				"validators" => array(// NOTE: no validation. just toggles save message mode
-				),
-				"control" => array("CheckBox"),
-				"helpstep" => 1
+		"requires" => array("hasphone"),
+		"control" => array("TextField"),
+		"helpstep" => 1
+	),
+	"optionsavemessage" => array(
+		"label" => "Save Message",
+		"value" => "",
+		"validators" => array(// NOTE: no validation. just toggles save message mode
 		),
-		"optionsavemessagename" => array(
-				"label" => "Name",
-				"value" => "",
-				"validators" => array(
-						array("ValDuplicateNameCheck", "type" => "messagegroup"),
-						array("ValLength","max" => 30)
-				),
-				"control" => array("TextField"),
-				"helpstep" => 1
+		"control" => array("CheckBox"),
+		"helpstep" => 1
+	),
+	"optionsavemessagename" => array(
+		"label" => "Name",
+		"value" => "",
+		"validators" => array(
+			array("ValDuplicateNameCheck", "type" => "messagegroup"),
+			array("ValLength","max" => 30)
 		),
-		//=========================================================================================
-		"SCHEDULE OPTIONS",
-		//=========================================================================================
-		"scheduletype" => array(
-				"label" => "Schedule type",
-				"value" => "",
-				"validators" => array(
-						array("ValInArray", "values" => array("now","schedule"))
-				),
-				"control" => array("RadioButton", "values" => array("now" => "now", "schedule" => "schedule")),
-				"helpstep" => 1
+		"control" => array("TextField"),
+		"helpstep" => 1
+	),
+	//=========================================================================================
+	"SCHEDULE OPTIONS",
+	//=========================================================================================
+	"scheduletype" => array(
+		"label" => "Schedule type",
+		"value" => "",
+		"validators" => array(
+			array("ValInArray", "values" => array("now","schedule"))
 		),
-		"scheduledate" => array(
-				"label" => "Date",
-				"value" => "",
-				"validators" => array(
-						array("ValConditionalOnValue", "fields" => array("scheduletype" => "schedule")),
-						array("ValDate", "min" => date("m/d/Y"))
-				),
-				"requires" => array("scheduletype"),
-				"control" => array("TextField"),
-				"helpstep" => 1
+		"control" => array("RadioButton", "values" => array("now" => "now", "schedule" => "schedule")),
+		"helpstep" => 1
+	),
+	"scheduledate" => array(
+		"label" => "Date",
+		"value" => "",
+		"validators" => array(
+			array("ValConditionalOnValue", "fields" => array("scheduletype" => "schedule")),
+			array("ValDate", "min" => date("m/d/Y"))
 		),
-		"schedulecallearly" => array(
-				"label" => "Start",
-				"value" => "",
-				"validators" => array(
-						array("ValConditionalOnValue", "fields" => array("scheduletype" => "schedule")),
-						array("ValTimeCheck", "min" => $ACCESS->getValue('callearly'), "max" => $ACCESS->getValue('calllate')),
-						array("ValTimeWindowCallEarly", "calllatefield" => "schedulecalllate")
-				),
-				"control" => array("TextField"),
-				"requires" => array("scheduletype", "schedulecalllate", "scheduledate"),
-				"helpstep" => 1
+		"requires" => array("scheduletype"),
+		"control" => array("TextField"),
+		"helpstep" => 1
+	),
+	"schedulecallearly" => array(
+		"label" => "Start",
+		"value" => "",
+		"validators" => array(
+			array("ValConditionalOnValue", "fields" => array("scheduletype" => "schedule")),
+			array("ValTimeCheck", "min" => $ACCESS->getValue('callearly'), "max" => $ACCESS->getValue('calllate')),
+			array("ValTimeWindowCallEarly", "calllatefield" => "schedulecalllate")
 		),
-		"schedulecalllate" => array(
-				"label" => "End",
-				"value" => "",
-				"validators" => array(
-						array("ValConditionalOnValue", "fields" => array("scheduletype" => "schedule")),
-						array("ValTimeCheck", "min" => $ACCESS->getValue('callearly'), "max" => $ACCESS->getValue('calllate')),
-						array("ValTimeWindowCallLate", "callearlyfield" => "schedulecallearly"),
-						array("ValTimePassed", "field" => "scheduledate")
-				),
-				"control" => array("TextField"),
-				"requires" => array("scheduletype", "schedulecallearly", "scheduledate"),
-				"helpstep" => 1
-		)
+		"control" => array("TextField"),
+		"requires" => array("scheduletype", "schedulecalllate", "scheduledate"),
+		"helpstep" => 1
+	),
+	"schedulecalllate" => array(
+		"label" => "End",
+		"value" => "",
+		"validators" => array(
+			array("ValConditionalOnValue", "fields" => array("scheduletype" => "schedule")),
+			array("ValTimeCheck", "min" => $ACCESS->getValue('callearly'), "max" => $ACCESS->getValue('calllate')),
+			array("ValTimeWindowCallLate", "callearlyfield" => "schedulecallearly"),
+			array("ValTimePassed", "field" => "scheduledate")
+		),
+		"control" => array("TextField"),
+		"requires" => array("scheduletype", "schedulecallearly", "scheduledate"),
+		"helpstep" => 1
+	)
 ));
 
 $displayingCallerid = !getSystemSetting('_hascallback', false) && (getSystemSetting("requireapprovedcallerid",false) || $USER->authorize('setcallerid'));
@@ -812,7 +812,7 @@ if(!$displayingCallerid) {
 }
 
 $buttons = array(submit_button(_L('Save'),"submit","tick"),
-		icon_button(_L('Cancel'),"cross",null,"start.php"));
+	icon_button(_L('Cancel'),"cross",null,"start.php"));
 $form = new MessageSenderForm("msgsndr",$formdata,array(),$buttons);
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -850,7 +850,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		}
 
 		$job = $msp->doPost($postdata);
-		
+
 		// run the job
 		$job->runNow();
 
@@ -887,36 +887,128 @@ if (isset($_GET['jsonformdata'])) {
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
-$PAGE = "notifications:jobs";
-$TITLE = "";
-$MESSAGESENDER = true;
-
-include("nav.inc.php");
-// Load Custom Form Validators
 ?>
+	<!doctype html>
+	<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+	<!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+	<!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
+	<!--[if gt IE 8]><!-->
+	<html class="no-js" lang="en"> <!--<![endif]-->
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<title>School Messenger : Message Sender</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1">
+		<link rel="stylesheet" href="messagesender/stylesheets/app.css">
+		<script type="text/javascript" src="messagesender/javascripts/vendor.js"></script>
+		<script type="text/javascript" src="messagesender/javascripts/app.js"></script>
+	</head>
+	<body class="newui" id="ms">
+	<iframe class="topnav-frame" src="messagesender_topnav.php" width="100%" height="1px" frameborder="0" scrolling="no"></iframe>
 
-<iframe id="messagesender_frame" src="messagesender.php" width="100%" height="1000px" frameborder="0" scrolling="no"></iframe>
+	<div id="messagesender-shell" style="clear: both;"></div>
 
-<script type="text/javascript">
-	jQuery(function($) {
-		// monitor the main content div for resize and send a message with this information
-		var lastHeight;
-		var msFrame = $('#messagesender_frame');
-		setInterval(function() {
-			var newHeight = (msFrame.contents().find('#messagesender-shell').height() + 16);
-			if (newHeight != lastHeight) {
-				msFrame.height(newHeight);
-				var msg = {};
-				msg["resize"] = lastHeight = newHeight;
-				top.postMessage(JSON.stringify(msg), '*');
-			}
-		}, 500);
-	}(jQuery));
-</script>
+	<iframe class="bottomnav-frame" src="messagesender_bottomnav.php" width="100%" height="100px" frameborder="0" scrolling="no"></iframe>
+
+	<script type="text/javascript" src="script/jquery.json-2.3.min.js"></script>
+	<script type="text/javascript" src="script/jquery.timer.js"></script>
+	<script type="text/javascript" src="script/jquery.moment.js"></script>
+	<script type="text/javascript" src="script/jquery.easycall.js"></script>
+	<script type="text/javascript" src="script/messagesender.emailattach.js"></script>
+	<script type="text/javascript" src="script/ckeditor/ckeditor.js"></script>
+	<script type="text/javascript" src="script/rcieditor.js"></script>
+	<script type="text/javascript" src="script/speller/spellChecker.js"></script>
+	<script type="text/javascript" src="script/niftyplayer.js.php"></script>
+	<!-- need utils to define session warning functions so the updates can bubble up to the responsible window -->
+	<script type="text/javascript" src="script/utils.js"></script>
+
+	<script type="text/javascript">
+		$(function () {
+
+			// initialize with a loading message
+			$('#messagesender-shell').html(
+				'<div class="loading">' +
+					'Loading, please wait...' +
+					'</div>'
+			);
+
+			window.BOOTSTRAP_DATA = {};
+			var orgID = -1;
+			var userBaseUrl = 'api/2/users/' + <?= $USER->id ?>;
+			var languages, features, options, facebookPages, initUserResponse;
+
+			var fetch = function (url) {
+				return $.ajax({
+					url:'api/2/organizations/' + orgID + url,
+					type:'GET',
+					dataType:'json'
+				});
+			};
+
+			var user = $.ajax({
+				url: userBaseUrl +'?expansions=roles/jobtypes,roles/feedcategories,roles/callerids,preferences,tokens',
+				type:'GET',
+				dataType:'json'
+			});
+
+			user.done(function (userResponse) {
+				var roles = userResponse.roles[0];
+				var org = roles.organization;
+				orgID = org.id;
+
+				languages = fetch('/languages');
+				features = fetch('/settings/features');
+				options = fetch('/settings/options');
+				facebookPages = fetch('/settings/facebookpages');
+				fieldmaps = $.getJSON(userBaseUrl + '/roles/' + orgID + '/accessprofile/fieldmaps');
+				formData = $.getJSON("message_sender.php?jsonformdata=true");
+
+				$.when(languages, features, options, facebookPages, fieldmaps, formData)
+					.done(function (languagesRes, featuresRes, optionsRes, facebookPagesRes, fieldmaps, formData) {
+						org.languages = languagesRes[0].languages;
+						org.settings = {
+							features:featuresRes[0].features,
+							options:optionsRes[0].options,
+							facebookpages:facebookPagesRes[0].facebookPages,
+							facebookAppID:  <?= $SETTINGS['facebook']['appid'] ?>
+						}
+						roles.accessProfile['fieldmaps'] = fieldmaps[0];
+						window.BOOTSTRAP_DATA.user = userResponse;
+
+						window.BOOTSTRAP_DATA.form = {
+							template: {
+								// get template settings (if loading from template, they will be set in session data)
+								subject: <?echo (isset($_SESSION['message_sender']['template']['subject'])?("'". str_replace("'", "\'", $_SESSION['message_sender']['template']['subject']). "'"):"''")?>,
+								lists: <?echo (isset($_SESSION['message_sender']['template']['lists'])?$_SESSION['message_sender']['template']['lists']:'[]')?>,
+								jtid: <?echo (isset($_SESSION['message_sender']['template']['jobtypeid'])?$_SESSION['message_sender']['template']['jobtypeid']:0)?>,
+								mgid: <?echo (isset($_SESSION['message_sender']['template']['messagegroupid'])?$_SESSION['message_sender']['template']['messagegroupid']:0)?>
+
+							},
+							snum:formData[0].snum,
+							schema:formData[0].formdata,
+							name:"msgsndr",
+							url:window.location.protocol + "//" + window.location.host + "/" + window.location.pathname.split('/')[1] + "/message_sender.php",
+							validators:document.validators
+						};
+
+						window.globals.require('initialize');
+					});
+			});
+
+			user.fail(function (userResponse) {
+				console.log('error creating bootstrap data:', userResponse);
+			});
+
+			// load required validators into document.validators
+			<? Validator::load_validators(array("ValCallerID", "ValConditionalOnValue", "ValConditionallyRequired", "ValDate", "ValDomain", "ValDomainList", "ValDuplicateNameCheck", "ValEasycall", "ValEmail", "ValEmailAttach", "ValEmailList", "ValFacebookPage", "ValFieldConfirmation", "ValHasMessage", "ValInArray", "ValLength", "ValLists", "ValMessageBody", "ValMessageGroup", "ValMessageTypeSelect", "ValNumber", "ValNumeric", "ValPhone", "ValRequired", "ValSmsText", "ValTextAreaAndSubjectWithCheckbox", "ValTimeCheck", "ValTimePassed", "ValTimeWindowCallEarly", "ValTimeWindowCallLate", "ValTranslation", "ValTranslationCharacterLimit", "ValTtsText", "valPhone")); ?>
+		});
+
+	</script>
+
+	</body>
+	</html>
+
 <?
-
-include("navbottom.inc.php");
-
 class MessageSenderProcessor {
 	private $displayingCallerid;
 	private $ttslanguages;
@@ -931,7 +1023,7 @@ class MessageSenderProcessor {
 		$this->ttslanguages = $ttsLangs;
 		$this->translationlanguages = $translationLangs;
 	}
-	
+
 	public function set_test_mode($mode) {
 		if (is_bool($mode)) $this->test_mode = $mode;
 	}
@@ -958,7 +1050,7 @@ class MessageSenderProcessor {
 		$job->modifydate = $job->createdate = date("Y-m-d H:i:s");
 
 		$schedule = $this->getSchedule($postdata);
-		
+
 		$job->scheduleid = null;
 		if ($schedule['date'])
 			$job->startdate = date("Y-m-d", strtotime($schedule['date']));
@@ -999,7 +1091,7 @@ class MessageSenderProcessor {
 			$addmelist->description = _L("JobWizard, addme");
 			$addmelist->deleted = 1;
 			$addmelist->create();
-				
+
 			// List was created, so add the "addme" person to it
 			if ($addmelist->id) {
 				// Constants
@@ -1038,10 +1130,10 @@ class MessageSenderProcessor {
 					$deliveryTypeObject->sequence = 0;
 					$deliveryTypeObject->editlock = 0;
 					$deliveryTypeObject->update();
-						
+
 					// NOTE: getUserJobTypes() automatically applies user jobType restrictions
 					$jobTypes = JobType::getUserJobTypes(false);
-						
+
 					// For each job type, assume sequence = 0, enabled = 1
 					foreach ($jobTypes as $jobType) {
 						// NOTE: $person->id is assumed to be a new id, so no need to worry about duplicate keys
@@ -1092,7 +1184,7 @@ class MessageSenderProcessor {
 			'sms' => array(),
 			'post' => array()
 		);
-		
+
 		// =============================================================
 		// Phone Message (callme, text, translations)
 		// =============================================================
@@ -1164,7 +1256,7 @@ class MessageSenderProcessor {
 					// create a post voice (provided that's enabled)
 					if (isset($postdata["phonemessagepost"]) && $postdata["phonemessagepost"])
 						$messages['post']['voice']['en']['none'] = $messages['phone']['voice']['en']['none'];
-						
+
 					// check for and retrieve translations
 					foreach ($this->ttslanguages as $code => $language) {
 						if (isset($postdata["phonemessagetexttranslate". $code. "text"]))
@@ -1196,7 +1288,7 @@ class MessageSenderProcessor {
 			$messages['email']['html']['en']['none']["subject"] = $postdata["emailmessagesubject"];
 			$attachments = isset($postdata["emailmessageattachment"])?json_decode($postdata["emailmessageattachment"]):array();
 			$messages['email']['html']['en']['none']['attachments'] = $attachments;
-				
+
 			// check for and retrieve translations
 			if (isset($postdata["emailmessagetexttranslate"]) && $postdata["emailmessagetexttranslate"]) {
 				foreach ($this->translationlanguages as $code => $language) {
@@ -1349,24 +1441,24 @@ class MessageSenderProcessor {
 	private function getSchedule($postdata) {
 		global $ACCESS;
 		global $USER;
-		
+
 		$type = $postdata["scheduletype"];
 		$maxjobdays = $postdata["optionmaxjobdays"];
 		$callearly = $postdata['schedulecallearly'];
 		$calllate = $postdata['schedulecalllate'];
 		$date = $postdata['scheduledate'];
-		
+
 		$schedule = array();
-		
+
 		if (!$maxjobdays)
 			$maxjobdays = 1;
-		
+
 		switch ($type) {
 			case "now":
 				//get the callearly and calllate defaults
 				$callearly = date("g:i a");
 				$calllate = $USER->getCallLate();
-					
+
 				//get access profile settings
 				$accessCallearly = $ACCESS->getValue("callearly");
 				if (!$accessCallearly)
@@ -1374,7 +1466,7 @@ class MessageSenderProcessor {
 				$accessCalllate = $ACCESS->getValue("calllate");
 				if (!$accessCalllate)
 					$accessCalllate = "11:59 pm";
-					
+
 				//convert everything to timestamps for comparisons
 				$callearlysec = strtotime($callearly);
 				$calllatesec = strtotime($calllate);
@@ -1388,27 +1480,27 @@ class MessageSenderProcessor {
 				// try to ensure calllate is at least an hour after start, up to access restriction
 				if ($callearlysec + 3600 > $calllatesec)
 					$calllatesec = $callearlysec + 3600;
-					
+
 				//make sure the calculated calllate is not past access profile
 				if ($calllatesec  > $accessCalllatesec)
 					$calllatesec = $accessCalllatesec;
 
 				$callearly = date("g:i a", $callearlysec);
 				$calllate = date("g:i a", $calllatesec);
-					
+
 				$schedule = array(
-						"maxjobdays" => $maxjobdays,
-						"date" => date('m/d/Y'),
-						"callearly" => $callearly,
-						"calllate" => $calllate
+					"maxjobdays" => $maxjobdays,
+					"date" => date('m/d/Y'),
+					"callearly" => $callearly,
+					"calllate" => $calllate
 				);
 				break;
 			case "schedule":
 				$schedule = array(
-				"maxjobdays" => $maxjobdays,
-				"date" => date('m/d/Y', strtotime($date)),
-				"callearly" => $callearly,
-				"calllate" => $calllate
+					"maxjobdays" => $maxjobdays,
+					"date" => date('m/d/Y', strtotime($date)),
+					"callearly" => $callearly,
+					"calllate" => $calllate
 				);
 				break;
 			default:
@@ -1417,5 +1509,4 @@ class MessageSenderProcessor {
 		return($schedule);
 	}
 }
-
 ?>

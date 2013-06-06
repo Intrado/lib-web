@@ -248,9 +248,6 @@ header('Content-type: text/html; charset=UTF-8') ;
 	
 </head>
 
-<!--[if IE 7]>    <body class="<?=getBrandTheme();?> ie7" <?= isset($MESSAGESENDER) && $MESSAGESENDER == true?' id="ms"':''?>> <![endif]-->
-<!--[if IE 8]>    <body class="<?=getBrandTheme();?> ie8" <?= isset($MESSAGESENDER) && $MESSAGESENDER == true?' id="ms"':''?>> <![endif]-->
-<!--[if gt IE 8]><!--> <body <?=setBodyClass();?> <?= isset($MESSAGESENDER) && $MESSAGESENDER == true?' id="ms"':''?> ><!--<![endif]-->
 	<script>
 		var _brandtheme = "<?=getBrandTheme();?>";
 

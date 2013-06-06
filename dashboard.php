@@ -191,7 +191,6 @@ $jobtemplates = DBFindMany("Job", $query,"j",array($USER->id));
 
 $PAGE = "start:start";
 $TITLE = "";
-$MESSAGESENDER = true;
 $DESCRIPTION = "";
 
 if($USER->authorize("leavemessage")){
