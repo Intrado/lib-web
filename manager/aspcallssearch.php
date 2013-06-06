@@ -25,7 +25,7 @@ Date:<br><select name="date" >
 </form>
 <?
 
-$phone = preg_replace("/[^0-9]*/","",$_GET['phone']);
+$phone = isset($_GET['phone']) ? preg_replace("/[^0-9]*/","",$_GET['phone']) : '';
 
 if (strlen($phone) == 10) {
 	

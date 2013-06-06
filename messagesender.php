@@ -1,5 +1,4 @@
-<?php
-// This file will be duplicated in the Kona project as 'messagesender.php', but is living here for documentation purposes.
+<?
 require_once("inc/common.inc.php");
 
 // Required to load validations
@@ -199,14 +198,24 @@ class ValConditionalOnValue extends Validator
 <script type="text/javascript" src="script/jquery.timer.js"></script>
 <script type="text/javascript" src="script/jquery.moment.js"></script>
 <script type="text/javascript" src="script/jquery.easycall.js"></script>
-<script type="text/javascript" src="script/message_sender.emailattach.js"></script>
+<script type="text/javascript" src="script/messagesender.emailattach.js"></script>
 <script type="text/javascript" src="script/ckeditor/ckeditor.js"></script>
 <script type="text/javascript" src="script/rcieditor.js"></script>
 <script type="text/javascript" src="script/speller/spellChecker.js"></script>
 <script type="text/javascript" src="script/niftyplayer.js.php"></script>
+<!-- need utils to define session warning functions so the updates can bubble up to the responsible window -->
+<script type="text/javascript" src="script/utils.js"></script>
 
 <script type="text/javascript">
 	$(function () {
+		
+		// initialize with a loading message
+		$('#messagesender-shell').html(
+			'<div class="loading">' +
+				'Loading, please wait...' +
+			'</div>'
+		);
+		
 		window.BOOTSTRAP_DATA = {};
 		var orgID = -1;
         var userBaseUrl = 'api/2/users/' + <?= $USER->id ?>;

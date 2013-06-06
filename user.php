@@ -494,6 +494,15 @@ if (getSystemSetting("_hasfeed", false)) {
 		"helpstep" => 2
 	);
 }
+if (getSystemSetting('_allowoldmessagesender', false)) {
+	$formdata["allowoldmessagesender"] = array(
+		"label" => _L('Use Deprecated Message Sender'),
+		"value" => $edituser->getSetting('_allowoldmessagesender', false),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 2
+	);
+}
 
 $formdata[] = _L("Data View");
 
@@ -931,6 +940,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			}
 		}
 		
+		if (isset($postdata['allowoldmessagesender'])) {
+			$edituser->setSetting('_allowoldmessagesender', ($postdata['allowoldmessagesender'] ? 1 : 0));
+		}
 		
 		Query("COMMIT");
 		

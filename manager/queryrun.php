@@ -40,6 +40,14 @@ $cid = $_SESSION['runquery']["cid"];
 // Action/Request Processing
 ////////////////////////////////////////////////////////////////////////////////
 
+// Is there a product filter on this query?
+if (($prodfilter = DBSafe($managerquery->getProductFilter())) !== '') {
+
+	// Set up a conditional join for the customer queries
+	$prodfiltercondition = "inner join customerproduct cp ON (cp.customerid = c.id AND cp.product = '{$prodfilter}')";
+}
+else $prodfiltercondition = '';
+
 ////////////////////////////////////////////////////////////////////////////////
 // Optional Form Items And Validators
 ////////////////////////////////////////////////////////////////////////////////
@@ -51,7 +59,7 @@ $formdata = array();
 
 
 if ($cid) {
-	$custurl = QuickQuery("select c.urlcomponent from customer c where c.id = ?", false, array($cid));
+	$custurl = QuickQuery("select c.urlcomponent from customer c {$prodfiltercondition} where c.id = ?", false, array($cid));
 	$formdata[] = _L("Query results for customer: %s", $custurl);
 }
 
@@ -151,7 +159,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		}
 		
 		//Following code mostly taken from query_customers, modified somewhat to fit this page
-		$query = "select c.id, s.dbhost, s.readonlyhost, s.dbusername, s.dbpassword, s.id from shard s inner join customer c on (c.shardid = s.id) where 1 $limit order by c.id";
+		$query = "select c.id, s.dbhost, s.readonlyhost, s.dbusername, s.dbpassword, s.id from shard s inner join customer c on (c.shardid = s.id) {$prodfiltercondition} where 1 $limit order by c.id";
+
 		$res = Query($query, false, $args);
 			
 		$data = array();

@@ -21,22 +21,37 @@ class Twitter extends TwitterOAuth {
 				$SETTINGS['twitter']['consumersecret']);
 		}
 	}
-	
+
+	/**
+	 * Purge the cached user data if it is set
+	 * 
+	 * @return boolean true if it was cached and removed, false if it wasn't cached
+	 */
+	public function purgeCachedUserData() {
+
+		// Do we have user data cached?
+		if (isset($_SESSION[$this->sesskey])) {
+
+			// Purge it
+			unset($_SESSION[$this->sesskey]);
+			return(true);
+		}
+
+		return(false);
+	}
+
 	public function hasValidAccessToken() {
+
+		// try to get the user data normally
 		$userData = $this->getUserData();
 		$result = isset($userData->screen_name) ? true : false;
 
-		// If the result was negative...
-		if (! $result) {
-
-			// And we were using cached data
-			if (isset($_SESSION[$this->sesskey])) {
-
-				// Blow away the cache and try again - maybe something in the cache broke!
-				unset($_SESSION[$this->sesskey]);
-				$result = isset($userData->screen_name) ? true : false;
-			}
+		// If the result was negative, purge the cache and try again
+		if ((! $result) && $this->purgeCachedUserData()) {
+			$userData = $this->getUserData();
+			$result = isset($userData->screen_name) ? true : false;
 		}
+
 		return($result);
 	}
 

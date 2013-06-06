@@ -208,9 +208,6 @@ while($row = DBGetRow($res)){
 // Secondly, get a list of customers with CommSuite product
 $query = "select c.id, c.shardid, c.urlcomponent, c.oem, c.oemid, c.nsid, c.notes, c.enabled, c.inboundnumber from customer c inner join customerproduct p on (p.customerid = c.id and p.product = 'cs' and p.enabled) where $sqlsearch $sqltoggledisabled $favidsql order by c.id";
 
-
-error_log($query);
-
 $customerquery = Query($query);
 $customers = array();
 if (!$shownone) {

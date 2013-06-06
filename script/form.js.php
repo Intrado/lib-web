@@ -175,7 +175,7 @@ function form_do_validation (form, element, validationHander) {
 					} else {
 						validationHander(element,"valid","");
 					}
-					if (kickSession instanceof Function) {
+					if (isFunction(kickSession)) {
 						kickSession();
 					}
 				},

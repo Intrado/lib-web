@@ -230,6 +230,7 @@ $settings = array(
 	'_hasfacebook' => '0',
 	'_hastwitter' => '0',
 	'_hasfeed' => '0',
+	'_allowoldmessagesender' => '0',
 	'autoreport_replyname' => 'SchoolMessenger',
 	'autoreport_replyemail' => 'autoreport@schoolmessenger.com',
 	'_renewaldate' => '',
@@ -613,6 +614,13 @@ $formdata["hasfeed"] = array(
 						"control" => array("CheckBox"),
 						"helpstep" => $helpstepnum
 );
+$formdata["allowoldmessagesender"] = array(
+						"label" => _L('Allow Deprecated Message Sender'),
+						"value" => $settings['_allowoldmessagesender'],
+						"validators" => array(),
+						"control" => array("CheckBox"),
+						"helpstep" => $helpstepnum
+);
 
 
 // Answering machine detection methods
@@ -898,6 +906,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		setCustomerSystemSetting('_hasfacebook', $postdata["hasfacebook"]?'1':'0', $custdb);
 		setCustomerSystemSetting('_hastwitter', $postdata["hastwitter"]?'1':'0', $custdb);
 		setCustomerSystemSetting('_hasfeed', $postdata["hasfeed"]?'1':'0', $custdb);
+		
+		setCustomerSystemSetting('_allowoldmessagesender', $postdata["allowoldmessagesender"]?'1':'0', $custdb);
 		
 		setCustomerSystemSetting('_amdtype', $postdata["amdtype"], $custdb);
 	

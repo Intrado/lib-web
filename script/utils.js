@@ -655,11 +655,26 @@ function curDate() {
 
 // Global timer variables
 sessionTimeout = 0;
-sessionLifetime = 0;
+sessionWarningTime = 0;
 
 function sessionKeepAliveWarning(timeout) {
-
-	sessionLifetime = timeout;
+	if (timeout)
+		sessionWarningTime = timeout;
+	else if (sessionWarningTime == 0)
+		return;
+	
+	// only set up the session warning timer if we are the top window capable of doing this job
+	var parentHasSessionWarning = false;
+	try {
+		parentHasSessionWarning = (this != top) && isFunction(window.parent.sessionKeepAliveWarning);
+	} catch (e) {
+		// parent doesn't have the session, or isn't workable (same-origin restriction?)
+		// we are the top authority in session warnings!
+	}
+	if (parentHasSessionWarning) {
+		window.parent.kickSession();
+		return;
+	}
 
 	// If there is already a timeout function running
 	if (sessionTimeout !== 0) {
@@ -729,17 +744,30 @@ function sessionKeepAliveWarning(timeout) {
 				method:'get',
 				parameters:{type: 'keepalive'}
 			});
-			sessionKeepAliveWarning(timeout);
+			sessionKeepAliveWarning();
 		});
 		
 		button.on('click',refreshSession);
-	}, timeout);
+	}, sessionWarningTime);
 }
 
 function kickSession() {
-	if (sessionLifetime) {
-		sessionKeepAliveWarning(sessionLifetime);
-	} else if (window.parent.sessionLifetime) {
-		window.parent.sessionKeepAliveWarning(window.parent.sessionLifetime);
+	var parentHasSessionWarning = false;
+	try {
+		parentHasSessionWarning = (this != top) && isFunction(window.parent.sessionKeepAliveWarning);
+	} catch (e) {
+		// parent doesn't have the session, or isn't workable (same-origin restriction?)
+		// we are the top authority in session warnings!
 	}
+	if (parentHasSessionWarning) {
+		parent.window.kickSession();
+	} else {
+		sessionKeepAliveWarning();
+	}
+}
+
+// Implementation of isFunctionA from http://jsperf.com/alternative-isfunction-implementations/4
+function isFunction(functionToCheck) {
+	var getType = {};
+	return functionToCheck && getType.toString.call(functionToCheck) === '[object Function]';
 }

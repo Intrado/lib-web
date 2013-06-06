@@ -48,9 +48,8 @@
 
                 // load existing values from attached input
                 var elementval = $(element).val();
-                if (elementval == "")
-                    elementdata = {};
-                else
+				var elementdata = {};
+                if (elementval !== undefined && elementval !== null && elementval !== "" && elementval !== "undefined")
                     elementdata = $.secureEvalJSON(elementval);
                 $.each(elementdata, function (code) {
                     // do a sanity check, then stuff the value in the recordings list
@@ -153,10 +152,9 @@
                     }
                 });
                 var prependSpan = $('<span />', {'class':'add-on'});
-                //prependSpan.append($('<span class="phone-icon"></span>'));
-                prependSpan.append($('<img />', {'src':'themes/newui/phone.png'}));
+                prependSpan.append($('<span class="phone-icon"></span>'));
                 // button to start the calling session
-                var callbutton = $('<button />', { "class":"btn btn-success", "value":"Call Now to Record"});
+                var callbutton = $('<button />', { "class":"record btn btn-success", "value":"Call Now to Record"});
                 callbutton.append($('<i />', { "class":"icon-hand-left icon-white" })).append(" &nbsp;Call Now to Record");
 
                 if (hasmenu) {
@@ -192,32 +190,26 @@
 
             createPreviewContainer:function (code) {
                 var $this = $(this);
-                var languageCode = $this.data('easyCall').languages[code];
+                var language = $this.data('easyCall').languages[code];
                 var recordingId = $this.data('easyCall').recording[code];
 
                 var container = $('<div />', { "class":"easycallpreviewcontainer"});
                 var btnGroupContainer = $('<div />', { "class":"btn-group"});
                 var languagetitle = $('<div />', { "class":"easycalllanguagetitle"});
-                languagetitle.append(' &nbsp;').append(languageCode);
-                var previewbutton = $('<button />', { "class":"easycallpreviewbutton btn", "href":"#ctr_play_audio_modal", "data-language":languageCode, "data-languageCode":code, "data-recordingId":recordingId, "data-toggle":"modal", "title":"Play audio of " + languageCode + " language voice recording", "rel":"tooltip" });
+                languagetitle.append(' &nbsp;').append(language);
+                var previewbutton = $('<button />', { "class":"easycallpreviewbutton btn", "href":"#ctr_play_audio_modal", "data-language":language, "data-language":code, "data-recordingId":recordingId, "data-toggle":"modal", "title":"Play audio of " + language + " language voice recording", "rel":"tooltip" });
                 previewbutton.html('<i class="icon-play"></i> &nbsp;Play Audio');
                 var removebutton = $('<button />', { "class":"easycallrerecordbutton btn" });
 
-                var flashPlayerContent = function () {
-                    return "<object width=\"165\" height=\"38\" align=\"\" class=\"niftyPlayer\" codebase=\"https://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=8,0,0,0\" classid=\"clsid:D27CDB6E-AE6D-11cf-96B8-444553540000\">\n    <param value=\"../media/niftyplayer.swf?file=../audio.wav.php/mediaplayer_preview.wav?id=" + recordingId + "&as=1\" name=\"movie\">\n    <param value=\"high\" name=\"quality\">\n    <param value=\"#FFFFFF\" name=\"bgcolor\">\n    <embed width=\"165\" height=\"38\" align=\"\" pluginspage=\"https://get.adobe.com/flashplayer\" type=\"application/x-shockwave-flash\" name=\"niftyPlayer\" bgcolor=\"#FFFFFF\" quality=\"high\" src=\"../media/niftyplayer.swf?file=../audio.wav.php/mediaplayer_preview.wav?id=" + recordingId + "&as=1\">\n</object>\n<div class=\"download_audio_button_container\">\n    <a class=\"btn\" type=\"button\" href=\"../audio.wav.php/download_preview.wav?id=" + recordingId + "&download=true\">Download " + languageCode + " Audio File &nbsp;<i class=\"icon-download-alt\"></i></a>\n</div>";
-                };
-
-
                 previewbutton.on('click', function () {
-                    $('#ctr_modal_body').html(flashPlayerContent());
-                    $('.ctr_language').html(languageCode);
+					$this.data('easyCall').element.trigger("easycall:preview", { recordingId: recordingId, languageCode: code, language: language });
                 });
 
 
                 if (code == $this.data('easyCall').defaultcode)
-                    removebutton.attr({"title":"Re-record " + languageCode + " language voice recording", "rel":"tooltip"}).append($('<i />', {"class":"icon-repeat"})).append(' &nbsp;').append($('<span />', { "text":"Re-record" }));
+                    removebutton.attr({"title":"Re-record " + language + " language voice recording", "rel":"tooltip"}).append($('<i />', {"class":"icon-repeat"})).append(' &nbsp;').append($('<span />', { "text":"Re-record" }));
                 else
-                    removebutton.attr({"title":"Remove " + languageCode + " language voice recording", "rel":"tooltip"}).append($('<i />', {"class":"icon-trash"})).append(' &nbsp;').append($('<span />', { "text":"Remove" }));
+                    removebutton.attr({"title":"Remove " + language + " language voice recording", "rel":"tooltip"}).append($('<i />', {"class":"icon-trash"})).append(' &nbsp;').append($('<span />', { "text":"Remove" }));
 
                 removebutton.click(function (e) {
                     e.preventDefault();
@@ -241,7 +233,7 @@
                 var $this = $(this);
 
                 var container = $('<div />', { "class":"easycallprogresscontainer"});
-                var languagetitle = $('<div />', { "class":"easycalllanguagetitlewhite", "text":$this.data('easyCall').languages[code] });
+                var languagetitle = $('<div />', { "class":"easycalllanguagetitle", "text":$this.data('easyCall').languages[code] });
                 var progresstext = $('<div />', { "class":"call-progress" });
                 progresstext.append($('<span />', { "class":"icon" })).append($('<span />', { "class":"easycallprogresstext" }))
 

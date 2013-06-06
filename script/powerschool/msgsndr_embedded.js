@@ -182,7 +182,7 @@ function MessageSender_embedded(ssoTarget, pkeyList, container) {
 	 * @private
 	 */
 	this._launchMessageSender = function() {
-		var msgsndrUrl = this.baseUrl + "message_sender.php?iframe&template=true&subject=" + encodeURIComponent(this.subject);
+		var msgsndrUrl = this.baseUrl + "newbroadcast.php?iframe&template=true&subject=" + encodeURIComponent(this.subject);
 
 		// if the pkey list is not empty, create a list with the rpc client
 		if (pkeyList.length > 0) {
@@ -198,7 +198,7 @@ function MessageSender_embedded(ssoTarget, pkeyList, container) {
 					that._addListPkeys(data.id, pkeyList, function() {
 						that.updateProgress("createlist", "done", "List creation complete");
 						that.updateProgress("launchmsgsndr", "trying", "Launching application...");
-						// load the iframe with message_sender.php (indicate list to add and excluding nav)
+						// load the iframe with newbroadcast.php (indicate list to add and excluding nav)
 						that.iframe.attr("src", msgsndrUrl + "&lists=[" + data.id + "]");
 					})(code, data);
 				} else {

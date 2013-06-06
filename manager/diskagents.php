@@ -200,7 +200,7 @@ while ($row = DBGetRow($result)) {
 	$data[] = $row;
 }
 // add any online agents that the server has, but the database does not
-foreach ($diskserverresults as $uuid => $agentprops) {
+if (is_array($diskserverresults) && count($diskserverresults)) foreach ($diskserverresults as $uuid => $agentprops) {
 	if (isset($agentprops['existsindb']))
 		continue;
 	// else not in db, let's add to display table

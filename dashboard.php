@@ -191,7 +191,7 @@ $jobtemplates = DBFindMany("Job", $query,"j",array($USER->id));
 
 $PAGE = "start:start";
 $TITLE = "";
-//$MESSAGESENDER = true;
+$MESSAGESENDER = true;
 $DESCRIPTION = "";
 
 if($USER->authorize("leavemessage")){
@@ -400,16 +400,16 @@ include("nav.inc.php");
 			<?  
 			Switch($requestValues["showactivity"]) {
 				case "me":
-					echo _L("You haven't sent any %s.",getJobsTitle()) . ' <a href="messagesender.php?new">' . _L("Create a %s",getJobTitle() ) . '</a>';
+					echo _L("You haven't sent any %s.",getJobsTitle()) . ' <a href="newbroadcast.php?new">' . _L("Create a %s",getJobTitle() ) . '</a>';
 					break;
 				case "everyone":
-					echo _L("No %s have been sent.",getJobsTitle()) . ' <a href="messagesender.php?new">' . _L("Create a %s",getJobTitle() ) . '</a>';
+					echo _L("No %s have been sent.",getJobsTitle()) . ' <a href="newbroadcast.php?new">' . _L("Create a %s",getJobTitle() ) . '</a>';
 					break;
 				default:
 					if (isset($useridList[$requestValues["showactivity"]])) {
 						echo _L("%s hasn't sent any %s.",$useridList[$requestValues["showactivity"]], getJobsTitle());
 					} else {
-						echo _L("No %s have been sent.",getJobsTitle()) . ' <a href="messagesender.php?new">' . _L("Create a %s",getJobTitle() ) . '</a>';
+						echo _L("No %s have been sent.",getJobsTitle()) . ' <a href="newbroadcast.php?new">' . _L("Create a %s",getJobTitle() ) . '</a>';
 					}
 					break;
 			} 
@@ -428,7 +428,7 @@ include("nav.inc.php");
 		if ($USER->authorize('sendphone') || $USER->authorize('sendemail') || $USER->authorize('sendsms')) {
 ?>
 		<div class="bigbtn">
-			<a class="bigbtn" href="messagesender.php?new"><span><?= _L("New %s",getJobTitle())?></span><b></b></a>
+			<a class="bigbtn" href="newbroadcast.php?new"><span><?= _L("New %s",getJobTitle())?></span><b></b></a>
 		</div>
 		
 <? 
@@ -450,7 +450,7 @@ include("nav.inc.php");
 						"jobtypeid" => $jobtemplate->jobtypeid,
 						"messagegroupid" => $jobtemplate->messagegroupid
 					);
-					echo "<li><a href=\"messagesender.php?template=true&" . http_build_query($options) . "\">{$jobtemplate->name}</a></li>";
+					echo "<li><a href=\"newbroadcast.php?template=true&" . http_build_query($options) . "\">{$jobtemplate->name}</a></li>";
 				}
 			}
 			?>

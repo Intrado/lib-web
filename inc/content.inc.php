@@ -42,7 +42,8 @@ function contentGet ($cmid, $base64 = false) {
 
 function contentGetForCustomerId ($customerid, $contentid) {
 	$filedata = commsuite_contentGetForCustomerId($customerid, $contentid);
-	return array($filedata->contenttype, $filedata->data);
+	// FIXME : SMK notes 2013-05-31 that ASPManager customer edit results in a non-object for the above call
+	return(is_object($filedata) ? array($filedata->contenttype, $filedata->data) : array(null, null));
 }
 
 // TODO: refactor to use appserver API at some point
