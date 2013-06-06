@@ -23,9 +23,9 @@ $MESSAGESENDER = true;
 </head>
 <body class="newui" id="ms">
 
-    <div class="invisible">
-    <div class="invisible">
-    <div class="invisible">
+    <div>
+    <div>
+    <div>
 
 <?
 include("navbottom.inc.php");
