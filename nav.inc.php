@@ -356,14 +356,14 @@ Event.observe(window, 'load', function() {
 
 
 <div class="content_wrap cf"><!-- tag ends in footer -->
-	
+<?if ($TITLE) {?>
 	<div class="container cf">
 		<div class="sectitle">
 			<div class="pagetitle"><?= (isset($TITLE) ? $TITLE : "") ?></div>
 			<div class="pagetitlesubtext"><?= (isset($DESCRIPTION) ? $DESCRIPTION : "") ?></div>
 		</div><!-- end sectitle -->
 	</div>
-
+<?}?>
 
 	<div class="container cf">
 	<?= $SYSTEMALERT ?>
