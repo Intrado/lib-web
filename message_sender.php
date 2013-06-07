@@ -1025,6 +1025,7 @@ $SESSION_WARNING_TIME = isset($SETTINGS['feature']['session_warning_time']) ?
 	<!-- Session warning modal -->
 	<div id="session-warning-modal" class="modal hide" aria-hidden="false">
 		<div class="modal-header">
+			<button class="close" type="button" data-dismiss="modal" aria-hidden="true">x</button>
 			<h3>Automatic Logout</h3>
 		</div>
 		<div class="modal-body">
