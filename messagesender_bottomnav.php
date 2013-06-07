@@ -27,7 +27,7 @@ $MESSAGESENDER = true;
     <link href="css.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print" />
     <link href="css.forms.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print" />
 </head>
-<body class="newui" id="ms">
+<body class="newui">
 
     <div class="wrap">
     <div>

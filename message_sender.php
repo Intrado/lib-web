@@ -903,12 +903,12 @@ if (isset($_GET['jsonformdata'])) {
 		<script type="text/javascript" src="messagesender/javascripts/vendor.js"></script>
 		<script type="text/javascript" src="messagesender/javascripts/app.js"></script>
 	</head>
-	<body class="newui" id="ms">
-	<iframe class="topnav-frame" src="messagesender_topnav.php" width="100%" height="1px" frameborder="0" scrolling="no"></iframe>
+	<body class="newui">
+	<iframe class="topnav-frame" src="messagesender_topnav.php" frameborder="0" scrolling="no"></iframe>
 
 	<div id="messagesender-shell" style="clear: both;"></div>
 
-	<iframe class="bottomnav-frame" src="messagesender_bottomnav.php" width="100%" height="100px" frameborder="0" scrolling="no"></iframe>
+	<iframe class="bottomnav-frame" src="messagesender_bottomnav.php" height="100px" frameborder="0" scrolling="no"></iframe>
 
 	<script type="text/javascript" src="script/jquery.json-2.3.min.js"></script>
 	<script type="text/javascript" src="script/jquery.timer.js"></script>
@@ -919,9 +919,6 @@ if (isset($_GET['jsonformdata'])) {
 	<script type="text/javascript" src="script/rcieditor.js"></script>
 	<script type="text/javascript" src="script/speller/spellChecker.js"></script>
 	<script type="text/javascript" src="script/niftyplayer.js.php"></script>
-	<!-- need utils to define session warning functions so the updates can bubble up to the responsible window -->
-	<script type="text/javascript" src="script/utils.js"></script>
-
 	<script type="text/javascript">
 		$(function () {
 
