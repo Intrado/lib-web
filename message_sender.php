@@ -903,12 +903,20 @@ if (isset($_GET['jsonformdata'])) {
 		<script type="text/javascript" src="messagesender/javascripts/vendor.js"></script>
 		<script type="text/javascript" src="messagesender/javascripts/app.js"></script>
 	</head>
+
+	
+<?if (!isset($_GET['iframe'])) {?>
 	<body class="newui">
 	<iframe class="topnav-frame" src="messagesender_topnav.php" frameborder="0" scrolling="no"></iframe>
+<?} else {?>
+	<body class="newui-nobackground">
+<?}?>
 
 	<div id="messagesender-shell" style="clear: both;"></div>
 
+<?if (!isset($_GET['iframe'])) {?>
 	<iframe class="bottomnav-frame" src="messagesender_bottomnav.php" height="100px" frameborder="0" scrolling="no"></iframe>
+<?}?>
 
 	<script type="text/javascript" src="script/jquery.json-2.3.min.js"></script>
 	<script type="text/javascript" src="script/jquery.timer.js"></script>
@@ -999,6 +1007,18 @@ if (isset($_GET['jsonformdata'])) {
 			// load required validators into document.validators
 			<? Validator::load_validators(array("ValCallerID", "ValConditionalOnValue", "ValConditionallyRequired", "ValDate", "ValDomain", "ValDomainList", "ValDuplicateNameCheck", "ValEasycall", "ValEmail", "ValEmailAttach", "ValEmailList", "ValFacebookPage", "ValFieldConfirmation", "ValHasMessage", "ValInArray", "ValLength", "ValLists", "ValMessageBody", "ValMessageGroup", "ValMessageTypeSelect", "ValNumber", "ValNumeric", "ValPhone", "ValRequired", "ValSmsText", "ValTextAreaAndSubjectWithCheckbox", "ValTimeCheck", "ValTimePassed", "ValTimeWindowCallEarly", "ValTimeWindowCallLate", "ValTranslation", "ValTranslationCharacterLimit", "ValTtsText", "valPhone")); ?>
 		});
+		
+		// monitor the main content div for resize and send a message with this information
+		var lastHeight;
+		setInterval(function() {
+			// #main-content has 8px of margins so adding a little extra to compensate...
+			var newHeight = $('#messagesender-shell').height() + 18;
+			if (newHeight != lastHeight) {
+				var msg = {};
+				msg["resize"] = lastHeight = newHeight;
+				top.postMessage($.toJSON(msg), '*');
+			}
+		}, 200);
 
 	</script>
 
