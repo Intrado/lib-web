@@ -183,7 +183,7 @@ subnavtabs li and a have been set up to list horizontal for all themes with basi
 further colours for subnav links are in the specific theme folder
 -----*/
 
-.subnavtabs { width: 100%; list-style-type: none; margin: 0px; padding: 0px; }
+.subnavtabs { width: 100%; list-style-type: none; margin: 0px; margin-bottom: 10px; padding: 0px; }
 .subnavtabs li { float: left; display: inline; font-size: 10px; margin-left: 10px; }
 .subnavtabs a { display: block; text-decoration: none; }
 .subnavtabs a:hover { text-decoration: underline; }
