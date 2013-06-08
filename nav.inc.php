@@ -219,27 +219,30 @@ header('Content-type: text/html; charset=UTF-8') ;
 	
 	<title><?= getBrand();?>: <?= $PAGETITLE ?></title>
 
+	<script type="text/javascript" src="script/jquery.1.7.2.min.js"></script>
+<?if (!isset($NOPROTOTYPE) || !$NOPROTOTYPE) {?>
+	<script type="text/javascript">
+		jQuery.noConflict();
+	</script>
 	<script src="script/prototype.js" type="text/javascript"></script> <!-- updated to prototype 1.7 -->
 	<script src="script/scriptaculous.js" type="text/javascript"></script>
-	<script src="script/prototip.js.php" type="text/javascript"></script>
 	<script src="script/utils.js"></script>
-	<script src="script/sorttable.js"></script>
-	<script src="script/form.js.php" type="text/javascript"></script>
+	<script type="text/javascript" src="script/datepicker.js"></script>
+	<link href="css/datepicker.css.php" type="text/css" rel="stylesheet" />
+	<link href="css/newui_datepicker.css" type="text/css" rel="stylesheet" />
+	<script src="script/modalwrapper.js" type="text/javascript"></script>
 	<script src="script/livepipe/livepipe.js" type="text/javascript"></script>
 	<script src="script/livepipe/window.js" type="text/javascript"></script>
-	<script src="script/modalwrapper.js" type="text/javascript"></script>
-    <script type="text/javascript" src="script/jquery.1.7.2.min.js"></script>
-    <script type="text/javascript">
-         jQuery.noConflict();
-    </script>
-	<script type="text/javascript" src="script/datepicker.js"></script>
+	<script src="script/prototip.js.php" type="text/javascript"></script>
+	<link href="css/prototip.css.php" type="text/css" rel="stylesheet" />
+	<script src="script/form.js.php" type="text/javascript"></script>
+<?}?>
+	<script src="script/sorttable.js"></script>
 	<script src="script/bootstrap-modal.js" type="text/javascript"></script>
+	<script src="script/session_warning.js" type="text/javascript"></script>
 	
 	<link href="css.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print" />
 	<link href="css.forms.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print" />
-	<link href="css/datepicker.css.php" type="text/css" rel="stylesheet" />
-	<link href="css/newui_datepicker.css" type="text/css" rel="stylesheet" />
-	<link href="css/prototip.css.php" type="text/css" rel="stylesheet" />
 	<link href="css/style_print.css" type="text/css" rel="stylesheet" media="print" />
 	
 	<!--[if IE 8]>
@@ -307,9 +310,9 @@ header('Content-type: text/html; charset=UTF-8') ;
 </div><!--  end top_banner -->
 
 <script type="text/javascript">
-Event.observe(window, 'load', function() {
-	sessionKeepAliveWarning(<?=$SESSION_WARNING_TIME?>);
-});
+	jQuery(function() {
+		sessionKeepAliveWarning(<?=$SESSION_WARNING_TIME?>);
+	});
 </script>
 
 <div class="primary_nav">
