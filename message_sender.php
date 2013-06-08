@@ -887,173 +887,19 @@ if (isset($_GET['jsonformdata'])) {
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
-// calculate the session warning timeout popup
-$SESSION_WARNING_TIME = isset($SETTINGS['feature']['session_warning_time']) ?
-	$SETTINGS['feature']['session_warning_time']*1000 : 1200000;
+$PAGE = "notifications:jobs";
+$TITLE = "";
 
+$NOPROTOTYPE = true;
+include("nav.inc.php");
 ?>
-	<!doctype html>
-	<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
-	<!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
-	<!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
-	<!--[if gt IE 8]><!-->
-	<html class="no-js" lang="en"> <!--<![endif]-->
-	<head>
-		<meta charset="utf-8">
-		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-		<title>School Messenger : Message Sender</title>
-		<meta name="viewport" content="width=device-width,initial-scale=1">
-		<link rel="stylesheet" href="messagesender/stylesheets/app.css">
-		<script type="text/javascript" src="messagesender/javascripts/vendor.js"></script>
-		<script type="text/javascript" src="messagesender/javascripts/app.js"></script>
-		<script type="text/javascript">
-			// Global timer variable
-			sessionTimeout = 0;
-			sessionWarningTime = 0;
 
-			sessionKeepAliveWarning(<?=$SESSION_WARNING_TIME?>);
+	<div id="messagesender-shell"></div>
 
-			function sessionKeepAliveWarning(timeout) {
-				if (timeout)
-					sessionWarningTime = timeout;
-				else if (sessionWarningTime == 0)
-					return;
+	<link rel="stylesheet" href="messagesender/stylesheets/app.css">
 
-				// only set up the session warning timer if we are the top window capable of doing this job
-				var parentHasSessionWarning = false;
-				try {
-					parentHasSessionWarning = (this != top) && isFunction(window.parent.sessionKeepAliveWarning);
-				} catch (e) {
-					// parent doesn't have the session, or isn't workable (same-origin restriction?)
-					// we are the top authority in session warnings!
-				}
-				if (parentHasSessionWarning) {
-					window.parent.kickSession();
-					return;
-				}
-
-				// If there is already a timeout function running
-				if (sessionTimeout !== 0) {
-					// Then clear it so that we can reset it
-					clearTimeout(sessionTimeout);
-					sessionTimeout = 0;
-				}
-
-				sessionTimeout = setTimeout(function() {
-					$('.modal.in').modal('hide');
-
-					var modal = $('#session-warning-modal');
-					modal.modal();
-					
-					// Hide modal on resize since it will no longer be centered.
-					$(window).one('resize',function() {
-						modal.modal('hide');
-					});
-					
-					var content = modal.find('.modal-body');
-					content.html("");
-					content.append($('<img>',{src : 'img/icons/lock.png',alt : 'Warning' }));
-					content.append($('<span>',{text : 'Your session is about to close due to inactivity.' }));
-					
-					var refreshSession = function() {
-						content.html($('<img>', {src:"img/ajax-loader.gif", alt: "Refreshing Session"}));
-						$.ajax({
-							url: 'ajax.php?type=keepalive',
-							type:'GET',
-							dataType:'json',
-							success: function (response) {
-								if (response === true){
-									content.html("");
-									content.append($('<img>', {src:"img/icons/accept.png", alt: "OK"}));
-									content.append($('<span>', {text : 'Your session was refreshed successfully.'}));
-									setTimeout(function() {
-										modal.modal('hide')
-									}, 4000);
-								} else {
-									content.html("");
-									content.append($('<img>', {src:"img/icons/error.png", alt: "Error"}));
-									content.append($('<span>', {text : 'Your session was not refreshed because your session has expired or logged out.'}));
-								}
-							},
-							error: function () {
-								content.html("An error occurred trying to refresh your session.");
-							}
-						});
-					};
-
-					// Dismissing the modal shows activity so do a request to keep session alive, and reset timer, logout if expired 
-					modal.one('hide',function() {
-						$.ajax({
-							url: 'ajax.php?type=keepalive',
-							type:'GET'
-						});
-						sessionKeepAliveWarning();
-					});
-
-					var button = modal.find('button.btn');
-					button.on('click',refreshSession);
-				}, sessionWarningTime);
-			}
-
-			function kickSession() {
-				var parentHasSessionWarning = false;
-				try {
-					parentHasSessionWarning = (this != top) && isFunction(window.parent.sessionKeepAliveWarning);
-				} catch (e) {
-					// parent doesn't have the session, or isn't workable (same-origin restriction?)
-					// we are the top authority in session warnings!
-				}
-				if (parentHasSessionWarning) {
-					parent.window.kickSession();
-				} else {
-					sessionKeepAliveWarning();
-				}
-			}
-		</script>
-	</head>
-
-	
-<?if (!isset($_GET['iframe'])) {?>
-	<body class="newui">
-	<iframe class="topnav-frame" src="messagesender_topnav.php" frameborder="0" scrolling="no"></iframe>
-<?} else {?>
-	<body class="newui-nobackground">
-<?}?>
-
-	<div id="messagesender-shell" style="clear: both;"></div>
-
-	<!-- Session warning modal -->
-	<div id="session-warning-modal" class="modal hide" aria-hidden="false">
-		<div class="modal-header">
-			<button class="close" type="button" data-dismiss="modal" aria-hidden="true">x</button>
-			<h3>Automatic Logout</h3>
-		</div>
-		<div class="modal-body">
-			<div class="keepalive">
-				<img src="img/icons/lock.png" alt="Warning">
-				<span>Your session is about to close due to inactivity.</span>
-			</div>
-		</div>
-		<div>
-			<p style="padding: 6px;">
-				<button class="btn" type="button">
-					<div class="btn_wrap cf">
-						<span class="btn_left"></span>
-						<span class="btn_middle">
-						<img class="btn_middle_icon" src="img/icons/tick.gif">
-						<span class="btn_text">Refresh Session</span>
-						</span>
-						<span class="btn_right"></span>
-					</div>
-				</button>
-			</p>
-		</div>
-	</div>
-
-<?if (!isset($_GET['iframe'])) {?>
-	<iframe class="bottomnav-frame" src="messagesender_bottomnav.php" height="100px" frameborder="0" scrolling="no"></iframe>
-<?}?>
-
+	<script type="text/javascript" src="messagesender/javascripts/vendor.js"></script>
+	<script type="text/javascript" src="messagesender/javascripts/app.js"></script>
 	<script type="text/javascript" src="script/jquery.json-2.3.min.js"></script>
 	<script type="text/javascript" src="script/jquery.timer.js"></script>
 	<script type="text/javascript" src="script/jquery.moment.js"></script>
@@ -1157,10 +1003,10 @@ $SESSION_WARNING_TIME = isset($SETTINGS['feature']['session_warning_time']) ?
 		}, 200);
 	</script>
 
-	</body>
-	</html>
-
 <?
+include("navbottom.inc.php");
+
+
 class MessageSenderProcessor {
 	private $displayingCallerid;
 	private $ttslanguages;
