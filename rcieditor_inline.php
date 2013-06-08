@@ -80,7 +80,7 @@
 			}
 		?>
 		</script>
-		<script type="text/javascript" src="script/jquery.1.7.2.min.js"></script>
+		<script type="text/javascript" src="script/jquery-1.8.3.min.js"></script>
 		<script type="text/javascript">
 			<?/* Note that this hack is to allow us to see the TextColor and BGCOlor buttons in the inline editor's 
 			     toolbar. If we do not call the setLoadingVisibility(false) then those two tools do not show up in

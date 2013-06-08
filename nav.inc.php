@@ -219,7 +219,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 	
 	<title><?= getBrand();?>: <?= $PAGETITLE ?></title>
 
-	<script type="text/javascript" src="script/jquery.1.7.2.min.js"></script>
+	<script type="text/javascript" src="script/jquery-1.8.3.min.js"></script>
 <?if (!isset($NOPROTOTYPE) || !$NOPROTOTYPE) {?>
 	<script type="text/javascript">
 		jQuery.noConflict();

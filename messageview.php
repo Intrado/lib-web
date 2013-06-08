@@ -47,7 +47,7 @@ function displayMessage() {
 ?>
 <!DOCTYPE html>
 <html>
-    <script type="text/javascript" src="script/jquery.1.7.2.min.js"></script>
+    <script type="text/javascript" src="script/jquery-1.8.3.min.js"></script>
     <script type="text/javascript">
    		$().ready(function() {
    			if (typeof(parent.messagePrevewLoaded) != 'undefined') 
