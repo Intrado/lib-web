@@ -318,30 +318,6 @@ header('Content-type: text/html; charset=UTF-8') ;
 <div class="primary_nav">
 <div class="contain cf">
 
-	<div class="navshortcut">
-	<? 	if ($USER->authorize("startshort")) { ?>
-		<div class="shortcuts hoverlinks" id="shortcuts" style="display: none;"><? doShortcuts($SHORTCUTS) ?></div>
-		
-		<div id="shortcutmenu" class="shortcutmenu">Shortcuts&nbsp;<img src="img/arrow_down.gif" alt=""></div>
-	
-		<script type="text/javascript">
-		Event.observe(window, 'load', function() {
-			new Tip('shortcutmenu', $('shortcuts'), {
-				style: 'fresh',
-				target: 'shortcutmenu',
-				hideOn: false,
-				hideAfter: 0.5,
-				hook: { target: 'bottomRight', tip: 'topRight' },
-				offset: { x: 0, y: 2 },
-				width: '250px'
-			});
-		});
-		</script>
-	
-	<? } ?>
-	</div><!-- navshortcut -->
-	
-	
 	<ul class="navtabs">
 	<?= $MAINTABS ?>
 	</ul>
