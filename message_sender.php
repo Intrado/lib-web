@@ -889,7 +889,7 @@ if (isset($_GET['jsonformdata'])) {
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "notifications:jobs";
 $TITLE = "";
-
+$MESSAGESENDER = true;
 $NOPROTOTYPE = true;
 include("nav.inc.php");
 ?>
