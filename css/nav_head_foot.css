@@ -219,6 +219,11 @@ div.default-modal {
 	margin: 0 0 10px;
 	width: 100%;
 }
+.subnavtabs ul {
+	list-style: none outside none;
+	margin: 0px;
+	padding: 0px;
+}
 .subnavtabs li {
 	margin: 5px 10px;
 	position: relative;
