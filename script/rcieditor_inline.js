@@ -308,7 +308,7 @@ window.RCIEditorInline = function () {
 
         // trigger event for BBMS to update it's EmailMessage model with the cleanedContent from CKE
         // NOTE: trigger event from parent window's rcieditor, using its instance of jQuery, not the iFrame's jQuery instance
-        window.parent.$(window.parent.rcieditor).trigger('ckeditor-inline:updateModel', content);
+        $(window.parent.rcieditor).trigger('ckeditor-inline:updateModel', content);
 
         // (8) Validate the changes as captured
         window.parent.rcieditor.validate();
