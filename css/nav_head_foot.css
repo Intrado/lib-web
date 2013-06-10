@@ -269,6 +269,7 @@ div.default-modal {
 .content_wrap {
 	margin: 0;
 	min-width: 985px;
+	padding: 0px 0 85px;
 	position: relative;
 }
 .wrap {
