@@ -897,6 +897,9 @@ include("nav.inc.php");
 	<div id="messagesender-shell"></div>
 
 	<link rel="stylesheet" href="messagesender/stylesheets/app.css">
+    <!--[if IE 8]>
+        <link rel="stylesheet" type="text/css" href="messagesender/styles/messagesender_ie8.css" >
+    <![endif]-->
 
 	<script type="text/javascript" src="messagesender/javascripts/vendor.js"></script>
 	<script type="text/javascript" src="messagesender/javascripts/app.js"></script>
