@@ -30,8 +30,13 @@ header('Content-type: text/html; charset=UTF-8') ;
 	<script src="script/bootstrap-modal.js" type="text/javascript"></script>
 	<script src="script/session_warning.js" type="text/javascript"></script>
 
+
+<?if (isset($MESSAGESENDER) && $MESSAGESENDER) {?>
+	<!-- no nav or footer so no CSS file for those elements should be loaded -->
+<?} else {?>
 	<link href="css.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print" />
 	<link href="css.forms.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print" />
+<?}?>
 	<link href="css/style_print.css" type="text/css" rel="stylesheet" media="print" />
 	
 	<!--[if IE 8]>
@@ -53,7 +58,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 //load validator for rules, handle rule add/delete to form submit (contactsearchformdata.inc.php)
 ?>
 
-<div class="content_wrap iframe_content_wrap cf">
+<div class="iframe_content_wrap">
 <div class="modal hide fade default-modal" id="defaultmodal">
 	<div class="modal-header">
 		<button class="close" aria-hidden="true" data-dismiss="modal" type="button">x</button>
