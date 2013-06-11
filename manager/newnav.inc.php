@@ -311,10 +311,15 @@ header('Content-type: text/html; charset=UTF-8') ;
 	<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
 	<title>Manager: <?= $PAGETITLE ?></title>
 
+	<script type="text/javascript" src="script/jquery-1.8.3.min.js"></script>
+	<script type="text/javascript">
+		jQuery.noConflict();
+	</script>
 	<script src="script/prototype.js" type="text/javascript"></script> <!-- updated to prototype 1.7 -->
 	<script src="script/scriptaculous.js" type="text/javascript"></script>
 	<script src="script/prototip.js.php" type="text/javascript"></script>
 	<script src="script/utils.js"></script>
+	<script src="script/session_warning.js" type="text/javascript"></script>
 	<script src="script/sorttable.js"></script>
 	<script src="script/form.js.php" type="text/javascript"></script>
 	<script src="script/livepipe/livepipe.js" type="text/javascript"></script>
