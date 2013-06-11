@@ -917,9 +917,7 @@ include("nav.inc.php");
 
 			// initialize with a loading message
 			$('#messagesender-shell').html(
-				'<div class="loading">' +
-					'Loading, please wait...' +
-				'</div>'
+				'<div class="loading"></div>'
 			);
 
 			window.BOOTSTRAP_DATA = {};
