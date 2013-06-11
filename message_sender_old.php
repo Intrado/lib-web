@@ -1344,7 +1344,6 @@ if (isset($_GET['jsonformdata'])) {
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "notifications:jobs";
 $TITLE = "";
-$MESSAGESENDER = true;
 
 include("nav.inc.php");
 // Load Custom Form Validators

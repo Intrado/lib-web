@@ -5,7 +5,7 @@ jQuery.noConflict();
 	var lastHeight;
 	setInterval(function() {
 		// content_wrap has a bunch of extra padding...
-		var newHeight = $('div.content_wrap').height();
+		var newHeight = $('div.iframe_content_wrap').height();
 		if (newHeight != lastHeight) {
 			var msg = {};
 			msg["resize"] = lastHeight = newHeight;
