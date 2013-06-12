@@ -115,6 +115,12 @@ if (strlen($SYSTEMALERT = getSystemSetting("alertmessage")) > 0)
 else
 	$SYSTEMALERT = "";
 
+//System maintenance message
+if (strlen($GLOBALALERT = getSystemSetting("globalmessage")) > 0)
+	$GLOBALALERT = "<div class='alertmessage noprint'>" . nl2br(escapehtml($GLOBALALERT)) . "</div>";
+else
+	$GLOBALALERT = "";
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display Functions
@@ -351,6 +357,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 
 	<div class="container cf">
 	<?= $SYSTEMALERT ?>
+	<?= $GLOBALALERT ?>
 
 	<?
 		if (!empty($_SESSION['confirmnotice'])) {
