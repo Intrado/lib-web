@@ -14,6 +14,8 @@ $job = new Job($jobid);
 $job->runNow();
 sleep(3);
 
+unset($_SESSION['jobid']);
+
 if (isset($_REQUEST['close']) && $_REQUEST['close']) {
 ?>
 

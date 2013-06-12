@@ -1154,6 +1154,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$_SESSION['jobid'] = $job->id;
 			$sendto = "jobconfirm.php";
 		} else {
+			unset($_SESSION['jobid']);
 			if (isset($_SESSION['origin']) && ($_SESSION['origin'] == 'start')) {
 				unset($_SESSION['origin']);
 				$sendto = 'start.php';
