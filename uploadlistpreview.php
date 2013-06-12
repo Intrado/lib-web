@@ -70,7 +70,7 @@ if ($datauri && !CheckFormSubmit($f,'save')) {
 				continue;
 
 			$row = str_getcsv($line);
-			$pkey = DBSafe(trim($row[0]));
+			$pkey = trim($row[0]);
 			if ($pkey == "")
 				continue;
 
