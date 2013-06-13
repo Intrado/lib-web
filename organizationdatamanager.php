@@ -224,6 +224,8 @@ $limit = 100;
 
 $data = QuickQueryMultiRow("select SQL_CALC_FOUND_ROWS id, orgkey from organization where not deleted order by orgkey, id limit $start, $limit", true);
 
+$total = QuickQuery("select FOUND_ROWS()");
+
 // TAI has a single root organization we want to display as the special case
 $rootOrgId = QuickQuery("select id from organization where (select 1 from setting where name like '_dbtaiversion') and parentorganizationid is null and not deleted");
 if ($rootOrgId) {
@@ -234,8 +236,6 @@ if ($rootOrgId) {
 		}
 	}
 }
-
-$total = QuickQuery("select FOUND_ROWS()");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
