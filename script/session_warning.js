@@ -73,7 +73,6 @@ function sessionKeepAliveWarning(timeout) {
 			$.ajax({
 				url: 'ajax.php?type=keepalive',
 				type:'GET',
-				dataType:'json',
 				success: function (response) {
 					if (response === true){
 						content.html("");
