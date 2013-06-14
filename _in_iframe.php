@@ -1,5 +1,8 @@
+<!DOCTYPE html>
 <html>
 <head>
+	<meta content="text/html; charset=UTF-8" http-equiv="Content-type">
+	<meta content="IE=edge" http-equiv="X-UA-Compatible">
 	<script type="text/javascript" src="script/jquery-1.8.3.min.js"></script>
 	<script type="text/javascript" src="script/jquery.json-2.3.min.js"></script>
 	<script type="text/javascript" src="script/postmessagehandler.js"></script>
