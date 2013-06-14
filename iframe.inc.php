@@ -27,13 +27,14 @@ header('Content-type: text/html; charset=UTF-8') ;
 	<script src="script/form.js.php" type="text/javascript"></script>
 <?}?>
 	<script src="script/sorttable.js"></script>
-	<script src="script/bootstrap-modal.js" type="text/javascript"></script>
 	<script src="script/session_warning.js" type="text/javascript"></script>
 
 
 <?if (isset($MESSAGESENDER) && $MESSAGESENDER) {?>
 	<!-- no nav or footer so no CSS file for those elements should be loaded -->
 <?} else {?>
+	<script src="script/bootstrap-modal.js" type="text/javascript"></script>
+	
 	<link href="css.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print" />
 	<link href="css.forms.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print" />
 <?}?>
