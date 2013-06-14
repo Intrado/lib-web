@@ -763,6 +763,7 @@ $formdata = array_merge($formdata, array(
 		"label" => "Schedule type",
 		"value" => "",
 		"validators" => array(
+			array("ValRequired"),
 			array("ValInArray", "values" => array("now","schedule"))
 		),
 		"control" => array("RadioButton", "values" => array("now" => "now", "schedule" => "schedule")),
