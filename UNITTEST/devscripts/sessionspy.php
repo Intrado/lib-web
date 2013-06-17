@@ -41,11 +41,13 @@ if (isset($_REQUEST['action'])) switch ($_REQUEST['action']) {
 				<tr>
 					<td>KEY</td>
 					<td><input type="text" name="key" value=""/></td>
-					<td rowspan="2"><input type="submit" value="SET IT!"/></td>
 				</tr>
 				<tr>
 					<td>VALUE</td>
 					<td><textarea name="value"></textarea></td>
+				</tr>
+				<tr>
+					<td colspan="2"><input type="submit" value="SET IT!"/></td>
 				</tr>
 			</form>
 		</table>
