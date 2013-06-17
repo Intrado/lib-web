@@ -24,11 +24,3 @@ $$$
 
 delete from setting where name in ("_brandtheme", "_brandprimary", "_brandratio", "_brandtheme1", "_brandtheme2")
 $$$
-
-INSERT INTO `setting` (`name`, `value`) VALUES
-('_brandprimary', '3e693f'),
-('_brandratio', '.2'),
-('_brandtheme', 'newui'),
-('_brandtheme1', '346799'),
-('_brandtheme2', '3399ff')
-$$$
