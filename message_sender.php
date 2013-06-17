@@ -916,10 +916,19 @@ include("nav.inc.php");
 	<script type="text/javascript">
 		$(function () {
 
-			// initialize with a loading message
+			// initialize with a loading message and progress bar
 			$('#messagesender-shell').html(
-				'<div class="loading"></div>'
-			);
+                '<div class="progressBarParent margRL30">' +
+                    '<div class="mask"></div>' +
+                    '<div id="maskLoadingContainer">' +
+                        '<h3>Loading: <span class="text-success"><em>New Broadcast</em></span>... </h3>' +
+                        '<div class="progress progress-success progress-striped active">' +
+                            '<div id="progressBar" class="bar" style="width:100%;" data-loading-percent="100"></div>' +
+                        '</div>' +
+                        '<small class="muted">This might take a few seconds</small>' +
+                    '</div>' +
+                '</div>'
+            );
 
 			window.BOOTSTRAP_DATA = {};
 			var orgID = -1;
@@ -954,7 +963,7 @@ include("nav.inc.php");
 
 				$.when(languages, features, options, facebookPages, fieldmaps, formData)
 					.done(function (languagesRes, featuresRes, optionsRes, facebookPagesRes, fieldmaps, formData) {
-						org.languages = languagesRes[0].languages;
+                        org.languages = _.sortBy(languagesRes[0].languages, function(language) {return language.name;});
 						org.settings = {
 							features:featuresRes[0].features,
 							options:optionsRes[0].options,
