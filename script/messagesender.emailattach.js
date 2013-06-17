@@ -35,7 +35,7 @@ window.stopUpload = function (id, name, size, errormessage) {
 			var downloadlinkContainer = $('<div class="downloadlinkContainer"></div>');
 			var attachment = $('<a data-attachment-id="' + contentid + '" class="emailAttachment" href="_emailattachment.php?id='  + contentid +  '&name=' + encodeURIComponent(encodeURIComponent(content.name)) + '" >' + content.name + '</a>');
 			var filesize = " &nbsp; (" + Math.round(content.size/1024) + " KB) &nbsp; ";
-			var removelink = $('<a class="removeAttachment" data-attachment-id="' + contentid + '" href="#" title="Remove attachment" rel="tooltip" data-placement="right"><span class="glyphicons remove_2 padR0"><i></i></span></a>');
+			var removelink = $('<a class="removeAttachment" data-attachment-id="' + contentid + '" href="#" title="Remove attachment" rel="tooltip" data-placement="right"><i class="icon-remove margT0 padR0"></i></a>');
 
 			// register click event handlers on dynamically created 'Remove' links
 			removelink.on('click', function(e) {
@@ -54,7 +54,7 @@ window.stopUpload = function (id, name, size, errormessage) {
 			removelink.tooltip();
 
 
-			downloadlinkContainer.append('<span class="glyphicons paperclip lighten"><i></i></span>')
+			downloadlinkContainer.append('<span class="sprite-glyphicons-paperclip lighten margT0"><i></i></span>')
 				.append(attachment)
 				.append(filesize)
 				.append(removelink);
