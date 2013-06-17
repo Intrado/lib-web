@@ -112,7 +112,7 @@
 		</div>
 		<style type="text/css">
 			<?/* SMK added 2013-03-07 to force this button's label to show in the toolbar */?>
-			.cke_button__pastefromphone_label {
+			.cke_button__pastefromphone_label, .cke_button__mkfield_label {
 				display: inline-block;
 			}
 		</style>
