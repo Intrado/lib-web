@@ -971,6 +971,7 @@ include("nav.inc.php");
 							facebookAppID:  <?= $SETTINGS['facebook']['appid'] ?>
 						}
 						roles.accessProfile['fieldmaps'] = fieldmaps[0];
+                        userResponse.preferences.push({name:'hidetoolbar', value: <?= ($USER->getSetting('hideemailtools', false) ? 'true' : 'false'); ?>});
 						window.BOOTSTRAP_DATA.user = userResponse;
 
 						window.BOOTSTRAP_DATA.form = {
