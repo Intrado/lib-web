@@ -2173,3 +2173,8 @@ $$$
 update setting set value='9.7/2' where name='_dbversion'
 $$$
 -- END 9.7/2
+
+-- START 9.7/3
+update setting set value='9.7/3' where name='_dbversion'
+$$$
+-- END 9.7/3

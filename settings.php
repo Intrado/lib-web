@@ -44,7 +44,6 @@ if ($USER->authorize('managesystem') || $USER->authorize('metadata')) {
 	}
 	if ($USER->authorize('managesystem')) {
 		$systemLinks[] = "<a href='securitysettings.php'>Security</a>";
-		$systemLinks[] = "<a href='displaysettings.php'>Display</a>";
 	}
 		
 	$linkLists[] = $systemLinks;

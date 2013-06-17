@@ -13,7 +13,6 @@ require_once("inc/themes.inc.php");
 require_once("obj/Validator.obj.php");
 require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
-require_once("obj/FormBrandTheme.obj.php");
 require_once("obj/FormUserItems.obj.php");
 require_once("inc/facebook.php");
 require_once("inc/facebookEnhanced.inc.php");
@@ -466,21 +465,6 @@ $formdata["hideemailtools"] = array(
 	"helpstep" => 3
 );
 
-$formdata["brandtheme"] = array(
-	"label" => _L("Customize Theme"),
-	"fieldhelp" => ("Use this to select a different theme for the user interface. Themes can be customized with alternate primary colors (in hex) and primary to background color ratio settings."),
-	"value" => json_encode(array("theme"=>$USER->getSetting('_brandtheme',getSystemSetting('_brandtheme')),
-		"color"=>$USER->getSetting('_brandprimary',getSystemSetting('_brandprimary')),
-		"ratio"=>$USER->getSetting('_brandratio',getSystemSetting('_brandratio')),
-		"customize"=>($USER->getSetting('_brandtheme'))?true:false
-		)),
-	"validators" => array(
-		array("ValBrandTheme", "values" => array_keys($COLORSCHEMES))
-	),
-	"control" => array("BrandTheme","values"=>$COLORSCHEMES,"toggle"=>true),
-	"helpstep" => 3
-);
-
 $buttons = array(submit_button(_L("Done"),"submit","tick"),
 				icon_button(_L("Cancel"),"cross",null,"start.php"));
 
@@ -540,36 +524,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		//$USER->setSetting("_locale", $postdata['locale']);
 		//$_SESSION['_locale'] = $postdata['locale'];
 		$USER->setSetting("hideemailtools", $postdata['hideemailtools']);
-
-		$newTheme = json_decode($postdata['brandtheme']);
-
-		if ($newTheme->customize) {
-
-			$USER->setSetting("_brandtheme", $newTheme->theme);
-			$USER->setSetting("_brandprimary", $newTheme->color);
-			$USER->setSetting("_brandratio", $newTheme->ratio);
-			$USER->setSetting("_brandtheme1", $COLORSCHEMES[$newTheme->theme]["_brandtheme1"]);
-			$USER->setSetting("_brandtheme2", $COLORSCHEMES[$newTheme->theme]["_brandtheme2"]);
-
-			$_SESSION['colorscheme']['_brandtheme'] = $newTheme->theme;
-			$_SESSION['colorscheme']['_brandprimary'] = $newTheme->color;
-			$_SESSION['colorscheme']['_brandratio'] = $newTheme->ratio;
-			$_SESSION['colorscheme']['_brandtheme1'] = $COLORSCHEMES[$newTheme->theme]["_brandtheme1"];
-			$_SESSION['colorscheme']['_brandtheme2'] = $COLORSCHEMES[$newTheme->theme]["_brandtheme2"];
-
-		} else {
-			$USER->setSetting("_brandtheme", "");
-			$USER->setSetting("_brandtheme1", "");
-			$USER->setSetting("_brandtheme2", "");
-			$USER->setSetting("_brandprimary", "");
-			$USER->setSetting("_brandratio", "");
-
-			$_SESSION['colorscheme']['_brandtheme'] = getSystemSetting("_brandtheme");
-			$_SESSION['colorscheme']['_brandtheme1'] = getSystemSetting("_brandtheme1");
-			$_SESSION['colorscheme']['_brandtheme2'] = getSystemSetting("_brandtheme2");
-			$_SESSION['colorscheme']['_brandprimary'] = getSystemSetting("_brandprimary");
-			$_SESSION['colorscheme']['_brandratio'] = getSystemSetting("_brandratio");
-		}
 		
 		Query('COMMIT');
 
@@ -608,7 +562,7 @@ include_once("nav.inc.php");
 
 ?>
 <script type="text/javascript">
-<? Validator::load_validators(array("ValLogin","ValPassword","ValBrandTheme", "ValAccesscode", "ValPin","ValCallerID","ValTimeWindowCallEarly","ValTimeWindowCallLate")); ?>
+<? Validator::load_validators(array("ValLogin","ValPassword", "ValAccesscode", "ValPin","ValCallerID","ValTimeWindowCallEarly","ValTimeWindowCallLate")); ?>
 </script>
 <?
 
