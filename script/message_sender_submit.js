@@ -134,7 +134,7 @@ function SubmitManager() {
 
 						// If test mode was used for the form submission, there might be postdata to show
 						if (typeof(res.postdata) !== "undefined") {
-							diagbox = '<br/><div style="display: none;"><textarea id="test_mode_postdata">';
+							diagbox = '<br/><div style="display: none;"><textarea id="debug_postdata">';
 							if (typeof(JSON) === 'object') {
 								diagbox += JSON.stringify(res.postdata);
 							}

@@ -845,11 +845,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		// The post handler will return a job that's ready to use if all went to plan
 		$postdata = $form->getData();
 
-		// If testmode=1 was added to the POST data then we can activate test mode that way
-		if (isset($_REQUEST['testmode']) && (intval($_REQUEST['testmode']) == 1)) {
-			$msp->set_test_mode(true);
-		}
-
 		$job = $msp->doPost($postdata);
 
 		// run the job
@@ -862,8 +857,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$form->sendTo("jobview.php?iframe&id=". $job->id);
 			}
 
-			// If we're in test mode
-			else if ($msp->get_test_mode()) {
+			// If we're debugging
+			else if ($_SESSION['DEBUG']) {
 				// Add some diagnostic info to the final return AJAX
 				$diagnostics = array(
 					'postdata' => $postdata
@@ -1024,22 +1019,10 @@ class MessageSenderProcessor {
 	private $ttslanguages;
 	private $translationlanguages;
 
-	// If test_mode is true then we can change our behavior to support
-	// some type of output verbosity for test automation to see the result 
-	private $test_mode = false;
-
 	function MessageSenderProcessor($dispCallerId, $ttsLangs, $translationLangs) {
 		$this->displayingCallerid = $dispCallerId;
 		$this->ttslanguages = $ttsLangs;
 		$this->translationlanguages = $translationLangs;
-	}
-
-	public function set_test_mode($mode) {
-		if (is_bool($mode)) $this->test_mode = $mode;
-	}
-
-	public function get_test_mode() {
-		return($this->test_mode);
 	}
 
 	public function doPost($postdata) {
