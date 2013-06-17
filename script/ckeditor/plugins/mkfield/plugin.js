@@ -10,7 +10,7 @@ CKEDITOR.plugins.add( 'mkfield', {
                 editor.addCommand('mkfield', new CKEDITOR.dialogCommand('mkfield'));
 
 		editor.ui.addButton('mkField', {
-			label: 'Make a new field insert',
+			label: 'Field Insert',
 			command: 'mkfield',
 			toolbar: 'newone'
 		});
