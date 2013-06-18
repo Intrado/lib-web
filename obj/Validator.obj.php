@@ -112,7 +112,7 @@ class ValConditionallyRequired extends Validator {
 	function getJSValidator () {
 		return
 			'function (name, label, value, args, requiredvalues) {
-				conditionvalue = requiredvalues[args["field"]];
+				var conditionvalue = requiredvalues[args["field"]];
 				if (conditionvalue.length != 0 && value.length == 0)
 					return label + " is required";
 				return true;
