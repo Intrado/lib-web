@@ -71,8 +71,8 @@ if (is_array($result)) {
 <html>
 <head>
 	<meta http-equiv="Content-type" value="text/html; charset=UTF-8" />
-	<link href="css.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print">
-	<link href="css.forms.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print" />
+	<link href="css.php" type="text/css" rel="stylesheet" media="screen, print">
+	<link href="css.forms.php" type="text/css" rel="stylesheet" media="screen, print" />
 	<style type="text/css">
 		html, body, iframe {
 			background: transparent;

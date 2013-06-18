@@ -70,17 +70,14 @@ $SHORTCUTS['Help'] = "javascript: popup('help/index.php',750,500);";
 
 //tree format:
 //[[title,default link,access,selected,[[sub title,sub link,sub access,sub selected],...],...]
-
-// Theme specific navigation
-// Start is renamed Dashboard and broadcast templates are only visable in new UI  
-
+$targetedMessagePerm = getSystemSetting("_hastargetedmessage", false) ? "targetedmessage" : "dummy";
 $NAVTREE = array (
-		array(_L("Dashboard"),"start.php",NULL,$MAINTAB=="start",array()),
-		array(getJobsTitle(),NULL,array("createlist","sendphone","sendprint","sendemail", "sendsms",getSystemSetting("_hastargetedmessage", false) ? "targetedmessage" : "dummy"),$MAINTAB=="notifications",array(
+	array(_L("Dashboard"),"start.php",NULL,$MAINTAB=="start",array()),
+	array(getJobsTitle(),NULL,array("createlist","sendphone","sendprint","sendemail", "sendsms", $targetedMessagePerm), $MAINTAB=="notifications",array(
 		array("Lists","lists.php",array("createlist","subscribe"),$SUBTAB=="lists"),
 		array("Messages","messages.php",array('sendemail', 'sendphone', "sendsms","subscribe"),$SUBTAB=="messages"),
 		array(getJobsTitle(),"jobs.php",array('sendemail', 'sendphone', "sendsms"),$SUBTAB=="jobs"),
-		array("Templates","jobtemplates.php",array('sendemail', 'sendphone', "sendsms")),
+		array("Templates","jobtemplates.php",array('sendemail', 'sendphone', "sendsms"), $SUBTAB=="templates"),
 		array("Posts","posts.php",getSystemSetting("_hasfeed", false) ? "feedpost" : "dummy",$SUBTAB=="post"),
 		array("Classroom","classroommessageoverview.php",getSystemSetting("_hastargetedmessage", false) ? "targetedmessage" : "dummy",$SUBTAB=="classroom"),
 		array("Surveys","surveys.php",$USER->canSendSurvey() ? "survey" : "dummy",$SUBTAB=="survey"),
@@ -246,8 +243,8 @@ header('Content-type: text/html; charset=UTF-8') ;
 <?} else {?>
 	<script src="script/bootstrap-modal.js" type="text/javascript"></script>
 	
-	<link href="css.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print" />
-	<link href="css.forms.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print" />
+	<link href="css.php" type="text/css" rel="stylesheet" media="screen, print" />
+	<link href="css.forms.php" type="text/css" rel="stylesheet" media="screen, print" />
 <?}?>
 	<link href="css/style_print.css" type="text/css" rel="stylesheet" media="print" />
 	

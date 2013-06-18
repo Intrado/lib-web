@@ -38,7 +38,7 @@ class PhoneMessageEditor extends FormItem {
 		
 		$messagegroupid = (isset($this->args['messagegroupid'])?$this->args['messagegroupid']:false);
 		
-		// style - added into form.css.php in advanced message editor section
+		// style - added into form.css in advanced message editor section
 		
 		// textarea for message bits
 		$textarea = '

@@ -97,8 +97,8 @@ header('Content-type: text/html; charset=UTF-8') ;
 	<script src="script/prototip.js.php" type="text/javascript"></script>
 	<script src="script/form.js.php" type="text/javascript"></script>
 
-	<link href="css.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print">
-	<link href="css.forms.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print" />
+	<link href="css.php" type="text/css" rel="stylesheet" media="screen, print">
+	<link href="css.forms.php" type="text/css" rel="stylesheet" media="screen, print" />
 	<link href="css/prototip.css.php" type="text/css" rel="stylesheet">
 	<link href='css/style_print.css' type='text/css' rel='stylesheet' media='print'>
 
@@ -153,7 +153,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 
 
 <div class="content_wrap cf"><!-- starts main content section, tag is ended in navbottom.inc.php -->
-		<div class="container cf">
+<div class="container cf">
 
 	<div class="pagetitle"><?= (isset($TITLE) ? $TITLE : "") ?></div>
 	<div class="pagetitlesubtext"><?= (isset($DESCRIPTION) ? $DESCRIPTION : "") ?></div>

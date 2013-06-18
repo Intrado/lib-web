@@ -306,8 +306,8 @@ header('Content-type: text/html; charset=UTF-8') ;
 	<script src="script/livepipe/window.js" type="text/javascript"></script>
 	<script src="script/modalwrapper.js" type="text/javascript"></script>
 	
-	<link href="css.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>&newnav=true" type="text/css" rel="stylesheet" media="screen, print" />
-	<link href="css.forms.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print" />
+	<link href="css.php?newnav=true" type="text/css" rel="stylesheet" media="screen, print" />
+	<link href="css.forms.php" type="text/css" rel="stylesheet" media="screen, print" />
 	<link href="css/datepicker.css.php" type="text/css" rel="stylesheet" />
 	<link href="css/prototip.css.php" type="text/css" rel="stylesheet" />
 	<link href="css/style_print.css" type="text/css" rel="stylesheet" media="print" />
@@ -320,9 +320,10 @@ header('Content-type: text/html; charset=UTF-8') ;
 	  </style>
 	<![endif]-->
 </head>
-<body>
+<body class="manager">
 <!-- ********************************************************************* -->
 
+<div class="wrap"><!-- tag ends in footer -->
 <div id="top_banner" class="banner cf">
 <div class="container">
 
@@ -333,8 +334,8 @@ header('Content-type: text/html; charset=UTF-8') ;
 	<div class="banner_links_wrap">
 		<ul class="banner_links cf">
 			<li class="bl_left"></li>
-			<li class="bl_last"><a href="allcustomers.php?newnav=false">Old Nav</a></li>
-			<li class="bl_last"><a href="index.php?logout=1">Logout</a></li>
+			<li><a href="allcustomers.php?newnav=false">Old Nav</a></li>
+			<li><a href="index.php?logout=1">Logout</a></li>
 			<li class="bl_right"></li>
 		</ul>
 	</div>
@@ -365,9 +366,8 @@ Event.observe(window, 'load', function() {
 	</div>
 </div>
 
-
 <div class="content_wrap cf"><!-- tag ends in footer -->
-<div class="container cf">
+<div class="container cf"><!-- tag ends in footer -->
 	<?
 		if (!empty($_SESSION['confirmnotice'])) {
 			echo "<div class='confirmnoticecontainer noprint'><div class='confirmnoticecontent noprint'>";

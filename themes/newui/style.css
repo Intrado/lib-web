@@ -1027,7 +1027,7 @@ p.warning {
 .ie8 .navtabs li a { background: none; padding: 14px 0; text-align: center; border: none; }
 
 .ie7 .window_title_wrap,
-.ie8 .window_title_wrap { background: url("themes/<?=$theme?>/win_t.gif") repeat-x; height: 58px; padding: 0 22px; border: none; }
+.ie8 .window_title_wrap { background: url(themes/newui/win_t.gif") repeat-x; height: 58px; padding: 0 22px; border: none; }
 
 .ie7 .window_title,
 .ie8 .window_title { background: none; padding: 15px 0 0 0; }

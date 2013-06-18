@@ -25,7 +25,7 @@ class EmailMessageEditor extends FormItem {
 		if (isset($this->args['subtype']))
 			$subtype = $this->args['subtype'];
 		
-		// style - added into form.css.php in advanced message editor section
+		// style - added into form.css in advanced message editor section
 			
 		// textarea for message bits
 		$textarea = '

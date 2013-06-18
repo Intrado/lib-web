@@ -54,9 +54,10 @@ if (isset($_GET['monitor'])) {
 	
 	
 </head>
-<body>
+<body class="manager">
 <!-- ********************************************************************* -->
 
+<div class="wrap"><!-- tag ends in footer -->
 <div class="manager_logo">
 	<img src="manager.png" alt="ASP Manager"  onclick="window.location='customers.php?newnav=true'"/>
 	<div style="float:right;margin:5px"><a href="customers.php?newnav=true">Beta Manager</a></div>
@@ -101,8 +102,8 @@ if (isset($_GET['monitor'])) {
 	</tr>
 </table>
 
-<div class="maincontent">
-
+<div class="content_wrap cf"><!-- tag ends in footer -->
+	<div class="container cf"><!-- tag ends in footer -->
 	<?
 		if (!empty($_SESSION['confirmnotice'])) {
 			echo "<div class='confirmnoticecontainer noprint'><div class='confirmnoticecontent noprint'>";

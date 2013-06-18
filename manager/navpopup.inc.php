@@ -29,8 +29,8 @@ header('Content-type: text/html; charset=UTF-8') ;
 	<script src="script/livepipe/window.js" type="text/javascript"></script>
 	<script src="script/modalwrapper.js" type="text/javascript"></script>
 	
-	<link href="css.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>&newnav=true" type="text/css" rel="stylesheet" media="screen, print" />
-	<link href="css.forms.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print" />
+	<link href="css.php?newnav=true" type="text/css" rel="stylesheet" media="screen, print" />
+	<link href="css.forms.php" type="text/css" rel="stylesheet" media="screen, print" />
 	<link href="css/datepicker.css.php" type="text/css" rel="stylesheet" />
 	<link href="css/prototip.css.php" type="text/css" rel="stylesheet" />
 	<link href="css/style_print.css" type="text/css" rel="stylesheet" media="print" />

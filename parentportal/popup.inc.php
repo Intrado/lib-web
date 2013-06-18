@@ -12,8 +12,8 @@ $pagetitle = preg_replace('/\\<.+>/','',(isset($TITLE) ? $TITLE : ""));
 	<script src='script/utils.js'></script>
 	<script src='script/sorttable.js'></script>
 	<link href='css/style_print.css' type='text/css' rel='stylesheet' media='print'>
-	<link href="css.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print">
-	<link href="css.forms.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print" />
+	<link href="css.php" type="text/css" rel="stylesheet" media="screen, print">
+	<link href="css.forms.php" type="text/css" rel="stylesheet" media="screen, print" />
   
   	<link href='parentportal.css' type='text/css' rel='stylesheet' media='screen'>
 	

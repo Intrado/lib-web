@@ -98,8 +98,8 @@ header('Content-type: text/html; charset=UTF-8') ;
 	<script src="script/prototip.js.php" type="text/javascript"></script>
 	<script src="script/form.js.php" type="text/javascript"></script>
 
-	<link href="css.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print">
-	<link href="css.forms.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print" />
+	<link href="css.php" type="text/css" rel="stylesheet" media="screen, print">
+	<link href="css.forms.php" type="text/css" rel="stylesheet" media="screen, print" />
   
   	<link href='parentportal.css' type='text/css' rel='stylesheet' media='screen'>
 
