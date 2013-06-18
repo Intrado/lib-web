@@ -843,6 +843,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$msp = new MessageSenderProcessor($displayingCallerid, $ttslanguages, $translationlanguages);
 
 		// The post handler will return a job that's ready to use if all went to plan
+		$rawdata = $_POST;
 		$postdata = $form->getData();
 
 		$job = $msp->doPost($postdata);
@@ -861,7 +862,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			else if ($_SESSION['DEBUG']) {
 				// Add some diagnostic info to the final return AJAX
 				$diagnostics = array(
-					'postdata' => $postdata
+					'postdata' => $postdata,
+					'rawdata' => $rawdata
 				);
 				$form->sendTo("start.php", $diagnostics);
 			}
