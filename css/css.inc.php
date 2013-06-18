@@ -1,28 +1,3 @@
-<?
-
-// FIXME: this doesn't need to be a php file anymore
-
-// FIXME: remove these calculated values. Always the same, now that themes are gone
-$newfade1 = fadecolor("3e693f", "E5E5E5", .2);
-$newfade2 = fadecolor("3e693f", "b9b9b9", .2);
-$newfade3 = fadecolor("3e693f", "848484", .2);
-
-$topbg = fadecolor("3399ff", "FFFFFF", .2/2);
-
-//Takes 2 hex color strings and 1 ratio to apply to to the primary:original
-function fadecolor($primary, $fade, $ratio){
-	$primaryarray = array(substr($primary, 0, 2), substr($primary, 2, 2), substr($primary, 4, 2));
-	$fadearray = array(substr($fade, 0, 2), substr($fade, 2, 2), substr($fade, 4, 2));
-	$newcolorarray = array();
-	for($i = 0; $i<3; $i++){
-		$newcolorarray[$i] = dechex(round(hexdec($primaryarray[$i]) * $ratio + hexdec($fadearray[$i])*(1-$ratio)));
-	}
-	$newcolor = "#" . implode("", $newcolorarray);
-	return $newcolor;
-}
-
-?>
-
 /* http://meyerweb.com/eric/tools/css/reset/ 
    v2.0 | 20110126
    License: none (public domain)
@@ -368,7 +343,7 @@ input.text, input , select, textarea, table.form  {
 	/*border: #346799 1px solid;*/
 }
 
-.windowRowHeader { background-color: #d4d4d4; color: <?=$newfade3?>; width: 85px; }
+.windowRowHeader { background-color: #d4d4d4; color: #767F76; width: 85px; }
 
 .chop { text-align: left; width: 100%; white-space:nowrap; overflow: hidden; color: #666666; border: 1px solid #346799; }
 div.gBranding { display:inline; }
@@ -435,7 +410,7 @@ table.list ul.actionlinks li:nth-child(2n) { background: transparent; }
 	 | lists / tables                                                 |
    +----------------------------------------------------------------+ */
 
-.listAlt { background-color: <?=$newfade1?>; }
+.listAlt { background-color: #C4CCC4; }
 
 .topBorder { border-top: 1px solid #3399ff; }
 .bottomBorder { border-bottom: 1px solid #3399ff; }
@@ -512,7 +487,7 @@ table.schedule th, table.schedule td { width: 30px; padding: 5px 0; text-align: 
 }
 
 .confirmnoticecontainer { margin: 5px 0 10px 25%; width: 50%; }
-.confirmnoticecontent { background: <?=$topbg?>; margin: 0px; padding: 10px; text-align: center; font-size: 1.2em; 
+.confirmnoticecontent { background: #EBF5FF; margin: 0px; padding: 10px; text-align: center; font-size: 1.2em; 
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px;
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; 
 -webkit-box-shadow: 0px 1px 2px 0px #999; -moz-box-shadow: 0px 1px 2px 0px #999; box-shadow: 0px 1px 2px 0px #999; }
@@ -678,12 +653,12 @@ td.SplitPane {
 
 .sortheader {
 	color: white;
-	background-color: <?=$newfade2?>;
+	background-color: #A0A9A1;
 }
 .sortheader:link {
 	text-decoration: none;
 	color: white;
-	background-color: <?=$newfade2?>;
+	background-color: #A0A9A1;
 }
 
 .floatingreportdata {
@@ -721,7 +696,7 @@ div.autocomplete ul {
   margin:0;
   padding:0;
 }
-div.autocomplete ul li.selected { background-color: <?=$newfade1?>;}
+div.autocomplete ul li.selected { background-color: #C4CCC4;}
 div.autocomplete ul li {
   list-style-type:none;
   display:block;
@@ -1028,7 +1003,7 @@ select#reldate { margin: 0 10px 0 0; }
    
 <?
 
-include_once("themes/newui/style.php");
+include_once("themes/newui/style.css");
 
 ?>
 
