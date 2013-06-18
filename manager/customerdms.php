@@ -389,7 +389,7 @@ if (count($data)) {
 	<span style="background: #FF00BB;">inbound</span>
 	<?
 } else {
-	echo "<div class='destlabel'><img src='img/largeicons/information.jpg' align='middle'> " . _L("No Records Found") . "<div>";
+	echo "<div class='destlabel'><img src='img/largeicons/information.jpg' align='middle'> " . _L("No Records Found") . "</div>";
 }
 
 ?>

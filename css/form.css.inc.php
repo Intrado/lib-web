@@ -1,19 +1,3 @@
-<?
-if (!isset($_SESSION['colorscheme'])) {
-	// TODO these should come from customer display data (still brand the login pages)
-	$theme = "classroom";
-	$primary = "3e693f";
-	$theme1 = "3e693f";
-	$theme2 = "b47727";
-	$globalratio = ".2";
-} else {
-	$theme = $_SESSION['colorscheme']['_brandtheme'];
-	$primary = $_SESSION['colorscheme']['_brandprimary'];
-	$theme1 = $_SESSION['colorscheme']['_brandtheme1'];
-	$theme2 = $_SESSION['colorscheme']['_brandtheme2'];
-	$globalratio = $_SESSION['colorscheme']['_brandratio'];
-}
-?>
 
 .newform_container {
 
@@ -119,7 +103,6 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 .newform .formcontrol textarea { margin: 0 0 5px 0; padding: 4px 5px; border: 1px solid #E7E7E7; 
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
-.newform .formcontrol input#account_brandthemecustomize { float: left; display: inline; }
 .newform .formcontrol .feed_url { margin: 2px 0 10px 0; font-size: 1.1em; line-height: 16px; }
 
 .newform .formcontrol .social_note,
@@ -395,7 +378,7 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 
 .maincontainerleft { float: left; display: inline; margin-right: 10px; width: /*438px;*/ }
 .maincontainerseperator { float: left; width: 15px; }
-.maincontainerright { float: left; display: inline; /*margin-left: 10px;*/ padding:6px; border: 1px solid #'.$_SESSION['colorscheme']['_brandtheme2'].'; }
+.maincontainerright { float: left; display: inline; /*margin-left: 10px;*/ padding:6px; border: 1px solid #3399ff; }
 
 
 /* email messages 
@@ -483,12 +466,7 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 /*---------- Include specific form theme styling ----------*/
 
 <?
-$formcssfilename = "themes/$theme/style.form.php";
-	if (is_readable($formcssfilename)) {
-		include_once($formcssfilename);
-	} else {
-		//error_log("unable to find $formcssfilename, looks like this theme doesn't have custom form styling; theme: " . $theme . " cwd:" . getcwd());
-	}
+is_readable("themes/newui/style.form.php");
 ?>
 
 

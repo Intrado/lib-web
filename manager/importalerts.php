@@ -199,7 +199,7 @@ function acknowledgeAlert(id, acknowledged) {
 <?
 
 } else {
-	echo "<div class='destlabel'><img src='img/largeicons/information.jpg' align='middle'> " . _L("No Records Found") . "<div>";
+	echo "<div class='destlabel'><img src='img/largeicons/information.jpg' align='middle'> " . _L("No Records Found") . "</div>";
 }
 endWindow();
 date_default_timezone_set("US/Pacific");

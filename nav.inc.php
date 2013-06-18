@@ -75,12 +75,12 @@ $SHORTCUTS['Help'] = "javascript: popup('help/index.php',750,500);";
 // Start is renamed Dashboard and broadcast templates are only visable in new UI  
 
 $NAVTREE = array (
-		array(($_SESSION['colorscheme']['_brandtheme'] == "newui" ? _L("Dashboard") : _L("Start")),"start.php",NULL,$MAINTAB=="start",array()),
+		array(_L("Dashboard"),"start.php",NULL,$MAINTAB=="start",array()),
 		array(getJobsTitle(),NULL,array("createlist","sendphone","sendprint","sendemail", "sendsms",getSystemSetting("_hastargetedmessage", false) ? "targetedmessage" : "dummy"),$MAINTAB=="notifications",array(
 		array("Lists","lists.php",array("createlist","subscribe"),$SUBTAB=="lists"),
 		array("Messages","messages.php",array('sendemail', 'sendphone', "sendsms","subscribe"),$SUBTAB=="messages"),
 		array(getJobsTitle(),"jobs.php",array('sendemail', 'sendphone', "sendsms"),$SUBTAB=="jobs"),
-		array("Templates","jobtemplates.php",($_SESSION['colorscheme']['_brandtheme'] == "newui" ? array('sendemail', 'sendphone', "sendsms") : array("dummy")),$SUBTAB=="templates"),
+		array("Templates","jobtemplates.php",array('sendemail', 'sendphone', "sendsms")),
 		array("Posts","posts.php",getSystemSetting("_hasfeed", false) ? "feedpost" : "dummy",$SUBTAB=="post"),
 		array("Classroom","classroommessageoverview.php",getSystemSetting("_hastargetedmessage", false) ? "targetedmessage" : "dummy",$SUBTAB=="classroom"),
 		array("Surveys","surveys.php",$USER->canSendSurvey() ? "survey" : "dummy",$SUBTAB=="survey"),
@@ -127,7 +127,6 @@ else
 ////////////////////////////////////////////////////////////////////////////////
 
 function navMainTab ($title, $link, $isselected) {
-	$theme = getBrandTheme();
 	return '<li '. ($isselected ? 'class="navtab_active"' : "") .'><a onfocus="blur()" href="' . $link . '">' . $title . '</a></li>';
 }
 
@@ -204,11 +203,6 @@ function doLogo () {
 		echo '<img src="logo.img.php?hash=' . $logohash .'" alt="">';
 }
 
-function setBodyClass () {
-	$theme = $_SESSION['colorscheme']['_brandtheme'];
-	echo 'class="' . $theme . '"';
-}
-
 doNavTabs($NAVTREE);
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -263,9 +257,10 @@ header('Content-type: text/html; charset=UTF-8') ;
 	
 </head>
 
-	<script>
-		var _brandtheme = "<?=getBrandTheme();?>";
-
+<!--[if IE 7]> <body class="ie7"> <![endif]-->
+<!--[if IE 8]> <body class="ie8"> <![endif]-->
+<!--[if gt IE 8]><!--> <body> <!--<![endif]-->
+	<script type="text/javascript">
 <?
 	if (isset($SETTINGS['googleanalytics']['trackingid'])) {
 ?>

@@ -15,7 +15,6 @@ require_once("../obj/Message.obj.php");
 require_once("../obj/MessagePart.obj.php");
 require_once("loadtemplatedata.php");
 require_once("createtemplates.php");
-require_once("../inc/themes.inc.php");
 require_once("../obj/FormBrandTheme.obj.php");
 require_once("../obj/ValSmsText.val.php");
 require_once("XML/RPC.php");
@@ -240,7 +239,6 @@ $settings = array(
 	'loginlockoutattempts' => '5',
 	'logindisableattempts' => '0',
 	'loginlockouttime' => '5',
-	'_brandtheme' => 'newui',
 	'_brandprimary' => '3e693f',
 	'_brandratio' => '.2',
 	'_amdtype' => "ivr"
@@ -706,24 +704,6 @@ $formdata["loginlockouttime"] = array(
 						"helpstep" => $helpstepnum
 );
 
-$helpsteps[$helpstepnum++] = _L("Choose a theme for the user interface.<br><br>Additionally, you can select a color which will be blended into the grey parts of certain interface components. The amount of tint is determined by the shader ratio.<br><br> Setting the theme will reset the color and ratio options to the theme defaults.");
-$formdata["brandtheme"] = array(
-						"label" => _L("Default Theme"),
-						"fieldhelp" => _L("Use this to select a different theme for the user interface. Themes can be customized with alternate primary colors (in hex) and primary to background color ratio settings."),
-						"value" => json_encode(array(
-							"theme"=>$settings['_brandtheme'],
-							"color"=>$settings['_brandprimary'],
-							"ratio"=>$settings['_brandratio'],
-							"customize"=>true
-						)),
-						"validators" => array(
-							array("ValRequired"),
-							array("ValBrandTheme", "values" => array_keys($COLORSCHEMES))),
-						"control" => array("BrandTheme","values"=>$COLORSCHEMES,"toggle"=>false),
-						"helpstep" => $helpstepnum
-);
-
-
 $thispage = "customeredit.php";
 $returntopage = "customers.php";
 
@@ -919,15 +899,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		setCustomerSystemSetting('loginlockoutattempts', $postdata['loginlockoutattempts'], $custdb);
 		setCustomerSystemSetting('logindisableattempts', $postdata['logindisableattempts'], $custdb);
 		setCustomerSystemSetting('loginlockouttime', $postdata['loginlockouttime'], $custdb);
-				
-		$newTheme = json_decode($postdata["brandtheme"]);
-		setCustomerSystemSetting('_brandtheme', $newTheme->theme,$custdb);
-		setCustomerSystemSetting('_brandprimary', $newTheme->color,$custdb);
-		setCustomerSystemSetting('_brandratio', $newTheme->ratio,$custdb);
-		setCustomerSystemSetting('_brandtheme1', $COLORSCHEMES[$newTheme->theme]["_brandtheme1"],$custdb);
-		setCustomerSystemSetting('_brandtheme2', $COLORSCHEMES[$newTheme->theme]["_brandtheme2"],$custdb);
-		
-		
 		
 		Query("COMMIT");
 		if($button == "done") {

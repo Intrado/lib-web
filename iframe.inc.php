@@ -52,12 +52,6 @@ header('Content-type: text/html; charset=UTF-8') ;
 
 
 <body style="margin: 0px; background: white;" onBeforeUnLoad="if(typeof(unloadsession) != 'undefined') {unloadsession();}">
-	<script>
-		var _brandtheme = "<?=getBrandTheme();?>";
-	</script>
-<? 
-//load validator for rules, handle rule add/delete to form submit (contactsearchformdata.inc.php)
-?>
 
 <div class="iframe_content_wrap">
 <div class="modal hide fade default-modal" id="defaultmodal">

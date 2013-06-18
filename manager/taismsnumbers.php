@@ -91,10 +91,10 @@ if (isset($_GET["search"])) {
 		showTable($numbers,$titles,$formatters);
 		echo '</table>';
 	} else {
-		echo "<div class='destlabel'><img src='img/largeicons/information.jpg' align='middle'> " . _L("No SMS numbers found with search '%s'",$safesearch) . "<div>";
+		echo "<div class='destlabel'><img src='img/largeicons/information.jpg' align='middle'> " . _L("No SMS numbers found with search '%s'",$safesearch) . "</div>";
 	}
 } else {
-	echo "<div class='destlabel'><img src='img/largeicons/information.jpg' align='middle'> " . _L("Use Search to find SMS Numbers") . "<div>";
+	echo "<div class='destlabel'><img src='img/largeicons/information.jpg' align='middle'> " . _L("Use Search to find SMS Numbers") . "</div>";
 }
 endWindow();
 

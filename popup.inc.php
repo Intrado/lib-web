@@ -35,9 +35,6 @@ header('Content-type: text/html; charset=UTF-8') ;
 
 
 <body style="margin: 0px; background-color: white;" onBeforeUnLoad="if(typeof(unloadsession) != 'undefined') {unloadsession();}">
-	<script>
-		var _brandtheme = "<?=getBrandTheme();?>";
-	</script>
 
 <!-- ********************************************************************* -->
 

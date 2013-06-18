@@ -254,20 +254,6 @@ function toggleHiddenField(i){
 	checkbox.checked = !checkbox.checked;
 }
 
-//variable _brandtheme needs to be declared externally of this file.
-function btn_rollover(obj) {
-	modifyMarkedNodes(obj,'buttonrollover','left',function(obj) {obj.src='mimg/themes/' + _brandtheme + '/button_left_over.gif';});
-	modifyMarkedNodes(obj,'buttonrollover','right',function(obj) {obj.src='mimg/themes/' + _brandtheme + '/button_right_over.gif';});
-	modifyMarkedNodes(obj,'buttonrollover','middle',function(obj) {obj.style.background = "url('mimg/themes/" + _brandtheme + "/button_mid_over.gif') repeat-x";});
-}
-
-//variable _brandtheme needs to be declared externally of this file.
-function btn_rollout(obj) {
-	modifyMarkedNodes(obj,'buttonrollover','left',function(obj) {obj.src='mimg/themes/' + _brandtheme + '/button_left.gif';});
-	modifyMarkedNodes(obj,'buttonrollover','right',function(obj) {obj.src='mimg/themes/' + _brandtheme + '/button_right.gif';});
-	modifyMarkedNodes(obj,'buttonrollover','middle',function(obj) {obj.style.background = "url('mimg/themes/" + _brandtheme + "/button_mid.gif') repeat-x";});
-}
-
 function windowHide(windowid) {
 	var windowbody = new getObj('window_' + windowid);
 	var collapseicon = new getObj('window_colapseimg_' + windowid);

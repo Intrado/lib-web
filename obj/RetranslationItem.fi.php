@@ -1,6 +1,6 @@
 <?
 
-/* Retranslation widget
+/** Retranslation widget
  * Shows the translated text, giving the user the ability to disable the language and preview a re-translated
  * english version
  * 
@@ -62,13 +62,12 @@ class RetranslationItem extends FormItem {
 				$previewname = false;
 		}
 
-		$theme2 = "#". $_SESSION['colorscheme']['_brandtheme2'];
 		$str = '
 			<style type="text/css">
 				.retranslateitems {
 				}
 				.retranslateitems .message {
-					border: 1px solid '. $theme2 .';
+					border: 1px solid #3399ff;
 					overflow: auto;
 					width: 70%
 					max-height: 150px;

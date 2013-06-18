@@ -1,14 +1,5 @@
 <?
 $scheme = getCustomerData($CUSTOMERURL);
-if ($scheme == false) {
-	$scheme = array("_brandtheme" => "classroom",
-					"colors" => array(
-						"_brandprimary" => "3e693f",
-						"_brandtheme1" => "3e693f",
-						"_brandtheme2" => "b47727",
-						"_brandratio" => ".2"));
-}
-$primary = $scheme['colors']['_brandprimary'];
 
 $CustomBrand = isset($scheme['productname']) ? $scheme['productname'] : "";
 $custname = isset($scheme['customerName']) ? $scheme['customerName'] : "";
@@ -80,7 +71,7 @@ if((isset($_COOKIE['embeddedpage']) && $_COOKIE['embeddedpage']) || isset($_GET[
 <?
 } else {
 ?>
-<body style='font-family: "Lucida Grande", verdana, arial, helvetica, sans-serif; margin: 0px; background-color: #<?=$primary?>;'>
+<body style='font-family: "Lucida Grande", verdana, arial, helvetica, sans-serif; margin: 0px; background-color: #3e693f;'>
 	<table border=0 cellpadding=0 cellspacing=0 width="100%">
 	<tr style="background-color: #FFFFFF;">
 		<td><div style="padding-left:5px; padding-bottom:5px;"><img src="logo.img.php" alt="" /></div></td>
@@ -93,7 +84,7 @@ if((isset($_COOKIE['embeddedpage']) && $_COOKIE['embeddedpage']) || isset($_GET[
 	</tr>
 	<tr>
 		<td width="320" valign="top" style="background-color: #D4DDE2; color: #365F8D;"><img src="loginpicture.img.php" alt=""></td>
-		<td style="background-color: #D4DDE2; color: #<?=$primary?>;">
+		<td style="background-color: #D4DDE2; color: #3e693f;">
 			<table>
 				<tr>
 					<td width="15px">&nbsp;</td>

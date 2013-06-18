@@ -9,9 +9,6 @@ function doLogo () {
 	echo '<img src="logo.img.php?hash=' . $logohash .'" alt="">';
 }
 ?>
-<script>
-	var _brandtheme = "<?=getBrandTheme();?>";
-</script>
 <html>
 <head>
 	<meta http-equiv="Content-type" value="text/html; charset=UTF-8" />

@@ -1,34 +1,13 @@
 <?
 
-// hack for pages not logged in (no session)
-if (!isset($_SESSION['colorscheme'])) {
-	// TODO these should come from customer display data (still brand the login pages)
-	$theme = "classroom";
-	$primary = "3e693f";
-	$theme1 = "3e693f";
-	$theme2 = "b47727";
-	$globalratio = ".2";
-} else {
-	$theme = $_SESSION['colorscheme']['_brandtheme'];
-	$primary = $_SESSION['colorscheme']['_brandprimary'];
-	$theme1 = $_SESSION['colorscheme']['_brandtheme1'];
-	$theme2 = $_SESSION['colorscheme']['_brandtheme2'];
-	$globalratio = $_SESSION['colorscheme']['_brandratio'];
-}
+// FIXME: this doesn't need to be a php file anymore
 
-$fade1 = "E5E5E5";
-$fade2 = "b9b9b9";
-$fade3 = "848484";
+// FIXME: remove these calculated values. Always the same, now that themes are gone
+$newfade1 = fadecolor("3e693f", "E5E5E5", .2);
+$newfade2 = fadecolor("3e693f", "b9b9b9", .2);
+$newfade3 = fadecolor("3e693f", "848484", .2);
 
-$newfade1 = fadecolor($primary, $fade1, $globalratio);
-$newfade2 = fadecolor($primary, $fade2, $globalratio);
-$newfade3 = fadecolor($primary, $fade3, $globalratio);
-
-$topbg = fadecolor($theme2, "FFFFFF", $globalratio/2);
-
-$primary = "#" . $primary;
-$theme1 = "#" . $theme1;
-$theme2 = "#" . $theme2;
+$topbg = fadecolor("3399ff", "FFFFFF", .2/2);
 
 //Takes 2 hex color strings and 1 ratio to apply to to the primary:original
 function fadecolor($primary, $fade, $ratio){
@@ -102,10 +81,10 @@ audio:not([controls]) { display: none; }
 
 html { font-size: 100%; overflow-y: scroll; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
 body { margin: 0; font-size: 0.75em; line-height: 1.231; }
-body, input, select, textarea, button { font-family: Verdana, "Helvetica Neue", helvetica,  Arial, sans-serif; color: #444 /*<?=$primary?>*/; }
+body, input, select, textarea, button { font-family: Verdana, "Helvetica Neue", helvetica,  Arial, sans-serif; color: #444 /*#3e693f*/; }
 
-a { color: <?=$primary?>; text-decoration: none; }
-a:hover { color: <?=$theme1?>; }
+a { color: #3e693f; text-decoration: none; }
+a:hover { color: #346799; }
 a:focus { outline: thin dotted; }
 a:hover, a:active { outline: 0; }
 a.cust_link { color: #1e7398; }
@@ -195,8 +174,8 @@ further colours for subnav links are in the specific theme folder
 
 .hoverlinks a { text-decoration: none; }
 .hoverlinks a:hover { text-decoration: none; }
-.destlabel { color: <?=$primary?>; }
-.custname { font-size: 12px; color:<?=$primary?>; white-space: nowrap; text-align: right; margin: 0px; padding: 0px; margin-right: 5px; }
+.destlabel { color: #3e693f; }
+.custname { font-size: 12px; color:#3e693f; white-space: nowrap; text-align: right; margin: 0px; padding: 0px; margin-right: 5px; }
 
 /*----- manager styles -----*/
 
@@ -221,7 +200,7 @@ secwindow is container for windows and table content set to fit screen width for
 .secwindow { width: 100%; }
 
 .pagetitle { margin-bottom: .5em; font-size: 21px; }
-.pagetitlesubtext { margin-left: 1em; margin-bottom: .5em; font-size: 1em; font-style: italic; color: <?=$primary?>; }
+.pagetitlesubtext { margin-left: 1em; margin-bottom: .5em; font-size: 1em; font-style: italic; color: #3e693f; }
 
 .crumbs { float: right; font-size: 10px; margin-top: 5px; margin-right: 15px; }
 .crumbs img { vertical-align: bottom; }
@@ -266,7 +245,7 @@ table.window_body { width: 100%; }
 
 /*----- Buttons, for buttons within the windows and tables, further styling is in the specific theme file for each theme -----*/
    
-button { color: <?=$primary?>; background: none; border: none; margin: none; padding: none; }
+button { color: #3e693f; background: none; border: none; margin: none; padding: none; }
 .btn { padding: 0; border: none;/* background: transparent;*/ font-weight: bold; cursor: pointer; }
 .btn_wrap { white-space: nowrap; position: relative; display: block; } 
 .btn_left, 
@@ -274,15 +253,15 @@ button { color: <?=$primary?>; background: none; border: none; margin: none; pad
 .btn_middle { display: block; height: 23px; line-height: 23px; font-size: 11px; }
 .btn_left, 
 .btn_right { position: absolute; top: 0; }
-.btn_left { left: 0; background: url(themes/<?=$theme?>/button_left.gif) no-repeat center center; width: 9px; }
-.btn_right { right: 0; background: url(themes/<?=$theme?>/button_right.gif) repeat-x center center; width: 9px;}
-.btn_middle { margin: 0 9px; padding-right: 2px;  background: url(themes/<?=$theme?>/button_mid.gif) repeat-x center center;}
+.btn_left { left: 0; background: url(themes/newui/button_left.gif) no-repeat center center; width: 9px; }
+.btn_right { right: 0; background: url(themes/newui/button_right.gif) repeat-x center center; width: 9px;}
+.btn_middle { margin: 0 9px; padding-right: 2px;  background: url(themes/newui/button_mid.gif) repeat-x center center;}
 			
 .btn_middle img { margin-top: -4px; padding: 0 3px 0 0; }
 
-.btn:hover .btn_left { background: url(themes/<?=$theme?>/button_left_over.gif) no-repeat center center; }
-.btn:hover .btn_middle { background: url(themes/<?=$theme?>/button_mid_over.gif) repeat-x center center; }
-.btn:hover .btn_right { background: url(themes/<?=$theme?>/button_right_over.gif) no-repeat center center; }
+.btn:hover .btn_left { background: url(themes/newui/button_left_over.gif) no-repeat center center; }
+.btn:hover .btn_middle { background: url(themes/newui/button_mid_over.gif) repeat-x center center; }
+.btn:hover .btn_right { background: url(themes/newui/button_right_over.gif) no-repeat center center; }
 
 .btn_hide { display: none !important; visibility: hidden; } /* for hidden buttons! */
 
@@ -339,7 +318,7 @@ table_left and table_right have the arrow controls, set to 8% width for 1024 scr
 
 /* === feed / left panel === */
 
-.content_side {  margin: 0 1% .5% 0; padding: 0 1% .5% 0; width: 15%;  min-width: 180px; border-right: 1px dotted <?=$theme2?>; }
+.content_side {  margin: 0 1% .5% 0; padding: 0 1% .5% 0; width: 15%;  min-width: 180px; border-right: 1px dotted #3399ff; }
 .content_main { width: 80%; padding: 0 1% 0 1%; }
 .content_row { width: 100%; min-width: 600px; position: relative; margin: 0 auto; margin-bottom: 1em; }
 .window_main .content_row { height: 65px; }
@@ -365,7 +344,7 @@ table_left and table_right have the arrow controls, set to 8% width for 1024 scr
 .content_feed .feed_wrap { float: left; display: inline; margin: 0; }
 .content_feed .actionlinks { float: right; display: inline; text-align: right; }
 .content_feed .no_content, td.no_content .feedtitle { display: block; padding: 12px 0 0; }
-.feed, .feedtitle, .feed_title, .feedtitle a { <?=$primary?> }
+.feed, .feedtitle, .feed_title, .feedtitle a { #3e693f }
 .feedtitle, .feed_title { font-size: 14px; font-weight: bold;  }
 .feed_icon { width: 48px; vertical-align: top; }
 .feed_actions { width: 100px; }
@@ -386,12 +365,12 @@ a.cke_button {height: 25px;}
    +----------------------------------------------------------------+ */
 
 input.text, input , select, textarea, table.form  {
-	/*border: <?=$theme1?> 1px solid;*/
+	/*border: #346799 1px solid;*/
 }
 
 .windowRowHeader { background-color: #d4d4d4; color: <?=$newfade3?>; width: 85px; }
 
-.chop { text-align: left; width: 100%; white-space:nowrap; overflow: hidden; color: #666666; border: 1px solid <?=$theme1?>; }
+.chop { text-align: left; width: 100%; white-space:nowrap; overflow: hidden; color: #666666; border: 1px solid #346799; }
 div.gBranding { display:inline; }
 
 /* Scrolling window style settings */
@@ -417,7 +396,7 @@ div.horizontalScrollTableContainer {
 	cursor: pointer;
 	font-size: 11px;
 
-	color: <?=$primary?>;
+	color: #3e693f;
 	margin: 2px 0;
 	display: inline-block;
 }
@@ -458,8 +437,8 @@ table.list ul.actionlinks li:nth-child(2n) { background: transparent; }
 
 .listAlt { background-color: <?=$newfade1?>; }
 
-.topBorder { border-top: 1px solid <?=$theme2?>; }
-.bottomBorder { border-bottom: 1px solid <?=$theme2?>; }
+.topBorder { border-top: 1px solid #3399ff; }
+.bottomBorder { border-bottom: 1px solid #3399ff; }
 .border { border-top: 1px solid #ccc; }
 
 #activeUsersContainer { margin: 10px 0 0; }
@@ -539,7 +518,7 @@ table.schedule th, table.schedule td { width: 30px; padding: 5px 0; text-align: 
 -webkit-box-shadow: 0px 1px 2px 0px #999; -moz-box-shadow: 0px 1px 2px 0px #999; box-shadow: 0px 1px 2px 0px #999; }
 
 .confirmnoticecontent hr {
-	border: solid 1px <?=$theme2?>;
+	border: solid 1px #3399ff;
 }
 
 
@@ -551,7 +530,7 @@ table.schedule th, table.schedule td { width: 30px; padding: 5px 0; text-align: 
 .horizontaltabstitlediv {
 	padding:0;
 	cursor: pointer;
-	color: <?=$primary?>;
+	color: #3e693f;
 	float: left;
 	margin:0;
 }
@@ -567,15 +546,15 @@ table.schedule th, table.schedule td { width: 30px; padding: 5px 0; text-align: 
 
 .horizontaltabstitlediv td.middle {
 	padding: 5px 3px 0 0; 
-	background: <?=$theme1?> url('img/horizontaltab_middle.gif') repeat-x;
+	background: #346799 url('img/horizontaltab_middle.gif') repeat-x;
 }
 .horizontaltabstitlediv td.right {
-	background: <?=$theme1?> url('img/horizontaltab_right.gif') no-repeat;
+	background: #346799 url('img/horizontaltab_right.gif') no-repeat;
 	width: 14px;
 	height: 26px;
 }
 .horizontaltabstitlediv td.left {
-	background: <?=$theme1?> url('img/horizontaltab_left.gif') no-repeat;
+	background: #346799 url('img/horizontaltab_left.gif') no-repeat;
 	width: 14px;
 	height: 26px;
 }
@@ -585,16 +564,16 @@ table.schedule th, table.schedule td { width: 30px; padding: 5px 0; text-align: 
 	border-bottom: solid 1px white;
 }
 
-.horizontaltabstitledivexpanded td.middle { background: <?=$theme2?> url('img/horizontaltab_middle.gif') repeat-x; padding: 5px 0 0; font-weight: bold; color: <?=$primary?>; font-size: 110%; }
+.horizontaltabstitledivexpanded td.middle { background: #3399ff url('img/horizontaltab_middle.gif') repeat-x; padding: 5px 0 0; font-weight: bold; color: #3e693f; font-size: 110%; }
 	
 .horizontaltabstitledivexpanded td.left {
-	background: <?=$theme2?> url('img/horizontaltab_left.gif') repeat-x;
+	background: #3399ff url('img/horizontaltab_left.gif') repeat-x;
 }
 .horizontaltabstitledivexpanded td.right {
-	background: <?=$theme2?> url('img/horizontaltab_right.gif') repeat-x;
+	background: #3399ff url('img/horizontaltab_right.gif') repeat-x;
 }
 .horizontaltabstitledivcollapsed {
-	color: <?=$theme1?>;
+	color: #346799;
 }
 .horizontaltabstitleicon {
 	margin-left: 5px;
@@ -605,7 +584,7 @@ table.schedule th, table.schedule td { width: 30px; padding: 5px 0; text-align: 
 	clear: both;
 }
 .horizontaltabspanelspane {
-	border: 1px solid <?=$theme2?>;
+	border: 1px solid #3399ff;
 	margin:2px;
 	margin-top: 0;
 	padding: 5px;
@@ -615,7 +594,7 @@ table.schedule th, table.schedule td { width: 30px; padding: 5px 0; text-align: 
 }
 .verticaltabstitlediv {
 	cursor: pointer;
-	color: <?=$primary?>;
+	color: #3e693f;
 	margin: 0;
 	padding: 0;
 	margin-top: 2px;
@@ -637,10 +616,10 @@ table.schedule th, table.schedule td { width: 30px; padding: 5px 0; text-align: 
 }
 .verticaltabstitlediv td.middle {
 	padding-right: 3px;
-	background: <?=$theme1?> url('img/verticaltab_middle.gif') repeat-x;
+	background: #346799 url('img/verticaltab_middle.gif') repeat-x;
 }
 .verticaltabstitlediv td.right {
-	background: <?=$theme1?> url('img/verticaltab_right.gif') no-repeat;
+	background: #346799 url('img/verticaltab_right.gif') no-repeat;
 	width: 14px;
 	height: 26px;
 }
@@ -651,18 +630,18 @@ table.schedule th, table.schedule td { width: 30px; padding: 5px 0; text-align: 
 	z-index: 2;
 }
 .verticaltabstitledivexpanded td.middle {
-	background: <?=$theme2?> url('img/verticaltab_middle.gif') repeat-x;
+	background: #3399ff url('img/verticaltab_middle.gif') repeat-x;
 	font-size: 110%;
 	font-weight: bold;
-	color: <?=$primary?>;
+	color: #3e693f;
 }
 .verticaltabstitledivexpanded td.right {
-	background: <?=$theme2?> url('img/verticaltab_right.gif') no-repeat;
+	background: #3399ff url('img/verticaltab_right.gif') no-repeat;
 }
 
 .verticaltabstitledivcollapsed {
 	font-weight: normal;
-	color: <?=$theme1?>;
+	color: #346799;
 }
 .verticaltabstitleicon {
 	margin-left: 5px;
@@ -679,7 +658,7 @@ table.schedule th, table.schedule td { width: 30px; padding: 5px 0; text-align: 
 	padding: 0;
 }
 .verticaltabspanelspane {
-	border-right: 2px solid <?=$theme2?>;
+	border-right: 2px solid #3399ff;
 	padding: 0;
 	margin-bottom: 1px;
 	background: white;
@@ -733,7 +712,7 @@ div.autocomplete {
   position:absolute;
   width:250px;
   background-color:white;
-  border:1px solid <?=$theme2?>;
+  border:1px solid #3399ff;
   margin:0;
   padding:0;
 }
@@ -1015,30 +994,30 @@ select#reldate { margin: 0 10px 0 0; }
 /*----- IE7 classes re-adds the rounded corners for ie7-----*/
 
 .ie7 .window { border: none; }
-.ie7 .window_title { background: url("themes/<?=$theme?>/win_t.gif") repeat-x; height: 23px; padding: 0 0 0 20px; line-height: 23px; }
-.ie7 .window_title_l { background: url("themes/<?=$theme?>/win_tl.gif") no-repeat; position: absolute; top: 0; left: 0; display: block; width: 12px; height: 23px; }
-.ie7 .window_title_r { background: url("themes/<?=$theme?>/win_tr.gif") no-repeat; position: absolute; top: 0; right: 0; display: block; width: 12px; height: 23px; }
+.ie7 .window_title { background: url("themes/newui/win_t.gif") repeat-x; height: 23px; padding: 0 0 0 20px; line-height: 23px; }
+.ie7 .window_title_l { background: url("themes/newui/win_tl.gif") no-repeat; position: absolute; top: 0; left: 0; display: block; width: 12px; height: 23px; }
+.ie7 .window_title_r { background: url("themes/newui/win_tr.gif") no-repeat; position: absolute; top: 0; right: 0; display: block; width: 12px; height: 23px; }
 
-.ie7 .window_left { background: url("themes/<?=$theme?>/win_l.gif") top left repeat-y; }
-.ie7 .window_right { background: url("themes/<?=$theme?>/win_r.gif") top right repeat-y; }
+.ie7 .window_left { background: url("themes/newui/win_l.gif") top left repeat-y; }
+.ie7 .window_right { background: url("themes/newui/win_r.gif") top right repeat-y; }
 
-.ie7 .window_foot_wrap { background: url("themes/<?=$theme?>/win_b.gif") 0 0 repeat-x; height: 15px; }
-.ie7 .window_foot_left { background: url("themes/<?=$theme?>/win_bl.gif") top left no-repeat; height: 15px; width: 100%; }
-.ie7 .window_foot_right { background: url("themes/<?=$theme?>/win_br.gif") top right no-repeat; height: 15px; width: 100%; }
+.ie7 .window_foot_wrap { background: url("themes/newui/win_b.gif") 0 0 repeat-x; height: 15px; }
+.ie7 .window_foot_left { background: url("themes/newui/win_bl.gif") top left no-repeat; height: 15px; width: 100%; }
+.ie7 .window_foot_right { background: url("themes/newui/win_br.gif") top right no-repeat; height: 15px; width: 100%; }
 
 /*----- IE8 classes re-adds the rounded corners for ie8-----*/
 
 .ie8 .window { border: none; }
-.ie8 .window_title { background: url("themes/<?=$theme?>/win_t.gif") repeat-x; height: 23px; padding: 0 0 0 20px; line-height: 23px; }
-.ie8 .window_title_l { background: url("themes/<?=$theme?>/win_tl.gif") no-repeat; position: absolute; top: 0; left: 0; display: block; width: 12px; height: 23px; }
-.ie8 .window_title_r { background: url("themes/<?=$theme?>/win_tr.gif") no-repeat; position: absolute; top: 0; right: 0; display: block; width: 12px; height: 23px; }
+.ie8 .window_title { background: url("themes/newui/win_t.gif") repeat-x; height: 23px; padding: 0 0 0 20px; line-height: 23px; }
+.ie8 .window_title_l { background: url("themes/newui/win_tl.gif") no-repeat; position: absolute; top: 0; left: 0; display: block; width: 12px; height: 23px; }
+.ie8 .window_title_r { background: url("themes/newui/win_tr.gif") no-repeat; position: absolute; top: 0; right: 0; display: block; width: 12px; height: 23px; }
 
-.ie8 .window_left { background: url("themes/<?=$theme?>/win_l.gif") top left repeat-y; }
-.ie8 .window_right { background: url("themes/<?=$theme?>/win_r.gif") top right repeat-y; }
+.ie8 .window_left { background: url("themes/newui/win_l.gif") top left repeat-y; }
+.ie8 .window_right { background: url("themes/newui/win_r.gif") top right repeat-y; }
 
-.ie8 .window_foot_wrap { background: url("themes/<?=$theme?>/win_b.gif") 0 0 repeat-x; height: 15px; }
-.ie8 .window_foot_left { background: url("themes/<?=$theme?>/win_bl.gif") top left no-repeat; height: 15px; width: 100%; }
-.ie8 .window_foot_right { background: url("themes/<?=$theme?>/win_br.gif") top right no-repeat; height: 15px; width: 100%; }
+.ie8 .window_foot_wrap { background: url("themes/newui/win_b.gif") 0 0 repeat-x; height: 15px; }
+.ie8 .window_foot_left { background: url("themes/newui/win_bl.gif") top left no-repeat; height: 15px; width: 100%; }
+.ie8 .window_foot_right { background: url("themes/newui/win_br.gif") top right no-repeat; height: 15px; width: 100%; }
 
 .ie8 .btn { overflow: visible; }
 
@@ -1048,19 +1027,8 @@ select#reldate { margin: 0 10px 0 0; }
    +----------------------------------------------------------------+ */
    
 <?
-$themecssfilename = "themes/$theme/style.php";
-if (!is_readable($themecssfilename)) {
-	//this can happen if the theme doesn't provide any override css. the default will image swap, and do a few variable colors.
-	//FIXME this should probably be included unconditionally, providing a base that themes can further customize with additional css. otherwise a theme that wants to customize a few things will have no easy way of including the default behavior, promoting copy/paste or nasty nested includes
-	$themecssfilename = "themes/default/style.php";
-}
 
-//check again, in case default is also not available!
-if (is_readable($themecssfilename)) {
-	include_once($themecssfilename);
-} else {
-	error_log("unable to find $themecssfilename, something is wrong! theme: " . $theme . " cwd:" . getcwd());	
-}
+include_once("themes/newui/style.php");
 
 ?>
 

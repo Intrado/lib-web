@@ -2,21 +2,7 @@
 
 $scheme = getCustomerData($CUSTOMERURL);
 
-if ($scheme == false) {
-	$scheme = array("_brandtheme" => "classroom",
-					"colors" => array(
-						"_brandprimary" => "3e693f",
-						"_brandtheme1" => "3e693f",
-						"_brandtheme2" => "b47727",
-						"_brandratio" => ".2"));
-}
-$theme = $scheme['_brandtheme'];
-$primary = $scheme['colors']['_brandprimary'];
-$theme1 = $scheme['colors']['_brandtheme1'];
-$theme2 = $scheme['colors']['_brandtheme2'];
-$globalratio = $scheme['colors']['_brandratio'];
-
-$topbg = fadecolor($theme2, "FFFFFF", $globalratio/2);
+$topbg = fadecolor("3399ff", "FFFFFF", .2/2);
 
 $CustomBrand = isset($scheme['productname']) ? $scheme['productname'] : "";
 $custname = isset($scheme['customerName']) ? $scheme['customerName'] : "";

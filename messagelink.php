@@ -82,27 +82,10 @@ if (!$badcode) {
 }
 
 if ($appservererror || $badcode) {
-	$theme = "classroom";
-	$primary = "3e693f";
-	$theme1 = "3e693f";
-	$theme2 = "b47727";
-	$globalratio = ".2";
 	$TITLE = "School Messenger";
 	$urlcomponent = "m";
 	$logosrc = "img/logo_small.gif";
 } else {
-	$theme = $messageinfo->brandinfo["theme"];
-	$primary = $messageinfo->brandinfo["primary"];
-	$theme1 = $messageinfo->brandinfo["theme1"];
-	$theme2 = $messageinfo->brandinfo["theme2"];
-	$globalratio = $messageinfo->brandinfo['globalratio'];
-	
-	// Set the session. Used for the window
-	$_SESSION['colorscheme'] = array("_brandtheme" => $theme,
-										"_brandprimary" => $primary,
-										"_brandtheme1" => $theme1,
-										"_brandtheme2" => $theme2,
-										"_brandratio" => $globalratio);
 	$TITLE = escapehtml($messageinfo->customerdisplayname);
 	$urlcomponent = $messageinfo->urlcomponent;
 	$logosrc = "messagelinklogo.img.php?code=". escapehtml($code);
@@ -121,15 +104,15 @@ if ($appservererror || $badcode) {
 	<style type="text/css">
 		.navband1 {
 			height: 6px; 
-			background: #<?=$primary ?>;
+			background: #3e693f;
 		}
 		.navband2 {
 			height: 2px; 
-			background: #<?=$theme2 ?>;
+			background: #3399ff;
 			margin-bottom: 3px;
 		}
 		.navlogoarea {
-			background: <?=fadecolor($theme2, "FFFFFF", $globalratio/2)?>;
+			background: <?=fadecolor("3399ff", "FFFFFF", .2/2)?>;
 		}
 		.menucollapse {
 			float: right;
@@ -147,7 +130,7 @@ if ($appservererror || $badcode) {
 			font-weight: bold;
 			padding-left: 5px;
 			padding-top: 2px;
-			color: #<?=$primary?>;
+			color: #3e693f;
 		}
 		.windowtable {
 		}

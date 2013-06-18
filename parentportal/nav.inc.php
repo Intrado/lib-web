@@ -40,7 +40,6 @@ function doLogo () {
 }
 
 function navMainTab ($display, $hint, $accesskey, $link, $isselected) {
-	$theme = getBrandTheme(); // contact manager is hardcoded to 3dblue
 	return '<li '. ($isselected ? 'class="navtab_active"' : "") .'><a accesskey="'.$accesskey.'" onfocus="blur()" href="' . $link . '" title="'.$hint.'"><span>' . $display . '</span></a></li>';
 }
 
@@ -117,10 +116,6 @@ header('Content-type: text/html; charset=UTF-8') ;
 
 </head>
 <body>
-	<script>
-		var _brandtheme = "<?=getBrandTheme();?>";
-	</script>
-
 <!-- ********************************************************************* -->
 <div class="wrap"><!-- ends in navbottom.inc -->
 

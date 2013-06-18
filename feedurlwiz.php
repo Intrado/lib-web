@@ -263,7 +263,7 @@ class FeedUrlWiz_feedwidgetstyle extends WizStep {
 			"bordercolor" => array(
 				"label" => _L('Border color'),
 				"fieldhelp" => _L('Color of the border on the container.'),
-				"value" => $_SESSION['colorscheme']['_brandtheme2'],
+				"value" => "3399ff",
 				"validators" => array(
 					array("ValRequired"),
 					array("ValColorPicker")),
@@ -342,7 +342,7 @@ class FeedUrlWiz_feedwidgetstyle extends WizStep {
 			"labelcolor" => array(
 				"label" => _L('Label color'),
 				"fieldhelp" => _L('Color of the font used when displaying the item labels.'),
-				"value" => $_SESSION['colorscheme']['_brandtheme1'],
+				"value" => "346799",
 				"validators" => array(
 					array("ValRequired"),
 					array("ValColorPicker")),
@@ -362,7 +362,7 @@ class FeedUrlWiz_feedwidgetstyle extends WizStep {
 			"descriptioncolor" => array(
 				"label" => _L('Description color'),
 				"fieldhelp" => _L('Color of the font used when displaying the item description.'),
-				"value" => $_SESSION['colorscheme']['_brandtheme2'],
+				"value" => "3399ff",
 				"validators" => array(
 					array("ValRequired"),
 					array("ValColorPicker")),

@@ -43,11 +43,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 	  </style>
 	<![endif]-->
 </head>
-<body <?='class="' . $_SESSION['colorscheme']['_brandtheme'] . '"'?> >
-	<script>
-		var _brandtheme = "<?=getBrandTheme();?>";
-	</script>
-
+<body>
 <!-- ********************************************************************* -->
 
 <div id="top_banner" class="banner cf">

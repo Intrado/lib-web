@@ -1,5 +1,4 @@
-<?
-////////////////////////////////////////////////////////////////////////////////
+<?////////////////////////////////////////////////////////////////////////////////
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -19,770 +18,540 @@ require_once("obj/SurveyQuestionnaire.obj.php");
 require_once("inc/formatters.inc.php");
 require_once("obj/Person.obj.php");
 require_once("obj/RenderedList.obj.php");
-
-// Redirect to dashboard for 'newui' theme ...
-//FIXME HACK using theme to version ui
-if ( $_SESSION['colorscheme']['_brandtheme'] == "newui") {
-	include_once("dashboard.php");
-	exit();
-}
+require_once("inc/help.inc.php");
 
 ////////////////////////////////////////////////////////////////////////////////
-// Data Handling
+// Authorization
 ////////////////////////////////////////////////////////////////////////////////
 
-$_SESSION['previewfrom'] = 'start.php';
+// everyone can see dashboard page
 
-if ($USER->authorize("loginweb") === false) {
-	redirect('unauthorized');
+////////////////////////////////////////////////////////////////////////////////
+// Action/Request Processing
+////////////////////////////////////////////////////////////////////////////////
+
+// List all possible request values and set their defaults
+$ranges = array("7days" => "7 Days","month" => "Month","year" => "Year");
+
+if (isset($_SESSION["dashboardactivity"])) {
+	$requestValues = $_SESSION["dashboardactivity"];
+} else {
+	$requestValues = array(
+				"showactivity" => 'me',
+				"daterange" => '7days',
+	);
 }
 
-if($USER->authorize("leavemessage")){
-	$count = QuickQuery("select count(*) from voicereply where userid = '$USER->id' and listened = '0'");
-}
-
-// get the facebook token's expiration date
-if (getSystemSetting("_hasfacebook") && $ACCESS->getPermission("facebookpost"))
-	$fbtokenexpires = $USER->getSetting("fb_expires_on");
-else
-	$fbtokenexpires = false;
-
-function itemcmp($a, $b) {
-	if ($a["date"] == $b["date"]) {
-        return 0;
-    }
-    return ($a["date"] > $b["date"]) ? -1 : 1;
-}
-
-$filter = "";
-if (isset($_GET['filter'])) {
-	$filter = $_GET['filter'];
-}
-
-$isajax = isset($_GET['ajax']);
-
-$mergeditems = array();
-if($isajax === true) {
-	
-	session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
-	
-	switch ($filter) {
-		case "lists":
-			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
-				select 'list' as type, 'Saved' as status, id, name, description, modifydate as date, lastused
-				from list where userid = ? and not deleted and modifydate is not null
-					and type != 'alert'
-				order by modifydate desc
-				limit 10",true,false,array($USER->id)));
-			break;
-		case "messages":
-			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
-				select 'message' as type, 'Saved' as status, mg.id as id, mg.name as name,mg.description,mg.modified as date, mg.deleted as deleted,
-					sum(m.type='phone') as phone,sum(m.type='email') as email,sum(m.type='sms') as sms,
-					sum(m.type='post' and m.subtype='facebook') as facebook, 
-					sum(m.type='post' and m.subtype='twitter') as twitter,
-					sum(m.type='post' and m.subtype='page') as page,
-					sum(m.type='post' and m.subtype='voice') as pagemedia,
-					sum(m.type='post' and m.subtype='feed') as feed
-				from messagegroup mg
-					left join message m on
-						(m.messagegroupid = mg.id)
-				where mg.userid=? and not mg.deleted and mg.modified is not null and mg.type = 'notification'
-				group by mg.id
-				order by mg.modified desc
-				limit 10",true,false,array($USER->id)));
-			break;
-		case "jobs":
-			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
-				select 'job' as type, status, id, name, modifydate as date, 'modifydate' as datetype, type as jobtype, deleted
-				from job
-				where userid=? and not deleted and (finishdate is null || status = 'repeating') and modifydate is not null
-					and type != 'alert'
-				order by modifydate desc
-				limit 10",true,false,array($USER->id)));
-			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
-				select 'job' as type, status, id, name, finishdate as date, 'finishdate' as datetype, type as jobtype, deleted
-				from job
-				where userid=? and not deleted and status != 'repeating' and finishdate is not null
-					and type != 'alert'
-				order by finishdate desc
-				limit 10",true,false,array($USER->id)));
-			break;
-		case "savedjobs":
-			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
-				select 'job' as type, status, id, name, modifydate as date,'modifydate' as datetype, type as jobtype, deleted
-				from job
-				where userid = ? and not deleted and finishdate is null and modifydate is not null and status = 'new'
-					and type != 'alert'
-				order by modifydate desc
-				limit 10",true,false,array($USER->id)));
-			break;
-		case "repeatingjobs":
-			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
-				select 'job' as type, status, id, name, modifydate as date,'modifydate' as datetype, type as jobtype, deleted
-				from job
-				where userid = ? and not deleted and modifydate is not null and status='repeating'
-					and type != 'alert'
-				order by modifydate desc
-				limit 10",true,false,array($USER->id)));
-			break;
-		case "scheduledjobs":
-			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
-				select 'job' as type, status, id, name, modifydate as date, 'modifydate' as datetype, type as jobtype, deleted
-				from job
-				where userid=? and not deleted and finishdate is null and modifydate is not null and status = 'scheduled'
-					 and type != 'alert'
-				order by modifydate desc
-				limit 10",true,false,array($USER->id)));
-			break;
-		case "activejobs":
-			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
-				select 'job' as type, status, id, name, modifydate as date, 'modifydate' as datetype, type as jobtype, percentprocessed, deleted
-				from job
-				where userid = ? and not deleted and finishdate is null and modifydate is not null and status in ('processing','procactive','active')
-					 and type != 'alert'
-				order by modifydate desc
-				limit 10",true,false,array($USER->id)));
-			break;
-		case "cancelledjobs":
-			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
-				select 'job' as type, status, id, name, modifydate as date, 'modifydate' as datetype, type as jobtype, deleted
-				from job
-				where userid=? and deleted = 0 and finishdate is null and modifydate is not null and status in ('cancelled','cancelling')
-					and type != 'alert'
-				order by modifydate desc
-				limit 10",true,false,array($USER->id)));
-			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
-				select 'job' as type, status, id, name, finishdate as date, 'finishdate' as datetype, type as jobtype, deleted
-				from job
-				where userid = ? and not deleted and finishdate is not null and status in ('cancelled','cancelling')
-					and type != 'alert'
-				order by finishdate desc
-				limit 10",true,false,array($USER->id)));
-			break;
-		case "completedjobs":
-			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
-				select 'job' as type, status, id, name, finishdate as date, 'finishdate' as datetype, type as jobtype, deleted
-				from job
-				where userid = ? and deleted = 0 and finishdate is not null and status = 'complete'
-					and type != 'alert'
-				order by finishdate desc
-				limit 10",true,false,array($USER->id)));
-			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
-				select 'job' as type, status, id, name, modifydate as date, 'modifydate' as datetype, type as jobtype, deleted
-				from job
-				where userid = ? and not deleted and finishdate is null and modifydate is not null and status in ('cancelled','cancelling')
-					and type != 'alert'
-				order by modifydate desc
-				limit 10",true,false,array($USER->id)));
-			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
-				select 'job' as type, status, id, name, finishdate as date, 'finishdate' as datetype, type as jobtype, deleted
-				from job
-				where userid = ? and not deleted and finishdate is not null and status in ('cancelled','cancelling')
-					and type != 'alert'
-				order by finishdate desc
-				limit 10",true,false,array($USER->id)));
-			break;
-		case "savedreports":
-			$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("
-				select 'report' as type, 'Saved' as status, id, name, modifydate as date
-				from reportsubscription
-				where userid = ? and modifydate is not null
-				order by modifydate desc
-				limit 10",true,false,array($USER->id)));
-			break;
-		case "emailedreports":
-			$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("
-				select 'report' as type, 'Emailed' as status, id, name, lastrun as date
-				from reportsubscription
-				where userid = ? and lastrun is not null
-				order by lastrun desc
-				limit 10",true,false,array($USER->id)));
-			break;
-		case "systemmessages":
-			$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("
-				select 'systemmessage' as type, '' as status, id, icon, message, modifydate as date
-				from systemmessages
-				where modifydate is not null
-				order by modifydate desc
-				limit 10",true));
-			break;
-		default:
-			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
-				select 'list' as type, 'Saved' as status, id, name, description, modifydate as date, lastused
-				from list
-				where userid = ? and not deleted and modifydate is not null
-					 and type != 'alert'
-				order by modifydate desc
-				limit 10",true,false,array($USER->id)));
-			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
-				select 'message' as type, 'Saved' as status, mg.id as id, mg.name as name,mg.description, mg.modified as date, mg.deleted as deleted,
-					sum(m.type='phone') as phone, sum(m.type='email') as email, sum(m.type='sms') as sms,
-					sum(m.type='post' and m.subtype='facebook') as facebook, 
-					sum(m.type='post' and m.subtype='twitter') as twitter,
-					sum(m.type='post' and m.subtype='page') as page,
-					sum(m.type='post' and m.subtype='voice') as pagemedia,
-					sum(m.type='post' and m.subtype='feed') as feed
-				from messagegroup mg
-					left join message m on
-						(m.messagegroupid = mg.id)
-				where mg.userid = ? and not mg.deleted and mg.modified is not null and mg.type = 'notification'
-				group by mg.id
-				order by mg.modified desc
-				limit 10 ",true,false,array($USER->id)));
-			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
-				select 'job' as type, status, id, name, modifydate as date, 'modifydate' as datetype, type as jobtype, deleted,percentprocessed
-				from job
-				where userid=? and not deleted and (finishdate is null || status = 'repeating') and modifydate is not null
-					and type != 'alert'
-				order by modifydate desc
-				limit 10",true,false,array($USER->id)));
-			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
-				select 'job' as type, status, id, name, finishdate as date, 'finishdate' as datetype, type as jobtype, deleted
-				from job
-				where userid=? and not deleted and status != 'repeating' and finishdate is not null
-					and type != 'alert'
-				order by finishdate desc
-				limit 10",true,false,array($USER->id)));
-			$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("
-				select 'report' as type, 'Saved' as status, id, name, modifydate as date
-				from reportsubscription
-				where userid = ? and modifydate is not null
-				order by modifydate desc
-				limit 10",true,false,array($USER->id)));
-			$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("
-				select 'report' as type, 'Emailed' as status, id, name, lastrun as date
-				from reportsubscription
-				where userid = ? and lastrun is not null
-				order by lastrun desc
-				limit 10",true,false,array($USER->id)));
-			$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("
-				select 'systemmessage' as type, '' as status, id, icon, message, modifydate as date
-				from systemmessages
-				where modifydate is not null
-				order by modifydate desc
-				limit 10",true));
-			break;
+// Update request values from what is passed in
+foreach($requestValues as $key => $values) {
+	if (isset($_REQUEST[$key])) {
+		$requestValues[$key] = $_REQUEST[$key];
 	}
+}
 
-	uasort($mergeditems, 'itemcmp');
+$_SESSION["dashboardactivity"] = $requestValues;
+
+$useridList = array();
+//FIXME don't format strings in DB
+$useridList = QuickQueryList("select u.id, concat_ws(' ', u.firstname, u.lastname) from userlink ul inner join user u on (ul.subordinateuserid = u.id) where ul.userid=?",true,false,array($USER->id));
+$useridList[$USER->id] = _L("Me");
+$start_datetime = time();
+switch($requestValues["daterange"]) {
+	case "7days":
+		$start_datetime -= 604800;
+		break;
+	case "month":
+		$start_datetime -= 2592000;
+		break;
+	case "year":
+		$start_datetime -= 31536000;
+		break;
+}
+
+$start_datetime = date("Y-m-d G:i:s",$start_datetime);
+$end_datetime = date("Y-m-d G:i:s");
+
+////////////////////////////////////////////////////////////////////////////////
+// Stats functions
+////////////////////////////////////////////////////////////////////////////////
+
+function generateStats($useridList, $start_datetime, $end_datetime) {
 	
-	header('Content-Type: application/json');
-	$data = activityfeed($mergeditems,true);
-	echo json_encode(!empty($data) ? $data : false);
-	exit();
+	// sql query parameters, always in same order for all stats
+	$params = array();
+	$params[] = $start_datetime;
+	$params[] = $end_datetime;
+	$params = array_merge($params, $useridList);
+	
+	$stats = array();
+	
+	// broadcasts
+	$query = "select count(*) from job j " .
+		"where j.status in ('procactive','active','complete','cancelled','cancelling') and " .
+		"j.activedate >= ? and j.activedate <= ? and " .
+		"j.userid in (" . repeatWithSeparator("?", ",", count($useridList)) . ")";
+		
+	$stats["total_jobs"] = QuickQuery($query, null, $params);
+
+	// languages
+	$query = "select count(distinct(m.languagecode)) from message m " .
+		"join messagegroup mg on (mg.id = m.messagegroupid) " .
+		"join job j on (j.messagegroupid = mg.id) " .
+		"where j.status in ('procactive','active','complete','cancelled','cancelling') and " .
+		"j.activedate >= ? and j.activedate <= ? and " .
+		"j.userid in (" . repeatWithSeparator("?", ",", count($useridList)) . ")";
+		
+	$stats["total_languages"] = QuickQuery($query, null, $params);
+	
+	// total of each message type
+	$query = "select m.type as type, count(distinct m.messagegroupid) as total from message m " .
+		"join messagegroup mg on (mg.id = m.messagegroupid) " .
+		"join job j on (j.messagegroupid = mg.id) " .
+		"where  " .
+		"j.status in ('procactive','active','complete','cancelled','cancelling') and " .
+		"j.activedate >= ? and j.activedate <= ? and " .
+		"j.userid in (" . repeatWithSeparator("?", ",", count($useridList)) . ") " .
+		"group by m.type";
+	
+	// init to zero, in case none found in query
+	$stats["total_phones"] = 0;
+	$stats["total_emails"] = 0;
+	$stats["total_sms"] = 0;
+	$stats["total_posts"] = 0;
+	
+	$rows = QuickQueryMultiRow($query, true, null, $params);
+	foreach ($rows as $row) {
+		if (!strcmp("phone", $row['type']))
+			$stats['total_phones'] = $row['total'];
+		if (!strcmp("email", $row['type']))
+			$stats['total_emails'] = $row['total'];
+		if (!strcmp("sms", $row['type']))
+			$stats['total_sms'] = $row['total'];
+		if (!strcmp("post", $row['type']))
+			$stats['total_posts'] = $row['total'];
+	}
+	
+	$total_types = $stats['total_phones'] + $stats["total_emails"] + $stats["total_sms"] + $stats["total_posts"];
+	$stats["percentage_slice"] = $total_types != 0 ? 100/$total_types : 0;
+	
+	// top jobtypes
+	$query = "select jt.name as name, count(*) as total from job j " .
+		"left join jobtype jt on (jt.id = j.jobtypeid) " .
+		"where j.status in ('procactive','active','complete','cancelled','cancelling') and " .
+		"j.activedate >= ? and j.activedate <= ? and " .
+		"j.userid in (" . repeatWithSeparator("?", ",", count($useridList)) . ") " .
+		"group by j.jobtypeid " .
+		"order by total desc";
+		
+	$stats["top_jobtypes"] = QuickQueryMultiRow($query, true, null, $params);
+
+	// top senders
+	//FIXME don't format strings in DB
+	$query = "select concat_ws(' ', u.firstname, u.lastname) as name, count(*) as total from job j " .
+		"left join user u on (u.id = j.userid) " .
+		"where j.status in ('procactive','active','complete','cancelled','cancelling') and " .
+		"j.activedate >= ? and j.activedate <= ? and " .
+		"j.userid in (" . repeatWithSeparator("?", ",", count($useridList)) . ") " .
+		"group by j.userid " .
+		"order by total desc";
+		
+	$stats["top_users"] = QuickQueryMultiRow($query, true, null, $params);
+
+	$stats["total_users"] = count($stats["top_users"]);
+
+	return $stats;
 }
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
-// Display Functions
+// Data
 ////////////////////////////////////////////////////////////////////////////////
 
-function job_responses ($obj,$name) {
-		$played = QuickQuery("Select count(*) from voicereply where jobid = '$obj->id' and listened = '0'");
-		$total = QuickQuery("Select count(*) from voicereply where jobid = '$obj->id'");
-		if($played > 0)
-			return '&nbsp;-<a style="display:inline;font-weight:bold; color: #000;" href="replies.php?jobid=' . $obj->id . '">&nbsp;'. $played . '&nbsp;Unplayed&nbsp;Response' . ($played>1?'s':'') . '</a>';
-		else if($total != 0) {
-			return '&nbsp;-<a style="display:inline;color: #000;" href="replies.php?jobid=' . $obj->id . '">&nbsp;' . $total . '&nbsp;Response' . ($total>1?'s':'') . '</a>';
-		}
-}
-
-//used in listcontacts as a callback for gen2cache
-function query_startpage_jobstats ($jobid) {
-	//FIXME this should use the slave
-	return QuickQueryRow("select 
-		sum(rc.type='phone') as total_phone,
-		sum(rc.type='email') as total_email,
-		sum(rc.type='sms') as total_sms,
-		100 * sum(rp.numcontacts and rp.status='success' and rp.type='phone') / (sum(rp.numcontacts and rp.status != 'duplicate' and rp.type='phone') +0.00) as success_rate_phone,
-		100 * sum(rp.numcontacts and rp.status='success' and rp.type='email') / (sum(rp.numcontacts and rp.status != 'duplicate' and rp.type='email') +0.00) as success_rate_email,
-		100 * sum(rp.numcontacts and rp.status='success' and rp.type='sms') / (sum(rp.numcontacts and rp.status != 'duplicate' and rp.type='sms') +0.00) as success_rate_sms
-		from reportperson rp
-		left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
-		where rp.jobid = ?", true, false, array($jobid));
-}
-
-function listcontacts ($obj,$name) {
-	$lists = array();
-	if ($name == "job") {
-		if (in_array($obj->status, array("active","cancelling"))) {
-			$result = QuickQueryRow("select
-				sum(rc.type='phone') as total_phone,
-            	sum(rc.type='email') as total_email,
-            	sum(rc.type='sms') as total_sms,
-				sum(rc.type='phone' and rc.result not in ('duplicate', 'blocked')) as total_phone_tosend,
-            	sum(rc.type='email' and rc.result not in ('duplicate', 'blocked')) as total_email_tosend,
-            	sum(rc.type='sms' and rc.result not in ('duplicate', 'blocked')) as total_sms_tosend,
-            	sum(rc.result not in ('A', 'M', 'duplicate', 'blocked') and rc.type='phone' and rc.numattempts < js.value) as remaining_phone,
-            	sum(rc.result not in ('sent', 'duplicate', 'blocked') and rc.type='email' and rc.numattempts < 1) as remaining_email,
-            	sum(rc.result not in ('sent', 'duplicate', 'blocked') and rc.type='sms' and rc.numattempts < 1) as remaining_sms,
-            	j.percentprocessed as percentprocessed
-				from job j
-           		left join reportcontact rc on j.id = rc.jobid
-      			left join jobsetting js on (js.jobid = j.id and js.name = 'maxcallattempts')
-            	where j.id=? group by j.id", true, false, array($obj->id));
-			$content = "";
-			if ($result["total_phone"] != 0) {
-				$content .= $result["total_phone"] . " Phone" . ($result["total_phone"]!=1?"s":"") ;
-				if ($result["total_phone_tosend"] != 0)
-					$content .= " (" .  sprintf("%0.2f",(100*$result["remaining_phone"]/$result["total_phone_tosend"])) . "% Remaining), ";
-				else
-					$content .= " (0% Remaining), ";
-			}
-			if ($result["total_email"] != 0) {
-				$content .= $result["total_email"] . " Email" . ($result["total_email"]!=1?"s":"");
-				if ($result["total_email_tosend"] != 0)
-					$content .= " (" .  sprintf("%0.2f",(100*$result["remaining_email"]/$result["total_email_tosend"])) . "% Remaining), ";
-				else
-					$content .= " (0% Remaining), ";
-			}
-			if ($result["total_sms"] != 0) {
-				$content .= $result["total_sms"] . " SMS";
-				if ($result["total_sms_tosend"] != 0)
-					$content .= " (" .  sprintf("%0.2f",(100*$result["remaining_sms"]/$result["total_sms_tosend"])) . "% Remaining)";
-				else
-					$content .= " (0% Remaining)";
-			}
-			return trim($content,", ");
-			
-		} else if(in_array($obj->status, array("cancelled","complete"))) {
-			
-			//memcache exptime is in seconds up to 30 days, then becomes a timestamp of a date to expire.
-			//since completed jobs don't change, we can cache it for a really long time.
-			//we could have used "QuickQueryRow" as a callback directly, however the key would contain the sql
-			//which would be too long, and the jobid (the important part) would be lost in the tail hash of automatic key generation
-			//wrapping the large, static argument in a function shortens key length and increases readability
-			$result = gen2cache(time() + 60*60*24*365, null, null, "query_startpage_jobstats", $obj->id);
-			
-			$content = "";
-			if ($result["total_phone"] != 0)
-				$content .= $result["total_phone"] . " Phone" . ($result["total_phone"]!=1?"s":"") . " (" . sprintf("%0.2f",$result["success_rate_phone"]) . "% Contacted), ";
-			if ($result["total_email"] != 0)
-				$content .= $result["total_email"] . " Email" . ($result["total_email"]!=1?"s":"") . " (" . sprintf("%0.2f",$result["success_rate_email"]) . "% Contacted), ";
-			if ($result["total_sms"] != 0)
-				$content .= $result["total_sms"] . " SMS (" . sprintf("%0.2f",$result["success_rate_sms"]) . "% Contacted)";
-
-			return trim($content, ", ");
-		} else {
-			$lists = QuickQueryList("select listid from joblist where jobid = ?", false, false, array($obj->id));
-		}
-	} else if($name == "list") {
-		$lists[] = $obj;
-	}
-	$calctotal = 0;
-	foreach ($lists as $id) {
-		$calctotal += RenderedList2::caclListTotal($id);
-	}
-	return "<b>" . $calctotal . ($calctotal!=1?"</b>&nbsp;contacts":"</b>&nbsp;contact");
-}
-
-function typestring($str) {
-		$jobtypes = explode(",",$str);
-		$typesstr = "";
-		foreach($jobtypes as $jobtype) {
-			if($jobtype == "sms")
-				$alt = strtoupper($jobtype);
-			else
-				$alt = escapehtml(ucfirst($jobtype));
-			$typesstr .= $alt . ", ";
-		}
-		$typesstr = trim($typesstr,', ');
-		$andpos = strrpos($typesstr,',');
-		if($andpos !== false)
-			return substr_replace($typesstr," and ",$andpos,1);
-		return $typesstr;
-}
-
-function activityfeed($mergeditems,$ajax = false) {
-	$actioncount = 0;
-	$activityfeed = $ajax===true?array():"";
-	$limit = 10;
-	$duplicatejob = array();
-
-	if($ajax===true) {
-		if(empty($mergeditems)) {
-				$activityfeed[] = array("itemid" => "",
-											"defaultlink" => "",
-											"defaultonclick" => "",
-											"icon" => "largeicons/information.jpg",
-											"title" => _L("No Recent Items."),
-											"content" => "",
-											"tools" => "");
-		} else {
-			while(!empty($mergeditems) && $limit > 0) {
-				$item = array_shift($mergeditems);
-				$time = date("M j, Y g:i a",strtotime($item["date"]));
-				$title = $item["status"];
-				$content = "";
-				$tools = "";
-				$itemid = $item["id"];
-				$icon = "";
-				$defaultlink = "";
-				$defaultonclick = "";
-				if($item["type"] == "job" ) {
-					if(array_search($itemid,$duplicatejob) !== false) {
-						continue;
-					}
-					$status = $item["status"];
-					if($status == "completed" || $status == "cancelled") {
-						$duplicatejob[] = $itemid;
-					}
-
-					$job = new Job();
-					$job->id = $itemid;
-					$job->type = $item["jobtype"];
-					$job->status = $status;
-					$job->deleted = $item["deleted"];
-					$tools = fmt_jobs_actions ($job,$item["name"]);
-					$tools = str_replace("&nbsp;|&nbsp;","<br />",$tools);
-
-					$jobtype = $item["jobtype"] == "survey" ? _L("Survey") : getJobTitle();
-					switch($status) {
-						case "new":
-							$title = _L('%1$s Saved',$jobtype);
-							$defaultlink = $item["jobtype"] == "survey" ? "survey.php?id=$itemid" : "job.php?id=$itemid";
-							$icon = 'largeicons/folderandfiles.jpg';
-							$jobcontent = typestring($item["jobtype"]) . "&nbsp;message&nbsp;with&nbsp;" . listcontacts($job,"job");
-							break;
-						case "repeating":
-							if($item["datetype"]=="finishdate")
-								$title = _L("Running Repeating " . getJobTitle());
-							else
-								$title = _L('Repeating ' . getJobTitle() . ' Saved');
-							$icon = 'largeicons/calendar.jpg';
-							$defaultlink = "jobrepeating.php?id=$itemid";
-							$jobcontent = typestring($item["jobtype"]) . "&nbsp;message&nbsp;with&nbsp;" . listcontacts($job,"job");
-							break;
-						case "complete":
-							$title = _L('%1$s Completed Successfully',$jobtype);
-							$icon = 'largeicons/' . ($item["jobtype"]=="survey"?"checklist.jpg":"checkedgreen.jpg") .  '"';
-							$defaultlink = $item["jobtype"] == "survey" ? "reportsurveysummary.php?jobid=$itemid" : "reportjobsummary.php?jobid=$itemid";
-							$jobcontent = listcontacts($job,"job");
-							break;
-						case "cancelled":
-							$title = _L('%1$s Cancelled',$jobtype);
-							$icon = 'largeicons/checkedbluegreen.jpg';
-							$jobcontent = listcontacts($job,"job");
-							$defaultlink = $item["jobtype"] == "survey" ? "reportsurveysummary.php?jobid=$itemid" : "reportjobsummary.php?jobid=$itemid";
-							break;
-						case "cancelling":
-							$title = _L('%1$s Cancelling',$jobtype);
-							$icon = 'largeicons/gear.jpg';
-							$jobcontent = listcontacts($job,"job");
-							$defaultlink = $item["jobtype"] == "survey" ? "reportsurveysummary.php?jobid=$itemid" : "reportjobsummary.php?jobid=$itemid";
-							break;
-						case "active":
-							$title = _L('%1$s Submitted, Status: Active',$jobtype);
-							$icon = 'largeicons/ping.jpg';
-							$defaultlink = "#";
-							$jobcontent = listcontacts($job,"job");
-							$defaultonclick = "onclick=\"popup('jobmonitor.php?jobid=$itemid', 650, 450);\"";
-							break;
-						case "scheduled":
-							$title = _L('%1$s Submitted, Status: Scheduled',$jobtype);
-							$icon = 'largeicons/clock.jpg';
-							$defaultlink = $item["jobtype"] == "survey" ? "survey.php?id=$itemid" : "job.php?id=$itemid";
-							$jobcontent = typestring($item["jobtype"]) . "&nbsp;message&nbsp;with&nbsp;" . listcontacts($job,"job");
-							break;
-						case "procactive" || "processing":
-							$job->percentprocessed = $item["percentprocessed"];
-							$title = _L('%1$s Submitted, Status: %2$s',$jobtype,escapehtml(fmt_status($job,$item["name"])));
-							$icon = 'largeicons/gear.jpg';
-							$defaultlink = $item["jobtype"] == "survey" ? "survey.php?id=$itemid" : "job.php?id=$itemid";
-							$jobcontent = typestring($item["jobtype"]) . "&nbsp;message&nbsp;with&nbsp;" . listcontacts($job,"job");
-							break;
-						default:
-							$title = getJobTitle(). ' ' . escapehtml(fmt_status($job,$item["name"]));
-							break;
-					}
-					$content = '<div class="content_feed_row"><a href="' . $defaultlink . '" ' . $defaultonclick . '>' .
-											$time .  '&nbsp;-&nbsp;<b>' .  escapehtml($item["name"]) . '</b>&nbsp;';
-
-					$content .= '</a><div class="content_feed_notification">
-								<a href="' . $defaultlink . '" ' . $defaultonclick . '>';
-					$content .= $jobcontent . '</a>';
-					$content .= job_responses($job,Null);
-					$content .= '</div></div>';
-				} else if($item["type"] == "list" ) {
-					$title = "Contact List " . escapehtml($title);
-					$defaultlink = "list.php?id=$itemid";
-					$content = '<div class="content_feed_row"><a href="' . $defaultlink . '">' . $time . ' - <b>' . escapehtml($item["name"]) . "</b>";
-					if ($item["description"] != "") {
-						$content .= "&nbsp;-&nbsp;" . escapehtml($item["description"]) ;
-					}
-					$content .= '<br/>';
-					if(isset($item["lastused"]))
-						$content .= 'This list was last used: <i>' . date("M j, Y g:i a",strtotime($item["lastused"])) . "</i>";
-					else
-						$content .= 'This list has never been used ';
-					$content .= " and has " . listcontacts($itemid,"list") . '</a></div>';
-					$tools = action_links_vertical(action_link("Edit", "pencil", "list.php?id=$itemid"),action_link("Preview", "application_view_list", "showlist.php?id=$itemid"));
-					$icon = 'largeicons/addrbook.jpg';
-				} else if($item["type"] == "message") {
-					$defaultlink = "mgeditor.php?id=$itemid";
-					$types = $item["phone"] > 0?'<a href="' . $defaultlink . '&redirect=phone"><img src="img/icons/telephone.png" alt="Phone" title="Phone"></a>':"";
-					$types .= $item["email"] > 0?' <a href="' . $defaultlink . '&redirect=email"><img src="img/icons/email.png" alt="Email" title="Email"></a>':"";
-					$types .= $item["sms"] > 0?' <a href="' . $defaultlink . '&redirect=sms"><img src="img/icons/fugue/mobile_phone.png" alt="SMS" title="SMS"></a>':"";
-					$types .= $item["facebook"] > 0?' <a href="' . $defaultlink . '&redirect=facebook"><img src="img/icons/custom/facebook.png" alt="Facebook" title="Facebook"></a>':"";
-					$types .= $item["twitter"] > 0?' <a href="' . $defaultlink . '&redirect=twitter"><img src="img/icons/custom/twitter.png" alt="Twitter" title="Twitter"></a>':"";
-					$types .= $item["feed"] > 0?' <a href="' . $defaultlink . '&redirect=feed"><img src="img/icons/rss.png" alt="Feed" title="Feed"></a>':"";
-					$types .= $item["page"] > 0?' <a href="' . $defaultlink . '&redirect=page"><img src="img/icons/layout_sidebar.png" alt="Page" title="Page"></a>':"";
-					$types .= $item["pagemedia"] > 0?' <a href="' . $defaultlink . '&redirect=voice"><img src="img/nifty_play.png" alt="Page Media" title="Page Media"></a>':"";
-					$title = _L('Message %1$s - ',escapehtml($title)) . ($types==""?_L("Empty Message"):$types);
-					$content = '<div class="content_feed_row cf"><a href="' . $defaultlink . '" ' . $defaultonclick . '>' . $time .  ' - <b>' .  escapehtml($item["name"]) . "</b>" . ($item["description"] != ""?" - " . escapehtml($item["description"]):"") . '</a></div>';
-
-					$icon = 'largeicons/letter.jpg';
-					$tools = action_links_vertical(action_link("Edit", "pencil", 'mgeditor.php?id=' . $itemid));
-				} else if($item["type"] == "report" ) {
-					$title = "Report " . escapehtml($title);
-					$content = '<div class="content_feed_row"><a href="' . $defaultlink . '" ' . $defaultonclick . '>' .
-									$time .  ' - ' .  escapehtml($item["name"]) . '</a></div>';
-					$icon = 'largeicons/savedreport.jpg';
-					$defaultlink = "reportjobsummary.php?id=$itemid";
-				} else if($item["type"] == "systemmessage" ) {
-					$content = $item["message"];
-					$icon = 'largeicons/news.jpg';
-				}
-				$activityfeed[] = array("itemid" => $itemid,
-											"defaultlink" => $defaultlink,
-											"defaultonclick" => $defaultonclick,
-											"icon" => $icon,
-											"title" => $title,
-											"content" => $content,
-											"tools" => $tools);
-
-				$limit--;
-			}
-		}
+if ($requestValues["showactivity"] == "me") {
+	$queryUsers = array($USER->id);
+} else if ($requestValues["showactivity"] == "everyone") {
+	$queryUsers = array_keys($useridList);
+} else {
+	if (in_array($requestValues["showactivity"], array_keys($useridList))) {
+		$queryUsers = array($requestValues["showactivity"] + 0);
 	} else {
-		$activityfeed .= '<table>
-											<tr>
-											<td><img src="img/ajax-loader.gif" alt="loading"/></td>
-											<td>
-											<div class="feedtitle">
-												<a href="">
-												' . _L("Loading Recent Activity") . '</a>
-											</div>
-											</td>
-											</tr>
-											</table>';
-		$activityfeed .= "
-				<script>
-				var actionids = $actioncount;
-
-				var jobfiltes = Array('none','jobs','savedjobs','scheduledjobs','activejobs','completedjobs','repeatingjobs','messages','lists','savedreports','systemmessages');
-
-				function addfeedtools() {
-					for(var id=0;id<actionids;id++){
-						$('actionlink_' + id).tip = new Tip('actionlink_' + id, $('actions_' + id).innerHTML, {
-							style: 'protogrey',
-							radius: 4,
-							border: 4,
-							hideOn: false,
-							hideAfter: 0.5,
-							stem: 'rightTop',
-							hook: {  target: 'leftMiddle', tip: 'topRight'  },
-							width: 'auto',
-							offset: { x: 0, y: 0 }
-						});
-					}
-				}
-				function removefeedtools() {
-					for(var id=0;id<actionids;id++){
-						Tips.remove('actionlink_' + id);
-					}
-				}
-				function applyfilter(filter) {
-						new Ajax.Request('start.php?ajax=true&filter=' + filter, {
-							method:'get',
-							onSuccess: function (response) {
-								var result = response.responseJSON;
-								if(result) {
-									var html = '';
-									var size = result.length;
-
-									removefeedtools();
-									actionids = 0;
-									for(i=0;i<size;i++){
-										var item = result[i];
-										html += '<div class=\"content_row\"><div class=\"content_feed_left\"><a href=\"' + item.defaultlink + '\" ' + item.defaultonclick + '><img src=\"img/' + item.icon + '\" alt=\"\" /></a></div><div class=\"content_feed_right\"><div class=\"feedtitle\"><a href=\"' + item.defaultlink + '\" ' + item.defaultonclick + '>' + item.title + '</a></div><div class=\"feed_content\">' + item.content + '</div></div>';
-										if(item.tools) {
-											html += '<div id=\"actionlink_' + actionids + '\" class=\"actionlink_tools\" ><img src=\"img/largeicons/tiny20x20/tools.jpg\" alt=\"edit tools\"/>&nbsp;Tools</div><div id=\"actions_' + actionids + '\" class=\"hidden\">' + item.tools + '</div>';
-											actionids++;
-										} else {
-											html += '<td width=\"100px\">&nbsp;</td>'
-										}
-										html += '</div>';
-									}
-									$('feeditems').update(html);
-									addfeedtools();
-
-									var filtercolor = $('filterby').getStyle('color');
-									if(!filtercolor)
-										filtercolor = '#000';
-
-									if(filter.substring(filter.length-4) != 'jobs')
-										$('jobsubfilters').hide();
-									size = jobfiltes.length;
-									for(i=0;i<size;i++){
-										$(jobfiltes[i] + 'filter').setStyle({color: filtercolor, fontWeight: 'normal'});
-									}
-									$(filter + 'filter').setStyle({
-	 									 color: '#000000',
-										 fontWeight: 'bold'
-									});
-
-								}
-
-							}
-						});
-				}
-				document.observe('dom:loaded', function() {
-					applyfilter('none');
-				});
-				</script>";
-
+		// in case of tampering with request, clear dashboardactivity variable so user can get back to dashboard and redirect to unauth
+		unset($_SESSION["dashboardactivity"]);
+		redirect('unauthorized.php');
 	}
-	return $activityfeed;
 }
+
+// sql explained key useraccess
+$query = "select max(j.activedate) from job j " .
+	"where j.userid in (" . repeatWithSeparator("?", ",", count($queryUsers)) . ")";
+	
+$expect = QuickQuery($query, null, $queryUsers);
+// keep one day, key generated
+$stats = gen2cache(60*60*24, $expect, null, "generateStats", $queryUsers, $start_datetime, $end_datetime);
+
+$query = "from job j 
+			inner join jobsetting js on (j.id = js.jobid) 
+			where 
+				j.userid=? and 
+				j.status='template' and 
+				not j.deleted and 
+				j.type = 'notification' and 
+				js.name='displayondashboard' and js.value=1
+			order by modifydate desc";
+$jobtemplates = DBFindMany("Job", $query,"j",array($USER->id));
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 
-$THEME = $_SESSION['colorscheme']['_brandtheme'];
-$PAGE = 'start:start';
-$TITLE = _L('Welcome %1$s %2$s',
-	escapehtml($USER->firstname),
-	escapehtml($USER->lastname));
+$PAGE = "start:start";
+$TITLE = "";
 $DESCRIPTION = "";
 
 if($USER->authorize("leavemessage")){
-	if($count > 0){
+	$voicereplies = QuickQuery("select count(*) from voicereply where userid = '$USER->id' and listened = '0'");
+	if($voicereplies > 0){
 		$DESCRIPTION = "<img src=\"img/bug_important.gif\"> You have unplayed responses to your notifications..." .
 				"<a href=\"replies.php?jobid=all&showonlyunheard=true\">click to view</a>";
 	}
 }
 
 // display a reminder to renew their facebook authorization token
-if ($fbtokenexpires) {
-	if ($DESCRIPTION)
-		$DESCRIPTION .= "<br>";
-	$timeleft = $fbtokenexpires - strtotime("now");
-	if ($timeleft < 0) {
-		$DESCRIPTION .= "<img src=\"img/bug_important.gif\"> ". _L("Your Facebook authorization has expired!") .
-			'<a href="account.php#facebookauth">  click to renew</a>';
-	} else if ($timeleft < 59*24*60*60) {
-		$DESCRIPTION .= "<img src=\"img/bug_important.gif\"> ". _L("Your Facebook authorization will expire on: %s...", date("F jS", $fbtokenexpires)).
-			'<a href="account.php#facebookauth">  click to renew</a>';
+if (getSystemSetting("_hasfacebook") && $ACCESS->getPermission("facebookpost")) {
+	$fbtokenexpires = $USER->getSetting("fb_expires_on");
+	if ($fbtokenexpires) {
+		if ($DESCRIPTION) {
+			$DESCRIPTION .= "<br>";
+		}
+		$timeleft = $fbtokenexpires - strtotime("now");
+		if ($timeleft < 0) {
+			$DESCRIPTION .= "<img src=\"img/bug_important.gif\"> ". _L("Your Facebook authorization has expired!") .
+				'<a href="account.php#facebookauth">  click to renew</a>';
+		} else if ($timeleft < 14*24*60*60) { // two weeks till expiration
+			$DESCRIPTION .= "<img src=\"img/bug_important.gif\"> ". _L("Your Facebook authorization will expire on: %s...", date("F jS", $fbtokenexpires)).
+				'<a href="account.php#facebookauth">  click to renew</a>';
+		}
 	}
 }
 
-include_once("nav.inc.php");
-
+include("nav.inc.php");
 ?>
 
-<link href='css/timeline.css' type='text/css' rel='stylesheet' media='screen'>
-
-
+	<div class="wrapper">
 	
-<div class="csec secbutton">
-<?
-			if ($USER->authorize('sendphone') || $USER->authorize('sendemail') || $USER->authorize('sendsms')) {
-				$allowedjobtypes = QuickQueryRow("select sum(jt.systempriority = 1) as Emergency, sum(jt.systempriority != 1) as Other from jobtype jt where jt.deleted = 0 and jt.issurvey = 0",true);
-				$jobtypes = QuickQueryList("select jt.systempriority from jobtype jt,userjobtypes ujt where ujt.jobtypeid = jt.id and ujt.userid=? and jt.deleted=0 and jt.issurvey = 0",false,false,array($USER->id));
-				$jobtypescount = count($jobtypes);
-?>
-		<div class="big_button_wrap">
-			<?
-				$hasnewjob = false;
-				if($allowedjobtypes["Other"] > 0) {
-					if($jobtypescount === 0)
-						$hasnewjob = true;
-					else {
-						$hasnewjob = (in_array(2,$jobtypes) || in_array(3,$jobtypes));
-					}
+	<div class="main_activity">
+<?if (count($useridList) > 1) {?>
+		<div class="users cf">
+			<p>Show activity for
+			<select onchange="window.location='start.php?showactivity=' + this.options[selectedIndex].value + '&<?= http_build_query(array_diff_key($requestValues,array("showactivity" => ''))) ?>'">
+				<option value="me" <?= ($requestValues["showactivity"]=="me")?"selected":"";?>><?= _L("Me")?></option>
+				<option value="everyone" <?= ($requestValues["showactivity"]=="everyone")?"selected":"";?>><?= _L("Everyone")?></option>
+				<optgroup label="<?= _L("Individual Users")?>">
+				<?
+				foreach ($useridList as $userid => $displayname) {
+					if ($userid != $USER->id)
+						echo "<option value=\"$userid\"" . ($requestValues["showactivity"]==$userid?"selected":"") . ">$displayname</option>";
 				}
-				if($hasnewjob) {
-					if ($THEME == 'newui') { 
-					?> <div class="newjob"><a href="newbroadcast.php">New Notification</a></div> <?
+				?>
+				</optgroup>
+			</select></p>
+		</div>
+<?}?>
+		
+		<div class="window summary">
+			<div class="window_title_wrap">
+			<h2><?= _L("Activity Summary")?></h2>
+			<div class="btngroup">
+				<?
+				$urlQueryState = http_build_query(array_diff_key($requestValues,array("daterange" => '')));
+				
+				foreach ($ranges as $range => $display) {
+					echo "<button " . ($requestValues["daterange"] == $range?"class=\"active\"":"") . " onclick=\"window.location='start.php?daterange=$range&$urlQueryState'\">$display</button>";
+				}
+				?>
+			</div>
+
+				<div class="window_title_start"></div>
+				<div class="window_title_end"></div>
+			</div>
+			
+			<div class="window_body_wrap cf">
+			<div class="col">
+				<h4><?= getJobsTitle()?></h4>
+				<p><strong><?=$stats["total_jobs"]?></strong></p>
+				<p><?= _L("%s Languages", $stats["total_languages"])?></p>
+				<p><?=_L("%s Senders", $stats["total_users"])?></p>
+			</div>
+			
+			<div class="col bloc">
+				<h4><?= _L("Content Mix")?></h4>
+				<?
+				
+				// Figure out what icons should be shown based on 
+				// permissions, however if there is a point in history
+				// where a type has been sent we have to include this
+				// value to not mess up the percentage values
+				
+				$graphtypes = array();
+				$hasPhone = $USER->authorize('sendphone');
+				$hasPhone = $hasPhone || ($stats["total_phones"] != 0 && !$hasPhone);
+				if ($hasPhone) {
+					$graphtypes["blue"] = $stats["total_phones"];
+				}
+					
+				$hasSms = getSystemSetting('_hassms', false) && $USER->authorize('sendsms');
+				$hasSms = $hasSms || ($stats["total_sms"] != 0 && !$hasSms);
+				if ($hasPhone) {
+					$graphtypes["orange"] = $stats["total_sms"];	
+				}
+				
+				$hasEmail = $USER->authorize('sendemail');
+				$hasEmail = $hasEmail || ($stats["total_emails"] != 0 && !$hasEmail);
+				if ($hasEmail) {
+					$graphtypes["red"] = $stats["total_emails"];
+				}
+				
+				$hasFacebook = getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost');
+				$hasTwitter = getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost');
+				$hasFeed = getSystemSetting('_hasfeed', false) && $USER->authorize('feedpost');
+				$hasPost = $hasFacebook || $hasTwitter || $hasFeed;
+				$hasPost = $hasPost || ($stats["total_posts"] != 0 && !$hasPost);
+				if ($hasPost) {
+					$graphtypes["green"] = $stats["total_posts"];
+				}
+				
+				?>
+				
+				<img class="dashboard_graph" src="graph_dashboard.png.php?<?= http_build_query($graphtypes)?>" />
+				<ul>
+				<?
+				echo $hasPhone?"<li><img src=\"themes/newui/phone-blue.png\"/>&nbsp;" . (round($stats["percentage_slice"] * $stats["total_phones"])) . "%</li>":"";
+				echo $hasEmail?"<li><img src=\"themes/newui/email-red.png\"/>&nbsp;" . (round($stats["percentage_slice"] * $stats["total_emails"])) . "%</li>":"";
+				echo $hasSms?"<li><img src=\"themes/newui/sms-orange.png\"/>&nbsp;" . (round($stats["percentage_slice"] * $stats["total_sms"])) . "%</li>":"";
+				echo $hasPost?"<li><img src=\"themes/newui/social-green.png\"/>&nbsp;" . (round($stats["percentage_slice"] * $stats["total_posts"])) . "%</li>":"";
+				?>
+				</ul>
+				
+			</div>
+			
+			<div class="col bloc">
+				<h4><?= _L("Top Types")?></h4>
+				<ul>
+<?
+				for ($i = 0; $i < 4; $i++) {
+					if (!isset($stats['top_jobtypes'][$i]))
+						break;
+?>
+					<li><span><?=$stats["top_jobtypes"][$i]['total']?></span><?=$stats["top_jobtypes"][$i]['name']?></li>
+<?
+				}
+?>
+				</ul>
+			</div>
+			
+			<div class="col bloc">
+				<h4><?= _L("Top Senders")?></h4>
+				<ul>
+<?
+				for ($i = 0; $i < 4; $i++) {
+					if (!isset($stats['top_users'][$i]))
+						break;
+?>
+					<li class="ellipsis"><span><?=$stats["top_users"][$i]['total']?></span><?=$stats["top_users"][$i]['name']?></li>
+<?
+				}
+?>
+				</ul>
+			</div>
+			</div><!-- /window_body_wrap -->
+		</div>
+
+<?
+		if ($USER->authorize('sendphone') || $USER->authorize('sendemail') || $USER->authorize('sendsms')) {
+?>
+		<div class="window broadcasts">
+			<div class="window_title_wrap"><h2><?= getJobsTitle()?></h2>
+				<div class="window_title_start"></div>
+				<div class="window_title_end"></div>
+			</div>
+			
+			<div class="window_body_wrap">
+			
+			<div id="activejobswrapper">
+			<h3><?= _L("In Progress")?> <span><?= _L("(Sending Now)")?></span></h3>
+			<table class="jobprogress info" id="activejobs">
+				<thead>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+			<div id="moreactivejobs"></div>
+			</div>
+			
+			<div id="scheduledjobswrapper">
+			<h3><?= _L("On Deck")?> <span><?= _L("(Sending Soon)")?></span></h3>
+			<table class="info" id="scheduledjobs">
+				<thead>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+			<div id="morescheduledjobs"></div>
+			</div>
+			
+			<div id="completedjobswrapper">
+			<h3><?= _L("Completed")?> <span><?= _L("(Already Sent)")?></span></h3>
+			<table class="info" id="completedjobs">
+				<thead>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+			<div id="morecompletedjobs"></div>
+			</div>
+			
+			<div id="nocontenthelper" class="nocontent">
+			<?  
+			Switch($requestValues["showactivity"]) {
+				case "me":
+					echo _L("You haven't sent any %s.",getJobsTitle()) . ' <a href="newbroadcast.php?new">' . _L("Create a %s",getJobTitle() ) . '</a>';
+					break;
+				case "everyone":
+					echo _L("No %s have been sent.",getJobsTitle()) . ' <a href="newbroadcast.php?new">' . _L("Create a %s",getJobTitle() ) . '</a>';
+					break;
+				default:
+					if (isset($useridList[$requestValues["showactivity"]])) {
+						echo _L("%s hasn't sent any %s.",$useridList[$requestValues["showactivity"]], getJobsTitle());
 					} else {
-					?> <div class="newjob"><a href="jobwizard.php?new&amp;jobtype=normal">New Notification</a></div> <?	
+						echo _L("No %s have been sent.",getJobsTitle()) . ' <a href="newbroadcast.php?new">' . _L("Create a %s",getJobTitle() ) . '</a>';
 					}
-				}
-
-				$hasemergency = false;
-				if($allowedjobtypes["Emergency"] > 0) {
-					if($jobtypescount === 0)
-						$hasemergency = true;
-					else {
-						$hasemergency = in_array(1,$jobtypes);
-					}
-				}
-				if($hasemergency) {
-			 ?>
-					<div class="emrjob"><a href="jobwizard.php?new&amp;jobtype=emergency">Emergency</a></div>
-			<? } ?>
-			</div> <!-- /.big_button_wrap -->
-			
-</div><!-- .csec .secbutton -->
-<?			}
-			if ($USER->authorize("startstats")) {
-?>
-<div class="csec sectimeline"> <? // NOTE: if the timeline isn't showing, check the style.php (css) for the theme to see if .sectimeline is set to display: none; ?>
+					break;
+			} 
+			?>
+			</div>
+			</div><!-- /window_body_wrap -->
+		</div>
 <?
-	startWindow(_L("%s Timeline", getJobTitle()));
-		include_once("inc/timeline.inc.php");
-	endWindow();
+		}
 ?>
-</div><!-- .csec .sectimelime -->
-
-<div class="csec secwindow"><!-- contains recent activity -->
+	</div><!-- end main_activity -->
+	
+	
+	<div class="main_aside">
 <?
-			startWindow(_L('Recent Activity'));
-$activityfeed = '
-			<div class="csec window_aside" id="recentactivity"> 
-				<div class="feedfilter">
-					<a id="nonefilter" href="start.php?filter=none" onclick="applyfilter(\'none\'); return false;"><img src="img/largeicons/tiny20x20/globe.jpg" alt="">Show&nbsp;All</a><br />
-				</div>
-				<h3 id="filterby">Filter By:</h3>
-				<div id="allfilters" class="feedfilter">
-					<a id="jobsfilter" href="start.php?filter=jobs" onclick="applyfilter(\'jobs\'); $(\'jobsubfilters\').toggle(); return false;"><img src="img/largeicons/tiny20x20/ping.jpg" alt="">' . getJobsTitle() . '</a>
-					<div id="jobsubfilters" style="' . (in_array($filter,array("savedjobs","scheduledjobs","activejobs","completedjobs","repeatingjobs"))?"display:block":"display:none") . ';padding-left:20px;">
-						<a id="savedjobsfilter" href="start.php?filter=savedjobs" onclick="applyfilter(\'savedjobs\'); return false;"><img src="img/largeicons/tiny20x20/folderandfiles.jpg" alt="">Saved</a>
-						<a id="scheduledjobsfilter" href="start.php?filter=scheduledjobs" onclick="applyfilter(\'scheduledjobs\'); return false;"><img src="img/largeicons/tiny20x20/clock.jpg" alt="">Scheduled</a>
-						<a id="activejobsfilter" href="start.php?filter=activejobs" onclick="applyfilter(\'activejobs\'); return false;"><img src="img/largeicons/tiny20x20/ping.jpg" alt="">Active</a>
-						<a id="completedjobsfilter" href="start.php?filter=completedjobs" onclick="applyfilter(\'completedjobs\'); return false;"><img src="img/largeicons/tiny20x20/checkedgreen.jpg" alt="">Completed</a>
-						<a id="repeatingjobsfilter" href="start.php?filter=repeatingjobs" onclick="applyfilter(\'repeatingjobs\'); return false;"><img src="img/largeicons/tiny20x20/calendar.jpg" alt="">Repeating</a>
-					</div>
-					<a id="messagesfilter" href="start.php?filter=messages" onclick="applyfilter(\'messages\'); return false;"><img src="img/largeicons/tiny20x20/letter.jpg" alt="">Messages</a>
-					<a id="listsfilter" href="start.php?filter=lists" onclick="applyfilter(\'lists\'); return false;"><img src="img/largeicons/tiny20x20/addrbook.jpg" alt="">Lists</a>
-					<a id="savedreportsfilter" href="start.php?filter=savedreports" onclick="applyfilter(\'savedreports\'); return false;"><img src="img/largeicons/tiny20x20/savedreport.jpg" alt="">Reports</a>
-					<a id="systemmessagesfilter" href="start.php?filter=systemmessages" onclick="applyfilter(\'systemmessages\'); return false;"><img src="img/largeicons/tiny20x20/news.jpg" alt="">System&nbsp;Messages</a>
-				</div>
-			</div> <!-- .csec .window_aside -->
-			
-			<div id="feeditems" class="csec window_main">
-				';
-
-$activityfeed .= activityfeed($mergeditems,false);
-$activityfeed .= '</div> <!-- .csec .window_main -->';
-			echo $activityfeed;
-			endWindow();
-
-			?> <?
+		if ($USER->authorize('sendphone') || $USER->authorize('sendemail') || $USER->authorize('sendsms')) {
+?>
+		<div class="bigbtn">
+			<a class="bigbtn" href="newbroadcast.php?new"><span><?= _L("New %s",getJobTitle())?></span><b></b></a>
+		</div>
+		
+<? 
+	if (isset($DESCRIPTION) && $DESCRIPTION != "") {
+		echo '<div class="dash_alert">' . $DESCRIPTION . '</div>';
+	}
+?>
+		
+		<div class="templates cf">
+			<h3 onclick="window.location='jobtemplates.php'"><?= _L("%s Templates",getJobTitle())?></h3>
+			<ul>
+			<?
+			if (count($jobtemplates)) {
+				foreach($jobtemplates as $jobtemplate) {
+					$lists = json_encode(quickQueryList("select listid from joblist where jobid = ?", false, false, array($jobtemplate->id)));
+					$options = array(
+						"subject" => $jobtemplate->name,
+						"lists" => $lists,
+						"jobtypeid" => $jobtemplate->jobtypeid,
+						"messagegroupid" => $jobtemplate->messagegroupid
+					);
+					echo "<li><a href=\"newbroadcast.php?template=true&" . http_build_query($options) . "\">{$jobtemplate->name}</a></li>";
+				}
 			}
-	?>
-</div><!-- .csec .secwindow -->
+			?>
+			</ul>
+			<a class="newtemplate" href="jobtemplate.php?id=new"><img src="themes/newui/add.png">&nbsp;<?= _L("New Template") ?></a>
+		</div>
+<?
+		}
+?>
+		<?= addHelpSection();?>
+	</div><!-- end main_aside -->
+	
+	</div><!-- end wrapper -->
+
 
 <script type="text/javascript">
-	document.observe('dom:loaded', function() {
-		// send a message to any listeners letting them know the page has been loaded
-		top.postMessage('{"custurl":"<?=$CUSTOMERURL?>", ' +
-				'"page":"<?=preg_replace('/.*\//', "", $_SERVER["SCRIPT_NAME"])?>", "user":"<?=$USER->login?>"}', '*');
+var jobloads = 3;
+
+function updateTableTools(section, action, override, start, limit, count){
+	// Remove previous tooltips if they exist add add new ones
+	$$('.jobtools').each(function(element) {
+		Tips.remove(element.id);
+		element.tip = new Tip(element.id, element.next().innerHTML, {
+			style: 'protogrey',
+			radius: 4,
+			border: 4,
+			hideOn: false,
+			hideAfter: 0.5,
+			stem: 'rightTop',
+			hook: {  target: 'leftMiddle', tip: 'topRight'  },
+			width: 'auto',
+			offset: { x: 0, y: 0 }
+		});
 	});
+	
+	if (start == 0 && count == 0) {
+		$(section + "wrapper").hide();
+	} else {
+		$(section + "wrapper").show();
+	}
+	
+	jobloads--;
+	if (jobloads <= 0) {
+		// Once all 3 initial job loads returned check if we should show helper
+		var status = ["active","scheduled","completed"];
+		var showhelper = true;
+		status.each(function(s) {
+			if ($(s + "jobswrapper").visible())
+				showhelper = false;
+		});
+		if (showhelper)
+			$("nocontenthelper").show();
+		else
+			$("nocontenthelper").hide();
+	}
+	
+	//Update More link to with the correct show status and url
+	if (count >= limit) {
+		if (override) {
+			start = 0;
+			limit += limit;
+		} else {
+			start += limit;
+		}
+		
+		$("more" + section).update(new Element("a",{href: "#", 
+			onclick: "ajax_obj_table_update('" + section + "','ajaxjob.php?action=" + action + "&who=<?=$requestValues["showactivity"]?>&start=" + start + "&limit=" + limit + "'," + override + ",updateTableTools.curry('" + section + "','" + action + "'," + override + "," + start + "," + limit + ")); return false;"
+			}).insert("<?= _L("Show More")?>"));
+	} else {
+		$("more" + section).update("");
+	}
+}
+
+document.observe('dom:loaded', function() {
+	$("nocontenthelper").hide();
+	ajax_obj_table_update('activejobs','ajaxjob.php?action=activejobs&who=<?=$requestValues["showactivity"]?>&start=0&limit=10',true,updateTableTools.curry("activejobs","activejobs",true,0,10));
+	ajax_obj_table_update('scheduledjobs','ajaxjob.php?action=scheduledjobs&who=<?=$requestValues["showactivity"]?>&start=0&limit=10',false,updateTableTools.curry("scheduledjobs","scheduledjobs",false,0,10));
+	ajax_obj_table_update('completedjobs','ajaxjob.php?action=completedjobs&who=<?=$requestValues["showactivity"]?>&start=0&limit=5',false,updateTableTools.curry("completedjobs","completedjobs",false,0,5));
+	// send a message to any listeners letting them know the page has been loaded
+	top.postMessage('{"custurl":"<?=$CUSTOMERURL?>", ' +
+			'"page":"<?=preg_replace('/.*\//', "", $_SERVER["SCRIPT_NAME"])?>", "user":"<?=$USER->login?>"}', '*');
+});
+
 </script>
 
+
 <?
-include_once("navbottom.inc.php");
+include("navbottom.inc.php");
 ?>

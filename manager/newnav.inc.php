@@ -7,20 +7,6 @@
 
 $currentpage = substr($_SERVER["SCRIPT_NAME"],strrpos($_SERVER["SCRIPT_NAME"],"/")+1);
 
-$COLORSCHEMES = array(
-	"forest" => array("displayname" => "Forest",
-							"_brandprimary" => "0D8336", /* mid green */
-							"_brandtheme1" => "13a545",
-							"_brandtheme2" => "484848",
-							"_brandratio" => ".2")
-);
-$_SESSION['colorscheme'] = array();
-$_SESSION['colorscheme']['_brandtheme'] = "forest";
-$_SESSION['colorscheme']['_brandprimary'] = "0D8336";
-$_SESSION['colorscheme']['_brandratio'] = ".2";
-$_SESSION['colorscheme']['_brandtheme1'] = $COLORSCHEMES["forest"]["_brandtheme1"];
-$_SESSION['colorscheme']['_brandtheme2'] = $COLORSCHEMES["forest"]["_brandtheme2"];
-
 if (!isset($TITLE))
 	$TITLE = "TODO: No Title";
 if (!isset($PAGE))
@@ -227,7 +213,6 @@ function get_authorized_advanced() {
 ////////////////////////////////////////////////////////////////////////////////
 
 function navMainTab ($title, $link, $isselected) {
-	$theme = getBrandTheme();
 	return '<li '. ($isselected ? 'class="navtab_active"' : "") .'><a onfocus="blur()" href="' . $link . '">' . $title . '</a></li>';
 }
 
@@ -286,11 +271,6 @@ function doLogo () {
 	echo '<img src="manager.png" alt="" onclick="window.location=\'customers.php\'" >';
 }
 
-function setBodyClass () {
-	$theme = $_SESSION['colorscheme']['_brandtheme'];
-	echo 'class="' . $theme . '"';
-}
-
 doNavTabs($NAVTREE);
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -340,11 +320,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 	  </style>
 	<![endif]-->
 </head>
-<body <?=setBodyClass();?> >
-	<script>
-		var _brandtheme = "<?=getBrandTheme();?>";
-	</script>
-
+<body>
 <!-- ********************************************************************* -->
 
 <div id="top_banner" class="banner cf">
@@ -352,7 +328,6 @@ header('Content-type: text/html; charset=UTF-8') ;
 
 	<div class="banner_logo">
 		<? doLogo() ?>
-		<h1>SchoolMessenger</h1>
 	</div>  
 	
 	<div class="banner_links_wrap">

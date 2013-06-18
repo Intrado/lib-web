@@ -332,8 +332,6 @@ class Form {
 	}
 
 	function render ($ignorelibraries = false) {
-		$theme = getBrandTheme();
-
 		$posturl = $_SERVER['REQUEST_URI'];
 		$posturl .= mb_strpos($posturl,"?") !== false ? "&" : "?";
 		$posturl .= "form=". $this->name;

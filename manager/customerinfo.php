@@ -75,7 +75,6 @@ $settings = array(
 	'loginlockoutattempts' => '5',
 	'logindisableattempts' => '0',
 	'loginlockouttime' => '5',
-	'_brandtheme' => 'newui',
 	'_brandprimary' => '3e693f',
 	'_brandratio' => '.2',
 	'_amdtype' => "ivr"

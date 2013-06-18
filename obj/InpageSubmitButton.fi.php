@@ -20,7 +20,6 @@ class InpageSubmitButton extends FormItem {
 		$submitvalue = (isset($this->args['submitvalue'])?$this->args['submitvalue']:'inpagesubmit');
 		
 		// create a submit button
-		$theme = getBrandTheme();
 		$onclick = 'return form_submit(event,\''.escapehtml($submitvalue).'\');';
 		if (isset($this->args['confirm']) && $this->args['confirm'])
 			$onclick = 'if (confirm(\''.escapehtml($this->args['confirm']).'\')) { '.$onclick.' } else { return false; }';

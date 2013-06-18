@@ -15,7 +15,6 @@ require_once("../obj/Message.obj.php");
 require_once("../obj/MessagePart.obj.php");
 require_once("loadtemplatedata.php");
 require_once("createtemplates.php");
-require_once("../inc/themes.inc.php");
 require_once("../obj/FormBrandTheme.obj.php");
 require_once("../obj/ValSmsText.val.php");
 require_once("XML/RPC.php");
@@ -128,7 +127,6 @@ $settings = array(
 	'loginlockoutattempts' => '5',
 	'logindisableattempts' => '0',
 	'loginlockouttime' => '5',
-	'_brandtheme' => 'newui',
 	'_brandprimary' => '3e693f',
 	'_brandratio' => '.2',
 	'_amdtype' => "ivr"

@@ -101,21 +101,11 @@ $TITLE= isset($questionnaire->webpagetitle) ? $questionnaire->usehtml ? $questio
 
 
 //Do inpage CSS
-$theme = $scheme['_brandtheme'];
-$primary = $scheme['colors']['_brandprimary'];
-$theme1 = "#" . $scheme['colors']['_brandtheme1'];
-$theme2 = "#" . $scheme['colors']['_brandtheme2'];
-$globalratio = $scheme['colors']['_brandratio'];
 
-$fade1 = "E5E5E5";
-$fade2 = "999999";
-$fade3 = "595959";
-
-$newfade1 = fadecolor($primary, $fade1, $globalratio);
-$newfade2 = fadecolor($primary, $fade2, $globalratio);
-$newfade3 = fadecolor($primary, $fade3, $globalratio);
-
-$primary = "#" . $primary;
+// FIXME: replace this with static values, these never change with themes gone
+$newfade1 = fadecolor("3e693f", "E5E5E5", .2);
+$newfade2 = fadecolor("3e693f", "999999", .2);
+$newfade3 = fadecolor("3e693f", "595959", .2);
 
 
 //Takes 2 hex color strings and 1 ratio to apply to to the primary:original

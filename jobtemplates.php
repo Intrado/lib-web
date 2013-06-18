@@ -96,35 +96,19 @@ if($isajax === true) {
 	$displaystart = ($total) ? $start +1 : 0;
 
 	if(empty($templatedata)) {
-
-		if (getBrandTheme() == 'newui') { 
-			$data->list[] = array(
-				"icon" => "img/newui/templates.png",
-				"title" => _L("No Templates."),
-				"details" => "",
-				"defaultlink" => "",
-				"content" => "",
-				"tools" => "");
-		} else {
-			$data->list[] = array(
-				"icon" => "img/largeicons/globe.jpg",
-				"title" => _L("No Templates."),
-				"details" => "",
-				"defaultlink" => "",
-				"content" => "",
-				"tools" => "");
-		}
+		$data->list[] = array(
+			"icon" => "img/newui/templates.png",
+			"title" => _L("No Templates."),
+			"details" => "",
+			"defaultlink" => "",
+			"content" => "",
+			"tools" => "");
 	} else {
 		foreach ($templatedata as $template) {
 			$jobid = $template['jobid'];
 			$time = date("M j, Y g:i a",strtotime($template["date"]));
 			$title = escapehtml($template["name"]);
-
-			if (getBrandTheme() == 'newui') { 
-				$icon = 'img/newui/templates.png';
-			} else {
-				$icon = 'img/largeicons/globe.jpg';
-			}
+			$icon = 'img/newui/templates.png';
 			
 			$lists = json_encode(quickQueryList("select listid from joblist where jobid = ?", false, false, array($jobid)));
 			$templateoptions = array(

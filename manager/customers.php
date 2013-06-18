@@ -111,7 +111,7 @@ function fmt_actions($row, $index) {
 
 function fmt_jobcount($row, $index){
 	if($row[$index] > 0){
-		return "<div style='background-color: #ccffcc;'>" . $row[$index] . "<div>";
+		return "<div style='background-color: #ccffcc;'>" . $row[$index] . "</div>";
 	} else {
 		return $row[$index];
 	}

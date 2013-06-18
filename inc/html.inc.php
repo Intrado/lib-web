@@ -1,7 +1,6 @@
 <?
 
 function help($title, $extrahtml = NULL, $style = NULL) {
-	$theme = getBrandTheme();
 	global $LOCALE;
 	$hoverfolder = "locale/$LOCALE/hover/$title.txt";
 	if (!file_exists($hoverfolder))
@@ -148,7 +147,6 @@ function hidden_submit_button($value = "submit") {
 }
 
 function submit_button($name, $value = "submit", $icon = null) {
-	$theme = getBrandTheme();
 	$btn = '<button class="btn" type="submit" name="submit" value="'.escapehtml($value).'" onclick="return form_submit(event,\''.escapehtml($value).'\');"><span class="btn_wrap cf"><span class="btn_left"></span><span class="btn_middle">';
 	
 	if ($icon == null)
@@ -161,7 +159,6 @@ function submit_button($name, $value = "submit", $icon = null) {
 }
 
 function icon_button($name,$icon,$onclick = NULL, $href = NULL, $extrahtml = NULL) {
-	$theme = getBrandTheme();
 	$autoid = $extrahtml == null ? ('id="' . autoID("icon_button", $name, $icon) . '"') : "";
 	$btn = '<button ' . $autoid . ' class="btn" type="button"';
 	if ($onclick)
@@ -176,7 +173,6 @@ function icon_button($name,$icon,$onclick = NULL, $href = NULL, $extrahtml = NUL
 }
 
 function button($name,$onclick = NULL, $href = NULL, $extrahtml = NULL) {
-	$theme = getBrandTheme();
 	$autoid = $extrahtml == null ? ('id="' . autoID("button", $name) . '"') : "";
 	$btn = '<button ' . $autoid . ' class="btn" type="button"';
 	if ($onclick)

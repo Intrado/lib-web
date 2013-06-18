@@ -7,14 +7,7 @@ header("Cache-Control: private");
 // skipcommon for login page, no session to keep
 if (!isset($_GET['skipcommon'])) {
 	include_once("common.inc.php");
-	require_once("../inc/themes.inc.php");
-	unset($_SESSION['colorscheme']);
 	
-	
-	if (!isset($_SESSION['classroomtheme'])) {
-		$_SESSION['colorscheme'] = $COLORSCHEMES["newui"];
-		$_SESSION['colorscheme']["_brandtheme"] = "newui";
-	}
 	session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 }
 

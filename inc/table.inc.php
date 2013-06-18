@@ -171,8 +171,6 @@ function showCsvData ($data, $titles, $formatters = array()) {
 }
 
 function startWindow($title) {
-	$theme = getBrandTheme();
-
 ?>
 
 <div class="window">
@@ -192,8 +190,6 @@ function startWindow($title) {
 }
 
 function endWindow() {
-	$theme = getBrandTheme();
-
 ?>
 				</div><!-- window_body -->
 			</div>

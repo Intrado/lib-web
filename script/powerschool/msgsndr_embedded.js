@@ -137,7 +137,7 @@ function MessageSender_embedded(ssoTarget, pkeyList, container) {
 	/**
 	 * handle message events a couple of different ways
 	 * 1. if it is a "resize" event, there will be resize data attached. This causes the iframe to resize so it fits the content
-	 * 2. if the current information indicates that the user has landed on "start.php" or "dashboard.php", start launching message sender
+	 * 2. if the current information indicates that the user has landed on "start.php", start launching message sender
 	 *
 	 * @param {event} event
 	 * @private
@@ -162,8 +162,8 @@ function MessageSender_embedded(ssoTarget, pkeyList, container) {
 				this.baseUrl = event.origin + "/" + data.custurl + "/";
 
 				// we received all the necessary data to indicate pages are loading correctly (and a user is authenticated)
-				// if the page loaded is start.php or dashboard.php, precede to the message sender
-				if (data.page == "start.php" || data.page == "dashboard.php") {
+				// if the page loaded is start.php, precede to the message sender
+				if (data.page == "start.php") {
 					clearTimeout(authTimer);
 
 					// Authentication completed

@@ -55,10 +55,6 @@ if (isset($_GET['monitor'])) {
 	
 </head>
 <body>
-	<script>
-		var _brandtheme = "classroom";
-	</script>
-	
 <!-- ********************************************************************* -->
 
 <div class="manager_logo">

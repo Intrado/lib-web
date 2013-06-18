@@ -351,7 +351,7 @@ if (count($data)) {
 	</script>
 	<?
 } else {
-	echo "<div class='destlabel'><img src='img/largeicons/information.jpg' align='middle'> " . _L("No Records Found") . "<div>";
+	echo "<div class='destlabel'><img src='img/largeicons/information.jpg' align='middle'> " . _L("No Records Found") . "</div>";
 }
 endWindow();
 

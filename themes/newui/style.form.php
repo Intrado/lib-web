@@ -17,7 +17,6 @@
 .newform .formcontrol textarea { display: block; width: 375px; margin: 0 20px 5px 0; padding: 4px 5px; font-size: 14px; line-height: 18px; border: 1px solid #E2E2E2; 
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
-.newform .formcontrol input#account_brandthemecustomize { margin: 5px 5px 0 0; }
 
 .newform .formcontrol .domain { padding: 5px 0 0; font-size: 14px; line-height: 18px; }
 

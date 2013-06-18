@@ -64,12 +64,6 @@ if (isset($_GET['logout'])) {
 			$_SESSION['portaluserid'] = $loginDetails["userID"];
 			$_SESSION['userlogintype'] = $loginDetails["type"]; // "powerschool" or "local"
 
-			$_SESSION['colorscheme']['_brandtheme'] = "3dblue";
-			$_SESSION['colorscheme']['_brandprimary'] = "26477D";
-			$_SESSION['colorscheme']['_brandtheme1'] = "89A3CE";
-			$_SESSION['colorscheme']['_brandtheme2'] = "89A3CE";
-			$_SESSION['colorscheme']['_brandratio'] = ".3";
-
 			$redirectLoc = isset($_SESSION['lasturi']) ? $_SESSION['lasturi'] : 'choosecustomer.php' . getAppendCustomerUrl();
 			unset($_SESSION['lasturi']);
 		} else {

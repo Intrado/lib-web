@@ -39,26 +39,6 @@ function loadSubscriberDisplaySettings() {
 	$_SESSION['subscriber.firstname'] = QuickQuery("select ".$firstnameField." from person where id=?", false, array($pid));
 	$_SESSION['subscriber.lastname'] = QuickQuery("select ".$lastnameField." from person where id=?", false, array($pid));
 
-	$theme = QuickQuery("select value from setting where name = '_brandtheme'");
-	if ($theme === false)
-		$theme = "classroom";
-	$theme1 = QuickQuery("select value from setting where name = '_brandtheme1'");
-	if ($theme1 === false)
-		$theme1 = "3e693f";
-	$theme2 = QuickQuery("select value from setting where name = '_brandtheme2'");
-	if ($theme2 === false)
-		$theme2 = "b47727";
-	$primary = QuickQuery("select value from setting where name = '_brandprimary'");
-	if ($primary === false)
-		$primary = "3e693f";
-	$ratio = QuickQuery("select value from setting where name = '_brandratio'");
-	if ($ratio === false)
-		$ratio = ".2";
-	$_SESSION['colorscheme']['_brandtheme']   = $theme;
-	$_SESSION['colorscheme']['_brandtheme1']  = $theme1;
-	$_SESSION['colorscheme']['_brandtheme2']  = $theme2;
-	$_SESSION['colorscheme']['_brandprimary'] = $primary;
-	$_SESSION['colorscheme']['_brandratio']   = $ratio;
 
 	$prefs = QuickQuery("select preferences from subscriber where id=?", false, array($subscriberID));
 	$preferences = json_decode($prefs, true);

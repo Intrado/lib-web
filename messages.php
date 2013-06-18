@@ -202,11 +202,7 @@ if($isajax === true) {
 			if ($item["type"] == "stationery") {
 				$icon = 'img/newui/posts.png';
 			} else {
-				if (getBrandTheme() == 'newui') { 
-					$icon = 'img/newui/letter.png';
-				} else {
-					$icon = 'img/largeicons/letter.jpg';
-				}
+				$icon = 'img/newui/letter.png';
 			}
 			// Users with published messages or subscribed messages will get a special action item
 			$publishactionlink = "";

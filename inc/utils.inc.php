@@ -617,29 +617,8 @@ function loadDisplaySettings(){
 	if($scheme == false){
 		$scheme = array(
 					"_supportemail" => "support@schoolmessenger.com",
-					"_supportphone" => "8009203897",
-					"_brandtheme" => "classroom",
-					"colors" => array(
-						"_brandprimary" => "3e693f",
-						"_brandtheme1" => "3e693f",
-						"_brandtheme2" => "b47727",
-						"_brandratio" => ".2"));
-	}
-	$userprefs = array();
-	$userprefs['_brandprimary'] = QuickQuery("select value from usersetting where userid=? and name = '_brandprimary'", false, array($USER->id));
-	$userprefs['_brandtheme1'] = QuickQuery("select value from usersetting where userid=? and name = '_brandtheme1'", false, array($USER->id));
-	$userprefs['_brandtheme2'] = QuickQuery("select value from usersetting where userid=? and name = '_brandtheme2'", false, array($USER->id));
-	$userprefs['_brandratio'] = QuickQuery("select value from usersetting where userid=? and name = '_brandratio'", false, array($USER->id));
-	$userprefs['_brandtheme'] = QuickQuery("select value from usersetting where userid=? and name = '_brandtheme'", false, array($USER->id));
-
-	if($userprefs['_brandprimary']){
-		$_SESSION['colorscheme'] = $userprefs;
-	} else {
-		$_SESSION['colorscheme'] = array("_brandtheme" => $scheme['_brandtheme'],
-									"_brandprimary" => $scheme['colors']['_brandprimary'],
-									"_brandtheme1" => $scheme['colors']['_brandtheme1'],
-									"_brandtheme2" => $scheme['colors']['_brandtheme2'],
-									"_brandratio" => $scheme['colors']['_brandratio']);
+					"_supportphone" => "8009203897"
+		);
 	}
 
 	$_SESSION['productname'] = isset($scheme['productname']) ? $scheme['productname'] : "" ;

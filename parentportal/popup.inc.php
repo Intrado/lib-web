@@ -3,9 +3,6 @@ header('Content-type: text/html; charset=UTF-8') ;
 
 $pagetitle = preg_replace('/\\<.+>/','',(isset($TITLE) ? $TITLE : ""));
 ?>
-<script>
-	var _brandtheme = "<?=getBrandTheme();?>";
-</script>
 <html>
 <head>
 	<meta http-equiv="Content-type" value="text/html; charset=UTF-8" />

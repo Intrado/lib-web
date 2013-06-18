@@ -222,7 +222,7 @@ if (count($data)) {
 }
 
 if (!$foundjobs) {
-	echo "<div class='destlabel'><img src='img/largeicons/information.jpg' align='middle'> " . _L("No jobs found for the current filter settings") . "<div>";
+	echo "<div class='destlabel'><img src='img/largeicons/information.jpg' align='middle'> " . _L("No jobs found for the current filter settings") . "</div>";
 }
 endWindow();
 

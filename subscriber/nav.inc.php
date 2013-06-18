@@ -32,7 +32,6 @@ $NAVTREE = array (
 ////////////////////////////////////////////////////////////////////////////////
 
 function navMainTab ($display, $hint, $accesskey, $link, $isselected) {
-	$theme = getBrandTheme();
 	return '<li '. ($isselected ? 'class="navtab_active"' : "") .'><a accesskey="'.$accesskey.'" onfocus="blur()" href="' . $link . '" title="'.$hint.'"><span>' . $display . '</span></a></li>';
 }
 
@@ -75,12 +74,6 @@ function doLogo () {
 		echo '<img src="logo.img.php?hash=' . $logohash .'" alt="" />';
 }
 
-function setBodyClass () {
-	$theme = $_SESSION['colorscheme']['_brandtheme'];
-	echo 'class="' . $theme . '"';
-}
-
-
 doNavTabs($NAVTREE);
 
 
@@ -118,11 +111,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 <![endif]-->
 
 </head>
-<body <?=setBodyClass();?> >
-	<script>
-		var _brandtheme = "<?=getBrandTheme();?>";
-	</script>
-
+<body>
 <!-- ********************************************************************* -->
 
 <div class="wrap"><!-- ends in navbottom.inc -->
