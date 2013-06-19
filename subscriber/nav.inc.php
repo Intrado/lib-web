@@ -117,7 +117,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 <div class="wrap"><!-- ends in navbottom.inc -->
 
 <div id="top_banner" class="banner cf">
-	<div class="container cf">
+	<div class="contain cf">
 
 	<div class="banner_logo">
 		<table class="logo"><tr><td><? doLogo() ?></td></tr></table>
@@ -134,7 +134,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 				</ul>		
 		</div>
 	
-</div><!-- /container -->	
+</div><!-- /contain -->	
 </div><!--  end top_banner -->
 
 
