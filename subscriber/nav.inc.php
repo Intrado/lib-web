@@ -146,11 +146,13 @@ header('Content-type: text/html; charset=UTF-8') ;
 </div>
 </div><!-- .primary_nav -->
 
-
-<div class="subnavmenu hoverlinks">
-	<?= $SUBTABS ?>
+<div class="subnavtabs">
+	<div class="contain">
+		<ul class="cf">
+			<?= $SUBTABS ?>
+		</ul>
+	</div>
 </div>
-
 
 <div class="content_wrap cf"><!-- starts main content section, tag is ended in navbottom.inc.php -->
 <div class="container cf">

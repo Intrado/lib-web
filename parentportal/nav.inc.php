@@ -189,7 +189,14 @@ header('Content-type: text/html; charset=UTF-8') ;
 	
 </div><!-- /container -->
 </div><!-- primary_nav -->
-	
+
+<div class="subnavtabs">
+	<div class="contain">
+		<ul class="cf">
+			<?= $SUBTABS ?>
+		</ul>
+	</div>
+</div>
 
 <div class="content_wrap cf"><!-- starts main content wrapper, tag ends in navbottom.inc.php -->
 
