@@ -139,7 +139,7 @@ border-top: 1px solid #bbb; border-right: 1px solid #bbb; border-bottom: 1px sol
 .summary .col li img { background: #555; display: inline-block; }
 .summary strong { font-weight: bold; font-size: 52px; line-height: 52px; }
 .summary .bloc { background: #fff; height: 140px; text-align: left; border: 1px solid #93C9D9; -webkit-border-radius: 5px; border-radius: 5px; white-space: nowrap;overflow: hidden;}
-.summary img.dashboard_graph { margin: 0 5px 0 0; }
+.summary img.dashboard_graph { width: 55%; margin: 0 5px 0 0; }
 .summary ul { float: left; }
 .summary .ellipsis { white-space: nowrap; width: 150px; overflow: hidden; -o-text-overflow: ellipsis; text-overflow: ellipsis; }
 
@@ -1094,6 +1094,7 @@ p.warning {
  /*.summary .col { width: 225px; }*/
  /*.summary .col:first-child { width: 181px; }*/
  .summary .ellipsis {  width: 195px; }
+ .summary img.dashboard_graph { width: 100px; }
  
  /*.ie8 .summary .col { width: 195px; }
  .ie8 .summary .col:first-child { width: 151px; }*/
