@@ -32,6 +32,8 @@ if (!$USER->authorize('createlist') || !($USER->authorize('listuploadids') || $U
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
+session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
+
 $list = new PeopleList(getCurrentList());
 $type = (isset($_GET['type']) && $_GET['type'] == "contacts") ? "contacts" : "ids";
 $importid = QuickQuery("select id from import where listid='$list->id'");
