@@ -56,3 +56,7 @@ include_once("css/css.inc.php");
 .manager .footer .timestamp {
 	margin-left: 20px;
 }
+.manager .window_title_wrap {
+	background-color: darkgray;
+	background-image: -moz-linear-gradient(center top , darkgray, #000066);
+}
