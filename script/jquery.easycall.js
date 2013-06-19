@@ -152,7 +152,7 @@
                     }
                 });
                 var prependSpan = $('<span />', {'class':'add-on'});
-                prependSpan.append($('<span class="phone-icon"></span>'));
+                prependSpan.append($('<span class="sprite-glyphicons-phone"></span>'));
                 // button to start the calling session
                 var callbutton = $('<button />', { "class":"record btn btn-success", "value":"Call Now to Record"});
                 callbutton.append($('<i />', { "class":"icon-hand-left icon-white" })).append(" &nbsp;Call Now to Record");
