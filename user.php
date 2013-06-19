@@ -496,7 +496,7 @@ if (getSystemSetting("_hasfeed", false)) {
 }
 if (getSystemSetting('_allowoldmessagesender', false)) {
 	$formdata["allowoldmessagesender"] = array(
-		"label" => _L('Use Deprecated Message Sender'),
+		"label" => _L('Use Classic Message Sender'),
 		"value" => $edituser->getSetting('_allowoldmessagesender', false),
 		"validators" => array(),
 		"control" => array("CheckBox"),
