@@ -18,9 +18,6 @@ list($MAINTAB,$SUBTAB) = explode(":",$PAGE);
 $FIRSTACTIVETABLINK = "";
 $ACTIVEMAINTABTITLE = "";
 
-$SESSION_WARNING_TIME = isset($SETTINGS['feature']['session_warning_time']) ? 
-	$SETTINGS['feature']['session_warning_time']*1000 : 1200000;
-
 $SHORTCUTS = array();
 
 if (isset($_GET['timer']) || isset($_SESSION['timer'])) {
@@ -305,7 +302,8 @@ header('Content-type: text/html; charset=UTF-8') ;
 	<script src="script/livepipe/livepipe.js" type="text/javascript"></script>
 	<script src="script/livepipe/window.js" type="text/javascript"></script>
 	<script src="script/modalwrapper.js" type="text/javascript"></script>
-	
+	<script src="script/bootstrap-modal.js" type="text/javascript"></script>
+
 	<link href="css.php?newnav=true" type="text/css" rel="stylesheet" media="screen, print" />
 	<link href="css.forms.php" type="text/css" rel="stylesheet" media="screen, print" />
 	<link href="css/datepicker.css.php" type="text/css" rel="stylesheet" />
@@ -319,9 +317,21 @@ header('Content-type: text/html; charset=UTF-8') ;
 	    }
 	  </style>
 	<![endif]-->
+
+	<script type="text/javascript">
+		sessionKeepAliveWarning(<?=$SESSION_WARNING_TIME?>);
+	</script>
 </head>
 <body class="manager">
 <!-- ********************************************************************* -->
+
+<div class="modal hide fade default-modal" id="defaultmodal">
+	<div class="modal-header">
+		<button class="close" aria-hidden="true" data-dismiss="modal" type="button">x</button>
+		<h3></h3>
+	</div>
+	<div class="modal-body"></div>
+</div>
 
 <div class="wrap"><!-- tag ends in footer -->
 <div id="top_banner" class="banner cf">
@@ -342,12 +352,6 @@ header('Content-type: text/html; charset=UTF-8') ;
 
 </div><!-- /container -->	
 </div><!--  end top_banner -->
-
-<script type="text/javascript">
-Event.observe(window, 'load', function() {
-	sessionKeepAliveWarning(<?=$SESSION_WARNING_TIME?>);
-});
-</script>
 
 <div class="primary_nav cf">
 <div class="container">

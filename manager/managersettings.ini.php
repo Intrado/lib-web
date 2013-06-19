@@ -60,6 +60,8 @@ has_ssl=true
 force_ssl=true
 should_grant_local=false
 query_trace=true
+; session_warning_time (in seconds) should be set less than autologoutminutes
+session_warning_time=3000
 autologoutminutes=60
 
 ; server to redirect customer link to

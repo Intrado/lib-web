@@ -1,4 +1,7 @@
 <?
+// calculate the session warning timeout popup
+$SESSION_WARNING_TIME = isset($SETTINGS['feature']['session_warning_time']) ?
+	$SETTINGS['feature']['session_warning_time']*1000 : 1200000;
 
 if (isset($_SESSION["newnav"])) {
 	include("newnav.inc.php");
@@ -28,10 +31,15 @@ if (isset($_GET['monitor'])) {
 }
 ?>
 
+	<script type="text/javascript" src="script/jquery-1.8.3.min.js"></script>
+	<script type="text/javascript">
+		jQuery.noConflict();
+	</script>
 	<script src="script/prototype.js" type="text/javascript"></script>
 	<script src="script/scriptaculous.js" type="text/javascript"></script>
 	<script src="script/prototip.js.php" type="text/javascript"></script>
 	<script src="script/utils.js"></script>
+	<script src="script/session_warning.js" type="text/javascript"></script>
 	<script src="script/sorttable.js"></script>
 	<script src="script/form.js.php" type="text/javascript"></script>
 	<link href="css.php" type="text/css" rel="stylesheet" media="screen, print" />
@@ -39,6 +47,7 @@ if (isset($_GET['monitor'])) {
 	<link href="css/datepicker.css.php" type="text/css" rel="stylesheet" />
 	<link href="css/prototip.css.php" type="text/css" rel="stylesheet" />
 	<link href="css/style_print.css" type="text/css" rel="stylesheet" media="print" />
+	<script src="script/bootstrap-modal.js" type="text/javascript"></script>
 	
 
 	<!--[if lte IE 6]>
@@ -51,11 +60,22 @@ if (isset($_GET['monitor'])) {
 
 	
 	<link rel="SHORTCUT ICON" href="mimg/manager_favicon.ico" />
-	
+
+	<script type="text/javascript">
+		sessionKeepAliveWarning(<?=$SESSION_WARNING_TIME?>);
+	</script>
 	
 </head>
 <body class="manager">
 <!-- ********************************************************************* -->
+
+<div class="modal hide fade default-modal" id="defaultmodal">
+	<div class="modal-header">
+		<button class="close" aria-hidden="true" data-dismiss="modal" type="button">x</button>
+		<h3></h3>
+	</div>
+	<div class="modal-body"></div>
+</div>
 
 <div class="wrap"><!-- tag ends in footer -->
 <div class="manager_logo">

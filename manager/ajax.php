@@ -47,6 +47,11 @@ switch ($_REQUEST["type"]) {
 			$result["error"] = "bad/missing request parameters";
 		}
 		break;
+
+	case "keepalive":
+		//keeps the users session alive
+		$result = true;
+		break;
 	
 	default:
 		$result = false;

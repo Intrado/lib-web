@@ -2,15 +2,21 @@
 
 session_cache_limiter(false); //disable automatic cache headers when sessions are used
 
-header("Expires: " . gmdate('D, d M Y H:i:s', time() + 60*60) . " GMT"); //exire in 1 hour, but if theme changes so will hash pointing to this file
+header("Expires: " . gmdate('D, d M Y H:i:s', time() + 60*60) . " GMT"); //exire in 1 hour
 header("Content-Type: text/css");
 header("Cache-Control: private");
 
 include_once("css/css.inc.php");
 ?>
+
+/* -------- Manager style overrides -------- */
 .manager .banner {
-	background-color: #CCCCCC;
-	background-image: -moz-linear-gradient(center top , #FFFFFF, #346998);
+	background-image: -webkit-gradient(linear, left top, left bottom, from(#FFFFFF), to(#346998));
+	background-image: -webkit-linear-gradient(top, #FFFFFF, #346998);
+	background-image: -moz-linear-gradient(top, #FFFFFF, #346998);
+	background-image: -ms-linear-gradient(top, #FFFFFF, #346998);
+	background-image: -o-linear-gradient(top, #FFFFFF, #346998);
+	background-image: linear-gradient(top, #FFFFFF, #346998);
 	border-top: 5px solid #363636;
 	padding: 0 5px 5px;
 }
