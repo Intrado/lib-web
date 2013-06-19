@@ -182,8 +182,12 @@ div.default-modal {
 	float: left;
 }
 .navtabs li a {
+	-moz-background-clip: padding;
+	-webkit-background-clip: padding-box;
 	background-clip: padding-box;
 	border: 1px solid transparent;
+	-webkit-border-radius: 5px 5px 0 0;
+	-moz-border-radius: 5px 5px 0 0;
 	border-radius: 5px 5px 0 0;
 	color: #FFFFFF;
 	display: block;
@@ -193,23 +197,17 @@ div.default-modal {
 	text-decoration: none;
 	text-shadow: 0 1px 0 #444444;
 }
-.navtabs li.navtab_active a {
-	-moz-border-bottom-colors: none;
-	-moz-border-left-colors: none;
-	-moz-border-right-colors: none;
-	-moz-border-top-colors: none;
-	background: none repeat scroll 0 0 #FFFFFF;
-	border-color: #2A4470 #2A4470 #FFFFFF;
-	border-image: none;
-	border-style: solid;
-	border-width: 1px;
-	color: #222222;
-	text-shadow: 0 1px 0 #FFFFFF;
-}
 .navtabs li a:hover {
 	border: 1px solid #2a4470;
 	-webkit-box-shadow: inset 0px 1px 0px rgba(255,255,255,0.5);
 	box-shadow: inset 0px 1px 0px rgba(255,255,255,0.5);
+}
+.navtabs li.navtab_active a {
+	background: #FFFFFF;
+	color: #222222;
+	text-shadow: 0 1px 0 #FFFFFF;
+	border: 1px solid #2a4470;
+	border-bottom: 1px solid #FFFFFF;
 }
 .subnavtabs {
 	background: none repeat scroll 0 0 #FFFFFF;
