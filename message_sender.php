@@ -892,11 +892,23 @@ $NOPROTOTYPE = true;
 include("nav.inc.php");
 ?>
 
-	<div id="messagesender-shell"></div>
 
 	<link rel="stylesheet" href="messagesender/stylesheets/app.css">
-    <!--[if IE 9]><link rel="stylesheet" type="text/css" href="messagesender/styles/messagesender_ie9.css" ><![endif]-->
-    <!--[if IE 8]><link rel="stylesheet" type="text/css" href="messagesender/styles/messagesender_ie8.css" ><![endif]-->
+	<!--[if IE 9]><link rel="stylesheet" type="text/css" href="messagesender/styles/messagesender_ie9.css" ><![endif]-->
+	<!--[if IE 8]><link rel="stylesheet" type="text/css" href="messagesender/styles/messagesender_ie8.css" ><![endif]-->
+
+	<div id="messagesender-shell">
+		<div class="progressBarParent margRL30">
+			<div class="mask"></div>
+			<div id="maskLoadingContainer">
+				<h3>Loading: <span class="text-success"><em>New Broadcast</em></span>... </h3>
+				<div class="progress progress-success progress-striped active">
+					<div id="progressBar" class="bar" style="width:100%;" data-loading-percent="100"></div>
+				</div>
+			<small class="muted">This might take a few seconds</small>
+			</div>
+		</div>
+	</div>
 
 	<script type="text/javascript" src="messagesender/javascripts/vendor.js"></script>
 	<script type="text/javascript" src="messagesender/javascripts/app.js"></script>
@@ -911,20 +923,6 @@ include("nav.inc.php");
 	<script type="text/javascript" src="script/niftyplayer.js.php"></script>
 	<script type="text/javascript">
 		$(function () {
-
-			// initialize with a loading message and progress bar
-			$('#messagesender-shell').html(
-                '<div class="progressBarParent margRL30">' +
-                    '<div class="mask"></div>' +
-                    '<div id="maskLoadingContainer">' +
-                        '<h3>Loading: <span class="text-success"><em>New Broadcast</em></span>... </h3>' +
-                        '<div class="progress progress-success progress-striped active">' +
-                            '<div id="progressBar" class="bar" style="width:100%;" data-loading-percent="100"></div>' +
-                        '</div>' +
-                        '<small class="muted">This might take a few seconds</small>' +
-                    '</div>' +
-                '</div>'
-            );
 
 			window.BOOTSTRAP_DATA = {};
 			var orgID = -1;
