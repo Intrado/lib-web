@@ -305,7 +305,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 			<li><a href="account.php">Account</a></li>
 <? } ?>
 			<li><a href="#" onclick="window.open('help/index.php', '_blank', 'width=950,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');">Help</a></li>
-			<li class="bl_last"><a href="index.php?logout=1">Logout</a></li>
+			<li class="bl_last"><a class="logout" href="index.php?logout=1">Logout</a></li>
 			<li class="bl_right"></li>
 		</ul>
 	</div>

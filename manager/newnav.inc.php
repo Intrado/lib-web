@@ -40,31 +40,31 @@ $NAVTREE = array();
 if (count($menu = get_authorized_commsuite())) {
 	$first_page = $menu[0][1];
 	$active = ($MAINTAB == 'commsuite');
-	$NAVTREE[] = array('Commsuite', $first_page, NULL, $active, ($active ? $menu : NULL));
+	$NAVTREE[] = array('Commsuite', $first_page, NULL, $active, ($active ? $menu : NULL), "commsuite");
 }
 
 if (count($menu = get_authorized_talkaboutit())) {
 	$first_page = $menu[0][1];
 	$active = ($MAINTAB == 'tai');
-	$NAVTREE[] = array('TalkAboutIt', $first_page, NULL, $active, ($active ? $menu : NULL));
+	$NAVTREE[] = array('TalkAboutIt', $first_page, NULL, $active, ($active ? $menu : NULL), "tai");
 }
 
 if (count($menu = get_authorized_advanced())) {
 	$first_page = $menu[0][1];
 	$active = ($MAINTAB == 'advanced');
-	$NAVTREE[] = array('Tools', $first_page, NULL, $active, ($active ? $menu : NULL));
+	$NAVTREE[] = array('Tools', $first_page, NULL, $active, ($active ? $menu : NULL), "tools");
 }
 
 if (count($menu = get_authorized_reports())) {
 	$first_page = $menu[0][1];
 	$active = ($MAINTAB == 'reports');
-	$NAVTREE[] = array('Reports', $first_page, NULL, $active, ($active ? $menu : NULL));
+	$NAVTREE[] = array('Reports', $first_page, NULL, $active, ($active ? $menu : NULL), "reports");
 }
 
 if (count($menu = get_authorized_customers())) {
 	$first_page = $menu[0][1];
 	$active = ($MAINTAB == 'overview');
-	$NAVTREE[] = array('Customers', $first_page, NULL, $active, ($active ? $menu : NULL));
+	$NAVTREE[] = array('Customers', $first_page, NULL, $active, ($active ? $menu : NULL), "customers");
 }
 
 
@@ -80,10 +80,10 @@ function get_authorized_talkaboutit() {
 
 	// FIXME - There are no apparenet explicit permissions required for TAI administration
 
-	$menu[] = array('Customers', 'taicustomers.php', NULL, ($SUBTAB == 'customers'));
-	$menu[] = array('Inbox', 'taiinbox.php', NULL, ($SUBTAB == 'inbox'));
-	$menu[] = array('Requests', 'tairevealrequests.php', NULL, ($SUBTAB=='requests'));
-	$menu[] = array('SMS&nbsp;Numbers', 'taismsnumbers.php', NULL, ($SUBTAB == 'smsnumbers'));
+	$menu[] = array('Customers', 'taicustomers.php', NULL, ($SUBTAB == 'customers'), "customers");
+	$menu[] = array('Inbox', 'taiinbox.php', NULL, ($SUBTAB == 'inbox'), "inbox");
+	$menu[] = array('Requests', 'tairevealrequests.php', NULL, ($SUBTAB=='requests'), "requests");
+	$menu[] = array('SMS&nbsp;Numbers', 'taismsnumbers.php', NULL, ($SUBTAB == 'smsnumbers'), "smsnumbers");
 
 	return($menu);
 }
@@ -94,10 +94,10 @@ function get_authorized_customers() {
 
 	$menu = Array();
 
-	$menu[] = array('Customer&nbsp;List', 'allcustomers.php', NULL, ($SUBTAB == 'customerlist'));
+	$menu[] = array('Customer&nbsp;List', 'allcustomers.php', NULL, ($SUBTAB == 'customerlist'), "customers");
 
 	if ($MANAGERUSER->authorized('newcustomer') && $MANAGERUSER->authorized('editcustomer')) {
-		$menu[] = array('New&nbsp;Customer', 'customeredit.php?id=new', NULL, ($SUBTAB == 'newcustomer'));
+		$menu[] = array('New&nbsp;Customer', 'customeredit.php?id=new', NULL, ($SUBTAB == 'newcustomer'), "newcustomer");
 	}
 
 	return($menu);
@@ -109,34 +109,34 @@ function get_authorized_commsuite() {
 
 	$menu = Array();
 
-	$menu[] = array('Customers', 'customers.php', NULL, ($SUBTAB == 'customers'));
+	$menu[] = array('Customers', 'customers.php', NULL, ($SUBTAB == 'customers'), "customers");
 
 	if ($MANAGERUSER->authorized('imports')) {
-		$menu[] = array('Import&nbsp;Alerts', 'importalerts.php', NULL, ($SUBTAB == 'importalerts'));
+		$menu[] = array('Import&nbsp;Alerts', 'importalerts.php', NULL, ($SUBTAB == 'importalerts'), "importalerts");
 	}
 
 	if ($MANAGERUSER->authorized('activejobs')) {
-		$menu[] = array('Active&nbsp;Jobs', 'customeractivejobs.php' ,NULL, ($SUBTAB == 'activejobs'));
+		$menu[] = array('Active&nbsp;Jobs', 'customeractivejobs.php' ,NULL, ($SUBTAB == 'activejobs'), "activejobs");
 	}
 
 	if ($MANAGERUSER->authorized('lockedusers')) {
-		$menu[] = array('Locked&nbsp;Users', 'lockedusers.php', 'lockedusers', ($SUBTAB == 'lockedusers'));
+		$menu[] = array('Locked&nbsp;Users', 'lockedusers.php', 'lockedusers', ($SUBTAB == 'lockedusers'), "lockedusers");
 	}
 
 	if ($MANAGERUSER->authorized('editdm')) {
-		$menu[] = array('SmartCall', 'customerdms.php?clear', NULL, ($SUBTAB == 'customerdms'));
+		$menu[] = array('SmartCall', 'customerdms.php?clear', NULL, ($SUBTAB == 'customerdms'), "customerdms");
 	}
 
 	if ($MANAGERUSER->authorized('systemdm')) {
-		$menu[] = array('System&nbsp;DMs', 'systemdms.php', NULL, ($SUBTAB == 'systemdms'));
+		$menu[] = array('System&nbsp;DMs', 'systemdms.php', NULL, ($SUBTAB == 'systemdms'), "systemdms");
 	}
 
 	if ($MANAGERUSER->authorized('systemdm')) {
-		$menu[] = array('DM&nbsp;Blocking', 'dmgroupblock.php', NULL, ($SUBTAB == 'dmblocking'));
+		$menu[] = array('DM&nbsp;Blocking', 'dmgroupblock.php', NULL, ($SUBTAB == 'dmblocking'), "dmblocking");
 	}
 
 	if ($MANAGERUSER->authorized('diskagent')) {
-		$menu[] = array('SwiftSync', 'diskagents.php', NULL, ($SUBTAB == 'swiftsync'));
+		$menu[] = array('SwiftSync', 'diskagents.php', NULL, ($SUBTAB == 'swiftsync'), "swiftsync");
 	}
 
 	return($menu);
@@ -149,27 +149,27 @@ function get_authorized_reports() {
 	$menu = Array();
 
 	if ($MANAGERUSER->authorized('billablecalls')) { 
-		$menu[] = array('Billable&nbsp;Calls', 'billablecalls.php', NULL, ($SUBTAB == 'billable'));
+		$menu[] = array('Billable&nbsp;Calls', 'billablecalls.php', NULL, ($SUBTAB == 'billable'), "billable");
 	}
 
 	if ($MANAGERUSER->authorized('emergencyjobs')) {
-		$menu[] = array('Completed&nbsp;Jobs', 'emergencyjobs.php', NULL, ($SUBTAB == 'joblist'));
+		$menu[] = array('Completed&nbsp;Jobs', 'emergencyjobs.php', NULL, ($SUBTAB == 'joblist'), "joblist");
 	}
 
 	if ($MANAGERUSER->authorizedAny(array('logcollector', 'aspcallgraphs'))) {
-		$menu[] = array('Graphs&nbsp;&amp;&nbsp;Logs', 'aspcallsindex.php', NULL, ($SUBTAB == 'graphlogs'));
+		$menu[] = array('Graphs&nbsp;&amp;&nbsp;Logs', 'aspcallsindex.php', NULL, ($SUBTAB == 'graphlogs'), "graphlogs");
 	}
 
 	if ($MANAGERUSER->authorized("customercontacts")) {
-		$menu[] = array('Contact&nbsp;Search', 'customercontactsearch.php', NULL, ($SUBTAB == 'contacts'));
+		$menu[] = array('Contact&nbsp;Search', 'customercontactsearch.php', NULL, ($SUBTAB == 'contacts'), "contacts");
 	}
 
 	if ($MANAGERUSER->authorized('bouncedemailsearch')) {
-		$menu[] = array('User&nbsp;Email', 'bouncedemailsearch.php', NULL, ($SUBTAB == 'email'));
+		$menu[] = array('User&nbsp;Email', 'bouncedemailsearch.php', NULL, ($SUBTAB == 'email'), "email");
 	}
 
 	if ($MANAGERUSER->authorized('passwordcheck')) {
-		$menu[] = array('Bad&nbsp;Passwords', 'passwordcheck.php', NULL, ($SUBTAB == 'badpasswd'));
+		$menu[] = array('Bad&nbsp;Passwords', 'passwordcheck.php', NULL, ($SUBTAB == 'badpasswd'), "badpassword");
 	}
 
 	return($menu);
@@ -183,23 +183,23 @@ function get_authorized_advanced() {
 
 	if ($MANAGERUSER->authorized('runqueries') || $MANAGERUSER->authorized('editqueries')) {
 		// TODO - find and document what the inner array does (runqueries/editqueries)
-		$menu[] = array('Queries', 'querylist.php', array('runqueries', 'editqueries'), ($SUBTAB == 'queries'));
+		$menu[] = array('Queries', 'querylist.php', array('runqueries', 'editqueries'), ($SUBTAB == 'queries'), "queries");
 	}
 
 	if (isset($SETTINGS['servermanagement']['manageservers']) && $SETTINGS['servermanagement']['manageservers'] && $MANAGERUSER->authorized('manageserver')) {
-		$menu[] = array('Servers', 'serverlist.php', NULL, ($SUBTAB == 'servers'));
+		$menu[] = array('Servers', 'serverlist.php', NULL, ($SUBTAB == 'servers'), "servers");
 	}
 
 	if ($MANAGERUSER->authorized('superuser')) { 
-		$menu[] = array('Manager&nbsp;Users', 'users.php', NULL, ($SUBTAB == 'users'));
+		$menu[] = array('Manager&nbsp;Users', 'users.php', NULL, ($SUBTAB == 'users'), "users");
 	}
 
 	if ($MANAGERUSER->authorized("smsblock")) {
-		$menu[] = array('SMS&nbsp;Block', 'smsblock.php', NULL, ($SUBTAB == 'smsblock'));
+		$menu[] = array('SMS&nbsp;Block', 'smsblock.php', NULL, ($SUBTAB == 'smsblock'), "smsblock");
 	}
 
 	if ($MANAGERUSER->authorized('tollfreenumbers')) {
-		$menu[] = array('Toll&nbsp;Free&nbsp;#s', 'tollfreenumbers.php', NULL, ($SUBTAB == 'tollfree'));
+		$menu[] = array('Toll&nbsp;Free&nbsp;#s', 'tollfreenumbers.php', NULL, ($SUBTAB == 'tollfree'), "tollfree");
 	}
 
 	return($menu);
@@ -209,12 +209,12 @@ function get_authorized_advanced() {
 // Display Functions
 ////////////////////////////////////////////////////////////////////////////////
 
-function navMainTab ($title, $link, $isselected) {
-	return '<li '. ($isselected ? 'class="navtab_active"' : "") .'><a onfocus="blur()" href="' . $link . '">' . $title . '</a></li>';
+function navMainTab ($title, $link, $isselected, $datatype) {
+	return '<li '. ($isselected ? 'class="navtab_active"' : "") .'><a data-type="'. $datatype. '" onfocus="blur()" href="' . $link . '">' . $title . '</a></li>';
 }
 
-function navSubTab ($title, $link, $isselected) {
-	return '<li '. ($isselected ? 'class="navtab_active"' : "") .'><a onfocus="blur()" class="subnavtab" href="' . $link . '">' . $title . '</a></li>';
+function navSubTab ($title, $link, $isselected, $datatype) {
+	return '<li '. ($isselected ? 'class="navtab_active"' : "") .'><a data-type="'. $datatype. '" onfocus="blur()" class="subnavtab" href="' . $link . '">' . $title . '</a></li>';
 }
 
 function doNavTabs ($navtree) {
@@ -236,14 +236,14 @@ function doNavTabs ($navtree) {
 					if ($maintab[3]) {
 						$FIRSTACTIVETABLINK = $maintablink;
 						$ACTIVEMAINTABTITLE = $maintab[0];
-						$SUBTABS .= navSubTab($subtab[0],$subtab[1],$subtab[3]);
+						$SUBTABS .= navSubTab($subtab[0],$subtab[1],$subtab[3], $subtab[4]);
 					}
 				}
 			}
 			//if we didnt get a link, then use the default
 			$maintablink = $maintablink === false ? $maintab[1] : $maintablink;
 
-			$MAINTABS .= navMainTab($maintab[0],$maintablink,$maintab[3]);
+			$MAINTABS .= navMainTab($maintab[0],$maintablink,$maintab[3],$maintab[5]);
 		}
 	}
 }
@@ -345,7 +345,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 		<ul class="banner_links cf">
 			<li class="bl_left"></li>
 			<li><a href="allcustomers.php?newnav=false">Old Nav</a></li>
-			<li><a href="index.php?logout=1">Logout</a></li>
+			<li><a class="logout" href="index.php?logout=1">Logout</a></li>
 			<li class="bl_right"></li>
 		</ul>
 	</div>
