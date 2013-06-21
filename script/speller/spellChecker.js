@@ -263,6 +263,9 @@ function terminateSpell() {
 			if( this.wordWin ) {
 				if( this.wordWin.textInputs[i] ) {
 					this.textInputs[i].value = this.wordWin.textInputs[i];
+                    var jq = jQuery || $;
+                    if (jq && jq.fn && jq.fn.change)
+                        jq(this.textInputs[i]).change();
 				}
 			}
 		}
