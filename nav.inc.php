@@ -19,54 +19,10 @@ list($MAINTAB,$SUBTAB) = explode(":",$PAGE);
 $FIRSTACTIVETABLINK = "";
 $ACTIVEMAINTABTITLE = "";
 
-$SHORTCUTS = array();
-
 if (isset($_GET['timer']) || isset($_SESSION['timer'])) {
 	$PAGETIME = microtime(true);
 	$_SESSION['timer'] = true;
 }
-
-if ($USER->authorize(array('starteasy', 'sendemail', 'sendphone', 'sendsms'))) {
-	$SHORTCUTS['<b>' . getJobsTitle() . ' & Messages</b>'] = "false;";
-	if ($USER->authorize("starteasy")) {
-		$SHORTCUTS['EasyStart'] = "jobwizard.php?new";
-	}
-	if ($USER->authorize(array('sendemail', 'sendphone', 'sendsms'))) {
-		$SHORTCUTS['My Messages'] = "messages.php";
-		$SHORTCUTS['My ' . getJobsTitle()] = "jobs.php";
-		$SHORTCUTS['My Archived ' . getJobsTitle()] = "jobsarchived.php";
-		$SHORTCUTS['New ' . getJobTitle()] = "job.php?id=new";
-	}
-	if ($USER->authorize("leavemessage")){
-		$SHORTCUTS['View Responses'] = "replies.php?reset=1";
-	}
-}
-
-if ($USER->authorize(array('createreport', 'viewsystemreports'))) {
-	$SHORTCUTS['<b>Reports & Status</b>'] = "false;";
-	if ($USER->authorize('createreport') || $USER->authorize('viewsystemreports')) {
-		$SHORTCUTS['Create a Report'] = "reports.php";
-		$SHORTCUTS['View ' . getJobsTitle() . ' Summary'] = "reportjobsearch.php";
-	}
-	if ($USER->authorize('viewusagestats')) {
-		$SHORTCUTS['Usage Stats'] = "reportsystem.php?clear=1";
-	}
-	if ($USER->authorize('viewcalldistribution')) {
-		$SHORTCUTS['Call Distribution'] = "reportsystemdistribution.php";
-	}
-}
-
-$SHORTCUTS['<b>Lists & Contacts</b>'] = "false;";
-if ($USER->authorize("createlist")) {
-	$SHORTCUTS['New List'] = "list.php?id=new";
-	$SHORTCUTS['My Lists'] = "lists.php";
-}
-$SHORTCUTS['My Address Book'] = "addresses.php?origin=nav";
-if ($USER->authorize("viewcontacts"))
-	$SHORTCUTS['System Contacts'] = "contacts.php";
-$SHORTCUTS['<b>Help & Documentation</b>'] = "false;";
-$SHORTCUTS['Message Tips & Ideas'] = "javascript: popup('help/html/Tips_for_Effective_Communication/Messaging_Tips.htm',750,500);";
-$SHORTCUTS['Help'] = "javascript: popup('help/index.php',750,500);";
 
 //tree format:
 //[[title,default link,access,selected,[[sub title,sub link,sub access,sub selected],...],...]
