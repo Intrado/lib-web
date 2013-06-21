@@ -425,7 +425,7 @@ else if ($MANAGERUSER->preference("favcustomers")) {
 <label for="showdisabled">Include Disabled</label> <input id="showdisabled" type="checkbox" onclick="window.location='customers.php?' + (this.checked ? 'showdisabled&' : '') <? if(isset($_GET["showall"])) print "+ 'showall'"; else if (isset($_GET["search"])) print "+ 'search=" . escapehtml($_GET['search']) . "'"; ?>;" <?= isset($_GET['showdisabled']) ? "checked" : ""?>>
 
 <?
-//show_column_selector('customers_table', $titles, $lockedTitles);
+show_column_selector('customers_table', $titles, $lockedTitles);
 ?>
 <hr />
 <table class="list sortable" id="customers_table">
