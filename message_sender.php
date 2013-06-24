@@ -949,7 +949,7 @@ include("nav.inc.php");
 				orgID = org.id;
 
                 // Remove 'Survey' job type(s); to prevent from displaying in Message Type drop-down.
-                roles.jobTypes = _.filter(roles.jobTypes, function(type) {return type && type.isSurvey !== true;});
+                roles.jobTypes = _.filter(roles.jobTypes, function(type) {return type && type.isSurvey === false;});
 
 				languages = fetch('/languages');
 				features = fetch('/settings/features');
