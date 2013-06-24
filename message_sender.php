@@ -948,6 +948,9 @@ include("nav.inc.php");
 				var org = roles.organization;
 				orgID = org.id;
 
+                // Remove 'Survey' job type(s); to prevent from displaying in Message Type drop-down.
+                roles.jobTypes = _.filter(roles.jobTypes, function(type) {return type && type.isSurvey !== true;});
+
 				languages = fetch('/languages');
 				features = fetch('/settings/features');
 				options = fetch('/settings/options');
@@ -963,7 +966,7 @@ include("nav.inc.php");
 							options:optionsRes[0].options,
 							facebookpages:facebookPagesRes[0].facebookPages,
 							facebookAppID:  <?= $SETTINGS['facebook']['appid'] ?>
-						}
+						};
 						roles.accessProfile['fieldmaps'] = fieldmaps[0];
                         userResponse.preferences.push({name:'hidetoolbar', value: <?= ($USER->getSetting('hideemailtools', false) ? 'true' : 'false'); ?>});
 						window.BOOTSTRAP_DATA.user = userResponse;
