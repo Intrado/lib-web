@@ -342,7 +342,7 @@ function showActionGrid ($columnlabels, $rowlabels, $links) {
 			if ($link !== false) {
 				if (isset($link['icon'])) {
 					echo "<td>
-							<div id='gridmenu-$row-$col' class='tinybutton'>
+							<div id='". $link["id"] ."' class='tinybutton'>
 							<img src='img/icons/{$link["icon"]}.png'
 								title=''
 								alt='{$link["title"]}'
@@ -352,7 +352,8 @@ function showActionGrid ($columnlabels, $rowlabels, $links) {
 					
 					// Attach action menu script for this item
 					if (isset($link["actions"])) {
-						$actionmenues[] = "createactionmenu('gridmenu-$row-$col','" . action_links_vertical($link["actions"]) . "','{$link["title"]}');";
+						$actionmenues[] = "createactionmenu('". $link["id"] ."','" . action_links_vertical($link["actions"]) . "',
+							'{$link["title"]}');";
 					}
 				} elseif (isset($link['button'])) {
 					echo "<td>
@@ -448,7 +449,8 @@ function makeMessageGrid($messagegroup) {
 				$actions[] = action_link("Record","diagona/16/151","editmessagerecord.php?id=new&languagecode=$languagecode&mgid=".$messagegroup->id);
 				$actions[] = action_link("Write","pencil_add","editmessagephone.php?id=new&languagecode=$languagecode&mgid=".$messagegroup->id);
 			}
-			$linkrow[] = array('icon' => $icon,'title' => _L(" %s Phone Message",$languagename), 'actions' => $actions);
+			$linkrow[] = array('icon' => $icon,'title' => _L(" %s Phone Message",$languagename), 'actions' => $actions,
+				'id' => "phone-voice-" . $languagecode);
 		}
 		
 		// Print SMS message actions if SMS is available 
@@ -465,7 +467,8 @@ function makeMessageGrid($messagegroup) {
 					$icon = "diagona/16/160";
 					$actions[] = action_link("New","pencil_add","editmessagesms.php?id=new&mgid=$messagegroup->id");
 				}
-				$linkrow[] = array('icon' => $icon,'title' => _L("%s SMS Message",$languagename), 'actions' => $actions);
+				$linkrow[] = array('icon' => $icon,'title' => _L("%s SMS Message",$languagename), 'actions' => $actions,
+					'id' => "sms-plain-" . $languagecode);
 			} else {
 				$linkrow[] = false;
 			}
@@ -488,7 +491,8 @@ function makeMessageGrid($messagegroup) {
 				$actions[] = action_link("New from stationery","pencil_add","mgstationeryselector.php?type=email&subtype=html&languagecode=$languagecode&mgid=".$messagegroup->id);
 				
 			}
-			$linkrow[] = array('icon' => $icon,'title' => _L("%s HTML Email Message",$languagename), 'actions' => $actions);
+			$linkrow[] = array('icon' => $icon,'title' => _L("%s HTML Email Message",$languagename), 'actions' => $actions,
+				'id' => "email-html-" . $languagecode);
 
 			$actions = array();
 			$message = $messagegroup->getMessage('email', 'plain', $languagecode);
@@ -501,7 +505,8 @@ function makeMessageGrid($messagegroup) {
 				$icon = "diagona/16/160";
 				$actions[] = action_link("New","pencil_add","editmessageemail.php?id=new&subtype=plain&languagecode=$languagecode&mgid=".$messagegroup->id);
 			}
-			$linkrow[] = array('icon' => $icon,'title' => _L("%s Plain Email Message",$languagename), 'actions' => $actions);
+			$linkrow[] = array('icon' => $icon,'title' => _L("%s Plain Email Message",$languagename), 'actions' => $actions,
+				'id' => "email-plain-" . $languagecode);
 		}
 		
 		// Facebook actions
@@ -519,7 +524,8 @@ function makeMessageGrid($messagegroup) {
 					$icon = "diagona/16/160";
 					$actions[] = action_link("New","pencil_add","editmessagefacebook.php?id=new&mgid=".$messagegroup->id);
 				}
-				$linkrow[] = array('icon' => $icon,'title' => _L("%s Facebook Message",$languagename), 'actions' => $actions);
+				$linkrow[] = array('icon' => $icon,'title' => _L("%s Facebook Message",$languagename), 'actions' => $actions,
+					'id' => "post-facebook-" . $languagecode);
 			} else {
 				$linkrow[] = false;
 			}
@@ -540,7 +546,8 @@ function makeMessageGrid($messagegroup) {
 					$icon = "diagona/16/160";
 					$actions[] = action_link("New","pencil_add","editmessagetwitter.php?id=new&mgid=".$messagegroup->id);
 				}
-				$linkrow[] = array('icon' => $icon,'title' => _L("%s Twitter Message",$languagename), 'actions' => $actions);
+				$linkrow[] = array('icon' => $icon,'title' => _L("%s Twitter Message",$languagename), 'actions' => $actions,
+					'id' => "post-twitter-" . $languagecode);
 			} else {
 				$linkrow[] = false;
 			}
@@ -561,7 +568,8 @@ function makeMessageGrid($messagegroup) {
 					$icon = "diagona/16/160";
 					$actions[] = action_link("New","pencil_add","editmessagefeed.php?id=new&mgid=".$messagegroup->id);
 				}
-				$linkrow[] = array('icon' => $icon,'title' => _L("%s Feed Message",$languagename), 'actions' => $actions);
+				$linkrow[] = array('icon' => $icon,'title' => _L("%s Feed Message",$languagename), 'actions' => $actions,
+					'id' => "post-feed-" . $languagecode);
 			} else {
 				$linkrow[] = false;
 			}
@@ -584,7 +592,8 @@ function makeMessageGrid($messagegroup) {
 					$icon = "diagona/16/160";
 					$actions[] = action_link("New","pencil_add","editmessagepage.php?id=new&mgid=".$messagegroup->id);
 				}
-				$linkrow[] = array('icon' => $icon,'title' => _L("%s Page Message",$languagename), 'actions' => $actions);
+				$linkrow[] = array('icon' => $icon,'title' => _L("%s Page Message",$languagename), 'actions' => $actions,
+					'id' => "post-page-" . $languagecode);
 				
 				$actions = array();
 				$message = $messagegroup->getMessage('post', 'voice', $languagecode);
@@ -600,7 +609,8 @@ function makeMessageGrid($messagegroup) {
 					$actions[] = action_link("New","pencil_add","editmessagepostvoice.php?id=new&mgid=".$messagegroup->id);
 					$actions[] = action_link("Copy From Phone Message","page_copy","mgeditor.php?copyphonetovoice");
 				}
-				$linkrow[] = array('icon' => $icon,'title' => _L("%s Page Media Message",$languagename), 'actions' => $actions);
+				$linkrow[] = array('icon' => $icon,'title' => _L("%s Page Media Message",$languagename), 'actions' => $actions,
+					'id' => "post-voice-" . $languagecode);
 				
 			} else {
 				$linkrow[] = false;
@@ -628,7 +638,7 @@ include_once("nav.inc.php");
 ?>
 <script type="text/javascript">
 <? Validator::load_validators(array("ValDuplicateNameCheck"));?>
-function createactionmenu(id, content,title) {
+function createactionmenu(id, content, title) {
 	new Tip($(id), content, {
 		title: title,
 		style: 'protogrey',
