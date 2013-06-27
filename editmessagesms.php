@@ -96,7 +96,7 @@ $formdata["message"] = array(
 $helpsteps = array(_L("Enter the message you wish to deliver via SMS Text."));
 
 $buttons = array(submit_button(_L('Done'),"submit","tick"));
-$form = new Form("phonerecord",$formdata,$helpsteps,$buttons);
+$form = new Form("smsedit",$formdata,$helpsteps,$buttons);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data Handling
