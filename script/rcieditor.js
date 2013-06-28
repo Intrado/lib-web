@@ -105,6 +105,7 @@
 			this.setSetting('fieldinsert_list', {});
 			this.setSetting('callback_onready_fn', null); // Optional callback fn to exec when editor is ready
 			this.setSetting('callback_onchange_fn', null); // Optional callback fn to exec when editor content changes
+			this.setSetting('callback_oncapture_fn', null); // Optional callback fn to exec when inline editor's content is captured
 	
 			// Make a generic, reusable text clipboard
 			this.setSetting('clipboard', '');
@@ -440,7 +441,7 @@
 			// Hook a call to caller's callback for onready event
 			var callback;
 			if (callback = this.getSetting('callback_onready_fn')) {
-				callback();
+				callback(true);
 			}
 
 			// Just trigger a validation event if there is something to look at
@@ -611,7 +612,7 @@
 			// Hook a call to caller's callback for onchange event
 			var callback;
 			if (callback = this.getSetting('callback_onchange_fn')) {
-				callback();
+				callback(cleanedContent);
 			}
 
 	
