@@ -435,9 +435,6 @@
 			// Hide our AJAXy loading indicator
 			this.setLoadingVisibility(false);
 
-			// FIXME: cannot do this and still be compatibile with prototype
-			//$(this).trigger('ckeditor:instanceReady', true);
-
 			// Hook a call to caller's callback for onready event
 			var callback;
 			if (callback = this.getSetting('callback_onready_fn')) {
@@ -605,10 +602,6 @@
 			var cleanedContent = this.cleanContent(content);
 			textarea.val(cleanedContent);
 	
-			// FIXME: you can't do this and be compatible with prototype
-			// trigger event for BBMS to update it's EmailMessage model with the cleanedContent from CKE
-			//$(this).trigger('ckeditor:updateModel', cleanedContent);
-
 			// Hook a call to caller's callback for onchange event
 			var callback;
 			if (callback = this.getSetting('callback_onchange_fn')) {
