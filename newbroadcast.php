@@ -14,7 +14,7 @@ $allowOldMessageSender = getSystemSetting('_allowoldmessagesender', false);
 // get user setting
 $userOldMessageSender = $USER->getSetting('_allowoldmessagesender', false);
 
-if ($allowOldMessageSender && $userOldMessageSender) {
+if (($allowOldMessageSender && $userOldMessageSender) || isset($_SESSION['OLDMS'])) {
 	$redirectUrl = 'message_sender_old.php';
 } else {
 	$redirectUrl = 'message_sender.php';
