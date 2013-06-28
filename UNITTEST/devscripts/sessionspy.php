@@ -17,6 +17,17 @@ require_once("inc/common.inc.php");
 
 ?>
 <html>
+	<head>
+		<title>SessionSpy (tm)</title>
+		<style>
+			div.notice {
+				background-color: blue;
+				color: white;
+				padding: 10px;
+				margin: 15px 75px;
+				border: 1px solid black;
+			}
+		</style>
 	<body>
 		<a href="sessionspy.php">Refresh</a><br/><br/>
 
@@ -24,19 +35,28 @@ require_once("inc/common.inc.php");
 if (isset($_REQUEST['action'])) switch ($_REQUEST['action']) {
 	case 'set':
 		$_SESSION[$_REQUEST['key']] = $_REQUEST['value'];
-		print "Value set for session key [{$_REQUEST['key']}]<br/>\n";
+		print '<div class="notice">Value set for session key [' . $_REQUEST['key'] . "]</div><br/>\n";
 		break;
 
 	case 'del':
 		unset($_SESSION[$_REQUEST['key']]);
-		print "Value deleted for session key [{$_REQUEST['key']}]<br/>\n";
+		print '<div class="notice">Value deleted for session key [' . $_REQUEST['key'] . "]</div><br/>\n";
 		break;
 }
 
 ?>
-		<h3>Set Session Data</h3>
 		<table>
 			<form method="POST">
+				<tr>
+					<td rowspan="4" style="vertical-align: top; padding-right: 50px; border-right: 1px solid #CCCCCC;">
+						<h3>Quick Toggles</h3>
+						&#149; DEBUG: <? print (isset($_SESSION['DEBUG']) ? '<a href="?action=del&key=DEBUG">DISable</a>' : '<a href="?action=set&key=DEBUG&value=1">ENable</a>'); ?><br/>
+						&#149; OLDMS: <? print (isset($_SESSION['OLDMS']) ? '<a href="?action=del&key=OLDMS">DISable</a>' : '<a href="?action=set&key=OLDMS&value=1">ENable</a>'); ?><br/>
+					</td>
+					<td colspan="2">
+						<h3>Set Session Data</h3>
+					</td>
+				</tr>
 				<input type="hidden" name="action" value="set"/>
 				<tr>
 					<td>KEY</td>
