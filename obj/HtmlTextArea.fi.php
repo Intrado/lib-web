@@ -55,7 +55,11 @@ class HtmlTextArea extends FormItem {
 
 				// apply the ckeditor to the textarea
 				document.observe("dom:loaded", function() {
-					rcieditor = new RCIEditor("' . $editor_mode . '", "' . $n . '", ' . json_encode($overridesettings) . ');
+					var overrideSettings = ' . json_encode($overridesettings) . ';
+					//overrideSettings["callback_onready_fn"] = function () { console.log("CKE onready callback called"); };
+					//overrideSettings["callback_onchange_fn"] = function () { console.log("CKE onchange callback called"); };
+
+					rcieditor = new RCIEditor("' . $editor_mode . '", "' . $n . '", overrideSettings);
 					rcieditor.setValidatorFunction(function () {
 						var form = $("' . $this->form->name . '");
 						var field = $("'.$n.'");

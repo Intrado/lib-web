@@ -40,6 +40,7 @@
 		var editorMode = null;	// Either null (uninitialized) or [plain|normal|full|inline]
 		var basename = 'rcicke';
 		var customsettings = {};
+
 	
 		// Lifted from utils.js so that we don't need to include that whole thing as an external dep.
 		this.getBaseUrl = function () {
@@ -102,6 +103,8 @@
 			this.setSetting('tool_pastefromphone', false);
 			this.setSetting('hidetoolbar', false);
 			this.setSetting('fieldinsert_list', {});
+			this.setSetting('callback_onready_fn', null); // Optional callback fn to exec when editor is ready
+			this.setSetting('callback_onchange_fn', null); // Optional callback fn to exec when editor content changes
 	
 			// Make a generic, reusable text clipboard
 			this.setSetting('clipboard', '');
@@ -430,9 +433,16 @@
 	
 			// Hide our AJAXy loading indicator
 			this.setLoadingVisibility(false);
+
 			// FIXME: cannot do this and still be compatibile with prototype
 			//$(this).trigger('ckeditor:instanceReady', true);
-	
+
+			// Hook a call to caller's callback for onready event
+			var callback;
+			if (callback = this.getSetting('callback_onready_fn')) {
+				callback();
+			}
+
 			// Just trigger a validation event if there is something to look at
 			var html = textarea.val();
 			switch (editorMode) {
@@ -449,7 +459,7 @@
 					textarea.hide().addClass('HtmlEditor');
 	
 					var htmleditorobject = this.getHtmlEditorObject();
-					if (!htmleditorobject) {
+					if (! htmleditorobject) {
 						// failed to get the htmleditorobject
 						return;
 					}
@@ -486,7 +496,7 @@
 				}
 	
 				// If the graphic container isn't already on the page...
-				if (!$('#htmleditorloadericon').length) {
+				if (! $('#htmleditorloadericon').length) {
 	
 					// Make a new container element for the spinny loader iocn
 					var htmleditorloadericon = $('<span id="htmleditorloadericon"><img src="img/ajax-loader.gif"/> Please wait while the HTML editor loads.</span>');
@@ -559,12 +569,12 @@
 					instance = CKEDITOR.instances[i];
 				}
 			}
-			if (!instance) {
+			if (! instance) {
 				return(false);
 			}
 	
 			var tmpcontainer = $('#cke_' + basename);
-			if (!tmpcontainer) {
+			if (! tmpcontainer) {
 				return(false);
 			}
 	
@@ -586,7 +596,7 @@
 		 */
 		this.saveHtmlEditorContent = function (existinghtmleditorobject) {
 			var htmleditorobject = existinghtmleditorobject || this.getHtmlEditorObject();
-			if (!htmleditorobject) {
+			if (! htmleditorobject) {
 				return(false);
 			}
 	
@@ -597,6 +607,13 @@
 			// FIXME: you can't do this and be compatible with prototype
 			// trigger event for BBMS to update it's EmailMessage model with the cleanedContent from CKE
 			//$(this).trigger('ckeditor:updateModel', cleanedContent);
+
+			// Hook a call to caller's callback for onchange event
+			var callback;
+			if (callback = this.getSetting('callback_onchange_fn')) {
+				callback();
+			}
+
 	
 			return(true);
 		};
@@ -743,7 +760,7 @@
 	
 			// CKEditor inserts blank tags even if the user has deleted everything.
 			// check if there is an image or href tag... if not, strip the tags and see if there is any text
-			if (!html.match(/[img,href]/)) {
+			if (! html.match(/[img,href]/)) {
 	
 				// For plain text, $ does not seem to extend it the same (there won't be any tags anyway)
 				if (typeof html.text !== 'undefined') {
