@@ -131,7 +131,7 @@ startWindow(_L("%s Types",getJobTitle()) . help("JobType_Manager"));
 foreach($systemprioritynames as $index => $name){
 ?>
 	<tr class="listheader">
-		<th align="left" colspan="4"><?=$name?><th>
+		<th align="left" colspan="4"><b><?=$name?></b><th>
 	</tr>
 	<tr>
 		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;"><?= _L("Name") ?></th>
@@ -151,7 +151,7 @@ if (getSystemSetting('_hassurvey', true)) {
 ?>
 
 	<tr class="listheader">
-		<th align="left" colspan="4">Surveys<th>
+		<th align="left" colspan="4"><b>Surveys</b><th>
 	<tr>
 	<tr>
 		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;"><?= _L("Name") ?></th>
