@@ -74,7 +74,11 @@ if (isset($_GET['stationery'])) {
 		
 		$emailstationeryparts = DBFindMany("MessagePart", "from messagepart where messageid = ? order by sequence", false, array($emailstationery->id));
 			
-		echo Message::format($emailstationeryparts);
+		$stationeryBody = Message::format($emailstationeryparts);
+		$stationeryBody = str_replace('<<', '&lt;&lt;', $stationeryBody);
+		$stationeryBody = str_replace('>>', '&gt;&gt;', $stationeryBody);
+
+		echo $stationeryBody;
 	}	
 		
 		
