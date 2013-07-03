@@ -984,7 +984,8 @@ include("nav.inc.php");
 							schema:formData[0].formdata,
 							name:"msgsndr",
 							url:window.location.protocol + "//" + window.location.host + "/" + window.location.pathname.split('/')[1] + "/message_sender.php",
-							validators:document.validators
+							validators:document.validators,
+							twitterMaxChars: <? print_r(140 - mb_strlen(" http://". getSystemSetting("tinydomain"). "/") - 6); ?>
 						};
 
 						window.globals.require('initialize');
