@@ -536,6 +536,15 @@ $formdata = array_merge($formdata, array(
 		"control" => array("TextField"),
 		"helpstep" => 1
 	),
+	"emailmessagefromstationery" => array(
+		"label" => "Stationery",
+		"value" => "",
+		"validators" => array(
+			//TODO: add fromstationery validator??
+		),
+		"control" => array("TextField"),
+		"helpstep" => 1
+	),
 	"emailmessagetext" => array(
 		"label" => "Body",
 		"value" => "",
@@ -1161,6 +1170,7 @@ class MessageSenderProcessor {
 			$messagegroup->name = $postdata["optionsavemessagename"];
 			$messagegroup->permanent = 1;
 			$messagegroup->deleted = 0;
+
 		} else {
 			$messagegroup->name = $job->name;
 			$messagegroup->deleted = 1;
@@ -1284,6 +1294,9 @@ class MessageSenderProcessor {
 			$messages['email']['html']['en']['none']["subject"] = $postdata["emailmessagesubject"];
 			$attachments = isset($postdata["emailmessageattachment"])?json_decode($postdata["emailmessageattachment"]):array();
 			$messages['email']['html']['en']['none']['attachments'] = $attachments;
+			if (isset($postdata["emailmessagefromstationery"])) {
+				$messages['email']['html']['en']['none']['fromstationery'] = $postdata["emailmessagefromstationery"];
+			}
 
 			// check for and retrieve translations
 			if (isset($postdata["emailmessagetexttranslate"]) && $postdata["emailmessagetexttranslate"]) {
@@ -1365,6 +1378,7 @@ class MessageSenderProcessor {
 							if ($type == 'email') {
 								$message->fromname = $data["fromname"];
 								$message->fromemail = $data["from"];
+								$message->fromstationery = $data["fromstationery"];
 							}
 
 							$message->stuffHeaders();
