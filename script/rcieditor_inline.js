@@ -306,16 +306,16 @@ window.RCIEditorInline = function () {
 		// (7) Inject the content from the wysiwyg page div into the textarea form element
 		textarea.val(content);
 
-		// (8) Adjust the iframe container's height
-		window.parent.rcieditor.adjustInlineHeight($(document).height());
+		// (8) Adjust the iframe container's height to match our possibly new document size
+		window.parent.rcieditor.adjustInlineHeight($('#wysiwygpage').height());
 
-	// (8) Hook a call to caller's callback for oncapture event
-	var callback;
-	if (callback = window.parent.rcieditor.getSetting('callback_oncapture_fn')) {
-		callback(content);
-	}
+		// (9) Hook a call to caller's callback for oncapture event
+		var callback;
+		if (callback = window.parent.rcieditor.getSetting('callback_oncapture_fn')) {
+			callback(content);
+		}
 
-		// (9) Validate the changes as captured
+		// (10) Validate the changes as captured
 		window.parent.rcieditor.validate();
 
 		return(true);

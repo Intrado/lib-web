@@ -319,7 +319,7 @@
 				cke.html('<iframe ' +
 					'src="' + this.getSetting('baseUrl') + 'rcieditor_inline.php?t=' + basename + '&d=' + document.domain + '" ' +
 					'name="' + iframeIdName + '" id="' + iframeIdName + '"' +
-					'style="width: 100%; height: 400px; border: 1px solid #999999; overflow-y: hidden;" scrolling="no"/>'
+					'style="width: 100%; height: 400px; border: 10px solid #999999; overflow-y: hidden;" scrolling="no"/>'
 				);
 	
 				// So now we have the inline editor component loading in an iframe;
@@ -889,11 +889,11 @@
 		 * eliminate its scrollbar but keep opening it up to accommodate
 		 * longer documents as needed.
 		 */
-		this.adjustInlineHeight = function (newheight) {	
+		this.adjustInlineHeight = function (newHeight) {	
 
 			// Adjust the iframe height for inline mode
 			if (editorMode == 'inline') {
-				var actualHeight = Math.max(200, newheight) + 20;
+				var actualHeight = Math.max(700, newHeight) + 40;
 				$('#' + iframeIdName).height(actualHeight);
 			}
 		};
