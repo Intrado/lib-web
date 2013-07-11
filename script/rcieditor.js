@@ -39,6 +39,7 @@
 		var container = null;	// The container ELEMENT, to contain the editor, not the ID
 		var editorMode = null;	// Either null (uninitialized) or [plain|normal|full|inline]
 		var basename = 'rcicke';
+		var iframeIdName = 'rcicke_iframe';
 		var customsettings = {};
 
 	
@@ -275,6 +276,7 @@
 			var extraButtons = [];
 			var extraPlugins = [];
 			extraPlugins.push('aspell'); // We always want the spell checker added
+			extraPlugins.push('autogrow'); // We always want the autogrow added
 			switch (setEditorMode) {
 	
 				default:
@@ -313,10 +315,11 @@
 				//this.setSetting('image_scaling', 500);
 	
 				// Add an IFRAME to the page that will load up the inline editor
+				iframeIdName = basename+'_iframe';
 				cke.html('<iframe ' +
 					'src="' + this.getSetting('baseUrl') + 'rcieditor_inline.php?t=' + basename + '&d=' + document.domain + '" ' +
-					'name="' + basename + '_iframe" ' +
-					'style="width: 100%; height: 400px; border: 1px solid #999999;"/>'
+					'name="' + iframeIdName + '" id="' + iframeIdName + '"' +
+					'style="width: 100%; height: 400px; border: 1px solid #999999; overflow-y: hidden;" scrolling="no"/>'
 				);
 	
 				// So now we have the inline editor component loading in an iframe;
@@ -352,21 +355,23 @@
 				// Now attach CKE to the form element with the name basename
 				// TODO - see if there's a way to get this CKE to insert itself into hider element
 				CKEDITOR.replace(basename, {
-					'customConfig':'',
-					'allowedContent':true,
-					'disableNativeSpellChecker':false,
-					'browserContextMenuOnCtrl':true,
-					'width':'100%',
-					'height':'400px',
-					'filebrowserImageUploadUrl':uploaderURI,
-					'toolbarStartupExpanded':(this.getSetting('hidetoolbar') ? false : true),
-					'toolbarCanCollapse':true,
-					'extraPlugins':extraPlugins.join(),
-					'disableObjectResizing':true, // disabled only because the message_parts data model cannot capture resized image attributes
-					'pasteFromWordRemoveFontStyles':false,
-					'pasteFromWordRemoveStyles':false,
+					'autoGrow_onStartup': true,
+					'autoGrow_maxHeight': ($(window).height() - 150),
+					'customConfig': '',
+					'allowedContent': true,
+					'disableNativeSpellChecker': false,
+					'browserContextMenuOnCtrl': true,
+					'width': '100%',
+					'height': '400px',
+					'filebrowserImageUploadUrl': uploaderURI,
+					'toolbarStartupExpanded': ( this.getSetting('hidetoolbar') ? false : true),
+					'toolbarCanCollapse': true,
+					'extraPlugins': extraPlugins.join(),
+					'disableObjectResizing': true, // disabled only because the message_parts data model cannot capture resized image attributes
+					'pasteFromWordRemoveFontStyles': false,
+					'pasteFromWordRemoveStyles': false,
 	
-					'toolbar_RCI':[
+					'toolbar_RCI': [
 						{ name:'r1g1', items:[ 'Print', 'Source' ] },
 						{ name:'r1g2', items:[ 'Undo', 'Redo'] },
 						{ name:'r1g3', items:[ 'NumberedList', 'BulletedList', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', 'Outdent', 'Indent' ] },
@@ -379,31 +384,31 @@
 						{ name:'r2g3', items:extraButtons }
 					],
 	
-					'toolbar':'RCI',
+					'toolbar': 'RCI',
 	
-					'on':{
-						'instanceReady':function (event) {
+					'on': {
+						'instanceReady': function (event) {
 							that.callbackEditorLoaded(this);
 						},
-						'key':( function () {
+						'key': ( function () {
 							that.eventListener();
 						} ),
-						'blur':( function () {
+						'blur': ( function () {
 							that.eventListener();
 						} ),
-						'saveSnapshot':( function () {
+						'saveSnapshot': ( function () {
 							that.eventListener();
 						} ),
-						'afterCommandExec':( function () {
+						'afterCommandExec': ( function () {
 							that.eventListener();
 						} ),
-						'insertHtml':( function () {
+						'insertHtml': ( function () {
 							that.eventListener();
 						} ),
-						'insertElement':( function () {
+						'insertElement': ( function () {
 							that.eventListener();
 						} ),
-						'focus':( function () {
+						'focus': ( function () {
 							that.eventListener();
 						} )
 					}
@@ -829,7 +834,7 @@
 	
 			// Set a new timer to fire the save/check
 			this.eventTimer = window.setTimeout(function () {
-	
+
 				// Save the changes to the hidden textarea
 				that.saveHtmlEditorContent();
 	
@@ -878,7 +883,21 @@
 		this.registerHtmlEditorKeyListener = function (listener_fn) {
 			this.setValidatorFunction(listener_fn);
 		};
-	
+
+		/**
+		 * Adjust the height of the inline editor's iframe so that we can
+		 * eliminate its scrollbar but keep opening it up to accommodate
+		 * longer documents as needed.
+		 */
+		this.adjustInlineHeight = function (newheight) {	
+
+			// Adjust the iframe height for inline mode
+			if (editorMode == 'inline') {
+				var actualHeight = Math.max(200, newheight) + 20;
+				$('#' + iframeIdName).height(actualHeight);
+			}
+		};
+
 		// Invoke out contstuct() method with the new() arguments supplied
 		this.reconstruct(editor_mode, textarea_id, overrideSettings);
 	}

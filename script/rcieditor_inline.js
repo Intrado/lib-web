@@ -306,6 +306,9 @@ window.RCIEditorInline = function () {
 		// (7) Inject the content from the wysiwyg page div into the textarea form element
 		textarea.val(content);
 
+		// (8) Adjust the iframe container's height
+		window.parent.rcieditor.adjustInlineHeight($(document).height());
+
 	// (8) Hook a call to caller's callback for oncapture event
 	var callback;
 	if (callback = window.parent.rcieditor.getSetting('callback_oncapture_fn')) {
