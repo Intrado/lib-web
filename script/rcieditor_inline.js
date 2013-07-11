@@ -229,6 +229,9 @@ window.RCIEditorInline = function () {
 			that.makeEditable($(this), index);
 		});
 
+		// Adjust the iframe container's height to match our initial document size
+		window.parent.rcieditor.adjustInlineHeight($('#wysiwygpage').height());
+
 		return(true);
 	}
 

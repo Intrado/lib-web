@@ -368,6 +368,7 @@
 					'toolbarCanCollapse': true,
 					'extraPlugins': extraPlugins.join(),
 					'disableObjectResizing': true, // disabled only because the message_parts data model cannot capture resized image attributes
+					'resize_enabled': false, // disabled because now we resize for the user, and manual resize just makes matters worse
 					'pasteFromWordRemoveFontStyles': false,
 					'pasteFromWordRemoveStyles': false,
 	
