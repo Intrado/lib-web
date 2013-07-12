@@ -6,7 +6,7 @@
 /**
  * @fileOverview AutoGrow plugin.
  */
-(function() {
+(function($) {
 
 	// Actual content height, figured out by appending check the last element's document position.
 	function contentHeight( scrollable ) {
@@ -63,12 +63,16 @@
 			newHeight = editor.fire( 'autoGrow', { currentHeight: currentHeight, newHeight: newHeight } ).newHeight;
 			editor.resize( editor.container.getStyle( 'width' ), newHeight, true );
 			lastHeight = newHeight;
-		}
 
-		if ( scrollable.$.scrollHeight > scrollable.$.clientHeight && newHeight < max )
-			scrollable.setStyle( 'overflow-y', 'hidden' );
-		else
-			scrollable.removeStyle( 'overflow-y' );
+			// Original code's style set/remove support was ineffective; use JQuery to set the
+			// overflow-y inline style property for the iframe which is where the magic is at
+			if (newHeight == max) {
+				$('iframe.cke_wysiwyg_frame').css( 'overflow-y', 'auto' );
+			}
+			else {
+				$('iframe.cke_wysiwyg_frame').css( 'overflow-y', 'hidden' );
+			}
+		}
 
 		return lastHeight;
 	};
@@ -133,7 +137,7 @@
 			});
 		}
 	});
-})();
+}) (jQuery);
 
 /**
  * The minimum height that the editor can reach using the AutoGrow feature.

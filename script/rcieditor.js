@@ -354,15 +354,17 @@
 	
 				// Now attach CKE to the form element with the name basename
 				// TODO - see if there's a way to get this CKE to insert itself into hider element
+				// FIXME - autoGrow_maxHeight establishes a height to keep toolbar/menu in view at current
+				// browser size, however if the user resizes the browser, this value needs to be adjusted.
 				CKEDITOR.replace(basename, {
+					'width': '100%',
+					'height': '400px',
 					'autoGrow_onStartup': true,
 					'autoGrow_maxHeight': ($(window).height() - 150),
 					'customConfig': '',
 					'allowedContent': true,
 					'disableNativeSpellChecker': false,
 					'browserContextMenuOnCtrl': true,
-					'width': '100%',
-					'height': '400px',
 					'filebrowserImageUploadUrl': uploaderURI,
 					'toolbarStartupExpanded': ( this.getSetting('hidetoolbar') ? false : true),
 					'toolbarCanCollapse': true,
