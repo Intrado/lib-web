@@ -65,12 +65,16 @@
 			lastHeight = newHeight;
 
 			// Original code's style set/remove support was ineffective; use JQuery to set the
-			// overflow-y inline style property for the iframe which is where the magic is at
-			if (newHeight == max) {
+			// overflow-y inline style property for the iframe which is where the magic is at;
+			// we need to auto-show sometimes for when the frame is maxed out on height (such as
+			// with the maximize plugin)
+			if (newHeight >= max) {
 				$('iframe.cke_wysiwyg_frame').css( 'overflow-y', 'auto' );
+				$('iframe.cke_wysiwyg_frame').attr('scrolling', 'yes'); // (for our webkit brethren)
 			}
 			else {
 				$('iframe.cke_wysiwyg_frame').css( 'overflow-y', 'hidden' );
+				$('iframe.cke_wysiwyg_frame').attr('scrolling', 'no'); // (for our webkit brethren)
 			}
 		}
 
