@@ -41,6 +41,7 @@
 		var basename = 'rcicke';
 		var iframeIdName = 'rcicke_iframe';
 		var customsettings = {};
+		var inlineIframe = null;
 
 	
 		// Lifted from utils.js so that we don't need to include that whole thing as an external dep.
@@ -316,11 +317,12 @@
 	
 				// Add an IFRAME to the page that will load up the inline editor
 				iframeIdName = basename+'_iframe';
-				cke.html('<iframe ' +
+				inlineIframe = $('<iframe ' +
 					'src="' + this.getSetting('baseUrl') + 'rcieditor_inline.php?t=' + basename + '&d=' + document.domain + '" ' +
 					'name="' + iframeIdName + '" id="' + iframeIdName + '"' +
-					'style="width: 100%; height: 400px; border: 1px solid #999999; overflow-y: hidden;" scrolling="no"/>'
+					'style="width: 100%; height: 400px; border: 1px solid #999999; overflow-y: hidden;" scrolling="no">'
 				);
+				cke.empty().append(inlineIframe);
 	
 				// So now we have the inline editor component loading in an iframe;
 				// the next move is up to the iframe content to call back the next
@@ -894,11 +896,13 @@
 		 */
 		this.adjustInlineHeight = function (newHeight) {	
 
-			// Adjust the iframe height for inline mode
-			if (editorMode == 'inline') {
-				var actualHeight = Math.max(700, newHeight) + 40;
-				$('#' + iframeIdName).height(actualHeight);
-			}
+			// This heith adjustment method is only for the inline mode iframe
+			if (editorMode != 'inline') return;
+
+			// The actual height needs to accommodate for html,
+			// body padding which we can't get otherwise:
+			var actualHeight = Math.max(700, newHeight) + 60;
+			inlineIframe.height(actualHeight);
 		};
 
 		// Invoke out contstuct() method with the new() arguments supplied

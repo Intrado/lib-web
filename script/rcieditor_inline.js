@@ -187,7 +187,6 @@ window.RCIEditorInline = function () {
 		}
 
 		// Fire the callback indicating initialization is done
-		//window.frames.parent.rcieditor.callbackEditorLoaded('wysiwygpage');
 		window.parent.rcieditor.callbackEditorLoaded('wysiwygpage');
 	}
 
