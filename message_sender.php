@@ -60,6 +60,14 @@ require_once("obj/TraslationItem.fi.php");
 require_once("obj/CallerID.fi.php");
 require_once("obj/ValDuplicateNameCheck.val.php");
 
+// Preview
+require_once("inc/previewfields.inc.php");
+require_once("obj/PreviewModal.obj.php");
+require_once("inc/appserver.inc.php");
+PreviewModal::HandleRequestWithPhoneText();
+PreviewModal::HandleRequestWithEmailText();
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
