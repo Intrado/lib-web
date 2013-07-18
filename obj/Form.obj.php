@@ -444,6 +444,10 @@ class Form {
 		return $res;
 	}
 
+	function getFormdata() {
+		return($this->formdata);
+	}
+
 	//gets assoc array for just provided field names
 	function getFieldValues ($names) {
 		$res = array();

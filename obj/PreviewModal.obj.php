@@ -251,8 +251,14 @@ class PreviewModal {
 		$playercontent = "";
 		if (!$this->playable) {
 			$modalcontent = $this->text;
-		} else if ($this->hasfieldinserts) {
-			$modalcontent = $this->form->render();
+		}
+		else if ($this->hasfieldinserts) {
+			if ($this->form->isAjaxSubmit()) {
+				$modalcontent = $this->form->getFormdata();
+			}
+			else {
+				$modalcontent = $this->form->render();
+			}
 		}
 		header('Content-Type: application/json');
 		echo json_encode(array(
@@ -262,7 +268,9 @@ class PreviewModal {
 			"errors" => $this->errors, 
 			"content" => $modalcontent, 
 			"uid" => $this->uid, 
-			"partscount" => count($this->parts)));
+			"partscount" => count($this->parts),
+			'ajax' => ($this->form->isAjaxSubmit() ? 'true' : 'false')
+		));
 		exit();
 	}
 	
