@@ -445,7 +445,24 @@ class Form {
 	}
 
 	function getFormdata() {
-		return($this->formdata);
+		$fd = $this->formdata;
+
+		// Add this too:
+		//<input name="'.$this->name.'-formsnum" type="hidden" value="' . $this->serialnum . '">
+		$fd['formsnum'] = Array(
+			'label' => '',
+			'value' => $this->serialnum,
+			'validators' => Array(),
+			'control' => Array(
+				'0' => 'HiddenField',
+				'maxlength' => 255,
+				'size' => 0
+			),
+			'helpstep' => 1,
+			'jsgetvalue' => 'form_default_get_value'
+		);
+
+		return($fd);
 	}
 
 	//gets assoc array for just provided field names

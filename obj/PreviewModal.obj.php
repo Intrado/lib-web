@@ -247,21 +247,18 @@ class PreviewModal {
 	
 	// Includeds the javascript necessary to open the modal and renderes the form if there are any field insters
 	function includeModal() {
-		$modalcontent = "";
-		$playercontent = "";
+		$modalcontent = $playercontent = $formdata = '';
 		if (!$this->playable) {
 			$modalcontent = $this->text;
 		}
 		else if ($this->hasfieldinserts) {
+			$modalcontent = $this->form->render();
 			if ($this->form->isAjaxSubmit()) {
-				$modalcontent = $this->form->getFormdata();
-			}
-			else {
-				$modalcontent = $this->form->render();
+				$formdata = $this->form->getFormdata();
 			}
 		}
-		header('Content-Type: application/json');
-		echo json_encode(array(
+
+		$result = Array(
 			"playable" => $this->playable,
 			"title" => $this->title, 
 			"hasinserts" => $this->hasfieldinserts, 
@@ -270,7 +267,14 @@ class PreviewModal {
 			"uid" => $this->uid, 
 			"partscount" => count($this->parts),
 			'ajax' => ($this->form->isAjaxSubmit() ? 'true' : 'false')
-		));
+		);
+
+		if (is_array($formdata) && count($formdata)) {
+			$result['formdata'] = $formdata;
+		}
+
+		header('Content-Type: application/json');
+		echo json_encode($result);
 		exit();
 	}
 	
