@@ -353,12 +353,8 @@
 				}
 	
 				var that = this;
-	
-				// Now attach CKE to the form element with the name basename
-				// TODO - see if there's a way to get this CKE to insert itself into hider element
-				// FIXME - autoGrow_maxHeight establishes a height to keep toolbar/menu in view at current
-				// browser size, however if the user resizes the browser, this value needs to be adjusted.
-				CKEDITOR.replace(basename, {
+
+				cke_config = {
 					'width': '100%',
 					'height': '400px',
 					'autoGrow_onStartup': true,
@@ -417,8 +413,18 @@
 							that.eventListener();
 						} )
 					}
-	
-				});
+				};
+
+				// Support for the caller conditionally remove some built-in plugins
+				if (this.getSetting('cke_remove_plugins')) {
+					cke_config.removePlugins = cke_remove_plugins;
+				}
+
+				// Now attach CKE to the form element with the name basename
+				// TODO - see if there's a way to get this CKE to insert itself into hider element
+				// FIXME - autoGrow_maxHeight establishes a height to keep toolbar/menu in view at current
+				// browser size, however if the user resizes the browser, this value needs to be adjusted.
+				CKEDITOR.replace(basename, cke_config);
 	
 				// Now we are just waiting on CKE to finish its business;
 				// it will fire instanceReady() function when it is done.
