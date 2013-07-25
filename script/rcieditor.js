@@ -417,7 +417,7 @@
 
 				// Support for the caller conditionally remove some built-in plugins
 				if (this.getSetting('cke_remove_plugins')) {
-					cke_config.removePlugins = cke_remove_plugins;
+					cke_config.removePlugins = this.getSetting('cke_remove_plugins');
 				}
 
 				// Now attach CKE to the form element with the name basename
