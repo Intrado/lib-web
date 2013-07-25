@@ -32,8 +32,6 @@ if (!$USER->authorize('createlist') || !($USER->authorize('listuploadids') || $U
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
-
 $list = new PeopleList(getCurrentList());
 $type = (isset($_GET['type']) && $_GET['type'] == "contacts") ? "contacts" : "ids";
 $importid = QuickQuery("select id from import where listid='$list->id'");
@@ -124,12 +122,12 @@ if (CheckFormSubmit($f,'save') || CheckFormSubmit($f,'preview')) {
 				//wait for the import to finish, up to 10 minutes, until the import is done
 				//stop waiting if the import didn't refresh from the db
 				$starttime = time();
+				session_write_close(); //In case of cancellation, allow the user's browser to make other PHP requests
 				do {
 					sleep(1); //this doesn't count toward php exec time!
 				} while (time() - $starttime < 60*10 &&
 					$import->refresh() && 
 					($import->status == "queued" || $import->status == "running"));
-				
 				if (!isset($_GET["iframe"])) {
 					redirect("list.php");
 				} else {
