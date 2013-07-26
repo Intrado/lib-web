@@ -109,7 +109,7 @@
     <item name="Blocking Phone Numbers" url="System_Administration/System_Settings/Blocking_Phone_Numbers.htm" />
   </book>
   <book name="Settings" >
-    <item name="Job Settings" url="System_Administration/System_Settings/Job.htm" />
+    <item name="Broadcast Settings" url="System_Administration/System_Settings/Job.htm" />
     <item name="Managing Caller IDs" url="System_Administration/System_Settings/Managing_Caller_IDs.htm" />
     <item name="Systemwide Settings" url="System_Administration/System_Settings/System.htm" />
     <item name="Destination Labels" url="System_Administration/System_Settings/Destination_Labels.htm" />

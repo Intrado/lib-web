@@ -141,15 +141,14 @@ else
 <h4><a name="Systemwide_Alert_Message" id="Systemwide_Alert_Message">Systemwide 
  Alert Message:</a></h4>
 <p style="font-weight: bold;"><img src="../../AdminSettingsAlertMessage.jpg" 
-														 alt="The Systemwide Alert Screen" 
-														 title="The Systemwide Alert Screen" 
-														 style="border: none;" 
-														 border="0" /></p>
+									 alt="The Systemwide Alert Screen" 
+									 title="The Systemwide Alert Screen" 
+									 style="border: none;" border="0" /></p>
 <ul type="disc">
-	<li><p><span style="font-weight: bold;"><b>Systemwide 
-	 Alert Message:</b></span> Text entered here will appear as an alert message 
-	 for all users in the system. The alert message appears as black text 
-	 in a red box on every page, as seen in the screenshot above..</p></li>
+	<li><p><span style="font-weight: bold;"><b>Systemwide Alert Message:</b></span> 
+	 Text entered here will appear as an alert message for all users in 
+	 the system. The alert message appears as black text in a red box on 
+	 every page, as seen in the screenshot above..</p></li>
 </ul>
 <p style="margin-left: 40px;">&#160;</p>
 <h4><a name="Customer_Information" id="Customer_Information">Customer Information:</a></h4>
@@ -158,14 +157,13 @@ else
 									 title="The Customer Information Screen." 
 									 style="border: none;" border="0" /></p>
 <ul type="disc">
-	<li><p><span style="font-weight: bold;"><b>Customer 
-	 Display Name:</b></span> Enter the name that you would like to appear 
-	 at the top of each page.</p></li>
-	<li><p><span style="font-weight: bold;"><b>Email 
-	 Domain:</b></span> Entering an email domain here will prevent users from 
-	 sending emails with a different &quot;From&quot; address.</p></li>
-	<li><p><span style="font-weight: bold;"><b>Local 
-	 Area Code:</b></span> Enter the local area code for your location.</p></li>
+	<li><p><span style="font-weight: bold;"><b>Customer Display Name:</b></span> 
+	 Enter the name that you would like to appear at the top of each page.</p></li>
+	<li><p><span style="font-weight: bold;"><b>Email Domain:</b></span> Entering 
+	 an email domain here will prevent users from sending emails with a 
+	 different &quot;From&quot; address.</p></li>
+	<li><p><span style="font-weight: bold;"><b>Local Area Code:</b></span> Enter 
+	 the local area code for your location.</p></li>
 </ul>
 <h4><a name="Field_Definitions" id="Field_Definitions">Field Definitions:</a></h4>
 <p style="margin-left: 40px; font-weight: bold;"><img src="../../AdminFieldDefinitions.jpg" 
@@ -180,7 +178,7 @@ else
 <p style="margin-left: 0px;">By default, your system will contain First 
  Name, Last Name, and Language metadata as shown in the image above. These 
  fields cannot be deleted or edited in any way.</p>
-<h3>Creating a new Field</h3>
+<h3>Creating a New Field Definition</h3>
 <p style="margin-left: 0px;">There are four parts to the form that you 
  will need to consider when creating a new field. They are:</p>
 <ul type="disc">
@@ -196,23 +194,28 @@ else
 	 are potentially available for creating dynamic messages.</p></li>
 	<li style="margin-left: 80px;"><p><span style="font-weight: bold;"><b>List:</b></span> 
 	 List will list all possible values for the data field in a drop down 
-	 menu. This is good for fields such as school name which will have 
-	 a limited number of values. Fields with the List type are used to 
-	 create rules throughout the system such as when creating lists, performing 
-	 searches, or restricting users to certain <a title="Click to learn more about creating Data Views." href="../User_Management/Managing_User_Accounts.htm#The User Editor Screen" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn more about creating Data Views.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Data 
+	 menu. This is good for fields such as grade which will have a limited 
+	 number of values. Fields with the List type are used to create rules 
+	 throughout the system such as when creating lists, performing searches, 
+	 or restricting users to certain <a title="Click to learn more about creating Data Views." href="../User_Management/Managing_User_Accounts.htm#The User Editor Screen" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn more about creating Data Views.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Data 
 	 Views</a>.</p></li>
 	<li style="margin-left: 80px;"><p><span style="font-weight: bold;"><b>Text:</b></span> 
 	 Text will give users the ability to search the data by typing into 
 	 a text box. This is good for fields which will have many possible 
 	 values such as first and last name. Fields with the text type are 
-	 only used on search pages such as the Contact Database and List Search.</p></li>
+	 only used on search pages such as <a title="Click to learn more about Quick Pick for adding individuals to lists." href="../../List_Builder/Add_Individual_Contacts.htm#Adding_Individuals_by_Searching" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn more about Quick Pick for adding individuals to lists.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Quick 
+	 Pick</a> when adding individuals to a list.</p></li>
 	<li style="margin-left: 80px;"><p><span style="font-weight: bold;"><b>Date:</b></span> 
 	 Defines data that contains a date, such as Absence Date.</p></li>
+	<li style="margin-left: 80px;"><p><span style="font-weight: bold;"><b>Numeric: 
+	 </b></span><span>Numeric is for fields which will contain an unknown quantity 
+	 of numeric values such as lunch balance. These </span></p></li>
 	<li><p style="margin-left: 0px;"><span style="font-weight: bold;"><b>Searchable:</b></span> 
 	 Checking this box determines whether or not users will be able to 
-	 search on this field. Not all fields should be searchable. This should 
-	 be checked for fields like Grade which have a set number of possible 
-	 values.</p></li>
+	 search on this field. Searchable fields are used when creating lists 
+	 or searching for recipients. Not all fields should be searchable. 
+	 This should be checked for fields like Grade which have a set number 
+	 of possible values.</p></li>
 </ul>
 <h4><a name="Group_Field_Definitions" id="Group_Field_Definitions">Group 
  Field Definitions</a></h4>

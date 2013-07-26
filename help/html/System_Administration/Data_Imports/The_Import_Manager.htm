@@ -278,7 +278,7 @@ else
  and would like the data to be automatically imported into the system's 
  database when the latest CSV file is uploaded.</p>
 <p style="margin-left: 40px;"><span style="font-weight: bold;"><b>Associated 
- Jobs</b></span> - Select any repeating jobs that you wish to have triggered 
+ Jobs</b></span> - Select any repeating Broadcasts that you wish to have triggered 
  after the data has finished being imported into the system's database. 
  This section is only displayed for imports with the Person data type.</p>
 <p style="margin-left: 40px;">&#160;</p>
@@ -311,12 +311,8 @@ else
 	 menu.</p></li>
 	<li class="p" style="font-weight: normal;"><p style="margin-left: 0px; 
 													 font-weight: normal;">Specify 
-	 the appropriate translator for the data type that you are importing 
-	 and enter the import format from the source data file in the Translator 
-	 options field. For example, if your data includes the date in yyyy/MM/dd 
-	 format, specify this in the options for the Date translator which 
-	 can then transform the data into MM/dd/yyyy format, which is the format 
-	 the system requires.</p></li>
+	 the appropriate translator for the data type that you are importing. 
+	 The various types of translators are described below.</p></li>
 	<li class="p" style="font-weight: normal;"><p style="margin-left: 0px; 
 													 font-weight: normal;">Select 
 	 the field in the CSV corresponding to the field you selected in the 
@@ -347,17 +343,29 @@ else
 	<li class="p"><p style="margin-left: 0px; font-weight: normal;"><span 
 	 style="font-weight: bold;"><b>Current Date:</b></span> &#160;Automatically 
 	 inserts the current date for every record.</p></li>
-	<li class="p"><p style="margin-left: 0px; font-weight: normal;"><span 
-	 style="font-weight: bold;"><b>Currency:</b></span> Automatically converts 
-	 numbers into standard currency format. For example $05.27 would be 
-	 converted into $5.27.</p></li>
+	<li class="p"><p style="margin-left: 0px; font-weight: normal;"><b>Numeric:</b> 
+	 <span style="mso-bidi-font-weight: bold;">Converts the data to a numeric 
+	 value, removing any non-numeric characters.</span></p></li>
+	<li class="MsoNormal" style="mso-list: l0 level1 lfo1; tab-stops: list .5in;"><p><b 
+	 style="mso-bidi-font-weight: normal;">Currency with Leading Zero:</b> 
+	 Automatically converts numbers into standard currency format, but 
+	 puts a zero value for dollars when the amount is less than one dollar.</p></li>
+	<li class="p"><p><span style="font-weight: bold;"><b>Currency:</b></span> 
+	 Automatically converts numbers into standard currency format. For 
+	 example $05.27 would be converted into $5.27.</p></li>
 	<li class="p"><p style="margin-left: 0px; font-weight: normal;"><span 
 	 style="font-weight: bold;"><b>Date:</b></span> Converts common date formats 
-	 into MM/DD/YYYY format.</p></li>
+	 into MM/dd/yyyy format. When you select this translator, you will 
+	 need to specify what the date format looks like in your data. For 
+	 example, if your data includes the date in yyyy/MM/dd format, specify 
+	 this in the options for the Date translator which can then transform 
+	 the data into MM/dd/yyyy format that the system requires.</p></li>
 	<li class="p"><p style="margin-left: 0px; font-weight: normal;"><span 
 	 style="font-weight: bold;"><b>Data Lookup:</b></span> Maps specific input 
 	 values to specified output values. For example, converting school 
-	 numeric codes into descriptions such as 027=Springfield HS.</p></li>
+	 numeric codes into descriptions such as 027=Springfield HS. Enter 
+	 each mapping on a new line in the Translator Options field to use 
+	 this translator.</p></li>
 </ul>
 <p>&#160;</p>
 <div style="width: 100%; position: relative;" id="footer">
