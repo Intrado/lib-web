@@ -34,7 +34,16 @@ if (!$USER->authorize('managemyaccount')) {
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
-$readonly = $USER->importid != null;
+$readonly = false;
+if ($USER->importid) {
+	$readonly = true;
+	$query = "select * from import where id = '{$USER->importid}';";
+	if ($importRes = Query($query)) {
+		$importInfo = $importRes->fetch(PDO::FETCH_ASSOC); // there should only be one result...
+		$readonly = ($importInfo['updatemethod'] != 'createonly'); // readonly for any import updatemethod other than 'createonly'
+	}
+}
+
 $ldapuser = $USER->ldap;
 
 $usernamelength = getSystemSetting("usernamelength", 5);
