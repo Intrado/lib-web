@@ -41,6 +41,7 @@ require_once("obj/PortalReport.obj.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
+/** @noinspection PhpUndefinedVariableInspection */
 if (!$USER->authorize('createreport') && !$USER->authorize('viewsystemreports')) {
 	redirect('unauthorized.php');
 }
@@ -191,7 +192,6 @@ switch($_SESSION['report']['type']){
 			"notattempted" => "Not Attempted",
 			"sent" => "Sent",
 			"unsent" => "Unsent",
-			"duplicate" => "Duplicate",
 			"declined" => "No Destination Selected");
 		break;
 }
@@ -582,12 +582,14 @@ endWindow();
 ?>
 	<script type="text/javascript">
 		document.observe('dom:loaded', function() {
-			var radioselectchoice = $('<?=$form->name?>_radioselect').down('input:checked');
+			var radioselectelem = $('<?=$form->name?>_radioselect');
+			var checkarchivedelem = $('<?=$form->name?>_checkarchived_fieldarea');
+			var radioselectchoice = radioselectelem.down('input:checked');
 			if (radioselectchoice.value == 'job') {
 				$('<?=$form->name?>_dateoptions_fieldarea').hide();
-				$('<?=$form->name?>_checkarchived_fieldarea').show();
+				checkarchivedelem.show();
 
-				if ($('<?=$form->name?>_checkarchived_fieldarea').checked) {
+				if (checkarchivedelem.checked) {
 					$('<?=$form->name?>_jobid_fieldarea').hide();
 					$('<?=$form->name?>_jobidarchived_fieldarea').show();
 				} else {
@@ -596,23 +598,24 @@ endWindow();
 				}
 			} else if (radioselectchoice.value == 'date') {
 				$('<?=$form->name?>_dateoptions_fieldarea').show();
-				$('<?=$form->name?>_checkarchived_fieldarea').hide();
+				checkarchivedelem.hide();
 				$('<?=$form->name?>_jobid_fieldarea').hide();
 				$('<?=$form->name?>_jobidarchived_fieldarea').hide();
-				$('<?=$form->name?>_checkarchived_fieldarea').hide();
+				checkarchivedelem.hide();
 			}
 			
 			ruleWidget.delayActions = true;
 			ruleWidget.container.observe('RuleWidget:AddRule', rulewidget_add_rule);
 			ruleWidget.container.observe('RuleWidget:DeleteRule', rulewidget_delete_rule);
 
-			$('<?=$form->name?>_radioselect').select('input').invoke('observe', 'click', function(event) {
+			radioselectelem.select('input').invoke('observe', 'click', function(event) {
 				var radio = event.element();
+				var checkarchivedelem = $('<?=$form->name?>_checkarchived_fieldarea');
 				if (radio.value == 'job') {
 					$('<?=$form->name?>_dateoptions_fieldarea').hide();
-					$('<?=$form->name?>_checkarchived_fieldarea').show();
+					checkarchivedelem.show();
 
-					if ($('<?=$form->name?>_checkarchived_fieldarea').checked) {
+					if (checkarchivedelem.checked) {
 						$('<?=$form->name?>_jobid_fieldarea').hide();
 						$('<?=$form->name?>_jobidarchived_fieldarea').show();
 					} else {
@@ -623,7 +626,7 @@ endWindow();
 					$('<?=$form->name?>_dateoptions_fieldarea').show();
 					$('<?=$form->name?>_jobid_fieldarea').hide();
 					$('<?=$form->name?>_jobidarchived_fieldarea').hide();
-					$('<?=$form->name?>_checkarchived_fieldarea').hide();
+					checkarchivedelem.hide();
 				}
 			});
 
@@ -645,7 +648,7 @@ endWindow();
 					});
 				}
 			}.bindAsEventListener($('jobtype'), jobtypesCheckboxes));
-			jobtypesCheckboxes.invoke('observe', 'click', function(event) {
+			jobtypesCheckboxes.invoke('observe', 'click', function() {
 				$('<?=$form->name?>_jobtype').checked = true;
 			});
 
@@ -657,7 +660,7 @@ endWindow();
 					});
 				}
 			}.bindAsEventListener($('result'), resultsCheckboxes));
-			resultsCheckboxes.invoke('observe', 'click', function(event) {
+			resultsCheckboxes.invoke('observe', 'click', function() {
 				$('<?=$form->name?>_result').checked = true;
 			});
 
