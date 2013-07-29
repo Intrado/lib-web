@@ -133,6 +133,7 @@ class JobDetailReport extends ReportGenerator{
 			from_unixtime(rc.starttime/1000) as lastattempt,
 			coalesce(if(rc.result='X' and rc.numattempts<3,'F',rc.result), rp.status) as result,
 			red.statuscode as emailstatuscode,
+			ret.requestduration as emailreadduration,
 			rp.status,
 			rc.numattempts as numattempts,
 			rc.resultdata,
@@ -157,6 +158,7 @@ class JobDetailReport extends ReportGenerator{
 			left join voicereply vr on (vr.jobid = rp.jobid and vr.personid = rp.personid and vr.sequence = rc.sequence and vr.userid = " . $USER->id . " and rc.type='phone')
 			left join language l on (l.code = rp." . FieldMap::GetLanguageField() . ")
 			left join reportemaildelivery red on (rc.jobid = red.jobid and rc.personid = red.personid and rc.sequence = red.sequence)
+			left join reportemailtracking ret on (rc.jobid = ret.jobid and rc.personid = ret.personid and rc.sequence = ret.sequence)
 			where 1
 			$searchquery
 			$rulesql
@@ -186,23 +188,27 @@ class JobDetailReport extends ReportGenerator{
 	}
 
 	function runHtml(){
-
 		//index 16 is voicereply id
 		function fmt_detailedresponse($row, $index){
 			global $USER;
 			$text = "";
 
-			if($row[17] != null){
+			if ($row[5] == 'email') {
+				$text = display_read_duration($row[11]);
+			} else {
 				if($row[18] != null){
-					$text .= ' <span class="voicereplyclickableicon"><img src="img/speaker.gif" onclick="popup(\'repliespreview.php?id=' . $row[17] . '&close=1\', 450, 600)"></span>';
-				} else {
-					$text .= ' <span class="voicereplyicon"><img src="img/speaker2.gif"></span>';
+					if($row[19] != null){
+						$text .= ' <span class="voicereplyclickableicon"><img src="img/speaker.gif" onclick="popup(\'repliespreview.php?id=' . $row[18] . '&close=1\', 450, 600)"></span>';
+					} else {
+						$text .= ' <span class="voicereplyicon"><img src="img/speaker2.gif"></span>';
+					}
 				}
-			}
-			if($row[$index] == "1"){
-				$text .= "Yes";
-			} else if($row[$index] == "2"){
-				$text .= "No";
+
+				if($row[$index] == "1"){
+					$text .= "Yes";
+				} else if($row[$index] == "2"){
+					$text .= "No";
+				}
 			}
 			return $text;
 		}
@@ -219,7 +225,7 @@ class JobDetailReport extends ReportGenerator{
 		}
 
 		function fmt_organization($row, $index) {
-			return $row[19];
+			return $row[20];
 		}
 
 		$typequery = "";
@@ -314,21 +320,21 @@ class JobDetailReport extends ReportGenerator{
 						2 => _L("ID#"),
 						3 => _L("First Name"),
 						4 => _L("Last Name"),
-						16 => _L("Sequence"),
+						17 => _L("Sequence"),
 						7 => _L("Destination"),
-						12 => _L("Attempts"),
+						13 => _L("Attempts"),
 						8 => _L("Last Attempt"),
 						9 => _L("Delivery Results"),
-						15 => _L("Response"),
-						18 => getSystemSetting("organizationfieldname","Organization"));
+						16 => _L("Response"),
+						19 => getSystemSetting("organizationfieldname","Organization"));
 		$titles = appendFieldTitles($titles, 18, $fieldlist, $activefields);
 
 		$formatters = array(7 => "fmt_destination",
 							8 => "fmt_date",
 							9 => "fmt_jobdetail_result",
-							15 => "fmt_detailedresponse",
-							16 => "fmt_dst_src",
-							18 => "fmt_organization"
+							16 => "fmt_detailedresponse",
+							17 => "fmt_dst_src",
+							19 => "fmt_organization"
 							);
 		showTable($data,$titles,$formatters);
 		echo "</table>";
@@ -346,12 +352,16 @@ class JobDetailReport extends ReportGenerator{
 
 
 		function fmt_confirmation($row, $index){
-			if($row[$index] == "1"){
-				$text = "Yes";
-			} else if($row[$index] == "2"){
-				$text = "No";
-			} else {
-				$text = "";
+			if ($row[5] == 'email') {
+				$text = display_read_duration($row[11]);
+			} else  {
+				if($row[$index] == "1"){
+					$text = "Yes";
+				} else if($row[$index] == "2"){
+					$text = "No";
+				} else {
+					$text = "";
+				}
 			}
 			return $text;
 		}
@@ -411,7 +421,7 @@ class JobDetailReport extends ReportGenerator{
 		while ($row = DBGetRow($result)) {
 			if($row[5] == "phone")
 				$row[7] = Phone::format($row[7]);
-			$row[12] = (isset($row[12]) ? $row[12] : "");
+			$row[13] = (isset($row[13]) ? $row[13] : "");
 
 
 			if (isset($row[8])) {
@@ -423,7 +433,7 @@ class JobDetailReport extends ReportGenerator{
 			}
 			$row[9] = html_entity_decode(fmt_jobdetail_result($row,9));
 
-			$reportarray = array($row[0], $row[1], $row[2],$row[3],$row[4],fmt_dst_src($row, 16),$row[7],$row[12],$row[8],$row[9],fmt_confirmation($row, 15), $row[19]);
+			$reportarray = array($row[0], $row[1], $row[2],$row[3],$row[4],fmt_dst_src($row, 17),$row[7],$row[13],$row[8],$row[9],fmt_confirmation($row, 16), $row[20]);
 			//index 18 is the last position of a non-ffield
 			foreach($fieldlist as $fieldnum => $fieldname){
 				if(isset($activefields[$fieldnum])){
@@ -432,7 +442,7 @@ class JobDetailReport extends ReportGenerator{
 					} else {
 						$num = $fieldindex[$fieldnum]; // ffield
 					}
-					$reportarray[] = $row[18+$num]; // 18 is last index, $num starts at 1 for f03
+					$reportarray[] = $row[19+$num]; // 18 is last index, $num starts at 1 for f03
 				}
 			}
 			if ($issurvey) {
@@ -441,9 +451,9 @@ class JobDetailReport extends ReportGenerator{
 
 				$questiondata = array();
 				if ($row[5] == "phone")
-					parse_str($row[13],$questiondata);
-				else if ($row[5] == "email")
 					parse_str($row[14],$questiondata);
+				else if ($row[5] == "email")
+					parse_str($row[15],$questiondata);
 
 				//add data to the report for each question
 				for ($x = 0; $x < $maxquestions; $x++) {
