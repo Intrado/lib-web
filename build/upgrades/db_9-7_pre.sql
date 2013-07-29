@@ -24,3 +24,8 @@ $$$
 
 delete from setting where name in ("_brandtheme", "_brandprimary", "_brandratio", "_brandtheme1", "_brandtheme2")
 $$$
+
+-- $rev 4
+-- Add indexes for reporting email read duration
+ALTER TABLE  `reportemaildelivery` ADD INDEX  `jobperson` (  `jobid` ,  `personid`, `sequence` )
+$$$

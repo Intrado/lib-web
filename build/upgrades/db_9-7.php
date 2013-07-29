@@ -14,7 +14,10 @@ function upgrade_9_7 ($rev, $shardid, $customerid, $db) {
 		case 2:
 			echo "|";
 			apply_sql("upgrades/db_9-7_pre.sql", $customerid, $db, 3);
-			
+		case 3:
+			echo "|";
+			apply_sql("upgrades/db_9-7_pre.sql", $customerid, $db, 4);
+
 	}
 	
 	//This statement should appear in each upgrade script, when relevent.
