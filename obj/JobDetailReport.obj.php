@@ -131,7 +131,8 @@ class JobDetailReport extends ReportGenerator{
 							coalesce(rc.zip,''))
 					) as destination,
 			from_unixtime(rc.starttime/1000) as lastattempt,
-			coalesce(if(rc.result='X' and rc.numattempts<3,'F',rc.result), rp.status) as result, 
+			coalesce(if(rc.result='X' and rc.numattempts<3,'F',rc.result), rp.status) as result,
+			red.statuscode as emailstatuscode,
 			rp.status,
 			rc.numattempts as numattempts,
 			rc.resultdata,
@@ -155,6 +156,7 @@ class JobDetailReport extends ReportGenerator{
 			left join destlabel dl on (rc.type = dl.type and rc.sequence = dl.sequence)
 			left join voicereply vr on (vr.jobid = rp.jobid and vr.personid = rp.personid and vr.sequence = rc.sequence and vr.userid = " . $USER->id . " and rc.type='phone')
 			left join language l on (l.code = rp." . FieldMap::GetLanguageField() . ")
+			left join reportemaildelivery red on (rc.jobid = red.jobid and rc.personid = red.personid and rc.sequence = red.sequence)
 			where 1
 			$searchquery
 			$rulesql
@@ -312,21 +314,21 @@ class JobDetailReport extends ReportGenerator{
 						2 => _L("ID#"),
 						3 => _L("First Name"),
 						4 => _L("Last Name"),
-						15 => _L("Sequence"),
+						16 => _L("Sequence"),
 						7 => _L("Destination"),
-						11 => _L("Attempts"),
+						12 => _L("Attempts"),
 						8 => _L("Last Attempt"),
 						9 => _L("Last Result"),
-						14 => _L("Response"),
-						17 => getSystemSetting("organizationfieldname","Organization"));
-		$titles = appendFieldTitles($titles, 17, $fieldlist, $activefields);
+						15 => _L("Response"),
+						18 => getSystemSetting("organizationfieldname","Organization"));
+		$titles = appendFieldTitles($titles, 18, $fieldlist, $activefields);
 
 		$formatters = array(7 => "fmt_destination",
 							8 => "fmt_date",
 							9 => "fmt_jobdetail_result",
-							14 => "fmt_detailedresponse",
-							15 => "fmt_dst_src",
-							17 => "fmt_organization"
+							15 => "fmt_detailedresponse",
+							16 => "fmt_dst_src",
+							18 => "fmt_organization"
 							);
 		showTable($data,$titles,$formatters);
 		echo "</table>";
@@ -409,7 +411,7 @@ class JobDetailReport extends ReportGenerator{
 		while ($row = DBGetRow($result)) {
 			if($row[5] == "phone")
 				$row[7] = Phone::format($row[7]);
-			$row[11] = (isset($row[11]) ? $row[11] : "");
+			$row[12] = (isset($row[12]) ? $row[12] : "");
 
 
 			if (isset($row[8])) {
@@ -421,16 +423,16 @@ class JobDetailReport extends ReportGenerator{
 			}
 			$row[9] = html_entity_decode(fmt_jobdetail_result($row,9));
 
-			$reportarray = array($row[0], $row[1], $row[2],$row[3],$row[4],fmt_dst_src($row, 15),$row[7],$row[11],$row[8],$row[9],fmt_confirmation($row, 14), $row[18]);
+			$reportarray = array($row[0], $row[1], $row[2],$row[3],$row[4],fmt_dst_src($row, 16),$row[7],$row[12],$row[8],$row[9],fmt_confirmation($row, 15), $row[19]);
 			//index 18 is the last position of a non-ffield
 			foreach($fieldlist as $fieldnum => $fieldname){
 				if(isset($activefields[$fieldnum])){
 					if (strpos($fieldnum, "g") === 0) {
-						$num = 17 + substr($fieldnum, 1); // gfields come after the 20 ffields (firstname/lastname excluded, 18 more ffields)
+						$num = 18 + substr($fieldnum, 1); // gfields come after the 20 ffields (firstname/lastname excluded, 18 more ffields)
 					} else {
 						$num = $fieldindex[$fieldnum]; // ffield
 					}
-					$reportarray[] = $row[17+$num]; // 18 is last index, $num starts at 1 for f03
+					$reportarray[] = $row[18+$num]; // 18 is last index, $num starts at 1 for f03
 				}
 			}
 			if ($issurvey) {
@@ -439,9 +441,9 @@ class JobDetailReport extends ReportGenerator{
 
 				$questiondata = array();
 				if ($row[5] == "phone")
-					parse_str($row[12],$questiondata);
-				else if ($row[5] == "email")
 					parse_str($row[13],$questiondata);
+				else if ($row[5] == "email")
+					parse_str($row[14],$questiondata);
 
 				//add data to the report for each question
 				for ($x = 0; $x < $maxquestions; $x++) {
