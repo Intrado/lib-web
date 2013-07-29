@@ -742,6 +742,7 @@ function fmt_obj_delivery_type_list($obj, $index) {
 
 //result formatter for job details.
 //index 5 is the delivery type
+//index 10 is the email SMTP status code
 function fmt_jobdetail_result($row, $index){
 	if($row[$index] == "nocontacts"){
 		if($row[5] == 'phone')
@@ -762,8 +763,30 @@ function fmt_jobdetail_result($row, $index){
 		else
 			return "No Selected";
 	} else {
-		return fmt_result($row, $index);
+		if ($row[5] == 'email' && $row[10] > 0) {
+			return fmt_email_result($row, 10);
+		} else {
+			return fmt_result($row, $index);
+		}
 	}
+}
+
+// result formatter for email status code, used in JobDetailReport
+function fmt_email_result ($row, $index) {
+	$result = "";
+	$status_code = $row[$index];
+	if (200 <= $status_code && $status_code <= 299) {
+		$result = "Delivered";
+	} else if (300 <= $status_code && $status_code <= 399) {
+		$result = "Unknown status";
+	} else if (404 == $status_code) {
+		$result = "Invalid email address";
+	} else if (400 <= $status_code && $status_code <= 499) {
+		$result = "Rejected";
+	} else if (500 <= $status_code && $status_code <= 599) {
+		$result = "Broken";
+	}
+	return $result;
 }
 
 

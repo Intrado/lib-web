@@ -192,9 +192,9 @@ class JobDetailReport extends ReportGenerator{
 			global $USER;
 			$text = "";
 
-			if($row[16] != null){
-				if($row[17] != null){
-					$text .= ' <span class="voicereplyclickableicon"><img src="img/speaker.gif" onclick="popup(\'repliespreview.php?id=' . $row[16] . '&close=1\', 450, 600)"></span>';
+			if($row[17] != null){
+				if($row[18] != null){
+					$text .= ' <span class="voicereplyclickableicon"><img src="img/speaker.gif" onclick="popup(\'repliespreview.php?id=' . $row[17] . '&close=1\', 450, 600)"></span>';
 				} else {
 					$text .= ' <span class="voicereplyicon"><img src="img/speaker2.gif"></span>';
 				}
@@ -219,7 +219,7 @@ class JobDetailReport extends ReportGenerator{
 		}
 
 		function fmt_organization($row, $index) {
-			return $row[18];
+			return $row[19];
 		}
 
 		$typequery = "";
@@ -318,7 +318,7 @@ class JobDetailReport extends ReportGenerator{
 						7 => _L("Destination"),
 						12 => _L("Attempts"),
 						8 => _L("Last Attempt"),
-						9 => _L("Last Result"),
+						9 => _L("Delivery Results"),
 						15 => _L("Response"),
 						18 => getSystemSetting("organizationfieldname","Organization"));
 		$titles = appendFieldTitles($titles, 18, $fieldlist, $activefields);
