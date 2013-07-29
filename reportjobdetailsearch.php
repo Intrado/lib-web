@@ -163,7 +163,7 @@ switch($_SESSION['report']['type']){
 		break;
 
 	case "email":
-		$possibleresults = array("sent" => "Sent",
+		$possibleresults = array("sent" => "Attempted",
 			"unsent" => "Unsent",
 			"duplicate" => "Duplicate",
 			"blocked" => "Blocked",
