@@ -24,6 +24,7 @@ require_once("obj/Twitter.obj.php");
 require_once("obj/CallerID.fi.php");
 require_once("obj/ValTimeWindowCallEarly.val.php");
 require_once("obj/ValTimeWindowCallLate.val.php");
+require_once("obj/Import.obj.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
@@ -36,12 +37,10 @@ if (!$USER->authorize('managemyaccount')) {
 ////////////////////////////////////////////////////////////////////////////////
 $readonly = false;
 if ($USER->importid) {
-	$readonly = true;
-	$query = "select * from import where id = '{$USER->importid}';";
-	if ($importRes = Query($query)) {
-		$importInfo = $importRes->fetch(PDO::FETCH_ASSOC); // there should only be one result...
-		$readonly = ($importInfo['updatemethod'] != 'createonly'); // readonly for any import updatemethod other than 'createonly'
-	}
+	// readonly for any import updatemethod that is 'full'
+	$import = new Import($USER->importid);
+	if ($import->updatemethod == 'full')
+		$readonly = true;
 }
 
 $ldapuser = $USER->ldap;
