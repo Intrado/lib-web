@@ -794,11 +794,11 @@ function display_read_duration($durationms) {
 	if (0 == $durationms) {
 		//Leave the string empty - this email hasn't been seen by the user
 	} else if (0 < $durationms && $durationms <= 1999) {
-		$result .= "Glanced/Deleted";
+		$result = "Glanced/Deleted";
 	} else if (2000 <= $durationms && $durationms <= 9999) {
-		$result .= "Skimmed";
+		$result = "Skimmed";
 	} else if (10000 <= $durationms) {
-		$result .= "Read";
+		$result = "Read";
 	}
 	return $result;
 }
