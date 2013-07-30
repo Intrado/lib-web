@@ -2181,6 +2181,7 @@ $$$
 
 -- START 9.7/4
 ALTER TABLE  `reportemaildelivery` ADD INDEX  `jobperson` (  `jobid` ,  `personid`, `sequence`)
+$$$
 
 update setting set value='9.7/4' where name='_dbversion'
 $$$
