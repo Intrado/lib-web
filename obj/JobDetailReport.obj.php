@@ -188,7 +188,7 @@ class JobDetailReport extends ReportGenerator{
 	}
 
 	function runHtml(){
-		//index 16 is voicereply id
+		//index 18 is voicereply id
 		function fmt_detailedresponse($row, $index){
 			global $USER;
 			$text = "";
@@ -327,7 +327,7 @@ class JobDetailReport extends ReportGenerator{
 						9 => _L("Delivery Results"),
 						16 => _L("Response"),
 						19 => getSystemSetting("organizationfieldname","Organization"));
-		$titles = appendFieldTitles($titles, 18, $fieldlist, $activefields);
+		$titles = appendFieldTitles($titles, 19, $fieldlist, $activefields);
 
 		$formatters = array(7 => "fmt_destination",
 							8 => "fmt_date",
