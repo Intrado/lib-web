@@ -33,58 +33,58 @@ if (isset($_GET['delete'])) {
 	$import = new Import($id);
 
 	Query("BEGIN");
-		// NOTE delete an import logic should be identical to what if you re-run the same import without any data in it
-		// only fullsync imports should delete data
-		if ($import->updatemethod == "full") {
-			switch ($import->datatype) {
-			case "person" :
-				// delete all personguardian with this importid
-				QuickUpdate("delete from personguardian where importid=?", false, array($id));
-				// delete all personassociation with this importid
-				QuickUpdate("delete from personassociation where importid=?", false, array($id));
-				// delete all groupdata with this importid
-				QuickUpdate("delete from groupdata where importid=?", false, array($id));
-				//deactivate everyone with this importid
-				QuickUpdate("update person set deleted=1, lastimport=now() where importid=?", false, array($id));
-				//TODO this doesnt seem to do anything since it doesn't check the deleted flag???
-				QuickUpdate("delete le from listentry le
-							left join person p on (p.id = le.personid)
-							where p.id is null and le.personid is not null");
+	// NOTE delete an import logic should be identical to running the same import without any data in it
+	// only fullsync imports should delete data
+	
+	switch ($import->datatype) {
+		// For user imports, the desired functionality is that the user accounts remain in the system
+		// additionaly, for FULL type imports, we want the user account to be moved to disabled
+		case "user" :
+			// When removing a "Full-sync" user import, we should disable the linked user accounts
+			if ($import->updatemethod == "full")
+				$import->disableUsers();
+			
+			$import->unlinkUserAssociations();
+			$import->removeRoles();
+			$import->unlinkUsers();
+			break;
 
-				//recalc pdvalues for all fields mapped
-				$fieldnums = QuickQueryList("select distinct mapto from importfield where (mapto like 'f%' or mapto like 'g%') and importid=?", false, false, array($id));
-				if (count($fieldnums) > 0) {
-					$fields = DBFindMany("FieldMap", "from fieldmap where fieldnum in ('" . implode("','",$fieldnums) . "')");
-					foreach ($fields as $field)
-						$field->updatePersonDataValues();
-				}
-			break;
-			case "user" :
-				// delete all association with this importid
-				QuickUpdate("delete from userassociation where importid=?", false, array($id));
-				QuickUpdate("delete from role where importid=?", false, array($id));
-				// disable all users with this importid and set importid to null
-				QuickUpdate("update user set enabled=0, lastimport=now(), importid=null where importid=?", false, array($id));
-			break;
-			case "section" :
-				// delete all userassociation with this importid, DO NOT remove sectionid=0 do not inadvertently grant access to persons they should not see.
-				QuickUpdate("delete from userassociation where importid=? and sectionid != 0", false, array($id));
-				// delete all sections with this importid
-				QuickUpdate("delete from section where importid=?", false, array($id));
-			break;
-			case "enrollment" :
-				// delete all personassociation with this importid
-				QuickUpdate("delete from personassociation where importid=?", false, array($id));
-			break;
+		case "person" :
+			// NOTE: "create only" and "create update" person imports don't delete any data when run with an empty file
+			// Only remove data when deleting a "update, create, delete" import
+			if ($import->updatemethod == "full") {
+				$import->removePersonGuardians();
+				$import->removePersonAssociations();
+				$import->removeGroupData();
+				
+				$import->softDeletePeople();
+				$import->recalculatePersonDataValues();
 			}
-		} // end if fullsync import
-
-		// NOTE do not hard delete import related data - feature request to someday soft delete imports CS-4473
+			$import->unlinkPeople();
+			break;
 		
-		// import alert rules will be deleted when checked. 
+		case "section" :
+			// delete all userassociation with this importid, DO NOT remove sectionid=0 do not inadvertently grant access to persons they should not see.
+			$import->removeUserAssociations();
+			$import->removePersonAssociations();
+			$import->removeSections();
+			break;
 		
-		//delete import
-		$import->destroy();
+		case "enrollment" :
+			$import->removePersonAssociations();
+			break;
+	}
+	// NOTE do not hard delete import related data - feature request to someday soft delete imports CS-4473
+	
+	// import alert rules will be deleted when checked. 
+	
+	//delete import
+	QuickUpdate("delete from importfield where importid = ?", false, array($import->id));
+	QuickUpdate("delete from importjob where importid = ?", false, array($import->id));
+	QuickUpdate("delete from importlogentry where importid = ?", false, array($import->id));
+	QuickUpdate("delete from importmicroupdate where importid = ?", false, array($import->id));
+	$import->destroy();
+	
 	Query("COMMIT");
 
 	notice(_L("The import, %s, is now deleted.", escapehtml($import->name)));

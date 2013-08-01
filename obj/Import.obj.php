@@ -47,6 +47,66 @@ class Import extends DBMappedObject {
 		return QuickQuery("select data from import where id=?", false, array($this->id));
 	}
 
+	// Always remove links to userAssociations, but don't actually remove them. We want the user to retain their privileges
+	function unlinkUserAssociations() {
+		return QuickUpdate("update userassociation set importid = null where importid = ?", false, array($this->id));
+	}
+
+	public function removeUserAssociations() {
+		return QuickUpdate("delete from userassociation where importid=? and sectionid != 0", false, array($this->id));
+	}
+	
+	// Roles are currently only used by TAI, so removing them is appropriate for the base kona application
+	function removeRoles() {
+		return QuickUpdate("delete from role where importid = ?", false, array($this->id));
+	}
+	
+	// will remove enabled flag for all users associated with this import
+	function disableUsers() {
+		return QuickUpdate("update user set enabled=0 where importid = ?", false, array($this->id));
+	}
+	
+	function unlinkUsers() {
+		return QuickUpdate("update user set importid = null, lastimport = now() where importid = ?", false, array($this->id));
+	}
+
+	public function removePersonGuardians() {
+		return QuickUpdate("delete from personguardian where importid=?", false, array($this->id));
+	}
+
+	public function removePersonAssociations() {
+		if ($this->datatype == "section") {
+			// have to clean up any person associations which use this import's section data
+			return QuickUpdate("delete from personassociation where type = 'section' and sectionid in (select id from section where importid = ?)",
+						false, array($this->id));
+		} else {
+			return QuickUpdate("delete from personassociation where importid = ?", false, array($this->id));
+		}
+	}
+
+	public function removeGroupData() {
+		return QuickUpdate("delete from groupdata where importid = ?", false, array($this->id));
+	}
+
+	public function softDeletePeople() {
+		return QuickUpdate("update person set deleted = 1 where importid = ?", false, array($this->id));
+	}
+	
+	public function unlinkPeople() {
+		return QuickUpdate("update person set importid = null, lastimport = now() where importid = ?", false, array($this->id));
+	}
+
+	public function recalculatePersonDataValues() {
+		$fields = DBFindMany("FieldMap", "from fieldmap where fieldnum in (select distinct mapto from importfield 
+										where (mapto like 'f%' or mapto like 'g%') and importid = ?)", false, array($this->id));
+		foreach ($fields as $field)
+			$field->updatePersonDataValues();
+	}
+
+	public function removeSections() {
+		return QuickUpdate("delete from section where importid = ?", false, array($this->id));
+	}
+
 }
 
 ?>
