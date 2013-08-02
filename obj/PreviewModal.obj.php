@@ -399,7 +399,6 @@ class PreviewModal {
 				'method': 'post',
 				'parameters': post_parameters,
 				'onSuccess': function(response) {
-console.log('AJAXY');
 					header.html("");
 					if (response.responseJSON) {
 						var result = response.responseJSON;
