@@ -777,14 +777,16 @@ function fmt_email_result ($row, $index) {
 	$status_code = $row[$index];
 	if (200 <= $status_code && $status_code <= 299) {
 		$result = "Delivered";
+	} else if (404 == $status_code || 450 == $status_code || 510 == $status_code
+		    || 512 == $status_code || 515 == $status_code || 550 == $status_code
+		    || 553 == $status_code) {
+		$result = "Invalid Address";
 	} else if (300 <= $status_code && $status_code <= 399) {
-		$result = "Unknown status";
-	} else if (404 == $status_code) {
-		$result = "Invalid email address";
+		$result = "Unknown Status";
 	} else if (400 <= $status_code && $status_code <= 499) {
-		$result = "Rejected";
+		$result = "Soft Bounced";
 	} else if (500 <= $status_code && $status_code <= 599) {
-		$result = "Broken";
+		$result = "Bounced";
 	}
 	return $result;
 }
