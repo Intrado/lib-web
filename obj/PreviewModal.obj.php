@@ -248,13 +248,16 @@ class PreviewModal {
 	// Includeds the javascript necessary to open the modal and renderes the form if there are any field insters
 	function includeModal() {
 		$modalcontent = $playercontent = $formdata = '';
+		$isAjaxSubmit = false;
 		if (!$this->playable) {
 			$modalcontent = $this->text;
 		}
 		else if ($this->hasfieldinserts) {
 			$modalcontent = $this->form->render();
-			if ($this->form->isAjaxSubmit()) {
-				$formdata = $this->form->getFormdata();
+			if ($this->form) {
+				if ($isAjaxSubmit = $this->form->isAjaxSubmit()) {
+					$formdata = $this->form->getFormdata();
+				}
 			}
 		}
 
@@ -266,7 +269,7 @@ class PreviewModal {
 			"content" => $modalcontent, 
 			"uid" => $this->uid, 
 			"partscount" => count($this->parts),
-			'ajax' => ($this->form->isAjaxSubmit() ? 'true' : 'false')
+			'ajax' => ($isAjaxSubmit ? 'true' : 'false')
 		);
 
 		if (is_array($formdata) && count($formdata)) {
@@ -396,6 +399,7 @@ class PreviewModal {
 				'method': 'post',
 				'parameters': post_parameters,
 				'onSuccess': function(response) {
+console.log('AJAXY');
 					header.html("");
 					if (response.responseJSON) {
 						var result = response.responseJSON;
@@ -452,13 +456,13 @@ class PreviewModal {
 						}
 					} else {
 						header.html('Error');
-						body.html('Unable to preview this message');
+						body.html('Unable to preview this message 2');
 					}
 				},
 				
 				'onFailure': function() {
 					header.html('Error');
-					body.html('Unable to preview this message');
+					body.html('Unable to preview this message 1');
 				},
 				'onComplete': function() {
 					centerModal(modal);
