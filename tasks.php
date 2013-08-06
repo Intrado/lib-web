@@ -33,58 +33,9 @@ if (isset($_GET['delete'])) {
 	$import = new Import($id);
 
 	Query("BEGIN");
-	// NOTE delete an import logic should be identical to running the same import without any data in it
-	// only fullsync imports should delete data
-	
-	switch ($import->datatype) {
-		// For user imports, the desired functionality is that the user accounts remain in the system
-		// additionaly, for FULL type imports, we want the user account to be moved to disabled
-		case "user" :
-			// When removing a "Full-sync" user import, we should disable the linked user accounts
-			if ($import->updatemethod == "full")
-				$import->disableUsers();
-			
-			$import->unlinkUserAssociations();
-			$import->removeRoles();
-			$import->unlinkUsers();
-			break;
 
-		case "person" :
-			// NOTE: "create only" and "create update" person imports don't delete any data when run with an empty file
-			// Only remove data when deleting a "update, create, delete" import
-			if ($import->updatemethod == "full") {
-				$import->removePersonGuardians();
-				$import->removePersonAssociations();
-				$import->removeGroupData();
-				
-				$import->softDeletePeople();
-				$import->recalculatePersonDataValues();
-			}
-			$import->unlinkPeople();
-			break;
-		
-		case "section" :
-			// delete all userassociation with this importid, DO NOT remove sectionid=0 do not inadvertently grant access to persons they should not see.
-			$import->removeUserAssociations();
-			$import->removePersonAssociations();
-			$import->removeSections();
-			break;
-		
-		case "enrollment" :
-			$import->removePersonAssociations();
-			break;
-	}
-	// NOTE do not hard delete import related data - feature request to someday soft delete imports CS-4473
-	
-	// import alert rules will be deleted when checked. 
-	
-	//delete import
-	QuickUpdate("delete from importfield where importid = ?", false, array($import->id));
-	QuickUpdate("delete from importjob where importid = ?", false, array($import->id));
-	QuickUpdate("delete from importlogentry where importid = ?", false, array($import->id));
-	QuickUpdate("delete from importmicroupdate where importid = ?", false, array($import->id));
 	$import->destroy();
-	
+
 	Query("COMMIT");
 
 	notice(_L("The import, %s, is now deleted.", escapehtml($import->name)));

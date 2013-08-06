@@ -107,6 +107,59 @@ class Import extends DBMappedObject {
 		return QuickUpdate("delete from section where importid = ?", false, array($this->id));
 	}
 
+	function destroy($destroychildren = false) {
+		// NOTE delete an import logic should be identical to running the same import without any data in it
+		// only fullsync imports should delete data
+
+		switch ($this->datatype) {
+			// For user imports, the desired functionality is that the user accounts remain in the system
+			// additionaly, for FULL type imports, we want the user account to be moved to disabled
+			case "user" :
+				// When removing a "Full-sync" user import, we should disable the linked user accounts
+				if ($this->updatemethod == "full")
+					$this->disableUsers();
+
+				$this->unlinkUserAssociations();
+				$this->removeRoles();
+				$this->unlinkUsers();
+				break;
+
+			case "person" :
+				// NOTE: "create only" and "create update" person imports don't delete any data when run with an empty file
+				// Only remove data when deleting a "update, create, delete" import
+				if ($this->updatemethod == "full") {
+					$this->removePersonGuardians();
+					$this->removePersonAssociations();
+					$this->removeGroupData();
+
+					$this->softDeletePeople();
+					$this->recalculatePersonDataValues();
+				}
+				$this->unlinkPeople();
+				break;
+
+			case "section" :
+				// delete all userassociation with this importid, DO NOT remove sectionid=0 do not inadvertently grant access to persons they should not see.
+				$this->removeUserAssociations();
+				$this->removePersonAssociations();
+				$this->removeSections();
+				break;
+
+			case "enrollment" :
+				$this->removePersonAssociations();
+				break;
+		}
+		// NOTE do not hard delete import related data - feature request to someday soft delete imports CS-4473
+
+		// import alert rules will be deleted when checked. 
+
+		//delete import
+		QuickUpdate("delete from importfield where importid = ?", false, array($this->id));
+		QuickUpdate("delete from importjob where importid = ?", false, array($this->id));
+		QuickUpdate("delete from importlogentry where importid = ?", false, array($this->id));
+		QuickUpdate("delete from importmicroupdate where importid = ?", false, array($this->id));
+		DBMappedObject::destroy($destroychildren);
+	}
 }
 
 ?>
