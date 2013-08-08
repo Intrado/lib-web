@@ -29,3 +29,18 @@ $$$
 -- Add indexes for reporting email read duration
 ALTER TABLE  `reportemaildelivery` ADD INDEX  `jobperson` (  `jobid` ,  `personid`, `sequence` )
 $$$
+
+-- $rev 5
+-- Updates existing email templates to include an email tracking pixel
+update messagepart mp set mp.txt = concat(mp.txt, '${trackingpixelimg}') where mp.messageid in
+	(select id from message where type = 'email' and subtype = 'html'
+		and messagegroupid in (select messagegroupid from template where type in ('emergency', 'notification')))
+$$$
+
+-- Updates existing customers to have the deprecated message sender enabled
+insert into setting (organizationid, name, value) values (null, '_allowoldmessagesender', 1)
+$$$
+
+-- Updates existing users who are not deleted to use the deprecated message sender
+insert into usersetting (userid, name, value) (select id, '_allowoldmessagesender' as name, 1 as value from user where not deleted)
+$$$

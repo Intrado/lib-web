@@ -17,6 +17,9 @@ function upgrade_9_7 ($rev, $shardid, $customerid, $db) {
 		case 3:
 			echo "|";
 			apply_sql("upgrades/db_9-7_pre.sql", $customerid, $db, 4);
+		case 4:
+			echo "|";
+			apply_sql("upgrades/db_9-7_pre.sql", $customerid, $db, 5);
 
 	}
 	
