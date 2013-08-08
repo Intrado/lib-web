@@ -234,6 +234,8 @@ window.RCIEditorInline = function () {
 		return(true);
 	}
 
+	this.preEditableStyle = '';
+
 	/**
 	 * Take a given element and make it editable with CKEditor on-click
 	 */
@@ -244,6 +246,7 @@ window.RCIEditorInline = function () {
 		element.attr('id', newid);
 		element.attr('contenteditable', 'true');
 		element.attr('tabindex', index);
+		this.preEditableStyle = element.attr('style');
 
 		// CKEDITOR.inline() does not like element if it is a jQuery object
 		// Get an UNextended copy of this same DOM element using the newid we assigned
@@ -261,7 +264,8 @@ window.RCIEditorInline = function () {
 		element.removeAttr('id');
 		element.removeAttr('contenteditable');
 		element.removeAttr('tabindex');
-		element.removeAttr('style');
+		//element.removeAttr('style');
+		element.attr('style', this.preEditableStyle);
 		element.removeAttr('spellcheck');
 
 		// CKE adds one or more class names to the element; instead of removing those (whose
