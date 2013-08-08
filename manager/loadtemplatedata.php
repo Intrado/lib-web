@@ -18,7 +18,7 @@ ${body}<br><br><hr />
 ${displayname} would like to continue connecting with you via email.  If you prefer to be removed from our list, please contact ${displayname} directly.  To stop receiving all email messages distributed through our ${productname} service, follow this link and confirm: <a href= "${unsubscribelink}">Unsubscribe</a>
 </p>
 <p style="font-family:verdana; color:#6B6B6B; font-size:75%">
-${productname} is a notification service used by the nation\'s leading school systems to connect with parents, students and staff through voice, SMS text, email, and social media.
+${productname} is a notification service used by the nation\'s leading school systems to connect with parents, students and staff through voice, SMS text, email, and social media.${trackingpixelimg}
 </p>
 ';
 
@@ -42,7 +42,7 @@ ${body}<br><br><hr/>
 				${displayname} le gustaría continuar comunicándose con usted por medio de correo electrónico.  Si usted prefiere ser borrado de nuestra lista, por favor contacte ${displayname} directamente.  Para dejar de recibir todos los mensajes de correo electrónico distribuidos por nuestro servicio de ${productname}, haga clic en el siguiente botón: <a href= "${unsubscribelink}">Anular Subscripción</a>
 				</p>
 				<p style="font-family:verdana; color:#6B6B6B; font-size:75%">
-				${productname} es un servicio de notificación usado por los sistemas escolares más importantes de la nación para comunicarse con padres, estudiantes, y personal por medio de voz, texto, correo electrónico y medios de comunicación social.
+				${productname} es un servicio de notificación usado por los sistemas escolares más importantes de la nación para comunicarse con padres, estudiantes, y personal por medio de voz, texto, correo electrónico y medios de comunicación social.${trackingpixelimg}
 				</p>
 ';
 
@@ -69,7 +69,7 @@ ${body}<br><br><hr />
 ${displayname} would like to continue connecting with you via email.  If you prefer to be removed from our list, please contact ${displayname} directly.  To stop receiving all email messages distributed through our ${productname} service, follow this link and confirm: <a href= "${unsubscribelink}">Unsubscribe</a>
 </p>
 <p style="font-family:verdana; color:#6B6B6B; font-size:75%">
-${productname} is a notification service used by the nation\'s leading school systems to connect with parents, students, and staff through voice, SMS text, email, and social media.
+${productname} is a notification service used by the nation\'s leading school systems to connect with parents, students, and staff through voice, SMS text, email, and social media.${trackingpixelimg}
 </p>
 ';
 
@@ -93,7 +93,7 @@ ${body}<br><br><hr/>
 				${displayname} le gustaría continuar comunicándose con usted por medio de correo electrónico.  Si usted prefiere ser borrado de nuestra lista, por favor contacte ${displayname} directamente.  Para dejar de recibir todos los mensajes de correo electrónico distribuidos por nuestro servicio de ${productname}, haga clic en el siguiente botón: <a href= "${unsubscribelink}">Anular Subscripción</a>
 				</p>
 				<p style="font-family:verdana; color:#6B6B6B; font-size:75%">
-				${productname} es un servicio de notificación usado por los sistemas escolares más importantes de la nación para comunicarse con padres, estudiantes, y personal por medio de voz, texto, correo electrónico y medios de comunicación social.
+				${productname} es un servicio de notificación usado por los sistemas escolares más importantes de la nación para comunicarse con padres, estudiantes, y personal por medio de voz, texto, correo electrónico y medios de comunicación social.${trackingpixelimg}
 				</p>
 ';
 
