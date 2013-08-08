@@ -586,26 +586,6 @@ function getBrand(){
 	return $_SESSION['productname'];
 }
 
-function getBrandTheme(){
-	if (isset($_SESSION['colorscheme']))
-		return $_SESSION['colorscheme']['_brandtheme'];
-	else
-		return "classroom"; // hack for buttons on pages not yet logged in
-}
-
-function getBrandPrimary(){
-	return $_SESSION['colorscheme']['_brandprimary'];
-}
-
-function getBrandTheme1(){
-	return $_SESSION['colorscheme']['_brandtheme1'];
-}
-
-function getBrandTheme2(){
-	return $_SESSION['colorscheme']['_brandtheme2'];
-}
-
-
 //Load display settings based on system or user preference
 //user must be loaded
 //customer url must also be loaded
