@@ -15,7 +15,6 @@ require_once("../obj/Message.obj.php");
 require_once("../obj/MessagePart.obj.php");
 require_once("loadtemplatedata.php");
 require_once("createtemplates.php");
-require_once("../obj/FormBrandTheme.obj.php");
 require_once("../obj/ValSmsText.val.php");
 require_once("XML/RPC.php");
 require_once("authclient.inc.php");
@@ -381,7 +380,7 @@ document.observe('dom:loaded', function() {
 			checkbox.checked = !confirm("Are you sure you want to DISABLE this customer?");
 	});
 });
-<? Validator::load_validators(array("ValBrandTheme","ValInboundNumber","ValUrlComponent","ValSmsText","ValLanguages","ValUrl"));?>
+<? Validator::load_validators(array("ValInboundNumber","ValUrlComponent","ValSmsText","ValLanguages","ValUrl"));?>
 </script>
 <?
 
