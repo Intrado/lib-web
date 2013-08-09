@@ -76,10 +76,24 @@ class Job extends DBMappedObject {
 			$newjob->name = substr($newjob->name,0,47 - strlen($tmpDate)) . " - $tmpDate";
 		} else {
 			$tmpJobName = $newjob->name;
-			$copySuffix = " (Copy)";
+			// Does this job name already end with (Copy or (Copy ##*?
+			if (preg_match("/^(.*?)\s+\(Copy(.*?)/", $tmpJobName, $matches)) {
+
+				// The new base name is everything leading up to the first "(Copy"
+				$tmpJobName = $matches[1];
+
+				// The starting copy count is the intval of the string following "(Copy";
+				// if it's empty, it will evaluate to 0; in either case we increment to
+				// the next number which will be the first one we want to check for availability
+				$copyCount = intval($matches[2]) + 1;
+				$copySuffix = " (Copy $copyCount)";
+			}
+			else {
+				$copyCount = 1;
+				$copySuffix = " (Copy)";
+			}
 			if (strlen($tmpJobName) > 40)
 				$tmpJobName = substr($tmpJobName,0,39) . "... ";
-			$copyCount = 1;
 			while (DBFind("Job", "from job where name =? and not deleted and cancelleduserid is NULL", false, array($tmpJobName.$copySuffix))) {
 				$copySuffix = " (Copy $copyCount)";
 				if (strlen($tmpJobName) > 39 - strlen($copyCount))
