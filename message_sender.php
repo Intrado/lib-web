@@ -876,7 +876,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			}
 
 			// If we're debugging
-			else if ($_SESSION['DEBUG']) {
+			else if (isset($_SESSION['DEBUG'])) {
 				// Add some diagnostic info to the final return AJAX
 				$diagnostics = array(
 					'postdata' => $postdata,
@@ -1095,6 +1095,13 @@ class MessageSenderProcessor {
 		// Lists, get listids and create an addme list
 		// =============================================================
 		$joblists = json_decode($postdata["listids"]);
+		// If 'addme' is part of the submited listids, we don't need
+		// it here; we'll pick up addme in postdata['addme']
+		foreach ($joblists as $index => $listid) {
+			if ($listid === 'addme')
+				unset($joblists[$index]);
+		}
+		$joblists = array_values($joblists); // 'reindex' array
 
 		// if there is "addme" data in the list selection, create a person and list with the contact details
 		if (isset($postdata['addme']) && $postdata['addme']) {
