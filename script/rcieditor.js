@@ -36,7 +36,7 @@
 (function ($) {
 	window.RCIEditor = function (editor_mode, textarea_id, overrideSettings) {
 
-console.log('RCIEditor::init');
+//console.log('RCIEditor::init');
 		var textarea = null;	// The textarea ELEMENT, not the ID
 		var container = null;	// The container ELEMENT, to contain the editor, not the ID
 		var editorMode = null;	// Either null (uninitialized) or [plain|normal|full|inline]
@@ -82,7 +82,7 @@ console.log('RCIEditor::init');
 		 */
 		this.reconstruct = function (editor_mode, textarea_id, overrideSettings) {
 	
-console.log('RCIEditor::reconstruct');
+//console.log('RCIEditor::reconstruct');
 			// (1) If the editorMode is defined...
 			if (editorMode) {
 	
@@ -131,7 +131,7 @@ console.log('RCIEditor::reconstruct');
 		 * object ready to continue working with a subsequent call to the construct method.
 		 */
 		this.deconstruct = function () {
-console.log('RCIEditor::deconstruct ENTER');
+//console.log('RCIEditor::deconstruct ENTER');
 	
 			// Show the loading spinner
 			this.setLoadingVisibility(true);
@@ -195,7 +195,7 @@ console.log('RCIEditor::deconstruct ENTER');
 		 * @param editorMode string One of either: 'inline', 'plain', 'normal', or 'full'
 		 */
 		this.changeMode = function (newEditorMode) {
-console.log('RCIEditor::changeMode');
+//console.log('RCIEditor::changeMode');
 	
 			// If we're already in this same mode
 			if (editorMode == newEditorMode) {
@@ -232,7 +232,7 @@ console.log('RCIEditor::changeMode');
 		 * being available
 		 */
 		this.applyEditor = function (setEditorMode, textarea_id, container_id, overrideSettings) {
-console.log('RCIEditor::applyEditor');
+//console.log('RCIEditor::applyEditor');
 	
 			// Hide the text area form field until we are done initializing
 			textarea = $('#' + textarea_id);
@@ -453,7 +453,7 @@ console.log('RCIEditor::applyEditor');
 		 * inline editor to have at.
 		 */
 		this.callbackEditorLoaded = function (activeContainerId) {
-console.log('RCIEditor::callbackEditorLoaded');
+//console.log('RCIEditor::callbackEditorLoaded');
 			this.setSetting('activeContainerId', activeContainerId);
 	
 			// Hide our AJAXy loading indicator
@@ -506,7 +506,7 @@ console.log('RCIEditor::callbackEditorLoaded');
 		 */
 		this.loadingVisible = false;
 		this.setLoadingVisibility = function (visible) {
-console.log('RCIEditor::setLoadingVisibility');
+//console.log('RCIEditor::setLoadingVisibility');
 	
 			// If we want to make it visible...
 			if (visible) {
@@ -562,7 +562,7 @@ console.log('RCIEditor::setLoadingVisibility');
 		 * able to hide it!
 		 */
 		this.hideHtmlEditor = function () {
-console.log('RCIEditor::hideHtmlEditor');
+//console.log('RCIEditor::hideHtmlEditor');
 			// hide the editor
 			$('#' + basename + 'hider').hide();
 		};
@@ -620,7 +620,7 @@ console.log('RCIEditor::hideHtmlEditor');
 		 * @return object containing the html editor instance and container, or null if not loaded
 		 */
 		this.saveHtmlEditorContent = function (existinghtmleditorobject) {
-console.log('RCIEditor::saveHtmlEditorContent');
+//console.log('RCIEditor::saveHtmlEditorContent');
 			var htmleditorobject = existinghtmleditorobject || this.getHtmlEditorObject();
 			if (! htmleditorobject) {
 				return(false);
@@ -649,7 +649,7 @@ console.log('RCIEditor::saveHtmlEditorContent');
 		 * object other than the one we're using internally
 		 */
 		this.refreshHtmlEditorContent = function (existinghtmleditorobject) {
-console.log('RCIEditor::refreshHtmlEditorContent');
+//console.log('RCIEditor::refreshHtmlEditorContent');
 	
 			// Refresh is neither supported nor necessary for inline mode
 			if (editorMode == 'inline') {
@@ -676,7 +676,7 @@ console.log('RCIEditor::refreshHtmlEditorContent');
 		 * @return boolean true on success, else false
 		 */
 		this.setHtmlEditorContentPrimary = function (content) {
-console.log('RCIEditor::setHtmlEditorContentPrimary');
+//console.log('RCIEditor::setHtmlEditorContentPrimary');
 			switch (editorMode) {
 				case 'inline':
 	
@@ -723,7 +723,7 @@ console.log('RCIEditor::setHtmlEditorContentPrimary');
 		 * object other than the one we're using internally
 		 */
 		this.clearHtmlEditorContent = function (existinghtmleditorobject) {
-console.log('RCIEditor::clearHtmlEditorContent');
+//console.log('RCIEditor::clearHtmlEditorContent');
 			var htmleditorobject = existinghtmleditorobject || this.getHtmlEditorObject();
 			if (!htmleditorobject) {
 				return(false);
@@ -738,7 +738,7 @@ console.log('RCIEditor::clearHtmlEditorContent');
 		 * object other than the one we're using internally
 		 */
 		this.setHtmlEditorContent = function (content, existinghtmleditorobject) {
-console.log('RCIEditor::setHtmlEditorContent');
+//console.log('RCIEditor::setHtmlEditorContent');
 			var htmleditorobject = existinghtmleditorobject || this.getHtmlEditorObject();
 			if (!htmleditorobject) {
 				return(false);
@@ -770,7 +770,7 @@ console.log('RCIEditor::setHtmlEditorContent');
 		 * @return string The cleaned up content ready for saving
 		 */
 		this.cleanContent = function (content) {
-console.log('RCIEditor::cleanContent');
+//console.log('RCIEditor::cleanContent');
 			var tempdiv = $('<div></div>').html(content);
 	
 			// Unstyle any image elements having src="viewimage.php?id=.."
@@ -813,7 +813,7 @@ console.log('RCIEditor::cleanContent');
 		 * @return string The cleaned up HTML
 		 */
 		this.cleanFieldInserts = function (html) {
-console.log('RCIEditor::cleanFieldInserts');
+//console.log('RCIEditor::cleanFieldInserts');
 			var regex = /&lt;(<.*?>)*?&lt;(.+?)&gt;(<.*?>)*?&gt;/g;
 			var matches = html.match(regex);
 	
@@ -890,7 +890,7 @@ console.log('RCIEditor::cleanFieldInserts');
 						return;
 				}
 			}
-console.log('RCIEditor::eventListener(', evt, ')');
+//console.log('RCIEditor::eventListener(', evt, ')');
 
 			// We got a new event so reset the timer
 			window.clearTimeout(this.eventTimer);
@@ -919,7 +919,7 @@ console.log('RCIEditor::eventListener(', evt, ')');
 		 */
 		this.validator_fn = null;
 		this.setValidatorFunction = function (validator_fn) {
-console.log('RCIEditor::setValidatorFunction');
+//console.log('RCIEditor::setValidatorFunction');
 			this.validator_fn = validator_fn;
 		};
 	
@@ -927,7 +927,7 @@ console.log('RCIEditor::setValidatorFunction');
 		 * Disables a validator function that was previously set
 		 */
 		this.resetValidatorFunction = function () {
-console.log('RCIEditor::resetValidatorFunction');
+//console.log('RCIEditor::resetValidatorFunction');
 			this.validator_fn = null;
 		}
 	
@@ -936,7 +936,7 @@ console.log('RCIEditor::resetValidatorFunction');
 		 * a validator function is set then it will be invoked, otherwise nada.
 		 */
 		this.validate = function () {
-console.log('RCIEditor::validate');
+//console.log('RCIEditor::validate');
 			if (typeof this.validator_fn === 'function') {
 				this.validator_fn();
 			}
@@ -951,7 +951,7 @@ console.log('RCIEditor::validate');
 		 * @todo Get rid of this method once all external calls to it are gone
 		 */
 		this.registerHtmlEditorKeyListener = function (listener_fn) {
-console.log('RCIEditor::registerHtmlEditorKeyListener');
+//console.log('RCIEditor::registerHtmlEditorKeyListener');
 			this.setValidatorFunction(listener_fn);
 		};
 
@@ -961,7 +961,7 @@ console.log('RCIEditor::registerHtmlEditorKeyListener');
 		 * longer documents as needed.
 		 */
 		this.adjustInlineHeight = function (newHeight) {	
-console.log('RCIEditor::adjustInlineHeight');
+//console.log('RCIEditor::adjustInlineHeight');
 
 			// This heith adjustment method is only for the inline mode iframe
 			if (editorMode != 'inline') return;
