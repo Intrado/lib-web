@@ -35,6 +35,8 @@
 
 (function ($) {
 	window.RCIEditor = function (editor_mode, textarea_id, overrideSettings) {
+
+console.log('RCIEditor::init');
 		var textarea = null;	// The textarea ELEMENT, not the ID
 		var container = null;	// The container ELEMENT, to contain the editor, not the ID
 		var editorMode = null;	// Either null (uninitialized) or [plain|normal|full|inline]
@@ -80,6 +82,7 @@
 		 */
 		this.reconstruct = function (editor_mode, textarea_id, overrideSettings) {
 	
+console.log('RCIEditor::reconstruct');
 			// (1) If the editorMode is defined...
 			if (editorMode) {
 	
@@ -128,10 +131,11 @@
 		 * object ready to continue working with a subsequent call to the construct method.
 		 */
 		this.deconstruct = function () {
+console.log('RCIEditor::deconstruct ENTER');
 	
 			// Show the loading spinner
 			this.setLoadingVisibility(true);
-	
+
 			// Tear down whatever editor is in place
 			switch (editorMode) {
 				case 'inline':
@@ -140,7 +144,7 @@
 					// just by emptying out the container
 					var tmpcontainer = $('#' + basename + '-htmleditor');
 					if (!tmpcontainer.length) {
-						return(false);
+						break;
 					}
 	
 					tmpcontainer.empty();
@@ -151,18 +155,23 @@
 				case 'full':
 					var htmleditorobject = this.getHtmlEditorObject();
 					if (!htmleditorobject) {
-						return(false);
+						break;
 					}
 	
 					if (typeof textarea !== 'object') {
-						return(false);
+						break;
 					}
 	
 					// Capture the textarea content to prevent CKE from further altering it
 					var content = textarea.val();
 	
 					// Let CKE do whatever it does while destroying itself
-					htmleditorobject.instance.destroy();
+					try {
+						htmleditorobject.instance.destroy();
+					}
+					catch (ex) {
+						//console.log('caught exception: [' + ex.message + ']');
+					}
 	
 					// And restore the textarea's content
 					textarea.val(content);
@@ -177,7 +186,6 @@
 					return(true);
 			}
 	
-			// Only an unsupported editorMode will end up here:
 			return(false);
 		};
 	
@@ -187,6 +195,7 @@
 		 * @param editorMode string One of either: 'inline', 'plain', 'normal', or 'full'
 		 */
 		this.changeMode = function (newEditorMode) {
+console.log('RCIEditor::changeMode');
 	
 			// If we're already in this same mode
 			if (editorMode == newEditorMode) {
@@ -223,6 +232,7 @@
 		 * being available
 		 */
 		this.applyEditor = function (setEditorMode, textarea_id, container_id, overrideSettings) {
+console.log('RCIEditor::applyEditor');
 	
 			// Hide the text area form field until we are done initializing
 			textarea = $('#' + textarea_id);
@@ -391,26 +401,23 @@
 						'instanceReady': function (event) {
 							that.callbackEditorLoaded(this);
 						},
-						'key': ( function () {
-							that.eventListener();
+						'key': ( function (evt) {
+							that.eventListener(evt);
 						} ),
-						'blur': ( function () {
-							that.eventListener();
+						'blur': ( function (evt) {
+							that.eventListener(evt);
 						} ),
-						'saveSnapshot': ( function () {
-							that.eventListener();
+						'saveSnapshot': ( function (evt) {
+							that.eventListener(evt);
 						} ),
-						'afterCommandExec': ( function () {
-							that.eventListener();
+						'afterCommandExec': ( function (evt) {
+							that.eventListener(evt);
 						} ),
-						'insertHtml': ( function () {
-							that.eventListener();
+						'insertHtml': ( function (evt) {
+							that.eventListener(evt);
 						} ),
-						'insertElement': ( function () {
-							that.eventListener();
-						} ),
-						'focus': ( function () {
-							that.eventListener();
+						'insertElement': ( function (evt) {
+							that.eventListener(evt);
 						} )
 					}
 				};
@@ -446,6 +453,7 @@
 		 * inline editor to have at.
 		 */
 		this.callbackEditorLoaded = function (activeContainerId) {
+console.log('RCIEditor::callbackEditorLoaded');
 			this.setSetting('activeContainerId', activeContainerId);
 	
 			// Hide our AJAXy loading indicator
@@ -498,6 +506,7 @@
 		 */
 		this.loadingVisible = false;
 		this.setLoadingVisibility = function (visible) {
+console.log('RCIEditor::setLoadingVisibility');
 	
 			// If we want to make it visible...
 			if (visible) {
@@ -553,6 +562,7 @@
 		 * able to hide it!
 		 */
 		this.hideHtmlEditor = function () {
+console.log('RCIEditor::hideHtmlEditor');
 			// hide the editor
 			$('#' + basename + 'hider').hide();
 		};
@@ -564,6 +574,7 @@
 		 * now that we hold everything as object properties
 		 */
 		this.getHtmlEditorObject = function () {
+//console.log('RCIEditor::getHtmlEditorObject ENTER');
 	
 			if ((typeof(CKEDITOR) == 'undefined') || !CKEDITOR) {
 				return(false);
@@ -609,6 +620,7 @@
 		 * @return object containing the html editor instance and container, or null if not loaded
 		 */
 		this.saveHtmlEditorContent = function (existinghtmleditorobject) {
+console.log('RCIEditor::saveHtmlEditorContent');
 			var htmleditorobject = existinghtmleditorobject || this.getHtmlEditorObject();
 			if (! htmleditorobject) {
 				return(false);
@@ -637,6 +649,7 @@
 		 * object other than the one we're using internally
 		 */
 		this.refreshHtmlEditorContent = function (existinghtmleditorobject) {
+console.log('RCIEditor::refreshHtmlEditorContent');
 	
 			// Refresh is neither supported nor necessary for inline mode
 			if (editorMode == 'inline') {
@@ -663,6 +676,7 @@
 		 * @return boolean true on success, else false
 		 */
 		this.setHtmlEditorContentPrimary = function (content) {
+console.log('RCIEditor::setHtmlEditorContentPrimary');
 			switch (editorMode) {
 				case 'inline':
 	
@@ -709,6 +723,7 @@
 		 * object other than the one we're using internally
 		 */
 		this.clearHtmlEditorContent = function (existinghtmleditorobject) {
+console.log('RCIEditor::clearHtmlEditorContent');
 			var htmleditorobject = existinghtmleditorobject || this.getHtmlEditorObject();
 			if (!htmleditorobject) {
 				return(false);
@@ -723,6 +738,7 @@
 		 * object other than the one we're using internally
 		 */
 		this.setHtmlEditorContent = function (content, existinghtmleditorobject) {
+console.log('RCIEditor::setHtmlEditorContent');
 			var htmleditorobject = existinghtmleditorobject || this.getHtmlEditorObject();
 			if (!htmleditorobject) {
 				return(false);
@@ -754,6 +770,7 @@
 		 * @return string The cleaned up content ready for saving
 		 */
 		this.cleanContent = function (content) {
+console.log('RCIEditor::cleanContent');
 			var tempdiv = $('<div></div>').html(content);
 	
 			// Unstyle any image elements having src="viewimage.php?id=.."
@@ -796,6 +813,7 @@
 		 * @return string The cleaned up HTML
 		 */
 		this.cleanFieldInserts = function (html) {
+console.log('RCIEditor::cleanFieldInserts');
 			var regex = /&lt;(<.*?>)*?&lt;(.+?)&gt;(<.*?>)*?&gt;/g;
 			var matches = html.match(regex);
 	
@@ -834,8 +852,46 @@
 		 * typing.
 		 */
 		this.eventTimer = null;
-		this.eventListener = function () {
-	
+		this.eventListener = function (evt) {
+			// For null-effect events such as certain key/mouse operations, we will
+			// suppress normal event handling just to quiet things down a bit;
+			// otherwise we'll trigger validation after every one of these.
+			if (evt.name == 'key') {
+				switch (evt.data.keyCode) {
+					case 2228240: // SHIFT
+					case 4456466: // ALT
+					case 1114129: // CTRL
+					case 112: // F1
+					case 113: // F2
+					case 114: // F3
+					case 115: // F4
+					case 116: // F5
+					case 117: // F6
+					case 118: // F7
+					case 119: // F8
+					case 120: // F9
+					case 121: // F10
+					case 122: // F11
+					case 123: // F12
+					case 38: // UP ARROW
+					case 39: // RIGHT ARROW
+					case 40: // DOWN ARROW
+					case 37: // LEFT ARROW
+					case 33: // PAGE UP
+					case 34: // PAGE DOWN
+					case 36: // HOME
+					case 35: // END
+					case 45: // INSERT
+					case 0: // APPLICATION CONTROL KEYS
+					case 20: // CAPSLOCK
+					case 144: // NUMLOCK
+					case 91: // OS/WINDOWS
+					case 27: // ESCAPE
+						return;
+				}
+			}
+console.log('RCIEditor::eventListener(', evt, ')');
+
 			// We got a new event so reset the timer
 			window.clearTimeout(this.eventTimer);
 	
@@ -863,6 +919,7 @@
 		 */
 		this.validator_fn = null;
 		this.setValidatorFunction = function (validator_fn) {
+console.log('RCIEditor::setValidatorFunction');
 			this.validator_fn = validator_fn;
 		};
 	
@@ -870,6 +927,7 @@
 		 * Disables a validator function that was previously set
 		 */
 		this.resetValidatorFunction = function () {
+console.log('RCIEditor::resetValidatorFunction');
 			this.validator_fn = null;
 		}
 	
@@ -878,6 +936,7 @@
 		 * a validator function is set then it will be invoked, otherwise nada.
 		 */
 		this.validate = function () {
+console.log('RCIEditor::validate');
 			if (typeof this.validator_fn === 'function') {
 				this.validator_fn();
 			}
@@ -892,6 +951,7 @@
 		 * @todo Get rid of this method once all external calls to it are gone
 		 */
 		this.registerHtmlEditorKeyListener = function (listener_fn) {
+console.log('RCIEditor::registerHtmlEditorKeyListener');
 			this.setValidatorFunction(listener_fn);
 		};
 
@@ -901,6 +961,7 @@
 		 * longer documents as needed.
 		 */
 		this.adjustInlineHeight = function (newHeight) {	
+console.log('RCIEditor::adjustInlineHeight');
 
 			// This heith adjustment method is only for the inline mode iframe
 			if (editorMode != 'inline') return;
