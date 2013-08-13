@@ -480,9 +480,7 @@ class Form {
 	}
 
 	function getSubmit() {
-		if (!isset($_POST['submit']) || $_REQUEST['form'] != $this->name)
-			return false;
-		return $_POST['submit'];
+		return(isset($_POST['submit']) && isset($_REQUEST['form']) && ($_REQUEST['form'] == $this->name) ? $_POST['submit'] : false);
 	}
 
 	//sends repsonse to an ajax call that will redirect the browser to a url
