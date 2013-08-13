@@ -245,7 +245,7 @@ class Form {
 			</fieldset>';
 			}
 
-			if ($lasthelpstep != $itemdata['helpstep']) {
+			if (isset($itemdata['helpstep']) && ($lasthelpstep != $itemdata['helpstep'])) {
 				$lasthelpstep = $itemdata['helpstep'];
 				$str .= '<fieldset id="'. $this->name . '_helpsection_'.$lasthelpstep.'">';
 			}
