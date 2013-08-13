@@ -135,10 +135,13 @@ if($isajax === true) {
 				$categories = "Categories: ".implode(", ", $categorynames);
 			else
 				$categories = "";
-			
+
+			$defaultlink = '';
 			if (userOwns("messagegroup", $messagegroup->id)) {
-				$defaultlink = 'editmessagefeed.php?postedit&id=' . $messagegroup->getMessage("post", "feed", "en")->id;
-			} else {
+				$msg = $messagegroup->getMessage("post", "feed", "en");
+				if ($msg) $defaultlink = 'editmessagefeed.php?postedit&id=' . $msg->id;
+			}
+			if (! strlen($defaultlink)) {
 				$defaultlink = 'messagegroupview.php?id=' . $mgid;
 			}
 			$content = '<a href="' . $defaultlink . '" >' . $time .  ($post["description"] != ""?" - " . escapehtml($post["description"]):"") . '</a>';
