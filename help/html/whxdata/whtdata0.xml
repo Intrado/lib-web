@@ -13,6 +13,10 @@
   <item name="Message Templates" url="Tips_for_Effective_Communication/Simple_Message_Templates.htm" />
   <item name="Communication Ideas" url="Tips_for_Effective_Communication/Communication_Ideas.htm" />
 </book>
+<book name="Email Tracking" >
+  <item name="Email Tracking Overview" url="Email_Tracking/Overview.htm" />
+  <item name="Maximizing Results" url="Email_Tracking/Maximizing_Data.htm" />
+</book>
 <book name="Email Stationery" >
   <item name="Email Stationery Overview" url="Stationery/Email_Stationery_Overview.htm" />
   <item name="Creating and Sharing Email Stationery" url="Stationery/Email_Stationery.htm" />
