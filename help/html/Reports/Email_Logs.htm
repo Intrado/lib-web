@@ -110,41 +110,69 @@ else
 <p>This section contains information to help you interpret Email Log reports.</p>
 <p><img src="../EmailLog.jpg" alt="Email Log Report" title="Email Log Report" 
 		 style="border: none;" border="0" /></p>
-<p>&#160;</p>
 <h4>Display Options </h4>
-<div style="
-padding:5px;
-background-repeat:Repeat-X;
-background-color:#DFEFF3;
-margin-left:4px;
-margin-right:4px;
-margin-top:4px;
-margin-bottom:4px;
-float:right;
-width:35%;">
-	<h2>Guide to Report Results</h2>
-	<p>This guide contains possible results which can be found in an Email 
-	 Log report.</p>
+<div style="border: Solid 6px #469eb9; padding: 5px; margin-left: 4px; 
+	 margin-right: 4px; margin-top: 4px; margin-bottom: 4px; width: 35%; 
+	 background-color: #e4eef1; float: right;">
+	<h1>Guide to Report Results</h1>
+	<p>This guide contains the definitions for each possible value you'll 
+	 find in the Delivery Results and Response columns of the Email Log 
+	 report.</p>
+	<h4>Delivery Results</h4>
 	<ul type="disc">
-		<li><p style="line-height: Normal; margin-left: 0px;"><span style="line-height: Normal;"><span 
-		 style="font-weight: bold;"><b>Sent:</b></span> The email was sent to 
-		 the recipient's email address.</span></p></li>
+		<li><p style="line-height: Normal; margin-left: 0px; font-weight: bold;">Blocked: 
+		 <span style="font-weight: normal;">The email address the system 
+		 was trying to contact is on the <a title="Click to view informatio about blocking email addresses." href="../System_Administration/System_Settings/Blocking_Email_Addresses.htm" style="font-weight: bold;" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to view informatio about blocking email addresses.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Blocked 
+		 Email</a> list.</span></p></li>
+		<li><p style="line-height: Normal; margin-left: 0px; font-weight: bold;">Bounced: 
+		 <span style="font-weight: normal;">We were completely unable to 
+		 deliver the email to the recipient's email address due to some 
+		 problem with the recipient's email service provider. This error 
+		 was not due to a problem with the recipient's email address.</span></p></li>
+		<li><p style="line-height: Normal; margin-left: 0px; font-weight: bold;">Delivered: 
+		 <span style="font-weight: normal;">The email was successfully 
+		 delivered.</span></p></li>
+		<li><p style="line-height: Normal; margin-left: 0px; font-weight: bold;">Duplicate: 
+		 <span style="font-weight: normal;">After sending an initial message, 
+		 the system will flag an email address as duplicate if it encounters 
+		 it again in the same notification Broadcast.</span></p></li>
+		<li><p style="line-height: Normal; margin-left: 0px; font-weight: bold;">Invalid 
+		 Address: <span style="font-weight: normal;">We were unable to 
+		 deliver an email to this recipient's email address because it 
+		 is invalid. </span></p></li>
+		<li><p style="line-height: Normal; margin-left: 0px; font-weight: bold;">No 
+		 Email Selected: <span style="font-weight: normal;">The recipient's 
+		 email address was not associated with the Broadcast type. For 
+		 example, if a recipient's email address was associated only with 
+		 emergency Broadcasts and not general notifications, a general 
+		 notification with an email message component and a list including 
+		 &#160;the recipient would result in &#160;&quot;No Email Selected&quot;.</span></p></li>
+		<li><p style="line-height: Normal; margin-left: 0px;"><span style="font-weight: bold;"><b>Soft 
+		 Bounced: </b></span><span>Our attempts to deliver the email to this 
+		 recipient have failed so far, but we're still trying. This can 
+		 happen if the recipient's inbox is full or if there is some temporary 
+		 problem with their email server.</span></p></li>
+		<li><p style="line-height: Normal; margin-left: 0px;"><span style="font-weight: bold;"><b>Sent:</b></span> 
+		 The email was sent to the recipient's email address.</p></li>
 		<li><p style="line-height: Normal; margin-left: 0px;"><span style="font-weight: bold;"><b>Unsent:</b></span> 
 		 The email hasn't been sent to the recipient yet.</p></li>
-		<li><p style="line-height: Normal; margin-left: 0px;"><span style="font-weight: bold;"><b>Duplicate:</b></span> 
-		 After sending an initial message, the system will flag an email 
-		 address as duplicate if it encounters it again in the same notification 
-		 Broadcast.</p></li>
-		<li><p style="line-height: Normal; margin-left: 0px;"><span style="font-weight: bold;"><b>Blocked:</b></span> 
-		 The email address the system was trying to contact is on the <a title="Click to view informatio about blocking email addresses." href="../System_Administration/System_Settings/Blocking_Email_Addresses.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to view informatio about blocking email addresses.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Blocked 
-		 Email</a> list.</p></li>
-		<li><p style="line-height: Normal; margin-left: 0px;"><span style="font-weight: bold;"><b>No 
-		 Email Selected:</b></span> The recipient's email address was not associated 
-		 with the Broadcast type. For example, if a recipient's email address 
-		 was associated only with emergency Broadcasts and not general 
-		 notifications, a general notification with an email message component 
-		 and a list including &#160;the recipient would result in &#160;&quot;No 
-		 Email Selected&quot;.</p></li>
+	</ul>
+	<h4>Response Results</h4>
+	<ul type="disc">
+		<li><p class="MsoListBullet"><span style="font-weight: bold;"><b><b 
+		 style="font-weight: bold; mso-bidi-font-weight: normal;">E</b>mpty 
+		 Value:</b></span> If the Response column is empty, then we did not 
+		 receive any tracking data, but the recipient &#160;may have still 
+		 read your message.</p></li>
+		<li><p class="MsoListBullet"><b style="font-weight: bold; mso-bidi-font-weight: normal;">Glanced/Deleted:</b> 
+		 The email was open for opened and close so quickly that it's unlikely 
+		 the recipient even skimmed the message and may have deleted it.</p></li>
+		<li><p class="MsoListBullet"><b style="font-weight: bold; mso-bidi-font-weight: normal;">Read:</b> 
+		 The recipient has viewed the email for a significant period of 
+		 time.</p></li>
+		<li><p class="MsoListBullet"><b style="font-weight: bold; mso-bidi-font-weight: normal;">Skimmed:</b> 
+		 The email was open for a short period of time, but long enough 
+		 to skim the message.</p></li>
 	</ul>
 </div>
 <p>The topmost part of the Email Log contains field and output options 
@@ -181,9 +209,16 @@ width:35%;">
 	<li class="p"><p style="line-height: Normal;"><span style="font-weight: bold;"><b>Last 
 	 Attempt:</b></span> <span>The last time that the system tried to contact 
 	 the recipient.</span></p></li>
-	<li class="p"><p style="line-height: Normal;"><span style="font-weight: bold;"><b>Last 
-	 Result:</b></span> Shows the result of the delivery attempt. Results are 
-	 explained in the Guide to Report Results in the blue box on this page.</p></li>
+	<li class="p"><p style="line-height: Normal;"><span style="font-weight: bold;"><b>Delivery 
+	 Results:</b></span> Shows the result of the delivery attempt. Results 
+	 are explained in the Guide to Report Results in the blue box on this 
+	 page.</p></li>
+	<li class="p"><p style="line-height: Normal;"><span style="font-weight: bold;"><b>Response:</b></span> 
+	 This column shows the email tracking results for the recipient. The 
+	 possible values are explained in the Guide to Report Results to the 
+	 right.</p></li>
+	<li class="p"><p style="line-height: Normal;"><span style="font-weight: bold;"><b>School:</b></span> 
+	 The school associated with the recipient.</p></li>
 </ul>
 <p style="line-height: Normal; margin-left: 80px;">&#160;</p>
 <div style="width: 100%; position: relative;" id="footer">
