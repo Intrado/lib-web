@@ -81,7 +81,7 @@ class PreviewModal {
 				switch ($message->subtype) {
 					case "html":
 						$modal->title = _L("%s HTML Email Message" , Language::getName($message->languagecode));
-						$modal->text = "<iframe id=\"email_preview_iframe\" frameborder=\"0\"src=\"messageview.php?messageid={$message->id}" . (isset($_REQUEST["jobtypeid"])?"&jobtypeid={$_REQUEST["jobtypeid"]}":"") . "\"></iframe>";//$email->emailbody;
+						$modal->text = "<iframe id=\"preview_iframe\" frameborder=\"0\" src=\"messageview.php?messageid={$message->id}" . (isset($_REQUEST["jobtypeid"])?"&jobtypeid={$_REQUEST["jobtypeid"]}":"") . "\"></iframe>";//$email->emailbody;
 						break;
 					case "plain":
 						$modal->title = _L("%s Plain Email Message" , Language::getName($message->languagecode));
@@ -441,6 +441,9 @@ class PreviewModal {
 						} else {
 							if (post_parameters && typeof(post_parameters) != 'undefined' && typeof(post_parameters.subtype) != 'undefined' ) {
 								var iframe = $("<iframe/>", {src: "blank.html"});
+console.log('here!');
+								iframe.attr('id', 'preview_iframe');
+								iframe.attr('data-msie-height-hack', '122');
 								body.html(iframe);
 								iframe.load(function(){
 									var iframecontent = iframe.contents().find('body');
@@ -472,17 +475,23 @@ class PreviewModal {
 					//  it, too, returns the height of the interior of the element
 					//  being examined and misses the padding. This code gets the
 					//  padding values that impact the iframe sizing for email
-					//  previews and adjusts the iframe height.
+					//  previews and adjusts the iframe height. Without this hack
+					//  of a fix, the iframe spills out of its container.
 					if ($.browser.msie) {
-						$emailpreviewiframe = $('#email_preview_iframe');
-						if ($emailpreviewiframe.length) {
+						var $previewiframe = $('#preview_iframe');
+						if ($previewiframe.length) {
 							setTimeout(function () {
-								$modalbody = $('div.modal-body');
-								header_vertical_padding = parseInt($('div.modal-header').css('padding')) * 2;
-								body_vertical_padding = parseInt($modalbody.css('padding')) * 2;
-								var container_height = $modalbody.height() - (header_vertical_padding + body_vertical_padding);
-								$emailpreviewiframe.height(container_height);
-							}, 50);
+								var $modalbody = $('div.modal-body');
+								var header_vertical_padding = parseInt($('div.modal-header').css('padding')) * 2;
+								var body_vertical_padding = parseInt($modalbody.css('padding')) * 2;
+								var container_height = $modalbody.height();
+								var hack_height = 0;
+								if ($previewiframe.attr('data-msie-height-hack')) {
+									hack_height = parseInt($previewiframe.attr('data-msie-height-hack'));
+								}
+								var iframe_height = container_height - (header_vertical_padding + body_vertical_padding + hack_height);
+								$previewiframe.height(iframe_height);
+							}, 500);
 						}
 					}
 				}
@@ -493,8 +502,5 @@ class PreviewModal {
 		<?
 	}
 }
-
-
-
 
 ?>
