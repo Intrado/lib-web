@@ -81,7 +81,7 @@ class PreviewModal {
 				switch ($message->subtype) {
 					case "html":
 						$modal->title = _L("%s HTML Email Message" , Language::getName($message->languagecode));
-						$modal->text = "<iframe src=\"messageview.php?messageid={$message->id}" . (isset($_REQUEST["jobtypeid"])?"&jobtypeid={$_REQUEST["jobtypeid"]}":"") . "\"></iframe>";//$email->emailbody;
+						$modal->text = "<iframe id=\"email_preview_iframe\" frameborder=\"0\"src=\"messageview.php?messageid={$message->id}" . (isset($_REQUEST["jobtypeid"])?"&jobtypeid={$_REQUEST["jobtypeid"]}":"") . "\"></iframe>";//$email->emailbody;
 						break;
 					case "plain":
 						$modal->title = _L("%s Plain Email Message" , Language::getName($message->languagecode));
@@ -465,6 +465,26 @@ class PreviewModal {
 				},
 				'onComplete': function() {
 					centerModal(modal);
+
+					//  IE8 incorrectly sizes the height of the iframe apparently
+					//  because it is unable to factor CSS-provided padding into
+					//  height calculations properly. This also impacts jQuery is
+					//  it, too, returns the height of the interior of the element
+					//  being examined and misses the padding. This code gets the
+					//  padding values that impact the iframe sizing for email
+					//  previews and adjusts the iframe height.
+					if ($.browser.msie) {
+						$emailpreviewiframe = $('#email_preview_iframe');
+						if ($emailpreviewiframe.length) {
+							setTimeout(function () {
+								$modalbody = $('div.modal-body');
+								header_vertical_padding = parseInt($('div.modal-header').css('padding')) * 2;
+								body_vertical_padding = parseInt($modalbody.css('padding')) * 2;
+								var container_height = $modalbody.height() - (header_vertical_padding + body_vertical_padding);
+								$emailpreviewiframe.height(container_height);
+							}, 50);
+						}
+					}
 				}
 			});
 			
