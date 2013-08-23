@@ -404,38 +404,23 @@ $formdata["tinydomain"] = array(
 						"helpstep" => $helpstepnum
 );
 
-$automessageexpire = array(
-	"0" => "Disabled",
-	"6" => "6 Months",
-	"12" => "12 Months",
-	"18" => "18 Months");
-
 $formdata["softdeletemonths"] = array(
-						"label" => _L('Auto Message Expire (soft delete)'),
+						"label" => _L('Auto Message Expire Months (soft delete)'),
 						"value" => $settings['softdeletemonths'],
 						"validators" => array(
-							array("ValInArray", "values" => array_keys($automessageexpire))
+							array('ValNumber', 'min' => 0, 'max' => 30000)
 						),
-						"control" => array("SelectMenu", "values" => $automessageexpire),
+						"control" => array("TextField","size" => 6, "maxlength" => 6),
 						"helpstep" => $helpstepnum
 );
 
-$autoreportexpire = array(
-	"0" => "Disabled",
-	"6" => "6 Months",
-	"12" => "12 Months",
-	"18" => "18 Months",
-	"24" => "24 Months",
-	"36" => "36 Months",
-	"48" => "48 Months");
-
 $formdata["harddeletemonths"] = array(
-						"label" => _L('Auto Report Expire (HARD delete)'),
+						"label" => _L('Auto Report Expire Months (HARD delete)'),
 						"value" => $settings['harddeletemonths'],
 						"validators" => array(
-							array("ValInArray", "values" => array_keys($autoreportexpire))
+							array('ValNumber', 'min' => 0, 'max' => 30000)
 						),
-						"control" => array("SelectMenu", "values" => $autoreportexpire),
+						"control" => array("TextField","size" => 6, "maxlength" => 6),
 						"helpstep" => $helpstepnum
 );
 
@@ -668,7 +653,7 @@ $formdata["timeslice"] = array(
 						"value" => $settings['_timeslice'],
 						"validators" => array(
 							array("ValRequired"),
-							array('ValNumber', "min" => 60, "max" => 1800)
+							array('ValNumber', "min" => 60, "max" => 18000)
 						),
 						"control" => array("TextField","size"=>4),
 						"helpstep" => $helpstepnum
