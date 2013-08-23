@@ -767,9 +767,11 @@ $formdata = array_merge($formdata, array(
 		"label" => "Name",
 		"value" => "",
 		"validators" => array(
+			array("ValConditionallyRequired", "field" => "optionsavemessage"),
 			array("ValDuplicateNameCheck", "type" => "messagegroup"),
 			array("ValLength","max" => 30)
 		),
+		"requires" => array("optionsavemessage"),
 		"control" => array("TextField"),
 		"helpstep" => 1
 	),
