@@ -878,7 +878,7 @@
 			// The new "autogrow" plugin triggers afterExec events
 			// that we don't need to respond to since they don't
 			// result in any change to the content
-			if (evt.data.name == 'autogrow') return;
+			if ((evt.name == 'afterExec') && (evt.data.name == 'autogrow')) return;
 	
 			// We got a new event so reset the timer
 			window.clearTimeout(this.eventTimer);
