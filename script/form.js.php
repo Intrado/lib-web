@@ -300,7 +300,7 @@ function form_make_validators(form, formvars) {
 			if (e.type == "checkbox") {
 				e.observe("change",form_event_handler);
 				e.observe("click",form_event_handler);
-			} else if (e.type.startsWith("select")) {
+			} else if (e.type && e.type.startsWith("select")) {
 				e.observe("change",form_event_handler);
 			}
 
