@@ -369,14 +369,6 @@ $formdata = array(
 	//=========================================================================================
 	"LIST DATA",
 	//=========================================================================================
-	"addme" => array(
-		"label" => "Add Myself",
-		"value" => "",
-		"validators" => array(// None, just toggles logic for addme fields
-		),
-		"control" => array("CheckBox"),
-		"helpstep" => 1
-	),
 	"addmephone" => array(
 		"label" => "Phone",
 		"value" => "",
@@ -1099,14 +1091,17 @@ class MessageSenderProcessor {
 		$joblists = json_decode($postdata["listids"]);
 		// If 'addme' is part of the submited listids, we don't need
 		// it here; we'll pick up addme in postdata['addme']
+		$addme = false;
 		foreach ($joblists as $index => $listid) {
-			if ($listid === 'addme')
+			if ($listid === 'addme') {
+				$addme = true;
 				unset($joblists[$index]);
+			}
 		}
 		$joblists = array_values($joblists); // 'reindex' array
 
 		// if there is "addme" data in the list selection, create a person and list with the contact details
-		if (isset($postdata['addme']) && $postdata['addme']) {
+		if ($addme) {
 			$addmelist = new PeopleList(null);
 			$addmelist->userid = $USER->id;
 			$addmelist->name = _L("Me");
