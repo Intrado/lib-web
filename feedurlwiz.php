@@ -481,7 +481,6 @@ function getFeedWidgetJs() {
 	var smwidgetdesc = \"".$vars['desc']."\";
 	var smwidgetaudio = \"".$vars['audio']."\";
 	var smfeedurl = \"".$vars['feedurl']."\";
-document.write('".$vars['iframe']."');
 </script>
 <!-- END - SchoolMessenger Feed Widget -->";
 	
@@ -515,7 +514,8 @@ function getFeedJsVars() {
 	// replace any placeholders in the js with the form values
 	$vars = str_replace('$IFRAMEHEIGHT', $postdata["iframeheight"], $vars);
 	$vars = str_replace('$IFRAMEWIDTH', $postdata["iframewidth"], $vars);
-	$vars = str_replace('$TINYURL', "http://".getSystemSetting("tinydomain","alrt4.me"), $vars);
+	$protocol = (isset($_SERVER['HTTPS']) && (strtolower($_SERVER['HTTPS']) == 'on')) ? 'https' : 'http';
+	$vars = str_replace('$TINYURL', "{$protocol}://" . getSystemSetting("tinydomain","alrt4.me"), $vars);
 	$vars = str_replace('$FONTFAMILY', (($postdata["fontfamily"] == "default")?"":"font-family:".$postdata["fontfamily"].";"), $vars);
 	$vars = str_replace('$TITLECOLOR', "#".$postdata["titlecolor"], $vars);
 	$vars = str_replace('$BORDERSTYLE', $postdata["borderstyle"], $vars);
