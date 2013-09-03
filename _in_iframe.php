@@ -82,8 +82,12 @@
 	pmHandler.attachListener(function(event) {
 		var data = $.secureEvalJSON(event.data);
 
-		if (data.resize != undefined && data.resize)
-			theIframe.attr("width", "98%").attr("height",data.resize + "px");
+		if (data.resize != undefined && data.resize) {
+			var size = data.resize;
+			if (size < 673) // minimum height of the rendered document is 673 px
+				size = 673
+			theIframe.attr("width", "98%").attr("height",size + "px");
+		}
 	});
 	
 </script>
