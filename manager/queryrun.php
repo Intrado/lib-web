@@ -43,7 +43,7 @@ $cid = $_SESSION['runquery']["cid"];
 if (($prodfilter = DBSafe($managerquery->getProductFilter())) !== '') {
 
 	// Set up a conditional join for the customer queries
-	$prodfiltercondition = "inner join customerproduct cp ON (cp.customerid = c.id AND cp.product = '{$prodfilter}')";
+	$prodfiltercondition = "inner join customerproduct cp ON (cp.customerid = c.id AND cp.product = '{$prodfilter}' and cp.enabled)";
 }
 else $prodfiltercondition = '';
 
