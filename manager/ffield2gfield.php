@@ -51,7 +51,7 @@ if(CheckFormSubmit($f,$s))
 			// verify data
 			echo "<pre>Verifying existing data is ok to move\n";
 
-			$query = "select m.name,m.userid,concat(u.login,if(u.deleted,' (deleted)',if(not u.enabled,' (disabled)',''))) from messagepart mp left join message m on (m.id = mp.messageid) left join user u on (m.userid=u.id) where fieldnum='$ffield' and not m.deleted";
+			$query = "select m.name,m.userid,concat(u.login,if(u.deleted,' (deleted)',if(not u.enabled,' (disabled)',''))) from messagepart mp left join message m on (m.id = mp.messageid) left join user u on (m.userid=u.id) where fieldnum='$ffield'";
 			$data = QuickQueryMultiRow($query,false,$custdb);
 			if (count($data) > 0) {
 				echo '<table border=1 cellspacing=0>';
