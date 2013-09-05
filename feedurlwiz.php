@@ -127,7 +127,7 @@ class FeedUrlWiz_feedoptions extends WizStep {
 class FeedUrlWiz_feedurl extends WizStep {
 	function getForm($postdata, $curstep) {
 		// construct feed url from form data on previous step
-		$feedurl = "http://".getSystemSetting("tinydomain", "alrt4.me")."/feed.php?cust=".getSystemSetting("urlcomponent");
+		$feedurl = "//".getSystemSetting("tinydomain", "alrt4.me")."/feed.php?cust=".getSystemSetting("urlcomponent");
 		$feedurl .= "&cat=".implode(",", $this->parent->dataHelper("/feedoptions:feedcategories", false, array()));
 		$feedurl .= "&items=".$this->parent->dataHelper("/feedoptions:itemcount","10");
 		if ($this->parent->dataHelper("/feedoptions:maxage"))
@@ -139,7 +139,7 @@ class FeedUrlWiz_feedurl extends WizStep {
 			"helptext" => array(
 				"label" => _L('URL'),
 				"control" => array("FormHtml", "html" => _L('<p class="feed_url">This URL should be used to subscribe to your new RSS feed. Copy the URL and distribute it to your potential subscribers. </p><p class="feed_url">If this is all you need, feel free to click Cancel now. If you would like to generate an RSS feed widget for your web page, click Next to continue.</p>
-					<input type="text" readonly value="'.escapehtml($feedurl).'" style="background-color:#ffffff;cursor:text;width:99%;"/>
+					<input type="text" readonly value="http:'.escapehtml($feedurl).'" style="background-color:#ffffff;cursor:text;width:99%;"/>
 					')),
 				"helpstep" => 1
 			),
@@ -427,7 +427,7 @@ class FinishFeedUrlWiz extends WizFinish {
 		<ul style="color:#3e693f;">
 			<li style="padding-bottom:8px;list-style-type:none;">
 				<div style="font-size:14px;color:black;">'._L("<p><b>Feed URL</b></p><p>The URL should be used to subscribe to the RSS feed using an RSS reader application. It should be distributed to potential subscribers.</p>").'</div>
-				<input type="text" readonly value="'.escapehtml($this->parent->dataHelper("/feedurl:feedurl")).'" style="background-color:#ffffff;cursor:text;width:99%;"/>
+				<input type="text" readonly value="http:'.escapehtml($this->parent->dataHelper("/feedurl:feedurl")).'" style="background-color:#ffffff;cursor:text;width:99%;"/>
 			</li>
 			<li style="padding-bottom:8px;list-style-type:none;">
 				<div style="font-size:14px;color:black;">'._L("<p><b>Widget</b></p><p>The generated widget is a javascript snippet which can be pasted into your web page. It will automatically display the content of this RSS feed. Simply copy and paste it into your web page at the location where the feed should be displayed.").'</div>
@@ -481,6 +481,7 @@ function getFeedWidgetJs() {
 	var smwidgetdesc = \"".$vars['desc']."\";
 	var smwidgetaudio = \"".$vars['audio']."\";
 	var smfeedurl = \"".$vars['feedurl']."\";
+	document.write('".$vars['iframe']."'); 
 </script>
 <!-- END - SchoolMessenger Feed Widget -->";
 	
@@ -514,8 +515,7 @@ function getFeedJsVars() {
 	// replace any placeholders in the js with the form values
 	$vars = str_replace('$IFRAMEHEIGHT', $postdata["iframeheight"], $vars);
 	$vars = str_replace('$IFRAMEWIDTH', $postdata["iframewidth"], $vars);
-	$protocol = (isset($_SERVER['HTTPS']) && (strtolower($_SERVER['HTTPS']) == 'on')) ? 'https' : 'http';
-	$vars = str_replace('$TINYURL', "{$protocol}://" . getSystemSetting("tinydomain","alrt4.me"), $vars);
+	$vars = str_replace('$TINYURL', "//" . getSystemSetting("tinydomain","alrt4.me"), $vars);
 	$vars = str_replace('$FONTFAMILY', (($postdata["fontfamily"] == "default")?"":"font-family:".$postdata["fontfamily"].";"), $vars);
 	$vars = str_replace('$TITLECOLOR', "#".$postdata["titlecolor"], $vars);
 	$vars = str_replace('$BORDERSTYLE', $postdata["borderstyle"], $vars);
