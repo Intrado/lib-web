@@ -133,6 +133,9 @@ function niftyplayer(name)
  */
 
 function embedPlayer(url,target,parts) {
+	target = $(target);
+	var preview_obj;
+
 	if(hasflash) {
 		var requestfiles = url;
 		if(typeof(parts) != "undefined") {
@@ -148,23 +151,27 @@ function embedPlayer(url,target,parts) {
 				requestfiles = url + '&partnum=1';
 			}
 		} 
-		$(target).update('<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" codebase="<?= isset($_SERVER['HTTPS'])?"https":"http" ?>://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=8,0,0,0" width="165" height="38" id="niftyPlayer1" align="">' +
+		preview_obj = '<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" codebase="//download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=8,0,0,0" width="165" height="38" id="niftyPlayer1" align="">' +
 			'<param name=movie value="media/niftyplayer.swf?file=' + encodeURIComponent(requestfiles)  + '&as=1">' + 
 			'<param name=quality value=high>' + 
 			'<param name=bgcolor value=#FFFFFF>' + 
-			'<embed src="media/niftyplayer.swf?file=' + encodeURIComponent(requestfiles) + '&as=1" quality=high bgcolor=#FFFFFF width="165" height="38" name="niftyPlayer1" align="" type="application/x-shockwave-flash" pluginspage="<?= isset($_SERVER['HTTPS'])?"https":"http" ?>://get.adobe.com/flashplayer">' +
+			'<embed src="media/niftyplayer.swf?file=' + encodeURIComponent(requestfiles) + '&as=1" quality=high bgcolor=#FFFFFF width="165" height="38" name="niftyPlayer1" align="" type="application/x-shockwave-flash" pluginspage="//get.adobe.com/flashplayer">' +
 			'</embed>' + 
-			'</object>');
+			'</object>';
 	} else {
 <?
 		$safari = strpos($_SERVER['HTTP_USER_AGENT'],"Safari");
 		if($safari) {
 ?>
-			$(target).update('<audio src="' + url +'" controls="controls" autoplay="autoplay"></audio>');
+			preview_obj = '<audio src="' + url +'" controls="controls" autoplay="autoplay"></audio>';
 <?		} else { ?>
-			$(target).update('<object classid="clsid:22D6F312-B0F6-11D0-94AB-0080C74C7E95" width="165" height="45"><param name="type" value="audio/mpeg" /><param name="src" value="'+ url +'" /><param name="autostart" value="true" /><object type="audio/mpeg" data="'+ url +'" width="165" height="45" autoplay="true"></object></object>');
+			preview_obj = '<object classid="clsid:22D6F312-B0F6-11D0-94AB-0080C74C7E95" width="165" height="45"><param name="type" value="audio/mpeg" /><param name="src" value="'+ url +'" /><param name="autostart" value="true" /><object type="audio/mpeg" data="'+ url +'" width="165" height="45" autoplay="true"></object></object>';
 <?		} ?>
 	}
+	if (target.update)
+		target.update(preview_obj);
+	else
+		target.html(preview_obj);
 }
 
 
