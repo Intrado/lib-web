@@ -7,6 +7,7 @@ require_once("obj/MessagePart.obj.php");
 require_once("obj/Language.obj.php");
 require_once("obj/FieldMap.obj.php");
 require_once("obj/Voice.obj.php");
+require_once("obj/Job.obj.php");
 require_once("obj/JobType.obj.php");
 
 
@@ -14,13 +15,13 @@ require_once("inc/appserver.inc.php");
 
 function displayMessage() {
 	if (!isset($_GET['messageid']) || !userCanSee("message", $_GET['messageid'])) {
-		error_log("Id is not set for message view");
+		echo "Sorry, this content does not appear to be available or you are not authorized to view it's content";
 		return;
 	}
 	
 	$message = DBFind("Message", "from message where id = ?", false, array($_GET['messageid']));
 	if (!$message) {
-		error_log("message is not set for message view" . json_encode($message));
+		echo "Sorry, this content does not appear to be available or you are not authorized to view it's content";
 		return;
 	}
 	
