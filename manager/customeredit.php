@@ -385,7 +385,7 @@ $formdata["emaildomain"] = array(
 						"label" => _L('Email Domain'),
 						"value" => $settings['emaildomain'],
 						"validators" => array(
-							array("ValLength","max" => 255),
+							array("ValLength","max" => 2048),
 							array("ValDomainList")
 						),
 						"control" => array("TextField","maxlength"=>255,"min"=>3,"size"=>35),
