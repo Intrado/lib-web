@@ -15,13 +15,13 @@ require_once("inc/appserver.inc.php");
 
 function displayMessage() {
 	if (!isset($_GET['messageid']) || !userCanSee("message", $_GET['messageid'])) {
-		echo "Sorry, this content does not appear to be available or you are not authorized to view it's content";
+		echo _L("Sorry, this content does not appear to be available or you are not authorized to view it's content");
 		return;
 	}
 	
 	$message = DBFind("Message", "from message where id = ?", false, array($_GET['messageid']));
 	if (!$message) {
-		echo "Sorry, this content does not appear to be available or you are not authorized to view it's content";
+		echo _L("Sorry, this content does not appear to be available or you are not authorized to view it's content");
 		return;
 	}
 	
