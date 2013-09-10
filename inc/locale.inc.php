@@ -2,8 +2,10 @@
 
 // Supported locales
 
-$LOCALES = array("en_US" => "English",
-				"es_US" => "Español");
+$LOCALES = array(
+	"en_US" => "English",
+	"es_US" => "Espa\xC3\xB1ol" // Espanol, UTF-8 "n" with tilde accent
+);
 
 if (isset($_SESSION['_locale']))
 	$LOCALE = $_SESSION['_locale'];
