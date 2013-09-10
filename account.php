@@ -575,7 +575,7 @@ include_once("nav.inc.php");
 
 if($USER->authorize('loginphone')) {
 	$tollfree = Phone::format(getSystemSetting("inboundnumber"));
-	echo '<br>Your toll free number is: <b>' . $tollfree . '</b><br><br>';
+	echo '<br>Remote phone access #: <b>' . $tollfree . '</b><br><br>';
 }
 
 startWindow(_L("User Information"));
