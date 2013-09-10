@@ -1,4 +1,5 @@
-<? 
+<?
+require_once("obj/Phone.obj.php");
 
 if (isset($_GET['iframe'])) {
 	include_once("iframebottom.inc.php");
@@ -22,7 +23,11 @@ Use of this system is subject to the <a href="privacy.html" target="_blank">Priv
 
 </div>
 <?
-print "<div id='logininfo' class='noprint' >Logged in as ".escapehtml($USER->firstname)." ".escapehtml($USER->lastname)." (".escapehtml($USER->login).")<br>Current system time is " . date("F jS, Y h:i a (e)") . "</div>";
+print "<div id='logininfo' class='noprint' >Logged in as ".escapehtml($USER->firstname)." ".escapehtml($USER->lastname)." (".escapehtml($USER->login).")";
+$inboundnumber = getSystemSetting("inboundnumber");
+if ($inboundnumber)
+	echo "<br>Remote phone access #: <b>" . Phone::format($inboundnumber) . "</b>";
+echo "<br>Current system time is " . date("F jS, Y h:i a (e)") . "</div>";
 ?>
 
 </div>
