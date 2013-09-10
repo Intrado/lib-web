@@ -194,6 +194,10 @@ function get_authorized_advanced() {
 		$menu[] = array('Manager&nbsp;Users', 'users.php', NULL, ($SUBTAB == 'users'), "users");
 	}
 
+	if ($MANAGERUSER->authorized("emailblock")) {
+		$menu[] = array('Email&nbsp;Block', 'emailblock.php', NULL, ($SUBTAB == 'emailblock'), "emailblock");
+	}
+
 	if ($MANAGERUSER->authorized("smsblock")) {
 		$menu[] = array('SMS&nbsp;Block', 'smsblock.php', NULL, ($SUBTAB == 'smsblock'), "smsblock");
 	}

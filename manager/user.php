@@ -111,6 +111,7 @@ $basicroles = array(
 	"imports" => "View Imports",
 	"editimportalerts" => "Edit import alerts",
 	"lockedusers" => "Manage locked users",
+	"emailblock" => "Add emails to block list(s) (System wide search)",
 	"smsblock" => "Manage SMS blocked numbers",
 	"activejobs" => "View active jobs",
 	"editdm" => "Edit SmartCall Appliances",
