@@ -118,19 +118,6 @@ function doNavTabs ($navtree) {
 	}
 }
 
-function doShortcuts ($shortcuts) {
-	global $USER;
-	if ($USER->authorize("startshort")) {
-		foreach ($shortcuts as $name => $value) {
-			if (strpos($name,"<b>") === 0) {
-				?><div class="shortcuttitle"><?= $name ?></div><?
-			} else {
-				?><a href="<?= escapehtml($value) ?>"><?= $name ?></a><?
-			}
-		}
-	}
-}
-
 function doCrumb ($firstactivetablink, $activemaintabtitle, $title) {
 	$crumb = array ("Start" => "start.php");
 	if ($firstactivetablink)
