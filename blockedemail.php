@@ -184,15 +184,11 @@ if ($button = $form->getSubmit()) {
 
 //BLOCKED EMAILS LISTING
 
-$titles = array(
+$baseTitles = array(
 			"4" => 'Email Address',
 			"5" => 'Reason for Blocking',
 			"6" => 'Blocked by',
 			"11" => 'Blocked on'); // date sort does not work with paging
-
-if ($ACCESS->getValue('callblockingperms') == 'editall' || $ACCESS->getValue('callblockingperms') == 'addonly') {
-	$titles = $titles + array("7" => 'Actions');
-}
 
 $formatters = array(
 			"4" => 'fmt_email',
@@ -237,34 +233,45 @@ if (count($ordering) > 0) {
 
 
 if ($settings["displaycontact"]) {
-	$personfields = array(
-		"1" => _L("ID #"),
-		"2" => _L("First Name"),
-		"3" => _L("Last Name"));
-	$titles = $personfields + $titles; // prepend the person fields, keeping the indecies in place
+	$titles =
+		array(
+			"1" => _L("ID #"),
+			"2" => _L("First Name"),
+			"3" => _L("Last Name")) +
+		$baseTitles +
+		array(
+			"14" => getSystemSetting("organizationfieldname","Organization"));
 	
 	// must have pid index 0, pkey index 1, for fmt_persontip to work
 	$dataquery = "select SQL_CALC_FOUND_ROWS p.id, p.pkey, p.f01, p.f02,
 			b.destination, b.description, CONCAT(u.firstname, ' ', u.lastname) as fullname, b.id, b.userid, '" .
-			$ACCESS->getValue('callblockingperms') . "' as permission, b.type, b.createdate, b.failattempts, b.blockmethod 
+			$ACCESS->getValue('callblockingperms') . "' as permission, b.type, b.createdate, b.failattempts, b.blockmethod, group_concat(o.orgkey separator '|')
 		from blockeddestination b
 		left join user u on (u.id = b.userid)
 		left join email e on (e.email = b.destination)
 		left join person p on (p.id = e.personid)
+		left join personassociation pa on (pa.personid = p.id and pa.type = 'organization')
+		left join organization o on (o.id = pa.organizationid)
 		where b.type = 'email'
 		and b.blockmethod in ('autoblock', 'manual')
 		$extrasql
+		group by p.id
 		$ordersql";
 } else {
+	$titles = $baseTitles;
+	
 	// must stub in dummy contact details for pid and pkey index order, if we do the same query with person details we get duplicate rows when multiple people share a phone
 	$dataquery = "select SQL_CALC_FOUND_ROWS 'pid', 'pkey', 'f01', 'f02', b.destination, b.description, CONCAT(u.firstname, ' ', u.lastname) as fullname, b.id, b.userid, '" .
-			$ACCESS->getValue('callblockingperms') . "' as permission, b.type, b.createdate, b.failattempts, b.blockmethod
+			$ACCESS->getValue('callblockingperms') . "' as permission, b.type, b.createdate, b.failattempts, b.blockmethod, 'orgkey'
 			from blockeddestination b
 			left join user u on (b.userid = u.id)
 			where b.type = 'email'
 			and b.blockmethod in ('autoblock', 'manual')
 			$extrasql
 			$ordersql";
+}
+if ($ACCESS->getValue('callblockingperms') == 'editall' || $ACCESS->getValue('callblockingperms') == 'addonly') {
+	$titles = $titles + array("7" => 'Actions');
 }
 //$settings["searchtext"]
 
@@ -299,21 +306,6 @@ function fmt_blockedby($row, $index) {
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 if ($settings["downloadcsv"]) {
-	
-	$titles = array(
-			"4" => 'Email Address',
-			"5" => 'Reason for Blocking',
-			"6" => 'Blocked by',
-			"11" => 'Blocked on');
-
-	if ($settings["displaycontact"]) {
-		$personfields = array(
-			"1" => _L("ID #"),
-			"2" => _L("First Name"),
-			"3" => _L("Last Name"));
-		$titles = $personfields + $titles; // prepend the person fields, keeping the indecies in place
-	}
-	
 	header("Pragma: private");
 	header("Cache-Control: private");
 	header("Content-disposition: attachment; filename=blockedemail.csv");
@@ -342,7 +334,7 @@ if ($settings["downloadcsv"]) {
 				$row[6] = "Recipient";
 		
 			if ($settings["displaycontact"])
-				$displaydata = array($row[1], $row[2], $row[3], $row[4], $row[5], $row[6], $row[11]);
+				$displaydata = array($row[1], $row[2], $row[3], $row[4], $row[5], $row[6], $row[11], $row[14]);
 			else
 				$displaydata = array($row[4], $row[5], $row[6], $row[11]);
 		
