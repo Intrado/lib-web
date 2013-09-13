@@ -300,7 +300,7 @@ function form_make_validators(form, formvars) {
 			if (e.type == "checkbox") {
 				e.observe("change",form_event_handler);
 				e.observe("click",form_event_handler);
-			} else if (e.type.startsWith("select")) {
+			} else if (e.type && e.type.startsWith("select")) {
 				e.observe("change",form_event_handler);
 			}
 
@@ -615,6 +615,9 @@ function form_handle_submit(form,event) {
 			} else if ("fail" == res.status) {
 				//show the validation results
 				if (res.validationerrors) {
+					form.fire("Form:ValidationErrors", res.validationerrors);
+					// Trigger jquery since jquery and prototype events aren't the same
+					jQuery('#' + form.id).trigger("Form:ValidationErrors", [res.validationerrors]);
 					res.validationerrors.each(function(res) {
 						try {
 						var targetname = form.name+"_"+res.name;

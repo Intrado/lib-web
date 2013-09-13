@@ -152,23 +152,7 @@ _L('Login Options'),
 		"helpstep" => 2
 	),
 
-_L('Start Page & Nav Options'),
-	"startstats" => array(
-		"label" => _L('View %s Statistics', getJobTitle()),
-		"fieldhelp" => _L('Shows current %s statistics on the start page.', getJobTitle()),
-		"value" => $obj->getValue("startstats"),
-		"validators" => array(),
-		"control" => array("CheckBox"),
-		"helpstep" => 3
-	),
-	"startshort" => array(
-		"label" => _L('View Shortcuts'),
-		"fieldhelp" => _L('Displays the shortcut menu for commonly used features.'),
-		"value" => $obj->getValue("startshort"),
-		"validators" => array(),
-		"control" => array("CheckBox"),
-		"helpstep" => 3
-	),
+_L('Messaging Options'),
 	"starteasy" => array(
 		"label" => _L('Outbound Recording'),
 		"fieldhelp" => _L('Allows users to call any phone number and record audio messages.'),
@@ -177,8 +161,6 @@ _L('Start Page & Nav Options'),
 		"control" => array("CheckBox"),
 		"helpstep" => 3
 	),
-
-_L('Messaging Options'),
 	"sendphone" => array(
 		"label" => _L('Send Phone Calls'),
 		"fieldhelp" => _L('Allows users to send %s with phone messages and manage related messages.', getJobsTitle()),
@@ -831,8 +813,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			
 			$obj->setPermission("loginweb", (bool)$postdata['loginweb']);
 			$obj->setPermission("loginphone", (bool)$postdata['loginphone']);
-			$obj->setPermission("startstats", (bool)$postdata['startstats']);
-			$obj->setPermission("startshort", (bool)$postdata['startshort']);
 			$obj->setPermission("starteasy", (bool)$postdata['starteasy']);
 			$obj->setPermission("sendphone",(bool)$postdata['sendphone']);
 			$obj->setPermission("callearly", $postdata['callearly']);

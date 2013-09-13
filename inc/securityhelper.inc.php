@@ -74,56 +74,78 @@ function userCanSee ($type,$id) {
 		case "messagegroup":
 			if (!isset($messagegroupid))
 				$messagegroupid = $id;
+			
 			// viewable if:
+			// this is a valid messagegroup id
+			$mg = DBFind("MessageGroup", "from messagegroup where id = ?", false, array($messagegroupid));
+			if (!$mg)
+				return false;
+			
 			// User owns it... obviously they can see it
-			if (userOwns("messagegroup", $messagegroupid))
+			if (userOwns("messagegroup", $mg->id))
 				return true;
+			
 			// User could subscribe to it...
-			if (userCanSubscribe("messagegroup", $messagegroupid))
+			if (userCanSubscribe("messagegroup", $mg->id))
 				return true;
 			
 			// Check targetedmessage link
 			if (getSystemSetting('_hastargetedmessage', false) && 
 				$USER->authorize('manageclassroommessaging') &&
-				QuickQuery("select 1 from targetedmessage where overridemessagegroupid=?",false,array($messagegroupid))) {
+				QuickQuery("select 1 from targetedmessage where overridemessagegroupid=?",false,array($mg->id))) {
 				return true;
 			}
 			
-			// This message group has been used by a job this user owns...
-			$query = "select 1
-				from  messagegroup mg
-				inner join job j on (j.messagegroupid = mg.id)
-				where mg.id = ?
-				and j.userid = ?";
-			if (QuickQuery($query, false, array($messagegroupid, $USER->id))) {
-				return true;
-			}
-			// else check jobs of this user's viewable users
-			$query = "select 1
-				from  messagegroup mg
-				inner join job j on (j.messagegroupid = mg.id)
-				where mg.id = ?
-				and j.userid in (select subordinateuserid from userlink where userid = ?)";
-			return QuickQuery($query, false, array($messagegroupid, $USER->id));
+			$job = DBFind("Job", "from job where messagegroupid = ?", false, array($mg->id));
 		case "job":
-			$job = new Job($id);
-			$monitorids = QuickQueryList("select id from monitor where userid=? and type like 'job-%'",false,false,array($USER->id));
-			$monitorfilters = QuickQueryList("select m.id, mf.val from monitor m inner join monitorfilter mf on (mf.monitorid = m.id) where m.userid=? and m.type like 'job%' and mf.type='userid'",true,false, array($USER->id));
-			foreach($monitorids as $monitorid) {
-				if (isset($monitorfilters[$monitorid])) {
-					if (in_array($job->userid, explode(",",$monitorfilters[$monitorid]))) {
-						return true;
-					}
-				} else {
-					return true;
-				}
-			}
+			if (!isset($job))
+				$job = DBFind("Job", "from job where id = ?", false, array($id));
+			
+			// viewable if:
+			// this is a valid job id
+			if (!$job)
+				return false;
+			
+			// User owns it... they should be able to see it
+			if (userOwns("job", $job->id))
+				return true;
+			
+			// this user is monitoring the owner of this job
+			if (userIsMonitoringUserJobs($job->userid))
+				return true;
+			
 			$hasUserLink = QuickQuery("select 1 from userlink ul where ul.userid = ? and ul.subordinateuserid=?",false,array($USER->id,$job->userid));
 			return $hasUserLink!=null;
 		default:
 			return false;
 	}
 }
+
+/** Is the current user monitoring jobs for the user id passed in?
+ * We assume that if they have a record in the db to monitor this user they are allowed to do so.
+ * 
+ * NOTE: Does not check profile monitor permissions
+ * 
+ * @param $userid the user to check for
+ * @return bool true if there exists monitors for this user's jobs, false otherwise
+ */
+function userIsMonitoringUserJobs($userid) {
+	global $USER;
+	$monitorids = QuickQueryList("select id from monitor where userid=? and type like 'job-%'",false,false,array($USER->id));
+	$monitorfilters = QuickQueryList("select m.id, mf.val from monitor m inner join monitorfilter mf on (mf.monitorid = m.id) where m.userid=? and m.type like 'job%' and mf.type='userid'",true,false, array($USER->id));
+
+	foreach($monitorids as $monitorid) {
+		if (isset($monitorfilters[$monitorid])) {
+			if (in_array($userid, explode(",",$monitorfilters[$monitorid]))) {
+				return true;
+			}
+		} else {
+			return true;
+		}
+	}
+	return false;
+}
+
 function isSubscribed ($type,$id) {
 	global $USER;
 	switch($type) {

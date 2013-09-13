@@ -91,8 +91,9 @@ class Publish extends DBMappedObject {
 		// create the sql that limits results by orgs, or doesn't depending on user associations
 		$orgrestrictionsql = "";
 		if (count($userassociatedorgs) == 0) {
+			// user has no restrictions, so let them see anything they want. CS-4781
 			unset($userassociatedorgs);
-			$orgrestrictionsql = "(p.organizationid is null or p.organizationid = 0)";
+			$orgrestrictionsql = "1";
 		} else if (count($userassociatedorgs) == 1 && $userassociatedorgs[0] === null) {
 			// this user is restricted to sectionid 0 and has no additional associations that provide orgs
 			unset($userassociatedorgs);

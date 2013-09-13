@@ -217,16 +217,12 @@ $formatters = array(
 $start = 0 + (isset($_GET['pagestart']) ? $_GET['pagestart'] : 0);
 $limit = 500;
 
-$titles = array(
+$baseTitles = array(
 	"4" => 'Phone Number',
 	"10" => "Type",
 	"5" => 'Reason for Blocking',
 	"6" => 'Blocked by',
 	"11" => 'Blocked on');
-
-if ($ACCESS->getValue('callblockingperms') == 'editall' || $ACCESS->getValue('callblockingperms') == 'addonly') {
-	$titles = $titles + array("7" => 'Actions');
-}
 
 $extrasql = "";
 $dataqueryargs = array();
@@ -276,47 +272,45 @@ if (count($ordering) > 0) {
 }
 
 if ($settings["displaycontact"]) {
-	$personfields = array(
-		"1" => _L("ID #"),
-		"2" => _L("First Name"),
-		"3" => _L("Last Name"));
-	$titles = $personfields + $titles; // prepend the person fields, keeping the indecies in place
+	$titles =
+		array(
+			"2" => _L("ID #"),
+			"3" => _L("First Name"),
+			"4" => _L("Last Name")) +
+		$baseTitles +
+		array(
+			"12" => getSystemSetting("organizationfieldname","Organization"));
 	
 	// must have pid index 0, pkey index 1, for fmt_persontip to work
-	$dataquery = "(select SQL_CALC_FOUND_ROWS p.id, p.pkey, p.f01, p.f02,
+	$dataquery = "select SQL_CALC_FOUND_ROWS p.id, p.pkey, p.f01, p.f02,
 			b.destination, b.description, CONCAT(u.firstname, ' ', u.lastname) as fullname, b.id, b.userid, '" .
-			$ACCESS->getValue('callblockingperms') . "' as permission, b.type, b.createdate 
-		from blockeddestination b
-		join user u on (u.id = b.userid)
-		left join phone ph on (ph.phone = b.destination)
-		left join person p on (p.id = ph.personid)
-		where b.userid = u.id and b.type = 'phone'
-		$extrasql
-		)
-		union
-		(select p.id, p.pkey, p.f01, p.f02,
-			b.destination, b.description, CONCAT(u.firstname, ' ', u.lastname) as fullname, b.id, b.userid, '" .
-			$ACCESS->getValue('callblockingperms') . "' as permission, b.type, b.createdate 
-		from blockeddestination b
-		join user u on (u.id = b.userid)
-		left join sms s on (s.sms = b.destination)
-		left join person p on (p.id = s.personid)
-		where b.userid = u.id and b.type = 'sms'
-		$extrasql
-		)
-		$ordersql";
+			$ACCESS->getValue('callblockingperms') . "' as permission, b.type, b.createdate, group_concat(o.orgkey separator '|')
+			from blockeddestination b
+			join user u on (u.id = b.userid)
+			left join phone ph on (ph.phone = b.destination)
+			left join person p on (p.id = ph.personid)
+			left join personassociation pa on (pa.personid = p.id and pa.type = 'organization')
+			left join organization o on (o.id = pa.organizationid)
+			where b.userid = u.id and b.type in ('phone', 'sms')
+			$extrasql
+			group by p.id, b.type
+			$ordersql";
 	
 	// duplicate search arguments because the union in this query
 	$dataqueryargs = array_merge($dataqueryargs,$dataqueryargs);
 } else {
+	$titles = $baseTitles;
 	// must stub in dummy contact details for pid and pkey index order, if we do the same query with person details we get duplicate rows when multiple people share a phone
 	$dataquery = "select SQL_CALC_FOUND_ROWS 'pid', 'pkey', 'f01', 'f02', b.destination, b.description, CONCAT(u.firstname, ' ', u.lastname) as fullname, b.id, b.userid, '" .
-			$ACCESS->getValue('callblockingperms') . "' as permission, b.type, b.createdate
+			$ACCESS->getValue('callblockingperms') . "' as permission, b.type, b.createdate, 'okey'
 			from blockeddestination b
 			join user u on (u.id = b.userid) 
 			where b.userid = u.id and b.type in ('phone', 'sms')
 			$extrasql
 			$ordersql";
+}
+if ($ACCESS->getValue('callblockingperms') == 'editall' || $ACCESS->getValue('callblockingperms') == 'addonly') {
+	$titles = $titles + array("7" => 'Actions');
 }
 //////////////////////////////////
 // Functions
@@ -348,22 +342,6 @@ function fmt_bntype ($row, $index) {
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 if ($settings["downloadcsv"]) {
-
-	$titles = array(
-		"4" => 'Phone Number',
-		"10" => 'Type',
-		"5" => 'Reason for Blocking',
-		"6" => 'Blocked by',
-		"11" => 'Blocked on');
-	
-	if ($settings["displaycontact"]) {
-		$personfields = array(
-			"1" => _L("ID #"),
-			"2" => _L("First Name"),
-			"3" => _L("Last Name"));
-		$titles = $personfields + $titles; // prepend the person fields, keeping the indecies in place
-	}
-	
 	header("Pragma: private");
 	header("Cache-Control: private");
 	header("Content-disposition: attachment; filename=blockedphone.csv");
@@ -396,7 +374,7 @@ if ($settings["downloadcsv"]) {
 			}
 		
 			if ($settings["displaycontact"])
-				$displaydata = array($row[1], $row[2], $row[3], $row[4], $row[10], $row[5], $row[6], $row[11]);
+				$displaydata = array($row[1], $row[2], $row[3], $row[4], $row[10], $row[5], $row[6], $row[11], $row[12]);
 					else
 				$displaydata = array($row[4], $row[10], $row[5], $row[6], $row[11]);
 		
