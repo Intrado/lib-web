@@ -8,6 +8,7 @@ require_once("obj/Language.obj.php");
 require_once("obj/FieldMap.obj.php");
 require_once("obj/Voice.obj.php");
 require_once("layouts/layouts.inc.php");
+require_once("obj/Job.obj.php");
 
 $isPreview = isset($_GET["preview"]);
 
