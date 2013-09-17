@@ -100,7 +100,7 @@ startWindow(_L('%s Settings',getJobTitle()));
 if (isset($_GET['iframe'])) {
 ?>
 	<br>
-	Click <a href="index.php" target="_blank">here</a> to manage jobs in SchoolMessenger</a>
+	Click <a href="index.php" target="_blank">here</a> to manage <?=getJobsTitle()?> in SchoolMessenger</a>
 <?
 } else {
 	if (isset($_SERVER['HTTP_REFERER'])) {
