@@ -388,7 +388,7 @@ $formdata["emaildomain"] = array(
 							array("ValLength","max" => 2048),
 							array("ValDomainList")
 						),
-						"control" => array("TextField","maxlength"=>255,"min"=>3,"size"=>35),
+						"control" => array("TextField","maxlength"=>2048,"min"=>3,"size"=>35),
 						"helpstep" => $helpstepnum
 );
 
