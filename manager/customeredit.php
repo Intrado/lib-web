@@ -385,10 +385,10 @@ $formdata["emaildomain"] = array(
 						"label" => _L('Email Domain'),
 						"value" => $settings['emaildomain'],
 						"validators" => array(
-							array("ValLength","max" => 2048),
+							array("ValLength","max" => 65535),
 							array("ValDomainList")
 						),
-						"control" => array("TextField","maxlength"=>2048,"min"=>3,"size"=>35),
+						"control" => array("TextField","maxlength"=>65535,"min"=>3,"size"=>35),
 						"helpstep" => $helpstepnum
 );
 
