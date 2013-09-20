@@ -11,6 +11,7 @@ require_once("obj/AudioFile.obj.php");
 require_once("obj/Voice.obj.php");
 require_once("obj/FieldMap.obj.php");
 require_once("obj/MessageGroup.obj.php");
+require_once("obj/Job.obj.php");
 
 if(isset($_GET['id'])) {
 	//session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point

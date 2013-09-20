@@ -274,9 +274,9 @@ if (count($ordering) > 0) {
 if ($settings["displaycontact"]) {
 	$titles =
 		array(
-			"2" => _L("ID #"),
-			"3" => _L("First Name"),
-			"4" => _L("Last Name")) +
+			"1" => _L("ID #"),
+			"2" => _L("First Name"),
+			"3" => _L("Last Name")) +
 		$baseTitles +
 		array(
 			"12" => getSystemSetting("organizationfieldname","Organization"));
@@ -295,9 +295,6 @@ if ($settings["displaycontact"]) {
 			$extrasql
 			group by p.id, b.type
 			$ordersql";
-	
-	// duplicate search arguments because the union in this query
-	$dataqueryargs = array_merge($dataqueryargs,$dataqueryargs);
 } else {
 	$titles = $baseTitles;
 	// must stub in dummy contact details for pid and pkey index order, if we do the same query with person details we get duplicate rows when multiple people share a phone
@@ -350,6 +347,7 @@ if ($settings["downloadcsv"]) {
 	session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 	
 	// write column titles
+	unset($titles['7']);
 	echo '"' . implode('","', $titles) . '"';
 	echo "\r\n";
 

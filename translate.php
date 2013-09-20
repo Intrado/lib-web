@@ -10,7 +10,9 @@ $translationObj = false;
 // Validate Length of both possible text inputs
 if( (isset($_REQUEST['english']) && mb_strlen($_REQUEST['english']) > 5000) || 
 	(isset($_REQUEST['text']) && mb_strlen($_REQUEST['text']) > 5000) ){
-	error_log("Request is too large to send to Google. Text length: " . mb_strlen($_REQUEST['text']));
+	$engLength = isset($_REQUEST['english'])?mb_strlen($_REQUEST['english']):0;
+	$textLength = isset($_REQUEST['text'])?mb_strlen($_REQUEST['text']):0;
+	error_log("Request is too large to send to Google. Text length: " . max($engLength, $textLength));
 	$responseObj->responseData = "";
 	$responseObj->responseDetails = NULL;
 	$responseObj->responseStatus = 503;

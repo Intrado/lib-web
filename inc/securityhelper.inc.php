@@ -89,6 +89,10 @@ function userCanSee ($type,$id) {
 			if (userCanSubscribe("messagegroup", $mg->id))
 				return true;
 			
+			// User has subscribed to it...
+			if (isSubscribed("messagegroup", $mg->id))
+				return true;
+			
 			// Check targetedmessage link
 			if (getSystemSetting('_hastargetedmessage', false) && 
 				$USER->authorize('manageclassroommessaging') &&

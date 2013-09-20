@@ -25,6 +25,7 @@ require_once("inc/previewfields.inc.php");
 require_once("inc/appserver.inc.php");
 require_once("obj/PreviewModal.obj.php");
 require_once("obj/JobType.obj.php");
+require_once("obj/Job.obj.php");
 
 
 ///////////////////////////////////////////////////////////////////////////////

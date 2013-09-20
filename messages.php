@@ -21,7 +21,7 @@ require_once("inc/feed.inc.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-if (!$USER->authorize(array('sendemail', 'sendphone', 'sendsms'))) {
+if (!$USER->authorize(array('sendemail', 'sendphone', 'sendsms', 'subscribe'))) {
 	redirect('unauthorized.php');
 }
 
@@ -295,7 +295,9 @@ $TITLE = "Message Builder";
 include_once("nav.inc.php");
 
 startWindow(_L('My Messages'), 'padding: 3px;', false, true);
-$feedButtons = array(icon_button(_L('Add New Message'),"add",null,"mgeditor.php?id=new"));
+
+if ($USER->authorize(array('sendemail', 'sendphone', 'sendsms')))
+	$feedButtons = array(icon_button(_L('Add New Message'),"add",null,"mgeditor.php?id=new"));
 if ($USER->authorize('createstationery'))
 	$feedButtons[] = icon_button(_L('Add New Stationery'),"add",null,"mglayoutselector.php");
 if ($USER->authorize('subscribe') && userCanSubscribe('messagegroup'))
