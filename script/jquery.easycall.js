@@ -111,6 +111,7 @@
 	
 				// phone number input field
 				var phoneinput = $('<input />', { "class":"easycallphoneinput span2", "type":"text", 'placeholder':'Number to Call'});
+				var extensioninput = $('<input />', { "class":"easycallextensioninput", "type":"text", 'placeholder':'optional', 'rel':'tooltip', 'title':"Include extension, ex. 555 (optional)", "data-container": "#callme"});
 				if ($this.data('easyCall').defaultphone) {
 					phoneinput.val($this.data('easyCall').defaultphone);
 				}
@@ -151,8 +152,12 @@
 						}).set({time:500, autostart:true});
 					}
 				});
-				var prependSpan = $('<span />', {'class':'add-on'});
+				var prependSpan = $('<span />', {'class':'add-on'});				
 				prependSpan.append($('<span class="sprite-glyphicons-phone"></span>'));
+
+				var extensionSpan = $('<span />', {'class':'add-on extension'});
+				extensionSpan.text('ext.')
+
 				// button to start the calling session
 				var callbutton = $('<button />', { "class":"record btn btn-success", "value":"Call Now to Record"});
 				callbutton.append($('<i />', { "class":"icon-hand-left icon-white" })).append(" &nbsp;Call Now to Record");
@@ -183,7 +188,7 @@
 					method.doCall(code);
 				});
 	
-				container.append(prependSpan).append(phoneinput).append(callbutton);
+				container.append(prependSpan).append(phoneinput).append(extensionSpan).append(extensioninput).append(callbutton);
 	
 				return container;
 			},
@@ -196,9 +201,9 @@
 				var container = $('<div />', { "class":"easycallpreviewcontainer"});
 				var btnGroupContainer = $('<div />', { "class":"btn-group"});
 				var languagetitle = $('<div />', { "class":"easycalllanguagetitle"});
-				languagetitle.append(' &nbsp;').append(language);
-				var previewbutton = $('<button />', { "class":"easycallpreviewbutton btn", "href":"#ctr_play_audio_modal", "data-language":language, "data-language":code, "data-recordingId":recordingId, "data-toggle":"modal", "title":"Play audio of " + language + " language voice recording", "rel":"tooltip" });
-				previewbutton.html('<i class="icon-play"></i> &nbsp;Play Audio');
+				languagetitle.append('<span class="lighten sprite-pictos-phone padR0"></span>  &nbsp; ').append(language);
+				var previewbutton = $('<button />', { "class":"easycallpreviewbutton btn", "href":"#ctr_play_audio_modal", "data-language":language, "data-language":code, "data-recordingId":recordingId, "data-toggle":"modal", "title":"Play audio of " + language + " language voice recording", "rel":"tooltip", "data-container": "#callme" });
+				previewbutton.html('<span class="sprite-pictos-play padR0"><i></i></span>');
 				var removebutton = $('<button />', { "class":"easycallrerecordbutton btn" });
 	
 				previewbutton.on('click', function () {
@@ -207,9 +212,9 @@
 	
 	
 				if (code == $this.data('easyCall').defaultcode)
-					removebutton.attr({"title":"Re-record " + language + " language voice recording", "rel":"tooltip"}).append($('<i />', {"class":"icon-repeat"})).append(' &nbsp;').append($('<span />', { "text":"Re-record" }));
+					removebutton.attr({"title":"Re-record " + language + " language voice recording", "rel":"tooltip", "data-container": "#callme"}).append($('<i />', {"class":"icon-repeat"}));
 				else
-					removebutton.attr({"title":"Remove " + language + " language voice recording", "rel":"tooltip"}).append($('<i />', {"class":"icon-trash"})).append(' &nbsp;').append($('<span />', { "text":"Remove" }));
+					removebutton.attr({"title":"Remove " + language + " language voice recording", "rel":"tooltip", "data-container": "#callme"}).append($('<span />', {"class":"sprite-glyphicons-remove_2 pad0"}));
 	
 				removebutton.click(function (e) {
 					e.preventDefault();
@@ -232,12 +237,15 @@
 			createProgressContainer:function (code) {
 				var $this = $(this);
 	
+				var progressBarWrapper = $('<div />', { "class":"progress progress-success progress-striped active"});
+				var progressBar = $('<div />', {"class": "bar"}).attr("data-loading-percent","100");
 				var container = $('<div />', { "class":"easycallprogresscontainer"});
-				var languagetitle = $('<div />', { "class":"easycalllanguagetitle", "text":$this.data('easyCall').languages[code] });
-				var progresstext = $('<div />', { "class":"call-progress" });
-				progresstext.append($('<span />', { "class":"icon" })).append($('<span />', { "class":"easycallprogresstext" }))
-	
-				container.append(languagetitle).append(progresstext).append($('<div style="clear:both"/>'));
+				var languagetitle = $('<div />', { "class":"easycalllanguagetitle"});
+
+				languagetitle.append('<span class="sprite-pictos-phone padR0"></span>  &nbsp; ').append($this.data('easyCall').languages[code])
+				progressBar.append($('<span />', { "class":"easycallprogresstext" }));	
+				progressBarWrapper.append(progressBar);	
+				container.append(languagetitle).append(progressBarWrapper);
 	
 				return container;
 			},
@@ -246,12 +254,14 @@
 			createErrorContainer:function (code, errortext) {
 				var $this = $(this);
 	
-				var container = $('<div />', { "class":"easycallerrorcontainer alert alert-error span6"});
+				var container = $('<div />', { "class":"easycallerrorcontainer alert alert-error"});
 				var languagetitle = $('<div />', { "class":"easycalllanguagetitle", "text":$this.data('easyCall').languages[code] });
-				var resetbutton = $('<button />', { "class":"easycallerrorbutton" });
+				var resetbutton = $('<button />', { "class":"easycallerrorbutton btn btn-danger pull-right" });
 				resetbutton.append("Retry");
 				container.append(languagetitle)
-					.append($('<span />', { "class":"" }).append(errortext))
+					.append($('<span />', { "class":"error-msg" })
+					.append('<span class="label label-important"><i class="icon-exclamation-sign icon-white"></i></span> &nbsp;<strong>Error: &nbsp;</strong>')
+					.append(errortext))
 					.append(resetbutton)
 					.append($('<div style="clear:both"/>'));
 	
@@ -321,7 +331,7 @@
 				if (valid !== true) {
 					if (phone == "")
 						phone = 'Number to Call'; //$this.data('easyCall').emptyphonetext;
-					container.append($('<div />', { "class":"easycallerrorcontainer alert alert-error span6", "html":valid })); //phone + " " + valid }));
+					container.append($('<div />', { "class":"easycallerrorcontainer alert alert-error", "html":valid })); //phone + " " + valid }));
 					return false;
 				}
 				return true;
@@ -342,6 +352,9 @@
 	
 				// get the phone number
 				var phone = $this.data('easyCall').subcontainer[code].children(".easycallphoneinput").val();
+
+				// get the phone extension, if any
+				var phoneExtension = $this.data('easyCall').subcontainer[code].children(".easycallextensioninput").val();
 	
 				// validate the phone
 				var valid = method.validatePhone(phone);
@@ -366,7 +379,7 @@
 	
 				method.replaceContainer(code, progresscontainer);
 	
-				$.post("ajaxeasycall.php", {"action":"new", "phone":phone}, function (data) {
+				$.post("ajaxeasycall.php", {"action":"new", "phone":phone, "extension":phoneExtension}, function (data) {
 					progresstext.empty().append("Initiated...");
 					if (!data) {
 						$this.data('easyCall').specialtaskid = false;
@@ -379,7 +392,7 @@
 							$.post("ajaxeasycall.php", {"action":"status", "id":$this.data('easyCall').specialtaskid}, function (data) {
 								// get the status
 								var status = method.handleStatus(data);
-								progresstext.empty().append(status.message);
+								progresstext.empty().append(status.message + "...");
 								if (!status.error && status.complete) {
 									$this.data('easyCall').timer.stop();
 									//$this.data('easyCall').element.trigger("easycall:endcall", this);

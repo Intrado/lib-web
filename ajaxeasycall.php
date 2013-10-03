@@ -18,7 +18,7 @@ if (!$USER->authorize("starteasy"))
 header("Content-Type: application/json");
 
 
-function taskNew($phone) {
+function taskNew($phone, $extension) {
 	global $USER;
 
 	// get min and max extension length
@@ -26,6 +26,7 @@ function taskNew($phone) {
 	$max = getSystemSetting('easycallmax',10);
 
 	$phone = Phone::parse($phone);
+	$extension = Phone::parse($extension);
 
 	// if this should be a 10 digit number, call phone validate on it
 	if ($min == $max && $min == 10) {
@@ -47,6 +48,7 @@ function taskNew($phone) {
 	$task->lastcheckin = date("Y-m-d H:i:s");
 
 	$task->setData('phonenumber', $phone);
+	$task->setData('phoneextension', $extension);
 	$task->setData('progress', _L("Creating Call"));
 	$task->setData('callerid', getSystemSetting('callerid'));
 
@@ -130,7 +132,8 @@ switch ($action) {
 	 * phone: phone number to call. should be valid */
 	case "new":
 		$phone = $_REQUEST['phone'];
-		echo json_encode(taskNew($phone));
+		$extension = $_REQUEST['extension'];
+		echo json_encode(taskNew($phone, $extension));
 		break;
 
 	// return task status by specialtaks id
