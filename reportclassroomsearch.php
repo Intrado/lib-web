@@ -101,7 +101,7 @@ class ValContactHistorySearch extends Validator {
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
 $formdata = array();
-$helpsteps = array ();
+$helpsteps = array();
 $helpstepscount = 1;
 
 $options = $_SESSION['report']['options'];
@@ -152,6 +152,22 @@ if($options['classroomreporttype'] == 'person') {
 	$helpstepscount++;
 }
 
+if ($options['classroomreporttype'] == 'organization') {	
+	$orgs = Organization::getAuthorizedOrgKeys();	
+	$orgSelect = array(0 => escapehtml(_L("All " . getSystemSetting("organizationfieldname","Organization") . "s"))) + $orgs;
+
+	$formdata["organizationid"] = array(
+		"label" => _L("Organization"),
+		"fieldhelp" => _L("Select the organization that the report should cover."),
+		"value" =>  $orgSelect[0],
+		"validators" => array(),
+		"control" => array("SelectMenu", "values" => $orgSelect),
+		"helpstep" => $helpstepscount
+	);
+	$helpsteps[] = _L('The Organization menu contains the list of available Organizations to filter your search results by.');
+	$helpstepscount++;
+}
+
 $formdata["dateoptions"] = array(
 	"label" => _L("Date Options"),
 	"fieldhelp" => _L("Select the date or date range that the report should cover."),
@@ -167,7 +183,7 @@ $formdata["dateoptions"] = array(
 );
 
 $helpsteps[] = _L('The Date Options menu contains date options that are relative to today as well as date ranges which you can configure.');
-$helpstepscount++;
+// $helpstepscount++;
 
 $buttons = array(
 	submit_button(_L("View Report"),"view","arrow_refresh"),
@@ -205,6 +221,10 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 						unset($_SESSION['report']['options']['personid']);
 					}
 				}
+				else if ($options['classroomreporttype'] == 'organization') {
+					$_SESSION['report']['options']['organizationid'] = $postdata['organizationid'];
+				}
+
 				$dateOptions = json_decode($postdata['dateoptions'], true);
 				if (!empty($dateOptions['reldate'])) {
 					$_SESSION['report']['options']['reldate'] = $dateOptions['reldate'];

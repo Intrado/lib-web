@@ -102,15 +102,18 @@ if($options['classroomreporttype'] == 'person') {
 					"0" => "fmt_null");
 } else if($options['classroomreporttype'] == 'organization') {
 	$TITLE = _L('Classroom Comment Report (From: %s To: %s)',$startdate,$enddate);
+	$orgidsql = $options['organizationid'] > 0 ? " AND o.id = ". $options['organizationid'] ." " : "";
 	$result = Query("SELECT o.orgkey,tm.id,tm.overridemessagegroupid, tm.messagekey, count( tm.messagekey )
 						FROM organization o
 						INNER JOIN event e ON ( e.organizationid = o.id )
 						INNER JOIN targetedmessage tm ON ( e.targetedmessageid = tm.id )
 						INNER JOIN alert a ON ( a.eventid = e.id )
 						WHERE 1
+						$orgidsql
 						$datesql
 						GROUP BY tm.messagekey
 						");
+
 	$overrideids = array();
 	$data = array();
 
@@ -176,9 +179,9 @@ startWindow("Search Results");
 
 if(count($data) > 0){
 ?>
-	<br />
 <?= buttons($back,$donebutton);?>
 		<?
+		echo '<a href="#" target="_blank" class="" style="float:right; margin:10px 0;"><img src="img/icons/document_excel_csv.png" style="margin-right:5px;">Open full detail report in Excel</a>';
 		if($options['classroomreporttype'] == 'person') {
 			echo '<table class="list" cellpadding="3" cellspacing="1" >';
 			showTable($data, $titles, $formatters);
@@ -202,6 +205,5 @@ if(count($data) > 0){
 	buttons($back,$donebutton);
 }
 endWindow();
-
 include_once("navbottom.inc.php");
 ?>
