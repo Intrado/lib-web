@@ -20,7 +20,8 @@ class application_AllTests {
 		// List of test classes to include; TODO: expand as needed:
 		$classes = Array(
 			//'FailSampleTest', // TODO - activate this line if you want to see the CI server catch an error and stop the build process.
-			'ValTranslationLengthTest'
+			'ValTranslationLengthTest',
+			'EasyCallTest'
 		);
 
 		$classdir = dirname(__FILE__);
