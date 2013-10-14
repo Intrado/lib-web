@@ -9,12 +9,15 @@ class RestrictedValues extends FormItem {
 		if (count($this->args['values']) == 0) {
 			return '<img src="img/icons/information.png" alt="Information" /> ' . _L("No Restrictable Fields");
 		}
-		
-		$label = (isset($this->args['label']) && $this->args['label'])? $this->args['label']: _L('Restrict to these fields:');
+
+		$extraStyle = isset($this->args['height']) ? ('height: ' . $this->args['height'] . '; overflow: auto;') : '';
+
+		$type = (isset($this->args['type'])) ? $this->args['type'] : 'fields';
+		$label = (isset($this->args['label']) && $this->args['label'])? $this->args['label']: _L('Restrict to these %1$s:', $type);
 		$restrictchecked = count($value) > 0 ? "checked" : "";
 		$str = '<div><input type="checkbox" id="'.$n.'-restrict" '.$restrictchecked .' onclick="restrictcheck(\''.$n.'-restrict\', \''.$n.'\')"><label for="'.$n.'-restrict">'.$label.'</label></div>';
 
-		$str .= '<div id='.$n.' class="radiobox" style="margin-left: 1em;">';
+		$str .= '<div id='.$n.' class="radiobox" style="margin-left: 1em;' . $extraStyle . '">';
 
 		$counter = 1;
 		foreach ($this->args['values'] as $checkvalue => $checkname) {
