@@ -2191,3 +2191,10 @@ $$$
 update setting set value='9.7/5' where name='_dbversion'
 $$$
 -- END 9.7/5
+
+-- START 10.0/1
+update setting set value='10.0/1' where name='_dbversion'
+$$$
+ALTER TABLE `alert` ADD INDEX ( `date` )
+$$$
+-- END 10.0/1
