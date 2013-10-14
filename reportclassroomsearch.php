@@ -10,6 +10,7 @@ require_once("inc/utils.inc.php");
 require_once("obj/Validator.obj.php");
 require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
+require_once("obj/RestrictedValues.fi.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -38,8 +39,8 @@ if (isset($_GET['type'])) {
 	$doredirect = true;
 }
 
-if($doredirect)
-	redirect();
+if($doredirect) redirect();
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
@@ -152,22 +153,6 @@ if($options['classroomreporttype'] == 'person') {
 	$helpstepscount++;
 }
 
-if ($options['classroomreporttype'] == 'organization') {	
-	$orgs = Organization::getAuthorizedOrgKeys();	
-	$orgSelect = array(0 => escapehtml(_L("All " . getSystemSetting("organizationfieldname","Organization") . "s"))) + $orgs;
-
-	$formdata["organizationid"] = array(
-		"label" => _L("Organization"),
-		"fieldhelp" => _L("Select the organization that the report should cover."),
-		"value" =>  $orgSelect[0],
-		"validators" => array(),
-		"control" => array("SelectMenu", "values" => $orgSelect),
-		"helpstep" => $helpstepscount
-	);
-	$helpsteps[] = _L('The Organization menu contains the list of available Organizations to filter your search results by.');
-	$helpstepscount++;
-}
-
 $formdata["dateoptions"] = array(
 	"label" => _L("Date Options"),
 	"fieldhelp" => _L("Select the date or date range that the report should cover."),
@@ -181,6 +166,23 @@ $formdata["dateoptions"] = array(
 	"validators" => array(array("ValReldate")),
 	"helpstep" => $helpstepscount
 );
+
+if ($options['classroomreporttype'] == 'organization') {	
+	//$orgs = Organization::getAuthorizedOrgKeys();	
+	//$orgSelect = array(0 => escapehtml(_L("All " . getSystemSetting("organizationfieldname","Organization") . "s"))) + $orgs;
+	$orgSelect = Organization::getAuthorizedOrgKeys();	
+
+	$formdata["organizationid"] = array(
+		"label" => _L(getSystemSetting("organizationfieldname","Organization")),
+		"fieldhelp" => _L("Select the organization that the report should cover."),
+		"value" =>  $orgSelect[0],
+		"validators" => array(),
+		"control" => array("RestrictedValues", "values" => $orgSelect, 'height' => '150px', 'type' => getSystemSetting('organizationfieldname', 'Organization') . 's'),
+		"helpstep" => $helpstepscount
+	);
+	$helpsteps[] = _L('The Organization menu contains the list of available Organizations to filter your search results by.');
+	$helpstepscount++;
+}
 
 $helpsteps[] = _L('The Date Options menu contains date options that are relative to today as well as date ranges which you can configure.');
 // $helpstepscount++;

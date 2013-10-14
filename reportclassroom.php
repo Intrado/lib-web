@@ -33,26 +33,15 @@ if(isset($_GET['pid'])){
 	redirect();
 }
 
+
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
-$contentfile = "messagedata/en/targetedmessage.php";
-if(file_exists($contentfile))
-	include_once($contentfile);
-	
+
 $options = $_SESSION['report']['options'];
-$datesql = "";
-
-
-$data = array();
-$titles = array();
-$formatters = array();
-$customxt = array();
-$displaydate = '';
-$startdate = '';
-$enddate = '';
 
 // ====== Note: Same date SQL is used for person and org report below ================
+$datesql = $startdate = $enddate = '';
 if(isset($options['reldate']) && $options['reldate'] != ""){
 	list($startdate, $enddate) = getStartEndDate($options['reldate'], $options);
 	$startdate = date("Y-m-d", $startdate);
@@ -64,6 +53,76 @@ if(isset($options['reldate']) && $options['reldate'] != ""){
 }
 // ===================================================================================
 
+if (isset($options['organizationid']) && count($options['organizationid'])) {
+	$orglist = join("','", $options['organizationid']);
+	$orgsql = "AND o.id in ('{$orglist}')";
+}
+else $orgsql = '';
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// CSV Report Handling
+////////////////////////////////////////////////////////////////////////////////
+
+if (isset($_GET['download'])) {
+
+        $query = Query("
+		select
+			a.id,
+			rc.jobid,
+			u.login,
+			concat(u.firstname, ' ', u.lastname) as teacher,
+			o.orgkey,
+			s.skey, 
+			if(rp.pkey is null, p.pkey, rp.pkey) as studentid, 
+			concat(if(rp.f01 is null, p.f01, rp.f01), ' ', if(rp.f02 is null, p.f02, rp.f02)) as student, 
+			tg.messagekey,
+			e.notes,
+			e.occurence, 
+			from_unixtime(if(rc.type = 'email', 
+			(select timestamp from reportemaildelivery where jobid = rc.jobid and personid = rc.personid and sequence = rc.sequence order by timestamp limit 1), rc.starttime/1000)) as lastattempt,
+			if(rc.type = 'email', rc.email, rc.phone) as destination, 
+			if(rc.type = 'email', (select statuscode from reportemaildelivery where jobid = rc.jobid and personid = rc.personid and sequence = rc.sequence order by timestamp limit 1), rc.result) as result, 
+			rp.status
+		from alert a
+			inner join event e on (e.id = a.eventid)
+			inner join organization o on (o.id = e.organizationid)
+			inner join section s on (s.id = e.sectionid)
+			inner join user u on (u.id = e.userid)
+			inner join person p on (p.id = a.personid)
+			inner join targetedmessage tg on (tg.id = e.targetedmessageid)
+			left join job j on (j.startdate = a.date and j.type = 'alert')
+			left join reportperson rp on (rp.jobid = j.id and rp.type in ('email', 'phone') and rp.personid = a.personid)
+			left join reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid)
+		where
+			1
+			{$orgsql}
+			{$datesql};
+	");
+
+	// set header
+	header("Pragma: private");
+	header("Cache-Control: private");
+	header("Content-disposition: attachment; filename=classroom_messaging_report.csv");
+	header("Content-type: application/vnd.ms-excel");
+
+	// echo out the data
+	echo '"id", "jobid", "login", "teacher", "orgkey", "skey", "student id", "student", "messagekey", "notes", "occurence", "lastattempt", "destination", "result", "status"' . "\n";
+	while ($row = $query->fetch(PDO::FETCH_ASSOC))
+		echo array_to_csv($row) . "\n";
+	exit;
+}
+
+$contentfile = "messagedata/en/targetedmessage.php";
+if(file_exists($contentfile))
+	include_once($contentfile);
+
+$data = array();
+$titles = array();
+$formatters = array();
+$customxt = array();
+
 if($options['classroomreporttype'] == 'person') {
 	$pid = $_SESSION['report']['options']['pid'];
 
@@ -72,16 +131,21 @@ if($options['classroomreporttype'] == 'person') {
 
 	$TITLE = _L('Classroom Comment Report: %s ID: %s (From: %s To: %s)',escapehtml(Person::getFullName($person)),escapehtml($person->pkey),$startdate,$enddate);
 
-	$result = Query("SELECT s.skey,tm.id,tm.overridemessagegroupid,tm.messagekey,a.date,a.time,CONCAT(u.firstname,' ',u.lastname),e.notes
-					FROM person p
-					INNER JOIN personassociation pa ON ( p.id = pa.personid )
-					INNER JOIN event e ON ( pa.eventid = e.id )
-					INNER JOIN targetedmessage tm ON ( e.targetedmessageid = tm.id )
-					INNER JOIN alert a ON ( e.id = a.eventid )
-					INNER JOIN user u ON ( e.userid = u.id )
-					INNER JOIN section s ON ( e.sectionid = s.id )
-					WHERE pa.type = 'event' and p.id = ?
-					$datesql", false, array($pid));
+	$result = Query("
+		SELECT
+			s.skey,tm.id,tm.overridemessagegroupid,tm.messagekey,a.date,a.time,CONCAT(u.firstname,' ',u.lastname),e.notes
+		FROM
+			person p
+			INNER JOIN personassociation pa ON ( p.id = pa.personid )
+			INNER JOIN event e ON ( pa.eventid = e.id )
+			INNER JOIN targetedmessage tm ON ( e.targetedmessageid = tm.id )
+			INNER JOIN alert a ON ( e.id = a.eventid )
+			INNER JOIN user u ON ( e.userid = u.id )
+			INNER JOIN section s ON ( e.sectionid = s.id )
+		WHERE
+			pa.type = 'event' and p.id = ?
+			$datesql
+	", false, array($pid));
 	$overrideids = array();
 	while($row = DBGetRow($result)){
 		$data[] = $row;
@@ -102,17 +166,21 @@ if($options['classroomreporttype'] == 'person') {
 					"0" => "fmt_null");
 } else if($options['classroomreporttype'] == 'organization') {
 	$TITLE = _L('Classroom Comment Report (From: %s To: %s)',$startdate,$enddate);
-	$orgidsql = $options['organizationid'] > 0 ? " AND o.id = ". $options['organizationid'] ." " : "";
-	$result = Query("SELECT o.orgkey,tm.id,tm.overridemessagegroupid, tm.messagekey, count( tm.messagekey )
-						FROM organization o
-						INNER JOIN event e ON ( e.organizationid = o.id )
-						INNER JOIN targetedmessage tm ON ( e.targetedmessageid = tm.id )
-						INNER JOIN alert a ON ( a.eventid = e.id )
-						WHERE 1
-						$orgidsql
-						$datesql
-						GROUP BY tm.messagekey
-						");
+	//$orgsql = $options['organizationid'] > 0 ? " AND o.id = ". $options['organizationid'] ." " : "";
+	$result = Query("
+		SELECT
+			o.orgkey,tm.id,tm.overridemessagegroupid, tm.messagekey, count( tm.messagekey )
+		FROM
+			organization o
+			INNER JOIN event e ON ( e.organizationid = o.id )
+			INNER JOIN targetedmessage tm ON ( e.targetedmessageid = tm.id )
+			INNER JOIN alert a ON ( a.eventid = e.id )
+		WHERE
+			1
+			$orgsql
+			$datesql
+		GROUP BY tm.messagekey
+	");
 
 	$overrideids = array();
 	$data = array();
@@ -134,17 +202,20 @@ if($options['classroomreporttype'] == 'person') {
 }
 
 if(!empty($overrideids)) {
-	$customtxt = QuickQueryList("select t.id, p.txt from targetedmessage t, message m, messagepart p
-										where t.deleted = 0
-										and t.overridemessagegroupid = m.messagegroupid
-										and m.languagecode = 'en'
-										and	p.messageid = m.id
-										and p.sequence = 0
-										and t.overridemessagegroupid in (" . implode(",",$overrideids). ")",true);
+	$customtxt = QuickQueryList("
+		select
+			t.id, p.txt
+		from
+			targetedmessage t, message m, messagepart p
+		where
+			t.deleted = 0
+			and t.overridemessagegroupid = m.messagegroupid
+			and m.languagecode = 'en'
+			and	p.messageid = m.id
+			and p.sequence = 0
+			and t.overridemessagegroupid in (" . implode(",",$overrideids). ")
+	",true);
 }
-
-
-
 
 
 function frm_classroommessage($row, $index) {
@@ -181,7 +252,7 @@ if(count($data) > 0){
 ?>
 <?= buttons($back,$donebutton);?>
 		<?
-		echo '<a href="#" target="_blank" class="" style="float:right; margin:10px 0;"><img src="img/icons/document_excel_csv.png" style="margin-right:5px;">Open full detail report in Excel</a>';
+		echo '<a href="?download" target="_blank" class="" style="float:right; margin:10px 0;"><img src="img/icons/document_excel_csv.png" style="margin-right:5px;">Open full detail report in Excel</a>';
 		if($options['classroomreporttype'] == 'person') {
 			echo '<table class="list" cellpadding="3" cellspacing="1" >';
 			showTable($data, $titles, $formatters);
