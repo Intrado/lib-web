@@ -80,8 +80,8 @@ if (isset($_GET['download'])) {
 			tg.messagekey,
 			e.notes,
 			e.occurence, 
-			from_unixtime(if(rc.type = 'email', 
-			(select timestamp from reportemaildelivery where jobid = rc.jobid and personid = rc.personid and sequence = rc.sequence order by timestamp limit 1), rc.starttime/1000)) as lastattempt,
+			from_unixtime(if(rc.type = 'email', (select timestamp from reportemaildelivery where jobid = rc.jobid and personid = rc.personid and sequence = rc.sequence order by timestamp limit 1), rc.starttime/1000)) as lastattempt,
+			rc.type,
 			if(rc.type = 'email', rc.email, rc.phone) as destination, 
 			if(rc.type = 'email', (select statuscode from reportemaildelivery where jobid = rc.jobid and personid = rc.personid and sequence = rc.sequence order by timestamp limit 1), rc.result) as result, 
 			rp.status
@@ -108,9 +108,27 @@ if (isset($_GET['download'])) {
 	header("Content-type: application/vnd.ms-excel");
 
 	// echo out the data
-	echo '"id", "jobid", "login", "teacher", "orgkey", "skey", "student id", "student", "messagekey", "notes", "occurence", "lastattempt", "destination", "result", "status"' . "\n";
-	while ($row = $query->fetch(PDO::FETCH_ASSOC))
+	echo '"alert id", "job id", "login", "teacher", "school", "section", "student id", "student", "messagekey", "notes", "occurence", "lastattempt", "type", "destination", "result", "status"' . "\n";
+
+	// For every row in the result data
+	while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
+
+		// Translate some of the raw values into something human readable
+		switch ($row['type']) {
+			case 'email':
+				// TODO - translate rp.status for email status significance
+				break;
+
+			case 'phone':
+				// TODO - translate rc.result for phone result significance
+				break;
+		}
+		// TODO - translate messagekey
+
+
+		// Then spit the row out to STDOUT as CSV data
 		echo array_to_csv($row) . "\n";
+	}
 	exit;
 }
 
