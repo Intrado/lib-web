@@ -33,6 +33,8 @@ if (!($USER->authorize('viewsystemreports'))) {
 // Custom Form Controls And Validators
 ////////////////////////////////////////////////////////////////////////////////
 
+// TODO - Use obj/RestrictedValues.fi.php instead ?
+
 class RestrictedValues extends FormItem {
 	var $clearonsubmit = true;
 	var $clearvalue = array();
