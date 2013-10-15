@@ -20,6 +20,7 @@ class ReportClassroomMessaging {
 			list($startdate, $enddate) = getStartEndDate($options['reldate'], $options);
 			$startdate = date("Y-m-d", $startdate);
 			$enddate = date("Y-m-d", $enddate);
+			// TODO - why not a.date <= $enddate for the second condition instead of the interval addition?
 			$datesql = "AND (a.date >= '$startdate' and a.date < date_add('$enddate',interval 1 day) )";
 		} else {
 			$datesql = "AND Date(e.occurence) = CURDATE()";
