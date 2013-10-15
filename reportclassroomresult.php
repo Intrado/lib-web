@@ -12,6 +12,7 @@ require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
 require_once("inc/date.inc.php");
 require_once("obj/FieldMap.obj.php");
+require_once("obj/ReportClassroomMessaging.obj.php");
 
 //require_once("inc/rulesutils.inc.php");
 
@@ -28,6 +29,21 @@ if(!(getSystemSetting('_hastargetedmessage', false) && $USER->authorize('viewsys
 ////////////////////////////////////////////////////////////////////////////////
 
 $options = $_SESSION['report']['options'];
+
+////////////////////////////////////////////////////////////////////////////////
+//// CSV Report Handling
+//////////////////////////////////////////////////////////////////////////////////
+
+if (isset($_GET['download'])) {
+	$rcm = new ReportClassroomMessaging();
+	$result = $rcm->get_csvdata($options);
+	$rcm->summary_csv_to_stdout($result);
+	exit;
+}
+
+
+
+
 $personsql = "";
 $emailtable = "";
 $emailtableGuardianauto = "";
@@ -149,8 +165,13 @@ include_once("nav.inc.php");
 
 startWindow("Search Results");
 
+// TODO - something looks wrong with the language below. "Your search returned
+// more than one result" would be true if count(data) > 1 was being checked, but
+// we're checking >0, so a count of 1 will also result in the same text being shown...
+
 if(count($data) > 0){
 ?>
+	<a href="?download" target="_blank" class="" style="float:right; margin:10px 0;"><img src="img/icons/document_excel_csv.png" style="margin-right:5px;">Open full detail report in Excel</a>
 	<div><?= _L('Your search returned more than one result.<br />
 	<br>Please select one of the following:') ?></div>
 	<br>

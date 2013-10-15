@@ -14,6 +14,7 @@ require_once("inc/date.inc.php");
 require_once("obj/FieldMap.obj.php");
 require_once("inc/formatters.inc.php");
 require_once("obj/Person.obj.php");
+require_once("obj/ReportClassroomMessaging.obj.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -33,12 +34,26 @@ if(isset($_GET['pid'])){
 	redirect();
 }
 
+$options = $_SESSION['report']['options'];
+
+
+////////////////////////////////////////////////////////////////////////////////
+// CSV Report Handling
+////////////////////////////////////////////////////////////////////////////////
+
+if (isset($_GET['download'])) {
+
+	$rcm = new ReportClassroomMessaging();
+	$result = $rcm->get_csvdata($options);
+	$rcm->summary_csv_to_stdout($result);
+	exit;
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-$options = $_SESSION['report']['options'];
 
 // ====== Note: Same date SQL is used for person and org report below ================
 $datesql = $startdate = $enddate = '';
@@ -58,79 +73,6 @@ if (isset($options['organizationid']) && count($options['organizationid'])) {
 	$orgsql = "AND o.id in ('{$orglist}')";
 }
 else $orgsql = '';
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// CSV Report Handling
-////////////////////////////////////////////////////////////////////////////////
-
-if (isset($_GET['download'])) {
-
-        $query = Query("
-		select
-			a.id,
-			rc.jobid,
-			u.login,
-			concat(u.firstname, ' ', u.lastname) as teacher,
-			o.orgkey,
-			s.skey, 
-			if(rp.pkey is null, p.pkey, rp.pkey) as studentid, 
-			concat(if(rp.f01 is null, p.f01, rp.f01), ' ', if(rp.f02 is null, p.f02, rp.f02)) as student, 
-			tg.messagekey,
-			e.notes,
-			e.occurence, 
-			from_unixtime(if(rc.type = 'email', (select timestamp from reportemaildelivery where jobid = rc.jobid and personid = rc.personid and sequence = rc.sequence order by timestamp limit 1), rc.starttime/1000)) as lastattempt,
-			rc.type,
-			if(rc.type = 'email', rc.email, rc.phone) as destination, 
-			if(rc.type = 'email', (select statuscode from reportemaildelivery where jobid = rc.jobid and personid = rc.personid and sequence = rc.sequence order by timestamp limit 1), rc.result) as result, 
-			rp.status
-		from alert a
-			inner join event e on (e.id = a.eventid)
-			inner join organization o on (o.id = e.organizationid)
-			inner join section s on (s.id = e.sectionid)
-			inner join user u on (u.id = e.userid)
-			inner join person p on (p.id = a.personid)
-			inner join targetedmessage tg on (tg.id = e.targetedmessageid)
-			left join job j on (j.startdate = a.date and j.type = 'alert')
-			left join reportperson rp on (rp.jobid = j.id and rp.type in ('email', 'phone') and rp.personid = a.personid)
-			left join reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid)
-		where
-			1
-			{$orgsql}
-			{$datesql};
-	");
-
-	// set header
-	header("Pragma: private");
-	header("Cache-Control: private");
-	header("Content-disposition: attachment; filename=classroom_messaging_report.csv");
-	header("Content-type: application/vnd.ms-excel");
-
-	// echo out the data
-	echo '"alert id", "job id", "login", "teacher", "school", "section", "student id", "student", "messagekey", "notes", "occurence", "lastattempt", "type", "destination", "result", "status"' . "\n";
-
-	// For every row in the result data
-	while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
-
-		// Translate some of the raw values into something human readable
-		switch ($row['type']) {
-			case 'email':
-				// TODO - translate rp.status for email status significance
-				break;
-
-			case 'phone':
-				// TODO - translate rc.result for phone result significance
-				break;
-		}
-		// TODO - translate messagekey
-
-
-		// Then spit the row out to STDOUT as CSV data
-		echo array_to_csv($row) . "\n";
-	}
-	exit;
-}
 
 $contentfile = "messagedata/en/targetedmessage.php";
 if(file_exists($contentfile))
@@ -184,7 +126,6 @@ if($options['classroomreporttype'] == 'person') {
 					"0" => "fmt_null");
 } else if($options['classroomreporttype'] == 'organization') {
 	$TITLE = _L('Classroom Comment Report (From: %s To: %s)',$startdate,$enddate);
-	//$orgsql = $options['organizationid'] > 0 ? " AND o.id = ". $options['organizationid'] ." " : "";
 	$result = Query("
 		SELECT
 			o.orgkey,tm.id,tm.overridemessagegroupid, tm.messagekey, count( tm.messagekey )
