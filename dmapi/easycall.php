@@ -20,8 +20,8 @@ if($REQUEST_TYPE == "new") {
 		<dial callerid="<?=$easycall->callerid()?>" amdhint="disable"><?=$easycall->phone()?></dial>
 		<? if($easycall->hasExtension()) { ?>
 			<message name="extensionintro">
-				<field name="dummy" type="menu" timeout="10000">
-					<prompt repeat="1">
+				<field name="dummy" type="menu" timeout="2000">
+					<prompt repeat="2">
 						<tts>Hello, Please direct this call to extension</tts>
 
 						<? foreach($easycall->extensionDigits() as $digit) { ?>
