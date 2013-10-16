@@ -15,6 +15,7 @@ require_once("obj/FieldMap.obj.php");
 require_once("inc/formatters.inc.php");
 require_once("obj/Person.obj.php");
 require_once("obj/ReportClassroomMessaging.obj.php");
+require_once("obj/Headers.obj.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -42,11 +43,14 @@ $options = $_SESSION['report']['options'];
 ////////////////////////////////////////////////////////////////////////////////
 
 if (isset($_GET['download'])) {
-
+	$headers = new Headers();
 	$rcm = new ReportClassroomMessaging();
-	$result = $rcm->get_csvdata($options);
-	$rcm->summary_csv_to_stdout($result);
-	exit;
+	if ($rcm->queryexec_csvdata($options)) {
+		$headers->send_csv_headers('classroom_messaging_report.csv');
+		$rcm->send_csvdata();
+		exit;
+	}
+	// If there was a query error, then.... just load the page again as usual?
 }
 
 

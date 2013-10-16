@@ -2,17 +2,20 @@
 
 class ReportClassroomMessaging {
 
+	// This is public so that our unit test can access it to stub data, no other reason.
+	public $csvdata = null;
+
 	/**
-	 * Get the classroom messaging report CSV data based on the supplied options
+	 * Run the classroom messaging report CSV query based on the supplied options
 	 *
 	 * @param array options - An associative array of options with name/value pairs
 	 * Valid options names are:
 	 * 	'reldate' - value from ReldateOptions FormItem
 	 *	'organizationid' - array of one or more organization ID's (from RestrictedValues FormItem)
 	 *
-	 * @return object The query result object
+	 * @return boolean true on successful query operation, else false
 	 */
-	public function get_csvdata($options) {
+	public function queryexec_csvdata($options) {
 
 		// Figure out what the date clause will look like
 		$datesql = $startdate = $enddate = '';
@@ -47,10 +50,8 @@ class ReportClassroomMessaging {
 
 
 		// The query including clauses from above as WHERE clause "filters"
-		$result = Query("
+		$this->csvdata = Query("
 			select
-				a.id,
-				rc.jobid,
 				u.login,
 				concat(u.firstname, ' ', u.lastname) as teacher,
 				o.orgkey,
@@ -85,25 +86,27 @@ class ReportClassroomMessaging {
 				{$datesql};
 		");
 
-		return($result);
+		return(is_object($this->csvdata));
 	}
 
-	/**
-	 * Send the results of the summary_query straight to STDOUT as CSV data
-	 */
-	public function summary_csv_to_stdout($result) {
-
+	public function send_headers() {
 		// set header
 		header("Pragma: private");
 		header("Cache-Control: private");
 		header("Content-disposition: attachment; filename=classroom_messaging_report.csv");
 		header("Content-type: application/vnd.ms-excel");
+	}
+
+	/**
+	 * Send the results of the summary_query straight to STDOUT as CSV data
+	 */
+	public function send_csvdata() {
 
 		// echo out the data
-		echo '"alert id", "job id", "login", "teacher", "school", "section", "student id", "student", "messagekey", "notes", "occurence", "lastattempt", "type", "destination", "result", "status"' . "\n";
+		echo '"login", "teacher", "school", "section", "student id", "student", "message", "notes", "message time", "last attempt", "destination", "result", "status"' . "\n";
 
 		// For every row in the result data
-		while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+		while ($row = $this->csvdata->fetch(PDO::FETCH_ASSOC)) {
 
 			// Translate some of the raw values into something human readable
 			switch ($row['type']) {

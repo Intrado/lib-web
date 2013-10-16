@@ -19,7 +19,7 @@ class QueryResult {
 
 	public function fetch($format) {
 		// If there are no results left to process then we're done
-		if (! (is_array($this->results) && count($this->results))) return(false);
+		if (! (is_array($this->results) && count($this->results))) return(array());
 
 		$row = array_shift($this->results);
 
@@ -31,7 +31,7 @@ class QueryResult {
 				return(array_values($row));
 		}
 
-		return(false);
+		return(array());
 	}
 }
 
