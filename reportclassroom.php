@@ -12,10 +12,14 @@ require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
 require_once("inc/date.inc.php");
 require_once("obj/FieldMap.obj.php");
-require_once("inc/formatters.inc.php");
 require_once("obj/Person.obj.php");
-require_once("obj/ReportClassroomMessaging.obj.php");
-require_once("obj/Headers.obj.php");
+
+require_once('obj/Headers.obj.php');
+require_once('obj/ReportGenerator.obj.php');
+require_once('obj/ReportClassroomMessaging.obj.php');
+require_once('obj/Formatters.obj.php');
+require_once('inc/formatters.inc.php');
+require_once('messagedata/en/targetedmessage.php');
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -44,13 +48,12 @@ $options = $_SESSION['report']['options'];
 
 if (isset($_GET['download'])) {
 	$headers = new Headers();
-	$rcm = new ReportClassroomMessaging();
-	if ($rcm->queryexec_csvdata($options)) {
-		$headers->send_csv_headers('classroom_messaging_report.csv');
-		$rcm->send_csvdata();
-		exit;
-	}
-	// If there was a query error, then.... just load the page again as usual?
+	$headers->send_csv_headers('classroom_messaging_report.csv');
+
+	$rcm = new ReportClassroomMessaging($options);
+	$rcm->set_format('csv');
+	$rcm->generate();
+	exit;
 }
 
 
@@ -78,9 +81,6 @@ if (isset($options['organizationid']) && count($options['organizationid'])) {
 }
 else $orgsql = '';
 
-$contentfile = "messagedata/en/targetedmessage.php";
-if(file_exists($contentfile))
-	include_once($contentfile);
 
 $data = array();
 $titles = array();
