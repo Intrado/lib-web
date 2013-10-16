@@ -21,8 +21,8 @@ class application_AllTests {
 		$classes = Array(
 			//'FailSampleTest', // TODO - activate this line if you want to see the CI server catch an error and stop the build process.
 			'ValTranslationLengthTest',
-			'EasyCallTest',
-			'ReportClassroomMessagingTest'
+			'EasyCallTest'//,
+			//'ReportClassroomMessagingTest'
 		);
 
 		$classdir = dirname(__FILE__);
