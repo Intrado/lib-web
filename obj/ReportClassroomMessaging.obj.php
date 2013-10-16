@@ -1,56 +1,72 @@
 <?php
 
-class ReportClassroomMessaging {
+/**
+ *
+ * DIRECT EXTERNAL DEPENDENCIES
+ * obj/ReportGenerator.obj.php
+ * obj/Formatters.obj.php
+ */
+
+class ReportClassroomMessaging extends ReportGenerator {
 
 	// This is public so that our unit test can access it to stub data, no other reason.
-	public $csvdata = null;
+	public $query = null;
+	private $options = array();
+
+	/**
+	 *  Constructor
+	 *
+	 * @param array options An associative array of options with name/value pairs
+	 * Valid options names are:
+	 * 	'reldate' - value from ReldateOptions FormItem
+	 *	'organizationid' - array of one or more organization ID's (from RestrictedValues FormItem)
+	 */
+	public function __construct($options) {
+		$this->options = $options;
+	}
 
 	/**
 	 * Run the classroom messaging report CSV query based on the supplied options
 	 *
-	 * @param array options - An associative array of options with name/value pairs
-	 * Valid options names are:
-	 * 	'reldate' - value from ReldateOptions FormItem
-	 *	'organizationid' - array of one or more organization ID's (from RestrictedValues FormItem)
-	 *
 	 * @return boolean true on successful query operation, else false
 	 */
-	public function queryexec_csvdata($options) {
+	public function generateQuery($hackPDF = false) {
 
 		// Figure out what the date clause will look like
 		$datesql = $startdate = $enddate = '';
-		if(isset($options['reldate']) && $options['reldate'] != ""){
-			list($startdate, $enddate) = getStartEndDate($options['reldate'], $options);
+		if(isset($this->options['reldate']) && $this->options['reldate'] != ""){
+			list($startdate, $enddate) = getStartEndDate($this->options['reldate'], $this->options);
 			$startdate = date("Y-m-d", $startdate);
 			$enddate = date("Y-m-d", $enddate);
 			// TODO - why not a.date <= $enddate for the second condition instead of the interval addition?
 			$datesql = "AND (a.date >= '$startdate' and a.date < date_add('$enddate',interval 1 day) )";
-		} else {
+		}
+		else {
 			$datesql = "AND Date(e.occurence) = CURDATE()";
 			$enddate = $startdate = date("Y-m-d", time());
 		}
 
 		// Figure out what the organization clause will look like
-		if (isset($options['organizationid']) && count($options['organizationid'])) {
-			$orglist = join("','", $options['organizationid']);
+		if (isset($this->options['organizationid']) && count($this->options['organizationid'])) {
+			$orglist = join("','", $this->options['organizationid']);
 			$orgsql = "AND o.id in ('{$orglist}')";
 		}
 		else $orgsql = '';
 
 		// Figure out a clause to restrict the view to a specific person (by personid or email)
-		if (isset($options['personid']) && strlen($options['personid'])) {
-			$personsql = "AND p.pkey = '" . DBSafe($options['personid']) . "'";
+		if (isset($this->options['personid']) && strlen($this->options['personid'])) {
+			$personsql = "AND p.pkey = '" . DBSafe($this->options['personid']) . "'";
 		}
-		else if(isset($options['email']) && $options['email'] != "") {
+		else if(isset($this->options['email']) && $this->options['email'] != "") {
 			$emailtable = " LEFT JOIN email e ON ( e.personid = p.id )";
 			$emailtableGuardianauto = " LEFT JOIN email e ON ( e.personid = pg.guardianpersonid )";
-			$emailsql = "AND e.email = '" . DBSafe($options['email']) . "'";
+			$emailsql = "AND e.email = '" . DBSafe($this->options['email']) . "'";
 		}
 		else $personsql = $emailsql = $emailtable = $emailtableGuardianauto = '';
 
 
 		// The query including clauses from above as WHERE clause "filters"
-		$this->csvdata = Query("
+		$this->query = Query("
 			select
 				u.login,
 				concat(u.firstname, ' ', u.lastname) as teacher,
@@ -64,8 +80,7 @@ class ReportClassroomMessaging {
 				from_unixtime(if(rc.type = 'email', (select timestamp from reportemaildelivery where jobid = rc.jobid and personid = rc.personid and sequence = rc.sequence order by timestamp limit 1), rc.starttime/1000)) as lastattempt,
 				rc.type,
 				if(rc.type = 'email', rc.email, rc.phone) as destination,
-				if(rc.type = 'email', (select statuscode from reportemaildelivery where jobid = rc.jobid and personid = rc.personid and sequence = rc.sequence order by timestamp limit 1), rc.result) as result,
-				rp.status
+				if(rc.type = 'email', (select statuscode from reportemaildelivery where jobid = rc.jobid and personid = rc.personid and sequence = rc.sequence order by timestamp limit 1), rc.result) as result
 			from alert a
 				inner join event e on (e.id = a.eventid)
 				inner join organization o on (o.id = e.organizationid)
@@ -86,43 +101,28 @@ class ReportClassroomMessaging {
 				{$datesql};
 		");
 
-		return(is_object($this->csvdata));
-	}
-
-	public function send_headers() {
-		// set header
-		header("Pragma: private");
-		header("Cache-Control: private");
-		header("Content-disposition: attachment; filename=classroom_messaging_report.csv");
-		header("Content-type: application/vnd.ms-excel");
+		return(is_object($this->query));
 	}
 
 	/**
 	 * Send the results of the summary_query straight to STDOUT as CSV data
 	 */
-	public function send_csvdata() {
+	public function runCSV() {
+
+		$fmt = new Formatters();
 
 		// echo out the data
-		echo '"login", "teacher", "school", "section", "student id", "student", "message", "notes", "message time", "last attempt", "destination", "result", "status"' . "\n";
+		$titles = array('login', 'teacher', 'school', 'section', 'student id', 'student', 'message', 'notes', 'message time', 'last attempt', 'destination', 'result');
+		echo array_to_csv($titles) . "\n";
+
+		$formatters = array(
+			'result' => 'fmt_phone_or_email_result',
+			'messagekey' => 'fmt_messagekey'
+		);
 
 		// For every row in the result data
-		while ($row = $this->csvdata->fetch(PDO::FETCH_ASSOC)) {
-
-			// Translate some of the raw values into something human readable
-			switch ($row['type']) {
-				case 'email':
-					// TODO - translate rp.status for email status significance
-					break;
-
-				case 'phone':
-					// TODO - translate rc.result for phone result significance
-					break;
-			}
-			// TODO - translate messagekey
-
-
-			// Then spit the row out to STDOUT as CSV data
-			echo array_to_csv($row) . "\n";
+		while ($row = $this->query->fetch(PDO::FETCH_ASSOC)) {
+			echo $fmt->fmt_csv_line($row, array_keys($titles), $formatters) . "\n";
 		}
 	}
 }
