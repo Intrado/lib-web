@@ -774,7 +774,7 @@ function fmt_jobdetail_result($row, $index){
 // result formatter for email status code, used in JobDetailReport
 function fmt_email_result ($row, $index) {
 	$result = "";
-	$status_code = $row[$index];
+	$status_code = intval($row[$index]);
 	if (200 <= $status_code && $status_code <= 299) {
 		$result = "Delivered";
 	} else if (510 == $status_code || 512 == $status_code || 515 == $status_code
