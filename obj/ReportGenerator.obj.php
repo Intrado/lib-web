@@ -1,39 +1,49 @@
 <?
 
 //abstract superclass for specific reports
-class ReportGenerator {
+abstract class ReportGenerator {
 
-	var $userid;
-	var $reportinstance;
-	var $format;
-	var $query="";
-	var $testquery = "";
-	var $params;
-	var $reporttype;
-	var $_readonlyDB;
+	const MAX_REPORT_PAGES = 33000;
 
-	function ReportGenerator() {
+	protected $userid;
+	protected $reportinstance;
+	protected $format;
+	protected $query = '';
+	protected $testquery = '';
+	protected $params;
+	protected $reporttype;
+	protected $_readonlyDB;
+
+	// Constructor
+	public function __construct() {
 		$this->_readonlyDB = readonlyDBConnect();	
 	}
-	
-	function testSize(){
+
+	// --------------------------------------------------------------------
+	// Abstract methods that derived classes must implement
+	abstract protected function generateQuery($hackPDF = false);
+
+
+	// --------------------------------------------------------------------
+	// public interface
+	// TODO - privatize any methods used internally only
+	public function testSize(){
 		$result = "";
 		$count = 0;
 		$this->generateQuery();
-		if($this->testquery != ""){
+		if ($this->testquery != ""){
 			$count = QuickQuery($this->testquery, $this->_readonlyDB);
 		}
-		if($count > 33000){
+		if ($count > MAX_REPORT_PAGES) {
 			$result = "Report exceeds max page limit";
 		}
 		
 		return $result;
 	}
 
-	function generate($options = false){
+	public function generate($options = false){
 		$result = "success";
-		$hackPDF = false; // used for Gfields display
-		if ($this->format == "pdf") $hackPDF = true;
+		$hackPDF = ($this->format == "pdf"); // used for Gfields display
 		$this->generateQuery($hackPDF);
 
 		switch($this->format){
@@ -52,7 +62,11 @@ class ReportGenerator {
 		return $result;
 	}
 
-	function runPDF($options = false) {
+	public function set_format($format) {
+		$this->format = $format;
+	}
+
+	public function runPDF($options = false) {
 		global $_DBHOST, $_DBNAME, $_DBUSER, $_DBPASS;
 		$instance = $this->reportinstance;
 		$xmlparams = array();
@@ -106,7 +120,7 @@ class ReportGenerator {
 		}
 	}
 	
-	function generateXmlParams(){
+	public function generateXmlParams(){
 		global $USER;
 		$params = array();
 		// Ffields
@@ -159,10 +173,9 @@ class ReportGenerator {
 		if(isset($this->params['sorrymessage']))
 			$params["sorrymessage"] = new XML_RPC_VALUE($this->params['sorrymessage'], 'string');
 		return $params;
-
 	}
 
-	function reportxmlrpc($method, $xmlparams){
+	public function reportxmlrpc($method, $xmlparams){
 		global $SETTINGS;
 		if (isset($SETTINGS['reportserver']['host']))
 			$reporthost = $SETTINGS['reportserver']['host'];
@@ -193,7 +206,7 @@ class ReportGenerator {
 
 	//setOptions
 	//array of options
-	function setOptions ($options) {
+	public function setOptions ($options) {
 		$this->options = $options;
 
 
@@ -213,7 +226,7 @@ class ReportGenerator {
 	//converts a string of options
 	//ie from a reportinstance parameter string
 	//or a GET query string
-	function setOptionsString ($paramstring) {
+	public function setOptionsString ($paramstring) {
 		$newoptions = array();
 		//parse this into an array
 		parse_str($paramstring, $newoptions);
@@ -223,7 +236,7 @@ class ReportGenerator {
 	//setOptionsCLI
 	//get options from command line params
 	//parses basic params ie "-school=1 -school=2 -someflag -format=csv"
-	function setOptionsCLI ($argvars, $argcount) {
+	public function setOptionsCLI ($argvars, $argcount) {
 		$options = array();
 		for ($x = 1; $x < $argcount ; $x++) {
 			if (strpos($argvars[$x], "-") === 0 ) {
