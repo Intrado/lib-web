@@ -139,6 +139,6 @@ class Formatters {
 	 */
 	public function fmt_field_messagekey($value, $data = array()) {
 		global $messagedatacache;
-		return(isset($messagedatacache['en'][$value]) ? $messagedatacache['en'][$value] : '');
+		return(isset($messagedatacache['en'][$value]) ? $messagedatacache['en'][$value] : $value);
 	}
 }
