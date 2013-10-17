@@ -4,7 +4,6 @@
  * ReportClassroomMessagingTest.php - PHPUnit test for obj/ReportClassroomMessaging.obj.php
  *
  * @package unittests
- * @author Sean M. Kelly, <skelly@schoolmessenger.com>
  * @version 1.0
  */
 
@@ -45,13 +44,13 @@ class ReportClassroomMessagingTest extends PHPUnit_Framework_TestCase {
 				'skey' => 4,
 				'studentid' => 5,
 				'student' => 6,
-				'messagekey' => 7,
+				'messagekey' => 'absent',
 				'notes' => 8,
 				'occurrence' => 9,
 				'lastattempt' => 10,
 				'destination' => 11,
-				'result' => 12,
-				'type' => 13
+				'result' => 'A',
+				'type' => 'phone'
 			)
 		);
 		$rcm->query->__results($fakedata);
@@ -85,7 +84,7 @@ class ReportClassroomMessagingTest extends PHPUnit_Framework_TestCase {
 		for ($i = 0; $i < self::NUM_EXPECTED_FIELDS; $i++) {
 			// Fields 6 and 12 are exceptions; because we use a formatter to
 			// modify their values, we expect them to NOT equal their index+1
-			if (($i == 6) || ($i == 12)) {
+			if (($i == 6) || ($i == 11)) {
 				if ($csvdata[$i] == ($i + 1)) {
 					$condition = false;
 					break;
