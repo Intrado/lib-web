@@ -34,7 +34,7 @@ abstract class ReportGenerator {
 		if ($this->testquery != ""){
 			$count = QuickQuery($this->testquery, $this->_readonlyDB);
 		}
-		if ($count > MAX_REPORT_PAGES) {
+		if ($count > self::MAX_REPORT_PAGES) {
 			$result = "Report exceeds max page limit";
 		}
 		
