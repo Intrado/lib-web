@@ -111,13 +111,27 @@ class ReportClassroomMessaging extends ReportGenerator {
 
 		$fmt = new Formatters();
 
-		// echo out the data
-		$titles = array('login', 'teacher', 'school', 'section', 'student id', 'student', 'message', 'notes', 'message time', 'last attempt', 'destination', 'result');
+		// For each of the query result fields selected that we want to show
+		// up in the CSV output, map the field to a title to use in the CSV
+		$titles = array(
+			'login' => 'Login',
+			'teacher' => 'Teacher',
+			'orgkey' => 'ORG', // TODO - translate to the customer's translated value for 'organization' 
+			'skey' => 'Section',
+			'studentid' => 'Student ID',
+			'student' => 'Student',
+			'messagekey' => 'Message',
+			'notes' => 'Notes',
+			'occurrence' => 'Message Time',
+			'lastattempt' => 'Last Attempt',
+			'destination' => 'Destination',
+			'result' => 'Result'
+		);
 		echo array_to_csv($titles) . "\n";
 
 		$formatters = array(
-			'result' => 'fmt_phone_or_email_result',
-			'messagekey' => 'fmt_messagekey'
+			'result' => 'fmt_field_phone_or_email_result',
+			'messagekey' => 'fmt_field_messagekey'
 		);
 
 		// For every row in the result data
