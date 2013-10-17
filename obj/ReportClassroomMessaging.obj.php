@@ -23,6 +23,11 @@ class ReportClassroomMessaging extends ReportGenerator {
 	 */
 	public function __construct($options) {
 		$this->options = $options;
+
+		// Allow the caller to specifiy the organization label to avoid calling getSystemSetting() in unit tests
+		if (! isset($this->options['orglabel'])) {
+			$this->options['orglabel'] = getSystemSetting('organizationfieldname', 'Organization');
+		}
 	}
 
 	/**
@@ -116,7 +121,7 @@ class ReportClassroomMessaging extends ReportGenerator {
 		$titles = array(
 			'login' => 'Login',
 			'teacher' => 'Teacher',
-			'orgkey' => 'ORG', // TODO - translate to the customer's translated value for 'organization' 
+			'orgkey' => $this->options['orglabel'],
 			'skey' => 'Section',
 			'studentid' => 'Student ID',
 			'student' => 'Student',

@@ -25,7 +25,10 @@ class ReportClassroomMessagingTest extends PHPUnit_Framework_TestCase {
 
 	public function test_summary_report() {
 
-		$options = array();
+		// Providing orglabel in options allows RCM constructor to skip a getSystemSetting() call for it
+		$options = array(
+			'orglabel' => 'School'
+		);
 		$rcm = new ReportClassroomMessaging($options);
 
 		// (1) Make sure it gives us a result object
