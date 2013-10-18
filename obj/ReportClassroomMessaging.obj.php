@@ -69,6 +69,12 @@ class ReportClassroomMessaging extends ReportGenerator {
 		}
 		else $personsql = $emailsql = $emailtable = $emailtableGuardianauto = '';
 
+		// Figure out a filter for a specific event user (teacher) to view only alerts/events associated with them
+		if (isset($this->options['userid'])) {
+			$eventsql = "AND e.userid = '" . intval($this->options['userid']) . "'";
+		}
+		else $eventsql = '';
+
 
 		// The query including clauses from above as WHERE clause "filters"
 		$this->query = Query("
@@ -103,6 +109,7 @@ class ReportClassroomMessaging extends ReportGenerator {
 				1
 				{$personsql}
 				{$emailsql}
+				{$eventsql}
 				{$orgsql}
 				{$datesql};
 		");

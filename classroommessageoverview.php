@@ -62,7 +62,7 @@ $options = $_SESSION['report']['options'];
 if (isset($_GET['download'])) {
 	$headers = new Headers();
 	$headers->send_csv_headers('classroom_messaging_report.csv');
-
+	$options['userid'] = $USER->id; // restrict the results to alerts/events linked with this user (teacher)
 	$rcm = new ReportClassroomMessaging($options);
 	$rcm->set_format('csv');
 	$rcm->generate();
@@ -206,10 +206,9 @@ select SQL_CALC_FOUND_ROWS
 	e.targetedmessageid,
 	e.notes
 from
-	personassociation pa
-	inner join person p on (pa.personid = p.id)
-	inner join event e on (pa.eventid = e.id)
-	INNER JOIN alert a ON (e.id = a.eventid)
+	alert a
+	inner join event e on (a.eventid = e.id)
+	inner join person p on (a.personid = p.id)
 	inner join targetedmessage tm on (e.targetedmessageid = tm.id)
 where
 	e.userid = ?
