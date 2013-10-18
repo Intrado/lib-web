@@ -16,11 +16,19 @@ require_once("obj/TargetedMessageCategory.obj.php");
 require_once("obj/Schedule.obj.php");
 require_once("inc/classroom.inc.php");
 
+// To add the filter form:
 require_once("obj/Validator.obj.php");
 require_once("obj/Phone.obj.php");
 require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
 
+// To add the CSV report:
+require_once('obj/Headers.obj.php');
+require_once('obj/ReportGenerator.obj.php');
+require_once('obj/ReportClassroomMessaging.obj.php');
+require_once('obj/Formatters.obj.php');
+require_once('inc/formatters.inc.php');
+require_once('messagedata/en/targetedmessage.php');
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -46,6 +54,22 @@ $limit = 100;
 $mode = $_SESSION['classroomoverview'];
 
 
+$options = $_SESSION['report']['options'];
+////////////////////////////////////////////////////////////////////////////////
+// CSV Report Handling
+////////////////////////////////////////////////////////////////////////////////
+
+if (isset($_GET['download'])) {
+	$headers = new Headers();
+	$headers->send_csv_headers('classroom_messaging_report.csv');
+
+	$rcm = new ReportClassroomMessaging($options);
+	$rcm->set_format('csv');
+	$rcm->generate();
+	exit;
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
@@ -53,9 +77,6 @@ $mode = $_SESSION['classroomoverview'];
 $formdata = array();
 $helpsteps = array();
 $helpstepscount = 1;
-
-$options = $_SESSION['report']['options'];
-
 
 $formdata["dateoptions"] = array(
 	"label" => _L("Date Options"),
@@ -122,7 +143,7 @@ if (isset($options['reldate']) && $options['reldate'] != '') {
 	$enddate = date('Y-m-d', $enddate);
 	$datesql = "AND (a.date >= '{$startdate}' and a.date < date_add('{$enddate}',interval 1 day) )";
 }
-else $datesql = '';
+else $datesql = 'AND a.date = CURDATE()';
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -251,11 +272,16 @@ startWindow(_L('My Classroom Messages'));
 	
 
 	<div class="csec window_main">
-		<? if($personcomments) { showPageMenu ($total,$start, $limit);} ?>
+		<?
+			if ($personcomments) {
+				showPageMenu ($total, $start, $limit);
+				echo '<a href="?download" target="_blank" class="" style="float:right; margin:10px 0;"><img src="img/icons/document_excel_csv.png" style="margin-right:5px;">Open full detail report in Excel</a>';
+			} 
+			echo $form->render();
+		?>
 		<table id="feeditems">
 			<?
 			if($personcomments) {
-				echo $form->render();
 				$customtxt = getoverridemessages($personcomments);
 				require_once($messagedatapath);
 				$currentdate = false;
@@ -263,7 +289,7 @@ startWindow(_L('My Classroom Messages'));
 				$first = current($personcomments);
 				if($first['date'] != date("Y-m-d", time())) {
 				?>
-					<tr><td style="border-bottom:0px;vertical-align:top;text-align:center;width:30px;"><img src="img/largeicons/information.jpg" /></td><td style="border-bottom:0px;"><div class="feedtitle"><?=_L("No Classroom Comments for Today") ?></div>
+					<tr><td style="border-bottom:0px;vertical-align:top;text-align:center;width:30px;"><img src="img/largeicons/information.jpg" /></td><td style="border-bottom:0px;"><div class="feedtitle"><?=_L('No Classroom Comments for Specified Date Range') ?></div>
 				<?
 				}
 
