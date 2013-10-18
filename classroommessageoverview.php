@@ -16,6 +16,13 @@ require_once("obj/TargetedMessageCategory.obj.php");
 require_once("obj/Schedule.obj.php");
 require_once("inc/classroom.inc.php");
 
+require_once("obj/Validator.obj.php");
+require_once("obj/Phone.obj.php");
+require_once("obj/Form.obj.php");
+require_once("obj/FormItem.obj.php");
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
@@ -37,6 +44,85 @@ $start = 0 + (isset($_GET['pagestart']) ? $_GET['pagestart'] : 0);
 $limit = 100;
 
 $mode = $_SESSION['classroomoverview'];
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Form Data
+////////////////////////////////////////////////////////////////////////////////
+
+$formdata = array();
+$helpsteps = array();
+$helpstepscount = 1;
+
+$options = $_SESSION['report']['options'];
+
+
+$formdata["dateoptions"] = array(
+	"label" => _L("Date Options"),
+	"fieldhelp" => _L("Select the date or date range that the report should cover."),
+	"value" => json_encode(array(
+		"reldate" => isset($options['reldate']) ? $options['reldate'] : 'today',
+		"xdays" => isset($options['lastxdays']) ? $options['lastxdays'] : '',
+		"startdate" => isset($options['startdate']) ? $options['startdate'] : '',
+		"enddate" => isset($options['enddate']) ? $options['enddate'] : ''
+	)),
+	"control" => array("ReldateOptions"),
+	"validators" => array(array("ValReldate")),
+	"helpstep" => $helpstepscount
+);
+
+$buttons = array( submit_button(_L('Filter'), 'filter', 'arrow_refresh'));
+$form = new Form('reportclassroomsearch', $formdata, $helpsteps, $buttons);
+
+////////////////////////////////////////////////////////////////////////////////
+// Form Data Handling
+////////////////////////////////////////////////////////////////////////////////
+
+//check and handle an ajax request (will exit early) or merge in related post data
+$form->handleRequest();
+
+
+$datachange = false;
+$errors = false;
+// check for form submission
+if ($button = $form->getSubmit()) { // checks for submit and merges in post data
+	$ajax = $form->isAjaxSubmit(); // whether or not this requires an ajax response
+
+	if ($form->checkForDataChange()) {
+		$datachange = true;
+	} else if (($errors = $form->validate()) === false) { // checks all of the items in this form
+		$postdata = $form->getData(); // gets assoc array of all values {name:value,...}
+		if ($ajax) {
+			if ($button == 'filter') {
+				$dateOptions = json_decode($postdata['dateoptions'], true);
+				if (! empty($dateOptions['reldate'])) {
+					$_SESSION['report']['options']['reldate'] = $dateOptions['reldate'];
+
+					if ($dateOptions['reldate'] == 'xdays' && isset($dateOptions['xdays'])) {
+						$_SESSION['report']['options']['lastxdays'] = $dateOptions['xdays'] + 0;
+					} else if ($dateOptions['reldate'] == 'daterange') {
+						if (! empty($dateOptions['startdate']))
+							$_SESSION['report']['options']['startdate'] = $dateOptions['startdate'];
+						if (! empty($dateOptions['enddate']))
+							$_SESSION['report']['options']['enddate'] = $dateOptions['enddate'];
+					}
+				}
+				$form->sendTo('classroommessageoverview.php');
+			}
+		} else {
+			redirect('lists.php');
+		}
+	}
+}
+
+$datesql = $startdate = $enddate = '';
+if (isset($options['reldate']) && $options['reldate'] != '') {
+	list($startdate, $enddate) = getStartEndDate($options['reldate'], $options);
+	$startdate = date('Y-m-d', $startdate);
+	$enddate = date('Y-m-d', $enddate);
+	$datesql = "AND (a.date >= '{$startdate}' and a.date < date_add('{$enddate}',interval 1 day) )";
+}
+else $datesql = '';
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -79,23 +165,40 @@ $commentpersons = false;
 
 $firstnamefield = FieldMap::getFirstNameField();
 $lastnamefield = FieldMap::getLastNameField();
-$orderby = "order by date desc, p.$firstnamefield,p.$lastnamefield,tm.id";
-
+$orderby = "order by date desc, p.{$firstnamefield},p.{$lastnamefield},tm.id";
 
 if($mode == 'comments') {
 	$orderby = "order by date desc,tm.id";
 }
 
-$query = "select SQL_CALC_FOUND_ROWS
-Date(e.occurence) as date, p.id as personid,p.pkey, p.$firstnamefield as firstname,p.$lastnamefield as lastname,
-tm.id as commentid ,tm.messagekey, tm.overridemessagegroupid ,tm.targetedmessagecategoryid, e.targetedmessageid, e.notes
-from personassociation pa
-inner join person p on (pa.personid = p.id)
-inner join event e on (pa.eventid = e.id)
-inner join targetedmessage tm on (e.targetedmessageid = tm.id)
-where e.userid = ? and not p.deleted $orderby limit $start, $limit";
+$query = "
+select SQL_CALC_FOUND_ROWS
+	Date(e.occurence) as date,
+	p.id as personid,
+	p.pkey,
+	p.{$firstnamefield} as firstname,
+	p.{$lastnamefield} as lastname,
+	tm.id as commentid,
+	tm.messagekey,
+	tm.overridemessagegroupid,
+	tm.targetedmessagecategoryid,
+	e.targetedmessageid,
+	e.notes
+from
+	personassociation pa
+	inner join person p on (pa.personid = p.id)
+	inner join event e on (pa.eventid = e.id)
+	INNER JOIN alert a ON (e.id = a.eventid)
+	inner join targetedmessage tm on (e.targetedmessageid = tm.id)
+where
+	e.userid = ?
+	and not p.deleted
+	{$datesql}
+{$orderby}
+limit
+	{$start}, {$limit}";
 
-$personcomments = QuickQueryMultiRow($query,true,false,array($USER->id));
+$personcomments = QuickQueryMultiRow($query, true, false, array($USER->id));
 
 $total = QuickQuery("select FOUND_ROWS()");
 
@@ -152,6 +255,7 @@ startWindow(_L('My Classroom Messages'));
 		<table id="feeditems">
 			<?
 			if($personcomments) {
+				echo $form->render();
 				$customtxt = getoverridemessages($personcomments);
 				require_once($messagedatapath);
 				$currentdate = false;
