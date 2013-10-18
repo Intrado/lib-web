@@ -2198,3 +2198,11 @@ $$$
 ALTER TABLE `alert` ADD INDEX ( `date` )
 $$$
 -- END 10.0/1
+
+-- START 10.0/2
+update setting set value='10.0/2' where name='_dbversion'
+$$$
+ALTER TABLE `event` ADD INDEX ( `userid` )
+$$$
+-- END 10.0/2
+
