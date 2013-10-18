@@ -86,7 +86,8 @@ class ReportClassroomMessaging extends ReportGenerator {
 				rc.type,
 				if(rc.type = 'email', rc.email, rc.phone) as destination,
 				if(rc.type = 'email', (select statuscode from reportemaildelivery where jobid = rc.jobid and personid = rc.personid and sequence = rc.sequence order by timestamp limit 1), rc.result) as result
-			from alert a
+			from
+				alert a
 				inner join event e on (e.id = a.eventid)
 				inner join organization o on (o.id = e.organizationid)
 				inner join section s on (s.id = e.sectionid)
