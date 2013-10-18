@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mocha</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" href="/UNITTEST/javascript/vendor/mocha.css" />
+
+  <script src="/script/jquery-1.8.3.js"></script>
+
+  <script src="/UNITTEST/javascript/vendor/mocha.js"></script>
+  <script src="/UNITTEST/javascript/vendor/chai.js"></script>
+  <script src="/UNITTEST/javascript/vendor/sinon-chai.js"></script>
+  <script src="/UNITTEST/javascript/vendor/sinon-1.5.0.js"></script>
+  </head>
+<body>
+  <div id="mocha"></div>
+  <script>
+    var expect = chai.expect;
+    mocha.setup({ui: 'bdd', ignoreLeaks: true});
+    </script>
+
+  <!-- TESTABLE FILES GO HERE -->
+  <script src="/script/rcieditor.js"></script>
+
+  <!-- TEST GO HERE -->
+  <script src="/UNITTEST/javascript/tests/example_test.js"></script>
+  <script src="/UNITTEST/javascript/tests/rcieditor_test.js"></script>
+
+  <script>
+    mocha.run();
+  </script>
+  </body>
+</html>
