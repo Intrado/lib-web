@@ -386,7 +386,7 @@
 	/*
 	 * Get the class contacts and set observers
 	 */
-	function getclass(selected) {
+	function getclass(selected, orderby) {
 		$('sectionloading').show();
 		$('sectionloaded').hide();
 		$('theinstructions').hide();
@@ -394,7 +394,7 @@
 		new Ajax.Request(requesturl,
 		{
 			method:'get',
-			parameters: {sectionid: selected},
+			parameters: {sectionid: selected, orderby: orderby},
 			onSuccess: function(transport){
 				var response = transport.responseJSON || "Class not available";
 				var contacts = $H(response.people);
@@ -417,7 +417,9 @@
 				contacts.each(function(person) {
 					var id = 'c-' + person.key;
 					var tr = new Element('tr');
-					tr.insert('<td width="100%"><a href="#" id="' + id + '" title="Student id: ' +  person.value.pkey + '" style="text-decoration:none;cursor:pointer;white-space: nowrap;">' + person.value.pkey + ' - ' + person.value.name +'</a></td>');
+					//name = person.value.name;
+					name = (orderby == 'l') ? person.value.lastname + ', ' + person.value.firstname : person.value.firstname + ' ' + person.value.lastname;
+					tr.insert('<td width="100%"><a href="#" id="' + id + '" title="Student id: ' +  person.value.pkey + '" style="text-decoration:none;cursor:pointer;white-space: nowrap;">' + person.value.pkey + ' - ' + name +'</a></td>');
 					var td = new Element('td', {style:'white-space:nowrap'});//{white-space:'nowrap'}
 					categoryinfo.each(function(category) {
 						td.insert('<img id="' + id + '-' + category.key + '"src="img/pixel.gif" title="0 Comment(s) for ' + category.value.name + '" style="width:10px;display:inline;" alt="" />');
@@ -585,6 +587,16 @@
 		}
 	};
 
+	function form_getclass() {
+		var sectionid = $('classselect').getValue();
+
+		// Here's how you get the value of the checked radio button in a radio button group with prototypejs
+		// ref: http://stereointeractive.com/blog/2008/06/05/get-radio-button-value-using-prototype/
+		var orderby = $$('input:checked[type="radio"][name="orderby"]').pluck('value');
+
+		getclass(sectionid, orderby);
+	}
+
 	document.observe("dom:loaded", function() {
 
 		getclass($('classselect').getValue());
@@ -619,7 +631,14 @@
 
 		$('classselect').observe('change', function(event) {
 			event.stop();
-			getclass(event.element().getValue());
+			form_getclass();
+		});
+
+		// Watch for changes to the order by:
+		//$('input:[type="radio"][name="orderby"]').observe('check', function (event) {
+		$('orderbys').on('change', '.orderbys', function (event) {
+			event.stop();
+			form_getclass();
 		});
 
 		$$('#libraryContent .classroomcomment').each(function(message) {

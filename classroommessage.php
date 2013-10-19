@@ -157,13 +157,44 @@ if (isset($_GET['sectionid'])) {
 		$firstnamefield = FieldMap::getFirstNameField();
 		$lastnamefield = FieldMap::getLastNameField();
 
-		$res = Query("select p.id, p.pkey,concat(p.$firstnamefield,' ', p.$lastnamefield) name
-											from person p join personassociation pa on (p.id = pa.personid)
-											where pa.type = 'section' and sectionid = ? and not p.deleted order by p.$firstnamefield,p.$lastnamefield",false,array($id));
+		switch ($_GET['orderby']) {
+			default:
+			case 'f':
+				$orderby = "p.{$firstnamefield}, p.{$lastnamefield}";
+				break;
+
+			case 'l':
+				$orderby = "p.{$lastnamefield}, p.{$firstnamefield}";
+				break;
+
+			case 'p':
+				$orderby = 'p.pkey';
+				break;
+		}
+
+		$res = Query("
+			select
+				p.id,
+				p.pkey,
+				p.{$firstnamefield} AS firstname,
+				p.{$lastnamefield} AS lastname
+			from
+				person p 
+				join personassociation pa on (p.id = pa.personid)
+			where
+				pa.type = 'section'
+				and sectionid = ?
+				and not p.deleted
+			order by
+				{$orderby};
+			", false, array($id));
+
 		while($row = DBGetRow($res)){
 			$obj = null;
 			$obj->pkey = escapehtml($row[1]);
-			$obj->name = escapehtml($row[2]);
+			//$obj->name = escapehtml($row[2]);
+			$obj->firstname = escapehtml($row[2]);
+			$obj->lastname = escapehtml($row[3]);
 			$response->people[$row[0]] = $obj;
 		}
 		if(isset($response->people) && count($response->people) > 0) {
@@ -259,6 +290,14 @@ include_once("nav.inc.php");
 startWindow(_L('Classroom Comments'));
 echo button_bar(icon_button("Done Picking Comments", "tick", null, $redirect), '<div id="clock" class="clock"></div>');
 ?>
+
+<div id="orderbys">
+	<h3>Sort By:</h3>
+	<input class="orderbys" type="radio" name="orderby" value="f" checked="checked"/> First Name<br/>
+	<input class="orderbys" type="radio" name="orderby" value="l"/> Last Name<br/>
+	<input class="orderbys" type="radio" name="orderby" value="p"/> Student ID<br/>
+</div>
+<br/>
 
 <label>Section: <select id="classselect" class="comment_section" name="classselect">
 <?
