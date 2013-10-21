@@ -233,7 +233,7 @@
 							comment.insert(new Element('img',{id:'smsgchk-' + itm.key,'class':'msgchk',src:'img/checkbox-clear.png',alt:''}));
 							comment.insert(new Element('div',{id:'smsgtxt-' + itm.key,'class':'msgtxt'}).update(itm.value.title));
 							comment.insert('<img src="img/icons/fugue/marker.gif" alt="Mark" title="Mark this Comment" class="marker" onclick="markcomment(\'smsg-\',\'' + itm.key + '\')" />');
-							var remarklink = new Element('div',{style:'clear:both;'});
+							var remarklink = new Element('div');
 
 							if(hascomments) {
 								remarklink.insert(new Element('div',{id:'smsgprem' + itm.key,'class':'remarklink'}));
