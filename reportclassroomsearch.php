@@ -106,8 +106,8 @@ $formdata = array();
 $helpsteps = array();
 $helpstepscount = 1;
 
-$options = $_SESSION['report']['options'];
-if($options['classroomreporttype'] == 'person') {
+$options = (isset($_SESSION['report'])) ? $_SESSION['report']['options'] : array();
+if (isset($options['classroomreporttype']) && ('person' == $options['classroomreporttype'])) {
 
 	if (!empty($options['personid'])) {
 		$searchmethod = 'personid';

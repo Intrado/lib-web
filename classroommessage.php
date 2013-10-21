@@ -291,30 +291,30 @@ startWindow(_L('Classroom Comments'));
 echo button_bar(icon_button("Done Picking Comments", "tick", null, $redirect), '<div id="clock" class="clock"></div>');
 ?>
 
-<div id="orderbys">
-	<h3>Sort By:</h3>
-	<input class="orderbys" type="radio" name="orderby" value="f" checked="checked"/> First Name<br/>
-	<input class="orderbys" type="radio" name="orderby" value="l"/> Last Name<br/>
-	<input class="orderbys" type="radio" name="orderby" value="p"/> Student ID<br/>
-</div>
-<br/>
-
-<label>Section: <select id="classselect" class="comment_section" name="classselect">
-<?
-
-if($sections) {
-	foreach($sections as $section)
-		echo '<option value="'.$section->id.'">'.escapehtml($section->skey).'</option>';
-} else {
-	echo '<option value="">' . _L('-- No Section Available --') . '</option>';
-}
-
-?>
-</select></label><div id="sectionloading">&nbsp;<?= $sections?'<img src="img/ajax-loader.gif" alt="Loading Section" />' . _L('Loading Section'):'' ?></div><br />
 
 <table width="100%" id="picker" style="display:none;clear:both; margin-top: 3px;">
 	<tr>
 		<td style="top: 0px; vertical-align: top; padding-right: 10px;white-space: nowrap;">
+			<div id="orderbys">
+				<h3>Sort By:</h3>
+				<input class="orderbys" type="radio" name="orderby" value="f" checked="checked"/> First Name<br/>
+				<input class="orderbys" type="radio" name="orderby" value="l"/> Last Name<br/>
+				<input class="orderbys" type="radio" name="orderby" value="p"/> Student ID<br/>
+			</div>
+			<br/>
+
+			<label>Section: <select id="classselect" class="comment_section" name="classselect">
+			<?
+
+			if($sections) {
+				foreach($sections as $section)
+					echo '<option value="'.$section->id.'">'.escapehtml($section->skey).'</option>';
+			} else {
+				echo '<option value="">' . _L('-- No Section Available --') . '</option>';
+			}
+
+			?>
+			</select></label><div id="sectionloading">&nbsp;<?= $sections?'<img src="img/ajax-loader.gif" alt="Loading Section" />' . _L('Loading Section'):'' ?></div><br />
 			<div id="sectionloaded" style="display:none;">
 			<a id="checkall" href="#" style="float:left;white-space: nowrap;">Select All</a><br />
 			<div id="contactwrapper" >

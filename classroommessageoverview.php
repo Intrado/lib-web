@@ -53,8 +53,9 @@ $limit = 100;
 
 $mode = $_SESSION['classroomoverview'];
 
+$options = (isset($_SESSION['report'])) ? $_SESSION['report']['options'] : array();
 
-$options = $_SESSION['report']['options'];
+
 ////////////////////////////////////////////////////////////////////////////////
 // CSV Report Handling
 ////////////////////////////////////////////////////////////////////////////////
@@ -89,8 +90,28 @@ $formdata["dateoptions"] = array(
 	)),
 	"control" => array("ReldateOptions"),
 	"validators" => array(array("ValReldate")),
-	"helpstep" => $helpstepscount
+	"helpstep" => $helpstepscount++
 );
+$helpsteps[] = _L('Select a date range to pull a classroom messaging report against.');
+
+// Person ID search filter - reuse the previous form submissions' value if there was one
+$searchvalue = (isset($options['personid'])) ? $options['personid'] : '';
+/*
+$formdata['searchmethod'] = array(
+	'value' => 'personid',
+	'control' => array('HiddenField')
+);
+*/
+$formdata["personid"] = array(
+	"label" => _L("Student ID"),
+	"fieldhelp" => _L("Enter the student ID that you want to restrict the report to."),
+	"value" => $searchvalue,
+	"control" => array("TextField"),
+	"validators" => array(),
+	"helpstep" => $helpstepscount++
+);
+$helpsteps[] = _L('Optionally enter a student ID to limit the report to just that student.');
+
 
 $buttons = array( submit_button(_L('Filter'), 'filter', 'arrow_refresh'));
 $form = new Form('reportclassroomsearch', $formdata, $helpsteps, $buttons);
@@ -128,6 +149,10 @@ if ($button = $form->getSubmit()) { // checks for submit and merges in post data
 							$_SESSION['report']['options']['enddate'] = $dateOptions['enddate'];
 					}
 				}
+				if (isset($postdata['personid'])) {
+					$_SESSION['report']['options']['personid'] = $postdata['personid'];
+				}
+
 				$form->sendTo('classroommessageoverview.php');
 			}
 		} else {
@@ -188,6 +213,11 @@ $firstnamefield = FieldMap::getFirstNameField();
 $lastnamefield = FieldMap::getLastNameField();
 $orderby = "order by date desc, p.{$firstnamefield},p.{$lastnamefield},tm.id";
 
+if (isset($options['personid']) && strlen($options['personid'])) {
+	$personsql = "AND p.pkey = '" . DBSafe($options['personid']) . "'";
+}
+else $personsql = '';
+
 if($mode == 'comments') {
 	$orderby = "order by date desc,tm.id";
 }
@@ -214,6 +244,7 @@ where
 	e.userid = ?
 	and not p.deleted
 	{$datesql}
+	{$personsql}
 {$orderby}
 limit
 	{$start}, {$limit}";
@@ -280,18 +311,10 @@ startWindow(_L('My Classroom Messages'));
 		?>
 		<table id="feeditems">
 			<?
-			if($personcomments) {
+			if ($personcomments) {
 				$customtxt = getoverridemessages($personcomments);
 				require_once($messagedatapath);
 				$currentdate = false;
-
-				$first = current($personcomments);
-				if($first['date'] != date("Y-m-d", time())) {
-				?>
-					<tr><td style="border-bottom:0px;vertical-align:top;text-align:center;width:30px;"><img src="img/largeicons/information.jpg" /></td><td style="border-bottom:0px;"><div class="feedtitle"><?=_L('No Classroom Comments for Specified Date Range') ?></div>
-				<?
-				}
-
 
 				if($mode == 'comments') {
 					$commentid = false;
