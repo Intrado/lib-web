@@ -1,0 +1,570 @@
+/* CSS style definitions for the jquery.easycall.js widget.
+ * The following styles were extracted from /css/messagesender.scss and bootstrap.css
+ * to provide consistent easycall widget styling across pages outside of messagesender.
+ * The prepended classes '.easycallmaincontainer.easycall-widget.easycall' were added
+ * to increase the CSS specificity in order to override some highly specific CSS from the forms in css.php
+
+************************************************************/
+
+
+
+/* The following are Twitter Bootstrap specific styles used for the easycall widget,
+ * (taken from bootstrap-2.3.2.css) and are used to provide similar
+ * look and feel to the easycall widget as in MessageSender
+**************************************************************/
+
+.easycallmaincontainer.easycall-widget.easycall input.easycallphoneinput,
+.easycallmaincontainer.easycall-widget.easycall input.easycallextensioninput {
+    background-color: #FFFFFF;
+    border: 1px solid #CCCCCC;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
+    transition: border 0.2s linear 0s, box-shadow 0.2s linear 0s;
+    color: #555555;
+    display: inline-block;
+    font-size: 14px;
+    font-family: "Helvetica Neue",​Helvetica,​Arial,​sans-serif;
+    height: 30px;
+    line-height: 30px;
+    margin-bottom: 10px;
+    padding: 4px 6px;
+    vertical-align: middle;
+    -webkit-border-radius: inherit;
+       -moz-border-radius: inherit;
+            border-radius: inherit;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+       -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+            box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  	-webkit-transition: border linear 0.2s, box-shadow linear 0.2s;
+       -moz-transition: border linear 0.2s, box-shadow linear 0.2s;
+         -o-transition: border linear 0.2s, box-shadow linear 0.2s;
+            transition: border linear 0.2s, box-shadow linear 0.2s;
+}
+
+.easycallmaincontainer.easycall-widget.easycall input.easycallphoneinput:focus,
+.easycallmaincontainer.easycall-widget.easycall input.easycallextensioninput:focus {
+  border-color: rgba(82, 168, 236, 0.8);
+  outline: 0;
+  outline: thin dotted \9;
+  /* IE6-9 */
+
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
+     -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
+          box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
+}
+
+.easycallmaincontainer.easycall-widget.easycall input.easycallphoneinput {
+	width: 135px;
+	min-width: 135px;
+}
+
+.easycallmaincontainer.easycall-widget.easycall .sprite-sprite,
+.easycallmaincontainer.easycall-widget.easycall .sprite-glyphicons-phone,
+.easycallmaincontainer.easycall-widget.easycall .sprite-pictos-phone,
+.easycallmaincontainer.easycall-widget.easycall .sprite-pictos-play,
+.easycallmaincontainer.easycall-widget.easycall .sprite-pictos-refresh,
+.easycallmaincontainer.easycall-widget.easycall .sprite-glyphicons-remove_2 {
+  background: url('../img/sprite-messagesender-9.7.3.png') no-repeat;
+  display: inline-block;
+}
+
+.easycallmaincontainer.easycall-widget.easycall .sprite-glyphicons-phone {
+  margin: 0 3px;
+  background-position: 0 -285px;
+  height: 17px;
+  width: 16px; }
+
+.easycallmaincontainer.easycall-widget.easycall .sprite-pictos-phone {
+  background-position: 0 -368px;
+  height: 16px;
+  width: 16px; }
+
+.easycallmaincontainer.easycall-widget.easycall .sprite-pictos-play {
+  background-position: 0 -453px;
+  height: 16px;
+  width: 16px; }
+
+.easycallmaincontainer.easycall-widget.easycall .sprite-pictos-refresh {
+  background-position: 0 -563px;
+  height: 16px;
+  width: 16px; }
+
+.easycallmaincontainer.easycall-widget.easycall .sprite-glyphicons-remove_2 {
+  background-position: 0 -1907px;
+  height: 13px;
+  width: 12px; }
+
+.easycallmaincontainer.easycall-widget.easycall .alert {
+    background-color: #FCF8E3;
+    border: 1px solid #FBEED5;
+    border-radius: 4px 4px 4px 4px;
+    margin-bottom: 20px;
+    padding: 8px 35px 8px 14px;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+.easycallmaincontainer.easycall-widget.easycall .alert-danger, .easycallmaincontainer.easycall-widget.easycall .alert-error {
+    background-color: #F2DEDE;
+    border-color: #EED3D7;
+    color: #B94A48;
+}
+
+.easycallmaincontainer.easycall-widget.easycall .btn-danger {
+    background-color: #DA4F49;
+    background-image: linear-gradient(to bottom, #EE5F5B, #BD362F);
+    background-repeat: repeat-x;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+    color: #FFFFFF;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+}
+.easycallmaincontainer.easycall-widget.easycall .btn-danger:hover,
+.easycallmaincontainer.easycall-widget.easycall .btn-danger:focus,
+.easycallmaincontainer.easycall-widget.easycall .btn-danger:active,
+.easycallmaincontainer.easycall-widget.easycall .btn-danger.active,
+.easycallmaincontainer.easycall-widget.easycall .btn-danger.disabled,
+.easycallmaincontainer.easycall-widget.easycall .btn-danger[disabled] {
+    background-color: #BD362F;
+    color: #FFFFFF;
+}
+
+.easycallmaincontainer.easycall-widget.easycall .btn.btn-success {
+  line-height: 20px;
+  padding: 4px 12px;
+  -webkit-background-clip: border-box;
+     -moz-background-clip: border-box;
+          background-clip: border-box;
+}
+.easycallmaincontainer.easycall-widget.easycall .btn-success {
+  color: #ffffff;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+  background-color: #5bb75b;
+  *background-color: #51a351;
+  background-image: -moz-linear-gradient(top, #62c462, #51a351);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#62c462), to(#51a351));
+  background-image: -webkit-linear-gradient(top, #62c462, #51a351);
+  background-image: -o-linear-gradient(top, #62c462, #51a351);
+  background-image: linear-gradient(to bottom, #62c462, #51a351);
+  background-repeat: repeat-x;
+  border-color: #51a351 #51a351 #387038;
+  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff62c462', endColorstr='#ff51a351', GradientType=0);
+  filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+}
+
+.easycallmaincontainer.easycall-widget.easycall .btn-success:hover,
+.easycallmaincontainer.easycall-widget.easycall .btn-success:focus,
+.easycallmaincontainer.easycall-widget.easycall .btn-success:active,
+.easycallmaincontainer.easycall-widget.easycall .btn-success.active,
+.easycallmaincontainer.easycall-widget.easycall .btn-success.disabled,
+.easycallmaincontainer.easycall-widget.easycall .btn-success[disabled] {
+    background-color: #51A351 !important;
+    color: #FFFFFF !important;
+    background-image: none !important;
+}
+
+.easycallmaincontainer.easycall-widget.easycall .input-append,
+.easycallmaincontainer.easycall-widget.easycall .input-prepend {
+    display: inline-block;
+    font-size: 0;
+    margin-bottom: 10px;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+.easycallmaincontainer.easycall-widget.easycall .input-append input,
+.easycallmaincontainer.easycall-widget.easycall .input-prepend input {
+    font-size: 14px;
+    border-radius: 0 4px 4px 0;
+    margin: 0;
+    position: relative;
+    vertical-align: top;
+}
+.easycallmaincontainer.easycall-widget.easycall .input-append input:focus,
+.easycallmaincontainer.easycall-widget.easycall .input-prepend input:focus {
+    z-index: 2;
+}
+.easycallmaincontainer.easycall-widget.easycall .input-append .add-on,
+.easycallmaincontainer.easycall-widget.easycall .input-prepend .add-on {
+    background-color: #EEEEEE;
+    border: 1px solid #CCCCCC;
+    display: inline-block;
+    font-size: 14px;
+    font-weight: normal;
+    height: 30px;
+    line-height: 30px;
+    min-width: 22px;
+    padding: 4px 5px;
+    text-align: center;
+    text-shadow: 0 1px 0 #FFFFFF;
+    width: auto;
+}
+
+.easycallmaincontainer.easycall-widget.easycall .input-append .add-on,
+.easycallmaincontainer.easycall-widget.easycall .input-prepend .add-on,
+.easycallmaincontainer.easycall-widget.easycall .input-append .btn,
+.easycallmaincontainer.easycall-widget.easycall .input-prepend .btn {
+    border-radius: 0 0 0 0;
+    vertical-align: top;
+}
+
+.easycallmaincontainer.easycall-widget.easycall .input-append .active,
+.easycallmaincontainer.easycall-widget.easycall .input-prepend .active {
+    background-color: #A9DBA9;
+    border-color: #46A546;
+}
+.easycallmaincontainer.easycall-widget.easycall .input-prepend .add-on,
+.easycallmaincontainer.easycall-widget.easycall .input-prepend .btn {
+    margin-right: -1px;
+}
+.easycallmaincontainer.easycall-widget.easycall .input-prepend .add-on:first-child,
+.easycallmaincontainer.easycall-widget.easycall .input-prepend .btn:first-child {
+    border-radius: 4px 0 0 4px;
+}
+.easycallmaincontainer.easycall-widget.easycall .input-append input {
+    border-radius: 4px 0 0 4px;
+}
+.easycallmaincontainer.easycall-widget.easycall .input-append input + .btn-group .btn:last-child,
+.easycallmaincontainer.easycall-widget.easycall .input-append select + .btn-group .btn:last-child {
+    border-radius: 0 4px 4px 0;
+}
+.easycallmaincontainer.easycall-widget.easycall .input-append .add-on,
+.easycallmaincontainer.easycall-widget.easycall .input-append .btn,
+.easycallmaincontainer.easycall-widget.easycall .input-append .btn-group {
+    margin-left: -1px;
+}
+.easycallmaincontainer.easycall-widget.easycall .input-append .add-on:last-child,
+.easycallmaincontainer.easycall-widget.easycall .input-append .btn:last-child {
+    border-radius: 0 4px 4px 0;
+}
+.easycallmaincontainer.easycall-widget.easycall .input-prepend.input-append input,
+.easycallmaincontainer.easycall-widget.easycall .input-prepend.input-append select {
+    border-radius: 0 0 0 0;
+}
+.easycallmaincontainer.easycall-widget.easycall .input-prepend.input-append input + .btn-group .btn,
+.easycallmaincontainer.easycall-widget.easycall .input-prepend.input-append select + .btn-group .btn {
+    border-radius: 0 4px 4px 0;
+}
+.easycallmaincontainer.easycall-widget.easycall .input-prepend.input-append .add-on:first-child,
+.easycallmaincontainer.easycall-widget.easycall .input-prepend.input-append .btn:first-child {
+    border-radius: 4px 0 0 4px;
+    margin-right: -1px;
+}
+.easycallmaincontainer.easycall-widget.easycall .input-prepend.input-append .add-on:last-child,
+.easycallmaincontainer.easycall-widget.easycall .input-prepend.input-append .btn:last-child {
+    border-radius: 0 4px 4px 0;
+    margin-left: -1px;
+}
+.easycallmaincontainer.easycall-widget.easycall .input-prepend.input-append .btn-group:first-child {
+    margin-left: 0;
+}
+.easycallmaincontainer.easycall-widget.easycall .pull-right {
+	float: right;
+}
+
+.easycallmaincontainer.easycall-widget.easycall .btn-group {
+    display: inline-block;
+    font-size: 0;
+    position: relative;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.easycallmaincontainer.easycall-widget.easycall .btn-group {
+  position: relative;
+  display: inline-block;
+  *display: inline;
+  *margin-left: .3em;
+  font-size: 0;
+  white-space: nowrap;
+  vertical-align: middle;
+  *zoom: 1;
+}
+
+.easycallmaincontainer.easycall-widget.easycall .btn-group:first-child {
+  *margin-left: 0;
+}
+
+.easycallmaincontainer.easycall-widget.easycall .btn-group > .btn {
+  padding-right: 12px;
+  padding-left: 12px;
+  position: relative;
+  font-size: 14px;
+  margin: 0;
+  -webkit-border-radius: 0;
+     -moz-border-radius: 0;
+          border-radius: 0;
+}
+
+.easycallmaincontainer.easycall-widget.easycall .btn-group > .btn + .btn {
+  margin-left: -1px;
+}
+
+.easycallmaincontainer.easycall-widget.easycall .btn-group > .btn:first-child {
+  margin-left: 0;
+  -webkit-border-bottom-left-radius: 4px;
+          border-bottom-left-radius: 4px;
+  -webkit-border-top-left-radius: 4px;
+          border-top-left-radius: 4px;
+  -moz-border-radius-bottomleft: 4px;
+  -moz-border-radius-topleft: 4px;
+}
+
+.easycallmaincontainer.easycall-widget.easycall .btn-group > .btn:last-child,
+.easycallmaincontainer.easycall-widget.easycall .btn-group > .dropdown-toggle {
+  -webkit-border-top-right-radius: 4px;
+          border-top-right-radius: 4px;
+  -webkit-border-bottom-right-radius: 4px;
+          border-bottom-right-radius: 4px;
+  -moz-border-radius-topright: 4px;
+  -moz-border-radius-bottomright: 4px;
+}
+
+.easycallmaincontainer.easycall-widget.easycall .btn-group > .btn:hover,
+.easycallmaincontainer.easycall-widget.easycall .btn-group > .btn:focus,
+.easycallmaincontainer.easycall-widget.easycall .btn-group > .btn:active,
+.easycallmaincontainer.easycall-widget.easycall .btn-group > .btn.active {
+  z-index: 2;
+}
+
+@-webkit-keyframes progress-bar-stripes {
+  from {
+    background-position: 40px 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+
+@-moz-keyframes progress-bar-stripes {
+  from {
+    background-position: 40px 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+
+@-ms-keyframes progress-bar-stripes {
+  from {
+    background-position: 40px 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+
+@-o-keyframes progress-bar-stripes {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 40px 0;
+  }
+}
+
+@keyframes progress-bar-stripes {
+  from {
+    background-position: 40px 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+
+.easycallmaincontainer.easycall-widget.easycall .progress {
+  height: 20px;
+  margin-bottom: 20px;
+  overflow: hidden;
+  background-color: #f7f7f7;
+  background-image: -moz-linear-gradient(top, #f5f5f5, #f9f9f9);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#f5f5f5), to(#f9f9f9));
+  background-image: -webkit-linear-gradient(top, #f5f5f5, #f9f9f9);
+  background-image: -o-linear-gradient(top, #f5f5f5, #f9f9f9);
+  background-image: linear-gradient(to bottom, #f5f5f5, #f9f9f9);
+  background-repeat: repeat-x;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fff5f5f5', endColorstr='#fff9f9f9', GradientType=0);
+  -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+     -moz-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+          box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.easycallmaincontainer.easycall-widget.easycall .progress .bar {
+  float: left;
+  width: 0;
+  height: 100%;
+  font-size: 12px;
+  color: #ffffff;
+  text-align: center;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+  background-color: #0e90d2;
+  background-image: -moz-linear-gradient(top, #149bdf, #0480be);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#149bdf), to(#0480be));
+  background-image: -webkit-linear-gradient(top, #149bdf, #0480be);
+  background-image: -o-linear-gradient(top, #149bdf, #0480be);
+  background-image: linear-gradient(to bottom, #149bdf, #0480be);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff149bdf', endColorstr='#ff0480be', GradientType=0);
+  -webkit-box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.15);
+     -moz-box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.15);
+          box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.15);
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
+  -webkit-transition: width 0.6s ease;
+     -moz-transition: width 0.6s ease;
+       -o-transition: width 0.6s ease;
+          transition: width 0.6s ease;
+}
+
+.easycallmaincontainer.easycall-widget.easycall .progress .bar + .bar {
+  -webkit-box-shadow: inset 1px 0 0 rgba(0, 0, 0, 0.15), inset 0 -1px 0 rgba(0, 0, 0, 0.15);
+     -moz-box-shadow: inset 1px 0 0 rgba(0, 0, 0, 0.15), inset 0 -1px 0 rgba(0, 0, 0, 0.15);
+          box-shadow: inset 1px 0 0 rgba(0, 0, 0, 0.15), inset 0 -1px 0 rgba(0, 0, 0, 0.15);
+}
+
+.easycallmaincontainer.easycall-widget.easycall .progress-striped .bar {
+  background-color: #149bdf;
+  background-image: -webkit-gradient(linear, 0 100%, 100% 0, color-stop(0.25, rgba(255, 255, 255, 0.15)), color-stop(0.25, transparent), color-stop(0.5, transparent), color-stop(0.5, rgba(255, 255, 255, 0.15)), color-stop(0.75, rgba(255, 255, 255, 0.15)), color-stop(0.75, transparent), to(transparent));
+  background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+  background-image: -moz-linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+  background-image: -o-linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+  background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+  -webkit-background-size: 40px 40px;
+     -moz-background-size: 40px 40px;
+       -o-background-size: 40px 40px;
+          background-size: 40px 40px;
+}
+
+.easycallmaincontainer.easycall-widget.easycall .progress.active .bar {
+  -webkit-animation: progress-bar-stripes 2s linear infinite;
+     -moz-animation: progress-bar-stripes 2s linear infinite;
+      -ms-animation: progress-bar-stripes 2s linear infinite;
+       -o-animation: progress-bar-stripes 2s linear infinite;
+          animation: progress-bar-stripes 2s linear infinite;
+}
+
+.easycallmaincontainer.easycall-widget.easycall .progress-success .bar,
+.easycallmaincontainer.easycall-widget.easycall .progress .bar-success {
+  background-color: #5eb95e;
+  background-image: -moz-linear-gradient(top, #62c462, #57a957);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#62c462), to(#57a957));
+  background-image: -webkit-linear-gradient(top, #62c462, #57a957);
+  background-image: -o-linear-gradient(top, #62c462, #57a957);
+  background-image: linear-gradient(to bottom, #62c462, #57a957);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff62c462', endColorstr='#ff57a957', GradientType=0);
+}
+
+.easycallmaincontainer.easycall-widget.easycall .progress-success.progress-striped .bar,
+.easycallmaincontainer.easycall-widget.easycall .progress-striped .bar-success {
+  background-color: #62c462;
+  background-image: -webkit-gradient(linear, 0 100%, 100% 0, color-stop(0.25, rgba(255, 255, 255, 0.15)), color-stop(0.25, transparent), color-stop(0.5, transparent), color-stop(0.5, rgba(255, 255, 255, 0.15)), color-stop(0.75, rgba(255, 255, 255, 0.15)), color-stop(0.75, transparent), to(transparent));
+  background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+  background-image: -moz-linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+  background-image: -o-linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+  background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+}
+
+
+
+
+/* The following styles were taken from messagesender.scss (as of 9.7.3)
+ * to support the similar LAF of easycall outside of MS
+***********************************************************************/
+.easycallmaincontainer.easycall-widget.easycall .call-progress,
+.easycallmaincontainer.easycall-widget.easycall .call-progress:hover {
+    animation: 2s linear 0s normal none infinite progress-bar-stripes;
+    background: linear-gradient(-45deg, rgba(255, 255, 255, 0.15) 25%, rgba(0, 0, 0, 0) 25%, rgba(0, 0, 0, 0) 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, rgba(0, 0, 0, 0) 75%, rgba(0, 0, 0, 0)) repeat scroll 0 0 / 40px 40px #55AA28;
+    border: 1px solid #40811E;
+    border-radius: 5px 5px 5px 5px;
+    box-shadow: none;
+    color: #FFFFFF;
+    cursor: default;
+    line-height: 19px;
+    padding: 5px 10px;
+    text-align: left;
+    width: 400px;
+}
+.easycallmaincontainer.easycall-widget.easycall .call-progress:hover {
+    cursor: pointer;
+}
+/*.easycallmaincontainer.easycall-widget.easycall .easycallphoneinput {
+    min-width: 135px;
+}*/
+.easycallmaincontainer.easycall-widget.easycall .easycallpreviewcontainer {
+    border-bottom: 1px solid #DDDDDD;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    width: 280px;
+}
+.easycallmaincontainer.easycall-widget.easycall .easycallpreviewcontainer .sprite-glyphicons-remove_2 {
+    margin: 3px 1px 0;
+}
+.easycallmaincontainer.easycall-widget.easycall select {
+    float: left;
+    margin-right: 5px;
+    width: 130px !important;
+}
+.easycallmaincontainer.easycall-widget.easycall .easycalllanguagetitle {
+    display: inline;
+    float: left;
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 18px;
+    margin: 6px 0 0 10px;
+    min-width: 125px;
+}
+
+#phonemessages .easycallmaincontainer.easycall-widget.easycall .easycalllanguagetitle,
+#phonesurvey .easycallmaincontainer.easycall-widget.easycall .easycalllanguagetitle {
+  min-width: 0;
+  width: 32px;
+}
+
+#phonemessages .easycallmaincontainer.easycall-widget.easycall .easycalllanguagetitlespan,
+#phonesurvey .easycallmaincontainer.easycall-widget.easycall .easycalllanguagetitlespan {
+  display: none;
+}
+.easycallmaincontainer.easycall-widget.easycall .easycalllanguagetitle .glyphicons.share i:before {
+    color: #468847;
+    margin-top: 1px;
+}
+.easycallmaincontainer.easycall-widget.easycall .easycallcallmecontainer .easycallselectmenu {
+    height: 30px;
+}
+.easycallmaincontainer.easycall-widget.easycall. .easycallcallmecontainer .sprite-glyphicons-phone {
+    margin-top: 1px !important;
+    padding-right: 0;
+}
+.easycallmaincontainer.easycall-widget.easycall .easycallcallmecontainer span.extension {
+    color: #999;
+    line-height: 20px;
+}
+.easycallmaincontainer.easycall-widget.easycall .easycallcallmecontainer .easycallextensioninput {
+    width: 100px;
+}
+.easycallmaincontainer.easycall-widget.easycall .easycallcallmecontainer input.blank {
+    color: #999;
+    font-style: normal;
+}
+.easycallmaincontainer.easycall-widget.easycall .easycallprogresscontainer .progress {
+    height: 30px;
+    width: 280px;
+}
+.easycallmaincontainer.easycall-widget.easycall .easycallprogresscontainer .bar {
+    font-size: 16px;
+    height: 30px;
+    line-height: 30px;
+    width: 100%;
+}
+.easycallmaincontainer.easycall-widget.easycall .easycallerrorcontainer {
+    font-size: 14px;
+    line-height: 30px;
+    margin: 0 30px 0 0;
+    max-width: 600px;
+    white-space: pre-line;
+}
+.easycallmaincontainer.easycall-widget.easycall .easycallselectmenu.add-on {
+    background: none repeat scroll 0 0 #FFFFFF;
+    text-align: left !important;
+}
