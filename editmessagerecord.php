@@ -43,9 +43,9 @@ if (!$USER->authorize("sendphone") || !$USER->authorize("starteasy"))
 setEditMessageSession();
 
 // set the message bits
-if (isset($_SESSION['editmessage']['messagegroupid']) && 
+if (isset($_SESSION['editmessage']['messagegroupid']) &&
 		isset($_SESSION['editmessage']['languagecode'])) {
-	
+
 	$messagegroup = new MessageGroup($_SESSION['editmessage']['messagegroupid']);
 	$languagecode = $_SESSION['editmessage']['languagecode'];
 } else {
@@ -64,19 +64,19 @@ if (!in_array($languagecode, array_keys(Language::getLanguageMap())))
 // no multi lingual and not default language code
 if (!$USER->authorize("sendmulti") && $languagecode != Language::getDefaultLanguageCode())
 	redirect('unauthorized.php');
-	
+
 $language = Language::getName($languagecode);
 
 $formdata = array($messagegroup->name. " (". $language. ")");
 
 $formdata["message"] = array(
 	"label" => _L("Voice Recording"),
-	"fieldhelp" => _L("Enter the 10-digit phone number that the system should call to record your message."),
+	"fieldhelp" => _L("Enter the 10-digit phone number (and optional 'extension') that the system should call to record your message."),
 	"value" => "",
 	"validators" => array(
 		array("ValRequired"),
 		array("PhoneMessageRecorderValidator")),
-	"control" => array( "PhoneMessageRecorder", "phone" => $USER->phone, "name" => $language),
+	"control" => array("PhoneMessageRecorder", "phone" => $USER->phone, "name" => $language, "langcode" => $languagecode),
 	"helpstep" => 1
 );
 
@@ -101,40 +101,40 @@ $datachange = false;
 $errors = false;
 //check for form submission
 if ($button = $form->getSubmit()) { //checks for submit and merges in post data
-	$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response	
-	
+	$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response
+
 	if ($form->checkForDataChange()) {
 		$datachange = true;
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
-		
+
 		Query("BEGIN");
-		
+
 		$messagegroup->modified = date("Y-m-d H:i:s", time());
 		$messagegroup->update(array("modified"));
-			
+
 		// get an existing message to overwrite, if one exists
 		$message = DBFind("Message", "from message
 									where messagegroupid = ?
 									and autotranslate in ('overridden', 'none', 'translated')
 									and type = 'phone'
 									and languagecode = ?", false, array($messagegroup->id, $languagecode));
-		
+
 		// if there is an existing message in the DB, must remove it's parts
 		if ($message) {
 			QuickUpdate("delete from messagepart where messageid = ?", false, array($message->id));
 			// delete existing messages
-			QuickUpdate("delete from message 
+			QuickUpdate("delete from message
 						where messagegroupid = ?
 						and type = 'phone'
 						and languagecode = ?
 						and id != ?", false, array($messagegroup->id, $languagecode, $message->id));
-			
+
 		} else {
 			// no message, create a new one!
 			$message = new Message();
 		}
-			
+
 		$message->messagegroupid = $messagegroup->id;
 		$message->type = 'phone';
 		$message->subtype = 'voice';
@@ -144,12 +144,12 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$message->userid = $USER->id;
 		$message->modifydate = date("Y-m-d H:i:s");
 		$message->languagecode = $languagecode;
-		
+
 		if (!$message->id)
 			$message->create();
 		else
 			$message->update();
-		
+
 		// pull the audiofileid from post data
 		$audiofileidmap = json_decode($postdata["message"]);
 		$audiofileid = $audiofileidmap->af;
@@ -165,14 +165,14 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$part->audiofileid = $audiofile->id;
 		$part->sequence = 0;
 		$part->create();
-		
+
 		$messagegroup->updateDefaultLanguageCode();
-		
+
 		Query("COMMIT");
-		
+
 		// remove the editors session data
 		unset($_SESSION['editmessage']);
-		
+
 		if ($ajax)
 			$form->sendTo(getEditMessageSendTo($messagegroup->id));
 		else
@@ -191,9 +191,12 @@ include_once("nav.inc.php");
 // Optional Load Custom Form Validators
 ?>
 <script type="text/javascript">
-<? Validator::load_validators(array("PhoneMessageRecorderValidator")); ?>
+	<? Validator::load_validators(array("PhoneMessageRecorderValidator")); ?>
 </script>
-<script src="script/niftyplayer.js.php" type="text/javascript"></script>
+<script type="text/javascript" src="script/jquery.json-2.3.min.js"></script>
+<script type="text/javascript" src="script/jquery.timer.js"></script>
+<script type="text/javascript" src="script/jquery.easycall.js"></script>
+<script type="text/javascript" src="script/niftyplayer.js.php"></script>
 <?
 
 startWindow($messagegroup->name);

@@ -1,4 +1,5 @@
 <link href="css/newui_datepicker.css" type="text/css" rel="stylesheet" />
+<link href="css/easycall_widget.css" type="text/css" rel="stylesheet" />
 
 	<div class="wrapper">
 	

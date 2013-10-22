@@ -76,7 +76,7 @@ class RemoveQuestionButton extends FormItem {
 			var phonemessage = $(formname+"_question"+qnum+"-phonemessage")
 			if (phonemessage) {
 				phonemessage.value="{\"delete\":true}";
-				$(formname+"_question"+qnum+"-phonemessage_content").update("Deleting");
+				jQuery("#"+formname+"_question"+qnum+"-phonemessage_fieldarea  .easycallmaincontainer.easycall-widget.easycall").html("Deleting...");
 			}
 		}
 		</script>
@@ -269,7 +269,7 @@ class SurveyTemplateWiz_phonemessages extends WizStep {
 					array("ValRequired"),
 					array("PhoneMessageRecorderValidator")
 				),
-				"control" => array("PhoneMessageRecorder", "name" => _L("Survey Machine Message")),
+				"control" => array("PhoneMessageRecorder", "langcode" => $questionnaire->machinemessageid ? "m" : "af"),
 				"helpstep" => $helpstepnum++
 			);
 			$helpsteps[] = _L('This message will be left in the event of the system reaching an answering machine. You should write your message before you record.');
@@ -292,7 +292,7 @@ class SurveyTemplateWiz_phonemessages extends WizStep {
 					array("ValRequired"),
 					array("PhoneMessageRecorderValidator")
 				),
-				"control" => array("PhoneMessageRecorder", "name" => _L("Survey Intro Message")),
+				"control" => array("PhoneMessageRecorder", "langcode" => $questionnaire->intromessageid ? "m" : "af" ),
 				"helpstep" => $helpstepnum++
 			);
 			$helpsteps[] = _L('Before you enter a phone number where the system can call you to record, you should prepare by writing your message down. This message will be played before the survey starts.');
@@ -317,7 +317,7 @@ class SurveyTemplateWiz_phonemessages extends WizStep {
 					array("ValRequired"),
 					array("PhoneMessageRecorderValidator")
 				),
-				"control" => array("PhoneMessageRecorder", "name" => _L("Survey Goodbye Message")),
+				"control" => array("PhoneMessageRecorder", "langcode" => $questionnaire->exitmessageid ? "m" : "af"),
 				"helpstep" => $helpstepnum++
 			);
 			$helpsteps[] = _L('This message will be played after the recipient has completed your survey. Best Practice is to thank them for their time. You should write down your message before you try to record.');
@@ -581,6 +581,7 @@ class SurveyTemplateWiz_questions extends WizStep {
 			$helpsteps[] = _L('Choose the range of numbers survey recipients can press in response to the question. For example, if this is a yes/no question, select 1-2.');
 
 			if ($hasphone) {
+				$values = json_decode($questiondata[$qnum]["phonemessage"]);
 				$formdata["question$qnum-phonemessage"] = array(
 					"label" => _L('Phone Question'),
 					"fieldhelp" => _L('Enter the phone number where the system can call you to record your question.'),
@@ -590,7 +591,7 @@ class SurveyTemplateWiz_questions extends WizStep {
 						array("ValRequired"),
 						array("PhoneMessageRecorderValidator")
 					),
-					"control" => array("PhoneMessageRecorder", "name" => _L("Survey Question")),
+					"control" => array("PhoneMessageRecorder", "langcode" => isset($values->m) ? "m" : "af"),
 					"helpstep" => $helpstepnum++
 				);
 				$helpsteps[] = _L('Enter the number where the system can call you to record your question. It\'s a good idea to write down your questions before you begin. Also, make sure to explain the possible reponses to the recipient. For example, "Press 1 for yes or 2 for no."');
@@ -832,12 +833,15 @@ require_once("nav.inc.php");
 
 // Load Custom Form Validators
 ?>
+<script type="text/javascript" src="script/jquery.json-2.3.min.js"></script>
+<script type="text/javascript" src="script/jquery.timer.js"></script>
+<script type="text/javascript" src="script/jquery.easycall.js"></script>
+<script src="script/niftyplayer.js.php" type="text/javascript"></script>
 <script type="text/javascript">
 <?
 Validator::load_validators(array("PhoneMessageRecorderValidator"));
 ?>
 </script>
-<script src="script/niftyplayer.js.php" type="text/javascript"></script>
 <?
 
 
