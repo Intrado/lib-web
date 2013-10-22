@@ -2,7 +2,7 @@
 
 class SurveyReport extends ReportGenerator{
 
-	function generateQuery(){
+	function generateQuery($hackPDF = false){
 		$instance = $this->reportinstance;
 		$params = $this->params = $instance->getParameters();
 		$this->reporttype = $params['reporttype'];

@@ -4,7 +4,7 @@
 
 class ContactChangeReport extends ReportGenerator {
 
-	function generateQuery(){
+	function generateQuery($hackPDF = false){
 		$hassms = getSystemSetting("_hassms", false);
 
 		$this->params = $this->reportinstance->getParameters();

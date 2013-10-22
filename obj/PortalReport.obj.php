@@ -4,7 +4,7 @@ class PortalReport extends ReportGenerator{
 
 	var $reporttotal = 0;
 
-	function generateQuery(){
+	function generateQuery($hackPDF = false){
 		global $USER;
 		
 		$this->params = $this->reportinstance->getParameters();

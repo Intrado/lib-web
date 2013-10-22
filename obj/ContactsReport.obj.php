@@ -4,7 +4,7 @@
 
 class ContactsReport extends ReportGenerator {
 
-	function generateQuery(){
+	function generateQuery($hackPDF = false){
 		global $USER;
 		$this->params = $this->reportinstance->getParameters();
 		$this->reporttype = $this->params['reporttype'];

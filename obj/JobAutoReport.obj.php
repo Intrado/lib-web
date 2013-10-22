@@ -2,7 +2,7 @@
 
 class JobAutoReport extends ReportGenerator{
 
-	function generateQuery(){
+	function generateQuery($hackPDF = false){
 		global $USER;
 		$instance = $this->reportinstance;
 		$params = $this->params = $instance->getParameters();
