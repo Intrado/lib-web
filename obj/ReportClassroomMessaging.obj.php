@@ -59,15 +59,16 @@ class ReportClassroomMessaging extends ReportGenerator {
 		else $orgsql = '';
 
 		// Figure out a clause to restrict the view to a specific person (by personid or email)
+		$personsql = $emailsql = $emailjoins = '';
 		if (isset($this->options['personid']) && strlen($this->options['personid'])) {
 			$personsql = "AND p.pkey = '" . DBSafe($this->options['personid']) . "'";
 		}
 		else if(isset($this->options['email']) && $this->options['email'] != "") {
-			$emailtable = " LEFT JOIN email e ON ( e.personid = p.id )";
-			$emailtableGuardianauto = " LEFT JOIN email e ON ( e.personid = pg.guardianpersonid )";
-			$emailsql = "AND e.email = '" . DBSafe($this->options['email']) . "'";
+
+			$emailjoins = " LEFT JOIN personguardian pg ON ( pg.personid = p.id )";
+			$emailjoins .= "\n LEFT JOIN email em ON ( em.personid = p.id OR em.personid = pg.guardianpersonid )";
+			$emailsql = "AND em.email = '" . DBSafe($this->options['email']) . "'";
 		}
-		else $personsql = $emailsql = $emailtable = $emailtableGuardianauto = '';
 
 		// Figure out a filter for a specific event user (teacher) to view only alerts/events associated with them
 		if (isset($this->options['userid'])) {
@@ -103,8 +104,7 @@ class ReportClassroomMessaging extends ReportGenerator {
 				left join job j on (j.startdate = a.date and j.type = 'alert')
 				left join reportperson rp on (rp.jobid = j.id and rp.type in ('email', 'phone') and rp.personid = a.personid)
 				left join reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid)
-				{$emailtable}
-				{$emailtableGuardianauto}
+				{$emailjoins}
 			where
 				1
 				{$personsql}
