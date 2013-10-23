@@ -189,20 +189,34 @@ if (isset($_GET['sectionid'])) {
 				{$orderby};
 			", false, array($id));
 
+		$contactids = array();
 		while($row = DBGetRow($res)){
 			$obj = null;
-			$obj->pkey = escapehtml($row[1]);
+			$obj->pid = intval($row[0]);
+			$contactids[] = $obj->pkey = escapehtml($row[1]);
 			//$obj->name = escapehtml($row[2]);
 			$obj->firstname = escapehtml($row[2]);
 			$obj->lastname = escapehtml($row[3]);
-			$response->people[$row[0]] = $obj;
+			//$response->people[$row[0]] = $obj;
+			$response->people[] = $obj;
 		}
 		if(isset($response->people) && count($response->people) > 0) {
-			$contactids = array_keys($response->people);
-			$query = "select tm.targetedmessagecategoryid, pa.personid, e.targetedmessageid, e.notes from
-					  personassociation pa inner join event e on (pa.eventid = e.id)
-					  inner join targetedmessage tm on (e.targetedmessageid = tm.id)
-					  where e.userid = ? and e.sectionid = ? and Date(e.occurence) = CURDATE() and pa.personid in (" . implode(",",$contactids) . ")";
+			//$contactids = array_keys($response->people);
+			$query = "
+				select
+					tm.targetedmessagecategoryid,
+					pa.personid,
+					e.targetedmessageid,
+					e.notes
+				from
+					personassociation pa
+					inner join event e on (pa.eventid = e.id)
+					inner join targetedmessage tm on (e.targetedmessageid = tm.id)
+				where
+					e.userid = ?
+					and e.sectionid = ?
+					and Date(e.occurence) = CURDATE()
+					and pa.personid in (" . implode(",",$contactids) . ")";
 			$response->cache = QuickQueryMultiRow($query,false,false,array($USER->id,$id));
 		} else {
 			$response = false;

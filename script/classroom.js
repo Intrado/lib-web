@@ -397,7 +397,7 @@
 			parameters: {sectionid: selected, orderby: orderby},
 			onSuccess: function(transport){
 				var response = transport.responseJSON || "Class not available";
-				var contacts = $H(response.people);
+				var contacts = $(response.people);
 				var size = 0;
 				$('contactbox').update("");
 
@@ -415,12 +415,11 @@
 				var tbody = new Element('tbody');
 
 				contacts.each(function(person) {
-					var id = 'c-' + person.key;
+					var id = 'c-' + person['pid'];
 					var tr = new Element('tr');
-					//name = person.value.name;
-					name = (orderby == 'l') ? person.value.lastname + ', ' + person.value.firstname : person.value.firstname + ' ' + person.value.lastname;
-					tr.insert('<td width="100%"><a href="#" id="' + id + '" title="Student id: ' +  person.value.pkey + '" style="text-decoration:none;cursor:pointer;white-space: nowrap;">' + person.value.pkey + ' - ' + name +'</a></td>');
-					var td = new Element('td', {style:'white-space:nowrap'});//{white-space:'nowrap'}
+					var name = (orderby == 'l') ? person['lastname'] + ', ' + person['firstname'] : person['firstname'] + ' ' + person['lastname'];
+					tr.insert('<td width="100%"><a href="#" id="' + id + '" title="Student id: ' +  person['pkey'] + '" style="text-decoration:none;cursor:pointer;white-space: nowrap;">' + person['pkey'] + ' - ' + name +'</a></td>');
+					var td = new Element('td', {style:'white-space:nowrap'});
 					categoryinfo.each(function(category) {
 						td.insert('<img id="' + id + '-' + category.key + '"src="img/pixel.gif" title="0 Comment(s) for ' + category.value.name + '" style="width:10px;display:inline;" alt="" />');
 					});
@@ -433,7 +432,7 @@
 
 
 				contacts.each(function(person) {
-					var id = 'c-' + person.key;
+					var id = 'c-' + person['pid'];
 					/*
 					 * Observe Contact Click. Select one contact at a time or multiple contacts with
 					 * alt key pressed.
