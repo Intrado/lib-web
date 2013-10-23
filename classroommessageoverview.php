@@ -269,6 +269,12 @@ $TITLE = _L('Classroom Messaging');
 
 include_once("nav.inc.php");
 
+?>
+<script type="text/javascript">
+	<? Validator::load_validators(array("ValReldate")); ?>
+</script>
+<?
+
 startWindow(_L('My Classroom Messages'));
 
 ?>
