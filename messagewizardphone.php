@@ -48,8 +48,8 @@ if (!$USER->authorize("sendphone"))
 if (isset($_GET['mgid']) && $_GET['mgid']) {
 	if (!userOwns('messagegroup', $_GET['mgid']))
 		redirect('unauthorized.php');
-	
-	$_SESSION['wizard_message_mgid'] = ($_GET['mgid'] + 0);		
+
+	$_SESSION['wizard_message_mgid'] = ($_GET['mgid'] + 0);
 }
 
 if (isset($_GET['debug']))
@@ -65,18 +65,18 @@ class MsgWiz_method extends WizStep {
 
 		// message icon button details
 		$methoddetails = array ();
-		
+
 		if ($USER->authorize("starteasy"))
 			$methoddetails["record"] = array(
 				"icon" => "img/record.gif",
 				"label" => _L("Record"),
-				"description" => 
+				"description" =>
 					'<ol>
 						<li class="wizbuttonlist">'.escapehtml(_L("Record an audio phone message using EasyCall")).'</li>
 						<li class="wizbuttonlist">'.escapehtml(_L("Record over the phone")).'</li>
 						<li class="wizbuttonlist">'.escapehtml(_L("Call yourself or a colleague")).'</li>
 					</ol>');
-		
+
 		$methoddetails['write'] = array(
 			"icon" => "img/write.gif",
 			"label" => _L("Write"),
@@ -87,7 +87,7 @@ class MsgWiz_method extends WizStep {
 					<li class="wizbuttonlist">'.escapehtml(_L("Use advanced features like field inserts")).'</li>'.
 					($USER->authorize('sendmulti')?'<li class="wizbuttonlist">'.escapehtml(_L("Auto-translate available")).'</li>':'').'
 				</ol>');
-					
+
 		$methods = array();
 		$values = array();
 		foreach ($methoddetails as $type => $details) {
@@ -108,7 +108,7 @@ class MsgWiz_method extends WizStep {
 					</tr>
 				</table>';
 		}
-		
+
 
 		$formdata = array(
 			$this->title,
@@ -123,9 +123,9 @@ class MsgWiz_method extends WizStep {
 				"control" => array("HtmlRadioButtonBigCheck", "values" => $methods),
 				"helpstep" => 1)
 		);
-		
+
 		$helpsteps = array(_L("Select the method you wish to use to create your phone message. Please note that automatic translation is only available for written messages."));
-		
+
 		return new Form("method",$formdata,$helpsteps);
 	}
 
@@ -138,19 +138,19 @@ class MsgWiz_method extends WizStep {
 class MsgWiz_language extends WizStep {
 	function getForm($postdata, $curstep) {
 		global $USER;
-		
+
 		$langs = array();
-		
+
 		// only allow auto translation on "write" messages when the user can send multi lingual
 		$method = (isset($postdata["/method"]["method"])?$postdata["/method"]["method"]:false);
 		if ($USER->authorize('sendmulti') && $method == "write") {
 			$langs["autotranslate"] = _L("Automatically <b>Translate</b> from English to other languages");
 			$langs[] = "#-#"; //insert an <hr>
 		}
-		
+
 		// alpha sorted, but with english as the first entry
 		$langs["en"] = _L("Create the <b>English</b> message");
-		
+
 		// If the method chosen will be rendered via TTS, we should only allow the user to select TTSable languages
 		$ttslanguages = Voice::getTTSLanguageMap();
 		$alllanguages = Language::getLanguageMap();
@@ -161,12 +161,12 @@ class MsgWiz_language extends WizStep {
 			$excludedlanguages = false;
 			$languages = $alllanguages;
 		}
-		
+
 		foreach ($languages as $key => $lang) {
 			if ($key != "en")
 				$langs[$key] = _L("Create the <b>%s</b> message", ucfirst($lang));
 		}
-		
+
 		$formdata = array(
 			$this->title,
 			"language" => array(
@@ -180,9 +180,9 @@ class MsgWiz_language extends WizStep {
 				"control" => array("RadioButton", "values" => $langs, "ishtml" => true),
 				"helpstep" => 1)
 		);
-		
+
 		$helpsteps = array(_L("Select whether or not you would like to automatically translate your message using Google Translate. If you prefer to write your own translations, leave this option unchecked.<br><br>Next, select the language of the message you're creating."));
-		
+
 		// if there are excluded languages, show them
 		if ($excludedlanguages) {
 			$html = '<div>'. _L('The following languages cannot be spoken via Text to Speech.'). '
@@ -191,15 +191,15 @@ class MsgWiz_language extends WizStep {
 			foreach ($excludedlanguages as $code => $language)
 				$html .= "<li>$language</li>";
 			$html .= "</ul></div>";
-			
+
 			$formdata["excludes"] = array(
 				"label" => _L("Non-TTS Languages"),
 				"control" => array("FormHtml", "html" => $html),
 				"helpstep" => 2
 			);
-			
+
 			$helpsteps[] = "These languages are not available for Text-to-Speech messaging. To create a message for one of these Languages, click Previous and choose Record";
-		}		
+		}
 		return new Form("start",$formdata,$helpsteps);
 	}
 
@@ -209,7 +209,7 @@ class MsgWiz_language extends WizStep {
 		// users who can't send multi lingual don't get language selection
 		if ($USER->authorize("sendmulti"))
 			return true;
-		
+
 		return false;
 	}
 }
@@ -217,10 +217,10 @@ class MsgWiz_language extends WizStep {
 class MsgWiz_phoneEasyCall extends WizStep {
 	function getForm($postdata, $curstep) {
 		global $USER;
-		
+
 		// Phone message recorder will store the audiofile with this name
 		$language = Language::getName(isset($postdata["/create/language"]["language"])?$postdata["/create/language"]["language"]:Language::getDefaultLanguageCode());
-		
+
 		$formdata = array($this->title);
 		$formdata['tips'] = array(
 			"label" => _L('Message Tips'),
@@ -234,6 +234,7 @@ class MsgWiz_phoneEasyCall extends WizStep {
 				'),
 				"helpstep" => 1
 			);
+
 		$formdata["message"] = array(
 			"label" => _L("Voice Recording"),
 			"fieldhelp" => _L("Enter the 10-digit phone number where you can be reached."),
@@ -242,10 +243,10 @@ class MsgWiz_phoneEasyCall extends WizStep {
 				array("ValRequired"),
 				array("PhoneMessageRecorderValidator")
 			),
-			"control" => array( "PhoneMessageRecorder", "phone" => $USER->phone, "name" => $language),
+			"control" => array( "PhoneMessageRecorder", "langcode" => "af"),
 			"helpstep" => 1
 		);
-		
+
 		$helpsteps = array(_L("The system will call you at the number you enter in this form and guide you through a series of prompts to record your message. The default message is always required and will be sent to any recipients who do not have a language specified.<br><br>Enter the phone number where the system can reach you. Then click \"Call Me to Record\" to get started. Listen carefully to the prompts when you receive the call. You may record as many different langauges as you need."));
 
 		return new Form("phoneEasyCall",$formdata,$helpsteps);
@@ -254,13 +255,13 @@ class MsgWiz_phoneEasyCall extends WizStep {
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
 		global $USER;
-		
+
 		if (!$USER->authorize("sendphone") || !$USER->authorize("starteasy"))
 			return false;
-			
+
 		if ($this->parent->dataHelper("/method:method") == "record")
 			return true;
-		
+
 		return false;
 	}
 }
@@ -268,37 +269,37 @@ class MsgWiz_phoneEasyCall extends WizStep {
 class MsgWiz_phoneAdvanced extends WizStep {
 
 	function getForm($postdata, $curstep) {
-		
+
 		// get the language code we are createing a message for
 		$langcode = Language::getDefaultLanguageCode();
 		if (isset($postdata["/create/language"]["language"])) {
 			if ($postdata["/create/language"]["language"] != "autotranslate")
 				$langcode = $postdata["/create/language"]["language"];
 		}
-		
+
 		$messagegroup = new MessageGroup($_SESSION['wizard_message']['mgid']);
 		$language = Language::getName($langcode);
 
 		$gender = $messagegroup->preferredgender;
-		
+
 		// get user default gender selection if none assigned
 		if (!$gender)
 			$gender = $USER->getSetting('defaultgender', "female");
-		
+
 		// upload audio needs this session data
 		$_SESSION['messagegroupid'] = $messagegroup->id;
-		
+
 		$formdata = array($messagegroup->name. " (". $language. ")");
 		$helpsteps = array();
 		$helpstep = 1;
-		
+
 		$messagevalidators = array(
 					array("ValRequired"),
 					array("ValMessageBody", "messagegroupid" => $_SESSION['wizard_message']['mgid']),
 					array("ValLength","max" => 10000), // 10000 Characters is about 40 minutes of tts, considered to be more than enough
 					array("ValTtsText")
 		);
-		
+
 		// if auto-translate, give the user a hint that this is the ENGLISH version from which translations will be created.
 		if (isset($postdata["/create/language"]["language"]) && $postdata["/create/language"]["language"] == "autotranslate") {
 			$formdata['tips'] = array(
@@ -314,7 +315,7 @@ class MsgWiz_phoneAdvanced extends WizStep {
 			$helpsteps[] = "You will create the English version of your message here. Your automatically translated messages will be created afterwards and you will be able to review and edit them.";
 			$messagevalidators[] = array("ValTranslationLength");
 		}
-		
+
 		$formdata["message"] = array(
 				"label" => _L("Advanced Message"),
 				"fieldhelp" => _L("Enter your phone message in this field. Click on the 'Guide' button for help with the different options which are available to you."),
@@ -329,7 +330,7 @@ class MsgWiz_phoneAdvanced extends WizStep {
 				"validators" => array(array("ValRequired")),
 				"control" => array("RadioButton", "values" => array("female" => _L("Female"), "male" => _L("Male"))),
 				"helpstep" => $helpstep++);
-		
+
 		$formdata["preview"] = array(
 				"label" => null,
 				"value" => "",
@@ -340,11 +341,11 @@ class MsgWiz_phoneAdvanced extends WizStep {
 					"gendertarget" => "gender",
 				),
 				"helpstep" => $helpstep++);
-		
+
 		$helpsteps[] = _L("<p>You can use a variety of techniques to build your message in this screen, but ideally you should use this to assemble snippets of audio with dynamic data field inserts. You can use 'Call me to Record' to create your audio snippets or upload pre-recorded audio from your computer. To record multiple audio snippets, you can use 'Call me to Record' for each snippet. </p><p>To insert data fields, set the cursor where the data should appear. Be careful to not delete any of the brackets that appear around audio snippets or other data fields. Select the data field you wish to insert and enter a default value which will display if a recipient does not have data in the chosen field. Click the 'Insert' button to add the data field to your message.</p><p><b>Note:</b> <i>Date inserts will insert the date relative to when the job is sent. For example, if you insert 'Date' and send the message immediately, it will have today's date. However, if you send the message tomorrow, it would insert tomorrow's date.</i></p>");
 		$helpsteps[] =_L("<p>If your message contains pieces that will be read by a text-to-speech voice, such as data fields or other text, select the gender of the text-to-speech voice. For best results, it's a good idea to select the same gender as the speaker in the audio files. </p><p>Some languages are only available in one gender. In those cases, selecting a different gender will result in the same message playback.</p>");
 		$helpsteps[] =_L("Click the preview button to hear a preview of your message.");
-		
+
 		return new Form("phoneAdvanced",$formdata,$helpsteps,null,"vertical");
 	}
 
@@ -353,22 +354,22 @@ class MsgWiz_phoneAdvanced extends WizStep {
 		global $USER;
 		if (!$USER->authorize("sendphone"))
 			return false;
-		
+
 		if ($this->parent->dataHelper("/method:method") == "write")
 			return true;
-		
+
 		return false;
 	}
 }
 
 class MsgWiz_translatePreview extends WizStep {
-	
+
 	function getForm($postdata, $curstep) {
 		global $TRANSLATIONLANGUAGECODES;
-		
+
 		// msgdata from phone
 		$sourcetext = $postdata['/create/phoneadvanced']['message'];
-		
+
 		static $translations = false;
 		static $translationlanguages = false;
 
@@ -379,7 +380,7 @@ class MsgWiz_translatePreview extends WizStep {
 
 		//Get available languages
 		$translationlanguages = Voice::getTTSLanguageMap();
-		
+
 		unset($translationlanguages['en']);
 		$translationlanguagecodes = array_keys($translationlanguages);
 		$translations = translate_fromenglish(makeTranslatableString($sourcetext),$translationlanguagecodes);
@@ -411,7 +412,7 @@ class MsgWiz_translatePreview extends WizStep {
 			foreach($translations as $translation){
 				if ($translation === false)
 					continue;
-				
+
 				$languagecode = array_shift($translationlanguagecodes);
 				$formdata[] = Language::getName($languagecode);
 				$formdata[$languagecode] = array(
@@ -449,7 +450,7 @@ class MsgWiz_translatePreview extends WizStep {
 			_L("This is the message that all contacts will receive if they do not have any other language message specified"),
 			_L("This is an automated translation powered by Google Translate. Please note that although machine translation is always improving, it is not perfect yet. You can try reverse translation for an idea of how well your message was translated.")
 		);
-		
+
 		return new Form("translatePreview",$formdata,$helpsteps);
 	}
 
@@ -461,7 +462,7 @@ class MsgWiz_translatePreview extends WizStep {
 				$this->parent->dataHelper("/method:method") == "write") {
 			return true;
 		}
-		
+
 		return false;
 	}
 }
@@ -469,10 +470,10 @@ class MsgWiz_translatePreview extends WizStep {
 class MsgWiz_submitConfirm extends WizStep {
 	function getForm($postdata, $curstep) {
 		global $USER;
-		
+
 		if ($USER->authorize('sendmulti'))
 			$srclanguagecode = $this->parent->dataHelper("/create/language:language",false,Language::getDefaultLanguageCode());
-				
+
 		$languagecodes = array();
 		if ($srclanguagecode == "autotranslate") {
 			$languagecodes[] = "en";
@@ -483,10 +484,10 @@ class MsgWiz_submitConfirm extends WizStep {
 		} else {
 			$languagecodes[] = $srclanguagecode;
 		}
-		
+
 		// get the message group we are modifying
 		$messagegroup = new MessageGroup($_SESSION['wizard_message']['mgid']);
-			
+
 		$html = '<div>'._L('The following messages will be overwritten').'</div>
 				<table class="list">
 					<tr class="listHeader">
@@ -505,25 +506,25 @@ class MsgWiz_submitConfirm extends WizStep {
 			}
 		}
 		$html .= '</table>';
-		
+
 		$formdata = array($this->title);
-		
+
 		$formdata["info"] = array(
 			"label" => _L("Overwritten Messages"),
 			"control" => array("FormHtml", "html" => $html),
 			"helpstep" => 1
 		);
-		
+
 		$helpsteps = array (_L("These older messages will be overwritten with the messages you've just created in the wizard. Clicking Next will replace the old messages with the new ones."));
-		
+
 		return new Form("submitConfirm",$formdata,$helpsteps);
-		
+
 	}
-	
+
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
 		global $USER;
-		
+
 		// if we are on the finish step, its only important to see if it actually overwrote anything
 		if (isset($_SESSION['wizard_message']['finish'])) {
 			if (isset($_SESSION['wizard_message']['didOverwrite']))
@@ -531,19 +532,19 @@ class MsgWiz_submitConfirm extends WizStep {
 			else
 				return false;
 		}
-	
+
 		if (!$this->parent->dataHelper('/method:method'))
 			return false;
-		
+
 		// if the user has multilingual but hasn't selected a language
 		if ($USER->authorize('sendmulti') && !$this->parent->dataHelper('/create/language:language'))
 			return false;
-		
+
 		// only show the confirm step if the creation of this message will overwrite an existing message
 		$languagecode = $this->parent->dataHelper('/create/language:language', false, Language::getDefaultLanguageCode());
-		
+
 		$args = array();
-		
+
 		// if it's an auto translate, we have to look up each of the trasnlated languages and english
 		if ($languagecode == "autotranslate") {
 			// autotranslate always overwrites the english message
@@ -558,25 +559,25 @@ class MsgWiz_submitConfirm extends WizStep {
 			// query the messages to see if a message exists already for this language code
 			$args[] = $languagecode;
 		}
-		
+
 		// need a list of ? for each language code we are going to look up to put in the query
 		$langqueryargs = repeatWithSeparator("?",",",count($args));
-		
+
 		// add additional query arguments
 		$args[] = $_SESSION['wizard_message']['mgid'];
-		
+
 		// query for any messages matching one of these language codes
 		$hasmessage = QuickQuery(
-			"select 1 from message 
-			where languagecode in (".$langqueryargs.") 
-			and messagegroupid = ? 
-			and type = 'phone' 
-			and subtype = 'voice' 
+			"select 1 from message
+			where languagecode in (".$langqueryargs.")
+			and messagegroupid = ?
+			and type = 'phone'
+			and subtype = 'voice'
 			and autotranslate in ('none', 'translated', 'overridden')", false, $args);
-		
+
 		if ($hasmessage)
 			return true;
-		
+
 		return false;
 	}
 }
@@ -584,21 +585,21 @@ class MsgWiz_submitConfirm extends WizStep {
 class FinishMessageWizard extends WizFinish {
 	function finish ($postdata) {
 		global $USER;
-		
+
 		$_SESSION['wizard_message']['finish'] = true;
-		
+
 		// start a transaction
 		QuickQuery("BEGIN");
-		
+
 		// is the messagegroup id still valid?
 		$messagegroup = new MessageGroup($_SESSION['wizard_message']['mgid']);
 		if (!userOwns("messagegroup", $messagegroup->id) || $messagegroup->deleted)
 			return;
-		
+
 		// get the language code from postdata
 		$langcode = $this->parent->dataHelper("/create/language:language",false,Language::getDefaultLanguageCode());
-		
-		// auto translations and english need the source stored as english. everything else stores as an overridden autotranslation 
+
+		// auto translations and english need the source stored as english. everything else stores as an overridden autotranslation
 		if ($langcode == "autotranslate" || $langcode == "en") {
 			$sourcelangcode = "en";
 			$autotrans = 'none';
@@ -606,32 +607,32 @@ class FinishMessageWizard extends WizFinish {
 			$sourcelangcode = $langcode;
 			$autotrans = 'overridden';
 		}
-		
+
 		// #################################################################
 		// CallMe based message
 		// phone -> record
-		
+
 		if (MsgWiz_phoneEasyCall::isEnabled($postdata, false)) {
 			// pull the audiofileid from post data
 			$audiofileidmap = $this->parent->dataHelper("/create/callme:message",true);
 			$audiofileid = $audiofileidmap->af;
-			
-			// check for an existing message with this language code for this message group 
+
+			// check for an existing message with this language code for this message group
 			// get either the 'none', 'overridden' or 'translated' message for overwriting
-			$message = DBFind("Message", 
-					"from message 
-					where messagegroupid = ? 
+			$message = DBFind("Message",
+					"from message
+					where messagegroupid = ?
 					and autotranslate in ('overridden', 'none', 'translated')
-					and type = 'phone' 
-					and subtype = 'voice' 
+					and type = 'phone'
+					and subtype = 'voice'
 					and languagecode = ?", false, array($messagegroup->id, $sourcelangcode));
-			
+
 			// if there is an existing message in the DB, must remove it's parts
 			if ($message) {
 				$_SESSION['wizard_message']['didOverwrite'] = true;
 				QuickUpdate("delete from messagepart where messageid = ?", false, array($message->id));
 				// delete existing messages
-				QuickUpdate("delete from message 
+				QuickUpdate("delete from message
 						where messagegroupid = ?
 						and type = 'phone'
 						and subtype = 'voice'
@@ -641,7 +642,7 @@ class FinishMessageWizard extends WizFinish {
 				// no message, create a new one!
 				$message = new Message();
 			}
-				
+
 			$message->messagegroupid = $messagegroup->id;
 			$message->type = 'phone';
 			$message->subtype = 'voice';
@@ -652,17 +653,17 @@ class FinishMessageWizard extends WizFinish {
 			$message->userid = $USER->id;
 			$message->modifydate = date("Y-m-d H:i:s");
 			$message->languagecode = $sourcelangcode;
-			
+
 			if (!$message->id)
 				$message->create();
 			else
 				$message->update();
-			
+
 			// assign this audiofile to the message group
 			$audiofile = new AudioFile($audiofileid);
 			$audiofile->messagegroupid = $messagegroup->id;
 			$audiofile->update();
-			
+
 			$part = new MessagePart();
 			$part->messageid = $message->id;
 			$part->type = "A";
@@ -670,28 +671,28 @@ class FinishMessageWizard extends WizFinish {
 			$part->sequence = 0;
 			$part->create();
 		} else {
-		
+
 			// #################################################################
 			// Text based messages
-			
+
 			$text = $this->parent->dataHelper("/create/phoneadvanced:message");
 			$gender = $this->parent->dataHelper("/create/phoneadvanced:gender");
-			
+
 			$messages = array();
-			
+
 			// if this is the default 'en' message, it's autotranslate value is 'none'
 			$messages[$sourcelangcode][$autotrans]['text'] = $text;
 			$messages[$sourcelangcode][$autotrans]['gender'] = $gender;
-			
+
 			// update usersetting for default gender
 			$USER->setSetting('defaultgender', $gender);
-			
+
 			//also set the messagegroup preferred gender
 			$messagegroup->preferredgender = $gender;
 			$messagegroup->stuffHeaders();
 			$messagegroup->modified = date("Y-m-d H:i:s", time());
 			$messagegroup->update(array("data","modified"));
-		
+
 			// check for and retrieve translations
 			if (MsgWiz_translatePreview::isEnabled($postdata, false) && $langcode == "autotranslate") {
 				$translationselections = $this->parent->dataHelper("/create/translatepreview",false,array());
@@ -707,31 +708,31 @@ class FinishMessageWizard extends WizFinish {
 					$translationsindex++;
 				}
 			}
-			
+
 			// #################################################################
 			// create a message for each one
-			
+
 			// for each language code
 			foreach ($messages as $langcode => $autotranslatevalues) {
 				// for each autotranslate value
 				foreach ($autotranslatevalues as $autotranslate => $data) {
-					
-					// check for an existing message with this language code for this message group 
-					$message = DBFind("Message", 
-						"from message 
-						where messagegroupid = ? 
-						and type = 'phone' 
-						and subtype = 'voice' 
-						and languagecode = ? 
+
+					// check for an existing message with this language code for this message group
+					$message = DBFind("Message",
+						"from message
+						where messagegroupid = ?
+						and type = 'phone'
+						and subtype = 'voice'
+						and languagecode = ?
 						and autotranslate = ?", false, array($messagegroup->id, $langcode, $autotranslate));
-				
+
 					if (!$message) {
 						// no message, create a new one!
 						$message = new Message();
 					} else {
 						$_SESSION['wizard_message']['didOverwrite'] = true;
 					}
-					
+
 					$message->messagegroupid = $messagegroup->id;
 					$message->type = 'phone';
 					$message->subtype = 'voice';
@@ -741,16 +742,16 @@ class FinishMessageWizard extends WizFinish {
 					$message->userid = $USER->id;
 					$message->modifydate = date("Y-m-d H:i:s");
 					$message->languagecode = $langcode;
-					
+
 					$message->stuffHeaders();
 					if (!$message->id)
 						$message->create();
 					else
 						$message->update();
-					
+
 					// create the message parts
 					$message->recreateParts($data['text'], null, isset($data['gender'])?$data['gender']:false);
-					
+
 					// remove old messages based on the auto translate value
 					// we need to get rid of recorded messages if this is now a TTS message for example
 					switch ($autotranslate) {
@@ -768,8 +769,8 @@ class FinishMessageWizard extends WizFinish {
 							// delete everything except this message
 							$autotranslateclause = "";
 					}
-					
-					QuickUpdate("delete from message 
+
+					QuickUpdate("delete from message
 						where messagegroupid = ?
 						and type = 'phone'
 						and subtype = 'voice'
@@ -779,13 +780,13 @@ class FinishMessageWizard extends WizFinish {
 				}
 			}
 		}
-		
+
 		$messagegroup->updateDefaultLanguageCode();
-		
+
 		// end the transaction
 		QuickQuery("COMMIT");
 	}
-	
+
 	function getFinishPage ($postdata) {
 		$html = '<h3>Success! Your message has been saved</h3>';
 		return $html;
@@ -811,14 +812,14 @@ $wizard->handlerequest();
 
 // After reload check session data for messagegroup information
 if (isset($_SESSION['wizard_message_mgid'])) {
-	
+
 	// check that this is a valid message group
 	$messagegroup = new MessageGroup($_SESSION['wizard_message_mgid']);
 	if (!userOwns("messagegroup", $messagegroup->id) || $messagegroup->deleted) {
 		unset($_SESSION['wizard_message_mgid']);
 		redirect('unauthorized.php');
 	}
-	
+
 	$_SESSION['wizard_message']['mgid'] = $_SESSION['wizard_message_mgid'];
 	unset($_SESSION['wizard_message_mgid']);
 }
@@ -839,6 +840,9 @@ $TITLE = false;
 require_once("nav.inc.php");
 
 ?>
+<script type="text/javascript" src="script/jquery.json-2.3.min.js"></script>
+<script type="text/javascript" src="script/jquery.timer.js"></script>
+<script type="text/javascript" src="script/jquery.easycall.js"></script>
 <script type="text/javascript">
 <?	Validator::load_validators(array("PhoneMessageRecorderValidator", "ValMessageBody","ValTranslationLength","ValTtsText"));?>
 </script>
