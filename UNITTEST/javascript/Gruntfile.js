@@ -22,7 +22,8 @@ module.exports = function (grunt) {
       all: {},
       options: {
         urls: ['http://localhost:8899/UNITTEST/javascript/tests.html'],
-        run: true
+        run: true,
+	reporter: 'XUnit'
       }
     }
   });
