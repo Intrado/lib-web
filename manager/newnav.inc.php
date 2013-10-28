@@ -290,6 +290,17 @@ header('Content-type: text/html; charset=UTF-8') ;
 <head>
 	<meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
+
+<?
+if (isset($_GET['monitor'])) {
+	$time = $_GET['monitor'] ? $_GET['monitor'] : 15;
+	echo '<meta http-equiv="refresh" content="'.$time.'">';
+} else {
+	$autologoutminutes = isset($SETTINGS['feature']['autologoutminutes']) ? $SETTINGS['feature']['autologoutminutes'] : 30;
+	echo '<meta http-equiv="refresh" content="'. 60*$autologoutminutes  .';url=index.php?logout=1&reason=timeout">';
+}
+?>
+
 	<title>Manager: <?= $PAGETITLE ?></title>
 
 	<script type="text/javascript" src="script/jquery-1.8.3.min.js"></script>
