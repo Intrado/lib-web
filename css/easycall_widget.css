@@ -522,9 +522,9 @@
   width: 32px;
 }
 
-#phonemessages .easycallmaincontainer.easycall-widget.easycall .easycalllanguagetitlespan,
-#phonesurvey .easycallmaincontainer.easycall-widget.easycall .easycalllanguagetitlespan,
-#phoneEasyCall .easycallmaincontainer.easycall-widget.easycall .easycalllanguagetitlespan {
+#phonemessages .easycallmaincontainer.easycall-widget.easycall .easycalllanguagetitlewrapper,
+#phonesurvey .easycallmaincontainer.easycall-widget.easycall .easycalllanguagetitlewrapper,
+#phoneEasyCall .easycallmaincontainer.easycall-widget.easycall .easycalllanguagetitlewrapper {
   display: none;
 }
 .easycallmaincontainer.easycall-widget.easycall .easycalllanguagetitle .glyphicons.share i:before {

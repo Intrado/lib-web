@@ -233,7 +233,7 @@
 				var container = $('<div />', { "class":"easycallpreviewcontainer"});
 				var btnGroupContainer = $('<div />', { "class":"btn-group"});
 				var languagetitle = $('<div />', { "class":"easycalllanguagetitle"});
-				var languagetitleSpan = $('<span />', { "class":"easycalllanguagetitlespan"});
+				var languagetitleSpan = $('<span />', { "class":"easycalllanguagetitlewrapper"});
 				languagetitle.append('<span class="lighten sprite-pictos-phone padR0"></span>  &nbsp; ').append(languagetitleSpan.append(language));
 				var previewbutton = $('<button />', { "class":"easycallpreviewbutton btn", "href":"#ctr_play_audio_modal", "data-language":language, "data-language":code, "data-recordingId":recordingId, "data-toggle":"modal", "title":"Play audio of " + language + " language voice recording", "rel":"tooltip", "data-container": "#callme" });
 				previewbutton.html('<span class="sprite-pictos-play padR0"><i></i></span>');
@@ -274,7 +274,7 @@
 				var progressBar = $('<div />', {"class": "bar"}).attr("data-loading-percent","100");
 				var container = $('<div />', { "class":"easycallprogresscontainer"});
 				var languagetitle = $('<div />', { "class":"easycalllanguagetitle"});
-				var languagetitleSpan = $('<span />', { "class":"easycalllanguagetitlespan"});
+				var languagetitleSpan = $('<span />', { "class":"easycalllanguagetitlewrapper"});
 				languagetitle.append('<span class="sprite-pictos-phone padR0"></span>  &nbsp; ').append(languagetitleSpan.append($this.data('easyCall').languages[code]));
 				progressBar.append($('<span />', { "class":"easycallprogresstext" }));
 				progressBarWrapper.append(progressBar);
@@ -289,7 +289,7 @@
 
 				var container = $('<div />', { "class":"easycallerrorcontainer alert alert-error"});
 				var languagetitle = $('<div />', { "class":"easycalllanguagetitle", "text":$this.data('easyCall').languages[code] });
-				var languagetitleSpan = $('<span />', { "class":"easycalllanguagetitlespan"});
+				var languagetitleSpan = $('<span />', { "class":"easycalllanguagetitlewrapper"});
 				var resetbutton = $('<button />', { "class":"easycallerrorbutton btn btn-danger pull-right" });
 				resetbutton.append("Retry");
 				container.append(languagetitleSpan.append(languagetitle))
