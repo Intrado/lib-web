@@ -23,7 +23,14 @@ require_once("obj/ValUrl.val.php");
 require_once("obj/LogoRadioButton.fi.php");
 require_once("obj/LanguagesItem.fi.php");
 require_once("obj/ValInboundNumber.val.php");
+
+// For QuickTip TAI table activation stuffs
+require_once("loadtaitemplatedata.php");
 require_once("inc/customersetup.inc.php");
+require_once("../obj/Person.obj.php");
+require_once("../obj/User.obj.php");
+require_once("../obj/Organization.obj.php");
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -229,6 +236,7 @@ $settings = array(
 	'_hastwitter' => '0',
 	'_hasfeed' => '0',
 	'_allowoldmessagesender' => '0',
+	'_hasquicktip' => '0',
 	'autoreport_replyname' => 'SchoolMessenger',
 	'autoreport_replyemail' => 'autoreport@schoolmessenger.com',
 	'_renewaldate' => '',
@@ -304,6 +312,7 @@ else
 
 $helpstepnum = 1;
 $formdata = array(_L('Basics'));
+// -----------------------------------------------------------------------------
 
 include("inc/customerRequiredFormItems.inc.php");
 
@@ -425,6 +434,7 @@ $formdata["harddeletemonths"] = array(
 );
 
 $formdata[] = _L("Languages");
+// -----------------------------------------------------------------------------
 
 $languages = $customerid?QuickQueryList("select code, name from language",true,$custdb):array("en" => "English", "es" => "Spanish");
 $formdata["languages"] = array(
@@ -440,6 +450,8 @@ $formdata["languages"] = array(
 );
 
 $formdata[] = _L("SMS");
+// -----------------------------------------------------------------------------
+
 $formdata["hassms"] = array(
 						"label" => _L('Has SMS'),
 						"value" => $settings['_hassms'],
@@ -482,6 +494,8 @@ $formdata["shortcodegroupname"] = array(
 );
 
 $formdata[] = _L("API");
+// -----------------------------------------------------------------------------
+
 $formdata["hassmapi"] = array(
 						"label" => _L('Has SMAPI'),
 						"value" => $settings['_hassmapi'],
@@ -508,9 +522,8 @@ $formdata["oemid"] = array(
 						"helpstep" => $helpstepnum
 );
 
-
-
 $formdata[] = _L("Callback");
+// -----------------------------------------------------------------------------
 
 $formdata["hascallback"] = array(
 						"label" => _L('Has Callback'),
@@ -529,7 +542,9 @@ $formdata["callbackdefault"] = array(
 						"control" => array("SelectMenu", "values" => array("inboundnumber" => "Inbound Number","callerid" => "Default CallerID")),
 						"helpstep" => $helpstepnum
 );
+
 $formdata[] = _L("Additional Features");
+// -----------------------------------------------------------------------------
 
 $formdata["portal"] = array(
 						"label" => _L('Portal'),
@@ -602,6 +617,13 @@ $formdata["allowoldmessagesender"] = array(
 						"helpstep" => $helpstepnum
 );
 
+$formdata["hasquicktip"] = array(
+						"label" => _L('Has QuickTip'),
+						"value" => $settings['_hasquicktip'],
+						"validators" => array(),
+						"control" => array("CheckBox"),
+						"helpstep" => $helpstepnum
+);
 
 // Answering machine detection methods
 $amdtypes = array(
@@ -610,6 +632,8 @@ $amdtypes = array(
 	"machinedetect" => "Voice / Beep Detect");
 
 $formdata[] = _L("Misc. Settings");
+// -----------------------------------------------------------------------------
+
 $formdata["amdtype"] = array(
 						"label" => _L('AMD Type'),
 						"value" => ($settings['_amdtype']?$settings['_amdtype']:"ivr"),
@@ -870,7 +894,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		setCustomerSystemSetting('_hasfeed', $postdata["hasfeed"]?'1':'0', $custdb);
 		
 		setCustomerSystemSetting('_allowoldmessagesender', $postdata["allowoldmessagesender"]?'1':'0', $custdb);
-		
+
 		setCustomerSystemSetting('_amdtype', $postdata["amdtype"], $custdb);
 	
 		setCustomerSystemSetting('_renewaldate', ($postdata['renewaldate']!=""?date("Y-m-d", strtotime($postdata['renewaldate'])):""), $custdb);
@@ -881,7 +905,18 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		setCustomerSystemSetting('loginlockoutattempts', $postdata['loginlockoutattempts'], $custdb);
 		setCustomerSystemSetting('logindisableattempts', $postdata['logindisableattempts'], $custdb);
 		setCustomerSystemSetting('loginlockouttime', $postdata['loginlockouttime'], $custdb);
-		
+
+		// QuickTip requires that we add the [dis|en]able the feature...
+		setCustomerSystemSetting('_hasquicktip', $postdata["hasquicktip"] ? '1' : '0', $custdb);
+
+		// ... and if it was disabled and is now enabled, add the TAI tables to this customer which QuickTip uses
+		if ($postdata["hasquicktip"] && (! $settings['_hasquicktip'])) {
+			$savedbcon = $_dbcon;
+			$_dbcon = $custdb;
+			tai_setup($customerid);
+			$_dbcon = $savedbcon;
+		}
+
 		Query("COMMIT");
 		if($button == "done") {
 			if ($ajax)
