@@ -32,7 +32,10 @@
   <script src="/UNITTEST/javascript/tests/phonemessageeditor_test.js"></script>
 
   <script>
-    mocha.run();
+    // Run mocha unless we're in PhantomJS
+    if (navigator.userAgent.indexOf('PhantomJS') < 0) {
+      mocha.run();
+    }
   </script>
   </body>
 </html>
