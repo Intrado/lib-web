@@ -182,6 +182,9 @@ class PhoneMessageEditor extends FormItem {
 	function renderJavascriptLibraries() {
 		global $USER;
 		$str = '
+			<script type="text/javascript" src="script/jquery.json-2.3.min.js"></script>
+			<script type="text/javascript" src="script/jquery.timer.js"></script>
+			<script type="text/javascript" src="script/jquery.easycall.js"></script>
 			<script type="text/javascript" src="script/audiolibrarywidget.js.php"></script>
 			<script type="text/javascript" src="script/phonemessageeditor.js"></script>';
 

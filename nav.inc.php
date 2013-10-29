@@ -156,7 +156,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 <head>
 	<meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-	
+
 	<title><?= getBrand();?>: <?= $PAGETITLE ?></title>
 
 	<script type="text/javascript" src="script/jquery-1.8.3.min.js"></script>
@@ -166,7 +166,6 @@ header('Content-type: text/html; charset=UTF-8') ;
 	</script>
 	<script src="script/prototype.js" type="text/javascript"></script> <!-- updated to prototype 1.7 -->
 	<script src="script/scriptaculous.js" type="text/javascript"></script>
-	<script src="script/utils.js"></script>
 	<script type="text/javascript" src="script/datepicker.js"></script>
 	<link href="css/datepicker.css.php" type="text/css" rel="stylesheet" />
 	<link href="css/newui_datepicker.css" type="text/css" rel="stylesheet" />
@@ -179,22 +178,23 @@ header('Content-type: text/html; charset=UTF-8') ;
 <?}?>
 	<script src="script/sorttable.js"></script>
 	<script src="script/session_warning.js" type="text/javascript"></script>
-	
+	<script src="script/utils.js"></script>
+
 
 <?if (isset($MESSAGESENDER) && $MESSAGESENDER) {?>
 	<link href="css/nav_head_foot.css" type="text/css" rel="stylesheet" />
 <?} else {?>
 	<script src="script/bootstrap-modal.js" type="text/javascript"></script>
-	
+
 	<link href="css.php" type="text/css" rel="stylesheet" media="screen, print" />
 	<link href="css.forms.php" type="text/css" rel="stylesheet" media="screen, print" />
 <?}?>
 	<link href="css/style_print.css" type="text/css" rel="stylesheet" media="print" />
-	
+
 	<!--[if IE 8]>
 		<script src="script/respond.min.js" type="text/javascript"></script>
 	<![endif]-->
-	
+
 </head>
 
 <!--[if IE 7]> <body class="ie7"> <![endif]-->
@@ -216,7 +216,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
 		})();
 <?
-}	
+}
 ?>
 	</script>
 
@@ -236,15 +236,15 @@ header('Content-type: text/html; charset=UTF-8') ;
 	<div class="banner_logo">
 		<table class="logo"><tr><td><? doLogo() ?></td></tr></table>
 		<h1><?= getBrand();?></h1>
-	</div>  
-	
+	</div>
+
 	<div class="banner_custname"><?= escapehtml($_SESSION['custname']); ?></div>
-	
+
 	<div class="banner_links_wrap">
 		<ul class="banner_links cf">
 			<li class="bl_left"></li>
 			<li><a href="addresses.php?origin=nav">Address Book</a></li>
-<? if($USER->authorize('managemyaccount')){ ?>			
+<? if($USER->authorize('managemyaccount')){ ?>
 			<li><a href="account.php">Account</a></li>
 <? } ?>
 			<li><a href="#" onclick="window.open('help/index.php', '_blank', 'width=950,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');">Help</a></li>
@@ -253,7 +253,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 		</ul>
 	</div>
 
-</div><!-- /container -->	
+</div><!-- /container -->
 </div><!--  end top_banner -->
 
 <script type="text/javascript">

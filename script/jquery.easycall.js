@@ -103,6 +103,8 @@
 						initdiv.append(subcontainer);
 				}
 
+				$this.data('easyCall').extensionValidatorRegex = new RegExp("^" + $this.data('easyCall').emptyextensiontext + "$", "i");
+
 				initdiv.insertAfter($this.data('easyCall').element);
 			},
 
@@ -494,41 +496,6 @@
 			doSaveAudioFile:function (code) {
 				var $this = $(this);
 
-				// Create timestamp to include in audiofilename to replicate similar behaviour of
-				// older easycall.js.php (audiofilename format: Language - timestamp).
-				// The audiofilename's are displayed to the user in the Audio Library field (editmessagephone.php)
-				// fcn taken from utils.js to utilize same timestamp using in audiofilename's (without importing unnecessarily the entire entire file)
-				var curDate = function() {
-				   var months = new Array(13);
-				   months[0]  = "Jan";
-				   months[1]  = "Feb";
-				   months[2]  = "Mar";
-				   months[3]  = "Apr";
-				   months[4]  = "May";
-				   months[5]  = "Jun";
-				   months[6]  = "Jul";
-				   months[7]  = "Aug";
-				   months[8]  = "Sep";
-				   months[9]  = "Oct";
-				   months[10] = "Nov";
-				   months[11] = "Dec";
-				   var now         = new Date();
-				   var monthnumber = now.getMonth();
-				   var monthname   = months[monthnumber];
-				   var monthday    = now.getDate();
-				   var year        = now.getFullYear();
-				   var hour   = now.getHours();
-				   var minute = now.getMinutes();
-				   var second = now.getSeconds();
-				   var ap = "am";
-				   if (hour   > 11) { ap = "pm";             }
-				   if (hour   > 12) { hour = hour - 12;      }
-				   if (hour   == 0) { hour = 12;             }
-				   if (minute < 10) { minute = "0" + minute; }
-				   if (second < 10) { second = "0" + second; }
-				   return monthname + ' ' + monthday + ', ' + year + " " + hour + ':' + minute + ':' + second + " " + ap;
-				};
-
 				$.post("ajaxeasycall.php", {
 						"action":"getaudiofile",
 						"id":$this.data('easyCall').specialtaskid,
@@ -682,9 +649,9 @@
 							return "is invalid. The phone number or extension must be no more than " + $this.data('easyCall').phonemaxdigits + " digits long.\nYou do not need to include a 1 for long distance.";
 					} else {
 						if (phone.length == 0)
-							return '<strong>Oops! &nbsp;</strong>A valid 10-digit phone number is required.<br/> Ex. (555) 123-4567, 555-123-4567, 555.123.4567, 5551234567';
+							return 'A valid 10-digit phone number is required.<br/> Ex. (555) 123-4567, 555-123-4567, 555.123.4567, 5551234567';
 						else
-							return '<strong>Oops! &nbsp;</strong>Please enter a valid 10-digit phone number.<br/>Ex. (555) 123-4567, 555-123-4567, 555.123.4567, 5551234567';
+							return 'Please enter a valid 10-digit phone number.<br/>Ex. (555) 123-4567, 555-123-4567, 555.123.4567, 5551234567';
 					}
 					return true;
 				}
@@ -698,21 +665,20 @@
 			validateExtension: function (value) {
 				var $this = $(this);
 
-				var trimmedExtension = $.trim(value);
-				var regex = new RegExp("^" + $this.data('easyCall').emptyextensiontext + "$", "i");
-				isPlaceholderText = trimmedExtension.search(regex) > -1;
+				var trimmedExtension = $.trim(value);				
+				isPlaceholderText = trimmedExtension.search($this.data('easyCall').extensionValidatorRegex) > -1;
 
 				if (trimmedExtension.length > 0) {
 					if ((value.search(/\d+/g)) > -1) {
 						if ((method.removeNonNumericValues(value)).length <= 10)
 							return true;
 						else
-							return '<strong>Oops! &nbsp;</strong>Extensions are limited to a maximum of 10 digits. Please enter an extension with 10 or fewer digits.';
+							return 'Extensions are limited to a maximum of 10 digits. Please enter an extension with 10 or fewer digits.';
 					}
 					else if (isPlaceholderText)
 						return true;
 					else
-						return '<strong>Oops! &nbsp;</strong>Extensions require 1 or more digits (0-9), up to a maximum of 10 digits.';
+						return 'Extensions require 1 or more digits (0-9), up to a maximum of 10 digits.';
 				}
 				else if (isPlaceholderText)
 					return true;

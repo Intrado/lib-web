@@ -2,7 +2,10 @@
 class PhoneMessageRecorder extends FormItem {
 
 	function renderJavascriptLibraries() {
-		return '<script src="script/phonemessagerecorder.js"></script>';
+		return '<script type="text/javascript" src="script/jquery.json-2.3.min.js"></script>
+				<script type="text/javascript" src="script/jquery.timer.js"></script>
+				<script type="text/javascript" src="script/jquery.easycall.js"></script>
+				<script src="script/phonemessagerecorder.js"></script>';
 	}
 
 	function render ($value) {

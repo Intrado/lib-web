@@ -193,9 +193,6 @@ include_once("nav.inc.php");
 <script type="text/javascript">
 	<? Validator::load_validators(array("PhoneMessageRecorderValidator")); ?>
 </script>
-<script type="text/javascript" src="script/jquery.json-2.3.min.js"></script>
-<script type="text/javascript" src="script/jquery.timer.js"></script>
-<script type="text/javascript" src="script/jquery.easycall.js"></script>
 <script type="text/javascript" src="script/niftyplayer.js.php"></script>
 <?
 
