@@ -5,14 +5,6 @@ abstract class ReportGenerator {
 
 	const MAX_REPORT_PAGES = 33000;
 
-	protected $userid;
-	protected $reportinstance;
-	protected $format;
-	protected $query = '';
-	protected $testquery = '';
-	protected $params;
-	protected $reporttype;
-	protected $_readonlyDB;
 
 	// Constructor
 	public function __construct() {
@@ -26,6 +18,17 @@ abstract class ReportGenerator {
 
 	// --------------------------------------------------------------------
 	// public interface
+
+	// FIXME - external reports are accessing these directly; make them use an accessor method, then turn these private!
+	public $reportinstance;
+	public $userid;
+	public $format;
+	public $query = '';
+	public $testquery = '';
+	public $params;
+	public $reporttype;
+	public $_readonlyDB;
+
 	// TODO - privatize any methods used internally only
 	public function testSize(){
 		$result = "";
