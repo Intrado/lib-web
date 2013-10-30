@@ -308,7 +308,7 @@ $sidebar_width = 275;
 ?>
 
 <div>
-<div style="width: <?= $sidebar_width ?>px; float: left;">
+	<div style="width: <?= $sidebar_width ?>px; float: left;">
 		<div id="orderbys">
 			<h3><? echo _L('Sort By'); ?>:</h3>
 			<input class="orderbys" type="radio" name="orderby" value="f" checked="checked"/> <? echo _L('First Name'); ?><br/>
