@@ -132,7 +132,7 @@ var Tabs = Class.create(Accordion, {
 			this.panelsPane = this.splitContainer.down('.SplitPane', 1);
 		}
 		this.tabsPane.addClassName(this.classPrefix+'tabspane');
-		this.tabsStopper = new Element('div', {'style':'clear:both'});
+		this.tabsStopper = new Element('br');
 		this.tabsPane.insert(this.tabsStopper);
 		this.panelsPane.addClassName(this.classPrefix+'panelspane');
 		this.container.insert(this.splitContainer);

@@ -218,15 +218,31 @@
 				onSuccess: function(transport){
 					var response = transport.responseJSON || false;
 					if(response) {
-						var container = new Element('div');
+						//var container = new Element('div');
 						var messages = $H(response);
 						var prevcategory = false;
 
+						// Empty out the search container
+						$('searchResult').update('');
+
+						// Make a new category container that will hold all the results for the current category
+						var category = new Element('div', {'class': 'clearfix'});
 						messages.each(function(itm) {
 							//all += itm.key + " " + itm.value + '\n';
+							// If the category for this result is different from the one we've been working on...
 							if(itm.value.categoryid != prevcategory) {
+
+								// If the category container has some results in it
+								if (! category.empty()) {
+									// append it to the main container
+									$('searchResult').insert(category);
+								}
+
+								// Empty out the category container once again
+								category = new Element('div', {'class': 'clearfix'});
+
 								var cat = categoryinfo.get(itm.value.categoryid);
-								container.insert('<div class="searchcategory"><img src="' + cat.img  + '" />&nbsp;' + cat.name +'</div><div style="clear:both;"></div>');
+								category.insert('<div class="searchcategory"><img src="' + cat.img  + '" />&nbsp;' + cat.name +'</div><br/>');
 								prevcategory = itm.value.categoryid;
 							}
 							var comment = new Element('div',{id:'smsg-' + itm.key,'class':'classroomcomment',category:itm.value.categoryid});
@@ -246,11 +262,15 @@
 							remarkbox.insert('<a href="#" class="remark" onclick="saveComment(\'' + itm.key + '\');return false;">Done</a>');
 
 							comment.insert(remarkbox);
-							container.insert(comment);
+							category.insert(comment);
 						});
 
-						container.insert('<div style="clear:both;"></div>');
-						$('searchResult').update(container);
+						// If the category container has some results in it
+						if (! category.empty()) {
+							// append it to the main container
+							category.insert('<div style="clear:right;"></div>');
+							$('searchResult').insert(category);
+						}
 
 						messages.each(function(itm) {
 							var div = $('smsg-' + itm.key);

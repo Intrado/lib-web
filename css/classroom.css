@@ -70,7 +70,7 @@ a.remarklink{
 }
 
 .searchcategory {
-	clear:both;
+	/*clear:both;*/
 	color:black;
 }
 
@@ -79,3 +79,17 @@ a.remarklink{
 }
 
 .comment_section { margin: 10px 0 0; }
+
+.clearfix:after {
+	content: ".";
+	display: block;
+	clear: both;
+	visibility: hidden;
+	line-height: 0;
+	height: 0;
+}
+
+.clearfix {
+	display: inline-block;
+}
+							 

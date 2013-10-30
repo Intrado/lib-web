@@ -303,21 +303,21 @@ include_once("nav.inc.php");
 <?
 startWindow(_L('Classroom Comments'));
 echo button_bar(icon_button("Done Picking Comments", "tick", null, $redirect), '<div id="clock" class="clock"></div>');
+
+$sidebar_width = 275;
 ?>
 
-
-<table width="100%" id="picker" style="display:none;clear:both; margin-top: 3px;">
-	<tr>
-		<td style="top: 0px; vertical-align: top; padding-right: 10px;white-space: nowrap;">
-			<div id="orderbys">
-				<h3>Sort By:</h3>
-				<input class="orderbys" type="radio" name="orderby" value="f" checked="checked"/> First Name<br/>
-				<input class="orderbys" type="radio" name="orderby" value="l"/> Last Name<br/>
-				<input class="orderbys" type="radio" name="orderby" value="p"/> Student ID<br/>
-			</div>
-			<br/>
-
-			<label>Section: <select id="classselect" class="comment_section" name="classselect">
+<div>
+<div style="width: <?= $sidebar_width ?>px; float: left;">
+		<div id="orderbys">
+			<h3><? echo _L('Sort By'); ?>:</h3>
+			<input class="orderbys" type="radio" name="orderby" value="f" checked="checked"/> <? echo _L('First Name'); ?><br/>
+			<input class="orderbys" type="radio" name="orderby" value="l"/> <? echo _L('Last Name'); ?><br/>
+			<input class="orderbys" type="radio" name="orderby" value="p"/> <? echo _L('Student ID'); ?><br/>
+		</div>
+		<br/>
+		<label for="classselect" style="font-weight: bold;"><? echo _L('Section'); ?>: </label>
+		<select id="classselect" class="comment_section" name="classselect">
 			<?
 
 			if($sections) {
@@ -328,8 +328,9 @@ echo button_bar(icon_button("Done Picking Comments", "tick", null, $redirect), '
 			}
 
 			?>
-			</select></label><div id="sectionloading">&nbsp;<?= $sections?'<img src="img/ajax-loader.gif" alt="Loading Section" />' . _L('Loading Section'):'' ?></div><br />
-			<div id="sectionloaded" style="display:none;">
+		</select>
+		<div id="sectionloading">&nbsp;<?= $sections?'<img src="img/ajax-loader.gif" alt="Loading Section" />' . _L('Loading Section'):'' ?></div><br />
+		<div id="sectionloaded" style="display:none;">
 			<a id="checkall" href="#" style="float:left;white-space: nowrap;">Select All</a><br />
 			<div id="contactwrapper" >
 				<div id="contactbox" style="width:100%;text-decoration:none;"></div>
@@ -337,64 +338,60 @@ echo button_bar(icon_button("Done Picking Comments", "tick", null, $redirect), '
 			<hr />
 			<img src="img/icons/fugue/light_bulb.gif" alt="" />Press and hold shift key to <br />&nbsp;&nbsp;&nbsp;&nbsp;multiselect
 			<hr />
-			</div>
-		</td>
+		</div>
+	</div>
 
-		<td style="vertical-align:top;width:100%">
-			<div id="theinstructions"><img src="img/icons/fugue/arrow_180.gif" alt="" style="vertical-align:middle;"/> Click on a Contact to Start</div>
-
-
-			<div id='tabsContainer' style='margin-right:0px;display:none;vertical-align:middle;'></div>
-			<div id="libraryContent" style="display:none;">
-			<?
-				$libraryids = array();
-				$messageids = array();
-				require_once($contentfile);
-				foreach($library as $categoryid => $messages) {
-					// add library to id since user may change the title of the category
-					echo '<div id="lib-' . $categoryid . '" style="display:block;">
-						  <span id="nowedit-' . $categoryid . '" class="nowedit"></span>
-						  <div style="clear:both"></div>';
-					foreach($messages as $message) {
-						if (!$message->isValid())
-							continue;
-						
-						if(isset($message->overridemessagegroupid) && isset($customtxt[$message->id])) {
-							$title = $customtxt[$message->id];
-						} else if(isset($messagedatacache["en"]) && isset($messagedatacache["en"][$message->messagekey])) {
-							$title = $messagedatacache["en"][$message->messagekey];
-						} else {
-							$title = ""; // Could not find message for this message key.
-						}
-						echo '<div id="msg-' . $message->id .'" class="classroomcomment" category="'.$categoryid.'">
-								<img id="msgchk-' . $message->id .'" class="msgchk" src="img/checkbox-clear.png" alt=""/>
-								<div id="msgtxt-' . $message->id .'" class="msgtxt" >'
-								. escapehtml($title) .
-								' </div>
-								<img src="img/icons/fugue/marker.gif" alt="Mark" title="Mark this Comment" class="marker" onclick="markcomment(\'msg-\',\'' . $message->id .'\')" />
-								<div>' .
-									($USER->authorize('targetedcomment')?'<div id="msgprem' . $message->id .'" class="remarklink"></div><a href="#" class="remarklink">Remark</a>':'&nbsp;') .
-								'</div>
-								<span id="msgrem' . $message->id .'" class="remark" style="display:none;">
-									<textarea class="remark"></textarea>
-									<a class="remark" href="#" onclick="saveComment(\''. $message->id .'\');false;">Done</a>
-								</span>
-							  </div>';
+	<div id="picker" style="display: none; margin-left: <?= $sidebar_width + 10 ?>px;">
+		<div id="theinstructions"><img src="img/icons/fugue/arrow_180.gif" alt="" style="vertical-align:middle;"/> <? echo _L('Click on a Contact to Start'); ?></div>
+		<div id="tabsContainer" style="margin-right:0px;display:none;vertical-align:middle;"></div>
+		<div id="libraryContent" style="display:none;">
+		<?
+			$libraryids = array();
+			$messageids = array();
+			require_once($contentfile);
+			foreach($library as $categoryid => $messages) {
+				// add library to id since user may change the title of the category
+				echo '<div id="lib-' . $categoryid . '" style="display:block;">
+					  <span id="nowedit-' . $categoryid . '" class="nowedit"></span>
+					  <br/>';
+				foreach($messages as $message) {
+					if (!$message->isValid())
+						continue;
+					
+					if(isset($message->overridemessagegroupid) && isset($customtxt[$message->id])) {
+						$title = $customtxt[$message->id];
+					} else if(isset($messagedatacache["en"]) && isset($messagedatacache["en"][$message->messagekey])) {
+						$title = $messagedatacache["en"][$message->messagekey];
+					} else {
+						$title = ""; // Could not find message for this message key.
 					}
-					echo '<div style="clear:both;"></div></div>';
+					echo '<div id="msg-' . $message->id .'" class="classroomcomment" category="'.$categoryid.'">
+							<img id="msgchk-' . $message->id .'" class="msgchk" src="img/checkbox-clear.png" alt=""/>
+							<div id="msgtxt-' . $message->id .'" class="msgtxt" >'
+							. escapehtml($title) .
+							' </div>
+							<img src="img/icons/fugue/marker.gif" alt="Mark" title="Mark this Comment" class="marker" onclick="markcomment(\'msg-\',\'' . $message->id .'\')" />
+							<div>' .
+								($USER->authorize('targetedcomment')?'<div id="msgprem' . $message->id .'" class="remarklink"></div><a href="#" class="remarklink">Remark</a>':'&nbsp;') .
+							'</div>
+							<span id="msgrem' . $message->id .'" class="remark" style="display:none;">
+								<textarea class="remark"></textarea>
+								<a class="remark" href="#" onclick="saveComment(\''. $message->id .'\');false;">Done</a>
+							</span>
+						  </div>';
 				}
-			?>
+				echo '<div style="clear:both;"></div></div>';
+			}
+		?>
 
-				<div id="lib-search">
-					<span id="nowedit-search" style="float:left;color:graytext;font-weight:lighter;font-style:italic;"></span>
-					<div id="searchContainer" style="clear:both;margin:10px;padding-top:10px;display:none;"><input id="searchbox" class="searchbox" type="text" value="" size="50" style="float:left"/><?= icon_button("Search", "magnifier", 'dosearch(); return false;', null) ?></div>
-					<div id="searchResult" style="clear:both;"></div>
-				</div>
+			<div id="lib-search">
+				<span id="nowedit-search" style="float:left;color:graytext;font-weight:lighter;font-style:italic;"></span><br/>
+				<div id="searchContainer" style="margin:10px;padding-top:10px;display:none;"><input id="searchbox" class="searchbox" type="text" value="" size="50" style="float:left"/><?= icon_button("Search", "magnifier", 'dosearch(); return false;', null) ?></div>
+				<div id="searchResult"></div>
 			</div>
-		</td>
-	</tr>
-</table>
-
+		</div>
+	</div>
+</div>
 
 <?
 endWindow();

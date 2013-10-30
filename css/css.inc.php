@@ -501,6 +501,7 @@ table.schedule th, table.schedule td { width: 30px; padding: 5px 0; text-align: 
 	margin: 0;
 	border: 0;
 	padding: 0;
+	height: 26px;
 }
 .horizontaltabstitlediv {
 	padding:0;
@@ -556,7 +557,7 @@ table.schedule th, table.schedule td { width: 30px; padding: 5px 0; text-align: 
 	vertical-align: middle;
 }
 .horizontaltabscontentdiv {
-	clear: both;
+	/*clear: both;*/
 }
 .horizontaltabspanelspane {
 	border: 1px solid #3399ff;
