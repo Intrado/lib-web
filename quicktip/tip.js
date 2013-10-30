@@ -10,8 +10,7 @@ var QuickTip = function() {
 		methods;
 
 	submitB && submitB.addEventListener('click', function(event) {
-		var isValid = methods.validate(messageTA, errorMsgCont, messageTACont);
-		if (!isValid) {
+		if (!methods.validate()) {
 			event.preventDefault();
 			setTimeout(function() {messageTA.focus();}, 500);
 		}
@@ -19,7 +18,7 @@ var QuickTip = function() {
 
 	messageTA && messageTA.addEventListener('keyup', function(event) {
 		if (!methods.hasClass(errorMsgCont, 'hide')) {
-			methods.validate(messageTA, errorMsgCont, messageTACont);
+			methods.validate();
 		}
 	}, false);
 
