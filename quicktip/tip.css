@@ -326,12 +326,14 @@ option {
 .summary-value {
   display: inline;
   margin-left: 10px;
+  word-wrap: break-word;
 }
 .summary-value.message-text {
   border-left: 5px solid #ddd;
   display: block;
   margin-top: 5px;
   padding-left: 15px;
+  word-wrap: break-word;
 }
 .contact-info {
   margin-bottom: 0;

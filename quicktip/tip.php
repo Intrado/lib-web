@@ -1,5 +1,5 @@
 <?
-	// temp stubbed API response for org tip data
+	// temp stubbed API response for org tip data	
 	$json_stub = json_encode(array(
 		"orgname" => "Example School District",
 		"categories" => array(
@@ -41,6 +41,7 @@
 	$phone  = isset($_POST['phone'])  ? $_POST['phone']  : null;
 
 	// if user has submitted a tip, get the category name and org name to show in summary
+	// TODO: replace depending on final API (in progress)
 	$categoryName = $categoryId ? $response->categories->$categoryId : "";
 	$orgName = $orgId ? $response->organizations->$orgId : "";
 ?>
@@ -58,9 +59,8 @@
 			<h1>SchoolMessenger Quick Tip</h1>
 			<div id="tip-orgname-label"><?= $response->orgname ?></div>
 
-			<?
-				if ($tipMessage) {
-			?>
+			<? if ($tipMessage) { ?>
+
 					<div id="thank-you" class="alert">
 						<h1>Thank You for the Tip!</h3>
 						<div class="text-danger call911">If this is an emergency, please call 911.</div>
@@ -71,24 +71,24 @@
 						<div><span class="summary-label">Category:</span> &nbsp;<div class="summary-value"><?= $categoryName ?></div></div>
 						<div><span class="summary-label">Message:</span> &nbsp;<div class="summary-value message-text">"<?= $tipMessage ?>"</div></div>
 						<? if ($attachment) {
-							echo '<div id="summary-attachment-container"><span class="summary-label">Attachment:</span> &nbsp;<div class="summary-value">'.$attachment.'</div></div>';
-						}
+								echo '<div id="summary-attachment-container"><span class="summary-label">Attachment:</span> &nbsp;<div class="summary-value">'.$attachment.'</div></div>';
+							}
 						?>
 
 						<? if ($name != null || $email != null || $phone != null) {
-							echo '<div class="alert contact-info">
-									<div class="summary-heading">Contact info you provided with your tip:</div>';
-							if ($name != null) {
-								echo '<div><span class="summary-label">Name:</span> &nbsp;<div class="summary-value">'.$name.'</div></div>';
+								echo '<div class="alert contact-info">
+										<div class="summary-heading">Contact info you provided with your tip:</div>';
+								if ($name != null) {
+									echo '<div><span class="summary-label">Name:</span> &nbsp;<div class="summary-value">'.$name.'</div></div>';
+								}
+								if ($email != null) {
+									echo '<div><span class="summary-label">Email:</span> &nbsp;<div class="summary-value">'.$email.'</div></div>';
+								}
+								if ($phone != null) {
+									echo '<div><span class="summary-label">Phone:</span> &nbsp;<div class="summary-value">'.$phone.'</div></div>';
+								}
+								echo '</div>';
 							}
-							if ($email != null) {
-								echo '<div><span class="summary-label">Email:</span> &nbsp;<div class="summary-value">'.$email.'</div></div>';
-							}
-							if ($phone != null) {
-								echo '<div><span class="summary-label">Phone:</span> &nbsp;<div class="summary-value">'.$phone.'</div></div>';
-							}
-							echo '</div>';
-						}
 						?>
 					</div>
 					<form id="newquicktip" name="newquicktip" action="<? echo $_SERVER['PHP_SELF']; ?>" method="POST">
@@ -96,8 +96,7 @@
 							<button id="new-tip" class="btn btn-lg btn-danger" type="submit">Done</button>
 						</fieldset>
 					</form>
-			<? } else {
-			?>
+			<? } else { ?>
 
 			<div class="alert"><strong>SchoolMessenger Quick Tip allows you to submit an anonymous tip to school and district officials.</strong>
 				Please select the appropriate organization and category when submitting your tip.
@@ -149,19 +148,23 @@
 						<input id="phone" name="phone" type="tel" pattern='\d{3}-\d{3}-\d{4}' placeholder="Phone number" value="" title="Enter your phone number, ex. 555-123-4567">
 					</fieldset>
 				</div>
-				<div id="tip-error-message" class="alert alert-danger hide">
-					Oops! &nbsp;Please enter a Tip Message.
-				</div>
+				<div id="tip-error-message" class="alert alert-danger hide">Please enter a Tip Message.</div>
 				<fieldset>
 					<button id="tip-submit" class="btn btn-lg btn-danger" type="submit">Submit Tip</button>
 				</fieldset>
-				<input id="tip-org-name" type="hidden" name="tip-org-name" value="">
-				<input id="tip-category-name" type="hidden" name="tip-category-name" value="">
 			</form>
-<? }
-?>
+<? } ?>
 
 		</div>
-		<script type="text/javascript" src="tip.js"></script>
+
+		<?	// only init QuickTip if we're on the starting page (not the Thank You landing page)
+			if ($tipMessage == null) { ?>
+				<script type="text/javascript" src="tip.js"></script>
+				<script type="text/javascript">
+					(function() {
+						new QuickTip();
+					})();	
+				</script>
+		<? } ?>	
 	</body>
 </html>
