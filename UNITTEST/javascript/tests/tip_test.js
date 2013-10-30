@@ -7,9 +7,6 @@ describe("QuickTip", function() {
 		errorMsgCont,
 		submitB,
 		selOrgName,
-		selCatName,
-		selOrgOption,
-		selCatOption,
 		qtip;
 
 	beforeEach(function() {
@@ -20,10 +17,6 @@ describe("QuickTip", function() {
 		messageTACont   = $("<div>").attr("id",'tip-message-control-group'),
 		errorMsgCont 	= $("<div>").attr("id","tip-error-message"),
 		submitB 		= $("<button>").attr("id","tip-submit"),
-		selOrgName 		= $("<input>").attr("id","tip-org-name"),
-		selCatName 		= $("<input>").attr("id","tip-category-name"),
-		selOrgOption 	= $("<option>").attr({"name":"orgName", "value":"1"}),
-		selCatOption 	= $("<option>").attr({"name":"catName", "value":"2"});
 		
 		// add elements to dom
 		$('body').append(orgListCoB);
@@ -32,11 +25,6 @@ describe("QuickTip", function() {
 		$('body').append(messageTACont);
 		$('body').append(errorMsgCont.addClass('hide')); // default/initial state = hidden
 		$('body').append(submitB);
-		$('body').append(selOrgName);
-		$('body').append(selCatName);
-
-		orgListCoB.append(selOrgOption);
-		categoryCoB.append(selCatOption);
 		
 		// init QuickTip object/api
 		qtip = new QuickTip();
@@ -51,8 +39,6 @@ describe("QuickTip", function() {
 		messageTACont.remove();
 		errorMsgCont.remove();
 		submitB.remove();
-		selOrgName.remove();
-		selCatName.remove();
 
 		window.qtip = undefined;
 	});
