@@ -7,17 +7,36 @@ var QuickTip = function() {
 		messageTACont   = document.getElementById('tip-message-control-group'),
 		errorMsgCont 	= document.getElementById("tip-error-message"),
 		submitB 		= document.getElementById("tip-submit"),
+		isValid = false,
 		methods;
 
-	submitB && submitB.addEventListener('click', function(event) {
+	// cross-browser addEvent handler
+	var addEvent = (function () {
+		if (window.addEventListener) {
+			return function (el, ev, fn) {
+				el.addEventListener(ev, fn, false);
+			};
+		} else if (window.attachEvent) {
+			return function (el, ev, fn) {
+				el.attachEvent('on' + ev, fn);
+			};
+		} else {
+			return function (el, ev, fn) {
+			el['on' + ev] =  fn;
+			};
+		}
+	}());
+
+
+	addEvent(submitB, 'click', function(event) {
 		if (!methods.validate()) {
 			event.preventDefault();
 			setTimeout(function() {messageTA.focus();}, 500);
 		}
 	}, false);
 
-	messageTA && messageTA.addEventListener('keyup', function(event) {
-		if (!methods.hasClass(errorMsgCont, 'hide')) {
+	addEvent(messageTA, 'keyup', function(event) {
+		if (!isValid) {			
 			methods.validate();
 		}
 	}, false);
@@ -25,12 +44,12 @@ var QuickTip = function() {
 	methods = {
 		
 		validate: function() {
-			var isValid = ((messageTA.value).replace(/^\s+|\s+$/g, '')).length > 0 ? true : false;
-			this.renderValidation(isValid);
+			isValid = ((messageTA.value).replace(/^\s+|\s+$/g, '')).length > 0 ? true : false;
+			this.renderValidation();
 			return isValid;
 		},
 
-		renderValidation: function(isValid) {
+		renderValidation: function() {
 			if (isValid) {
 				this.addClass(errorMsgCont, 'hide');
 				this.removeClass(messageTACont, 'has-error');

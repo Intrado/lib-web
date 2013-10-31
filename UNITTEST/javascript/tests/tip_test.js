@@ -58,7 +58,7 @@ describe("QuickTip", function() {
 		});
 	});
 
-	describe("renderValidation(isValid)", function() {
+	describe("renderValidation()", function() {
 		it("if valid, hides error message container and removes error styling on textarea", function() {
 			var errorCont = errorMsgCont[0];
 			var msgTACont = messageTACont[0];
@@ -67,11 +67,21 @@ describe("QuickTip", function() {
 			expect(qtip.hasClass(errorCont, 'hide')).to.equal(true);
 			expect(qtip.hasClass(msgTACont, 'has-error')).to.equal(false);
 
-			expect(qtip.renderValidation(false));
+			expect(qtip.renderValidation());
 
 			// check if error container is visible (no 'hide' class) and textarea has 'has-error' class
 			expect(qtip.hasClass(errorCont, 'hide')).to.equal(false);
 			expect(qtip.hasClass(msgTACont, 'has-error')).to.equal(true);
+
+			messageTA[0].value = "some tip text";
+			messageTA[0].dispatchEvent(new Event('keyup')); // simulate keyup with some text in the textarea
+
+			expect(qtip.renderValidation());
+
+			// error container should be hidden and textarea with no 'has-error' class
+			expect(qtip.hasClass(errorCont, 'hide')).to.equal(true);
+			expect(qtip.hasClass(msgTACont, 'has-error')).to.equal(false);
+
 		});
 	});
 
@@ -87,7 +97,7 @@ describe("QuickTip", function() {
 	});
 
 	describe("addClass(elem, className)", function() {
-		it("adds className to elem", function() {	
+		it("adds className to elem", function() {
 			var elem = errorMsgCont[0];
 			expect(qtip.hasClass(elem, 'test-class')).to.equal(false);
 
@@ -98,7 +108,7 @@ describe("QuickTip", function() {
 	});
 
 	describe("removeClass(elem, className)", function() {
-		it("removes className from elem", function() {	
+		it("removes className from elem", function() {
 			var elem = errorMsgCont[0];		
 			expect(qtip.hasClass(elem, 'test-class')).to.equal(false);
 

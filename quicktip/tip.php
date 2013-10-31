@@ -161,9 +161,9 @@
 			if ($tipMessage == null) { ?>
 				<script type="text/javascript" src="tip.js"></script>
 				<script type="text/javascript">
-					(function() {
+					window.onload = function() {
 						new QuickTip();
-					})();	
+					};
 				</script>
 		<? } ?>	
 	</body>
