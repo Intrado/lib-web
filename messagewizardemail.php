@@ -108,7 +108,7 @@ class MsgWiz_language extends WizStep {
 				"helpstep" => 1)
 		);
 		
-		$helpsteps = array(_L("Select whether or not you would like to automatically translate your message using Google Translate. If you prefer to write your own translations, leave this option unchecked.<br><br>Next, select the language of the message you're creating."));
+		$helpsteps = array(_L("Select whether or not you would like to automatically translate your message using Google Translate. If you prefer to write your own translations, simply select the language of the message you're creating."));
 		
 		return new Form("start",$formdata,$helpsteps);
 	}
