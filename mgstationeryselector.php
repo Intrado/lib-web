@@ -77,7 +77,7 @@ if (!$USER->authorize("sendmulti") && $languagecode != Language::getDefaultLangu
 $helpsteps = array();
 $formdata = array();
 $helpstepnum = 1;
-$helpsteps[] = _L("");
+$helpsteps[] = _L("The dropdown menu contains all of the stationery currently available to you. Select the stationery you wish to use from the dropdown menu and click Next to continue.");
 
 
 $args = array($USER->id);
@@ -118,7 +118,7 @@ if (count($stationery) == 1) {
 
 $formdata["stationery"] = array(
 		"label" => _L("Stationery"),
-		"fieldhelp" => _L("Select the stationery that is similar to the email that is desired. "),
+		"fieldhelp" => _L("Select which stationery you would like to use."),
 		"value" => "",
 		"validators" => array(
 				array("ValRequired"),
@@ -127,7 +127,6 @@ $formdata["stationery"] = array(
 		"control" => array("StationerySelector", "values" => $stationery),
 		"helpstep" => $helpstepnum++
 );
-
 
 $buttons = array(submit_button(_L('Next'),"submit","arrow_right"),icon_button(_L('Cancel'),"cross",null,"mgeditor.php"));
 

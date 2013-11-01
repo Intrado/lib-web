@@ -234,11 +234,20 @@ if ($subtype == 'plain') {
 	$messagecontrol['editor_mode'] = $fromstationery ? 'inline' : 'normal';
 }
 
-$helpsteps[] = _L("Email message body text goes here. Be sure to introduce yourself and give detailed information. For ".
+if ($fromstationery){
+	$helpsteps[] = _L("Click the editable regions of the stationery to enter your message. Be sure to introduce yourself and give detailed information. For ".
 	"helpful message tips and ideas, click the Help link in the upper right corner of the screen.<br><br>If you would ".
 	"like to insert dynamic data fields, such as the recipient's name, move the cursor to the location where the data ".
 	"should be inserted, select the data field, and click 'Insert'. It's a good idea to enter a default value in the ".
 	"Default Value field for each insert. This value will be displayed in the event of a recipient having no data in your chosen field.");
+} else {
+	$helpsteps[] = _L("Enter your Email message body text here. Be sure to introduce yourself and give detailed information. For ".
+	"helpful message tips and ideas, click the Help link in the upper right corner of the screen.<br><br>If you would ".
+	"like to insert dynamic data fields, such as the recipient's name, move the cursor to the location where the data ".
+	"should be inserted, select the data field, and click 'Insert'. It's a good idea to enter a default value in the ".
+	"Default Value field for each insert. This value will be displayed in the event of a recipient having no data in your chosen field.");
+}
+
 $formdata["message"] = array(
 	"label" => _L("Email Message"),
 	"fieldhelp" => _L('Enter the message you would like to send. Helpful tips for successful messages can be found at ".
