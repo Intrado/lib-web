@@ -180,9 +180,15 @@ class MsgWiz_language extends WizStep {
 				"control" => array("RadioButton", "values" => $langs, "ishtml" => true),
 				"helpstep" => 1)
 		);
-
-		$helpsteps = array(_L("Select whether or not you would like to automatically translate your message using Google Translate. If you prefer to write your own translations, leave this option unchecked.<br><br>Next, select the language of the message you're creating."));
-
+		
+		if ($method == "write"){
+			$helpsteps = array(_L("Select whether or not you would like to automatically translate your message using Google Translate. If you prefer to write your own translations, leave this option unchecked.<br><br>Next, select the language of the message you're creating."));
+		} 
+		else {
+			$helpsteps = array(_L("Select the language you wish to record."));
+		}
+		
+		
 		// if there are excluded languages, show them
 		if ($excludedlanguages) {
 			$html = '<div>'. _L('The following languages cannot be spoken via Text to Speech.'). '
