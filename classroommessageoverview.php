@@ -81,7 +81,7 @@ $helpstepscount = 1;
 
 $formdata["dateoptions"] = array(
 	"label" => _L("Date Options"),
-	"fieldhelp" => _L("Select the date or date range that the report should cover."),
+	"fieldhelp" => _L("Select the time period you would like to review."),
 	"value" => json_encode(array(
 		"reldate" => isset($options['reldate']) ? $options['reldate'] : 'today',
 		"xdays" => isset($options['lastxdays']) ? $options['lastxdays'] : '',
@@ -92,7 +92,7 @@ $formdata["dateoptions"] = array(
 	"validators" => array(array("ValReldate")),
 	"helpstep" => $helpstepscount++
 );
-$helpsteps[] = _L('Select a date range to pull a classroom messaging report against.');
+$helpsteps[] = _L('You can view your Classroom Messaging history for a particular time period using the choice in the Date Options menu.');
 
 // Person ID search filter - reuse the previous form submissions' value if there was one
 $searchvalue = (isset($options['personid'])) ? $options['personid'] : '';
@@ -104,13 +104,13 @@ $formdata['searchmethod'] = array(
 */
 $formdata["personid"] = array(
 	"label" => _L("Student ID"),
-	"fieldhelp" => _L("Enter the student ID that you want to restrict the report to."),
+	"fieldhelp" => _L("Optionally enter a student ID number to view only the messages sent to a certain student."),
 	"value" => $searchvalue,
 	"control" => array("TextField"),
 	"validators" => array(),
 	"helpstep" => $helpstepscount++
 );
-$helpsteps[] = _L('Optionally enter a student ID to limit the report to just that student.');
+$helpsteps[] = _L('Optionally enter a student ID number to view only the messages sent to a certain student over the date range that you specified above.');
 
 
 $buttons = array( submit_button(_L('Filter'), 'filter', 'arrow_refresh'));
