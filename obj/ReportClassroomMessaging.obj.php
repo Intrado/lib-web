@@ -88,7 +88,7 @@ class ReportClassroomMessaging extends ReportGenerator {
 				concat(if(rp.f01 is null, p.f01, rp.f01), ' ', if(rp.f02 is null, p.f02, rp.f02)) as student,
 				tg.messagekey,
 				e.notes,
-				e.occurence,
+				e.occurence AS occurrence,
 				from_unixtime(if(rc.type = 'email', (select timestamp from reportemaildelivery where jobid = rc.jobid and personid = rc.personid and sequence = rc.sequence order by timestamp limit 1), rc.starttime/1000)) as lastattempt,
 				rc.type,
 				if(rc.type = 'email', rc.email, rc.phone) as destination,
