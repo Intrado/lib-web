@@ -39,7 +39,9 @@ class Form {
 	function handleRequest($dontexit = false) {
 		if (!isset($_REQUEST['form']) || $_REQUEST['form'] != $this->name)
 			return false; //nothing to do
-		
+
+		$isAjax = isset($_REQUEST['ajax']);
+
 		//single item ajax validation call
 		if (isset($_REQUEST['ajaxvalidator'])) {
 
@@ -73,7 +75,7 @@ class Form {
 		//ajax post form - merge in data, check validation, etc
 		if (isset($_POST['submit'])) {
 			//check the form snum vs loaded formdata
-			if (isset($_REQUEST['ajax']) && $this->checkForDataChange()) {
+			if ($isAjax && $this->checkForDataChange()) {
 				$result = array("status" => "fail", "datachange" => true);
 				if ($dontexit) {
 					return $result;
@@ -126,7 +128,7 @@ class Form {
 			$errors = $this->validate();
 
 			//if this is an ajax request, validate now and return json results for the form
-			if (isset($_REQUEST['ajax']) && $errors !== false) {
+			if ($isAjax && ($errors !== false)) {
 				$result = array("status" => "fail", "validationerrors" => $errors);
 				if ($dontexit) {
 					return $result;
@@ -136,11 +138,33 @@ class Form {
 					exit();
 				}
 			}
+
+			// If there were no validation errors
+			if ($errors === false) {
+
+				// Go ahead with handling the form data submission
+				$location = $this->handleSubmit($this->getSubmit(), $this->getData());
+
+				// If handleSubmit returned a valid page to send us to post-submission
+				if ($location !== false) {
+
+					// For compatibility with non-AJAX form submissions
+					if ($isAjax)
+						$form->sendTo($location);
+					else
+						redirect($location);
+				}
+			}
 		}
 
 		return false;
 	}
-	
+
+	// This is a no-op function stub for the new PageForms that will provide this method;
+	// see _PageTemplate.php PageForm::handleSubmit() for an example of what to do
+	function handleSubmit($button, $data) {
+		return(false);
+	}
 	
 	function markRequired($item) {
 		array_unshift($this->formdata[$item]['validators'], array("ValRequired"));
