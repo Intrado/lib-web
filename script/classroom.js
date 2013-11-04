@@ -406,6 +406,7 @@
 	/*
 	 * Get the class contacts and set observers
 	 */
+	var currently_selected = null;
 	function getclass(selected, orderby) {
 		$('sectionloading').show();
 		$('sectionloaded').hide();
@@ -419,7 +420,6 @@
 				var response = transport.responseJSON || "Class not available";
 				var contacts = $(response.people);
 				var size = 0;
-				$('contactbox').update("");
 
 				$('theinstructions').show();
 				$('sectionloaded').show();
@@ -427,11 +427,10 @@
 				$('tabsContainer').hide();
 				$('searchContainer').hide();
 
-				clearcache();
-
+				// Only clear the cache if the selected class (secetion ID) has changed
+				if (selected != currently_selected) clearcache();
 				revealmessages = true;
 
-				var dom = $('contactbox').remove();
 				var tbody = new Element('tbody');
 
 				contacts.each(function(person) {
@@ -439,17 +438,31 @@
 					var tr = new Element('tr');
 					var name = (orderby == 'l') ? person['lastname'] + ', ' + person['firstname'] : person['firstname'] + ' ' + person['lastname'];
 					tr.insert('<td width="100%"><a href="#" id="' + id + '" title="Student id: ' +  person['pkey'] + '" style="text-decoration:none;cursor:pointer;white-space: nowrap;">' + person['pkey'] + ' - ' + name +'</a></td>');
-					var td = new Element('td', {style:'white-space:nowrap'});
-					categoryinfo.each(function(category) {
-						td.insert('<img id="' + id + '-' + category.key + '"src="img/pixel.gif" title="0 Comment(s) for ' + category.value.name + '" style="width:10px;display:inline;" alt="" />');
-					});
+
+					// Only create new/default per-category indicators if the class (section ID) has changed
+					var statsid = 'stats-' + person['pid'];
+					var td = new Element('td', {style: 'white-space:nowrap'});
+					if (selected != currently_selected) {
+						categoryinfo.each(function(category) {
+							td.insert('<img id="' + id + '-' + category.key + '"src="img/pixel.gif" title="0 Comment(s) for ' + category.value.name + '" style="width:10px;display:inline;" alt="" />');
+						});
+					}
+					else {
+						// Otherwise, we'll copy the status indicators from the existing DOM
+						var t = $$('td[title='+statsid+']')[0].innerHTML;
+						td.innerHTML = t;
+					}
+					td.setAttribute('title', statsid);
 					tr.insert(td);
+
 					tbody.insert(tr);
 					size++;
 				});
+
+				$('contactbox').update("");
+				var dom = $('contactbox').remove();
 				dom.insert(new Element('table').insert(tbody));
 				$('contactwrapper').insert(dom);
-
 
 				contacts.each(function(person) {
 					var id = 'c-' + person['pid'];
@@ -492,6 +505,8 @@
 				} else {
 					$('picker').hide();
 				}
+
+				currently_selected = selected;
 			}
 		});
 	}
