@@ -48,7 +48,7 @@ CREATE TABLE tai_messageattachment (
 	messageid int(11) NOT NULL,
 	contentid bigint(20) NOT NULL,
 	filename varchar(255) NOT NULL,
-	'size' int(11) NOT NULL,
+	`size` int(11) NOT NULL,
 	PRIMARY KEY (id),
 	KEY messageid (messageid)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8
