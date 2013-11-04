@@ -41,3 +41,15 @@ $$$
 -- $rev 4
 -- empty, run to insert setting _dbupgrade_inprogress bug CS-4311
 
+
+-- $rev 5
+CREATE TABLE tai_messageattachment (
+	id int(11) NOT NULL AUTO_INCREMENT,
+	messageid int(11) NOT NULL,
+	contentid bigint(20) NOT NULL,
+	filename varchar(255) NOT NULL,
+	'size' int(11) NOT NULL,
+	PRIMARY KEY (id),
+	KEY messageid (messageid)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8
+$$$
