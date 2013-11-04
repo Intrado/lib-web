@@ -13,9 +13,10 @@ header('Content-type: text/html; charset=UTF-8') ;
 	<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
 
 	<title>SUBSCRIBER<?=isset($TITLE) ? ": " . $TITLE : ""?></title>
-	
-	<script src='script/utils.js'></script>
-	<script src='script/sorttable.js'></script>
+
+	<script src="script/jquery-1.8.3.min.js" type="text/javascript"></script>
+	<script src='script/utils.js' type="text/javascript"></script>
+	<script src='script/sorttable.js' type="text/javascript" ></script>
 	<script src="script/prototype.js" type="text/javascript"></script>
 	<script src="script/scriptaculous.js" type="text/javascript"></script>
 	<script src="script/prototip.js.php" type="text/javascript"></script>
