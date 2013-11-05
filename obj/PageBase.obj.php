@@ -40,8 +40,11 @@
  * 'formname' - The name for the primary form that we're going to be working on
  * 	If it is blank, then the default implementation will not initialize or
  * 	invoke form-related opteraions.
+ *
+ * DEPENDENCIES
+ * ifc/Page.ifc.php
  */
-class PageBase {
+abstract class PageBase implements Page {
 
 	/**
 	 * All our operational options, protectively set, publicly readable
@@ -49,6 +52,7 @@ class PageBase {
 	var $options;
 	var $form;
 	var $konadir;
+	var $pageOutput = '';
 
 	/**
 	 * Base constructor; just manages options 
@@ -70,57 +74,27 @@ class PageBase {
 
 		// Then merge in the options provided
 		$this->options = array_merge($options);
+
+		// Call a customer initializer if it exists
+		$this->initialize();
 	}
+
+	/**
+	 * Post-constructor initialization
+	 *
+	 * Derived class should implement this method with any additional
+	 * initialization code needed along with the class instantiation.
+	 */
+	function initialize() {
+	}
+
 
 	/**
 	 * Wrap the request handler's output with the full navigation chrome/template
 	 *
 	 * Sends output directly to stdout!
 	 */
-	function show() {
-		global $PAGE, $TITLE;
-
-		// First handle the request; this might exit early with a redirect
-		$pageOutput = $this->handleRequest($_GET, $_POST);
-
-		$PAGE = $this->options['page'];
-		$TITLE = _L($this->options['title']);
-		include_once("{$this->konadir}/nav.inc.php");
-
-		// Optionally load extra form validators
-		if (is_array($this->options['validators']) && count($this->options['validators'])) {
-			print '<script type="text/javascript">' . Validator::load_validators($this->options['validators']) . "</script>\n";
-		}
-
-		startWindow($TITLE);
-		echo $pageOutput;
-		endWindow();
-
-		include_once("{$this->konadir}/navbottom.inc.php");
-	}
-
-	/**
-	 * Render and deliver the output for this page
-	 *
-	 * Ideally, all output from the page, headers excluded, would be passed
-	 * back to the caller through this method. This allows 100% of the HTML
-	 * page content to be captured in a single operation where the result
-	 * may then be redirected to a file, sent to standard out, or processed
-	 * for testing to verify its output. In reality, there is quite a bit
-	 * of code within the application that directly echoes/prints to stdout
-	 * which would prevent this method from buffering it. Over time, such
-	 * mechanisms should be converted to assemble a page bit by bit and not
-	 * output directlry.
-	 *
-	 * An exception to this would be for "pages" that contain large data
-	 * sets such as CSV output where it would be detrimental to the system
-	 * performance to buffer all that data in memory before sending to
-	 * stdout.
-	 *
-	 * @return mixed HTML output string for the requested page, or nothing
-	 * if it was a form submission that redirected and exited.
-	 */
-	function handleRequest($get, $post) {
+	function execute($get = Array(), $post = Array()) {
 
 		// Check authorization
 		if (! $this->is_authorized($get, $post)) {
@@ -138,7 +112,23 @@ class PageBase {
 			redirect($location);
 		}
 
-		return($this->process($get, $post));
+		// Pull request data into instance properties
+		$this->beforeLoad($get, $post);
+
+		// Load the form and any supplemental database data that it needs
+		$this->load();
+
+		// Do whatever we need to do after loading
+		$this->afterLoad();
+
+		// Anything else we need to do before rendering?
+		$this->beforeRender();
+
+		// Render output
+		$this->pageOutput = $this->render();
+
+		// And send it out to the client
+		$this->send();
 	}
 
 	/**
@@ -161,31 +151,7 @@ class PageBase {
 	}
 
 	/**
-	 * Start processing this page request
-	 *
-	 * @param array $get Associative array of name/value pairs akin to $_GET
-	 * @param array $post Associative array of name/value pairs akin to $_POST
-	 */
-	function process($get, $post) {
-
-		// Pull request data into instance properties
-		$this->beforeLoadForm($get, $post);
-
-		// Load the form and any supplemental database data that it needs
-		$this->loadForm();
-
-		// Handle the form; might not return if it was an ajax submit
-		$this->handleForm();
-
-		// Anything else we need to do before rendering?
-		$this->beforeRender();
-
-		// Finally render
-		return($this->render());
-	}
-
-	/**
-	 * Before loading form data, convert request arguments into local vars
+	 * Before loading any data, convert request arguments into local vars
 	 *
 	 * Turn our request arguments into instance properties; this is the last
 	 * time that we will access request arguments directly - everything else
@@ -199,14 +165,11 @@ class PageBase {
 	 * @param array $get Associative array of name/value pairs akin to $_GET
 	 * @param array $post Associative array of name/value pairs akin to $_POST
 	 */
-	function beforeLoadForm($get, $post) {
-		// By default we will do nothing with the data; the derived class
-		// must implement this method to be able to pull any of the
-		// request data into the page processing.
+	function beforeLoad($get, $post) {
 	}
 
 	/**
-	 * Load base data needed to handle form submission
+	 * Load base data needed to handle submission
 	 *
 	 * All data required from the database, anything needed to drive a form
 	 * must all be loaded at this time and by this method. If it was a form
@@ -216,23 +179,11 @@ class PageBase {
 	 * the submission to to proceed. By the time we leave here there should
 	 * be nothing left to be discovered to save the submitted data.
 	 */
-	function loadForm() {
-
-		// By default this method instantiates an empty form; the
-		// derived class must implement this method to show a userful
-		// form.
-		if (strlen($this->options['formname'])) {
-
-			// Initialize some bogus data
-			$formdata = $helpsteps = $buttons = array();
-
-			// And instantiate a form object
-			$this->form = new PageForm($this->options['formname'], $formdata, $helpsteps, $buttons, 'vertical');
-		}
+	function load() {
 	}
 
 	/**
-	 * Handle form submission
+	 * Handle any processing needed after a data load
 	 *
 	 * Anything after loading the base data necessary for form submission
 	 * and related to the actual process of submitting the form goes here.
@@ -241,13 +192,7 @@ class PageBase {
 	 * that in most cases it will probably suffice as is. It will likely
 	 * need an override for anypage that has more than one form on it...
 	 */
-	function handleForm() {
-		// If we have a primary form
-		if (strlen($this->options['formname'])) {
-
-			// Submit the form (if it is a submission!)
-			$this->form->handleRequest(); // Calls $this->form->handleSubmit()
-		}
+	function afterLoad() {
 	}
 
 	/**
@@ -274,10 +219,33 @@ class PageBase {
 	 * Any page wanting to show more than just a single form as the output
 	 * would need to override this method to render whatever HTML it wants
 	 * to output.
+	 *
+	 * @return string HTML that we want to send as the page content
 	 */
 	function render() {
-		$html = $this->form->render();
-		return($html);
+		return('');
+	}
+
+	/**
+	 * Send final output to the client
+	 *
+	 * This default implementation takes whatever HTML is rendered into
+	 * this->pageOutput and wraps it up with standard page header/footer
+	 * and the normal start/end window wrapper.
+	 */
+	function send() {
+		global $PAGE, $TITLE;
+
+		// If we got this far, then assemble some HTML and spit it out
+		$PAGE = $this->options['page'];
+		$TITLE = _L($this->options['title']);
+		include_once("{$this->konadir}/nav.inc.php");
+
+		startWindow($TITLE);
+		echo $this->pageOutput;
+		endWindow();
+
+		include_once("{$this->konadir}/navbottom.inc.php");
 	}
 }
 

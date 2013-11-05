@@ -1,5 +1,6 @@
 <?
 
+
 require_once('inc/common.inc.php');
 require_once('inc/securityhelper.inc.php');
 require_once('inc/table.inc.php');
@@ -9,7 +10,9 @@ require_once('obj/Validator.obj.php');
 require_once('obj/Form.obj.php');
 require_once('obj/FormItem.obj.php');
 
+require_once('ifc/Page.ifc.php');
 require_once('obj/PageBase.obj.php');
+require_once('obj/PageForm.obj.php');
 
 
 // -----------------------------------------------------------------------------
@@ -73,9 +76,9 @@ class TemplateItem extends FormItem {
 // CUSTOM FORM FOR THIS PAGE
 // -----------------------------------------------------------------------------
 
-class PageForm extends Form {
+class TemplateForm extends Form {
 
-	function PageForm($name, $rawdata) {
+	function TemplateForm($name, $rawdata) {
 		$formdata = array(
 			_L('Template Section 1'), // Optional
 			"templatetextfield" => array(
@@ -145,13 +148,13 @@ function fmt_template ($obj, $field) {
 // CUSTOM PAGE FUNCTIONALITY
 // -----------------------------------------------------------------------------
 
-class PageTemplate extends PageBase {
+class TemplatePage extends PageForm {
 
 	function is_authorized($get, $post) {
 		return(true); // open to the world, unconditionally!
 	}
 
-	function beforeLoadForm($get, $post) {
+	function beforeLoad($get, $post) {
 
 		// Special case for handling deletions
 		if (isset($get['deleteid'])) {
@@ -168,8 +171,8 @@ class PageTemplate extends PageBase {
 		$this->data['number'] = intval($post['number']);
 	}
 
-	function loadForm() {
-		$this->form = new PageForm($this->options['formname'], $this->data);
+	function load() {
+		$this->form = new TemplateForm($this->options['formname'], $this->data);
 
 	}
 
@@ -189,10 +192,10 @@ class PageTemplate extends PageBase {
 // PAGE INSTANTIATION AND DISPLAY
 // -----------------------------------------------------------------------------
 
-$page = new PageTemplate(Array(
+$page = new TemplatePage(Array(
 	'formname' => 'templateform',
 	'validators' => Array('ValTemplateItem')
 ));
 
-$page->show();
+$page->execute();
 
