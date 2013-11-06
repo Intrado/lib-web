@@ -32,7 +32,7 @@ abstract class PageForm extends PageBase {
 			$formdata = $helpsteps = $buttons = array();
 
 			// And instantiate a form object
-			$this->form = new PageForm($this->options['formname'], $formdata, $helpsteps, $buttons, 'vertical');
+			$this->form = new TemplateForm($this->options['formname'], $formdata, $helpsteps, $buttons, 'vertical');
 		}
 	}
 
@@ -93,7 +93,7 @@ abstract class PageForm extends PageBase {
 	 * and the normal start/end window wrapper.
 	 */
 	function send() {
-		global $PAGE, $TITLE;
+		global $PAGE, $TITLE, $USER;
 
 		// If we got this far, then assemble some HTML and spit it out
 		$PAGE = $this->options['page'];
@@ -102,7 +102,9 @@ abstract class PageForm extends PageBase {
 
 		// Optionally load extra form validators
 		if (is_array($this->options['validators']) && count($this->options['validators'])) {
-			print '<script type="text/javascript">' . Validator::load_validators($this->options['validators']) . "</script>\n";
+			print '<script type="text/javascript">';
+			Validator::load_validators($this->options['validators']);
+			print "</script>\n";
 		}
 
 		startWindow($TITLE);

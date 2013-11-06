@@ -1,6 +1,5 @@
 <?
 
-
 require_once('inc/common.inc.php');
 require_once('inc/securityhelper.inc.php');
 require_once('inc/table.inc.php');
@@ -9,6 +8,7 @@ require_once('inc/utils.inc.php');
 require_once('obj/Validator.obj.php');
 require_once('obj/Form.obj.php');
 require_once('obj/FormItem.obj.php');
+
 
 require_once('ifc/Page.ifc.php');
 require_once('obj/PageBase.obj.php');
@@ -168,7 +168,7 @@ class TemplatePage extends PageForm {
 		// Any other special case. early-exit operations needed for our page?
 
 		// Set up data that we're going to need for the form
-		$this->data['number'] = intval($post['number']);
+		$this->data['number'] = isset($post['number']) ? intval($post['number']) : 0;
 	}
 
 	function load() {
@@ -182,7 +182,7 @@ class TemplatePage extends PageForm {
 	}
 
 	function render() {
-		$html = "There are {$this->days} left `til Christmas!<br/><br/>\n{$this->form->render()}";
+		$html = "There are {$this->days} days left `til Christmas!<br/><br/>\n{$this->form->render()}";
 		return($html);
 	}
 }

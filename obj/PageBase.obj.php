@@ -44,6 +44,7 @@
  * DEPENDENCIES
  * ifc/Page.ifc.php
  */
+
 abstract class PageBase implements Page {
 
 	/**
@@ -63,17 +64,17 @@ abstract class PageBase implements Page {
 		$this->konadir = dirname(dirname(__FILE__));
 
 		// Set some default options
-		$this->options = Array(
+		$defaults = Array(
 			'testmode' => 'false',
 			'noauth_redirect' => 'unauthorized.php',
 			'title' => 'Default Page Title',
-			'page' => 'default:default',
+			'page' => 'notifications:jobs',
 			'formname' => '',
 			'validators' => Array()
 		);
 
-		// Then merge in the options provided
-		$this->options = array_merge($options);
+		// Then merge defaults with the options provided 
+		$this->options = array_merge($defaults, $options);
 
 		// Call a customer initializer if it exists
 		$this->initialize();
@@ -234,7 +235,7 @@ abstract class PageBase implements Page {
 	 * and the normal start/end window wrapper.
 	 */
 	function send() {
-		global $PAGE, $TITLE;
+		global $PAGE, $TITLE, $USER;
 
 		// If we got this far, then assemble some HTML and spit it out
 		$PAGE = $this->options['page'];
