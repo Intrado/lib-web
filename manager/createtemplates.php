@@ -125,6 +125,62 @@ function createDefaultTemplates($useSmsMessagelinkInboundnumber = false) {
 			return true;
 }
 
+/**
+ * Given a name and template data, create a new message group
+ *
+ * @param $templateName
+ * @param $templateData
+ * @return bool|int
+ */
+function createEmailTemplateMessageGroup($templateName, $templateData) {
+	$messagegroup = new MessageGroup();
+	// create messagegroup
+	$messagegroup->userid = null;
+	$messagegroup->type = "systemtemplate";
+	$messagegroup->name = $templateName . " Template";
+	$messagegroup->description = "";
+	$messagegroup->modified = date('Y-m-d H:i:s');
+	$messagegroup->permanent = 1;
+	$messagegroup->deleted = 0;
+	$messagegroup->defaultlanguagecode = "en";
+	if (!$messagegroup->create())
+		return false;
+
+	foreach ($templateData as $langCode => $subTypeData) {
+		foreach ($subTypeData as $subType => $data) {
+			$subject = urlencode($data['subject']);
+			$fromName = urlencode($data['fromname']);
+			$fromAddr = urlencode($data['fromaddr']);
+			$body = $data['body'];
+
+			// create message
+			$message = new Message();
+			$message->messagegroupid = $messagegroup->id;
+			$message->userid = null;
+			$message->name = $templateName . " Template";
+			$message->description = "$templateName, $langCode, email, $subType";
+			$message->type = "email";
+			$message->subtype = $subType;
+			$message->data = "subject=$subject&fromname=$fromName&fromemail=$fromAddr";
+			$message->modifydate = date('Y-m-d H:i:s');
+			$message->autotranslate = "none";
+			$message->languagecode = $langCode;
+			if (!$message->create())
+				return false;
+
+			// create messagepart
+			$messagepart = new MessagePart();
+			$messagepart->messageid = $message->id;
+			$messagepart->type = "T";
+			$messagepart->txt = $body;
+			$messagepart->sequence = 0;
+			if (!$messagepart->create())
+				return false;
+		}
+	}
+	return $messagegroup->id;
+}
+
 function createTemplate($templatetype, $englishplain, $englishhtml, $spanishplain, $spanishhtml) {
 	$messagegroup = new MessageGroup();
 	// create messagegroup

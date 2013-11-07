@@ -655,6 +655,71 @@ DO NOT REPLY: This is an automatically generated email. Please do not send a rep
 ';
 
 
+////////////////////////////
+// QUICK TIP
+////////////////////////////
+
+	// quicktip english html
+	$templates['quicktipalert']['en']['html']['subject'] = 'New QuickTip Alert: ${date}';
+	$templates['quicktipalert']['en']['html']['fromname'] = '${productname}';
+	$templates['quicktipalert']['en']['html']['fromaddr'] = 'noreply@schoolmessenger.com';
+	$templates['quicktipalert']['en']['html']['body'] = '
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>New QuickTip Alert: ${date}</title>
+</head>
+<body style="background:lightslategrey">
+<table style="max-width:800px;"><tr><td>
+    <div style="border:1px solid #2e2e2e;border-radius:8px 8px 8px 8px;box-shadow:0 2px 8px rgba(0, 0, 0, 0.15);background:white;padding:12px;margin:20px">
+        <p style="font-size:20px;font-style:italic;font-weight:bold;margin-top:4px;">${product}® QuickTip</p>
+        <p style="font-size:18px;font-weight:bold;">New Tip Alert</p>
+        <p>Generated on ${date}</p>
+        <div style="border:1px solid #2e2e2e;border-radius:8px 8px 8px 8px;box-shadow:0 2px 8px rgba(0, 0, 0, 0.15);background:white;padding:8px;">
+            <table width="100%">
+                <tr><th align="left">Organization:</th><th align="left">${okey}</th></tr>
+                <tr><td align="left">Tip Category:</td><td align="left">${topicname}</td></tr>
+                <tr><td align="left">Submitted by:</td><td align="left">${tipgivername}</td></tr>
+                <tr><td align="left">Attachments:</td><td align="left">${hasattachments}</td></tr>
+                <tr><td colspan="2">
+                    <div style="border:1px solid #bababa;border-radius:8px 8px 8px 8px;box-shadow:0 2px 8px rgba(0, 0, 0, 0.15);background:lightblue;padding:10px;">
+                        <b>${tipbody}</b>
+                    </div>
+                </td></tr>
+            </table>
+        </div>
+        <br>
+        <div style="margin-top:20px;width:100%;">
+            <p><i>To view a detailed version of this report, go to <a href="http://asp.schoolmessenger.com/${customerurl}/quicktip.php">${product}</a> and log in.</i></p>
+            <p><i>You are receiving this alert because your profile has "Topic Recipient" enabled. Contact your system administrator for more details about QuickTip alerts.</i></p>
+        </div>
+    </div>
+</td></tr></table>
+</body>
+</html>';
+
+	// quicktip english html
+	$templates['quicktipalert']['en']['plain']['subject'] = 'New QuickTip Alert: ${date}';
+	$templates['quicktipalert']['en']['plain']['fromname'] = '${productname}';
+	$templates['quicktipalert']['en']['plain']['fromaddr'] = 'noreply@schoolmessenger.com';
+	$templates['quicktipalert']['en']['plain']['body'] = '
+${product}® QuickTip
+New Tip Alert
+Generated on ${date}
+
+Organization: ${okey}
+Tip Category: ${topicname}
+Submitted by: ${tipgivername}
+Attachments: ${hasattachments}
+
+${tipbody}
+
+--------
+You are receiving this alert because your profile has "Topic Recipient" enabled.
+To view a detailed version of this report, go to http://asp.schoolmessenger.com/${customerurl}/quicktip.php and log in.
+';
+
 return $templates;
 }
 

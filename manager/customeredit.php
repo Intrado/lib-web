@@ -734,6 +734,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$datachange = true;
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
+		$templates = loadTemplateData(false);
+
 		Query("BEGIN");
 		// Craete new customer if It does not exist 
 		if (!$customerid) {
@@ -910,10 +912,19 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		setCustomerSystemSetting('_hasquicktip', $postdata["hasquicktip"] ? '1' : '0', $custdb);
 
 		// ... and if it was disabled and is now enabled, add the TAI tables to this customer which QuickTip uses
+		// and add the quicktip alert email template
 		if ($postdata["hasquicktip"] && (! $settings['_hasquicktip'])) {
 			$savedbcon = $_dbcon;
 			$_dbcon = $custdb;
 			tai_setup($customerid);
+
+			$templateName = 'quicktipalert';
+			$hasQtAlertTemplate = QuickQuery('select 1 from template where name = ?', $custdb, array($templateName));
+			if (!$hasQtAlertTemplate) {
+				$messageGroupId = createEmailTemplateMessageGroup($templateName, $templates[$templateName]);
+				QuickQuery('insert into template (type, messagegroupid) values (?,?)', $custdb, array($templateName, $messageGroupId));
+			}
+
 			$_dbcon = $savedbcon;
 		}
 
