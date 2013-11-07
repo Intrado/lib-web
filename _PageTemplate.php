@@ -155,6 +155,8 @@ class TemplatePage extends PageForm {
 	}
 
 	function beforeLoad($get, $post) {
+		$_GET = $get; // Ben's crutch
+		$_POST = $post; // Ben's crutch
 
 		// Special case for handling deletions
 		if (isset($get['deleteid'])) {
@@ -163,7 +165,7 @@ class TemplatePage extends PageForm {
 			//Query("BEGIN");
 			//FooDBMO::delete($get['deleteid']);
 			//Query("COMMIT");
-			retirect();
+			redirect();
 		}
 		// Any other special case. early-exit operations needed for our page?
 
@@ -174,6 +176,10 @@ class TemplatePage extends PageForm {
 	function load() {
 		$this->form = new TemplateForm($this->options['formname'], $this->data);
 
+	}
+
+	function afterLoad() {
+		$this->form->handleRequest();
 	}
 
 	function beforeRender() {
@@ -197,5 +203,5 @@ $page = new TemplatePage(Array(
 	'validators' => Array('ValTemplateItem')
 ));
 
-$page->execute();
+executePage($page);
 

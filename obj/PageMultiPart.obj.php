@@ -30,29 +30,15 @@ abstract class PageMultiPart extends PageBase {
 	}
 
 	/**
-	 * Send final output to the client
-	 *
-	 * This default implementation takes whatever HTML is rendered into
-	 * this->pageOutput and wraps it up with standard page header/footer
-	 * and the normal start/end window wrapper.
+	 * Override to make one "window" per part
 	 */
-	function send() {
-		global $PAGE, $TITLE, $USER;
-
-		// If we got this far, then assemble some HTML and spit it out
-		$PAGE = $this->options['page'];
-		$TITLE = _L($this->options['title']);
-		include_once("{$this->konadir}/nav.inc.php");
-
-		if (count($this->parts)) {
-			foreach ($this->parts as $part) {
-				startWindow(_L($part['title']));
-				echo $part['content'];
-				endWindow();
-			}
+	function sendPageOutput() {
+		if (! count($this->parts)) return;
+		foreach ($this->parts as $part) {
+			startWindow(_L($part['title']));
+			echo $part['content'];
+			endWindow();
 		}
-
-		include_once("{$this->konadir}/navbottom.inc.php");
 	}
 }
 

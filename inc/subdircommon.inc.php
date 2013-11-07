@@ -1,4 +1,7 @@
 <?
+// In case the mechanism for checking if we're running under PHPUnit needs to change,
+// we check it here and set our own global constant PHPUNIT that we can use everywhere
+if (defined('PHPUnit_MAIN_METHOD')) define('PHPUNIT', true);
 
 setlocale(LC_ALL, 'en_US.UTF-8');
 mb_internal_encoding('UTF-8');
@@ -28,6 +31,18 @@ require_once("../obj/Permission.obj.php");
 require_once("../obj/Rule.obj.php"); //for search and sec profile rules
 require_once("../obj/Organization.obj.php"); //for search and sec profile rules
 require_once("../obj/Section.obj.php"); //for search and sec profile rules
+
+/**
+ * Any PageObject derived class must invoke this function to executePage()
+ * This ensures that the test for PHPUNIT environment only needs to exist
+ * in this one place.
+ */
+function executePage($pageObject) {
+	if (! defined('PHPUNIT')) {
+		$pageObject.execute();
+	}
+}
+
 
 if (!isset($isindexpage) || !$isindexpage) {
 	doStartSession();

@@ -20,13 +20,19 @@ require_once('obj/PageMultiPart.obj.php');
 
 class SearchForm extends Form {
 
+	/**
+	 * Custom constructor sets up the form data that we need
+	 *
+	 */
 	function SearchForm($name, $rawdata) {
-		$formdata = array(
+
+		// TODO - Plug the $rawdata into the $formitems' values as needed
+		$formitems = array(
 			'terms' => array(
 				'label' => _L('Search'),
 				'value' => '',
 				'validators' => array(),
-				'control' => array('TextField', 'size' => 30, 'maxlength' => 51, 'autocomplete' => 'test"'),
+				'control' => array('TextField', 'size' => 30, 'maxlength' => 51),
 				'helpstep' => 1
 			)
 		);
@@ -37,27 +43,31 @@ class SearchForm extends Form {
 			submit_button(_L('Search'), 'submit', 'tick')
 		);
 
-		parent::Form($name, $formdata, $helpsteps, $buttons);
+		parent::Form($name, $formitems, $helpsteps, $buttons);
 	}
 
-	function handleSubmit($button, $data) {
+	/**
+	 * Custom handling for the form submission
+	 *
+	 * Return boolean false if we want to continue processing in
+	 * Page::afterLoad() following the Form::handleRequest() operation
+	 * (which allows us to return a JSON response to the client)
+	 *
+	 * @param string $button The name of the form button that was clicked to
+	 * submit the form
+	 * @param array $formData The pre-validated data submitted with the form
+	 *
+	 * @return mixed string location to redirect to after submission handling
+	 * is done, or boolean false to return to caller without redirection
+	 */
+	function handleSubmit($button, $formData) {
 		//Query('BEGIN');
 		// TODO: Save form data
 		//Query('COMMIT');
 
 		// Where do we want the client to be sent after submission?
-		return('start.php');
+		return(false);
 	}
-}
-
-
-// -----------------------------------------------------------------------------
-// CUSTOM FORMATTERS
-// -----------------------------------------------------------------------------
-
-// TODO: Make better examples of working formatters (extend Formatters.obj.php?)
-function fmt_template ($obj, $field) {
-	return $obj->$field;
 }
 
 
@@ -100,6 +110,29 @@ class TemplatePage extends PageMultiPart {
 
 			// Submit the form (if it is a submission!)
 			$this->form->handleRequest(); // Calls $this->form->handleSubmit()
+
+			// If the form was submitted...
+			if ($this->form->getSubmit()) {
+
+				// Use our form-submitted search terms to find messages
+				$formData = $this->form->getData();
+				$query = "
+					SELECT
+						mg.id,
+						mg.name
+					FROM
+						messagegroup mg
+					WHERE
+						mg.name like ?
+						AND ! mg.deleted;
+				";
+				$messageGroups = QuickQueryList($query, true, false, array("%{$formData['terms']}%"));
+
+				// Return some JSON data for what the form submitted
+				header('Content-Type: application/json');
+				print json_encode($messageGroups);
+				exit;
+			}
 		}
 	}
 		
@@ -111,7 +144,7 @@ class TemplatePage extends PageMultiPart {
 	}
 
 	function render() {
-		$html = "Find something very interesting here:<br/>\n";
+		$html = "Find a message group by name:<br/>\n";
 		$html .= $this->form->render();
 		$this->addPart('Search', $html);
 
@@ -120,7 +153,10 @@ class TemplatePage extends PageMultiPart {
 			// Show some results in a separate part
 			$this->addPart('Results', "Search results for: '{$this->data['terms']}'");
 		}
-		
+
+
+		$this->addPart('Results', "Some super-useful search results would go here.");
+
 		return('');
 	}
 }
@@ -135,5 +171,5 @@ $page = new TemplatePage(Array(
 	'validators' => Array('ValTemplateItem')
 ));
 
-$page->execute();
+executePage($page);
 

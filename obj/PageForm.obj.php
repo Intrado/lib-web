@@ -86,20 +86,9 @@ abstract class PageForm extends PageBase {
 	}
 
 	/**
-	 * Send final output to the client
-	 *
-	 * This default implementation takes whatever HTML is rendered into
-	 * this->pageOutput and wraps it up with standard page header/footer
-	 * and the normal start/end window wrapper.
+	 * Override default snedPageOutput to include custom validators for forms
 	 */
-	function send() {
-		global $PAGE, $TITLE, $USER;
-
-		// If we got this far, then assemble some HTML and spit it out
-		$PAGE = $this->options['page'];
-		$TITLE = _L($this->options['title']);
-		include_once("{$this->konadir}/nav.inc.php");
-
+	function sendPageOutput() {
 		// Optionally load extra form validators
 		if (is_array($this->options['validators']) && count($this->options['validators'])) {
 			print '<script type="text/javascript">';
@@ -107,11 +96,8 @@ abstract class PageForm extends PageBase {
 			print "</script>\n";
 		}
 
-		startWindow($TITLE);
-		echo $this->pageOutput;
-		endWindow();
-
-		include_once("{$this->konadir}/navbottom.inc.php");
+		// Then use the default handling as normal
+		parent::sendPageOutput();
 	}
 }
 

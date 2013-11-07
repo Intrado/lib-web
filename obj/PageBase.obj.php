@@ -95,10 +95,10 @@ abstract class PageBase implements Page {
 	 *
 	 * Sends output directly to stdout!
 	 */
-	function execute($get = Array(), $post = Array()) {
+	function execute() {
 
 		// Check authorization
-		if (! $this->is_authorized($get, $post)) {
+		if (! $this->is_authorized($_GET, $_POST)) {
 
 			// Redirect if unauthorized
 			$location = $this->options['noauth_redirect'];
@@ -114,7 +114,7 @@ abstract class PageBase implements Page {
 		}
 
 		// Pull request data into instance properties
-		$this->beforeLoad($get, $post);
+		$this->beforeLoad($_GET, $_POST);
 
 		// Load the form and any supplemental database data that it needs
 		$this->load();
@@ -241,12 +241,26 @@ abstract class PageBase implements Page {
 		$PAGE = $this->options['page'];
 		$TITLE = _L($this->options['title']);
 		include_once("{$this->konadir}/nav.inc.php");
+		$this->sendPageOutput();
+		include_once("{$this->konadir}/navbottom.inc.php");
+	}
 
+	/**
+	 * Just send the page output to the client
+	 *
+	 * This enables the derived class to override this method so that it can
+	 * legacy code which sends output to the client directly. A well-behaved
+	 * page will build an HTML string and return it with render(), but an
+	 * older style page may use methods like showTable() that just output
+	 * directly - by overriding this method, the derived class can wrap the
+	 * call to showTable() here so that it only gets invoked when send() is
+	 * ready for it.
+	 */
+	function sendPageOutput() {
+		global $TITLE;
 		startWindow($TITLE);
 		echo $this->pageOutput;
 		endWindow();
-
-		include_once("{$this->konadir}/navbottom.inc.php");
 	}
 }
 
