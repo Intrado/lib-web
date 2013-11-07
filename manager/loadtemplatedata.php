@@ -660,7 +660,7 @@ DO NOT REPLY: This is an automatically generated email. Please do not send a rep
 ////////////////////////////
 
 	// quicktip english html
-	$templates['quicktipalert']['en']['html']['subject'] = 'New QuickTip Alert: ${date}';
+	$templates['quicktipalert']['en']['html']['subject'] = 'New QuickTip Alert';
 	$templates['quicktipalert']['en']['html']['fromname'] = '${productname}';
 	$templates['quicktipalert']['en']['html']['fromaddr'] = 'noreply@schoolmessenger.com';
 	$templates['quicktipalert']['en']['html']['body'] = '
@@ -700,7 +700,7 @@ DO NOT REPLY: This is an automatically generated email. Please do not send a rep
 </html>';
 
 	// quicktip english html
-	$templates['quicktipalert']['en']['plain']['subject'] = 'New QuickTip Alert: ${date}';
+	$templates['quicktipalert']['en']['plain']['subject'] = 'New QuickTip Alert';
 	$templates['quicktipalert']['en']['plain']['fromname'] = '${productname}';
 	$templates['quicktipalert']['en']['plain']['fromaddr'] = 'noreply@schoolmessenger.com';
 	$templates['quicktipalert']['en']['plain']['body'] = '
