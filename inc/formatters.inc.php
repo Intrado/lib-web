@@ -18,6 +18,14 @@ function fmt_date ($row,$index) {
 	return "&nbsp;";
 }
 
+// non-breaking date string
+function fmt_nbr_date ($row, $index) {
+	if (isset($row[$index])) {
+		return str_replace(" ", "&nbsp;", fmt_date($row, $index));
+	}
+	return "&nbsp;";
+}
+
 // Requires a not null value
 function fmt_txt_date ($row, $index) {
 	return date("M j, Y",strtotime($row[$index]));
