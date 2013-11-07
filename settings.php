@@ -41,7 +41,10 @@ if ($USER->authorize('managesystem') || $USER->authorize('metadata')) {
 			$systemLinks[] = "<a href='scheduledatamanager.php'>Section Field Definitions</a>";
 		}
 		$systemLinks[] = "<a href='organizationdatamanager.php'>Organization Manager</a>";
-		$systemLinks[] = "<a href='topicdatamanager.php'>Topic Manager</a>";
+
+		if (getSystemSetting('_hasquicktip', false)) {
+			$systemLinks[] = "<a href='topicdatamanager.php'>Topic Manager</a>";
+		}
 	}
 	if ($USER->authorize('managesystem')) {
 		$systemLinks[] = "<a href='securitysettings.php'>Security</a>";
