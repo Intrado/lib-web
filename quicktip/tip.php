@@ -112,7 +112,7 @@
 			<form id="quicktip" name="quicktip" action="<? $PHP_SELF ?>" method="POST" enctype="multipart/form-data">
 				<fieldset>
 					<label for="tip-org-id">Organization <span class="sup" title="Required field">*</span></label>
-					<select id="tip-org-id" name="tip-org-id">
+					<select id="tip-org-id" name="tip-org-id" tabindex="1">
 						<?
 							foreach ($response->organizations as $id => $name) {
 								echo '<option value="'.$id.'">'.$name.'</option>';
@@ -120,7 +120,7 @@
 						?>
 					</select>
 					<label for="tip-category-id">Tip Category <span class="sup" title="Required field">*</span></label>
-					<select id="tip-category-id" name="tip-category-id">
+					<select id="tip-category-id" name="tip-category-id" tabindex="2">
 						<?
 							foreach ($response->categories as $id => $name) {
 								echo '<option value="'.$id.'">'.$name.'</option>';
@@ -130,36 +130,36 @@
 
 					<div id="tip-message-control-group" class="form-group">
 						<label for="tip-message" class="control-label">Tip Message <span class="sup" title="Required field">*</span></label>
-						<textarea id="tip-message" class="form-control" name="tip-message" rows="8" placeholder="Enter your tip here..." ></textarea>
+						<textarea id="tip-message" class="form-control" name="tip-message" rows="8" placeholder="Enter your tip here..." tabindex="3"></textarea>
 					</div>
 
 				</fieldset>
 				<fieldset>
 					<label for="tip-file-attachment" title="Optional">Do you have a related image?</label>
 					<div id="tip-attach-instruction">If so, you can attach it to your tip to help provide additional information.</div>
-					<input id="tip-file-attachment" name="tip-file-attachment" type="file">
+					<input id="tip-file-attachment" name="tip-file-attachment" type="file" tabindex="4">
  				</fieldset>
 				<div id="tip-contact" class="alert">
 					<h4>Contact Information &nbsp;<span class="small">(Optional)</span></h4>
 					<p>You have the option to leave your personal contact information. If provided, you may be contacted for more information if necessary.</p>
 					<fieldset>
 						<label for="firstname">First</label>
-						<input id="firstname" name="firstname" type="text" placeholder="First name" value="" title="Enter your first name">
+						<input id="firstname" name="firstname" type="text" placeholder="First name" value="" title="Enter your first name" tabindex="5">
 						<label for="lastname">Last</label>
-						<input id="lastname" name="lastname" type="text" placeholder="Last name" value="" title="Enter your last name">
+						<input id="lastname" name="lastname" type="text" placeholder="Last name" value="" title="Enter your last name" tabindex="6">
 					</fieldset>
 					<fieldset>
 						<label for="email">Email</label>
-						<input id="email" name="email" type="email" placeholder="Email address" value="" title="Enter your email address, ex. janedoe@example.com">
+						<input id="email" name="email" type="email" placeholder="Email address" value="" title="Enter your email address, ex. janedoe@example.com" tabindex="7">
 					</fieldset>
 					<fieldset>
 						<label for="phone">Phone</label>
-						<input id="phone" name="phone" type="tel" pattern='\d{3}-\d{3}-\d{4}' placeholder="Phone number" value="" title="Enter your phone number, ex. 555-123-4567">
+						<input id="phone" name="phone" type="tel" pattern='\d{3}-\d{3}-\d{4}' placeholder="Phone number" value="" title="Enter your phone number, ex. 555-123-4567" tabindex="8">
 					</fieldset>
 				</div>
 				<div id="tip-error-message" class="alert alert-danger hide">Please enter a Tip Message.</div>
 				<fieldset>
-					<button id="tip-submit" class="btn btn-lg btn-danger" type="submit">Submit Tip</button>
+					<button id="tip-submit" class="btn btn-lg btn-danger" type="submit" tabindex="9">Submit Tip</button>
 				</fieldset>
 			</form>
 <? } ?>
