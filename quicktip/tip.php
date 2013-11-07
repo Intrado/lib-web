@@ -36,7 +36,8 @@
 	$attachment = isset($_FILES['tip-file-attachment']['name']) ? $_FILES['tip-file-attachment']['name'] : null;
 
 	// user-provided contact info, if any
-	$name   = isset($_POST['name']) ? $_POST['name'] : null;
+	$firstname   = isset($_POST['firstname']) ? $_POST['firstname'] : null;
+	$lastname   = isset($_POST['lastname']) ? $_POST['lastname'] : null;
 	$email 	= isset($_POST['email'])  ? $_POST['email']  : null;
 	$phone  = isset($_POST['phone'])  ? $_POST['phone']  : null;
 
@@ -75,12 +76,18 @@
 							}
 						?>
 
-						<? if ($name != null || $email != null || $phone != null) {
+						<? if ($firstname != null || $lastname != null || $email != null || $phone != null) {
 								echo '<div class="alert contact-info">
 										<div class="summary-heading">Contact info you provided with your tip:</div>';
-								if ($name != null) {
-									echo '<div><span class="summary-label">Name:</span> &nbsp;<div class="summary-value">'.$name.'</div></div>';
+								if ($firstname != null && $lastname != null) {
+									echo '<div><span class="summary-label">Name:</span> &nbsp;<div class="summary-value">'.$firstname.' '.$lastname.'</div></div>';
 								}
+								if ($firstname != null && $lastname == null) {
+									echo '<div><span class="summary-label">First Name:</span> &nbsp;<div class="summary-value">'.$firstname.'</div></div>';
+								}
+								if ($firstname == null && $lastname != null) {
+									echo '<div><span class="summary-label">Last Name:</span> &nbsp;<div class="summary-value">'.$lastname.'</div></div>';
+								}								
 								if ($email != null) {
 									echo '<div><span class="summary-label">Email:</span> &nbsp;<div class="summary-value">'.$email.'</div></div>';
 								}
@@ -136,8 +143,10 @@
 					<h4>Contact Information &nbsp;<span class="small">(Optional)</span></h4>
 					<p>You have the option to leave your personal contact information. If provided, you may be contacted for more information if necessary.</p>
 					<fieldset>
-						<label for="name">Name</label>
-						<input id="name" name="name" type="text" placeholder="Full name" value="" title="Enter your full name, ex. Jane Doe">
+						<label for="firstname">First</label>
+						<input id="firstname" name="firstname" type="text" placeholder="First name" value="" title="Enter your first name">
+						<label for="lastname">Last</label>
+						<input id="lastname" name="lastname" type="text" placeholder="Last name" value="" title="Enter your last name">
 					</fieldset>
 					<fieldset>
 						<label for="email">Email</label>
