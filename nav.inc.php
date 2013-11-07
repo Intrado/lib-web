@@ -37,7 +37,8 @@ $NAVTREE = array (
 		array("Posts","posts.php",getSystemSetting("_hasfeed", false) ? "feedpost" : "dummy",$SUBTAB=="post"),
 		array("Classroom","classroommessageoverview.php",getSystemSetting("_hastargetedmessage", false) ? "targetedmessage" : "dummy",$SUBTAB=="classroom"),
 		array("Surveys","surveys.php",$USER->canSendSurvey() ? "survey" : "dummy",$SUBTAB=="survey"),
-		array("Responses","replies.php?reset=1","leavemessage",$SUBTAB=="responses")
+		array("Responses","replies.php?reset=1","leavemessage",$SUBTAB=="responses"),
+		array("Tips","tips.php",NULL,$SUBTAB=="tips")
 		)),
 	array("Reports","reports.php",array('createreport',"viewsystemreports", "viewusagestats","viewcalldistribution"),$MAINTAB=="reports",array(
 		array("Reports", "reports.php", array("createreport", "viewsystemreports"), $SUBTAB=="reports"),
