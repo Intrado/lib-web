@@ -53,3 +53,7 @@ CREATE TABLE tai_messageattachment (
 	KEY messageid (messageid)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8
 $$$
+
+-- $rev 6
+ALTER TABLE tai_message ADD `type` ENUM( 'text', 'html' ) NOT NULL DEFAULT 'html' AFTER method
+$$$
