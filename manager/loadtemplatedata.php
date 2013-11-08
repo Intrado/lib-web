@@ -691,7 +691,7 @@ DO NOT REPLY: This is an automatically generated email. Please do not send a rep
         </div>
         <br>
         <div style="margin-top:20px;width:100%;">
-            <p><i>To view a detailed version of this report, go to <a href="http://asp.schoolmessenger.com/${customerurl}/tips.php">${productname}</a> and log in.</i></p>
+            <p><i>To view a detailed version of this report, go to <a href="${csurl}${customerurl}/tips.php">${productname}</a> and log in.</i></p>
             <p><i>You are receiving this alert because your profile has "Topic Recipient" enabled. Contact your system administrator for more details about QuickTip alerts.</i></p>
         </div>
     </div>
@@ -717,7 +717,7 @@ ${tipbody}
 
 --------
 You are receiving this alert because your profile has "Topic Recipient" enabled.
-To view a detailed version of this report, go to http://asp.schoolmessenger.com/${customerurl}/tips.php and log in.
+To view a detailed version of this report, go to ${csurl}${customerurl}/tips.php and log in.
 ';
 
 return $templates;
