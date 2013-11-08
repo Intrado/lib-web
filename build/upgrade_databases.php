@@ -169,7 +169,7 @@ foreach ($customers as  $customerid => $customer) {
 				update_customer($db, $customerid, $customer['shardid']);
 				break;
 			case "tai":
-				$hastai = QuickQuery("select 1 from customerproduct where customerid=? and product='tai' and enabled=1",$authdb,array($customerid));
+				$hastai = QuickQuery("show tables like 'tai_topic'");
 				if ($hastai) {
 					update_taicustomer($db, $customerid, $customer['shardid']);
 				}
