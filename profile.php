@@ -712,8 +712,33 @@ _L('Talk About It Controls'),
 	)
 );
 
+$quicktip_formdata = array(
+	_L('QuickTip Controls'),
+	"taicanbetopicrecipient" => array(
+		"label" => _L('Topic Recipient'),
+		"fieldhelp" => _L('Allows users to TODO '),
+		"value" => $obj->getValue("tai_canbetopicrecipient"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 13
+	),
+	"taicanmanagetopics" => array(
+		"label" => _L('Manage Topics'),
+		"fieldhelp" => _L('Allows users to TODO '),
+		"value" => $obj->getValue("tai_canmanagetopics"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 13
+	)
+);
+
+
 if (hasProduct('tai')) {
 	$formdata = array_merge($formdata, $tai_formdata);
+}
+
+if (getSystemSetting("_hasquicktip", false)) {
+	$formdata = array_merge($formdata, $quicktip_formdata);
 }
 
 
@@ -896,7 +921,12 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$obj->setPermission("tai_canmanagelockouts", (bool)$postdata['taicanmanagelockouts']);
 				$obj->setPermission("tai_canmanageactivationcodes", (bool)$postdata['taicanmanageactivationcodes']);
 			}
-				
+
+			if (getSystemSetting('_hasquicktip', false)) {
+				$obj->setPermission("tai_canmanagetopics", (bool)$postdata['taicanmanagetopics']);
+				$obj->setPermission("tai_canbetopicrecipient", (bool)$postdata['taicanbetopicrecipient']);
+			}
+
 		Query("COMMIT");
 
 		$_SESSION['editaccessid'] = $obj->id;

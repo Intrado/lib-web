@@ -41,15 +41,11 @@ if ($USER->authorize('managesystem') || $USER->authorize('metadata')) {
 			$systemLinks[] = "<a href='scheduledatamanager.php'>Section Field Definitions</a>";
 		}
 		$systemLinks[] = "<a href='organizationdatamanager.php'>Organization Manager</a>";
-
-		if (getSystemSetting('_hasquicktip', false)) {
-			$systemLinks[] = "<a href='topicdatamanager.php'>Topic Manager</a>";
-		}
 	}
 	if ($USER->authorize('managesystem')) {
 		$systemLinks[] = "<a href='securitysettings.php'>Security</a>";
 	}
-		
+
 	$linkLists[] = $systemLinks;
 }
 if ($USER->authorize('managesystem')) {
@@ -78,7 +74,8 @@ if ((getSystemSetting('_hasportal', false) && $USER->authorize('portalaccess') &
 	($USER->authorize('managesystem') && getSystemSetting('_dmmethod', "")!='asp') ||
 	($USER->authorize('manageclassroommessaging') && getSystemSetting('_hastargetedmessage')) ||
 	($USER->authorize('managesystem') && getSystemSetting("_hasfacebook")) ||
-	($USER->authorize('managesystem') && getSystemSetting("_hasfeed"))) {
+	($USER->authorize('managesystem') && getSystemSetting("_hasfeed")) ||
+	(getSystemSetting('_hasquicktip', false) && $USER->authorize("tai_canmanagetopics"))) {
 
 	$headers[] = _L("Features");
 	
@@ -106,7 +103,11 @@ if ((getSystemSetting('_hasportal', false) && $USER->authorize('portalaccess') &
 	if (getSystemSetting("_hasfeed")) {
 		$featureLinks[] = "<a href='editfeedcategory.php'>" . _L("Feed Categories") . "</a>";
 	}
-	
+
+	if (getSystemSetting('_hasquicktip', false) && $USER->authorize('tai_canmanagetopics')) {
+		$featureLinks[] = "<a href='topicdatamanager.php'>Topic Manager</a>";
+	}
+
 	$linkLists[] = $featureLinks;
 }
 

@@ -13,7 +13,7 @@ require_once("obj/TopicDataFormatter.obj.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-if (!$USER->authorize('metadata')) {
+if (!(getSystemSetting('_hasquicktip') && $USER->authorize('tai_canmanagetopics'))) {
 	redirect('unauthorized.php');
 }
 

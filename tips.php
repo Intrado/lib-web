@@ -12,10 +12,13 @@ require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
 
 
-//TODO: add authorize setting for tips
-// if (!$USER->authorize('viewtips')) {
-// 	redirect('unauthorized.php');
-// }	
+
+////////////////////////////////////////////////////////////////////////////////
+// Authorization
+////////////////////////////////////////////////////////////////////////////////
+if (!(getSystemSetting('_hasquicktip') && $USER->authorize('tai_canbetopicrecipient'))) {
+	redirect('unauthorized.php');
+}
 
 /**
  * class TipSubmissionViewer
