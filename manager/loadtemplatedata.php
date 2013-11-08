@@ -671,8 +671,8 @@ DO NOT REPLY: This is an automatically generated email. Please do not send a rep
     <title>New QuickTip Alert: ${date}</title>
 </head>
 <body style="background:lightslategrey">
-<table style="max-width:800px;"><tr><td>
-    <div style="border:1px solid #2e2e2e;border-radius:8px 8px 8px 8px;box-shadow:0 2px 8px rgba(0, 0, 0, 0.15);background:white;padding:12px;margin:20px">
+<table width="540px"><tr><td>
+    <div style="border:1px solid #2e2e2e;border-radius:8px 8px 8px 8px;box-shadow:0 2px 8px rgba(0, 0, 0, 0.15);background:white;padding:12px;margin:10px">
         <p style="font-size:20px;font-style:italic;font-weight:bold;margin-top:4px;">${productname}&reg; QuickTip</p>
         <p style="font-size:18px;font-weight:bold;">New Tip Alert</p>
         <p>Generated on ${date}</p>
@@ -691,7 +691,7 @@ DO NOT REPLY: This is an automatically generated email. Please do not send a rep
         </div>
         <br>
         <div style="margin-top:20px;width:100%;">
-            <p><i>To view a detailed version of this report, go to <a href="http://asp.schoolmessenger.com/${customerurl}/tips.php">${product}</a> and log in.</i></p>
+            <p><i>To view a detailed version of this report, go to <a href="http://asp.schoolmessenger.com/${customerurl}/tips.php">${productname}</a> and log in.</i></p>
             <p><i>You are receiving this alert because your profile has "Topic Recipient" enabled. Contact your system administrator for more details about QuickTip alerts.</i></p>
         </div>
     </div>
