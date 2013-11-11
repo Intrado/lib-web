@@ -1,6 +1,7 @@
 describe("QuickTip", function() {
 
-	var	orgListCoB,
+	var	tipForm,
+		orgListCoB,
 		categoryCoB,
 		messageTA,
 		messageTACont,
@@ -11,20 +12,22 @@ describe("QuickTip", function() {
 
 	beforeEach(function() {
 		// create some dummy elements
-		orgListCoB 		= $("<select>").attr("id","tip-org-id"),
-		categoryCoB 	= $("<select>").attr("id","tip-category-id"),
-		messageTA 		= $("<textarea>").attr("id","tip-message"),
+		tipForm			= $("<form>").attr({"id":"quicktip", "action":"", "method":"POST"}),
+		orgListCoB 		= $("<select>").attr("id","orgId"),
+		categoryCoB 	= $("<select>").attr("id","topicId"),
+		messageTA 		= $("<textarea>").attr("id","message"),
 		messageTACont   = $("<div>").attr("id",'tip-message-control-group'),
 		errorMsgCont 	= $("<div>").attr("id","tip-error-message"),
 		submitB 		= $("<button>").attr("id","tip-submit"),
 		
 		// add elements to dom
-		$('body').append(orgListCoB);
-		$('body').append(categoryCoB);
-		$('body').append(messageTA);
-		$('body').append(messageTACont);
-		$('body').append(errorMsgCont.addClass('hide')); // default/initial state = hidden
-		$('body').append(submitB);
+		tipForm.append(orgListCoB);
+		tipForm.append(categoryCoB);
+		tipForm.append(messageTA);
+		tipForm.append(messageTACont);
+		tipForm.append(errorMsgCont.addClass('hide')); // default/initial state = hidden
+		tipForm.append(submitB);
+		$('body').append(tipForm);
 		
 		// init QuickTip object/api
 		qtip = new QuickTip();
@@ -33,6 +36,7 @@ describe("QuickTip", function() {
 
 	afterEach(function() {	
 		// remove elements from dom	
+		tipForm.remove();
 		orgListCoB.remove();
 		categoryCoB.remove();
 		messageTA.remove();
@@ -121,5 +125,92 @@ describe("QuickTip", function() {
 			expect(qtip.hasClass(elem, 'test-class')).to.equal(false);
 		});
 	});	
+
+	describe("setSelectedOrgId()", function() {
+		it("sets the orgId based on the selected Organization option (in the Org dropdown)", function() {
+
+			// var url = "https://sandbox.testschoolmessenger.com/kbhigh/api/2/organizations/" + orgId + "/topics/" + topicId+ "/quicktip";
+			// expect(tipForm.attr("action")).to.equal("");
+			var orgOptions = [];
+			// add some Org options
+			for(var i = 0; i <= 3; i++) {
+				var option = $("<option>").attr({"value": i}).html("Org_" + i);
+				orgOptions.push(option);
+			}
+			orgListCoB.append(orgOptions);
+			
+			// set elem[0] (Org option) selected
+			orgOptions[0].attr('selected', 'selected');
+			qtip.setSelectedOrgId();
+			expect(qtip.getSelectedOrgId()).to.equal("0");
+
+			orgOptions[0].removeAttr('selected');
+
+			// set elem[3] (Org option) selected
+			orgOptions[3].attr('selected', 'selected');
+			qtip.setSelectedOrgId();
+			expect(qtip.getSelectedOrgId()).to.equal("3");
+		});
+	});
+
+	describe("setSelectedTopicId()", function() {
+		it("sets the topicId based on the selected Category (Topic) option (in the Category dropdown)", function() {
+
+			var topicOptions = [];
+			// add some category options
+			for(var i = 0; i <= 10; i++) {
+				var option = $("<option>").attr({"value": i}).html("Topic_" + i);
+				topicOptions.push(option);
+			}
+			categoryCoB.append(topicOptions);
+			
+			// set elem[7] (Cat option) selected
+			topicOptions[7].attr('selected', 'selected');
+			qtip.setSelectedTopicId();
+			expect(qtip.getSelectedTopicId()).to.equal("7");
+
+			topicOptions[7].removeAttr('selected');
+
+			// set elem[10] (Cat option) selected
+			topicOptions[10].attr('selected', 'selected');
+			qtip.setSelectedTopicId();
+			expect(qtip.getSelectedTopicId()).to.equal("10");
+		});
+	});
+
+	describe("setFormActionURL()", function() {
+		it("sets the form's action url based on the currently selected orgId and topicId, if either is null, sets it to an empty string", function() {
+
+			var orgOptions = [];
+			// add some Org options
+			for(var i = 0; i <= 3; i++) {
+				var option = $("<option>").attr({"value": i}).html("Org_" + i);
+				orgOptions.push(option);
+			}
+			orgListCoB.append(orgOptions);
+			
+			// set elem w/ orgId = 2 selected
+			orgOptions[2].attr('selected', 'selected');
+			qtip.setSelectedOrgId();
+			expect(qtip.getSelectedOrgId()).to.equal("2");
+
+			var topicOptions = [];
+			// add some category options
+			for(var i = 0; i <= 5; i++) {
+				var option = $("<option>").attr({"value": i}).html("Topic_" + i);
+				topicOptions.push(option);
+			}
+			categoryCoB.append(topicOptions);
+			
+			// set elem w/ topicId = 7 selected
+			topicOptions[5].attr('selected', 'selected');
+			qtip.setSelectedTopicId();
+			expect(qtip.getSelectedTopicId()).to.equal("5");
+
+			qtip.setFormActionURL();
+
+			expect(qtip.getFormActionURL()).to.equal("/api/2/organizations/2/topics/5/quicktip");
+		});
+	});
 
 });

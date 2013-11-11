@@ -1,144 +1,211 @@
 <?
-	// temp stubbed API response for org tip data	
-	$json_stub = json_encode(array(
-		"orgname" => "Example School District",
-		"categories" => array(
-			"1" => "General",
-			"2" => "Bullying",
-	        "3" => "Drugs",
-	        "4" => "Fighting",
-	        "5" => "Personal Crisis",
-	        "6" => "Threat",
-	        "7" => "Truancy",
-	        "8" => "Vandalism",
-	        "9" => "Weapons"
-		),
-		"organizations" => array(
-			"1" => "Santa Cruz County School District",
-			"2" => "Aptos High",
-	        "3" => "Harbor High",
-	        "4" => "Monte Vista High",
-	        "5" => "Santa Cruz High",
-	        "6" => "Scotts Valley High",
-	        "7" => "Soquel High",
-	        "8" => "Watsonville High"
-		)
-	));
 
-	$response = json_decode($json_stub);
+/**
+ * class Tip
+ *
+ * Description: Simple class to help manage the Quick Tip form field validation, 
+ * form submission to a target iframe (POST to quicktip API POST endpoint for tip submission),
+ * fetching customer (root org) data via quicktip API REST endpoint for population 
+ * into Organization and Category dropdowns. 
+ * 
+ * @author Justin Burns <jburns@schoolmessenger.com>
+ * @date 11/08/2013
+ */
 
-	// required fields
-	$categoryId = isset($_POST['tip-category-id']) ? $_POST['tip-category-id'] : null;
-	$orgId 	 	= isset($_POST['tip-org-id']) ? $_POST['tip-org-id'] : null;
-	$tipMessage = isset($_POST['tip-message']) ? $_POST['tip-message'] : null;
+class Tip {
+	
+	private $customerId;
+	private $customerName;
+	private $customerDataURL;
+	private $customerData;
 
-	// optional attachment
-	$attachment = isset($_FILES['tip-file-attachment']['name']) ? $_FILES['tip-file-attachment']['name'] : null;
+	private $baseCustomerURL;
+	private $organizations;
+	private $topics;
+	
+	private $orgId;
+	private $topicId;
+	private $orgName;
+	private $topicName;
+	private $message;
+	private $firstName;
+	private $lastName;
+	private $email;
+	private $phone;
+	private $file;
 
-	// user-provided contact info, if any
-	$firstname   = isset($_POST['firstname']) ? $_POST['firstname'] : null;
-	$lastname   = isset($_POST['lastname']) ? $_POST['lastname'] : null;
-	$email 	= isset($_POST['email'])  ? $_POST['email']  : null;
-	$phone  = isset($_POST['phone'])  ? $_POST['phone']  : null;
+	private $sessionData;
+	private $postData;
 
-	// if user has submitted a tip, get the category name and org name to show in summary
-	// TODO: replace depending on final API (in progress)
-	$categoryName = $categoryId ? $response->categories->$categoryId : "";
-	$orgName = $orgId ? $response->organizations->$orgId : "";
-?>
 
-<!DOCTYPE html>
-<html lang="en">
-	<head>
-		<meta charset="utf-8">
-		<title>Quick Tip - Submit an Annoymous Tip - Powered by SchoolMessenger</title>
-		<link rel="stylesheet" type="text/css" href="tip.css">
-	</head>
-	<body>
-		<div id="tip-container">
-			<div class="tip-chat"></div>
-			<h1>SchoolMessenger Quick Tip</h1>
-			<div id="tip-orgname-label"><?= $response->orgname ?></div>
+	public function __construct($options) {
+		if (isset($options)) {
 
-			<? if ($tipMessage) { ?>
+			$this->baseCustomerURL = $options["baseCustomerURL"];
+			$this->customerId	= $options["customerId"];
+			$this->orgId 		= $options["orgId"];
+			$this->topicId 		= $options["topicId"];
+			$this->message 		= $options["message"];
+			$this->file 		= $options["file"];
+			$this->firstname 	= $options["firstname"];
+			$this->lastname 	= $options["lastname"];
+			$this->email 		= $options["email"];
+			$this->phone 		= $options["phone"];
 
-					<div id="thank-you" class="alert">
-						<h1>Thank You for the Tip!</h3>
-						<div class="text-danger call911">If this is an emergency, please call 911.</div>
-					</div>
-					<div class="summary-info">
-						<div class="summary-heading">Summary of the tip information you submitted:</div>
-						<div><span class="summary-label">Organization:</span> &nbsp;<div class="summary-value"><?= $orgName ?></div></div>
-						<div><span class="summary-label">Category:</span> &nbsp;<div class="summary-value"><?= $categoryName ?></div></div>
-						<div><span class="summary-label">Message:</span> &nbsp;<div class="summary-value message-text">"<?= $tipMessage ?>"</div></div>
-						<? if ($attachment) {
-								echo '<div id="summary-attachment-container"><span class="summary-label">Attachment:</span> &nbsp;<div class="summary-value">'.$attachment.'</div></div>';
-							}
-						?>
+			$this->postData = array(
+				"postURL"	 => $this->baseCustomerURL . '/api/2/organizations/' . $this->orgId . '/topics/' . $this->topicId . '/quicktip',
+			    "orgId" 	 => $this->orgId,
+			    "topicId" 	 => $this->topicId,
+			    "message" 	 => $this->message,
+			    "file" 		 => $this->file,
+			    "firstname"  => $this->firstname,
+			    "lastname" 	 => $this->lastname,
+			    "email" 	 => $this->email,
+			    "phone" 	 => $this->phone
+			);
 
-						<? if ($firstname != null || $lastname != null || $email != null || $phone != null) {
-								echo '<div class="alert contact-info">
-										<div class="summary-heading">Contact info you provided with your tip:</div>';
-								if ($firstname != null && $lastname != null) {
-									echo '<div><span class="summary-label">Name:</span> &nbsp;<div class="summary-value">'.$firstname.' '.$lastname.'</div></div>';
-								}
-								if ($firstname != null && $lastname == null) {
-									echo '<div><span class="summary-label">First Name:</span> &nbsp;<div class="summary-value">'.$firstname.'</div></div>';
-								}
-								if ($firstname == null && $lastname != null) {
-									echo '<div><span class="summary-label">Last Name:</span> &nbsp;<div class="summary-value">'.$lastname.'</div></div>';
-								}								
-								if ($email != null) {
-									echo '<div><span class="summary-label">Email:</span> &nbsp;<div class="summary-value">'.$email.'</div></div>';
-								}
-								if ($phone != null) {
-									echo '<div><span class="summary-label">Phone:</span> &nbsp;<div class="summary-value">'.$phone.'</div></div>';
-								}
-								echo '</div>';
-							}
-						?>
-					</div>
-					<form id="newquicktip" name="newquicktip" action="<? echo $_SERVER['PHP_SELF']; ?>" method="POST">
-						<fieldset>
-							<button id="new-tip" class="btn btn-lg btn-danger" type="submit">Done</button>
-						</fieldset>
-					</form>
-			<? } else { ?>
+		 	// if $this->message does not exist, display starting Tip form; 
+		 	// fetch the customer data and set the org and topic combos 
+			if (!isset($this->message)) {
 
-			<div class="alert"><strong>SchoolMessenger Quick Tip allows you to submit an anonymous tip to school and district officials.</strong>
+				// set the customer's REST API URL for fetching their data via GET
+				$this->customerDataURL = $this->baseCustomerURL . '/api/2/organizations/' . $this->customerId . '/quicktip/info';
+
+				// fetch customer data via curl GET request to customer's quicktip API endpoint
+				$this->customerData = json_decode($this->fetchCustomerData());
+				
+				// build up the Organization and Category (topic) combos
+				$this->setOrganizations($this->customerData->organizations);
+				$this->setTopics($this->customerData->topics);
+
+			} 
+		}
+	}
+
+	/** 
+	 * Performs curl GET request for resouce at customer's 
+	 * quicktip API endpoint; ie $this->customerDataURL
+	 * ex GET URL: https://<host>/<custname>/api/2/organizations/<custid>/quicktip/info';
+	 * returns a json array of objects
+	 */
+	public function fetchCustomerData() {
+		$curl = curl_init($this->customerDataURL);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+		$response = curl_exec($curl);
+		curl_close($curl);
+
+		return $response;
+ 	}
+
+	/** 
+	 * Performs curl POST request to customer's postURL, ie $this->postData["postURL"].
+	 * The form post uses a target iframe to post the response to; the target iframe is hidden
+	 * ex POST URL: https://<host>/<custname>/api/2/organizations/<orgid>/topics/<topicid>/quicktip';
+	 * @param array postData - array containing tip message data to be posted
+	 */
+ 	public function postTipMessage() {
+
+		$curl = curl_init($this->postData["postURL"]);
+		$curl_post_data = array(
+		    "message" 		=> $this->postData["message"],
+		    "file" 			=> $this->postData["file"],
+		    "firstname" 	=> $this->postData["firstname"],
+		    "lastname" 		=> $this->postData["lastname"],
+		    "email" 		=> $this->postData["email"],
+		    "phone" 		=> $this->postData["phone"]
+	    );
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($curl, CURLOPT_POST, 1);
+		curl_setopt($curl, CURLOPT_POSTFIELDS, $curl_post_data);
+		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+		$response = curl_exec($curl);
+		curl_close($curl);
+
+		return $response;
+ 	}
+
+ 	public function setOrganizations($orgs) {
+ 		$this->organizations = $orgs;
+ 	}
+
+ 	public function setTopics($topics) {
+ 		$this->topics = $topics;
+ 	}
+
+ 	/**
+ 	 * Gets the name of an organization or category/topic for a given org/topicid and org/topic array
+ 	 * @param int id - id of an Org or Topic
+ 	 * @param array arr - array of either Org or Topic objects
+     * @return the name of an org or topic for the given id; from the respective array (Org/Topic)
+ 	 */
+ 	public function getName($id, $arr) {
+		$name = '';
+		foreach ($arr as $k => $obj) {
+			if ($obj->id == $id) {
+				return $obj->name;
+			}
+		}
+		return $name;
+ 	}
+
+ 	public function getCustomerData() {
+ 		return $this->customerData;
+ 	}
+
+ 	/**
+ 	 * Returns a string containing all the <option> elements for a given array
+ 	 * of objects, ex Org or Topics.
+ 	 * @param array arrayOfObjects array of objects from either organizations or topics 
+ 	 * return string a string containing all the <option> elements for a given array of objects
+ 	 */
+ 	public function setSelectOptions($arrayOfObjects) {
+		$html = '';
+		foreach ($arrayOfObjects as $k => $obj) {
+			$html .= '<option value="'.$obj->id.'">'.$obj->name.'</option>';
+		}
+		return $html;
+ 	}
+
+ 	public function setSessionData($sessionData) {
+ 		$this->sessionData = $sessionData;
+ 	}
+
+ 	/**
+ 	 * Provides the HTML for the starting Tip form page, using customer data fetched for their Orgs & Topics
+ 	 * return string representing the resulting HTML for the starting Tip form page
+ 	 */
+ 	public function renderTipForm() {
+ 		$html = '
+ 			<div class="alert"><strong>SchoolMessenger Quick Tip allows you to submit an anonymous tip to school and district officials.</strong>
 				Please select the appropriate organization and category when submitting your tip.
 				<div class="text-danger call911">If this is an emergency, please call 911.</div>
 			</div>
-			<form id="quicktip" name="quicktip" action="<? $PHP_SELF ?>" method="POST" enctype="multipart/form-data">
-				<fieldset>
-					<label for="tip-org-id">Organization <span class="sup" title="Required field">*</span></label>
-					<select id="tip-org-id" name="tip-org-id" tabindex="1">
-						<?
-							foreach ($response->organizations as $id => $name) {
-								echo '<option value="'.$id.'">'.$name.'</option>';
-							}
-						?>
-					</select>
-					<label for="tip-category-id">Tip Category <span class="sup" title="Required field">*</span></label>
-					<select id="tip-category-id" name="tip-category-id" tabindex="2">
-						<?
-							foreach ($response->categories as $id => $name) {
-								echo '<option value="'.$id.'">'.$name.'</option>';
-							}
-						?>
-					</select>
 
+			<form id="quicktip" name="quicktip" action="" method="POST" enctype="multipart/form-data" data-base-url="' . $this->baseCustomerURL .'"  target="thank-you-iframe">
+			<fieldset>
+					<label for="orgId">Organization <span class="sup" title="Required field">*</span></label>
+					<select id="orgId" name="orgId" tabindex="1">';
+			
+			$html .= $this->setSelectOptions($this->organizations);
+			
+			$html .= '</select>
+					<label for="topicId">Tip Category <span class="sup" title="Required field">*</span></label>
+					<select id="topicId" name="topicId" tabindex="2">';
+			
+			$html .= $this->setSelectOptions($this->topics);
+			
+			$html .= '</select>
 					<div id="tip-message-control-group" class="form-group">
-						<label for="tip-message" class="control-label">Tip Message <span class="sup" title="Required field">*</span></label>
-						<textarea id="tip-message" class="form-control" name="tip-message" rows="8" placeholder="Enter your tip here..." tabindex="3"></textarea>
+						<label for="message" class="control-label">Tip Message <span class="sup" title="Required field">*</span></label>
+						<textarea id="message" class="form-control" name="message" rows="8" placeholder="Enter your tip here..." tabindex="3"></textarea>
 					</div>
-
 				</fieldset>
 				<fieldset>
-					<label for="tip-file-attachment" title="Optional">Do you have a related image?</label>
+					<label for="file" title="Optional">Do you have a related image?</label>
 					<div id="tip-attach-instruction">If so, you can attach it to your tip to help provide additional information.</div>
-					<input id="tip-file-attachment" name="tip-file-attachment" type="file" tabindex="4">
- 				</fieldset>
+					<input id="file" name="file" type="file" tabindex="4">
+					</fieldset>
 				<div id="tip-contact" class="alert">
 					<h4>Contact Information &nbsp;<span class="small">(Optional)</span></h4>
 					<p>You have the option to leave your personal contact information. If provided, you may be contacted for more information if necessary.</p>
@@ -154,26 +221,202 @@
 					</fieldset>
 					<fieldset>
 						<label for="phone">Phone</label>
-						<input id="phone" name="phone" type="tel" pattern='\d{3}-\d{3}-\d{4}' placeholder="Phone number" value="" title="Enter your phone number, ex. 555-123-4567" tabindex="8">
+						<input id="phone" name="phone" type="tel" pattern="\d{3}-\d{3}-\d{4}" placeholder="Phone number" value="" title="Enter your phone number, ex. 555-123-4567" tabindex="8">
 					</fieldset>
 				</div>
 				<div id="tip-error-message" class="alert alert-danger hide">Please enter a Tip Message.</div>
 				<fieldset>
-					<button id="tip-submit" class="btn btn-lg btn-danger" type="submit" tabindex="9">Submit Tip</button>
+					<button id="tip-submit" class="btn btn-lg btn-danger" type="button" tabindex="9">Submit Tip</button>
 				</fieldset>
 			</form>
-<? } ?>
+			';
 
-		</div>
+		return $html;
+ 	}
 
-		<?	// only init QuickTip if we're on the starting page (not the Thank You landing page)
-			if ($tipMessage == null) { ?>
-				<script type="text/javascript" src="tip.js"></script>
-				<script type="text/javascript">
-					window.onload = function() {
-						new QuickTip();
-					};
-				</script>
-		<? } ?>	
-	</body>
-</html>
+ 	/**
+ 	 * Provides the HTML for the final Thank You page, using data submitted by user in
+ 	 * return string representing the resulting HTML for the 'Thank You for your tip' landing page
+ 	 */
+ 	public function renderThankYou() {
+		// get the category and org names (based on their id) to show on Thank You page
+		if (isset($this->sessionData)) {
+			$this->topicName = $this->getName($this->topicId, $this->sessionData['topics']);
+			$this->orgName 	 = $this->getName($this->orgId, $this->sessionData['organizations']);
+		}
+
+		$html = '
+			<div id="thank-you" class="alert">
+				<h1>Thank You for the Tip!</h3>
+				<div class="text-danger call911">If this is an emergency, please call 911.</div>
+			</div>
+			<div class="summary-info">
+				<div class="summary-heading">Summary of the tip information you submitted:</div>
+				<div><span class="summary-label">Organization:</span> &nbsp;<div class="summary-value">'. $this->orgName. '</div></div>
+				<div><span class="summary-label">Tip Category:</span> &nbsp;<div class="summary-value">'. $this->topicName .'</div></div>
+				<div><span class="summary-label">Tip Message:</span> &nbsp;<div class="summary-value message-text">"'. $this->message .'</div></div>';
+		if ($this->file) {
+			$html .= '<div id="summary-attachment-container"><span class="summary-label">Attachment:</span> &nbsp;<div class="summary-value">'.$this->file.'</div></div>';
+		}
+
+		// show the user's contact info, if provided
+		if ($this->firstname != null || $this->lastname != null || $this->email != null || $this->phone != null) {
+				$html .= '<div class="alert contact-info">
+						<div class="summary-heading">Contact info you provided with your tip:</div>';
+				if ($this->firstname != null && $this->lastname != null) {
+					$html .= '<div><span class="summary-label">Name:</span> &nbsp;<div class="summary-value">'.$this->firstname.' '.$this->lastname.'</div></div>';
+				}
+				if ($this->firstname != null && $this->lastname == null) {
+					$html .= '<div><span class="summary-label">First Name:</span> &nbsp;<div class="summary-value">'.$this->firstname.'</div></div>';
+				}
+				if ($this->firstname == null && $this->lastname != null) {
+					$html .= '<div><span class="summary-label">Last Name:</span> &nbsp;<div class="summary-value">'.$this->lastname.'</div></div>';
+				}								
+				if ($this->email != null) {
+					$html .= '<div><span class="summary-label">Email:</span> &nbsp;<div class="summary-value">'.$this->email.'</div></div>';
+				}
+				if ($this->phone != null) {
+					$html .= '<div><span class="summary-label">Phone:</span> &nbsp;<div class="summary-value">'.$this->phone.'</div></div>';
+				}
+				$html .= '</div>';
+		}
+
+		$html .= '</div>
+			<form id="newquicktip" name="newquicktip" action="' . $_SERVER["PHP_SELF"] . '" method="POST">
+				<fieldset>
+					<button id="new-tip" class="btn btn-lg btn-danger" type="submit">Done</button>
+				</fieldset>
+			</form>';
+
+		return $html;
+ 	}
+
+ 	/**
+ 	 * Tip-specific JS; handles 'final' form submission (after initial form POST to API endpoint
+ 	 * with the POST results sent to a hidden target iframe)
+ 	 * @return string custom javascript for tip form handling
+  	 */
+ 	public function renderTipJavascript() {
+		$html = '
+			<script type="text/javascript" src="tip.js"></script>
+			<script type="text/javascript">
+				var qtip;
+				window.onload = function() {
+					qtip = new QuickTip();
+				};
+
+				var form 			= window.document.getElementById("quicktip"),
+					targetIframe 	= window.document.getElementById("thank-you-iframe"),
+					mask 			= window.document.getElementById("mask");
+
+				targetIframe.onload = function() {
+					var iframeContent = targetIframe.contentWindow.document.body.innerHTML;
+					
+					// if iframe content contains HTML response with "Thank You", it means the tip submission
+					// was successfully received, else there was an error
+					if (iframeContent && iframeContent.indexOf("Thank you") > -1) {
+						// remove hidden target iframe (no longer needed)
+						targetIframe.parentNode.removeChild(targetIframe);
+
+						// remove the previous POST API URL (so we don\'t accidentally re-post to POST API URL)
+						// and set action="" (defaults to post back to "self", i.e. ../quicktip/tip.php)
+						form.setAttribute("action", "");
+
+						// remove the target attribute to make sure we submit (post) to ourself, not the target iframe;
+						form.removeAttribute("target");
+
+						// remove previous event handler; we dont want that old behavior at this point; 
+						// just a simple form submit (back to ourself) is enough
+						qtip.removeEventHandlers();
+
+						// submit form (posts back to ourself; i.e. ../quicktip/tip.php)
+						form.submit();
+					} else {
+						qtip.showServerErrorMessage("Sorry, there was an error.  Please try again.");
+						qtip.addClass(mask, "hide");
+					}
+				};
+			</script>';
+
+		return $html;
+ 	}
+
+ 	/**
+ 	 * Provides the final HTML for either the starting Tip form or Thank You page, 
+ 	 * depending on existance of post data (or not)
+ 	 * echoes string representing the final HTML for the 'Thank You for your tip' landing page
+ 	 */
+	public function render() {
+		$html = '
+		<!DOCTYPE html>
+		<html lang="en">
+			<head>
+				<meta charset="utf-8">
+				<title>Quick Tip - Submit an Annoymous Tip - Powered by SchoolMessenger</title>
+				<link rel="stylesheet" type="text/css" href="tip.css">
+			</head>
+			<body>		
+				<div id="tip-container">
+					<div id="mask" class="hide"></div>
+					<div class="tip-chat"></div>
+					<h1>SchoolMessenger Quick Tip</h1>
+					<div id="tip-orgname-label">'. $this->sessionData['customerName'] .' </div>';
+
+					if (isset($this->message)) {
+						$html .= $this->renderThankYou();
+					} 
+
+					else {
+
+						$html .= $this->renderTipForm();
+					}
+
+		$html .= '</div>
+		<iframe id="thank-you-iframe" name="thank-you-iframe" style="display:none;"></iframe>';
+
+		// only init QuickTip (JS) if we're on the starting page (not the Thank You landing page)
+		if (!isset($this->message)) {
+			$html .= $this->renderTipJavascript();
+		}	
+
+		$html .= '</body></html>';
+
+		echo $html;
+	}
+}
+///////////////// end of Tip class ///////////////////////
+
+
+// start a session (no access to commom.inc.php so have to do explicit call)
+session_start();
+
+// scrape customer 'name' out of the URL (for use in 'baseCustomerURL')
+$uriParts 	= explode('/', $_SERVER['REQUEST_URI']); // ex /custname/quicktip/tip.php
+$custName 	= $uriParts[1];
+
+// define options hash to pass to Tip constructor for proper initialization of Tip instance
+$options = array(
+	"customerId"	=> 278, // TODO: replace with proper way to obtain root org id
+	"baseCustomerURL"	=> (isset($_SERVER['HTTPS']) ? 'https://' : 'http://') . $_SERVER['SERVER_NAME'] . '/' . $custName,
+	"orgId" 	 	=> isset($_POST['orgId']) ? $_POST['orgId'] : null,
+	"topicId" 		=> isset($_POST['topicId']) ? $_POST['topicId'] : null,
+	"message" 		=> isset($_POST['message']) ? $_POST['message'] : null,
+	"file"			=> isset($_FILES['file']['name']) ? $_FILES['file']['name'] : null,
+	"firstname"  	=> isset($_POST['firstname']) ? $_POST['firstname'] : null,
+	"lastname"   	=> isset($_POST['lastname'])  ? $_POST['lastname'] : null,
+	"email" 		=> isset($_POST['email'])  	? $_POST['email'] : null,
+	"phone"  		=> isset($_POST['phone'])  ? $_POST['phone'] : null
+);
+
+$tip = new Tip($options);
+
+// save customer data in SESSION, so we can use it in the POST response without re-fetching it again
+if (!isset($_SESSION['tip-customer-data'])) {
+	$_SESSION['tip-customer-data'] = (array) $tip->getCustomerData();
+} else {
+	$tip->setSessionData($_SESSION['tip-customer-data']);
+}
+
+$tip->render();
+
+?>
