@@ -14,7 +14,7 @@
 
 class Tip {
 	
-	private $customerId;
+	private $rootOrgId;
 	private $customerName;
 	private $customerDataURL;
 	private $customerData;
@@ -42,7 +42,7 @@ class Tip {
 		if (isset($options)) {
 
 			$this->baseCustomerURL = $options["baseCustomerURL"];
-			$this->customerId	= $options["customerId"];
+			$this->rootOrgId	= $options["rootOrgId"];
 			$this->orgId 		= $options["orgId"];
 			$this->topicId 		= $options["topicId"];
 			$this->message 		= $options["message"];
@@ -69,7 +69,7 @@ class Tip {
 			if (!isset($this->message)) {
 
 				// set the customer's REST API URL for fetching their data via GET
-				$this->customerDataURL = $this->baseCustomerURL . '/api/2/organizations/' . $this->customerId . '/quicktip/info';
+				$this->customerDataURL = $this->baseCustomerURL . '/api/2/organizations/' . $this->rootOrgId . '/quicktip/info';
 
 				// fetch customer data via curl GET request to customer's quicktip API endpoint
 				$this->customerData = json_decode($this->fetchCustomerData());
@@ -85,7 +85,7 @@ class Tip {
 	/** 
 	 * Performs curl GET request for resouce at customer's 
 	 * quicktip API endpoint; ie $this->customerDataURL
-	 * ex GET URL: https://<host>/<custname>/api/2/organizations/<custid>/quicktip/info';
+	 * ex GET URL: https://<host>/<custname>/api/2/organizations/<rootorgid>/quicktip/info';
 	 * returns a json array of objects
 	 */
 	public function fetchCustomerData() {
@@ -282,7 +282,7 @@ class Tip {
 		}
 
 		$html .= '</div>
-			<form id="newquicktip" name="newquicktip" action="' . $_SERVER["PHP_SELF"] . '" method="POST">
+			<form id="newquicktip" name="newquicktip" action="' . $_SERVER["PHP_SELF"] . '?i=' . $this->rootOrgId. '" method="POST">
 				<fieldset>
 					<button id="new-tip" class="btn btn-lg btn-danger" type="submit">Done</button>
 				</fieldset>
@@ -320,7 +320,7 @@ class Tip {
 
 						// remove the previous POST API URL (so we don\'t accidentally re-post to POST API URL)
 						// and set action="" (defaults to post back to "self", i.e. ../quicktip/tip.php)
-						form.setAttribute("action", "");
+						form.setAttribute("action", "' . $_SERVER["PHP_SELF"] . '?i=' . $this->rootOrgId. '");
 
 						// remove the target attribute to make sure we submit (post) to ourself, not the target iframe;
 						form.removeAttribute("target");
@@ -394,9 +394,13 @@ session_start();
 $uriParts 	= explode('/', $_SERVER['REQUEST_URI']); // ex /custname/quicktip/tip.php
 $custName 	= $uriParts[1];
 
+// get customer's root org id (used in API URL) from $_GET param
+$rootOrgId 	= isset($_GET['i']) ? $_GET['i'] : 0;
+
+
 // define options hash to pass to Tip constructor for proper initialization of Tip instance
 $options = array(
-	"customerId"	=> 278, // TODO: replace with proper way to obtain root org id
+	"rootOrgId"	=> $rootOrgId, 
 	"baseCustomerURL"	=> (isset($_SERVER['HTTPS']) ? 'https://' : 'http://') . $_SERVER['SERVER_NAME'] . '/' . $custName,
 	"orgId" 	 	=> isset($_POST['orgId']) ? $_POST['orgId'] : null,
 	"topicId" 		=> isset($_POST['topicId']) ? $_POST['topicId'] : null,
