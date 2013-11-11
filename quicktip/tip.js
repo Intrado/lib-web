@@ -4,7 +4,7 @@ var QuickTip = function() {
 		tipForm 		= document.getElementById('quicktip'),
 		mask	 		= document.getElementById('mask'),
 		orgListCoB 		= document.getElementById("orgId"),
-		categoryCoB 	= document.getElementById("topicId"),
+		topicCoB 		= document.getElementById("topicId"),
 		messageTA 		= document.getElementById("message"),
 		messageTACont   = document.getElementById('tip-message-control-group'),
 		errorMsgCont 	= document.getElementById("tip-error-message"),
@@ -36,8 +36,12 @@ var QuickTip = function() {
 	// public QuickTip API
 	methods = {
 		submitFormHandler: function(event) {
-			if (!methods.validate()) {
+			methods.setSelectedOrgId();
+			methods.setSelectedTopicId();
+
+			if (!methods.isTipValid()) {
 				event.preventDefault();
+				methods.renderValidation();
 			} else {
 				methods.setFormActionURL();
 				methods.removeClass(mask, 'hide');
@@ -47,7 +51,10 @@ var QuickTip = function() {
 
 		messageTextHandler: function(event) {
 			if (!isValid) {
-				methods.validate();
+				methods.isTipValid();
+				if (methods.isMessageTextValid()) {
+					methods.renderValidation();
+				}
 			}
 		},
 
@@ -56,30 +63,55 @@ var QuickTip = function() {
 			messageTA.removeEventListener('keyup', methods.messageTextHandler, false);
 		},
 
-		showServerErrorMessage: function(errorMsg) {
-			errorMsgCont.innerHTML = errorMsg;
+		setErrorMessage: function(errorMsg) {
+			errorMsgCont.innerHTML += errorMsg + '<br>';
 			this.removeClass(errorMsgCont, 'hide');
 		},
 
-		validate: function() {
-			isValid = ((messageTA.value).replace(/^\s+|\s+$/g, '')).length > 0 ? true : false;
-			this.renderValidation();
-			return isValid;
+		isMessageTextValid: function() {
+			return ((messageTA.value).replace(/^\s+|\s+$/g, '')).length > 0 ? true : false;
+		},
+
+		isSelectedOrgValid: function() {
+			var id = this.getSelectedOrgId();
+			return (typeof(id) !== 'undefined' && id > -1) ? true : false;
+		},
+
+		isSelectedTopicValid: function() {
+			var id = this.getSelectedTopicId();
+			return (typeof(id) !== 'undefined' && id > -1) ? true : false;
+		},
+
+		isTipValid: function() {
+			return isValid = ((this.isMessageTextValid() && this.isSelectedOrgValid() && this.isSelectedTopicValid())) ? true : false;
 		},
 
 		renderValidation: function() {
+			errorMsgCont.innerHTML = '';
+
 			if (isValid) {
 				this.addClass(errorMsgCont, 'hide');
 				this.removeClass(messageTACont, 'has-error');
 			} else {
+				if (!this.isSelectedOrgValid()) {
+					this.setErrorMessage('Please select a valid Organization.');
+				}
+				if (!this.isSelectedTopicValid()) {
+					this.setErrorMessage('Please select a valid Category.');
+				}
+				if (!this.isMessageTextValid()) {
+					this.addClass(messageTACont, 'has-error');
+					this.setErrorMessage('Please enter a Tip Message.')
+				} else if (this.isMessageTextValid()) {
+					this.removeClass(messageTACont, 'has-error');
+				}
+
 				this.removeClass(errorMsgCont, 'hide');
-				this.addClass(messageTACont, 'has-error');
+
 			}
 		},
 
 		setFormActionURL: function() {
-			this.setSelectedOrgId();
-			this.setSelectedTopicId();
 			this.formActionUrl = "/api/2/organizations/" + this.getSelectedOrgId() + "/topics/" + this.getSelectedTopicId() + "/quicktip";
 			this.baseCustomerURL = tipForm.getAttribute('data-base-url');
 			tipForm.setAttribute('action', this.baseCustomerURL + this.formActionUrl);
@@ -90,7 +122,7 @@ var QuickTip = function() {
 		},
 
 		setSelectedOrgId: function() {
-			this.orgId = orgListCoB.options[orgListCoB.selectedIndex].value;
+			this.orgId = (orgListCoB.selectedIndex > -1) ? orgListCoB.options[orgListCoB.selectedIndex].value : -1;
 		},
 
 		getSelectedOrgId: function() {
@@ -98,7 +130,7 @@ var QuickTip = function() {
 		},
 
 		setSelectedTopicId: function() {
-			this.topicId = categoryCoB.options[categoryCoB.selectedIndex].value;
+			this.topicId = (topicCoB.selectedIndex > -1) ? topicCoB.options[topicCoB.selectedIndex].value : -1;
 		},
 
 		getSelectedTopicId: function() {

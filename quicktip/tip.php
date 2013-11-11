@@ -224,7 +224,7 @@ class Tip {
 						<input id="phone" name="phone" type="tel" pattern="\d{3}-\d{3}-\d{4}" placeholder="Phone number" value="" title="Enter your phone number, ex. 555-123-4567" tabindex="8">
 					</fieldset>
 				</div>
-				<div id="tip-error-message" class="alert alert-danger hide">Please enter a Tip Message.</div>
+				<div id="tip-error-message" class="alert alert-danger hide"></div>
 				<fieldset>
 					<button id="tip-submit" class="btn btn-lg btn-danger" type="button" tabindex="9">Submit Tip</button>
 				</fieldset>
@@ -332,7 +332,7 @@ class Tip {
 						// submit form (posts back to ourself; i.e. ../quicktip/tip.php)
 						form.submit();
 					} else {
-						qtip.showServerErrorMessage("Sorry, there was an error.  Please try again.");
+						qtip.setErrorMessage("Sorry, there was an error.  Please try again.");
 						qtip.addClass(mask, "hide");
 					}
 				};
