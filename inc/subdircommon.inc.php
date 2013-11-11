@@ -1,4 +1,10 @@
 <?
+
+// Get the path to kona's base directory
+$incdir = dirname(__FILE__);
+$basedir = dirname($incdir);
+$objdir = "{$basedir}/obj";
+
 // In case the mechanism for checking if we're running under PHPUnit needs to change,
 // we check it here and set our own global constant PHPUNIT that we can use everywhere
 if (defined('PHPUnit_MAIN_METHOD')) define('PHPUNIT', true);
@@ -6,31 +12,38 @@ if (defined('PHPUnit_MAIN_METHOD')) define('PHPUNIT', true);
 setlocale(LC_ALL, 'en_US.UTF-8');
 mb_internal_encoding('UTF-8');
 
-$SETTINGS = parse_ini_file("../inc/settings.ini.php",true);
+$SETTINGS = parse_ini_file("{$incdir}/settings.ini.php",true);
 
 //get the customer URL
 $CUSTOMERURL = substr($_SERVER["SCRIPT_NAME"],1);
 $CUSTOMERURL = strtolower(substr($CUSTOMERURL,0,strpos($CUSTOMERURL,"/")));
 $BASEURL = "/$CUSTOMERURL";
 
-apache_note("CS_APP","cs"); //for logging
-apache_note("CS_CUST",urlencode($CUSTOMERURL)); //for logging
+require_once("{$incdir}/utils.inc.php");
+require_once("{$incdir}/db.inc.php");
+require_once("{$incdir}/memcache.inc.php");
 
-require_once("../inc/utils.inc.php");
-require_once("../inc/db.inc.php");
-require_once("../inc/memcache.inc.php");
-require_once("../inc/DBMappedObject.php");
-require_once("../inc/DBRelationMap.php");
+// If PHPUNIT is NOT running
+if (! defined('PHPUNIT')) {
+
+	apache_note("CS_APP","cs"); //for logging
+	apache_note("CS_CUST",urlencode($CUSTOMERURL)); //for logging
+
+	// Start up the memcache interface
+	init_memcache();
+}
+require_once("{$incdir}/DBMappedObject.php");
+require_once("{$incdir}/DBRelationMap.php");
 require_once("XML/RPC.php");
-require_once("../inc/auth.inc.php");
-require_once("../inc/sessionhandler.inc.php");
+require_once("{$incdir}/auth.inc.php");
+require_once("{$incdir}/sessionhandler.inc.php");
 
-require_once("../obj/User.obj.php");
-require_once("../obj/Access.obj.php");
-require_once("../obj/Permission.obj.php");
-require_once("../obj/Rule.obj.php"); //for search and sec profile rules
-require_once("../obj/Organization.obj.php"); //for search and sec profile rules
-require_once("../obj/Section.obj.php"); //for search and sec profile rules
+require_once("{$objdir}/User.obj.php");
+require_once("{$objdir}/Access.obj.php");
+require_once("{$objdir}/Permission.obj.php");
+require_once("{$objdir}/Rule.obj.php"); //for search and sec profile rules
+require_once("{$objdir}/Organization.obj.php"); //for search and sec profile rules
+require_once("{$objdir}/Section.obj.php"); //for search and sec profile rules
 
 /**
  * Any PageObject derived class must invoke this function to executePage()
@@ -38,13 +51,14 @@ require_once("../obj/Section.obj.php"); //for search and sec profile rules
  * in this one place.
  */
 function executePage($pageObject) {
+	// If PHPUNIT is NOT running
 	if (! defined('PHPUNIT')) {
 		$pageObject.execute();
 	}
 }
 
 
-if (!isset($isindexpage) || !$isindexpage) {
+if ((! defined('PHPUNIT')) && (!isset($isindexpage) || !$isindexpage)) {
 	doStartSession();
 	//force ssl?
 	if ($SETTINGS['feature']['force_ssl'] && !isset($_SERVER["HTTPS"])) {
@@ -73,6 +87,6 @@ if (!isset($isindexpage) || !$isindexpage) {
 
 // load customer/user locale 
 //this needs the USER object to already be loaded
-require_once("../inc/locale.inc.php");
+require_once("{$incdir}/locale.inc.php");
 
 ?>

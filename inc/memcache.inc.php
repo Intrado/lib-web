@@ -299,8 +299,4 @@ function init_memcache() {
 	}
 }
 
-init_memcache();
-
-
-
 ?>
