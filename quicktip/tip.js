@@ -163,6 +163,10 @@ var QuickTip = function() {
 	addEvent(submitB,   'click', methods.submitFormHandler);
 	addEvent(messageTA, 'keyup', methods.messageTextHandler);
 
+	// initialize selected Org and Topic Ids
+	methods.setSelectedOrgId();
+	methods.setSelectedTopicId();
+
 	return methods;
 };
 
