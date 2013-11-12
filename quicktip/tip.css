@@ -108,7 +108,7 @@ input:focus {
   outline-offset: -2px;
 }
 
-.btn-danger {
+/*.btn-danger {
   color: #ffffff;
   background-color: #d9534f;
   border-color: #d43f3a;
@@ -124,6 +124,24 @@ input:focus {
 }
 
 .btn-danger:active {
+  background-image: none;
+}*/
+
+.btn-primary {
+  color: #ffffff;
+  background-color: #428bca;
+  border-color: #357ebd;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+  color: #ffffff;
+  background-color: #3276b1;
+  border-color: #285e8e;
+}
+
+.btn-primary:active{
   background-image: none;
 }
 

@@ -220,7 +220,7 @@ class TipSubmissionHandler {
 				</div>
 				<div id="tip-error-message" class="alert alert-danger hide"></div>
 				<fieldset>
-					<button id="tip-submit" class="btn btn-lg btn-danger" type="button" tabindex="9">Submit Tip</button>
+					<button id="tip-submit" class="btn btn-lg btn-primary" type="button" tabindex="9">Submit Tip</button>
 				</fieldset>
 			</form>
 			';
@@ -278,7 +278,7 @@ class TipSubmissionHandler {
 		$html .= '</div>
 			<form id="newquicktip" name="newquicktip" action="' . $_SERVER["PHP_SELF"] . '?i=' . $this->rootOrgId. '" method="POST">
 				<fieldset>
-					<button id="new-tip" class="btn btn-lg btn-danger" type="submit">Done</button>
+					<button id="new-tip" class="btn btn-lg btn-primary" type="submit">Done</button>
 				</fieldset>
 			</form>';
 
