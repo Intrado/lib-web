@@ -1,7 +1,11 @@
 <?
 
+// required for escapeHtml()
+setlocale(LC_ALL, 'en_US.UTF-8');
+mb_internal_encoding('UTF-8');
+
 /**
- * class Tip
+ * class TipSubmissionHandler
  *
  * Description: Simple class to help manage the Quick Tip form field validation, 
  * form submission to a target iframe (POST to quicktip API POST endpoint for tip submission),
@@ -12,7 +16,7 @@
  * @date 11/08/2013
  */
 
-class Tip {
+class TipSubmissionHandler {
 	
 	private $rootOrgId;
 	private $customerName;
@@ -33,8 +37,6 @@ class Tip {
 	private $email;
 	private $phone;
 	private $file;
-
-	private $sessionData;
 	private $postData;
 
 
@@ -45,12 +47,12 @@ class Tip {
 			$this->rootOrgId	= $options["rootOrgId"];
 			$this->orgId 		= $options["orgId"];
 			$this->topicId 		= $options["topicId"];
-			$this->message 		= $options["message"];
+			$this->message 		= isset($options["message"]) ? $this->escapeHtml($options["message"]) : null;
 			$this->file 		= $options["file"];
-			$this->firstname 	= $options["firstname"];
-			$this->lastname 	= $options["lastname"];
-			$this->email 		= $options["email"];
-			$this->phone 		= $options["phone"];
+			$this->firstname 	= isset($options["firstname"]) ? $this->escapeHtml($options["firstname"]) : null;
+			$this->lastname 	= isset($options["lastname"]) ? $this->escapeHtml($options["lastname"]) : null;
+			$this->email 		= isset($options["email"]) ? $this->escapeHtml($options["email"]) : null;
+			$this->phone 		= isset($options["phone"]) ? $this->escapeHtml($options["phone"]) : null;
 
 			$this->postData = array(
 				"postURL"	 => $this->baseCustomerURL . '/api/2/organizations/' . $this->orgId . '/topics/' . $this->topicId . '/quicktip',
@@ -64,20 +66,16 @@ class Tip {
 			    "phone" 	 => $this->phone
 			);
 
-		 	// if $this->message does not exist, display starting Tip form; 
-		 	// fetch the customer data and set the org and topic combos 
+			// set the customer's REST API URL for fetching their data via GET
+			$this->customerDataURL = $this->baseCustomerURL . '/api/2/organizations/' . $this->rootOrgId . '/quicktip/info';
+
+			// fetch customer data via curl GET request to customer's quicktip API endpoint
+			$this->customerData = json_decode($this->fetchCustomerData());
+			
 			if (!isset($this->message)) {
-
-				// set the customer's REST API URL for fetching their data via GET
-				$this->customerDataURL = $this->baseCustomerURL . '/api/2/organizations/' . $this->rootOrgId . '/quicktip/info';
-
-				// fetch customer data via curl GET request to customer's quicktip API endpoint
-				$this->customerData = json_decode($this->fetchCustomerData());
-				
 				// build up the Organization and Category (topic) combos
 				$this->setOrganizations($this->customerData->organizations);
 				$this->setTopics($this->customerData->topics);
-
 			} 
 		}
 	}
@@ -149,10 +147,6 @@ class Tip {
 		return $name;
  	}
 
- 	public function getCustomerData() {
- 		return $this->customerData;
- 	}
-
  	/**
  	 * Returns a string containing all the <option> elements for a given array
  	 * of objects, ex Org or Topics.
@@ -167,9 +161,9 @@ class Tip {
 		return $html;
  	}
 
- 	public function setSessionData($sessionData) {
- 		$this->sessionData = $sessionData;
- 	}
+ 	public function escapeHtml($string) {
+		return htmlentities($string, ENT_COMPAT, 'UTF-8') ;
+	}
 
  	/**
  	 * Provides the HTML for the starting Tip form page, using customer data fetched for their Orgs & Topics
@@ -240,9 +234,9 @@ class Tip {
  	 */
  	public function renderThankYou() {
 		// get the category and org names (based on their id) to show on Thank You page
-		if (isset($this->sessionData)) {
-			$this->topicName = $this->getName($this->topicId, $this->sessionData['topics']);
-			$this->orgName 	 = $this->getName($this->orgId, $this->sessionData['organizations']);
+		if (isset($this->customerData)) {
+			$this->topicName = $this->getName($this->topicId, $this->customerData->topics);
+			$this->orgName 	 = $this->getName($this->orgId, $this->customerData->organizations);
 		}
 
 		$html = '
@@ -254,7 +248,7 @@ class Tip {
 				<div class="summary-heading">Summary of the tip information you submitted:</div>
 				<div><span class="summary-label">Organization:</span> &nbsp;<div class="summary-value">'. $this->orgName. '</div></div>
 				<div><span class="summary-label">Tip Category:</span> &nbsp;<div class="summary-value">'. $this->topicName .'</div></div>
-				<div><span class="summary-label">Tip Message:</span> &nbsp;<div class="summary-value message-text">"'. $this->message .'</div></div>';
+				<div><span class="summary-label">Tip Message:</span> &nbsp;<div class="summary-value message-text">"'. $this->message .'"</div></div>';
 		if ($this->file) {
 			$html .= '<div id="summary-attachment-container"><span class="summary-label">Attachment:</span> &nbsp;<div class="summary-value">'.$this->file.'</div></div>';
 		}
@@ -319,7 +313,8 @@ class Tip {
 						targetIframe.parentNode.removeChild(targetIframe);
 
 						// remove the previous POST API URL (so we don\'t accidentally re-post to POST API URL)
-						// and set action="" (defaults to post back to "self", i.e. ../quicktip/tip.php)
+						// and set action attribute to originating script with the rootorgid query param,
+						// i.e. /<custname>/quicktip/tip.php?i=<rootorgid>
 						form.setAttribute("action", "' . $_SERVER["PHP_SELF"] . '?i=' . $this->rootOrgId. '");
 
 						// remove the target attribute to make sure we submit (post) to ourself, not the target iframe;
@@ -329,9 +324,10 @@ class Tip {
 						// just a simple form submit (back to ourself) is enough
 						qtip.removeEventHandlers();
 
-						// submit form (posts back to ourself; i.e. ../quicktip/tip.php)
+						// submit form (posts back to ourself; i.e. /<custname>/quicktip/tip.php?i=<rootorgid>)
 						form.submit();
 					} else {
+						// there was an error; show the error message
 						qtip.setErrorMessage("Sorry, there was an error.  Please try again.");
 						qtip.addClass(mask, "hide");
 					}
@@ -352,7 +348,7 @@ class Tip {
 		<html lang="en">
 			<head>
 				<meta charset="utf-8">
-				<title>Quick Tip - Submit an Annoymous Tip - Powered by SchoolMessenger</title>
+				<title>Quick Tip - '. ((isset($this->message)) ? 'Thank You for the Tip!' : 'Submit an Annoymous Tip') .' - Powered by SchoolMessenger</title>
 				<link rel="stylesheet" type="text/css" href="tip.css">
 			</head>
 			<body>		
@@ -360,7 +356,7 @@ class Tip {
 					<div id="mask" class="hide"></div>
 					<div class="tip-chat"></div>
 					<h1>SchoolMessenger Quick Tip</h1>
-					<div id="tip-orgname-label">'. $this->sessionData['customerName'] .' </div>';
+					<div id="tip-orgname-label">'. $this->customerData->customerName .' </div>';
 
 					if (isset($this->message)) {
 						$html .= $this->renderThankYou();
@@ -386,17 +382,12 @@ class Tip {
 }
 ///////////////// end of Tip class ///////////////////////
 
-
-// start a session (no access to commom.inc.php so have to do explicit call)
-session_start();
-
 // scrape customer 'name' out of the URL (for use in 'baseCustomerURL')
 $uriParts 	= explode('/', $_SERVER['REQUEST_URI']); // ex /custname/quicktip/tip.php
 $custName 	= $uriParts[1];
 
 // get customer's root org id (used in API URL) from $_GET param
 $rootOrgId 	= isset($_GET['i']) ? $_GET['i'] : 0;
-
 
 // define options hash to pass to Tip constructor for proper initialization of Tip instance
 $options = array(
@@ -412,15 +403,11 @@ $options = array(
 	"phone"  		=> isset($_POST['phone'])  ? $_POST['phone'] : null
 );
 
-$tip = new Tip($options);
+// initialize new TipSubmissionHandler instance with $options arg
+$tipSubmissionHandler = new TipSubmissionHandler($options);
 
-// save customer data in SESSION, so we can use it in the POST response without re-fetching it again
-if (!isset($_SESSION['tip-customer-data'])) {
-	$_SESSION['tip-customer-data'] = (array) $tip->getCustomerData();
-} else {
-	$tip->setSessionData($_SESSION['tip-customer-data']);
-}
-
-$tip->render();
+// render final HTML markup for Tip Submission form or
+// resulting Thank You landing page, depending on $options
+$tipSubmissionHandler->render();
 
 ?>
