@@ -2,6 +2,7 @@
 
 //
 // Requires Topic
+// Requires OrganizationTopic
 
 class TopicDataManager {
 
@@ -36,18 +37,25 @@ where topicid = ?
 and organizationid = ?", false, array($topicid, $this->rootOrganizationId()));
 	}
 
-	public function updateTopicName($topicid, $topicname) {
-		QuickUpdate("update tai_topic set name = ? where id = ?", false, array($topicname, $topicid));
+	public function updateTopicName($topic, $topicname) {
+		$topic->name = $topicname;
+		$topic->update();
 	}
 
-	public function createTopic($topicBuilder,$topicname) {
-		$topic = new Topic();
+	public function createTopic($topic,$topicname) {
 		$topic->name = $topicname;
 		$topic->create();
-		QuickUpdate("insert into tai_organizationtopic (organizationid, topicid) values (?, ?)",
-								false,
-								array($this->rootOrganizationId(), $topic->id));
+		$organizationtopic = $this->organizationTopicFor($topic->id);
+		$organizationtopic->create();
 	}
+
+	private function organizationTopicFor($topicid) {
+		$organizationtopic = new OrganizationTopic();
+		$organizationtopic->organizationid = $this->rootOrganizationId();
+		$organizationtopic->topicid = $topicid;
+		return $organizationtopic;
+	}
+
 
 }
 
