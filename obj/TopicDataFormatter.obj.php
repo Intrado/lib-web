@@ -22,7 +22,7 @@ class TopicDataFormatter {
 	}
 
 	public function anyTopics() {
-		return count($this->topics);
+		return count($this->topics) > 0;
 	}
 
 	public function showMenu() {
