@@ -47,18 +47,113 @@ describe("QuickTip", function() {
 		window.qtip = undefined;
 	});
 
-	describe("validate()", function() {
-		it("returns true/false depending if Tip Message text is valid, and calls renderValidation() to update validation error messaging", function() {
+	describe("isMessageTextValid()", function() {
+		it("returns true/false depending if Tip Message text is valid", function() {
 			// empty string in TA is invalid
 			messageTA[0].value = "";
-			expect(qtip.validate()).to.equal(false);
+			expect(qtip.isMessageTextValid()).to.equal(false);
 			
 			// spaces only in TA is invalid
 			messageTA[0].value = "   ";
-			expect(qtip.validate()).to.equal(false);
+			expect(qtip.isMessageTextValid()).to.equal(false);
 
 			messageTA[0].value = "finally some tip text...";
-			expect(qtip.validate()).to.equal(true);
+			expect(qtip.isMessageTextValid()).to.equal(true);
+		});
+	});
+
+	describe("isSelectedOrgValid()", function() {
+		it("returns true/false depending if selected Orgnziation (id) is valid (int > -1)", function() {
+			
+			// no Org options defined, so must be false/invalid
+			expect(qtip.isSelectedOrgValid()).to.equal(false);
+
+			var orgOptions = [];
+			// add some Org options
+			for(var i = 0; i <= 3; i++) {
+				var option = $("<option>").attr({"value": i}).html("Org_" + i);
+				orgOptions.push(option);
+			}
+			orgListCoB.append(orgOptions);
+			
+			// set elem[0] (Org option) selected
+			orgOptions[0].attr('selected', 'selected');
+			qtip.setSelectedOrgId();
+			expect(qtip.getSelectedOrgId()).to.equal("0");
+
+			
+			expect(qtip.isSelectedOrgValid()).to.equal(true);
+		});
+	});
+
+	describe("isSelectedTopicValid()", function() {
+		it("returns true/false depending if selected Orgnziation (id) is valid (int > -1)", function() {
+			
+			// no topic options defined, so must be false/invalid
+			expect(qtip.isSelectedTopicValid()).to.equal(false);
+
+			var topicOptions = [];
+			// add some Org options
+			for(var i = 0; i <= 3; i++) {
+				var option = $("<option>").attr({"value": i}).html("Cat_" + i);
+				topicOptions.push(option);
+			}
+			categoryCoB.append(topicOptions);
+			
+			// set elem[0] (Org option) selected
+			topicOptions[0].attr('selected', 'selected');
+			qtip.setSelectedTopicId();
+			expect(qtip.getSelectedTopicId()).to.equal("0");
+
+			
+			expect(qtip.isSelectedTopicValid()).to.equal(true);
+		});
+	});
+
+	describe("isValid()", function() {
+		it("returns true/false depending if Tip message is && selected Orgnziation and Topic (ids) are valid (int > -1)", function() {
+			
+			// no message text && no topic options defined, so must be false/invalid
+			expect(qtip.isTipValid()).to.equal(false);
+
+			messageTA[0].value = "finally some tip text...";
+			
+			// message will be valid now but not the org and topic combos
+			expect(qtip.isTipValid()).to.equal(false);
+
+			// set selected topic option
+			var orgOptions = [];
+			// add some Org options
+			for(var i = 0; i <= 3; i++) {
+				var option = $("<option>").attr({"value": i}).html("Org_" + i);
+				orgOptions.push(option);
+			}
+			orgListCoB.append(orgOptions);
+			
+			// set elem[0] (Org option) selected
+			orgOptions[0].attr('selected', 'selected');
+			qtip.setSelectedOrgId();
+			expect(qtip.getSelectedOrgId()).to.equal("0");
+
+			// message text and org combos are valid, but not topic yet, so still invalid
+			expect(qtip.isTipValid()).to.equal(false);
+
+			// set selected topic option
+			var topicOptions = [];
+			// add some Org options
+			for(var i = 0; i <= 3; i++) {
+				var option = $("<option>").attr({"value": i}).html("Cat_" + i);
+				topicOptions.push(option);
+			}
+			categoryCoB.append(topicOptions);
+			
+			// set elem[0] (Org option) selected
+			topicOptions[0].attr('selected', 'selected');
+			qtip.setSelectedTopicId();
+			expect(qtip.getSelectedTopicId()).to.equal("0");
+
+			// finally, topic combo is set, so all 3 required fields are valid
+			expect(qtip.isTipValid()).to.equal(true);
 		});
 	});
 
@@ -82,8 +177,8 @@ describe("QuickTip", function() {
 
 			expect(qtip.renderValidation());
 
-			// error container should be hidden and textarea with no 'has-error' class
-			expect(qtip.hasClass(errorCont, 'hide')).to.equal(true);
+			// error container should NOT be hidden (org and topic combos don't have selected options yet) but textarea is now valid with no 'has-error' class
+			expect(qtip.hasClass(errorCont, 'hide')).to.equal(false);
 			expect(qtip.hasClass(msgTACont, 'has-error')).to.equal(false);
 
 		});
