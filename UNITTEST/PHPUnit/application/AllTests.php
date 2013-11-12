@@ -24,7 +24,9 @@ class application_AllTests {
 			'EasyCallTest',
 			//'HeadersTest', // TODO - this test is disabled because PHP has a bug in headers_list(), and we don't have the alternative apache_request_headers() compiled in; fix one or the other
 			'ReportClassroomMessagingTest',
-			'FormattersTest'
+			'FormattersTest',
+			'TopicDataFormatterTest',
+			'TopicDataManagerTest'
 		);
 
 		$classdir = dirname(__FILE__);
@@ -36,7 +38,7 @@ class application_AllTests {
 
 			// Include individual test classes that are to be part of the suite
 			require_once("{$classdir}/{$class}.php");
- 
+
 			// Add each individual test class to this test suite
 			$suite->addTestSuite($class);
 
@@ -47,4 +49,3 @@ class application_AllTests {
 	}
 }
 ?>
-
