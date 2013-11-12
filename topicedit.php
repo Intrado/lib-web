@@ -13,7 +13,7 @@ require_once("obj/FormItem.obj.php");
 
 require_once("obj/TopicDataManager.obj.php");
 require_once("obj/Topic.obj.php");
-
+require_once("obj/OrganizationTopic.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -29,6 +29,7 @@ if (!(getSystemSetting('_hasquicktip') && $USER->authorize('tai_canmanagetopics'
 if(isset($_GET['topicid'])) {
 	if ($_GET['topicid'] == 'new') {
 		$topicname = "";
+		$topicid = NULL;
 	} else {
 		$topicid = $_GET['topicid'];
 		$topicname = QuickQuery("select name from tai_topic where id = ?", false, array($topicid));
@@ -95,18 +96,14 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
 		Query("BEGIN");
 
+
 		$topic = DBFind("Topic", "from tai_topic where id = ?", false, array($topicid));
 
 		if ($topic) {
-			$topic->name = $topicname;
-			$topic->update();
+			$topicDataManager->updateTopicName($topic, $topicname);
 		} else {
 			$topic = new Topic();
-			$topic->name = $topicname;
-			$topic->create();
-			QuickUpdate("insert into tai_organizationtopic (organizationid, topicid) values (?, ?)",
-									false,
-									array($topicDataManager->rootOrganizationId(), $topic->id));
+			$topicDataManager->createTopic($topic, $topicname);
 		}
 
 		Query("COMMIT");
