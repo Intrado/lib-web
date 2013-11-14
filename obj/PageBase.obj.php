@@ -235,7 +235,7 @@ abstract class PageBase implements Page {
 	 * and the normal start/end window wrapper.
 	 */
 	function send() {
-		global $PAGE, $TITLE, $USER;
+		global $PAGE, $TITLE, $USER, $MAINTABS, $SUBTABS, $LOCALE;
 
 		// If we got this far, then assemble some HTML and spit it out
 		$PAGE = $this->options['page'];
