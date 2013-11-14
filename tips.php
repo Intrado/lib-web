@@ -50,7 +50,11 @@ class TipSearchForm extends Form {
 		}
 
 		$catArray[0] = "All Categories";
-		$catList = QuickQueryList("select id, name from tai_topic", true);
+		$catList = QuickQueryList("
+					SELECT tt.id, tt.name FROM tai_topic tt
+					INNER JOIN tai_organizationtopic tot on (tot.topicid = tt.id)
+					WHERE tot.organizationid = (SELECT id FROM organization WHERE parentorganizationid IS NULL)
+					ORDER BY tt.name ASC", true);
 		foreach ($catList as $id => $value) {
 			$catArray[$id] = escapehtml($value);
 		}
