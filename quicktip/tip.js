@@ -8,12 +8,18 @@ var QuickTip = function() {
 		messageTA 		= document.getElementById("message"),
 		messageTACont   = document.getElementById('tip-message-control-group'),
 		errorMsgCont 	= document.getElementById("tip-error-message"),
+		emailTF 		= document.getElementById("email"),
+		phoneTF 		= document.getElementById("phone"),
 		submitB 		= document.getElementById("tip-submit"),
+		submittingTipSp	= document.getElementById("submitting-tip-span"),
+		submitTipSp		= document.getElementById("submit-tip-span"),
 		orgId			= null,
 		topicId			= null,
 		baseCustomerURL = "",
 		formActionUrl	= "",
 		isValid = false,
+		isEmailValid = true,
+		isPhoneValid = true,
 		methods;
 
 	// cross-browser addEvent handler
@@ -38,13 +44,27 @@ var QuickTip = function() {
 		submitFormHandler: function(event) {
 			methods.setSelectedOrgId();
 			methods.setSelectedTopicId();
+			
+			// check if required fields are valid
+			methods.isTipValid()
 
-			if (!methods.isTipValid()) {
+			// check if optional email/phone fields are valid;
+			// valid = either empty or if non-empty, they have the correct format (email / phone pattern formats)
+			methods.isEmailValid();
+			methods.isPhoneValid();
+
+			// if invalid, stop form submission and render validation error message
+			if (!isValid || !isEmailValid || !isPhoneValid) {
 				event.preventDefault();
 				methods.renderValidation();
 			} else {
+
+				// form fields are valid, now set form's action URL, display mask overlay, and submit form
+				// to QuickTip API (response gets sent to hidden target iframe)
 				methods.setFormActionURL();
 				methods.removeClass(mask, 'hide');
+				methods.removeClass(submittingTipSp, 'hide');
+				methods.addClass(submitTipSp, 'hide');
 				tipForm.submit();
 			}
 		},
@@ -58,9 +78,29 @@ var QuickTip = function() {
 			}
 		},
 
+		emailHandler: function(event) {
+			if (!isValid) {
+				methods.isTipValid();
+				if (methods.isEmailValid()) {
+					methods.renderValidation();
+				}
+			}
+		},
+
+		phoneHandler: function(event) {
+			if (!isValid) {
+				methods.isTipValid();
+				if (methods.isPhoneValid()) {
+					methods.renderValidation();
+				}
+			}
+		},
+
 		removeEventHandlers: function() {
 			submitB.removeEventListener('click', methods.submitHandler, false);
 			messageTA.removeEventListener('keyup', methods.messageTextHandler, false);
+			emailTF.removeEventListener('keyup', methods.emailHandler, false);
+			phoneTF.removeEventListener('keyup', methods.phoneHandler, false);
 		},
 
 		setErrorMessage: function(errorMsg) {
@@ -83,7 +123,20 @@ var QuickTip = function() {
 		},
 
 		isTipValid: function() {
-			return isValid = ((this.isMessageTextValid() && this.isSelectedOrgValid() && this.isSelectedTopicValid())) ? true : false;
+			return isValid = (this.isMessageTextValid() && 
+							  this.isSelectedOrgValid() && 
+							  this.isSelectedTopicValid() &&
+							  this.isEmailValid() &&
+							  this.isPhoneValid()
+							 );
+		},
+
+		isEmailValid: function() {
+			return isEmailValid = (typeof(emailTF.checkValidity) === 'function') ? emailTF.checkValidity() : true;
+		},
+
+		isPhoneValid: function() {
+			return isPhoneValid = (typeof(phoneTF.checkValidity) === 'function') ? phoneTF.checkValidity() : true;
 		},
 
 		renderValidation: function() {
@@ -101,11 +154,16 @@ var QuickTip = function() {
 				}
 				if (!this.isMessageTextValid()) {
 					this.addClass(messageTACont, 'has-error');
-					this.setErrorMessage('Please enter a Tip Message.')
+					this.setErrorMessage('Please enter a Tip Message.');
 				} else if (this.isMessageTextValid()) {
 					this.removeClass(messageTACont, 'has-error');
 				}
-
+				if (!isEmailValid) {
+					this.setErrorMessage('Please enter a valid email address.<div class="error-format-example">Ex. janedoe@example.com</div>');
+				}
+				if (!isPhoneValid) {
+					this.setErrorMessage('Please enter a valid phone number.<div class="error-format-example">Format: (888) 555-1234, 888-555-1234, or 888.555.1234</div>');
+				}
 				this.removeClass(errorMsgCont, 'hide');
 
 			}
@@ -162,6 +220,8 @@ var QuickTip = function() {
 	// add event listeners
 	addEvent(submitB,   'click', methods.submitFormHandler);
 	addEvent(messageTA, 'keyup', methods.messageTextHandler);
+	addEvent(emailTF, 'keyup', methods.emailHandler);
+	addEvent(phoneTF, 'keyup', methods.phoneHandler);
 
 	// initialize selected Org and Topic Ids
 	methods.setSelectedOrgId();

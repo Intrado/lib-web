@@ -377,12 +377,20 @@ option {
     min-width: 50px;
 }
 
-#attachment {
+#file {
   margin-top: 10px;
   width: 310px;
 }
 #summary-attachment-container {
   margin-top: 20px;
+}
+
+.error-format-example {
+  font-weight: normal;
+  padding-top: 5px;
+  margin-top: 5px;
+  margin-bottom: -18px;
+  border-top: 1px solid #DEBAB8;
 }
 
 /* media queries for responsive scaling

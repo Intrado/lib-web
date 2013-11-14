@@ -37,7 +37,6 @@ class TipSubmissionHandler {
 	private $email;
 	private $phone;
 	private $file;
-	private $postData;
 
 
 	public function __construct($options) {
@@ -53,18 +52,6 @@ class TipSubmissionHandler {
 			$this->lastname 	= isset($options["lastname"]) ? $this->escapeHtml($options["lastname"]) : null;
 			$this->email 		= isset($options["email"]) ? $this->escapeHtml($options["email"]) : null;
 			$this->phone 		= isset($options["phone"]) ? $this->escapeHtml($options["phone"]) : null;
-
-			$this->postData = array(
-				"postURL"	 => $this->baseCustomerURL . '/api/2/organizations/' . $this->orgId . '/topics/' . $this->topicId . '/quicktip',
-			    "orgId" 	 => $this->orgId,
-			    "topicId" 	 => $this->topicId,
-			    "message" 	 => $this->message,
-			    "file" 		 => $this->file,
-			    "firstname"  => $this->firstname,
-			    "lastname" 	 => $this->lastname,
-			    "email" 	 => $this->email,
-			    "phone" 	 => $this->phone
-			);
 
 			// set the customer's REST API URL for fetching their data via GET
 			$this->customerDataURL = $this->baseCustomerURL . '/api/2/organizations/' . $this->rootOrgId . '/quicktip/info';
@@ -89,33 +76,6 @@ class TipSubmissionHandler {
 	public function fetchCustomerData() {
 		$curl = curl_init($this->customerDataURL);
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
-		$response = curl_exec($curl);
-		curl_close($curl);
-
-		return $response;
- 	}
-
-	/** 
-	 * Performs curl POST request to customer's postURL, ie $this->postData["postURL"].
-	 * The form post uses a target iframe to post the response to; the target iframe is hidden
-	 * ex POST URL: https://<host>/<custname>/api/2/organizations/<orgid>/topics/<topicid>/quicktip';
-	 * @param array postData - array containing tip message data to be posted
-	 */
- 	public function postTipMessage() {
-
-		$curl = curl_init($this->postData["postURL"]);
-		$curl_post_data = array(
-		    "message" 		=> $this->postData["message"],
-		    "file" 			=> $this->postData["file"],
-		    "firstname" 	=> $this->postData["firstname"],
-		    "lastname" 		=> $this->postData["lastname"],
-		    "email" 		=> $this->postData["email"],
-		    "phone" 		=> $this->postData["phone"]
-	    );
-		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($curl, CURLOPT_POST, 1);
-		curl_setopt($curl, CURLOPT_POSTFIELDS, $curl_post_data);
 		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
 		$response = curl_exec($curl);
 		curl_close($curl);
@@ -215,12 +175,12 @@ class TipSubmissionHandler {
 					</fieldset>
 					<fieldset>
 						<label for="phone">Phone</label>
-						<input id="phone" name="phone" type="tel" pattern="\d{3}-\d{3}-\d{4}" placeholder="Phone number" value="" title="Enter your phone number, ex. 555-123-4567" tabindex="8">
+						<input id="phone" name="phone" type="tel" pattern="^\(?\d{3}\)?[- \.]?\d{3}[- \.]?\d{4}$" placeholder="Phone number" value="" title="Enter your phone number. accepted formats: (555) 555-5555, 555-555-5555, 555.555.5555, or 555 555 5555" tabindex="8">
 					</fieldset>
 				</div>
 				<div id="tip-error-message" class="alert alert-danger hide"></div>
 				<fieldset>
-					<button id="tip-submit" class="btn btn-lg btn-primary" type="button" tabindex="9">Submit Tip</button>
+					<button id="tip-submit" class="btn btn-lg btn-primary" type="submit" tabindex="9"><span id="submitting-tip-span" class="hide">Submitting Tip...</span><span id="submit-tip-span">Submit Tip</span></button>
 				</fieldset>
 			</form>
 			';
@@ -363,7 +323,6 @@ class TipSubmissionHandler {
 					} 
 
 					else {
-
 						$html .= $this->renderTipForm();
 					}
 
