@@ -6,90 +6,42 @@ require_once("inc/table.inc.php");
 require_once("inc/utils.inc.php");
 require_once("inc/securityhelper.inc.php");
 require_once("inc/formatters.inc.php");
+include_once("obj/Phone.obj.php");
 require_once("inc/date.inc.php");
 require_once("obj/Validator.obj.php");
 require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
 
+require_once('ifc/Page.ifc.php');
+require_once('obj/PageBase.obj.php');
+require_once('obj/PageForm.obj.php');
 
-
-////////////////////////////////////////////////////////////////////////////////
-// Authorization
-////////////////////////////////////////////////////////////////////////////////
-if (!(getSystemSetting('_hasquicktip') && $USER->authorize('tai_canbetopicrecipient'))) {
-	redirect('unauthorized.php');
-}
 
 /**
- * class TipSubmissionViewer
+ * class TipSearchForm
  * 
- * @description: class used for managing the tips.php page in kona
+ * @description: class used for initializing the Tip Submission Search form
  * @author: Justin Burns <jburns@schoolmessenger.com>
- * @date: 11/6/2013
+ * @date: 11/12/2013
  */
 
-class TipSubmissionViewer {
+class TipSearchForm extends Form {
 
-	private $page = "notifications:tips";
-	private $title = '';
-	private $formdata = array();
-	private $pagingStart = 0;
-	private $pagingLimit = 30;
-	private $ajaxsubmit = false;
-	private $form;
-	private $query;
-	private $options;
+	var $options;
 
-	public function __construct($options) {
+	function __construct($name, $options) {
 		if (isset($options)) {
 			$this->options = $options;
+			$this->setFormData();
+			parent::Form($name, $this->formdata, null, array( submit_button(_L(' Search Tips'), 'search', "find")));
 		}
 	}
 
-	public function execute() {
-		$this->setTitle('Tip Submissions');
-		$this->setPagingStart((isset($_GET['pagestart'])) ? $_GET['pagestart'] : 0);
-		$this->setFormData();
-
-		$this->setForm(new Form('tips', $this->getFormData(), null, array( submit_button(_L(' Search Tips'), 'search', "find"))));
-
-		$this->getForm()->ajaxsubmit = false;
-		$this->getForm()->handleRequest();
-
-		// if user submits a search, update session with form data then reload self
-		if ($this->getForm()->getSubmit()) {
-			$this->options = $_SESSION['tips'] = $this->getForm()->getData();
-			redirect($_SERVER['PHP_SELF']);
-		}
-
-		$this->renderNav();
-		$this->setSearchQuery();
-		$this->renderSearchResults();
-		$this->renderFooter();
-		$this->renderJavascript();
-	}
-
-	public function setTitle($pageTitle) {
-		$this->title = _L($pageTitle);
-	}
-
-	public function setPagingStart($pagestart) {
-		$this->pagingStart = 0 + $pagestart;
-	}
-
-	public function getPagingStart() {
-		return $this->pagingStart;
-	}
-
-	public function getPagingLimit() {
-		return $this->pagingLimit;
-	}
-
-	public function addFormData($key, $obj) {
+	function addFormData($key, $obj) {
 		$key != null ? $this->formdata[$key] = $obj : $this->formdata[] = $obj;
 	}
 
-	public function setFormData() {
+	function setFormData() {
 
 		$orgArray[0] = "All Organizations";
 		$orgList = Organization::getAuthorizedOrgKeys();
@@ -117,7 +69,7 @@ class TipSubmissionViewer {
 		$this->addFormData("orgid",
 			array(
 				"label" 		=> _L("Organization"),
-				"fieldhelp" 	=> ("Select an Organization to filter Tip search results on. "),
+				"fieldhelp" 	=> _L("Select an Organization to filter Tip search results on. "),
 				"value" 		=> isset($this->options['orgid']) ? $this->options['orgid'] : $orgArray[0],
 				"validators" 	=> array(array("ValInArray", "values" => array_keys($orgArray))),
 				"control" 		=> array("SelectMenu", "values" => $orgArray),
@@ -128,7 +80,7 @@ class TipSubmissionViewer {
 		$this->addFormData("categoryid",
 			array(
 				"label" 		=> _L("Category"),
-				"fieldhelp" 	=> ("Select a Category to filter Tip search results on."),
+				"fieldhelp" 	=> _L("Select a Category to filter Tip search results on."),
 				"value" 		=> isset($this->options['categoryid']) ? $this->options['categoryid'] : $catArray[0],
 				"validators" 	=> array(array("ValInArray", "values" => array_keys($catArray))),
 				"control" 		=> array("SelectMenu", "values" => $catArray),
@@ -148,40 +100,124 @@ class TipSubmissionViewer {
 		);
 	}
 
-	public function getFormData() {
-		return $this->formdata;
+}
+/////////////// end of TipSearchForm class ////////////////////////
+
+
+/**
+ * class TipSubmissionViewer
+ * 
+ * @description: class used for managing the Tip Submission viewer table/page (tips.php), 
+ * which is dependant on the TipSearchForm fields 
+ * @author: Justin Burns <jburns@schoolmessenger.com>
+ * @date: 11/12/2013
+ */
+class TipSubmissionViewer extends PageForm {
+
+	var $pagingStart = 0;
+	var $pagingLimit = 30;
+	var $ajaxsubmit = false;
+	var $searchQuery;
+	var $options;
+	var $tableColumnHeadings;
+	var $tableCellFormatters;
+	var $tipData = array();
+	var $total;
+
+	function __construct($options) {
+		if (isset($options)) {
+			$this->options = $options;
+			parent::PageBase($options);
+		}
 	}
 
-	public function getForm() {
-		return $this->form;
+	// @override
+	function is_authorized($get, $post) {
+		global $USER;
+		return getSystemSetting('_hasquicktip', false) && $USER->authorize('tai_canbetopicrecipient'); 
 	}
 
-	public function setForm($form) {
-		$this->form = $form;
+	// @override
+	function initialize() {
+		$this->options["formname"] = 'tips';
+		$this->options["title"] = 'Tip Submissions';
+		$this->options["page"]  = "notifications:tips";
+
+		$this->tableColumnHeadings = array(
+			"0" => _L('Organization'),
+			"1" => _L('Category'),
+			"2" => _L('Message'),
+			"3" => _L('Date'),
+			"4" => _L('Name'),
+			"5" => _L('Email'),
+			"6" => _L('Phone')
+		);
+
+		$this->tableCellFormatters = array(
+			"2" =>  "fmt_tip_message",
+			"3" => "fmt_nbr_date",
+			"5" => "fmt_email",
+			"6" => "fmt_phone"
+		);
 	}
 
-	public function renderNav() {
-		global $USER, $PAGE, $TITLE, $MAINTABS, $SUBTABS;
-		$PAGE = $this->page;
-		$TITLE = $this->title;
-		include_once("nav.inc.php");
+	// @override
+	function beforeLoad($get, $post) {
+		if (!$this->is_authorized($get, $post)) {
+			redirect('unauthorized.php');
+		}
+		$this->setPagingStart((isset($get['pagestart'])) ? $get['pagestart'] : 0);
 	}
 
-	public function renderFooter() {
-		global $USER, $LOCALE;
-		include_once("navbottom.inc.php");
+	// @override
+	function load() {
+		$this->doSearchQuery();
+		$this->form = new TipSearchForm($this->options['formname'], $this->options);
+		$this->form->ajaxsubmit = false;
 	}
 
-	public function renderForm() {
+	// @override
+	function afterLoad() {
+		$this->form->handleRequest();
+		if ($this->form->getSubmit()) {
+			// if user submits a search, update SESSION['tips'] with latest form data 
+			$_SESSION['tips'] = $this->form->getData();
+			// then reload (redirect to) self (with new data)
+			redirect($_SERVER['PHP_SELF']);
+		}
+	}
+
+	// @override
+	function sendPageOutput() {
+		global $TITLE;
+		startWindow($TITLE);
+
+		// render search form
 		echo $this->form->render();
+
+		// top pager
+		showPageMenu($this->total, $this->pagingStart, $this->pagingLimit);
+		
+		// Tip Submissions table
+		echo '<table id="tips-table" width="100%" cellpadding="3" cellspacing="1" class="list" style="margin-top:15px;">';
+		showTable($this->tipData, $this->tableColumnHeadings, $this->tableCellFormatters);
+		echo "</table>";
+
+		// only show bottom pager if there's more than 30 rows
+		if ($this->total > 30) {
+			showPageMenu($this->total, $this->pagingStart, $this->pagingLimit);
+		}
+
+		endWindow();
+		echo '<script src="script/tips.js"></script>';
 	}
 
-	public function getSearchQuery() {
-		return $this->query;
+	function setPagingStart($pagestart) {
+		$this->pagingStart = 0 + $pagestart;
 	}
 
-	public function setSearchQuery() {
-		$this->query = "
+	function doSearchQuery() {
+		$this->searchQuery = "
 			SELECT SQL_CALC_FOUND_ROWS o.orgkey, tai_topic.name, tm.body, from_unixtime(tm.modifiedtimestamp) as date1, 
 					(select concat(u.firstname, ' ', u.lastname)), u.email, u.phone FROM tai_message tm 
 			INNER JOIN tai_thread tt on (tm.threadid = tt.id) 
@@ -191,8 +227,8 @@ class TipSubmissionViewer {
 			WHERE 1 ";
 
 		// include user org/category search params, if any
-		$this->query .= isset($this->options['orgid']) && $this->options['orgid'] > 0 ? ' AND o.id = ' . $this->options['orgid'] . ' ' : '';
-		$this->query .= isset($this->options['categoryid']) && $this->options['categoryid'] > 0 ?	' AND tai_topic.id = ' . $this->options['categoryid'] . ' ' : '';
+		$this->searchQuery .= isset($this->options['orgid']) && $this->options['orgid'] > 0 ? ' AND o.id = ' . $this->options['orgid'] . ' ' : '';
+		$this->searchQuery .= isset($this->options['categoryid']) && $this->options['categoryid'] > 0 ?	' AND tai_topic.id = ' . $this->options['categoryid'] . ' ' : '';
 
 		$datesql = $startdate = $enddate = ' ';
 
@@ -215,80 +251,21 @@ class TipSubmissionViewer {
 			$datesql = " AND Date(from_unixtime(tm.modifiedtimestamp)) = CURDATE()";
 			$enddate = $startdate = date("Y-m-d", time());
 		}
-		$this->query .= $datesql;
-		$this->query .= " ORDER BY date1 desc limit " . $this->getPagingStart() .",". $this->getPagingLimit();
+		$this->searchQuery .= $datesql;
+		$this->searchQuery .= " ORDER BY date1 desc limit " . $this->pagingStart .",". $this->pagingLimit;
 
-	}
-
-	public function renderSearchResults() {
-		startWindow(_L('Tip Submissions'));
-		
-		$tipData = array();
-		$tipQueryStr = $this->getSearchQuery();
-		$tipQueryResult = Query($tipQueryStr);
+		// do the query now that the query string is ready
+		$tipQueryResult = Query($this->searchQuery);
 
 		while ($row = DBGetRow($tipQueryResult)) {
-			$tipData[] = $row;
+			$this->tipData[] = $row;
 		}
-
-		$tableColumnHeadings = array(
-			"0" => _L('Organization'),
-			"1" => _L('Category'),
-			"2" => _L('Message'),
-			"3" => _L('Date'),
-			"4" => _L('Name'),
-			"5" => _L('Email'),
-			"6" => _L('Phone')
-		);
-
-		$tableCellFormatters = array(
-			"2" =>  "fmt_tip_message",
-			"3" => "fmt_nbr_date",
-			"5" => "fmt_email"
-		);
 		
 		// get total row count for pager
-		$totalQueryStr = "select FOUND_ROWS()";
-		$total = QuickQuery($totalQueryStr);
-		
-		$this->renderForm(); // search form
-		showPageMenu($total, $this->getPagingStart(), $this->getPagingLimit());
-		
-		echo '<table id="tips-table" width="100%" cellpadding="3" cellspacing="1" class="list" style="margin-top:15px;">';
-		showTable($tipData, $tableColumnHeadings, $tableCellFormatters);
-		echo "</table>";
+		$this->total = QuickQuery("select FOUND_ROWS()");
 
-		// only show bottom pager if there's at least 10 rows;
-		if ($total >= 10) {
-			showPageMenu($total, $this->getPagingStart(), $this->getPagingLimit());
-		}
-
-		endWindow();
 	}
 
-	// Attach click event handlers to 'Read More' links on Tip Messages
-	// and append descending sort carat in Date table column heading
-	public function renderJavascript() {
-		echo '
-			<script>
-				(function($) {
-					$(".tip-read-more").on("click", function(e) {
-						e.preventDefault();
-						var parent = $(this).parent();
-						parent.fadeOut(200, function() {
-							parent.next().fadeIn(200);
-						});
-					});
-					// show descending carat to give user visual indication on how data is sorted (desc);
-					// only show carat if 1 or more actual rows of data are present, not header only
-					if ($("#tips-table tbody tr").length > 1) {
-						$("#tips-table.list .listHeader th:nth-child(4)").append("<div id=\"carat\"></div>");
-					}
-					$(".pagetitle").parent().remove();
-				})(jQuery);
-			</script>
-		';
-	}
 }
 
 /////////////// end of TipSubmissionViewer class ////////////////////////
@@ -310,9 +287,7 @@ function fmt_tip_message ($row, $index) {
 }
 
 
-
-////////////////////////////////////////////////////////////////////////////////
-// Initialize SESSION and handle request params;
+// Initialize SESSION['tips'] data and handle request params;
 ////////////////////////////////////////////////////////////////////////////////
 
 if (!isset($_SESSION['tips'])) {
@@ -326,20 +301,14 @@ $categoryid = 	isset($_POST['tips_categoryid']) ? $_POST['tips_categoryid'] :
 $date = 		isset($_POST['tips_date']) ? $_POST['tips_date'] : 
 				isset($_SESSION['tips']['date']) ? $_SESSION['tips']['date'] : null;
 
-$_SESSION['tips']['orgid'] = $orgid;
+$_SESSION['tips']['orgid'] 		= $orgid;
 $_SESSION['tips']['categoryid'] = $categoryid;
-$_SESSION['tips']['date'] = $date;
-
-$options = $_SESSION['tips'];
+$_SESSION['tips']['date'] 		= $date;
 
 
+// Initialize TipSubmissionViewer with $_SESSION['tips'] data ($options) and exexute (render final page)
 ////////////////////////////////////////////////////////////////////////////////
-// Initialize new TipSubmissionViewer object; 
-// uses $options ($_SESSION['tips']) data to init form elements (value settings), 
-// SQL query and table rendering
-////////////////////////////////////////////////////////////////////////////////
-$tips = new TipSubmissionViewer($options);
-$tips->execute();
-
+$tips = new TipSubmissionViewer($_SESSION['tips']);
+executePage($tips);
 
 ?>
