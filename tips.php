@@ -72,7 +72,7 @@ class TipSearchForm extends Form {
 		
 		$this->addFormData("orgid",
 			array(
-				"label" 		=> _L($orgType . 's'),
+				"label" 		=> _L($orgType),
 				"fieldhelp" 	=> _L("Select a ".getSystemSetting("organizationfieldname","Organization")." to filter Tip search results on. "),
 				"value" 		=> isset($this->options['orgid']) ? $this->options['orgid'] : $orgArray[0],
 				"validators" 	=> array(array("ValInArray", "values" => array_keys($orgArray))),
