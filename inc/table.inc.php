@@ -76,7 +76,7 @@ function prepareAjaxTableObjects ($data, $titles, $formatters = array(),$row_act
 }
 
 
-function showTable ($data, $titles, $formatters = array(), $repeatedColumns = array(), $groupby = null) {
+function showTable ($data, $titles, $formatters = array(), $repeatedColumns = array(), $groupby = null, $escapehtml = true) {
 	//use sparse array to use isset later
 	$hiddencolumns = array();
 	echo '<tr class="listHeader">';
@@ -104,7 +104,7 @@ function showTable ($data, $titles, $formatters = array(), $repeatedColumns = ar
 		} else {
 			$displaytitle = $title;
 		}
-		echo escapehtml($displaytitle) . "</th>";
+		echo ($escapehtml ? escapehtml($displaytitle) : $displaytitle ). "</th>";
 	}
 	echo "</tr>\n";
 
@@ -137,7 +137,7 @@ function showTable ($data, $titles, $formatters = array(), $repeatedColumns = ar
 						$fn = $formatters[$index];
 						$cel = $fn($row,$index);
 					} else {
-						$cel = escapehtml($row[$index]);
+						$cel = $escapehtml ? escapehtml($row[$index]) : $row[$index];
 					}
 				} else {
 					$cel = "&nbsp;";
