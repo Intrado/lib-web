@@ -33,17 +33,19 @@ class TipSearchForm extends Form {
 		if (isset($options)) {
 			$this->options = $options;
 			$this->setFormData();
-			parent::Form($name, $this->formdata, null, array( submit_button(_L(' Search Tips'), 'search', "find")));
+			parent::Form($name, $this->formdata, null, array( submit_button_with_image(_L(' Search Tips'), 'search', 'img/pictos-search.png')));
 		}
 	}
 
 	function addFormData($key, $obj) {
-		$key != null ? $this->formdata[$key] = $obj : $this->formdata[] = $obj;
+		isset($key) ? $this->formdata[$key] = $obj : $this->formdata[] = $obj;
 	}
 
 	function setFormData() {
 
-		$orgArray[0] = "All Organizations";
+		$orgType = getSystemSetting("organizationfieldname","Organization");
+
+		$orgArray[0] = 'All ' . $orgType . 's';
 		$orgList = Organization::getAuthorizedOrgKeys();
 		foreach ($orgList as $id => $value) {
 			$orgArray[$id] = escapehtml($value);
@@ -66,14 +68,12 @@ class TipSearchForm extends Form {
 			"xdays" 	=> isset($dateObj->xdays) ? $dateObj->xdays : '',
 			"startdate" => isset($dateObj->startdate) ? $dateObj->startdate : '',
 			"enddate" 	=> isset($dateObj->enddate) ? $dateObj->enddate : ''
-		);		
-
-		$this->addFormData(null, _L('Search Tip Submissions by Organization, Category, and/or Date'));
+		);
 		
 		$this->addFormData("orgid",
 			array(
-				"label" 		=> _L("Organization"),
-				"fieldhelp" 	=> _L("Select an Organization to filter Tip search results on. "),
+				"label" 		=> _L($orgType . 's'),
+				"fieldhelp" 	=> _L("Select a ".getSystemSetting("organizationfieldname","Organization")." to filter Tip search results on. "),
 				"value" 		=> isset($this->options['orgid']) ? $this->options['orgid'] : $orgArray[0],
 				"validators" 	=> array(array("ValInArray", "values" => array_keys($orgArray))),
 				"control" 		=> array("SelectMenu", "values" => $orgArray),
@@ -148,20 +148,19 @@ class TipSubmissionViewer extends PageForm {
 		$this->options["page"]  = "notifications:tips";
 
 		$this->tableColumnHeadings = array(
+			"3" => _L('<div class="attachment"></div>'),
+			"2" => _L('Message'),
 			"0" => _L('Organization'),
 			"1" => _L('Category'),
-			"2" => _L('Message'),
-			"3" => _L('Date'),
-			"4" => _L('Name'),
-			"5" => _L('Email'),
-			"6" => _L('Phone')
+			"6" => _L('Date <div id="carat"></div>'),
+			"7" => _L('Contact&nbsp;Info')
 		);
 
 		$this->tableCellFormatters = array(
-			"2" =>  "fmt_tip_message",
-			"3" => "fmt_nbr_date",
-			"5" => "fmt_email",
-			"6" => "fmt_phone"
+			"2" => "fmt_tip_message",
+			"3" => "fmt_attachment",
+			"6" => "fmt_nbr_date",
+			"7" => "fmt_contact_info"
 		);
 	}
 
@@ -196,6 +195,7 @@ class TipSubmissionViewer extends PageForm {
 		global $TITLE;
 		startWindow($TITLE);
 
+		echo '<div id="tip-icon"></div><div id="tip-search-instruction">Search Tip Submissions based on '.getSystemSetting("organizationfieldname", "Organization").'s, Category, and/or Date.</div>';
 		// render search form
 		echo $this->form->render();
 
@@ -204,7 +204,7 @@ class TipSubmissionViewer extends PageForm {
 		
 		// Tip Submissions table
 		echo '<table id="tips-table" width="100%" cellpadding="3" cellspacing="1" class="list" style="margin-top:15px;">';
-		showTable($this->tipData, $this->tableColumnHeadings, $this->tableCellFormatters);
+		showTable($this->tipData, $this->tableColumnHeadings, $this->tableCellFormatters, array(), NULL, false);
 		echo "</table>";
 
 		// only show bottom pager if there's more than 30 rows
@@ -214,6 +214,7 @@ class TipSubmissionViewer extends PageForm {
 
 		endWindow();
 		echo '<script src="script/tips.js"></script>';
+		$this->createAttachmentViewerModal();
 	}
 
 	function setPagingStart($pagestart) {
@@ -222,12 +223,13 @@ class TipSubmissionViewer extends PageForm {
 
 	function doSearchQuery() {
 		$this->searchQuery = "
-			SELECT SQL_CALC_FOUND_ROWS o.orgkey, tai_topic.name, tm.body, from_unixtime(tm.modifiedtimestamp) as date1, 
-					(select concat(u.firstname, ' ', u.lastname)), u.email, u.phone FROM tai_message tm 
+			SELECT SQL_CALC_FOUND_ROWS o.orgkey, tai_topic.name, tm.body, tma.filename, tma.size, tma.contentid, from_unixtime(tm.modifiedtimestamp) as date1, 
+					u.firstname, u.lastname, u.email, u.phone FROM tai_message tm 
 			INNER JOIN tai_thread tt on (tm.threadid = tt.id) 
 			INNER JOIN organization o on (o.id = tt.organizationid)
 			INNER JOIN tai_topic on (tt.topicid = tai_topic.id)
 			INNER JOIN user u on (u.id = tm.senderuserid) 
+			LEFT JOIN tai_messageattachment tma on (tma.messageid = tm.id)
 			WHERE 1 ";
 
 		// include user org/category search params, if any
@@ -270,6 +272,24 @@ class TipSubmissionViewer extends PageForm {
 
 	}
 
+	function createAttachmentViewerModal() {
+		$str =	'
+			<div id="tip-view-attachment" class="modal hide">
+				<div class="modal-header">
+					<h3 id="attachment-details">Tip Attachment</h3>
+				</div>
+				<div class="modal-body">
+					<div id="tip-attachment-content">
+						<img id="attachment-image" src="viewimage.php?id=527" />
+					</div>
+				</div>
+				<div class="modal-footer">
+					<a href="#" class="btn" data-dismiss="modal">Close</a>
+				</div>
+			</div>';
+		echo $str;
+	}
+
 }
 
 /////////////// end of TipSubmissionViewer class ////////////////////////
@@ -290,6 +310,54 @@ function fmt_tip_message ($row, $index) {
 		return "\"" . $txt . "\"";
 }
 
+function fmt_attachment ($row, $index) {
+	if (isset($row[$index])) {
+		// set content allowed for the given image id ($row[$index+2]),
+		// so it can be viewable in the attachment modal
+		permitContent($row[$index+2]);
+		
+		$fileDetailsOrig = $row[$index].' ('. round((($row[$index+1]) / 1024), 1) . 'KB)';
+		$max = 12;
+		if (strlen($row[$index]) > $max) {
+			$fileNameTrimmed = substr($row[$index], 0, $max - 3) . '...';
+			return '<a href="#" class="attachment" data-image-id="'.$row[$index+2].'" title="Attachment: '.$fileDetailsOrig .'">'.$fileNameTrimmed.'&nbsp;<span>('. round((($row[$index+1]) / 1024), 1) . 'KB)</span></a>';
+		}
+		return '<a href="#" class="attachment" data-image-id="'.$row[$index+2].'" title="Attachment: '.$fileDetailsOrig .'">'.$row[$index].'&nbsp;<span>('. round((($row[$index+1]) / 1024), 1) . 'KB)</span></a>';
+	}
+	return "&nbsp;";
+}
+
+function fmt_contact_info ($row, $index) {
+	$str  = '';
+	$hasFirst = isset($row[$index]) && strlen($row[$index]) > 0;
+	$hasLast  = isset($row[$index+1]) && strlen($row[$index+1]) > 0;
+	$hasEmail = isset($row[$index+2]) && strlen($row[$index+2]) > 0;
+	$hasPhone = isset($row[$index+3]) && strlen($row[$index+3]) > 0;
+
+	if ($hasFirst || $hasLast || $hasEmail || $hasPhone) {
+		$str .= '<a href="#" class="tip-view-contact">View</a>';
+		$str .= '<span class="tip-contact-details" style="display:none">';
+		if ($hasFirst && $hasLast) {
+			$str .= '<div>Name:&nbsp;'.$row[$index].' '.$row[$index+1].'</div>';
+		}
+		else if ($hasFirst && !$hasLast) {
+			$str .= '<div>First&nbsp;Name:&nbsp;'.$row[$index].'</div>';
+		}
+		else if (!$hasFirst && $hasLast) {
+			$str .= '<div>Last&nbsp;Name:&nbsp;'.$row[$index+1].'</div>';
+		}
+
+		if ($hasEmail) {
+			$str .= '<div>Email:&nbsp;'.$row[$index+2].'</div>';
+		}
+		if ($hasPhone) {
+			$str .= '<div>Phone:&nbsp;'.$row[$index+3].'</div>';
+		}
+		$str .= '</span>';
+	}
+		
+	return $str;
+}
 
 // Initialize SESSION['tips'] data and handle request params;
 ////////////////////////////////////////////////////////////////////////////////
