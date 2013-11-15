@@ -521,17 +521,33 @@ _L('Systemwide View Options'),
 		),
 		"control" => array("RadioButton", "values" => $blockednumberoptions),
 		"helpstep" => 11
-	),
+	));
+	
+	$helpsteps = array (
+	_L('Enter a name and optional description for this Access Profile.'),
+	_L('Choose how you want users with this profile to be able to access the system. Then select whether they should be able to edit their own account information or not.'),
+	_L('Select whether or not this profile will display current job statistics on the start page.').'<br><br>'._L('You may also choose to display the shortcuts menu, allowing users to quickly access the most common tasks.'),
+	_L('Select the combination of messaging options most appropriate for the users of this profile. Click on the individual options for more information about their functions.'),
+	_L('Users can send one time jobs by default. This section allows you to enable repeating job and survey creation. You can also limit the number of days a job can run and allow users to change their Caller ID.'),
+	_L('This section determines whether the user can create and edit lists as well as the types of lists they can create. Enabling Create & Edit Lists does not allow users to contact people outside of their restrictions.').'<br><br>'._L('Uploading lists by ID number allows users to create lists of ID numbers, referencing contacts that exist in the database.').'<br><br>'._L('Uploading lists by contact data will let users create lists from CSV files containing any contact information, regardless of whether the contact exists in the database. This method allows users to contact anyone they upload to their address book.'),
+	_L('Select the object types the user can subscribe to or publish.'),
+	_L('Select the fields users should be able to see. They can use these fields for lists, messages, and reports. Leave everything blank to allow unlimited access.').'<br><br>'._L('You may also use this section to allow access to the Contacts Tab and allow users to edit contact details.'),
+	_L('Choose whether the user can create reports or not.'),
+	_L('Choose whether the user can monitor events like job sent and/or completed'),
+	_L('The options in this section control views of all of the activity in the system.')
+);
+	
+	$admin_formdata = array( 
 _L('Security & Administrator Controls'),
 	"securitywarning" => array (
 		"label" => _L('Security Notice'),
 		"control" => array("FormHtml", "html" => '<p style="border: 3px double red; font-weight: bold; width: 50%; padding: 5px;"><img src="img/icons/error.gif" alt="" style="vertical-align: top;">'._L('The following settings control top-level administration functions. Only top-level administrators should have these enabled.').'</p>'),
-		"helpstep" => 12
+		"helpstep" => 13
 	),
 	"enableadminoptions" => array (
 		"label" => _L('Enable All'),
 		"control" => array("FormHtml", "html" => icon_button(_L('Enable Administrator Options'),"key",'checkAllCheckboxes(true);')),
-		"helpstep" => 12
+		"helpstep" => 13
 	),
 	"manageaccount" => array(
 		"label" => _L('Manage Users'),
@@ -539,7 +555,7 @@ _L('Security & Administrator Controls'),
 		"value" => $obj->getValue("manageaccount"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 12
+		"helpstep" => 13
 	),
 	"manageprofile" => array(
 		"label" => _L('Manage Profiles'),
@@ -547,7 +563,7 @@ _L('Security & Administrator Controls'),
 		"value" => $obj->getValue("manageprofile"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 12
+		"helpstep" => 13
 	),
 	"managesystem" => array(
 		"label" => _L('Manage System Settings'),
@@ -555,7 +571,7 @@ _L('Security & Administrator Controls'),
 		"value" => $obj->getValue("managesystem"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 12
+		"helpstep" => 13
 	),
 	"managesystemjobs" => array(
 		"label" => _L('Manage All %s', getJobsTitle()),
@@ -563,7 +579,7 @@ _L('Security & Administrator Controls'),
 		"value" => $obj->getValue("managesystemjobs"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 12
+		"helpstep" => 13
 	),
 	"managetasks" => array(
 		"label" => _L('Manage Data Imports'),
@@ -571,7 +587,7 @@ _L('Security & Administrator Controls'),
 		"value" => $obj->getValue("managetasks"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 12
+		"helpstep" => 13
 	),
 	"metadata" => array(
 		"label" => _L('Manage Field Definitions'),
@@ -579,7 +595,7 @@ _L('Security & Administrator Controls'),
 		"value" => $obj->getValue("metadata"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 12
+		"helpstep" => 13
 	),
 	"manageclassroommessaging" => array(
 		"label" => _L('Manage Classroom Data'),
@@ -587,16 +603,21 @@ _L('Security & Administrator Controls'),
 		"value" => $obj->getValue("manageclassroommessaging"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 12
+		"helpstep" => 13
 	)
 );
+
+$admin_helpsteps = array(
+	_L('This section contains options for top-level administrative functions such as creating users and managing system settings. You should only enable these features for top-level administrators.')
+	);
+
 
 $tai_formdata = array(
 _L('Talk About It Controls'),
 	"enabletaioptions" => array (
 		"label" => _L('Enable All'),
 		"control" => array("FormHtml", "html" => icon_button(_L('Enable All Talk About It Options'),"key",'checkAllTaiCheckboxes();')),
-		"helpstep" => 13
+		"helpstep" => 12
 	),
 	"taicansendanonymously" => array(
 		"label" => _L('Send Anonymously'),
@@ -604,7 +625,7 @@ _L('Talk About It Controls'),
 		"value" => $obj->getValue("tai_cansendanonymously"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 13
+		"helpstep" => 12
 	),
 	"taicanbetopicrecipient" => array(
 		"label" => _L('Topic Recipient'),
@@ -612,7 +633,7 @@ _L('Talk About It Controls'),
 		"value" => $obj->getValue("tai_canbetopicrecipient"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 13
+		"helpstep" => 12
 	),
 	"taicanforwardthread" => array(
 		"label" => _L('Forward Thread'),
@@ -620,7 +641,7 @@ _L('Talk About It Controls'),
 		"value" => $obj->getValue("tai_canforwardthread"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 13
+		"helpstep" => 12
 	),
 	"taicanusecannedresponses" => array(
 		"label" => _L('Use Canned Responses'),
@@ -628,7 +649,7 @@ _L('Talk About It Controls'),
 		"value" => $obj->getValue("tai_canusecannedresponses"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 13
+		"helpstep" => 12
 	),
 	"taicanrequestidentityreveal" => array(
 		"label" => _L('Request Identity Reveal'),
@@ -636,7 +657,7 @@ _L('Talk About It Controls'),
 		"value" => $obj->getValue("tai_canrequestidentityreveal"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 13
+		"helpstep" => 12
 	),
 	"taicanviewreports" => array(
 		"label" => _L('View Reports'),
@@ -644,7 +665,7 @@ _L('Talk About It Controls'),
 		"value" => $obj->getValue("tai_canviewreports"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 13
+		"helpstep" => 12
 	),
 	"taicanviewunreadmessagereport" => array(
 		"label" => _L('View Unread Message Reports'),
@@ -652,7 +673,7 @@ _L('Talk About It Controls'),
 		"value" => $obj->getValue("tai_canviewunreadmessagereport"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 13
+		"helpstep" => 12
 	),
 	"taicanmodifydisplayname" => array(
 		"label" => _L('Modify Display Name'),
@@ -660,7 +681,7 @@ _L('Talk About It Controls'),
 		"value" => $obj->getValue("tai_canmodifydisplayname"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 13
+		"helpstep" => 12
 	),
 	"taicanmanagenews" => array(
 		"label" => _L('Manage News'),
@@ -668,7 +689,7 @@ _L('Talk About It Controls'),
 		"value" => $obj->getValue("tai_canmanagenews"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 13
+		"helpstep" => 12
 	),
 	"taicanmanagetopics" => array(
 		"label" => _L('Manage Topics'),
@@ -676,7 +697,7 @@ _L('Talk About It Controls'),
 		"value" => $obj->getValue("tai_canmanagetopics"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 13
+		"helpstep" => 12
 	),
 	"taicanmanagecannedresponses" => array(
 		"label" => _L('Manage Canned Responses'),
@@ -684,7 +705,7 @@ _L('Talk About It Controls'),
 		"value" => $obj->getValue("tai_canmanagecannedresponses"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 13
+		"helpstep" => 12
 	),
 	"taicanmanagesurveys" => array(
 		"label" => _L('Manage Surveys'),
@@ -692,7 +713,7 @@ _L('Talk About It Controls'),
 		"value" => $obj->getValue("tai_canmanagesurveys"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 13
+		"helpstep" => 12
 	),
 	"taicanmanagelockouts" => array(
 		"label" => _L('Manage Lockouts'),
@@ -700,7 +721,7 @@ _L('Talk About It Controls'),
 		"value" => $obj->getValue("tai_canmanagelockouts"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 13
+		"helpstep" => 12
 	),
 	"taicanmanageactivationcodes" => array(
 		"label" => _L('Manage Activation Codes'),
@@ -708,39 +729,48 @@ _L('Talk About It Controls'),
 		"value" => $obj->getValue("tai_canmanageactivationcodes"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 13
+		"helpstep" => 12
 	)
 );
+
+$tai_helpsteps = array(
+	_L('This section is for Talk About It permissions'));
 
 $quicktip_formdata = array(
 	_L('QuickTip Controls'),
 	"taicanbetopicrecipient" => array(
 		"label" => _L('Topic Recipient'),
-		"fieldhelp" => _L('Allows users to TODO '),
+		"fieldhelp" => _L('Allows users to receive Quick Tip messages.'),
 		"value" => $obj->getValue("tai_canbetopicrecipient"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 13
+		"helpstep" => 12
 	),
 	"taicanmanagetopics" => array(
 		"label" => _L('Manage Topics'),
-		"fieldhelp" => _L('Allows users to TODO '),
+		"fieldhelp" => _L('Enables user to edit topic categories for Quick Tip messages.'),
 		"value" => $obj->getValue("tai_canmanagetopics"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 13
+		"helpstep" => 12
 	)
 );
 
+$quicktip_helpsteps = array(
+	_L('Use these options to configure how users with this profile may interact with the Quick Tip feature. You may give users permission to receive Quick Tip messages with the Topic Recipient option. Users may create or delete Quick Tip topics categories with the Manage Topics option.'));
 
 if (hasProduct('tai')) {
 	$formdata = array_merge($formdata, $tai_formdata);
+	$helpsteps = array_merge($helpsteps, $tai_helpsteps);
 }
 
 if (getSystemSetting("_hasquicktip", false)) {
 	$formdata = array_merge($formdata, $quicktip_formdata);
+	$helpsteps = array_merge($helpsteps, $quicktip_helpsteps);
 }
 
+$formdata = array_merge($formdata, $admin_formdata);
+$helpsteps = array_merge($helpsteps, $admin_helpsteps);
 
 //remove any formdata for features that are not enabled
 
@@ -776,21 +806,6 @@ if (!getSystemSetting('_hastwitter', false))
 if (!getSystemSetting('_hasfeed', false))
 	unset($formdata['feedpost']);
 
-$helpsteps = array (
-	_L('Enter a name and optional description for this Access Profile.'),
-	_L('Choose how you want users with this profile to be able to access the system. Then select whether they should be able to edit their own account information or not.'),
-	_L('Select whether or not this profile will display current job statistics on the start page.').'<br><br>'._L('You may also choose to display the shortcuts menu, allowing users to quickly access the most common tasks.'),
-	_L('Select the combination of messaging options most appropriate for the users of this profile. Click on the individual options for more information about their functions.'),
-	_L('Users can send one time jobs by default. This section allows you to enable repeating job and survey creation. You can also limit the number of days a job can run and allow users to change their Caller ID.'),
-	_L('This section determines whether the user can create and edit lists as well as the types of lists they can create. Enabling Create & Edit Lists does not allow users to contact people outside of their restrictions.').'<br><br>'._L('Uploading lists by ID number allows users to create lists of ID numbers, referencing contacts that exist in the database.').'<br><br>'._L('Uploading lists by contact data will let users create lists from CSV files containing any contact information, regardless of whether the contact exists in the database. This method allows users to contact anyone they upload to their address book.'),
-	_L('Select the object types the user can subscribe to or publish.'),
-	_L('Select the fields users should be able to see. They can use these fields for lists, messages, and reports. Leave everything blank to allow unlimited access.').'<br><br>'._L('You may also use this section to allow access to the Contacts Tab and allow users to edit contact details.'),
-	_L('Choose whether the user can create reports or not.'),
-	_L('Choose whether the user can monitor events like job sent and/or completed'),
-	_L('The options in this section control views of all of the activity in the system.'),
-	_L('This section contains options for top-level administrative functions such as creating users and managing system settings. You should only enable these features for top-level administrators.'),
-	_L('This section is for Talk About It permissions')
-);
 
 $buttons = array(submit_button(_L('Save'),"submit","tick"));
 $form = new Form("accessprofile",$formdata,$helpsteps,$buttons);
