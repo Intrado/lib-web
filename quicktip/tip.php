@@ -346,7 +346,7 @@ $uriParts 	= explode('/', $_SERVER['REQUEST_URI']); // ex /custname/quicktip/tip
 $custName 	= $uriParts[1];
 
 // get customer's root org id (used in API URL) from $_GET param
-$rootOrgId 	= isset($_GET['i']) ? $_GET['i'] : 0;
+$rootOrgId 	= isset($_GET['i']) ? $_GET['i'] : 'root;
 
 // define options hash to pass to Tip constructor for proper initialization of Tip instance
 $options = array(
