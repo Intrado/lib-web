@@ -158,6 +158,18 @@ function submit_button($name, $value = "submit", $icon = null) {
 	return $btn;
 }
 
+function submit_button_with_image($name, $value = "submit", $imagepath = null) {
+	$btn = '<button class="btn" type="submit" name="submit" value="'.escapehtml($value).'" onclick="return form_submit(event,\''.escapehtml($value).'\');"><span class="btn_wrap cf"><span class="btn_left"></span><span class="btn_middle">';
+	
+	if ($imagepath == null)
+		$btn .= '<img src="img/pixel.gif" alt="" height="16" width="1">';
+	else
+		$btn .= '<img src="'.$imagepath.'" alt="">';
+	$btn .= escapehtml($name) . '</span><span class="btn_right"></span></span></button>';
+	
+	return $btn;
+}
+
 function icon_button($name,$icon,$onclick = NULL, $href = NULL, $extrahtml = NULL) {
 	$autoid = $extrahtml == null ? ('id="' . autoID("icon_button", $name, $icon) . '"') : "";
 	$btn = '<button ' . $autoid . ' class="btn" type="button"';
