@@ -280,7 +280,7 @@ class TipSubmissionViewer extends PageForm {
 				</div>
 				<div class="modal-body">
 					<div id="tip-attachment-content">
-						<img id="attachment-image" src="viewimage.php?id=527" />
+						<img id="attachment-image" src="" />
 					</div>
 				</div>
 				<div class="modal-footer">
