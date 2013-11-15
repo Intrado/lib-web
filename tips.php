@@ -284,7 +284,7 @@ class TipSubmissionViewer extends PageForm {
 					</div>
 				</div>
 				<div class="modal-footer">
-					<a href="#" class="btn" data-dismiss="modal">Close</a>
+					<button type="button" class="btn" data-dismiss="modal">Close</button>
 				</div>
 			</div>';
 		echo $str;
