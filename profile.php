@@ -533,7 +533,7 @@ _L('Systemwide View Options'),
 	_L('Select the object types the user can subscribe to or publish.'),
 	_L('Select the fields users should be able to see. They can use these fields for lists, messages, and reports. Leave everything blank to allow unlimited access.').'<br><br>'._L('You may also use this section to allow access to the Contacts Tab and allow users to edit contact details.'),
 	_L('Choose whether the user can create reports or not.'),
-	_L('Choose whether the user can monitor events like job sent and/or completed'),
+	_L('Choose whether the user can monitor events like job sent and/or completed.'),
 	_L('The options in this section control views of all of the activity in the system.')
 );
 	
@@ -611,7 +611,7 @@ $admin_helpsteps = array(
 	_L('This section contains options for top-level administrative functions such as creating users and managing system settings. You should only enable these features for top-level administrators.')
 	);
 
-
+//Helpsteps in TAI and Quick Tip are set to 12 because the helpstep arrays for each section are merged such that these sections will be merged before the Admin section.
 $tai_formdata = array(
 _L('Talk About It Controls'),
 	"enabletaioptions" => array (
@@ -761,15 +761,18 @@ $quicktip_helpsteps = array(
 
 if (hasProduct('tai')) {
 	$formdata = array_merge($formdata, $tai_formdata);
+	//Puts these helpsteps at position 12.
 	$helpsteps = array_merge($helpsteps, $tai_helpsteps);
 }
 
 if (getSystemSetting("_hasquicktip", false)) {
 	$formdata = array_merge($formdata, $quicktip_formdata);
+	//Puts these helpsteps at position 12.
 	$helpsteps = array_merge($helpsteps, $quicktip_helpsteps);
 }
 
 $formdata = array_merge($formdata, $admin_formdata);
+//Puts these helpsteps at position 13.
 $helpsteps = array_merge($helpsteps, $admin_helpsteps);
 
 //remove any formdata for features that are not enabled

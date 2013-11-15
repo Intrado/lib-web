@@ -37,7 +37,7 @@ class ValRequireApprovedCallerID extends Validator {
 $formdata = array();
 $helpstepnum = 0;
 
-$helpsteps[$helpstepnum++] = _L("The default Caller ID number will be used in the following situations: <br><ul><li> There are no other Caller ID options. <li> The user has no selected a Caller ID from the optional Caller IDs. <li> The user's Access Profile allows him to overwrite the Caller ID.</ul>");
+$helpsteps[$helpstepnum++] = _L("The default Caller ID number will be used in the following situations: <br><ul><li> There are no other Caller ID options. <li> The user has not selected a Caller ID from the optional Caller IDs. <li> The user's Access Profile permits overwriting the Caller ID.</ul>");
 if (getSystemSetting('_hascallback', false)) {
 	$formdata["callerid"] = array(
 		"label" => _L("Default Caller ID Number"),

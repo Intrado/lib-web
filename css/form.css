@@ -64,7 +64,7 @@ border-color: transparent #ccc transparent transparent; border-width: 10px; bord
 border-color: transparent #f0f0f0 transparent transparent; border-width: 10px; border-style: solid; }
 
 .helper .helpercontent { background: #f0f0f0; height: 150px; padding: 0 7px; font-size: 1em; font-family: sans-serif; line-height:1.3em; overflow: auto; border-right: 1px solid #ccc; border-left: 1px solid #ccc; }
-.helper .helpercontent ul { padding-left: 1.2em; margin-left: 0px; }
+.helper .helpercontent ul { padding-left: 1.5em; margin-left: 0px; list-style-type: disc;}
 .helper .helpercontent p { margin: 0 0 4px 0; font-size: 1em; line-height:1.3em;}
 .helper .info { padding-top: .4em; font-size: .9em; text-align: center; }
 
