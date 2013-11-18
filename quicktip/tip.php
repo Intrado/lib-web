@@ -18,6 +18,7 @@ mb_internal_encoding('UTF-8');
 
 class TipSubmissionHandler {
 	
+	private $productName;
 	private $rootOrgId;
 	private $customerName;
 	private $customerDataURL;
@@ -59,6 +60,9 @@ class TipSubmissionHandler {
 			// fetch customer data via curl GET request to customer's quicktip API endpoint
 			$this->customerData = json_decode($this->fetchCustomerData());
 			
+			// set the product name, ex SchoolMessenger
+			$this->productName = $this->customerData->productName;
+
 			if (!isset($this->message)) {
 				// build up the Organization and Category (topic) combos
 				$this->setOrganizations($this->customerData->organizations);
@@ -101,7 +105,7 @@ class TipSubmissionHandler {
 		$name = '';
 		foreach ($arr as $k => $obj) {
 			if ($obj->id == $id) {
-				return $obj->name;
+				return $this->escapeHtml($obj->name);
 			}
 		}
 		return $name;
@@ -116,7 +120,7 @@ class TipSubmissionHandler {
  	public function setSelectOptions($arrayOfObjects) {
 		$html = '';
 		foreach ($arrayOfObjects as $k => $obj) {
-			$html .= '<option value="'.$obj->id.'">'.$obj->name.'</option>';
+			$html .= '<option value="'.$obj->id.'">'.$this->escapeHtml($obj->name).'</option>';
 		}
 		return $html;
  	}
@@ -131,7 +135,7 @@ class TipSubmissionHandler {
  	 */
  	public function renderTipForm() {
  		$html = '
- 			<div class="alert"><strong>SchoolMessenger Quick Tip allows you to submit an anonymous tip to school and district officials.</strong>
+ 			<div class="alert"><strong>'.$this->productName.' Quick Tip allows you to submit an anonymous tip to school and district officials.</strong>
 				Please select the appropriate organization and category when submitting your tip.
 				<div class="text-danger call911">If this is an emergency, please call 911.</div>
 			</div>
@@ -308,14 +312,14 @@ class TipSubmissionHandler {
 		<html lang="en">
 			<head>
 				<meta charset="utf-8">
-				<title>Quick Tip - '. ((isset($this->message)) ? 'Thank You for the Tip!' : 'Submit an Annoymous Tip') .' - Powered by SchoolMessenger</title>
+				<title>Quick Tip - '. ((isset($this->message)) ? 'Thank You for the Tip!' : 'Submit an Annoymous Tip') .' - Powered by '.$this->productName.'</title>
 				<link rel="stylesheet" type="text/css" href="tip.css">
 			</head>
 			<body>		
 				<div id="tip-container">
 					<div id="mask" class="hide"></div>
 					<div class="tip-chat"></div>
-					<h1>SchoolMessenger Quick Tip</h1>
+					<h1>'.$this->productName.' Quick Tip</h1>
 					<div id="tip-orgname-label">'. $this->customerData->customerName .' </div>';
 
 					if (isset($this->message)) {
