@@ -75,7 +75,7 @@ if ((getSystemSetting('_hasportal', false) && $USER->authorize('portalaccess') &
 	($USER->authorize('manageclassroommessaging') && getSystemSetting('_hastargetedmessage')) ||
 	($USER->authorize('managesystem') && getSystemSetting("_hasfacebook")) ||
 	($USER->authorize('managesystem') && getSystemSetting("_hasfeed")) ||
-	(getSystemSetting('_hasquicktip', false) && $USER->authorize("tai_canmanagetopics"))) {
+	($USER->authorize('managesystem') && getSystemSetting('_hasquicktip', false) && $USER->authorize("tai_canmanagetopics"))) {
 
 	$headers[] = _L("Features");
 	
