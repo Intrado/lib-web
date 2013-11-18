@@ -157,8 +157,10 @@ class TipSubmissionViewer extends PageForm {
 		);
 
 		$this->tableCellFormatters = array(
-			"2" => "fmt_tip_message",
 			"3" => "fmt_attachment",
+			"2" => "fmt_tip_message",
+			"0" => "fmt_escapehtml",
+			"1" => "fmt_escapehtml",
 			"6" => "fmt_nbr_date",
 			"7" => "fmt_contact_info"
 		);
@@ -173,9 +175,9 @@ class TipSubmissionViewer extends PageForm {
 	}
 
 	// @override
-	function load() {
+	function load(TipSearchForm $form = null) {
 		$this->doSearchQuery();
-		$this->form = new TipSearchForm($this->options['formname'], $this->options);
+		$this->form = (isset($form)) ? $form : new TipSearchForm($this->options['formname'], $this->options);
 		$this->form->ajaxsubmit = false;
 	}
 
@@ -299,7 +301,7 @@ class TipSubmissionViewer extends PageForm {
 // formats Tip Message with a truncated text at 140 chars max,
 // and a 'Read More' link, which shows the full message if clicked
 function fmt_tip_message ($row, $index) {
-	$txt = fmt_null($row, $index);
+	$txt = fmt_null($row, $index); // returns 'html escaped string'
 	$max = 140;
 	if (strlen($txt) > $max) {
 		$s  = '<span class="tip-message-trimmed">"' . substr($txt, 0, $max - 3) . '..." ';
@@ -329,29 +331,37 @@ function fmt_attachment ($row, $index) {
 
 function fmt_contact_info ($row, $index) {
 	$str  = '';
-	$hasFirst = isset($row[$index]) && strlen($row[$index]) > 0;
-	$hasLast  = isset($row[$index+1]) && strlen($row[$index+1]) > 0;
-	$hasEmail = isset($row[$index+2]) && strlen($row[$index+2]) > 0;
-	$hasPhone = isset($row[$index+3]) && strlen($row[$index+3]) > 0;
+
+	// get the individual contact fields in the row (and html escape them)
+	$first = (isset($row[$index])) 	   ? escapehtml($row[$index]) 	  : null;
+	$last  = (isset($row[$index + 1])) ? escapehtml($row[$index + 1]) : null;
+	$email = (isset($row[$index + 2])) ? escapehtml($row[$index + 2]) : null;
+	$phone = (isset($row[$index + 3])) ? escapehtml($row[$index + 3]) : null;
+
+	// check for existence (to determine if/how we display them)
+	$hasFirst = isset($first) && strlen($first) > 0;
+	$hasLast  = isset($last)  && strlen($last)  > 0;
+	$hasEmail = isset($email) && strlen($email) > 0;
+	$hasPhone = isset($phone) && strlen($phone) > 0;
 
 	if ($hasFirst || $hasLast || $hasEmail || $hasPhone) {
 		$str .= '<a href="#" class="tip-view-contact">View</a>';
 		$str .= '<span class="tip-contact-details" style="display:none">';
 		if ($hasFirst && $hasLast) {
-			$str .= '<div>Name:&nbsp;'.$row[$index].' '.$row[$index+1].'</div>';
+			$str .= '<div>Name:&nbsp;'.$first.' '.$last.'</div>';
 		}
 		else if ($hasFirst && !$hasLast) {
-			$str .= '<div>First&nbsp;Name:&nbsp;'.$row[$index].'</div>';
+			$str .= '<div>First&nbsp;Name:&nbsp;'.$first.'</div>';
 		}
 		else if (!$hasFirst && $hasLast) {
-			$str .= '<div>Last&nbsp;Name:&nbsp;'.$row[$index+1].'</div>';
+			$str .= '<div>Last&nbsp;Name:&nbsp;'.$last.'</div>';
 		}
 
 		if ($hasEmail) {
-			$str .= '<div>Email:&nbsp;'.$row[$index+2].'</div>';
+			$str .= '<div>Email:&nbsp;'.$email.'</div>';
 		}
 		if ($hasPhone) {
-			$str .= '<div>Phone:&nbsp;'.$row[$index+3].'</div>';
+			$str .= '<div>Phone:&nbsp;'.$phone.'</div>';
 		}
 		$str .= '</span>';
 	}
