@@ -62,10 +62,6 @@ function fmt_obj_email ($obj,$name) {
 		return $txt;
 }
 
-function fmt_escapehtml ($row, $index) {
-	return escapehtml($row[$index]);
-}
-
 function fmt_null ($row,$index) {
 	if (isset($row[$index]))
 		return escapehtml($row[$index]);
