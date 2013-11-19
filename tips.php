@@ -29,11 +29,13 @@ class TipSearchForm extends Form {
 
 	var $options;
 
-	function __construct($name, $options) {
+	function __construct($name, $options = array()) {
 		if (isset($options)) {
 			$this->options = $options;
 			$this->setFormData();
-			parent::Form($name, $this->formdata, null, array( submit_button_with_image(_L(' Search Tips'), 'search', 'img/pictos-search.png')));
+			if (isset($this->formdata)) {
+				parent::Form($name, $this->formdata, null, array( submit_button_with_image(_L(' Search Tips'), 'search', 'img/pictos-search.png')));
+			}
 		}
 	}
 
@@ -121,14 +123,13 @@ class TipSubmissionViewer extends PageForm {
 	var $pagingStart = 0;
 	var $pagingLimit = 30;
 	var $ajaxsubmit = false;
-	var $searchQuery;
 	var $options;
 	var $tableColumnHeadings;
 	var $tableCellFormatters;
 	var $tipData = array();
 	var $total;
 
-	function __construct($options) {
+	function __construct($options = array()) {
 		if (isset($options)) {
 			$this->options = $options;
 			parent::PageBase($options);
@@ -148,21 +149,25 @@ class TipSubmissionViewer extends PageForm {
 		$this->options["page"]  = "notifications:tips";
 
 		$this->tableColumnHeadings = array(
-			"3" => _L('<div class="attachment"></div>'),
+			"3" => _L("Attachment"), 
 			"2" => _L('Message'),
 			"0" => _L('Organization'),
 			"1" => _L('Category'),
-			"6" => _L('Date <div id="carat"></div>'),
-			"7" => _L('Contact&nbsp;Info')
+			"6" => _L('Date'), 
+			"7" => _L('Contact Info')
 		);
 
 		$this->tableCellFormatters = array(
 			"3" => "fmt_attachment",
 			"2" => "fmt_tip_message",
-			"0" => "fmt_escapehtml",
-			"1" => "fmt_escapehtml",
 			"6" => "fmt_nbr_date",
 			"7" => "fmt_contact_info"
+		);
+
+		$this->tableColumnHeadingFormatters = array(
+			"3" => "fmt_attach_col_heading",
+			"6" => "fmt_date_col_heading",
+			"7" => "fmt_contactinfo_col_heading",
 		);
 	}
 
@@ -175,9 +180,9 @@ class TipSubmissionViewer extends PageForm {
 	}
 
 	// @override
-	function load(TipSearchForm $form = null) {
+	function load() {
 		$this->doSearchQuery();
-		$this->form = (isset($form)) ? $form : new TipSearchForm($this->options['formname'], $this->options);
+		$this->form = new TipSearchForm($this->options['formname'], $this->options);
 		$this->form->ajaxsubmit = false;
 	}
 
@@ -206,25 +211,21 @@ class TipSubmissionViewer extends PageForm {
 		
 		// Tip Submissions table
 		echo '<table id="tips-table" width="100%" cellpadding="3" cellspacing="1" class="list" style="margin-top:15px;">';
-		showTable($this->tipData, $this->tableColumnHeadings, $this->tableCellFormatters, array(), NULL, false);
+		showTable($this->tipData, $this->tableColumnHeadings, $this->tableCellFormatters, array(), NULL, $this->tableColumnHeadingFormatters);
 		echo "</table>";
 
-		// only show bottom pager if there's more than 30 rows
-		if ($this->total > 30) {
+		// only show bottom pager if there's more than 30 ($this->pagingLimit) rows
+		if ($this->total > $this->pagingLimit) {
 			showPageMenu($this->total, $this->pagingStart, $this->pagingLimit);
 		}
 
-		endWindow();
+		endWindow(); 
 		echo '<script src="script/tips.js"></script>';
 		$this->createAttachmentViewerModal();
 	}
 
-	function setPagingStart($pagestart) {
-		$this->pagingStart = 0 + $pagestart;
-	}
-
-	function doSearchQuery() {
-		$this->searchQuery = "
+	function getQueryString() {
+		$query = "
 			SELECT SQL_CALC_FOUND_ROWS o.orgkey, tai_topic.name, tm.body, tma.filename, tma.size, tma.contentid, from_unixtime(tm.modifiedtimestamp) as date1, 
 					u.firstname, u.lastname, u.email, u.phone FROM tai_message tm 
 			INNER JOIN tai_thread tt on (tm.threadid = tt.id) 
@@ -235,8 +236,8 @@ class TipSubmissionViewer extends PageForm {
 			WHERE 1 ";
 
 		// include user org/category search params, if any
-		$this->searchQuery .= isset($this->options['orgid']) && $this->options['orgid'] > 0 ? ' AND o.id = ' . $this->options['orgid'] . ' ' : '';
-		$this->searchQuery .= isset($this->options['categoryid']) && $this->options['categoryid'] > 0 ?	' AND tai_topic.id = ' . $this->options['categoryid'] . ' ' : '';
+		$query .= isset($this->options['orgid']) && $this->options['orgid'] > 0 ? ' AND o.id = ' . $this->options['orgid'] . ' ' : '';
+		$query .= isset($this->options['categoryid']) && $this->options['categoryid'] > 0 ?	' AND tai_topic.id = ' . $this->options['categoryid'] . ' ' : '';
 
 		$datesql = $startdate = $enddate = ' ';
 
@@ -259,11 +260,15 @@ class TipSubmissionViewer extends PageForm {
 			$datesql = " AND Date(from_unixtime(tm.modifiedtimestamp)) = CURDATE()";
 			$enddate = $startdate = date("Y-m-d", time());
 		}
-		$this->searchQuery .= $datesql;
-		$this->searchQuery .= " ORDER BY date1 desc limit " . $this->pagingStart .",". $this->pagingLimit;
+		$query .= $datesql;
+		$query .= " ORDER BY date1 desc limit " . $this->pagingStart .",". $this->pagingLimit;
 
-		// do the query now that the query string is ready
-		$tipQueryResult = Query($this->searchQuery);
+		return $query;
+
+	}
+
+	function doSearchQuery() {
+		$tipQueryResult = Query($this->getQueryString());
 
 		while ($row = DBGetRow($tipQueryResult)) {
 			$this->tipData[] = $row;
@@ -271,7 +276,10 @@ class TipSubmissionViewer extends PageForm {
 		
 		// get total row count for pager
 		$this->total = QuickQuery("select FOUND_ROWS()");
+	}
 
+	function setPagingStart($pagestart) {
+		$this->pagingStart = 0 + $pagestart;
 	}
 
 	function createAttachmentViewerModal() {
@@ -367,6 +375,20 @@ function fmt_contact_info ($row, $index) {
 	}
 		
 	return $str;
+}
+
+// table column heading <th> formatters
+function fmt_attach_col_heading() {
+	return '<div class="attachment"></div>';
+}
+
+function fmt_date_col_heading() {
+	return _L('Date') . ' <div id="carat"></div>';
+}
+
+function fmt_contactinfo_col_heading() {
+	// non-breaking so it doesn't wrap on 2 lines
+	return _L('Contact'). '&nbsp;'. _L('Info'); 
 }
 
 // Initialize SESSION['tips'] data and handle request params;
