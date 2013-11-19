@@ -21,18 +21,29 @@ if($REQUEST_TYPE == "new") {
 		<? if($easycall->hasExtension()) { ?>
 			<message name="extensionintro">
 				<field name="dummy" type="menu" timeout="2000">
-					<prompt repeat="2">
-						<tts>Hello, Please direct this call to extension</tts>
+					<prompt repeat="3">
+					<? switch (getCustomerSystemSetting('_productname')) {
+						case "AutoMessenger":?>
+							<audio cmid="file://prompts/IntroExtensionAm.wav" />
+							<? break;
+						case "Skylert":?>
+							<audio cmid="file://prompts/IntroExtensionSl.wav" />
+							<? break;
+						default: ?>
+							<audio cmid="file://prompts/IntroExtensionSm.wav" />
+					<? } ?>
 
-						<? foreach($easycall->extensionDigits() as $digit) { ?>
-							<audio cmid="file://prompts/inbound/<?= $digit ?>.wav" />
-						<? } ?>
+						<audio cmid="file://prompts/IntroExtesionPt2.wav" />
 
-						<? foreach($easycall->extensionDigits() as $digit) { ?>
-							<audio cmid="file://prompts/dtmf/<?= $digit ?>.wav" />
-						<? } ?>
+					<? foreach($easycall->extensionDigits() as $digit) { ?>
+						<audio cmid="file://prompts/inbound/<?= $digit ?>.wav" />
+					<? } ?>
 
-						<tts>If this is the correct extension, press 1 and follow the prompts to record your message.</tts>
+					<? foreach($easycall->extensionDigits() as $digit) { ?>
+						<audio cmid="file://prompts/dtmf/<?= $digit ?>.wav" />
+					<? } ?>
+
+						<audio cmid="file://prompts/Intro2.wav" />
 					</prompt>
 
 					<choice digits="1">
