@@ -21,7 +21,11 @@ $CUSTOMERURL = strtolower(substr($CUSTOMERURL,0,strpos($CUSTOMERURL,"/")));
 $BASEURL = "/$CUSTOMERURL";
 
 require_once("{$incdir}/utils.inc.php");
-require_once("{$incdir}/db.inc.php");
+// If PHPUNIT is NOT running
+if (! defined('PHPUNIT')) {
+	// db.inc.php's library functions  will be stubbed out in PHPUnit context
+	require_once("{$incdir}/db.inc.php");
+}
 require_once("{$incdir}/memcache.inc.php");
 
 // If PHPUNIT is NOT running
