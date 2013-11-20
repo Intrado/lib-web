@@ -2206,3 +2206,23 @@ ALTER TABLE `event` ADD INDEX ( `userid` )
 $$$
 -- END 10.0/2
 
+-- START 10.0/3
+update setting set value='10.0/3' where name='_dbversion'
+$$$
+
+CREATE TABLE IF NOT EXISTS `burst` (
+  `id` int(11) NOT NULL auto_increment,
+  `userid` int(11) NOT NULL,
+  `contentid` bigint(20),
+  `name` varchar(50) NOT NULL default '',
+  `status` enum('new','mapped','sent') NOT NULL default 'new',
+  `filename` varchar(255) NOT NULL default '',
+  `bytes` bigint(20),
+  `deleted` tinyint(4) NOT NULL default '0',
+  PRIMARY KEY  (`id`),
+  KEY `id` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
+
+-- END 10.0/3
+
