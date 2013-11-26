@@ -19,20 +19,22 @@ if (!$custdb) {
 }
 
 
-// index 0 is type
-// index 1 is messagegroupid
+// index 0 is name
+// index 1 is burst_template.id
 function fmt_actions($row, $index) {
 	global $currentid;
-	$url =  '<a href="editbursttemplate.php?cid=' . $currentid . '&id=' . $row[1] . '" title="Edit"><img src="mimg/s-edit.png" border=0></a>&nbsp;' ;
+	$url =  '<a href="bursttemplateedit.php?cid=' . $currentid . '&id=' . $row[1] . '" title="Edit"><img src="mimg/s-edit.png" border=0></a>&nbsp;' ;
 	return $url;
 }
 
-$TITLE = 'Customer Templates';
+$TITLE = 'PDF Burst Templates';
 $PAGE = 'commsuite:customers';
 
 include_once("nav.inc.php");
 
 startWindow(_L('Edit PDF Burst Templates for Customer: ' . $custinfo[3]));
+
+echo "<div style='padding:10px'>" . icon_button("Add PDF Template", "add",false,"bursttemplateedit.php?cid={$currentid}&id=new") . "</div><br />\n";
 
 ?>
 <table class="list sortable" id="customer_templates_table">
