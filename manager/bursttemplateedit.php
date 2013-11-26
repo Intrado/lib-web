@@ -33,6 +33,19 @@ if (isset($_GET['id'])) {
 
 $bursttemplateid = isset($_SESSION['bursttemplateid'])?$_SESSION['bursttemplateid']:false;
 
+// Make sure cid is set in the session because we need to change to that customer's database...
+if (! isset($_SESSION['bursttemplatecid'])) {
+	exit(_L('Missing customer id'));
+}
+
+$bursttemplatecid = $_SESSION['bursttemplatecid'];
+$custinfo = QuickQueryRow("select s.dbhost, c.dbusername, c.dbpassword, c.urlcomponent from customer c inner join shard s on (c.shardid = s.id) where c.id = '{$bursttemplatecid}'");
+$custdb = DBConnect($custinfo[0], $custinfo[1], $custinfo[2], "c_{$bursttemplatecid}");
+if (! $custdb) {
+	exit("Connection failed for customer: $custinfo[0], db: c_{$bursttemplatecid}");
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // Optional Form Items And Validators
 ////////////////////////////////////////////////////////////////////////////////
@@ -113,9 +126,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		Query("BEGIN");
 		
 		//save data here	
-		$managerquery->name = $postdata["name"];
-		$managerquery->x = $postdata["coordx"];
-		$managerquery->y = $postdata["coordy"];
+		$bursttemplate->name = $postdata["name"];
+		$bursttemplate->x = $postdata["coordx"];
+		$bursttemplate->y = $postdata["coordy"];
 
 		if ($bursttemplateid)
 			$bursttemplate->update();
@@ -124,9 +137,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
 		Query("COMMIT");
 		if ($ajax)
-			$form->sendTo("bursttemplates.php?cid={$_SESSION['bursttemplatecid']}");
+			$form->sendTo("bursttemplates.php?cid={$bursttemplatecid}");
 		else
-			redirect("bursttemplates.php?cid={$_SESSION['bursttemplatecid']}");
+			redirect("bursttemplates.php?cid={$bursttemplatecid}");
 	}
 }
 

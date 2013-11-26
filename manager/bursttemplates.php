@@ -5,11 +5,9 @@ require_once("../inc/html.inc.php");
 require_once("../inc/table.inc.php");
 require_once("../inc/utils.inc.php");
 
-if (!$MANAGERUSER->authorized("edittemplate"))
-	exit("Not Authorized");
+//if (!$MANAGERUSER->authorized("edittemplate")) exit("Not Authorized");
 
-if (!isset($_GET['cid']))
-	exit("Missing customer id");
+if (! isset($_GET['cid'])) exit("Missing customer id");
 
 $currentid = $_GET['cid'] + 0;
 $custinfo = QuickQueryRow("select s.dbhost, c.dbusername, c.dbpassword, c.urlcomponent from customer c inner join shard s on (c.shardid = s.id) where c.id = '$currentid'");
