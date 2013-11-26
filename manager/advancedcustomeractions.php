@@ -48,6 +48,8 @@ startWindow(_L('Advanced Customer Actions for customer: ' . $custurl));
 <li><a href="querylist.php?cid=<?=$cid?>">Run Queries</a></li>
 <? } ?>
 
+<li><a href="bursttemplates.php?cid=<?=$cid?>">PDF Bursting Templates</a></li>
+
 </ul>
 <?
 endWindow();
