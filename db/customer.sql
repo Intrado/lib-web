@@ -2209,7 +2209,6 @@ $$$
 -- START 10.0/3
 update setting set value='10.0/3' where name='_dbversion'
 $$$
-
 CREATE TABLE IF NOT EXISTS `burst` (
   `id` int(11) NOT NULL auto_increment,
   `userid` int(11) NOT NULL,
@@ -2223,6 +2222,21 @@ CREATE TABLE IF NOT EXISTS `burst` (
   KEY `id` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
-
 -- END 10.0/3
+
+-- START 10.0/4
+update setting set value='10.0/4' where name='_dbversion'
+$$$
+CREATE TABLE IF NOT EXISTS `burst_template` (
+  `id` int(11) NOT NULL auto_increment,
+  `name` varchar(100) NOT NULL default '',
+  `x` double(12,8),
+  `y` double(12,8),
+  `created` datetime,
+  `deleted` tinyint(4) NOT NULL default '0',
+  PRIMARY KEY  (`id`),
+  KEY `id` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
+-- END 10.0/4
 
