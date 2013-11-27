@@ -18,7 +18,7 @@ if (!$custdb) {
 
 if (isset($_GET['deleteid'])) {
 	$deleteid = intval($_GET['deleteid']);
-	Query("update burst_template set deleted=1 where id='{$deleteid}';", $custdb);
+	Query("update bursttemplate set deleted=1 where id='{$deleteid}';", $custdb);
 }
 
 
@@ -45,7 +45,7 @@ echo "<div style='padding:10px'>" . icon_button("Add PDF Template", "add",false,
 <table class="list sortable" id="customer_templates_table">
 <?
 	$templates = array();
-	$result = Query("select name, id from burst_template where not deleted order by name", $custdb);
+	$result = Query("select name, id from bursttemplate where not deleted order by name", $custdb);
 	if (is_object($result)) {
 		while ($row = DBGetRow($result)) {
 			$templates[] = $row;
