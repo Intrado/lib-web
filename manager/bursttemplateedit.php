@@ -21,7 +21,6 @@ require_once("../obj/BurstTemplate.obj.php");
 if (isset($_GET['cid'])) {
 	$_SESSION['bursttemplatecid'] = intval($_GET['cid']);
 }
-$_SESSION['bursttemplateid'] = null;
 if (isset($_GET['id'])) {
 	if ($_GET['id'] === "new") {
 		$_SESSION['bursttemplateid'] = null;
@@ -31,7 +30,7 @@ if (isset($_GET['id'])) {
 	redirect();
 }
 
-$bursttemplateid = isset($_SESSION['bursttemplateid'])?$_SESSION['bursttemplateid']:false;
+$bursttemplateid = isset($_SESSION['bursttemplateid']) ? $_SESSION['bursttemplateid'] : false;
 
 // Make sure cid is set in the session because we need to change to that customer's database...
 if (! isset($_SESSION['bursttemplatecid'])) {
@@ -55,10 +54,10 @@ if (! $custdb) {
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
 
-// If a query ID was specified
+// If a burst template ID was specified
 if ($bursttemplateid) {
-	// Load up the query we want
-	$bursttemplate = DBFind("BurstTemplate", "from bursttemplate where id=?", false, array($bursttemplateid));
+	// Load up the one we want
+	$bursttemplate = DBFind("BurstTemplate", "from burst_template where id=?", false, array($bursttemplateid), $custdb);
 } else {
 	// Otherwise we're going to create a new query, so start a blank one
 	$bursttemplate = new BurstTemplate();
@@ -100,7 +99,7 @@ $formdata["coordy"] = array(
 
 $buttons = array(
 	submit_button(_L('Save'),"submit","tick"),
-	icon_button(_L('Cancel'),"cross",null,"bursttemplates.php")
+	icon_button(_L('Cancel'),"cross",null,"bursttemplates.php?cid={$bursttemplatecid}")
 );
 $form = new Form("bursttemplateedit", $formdata, false, $buttons);
 
@@ -123,6 +122,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 	}
 	else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
+
+		global $_dbcon;
+		$savedbcon = $_dbcon;
+		$_dbcon = $custdb;
+
 		Query("BEGIN");
 		
 		//save data here	
@@ -137,7 +141,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
 		Query("COMMIT");
 		if ($ajax)
-			$form->sendTo("bursttemplates.php?cid={$bursttemplatecid}");
+			$form->sendTo("bursttemplates.php?cid={$bursttemplatecid}&id={$bursttemplate->id}");
 		else
 			redirect("bursttemplates.php?cid={$bursttemplatecid}");
 	}

@@ -10,8 +10,9 @@ class BurstTemplate extends DBMappedObject {
 
 	function BurstTemplate ($id = NULL) {
 		$this->_allownulls = true;
-		$this->_tablename = "bursttemplate";
-		$this->_fieldlist = array("name", "x", "y", "created", "deleted");
+		$this->_tablename = "burst_template";
+		//$this->_fieldlist = array("name", "x", "y", "created", "deleted");
+		$this->_fieldlist = array("name", "x", "y");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}
