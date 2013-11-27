@@ -2240,3 +2240,24 @@ CREATE TABLE IF NOT EXISTS `burst_template` (
 $$$
 -- END 10.0/4
 
+
+-- START 10.0/5
+update setting set value='10.0/5' where name='_dbversion'
+$$$
+RENAME TABLE burst_template TO bursttemplate
+$$$
+
+ALTER TABLE burst
+ADD COLUMN `bursttemplateid`    INT(11),
+ADD COLUMN `uploaddatems`       BIGINT(20) NOT NULL,
+ADD COLUMN `pagesskipstart`     INT(3)     NOT NULL DEFAULT 0,
+ADD COLUMN `pagesskipend`       INT(3)     NOT NULL DEFAULT 0,
+ADD COLUMN `pagesperreport`     INT(3)     NOT NULL DEFAULT 1,
+ADD COLUMN `totalpagesfound`    INT(6),
+ADD COLUMN `actualreportscount` INT(6)
+$$$
+
+drop INDEX `id` ON burst
+$$$
+
+-- END 10.0/5

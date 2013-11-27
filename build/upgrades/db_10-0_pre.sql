@@ -30,3 +30,20 @@ CREATE TABLE IF NOT EXISTS `burst_template` (
   KEY `id` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
+
+-- $rev 5
+RENAME TABLE burst_template TO bursttemplate
+$$$
+
+ALTER TABLE burst
+ADD COLUMN `bursttemplateid`    INT(11),
+ADD COLUMN `uploaddatems`       BIGINT(20) NOT NULL,
+ADD COLUMN `pagesskipstart`     INT(3)     NOT NULL DEFAULT 0,
+ADD COLUMN `pagesskipend`       INT(3)     NOT NULL DEFAULT 0,
+ADD COLUMN `pagesperreport`     INT(3)     NOT NULL DEFAULT 1,
+ADD COLUMN `totalpagesfound`    INT(6),
+ADD COLUMN `actualreportscount` INT(6)
+$$$
+
+drop INDEX `id` ON burst
+$$$
