@@ -16,13 +16,20 @@ if (!$custdb) {
 	exit("Connection failed for customer: $custinfo[0], db: c_$currentid");
 }
 
+if (isset($_GET['deleteid'])) {
+	$deleteid = intval($_GET['deleteid']);
+	Query("update burst_template set deleted=1 where id='{$deleteid}';", $custdb);
+}
+
+
 
 // index 0 is name
 // index 1 is burst_template.id
 function fmt_actions($row, $index) {
 	global $currentid;
-	$url =  '<a href="bursttemplateedit.php?cid=' . $currentid . '&id=' . $row[1] . '" title="Edit"><img src="mimg/s-edit.png" border=0></a>&nbsp;' ;
-	return $url;
+	$src =  '<a href="bursttemplateedit.php?cid=' . $currentid . '&id=' . $row[1] . '" title="Edit"><img src="mimg/s-edit.png" border=0></a>&nbsp;' ;
+	$src .=  '<a href="?cid=' . $currentid . '&deleteid=' . $row[1] . '" title="Delete"><img src="mimg/cross.png" border=0></a>&nbsp;' ;
+	return $src;
 }
 
 $TITLE = 'PDF Burst Templates';
@@ -38,7 +45,7 @@ echo "<div style='padding:10px'>" . icon_button("Add PDF Template", "add",false,
 <table class="list sortable" id="customer_templates_table">
 <?
 	$templates = array();
-	$result = Query("select name, id from burst_template order by name", $custdb);
+	$result = Query("select name, id from burst_template where not deleted order by name", $custdb);
 	if (is_object($result)) {
 		while ($row = DBGetRow($result)) {
 			$templates[] = $row;
