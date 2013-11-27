@@ -57,7 +57,7 @@ if (! $custdb) {
 // If a burst template ID was specified
 if ($bursttemplateid) {
 	// Load up the one we want
-	$bursttemplate = DBFind("BurstTemplate", "from burst_template where id=?", false, array($bursttemplateid), $custdb);
+	$bursttemplate = DBFind("BurstTemplate", "from bursttemplate where id = ? and not deleted", false, array($bursttemplateid), $custdb);
 } else {
 	// Otherwise we're going to create a new query, so start a blank one
 	$bursttemplate = new BurstTemplate();
