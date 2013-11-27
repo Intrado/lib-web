@@ -10,7 +10,8 @@ class BurstTemplate extends DBMappedObject {
 
 	function BurstTemplate ($id = NULL) {
 		$this->_allownulls = true;
-		$this->_tablename = "burst_template";
+		$this->_tablename = "bursttemplate";
+		// TODO - how do you handle assignments to a function in SQL using DBMO such as '... created = NOW() ...'
 		//$this->_fieldlist = array("name", "x", "y", "created", "deleted");
 		$this->_fieldlist = array("name", "x", "y");
 		//call super's constructor
