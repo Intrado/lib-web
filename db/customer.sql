@@ -2260,4 +2260,7 @@ $$$
 drop INDEX `id` ON burst
 $$$
 
+drop INDEX `id` ON bursttemplate
+$$$
+
 -- END 10.0/5

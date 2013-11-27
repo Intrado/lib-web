@@ -47,3 +47,6 @@ $$$
 
 drop INDEX `id` ON burst
 $$$
+
+drop INDEX `id` ON bursttemplate
+$$$
