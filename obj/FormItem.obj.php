@@ -425,13 +425,13 @@ class ReldateOptions extends FormItem {
 		$selectbox .= "</select>";
 
 		$xdaysValue = isset($data['xdays']) ? $data['xdays'] : $defaultxdays;
-		$xdaysChange = "$(\"$n\").value = Object.toJSON({\"reldate\":$(\"{$n}_reldate\").value, \"xdays\":this.value});";
-		$xdays = _L("Days: ") . "<input type='text' size='3' id='{$n}_xdays' value='$xdaysValue' onclick='$xdaysChange' onfocus='$xdaysChange' onblur='$xdaysChange' onchange='$xdaysChange'/>";
+		$xdaysChange = "$(\"$n\").value = Object.toJSON({\"reldate\":$(\"{$n}_reldate\").value, \"xdays\":this.value}); form_do_validation($(\"{$this->form->name}\"), $(\"$n\"))";
+		$xdays = _L("Days: ") . "<input type='text' size='3' id='{$n}_xdays' value='".escapehtml($xdaysValue)."' onblur='$xdaysChange' onchange='$xdaysChange'/>";
 
 		$startdateValue = !empty($data['startdate']) ? $data['startdate'] : '';
 		$enddateValue = !empty($data['enddate']) ? $data['enddate'] : '';
-		$dateboxes = _L("From: ") . "<input id='{$n}_startdate' value='$startdateValue' type='text' size='20' onblur='{$n}_datechange()' onchange='{$n}_datechange()' onfocus='{$n}_datepick(this);' />";
-		$dateboxes .= _L("To: ") . "<input id='{$n}_enddate' value='$enddateValue' type='text' size='20' onblur='{$n}_datechange()' onchange='{$n}_datechange()' onfocus='{$n}_datepick(this);' />";
+		$dateboxes = _L("From: ") . "<input id='{$n}_startdate' value='".escapehtml($startdateValue)."' type='text' size='20' onblur='{$n}_datechange()' onchange='{$n}_datechange()' onfocus='{$n}_datepick(this);' />";
+		$dateboxes .= _L("To: ") . "<input id='{$n}_enddate' value='".escapehtml($enddateValue)."' type='text' size='20' onblur='{$n}_datechange()' onchange='{$n}_datechange()' onfocus='{$n}_datepick(this);' />";
 		$xdaysHidden = ($data['reldate'] != 'xdays') ? 'display:none;' : '';
 		$dateHidden = ($data['reldate'] != 'daterange') ? 'display:none;' : '';
 		return "<div>
