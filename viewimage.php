@@ -1,4 +1,14 @@
 <?
+/*
+ * WARNING: THIS FILE IS DEPRECATED. DO NOT USE THIS FOR NEW FEATURES. permitContent() and contentAllowed() are anti-patterns.
+ * WARNING: THIS FILE IS DEPRECATED. DO NOT USE THIS FOR NEW FEATURES. permitContent() and contentAllowed() are anti-patterns.
+ * WARNING: THIS FILE IS DEPRECATED. DO NOT USE THIS FOR NEW FEATURES. permitContent() and contentAllowed() are anti-patterns.
+ * WARNING: THIS FILE IS DEPRECATED. DO NOT USE THIS FOR NEW FEATURES. permitContent() and contentAllowed() are anti-patterns.
+ * 
+*/
+
+
+
 include_once("inc/common.inc.php");
 include_once("inc/securityhelper.inc.php");
 include_once("inc/content.inc.php");
