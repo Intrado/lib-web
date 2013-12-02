@@ -43,7 +43,7 @@ function userOwns ($type,$id) {
 		case "voicereply":
 		case "message":
 		case "messagegroup":
-		case "monitor";
+		case "monitor":
 			return QuickQuery("select count(*) from $type where userid=? and id=?", false, array($USER->id, $id));
 		default:
 			return false;
