@@ -22,7 +22,7 @@
 		
 		// set img src in modal body to use view.image.php?id=<id>, where id = (tai) messageid
 		// which displays the requested image in the modal body
-		$("#attachment-image").attr('src', 'view.image.php?id=' + id );
+		$("#attachment-image").attr('src', 'filefetch.php?type="tai_messageattachment&id=' + id );
 		
 		// open modal now that its ready for viewing
 		$("#tip-view-attachment").modal('show');
