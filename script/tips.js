@@ -5,11 +5,6 @@
 		toggleElem(e, $(this).parent());
 	});
 
-	// show contact info details if user clicks on 'View' links
-	$(".tip-view-contact").on("click", function(e) {
-		toggleElem(e, $(this));
-	});
-
 	var toggleElem = function(e, elem) {
 		e.preventDefault();
 		elem.fadeOut(200, function() {

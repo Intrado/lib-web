@@ -29,7 +29,7 @@ class TipSearchForm extends Form {
 
 	var $options;
 
-	function __construct($name, $options = array()) {
+	function TipSearchForm($name, $options = array()) {
 		if (isset($options)) {
 			$this->options = $options;
 			$this->setFormData();
@@ -53,7 +53,7 @@ class TipSearchForm extends Form {
 			$orgArray[$id] = escapehtml($value);
 		}
 
-		$catArray[0] = "All Categories";
+		$catArray[0] = "All Topics";
 		$catList = QuickQueryList("
 					SELECT tt.id, tt.name FROM tai_topic tt
 					INNER JOIN tai_organizationtopic tot on (tot.topicid = tt.id)
@@ -63,13 +63,13 @@ class TipSearchForm extends Form {
 			$catArray[$id] = escapehtml($value);
 		}
 
-		$dateObj = json_decode($this->options['date']);
-		$dateType = $dateObj->reldate;
+		$dateObj = json_decode($this->options['date'], true);
+		$dateType = $dateObj['reldate'];
 		$dateArr = array(
-			"reldate" 	=> isset($dateObj->reldate) ? $dateObj->reldate : 'today',
-			"xdays" 	=> isset($dateObj->xdays) ? $dateObj->xdays : '',
-			"startdate" => isset($dateObj->startdate) ? $dateObj->startdate : '',
-			"enddate" 	=> isset($dateObj->enddate) ? $dateObj->enddate : ''
+			"reldate" 	=> isset($dateObj['reldate']) ? $dateObj['reldate'] : 'today',
+			"xdays" 	=> isset($dateObj['xdays']) ? $dateObj['xdays'] : '',
+			"startdate" => isset($dateObj['startdate']) ? $dateObj['startdate'] : '',
+			"enddate" 	=> isset($dateObj['enddate']) ? $dateObj['enddate'] : ''
 		);
 		
 		$this->addFormData("orgid",
@@ -85,8 +85,8 @@ class TipSearchForm extends Form {
 		
 		$this->addFormData("categoryid",
 			array(
-				"label" 		=> _L("Category"),
-				"fieldhelp" 	=> _L("Select a Category to filter Tip search results on."),
+				"label" 		=> _L("Topic"),
+				"fieldhelp" 	=> _L("Select a Topic to filter Tip search results on."),
 				"value" 		=> isset($this->options['categoryid']) ? $this->options['categoryid'] : $catArray[0],
 				"validators" 	=> array(array("ValInArray", "values" => array_keys($catArray))),
 				"control" 		=> array("SelectMenu", "values" => $catArray),
@@ -121,17 +121,25 @@ class TipSearchForm extends Form {
 class TipSubmissionViewer extends PageForm {
 
 	var $pagingStart = 0;
-	var $pagingLimit = 30;
-	var $ajaxsubmit = false;
+	var $pagingLimit = 100;
 	var $options;
 	var $tableColumnHeadings;
 	var $tableCellFormatters;
-	var $tipData = array();
+	var $tipData;
 	var $total;
+	var $orgId = 0;
+	var $categoryId = 0;
+	var $date;
+	var $sqlArgs;
 
-	function __construct($options = array()) {
+	function TipSubmissionViewer($options = array()) {
 		if (isset($options)) {
 			$this->options = $options;
+
+			$this->orgId 		= $this->options['orgid'];
+			$this->categoryId 	= $this->options['categoryid'];
+			$this->date 		= $this->options['date'];
+
 			parent::PageBase($options);
 		}
 	}
@@ -151,8 +159,8 @@ class TipSubmissionViewer extends PageForm {
 		$this->tableColumnHeadings = array(
 			"3" => _L("Attachment"), 
 			"2" => _L('Message'),
-			"0" => _L('Organization'),
-			"1" => _L('Category'),
+			"0" => _L(getSystemSetting("organizationfieldname", "Organization")),
+			"1" => _L('Topic'),
 			"6" => _L('Date'), 
 			"7" => _L('Contact Info')
 		);
@@ -193,16 +201,17 @@ class TipSubmissionViewer extends PageForm {
 			// if user submits a search, update SESSION['tips'] with latest form data 
 			$_SESSION['tips'] = $this->form->getData();
 			// then reload (redirect to) self (with new data)
-			redirect($_SERVER['PHP_SELF']);
+			redirect('tips.php');
 		}
 	}
 
 	// @override
 	function sendPageOutput() {
 		global $TITLE;
+
 		startWindow($TITLE);
 
-		echo '<div id="tip-icon"></div><div id="tip-search-instruction">Search Tip Submissions based on '.getSystemSetting("organizationfieldname", "Organization").'s, Category, and/or Date.</div>';
+		echo '<div id="tip-icon"></div><div id="tip-search-instruction">Search Tip Submissions based on '.getSystemSetting("organizationfieldname", "Organization").', Topic, and/or Date.</div>';
 		// render search form
 		echo $this->form->render();
 
@@ -214,7 +223,7 @@ class TipSubmissionViewer extends PageForm {
 		showTable($this->tipData, $this->tableColumnHeadings, $this->tableCellFormatters, array(), NULL, $this->tableColumnHeadingFormatters);
 		echo "</table>";
 
-		// only show bottom pager if there's more than 30 ($this->pagingLimit) rows
+		// only show bottom pager if there's more than 100 ($this->pagingLimit) rows
 		if ($this->total > $this->pagingLimit) {
 			showPageMenu($this->total, $this->pagingStart, $this->pagingLimit);
 		}
@@ -225,6 +234,8 @@ class TipSubmissionViewer extends PageForm {
 	}
 
 	function getQueryString() {
+		$this->sqlArgs = array();
+
 		$query = "
 			SELECT SQL_CALC_FOUND_ROWS o.orgkey, tai_topic.name, tm.body, tma.filename, tma.size, tma.contentid, from_unixtime(tm.modifiedtimestamp) as date1, 
 					u.firstname, u.lastname, u.email, u.phone FROM tai_message tm 
@@ -236,44 +247,45 @@ class TipSubmissionViewer extends PageForm {
 			WHERE 1 ";
 
 		// include user org/category search params, if any
-		$query .= isset($this->options['orgid']) && $this->options['orgid'] > 0 ? ' AND o.id = ' . $this->options['orgid'] . ' ' : '';
-		$query .= isset($this->options['categoryid']) && $this->options['categoryid'] > 0 ?	' AND tai_topic.id = ' . $this->options['categoryid'] . ' ' : '';
+		if ($this->orgId) {
+			$query .= ' AND o.id = ?';
+			$this->sqlArgs[] = $this->orgId;
+		}
 
-		$datesql = $startdate = $enddate = ' ';
+		if ($this->categoryId) {
+			$query .= ' AND tai_topic.id = ?';
+			$this->sqlArgs[] = $this->categoryId;
+		}
 
 		// get user-specified date options
-		if (isset($this->options['date']) && $this->options['date'] != ""){
-			$dateObj = json_decode($this->options['date']);
-			$dateType = $dateObj->reldate;
+		if ($this->date){
+			$dateObj = json_decode($this->date, true);
+			$dateType = $dateObj['reldate'];
 			list($startdate, $enddate) = getStartEndDate($dateType, array(
-				"reldate" 	=> $dateObj->reldate,
-				"lastxdays" => isset($dateObj->xdays) ? $dateObj->xdays : "",
-				"startdate" => isset($dateObj->startdate) ? $dateObj->startdate : "",
-				"enddate" 	=> isset($dateObj->enddate) ? $dateObj->enddate : ""
+				"reldate" 	=> $dateObj['reldate'],
+				"lastxdays" => isset($dateObj['xdays']) ? $dateObj['xdays'] : "",
+				"startdate" => isset($dateObj['startdate']) ? $dateObj['startdate'] : "",
+				"enddate" 	=> isset($dateObj['enddate']) ? $dateObj['enddate'] : ""
 			));
 
-			$startdate = date("Y-m-d", $startdate);
-			$enddate = date("Y-m-d", $enddate);
-			$datesql = " AND (from_unixtime(tm.modifiedtimestamp) >= '$startdate' and from_unixtime(tm.modifiedtimestamp) < date_add('$enddate',interval 1 day) )";
+			$this->sqlArgs[] = date("Y-m-d", $startdate);
+			$this->sqlArgs[] = date("Y-m-d", $enddate);
+			$query .= " AND (from_unixtime(tm.modifiedtimestamp) >= ? and from_unixtime(tm.modifiedtimestamp) < date_add(?, interval 1 day) )";
+		
 		} else {
 			// default to current date (today) if not set by user
-			$datesql = " AND Date(from_unixtime(tm.modifiedtimestamp)) = CURDATE()";
-			$enddate = $startdate = date("Y-m-d", time());
+			$query .= " AND Date(from_unixtime(tm.modifiedtimestamp)) = CURDATE()";
 		}
-		$query .= $datesql;
-		$query .= " ORDER BY date1 desc limit " . $this->pagingStart .",". $this->pagingLimit;
+
+		$query .= " ORDER BY date1 desc limit " .$this->pagingStart. ", " .$this->pagingLimit;
 
 		return $query;
 
 	}
 
 	function doSearchQuery() {
-		$tipQueryResult = Query($this->getQueryString());
+		$this->tipData = QuickQueryMultiRow($this->getQueryString(), false, false, $this->sqlArgs);
 
-		while ($row = DBGetRow($tipQueryResult)) {
-			$this->tipData[] = $row;
-		}
-		
 		// get total row count for pager
 		$this->total = QuickQuery("select FOUND_ROWS()");
 	}
@@ -341,20 +353,19 @@ function fmt_contact_info ($row, $index) {
 	$str  = '';
 
 	// get the individual contact fields in the row (and html escape them)
-	$first = (isset($row[$index])) 	   ? escapehtml($row[$index]) 	  : null;
-	$last  = (isset($row[$index + 1])) ? escapehtml($row[$index + 1]) : null;
-	$email = (isset($row[$index + 2])) ? escapehtml($row[$index + 2]) : null;
-	$phone = (isset($row[$index + 3])) ? escapehtml($row[$index + 3]) : null;
+	$first = (isset($row[$index])) 	   ? escapehtml($row[$index]) 	  : "";
+	$last  = (isset($row[$index + 1])) ? escapehtml($row[$index + 1]) : "";
+	$email = (isset($row[$index + 2])) ? escapehtml($row[$index + 2]) : "";
+	$phone = (isset($row[$index + 3])) ? escapehtml($row[$index + 3]) : "";
 
 	// check for existence (to determine if/how we display them)
-	$hasFirst = isset($first) && strlen($first) > 0;
-	$hasLast  = isset($last)  && strlen($last)  > 0;
-	$hasEmail = isset($email) && strlen($email) > 0;
-	$hasPhone = isset($phone) && strlen($phone) > 0;
+	$hasFirst = strlen($first) > 0;
+	$hasLast  = strlen($last)  > 0;
+	$hasEmail = strlen($email) > 0;
+	$hasPhone = strlen($phone) > 0;
 
 	if ($hasFirst || $hasLast || $hasEmail || $hasPhone) {
-		$str .= '<a href="#" class="tip-view-contact">View</a>';
-		$str .= '<span class="tip-contact-details" style="display:none">';
+		$str .= '<span class="tip-contact-details">';
 		if ($hasFirst && $hasLast) {
 			$str .= '<div>Name:&nbsp;'.$first.' '.$last.'</div>';
 		}
@@ -383,12 +394,12 @@ function fmt_attach_col_heading() {
 }
 
 function fmt_date_col_heading() {
-	return _L('Date') . ' <div id="carat"></div>';
+	return _L('Date') . '&nbsp;<div id="carat"></div>';
 }
 
 function fmt_contactinfo_col_heading() {
 	// non-breaking so it doesn't wrap on 2 lines
-	return _L('Contact'). '&nbsp;'. _L('Info'); 
+	return _L('Contact&nbsp;Info'); 
 }
 
 // Initialize SESSION['tips'] data and handle request params;
@@ -414,5 +425,4 @@ $_SESSION['tips']['date'] 		= $date;
 ////////////////////////////////////////////////////////////////////////////////
 $tips = new TipSubmissionViewer($_SESSION['tips']);
 executePage($tips);
-
 ?>
