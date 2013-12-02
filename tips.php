@@ -237,7 +237,7 @@ class TipSubmissionViewer extends PageForm {
 		$this->sqlArgs = array();
 
 		$query = "
-			SELECT SQL_CALC_FOUND_ROWS o.orgkey, tai_topic.name, tm.body, tma.filename, tma.size, tma.contentid, from_unixtime(tm.modifiedtimestamp) as date1, 
+			SELECT SQL_CALC_FOUND_ROWS o.orgkey, tai_topic.name, tm.body, tma.filename, tma.size, tma.messageid, from_unixtime(tm.modifiedtimestamp) as date1, 
 					u.firstname, u.lastname, u.email, u.phone FROM tai_message tm 
 			INNER JOIN tai_thread tt on (tm.threadid = tt.id) 
 			INNER JOIN organization o on (o.id = tt.organizationid)
@@ -334,17 +334,13 @@ function fmt_tip_message ($row, $index) {
 
 function fmt_attachment ($row, $index) {
 	if (isset($row[$index])) {
-		// set content allowed for the given image id ($row[$index+2]),
-		// so it can be viewable in the attachment modal
-		permitContent($row[$index+2]);
-		
 		$fileDetailsOrig = $row[$index].' ('. round((($row[$index+1]) / 1024), 1) . 'KB)';
 		$max = 12;
 		if (strlen($row[$index]) > $max) {
 			$fileNameTrimmed = substr($row[$index], 0, $max - 3) . '...';
-			return '<a href="#" class="attachment" data-image-id="'.$row[$index+2].'" title="Attachment: '.$fileDetailsOrig .'">'.$fileNameTrimmed.'&nbsp;<span>('. round((($row[$index+1]) / 1024), 1) . 'KB)</span></a>';
+			return '<a href="#" class="attachment" data-message-id="'.$row[$index+2].'" title="Attachment: '.$fileDetailsOrig .'">'.$fileNameTrimmed.'&nbsp;<span>('. round((($row[$index+1]) / 1024), 1) . 'KB)</span></a>';
 		}
-		return '<a href="#" class="attachment" data-image-id="'.$row[$index+2].'" title="Attachment: '.$fileDetailsOrig .'">'.$row[$index].'&nbsp;<span>('. round((($row[$index+1]) / 1024), 1) . 'KB)</span></a>';
+		return '<a href="#" class="attachment" data-message-id="'.$row[$index+2].'" title="Attachment: '.$fileDetailsOrig .'">'.$row[$index].'&nbsp;<span>('. round((($row[$index+1]) / 1024), 1) . 'KB)</span></a>';
 	}
 	return "&nbsp;";
 }

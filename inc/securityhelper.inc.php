@@ -66,6 +66,9 @@ function userCanSee ($type,$id) {
 			$messagegroupid = QuickQuery("select messagegroupid from audiofile where id=?", false, array($id));
 			if ($messagegroupid == null)
 				return false;
+		case "taimessageattachment":
+			$messageid = QuickQuery("select id from tai_messageattachment where messageid=?", false, array($id));
+			return ($messageid != null);
 		case "message":
 			// vieable if:
 			//   it's message group matches below

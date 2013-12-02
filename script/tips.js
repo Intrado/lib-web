@@ -14,15 +14,15 @@
 
 	// Tip attachments click event handler
 	$("a.attachment").on('click', function(e) {
-		var id = $(this).attr('data-image-id');
+		var id = $(this).attr('data-message-id');
 		var fileDetails = $(this).attr('title');
 
 		// set attachment modal header text with file details (name, size)
 		$('#attachment-details').html('Tip ' + fileDetails);
 		
-		// set img src in modal body to use viewimage.php?id=<id>, 
+		// set img src in modal body to use view.image.php?id=<id>, where id = (tai) messageid
 		// which displays the requested image in the modal body
-		$("#attachment-image").attr('src', 'viewimage.php?id=' + id );
+		$("#attachment-image").attr('src', 'view.image.php?id=' + id );
 		
 		// open modal now that its ready for viewing
 		$("#tip-view-attachment").modal('show');
