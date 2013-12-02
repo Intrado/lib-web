@@ -115,7 +115,8 @@ $basicroles = array(
 	"smsblock" => "Manage SMS blocked numbers",
 	"activejobs" => "View active jobs",
 	"editdm" => "Edit SmartCall Appliances",
-	"diskagent" => "Manage SwiftSync Agents"
+	"diskagent" => "Manage SwiftSync Agents",
+	"pdfbursttemplates" => "Manage customer PDF Bursting templates"
 );
 
 $advancedroles = array(

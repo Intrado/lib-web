@@ -5,7 +5,7 @@ require_once("../inc/html.inc.php");
 require_once("../inc/table.inc.php");
 require_once("../inc/utils.inc.php");
 
-//if (!$MANAGERUSER->authorized("edittemplate")) exit("Not Authorized");
+if (!$MANAGERUSER->authorized("pdfbursttemplates")) exit("Not Authorized");
 
 if (! isset($_GET['cid'])) exit("Missing customer id");
 

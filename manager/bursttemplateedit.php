@@ -15,6 +15,8 @@ require_once("../obj/BurstTemplate.obj.php");
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
 
+if (!$MANAGERUSER->authorized("pdfbursttemplates")) exit("Not Authorized");
+
 ////////////////////////////////////////////////////////////////////////////////
 // Action/Request Processing
 ////////////////////////////////////////////////////////////////////////////////'
@@ -123,6 +125,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 	else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 
+		// save the global dbcon and replace it with custdb so that the DBMO can get to the customer data
 		global $_dbcon;
 		$savedbcon = $_dbcon;
 		$_dbcon = $custdb;
@@ -140,6 +143,13 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$bursttemplate->create();
 
 		Query("COMMIT");
+
+		// restore the database connection
+		$_dbcon = $savedbcon;
+
+		// Session data cleanup
+		unset($_SESSION['bursttemplatecid'], $_SESSION['bursttemplateid']);
+
 		if ($ajax)
 			$form->sendTo("bursttemplates.php?cid={$bursttemplatecid}&id={$bursttemplate->id}");
 		else
