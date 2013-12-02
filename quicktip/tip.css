@@ -355,7 +355,7 @@ option {
 }
 .summary-label {
   display: inline-block;
-  min-width: 94px;
+  min-width: 70px;
   font-weight: bold;
 }
 .summary-value {

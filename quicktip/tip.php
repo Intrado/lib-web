@@ -10,7 +10,7 @@ mb_internal_encoding('UTF-8');
  * Description: Simple class to help manage the Quick Tip form field validation, 
  * form submission to a target iframe (POST to quicktip API POST endpoint for tip submission),
  * fetching customer (root org) data via quicktip API REST endpoint for population 
- * into Organization and Category dropdowns. 
+ * into Organization and Topic dropdowns. 
  * 
  * @author Justin Burns <jburns@schoolmessenger.com>
  * @date 11/08/2013
@@ -31,6 +31,7 @@ class TipSubmissionHandler {
 	private $orgId;
 	private $topicId;
 	private $orgName;
+	private $orgFieldName;
 	private $topicName;
 	private $message;
 	private $firstName;
@@ -60,8 +61,9 @@ class TipSubmissionHandler {
 			// fetch customer data via curl GET request to customer's quicktip API endpoint
 			$this->customerData = json_decode($this->fetchCustomerData());
 			
-			// set the product name, ex SchoolMessenger
+			// set the product name, ex SchoolMessenger & org field name (ex. School, Organization)
 			$this->productName = $this->customerData->productName;
+			$this->orgFieldName = $this->customerData->organizationFieldName;
 
 			if (!isset($this->message)) {
 				// build up the Organization and Category (topic) combos
@@ -136,27 +138,27 @@ class TipSubmissionHandler {
  	public function renderTipForm() {
  		$html = '
  			<div class="alert"><strong>'.$this->productName.' Quick Tip allows you to submit an anonymous tip to school and district officials.</strong>
-				Please select the appropriate organization and category when submitting your tip.
+				Please select the appropriate '.$this->orgFieldName.' and Topic when submitting your tip.
 				<div class="text-danger call911">If this is an emergency, please call 911.</div>
 			</div>
 
 			<form id="quicktip" name="quicktip" action="" method="POST" enctype="multipart/form-data" data-base-url="' . $this->baseCustomerURL .'"  target="thank-you-iframe">
 			<fieldset>
-					<label for="orgId">Organization <span class="sup" title="Required field">*</span></label>
+					<label for="orgId">'.$this->orgFieldName.' <span class="sup" title="Required field">*</span></label>
 					<select id="orgId" name="orgId" tabindex="1">';
 			
 			$html .= $this->setSelectOptions($this->organizations);
 			
 			$html .= '</select>
-					<label for="topicId">Tip Category <span class="sup" title="Required field">*</span></label>
+					<label for="topicId">Topic <span class="sup" title="Required field">*</span></label>
 					<select id="topicId" name="topicId" tabindex="2">';
 			
 			$html .= $this->setSelectOptions($this->topics);
 			
 			$html .= '</select>
 					<div id="tip-message-control-group" class="form-group">
-						<label for="message" class="control-label">Tip Message <span class="sup" title="Required field">*</span></label>
-						<textarea id="message" class="form-control" name="message" rows="8" placeholder="Enter your tip here..." tabindex="3"></textarea>
+						<label for="message" class="control-label">Message <span class="sup" title="Required field">*</span></label>
+						<textarea id="message" class="form-control" name="message" rows="8" placeholder="Enter your tip here..." tabindex="3" max-length="10000"></textarea>
 					</div>
 				</fieldset>
 				<fieldset>
@@ -169,13 +171,13 @@ class TipSubmissionHandler {
 					<p>You have the option to leave your personal contact information. If provided, you may be contacted for more information if necessary.</p>
 					<fieldset>
 						<label for="firstname">First</label>
-						<input id="firstname" name="firstname" type="text" placeholder="First name" value="" title="Enter your first name" tabindex="5">
+						<input id="firstname" name="firstname" type="text" placeholder="First name" value="" title="Enter your first name" tabindex="5" max-length="50">
 						<label for="lastname">Last</label>
-						<input id="lastname" name="lastname" type="text" placeholder="Last name" value="" title="Enter your last name" tabindex="6">
+						<input id="lastname" name="lastname" type="text" placeholder="Last name" value="" title="Enter your last name" tabindex="6" max-length="50">
 					</fieldset>
 					<fieldset>
 						<label for="email">Email</label>
-						<input id="email" name="email" type="email" placeholder="Email address" value="" title="Enter your email address, ex. janedoe@example.com" tabindex="7">
+						<input id="email" name="email" type="email" placeholder="Email address" value="" title="Enter your email address, ex. janedoe@example.com" tabindex="7" max-length="255">
 					</fieldset>
 					<fieldset>
 						<label for="phone">Phone</label>
@@ -197,7 +199,7 @@ class TipSubmissionHandler {
  	 * return string representing the resulting HTML for the 'Thank You for your tip' landing page
  	 */
  	public function renderThankYou() {
-		// get the category and org names (based on their id) to show on Thank You page
+		// get the topic and org names (based on their id) to show on Thank You page
 		if (isset($this->customerData)) {
 			$this->topicName = $this->getName($this->topicId, $this->customerData->topics);
 			$this->orgName 	 = $this->getName($this->orgId, $this->customerData->organizations);
@@ -210,9 +212,9 @@ class TipSubmissionHandler {
 			</div>
 			<div class="summary-info">
 				<div class="summary-heading">Summary of the tip information you submitted:</div>
-				<div><span class="summary-label">Organization:</span> &nbsp;<div class="summary-value">'. $this->orgName. '</div></div>
-				<div><span class="summary-label">Tip Category:</span> &nbsp;<div class="summary-value">'. $this->topicName .'</div></div>
-				<div><span class="summary-label">Tip Message:</span> &nbsp;<div class="summary-value message-text">"'. $this->message .'"</div></div>';
+				<div><span class="summary-label">'.$this->orgFieldName.':</span> &nbsp;<div class="summary-value">'. $this->orgName. '</div></div>
+				<div><span class="summary-label">Topic:</span> &nbsp;<div class="summary-value">'. $this->topicName .'</div></div>
+				<div><span class="summary-label">Message:</span> &nbsp;<div class="summary-value message-text">"'. $this->message .'"</div></div>';
 		if ($this->file) {
 			$html .= '<div id="summary-attachment-container"><span class="summary-label">Attachment:</span> &nbsp;<div class="summary-value">'.$this->file.'</div></div>';
 		}
