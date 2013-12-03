@@ -34,7 +34,7 @@ var QuickTip = function() {
 			};
 		} else {
 			return function (el, ev, fn) {
-			el['on' + ev] =  fn;
+				el['on' + ev] =  fn;
 			};
 		}
 	}());
@@ -112,20 +112,14 @@ var QuickTip = function() {
 			return ((messageTA.value).replace(/^\s+|\s+$/g, '')).length > 0 ? true : false;
 		},
 
-		isSelectedOrgValid: function() {
-			var id = this.getSelectedOrgId();
-			return (typeof(id) !== 'undefined' && id > -1) ? true : false;
-		},
-
-		isSelectedTopicValid: function() {
-			var id = this.getSelectedTopicId();
+		isSelectedIdValid: function(id) {
 			return (typeof(id) !== 'undefined' && id > -1) ? true : false;
 		},
 
 		isTipValid: function() {
 			return isValid = (this.isMessageTextValid() && 
-							  this.isSelectedOrgValid() && 
-							  this.isSelectedTopicValid() &&
+							  this.isSelectedIdValid(this.orgId) && 
+							  this.isSelectedIdValid(this.topicId) &&
 							  this.isEmailValid() &&
 							  this.isPhoneValid()
 							 );
@@ -146,11 +140,11 @@ var QuickTip = function() {
 				this.addClass(errorMsgCont, 'hide');
 				this.removeClass(messageTACont, 'has-error');
 			} else {
-				if (!this.isSelectedOrgValid()) {
+				if (!this.isSelectedIdValid(this.orgId)) {
 					this.setErrorMessage('Please select a valid Organization.');
 				}
-				if (!this.isSelectedTopicValid()) {
-					this.setErrorMessage('Please select a valid Category.');
+				if (!this.isSelectedIdValid(this.topicId)) {
+					this.setErrorMessage('Please select a valid Topic.');
 				}
 				if (!this.isMessageTextValid()) {
 					this.addClass(messageTACont, 'has-error');
@@ -170,29 +164,17 @@ var QuickTip = function() {
 		},
 
 		setFormActionURL: function() {
-			this.formActionUrl = "/api/2/organizations/" + this.getSelectedOrgId() + "/topics/" + this.getSelectedTopicId() + "/quicktip";
+			this.formActionUrl = "/api/2/organizations/" + this.orgId + "/topics/" + this.topicId + "/quicktip";
 			this.baseCustomerURL = tipForm.getAttribute('data-base-url');
 			tipForm.setAttribute('action', this.baseCustomerURL + this.formActionUrl);
-		},
-
-		getFormActionURL: function() {
-			return this.formActionUrl;
 		},
 
 		setSelectedOrgId: function() {
 			this.orgId = (orgListCoB.selectedIndex > -1) ? orgListCoB.options[orgListCoB.selectedIndex].value : -1;
 		},
 
-		getSelectedOrgId: function() {
-			return this.orgId;
-		},
-
 		setSelectedTopicId: function() {
 			this.topicId = (topicCoB.selectedIndex > -1) ? topicCoB.options[topicCoB.selectedIndex].value : -1;
-		},
-
-		getSelectedTopicId: function() {
-			return this.topicId;
 		},
 
 		// helper methods for validation rendering (ex add/remove classes)

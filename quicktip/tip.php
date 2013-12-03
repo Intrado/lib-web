@@ -28,6 +28,7 @@ class TipSubmissionHandler {
 	private $customerData;
 
 	private $baseCustomerURL;
+	private $actionURL;
 	private $organizations;
 	private $topics;
 	
@@ -58,8 +59,11 @@ class TipSubmissionHandler {
 		$this->customerData = json_decode($this->fetchCustomerData());
 		
 		// set the product name, ex SchoolMessenger & org field name (ex. School, Organization)
-		$this->productName = $this->customerData->productName;
+		$this->productName 	= $this->customerData->productName;
 		$this->orgFieldName = $this->customerData->organizationFieldName;
+		
+		// set the form's action attribute; only include query string param if not 'root' org
+		$this->actionURL 	= $_SERVER["PHP_SELF"] . (is_numeric($this->rootOrgId) ? '?i='.$this->rootOrgId : '');
 
 		if (!isset($this->message)) {
 			// build up the Organization and Topic combos
@@ -204,8 +208,8 @@ class TipSubmissionHandler {
 			<div class="summary-info">
 				<div class="summary-heading">Summary of the tip information you submitted:</div>
 				<div><span class="summary-label">'.$this->orgFieldName.':</span> &nbsp;<div class="summary-value">'. $this->orgName. '</div></div>
-				<div><span class="summary-label">Topic:</span> &nbsp;<div class="summary-value">'. $this->topicName .'</div></div>
-				<div><span class="summary-label">Message:</span> &nbsp;<div class="summary-value message-text">"'. $this->message .'"</div></div>';
+				<div><span class="summary-label">Topic:</span> &nbsp;<div class="summary-value">'. $this->topicName.'</div></div>
+				<div><span class="summary-label">Message:</span> &nbsp;<div class="summary-value message-text">"'.$this->message.'"</div></div>';
 		if ($this->file) {
 			$html .= '<div id="summary-attachment-container"><span class="summary-label">Attachment:</span> &nbsp;<div class="summary-value">'.$this->file.'</div></div>';
 		}
@@ -233,7 +237,7 @@ class TipSubmissionHandler {
 		}
 
 		$html .= '</div>
-			<form id="newquicktip" name="newquicktip" action="' . $_SERVER["PHP_SELF"] . '?i=' . $this->rootOrgId. '" method="POST">
+			<form id="newquicktip" name="newquicktip" action="' . $this->actionURL . '" method="POST">
 				<fieldset>
 					<button id="new-tip" class="btn btn-lg btn-primary" type="submit">Done</button>
 				</fieldset>
@@ -272,7 +276,7 @@ class TipSubmissionHandler {
 						// remove the previous POST API URL (so we don\'t accidentally re-post to POST API URL)
 						// and set action attribute to originating script with the rootorgid query param,
 						// i.e. /<custname>/quicktip/tip.php?i=<rootorgid>
-						form.setAttribute("action", "' . $_SERVER["PHP_SELF"] . '?i=' . $this->rootOrgId. '");
+						form.setAttribute("action", "' . $this->actionURL . '");
 
 						// remove the target attribute to make sure we submit (post) to ourself, not the target iframe;
 						form.removeAttribute("target");
@@ -351,12 +355,12 @@ $options = array(
 	"baseCustomerURL"	=> (isset($_SERVER['HTTPS']) ? 'https://' : 'http://') . $_SERVER['SERVER_NAME'] . '/' . $custName,
 	"orgId" 	 		=> isset($_POST['orgId']) ? $_POST['orgId'] : null,
 	"topicId" 			=> isset($_POST['topicId']) ? $_POST['topicId'] : null,
-	"message" 			=> isset($_POST['message']) ? $_POST['message'] : null,
-	"file"				=> isset($_FILES['file']['name']) ? $_FILES['file']['name'] : null,
-	"firstname"  		=> isset($_POST['firstname']) ? $_POST['firstname'] : null,
-	"lastname"   		=> isset($_POST['lastname'])  ? $_POST['lastname'] : null,
-	"email" 			=> isset($_POST['email'])  	? $_POST['email'] : null,
-	"phone"  			=> isset($_POST['phone'])  ? $_POST['phone'] : null
+	"message" 			=> isset($_POST['message']) ? escapeHtml($_POST['message']) : null,
+	"file"				=> isset($_FILES['file']['name']) ? escapeHtml($_FILES['file']['name']) : null,
+	"firstname"  		=> isset($_POST['firstname']) ? escapeHtml($_POST['firstname']) : null,
+	"lastname"   		=> isset($_POST['lastname'])  ? escapeHtml($_POST['lastname']) : null,
+	"email" 			=> isset($_POST['email'])  	? escapeHtml($_POST['email']) : null,
+	"phone"  			=> isset($_POST['phone'])  ? escapeHtml($_POST['phone']) : null
 );
 
 // initialize new TipSubmissionHandler instance with $options arg
