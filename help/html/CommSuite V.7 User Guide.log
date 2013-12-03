@@ -133,6 +133,7 @@ CommSuite_User_Guide.hhc
 CommSuite_User_Guide.hhk
 Broadcasts\Broadcast_Templates.htm
 Classroom_Messaging\Classroom_Messaging_Overview.htm
+Classroom_Messaging\Classroom_Messaging_Reports.htm
 Classroom_Messaging\Creating_Custom_Comments.htm
 Classroom_Messaging\Editing_Classroom_Comments.htm
 Classroom_Messaging\Managing_Comments.htm
@@ -256,6 +257,7 @@ AdminSettingsEmailLabel.jpg
 AdminSettingsMain.jpg
 AdminImportInfo.jpg
 Page.jpg
+ClassroomMessagingContactHi.jpg
 AddFB.jpg
 AddPhoneWizardTTS4.jpg
 NewBroadcastButton.jpg
@@ -265,18 +267,21 @@ AdminSettingsSMSLabels.jpg
 AdminCustomerDisplaySetting.jpg
 AdminImportNewImport.jpg
 light_bulb__exclamation.png
+ClassroomMessagingSummary1.jpg
 FeedWidgetFinal.jpg
 BroadcastTemplatesonDashBoa.jpg
 ReportCallDistribution.jpg
 SocialMediaOptions.jpg
 AdminSettingsDisplay.jpg
 add.png
+ClassroomMessagingSummary2.jpg
 BroadcastWizAddRecip.jpg
 StationeryFrozenBannerText.jpg
 AddHTMLEmail.jpg
 MessageBuilder.jpg
 PhoneLog.jpg
 exclamation.png
+ClassroomMessageMainReport.jpg
 ListBuilder.jpg
 SurveyReport.jpg
 SmartCallAuthAppliances.jpg
@@ -313,6 +318,7 @@ ReportBuilder.jpg
 SelfSignup2.jpg
 AdminFieldDefinitions.jpg
 FacebookLink.gif
+ClassroomMessagingTemplate.jpg
 UploadListID.jpg
 ListEditor.jpg
 TwitterMessEditor.jpg
@@ -500,6 +506,7 @@ whxdata\package_160.xml
 whxdata\package_161.xml
 whxdata\package_162.xml
 whxdata\package_163.xml
+whxdata\package_164.xml
 whxdata\packageindex.xml
 whxdata\synonym.xml
 whxdata\topictable_0.xml
@@ -683,6 +690,7 @@ whgdata\whlstf114.htm
 whgdata\whlstf115.htm
 whgdata\whlstf116.htm
 whgdata\whlstf117.htm
+whgdata\whlstf118.htm
 whgdata\whlstg0.htm
 CommSuite_User_Guide.htm
 CommSuite_User_Guide_csh.htm
