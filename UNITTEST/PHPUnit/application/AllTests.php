@@ -26,8 +26,7 @@ class application_AllTests {
 			'ReportClassroomMessagingTest',
 			'FormattersTest',
 			'TopicDataFormatterTest',
-			'TopicDataManagerTest',
-			'TipsTest'
+			'TopicDataManagerTest'
 		);
 
 		$classdir = dirname(__FILE__);
