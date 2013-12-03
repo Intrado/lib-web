@@ -253,7 +253,7 @@ class TipSubmissionHandler {
   	 */
  	public function renderTipJavascript() {
 		$html = '
-			<script type="text/javascript" src="tip.js"></script>
+			<script type="text/javascript" src="tip.min.js"></script>
 			<script type="text/javascript">
 				var qtip;
 				window.onload = function() {
