@@ -30,7 +30,8 @@ function getContentInfoForType($id, $type) {
 			if (!userCanSee("tai_messageattachment", $id))
 				return false;
 
-			$tma = new Tai_MessageAttachment($id);
+			$tmaId = QuickQuery("select id from tai_messageattachment where messageid = ?", false, array($id));
+			$tma = new Tai_MessageAttachment($tmaId);
 
 			list($contentType, $data) = contentGet($tma->contentid);
 			return array(
@@ -50,7 +51,7 @@ function getContentInfoForType($id, $type) {
 //TODO add download support, but please README about content-disposition security concerns.
 function viewFile($id, $type) {
 	$isAuthorized = authorizeFile($id, $type);
-	if (!isAuthorized) {
+	if (!$isAuthorized) {
 		//TODO return unauthorized response
 		return;
 	}

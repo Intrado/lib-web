@@ -4,6 +4,10 @@
 setlocale(LC_ALL, 'en_US.UTF-8');
 mb_internal_encoding('UTF-8');
 
+function escapeHtml($string) {
+	return htmlentities($string, ENT_COMPAT, 'UTF-8') ;
+}
+
 /**
  * class TipSubmissionHandler
  *
@@ -17,7 +21,6 @@ mb_internal_encoding('UTF-8');
  */
 
 class TipSubmissionHandler {
-	
 	private $productName;
 	private $rootOrgId;
 	private $customerName;
@@ -41,36 +44,28 @@ class TipSubmissionHandler {
 	private $file;
 
 
-	public function __construct($options) {
-		if (isset($options)) {
+	public function TipSubmissionHandler($options = array()) {
 
-			$this->baseCustomerURL = $options["baseCustomerURL"];
-			$this->rootOrgId	= $options["rootOrgId"];
-			$this->orgId 		= $options["orgId"];
-			$this->topicId 		= $options["topicId"];
-			$this->message 		= isset($options["message"]) ? $this->escapeHtml($options["message"]) : null;
-			$this->file 		= $options["file"];
-			$this->firstname 	= isset($options["firstname"]) ? $this->escapeHtml($options["firstname"]) : null;
-			$this->lastname 	= isset($options["lastname"]) ? $this->escapeHtml($options["lastname"]) : null;
-			$this->email 		= isset($options["email"]) ? $this->escapeHtml($options["email"]) : null;
-			$this->phone 		= isset($options["phone"]) ? $this->escapeHtml($options["phone"]) : null;
-
-			// set the customer's REST API URL for fetching their data via GET
-			$this->customerDataURL = $this->baseCustomerURL . '/api/2/organizations/' . $this->rootOrgId . '/quicktip/info';
-
-			// fetch customer data via curl GET request to customer's quicktip API endpoint
-			$this->customerData = json_decode($this->fetchCustomerData());
-			
-			// set the product name, ex SchoolMessenger & org field name (ex. School, Organization)
-			$this->productName = $this->customerData->productName;
-			$this->orgFieldName = $this->customerData->organizationFieldName;
-
-			if (!isset($this->message)) {
-				// build up the Organization and Category (topic) combos
-				$this->setOrganizations($this->customerData->organizations);
-				$this->setTopics($this->customerData->topics);
-			} 
+		// sets required private member variables to the values in the $options arg array
+		foreach ($options as $key => $value) {
+			$this->$key = $value;
 		}
+
+		// set the customer's REST API URL for fetching their data via GET
+		$this->customerDataURL = $this->baseCustomerURL . '/api/2/organizations/' . $this->rootOrgId . '/quicktip/info';
+
+		// fetch customer data via curl GET request to customer's quicktip API endpoint
+		$this->customerData = json_decode($this->fetchCustomerData());
+		
+		// set the product name, ex SchoolMessenger & org field name (ex. School, Organization)
+		$this->productName = $this->customerData->productName;
+		$this->orgFieldName = $this->customerData->organizationFieldName;
+
+		if (!isset($this->message)) {
+			// build up the Organization and Topic combos
+			$this->setOrganizations($this->customerData->organizations);
+			$this->setTopics($this->customerData->topics);
+		} 
 	}
 
 	/** 
@@ -107,7 +102,7 @@ class TipSubmissionHandler {
 		$name = '';
 		foreach ($arr as $k => $obj) {
 			if ($obj->id == $id) {
-				return $this->escapeHtml($obj->name);
+				return escapeHtml($obj->name);
 			}
 		}
 		return $name;
@@ -122,14 +117,10 @@ class TipSubmissionHandler {
  	public function setSelectOptions($arrayOfObjects) {
 		$html = '';
 		foreach ($arrayOfObjects as $k => $obj) {
-			$html .= '<option value="'.$obj->id.'">'.$this->escapeHtml($obj->name).'</option>';
+			$html .= '<option value="'.$obj->id.'">'.escapeHtml($obj->name).'</option>';
 		}
 		return $html;
  	}
-
- 	public function escapeHtml($string) {
-		return htmlentities($string, ENT_COMPAT, 'UTF-8') ;
-	}
 
  	/**
  	 * Provides the HTML for the starting Tip form page, using customer data fetched for their Orgs & Topics
@@ -356,16 +347,16 @@ $rootOrgId 	= isset($_GET['i']) ? $_GET['i'] : 'root';
 
 // define options hash to pass to Tip constructor for proper initialization of Tip instance
 $options = array(
-	"rootOrgId"	=> $rootOrgId, 
+	"rootOrgId"			=> $rootOrgId, 
 	"baseCustomerURL"	=> (isset($_SERVER['HTTPS']) ? 'https://' : 'http://') . $_SERVER['SERVER_NAME'] . '/' . $custName,
-	"orgId" 	 	=> isset($_POST['orgId']) ? $_POST['orgId'] : null,
-	"topicId" 		=> isset($_POST['topicId']) ? $_POST['topicId'] : null,
-	"message" 		=> isset($_POST['message']) ? $_POST['message'] : null,
-	"file"			=> isset($_FILES['file']['name']) ? $_FILES['file']['name'] : null,
-	"firstname"  	=> isset($_POST['firstname']) ? $_POST['firstname'] : null,
-	"lastname"   	=> isset($_POST['lastname'])  ? $_POST['lastname'] : null,
-	"email" 		=> isset($_POST['email'])  	? $_POST['email'] : null,
-	"phone"  		=> isset($_POST['phone'])  ? $_POST['phone'] : null
+	"orgId" 	 		=> isset($_POST['orgId']) ? $_POST['orgId'] : null,
+	"topicId" 			=> isset($_POST['topicId']) ? $_POST['topicId'] : null,
+	"message" 			=> isset($_POST['message']) ? $_POST['message'] : null,
+	"file"				=> isset($_FILES['file']['name']) ? $_FILES['file']['name'] : null,
+	"firstname"  		=> isset($_POST['firstname']) ? $_POST['firstname'] : null,
+	"lastname"   		=> isset($_POST['lastname'])  ? $_POST['lastname'] : null,
+	"email" 			=> isset($_POST['email'])  	? $_POST['email'] : null,
+	"phone"  			=> isset($_POST['phone'])  ? $_POST['phone'] : null
 );
 
 // initialize new TipSubmissionHandler instance with $options arg
