@@ -164,18 +164,30 @@ var QuickTip = function() {
 		},
 
 		setFormActionURL: function() {
-			this.formActionUrl = "/api/2/organizations/" + this.orgId + "/topics/" + this.topicId + "/quicktip";
+			this.formActionUrl = "/api/2/organizations/" + this.getSelectedOrgId() + "/topics/" + this.getSelectedTopicId() + "/quicktip";
 			this.baseCustomerURL = tipForm.getAttribute('data-base-url');
 			tipForm.setAttribute('action', this.baseCustomerURL + this.formActionUrl);
+		},
+
+		getFormActionURL: function() {
+			return this.formActionUrl;
 		},
 
 		setSelectedOrgId: function() {
 			this.orgId = (orgListCoB.selectedIndex > -1) ? orgListCoB.options[orgListCoB.selectedIndex].value : -1;
 		},
 
+		getSelectedOrgId: function() {
+ 			return this.orgId;
+ 		},
+
 		setSelectedTopicId: function() {
 			this.topicId = (topicCoB.selectedIndex > -1) ? topicCoB.options[topicCoB.selectedIndex].value : -1;
 		},
+
+		getSelectedTopicId: function() {
+ 			return this.topicId;
+ 		},
 
 		// helper methods for validation rendering (ex add/remove classes)
 		hasClass: function(elem, className) {

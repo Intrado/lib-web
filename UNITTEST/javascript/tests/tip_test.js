@@ -18,6 +18,8 @@ describe("QuickTip", function() {
 		messageTA 		= $("<textarea>").attr("id","message"),
 		messageTACont   = $("<div>").attr("id",'tip-message-control-group'),
 		errorMsgCont 	= $("<div>").attr("id","tip-error-message"),
+		emailTF			= $("<input>").attr("id", "email"),
+		phoneTF			= $("<input>").attr("id", "phone"),
 		submitB 		= $("<button>").attr("id","tip-submit"),
 		
 		// add elements to dom
@@ -25,6 +27,8 @@ describe("QuickTip", function() {
 		tipForm.append(categoryCoB);
 		tipForm.append(messageTA);
 		tipForm.append(messageTACont);
+		tipForm.append(emailTF);
+		tipForm.append(phoneTF);
 		tipForm.append(errorMsgCont.addClass('hide')); // default/initial state = hidden
 		tipForm.append(submitB);
 		$('body').append(tipForm);
@@ -42,6 +46,8 @@ describe("QuickTip", function() {
 		messageTA.remove();
 		messageTACont.remove();
 		errorMsgCont.remove();
+		emailTF.remove();
+		phoneTF.remove();
 		submitB.remove();
 
 		window.qtip = undefined;
@@ -62,11 +68,11 @@ describe("QuickTip", function() {
 		});
 	});
 
-	describe("isSelectedOrgValid()", function() {
+	describe("isSelectedIdValid()", function() {
 		it("returns true/false depending if selected Orgnziation (id) is valid (int > -1)", function() {
 			
 			// no Org options defined, so must be false/invalid
-			expect(qtip.isSelectedOrgValid()).to.equal(false);
+			expect(qtip.isSelectedIdValid(qtip.getSelectedOrgId())).to.equal(false);
 
 			var orgOptions = [];
 			// add some Org options
@@ -82,33 +88,10 @@ describe("QuickTip", function() {
 			expect(qtip.getSelectedOrgId()).to.equal("0");
 
 			
-			expect(qtip.isSelectedOrgValid()).to.equal(true);
+			expect(qtip.isSelectedIdValid(qtip.getSelectedOrgId())).to.equal(true);
 		});
 	});
 
-	describe("isSelectedTopicValid()", function() {
-		it("returns true/false depending if selected Orgnziation (id) is valid (int > -1)", function() {
-			
-			// no topic options defined, so must be false/invalid
-			expect(qtip.isSelectedTopicValid()).to.equal(false);
-
-			var topicOptions = [];
-			// add some Org options
-			for(var i = 0; i <= 3; i++) {
-				var option = $("<option>").attr({"value": i}).html("Cat_" + i);
-				topicOptions.push(option);
-			}
-			categoryCoB.append(topicOptions);
-			
-			// set elem[0] (Org option) selected
-			topicOptions[0].attr('selected', 'selected');
-			qtip.setSelectedTopicId();
-			expect(qtip.getSelectedTopicId()).to.equal("0");
-
-			
-			expect(qtip.isSelectedTopicValid()).to.equal(true);
-		});
-	});
 
 	describe("isValid()", function() {
 		it("returns true/false depending if Tip message is && selected Orgnziation and Topic (ids) are valid (int > -1)", function() {
