@@ -145,7 +145,7 @@ class TipSubmissionViewer extends PageForm {
 	}
 
 	// @override
-	function is_authorized($get, $post) {
+	function isAuthorized($get, $post) {
 		global $USER;
 		return getSystemSetting('_hasquicktip', false) && $USER->authorize('tai_canbetopicrecipient'); 
 	}
