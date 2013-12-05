@@ -11,9 +11,9 @@ function escapeHtml($string) {
 /**
  * class TipSubmissionHandler
  *
- * Description: Simple class to help manage the Quick Tip form field validation, 
+ * Description: class to help manage the Quick Tip form field validation, 
  * form submission to a target iframe (POST to quicktip API POST endpoint for tip submission),
- * fetching customer (root org) data via quicktip API REST endpoint for population 
+ * fetching customer (root org or org specifed via GET 'i' attribute) data via quicktip API REST endpoint for population 
  * into Organization and Topic dropdowns. 
  * 
  * @author Justin Burns <jburns@schoolmessenger.com>
@@ -47,7 +47,7 @@ class TipSubmissionHandler {
 
 	public function TipSubmissionHandler($options = array()) {
 
-		// sets required private member variables to the values in the $options arg array
+		// sets required private member variables to values in the $options arg array
 		foreach ($options as $key => $value) {
 			$this->$key = $value;
 		}
@@ -209,9 +209,9 @@ class TipSubmissionHandler {
 				<div class="summary-heading">Summary of the tip information you submitted:</div>
 				<div><span class="summary-label">'.$this->orgFieldName.':</span> &nbsp;<div class="summary-value">'. $this->orgName. '</div></div>
 				<div><span class="summary-label">Topic:</span> &nbsp;<div class="summary-value">'. $this->topicName.'</div></div>
-				<div><span class="summary-label">Message:</span> &nbsp;<div class="summary-value message-text">"'.$this->message.'"</div></div>';
+				<div><span class="summary-label">Message:</span> &nbsp;<div class="summary-value message-text">"'.escapeHtml($this->message).'"</div></div>';
 		if ($this->file) {
-			$html .= '<div id="summary-attachment-container"><span class="summary-label">Attachment:</span> &nbsp;<div class="summary-value">'.$this->file.'</div></div>';
+			$html .= '<div id="summary-attachment-container"><span class="summary-label">Attachment:</span> &nbsp;<div class="summary-value">'.escapeHtml($this->file).'</div></div>';
 		}
 
 		// show the user's contact info, if provided
@@ -219,25 +219,25 @@ class TipSubmissionHandler {
 				$html .= '<div class="alert contact-info">
 						<div class="summary-heading">Contact info you provided with your tip:</div>';
 				if ($this->firstname != null && $this->lastname != null) {
-					$html .= '<div><span class="summary-label">Name:</span> &nbsp;<div class="summary-value">'.$this->firstname.' '.$this->lastname.'</div></div>';
+					$html .= '<div><span class="summary-label">Name:</span> &nbsp;<div class="summary-value">'.escapeHtml($this->firstname).' '.escapeHtml($this->lastname).'</div></div>';
 				}
 				if ($this->firstname != null && $this->lastname == null) {
-					$html .= '<div><span class="summary-label">First Name:</span> &nbsp;<div class="summary-value">'.$this->firstname.'</div></div>';
+					$html .= '<div><span class="summary-label">First Name:</span> &nbsp;<div class="summary-value">'.escapeHtml($this->firstname).'</div></div>';
 				}
 				if ($this->firstname == null && $this->lastname != null) {
-					$html .= '<div><span class="summary-label">Last Name:</span> &nbsp;<div class="summary-value">'.$this->lastname.'</div></div>';
+					$html .= '<div><span class="summary-label">Last Name:</span> &nbsp;<div class="summary-value">'.escapeHtml($this->lastname).'</div></div>';
 				}								
 				if ($this->email != null) {
-					$html .= '<div><span class="summary-label">Email:</span> &nbsp;<div class="summary-value">'.$this->email.'</div></div>';
+					$html .= '<div><span class="summary-label">Email:</span> &nbsp;<div class="summary-value">'.escapeHtml($this->email).'</div></div>';
 				}
 				if ($this->phone != null) {
-					$html .= '<div><span class="summary-label">Phone:</span> &nbsp;<div class="summary-value">'.$this->phone.'</div></div>';
+					$html .= '<div><span class="summary-label">Phone:</span> &nbsp;<div class="summary-value">'.escapeHtml($this->phone).'</div></div>';
 				}
 				$html .= '</div>';
 		}
 
 		$html .= '</div>
-			<form id="newquicktip" name="newquicktip" action="' . $this->actionURL . '" method="POST">
+			<form id="newquicktip" name="newquicktip" action="' . escapeHtml($this->actionURL) . '" method="POST">
 				<fieldset>
 					<button id="new-tip" class="btn btn-lg btn-primary" type="submit">Done</button>
 				</fieldset>
@@ -253,16 +253,16 @@ class TipSubmissionHandler {
   	 */
  	public function renderTipJavascript() {
 		$html = '
-			<script type="text/javascript" src="tip.min.js"></script>
+			<script type="text/javascript" src="tip.js"></script>
 			<script type="text/javascript">
-				var qtip;
+				var qtip,
+					form 			= window.document.getElementById("quicktip"),
+					targetIframe 	= window.document.getElementById("thank-you-iframe"),
+					mask 			= window.document.getElementById("mask");
+				
 				window.onload = function() {
 					qtip = new QuickTip();
 				};
-
-				var form 			= window.document.getElementById("quicktip"),
-					targetIframe 	= window.document.getElementById("thank-you-iframe"),
-					mask 			= window.document.getElementById("mask");
 
 				targetIframe.onload = function() {
 					var iframeContent = targetIframe.contentWindow.document.body.innerHTML;
@@ -301,7 +301,7 @@ class TipSubmissionHandler {
  	/**
  	 * Provides the final HTML for either the starting Tip form or Thank You page, 
  	 * depending on existance of post data (or not)
- 	 * echoes string representing the final HTML for the 'Thank You for your tip' landing page
+ 	 * echoes string representing the final HTML for the Tip submission form or the 'Thank You for your tip' landing page
  	 */
 	public function render() {
 		$html = '
@@ -327,11 +327,11 @@ class TipSubmissionHandler {
 						$html .= $this->renderTipForm();
 					}
 
-		$html .= '</div>
-		<iframe id="thank-you-iframe" name="thank-you-iframe" style="display:none;"></iframe>';
+		$html .= '</div>';
 
-		// only init QuickTip (JS) if we're on the starting page (not the Thank You landing page)
+		// only add hidden target iframe & init QuickTip (JS) if we're on the starting page (not the Thank You landing page)
 		if (!isset($this->message)) {
+			$html .= '<iframe id="thank-you-iframe" name="thank-you-iframe" style="display:none;"></iframe>';
 			$html .= $this->renderTipJavascript();
 		}	
 
@@ -355,12 +355,12 @@ $options = array(
 	"baseCustomerURL"	=> (isset($_SERVER['HTTPS']) ? 'https://' : 'http://') . $_SERVER['SERVER_NAME'] . '/' . $custName,
 	"orgId" 	 		=> isset($_POST['orgId']) ? $_POST['orgId'] : null,
 	"topicId" 			=> isset($_POST['topicId']) ? $_POST['topicId'] : null,
-	"message" 			=> isset($_POST['message']) ? escapeHtml($_POST['message']) : null,
-	"file"				=> isset($_FILES['file']['name']) ? escapeHtml($_FILES['file']['name']) : null,
-	"firstname"  		=> isset($_POST['firstname']) ? escapeHtml($_POST['firstname']) : null,
-	"lastname"   		=> isset($_POST['lastname'])  ? escapeHtml($_POST['lastname']) : null,
-	"email" 			=> isset($_POST['email'])  	? escapeHtml($_POST['email']) : null,
-	"phone"  			=> isset($_POST['phone'])  ? escapeHtml($_POST['phone']) : null
+	"message" 			=> isset($_POST['message']) ? $_POST['message'] : null,
+	"file"				=> isset($_FILES['file']['name']) ? $_FILES['file']['name'] : null,
+	"firstname"  		=> isset($_POST['firstname']) ? $_POST['firstname'] : null,
+	"lastname"   		=> isset($_POST['lastname'])  ? $_POST['lastname'] : null,
+	"email" 			=> isset($_POST['email'])  	? $_POST['email'] : null,
+	"phone"  			=> isset($_POST['phone'])  ? $_POST['phone'] : null
 );
 
 // initialize new TipSubmissionHandler instance with $options arg

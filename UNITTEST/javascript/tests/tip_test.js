@@ -53,56 +53,31 @@ describe("QuickTip", function() {
 		window.qtip = undefined;
 	});
 
-	describe("isMessageTextValid()", function() {
+	describe("validation.message.validate()", function() {
 		it("returns true/false depending if Tip Message text is valid", function() {
 			// empty string in TA is invalid
 			messageTA[0].value = "";
-			expect(qtip.isMessageTextValid()).to.equal(false);
+			expect(qtip.validation.message.validate()).to.equal(false);
 			
 			// spaces only in TA is invalid
 			messageTA[0].value = "   ";
-			expect(qtip.isMessageTextValid()).to.equal(false);
+			expect(qtip.validation.message.validate()).to.equal(false);
 
 			messageTA[0].value = "finally some tip text...";
-			expect(qtip.isMessageTextValid()).to.equal(true);
+			expect(qtip.validation.message.validate()).to.equal(true);
 		});
 	});
 
-	describe("isSelectedIdValid()", function() {
-		it("returns true/false depending if selected Orgnziation (id) is valid (int > -1)", function() {
-			
-			// no Org options defined, so must be false/invalid
-			expect(qtip.isSelectedIdValid(qtip.getSelectedOrgId())).to.equal(false);
-
-			var orgOptions = [];
-			// add some Org options
-			for(var i = 0; i <= 3; i++) {
-				var option = $("<option>").attr({"value": i}).html("Org_" + i);
-				orgOptions.push(option);
-			}
-			orgListCoB.append(orgOptions);
-			
-			// set elem[0] (Org option) selected
-			orgOptions[0].attr('selected', 'selected');
-			qtip.setSelectedOrgId();
-			expect(qtip.getSelectedOrgId()).to.equal("0");
-
-			
-			expect(qtip.isSelectedIdValid(qtip.getSelectedOrgId())).to.equal(true);
-		});
-	});
-
-
-	describe("isValid()", function() {
-		it("returns true/false depending if Tip message is && selected Orgnziation and Topic (ids) are valid (int > -1)", function() {
+	describe("validation.isValid()", function() {
+		it("returns true/false depending if Tip message is && selected Orgnziation and Topic (ids) are valid (int > -1) and email & phone are valid", function() {
 			
 			// no message text && no topic options defined, so must be false/invalid
-			expect(qtip.isTipValid()).to.equal(false);
+			expect(qtip.validation.isValid()).to.equal(false);
 
 			messageTA[0].value = "finally some tip text...";
 			
 			// message will be valid now but not the org and topic combos
-			expect(qtip.isTipValid()).to.equal(false);
+			expect(qtip.validation.isValid()).to.equal(false);
 
 			// set selected topic option
 			var orgOptions = [];
@@ -116,10 +91,10 @@ describe("QuickTip", function() {
 			// set elem[0] (Org option) selected
 			orgOptions[0].attr('selected', 'selected');
 			qtip.setSelectedOrgId();
-			expect(qtip.getSelectedOrgId()).to.equal("0");
+			expect(qtip.orgId).to.equal("0");
 
 			// message text and org combos are valid, but not topic yet, so still invalid
-			expect(qtip.isTipValid()).to.equal(false);
+			expect(qtip.validation.isValid()).to.equal(false);
 
 			// set selected topic option
 			var topicOptions = [];
@@ -133,10 +108,34 @@ describe("QuickTip", function() {
 			// set elem[0] (Org option) selected
 			topicOptions[0].attr('selected', 'selected');
 			qtip.setSelectedTopicId();
-			expect(qtip.getSelectedTopicId()).to.equal("0");
+			expect(qtip.topicId).to.equal("0");
 
 			// finally, topic combo is set, so all 3 required fields are valid
-			expect(qtip.isTipValid()).to.equal(true);
+			expect(qtip.validation.isValid()).to.equal(true);
+		});
+	});
+
+	describe("isSelectedIdValid()", function() {
+		it("returns true/false depending if selected Orgnziation (id) is valid (int > -1)", function() {
+			
+			// no Org options defined, so must be false/invalid
+			expect(qtip.isSelectedIdValid(qtip.orgId)).to.equal(false);
+
+			var orgOptions = [];
+			// add some Org options
+			for(var i = 0; i <= 3; i++) {
+				var option = $("<option>").attr({"value": i}).html("Org_" + i);
+				orgOptions.push(option);
+			}
+			orgListCoB.append(orgOptions);
+			
+			// set elem[0] (Org option) selected
+			orgOptions[0].attr('selected', 'selected');
+			qtip.setSelectedOrgId();
+			expect(qtip.orgId).to.equal("0");
+
+			
+			expect(qtip.isSelectedIdValid(qtip.orgId)).to.equal(true);
 		});
 	});
 
@@ -162,8 +161,7 @@ describe("QuickTip", function() {
 
 			// error container should NOT be hidden (org and topic combos don't have selected options yet) but textarea is now valid with no 'has-error' class
 			expect(qtip.hasClass(errorCont, 'hide')).to.equal(false);
-			expect(qtip.hasClass(msgTACont, 'has-error')).to.equal(false);
-
+			expect(qtip.hasClass(msgTACont, 'has-error')).to.equal(true);
 		});
 	});
 
@@ -220,14 +218,14 @@ describe("QuickTip", function() {
 			// set elem[0] (Org option) selected
 			orgOptions[0].attr('selected', 'selected');
 			qtip.setSelectedOrgId();
-			expect(qtip.getSelectedOrgId()).to.equal("0");
+			expect(qtip.orgId).to.equal("0");
 
 			orgOptions[0].removeAttr('selected');
 
 			// set elem[3] (Org option) selected
 			orgOptions[3].attr('selected', 'selected');
 			qtip.setSelectedOrgId();
-			expect(qtip.getSelectedOrgId()).to.equal("3");
+			expect(qtip.orgId).to.equal("3");
 		});
 	});
 
@@ -245,14 +243,14 @@ describe("QuickTip", function() {
 			// set elem[7] (Cat option) selected
 			topicOptions[7].attr('selected', 'selected');
 			qtip.setSelectedTopicId();
-			expect(qtip.getSelectedTopicId()).to.equal("7");
+			expect(qtip.topicId).to.equal("7");
 
 			topicOptions[7].removeAttr('selected');
 
 			// set elem[10] (Cat option) selected
 			topicOptions[10].attr('selected', 'selected');
 			qtip.setSelectedTopicId();
-			expect(qtip.getSelectedTopicId()).to.equal("10");
+			expect(qtip.topicId).to.equal("10");
 		});
 	});
 
@@ -270,7 +268,7 @@ describe("QuickTip", function() {
 			// set elem w/ orgId = 2 selected
 			orgOptions[2].attr('selected', 'selected');
 			qtip.setSelectedOrgId();
-			expect(qtip.getSelectedOrgId()).to.equal("2");
+			expect(qtip.orgId).to.equal("2");
 
 			var topicOptions = [];
 			// add some category options
@@ -283,11 +281,11 @@ describe("QuickTip", function() {
 			// set elem w/ topicId = 7 selected
 			topicOptions[5].attr('selected', 'selected');
 			qtip.setSelectedTopicId();
-			expect(qtip.getSelectedTopicId()).to.equal("5");
+			expect(qtip.topicId).to.equal("5");
 
 			qtip.setFormActionURL();
 
-			expect(qtip.getFormActionURL()).to.equal("/api/2/organizations/2/topics/5/quicktip");
+			expect(qtip.formActionUrl).to.equal("/api/2/organizations/2/topics/5/quicktip");
 		});
 	});
 
