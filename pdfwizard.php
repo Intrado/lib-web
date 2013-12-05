@@ -76,9 +76,9 @@ class TemplateItem extends FormItem {
 // CUSTOM FORM FOR THIS PAGE
 // -----------------------------------------------------------------------------
 
-class TemplateForm extends Form {
+class PDFWizardFormStep1 extends Form {
 
-	function TemplateForm($name, $rawdata) {
+	function PDFWizardFormStep1($name, $rawdata) {
 		$formdata = array(
 			_L('Template Section 1'), // Optional
 			"templatetextfield" => array(
@@ -180,10 +180,26 @@ class TemplatePage extends PageForm {
 	function load() {
 		if ($this->burstid) {
 			// Load up the one we want
-			$bursttemplate = DBFind("Burst", "from burst where id = ? and not deleted", false, array($bursttemplateid), $custdb);
+			$bursttemplate = DBFind("Burst", "from burst where id = ? and not deleted", false, array($bursttemplateid));
 		}	
 
-		$this->form = new TemplateForm($this->options['formname'], $this->data);
+		switch ($this->stepnum) {
+			case 1:
+				$formclass = 'PDFWizardFormStep1';
+				break;
+
+			case 2:
+				$formclass = 'PDFWizardFormStep2';
+				break;
+
+			case 3:
+				$formclass = 'PDFWizardFormStep3';
+				break;
+
+			default:
+				return;
+		}
+		$this->form = new $formclass($this->options['formname'], $this->data);
 
 	}
 
