@@ -103,7 +103,7 @@ function showTable ($data, $titles, $formatters = array(), $repeatedColumns = ar
 			$displaytitle = substr($title,1);
 		} else if (isset($columnheadingformatters[$index])) {
 			$fn = $columnheadingformatters[$index];
-			$displaytitle = $fn($row,$index);
+			$displaytitle = $fn($index);
 		} else {
 			$displaytitle = escapehtml($title);
 		}
