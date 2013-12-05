@@ -77,7 +77,7 @@ class SearchForm extends Form {
 
 class TemplatePage extends PageMultiPart {
 
-	function is_authorized($get, $post) {
+	function isAuthorized($get, $post) {
 		return(true); // open to the world, unconditionally!
 	}
 

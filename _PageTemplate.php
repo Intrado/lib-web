@@ -150,13 +150,11 @@ function fmt_template ($obj, $field) {
 
 class TemplatePage extends PageForm {
 
-	function is_authorized($get, $post) {
+	function isAuthorized($get, $post) {
 		return(true); // open to the world, unconditionally!
 	}
 
 	function beforeLoad($get, $post) {
-		$_GET = $get; // Ben's crutch
-		$_POST = $post; // Ben's crutch
 
 		// Special case for handling deletions
 		if (isset($get['deleteid'])) {

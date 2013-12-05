@@ -98,7 +98,7 @@ abstract class PageBase implements Page {
 	function execute() {
 
 		// Check authorization
-		if (! $this->is_authorized($_GET, $_POST)) {
+		if (! $this->isAuthorized($_GET, $_POST)) {
 
 			// Redirect if unauthorized
 			$location = $this->options['noauth_redirect'];
@@ -147,7 +147,7 @@ abstract class PageBase implements Page {
 	 *
 	 * @return boolean true if the user is authorized to continue, else false
 	 */
-	function is_authorized($get, $post) {
+	function isAuthorized($get, $post) {
 		return(false);
 	}
 
