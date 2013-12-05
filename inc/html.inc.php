@@ -150,21 +150,9 @@ function submit_button($name, $value = "submit", $icon = null) {
 	$btn = '<button class="btn" type="submit" name="submit" value="'.escapehtml($value).'" onclick="return form_submit(event,\''.escapehtml($value).'\');"><span class="btn_wrap cf"><span class="btn_left"></span><span class="btn_middle">';
 	
 	if ($icon == null)
-		$btn .= '<img src="img/pixel.gif" alt="" height="16" width="1">';		
+		$btn .= '<img src="img/pixel.png" alt="" height="16" width="1">';		
 	else
-		$btn .= '<img src="img/icons/'.$icon.'.gif" alt="">';
-	$btn .= escapehtml($name) . '</span><span class="btn_right"></span></span></button>';
-	
-	return $btn;
-}
-
-function submit_button_with_image($name, $value = "submit", $imagepath = null) {
-	$btn = '<button class="btn" type="submit" name="submit" value="'.escapehtml($value).'" onclick="return form_submit(event,\''.escapehtml($value).'\');"><span class="btn_wrap cf"><span class="btn_left"></span><span class="btn_middle">';
-	
-	if ($imagepath == null)
-		$btn .= '<img src="img/pixel.gif" alt="" height="16" width="1">';
-	else
-		$btn .= '<img src="'.$imagepath.'" alt="">';
+		$btn .= '<img src="img/icons/'.$icon.'.png" alt="">';
 	$btn .= escapehtml($name) . '</span><span class="btn_right"></span></span></button>';
 	
 	return $btn;
@@ -180,7 +168,7 @@ function icon_button($name,$icon,$onclick = NULL, $href = NULL, $extrahtml = NUL
 
 	if ($extrahtml)
 		$btn .= $extrahtml;
-	$btn .= '><span class="btn_wrap cf"><span class="btn_left"></span><span class="btn_middle"><img class="btn_middle_icon" src="img/icons/'.$icon.'.gif" alt="">' . escapehtml($name) .'</span><span class="btn_right"></span></span></button>';
+	$btn .= '><span class="btn_wrap cf"><span class="btn_left"></span><span class="btn_middle"><img class="btn_middle_icon" src="img/icons/'.$icon.'.png" alt="">' . escapehtml($name) .'</span><span class="btn_right"></span></span></button>';
 	return $btn;
 }
 
