@@ -133,7 +133,7 @@ class TipSubmissionViewer extends PageForm {
 	var $sqlArgs;
 
 	function TipSubmissionViewer($options = array()) {
-		if (isset($options)) {
+		if (count($options)) {
 			$this->options = $options;
 
 			$this->orgId 		= $this->options['orgid'];
@@ -156,10 +156,12 @@ class TipSubmissionViewer extends PageForm {
 		$this->options["title"] = 'Tip Submissions';
 		$this->options["page"]  = "notifications:tips";
 
+		$orgFieldName = getSystemSetting("organizationfieldname", "Organization") || '';
+
 		$this->tableColumnHeadings = array(
 			"3" => _L("Attachment"), 
 			"2" => _L('Message'),
-			"0" => _L(getSystemSetting("organizationfieldname", "Organization")),
+			"0" => _L($orgFieldName),
 			"1" => _L('Topic'),
 			"6" => _L('Date'), 
 			"7" => _L('Contact Info')
