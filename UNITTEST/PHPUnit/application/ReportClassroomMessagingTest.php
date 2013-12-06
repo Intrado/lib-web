@@ -23,6 +23,7 @@ class ReportClassroomMessagingTest extends PHPUnit_Framework_TestCase {
 	const NUM_EXPECTED_FIELDS = 12;
 
 	public function test_summary_report() {
+		global $queryRules;
 
 		// Providing orglabel in options allows RCM constructor to skip a getSystemSetting() call for it
 		$options = array(
@@ -30,12 +31,8 @@ class ReportClassroomMessagingTest extends PHPUnit_Framework_TestCase {
 		);
 		$rcm = new ReportClassroomMessaging($options);
 
-		// (1) Make sure it gives us a result object
-		$condition = $rcm->generateQuery();
-		$this->assertTrue($condition, 'generateQuery() indicated error result');
-
-
-		// (2) Make sure it sends CSV to STDOUT - output buffering needed accordingly
+		// (1) Make sure our classroom messaging query generation
+		// method results in no errors and stub the queryResult data
 		$fakedata = array(
 			array(
 				'login' => 1,
@@ -53,7 +50,13 @@ class ReportClassroomMessagingTest extends PHPUnit_Framework_TestCase {
 				'type' => 'phone'
 			)
 		);
-		$rcm->query->__results($fakedata);
+
+		$queryRules->add('/tg.messagekey/m', $fakedata);
+		$condition = $rcm->generateQuery();
+		$this->assertTrue($condition, 'generateQuery() indicated error result');
+
+
+		// (2) Make sure it sends CSV to STDOUT - output buffering needed accordingly
 		ob_start();
 		$rcm->runCSV();
 		$csv = ob_get_contents();
