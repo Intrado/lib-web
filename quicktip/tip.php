@@ -208,7 +208,7 @@ class TipSubmissionHandler {
 			<div class="summary-info">
 				<div class="summary-heading">Summary of the tip information you submitted:</div>
 				<div><span class="summary-label">'.$this->orgFieldName.':</span> &nbsp;<div class="summary-value">'. $this->orgName. '</div></div>
-				<div><span class="summary-label">Topic:</span> &nbsp;<div class="summary-value">'. $this->topicName.'</div></div>
+				<div><span class="summary-label">Topic:</span> &nbsp;<div class="summary-value">'. escapeHtml($this->topicName).'</div></div>
 				<div><span class="summary-label">Message:</span> &nbsp;<div class="summary-value message-text">"'.escapeHtml($this->message).'"</div></div>';
 		if ($this->file) {
 			$html .= '<div id="summary-attachment-container"><span class="summary-label">Attachment:</span> &nbsp;<div class="summary-value">'.escapeHtml($this->file).'</div></div>';
@@ -237,7 +237,7 @@ class TipSubmissionHandler {
 		}
 
 		$html .= '</div>
-			<form id="newquicktip" name="newquicktip" action="' . escapeHtml($this->actionURL) . '" method="POST">
+			<form id="newquicktip" name="newquicktip" action="' . $this->actionURL . '" method="POST">
 				<fieldset>
 					<button id="new-tip" class="btn btn-lg btn-primary" type="submit">Done</button>
 				</fieldset>
