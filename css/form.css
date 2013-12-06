@@ -658,10 +658,10 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
             border-radius: 4px;
 	text-decoration: none;
 	display: inline-block;
-	padding: 3px 12px 3px 27px;
-	margin: 0 2px;
-	width: auto;
-	height: auto;
+	padding: 13px;
+	margin: 0;
+	width: 18px;
+	height: 18px;
 }
 #tips-table a.attachment:hover {
 	background: url("img/glyphicons-paperclip.png") no-repeat 5px center rgba(0, 0, 0, 0.04);
@@ -690,8 +690,11 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 #tip-view-attachment .modal-body {
 	max-height: 500px;
 }
+#tip-view-attachment #tip-attachment-content {
+	text-align: center;
+}
 #tip-view-attachment #attachment-image {
-	width: 100%;
+	width: auto;
 }
 #tip-view-attachment .modal-header h3 {
 	font-size: 20px;
