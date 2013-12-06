@@ -8,15 +8,25 @@
  */
 
 require_once(realpath(dirname(dirname(__FILE__)) .'/konaenv.php'));
+require_once(realpath(dirname(dirname(__FILE__)) .'/DBStub.php'));
 // ----------------------------------------------------------------------------
 
 require_once("{$konadir}/tips.php");
 
 
 class TipsTest extends PHPUnit_Framework_TestCase {
-	private $tips;
-	private $sessionData;
 
+	public function test_isAuthorized() {
+		global $queryRules;
+
+		$tipSubmissionViewer = new TipSubmissionViewer();
+
+		// By default, without staging something special, we should be denied authorization
+		$result = $tipSubmissionViewer->isAuthorized();
+		$this->assertFalse($result);
+	}
+/*
+	private $sessionData;
 
 	function setUp() {
 		$this->sessionData = array(
@@ -72,6 +82,6 @@ class TipsTest extends PHPUnit_Framework_TestCase {
 		$this->tipSubmissionViewer->setPagingStart(123);
 		$this->assertEquals($this->tipSubmissionViewer->pagingStart, 123);
 	}
-
+*/
 }
 ?>
