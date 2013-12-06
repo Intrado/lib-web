@@ -14,6 +14,7 @@
 
 	// Tip attachments click event handler
 	$("a.attachment").on('click', function(e) {
+		e.preventDefault();
 		var id = $(this).attr('data-message-id');
 		var fileDetails = $(this).attr('title');
 
