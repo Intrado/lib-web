@@ -10,7 +10,7 @@
 class ReportClassroomMessaging extends ReportGenerator {
 
 	// This is public so that our unit test can access it to stub data, no other reason.
-	public $query = null;
+	public $queryResult = null;
 	private $options = array();
 
 	/**
@@ -78,7 +78,7 @@ class ReportClassroomMessaging extends ReportGenerator {
 
 
 		// The query including clauses from above as WHERE clause "filters"
-		$this->query = Query("
+		$this->queryResult = Query("
 			select
 				u.login,
 				concat(u.firstname, ' ', u.lastname) as teacher,
@@ -114,7 +114,7 @@ class ReportClassroomMessaging extends ReportGenerator {
 				{$datesql};
 		");
 
-		return(is_object($this->query));
+		return(is_object($this->queryResult));
 	}
 
 	/**
@@ -148,7 +148,7 @@ class ReportClassroomMessaging extends ReportGenerator {
 		);
 
 		// For every row in the result data
-		while ($row = $this->query->fetch(PDO::FETCH_ASSOC)) {
+		while ($row = $this->queryResult->fetch(PDO::FETCH_ASSOC)) {
 			echo $fmt->fmt_csv_line($row, array_keys($titles), $formatters) . "\n";
 		}
 	}
