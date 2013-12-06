@@ -26,32 +26,22 @@ require_once('obj/PageForm.obj.php');
  */
 class TipSubmissionViewer extends PageForm {
 
+	var $formName = 'tips';
+	var $pageTitle = 'Tip Submissions';
+	var $pageNav = 'notifications:tips';
 	var $pagingStart = 0;
 	var $pagingLimit = 100;
 	var $options;
 	var $tableColumnHeadings;
 	var $tableCellFormatters;
 	var $orgFieldName;
+	var $authOrgList;
 	var $tipData;
 	var $total;
-	var $orgId = 0;
-	var $categoryId = 0;
-	var $date;
+	var $orgId = null;
+	var $categoryId = null;
+	var $date = null;
 	var $sqlArgs;
-
-	function TipSubmissionViewer($options = array()) {
-		if (count($options)) {
-			$this->options = $options;
-
-			$this->orgFieldName = $this->options['orgFieldName'];
-			
-			$this->orgId 		= $this->options['orgid'];
-			$this->categoryId 	= $this->options['categoryid'];
-			$this->date 		= $this->options['date'];
-
-			parent::PageBase($options);
-		}
-	}
 
 	// @override
 	function isAuthorized($get, $post) {
@@ -61,9 +51,9 @@ class TipSubmissionViewer extends PageForm {
 
 	// @override
 	function initialize() {
-		$this->options["formname"] = 'tips';
-		$this->options["title"] = 'Tip Submissions';
-		$this->options["page"]  = "notifications:tips";
+		$this->options["formname"] = $this->formName;
+		$this->options["title"] = $this->pageTitle;
+		$this->options["page"]  = $this->pageNav;
 
 		$this->tableColumnHeadings = array(
 			"3" => _L("Attachment"), 
@@ -90,9 +80,18 @@ class TipSubmissionViewer extends PageForm {
 
 	// @override
 	function beforeLoad($get, $post) {
-		if (!$this->isAuthorized($get, $post)) {
-			redirect('unauthorized.php');
-		}
+		$tipState = isset($_SESSION['tips']) ? $_SESSION['tips'] : array() ;
+
+		// inspecting POST params is only necessary for the *first* form submission, 
+		// after which subsequest submissions will contain the SESSION['tips'] data from form->getData() in afterLoad()
+		$this->orgId 		= $tipState['orgid'] ? $tipState['orgid'] : (isset($_POST['tips_orgid']) ? $_POST['tips_orgid'] : null);
+		$this->categoryId 	= $tipState['categoryid'] ? $tipState['categoryid'] : (isset($_POST['tips_categoryid']) ? $_POST['tips_categoryid'] : null);
+		$this->date 		= $tipState['date'] ? $tipState['date'] : (isset($_POST['tips_date']) ? $_POST['tips_date'] : null);
+
+		// fetch org field name and auth key list as these are needed in setFormData()
+		$this->authOrgList 	= Organization::getAuthorizedOrgKeys();
+		$this->orgFieldName = getSystemSetting("organizationfieldname", "Organization");
+
 		$this->setPagingStart((isset($get['pagestart'])) ? $get['pagestart'] : 0);
 		$this->setFormData();
 	}
@@ -105,7 +104,7 @@ class TipSubmissionViewer extends PageForm {
 
 	// @override
 	function afterLoad() {
-		$this->form = new Form($this->options['formname'], $this->formdata, null, array( submit_button(_L(' Search Tips'), 'search', 'pictos/p1/16/64')));
+		$this->form = new Form($this->formName, $this->formdata, null, array( submit_button(_L(' Search Tips'), 'search', 'pictos/p1/16/64')));
 		$this->form->ajaxsubmit = false;
 
 		$this->form->handleRequest();
@@ -147,8 +146,8 @@ class TipSubmissionViewer extends PageForm {
 
 	function setFormData() {
 		$orgArray[0] = 'All ' . $this->orgFieldName . 's';
-		$orgList = Organization::getAuthorizedOrgKeys();
-		foreach ($orgList as $id => $value) {
+		$this->authOrgList = Organization::getAuthorizedOrgKeys();
+		foreach ($this->authOrgList as $id => $value) {
 			$orgArray[$id] = escapehtml($value);
 		}
 
@@ -162,7 +161,7 @@ class TipSubmissionViewer extends PageForm {
 			$catArray[$id] = escapehtml($value);
 		}
 
-		$dateObj = json_decode($this->options['date'], true);
+		$dateObj = json_decode($this->date, true);
 		$dateType = $dateObj['reldate'];
 		$dateArr = array(
 			"reldate" 	=> isset($dateObj['reldate']) ? $dateObj['reldate'] : 'today',
@@ -174,7 +173,7 @@ class TipSubmissionViewer extends PageForm {
 		$this->formdata['orgid'] = array(
 			"label" 		=> _L($this->orgFieldName),
 			"fieldhelp" 	=> _L("Select a ".$this->orgFieldName." to filter Tip search results on. "),
-			"value" 		=> isset($this->options['orgid']) ? $this->options['orgid'] : $orgArray[0],
+			"value" 		=> $this->orgId ? $this->orgId : $orgArray[0],
 			"validators" 	=> array(array("ValInArray", "values" => array_keys($orgArray))),
 			"control" 		=> array("SelectMenu", "values" => $orgArray),
 			"helpstep" 		=> 1
@@ -183,7 +182,7 @@ class TipSubmissionViewer extends PageForm {
 		$this->formdata['categoryid'] = array(
 			"label" 		=> _L("Topic"),
 			"fieldhelp" 	=> _L("Select a Topic to filter Tip search results on."),
-			"value" 		=> isset($this->options['categoryid']) ? $this->options['categoryid'] : $catArray[0],
+			"value" 		=> $this->categoryId ? $this->categoryId : $catArray[0],
 			"validators" 	=> array(array("ValInArray", "values" => array_keys($catArray))),
 			"control" 		=> array("SelectMenu", "values" => $catArray),
 			"helpstep" 		=> 1
@@ -289,12 +288,12 @@ function fmt_tip_message ($row, $index) {
 	$txt = fmt_null($row, $index); // returns 'html escaped string'
 	$max = 140;
 	if (strlen($txt) > $max) {
-		$s  = '<span class="tip-message-trimmed">"' . substr($txt, 0, $max - 3) . '..." ';
+		$s  = '<span class="tip-message-trimmed">' . substr($txt, 0, $max - 3) . '... ';
 		$s .= '<a href="#" class="tip-read-more">Read More</a></span>';
-		$s .= '<span class="tip-message-full" style="display:none">"' . $txt . '"</span>';
+		$s .= '<span class="tip-message-full" style="display:none">' . $txt . '</span>';
 		return $s;
 	} else
-		return "\"" . $txt . "\"";
+		return $txt;
 }
 
 function fmt_attachment ($row, $index) {
@@ -358,28 +357,8 @@ function fmt_contactinfo_col_heading() {
 	return _L('Contact&nbsp;Info'); 
 }
 
-// Initialize SESSION['tips'] data and handle request params;
-////////////////////////////////////////////////////////////////////////////////
 
-if (!isset($_SESSION['tips'])) {
-	$_SESSION['tips'] = array();
-}
-
-$orgid = 		isset($_POST['tips_orgid']) ? $_POST['tips_orgid'] : 
-				isset($_SESSION['tips']['orgid']) ? $_SESSION['tips']['orgid'] : null;
-$categoryid = 	isset($_POST['tips_categoryid']) ? $_POST['tips_categoryid'] : 
-				isset($_SESSION['tips']['categoryid']) ? $_SESSION['tips']['categoryid'] : null;
-$date = 		isset($_POST['tips_date']) ? $_POST['tips_date'] : 
-				isset($_SESSION['tips']['date']) ? $_SESSION['tips']['date'] : null;
-
-$_SESSION['tips']['orgid'] 		= $orgid;
-$_SESSION['tips']['categoryid'] = $categoryid;
-$_SESSION['tips']['date'] 		= $date;
-
-$_SESSION['tips']['orgFieldName'] = getSystemSetting("organizationfieldname", "Organization");
-
-// Initialize TipSubmissionViewer with $_SESSION['tips'] data ($options) and exexute (render final page)
-////////////////////////////////////////////////////////////////////////////////
-$tips = new TipSubmissionViewer($_SESSION['tips']);
-executePage($tips);
+// Initialize TipSubmissionViewer and execute (render final page)
+// ================================================================
+executePage(new TipSubmissionViewer());
 ?>
