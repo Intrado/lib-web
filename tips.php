@@ -44,7 +44,7 @@ class TipSubmissionViewer extends PageForm {
 	var $sqlArgs;
 
 	// @override
-	function isAuthorized($get, $post) {
+	function isAuthorized($get = array(), $post = array()) {
 		global $USER;
 		return getSystemSetting('_hasquicktip', false) && $USER->authorize('tai_canbetopicrecipient'); 
 	}
@@ -79,7 +79,7 @@ class TipSubmissionViewer extends PageForm {
 	}
 
 	// @override
-	function beforeLoad($get, $post) {
+	function beforeLoad($get = array(), $post = array()) {
 		$tipState = isset($_SESSION['tips']) ? $_SESSION['tips'] : array() ;
 
 		// inspecting POST params is only necessary for the *first* form submission, 
@@ -362,3 +362,4 @@ function fmt_contactinfo_col_heading() {
 // ================================================================
 executePage(new TipSubmissionViewer());
 ?>
+

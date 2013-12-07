@@ -147,7 +147,7 @@ abstract class PageBase implements Page {
 	 *
 	 * @return boolean true if the user is authorized to continue, else false
 	 */
-	function isAuthorized($get, $post) {
+	function isAuthorized($get = array(), $post = array()) {
 		return(false);
 	}
 
@@ -166,7 +166,7 @@ abstract class PageBase implements Page {
 	 * @param array $get Associative array of name/value pairs akin to $_GET
 	 * @param array $post Associative array of name/value pairs akin to $_POST
 	 */
-	function beforeLoad($get, $post) {
+	function beforeLoad($get = array(), $post = array()) {
 	}
 
 	/**

@@ -9,7 +9,14 @@
  */
 
 class QueryRules {
-	private $rules = array();
+	private $rules;
+
+	/**
+	 * Constructor, nothing fancy
+	 */
+	public function QueryRules() {
+		$this->reset();
+	}
 
 	/**
 	 * Reset all the rules; should be done at the start of
@@ -22,17 +29,53 @@ class QueryRules {
 	/**
 	 * Add a query rule iwth the supplied pattern and data
 	 *
+	 * add($pattern, $data);
+	 * add($pattern, $args, $data);
+	 *
 	 * @param string $pattern Regex pattern to match against $query in the
 	 * apply function
 	 * @param array $data Multidimensional array of query result data we
 	 * want the apply function to return whenever this pattern is matched in
 	 * a query
+	 * @param array $args When three arguments are passed, the second is an
+	 * indexed array of arguments to be injected into a parameterized query
 	 */
-	public function add($pattern, $data) {
-		$this->rules[] = array(
-			'pattern' => $pattern,
-			'data' => $data
-		);
+	public function add() {
+
+		// Quasi-poly-mophism in PHP:
+		switch (func_num_args()) {
+			case 2:
+				list($pattern, $data) = func_get_args();
+				$args = array();
+				break;
+
+			case 3:
+				list($pattern, $args, $data) = func_get_args();
+				break;
+
+			// Any other argument count is not supported
+			default:
+				print "QueryRules::add() called with an unsupported count of arguments\n";
+				return;
+		}
+
+		// The distinct rule key is a combination of the pattern and the parameterization arguments
+		$rulekey = md5($pattern . serialize($args));
+
+		// If there is already a rule with this key
+		if (isset($this->rules[$rulekey])) {
+
+			// Add this data set to the pattern's result set
+			$this->rules[$rulekey]['data'][] = $data;
+		}
+		else {
+			// Add a new rule for this key
+			$this->rules[$rulekey] = array(
+				'pattern' => $pattern,
+				'data' => array($data),
+				'dataptr' => 0
+			);
+		}
 	}
 
 	/**
@@ -46,17 +89,23 @@ class QueryRules {
 	 * @return array Data associated with whatever pattern matches first, or
 	 * an empty array if there were no pattern matches
 	 */
-	public function apply($query) {
-
-		// If there are no rules to apply, then the result data will be an empty array
-		if (! count($this->rules)) return(array());
+	public function apply($query, $args = array()) {
 
 		// For each rule defined...
-		foreach ($this->rules as $rule) {
+		if (count($this->rules)) {
+			foreach ($this->rules as $rulekey => $rule) {
 
-			// If the pattern matches this query...
-			if (preg_match($rule['pattern'], $query, $matches)) {
-				return($rule['data']);
+				// If the pattern matches this query...
+				if (preg_match($rule['pattern'], $query, $matches)) {
+
+					// Get the data for this rule at its current data pointer location
+					$data = $rule['data'][$rule['dataptr']];
+
+					// Advance the data pointer location in a looping fashion
+					$rule['dataptr'] = ($rule['dataptr'] + 1) % count($rule['data']);
+
+					return($data);
+				}
 			}
 		}
 
@@ -95,6 +144,7 @@ class QueryResult {
 	}
 }
 
+// functions that are stubbed because real ones would actually touch the database server
 
 function DBSafe($value) {
 
@@ -120,5 +170,12 @@ function Query($query) {
 function QuickQuery($query) {
 	global $queryRules;
 	return(new QueryResult($queryRules->apply($query)));
+}
+
+
+// functions lifted verbatim from db.inc.php
+
+function DBGetRow ($result, $assoc = false) {
+	return $result->fetch($assoc ? PDO::FETCH_ASSOC : PDO::FETCH_NUM);
 }
 

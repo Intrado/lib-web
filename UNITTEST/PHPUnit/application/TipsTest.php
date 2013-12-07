@@ -17,7 +17,14 @@ require_once("{$konadir}/tips.php");
 class TipsTest extends PHPUnit_Framework_TestCase {
 
 	public function test_isAuthorized() {
-		global $queryRules;
+		global $queryRules, $USER;
+
+		// Make a new user object for uid=1
+		$USER = new User(1);
+
+
+		// Make some query rules
+		$queryRules->add('/select value from setting where name = ?/', 1);
 
 		$tipSubmissionViewer = new TipSubmissionViewer();
 
