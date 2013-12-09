@@ -86,63 +86,45 @@ class TipsTest extends PHPUnit_Framework_TestCase {
 		$result = $tipSubmissionViewer->isAuthorized();
 		$this->assertTrue($result);
 	}
-/*
-	private $sessionData;
 
-	function setUp() {
-		$this->sessionData = array(
-			"tips" => array(
-				"orgid" => "25",
-				"categoryid" => "15",
-				"date" => '{"reldate":"today","xdays":"","startdate":"","enddate":""}'
-			)
-		);
+	public function test_fmt_contact_info() {
 
-		// $this->$mock_searchForm = $this->getMock("TipSearchForm");
-		// $this->tipSubmissionViewer = new TipSubmissionViewer($sessionData);
+		// Fully populated contact info should result in a useful string
+		$row = array('first', 'last', 'email', 'phone');
+		$result = fmt_contact_info($row, 0);
+		$this->assertTrue(strlen($result) > 0);
 
+		// Empty contact info should result in an empty string
+		$result = fmt_contact_info(array('', '', '', ''), 0);
+		$this->assertTrue(strlen($result) == 0);
 	}
 
-	// sets options with the formname, title and page (nav), 
-	public function test_initialize() {
-		$this->tipSubmissionViewer = new TipSubmissionViewer($this->sessionData);
+	public function test_fmt_attachment() {
 
-		$this->assertEquals($this->tipSubmissionViewer->options["formname"], 'tips');
-		$this->assertEquals($this->tipSubmissionViewer->options["title"], 'Tip Submissions');
-		$this->assertEquals($this->tipSubmissionViewer->options["page"], 'notifications:tips');
+		// 500000 bytes should become 488.3KB
+		$row = array('Attachment name', 500000, 1);
+		$result = fmt_attachment($row, 0);
+		$this->assertTrue($result != '&nbsp;');
+		$this->assertTrue(strpos($result, '488.3KB') > 0);
 
-		$this->assertEquals(count($this->tipSubmissionViewer->tableColumnHeadings), 6);
-
-		$this->assertEquals($this->tipSubmissionViewer->tableCellFormatters["2"], "fmt_tip_message");
-		$this->assertEquals($this->tipSubmissionViewer->tableCellFormatters["3"], "fmt_attachment");
-		$this->assertEquals($this->tipSubmissionViewer->tableCellFormatters["6"], "fmt_nbr_date");
-		$this->assertEquals($this->tipSubmissionViewer->tableCellFormatters["7"], "fmt_contact_info");
-
-		$this->assertEquals($this->tipSubmissionViewer->tableColumnHeadingFormatters["3"], "fmt_attach_col_heading");
-		$this->assertEquals($this->tipSubmissionViewer->tableColumnHeadingFormatters["6"], "fmt_date_col_heading");
-		$this->assertEquals($this->tipSubmissionViewer->tableColumnHeadingFormatters["7"], "fmt_contactinfo_col_heading");
+		// A non-attachment record should deliver a non-breaking space
+		$result = fmt_attachment(array(), 0);
+		$this->assertTrue($result == '&nbsp;');
 	}
 
-	public function test_load() {
-		// needs database access to test
-		$this->markTestIncomplete();
-	}
+	public function test_fmt_tip_message() {
 
-	public function test_sendPageOutput() {
-		// untestable while start(end)Window, showTable, showPageMenu only writes to stdout instead of returning a string
-		$this->markTestIncomplete();
-	}
+		// The limit is 140 chars; under should be unmodified
+		$result = fmt_tip_message(array(str_repeat('a', 130)), 0);
+		$this->assertTrue(strlen($result) == 130);
 
-	public function test_doSearchQuery() {
-		// needs database access to test
-		$this->markTestIncomplete();
-	}
+		// On the limit should also be unmodified
+		$result = fmt_tip_message(array(str_repeat('a', 140)), 0);
+		$this->assertTrue(strlen($result) == 140);
 
-	public function test_setPagingStart() {
-		$this->tipSubmissionViewer = new TipSubmissionViewer($this->sessionData);
-		$this->tipSubmissionViewer->setPagingStart(123);
-		$this->assertEquals($this->tipSubmissionViewer->pagingStart, 123);
+		// But over the limit should return WAY more data
+		$result = fmt_tip_message(array(str_repeat('a', 150)), 0);
+		$this->assertTrue(strlen($result) > 150);
 	}
-*/
 }
 ?>
