@@ -16,21 +16,75 @@ require_once("{$konadir}/tips.php");
 
 class TipsTest extends PHPUnit_Framework_TestCase {
 
+	const USER_ID = 1;
+	const ACCESS_ID = 3;
+
 	public function test_isAuthorized() {
 		global $queryRules, $USER;
 
-		// Make a new user object for uid=1
-		$USER = new User(1);
+		// Make some query rules:
 
+		// 1) The getCustomerSetting('_hasquicktip') query
+		$queryRules->add('/select value from setting where name = ?/', array('_hasquicktip'), 0);
 
-		// Make some query rules
-		$queryRules->add('/select value from setting where name = ?/', 1);
+		// 2) The user DBMO initialization query for userID=1
+		$queryRules->add('/from user where id/', array(self::USER_ID),
+			array(
+				array(
+					self::ACCESS_ID,
+					'first.last',
+					'',
+					'first',
+					'last',
+					'description',
+					'email',
+					'autoreportemail',
+					'8316001335',
+					1,
+					null,
+					0,
+					0,
+					'staff10124',
+					null,
+					'2013-01-01 12:00:00',
+					null
+				)
+			)
+		);
+
+		// 3) The profile (access) record for this user
+		$queryRules->add('/from access where id/', array(self::ACCESS_ID),
+			array(
+				array(
+					'name',
+					'description'
+				)
+			)
+		);
+
+		// 4) Permissions for this user's profile
+		$queryRules->add('/from permission where accessid/',
+			array(
+				array(
+					1,
+					self::ACCESS_ID,
+					'tai_canbetopicrecipient',
+					1
+				)
+			)
+		);
+
+		// Make a new user object for userID=1
+		$USER = new User(self::USER_ID);
+
+		// Make a new access object
+		$ACCESS = $_SESSION['access'] = new Access($USER->accessid);
 
 		$tipSubmissionViewer = new TipSubmissionViewer();
 
 		// By default, without staging something special, we should be denied authorization
 		$result = $tipSubmissionViewer->isAuthorized();
-		$this->assertFalse($result);
+		$this->assertTrue($result);
 	}
 /*
 	private $sessionData;
