@@ -98,6 +98,35 @@ $formdata["coordy"] = array(
 	"helpstep" => $helpstepnum
 );
 
+$formdata["skipstart"] = array(
+	"label" => _L('# Pages to Skip @ Start'),
+	"value" => $bursttemplate->pagesskipstart,
+	"validators" => array(
+		array("ValRequired"),
+	),
+	"control" => array("TextField", "size" => 4, "maxlength" => 4),
+	"helpstep" => $helpstepnum
+);
+
+$formdata["skipend"] = array(
+	"label" => _L('# Pages to Skip @ End'),
+	"value" => $bursttemplate->pagesskipend,
+	"validators" => array(
+		array("ValRequired"),
+	),
+	"control" => array("TextField", "size" => 4, "maxlength" => 4),
+	"helpstep" => $helpstepnum
+);
+
+$formdata["ppstudent"] = array(
+	"label" => _L('# Pages per Student'),
+	"value" => $bursttemplate->pagesperreport,
+	"validators" => array(
+		array("ValRequired"),
+	),
+	"control" => array("TextField", "size" => 4, "maxlength" => 4),
+	"helpstep" => $helpstepnum
+);
 
 $buttons = array(
 	submit_button(_L('Save'),"submit","tick"),
@@ -136,6 +165,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$bursttemplate->name = $postdata["name"];
 		$bursttemplate->x = $postdata["coordx"];
 		$bursttemplate->y = $postdata["coordy"];
+		$bursttemplate->pagesskipstart = $postdata["skipstart"];
+		$bursttemplate->pagesskipend = $postdata["skipend"];
+		$bursttemplate->pagesperreport = $postdata["ppstudent"];
 
 		if ($bursttemplateid)
 			$bursttemplate->update();
