@@ -27,7 +27,7 @@ class QueryRules {
 	}
 
 	/**
-	 * Add a query rule iwth the supplied pattern and data
+	 * Add a query rule with the supplied pattern and data
 	 *
 	 * add($pattern, $data);
 	 * add($pattern, $args, $data);
@@ -60,7 +60,7 @@ class QueryRules {
 		}
 
 		// The distinct rule key is a combination of the pattern and the parameterization arguments
-		$rulekey = md5($pattern . serialize($args));
+		$rulekey = $this->makeRulekey($pattern, $args);
 
 		// If there is already a rule with this key
 		if (isset($this->rules[$rulekey])) {
@@ -79,6 +79,20 @@ class QueryRules {
 	}
 
 	/**
+	 * Helper function to make a distinct rulekey for each query pattern / argument set supplied
+	 */
+	private function makeRulekey($pattern, $args) {
+
+		// The default value for args in the query functions is boolean false (mixed type, ugh!)
+		if (! is_array($args)) $args = array();
+
+		// The distinct rule key is a combination of the pattern and the parameterization arguments
+		$rulekey = md5($pattern . serialize($args));
+
+		return($rulekey);
+	}
+
+	/**
 	 * Apply any stubbed database query rules that are defined; the
 	 * first match will result in returning whatever result array that
 	 * the matching rule specifies
@@ -93,24 +107,29 @@ class QueryRules {
 
 		// For each rule defined...
 		if (count($this->rules)) {
+
 			foreach ($this->rules as $rulekey => $rule) {
 
 				// If the pattern matches this query...
 				if (preg_match($rule['pattern'], $query, $matches)) {
+		
+					// And if the distinct rule key matchs the supplied arguments
+					if ($rulekey == $this->makeRulekey($rule['pattern'], $args)) {
 
-					// Get the data for this rule at its current data pointer location
-					$data = $rule['data'][$rule['dataptr']];
+						// Get the data for this rule at its current data pointer location
+						$data = $rule['data'][$rule['dataptr']];
 
-					// Advance the data pointer location in a looping fashion
-					$rule['dataptr'] = ($rule['dataptr'] + 1) % count($rule['data']);
+						// Advance the data pointer location in a looping fashion
+						$rule['dataptr'] = ($rule['dataptr'] + 1) % count($rule['data']);
 
-					return($data);
+						return($data);
+					}
 				}
 			}
 		}
 
 		// Well, no rules matched, so empty array data result it is
-		print("QueryRules::apply() - No rule matching query: [{$query}]\n\n");
+		print("QueryRules::apply() - No rule matching query: [{$query}]\nargs: " . print_r($args, true) ."\n\n");
 		return(array());
 	}
 }
@@ -162,14 +181,14 @@ function getStartEndDate() {
 	return(array(time(),time()));
 }
 
-function Query($query) {
+function Query($query, $dbconnect=false, $args=false) {
 	global $queryRules;
-	return(new QueryResult($queryRules->apply($query)));
+	return(new QueryResult($queryRules->apply($query, $args)));
 }
 
-function QuickQuery($query) {
+function QuickQuery($query, $dbconnect=false, $args=false) {
 	global $queryRules;
-	return(new QueryResult($queryRules->apply($query)));
+	return(new QueryResult($queryRules->apply($query, $args)));
 }
 
 
