@@ -51,6 +51,7 @@ class TipSubmissionViewer extends PageForm {
 
 	// @override
 	function initialize() {
+		// override some options set in PageBase
 		$this->options["formname"] = $this->formName;
 		$this->options["title"] = $this->pageTitle;
 		$this->options["page"]  = $this->pageNav;
@@ -82,11 +83,9 @@ class TipSubmissionViewer extends PageForm {
 	function beforeLoad($get = array(), $post = array()) {
 		$tipState = isset($_SESSION['tips']) ? $_SESSION['tips'] : array() ;
 
-		// inspecting POST params is only necessary for the *first* form submission, 
-		// after which subsequest submissions will contain the SESSION['tips'] data from form->getData() in afterLoad()
-		$this->orgId 		= $tipState['orgid'] ? $tipState['orgid'] : (isset($_POST['tips_orgid']) ? $_POST['tips_orgid'] : null);
-		$this->categoryId 	= $tipState['categoryid'] ? $tipState['categoryid'] : (isset($_POST['tips_categoryid']) ? $_POST['tips_categoryid'] : null);
-		$this->date 		= $tipState['date'] ? $tipState['date'] : (isset($_POST['tips_date']) ? $_POST['tips_date'] : null);
+		$this->orgId 		= $tipState['orgid'];
+		$this->categoryId 	= $tipState['categoryid'];
+		$this->date 		= $tipState['date'];
 
 		// fetch org field name and auth key list as these are needed in setFormData()
 		$this->authOrgList 	= Organization::getAuthorizedOrgKeys();
@@ -146,7 +145,6 @@ class TipSubmissionViewer extends PageForm {
 
 	function setFormData() {
 		$orgArray[0] = 'All ' . $this->orgFieldName . 's';
-		$this->authOrgList = Organization::getAuthorizedOrgKeys();
 		foreach ($this->authOrgList as $id => $value) {
 			$orgArray[$id] = escapehtml($value);
 		}
