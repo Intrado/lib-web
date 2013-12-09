@@ -118,7 +118,7 @@ class TipSubmissionViewer extends PageForm {
 	// @override
 	function sendPageOutput() {
 		global $TITLE;
-
+		include_once("css/tips.css.php");
 		startWindow($TITLE);
 
 		echo '<div id="tip-icon"></div><div id="tip-search-instruction">Search Tip Submissions based on '.$this->orgFieldName.', Topic, and/or Date.</div>';
