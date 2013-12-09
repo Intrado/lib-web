@@ -58,6 +58,12 @@ class TipSubmissionHandler {
 		// fetch customer data via curl GET request to customer's quicktip API endpoint
 		$this->customerData = json_decode($this->fetchCustomerData());
 		
+		// render blank page and exit if customer data is null due to 404 response from fetchCustomerData() call
+		if (!$this->customerData) {
+			$this->renderBlankPage();
+			exit;
+		}
+
 		// set the product name, ex SchoolMessenger & org field name (ex. School, Organization)
 		$this->productName 	= $this->customerData->productName;
 		$this->orgFieldName = $this->customerData->organizationFieldName;
@@ -70,6 +76,10 @@ class TipSubmissionHandler {
 			$this->setOrganizations($this->customerData->organizations);
 			$this->setTopics($this->customerData->topics);
 		} 
+	}
+
+	public function renderBlankPage() {
+		echo '<!DOCTYPE html><html lang="en"><head></head><body></body></html>';
 	}
 
 	/** 
