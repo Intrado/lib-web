@@ -53,18 +53,18 @@ describe("QuickTip", function() {
 		window.qtip = undefined;
 	});
 
-	describe("validation.message.validate()", function() {
+	describe("this.valMessage()", function() {
 		it("returns true/false depending if Tip Message text is valid", function() {
 			// empty string in TA is invalid
 			messageTA[0].value = "";
-			expect(qtip.validation.message.validate.call(qtip)).to.equal(false);
+			expect(qtip.valMessage()).to.equal(false);
 			
 			// spaces only in TA is invalid
 			messageTA[0].value = "   ";
-			expect(qtip.validation.message.validate.call(qtip)).to.equal(false);
+			expect(qtip.valMessage()).to.equal(false);
 
 			messageTA[0].value = "finally some tip text...";
-			expect(qtip.validation.message.validate.call(qtip)).to.equal(true);
+			expect(qtip.valMessage()).to.equal(true);
 		});
 	});
 
@@ -72,12 +72,12 @@ describe("QuickTip", function() {
 		it("returns true/false depending if Tip message is && selected Orgnziation and Topic (ids) are valid (int > -1) and email & phone are valid", function() {
 			
 			// no message text && no topic options defined, so must be false/invalid
-			expect(qtip.validation.validate.call(qtip)).to.equal(false);
+			expect(qtip.validate()).to.equal(false);
 
 			messageTA[0].value = "finally some tip text...";
 			
 			// message will be valid now but not the org and topic combos
-			expect(qtip.validation.validate.call(qtip)).to.equal(false);
+			expect(qtip.validate()).to.equal(false);
 
 			// set selected topic option
 			var orgOptions = [];
@@ -94,7 +94,7 @@ describe("QuickTip", function() {
 			expect(qtip.orgId).to.equal("0");
 
 			// message text and org combos are valid, but not topic yet, so still invalid
-			expect(qtip.validation.validate.call(qtip)).to.equal(false);
+			expect(qtip.validate()).to.equal(false);
 
 			// set selected topic option
 			var topicOptions = [];
@@ -111,7 +111,7 @@ describe("QuickTip", function() {
 			expect(qtip.topicId).to.equal("0");
 
 			// finally, topic combo is set, so all 3 required fields are valid
-			expect(qtip.validation.validate.call(qtip)).to.equal(true);
+			expect(qtip.validate()).to.equal(true);
 		});
 	});
 
