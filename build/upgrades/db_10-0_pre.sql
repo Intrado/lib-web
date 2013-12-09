@@ -50,3 +50,18 @@ $$$
 
 drop INDEX `id` ON bursttemplate
 $$$
+
+-- $rev 6
+alter table `burst` drop column `pagesskipstart`;
+$$$
+alter table `burst` drop column `pagesskipend`;
+$$$
+alter table `burst` drop column `pagesperreport`;
+$$$
+alter table `bursttemplate` add column `pagesskipstart` int(3) default 0 after `y`;
+$$$
+alter table `bursttemplate` add column `pagesskipend` int(3) default 0 after `pagesskipstart`;
+$$$
+alter table `bursttemplate` add column `pagesperreport` int(3) default 1 after `pagesskipend`;
+$$$
+

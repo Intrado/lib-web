@@ -2264,3 +2264,22 @@ drop INDEX `id` ON bursttemplate
 $$$
 
 -- END 10.0/5
+
+
+-- START 10.0/6
+update setting set value='10.0/6' where name='_dbversion'
+$$$
+alter table `burst` drop column `pagesskipstart`;
+$$$
+alter table `burst` drop column `pagesskipend`;
+$$$
+alter table `burst` drop column `pagesperreport`;
+$$$
+alter table `bursttemplate` add column `pagesskipstart` int(3) default 0 after `y`;
+$$$
+alter table `bursttemplate` add column `pagesskipend` int(3) default 0 after `pagesskipstart`;
+$$$
+alter table `bursttemplate` add column `pagesperreport` int(3) default 1 after `pagesskipend`;
+$$$
+-- END 10.0/6
+
