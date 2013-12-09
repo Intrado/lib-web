@@ -7,46 +7,6 @@ function QuickTip() {
 	this.formActionUrl	 = "",
 	this.isValid 		 = false;
 
-	this.validation = {
-		validate: function() {
-			return this.isValid = (this.validation.org.validate.call(this) &&
-								   this.validation.topic.validate.call(this) &&
-								   this.validation.message.validate.call(this) &&
-								   this.validation.email.validate.call(this) &&
-								   this.validation.phone.validate.call(this));
-		},
-		org: {
-			isValid: false,
-			msg: 'Please select a valid Organization.',
-			validate: function () {
-				return this.validation.org.isValid = this.isSelectedIdValid(this.orgId);}
-		},
-		topic: {
-			isValid: false,
-			msg: 'Please select a valid Topic.',
-			validate: function () {
-				return this.validation.topic.isValid = this.isSelectedIdValid(this.topicId);}
-		},
-		message: {
-			isValid: false,
-			msg: 'Please enter a Tip Message.',
-			validate: function() {
-				return this.validation.message.isValid = ((this.messageTA.value).replace(/^\s+|\s+$/g, '')).length > 0 ? true : false;}
-		},
-		email: {
-			isValid: true,
-			msg: 'Please enter a valid email address.<div class="error-format-example">Ex. janedoe@example.com</div>',
-			validate: function() {
-				return this.validation.email.isValid = (typeof(this.emailTF.checkValidity) === 'function') ? this.emailTF.checkValidity() : true;}
-		},
-		phone: {
-			isValid: true,
-			msg: 'Please enter a valid phone number.<div class="error-format-example">Format: (888) 555-1234, 888-555-1234, or 888.555.1234</div>',
-			validate: function() {
-				return this.validation.phone.isValid = (typeof(this.phoneTF.checkValidity) === 'function') ? this.phoneTF.checkValidity() : true;}
-		}
-	};
-
 	this.ui = {
 		'tipForm': 			'quicktip',
 		'mask':	 			'mask',
@@ -65,6 +25,53 @@ function QuickTip() {
 	for(var key in this.ui) {
 		this[key] = this.doc.getElementById(this.ui[key]);
 	}
+
+	this.valOrg = function () {
+		return this.validation.org.isValid = this.isSelectedIdValid(this.orgId);
+	};
+
+	this.valTopic = function () {
+		return this.validation.topic.isValid = this.isSelectedIdValid(this.topicId);
+	};
+
+	this.valMessage = function() {
+		return this.validation.message.isValid = ((this.messageTA.value).replace(/^\s+|\s+$/g, '')).length > 0 ? true : false;
+	};
+
+	this.valEmail = function() {
+		return this.validation.email.isValid = (typeof(this.emailTF.checkValidity) === 'function') ? this.emailTF.checkValidity() : true;
+	}
+
+	this.valPhone = function() {
+		return this.validation.phone.isValid = (typeof(this.phoneTF.checkValidity) === 'function') ? this.phoneTF.checkValidity() : true;
+	}
+
+	this.validate = function() {
+		return this.isValid = (this.valOrg() && this.valTopic() && this.valMessage() && this.valEmail() && this.valPhone());
+	};
+
+	this.validation = {
+		org: {
+			isValid: false,
+			msg: 'Please select a valid Organization.'
+		},
+		topic: {
+			isValid: false,
+			msg: 'Please select a valid Topic.'
+		},
+		message: {
+			isValid: false,
+			msg: 'Please enter a Tip Message.'
+		},
+		email: {
+			isValid: true,
+			msg: 'Please enter a valid email address.<div class="error-format-example">Ex. janedoe@example.com</div>'
+		},
+		phone: {
+			isValid: true,
+			msg: 'Please enter a valid phone number.<div class="error-format-example">Format: (888) 555-1234, 888-555-1234, or 888.555.1234</div>'
+		}
+	};
 
 	this.renderValidation = function() {
 		this.errorMsgCont.innerHTML = '';
@@ -157,35 +164,20 @@ function QuickTip() {
 		}
 	}());
 
-	this.removeEventHandlers = function() {
-		this.submitB.removeEventListener('click', this.submitFormHandler, false);
-		this.messageTA.removeEventListener('keyup', this.messageHandler, false);
-		this.emailTF.removeEventListener('keyup', this.emailHandler, false);
-		this.phoneTF.removeEventListener('keyup', this.phoneHandler, false);
+	this.bind = function (fn){ 
+	  var ctx = this;
+	  return function(){ 
+	    return fn.apply(ctx, arguments); 
+	  }; 
 	};
 
-	this.bind = function(ctx, fn, args) {
-		return function(event) {
-			fn.call(ctx, (args || event));
-		};
-	};
-
-	this.valHandler = function(updateFieldVal) {
-		if (!this.isValid) {
-			this.validation.validate.call(this);
-			if (updateFieldVal.call(this)) {
-				this.renderValidation();
-			}
-		}
-	};
-
-	this.submitForm = function(event) {
+	this.submitHandler = this.bind(function(event) {
 		event.preventDefault();
 
 		this.setSelectedOrgId();
 		this.setSelectedTopicId();
 
-		if (!this.validation.validate.call(this)) {
+		if (!this.validate()) {
 			this.renderValidation();
 		} else {
 			this.setFormActionURL();
@@ -194,14 +186,30 @@ function QuickTip() {
 			this.addClass(this.submitTipSp, 'hide');
 			this.tipForm.submit();
 		}
-	}
+	});
 
-	this.submitFormHandler	= this.bind(this, this.submitForm);
-	this.messageHandler 	= this.bind(this, this.valHandler, this.validation.message.validate);
-	this.emailHandler 		= this.bind(this, this.valHandler, this.validation.email.validate);
-	this.phoneHandler 		= this.bind(this, this.valHandler, this.validation.phone.validate);
+	this.valHandler = function(updateFieldVal) {
+		if (!this.isValid) {
+			this.validate();
+			if (updateFieldVal.apply(this)) {
+				this.renderValidation();
+			}
+		}
+	};
 
-	this.addEvent(this.submitB,   'click', this.submitFormHandler);
+	this.messageHandler = this.bind(function() {
+		this.valHandler(this.valMessage);
+	});
+
+	this.emailHandler = this.bind(function() {
+		this.valHandler(this.valEmail);
+	});
+
+	this.phoneHandler = this.bind(function() {
+		this.valHandler(this.valPhone);
+	});
+
+	this.addEvent(this.submitB,   'click', this.submitHandler);
 	this.addEvent(this.messageTA, 'keyup', this.messageHandler);
 	this.addEvent(this.emailTF,   'keyup', this.emailHandler);
 	this.addEvent(this.phoneTF,   'keyup', this.phoneHandler);

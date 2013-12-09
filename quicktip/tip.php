@@ -281,10 +281,6 @@ class TipSubmissionHandler {
 						// remove the target attribute to make sure we submit (post) to ourself, not the target iframe;
 						form.removeAttribute("target");
 
-						// remove previous event handler; we dont want that old behavior at this point; 
-						// just a simple form submit (back to ourself) is enough
-						qtip.removeEventHandlers();
-
 						// submit form (posts back to ourself; i.e. /<custname>/quicktip/tip.php?i=<rootorgid>)
 						form.submit();
 					} else {
