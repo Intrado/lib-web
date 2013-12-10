@@ -291,6 +291,9 @@ class TipSubmissionViewer extends PageForm {
 			LEFT JOIN tai_messageattachment tma on (tma.messageid = tm.id)
 			WHERE 1 ";
 
+		// limit results to only those orgs in the user's authorized org list
+		$query .= " AND o.id IN (" . implode(', ', array_keys($this->authOrgList)) . ") ";
+
 		// include user org/category search params, if any
 		if ($this->orgId) {
 			$query .= ' AND o.id = ?';
