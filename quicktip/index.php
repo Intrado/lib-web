@@ -278,7 +278,7 @@ class TipSubmissionHandler {
 					var iframeContent = targetIframe.contentWindow.document.body.innerHTML;
 					
 					// handle IE loading empty iframe on page load
-					if (iframeContent.length == 0) {
+					if (iframeContent && iframeContent.length == 0) {
 						return false;
 					}
 
