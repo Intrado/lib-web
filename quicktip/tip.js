@@ -26,14 +26,6 @@ function QuickTip() {
 		this[key] = this.doc.getElementById(this.ui[key]);
 	}
 
-	this.valOrg = function () {
-		return this.validation.org.isValid = this.isSelectedIdValid(this.orgId);
-	};
-
-	this.valTopic = function () {
-		return this.validation.topic.isValid = this.isSelectedIdValid(this.topicId);
-	};
-
 	this.valMessage = function() {
 		return this.validation.message.isValid = ((this.messageTA.value).replace(/^\s+|\s+$/g, '')).length > 0 ? true : false;
 	};
@@ -47,18 +39,10 @@ function QuickTip() {
 	}
 
 	this.validate = function() {
-		return this.isValid = (this.valOrg() && this.valTopic() && this.valMessage() && this.valEmail() && this.valPhone());
+		return this.isValid = (this.valMessage() && this.valEmail() && this.valPhone());
 	};
 
 	this.validation = {
-		org: {
-			isValid: false,
-			msg: 'Please select a valid Organization.'
-		},
-		topic: {
-			isValid: false,
-			msg: 'Please select a valid Topic.'
-		},
 		message: {
 			isValid: false,
 			msg: 'Please enter a Tip Message.'
@@ -80,12 +64,6 @@ function QuickTip() {
 			this.addClass(this.errorMsgCont, 'hide');
 			this.removeClass(this.messageTACont, 'has-error');
 		} else {
-			if (!this.validation.org.isValid) {
-				this.setErrorMessage(this.validation.org.msg);
-			}
-			if (!this.validation.topic.isValid) {
-				this.setErrorMessage(this.validation.topic.msg);
-			}
 			if (!this.validation.message.isValid) {
 				this.addClass(this.messageTACont, 'has-error');
 				this.setErrorMessage(this.validation.message.msg);

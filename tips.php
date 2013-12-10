@@ -16,6 +16,85 @@ require_once('ifc/Page.ifc.php');
 require_once('obj/PageBase.obj.php');
 require_once('obj/PageForm.obj.php');
 
+
+// Table Formatters
+
+// Formats Tip Message with a truncated text at 140 chars max,
+// and a 'Read More' link, which shows the full message if clicked
+function fmt_tip_message ($row, $index) {
+	$msg = $row[$index];
+	$max = 140;
+	if (strlen($msg) > $max) {
+		$s  = '<span class="tip-message-trimmed">' . escapehtml(substr($msg, 0, $max - 3)) . '... ';
+		$s .= '<a href="#" class="tip-read-more">Read More</a></span>';
+		$s .= '<span class="tip-message-full" style="display:none">' . escapehtml($msg) . '</span>';
+		return $s;
+	} else
+		return escapehtml($msg);
+}
+
+function fmt_attachment ($row, $index) {
+	if (isset($row[$index])) {
+		$fileDetailsOrig = $row[$index].' ('. round((($row[$index+1]) / 1024), 1) . 'KB)';
+		return '<a href="#" class="attachment" data-message-id="'.$row[$index+2].'" title="Attachment: '.$fileDetailsOrig .'"></a>';
+	}
+	return "&nbsp;";
+}
+
+function fmt_contact_info ($row, $index) {
+	$str  = '';
+
+	// get the individual contact fields in the row (and html escape them)
+	$first = (isset($row[$index])) 	   ? escapehtml($row[$index]) 	  : "";
+	$last  = (isset($row[$index + 1])) ? escapehtml($row[$index + 1]) : "";
+	$email = (isset($row[$index + 2])) ? escapehtml($row[$index + 2]) : "";
+	$phone = (isset($row[$index + 3])) ? escapehtml($row[$index + 3]) : "";
+
+	// check for existence (to determine if/how we display them)
+	$hasFirst = strlen($first) > 0;
+	$hasLast  = strlen($last)  > 0;
+	$hasEmail = strlen($email) > 0;
+	$hasPhone = strlen($phone) > 0;
+
+	if ($hasFirst || $hasLast || $hasEmail || $hasPhone) {
+		$str .= '<span class="tip-contact-details">';
+		if ($hasFirst && $hasLast) {
+			$str .= '<div>Name:&nbsp;'.$first.' '.$last.'</div>';
+		}
+		else if ($hasFirst && !$hasLast) {
+			$str .= '<div>First&nbsp;Name:&nbsp;'.$first.'</div>';
+		}
+		else if (!$hasFirst && $hasLast) {
+			$str .= '<div>Last&nbsp;Name:&nbsp;'.$last.'</div>';
+		}
+
+		if ($hasEmail) {
+			$str .= '<div>Email:&nbsp;'.$email.'</div>';
+		}
+		if ($hasPhone) {
+			$str .= '<div>Phone:&nbsp;'.$phone.'</div>';
+		}
+		$str .= '</span>';
+	}
+		
+	return $str;
+}
+
+// table column heading <th> formatters
+function fmt_attach_col_heading() {
+	return '<div class="attachment"></div>';
+}
+
+function fmt_date_col_heading() {
+	return _L('Date') . '&nbsp;<div id="carat"></div>';
+}
+
+function fmt_contactinfo_col_heading() {
+	// non-breaking so it doesn't wrap on 2 lines
+	return _L('Contact&nbsp;Info'); 
+}
+
+
 /**
  * class TipSubmissionViewer
  * 
@@ -55,7 +134,31 @@ class TipSubmissionViewer extends PageForm {
 		$this->options["formname"] = $this->formName;
 		$this->options["title"] = $this->pageTitle;
 		$this->options["page"]  = $this->pageNav;
+	}
 
+	// @override
+	function beforeLoad($get = array(), $post = array()) {
+		$tipState = isset($_SESSION['tips']) ? $_SESSION['tips'] : array() ;
+
+		$this->orgId 		= $tipState['orgid'];
+		$this->categoryId 	= $tipState['categoryid'];
+		$this->date 		= $tipState['date'];
+
+		$this->setPagingStart((isset($get['pagestart'])) ? $get['pagestart'] : 0);
+	}
+
+	// @override
+	function load() {
+		// fetch org field name and auth key list as these are needed in setFormData()
+		$this->authOrgList 	= Organization::getAuthorizedOrgKeys();
+		$this->orgFieldName = getSystemSetting("organizationfieldname", "Organization");
+
+		// gets table data based on search/filter settings
+		$this->doSearchQuery();
+	}
+
+	// @override
+	function afterLoad() {
 		$this->tableColumnHeadings = array(
 			"3" => _L("Attachment"), 
 			"2" => _L('Message'),
@@ -77,32 +180,8 @@ class TipSubmissionViewer extends PageForm {
 			"6" => "fmt_date_col_heading",
 			"7" => "fmt_contactinfo_col_heading",
 		);
-	}
 
-	// @override
-	function beforeLoad($get = array(), $post = array()) {
-		$tipState = isset($_SESSION['tips']) ? $_SESSION['tips'] : array() ;
-
-		$this->orgId 		= $tipState['orgid'];
-		$this->categoryId 	= $tipState['categoryid'];
-		$this->date 		= $tipState['date'];
-
-		// fetch org field name and auth key list as these are needed in setFormData()
-		$this->authOrgList 	= Organization::getAuthorizedOrgKeys();
-		$this->orgFieldName = getSystemSetting("organizationfieldname", "Organization");
-
-		$this->setPagingStart((isset($get['pagestart'])) ? $get['pagestart'] : 0);
 		$this->setFormData();
-	}
-
-	// @override
-	function load() {
-		// gets table data based on search/filter settings
-		$this->doSearchQuery();
-	}
-
-	// @override
-	function afterLoad() {
 		$this->form = new Form($this->formName, $this->formdata, null, array( submit_button(_L(' Search Tips'), 'search', 'pictos/p1/16/64')));
 		$this->form->ajaxsubmit = false;
 
@@ -118,10 +197,10 @@ class TipSubmissionViewer extends PageForm {
 	// @override
 	function sendPageOutput() {
 		global $TITLE;
-		include_once("css/tips.css.php");
 		startWindow($TITLE);
 
-		echo '<div id="tip-icon"></div><div id="tip-search-instruction">Search Tip Submissions based on '.$this->orgFieldName.', Topic, and/or Date.</div>';
+		echo '<link rel="stylesheet" type="text/css" href="css/tips.css">
+			  <div id="tip-icon"></div><div id="tip-search-instruction">Search Tip Submissions based on '.$this->orgFieldName.', Topic, and/or Date.</div>';
 		// render search form
 		echo $this->form->render();
 
@@ -142,6 +221,8 @@ class TipSubmissionViewer extends PageForm {
 		echo '<script src="script/tips.js"></script>';
 		$this->createAttachmentViewerModal();
 	}
+
+	/*=============== non-override helper methods below =================*/
 
 	function setFormData() {
 		$orgArray[0] = 'All ' . $this->orgFieldName . 's';
@@ -275,86 +356,6 @@ class TipSubmissionViewer extends PageForm {
 	}
 
 }
-
-/////////////// end of TipSubmissionViewer class ////////////////////////
-
-
-// Helper formatter function:
-// formats Tip Message with a truncated text at 140 chars max,
-// and a 'Read More' link, which shows the full message if clicked
-function fmt_tip_message ($row, $index) {
-	$txt = fmt_null($row, $index); // returns 'html escaped string'
-	$max = 140;
-	if (strlen($txt) > $max) {
-		$s  = '<span class="tip-message-trimmed">' . substr($txt, 0, $max - 3) . '... ';
-		$s .= '<a href="#" class="tip-read-more">Read More</a></span>';
-		$s .= '<span class="tip-message-full" style="display:none">' . $txt . '</span>';
-		return $s;
-	} else
-		return $txt;
-}
-
-function fmt_attachment ($row, $index) {
-	if (isset($row[$index])) {
-		$fileDetailsOrig = $row[$index].' ('. round((($row[$index+1]) / 1024), 1) . 'KB)';
-		return '<a href="#" class="attachment" data-message-id="'.$row[$index+2].'" title="Attachment: '.$fileDetailsOrig .'"></a>';
-	}
-	return "&nbsp;";
-}
-
-function fmt_contact_info ($row, $index) {
-	$str  = '';
-
-	// get the individual contact fields in the row (and html escape them)
-	$first = (isset($row[$index])) 	   ? escapehtml($row[$index]) 	  : "";
-	$last  = (isset($row[$index + 1])) ? escapehtml($row[$index + 1]) : "";
-	$email = (isset($row[$index + 2])) ? escapehtml($row[$index + 2]) : "";
-	$phone = (isset($row[$index + 3])) ? escapehtml($row[$index + 3]) : "";
-
-	// check for existence (to determine if/how we display them)
-	$hasFirst = strlen($first) > 0;
-	$hasLast  = strlen($last)  > 0;
-	$hasEmail = strlen($email) > 0;
-	$hasPhone = strlen($phone) > 0;
-
-	if ($hasFirst || $hasLast || $hasEmail || $hasPhone) {
-		$str .= '<span class="tip-contact-details">';
-		if ($hasFirst && $hasLast) {
-			$str .= '<div>Name:&nbsp;'.$first.' '.$last.'</div>';
-		}
-		else if ($hasFirst && !$hasLast) {
-			$str .= '<div>First&nbsp;Name:&nbsp;'.$first.'</div>';
-		}
-		else if (!$hasFirst && $hasLast) {
-			$str .= '<div>Last&nbsp;Name:&nbsp;'.$last.'</div>';
-		}
-
-		if ($hasEmail) {
-			$str .= '<div>Email:&nbsp;'.$email.'</div>';
-		}
-		if ($hasPhone) {
-			$str .= '<div>Phone:&nbsp;'.$phone.'</div>';
-		}
-		$str .= '</span>';
-	}
-		
-	return $str;
-}
-
-// table column heading <th> formatters
-function fmt_attach_col_heading() {
-	return '<div class="attachment"></div>';
-}
-
-function fmt_date_col_heading() {
-	return _L('Date') . '&nbsp;<div id="carat"></div>';
-}
-
-function fmt_contactinfo_col_heading() {
-	// non-breaking so it doesn't wrap on 2 lines
-	return _L('Contact&nbsp;Info'); 
-}
-
 
 // Initialize TipSubmissionViewer and execute (render final page)
 // ================================================================
