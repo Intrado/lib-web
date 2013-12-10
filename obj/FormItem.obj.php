@@ -173,7 +173,7 @@ class TextArea extends FormItem {
 		$disablebrowserspellcheck = isset($this->args['disablebrowserspellcheck']) && $this->args['disablebrowserspellcheck'] ? 'spellcheck="false"' : "";
 		$spellcheck = isset($this->args['spellcheck']) && $this->args['spellcheck'];
 		
-		$str = '<textarea id="'.$n.'" name="'.$n.'" '.$rows.' '.$cols.' '.$disablebrowserspellcheck.'/>'.escapehtml($value).'</textarea>';
+		$str = '<textarea id="'.$n.'" name="'.$n.'" '.$rows.' '.$cols.' '.$disablebrowserspellcheck.'>'.escapehtml($value).'</textarea>';
 		
 		//FIXME this belongs in renderJavaScript()
 		if(isset($this->args['counter'])) {
