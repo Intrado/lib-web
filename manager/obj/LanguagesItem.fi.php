@@ -8,27 +8,34 @@ class LanguagesItem extends FormItem {
 				<input id='$n' name='$n' type='hidden' value='$value' />
 				<div id='$n-removelang' style='display:none'>" . icon_button("Remove", "delete") . "</div>
 				<div id='$n-disp'></div>
-				<table><td style=\"border: 1px solid black;\">
-				Language Lookup:<br />
-				<table><tr><td>
-				<select id='newlanginputselect' onchange='languageselect();'>
-				<option value=0> -- Select Common Language -- </option>";
-				foreach ($this->args['googlelangs'] as $code => $googlang) {
-					$ttsLangSup = '';
-					if (in_array($code, $this->args['ttslangs']))
-						$ttsLangSup .= " (TTS Support)";
-					$str .= "<option value='" . str_pad($code,3) . " $googlang' >$googlang $ttsLangSup</option>";
-				}
-				$str .= '
-				</select>
-				</td><td>&nbsp;&nbsp;&nbsp;or&nbsp;&nbsp;&nbsp;</td><td><input id="searchbox" type="text" size="30" /></td><td>' . icon_button("Search", "magnifier","searchlanguages();") . '</td></tr></table>
-				<table id="searchresult" style=""><tr><td></td></tr></table>
-				<table style="display:inline;"><tr><td>Code: 
-				<div style="display:inline;font-weight: bold;" id="newlangcodedisp">N/A</div> Name: 
-				<input id="newlangcode" type="hidden" maxlength="50" size="25" />
-				<input id="newlanginput" type="text" maxlength="50" size="25" />
-				</td><td>' . icon_button("Add", "add","changelanguage('$n')") . '</td></tr></table>
-				</td></tr>
+				<table>
+					<tr><td style=\"border: 1px solid black;\">
+						Language Lookup:<br />
+						<table><tr><td>
+							<select id='newlanginputselect' onchange='languageselect();'>
+								<option value=0> -- Select Common Language -- </option>";
+		foreach ($this->args['googlelangs'] as $code => $googlang) {
+			$ttsLangSup = '';
+			if (in_array($code, $this->args['ttslangs']))
+				$ttsLangSup .= " (TTS Support)";
+			$str .= "<option value='" . str_pad($code,3) . " $googlang' >$googlang $ttsLangSup</option>";
+		}
+		$str .= '
+							</select>
+							</td>
+							<td>&nbsp;&nbsp;&nbsp;or&nbsp;&nbsp;&nbsp;</td>
+							<td><input id="searchbox" type="text" size="30" /></td>
+							<td>' . icon_button("Search", "magnifier","searchlanguages();") . '</td>
+						</tr></table>
+						<table id="searchresult" style=""><tr><td></td></tr></table>
+						<table style="display:inline;"><tr><td>Code: 
+							<div style="display:inline;font-weight: bold;" id="newlangcodedisp">N/A</div> Name: 
+							<input id="newlangcode" type="hidden" maxlength="50" size="25" />
+							<input id="newlanginput" type="text" maxlength="50" size="25" />
+							</td>
+							<td>' . icon_button("Add", "add","changelanguage('$n')") . '</td>
+						</tr></table>
+					</td></tr>
 				</table>
 				';
 		return $str;
