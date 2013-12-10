@@ -277,6 +277,11 @@ class TipSubmissionHandler {
 				targetIframe.onload = function() {
 					var iframeContent = targetIframe.contentWindow.document.body.innerHTML;
 					
+					// handle IE loading empty iframe on page load
+					if (iframeContent.length == 0) {
+						return false;
+					}
+
 					// if iframe content contains HTML response with "Thank You", it means the tip submission
 					// was successfully received, else there was an error
 					if (iframeContent && iframeContent.indexOf("Thank you") > -1) {
