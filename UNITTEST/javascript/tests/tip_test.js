@@ -69,48 +69,12 @@ describe("QuickTip", function() {
 	});
 
 	describe("validation.isValid()", function() {
-		it("returns true/false depending if Tip message is && selected Orgnziation and Topic (ids) are valid (int > -1) and email & phone are valid", function() {
+		it("returns true/false depending if Tip message length (trimmed) > 0", function() {
 			
 			// no message text && no topic options defined, so must be false/invalid
 			expect(qtip.validate()).to.equal(false);
 
 			messageTA[0].value = "finally some tip text...";
-			
-			// message will be valid now but not the org and topic combos
-			expect(qtip.validate()).to.equal(false);
-
-			// set selected topic option
-			var orgOptions = [];
-			// add some Org options
-			for(var i = 0; i <= 3; i++) {
-				var option = $("<option>").attr({"value": i}).html("Org_" + i);
-				orgOptions.push(option);
-			}
-			orgListCoB.append(orgOptions);
-			
-			// set elem[0] (Org option) selected
-			orgOptions[0].attr('selected', 'selected');
-			qtip.setSelectedOrgId();
-			expect(qtip.orgId).to.equal("0");
-
-			// message text and org combos are valid, but not topic yet, so still invalid
-			expect(qtip.validate()).to.equal(false);
-
-			// set selected topic option
-			var topicOptions = [];
-			// add some Org options
-			for(var i = 0; i <= 3; i++) {
-				var option = $("<option>").attr({"value": i}).html("Cat_" + i);
-				topicOptions.push(option);
-			}
-			categoryCoB.append(topicOptions);
-			
-			// set elem[0] (Org option) selected
-			topicOptions[0].attr('selected', 'selected');
-			qtip.setSelectedTopicId();
-			expect(qtip.topicId).to.equal("0");
-
-			// finally, topic combo is set, so all 3 required fields are valid
 			expect(qtip.validate()).to.equal(true);
 		});
 	});
@@ -160,7 +124,7 @@ describe("QuickTip", function() {
 			expect(qtip.renderValidation());
 
 			// error container should NOT be hidden (org and topic combos don't have selected options yet) but textarea is now valid with no 'has-error' class
-			expect(qtip.hasClass(errorCont, 'hide')).to.equal(false);
+			expect(qtip.hasClass(errorCont, 'hide')).to.equal(true);
 			expect(qtip.hasClass(msgTACont, 'has-error')).to.equal(false);
 		});
 	});
