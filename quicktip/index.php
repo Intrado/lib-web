@@ -272,37 +272,35 @@ class TipSubmissionHandler {
 				
 				window.onload = function() {
 					qtip = new QuickTip();
-				};
+					qtip.iframeHandler = qtip.bind(function() {
+						var iframeContent = targetIframe.contentWindow.document.body.innerHTML;
 
-				targetIframe.onload = function() {
-					var iframeContent = targetIframe.contentWindow.document.body.innerHTML;
-					
-					// handle IE loading empty iframe on page load; iframeContent = "" (empty string) in this case
-					if (iframeContent.length == 0) {
-						return false;
-					}
+						// if iframe content contains HTML response with "Thank You", it means the tip submission
+						// was successfully received, else there was an error
+						if (iframeContent && iframeContent.indexOf("Thank you") > -1) {
+							// remove hidden target iframe (no longer needed)
+							targetIframe.parentNode.removeChild(targetIframe);
 
-					// if iframe content contains HTML response with "Thank You", it means the tip submission
-					// was successfully received, else there was an error
-					if (iframeContent && iframeContent.indexOf("Thank you") > -1) {
-						// remove hidden target iframe (no longer needed)
-						targetIframe.parentNode.removeChild(targetIframe);
+							// remove the previous POST API URL (so we don\'t accidentally re-post to POST API URL)
+							// and set action attribute to originating script with the rootorgid query param,
+							// i.e. /<custname>/quicktip/tip.php?i=<rootorgid>
+							form.setAttribute("action", "' . $this->actionURL . '");
 
-						// remove the previous POST API URL (so we don\'t accidentally re-post to POST API URL)
-						// and set action attribute to originating script with the rootorgid query param,
-						// i.e. /<custname>/quicktip/tip.php?i=<rootorgid>
-						form.setAttribute("action", "' . $this->actionURL . '");
+							// remove the target attribute to make sure we submit (post) to ourself, not the target iframe;
+							form.removeAttribute("target");
 
-						// remove the target attribute to make sure we submit (post) to ourself, not the target iframe;
-						form.removeAttribute("target");
+							// submit form (posts back to ourself; i.e. /<custname>/quicktip/tip.php?i=<rootorgid>)
+							form.submit();
+						} else {
+							// there was an error; show the error message
+							qtip.setErrorMessage("Sorry, there was an error.  Please try again.");
+							qtip.addClass(mask, "hide");
+						}
+					});
 
-						// submit form (posts back to ourself; i.e. /<custname>/quicktip/tip.php?i=<rootorgid>)
-						form.submit();
-					} else {
-						// there was an error; show the error message
-						qtip.setErrorMessage("Sorry, there was an error.  Please try again.");
-						qtip.addClass(mask, "hide");
-					}
+					// listen to "onload" event (fired when iframe gets loaded with initial API POST response) 
+					// from targetIframe and call iframeHandler callback
+					qtip.addEvent(targetIframe, "load", qtip.iframeHandler);
 				};
 			</script>';
 

@@ -83,9 +83,10 @@
 	color: #999;
 }
 #tips-table.list tr.listHeader div#carat {
-	border-color: #444444 rgba(0, 0, 0, 0) rgba(0, 0, 0, 0);
-    border-style: solid;
-    border-width: 4px;
+    border-top: 4px solid #444;
+    border-right: 4px solid transparent;
+    border-left: 4px solid transparent;
+    border-bottom: 4px solid transparent;
     float: right;
     height: 0;
     margin-right: 5px;
@@ -95,7 +96,7 @@
 #tip-view-attachment.modal {
 	margin-left: -330px;
     margin-top: -285px;
-    max-height: 500px;
+    max-height: 530px;
     width: 660px;
 }
 #tip-view-attachment .modal-body {

@@ -150,7 +150,7 @@ function QuickTip() {
 	};
 
 	this.submitHandler = this.bind(function(event) {
-		event.preventDefault();
+		event.preventDefault ? event.preventDefault() : event.returnValue = false;
 
 		this.setSelectedOrgId();
 		this.setSelectedTopicId();
