@@ -53,7 +53,8 @@ $versions = array (
 		"9.5/3",
 		"9.6/1",
 		"9.7/5",
-		"10.0/6"
+		"10.0/6",
+		"10.1/1"
 		//etc
 	),
 	
@@ -235,6 +236,7 @@ function update_customer($db, $customerid, $shardid) {
 	require_once("upgrades/db_9-6.php");
 	require_once("upgrades/db_9-7.php");
 	require_once("upgrades/db_10-0.php");
+	require_once("upgrades/db_10-1.php");
 	
 
 	// for each version, upgrade to the next
@@ -342,6 +344,11 @@ function update_customer($db, $customerid, $shardid) {
 				break;
 			case "10.0":
 				if (!upgrade_10_0($rev, $shardid, $customerid, $db)) {
+					exit("Error upgrading DB");
+				}
+				break;
+			case "10.1":
+				if (!upgrade_10_1($rev, $shardid, $customerid, $db)) {
 					exit("Error upgrading DB");
 				}
 				break;

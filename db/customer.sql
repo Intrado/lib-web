@@ -2269,17 +2269,24 @@ $$$
 -- START 10.0/6
 update setting set value='10.0/6' where name='_dbversion'
 $$$
-alter table `burst` drop column `pagesskipstart`;
+alter table `burst` drop column `pagesskipstart`
 $$$
-alter table `burst` drop column `pagesskipend`;
+alter table `burst` drop column `pagesskipend`
 $$$
-alter table `burst` drop column `pagesperreport`;
+alter table `burst` drop column `pagesperreport`
 $$$
-alter table `bursttemplate` add column `pagesskipstart` int(3) default 0 after `y`;
+alter table `bursttemplate` add column `pagesskipstart` int(3) default 0 after `y`
 $$$
-alter table `bursttemplate` add column `pagesskipend` int(3) default 0 after `pagesskipstart`;
+alter table `bursttemplate` add column `pagesskipend` int(3) default 0 after `pagesskipstart`
 $$$
-alter table `bursttemplate` add column `pagesperreport` int(3) default 1 after `pagesskipend`;
+alter table `bursttemplate` add column `pagesperreport` int(3) default 1 after `pagesskipend`
 $$$
 -- END 10.0/6
 
+-- START 10.1/1
+ALTER TABLE `bursttemplate` CHANGE `created` `createdtimestampms` BIGINT NULL DEFAULT NULL
+$$$
+
+update setting set value='10.1/1' where name='_dbversion'
+$$$
+-- END 10.1/1
