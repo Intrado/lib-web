@@ -101,7 +101,7 @@ class PdfManager extends PageBase {
 		if ($this->isAjaxRequest) {
 			// sets paging-related numPages, curPage, displayStart, displayEnd from $total result above
 			$this->setDisplayPagingDetails();
-			$this->processQueryResults();
+			$this->burstsAjaxResponse();
 		}
 	}
 
@@ -114,11 +114,10 @@ class PdfManager extends PageBase {
 			  </div>
 			  <hr>';
 
-
 		$feedButtons = array(icon_button(_L(' Upload New PDF'), "pdficon_16", null, "pdfedit.php"));
 		$sortoptions = array(
-			"name" => array("icon" => "img/largeicons/tiny20x20/pencil.jpg", "name" => "Name"),
-			"date" => array("icon" => "img/largeicons/tiny20x20/clock.jpg", "name" => "Date")
+			"name" => array("icon" => "img/largeicons/tiny20x20/pencil.jpg", "name" => "Filename"),
+			"date" => array("icon" => "img/largeicons/tiny20x20/clock.jpg", "name" => "Upload Date")
 		);
 		feed($feedButtons,$sortoptions);
 		echo '<script type="text/javascript" src="script/feed.js.php"></script>
@@ -146,7 +145,7 @@ class PdfManager extends PageBase {
 		return $response;
  	}
 
-	public function processQueryResults() {
+	public function burstsAjaxResponse() {
 		if(empty($this->feedData)) {
 			$data->list[] = array("itemid" => "",
 								  "defaultlink" => "",
@@ -157,26 +156,26 @@ class PdfManager extends PageBase {
 		} else {
 			
 			while(!empty($this->feedData)) {
-				$item = array_shift($this->feedData);
-				$itemid = $item['id'];
-				$defaultlink = $this->burstsURL . "/" . $itemid. "/pdf";
+				$item 			= array_shift($this->feedData);
+				$itemid 		= $item['id'];
+				$defaultlink 	= $this->burstsURL . "/" . $itemid. "/pdf";
 
-				$title = escapehtml($item['name']);
-				$fileName = escapehtml($item['filename']);
-				$uploadDate = date("M j, Y g:i a", $item['uploaddatems']);
-				$fileSize = $item['bytes'];
-				$status = $item['status'];
-
-				$icon = 'img/pdficon_32.png';
+				$title 			= escapehtml($item['name']);
+				$fileName 		= escapehtml($item['filename']);
+				$uploadDate 	= date("M j, Y g:i a", $item['uploaddatems']);
+				$fileSize 		= $item['bytes'];
+				$status 		= $item['status'];
+				
+				$icon 			= 'img/pdficon_32.png';
 
 				// if (userOwns("messagegroup", $itemid)) { //TODO: add proper privilege checks for PDFs
 				if (true) {	
 					$tools = action_links (
 						action_link(" Edit", "pencil", 'pdfedit.php?id=' . $itemid),
-						action_link(" Preview", "magnifier", 'todo'),
-						action_link(" Send Email", "email_go", 'todo'),
-						action_link(" Download", "disk", 'todo'),
-						action_link(" Delete", "cross", 'todo', "return confirmDelete();")
+						action_link(" Preview", "magnifier", $this->burstsURL . "/" . $itemid. "/portions"),
+						action_link(" Send Email", "email_go", $this->burstsURL . "/" . $itemid. "/send"),
+						action_link(" Download", "disk", $this->burstsURL . "/" . $itemid. "/pdf"),
+						action_link(" Delete", "cross", $this->burstsURL . "/" . $itemid. "/delete", "return confirmDelete();")
 					);
 				} 
 				
@@ -198,7 +197,7 @@ class PdfManager extends PageBase {
 			$data->pageinfo = array($this->numPages,
 									$this->pagingLimit,
 									$this->curPage, 
-									"Showing $this->displayStart - $this->displayEnd of $this->total records on $this->numPages pages "
+									"Showing $this->displayStart - $this->displayEnd of $this->total records on $this->numPages pages &nbsp;"
 									);
 
 			header('Content-Type: application/json');
