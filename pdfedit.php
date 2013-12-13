@@ -107,6 +107,8 @@ function fmt_template ($obj, $field) {
 
 class PDFEditPage extends PageForm {
 
+	const MAX_PDF_UPLOAD_BYTES = 209715200; // 200MB
+
 	var $burst = null;		// DBMO for the burst record we're working on
 	var $burstId = null;		// ID for the DBMO object to interface with
 	var $burstTemplates = array();	// An array to collect all the available burst templates into
@@ -116,14 +118,14 @@ class PDFEditPage extends PageForm {
 		parent::PageForm($options);
 	}
 
-	function isAuthorized($get, $post, $request, $session) {
+	function isAuthorized(&$get, &$post, &$request, &$session) {
 		return(true); // open to the world, unconditionally!
 	}
 
-	function beforeLoad($get, $post, $request, $session) {
+	function beforeLoad(&$get, &$post, &$request, &$session) {
 
-		// The the query string has a burst ID specified, then grab it
-		$this->burstId = (isset($get['id']) && intval($get['id'])) ? intval($get['id']) : null;
+		// The the query string/post data has a burst ID specified, then grab it
+		$this->burstId = (isset($request['id']) && intval($request['id'])) ? intval($request['id']) : null;
 
 		// Special case for handling deletions
 		if (isset($get['deleteid'])) {
@@ -137,7 +139,7 @@ class PDFEditPage extends PageForm {
 		// Any other special case. early-exit operations needed for our page?
 	}
 
-	function load($get, $post, $request, $session) {
+	function load(&$get, &$post, &$request, &$session) {
 
 		// Make the burst DBMO
 		$this->burst = new Burst($this->burstId);
@@ -174,6 +176,7 @@ class PDFEditPage extends PageForm {
 				"label" => _L('Name'),
 				"value" => "",
 				"validators" => array(
+					array('ValRequired'),
 					array("ValLength","min" => 3,"max" => 50)
 				),
 				"control" => array("TextField","size" => 30, "maxlength" => 50, "autocomplete" => "test"),
@@ -183,10 +186,27 @@ class PDFEditPage extends PageForm {
 				"label" => _L('Template'),
 				"value" => '0',
 				"validators" => array(),
-				"control" => array('SelectMenu', 'values' => (array('null' => _L('Select PDF Template')) + $this->burstTemplates)),
+				"control" => array('SelectMenu', 'values' => (array('' => _L('Select PDF Template')) + $this->burstTemplates)),
 				"helpstep" => 2
 			)
 		);
+
+		// If we already have a burstId
+		if ($this->burstId) {
+			// TODO: Then a file has already been uploaded, so we're just going to show a read-only representation
+		}
+		else {
+			// Otherwise we need to show the upload formitem to be able to select and upload a new PDF
+			$formdata[] = array(
+				"label" => _L('Upload PDF'),
+				"value" => '',
+				"validators" => array(
+					array('ValRequired')
+				),
+				"control" => array('FileUpload'),
+				"helpstep" => 3
+			);
+		}
 
                 $helpsteps = array (
 			_L('Templatehelpstep 1'),
