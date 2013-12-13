@@ -5,8 +5,29 @@
 	float: left;
 	height: auto;
 }
-
+.content_feed {
+	float: left;
+	margin-top: 5px;
+	margin-bottom: 10px;
+}
 .content_feed span, .feed_detail {
 	color: #777;
 	padding-top: 2px;
+}
+#feeditems .content_row {
+    margin-bottom: 0;
+    padding: 10px;
+}
+#feeditems .content_row:hover {
+	background: #fcfcfc;
+} 
+
+.well {
+	background: #f9f9f9;
+	padding: 15px 20px;
+}
+
+.well p {
+	color: #777;
+	margin-bottom: 0;
 }

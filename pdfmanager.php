@@ -44,6 +44,7 @@ class PdfManager extends PageBase {
 	var $curPage;
 	var $displayEnd;
 	var $displayStart;
+	var $custName;
 	var $baseCustomerURL;
 	var $burstsURL;
 
@@ -66,6 +67,7 @@ class PdfManager extends PageBase {
 		$this->options["title"] = $this->pageTitle;
 		$this->options["page"]  = $this->pageNav;
 
+		$this->setCustomerName();
 		$this->setBaseCustomerURL();
 		$this->setBurstsURL();
 
@@ -105,10 +107,15 @@ class PdfManager extends PageBase {
 
 	// @override
 	public function sendPageOutput() {
-
 		echo '<link rel="stylesheet" type="text/css" href="css/pdfmanager.css">';
 		startWindow(_L('PDF Report Manager'), 'padding: 3px;', false, true);
-		$feedButtons = array(icon_button(_L(' Upload New PDF'),"pdficon_16",null,"mgeditor.php?id=new"));
+		echo '<div class="well">
+				<p>The <strong>PDF Report Manager</strong> allows you to upload your original (full-length) PDF files that contain multiple, equal pagelength reports, ex. 1-pg Report Cards, to be split into separate PDFs, previewed for (report splitting) accuracy, and emailed to recipients</p>
+			  </div>
+			  <hr>';
+
+
+		$feedButtons = array(icon_button(_L(' Upload New PDF'), "pdficon_16", null, "pdfedit.php"));
 		$sortoptions = array(
 			"name" => array("icon" => "img/largeicons/tiny20x20/pencil.jpg", "name" => "Name"),
 			"date" => array("icon" => "img/largeicons/tiny20x20/clock.jpg", "name" => "Date")
@@ -125,16 +132,12 @@ class PdfManager extends PageBase {
 	}
 
 	public function fetchBurstData() {
-		$res = explode("=", $_SERVER['HTTP_COOKIE']);
-		$cookie = $res[1];
-		
 		$curl = curl_init($this->burstsURL);
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
 		curl_setopt($curl, CURLOPT_HTTPHEADER, array(
 			"Accept: application/json",
-			"Content-Type: application/json",
-			"X-Auth-SessionId: " . $cookie)
+			"X-Auth-SessionId: " . $_COOKIE[$this->custName . '_session'])
 		);
 		
 		$response = curl_exec($curl);
@@ -156,7 +159,7 @@ class PdfManager extends PageBase {
 			while(!empty($this->feedData)) {
 				$item = array_shift($this->feedData);
 				$itemid = $item['id'];
-				$defaultlink = $this->burstsURL . "/download";
+				$defaultlink = $this->burstsURL . "/" . $itemid. "/pdf";
 
 				$title = escapehtml($item['name']);
 				$fileName = escapehtml($item['filename']);
@@ -169,18 +172,19 @@ class PdfManager extends PageBase {
 				// if (userOwns("messagegroup", $itemid)) { //TODO: add proper privilege checks for PDFs
 				if (true) {	
 					$tools = action_links (
-						action_link("Send Email", "pencil", 'todo'),
-						action_link("Preview", "pencil", 'todo'),
-						action_link("Edit", "pencil", 'pdfedit.php?id=' . $itemid),
-						action_link("Delete", "cross", 'todo', "return confirmDelete();")
+						action_link(" Edit", "pencil", 'pdfedit.php?id=' . $itemid),
+						action_link(" Preview", "magnifier", 'todo'),
+						action_link(" Send Email", "email_go", 'todo'),
+						action_link(" Download", "disk", 'todo'),
+						action_link(" Delete", "cross", 'todo', "return confirmDelete();")
 					);
 				} 
 				
 				$content = '<span>';
-				$content .= 'File: <strong>' .$fileName. '</strong><br>';
-				$content .= 'Size: <strong>' . number_format(($fileSize / pow(2,20)), 1, '.', '') . 'MB</strong><br>';
-				$content .= 'Upload Date: <strong>' .$uploadDate.'</strong><br>';
-				$content .= 'Status: <strong>' .ucwords($status).'</strong></span>';
+				$content .= 'File: &nbsp;<strong>' .$fileName. '</strong><br>';
+				$content .= 'Size: &nbsp;<strong>' . number_format(($fileSize / pow(2,20)), 1, '.', '') . 'MB</strong><br>';
+				$content .= 'Upload Date: &nbsp;<strong>' .$uploadDate.'</strong><br>';
+				$content .= 'Status: &nbsp;<strong>' .ucwords($status).'</strong></span>';
 				
 				$data->list[] = array("itemid" 			=> $itemid,
 									  "defaultlink"		=> $defaultlink,
@@ -203,11 +207,14 @@ class PdfManager extends PageBase {
 		}
 	}
 
-	public function setBaseCustomerURL() {
+	public function setCustomerName() {
 		// scrape customer 'name' out of the URL (for use in 'baseCustomerURL')	
 		$uriParts 	= explode('/', $_SERVER['REQUEST_URI']); // ex /custname/...
-		$custName 	= $uriParts[1];
-		$this->baseCustomerURL = (isset($_SERVER['HTTPS']) ? 'https://' : 'http://') . $_SERVER['SERVER_NAME'] . '/' . $custName;
+		$this->custName = $uriParts[1];
+	}
+
+	public function setBaseCustomerURL() {
+		$this->baseCustomerURL = (isset($_SERVER['HTTPS']) ? 'https://' : 'http://') . $_SERVER['SERVER_NAME'] . '/' . $this->custName;
 	}
 
 	public function setBurstsURL() {
@@ -217,8 +224,10 @@ class PdfManager extends PageBase {
 	}
 
 	public function setDisplayPagingDetails() {
-		$this->numPages 	= ceil($this->total/$this->pagingLimit);
-		$this->curPage 		= ceil($this->pagingStart/$this->pagingLimit) + 1;
+		$this->total = count($this->feedData);
+
+		$this->numPages 	= ceil($this->total / $this->pagingLimit);
+		$this->curPage 		= ceil($this->pagingStart / $this->pagingLimit) + 1;
 		$this->displayEnd 	= ($this->pagingStart + $this->pagingLimit) > $this->total ? $this->total : ($this->pagingStart + $this->pagingLimit);
 		$this->displayStart = ($this->total) ? $this->pagingStart + 1 : 0;
 	}
