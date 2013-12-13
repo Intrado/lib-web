@@ -181,9 +181,9 @@ class PDFEditPage extends PageForm {
 			),
 			"bursttemplate" => array(
 				"label" => _L('Template'),
-				"value" => "",
+				"value" => '0',
 				"validators" => array(),
-				"control" => array("SelectMenu", "values" => $this->burstTemplates),
+				"control" => array('SelectMenu', 'values' => (array('null' => _L('Select PDF Template')) + $this->burstTemplates)),
 				"helpstep" => 2
 			)
 		);
@@ -219,15 +219,15 @@ class PDFEditPage extends PageForm {
 		else {
 			$html = "{$this->form->render()}";
 		}
-
 /*
-		if (count($this->burstTemplates)) {
-			$html .= "Templates:<br/>\n<ul>\n";
-			foreach ($this->burstTemplates as $id => $name) {
-				$html .= "<li> {$id} - '{$name}'</li>\n";
-			}
-			$html .= "</ul>\n\n";
-		}
+// TODO - kill this debug output
+if (count($this->burstTemplates)) {
+	$html .= "Templates:<br/>\n<ul>\n";
+	foreach ($this->burstTemplates as $id => $name) {
+		$html .= "<li> {$id} - '{$name}'</li>\n";
+	}
+	$html .= "</ul>\n\n";
+}
 */
 		return($html);
 	}
