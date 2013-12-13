@@ -14,6 +14,8 @@ require_once('ifc/Page.ifc.php');
 require_once('obj/PageBase.obj.php');
 require_once('obj/PageForm.obj.php');
 
+require_once('obj/Burst.obj.php');
+
 
 // -----------------------------------------------------------------------------
 // CUSTOM VALIDATORS
@@ -103,13 +105,25 @@ function fmt_template ($obj, $field) {
 // CUSTOM PAGE FUNCTIONALITY
 // -----------------------------------------------------------------------------
 
-class PDFUploadPage extends PageForm {
+class PDFEditPage extends PageForm {
 
-	function isAuthorized($get, $post) {
+	var $burst = null;		// DBMO for the burst record we're working on
+	var $burstId = null;		// ID for the DBMO object to interface with
+	var $burstTemplates = array();	// An array to collect all the available burst templates into
+	function PDFEditPage() {
+		$options = array();
+
+		parent::PageForm($options);
+	}
+
+	function isAuthorized($get, $post, $request, $session) {
 		return(true); // open to the world, unconditionally!
 	}
 
-	function beforeLoad($get, $post) {
+	function beforeLoad($get, $post, $request, $session) {
+
+		// The the query string has a burst ID specified, then grab it
+		$this->burstId = (isset($get['id']) && intval($get['id'])) ? intval($get['id']) : null;
 
 		// Special case for handling deletions
 		if (isset($get['deleteid'])) {
@@ -123,9 +137,36 @@ class PDFUploadPage extends PageForm {
 		// Any other special case. early-exit operations needed for our page?
 	}
 
-	function load() {
+	function load($get, $post, $request, $session) {
+
+		// Make the burst DBMO
+		$this->burst = new Burst($this->burstId);
+
+		// Get a list of burst templates
+		$this->loadBurstTemplates();
+
+		// Make the edit FORM
 		$this->form = $this->factoryFormPDFUpload();
 	}
+
+	function loadBurstTemplates() {
+		$res = Query("
+			SELECT
+				`id`,
+				`name`
+			FROM
+				`bursttemplate`
+			WHERE
+				NOT `deleted`;
+		");
+
+		if (is_object($res)) {
+			while ($row = DBGetRow($res, true)) {
+				$this->burstTemplates[$row['id']] = $row['name'];
+			 }
+		}
+	}
+
 
 	function factoryFormPDFUpload() {
 		$formdata = array(
@@ -137,6 +178,13 @@ class PDFUploadPage extends PageForm {
 				),
 				"control" => array("TextField","size" => 30, "maxlength" => 50, "autocomplete" => "test"),
 				"helpstep" => 1
+			),
+			"bursttemplate" => array(
+				"label" => _L('Template'),
+				"value" => "",
+				"validators" => array(),
+				"control" => array("SelectMenu", "values" => $this->burstTemplates),
+				"helpstep" => 2
 			)
 		);
 
@@ -156,6 +204,7 @@ class PDFUploadPage extends PageForm {
 
 	function afterLoad() {
 		$this->form->handleRequest();
+		$this->options['title'] = ($this->burstId) ? _L('Edit PDF Properties') : _L('Upload New PDF');
 	}
 
 	function beforeRender() {
@@ -164,7 +213,22 @@ class PDFUploadPage extends PageForm {
 	}
 
 	function render() {
-		$html = "{$this->form->render()}";
+		if ($this->burstId && ! $this->burst->isCreated()) {
+			$html = "There is no PDF on file with the requested ID.<br/>\n";
+		}
+		else {
+			$html = "{$this->form->render()}";
+		}
+
+/*
+		if (count($this->burstTemplates)) {
+			$html .= "Templates:<br/>\n<ul>\n";
+			foreach ($this->burstTemplates as $id => $name) {
+				$html .= "<li> {$id} - '{$name}'</li>\n";
+			}
+			$html .= "</ul>\n\n";
+		}
+*/
 		return($html);
 	}
 }
@@ -174,9 +238,5 @@ class PDFUploadPage extends PageForm {
 // PAGE INSTANTIATION AND DISPLAY
 // -----------------------------------------------------------------------------
 
-$page = new PDFUploadPage(Array(
-	'title' => 'Upload New PDF'
-));
-
-executePage($page);
+executePage(new PDFEditPage());
 

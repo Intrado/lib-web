@@ -14,7 +14,7 @@ class Burst extends DBMappedObject {
 	function Burst ($id = NULL) {
 		$this->_allownulls = true;
 		$this->_tablename = "burst";
-		$this->_fieldlist = array("userid", "contentid", "name", "status", "filename", "bytes", "deleted");
+		$this->_fieldlist = array("userid", "contentid", "name", "status", "filename", "bytes", "deleted", "bursttemplateid", "uploaddatems", "totalpagesfound", "actualreportscount");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}
