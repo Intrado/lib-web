@@ -1,0 +1,12 @@
+.pagetitle {
+	display: none;
+}
+.window_main .content_row {
+	float: left;
+	height: auto;
+}
+
+.content_feed span, .feed_detail {
+	color: #777;
+	padding-top: 2px;
+}
