@@ -15,7 +15,6 @@ header('Content-type: text/html; charset=UTF-8') ;
 	</script>
 	<script src="script/prototype.js" type="text/javascript"></script> <!-- updated to prototype 1.7 -->
 	<script src="script/scriptaculous.js" type="text/javascript"></script>
-	<script src="script/utils.js"></script>
 	<script type="text/javascript" src="script/datepicker.js"></script>
 	<link href="css/datepicker.css.php" type="text/css" rel="stylesheet" />
 	<link href="css/newui_datepicker.css" type="text/css" rel="stylesheet" />
@@ -28,6 +27,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 <?}?>
 	<script src="script/sorttable.js"></script>
 	<script src="script/session_warning.js" type="text/javascript"></script>
+	<script src="script/utils.js"></script>
 
 
 <?if (isset($MESSAGESENDER) && $MESSAGESENDER) {?>
