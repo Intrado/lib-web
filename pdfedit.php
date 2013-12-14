@@ -18,63 +18,6 @@ require_once('obj/Burst.obj.php');
 
 
 // -----------------------------------------------------------------------------
-// CUSTOM VALIDATORS
-// -----------------------------------------------------------------------------
-
-// Example of a custom form Validator
-class ValTemplateItem extends Validator {
-	function validate ($value, $args) {
-		if(!is_array($value)) {
-			$value = json_decode($value,true);
-		}
-		if (!($value["left"] == "true" || $value["right"] == "true"))
-			return "One item is required for " . $this->label;
-		else
-			return true;
-
-	}
-	function getJSValidator () {
-		return
-			'function (name, label, value, args) {
-				checkval = value.evalJSON();
-				if (!(checkval.left == "true" || checkval.right == "true"))
-					return "One item is required for " + label;
-				return true;
-			}';
-	}
-}
-
-
-// -----------------------------------------------------------------------------
-// CUSTOM FORM ITEMS
-// -----------------------------------------------------------------------------
-
-// TODO - move this guy's javascript component to its own method where it belogs
-class TemplateItem extends FormItem {
-	function render ($value) {
-		$n = $this->form->name."_".$this->name;
-		if($value == null || $value == "") // Handle empty value to combind this validator with ValRequired
-			$value = array("left" => "false","right" => "false");
-		// edit input type from "hidden" to "text" to debug the form value
-		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml(json_encode($value)).'"/>';
-		$str .= '<input id="'.$n.'left" name="'.$n.'left" type="checkbox" onchange="setValue_'.$n.'()" value="" '. ($value["left"] == "true" ? 'checked' : '').' />';
-		$str .= '<input id="'.$n.'right" name="'.$n.'right" type="checkbox" onchange="setValue_'.$n.'()" value="" '. ($value["right"] == "true" ? 'checked' : '').' />';
-		$str .= '<script>function setValue_'.$n.'(){
-								$("'.$n.'").value = Object.toJSON({
-									"left": $("'.$n.'left").checked.toString(),
-									"right": $("'.$n.'right").checked.toString()
-							});
-							form_do_validation($("' . $this->form->name . '"), $("' . $n . '"));
-						 }
-				</script>';
-		return $str;
-	}
-}
-
-
-
-
-// -----------------------------------------------------------------------------
 // CUSTOM FORM FOR THIS PAGE
 // -----------------------------------------------------------------------------
 
@@ -92,16 +35,6 @@ class TemplateForm extends Form {
 
 
 // -----------------------------------------------------------------------------
-// CUSTOM FORMATTERS
-// -----------------------------------------------------------------------------
-
-// TODO: Make better examples of working formatters (extend Formatters.obj.php?)
-function fmt_template ($obj, $field) {
-	return $obj->$field;
-}
-
-
-// -----------------------------------------------------------------------------
 // CUSTOM PAGE FUNCTIONALITY
 // -----------------------------------------------------------------------------
 
@@ -109,13 +42,28 @@ class PDFEditPage extends PageForm {
 
 	const MAX_PDF_UPLOAD_BYTES = 209715200; // 200MB
 
-	var $burst = null;		// DBMO for the burst record we're working on
+	//var $burst = null;		// DBMO for the burst record we're working on
+	var $burstData = null;		// Associative array for the burst record we're working on
 	var $burstId = null;		// ID for the DBMO object to interface with
 	var $burstTemplates = array();	// An array to collect all the available burst templates into
-	function PDFEditPage() {
-		$options = array();
 
-		parent::PageForm($options);
+	var $customerName = '';		// For API access (customer name)
+	var $customerURL = '';		// Base URL for the customer
+	var $APIURL = '';		// API URL for the customer
+
+	function PDFEditPage() {
+		global $USER;
+
+		// URL parts needed for API access
+		// TODO : is the internal API HTTPS? does it need to be? it would reduce overhead if it was plain HTTP...
+		if (isset($_SERVER['REQUEST_URI'])) {
+			$uriParts = explode('/', $_SERVER['REQUEST_URI']); // ex /custname/...
+			$this->customerName = $uriParts[1];
+			$this->customerURL = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . "://{$_SERVER['SERVER_NAME']}/{$this->customerName}/";
+			$this->APIURL = "{$this->customerURL}api/2/users/{$USER->id}/bursts";
+		}
+
+		parent::PageForm(array());
 	}
 
 	function isAuthorized(&$get, &$post, &$request, &$session) {
@@ -142,8 +90,11 @@ class PDFEditPage extends PageForm {
 	function load(&$get, &$post, &$request, &$session) {
 
 		// Make the burst DBMO
-		$this->burst = new Burst($this->burstId);
-
+		//$this->burst = new Burst($this->burstId);
+		if ($this->burstId) {
+			$this->apiGetBurstData();
+		}
+		
 		// Get a list of burst templates
 		$this->loadBurstTemplates();
 
@@ -169,7 +120,6 @@ class PDFEditPage extends PageForm {
 		}
 	}
 
-
 	function factoryFormPDFUpload() {
 		$formdata = array(
 			"pdfname" => array(
@@ -193,7 +143,12 @@ class PDFEditPage extends PageForm {
 
 		// If we already have a burstId
 		if ($this->burstId) {
-			// TODO: Then a file has already been uploaded, so we're just going to show a read-only representation
+			// Then a file has already been uploaded, so we're just going to show a read-only representation
+			$formdata[] = array(
+				"label" => _L('Uploaded PDF'),
+				//"control" => array('FormHtml', 'html' => $this->burst->filename)
+				"control" => array('FormHtml', 'html' => $this->burstData['filename'])
+			);
 		}
 		else {
 			// Otherwise we need to show the upload formitem to be able to select and upload a new PDF
@@ -228,28 +183,109 @@ class PDFEditPage extends PageForm {
 	}
 
 	function beforeRender() {
-		// Do some extra work in the database to determine how many days are left `til Christmas
-		$this->days = 50;
 	}
 
 	function render() {
-		if ($this->burstId && ! $this->burst->isCreated()) {
-			$html = "There is no PDF on file with the requested ID.<br/>\n";
+		if ($this->burstId && ! $this->burstData) {
+			$html = _L('There is no PDF on file with the requested ID.') . "<br/>\n";
 		}
 		else {
-			$html = "{$this->form->render()}";
+			$html = $this->form->render();
 		}
-/*
-// TODO - kill this debug output
-if (count($this->burstTemplates)) {
-	$html .= "Templates:<br/>\n<ul>\n";
-	foreach ($this->burstTemplates as $id => $name) {
-		$html .= "<li> {$id} - '{$name}'</li>\n";
-	}
-	$html .= "</ul>\n\n";
-}
-*/
+
 		return($html);
+	}
+
+	function apiGetBurstData() {
+		$creq = curl_init("{$this->APIURL}/{$this->burstId}");
+		curl_setopt($creq, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($creq, CURLOPT_SSL_VERIFYPEER, 0);
+		curl_setopt($creq, CURLOPT_HTTPHEADER, array(
+			"Accept: application/json",
+			"X-Auth-SessionId: " . $_COOKIE[$this->customerName . '_session'])
+		);
+
+		$response = curl_exec($creq);
+
+		$hdrsize = curl_getinfo($creq, CURLINFO_HEADER_SIZE);
+		$headers = substr($response, 0, $hdrsize);
+		$body = substr($response, $hdrsize);
+		$code = curl_getinfo($creq, CURLINFO_HTTP_CODE);
+
+		curl_close($creq);
+
+		// If we got anything other than 200OK, then return false, else return just the response body without headers
+		$this->burstData = ($code == 200) ? json_decode($body) : null;
+	}
+
+	function apiPutBurstData() {
+
+		// We don't support PUTting ALL fields, only some...
+		// TODO - is the API doc correct on this? it seems to show all fields updatable...
+		$postData = array(
+			'name' => $this->burstData['name'],
+			'bursttemplateid' => $this->burstData['bursttemplateid']
+		);
+
+		$creq = curl_init("{$this->APIURL}/{$this->burstId}");
+		curl_setopt($creq, CURLOPT_PUT, 1);
+		curl_setopt($creq, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($creq, CURLOPT_SSL_VERIFYPEER, 0);
+		curl_setopt($creq, CURLOPT_POSTFIELDS, http_build_query($postData));
+		curl_setopt($creq, CURLOPT_HTTPHEADER, array(
+			"Accept: application/json",
+			"X-Auth-SessionId: " . $_COOKIE[$this->customerName . '_session'])
+		);
+		
+		if (! ($response = curl_exec($creq))) return(false);
+
+		$hdrsize = curl_getinfo($creq, CURLINFO_HEADER_SIZE);
+		$headers = substr($response, 0, $hdrsize);
+		$body = substr($response, $hdrsize);
+		$code = curl_getinfo($creq, CURLINFO_HTTP_CODE);
+
+		curl_close($creq);
+
+		return($code == 200);
+	}
+
+	function apiPostBurstData() {
+
+		// get all the uploaded files names (there should be one)
+		$uploadedNames = array_keys($_FILES);
+		// get the first one
+		$uploadedName = $uploadedNames[0];
+		// get the details for this one
+		$uploadedFile = $_FILES[$uploadedName];
+
+		// ref: http://stackoverflow.com/questions/15223191/php-curl-file-upload-multipart-boundary
+		$postData = array(
+			'name' => $this->burstData['name'],
+			'templateid' => $this->burstData['bursttemplateid'], // TODO - can we change this? it is inconsistent with the GET and response
+			$uploadedName => "@{$uploadedFile['tmp_name']};type=application/pdf"
+		);
+
+		$creq = curl_init("{$this->APIURL}/{$this->burstId}");
+		curl_setopt($creq, CURLOPT_POST, 1);
+		curl_setopt($creq, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($creq, CURLOPT_SSL_VERIFYPEER, 0);
+		curl_setopt($creq, CURLOPT_POSTFIELDS, http_build_query($postData));
+		curl_setopt($creq, CURLOPT_HTTPHEADER, array(
+			"Content-type: multipart/form-data",
+			"Accept: application/json",
+			"X-Auth-SessionId: " . $_COOKIE[$this->customerName . '_session'])
+		);
+		
+		if (! ($response = curl_exec($creq))) return(false);
+
+		$hdrsize = curl_getinfo($creq, CURLINFO_HEADER_SIZE);
+		$headers = substr($response, 0, $hdrsize);
+		$body = substr($response, $hdrsize);
+		$code = curl_getinfo($creq, CURLINFO_HTTP_CODE);
+
+		curl_close($creq);
+
+		return($code == 200);
 	}
 }
 
