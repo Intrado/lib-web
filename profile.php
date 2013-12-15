@@ -313,6 +313,14 @@ _L('Advanced %s Options', getJobTitle()),
 		"control" => array("CheckBox"),
 		"helpstep" => 5
 	),
+	"canpdfburst" => array(
+		"label" => _L('Create Secure Document Delivery'),
+		"fieldhelp" => _L('Allows users to upload and send secure documents.'),
+		"value" => $obj->getValue("canpdfburst"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 5
+	),
 	"survey" => array(
 		"label" => _L('Create Surveys'),
 		"fieldhelp" => _L('Allows users to build surveys and collect responses via phone and email.'),
@@ -870,6 +878,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$obj->setPermission("subscribe", $subscribed);
 			$obj->setPermission("datafields", $allowedfields);
 			$obj->setPermission("createrepeat", (bool)$postdata['createrepeat']);
+			$obj->setPermission("canpdfburst", (bool)$postdata['canpdfburst']);
 			$obj->setPermission("maxjobdays", $postdata['maxjobdays']);
 			$obj->setPermission("blocknumbers", $postdata['callblockingperms'] != "none");
 			$obj->setPermission("callblockingperms", $postdata['callblockingperms']);
