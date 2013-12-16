@@ -21,13 +21,3 @@
 #feeditems .content_row:hover {
 	background: #fcfcfc;
 } 
-
-.well {
-	background: #f9f9f9;
-	padding: 15px 20px;
-}
-
-.well p {
-	color: #777;
-	margin-bottom: 0;
-}

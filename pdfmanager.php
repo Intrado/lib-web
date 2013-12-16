@@ -36,7 +36,7 @@ class PdfManager extends PageBase {
 	var $sortBy = '';
 	var $orderBy = 'uploaddatems desc';
 	var $isAjaxRequest = false;
-	var $isDeleteRequest = false;
+	var $deleteID;
 	var $sqlArgs = array();
 	var $feedData;
 	var $total = 0;
@@ -47,6 +47,7 @@ class PdfManager extends PageBase {
 	var $custName;
 	var $baseCustomerURL;
 	var $burstsURL;
+	var $curlOptions;
 
 	function PdfManager($options = array()) {
 		if (isset($options)) {
@@ -58,7 +59,7 @@ class PdfManager extends PageBase {
 	// @override
 	function isAuthorized($get = array(), $post = array()) {
 		global $USER;
-		return true; // TODO
+		return true; //$USER->authorize('canpdfburst');
 	}
 
 	// @override
@@ -71,13 +72,34 @@ class PdfManager extends PageBase {
 		$this->setBaseCustomerURL();
 		$this->setBurstsURL();
 
+		// define common curl options (for both fetch and delete API calls)
+		$this->curlOptions = array(
+			array('option' => CURLOPT_RETURNTRANSFER, 'value' => 1),
+			array('option' => CURLOPT_SSL_VERIFYPEER, 'value' => 0),
+			array('option' => CURLOPT_HTTPHEADER, 'value' => array(
+											"Accept: application/json",
+											"X-Auth-SessionId: " . $_COOKIE[$this->custName . '_session']))
+		);
+
 	}
 
 	// @override
 	public function beforeLoad($get, $post) {
-		$this->isDeleteRequest = isset($get['delete']); 
 		$this->isAjaxRequest = isset($get['ajax']); 
 		
+		// if delete request, execute delete API call and exit, 
+		// which upon a successful response (200) will reload pdfmanager.php page (via JS in pdfmanager.js)
+		if (isset($post['delete'])) {
+			$this->deleteID = $post['id'];
+			$deleteURL = $this->burstsURL . '/' . $this->deleteID;
+			$deleteCurlOptions = array_merge($this->curlOptions, array(array('option' => CURLOPT_CUSTOMREQUEST, 'value' => 'DELETE')));
+			$response = $this->curlRequest($deleteURL, $deleteCurlOptions);
+			
+			header('Content-Type: application/json');
+			echo json_encode($response);
+			exit();
+		}
+
 		if (isset($get['feed_sortby'])) {
 			$this->sortBy = $get['feed_sortby'];
 		}
@@ -87,11 +109,11 @@ class PdfManager extends PageBase {
 
 	// @override
 	public function load() {
-		global $USER;
-
 		if ($this->isAjaxRequest) {
 			$this->authOrgList 	= Organization::getAuthorizedOrgKeys();
-			$this->feedResponse = json_decode($this->fetchBurstData(), true);
+
+			// fetch all existing burst records
+			$this->feedResponse = json_decode($this->curlRequest($this->burstsURL, $this->curlOptions), true);
 			$this->feedData = $this->feedResponse['bursts'];
 		}
 	}
@@ -108,11 +130,8 @@ class PdfManager extends PageBase {
 	// @override
 	public function sendPageOutput() {
 		echo '<link rel="stylesheet" type="text/css" href="css/pdfmanager.css">';
+		echo '<script type="text/javascript" src="script/pdfmanager.js"></script>';
 		startWindow(_L('PDF Report Manager'), 'padding: 3px;', false, true);
-		echo '<div class="well">
-				<p>The <strong>PDF Report Manager</strong> allows you to upload your original (full-length) PDF files that contain multiple, equal pagelength reports, ex. 1-pg Report Cards, to be split into separate PDFs, previewed for (report splitting) accuracy, and emailed to recipients</p>
-			  </div>
-			  <hr>';
 
 		$feedButtons = array(icon_button(_L(' Upload New PDF'), "pdficon_16", null, "pdfedit.php"));
 		$sortoptions = array(
@@ -130,15 +149,17 @@ class PdfManager extends PageBase {
 
 	}
 
-	public function fetchBurstData() {
-		$curl = curl_init($this->burstsURL);
-		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
-		curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-			"Accept: application/json",
-			"X-Auth-SessionId: " . $_COOKIE[$this->custName . '_session'])
-		);
-		
+	/*
+	 * Description: performs a curl (API) request using the specified $url and $curlOptions
+	 * @param $url string - request url; should be full absolute path, ex. https://...
+	 * @param $curlOptions ex. array(array('option' => CURLOPT_RETURNTRANSFER, 'value' => 1), array(...) ...)
+	 * return JSON response from API call or null? for delete call
+	 */
+	public function curlRequest($url, $curlOptions) {
+		$curl = curl_init($url);
+		foreach ($curlOptions as $obj) {
+			curl_setopt($curl, $obj['option'], $obj['value']);
+		}
 		$response = curl_exec($curl);
 		curl_close($curl);
 
@@ -172,10 +193,10 @@ class PdfManager extends PageBase {
 				if (true) {	
 					$tools = action_links (
 						action_link(" Edit", "pencil", 'pdfedit.php?id=' . $itemid),
-						action_link(" Preview", "magnifier", $this->burstsURL . "/" . $itemid. "/portions"),
 						action_link(" Send Email", "email_go", $this->burstsURL . "/" . $itemid. "/send"),
 						action_link(" Download", "disk", $this->burstsURL . "/" . $itemid. "/pdf"),
-						action_link(" Delete", "cross", $this->burstsURL . "/" . $itemid. "/delete", "return confirmDelete();")
+						action_link(" Delete", "cross", '#', "deleteBurst('".$this->burstsURL."', ".$itemid.");")
+						// action_link(" Delete", "cross", 'pdfmanager.php?deleteid=' . $itemid, "return confirmDelete();")
 					);
 				} 
 				
