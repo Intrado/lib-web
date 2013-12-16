@@ -98,7 +98,7 @@ abstract class PageBase implements Page {
 	function execute() {
 
 		// Check authorization
-		if (! $this->isAuthorized($_GET, $_POST)) {
+		if (! $this->isAuthorized($_GET, $_POST, $_REQUEST, $_SESSION)) {
 
 			// Redirect if unauthorized
 			$location = $this->options['noauth_redirect'];
@@ -114,10 +114,10 @@ abstract class PageBase implements Page {
 		}
 
 		// Pull request data into instance properties
-		$this->beforeLoad($_GET, $_POST);
+		$this->beforeLoad($_GET, $_POST, $_REQUEST, $_SESSION);
 
 		// Load the form and any supplemental database data that it needs
-		$this->load();
+		$this->load($_GET, $_POST, $_REQUEST, $_SESSION);
 
 		// Do whatever we need to do after loading
 		$this->afterLoad();
@@ -147,7 +147,7 @@ abstract class PageBase implements Page {
 	 *
 	 * @return boolean true if the user is authorized to continue, else false
 	 */
-	function isAuthorized($get = array(), $post = array()) {
+	function isAuthorized($get = array(), $post = array(), $request = array(), $session = array()) {
 		return(false);
 	}
 
@@ -166,7 +166,7 @@ abstract class PageBase implements Page {
 	 * @param array $get Associative array of name/value pairs akin to $_GET
 	 * @param array $post Associative array of name/value pairs akin to $_POST
 	 */
-	function beforeLoad($get = array(), $post = array()) {
+	function beforeLoad($get = array(), $post = array(), $request = array(), $session = array()) {
 	}
 
 	/**
@@ -180,7 +180,7 @@ abstract class PageBase implements Page {
 	 * the submission to to proceed. By the time we leave here there should
 	 * be nothing left to be discovered to save the submitted data.
 	 */
-	function load() {
+	function load($get = array(), $post = array(), $request = array(), $session = array()) {
 	}
 
 	/**

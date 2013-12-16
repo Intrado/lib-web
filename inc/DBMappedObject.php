@@ -25,6 +25,8 @@ Ben Hencke <bhencke@schoolmessenger.com>
 
 
 class DBMappedObject {
+
+	private $_isCreated = false;
 	var $id; //always has an id
 
 	var $_tablename = ''; //name of our table
@@ -57,6 +59,10 @@ class DBMappedObject {
 		foreach (array_keys($this->_relations) as $index) {
 			$this->_relations[$index]->refresh();
 		}
+	}
+
+	function isCreated() {
+		return($this->_isCreated);
 	}
 
 	function create ($specificfields = NULL, $createchildren = false) {
@@ -122,13 +128,17 @@ class DBMappedObject {
 			}
 		}
 
+		if ($this->id) {
+			$this->_isCreated = true;
+		}
+
 		return $this->id;
 	}
 
 	function refresh ($specificfields = NULL, $refreshchildren = false) {
 		$isrefreshed = false;
 
-		if (!isset($this->id))
+		if (! isset($this->id))
 			return false;
 
 		$query = "select " . $this->getFieldList(false, $specificfields)
@@ -144,6 +154,7 @@ class DBMappedObject {
 						$this->$name = ($row[$index]);
 				}
 				$isrefreshed = true;
+				$this->_isCreated = true;
 			}
 			$result = null;
 		}
