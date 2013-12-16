@@ -89,6 +89,7 @@ class PDFEditPage extends PageForm {
 		// Make the edit FORM
 		$this->form = $this->factoryFormPDFUpload();
 		$this->form->multipart = true;
+		$this->form->ajaxsubmit = false;
 	}
 
 	public function loadBurstTemplates() {
