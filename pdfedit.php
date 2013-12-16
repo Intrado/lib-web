@@ -14,8 +14,10 @@ require_once('ifc/Page.ifc.php');
 require_once('obj/PageBase.obj.php');
 require_once('obj/PageForm.obj.php');
 
-require_once('obj/Burst.obj.php');
+//require_once('obj/Burst.obj.php');
 
+require_once('obj/APIClient.obj.php');
+require_once('obj/BurstAPIClient.obj.php');
 
 // -----------------------------------------------------------------------------
 // CUSTOM FORM FOR THIS PAGE
@@ -47,52 +49,38 @@ class PDFEditPage extends PageForm {
 	var $burstId = null;		// ID for the DBMO object to interface with
 	var $burstTemplates = array();	// An array to collect all the available burst templates into
 
-	var $customerName = '';		// For API access (customer name)
-	var $customerURL = '';		// Base URL for the customer
-	var $APIURL = '';		// API URL for the customer
+	private $burstAPI = null;
 
-	function PDFEditPage() {
+	public function __construct($args) {
+		$this->burstAPI = new BurstAPIClient($args);
+		parent::__construct(array());
+	}
+
+	public function isAuthorized(&$get, &$post, &$request, &$session) {
 		global $USER;
-
-		// URL parts needed for API access
-		// TODO : is the internal API HTTPS? does it need to be? it would reduce overhead if it was plain HTTP...
-		if (isset($_SERVER['REQUEST_URI'])) {
-			$uriParts = explode('/', $_SERVER['REQUEST_URI']); // ex /custname/...
-			$this->customerName = $uriParts[1];
-			$this->customerURL = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . "://{$_SERVER['SERVER_NAME']}/{$this->customerName}/";
-			$this->APIURL = "{$this->customerURL}api/2/users/{$USER->id}/bursts";
-		}
-
-		parent::PageForm(array());
+		//return($USER->authorize('canpdfburst'));
+		return(true); // FIXME - white screen of death on use of authorize()
 	}
 
-	function isAuthorized(&$get, &$post, &$request, &$session) {
-		return(true); // open to the world, unconditionally!
-	}
-
-	function beforeLoad(&$get, &$post, &$request, &$session) {
+	public function beforeLoad(&$get, &$post, &$request, &$session) {
 
 		// The the query string/post data has a burst ID specified, then grab it
 		$this->burstId = (isset($request['id']) && intval($request['id'])) ? intval($request['id']) : null;
 
-		// Special case for handling deletions
-		if (isset($get['deleteid'])) {
-			// best practice: use transaction whenever modifying data
-			// (around whole section or logical atomic block)
-			//Query("BEGIN");
-			//FooDBMO::delete($get['deleteid']);
-			//Query("COMMIT");
-			redirect();
-		}
-		// Any other special case. early-exit operations needed for our page?
 	}
 
-	function load(&$get, &$post, &$request, &$session) {
+	public function load(&$get, &$post, &$request, &$session) {
 
-		// Make the burst DBMO
-		//$this->burst = new Burst($this->burstId);
+		// If we're editing an existing one, get its data
 		if ($this->burstId) {
-			$this->apiGetBurstData();
+			$this->burstData = $this->burstAPI->getBurstData($this->burstId);
+		}
+		else {
+			$this->burstData = Array(
+				'name' => '',
+				'templateid' => '',
+				'filename' => ''
+			);
 		}
 		
 		// Get a list of burst templates
@@ -100,9 +88,10 @@ class PDFEditPage extends PageForm {
 
 		// Make the edit FORM
 		$this->form = $this->factoryFormPDFUpload();
+		$this->form->multipart = true;
 	}
 
-	function loadBurstTemplates() {
+	public function loadBurstTemplates() {
 		$res = Query("
 			SELECT
 				`id`,
@@ -120,11 +109,11 @@ class PDFEditPage extends PageForm {
 		}
 	}
 
-	function factoryFormPDFUpload() {
+	public function factoryFormPDFUpload() {
 		$formdata = array(
-			"pdfname" => array(
+			"name" => array(
 				"label" => _L('Name'),
-				"value" => "",
+				"value" => $this->burstData['name'],
 				"validators" => array(
 					array('ValRequired'),
 					array("ValLength","min" => 3,"max" => 50)
@@ -132,9 +121,9 @@ class PDFEditPage extends PageForm {
 				"control" => array("TextField","size" => 30, "maxlength" => 50, "autocomplete" => "test"),
 				"helpstep" => 1
 			),
-			"bursttemplate" => array(
+			"templateid" => array(
 				"label" => _L('Template'),
-				"value" => '0',
+				"value" => $this->burstData['templateid'],
 				"validators" => array(),
 				"control" => array('SelectMenu', 'values' => (array('' => _L('Select PDF Template')) + $this->burstTemplates)),
 				"helpstep" => 2
@@ -146,7 +135,6 @@ class PDFEditPage extends PageForm {
 			// Then a file has already been uploaded, so we're just going to show a read-only representation
 			$formdata[] = array(
 				"label" => _L('Uploaded PDF'),
-				//"control" => array('FormHtml', 'html' => $this->burst->filename)
 				"control" => array('FormHtml', 'html' => $this->burstData['filename'])
 			);
 		}
@@ -155,9 +143,10 @@ class PDFEditPage extends PageForm {
 			$formdata[] = array(
 				"label" => _L('Upload PDF'),
 				"value" => '',
-				"validators" => array(
-					array('ValRequired')
-				),
+				"validators" => array(),
+				//"validators" => array(
+				//	array('ValRequired')
+				//),
 				"control" => array('FileUpload'),
 				"helpstep" => 3
 			);
@@ -177,15 +166,22 @@ class PDFEditPage extends PageForm {
 		return(new Form('pdfuploader', $formdata, $helpsteps, $buttons, 'vertical'));
 	}
 
-	function afterLoad() {
+	public function afterLoad() {
 		$this->form->handleRequest();
+		if ($button = $this->form->getSubmit()) {
+			$postdata = $this->form->getData();
+			$name = $postdata['name'];
+			$template = intval($postdata['templateid']);
+			$this->burstAPI->postBurst($name, $template);
+			redirect('pdfmanager.php');
+		}
 		$this->options['title'] = ($this->burstId) ? _L('Edit PDF Properties') : _L('Upload New PDF');
 	}
 
-	function beforeRender() {
+	public function beforeRender() {
 	}
 
-	function render() {
+	public function render() {
 		if ($this->burstId && ! $this->burstData) {
 			$html = _L('There is no PDF on file with the requested ID.') . "<br/>\n";
 		}
@@ -195,98 +191,6 @@ class PDFEditPage extends PageForm {
 
 		return($html);
 	}
-
-	function apiGetBurstData() {
-		$creq = curl_init("{$this->APIURL}/{$this->burstId}");
-		curl_setopt($creq, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($creq, CURLOPT_SSL_VERIFYPEER, 0);
-		curl_setopt($creq, CURLOPT_HTTPHEADER, array(
-			"Accept: application/json",
-			"X-Auth-SessionId: " . $_COOKIE[$this->customerName . '_session'])
-		);
-
-		$response = curl_exec($creq);
-
-		$hdrsize = curl_getinfo($creq, CURLINFO_HEADER_SIZE);
-		$headers = substr($response, 0, $hdrsize);
-		$body = substr($response, $hdrsize);
-		$code = curl_getinfo($creq, CURLINFO_HTTP_CODE);
-
-		curl_close($creq);
-
-		// If we got anything other than 200OK, then return false, else return just the response body without headers
-		$this->burstData = ($code == 200) ? json_decode($body) : null;
-	}
-
-	function apiPutBurstData() {
-
-		// We don't support PUTting ALL fields, only some...
-		// TODO - is the API doc correct on this? it seems to show all fields updatable...
-		$postData = array(
-			'name' => $this->burstData['name'],
-			'bursttemplateid' => $this->burstData['bursttemplateid']
-		);
-
-		$creq = curl_init("{$this->APIURL}/{$this->burstId}");
-		curl_setopt($creq, CURLOPT_PUT, 1);
-		curl_setopt($creq, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($creq, CURLOPT_SSL_VERIFYPEER, 0);
-		curl_setopt($creq, CURLOPT_POSTFIELDS, http_build_query($postData));
-		curl_setopt($creq, CURLOPT_HTTPHEADER, array(
-			"Accept: application/json",
-			"X-Auth-SessionId: " . $_COOKIE[$this->customerName . '_session'])
-		);
-		
-		if (! ($response = curl_exec($creq))) return(false);
-
-		$hdrsize = curl_getinfo($creq, CURLINFO_HEADER_SIZE);
-		$headers = substr($response, 0, $hdrsize);
-		$body = substr($response, $hdrsize);
-		$code = curl_getinfo($creq, CURLINFO_HTTP_CODE);
-
-		curl_close($creq);
-
-		return($code == 200);
-	}
-
-	function apiPostBurstData() {
-
-		// get all the uploaded files names (there should be one)
-		$uploadedNames = array_keys($_FILES);
-		// get the first one
-		$uploadedName = $uploadedNames[0];
-		// get the details for this one
-		$uploadedFile = $_FILES[$uploadedName];
-
-		// ref: http://stackoverflow.com/questions/15223191/php-curl-file-upload-multipart-boundary
-		$postData = array(
-			'name' => $this->burstData['name'],
-			'templateid' => $this->burstData['bursttemplateid'], // TODO - can we change this? it is inconsistent with the GET and response
-			$uploadedName => "@{$uploadedFile['tmp_name']};type=application/pdf"
-		);
-
-		$creq = curl_init("{$this->APIURL}/{$this->burstId}");
-		curl_setopt($creq, CURLOPT_POST, 1);
-		curl_setopt($creq, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($creq, CURLOPT_SSL_VERIFYPEER, 0);
-		curl_setopt($creq, CURLOPT_POSTFIELDS, http_build_query($postData));
-		curl_setopt($creq, CURLOPT_HTTPHEADER, array(
-			"Content-type: multipart/form-data",
-			"Accept: application/json",
-			"X-Auth-SessionId: " . $_COOKIE[$this->customerName . '_session'])
-		);
-		
-		if (! ($response = curl_exec($creq))) return(false);
-
-		$hdrsize = curl_getinfo($creq, CURLINFO_HEADER_SIZE);
-		$headers = substr($response, 0, $hdrsize);
-		$body = substr($response, $hdrsize);
-		$code = curl_getinfo($creq, CURLINFO_HTTP_CODE);
-
-		curl_close($creq);
-
-		return($code == 200);
-	}
 }
 
 
@@ -294,5 +198,16 @@ class PDFEditPage extends PageForm {
 // PAGE INSTANTIATION AND DISPLAY
 // -----------------------------------------------------------------------------
 
-executePage(new PDFEditPage());
+// Fun with globals and super globals...
+$uriParts = explode('/', $_SERVER['REQUEST_URI']); // ex /custname/...
+$apiCustomer = $uriParts[1];
+
+$args = Array(
+	'apiHostname' => $_SERVER['SERVER_NAME'],
+	'apiCustomer' => $apiCustomer,
+	'apiUser' => $USER->id,
+	'apiAuth' => $_COOKIE[$apiCustomer . '_session']
+);
+
+executePage(new PDFEditPage($args));
 
