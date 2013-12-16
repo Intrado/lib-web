@@ -18,7 +18,7 @@ class BurstAPIClient extends APIClient {
 
 	public function getBurstData($id) {
 		$res = $this->apiGet("/{$id}");
-		return($res['code'] == 200 ? json_parse($res['body']) : false);
+		return($res['code'] == 200 ? json_decode($res['body']) : false);
 	}
 
 	public function putBurstData($id, $name, $template) {

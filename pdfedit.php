@@ -66,7 +66,6 @@ class PDFEditPage extends PageForm {
 
 		// The the query string/post data has a burst ID specified, then grab it
 		$this->burstId = (isset($request['id']) && intval($request['id'])) ? intval($request['id']) : null;
-
 	}
 
 	public function load(&$get, &$post, &$request, &$session) {
@@ -82,14 +81,12 @@ class PDFEditPage extends PageForm {
 				'filename' => ''
 			);
 		}
-		
+
 		// Get a list of burst templates
 		$this->loadBurstTemplates();
 
 		// Make the edit FORM
 		$this->form = $this->factoryFormPDFUpload();
-		$this->form->multipart = true;
-		$this->form->ajaxsubmit = false;
 	}
 
 	public function loadBurstTemplates() {
@@ -114,7 +111,7 @@ class PDFEditPage extends PageForm {
 		$formdata = array(
 			"name" => array(
 				"label" => _L('Name'),
-				"value" => $this->burstData['name'],
+				"value" => $this->burstData->name,
 				"validators" => array(
 					array('ValRequired'),
 					array("ValLength","min" => 3,"max" => 50)
@@ -124,7 +121,7 @@ class PDFEditPage extends PageForm {
 			),
 			"templateid" => array(
 				"label" => _L('Template'),
-				"value" => $this->burstData['templateid'],
+				"value" => $this->burstData->templateid,
 				"validators" => array(),
 				"control" => array('SelectMenu', 'values' => (array('' => _L('Select PDF Template')) + $this->burstTemplates)),
 				"helpstep" => 2
@@ -136,7 +133,7 @@ class PDFEditPage extends PageForm {
 			// Then a file has already been uploaded, so we're just going to show a read-only representation
 			$formdata[] = array(
 				"label" => _L('Uploaded PDF'),
-				"control" => array('FormHtml', 'html' => $this->burstData['filename'])
+				"control" => array('FormHtml', 'html' => $this->burstData->filename)
 			);
 		}
 		else {
@@ -164,7 +161,12 @@ class PDFEditPage extends PageForm {
 			icon_button(_L('Cancel'), 'cross', null, 'pdfmanager.php')
 		);
 
-		return(new Form('pdfuploader', $formdata, $helpsteps, $buttons, 'vertical'));
+		// A new form with some defaults overridden...
+		$form = new Form('pdfuploader', $formdata, $helpsteps, $buttons, 'vertical');
+		$form->multipart = true;
+		$form->ajaxsubmit = false;
+
+		return($form);
 	}
 
 	public function afterLoad() {
@@ -183,8 +185,8 @@ class PDFEditPage extends PageForm {
 	}
 
 	public function render() {
-		if ($this->burstId && ! $this->burstData) {
-			$html = _L('There is no PDF on file with the requested ID.') . "<br/>\n";
+		if ($this->burstId && ! is_object($this->burstData)) {
+			$html = _L('The requested PDF Document could not be found') . "<br/>\n";
 		}
 		else {
 			$html = $this->form->render();

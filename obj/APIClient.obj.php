@@ -26,6 +26,7 @@ class APIClient {
 		$creq = curl_init($this->APIURL . $node);
 		curl_setopt($creq, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($creq, CURLOPT_SSL_VERIFYPEER, 0);
+		curl_setopt($creq, CURLOPT_HEADER, 1);
 
 		// Some initial headers we will need, but there may be more...
 		$headers = array(
@@ -36,7 +37,8 @@ class APIClient {
 		// Set some options based on the REST method
 		switch ($method) {
 			case 'GET':
-				curl_setopt($creq, CURLOPT_GET, 1);
+				// Get is the default method type, so maybe there's nothing to do here...
+				//curl_setopt($creq, CURLOPT_GET, 1);
 				break;
 
 			case 'PUT':
@@ -52,7 +54,8 @@ class APIClient {
 				break;
 
 			case 'DELETE':
-				curl_setopt($creq, CURLOPT_DELETE, 1);
+				// ref: http://stackoverflow.com/questions/13420952/php-curl-delete-request
+				curl_setopt($creq, CURLOPT_CUSTOMREQUEST, 'DELETE');
 				break;
 		}
 
