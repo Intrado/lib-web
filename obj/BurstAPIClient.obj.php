@@ -48,7 +48,7 @@ class BurstAPIClient extends APIClient {
 		// ref: http://stackoverflow.com/questions/15223191/php-curl-file-upload-multipart-boundary
 		$data = array(
 			'name' => $name,
-			'templateid' => $template,
+			'templateid' => intval($template),
 			$uploadedName => "@{$uploadedFile['tmp_name']};type=application/pdf"
 		);
 
