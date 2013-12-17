@@ -1,7 +1,5 @@
 <?
 
-class BurstJSONObject {};
-
 class BurstAPIClient extends APIClient {
 
 	public function __construct($args) {
@@ -26,13 +24,12 @@ class BurstAPIClient extends APIClient {
 	public function putBurstData($id, $name, $template) {
 
 		// We don't support PUTting ALL fields here, only some...
-		$data = new BurstJSONObject();
+		$data = (object) null;
 		$data->id = intval($id);
 		$data->name = $name;
 		$data->bursttemplateid = $template;
 
 		$res = $this->apiPut("/{$id}", $data);
-
 		return($res['code'] == 200 ? true : false);
 	}
 
