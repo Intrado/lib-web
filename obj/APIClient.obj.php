@@ -20,7 +20,7 @@ class APIClient {
 		$this->APIURL = "{$this->customerURL}api/2/users/{$this->apiUser}";
 	}
 
-	private function sendRequest($method, $node, $data = Array()) {
+	private function sendRequest($method, $node, $data = null) {
 
 		// Make a new curl request object with some default options
 		$creq = curl_init($this->APIURL . $node);
@@ -42,14 +42,18 @@ class APIClient {
 				break;
 
 			case 'PUT':
-				curl_setopt($creq, CURLOPT_PUT, 1);
-				curl_setopt($creq, CURLOPT_POSTFIELDS, http_build_query($postData));
+				// ref: http://developer.sugarcrm.com/2011/11/22/howto-do-put-requests-with-php-curl-without-writing-to-a-file/
+				$json = json_encode($data);
+				curl_setopt($creq, CURLOPT_CUSTOMREQUEST, 'PUT');
+				curl_setopt($creq, CURLOPT_POSTFIELDS, $json);
+				$headers[] = 'Content-Type: application/json';
+				$headers[] = 'Content-Length: ' . strlen($json);
 				break;
 
 			case 'POST':
 				// ref: http://stackoverflow.com/questions/15223191/php-curl-file-upload-multipart-boundary
 				curl_setopt($creq, CURLOPT_POST, 1);
-				curl_setopt($creq, CURLOPT_POSTFIELDS, http_build_query($postData));
+				curl_setopt($creq, CURLOPT_POSTFIELDS, http_build_query($data));
 				$headers[] = 'Content-type: multipart/form-data';
 				break;
 
@@ -83,11 +87,11 @@ class APIClient {
 		return($this->sendRequest('GET', $node));
 	}
 
-	protected function apiPut($node = '', $data = Array()) {
+	protected function apiPut($node = '', $data = null) {
 		return($this->sendRequest('PUT', $node, $data));
 	}
 
-	protected function apiPost($node = '', $data = Array()) {
+	protected function apiPost($node = '', $data = null) {
 		return($this->sendRequest('POST', $node, $data));
 	}
 

@@ -35,6 +35,8 @@ class TemplateForm extends Form {
 	}
 }
 
+class JSONObject {};
+
 
 // -----------------------------------------------------------------------------
 // CUSTOM PAGE FUNCTIONALITY
@@ -75,11 +77,10 @@ class PDFEditPage extends PageForm {
 			$this->burstData = $this->burstAPI->getBurstData($this->burstId);
 		}
 		else {
-			$this->burstData = Array(
-				'name' => '',
-				'templateid' => '',
-				'filename' => ''
-			);
+			$this->burstData = new JSONObject();
+			$this->burstData->name = '';
+			$this->burstData->bursttemplateid = '';
+			$this->burstData->filename = '';
 		}
 
 		// Get a list of burst templates
@@ -119,9 +120,9 @@ class PDFEditPage extends PageForm {
 				"control" => array("TextField","size" => 30, "maxlength" => 50, "autocomplete" => "test"),
 				"helpstep" => 1
 			),
-			"templateid" => array(
+			"bursttemplateid" => array(
 				"label" => _L('Template'),
-				"value" => $this->burstData->templateid,
+				"value" => $this->burstData->bursttemplateid,
 				"validators" => array(),
 				"control" => array('SelectMenu', 'values' => (array('' => _L('Select PDF Template')) + $this->burstTemplates)),
 				"helpstep" => 2
@@ -130,7 +131,15 @@ class PDFEditPage extends PageForm {
 
 		// If we already have a burstId
 		if ($this->burstId) {
-			// Then a file has already been uploaded, so we're just going to show a read-only representation
+			// Then a file has already been uploaded
+
+			// Hide the ID from sight!
+			$formdata['id'] = array(
+				'value' => $this->burstId,
+				'control' => array('HiddenField')
+			);
+
+			// we're just going to show a read-only representation
 			$formdata[] = array(
 				"label" => _L('Uploaded PDF'),
 				"control" => array('FormHtml', 'html' => $this->burstData->filename)
@@ -157,7 +166,7 @@ class PDFEditPage extends PageForm {
 		);
 
 		$buttons = array(
-			submit_button(_L('Upload'), 'submit', 'tick'),
+			submit_button(_L($this->burstId ? 'Save' : 'Upload'), 'submit', 'tick'),
 			icon_button(_L('Cancel'), 'cross', null, 'pdfmanager.php')
 		);
 
@@ -174,8 +183,23 @@ class PDFEditPage extends PageForm {
 		if ($button = $this->form->getSubmit()) {
 			$postdata = $this->form->getData();
 			$name = $postdata['name'];
-			$template = intval($postdata['templateid']);
-			$this->burstAPI->postBurst($name, $template);
+			$bursttemplateid = intval($postdata['bursttemplateid']);
+
+			// Are we saving edits or uploading anew?
+			if ($this->burstId) {
+				// Saving edits!
+				if ($this->burstAPI->putBurstData($this->burstId, $name, $bursttemplateid)) {
+					print "saved!";
+				}
+				else print "failed 1";
+			}
+			else {
+				// Uploading anew!
+				if ($this->burstAPI->postBurst($name, $bursttemplateid)) {
+					print "uploaded!";
+				}
+				else print "failed 2";
+			}
 			redirect('pdfmanager.php');
 		}
 		$this->options['title'] = ($this->burstId) ? _L('Edit PDF Properties') : _L('Upload New PDF');
