@@ -13,7 +13,7 @@ class BurstAPIClient extends APIClient {
 		if ($limit) $querystring .= '&limit=' . intval($limit);
 
 		$res = $this->apiGet("/{$querystring}");
-		return($res['code'] == 200 ? json_parse($res['body']) : false);
+		return($res['code'] == 200 ? json_decode($res['body']) : false);
 	}
 
 	public function getBurstData($id) {
