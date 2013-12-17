@@ -20,6 +20,9 @@ require_once('ifc/Page.ifc.php');
 require_once('obj/PageBase.obj.php');
 require_once('obj/PageForm.obj.php');
 
+require_once('obj/APIClient.obj.php');
+require_once('obj/BurstAPIClient.obj.php');
+
 /**
  * class PdfManager
  * 
@@ -47,7 +50,7 @@ class PdfManager extends PageBase {
 	var $custName;
 	var $baseCustomerURL;
 	var $burstsURL;
-	var $curlOptions;
+	var $burstAPIClient;
 
 	function PdfManager($options = array()) {
 		if (isset($options)) {
@@ -59,11 +62,13 @@ class PdfManager extends PageBase {
 	// @override
 	function isAuthorized($get = array(), $post = array()) {
 		global $USER;
-		return true; //$USER->authorize('canpdfburst');
+		return $USER->authorize('canpdfburst');
 	}
 
 	// @override
 	public function initialize() {
+		global $USER;
+
 		// override some options on PageBase
 		$this->options["title"] = $this->pageTitle;
 		$this->options["page"]  = $this->pageNav;
@@ -72,33 +77,31 @@ class PdfManager extends PageBase {
 		$this->setBaseCustomerURL();
 		$this->setBurstsURL();
 
-		// define common curl options (for both fetch and delete API calls)
-		$this->curlOptions = array(
-			array('option' => CURLOPT_RETURNTRANSFER, 'value' => 1),
-			array('option' => CURLOPT_SSL_VERIFYPEER, 'value' => 0),
-			array('option' => CURLOPT_HTTPHEADER, 'value' => array(
-											"Accept: application/json",
-											"X-Auth-SessionId: " . $_COOKIE[$this->custName . '_session']))
+		// args array to pass to BurstAPIClient contstructor
+		$apiClientArgs = array(
+			'apiHostname' 	=> $_SERVER['SERVER_NAME'],
+			'apiCustomer' 	=> $this->custName,
+			'apiUser'		=> $USER->id,
+			'apiAuth'		=> $_COOKIE[$this->custName . '_session']
 		);
 
+		// create new instance of BurstAPIClient for use in burst API curl calls 
+		$this->burstAPIClient = new BurstAPIClient($apiClientArgs);
 	}
 
 	// @override
-	public function beforeLoad($get, $post) {
-		$this->isAjaxRequest = isset($get['ajax']); 
-		
+	public function beforeLoad($get, $post) { 
 		// if delete request, execute delete API call and exit, 
 		// which upon a successful response (200) will reload pdfmanager.php page (via JS in pdfmanager.js)
 		if (isset($post['delete'])) {
-			$this->deleteID = $post['id'];
-			$deleteURL = $this->burstsURL . '/' . $this->deleteID;
-			$deleteCurlOptions = array_merge($this->curlOptions, array(array('option' => CURLOPT_CUSTOMREQUEST, 'value' => 'DELETE')));
-			$response = $this->curlRequest($deleteURL, $deleteCurlOptions);
+			$response = $this->burstAPIClient->deleteBurst($post['id']);
 			
 			header('Content-Type: application/json');
 			echo json_encode($response);
 			exit();
 		}
+
+		$this->isAjaxRequest = isset($get['ajax']);
 
 		if (isset($get['feed_sortby'])) {
 			$this->sortBy = $get['feed_sortby'];
@@ -113,8 +116,8 @@ class PdfManager extends PageBase {
 			$this->authOrgList 	= Organization::getAuthorizedOrgKeys();
 
 			// fetch all existing burst records
-			$this->feedResponse = json_decode($this->curlRequest($this->burstsURL, $this->curlOptions), true);
-			$this->feedData = $this->feedResponse['bursts'];
+			$this->feedResponse = $this->burstAPIClient->getBurstList($this->pagingStart, $this->pagingLimit);
+			$this->feedData = $this->feedResponse->bursts;
 		}
 	}
 
@@ -149,23 +152,6 @@ class PdfManager extends PageBase {
 
 	}
 
-	/*
-	 * Description: performs a curl (API) request using the specified $url and $curlOptions
-	 * @param $url string - request url; should be full absolute path, ex. https://...
-	 * @param $curlOptions ex. array(array('option' => CURLOPT_RETURNTRANSFER, 'value' => 1), array(...) ...)
-	 * return JSON response from API call or null? for delete call
-	 */
-	public function curlRequest($url, $curlOptions) {
-		$curl = curl_init($url);
-		foreach ($curlOptions as $obj) {
-			curl_setopt($curl, $obj['option'], $obj['value']);
-		}
-		$response = curl_exec($curl);
-		curl_close($curl);
-
-		return $response;
- 	}
-
 	public function burstsAjaxResponse() {
 		if(empty($this->feedData)) {
 			$data->list[] = array("itemid" => "",
@@ -178,14 +164,14 @@ class PdfManager extends PageBase {
 			
 			while(!empty($this->feedData)) {
 				$item 			= array_shift($this->feedData);
-				$itemid 		= $item['id'];
+				$itemid 		= $item->id;
 				$defaultlink 	= $this->burstsURL . "/" . $itemid. "/pdf";
 
-				$title 			= escapehtml($item['name']);
-				$fileName 		= escapehtml($item['filename']);
-				$uploadDate 	= date("M j, Y g:i a", $item['uploaddatems']);
-				$fileSize 		= $item['bytes'];
-				$status 		= $item['status'];
+				$title 			= escapehtml($item->name);
+				$fileName 		= escapehtml($item->filename);
+				$uploadDate 	= date("M j, Y g:i a", $item->uploaddatems);
+				$fileSize 		= $item->bytes;
+				$status 		= $item->status;
 				
 				$icon 			= 'img/pdficon_32.png';
 
@@ -195,17 +181,16 @@ class PdfManager extends PageBase {
 						action_link(" Edit", "pencil", 'pdfedit.php?id=' . $itemid),
 						action_link(" Send Email", "email_go", $this->burstsURL . "/" . $itemid. "/send"),
 						action_link(" Download", "disk", $this->burstsURL . "/" . $itemid. "/pdf"),
-						action_link(" Delete", "cross", '#', "deleteBurst('".$this->burstsURL."', ".$itemid.");")
-						// action_link(" Delete", "cross", 'pdfmanager.php?deleteid=' . $itemid, "return confirmDelete();")
+						action_link(" Delete", "cross", '#', "deleteBurst(".$itemid.");")
 					);
 				} 
-				
-				$content = '<span>';
+
+				$content = '<span data-burst-id="'.$itemid.'">';
 				$content .= 'File: &nbsp;<strong>' .$fileName. '</strong><br>';
 				$content .= 'Size: &nbsp;<strong>' . number_format(($fileSize / pow(2,20)), 1, '.', '') . 'MB</strong><br>';
 				$content .= 'Upload Date: &nbsp;<strong>' .$uploadDate.'</strong><br>';
 				$content .= 'Status: &nbsp;<strong>' .ucwords($status).'</strong></span>';
-				
+
 				$data->list[] = array("itemid" 			=> $itemid,
 									  "defaultlink"		=> $defaultlink,
 									  "icon" 			=> $icon,
