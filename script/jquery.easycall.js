@@ -17,6 +17,16 @@
 		});
 	};
 
+	$.fn.resetEasyCall = function () {
+		return this.each(function () {
+			var $this = $(this);
+			if ($this.data('easyCall')) {
+				$this.detachEasyCall();
+				$this.attachEasyCall($this.data('easyCall'));
+			}
+		});
+	};
+
 	$.fn.attachEasyCall = function (options) {
 
 		var method = {
@@ -55,8 +65,7 @@
 
 				$.each(elementdata, function (code) {
 					// do a sanity check, then stuff the value in the recordings list
-					// if the code = "af" or "m", it refers to an audiofile or messagegroupid; treat similar to language code
-					if ($this.data('easyCall').languages[code] || code === "af" || code === "m")
+					if ($this.data('easyCall').languages[code])
 						$this.data('easyCall').recording[code] = elementdata[code];
 				});
 
@@ -309,7 +318,7 @@
 				return container;
 			},
 
-			// intelegently replace the current container with a callme container
+			// intelligently replace the current container with a callme container
 			resetToCallMeContainer:function (code) {
 				var $this = $(this);
 
@@ -516,12 +525,12 @@
 							method.updateParentElement();
 						} else {
 							// transition to error mode
-							method.replaceContainer(code, method.createErrorContainer(code, "An error occured while attempting to save audio."));
+							method.replaceContainer(code, method.createErrorContainer(code, "An error occurred while attempting to save audio."));
 						}
 					}, "json")
 					.error(function () {
 						// transition to error mode
-						method.replaceContainer(code, method.createErrorContainer(code, "An error occured while requesting save audio."));
+						method.replaceContainer(code, method.createErrorContainer(code, "An error occurred while requesting save audio."));
 					});
 				$this.data('easyCall').specialtaskid = false;
 			},
@@ -532,14 +541,20 @@
 
 				// update json data in parent input field
 				var itemdata = {};
-				$.each($this.data('easyCall').recording, function (code) {
-					if ($this.data('easyCall').recording[code] !== false)
-						itemdata[code] = $this.data('easyCall').recording[code];
+				// construct some interesting data to return with the event
+				var eventData = { recordings: [] };
+				$.each($this.data('easyCall').recording, function (languageCode) {
+					if ($this.data('easyCall').recording[languageCode] !== false) {
+						var recordingId = $this.data('easyCall').recording[languageCode];
+						var language = $this.data('easyCall').languages[languageCode];
+						itemdata[languageCode] = recordingId;
+						eventData.recordings.push({ recordingId: recordingId, languageCode: languageCode, language: language });
+					}
 				});
 				$this.data('easyCall').element.val($.toJSON(itemdata));
 
 				// data was changed. trigger an event on the parent element
-				$this.data('easyCall').element.trigger("easycall:update");
+				$this.data('easyCall').element.trigger("easycall:update", eventData);
 			},
 
 			// read the return status and provide appropriate error handling messages

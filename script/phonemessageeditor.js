@@ -47,52 +47,40 @@ function setupAudioUpload(e, audiolibrarywidget) {
 /* Function to initialize the jquery.easycall.js widget in non-MessageSender locations
  * in Kona, ex. Messages > select message > Edit > select Language > Record, Surveys (New or Edit)
  *
- * @param: formname - String representing name (and id) attr of EasyCall (ec) widgets parent form
- * @param: langcode - String representing language code, ex. 'en', 'af', 'm' ('af' & 'm' are non-language audiofile and messagegroup codes)
- * @param: language - String representing language, ex 'English'
- * @param: phone - String of phone number to initialize ec widget with
+ * @param: form - The form
+ * @param: formItem - The form input (or text area) which holds the message data
+ * @param: easyCallFormItem - Hidden input to attach easyCall to
+ * @param: easyCallOptions - Initialization options for easyCall
  * @param: messagegroupid - integer
  * @param: audiolibrarywidget - reference to audiolibrarywidget
  */
-function setupAdvancedVoiceRecorder(formname, langcode, language, phone, messagegroupid, audiolibrarywidget) {
+function setupAdvancedVoiceRecorder(form, formItem, easyCallFormItem, easyCallOptions, messagegroupid, audiolibrarywidget) {
 	// need to reference jQuery as $ is used by prototype
-	var easyCallObj = jQuery("#" + formname + "-easycall-widget");
-
-	// get messageArea and its parent form DOM objects (not jQuery objs) for use in form validation (uses Prototype)
-	var messageAreaDomEl = jQuery("#" + formname)[0];
-	var formDomEl = easyCallObj.closest("form")[0];
-
-	var languages = {};
-	languages[langcode] = language;
-
-	var easyCallOptions = {
-		"languages": languages,
-		"defaultcode": langcode,
-		"defaultphone": phone
-	};
+	var formEl = jQuery(form)[0];
+	var formItemEl = jQuery(formItem)[0];
+	var easyCallObj = jQuery(easyCallFormItem);
 
 	// attach EasyCall widget to easyCallObj (hidden input elem)
 	easyCallObj.val("").attachEasyCall(easyCallOptions);
 
 	// attach "easycall:update" event binding and callback handler fcn
-	easyCallObj.on("easycall:update", function(event) {
-		// event.currentTarget.value is a JSON string
-		var easyCallDataObj = event && event.currentTarget && JSON.parse(event.currentTarget.value) || {};
-		var audioFileId = easyCallDataObj[langcode];
+	easyCallObj.on("easycall:update", function(event, data) {
+		// there is only ever one recording going on at a time, so just get the first recording from the event
+		var audiofileId = null;
+		var language = null;
+		if (data.recordings) {
+			var firstRecording = data.recordings[0];
+			audiofileId = firstRecording.recordingId;
+			language = firstRecording.language;
+		}
 
-		if (audioFileId && audioFileId.length > 0) {
+		if (audiofileId) {
 			// insert the audiofile into the messageAreaDomEl
-			textInsert("{{" + language + " - " + curDate() + ":#" + audioFileId +"}}", messageAreaDomEl);
-			form_do_validation(formDomEl, messageAreaDomEl);
+			textInsert("{{" + language + " - " + curDate() + ":#" + audiofileId +"}}", formItemEl);
+			form_do_validation(formEl, formItemEl);
 
-			// remove all remnants of previous ec recorder, in preparation for creating a new EasyCall
-			easyCallObj.off("easycall:update");
-			easyCallObj.detachEasyCall();
-			easyCallObj.val("");
-
-			// create a new EasyCall (renders the EasyCall widget in its default initial state again)
-			// to allow users to continue to add more recordings if desired
-			setupAdvancedVoiceRecorder(formname, langcode, language, phone, messagegroupid, audiolibrarywidget);
+			// remove all remnants of previous easycall recorder and re-initialize it
+			easyCallObj.val("").resetEasyCall();
 
 			if (messagegroupid && audiolibrarywidget) {
 				// assign the audiofile to this message group
@@ -100,7 +88,7 @@ function setupAdvancedVoiceRecorder(formname, langcode, language, phone, message
 					"method": "post",
 					"parameters": {
 						"action": "assignaudiofile",
-						"id": audioFileId,
+						"id": audiofileId,
 						"messagegroupid": messagegroupid
 					},
 					"onSuccess": function() {
@@ -119,10 +107,8 @@ function setupAdvancedVoiceRecorder(formname, langcode, language, phone, message
 
 
 // set up the library of audio files for this message group, returns a reference to the widget
-function setupAudioLibrary(e, mgid) {
-	e = $(e);
-	var library = $(e.id+"-library");
-	var messagearea = e;
+function setupAudioLibrary(formItem, libraryItem, mgid) {
+	var library = $(libraryItem);
 
 	// keep a reference to the audio library widget so we can pass it to other methods which will call reload() on it
 	var audiolibrarywidget = new AudioLibraryWidget(library, mgid);
@@ -132,7 +118,7 @@ function setupAudioLibrary(e, mgid) {
 		var audiofile = event.memo.audiofile;
 
 		// insert the audiofile into the message
-		textInsert("{{" + audiofile.name + ":#" + audiofile.id +"}}", messagearea);
+		textInsert("{{" + audiofile.name + ":#" + audiofile.id +"}}", formItem);
 	});
 
 	return audiolibrarywidget;

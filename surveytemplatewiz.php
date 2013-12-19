@@ -247,6 +247,16 @@ class SurveyTemplateWiz_phonemessages extends WizStep {
 	function getForm($postdata, $curstep) {
 		global $USER, $questionnaire, $questions;
 
+		$machineAudioFile = DBFind("audiofile", "from messagepart mp
+			inner join audiofile a on (a.id = mp.audiofileid)
+			where mp.messageid = ?", 'a', array($questionnaire->machinemessageid));
+		$introAudioFile = DBFind("audiofile", "from messagepart mp
+			inner join audiofile a on (a.id = mp.audiofileid)
+			where mp.messageid = ?", 'a', array($questionnaire->intromessageid));
+		$exitAudioFile = DBFind("audiofile", "from messagepart mp
+			inner join audiofile a on (a.id = mp.audiofileid)
+			where mp.messageid = ?", 'a', array($questionnaire->exitmessageid));
+
 		$formdata = array();
 		$helpsteps = array();
 		$helpstepnum = 1;
@@ -264,12 +274,17 @@ class SurveyTemplateWiz_phonemessages extends WizStep {
 			$formdata["amsweringmachine"] = array(
 				"label" => _L('Answering Machine Message'),
 				"fieldhelp" => _L('Enter a phone number where the system can call you.'),
-				"value" => $questionnaire->machinemessageid ? '{"m":' . $questionnaire->machinemessageid . '}' : "",
+				"value" => ($machineAudioFile->id ? json_encode(array('en' => $machineAudioFile->id)) : ""),
 				"validators" => array(
 					array("ValRequired"),
 					array("PhoneMessageRecorderValidator")
 				),
-				"control" => array("PhoneMessageRecorder", "langcode" => $questionnaire->machinemessageid ? "m" : "af"),
+				"control" => array("PhoneMessageRecorder",
+					"phone" => $USER->phone,
+					"languages" => array("en" => "English"),
+					"phonemindigits" => getCustomerSystemSetting("easycallmin", 10),
+					"phonemaxdigits" => getCustomerSystemSetting("easycallmax", 10)
+				),
 				"helpstep" => $helpstepnum++
 			);
 			$helpsteps[] = _L('This message will be left in the event of the system reaching an answering machine. You should write your message before you record.');
@@ -287,12 +302,17 @@ class SurveyTemplateWiz_phonemessages extends WizStep {
 			$formdata["intromessage"] = array(
 				"label" => _L('Intro Message'),
 				"fieldhelp" => _L('Enter a phone number where the system can call you.'),
-				"value" => $questionnaire->intromessageid ? '{"m":' . $questionnaire->intromessageid . '}' : "",
+				"value" => ($introAudioFile->id ? json_encode(array('en' => $introAudioFile->id)) : ""),
 				"validators" => array(
 					array("ValRequired"),
 					array("PhoneMessageRecorderValidator")
 				),
-				"control" => array("PhoneMessageRecorder", "langcode" => $questionnaire->intromessageid ? "m" : "af" ),
+				"control" => array("PhoneMessageRecorder",
+					"phone" => $USER->phone,
+					"languages" => array("en" => "English"),
+					"phonemindigits" => getCustomerSystemSetting("easycallmin", 10),
+					"phonemaxdigits" => getCustomerSystemSetting("easycallmax", 10)
+				),
 				"helpstep" => $helpstepnum++
 			);
 			$helpsteps[] = _L('Before you enter a phone number where the system can call you to record, you should prepare by writing your message down. This message will be played before the survey starts.');
@@ -312,12 +332,17 @@ class SurveyTemplateWiz_phonemessages extends WizStep {
 			$formdata["goodbyemessage"] = array(
 				"label" => _L('Goodbye Message'),
 				"fieldhelp" => _L('Enter a phone number where the system can call you.'),
-				"value" => $questionnaire->exitmessageid ? '{"m":' . $questionnaire->exitmessageid . '}' : "",
+				"value" => ($exitAudioFile->id ? json_encode(array('en' => $exitAudioFile->id)) : ""),
 				"validators" => array(
 					array("ValRequired"),
 					array("PhoneMessageRecorderValidator")
 				),
-				"control" => array("PhoneMessageRecorder", "langcode" => $questionnaire->exitmessageid ? "m" : "af"),
+				"control" => array("PhoneMessageRecorder",
+					"phone" => $USER->phone,
+					"languages" => array("en" => "English"),
+					"phonemindigits" => getCustomerSystemSetting("easycallmin", 10),
+					"phonemaxdigits" => getCustomerSystemSetting("easycallmax", 10)
+				),
 				"helpstep" => $helpstepnum++
 			);
 			$helpsteps[] = _L('This message will be played after the recipient has completed your survey. Best Practice is to thank them for their time. You should write down your message before you try to record.');
@@ -527,8 +552,12 @@ class SurveyTemplateWiz_questions extends WizStep {
 				$qnum = $index + 1;
 				$questiondata[$qnum]["reportlabel"] = $question->reportlabel;
 				$questiondata[$qnum]["validresponse"] = $question->validresponse;
-				if ($hasphone)
-					$questiondata[$qnum]["phonemessage"] = $question->phonemessageid ? '{"m": ' . $question->phonemessageid . '}' : "";
+				if ($hasphone) {
+					$audioFile = DBFind("audiofile", "from messagepart mp
+						inner join audiofile a on (a.id = mp.audiofileid)
+						where mp.messageid = ?", 'a', array($question->phonemessageid));
+					$questiondata[$qnum]["phonemessage"] = ($audioFile->id ? json_encode(array('en' => $audioFile->id)) : "");
+				}
 				if ($hasweb)
 					$questiondata[$qnum]["webtext"] = $question->webmessage;
 			}
@@ -591,7 +620,12 @@ class SurveyTemplateWiz_questions extends WizStep {
 						array("ValRequired"),
 						array("PhoneMessageRecorderValidator")
 					),
-					"control" => array("PhoneMessageRecorder", "langcode" => isset($values->m) ? "m" : "af"),
+					"control" => array("PhoneMessageRecorder",
+						"phone" => $USER->phone,
+						"languages" => array("en" => "English"),
+						"phonemindigits" => getCustomerSystemSetting("easycallmin", 10),
+						"phonemaxdigits" => getCustomerSystemSetting("easycallmax", 10)
+					),
 					"helpstep" => $helpstepnum++
 				);
 				$helpsteps[] = _L('Enter the number where the system can call you to record your question. It\'s a good idea to write down your questions before you begin. Also, make sure to explain the possible reponses to the recipient. For example, "Press 1 for yes or 2 for no."');
@@ -647,11 +681,9 @@ function getMessageIdForPhoneRecorder($value) {
 	global $USER;
 
 	$values = json_decode($value);
+	$firstLangCode = key($values);
 
-	if (isset($values->m))
-		return $values->m;
-
-	if (isset($values->af)) {
+	if ($values->$firstLangCode) {
 		//make a message for this audiofile and return the messageid
 		$m = new Message();
 		$m->userid = $USER->id;
@@ -668,7 +700,7 @@ function getMessageIdForPhoneRecorder($value) {
 		$mp = new MessagePart();
 		$mp->messageid = $m->id;
 		$mp->type = "A";
-		$mp->audiofileid = $values->af;
+		$mp->audiofileid = $values->$firstLangCode;
 		$mp->sequence = 0;
 		$mp->create();
 

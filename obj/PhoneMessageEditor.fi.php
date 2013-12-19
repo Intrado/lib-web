@@ -25,6 +25,22 @@
  */
 
 class PhoneMessageEditor extends FormItem {
+	var $languages;
+	var $defaultPhone;
+	var $phoneMinDigits;
+	var $phoneMaxDigits;
+	var $messagegroupId;
+
+	function PhoneMessageEditor($form, $name, $args) {
+		parent::FormItem($form, $name, $args);
+		global $USER;
+
+		$this->languages = (isset($this->args['languages']) ? $this->args['languages'] : array("en" => "English"));
+		$this->defaultPhone = (isset($this->args['phone'])) ? Phone::format(escapehtml($this->args['phone'])) : Phone::format($USER->phone);
+		$this->phoneMinDigits = (isset($this->args['phonemindigits']) ? $this->args['phonemindigits'] : 10);
+		$this->phoneMaxDigits = (isset($this->args['phonemaxdigits']) ? $this->args['phonemaxdigits'] : 10);
+		$this->messagegroupId = (isset($this->args['messagegroupid'])?$this->args['messagegroupid']:false);
+	}
 
 	function render ($value) {
 		global $USER;
@@ -35,8 +51,6 @@ class PhoneMessageEditor extends FormItem {
 		$enableFieldInserts = true;
 		if (isset($this->args['enablefieldinserts']))
 			$enableFieldInserts = $this->args['enablefieldinserts'];
-
-		$messagegroupid = (isset($this->args['messagegroupid'])?$this->args['messagegroupid']:false);
 
 		// style - added into form.css in advanced message editor section
 
@@ -138,13 +152,13 @@ class PhoneMessageEditor extends FormItem {
 		}
 
 		// if there are additional tools available, show them to the right
-		if ($USER->authorize('starteasy') || $messagegroupid ) {
+		if ($USER->authorize('starteasy') || $this->messagegroupId ) {
 			$str .= '
 				<div class="cf"></div>
 				<div class="audiocontainer">
 					'.($USER->authorize('starteasy')?$voicerecorder:"").'
-					'.($messagegroupid?$audioupload:"").'
-					'.($messagegroupid?$audiolibrary:"").'
+					'.($this->messagegroupId?$audioupload:"").'
+					'.($this->messagegroupId?$audiolibrary:"").'
 				</div>';
 		}
 		$str .= '
@@ -154,41 +168,44 @@ class PhoneMessageEditor extends FormItem {
 	}
 
 	function renderJavascript($value) {
-		global $USER;
-		$n = $this->form->name."_".$this->name;
+		reset($this->languages);
+		return "
+			jQuery(function($){
+				var form = $('#{$this->form->name}');
+				var formItem = $('#{$this->form->name}_{$this->name}');
+				var easyCallFormItem = $('#{$this->form->name}_{$this->name}-easycall-widget');
+				var audioLibraryItem = $('#{$this->form->name}_{$this->name}-library');
+				var audioLibraryWidget = null;
 
-		// langcode and messagegroupid should be passed as args
-		$langcode = (isset($this->args['langcode'])?$this->args['langcode']:Language::getDefaultLanguageCode());
-		$messagegroupid = (isset($this->args['messagegroupid'])?$this->args['messagegroupid']:false);
-		$language = Language::getName($langcode);
+				// create and initialize the audio library if there is a spot for it in the dom
+				if (audioLibraryItem) {
+					audioLibraryWidget = setupAudioLibrary(formItem[0], audioLibraryItem[0], '{$this->messagegroupId}');
+					setupAudioUpload(formItem[0], audioLibraryWidget);
+				}
 
-		// set up the controls in the form and initialize any event listeners
-		// NOTE: the audio upload and audio library require a messagegroup id be set
-		if ($messagegroupid) {
-			$str = 'var audiolibrarywidget = setupAudioLibrary("'.$n.'", "'.$messagegroupid.'");
-						setupAudioUpload("'.$n.'", audiolibrarywidget);
-					';
-			if ($USER->authorize('starteasy'))
-				$str .= 'setupAdvancedVoiceRecorder("'.$n.'", "'.$langcode.'","'.$language.'", "'.Phone::format($USER->phone).'", '.$messagegroupid.', audiolibrarywidget);';
-		} else if ($USER->authorize('starteasy')) {
-			$str = 'setupAdvancedVoiceRecorder("'.$n.'", "'.$langcode.'","'.$language.'", "'.Phone::format($USER->phone).'", false, null);';
-		} else {
-			$str = "";
-		}
+				// initialize the call me to record feature if there is a spot for it in the dom
+				if (easyCallFormItem) {
+					var easyCallOptions = {
+						languages: ". json_encode($this->languages). ",
+						defaultcode: '". key($this->languages). "',
+						defaultphone: '{$this->defaultPhone}',
+						phonemindigits: {$this->phoneMinDigits},
+						phonemaxdigits: {$this->phoneMaxDigits}
+					};
 
-		return $str;
+					setupAdvancedVoiceRecorder(form, formItem, easyCallFormItem, easyCallOptions, '{$this->messagegroupId}', audioLibraryWidget);
+				}
+			}(jQuery));
+		";
 	}
 
 	function renderJavascriptLibraries() {
-		global $USER;
-		$str = '
+		return '
 			<script type="text/javascript" src="script/jquery.json-2.3.min.js"></script>
 			<script type="text/javascript" src="script/jquery.timer.js"></script>
 			<script type="text/javascript" src="script/jquery.easycall.js"></script>
 			<script type="text/javascript" src="script/audiolibrarywidget.js.php"></script>
 			<script type="text/javascript" src="script/phonemessageeditor.js"></script>';
-
-		return $str;
 	}
 }
 ?>

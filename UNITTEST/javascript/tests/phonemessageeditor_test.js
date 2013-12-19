@@ -1,28 +1,29 @@
-describe("setupAdvancedVoiceRecorder(formname, langcode, language, phone, messagegroupid, audiolibrarywidget)", function() {
+describe("setupAdvancedVoiceRecorder(form, formItem, easyCallFormItem, easyCallOptions, messagegroupid, audiolibrarywidget)", function() {
 
-		var formname = 'formname';
-		var ecEl = $('<input>').attr({
-				'type':'hidden',
-				'id': formname + '-easycall-widget',
-				'value': '{}'
-			});
+	var formname = 'formname';
+	var easyCallFormItem = $('<input>').attr({
+			'type':'hidden',
+			'id': formname + '-easycall-widget',
+			'value': '{}'
+		});
 
-		var formEl = $('<form>').attr({
-				'id': formname + "-form"
-			});
+	var form = $('<form>').attr({
+			'id': formname + "-form"
+		});
 
-		var messageAreaEl = $('<textarea>').attr({
-				'id': formname
-			});
+	var formItem = $('<textarea>').attr({
+			'id': formname
+		});
 
-		var formDomEl = formEl[0],
-			messageAreaDomEl = messageAreaEl[0],
-			langs = {};
-			langcode = 'en';
-			language = 'English'
-			langs['en'] = 'English',
-			phone = '888-123-4567',
-			curDate = '01/02/2013 12:00p';
+	var curDate = '01/02/2013 12:00p';
+
+	var easyCallOptions = {
+		languages: {en: "English"},
+		defaultcode: 'en',
+		defaultphone: '888-123-4567',
+		phonemindigits: 10,
+		phonemaxdigits: 10
+	};
 
 	beforeEach(function() {
 		window.textInsert = function() {
@@ -38,25 +39,27 @@ describe("setupAdvancedVoiceRecorder(formname, langcode, language, phone, messag
 		};
 
 		this.attachSpy = sinon.spy($.fn, 'attachEasyCall');
-		this.detachSpy = sinon.spy($.fn, 'detachEasyCall')
+		this.detachSpy = sinon.spy($.fn, 'detachEasyCall');
 		this.textInsertStub = sinon.stub(window, 'textInsert');
 		this.validationStub = sinon.stub(window, 'form_do_validation');
 
 		// stick ec elem inside form
-		$("body").append(formEl.append(ecEl));
-		setupAdvancedVoiceRecorder(formname, langcode, language, phone, false, null);
+		$("body").append(form.append(easyCallFormItem));
 
+		var messagegroupid = null;
+		var audiolibrarywidget = null;
+		setupAdvancedVoiceRecorder(form[0], formItem[0], easyCallFormItem[0], easyCallOptions, messagegroupid, audiolibrarywidget);
 	});
 
 
 	afterEach(function() {
 		// remove ec event bindings
-		ecEl.off("easycall:update");
-		ecEl.off("easycall:preview");
-		ecEl.detachEasyCall();
-		ecEl.val("");
-		formEl.remove();
-		ecEl.remove();
+		easyCallFormItem.off("easycall:update");
+		easyCallFormItem.off("easycall:preview");
+		easyCallFormItem.detachEasyCall();
+		easyCallFormItem.val("");
+		form.remove();
+		easyCallFormItem.remove();
 		$(".easycallmaincontainer.easycall-widget.easycall").remove();
 		this.attachSpy.restore();
 		this.detachSpy.restore();
@@ -69,13 +72,7 @@ describe("setupAdvancedVoiceRecorder(formname, langcode, language, phone, messag
 	});
 
 	it("calls attachEasyCall(options) on the easyCall hidden input element ", function() {
-		var options = {
-			"languages": langs,
-			"defaultcode": langcode,
-			"defaultphone": phone
-		};
-
-		expect(this.attachSpy).to.have.been.calledWith(options);
+		expect(this.attachSpy).to.have.been.calledWith(easyCallOptions);
 	});
 
 	describe('"easycall:update" event handler', function() {
@@ -84,27 +81,23 @@ describe("setupAdvancedVoiceRecorder(formname, langcode, language, phone, messag
 
 		});
 		it('inserts audio recording text string into message textarea; calls textInsert()', function() {
-			var res = "{\"en\": \"123\"}";
-			ecEl.val(res);
-			ecEl.trigger('easycall:update', res);
+			var res = { recordings: [ { recordingId: 123, languageCode: 'en', language: 'English' } ] };
+			easyCallFormItem.trigger('easycall:update', res);
 			expect(this.textInsertStub).to.have.been.called;
 		});
 
 		it('validates the message textarea after inserting the audio text string; calls form_do_validation()', function() {
-			var res = "{\"en\": \"123\"}";
-			ecEl.val(res);
-			ecEl.trigger('easycall:update', res);
+			var res = { recordings: [ { recordingId: 123, languageCode: 'en', language: 'English' } ] };
+			easyCallFormItem.trigger('easycall:update', res);
 			expect(this.validationStub).to.have.been.called;
 		});
 
 		it('detaches old easyCall widget (removes "easycall:update" event listener, detaches easycall, clears value attr); calls detachEasyCall()', function() {
 			var offStub = sinon.stub($.fn, 'off');
 			var valSpy = sinon.spy($.fn, "val");
-			var res = "{\"en\": \"876\"}";
-			ecEl.val(res);
-			ecEl.trigger('easycall:update', res);
+			var res = { recordings: [ { recordingId: 123, languageCode: 'en', language: 'English' } ] };
+			easyCallFormItem.trigger('easycall:update', res);
 
-			expect(offStub).to.have.been.calledWith('easycall:update');
 			expect(this.detachSpy).to.have.been.called;
 			expect(valSpy).to.have.been.called;
 
@@ -112,15 +105,12 @@ describe("setupAdvancedVoiceRecorder(formname, langcode, language, phone, messag
 			valSpy.restore();
 		});
 
-		it('re-initializes new EasyCall widget (after detaching old EC) by calling setupAdvancedVoiceRecorder()', function() {
-			var recorderStub = sinon.stub(window, 'setupAdvancedVoiceRecorder');
+		it('re-initializes new EasyCall widget (after detaching old EC) by calling resetEasyCall()', function() {
+			var res = { recordings: [ { recordingId: 123, languageCode: 'en', language: 'English' } ] };
+			easyCallFormItem.trigger('easycall:update', res);
 
-			var res = "{\"en\": \"876\"}";
-			ecEl.val(res);
-			ecEl.trigger('easycall:update', res);
-
-			expect(recorderStub).to.have.been.called;
-			recorderStub.restore()
+			expect(this.detachSpy).to.have.been.called;
+			expect(this.attachSpy).to.have.been.called;
 		});
 	});
 });

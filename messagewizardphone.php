@@ -275,6 +275,7 @@ class MsgWiz_phoneEasyCall extends WizStep {
 class MsgWiz_phoneAdvanced extends WizStep {
 
 	function getForm($postdata, $curstep) {
+		global $USER;
 
 		// get the language code we are createing a message for
 		$langcode = Language::getDefaultLanguageCode();
@@ -327,7 +328,14 @@ class MsgWiz_phoneAdvanced extends WizStep {
 				"fieldhelp" => _L("Enter your phone message in this field. Click on the 'Guide' button for help with the different options which are available to you."),
 				"value" => "",
 				"validators" => $messagevalidators,
-				"control" => array("PhoneMessageEditor", "langcode" => $langcode, "messagegroupid" => $messagegroup->id),
+				"control" => array("PhoneMessageEditor",
+					"enablefieldinserts" => "limited",
+					"messagegroupid" => $messagegroup->id,
+					"phone" => $USER->phone,
+					"languages" => array($langcode => Language::getName($langcode)),
+					"phonemindigits" => getCustomerSystemSetting("easycallmin", 10),
+					"phonemaxdigits" => getCustomerSystemSetting("easycallmax", 10)
+				),
 				"helpstep" => $helpstep++);
 		$formdata["gender"] = array(
 				"label" => _L("Gender"),
