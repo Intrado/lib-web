@@ -225,7 +225,8 @@ class MsgWiz_phoneEasyCall extends WizStep {
 		global $USER;
 
 		// Phone message recorder will store the audiofile with this name
-		$language = Language::getName(isset($postdata["/create/language"]["language"])?$postdata["/create/language"]["language"]:Language::getDefaultLanguageCode());
+		$languagecode = isset($postdata["/create/language"]["language"])?$postdata["/create/language"]["language"]:Language::getDefaultLanguageCode();
+		$language = Language::getName($languagecode);
 
 		$formdata = array($this->title);
 		$formdata['tips'] = array(
@@ -249,7 +250,12 @@ class MsgWiz_phoneEasyCall extends WizStep {
 				array("ValRequired"),
 				array("PhoneMessageRecorderValidator")
 			),
-			"control" => array( "PhoneMessageRecorder", "langcode" => "af"),
+			"control" => array("PhoneMessageRecorder",
+				"phone" => $USER->phone,
+				"languages" => array($languagecode => $language),
+				"phonemindigits" => getCustomerSystemSetting("easycallmin", 10),
+				"phonemaxdigits" => getCustomerSystemSetting("easycallmax", 10)
+			),
 			"helpstep" => 1
 		);
 
@@ -629,7 +635,7 @@ class FinishMessageWizard extends WizFinish {
 		if (MsgWiz_phoneEasyCall::isEnabled($postdata, false)) {
 			// pull the audiofileid from post data
 			$audiofileidmap = $this->parent->dataHelper("/create/callme:message",true);
-			$audiofileid = $audiofileidmap->af;
+			$audiofileid = $audiofileidmap->$sourcelangcode;
 
 			// check for an existing message with this language code for this message group
 			// get either the 'none', 'overridden' or 'translated' message for overwriting
