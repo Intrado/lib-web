@@ -236,10 +236,25 @@ class PDFEditPage extends PageForm {
 		return($html);
 	}
 
-	private function modalHtml($content) {
-		// TODO - implement bootstrap modal solution from tips.php
+	// Here's a nifty bootstrap modal implementation lifted from tips.php/js
+	private function modalHtml($content, $heading='Error') {
 		$html = <<<END
-Here is a modal with the following important message: {$content}
+			<div id="pdfeditmodal" class="modal hide">
+				<div class="modal-header">
+					<h3 id="attachment-details">{$heading}</h3>
+				</div>
+				<div class="modal-body">
+					<div id="tip-attachment-content">{$content}</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+			<script language="JavaScript">
+				(function($) {
+					$('#pdfeditmodal').modal('show');
+				}) (jQuery);
+			</script>
 END;
 		return($html);
 	}
