@@ -37,8 +37,6 @@ class PdfManager extends PageBase {
 	var $pagingStart = 0;
 	var $pagingLimit = 100;
 	var $isAjaxRequest = false;
-	var $deleteID;
-	var $sqlArgs = array();
 	var $feedResponse;
 	var $feedData;
 	var $total = 0;
@@ -47,7 +45,6 @@ class PdfManager extends PageBase {
 	var $displayEnd;
 	var $displayStart;
 	var $custName;
-	var $baseCustomerURL;
 	var $burstsURL;
 	var $burstAPIClient;
 
@@ -72,9 +69,9 @@ class PdfManager extends PageBase {
 		$this->options["title"] = $this->pageTitle;
 		$this->options["page"]  = $this->pageNav;
 
-		$this->setCustomerName();
-		$this->setBaseCustomerURL();
-		$this->setBurstsURL();
+		// scrape customer 'name' out of the URL (for use in 'BurstAPIClient')	
+		$uriParts 	= explode('/', $_SERVER['REQUEST_URI']); // ex /custname/...
+		$this->custName = $uriParts[1];
 
 		// args array to pass to BurstAPIClient contstructor
 		$apiClientArgs = array(
@@ -86,6 +83,7 @@ class PdfManager extends PageBase {
 
 		// create new instance of BurstAPIClient for use in burst API curl calls 
 		$this->burstAPIClient = new BurstAPIClient($apiClientArgs);
+		$this->burstsURL = $this->burstAPIClient->getAPIURL();
 	}
 
 	// @override
@@ -132,7 +130,6 @@ class PdfManager extends PageBase {
 		echo '<link rel="stylesheet" type="text/css" href="css/pdfmanager.css">';
 		echo '<script type="text/javascript" src="script/pdfmanager.js"></script>';
 		startWindow(_L('PDF Report Manager'), 'padding: 3px;', false, true);
-
 		$feedButtons = array(icon_button(_L(' Upload New PDF'), "pdficon_16", null, "pdfedit.php"));
 		feed($feedButtons, null);
 		echo '<script type="text/javascript" src="script/feed.js.php"></script>
@@ -142,7 +139,6 @@ class PdfManager extends PageBase {
 		});
 		</script>';
 		endWindow();
-
 	}
 
 	public function burstsAjaxResponse() {
@@ -200,22 +196,6 @@ class PdfManager extends PageBase {
 		header('Content-Type: application/json');
 		echo json_encode(!empty($data) ? $data : false);
 		exit();
-	}
-
-	public function setCustomerName() {
-		// scrape customer 'name' out of the URL (for use in 'baseCustomerURL')	
-		$uriParts 	= explode('/', $_SERVER['REQUEST_URI']); // ex /custname/...
-		$this->custName = $uriParts[1];
-	}
-
-	public function setBaseCustomerURL() {
-		$this->baseCustomerURL = (isset($_SERVER['HTTPS']) ? 'https://' : 'http://') . $_SERVER['SERVER_NAME'] . '/' . $this->custName;
-	}
-
-	public function setBurstsURL() {
-		global $USER;
-		// burst API url to fetch all bursts for a given user
-		$this->burstsURL = $this->baseCustomerURL . '/api/2/users/' . $USER->id . '/bursts';
 	}
 
 	public function setDisplayPagingDetails() {
