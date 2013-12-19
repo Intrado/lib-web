@@ -168,7 +168,14 @@ if ($hasPhoneTargetedMessage) {
 				array("ValLength","max" => 10000), // 10000 Characters is about 40 minutes of tts, considered to be more than enough
 				array("ValTtsText")
 			),
-			"control" => array("PhoneMessageEditor", "enablefieldinserts" => "limited", "langcode" => $languagecode, "messagegroupid" => $messagegroup->id),
+			"control" => array("PhoneMessageEditor",
+					"enablefieldinserts" => "limited",
+					"messagegroupid" => $messagegroup->id,
+					"phone" => $USER->phone,
+					"languages" => array($languagecode => Language::getName($languagecode)),
+					"phonemindigits" => getCustomerSystemSetting("easycallmin", 10),
+					"phonemaxdigits" => getCustomerSystemSetting("easycallmax", 10)
+				),
 			"helpstep" => 2);
 	
 	if ($targetedmessage->isNewCustom()) {

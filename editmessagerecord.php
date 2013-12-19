@@ -76,7 +76,12 @@ $formdata["message"] = array(
 	"validators" => array(
 		array("ValRequired"),
 		array("PhoneMessageRecorderValidator")),
-	"control" => array("PhoneMessageRecorder", "phone" => $USER->phone, "name" => $language, "langcode" => $languagecode),
+	"control" => array("PhoneMessageRecorder",
+			"phone" => $USER->phone,
+			"languages" => array($languagecode => $language),
+			"phonemindigits" => getCustomerSystemSetting("easycallmin", 10),
+			"phonemaxdigits" => getCustomerSystemSetting("easycallmax", 10)
+		),
 	"helpstep" => 1
 );
 
@@ -152,7 +157,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
 		// pull the audiofileid from post data
 		$audiofileidmap = json_decode($postdata["message"]);
-		$audiofileid = $audiofileidmap->af;
+		$audiofileid = $audiofileidmap->$languagecode;
 
 		// assign this audiofile to the message group
 		$audiofile = new AudioFile($audiofileid);

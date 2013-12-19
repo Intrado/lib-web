@@ -9,21 +9,12 @@ class PhoneMessageRecorderValidator extends Validator {
 		if (!$USER->authorize("starteasy"))
 			return _L('%1$s is not allowed for this user account',$this->label);
 		$values = json_decode($value);
-
-		if ($values == null || (!isset($values->m) && !isset($values->af) && !isset($values->delete)))
+		if ($values == null || $value == '{}')
 			return _L('%1$s does not have a message recorded', $this->label);
 
-		//special allow for delete
-		if (isset($values->delete))
-			return true;
-
-		if (isset($values->m)) {
-			if (!QuickQuery("select count(*) from message where id=? and userid=?",false,array($values->m,$USER->id)))
-				return _L('%1$s has an invalid or missing message', $this->label);
-		}
-
-		if (isset($values->af)) {
-			if (!QuickQuery("select count(*) from audiofile where id=? and userid=?",false,array($values->af,$USER->id)))
+		foreach ($values as $langCode => $audiofileId) {
+			$languages = Language::getLanguageMap();
+			if (!isset($languages[$langCode]) || !userCanSee("audiofile", $audiofileId))
 				return _L('%1$s has an invalid or missing message', $this->label);
 		}
 

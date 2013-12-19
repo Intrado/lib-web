@@ -111,7 +111,14 @@ $formdata = array(
 		"validators" => array(
 			array("ValRequired"),
 			array("ValMessageBody", "messagegroupid" => $messagegroup->id)),
-		"control" => array("PhoneMessageEditor", "enablefieldinserts" => false, "messagegroupid" => $messagegroup->id),
+		"control" => array("PhoneMessageEditor",
+			"enablefieldinserts" => "limited",
+			"messagegroupid" => $messagegroup->id,
+			"phone" => $USER->phone,
+			"languages" => array(Language::getDefaultLanguageCode() => Language::getName(Language::getDefaultLanguageCode())),
+			"phonemindigits" => getCustomerSystemSetting("easycallmin", 10),
+			"phonemaxdigits" => getCustomerSystemSetting("easycallmax", 10)
+		),
 		"helpstep" => 1
 	),
 	"gender" => array(
