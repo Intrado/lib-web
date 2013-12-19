@@ -460,7 +460,7 @@ class ReldateOptions extends FormItem {
 class FileUpload extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
-		$str = '<input type="file" id='.$n.' name="'.$n.'[]" onchange="form_do_validation($(\'' . $this->form->name . '\'), $(\'' . $n . '\'));"/>';
+		$str = '<input type="file" id='.$n.' name="'.$n.'" onchange="form_do_validation($(\'' . $this->form->name . '\'), $(\'' . $n . '\'));"/>';
 		return $str;
 	}
 }

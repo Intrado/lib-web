@@ -36,7 +36,9 @@ class BurstAPIClient extends APIClient {
 	public function postBurst($name, $template) {
 
 		// this method requires a file to have been uploaded...
-		if (! count($_FILES)) return(false);
+		if (! count($_FILES)) {
+			return(false);
+		}
 
 		// Get the key for the fileSet (in case some screwy future
 		// version supplies multiple sets in a single POST)
@@ -44,10 +46,10 @@ class BurstAPIClient extends APIClient {
 		$fileSetKey = array_shift($fileSetKeys);
 
 		// Get the first filename in this file set
-		$filename = $_FILES[$fileSetKey]['name'][0];
-		$filetype = $_FILES[$fileSetKey]['type'][0];
-		$tempfile = $_FILES[$fileSetKey]['tmp_name'][0];
-		$filesize = $_FILES[$fileSetKey]['size'][0];
+		$filename = $_FILES[$fileSetKey]['name'];
+		$filetype = $_FILES[$fileSetKey]['type'];
+		$tempfile = $_FILES[$fileSetKey]['tmp_name'];
+		$filesize = $_FILES[$fileSetKey]['size'];
 
 		// We are only going to allow PDF file mime types through to the API
 		if ($filetype != 'application/pdf') {
@@ -82,7 +84,6 @@ class BurstAPIClient extends APIClient {
 			$data['burstTemplateId'] = intval($template);
 		}
 		$res = $this->apiPost('/upload', $data);
-
 		return($res['code'] == 201 ? true : false);
 	}
 

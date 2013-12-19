@@ -151,13 +151,12 @@ class PDFEditPage extends PageForm {
 		}
 		else {
 			// Otherwise we need to show the upload formitem to be able to select and upload a new PDF
-			$formdata[] = array(
+			$formdata['thefile'] = array(
 				"label" => _L('PDF Document'),
 				"value" => '',
-				"validators" => array(),
-				//"validators" => array(
-				//	array('ValRequired')
-				//),
+				"validators" => array(
+					array('ValRequired')
+				),
 				"control" => array('FileUpload'),
 				"helpstep" => 3
 			);
