@@ -90,6 +90,10 @@ class BurstAPIClient extends APIClient {
 		$res = $this->apiDelete("/{$id}");
 		return($res['code'] == 200 ? true : false);
 	}
+
+	public function getAPIURL() {
+		return $this->APIURL;
+	}
 }
 
 ?>
