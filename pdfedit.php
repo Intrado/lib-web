@@ -185,18 +185,23 @@ class PDFEditPage extends PageForm {
 	public function afterLoad() {
 		$this->form->handleRequest();
 		if ($button = $this->form->getSubmit()) {
-			// TODO - checkDataChange and display a notification if something has changed on us...
 			$postdata = $this->form->getData();
 			$name = $postdata['name'];
 			$bursttemplateid = intval($postdata['bursttemplateid']);
 
 			// Are we saving edits or uploading anew?
 			if ($this->burstId) {
-				// Saving edits!
-				if ($this->burstAPI->putBurstData($this->burstId, $name, $bursttemplateid)) {
-					notice(_L('The PDF Document was successfully updated'));
-				} else {
-					$this->error = _L('There was a problem updating the PDF Document - please try again later');
+				// check if the data hase changed and display a notification if so...
+				if ($this->form->checkForDataChange()) {
+					$this->error = _L("This PDF Document's record has been changed in another window/session; please reload the current document.");
+				}
+				else {
+					// Saving edits!
+					if ($this->burstAPI->putBurstData($this->burstId, $name, $bursttemplateid)) {
+						notice(_L('The PDF Document was successfully updated'));
+					} else {
+						$this->error = _L('There was a problem updating the PDF Document - please try again later');
+					}
 				}
 			}
 			else {
@@ -275,7 +280,7 @@ $args = Array(
 	'apiHostname' => $_SERVER['SERVER_NAME'],
 	'apiCustomer' => $apiCustomer,
 	'apiUser' => $USER->id,
-	'apiAuth' => $_COOKIE[$apiCustomer . '_session']
+	'apiAuth' => $_COOKIE[strtolower($apiCustomer) . '_session']
 );
 
 executePage(new PDFEditPage($args));

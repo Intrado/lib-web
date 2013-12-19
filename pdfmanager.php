@@ -78,7 +78,7 @@ class PdfManager extends PageBase {
 			'apiHostname' 	=> $_SERVER['SERVER_NAME'],
 			'apiCustomer' 	=> $this->custName,
 			'apiUser'		=> $USER->id,
-			'apiAuth'		=> $_COOKIE[$this->custName . '_session']
+			'apiAuth'		=> $_COOKIE[strtolower($this->custName) . '_session']
 		);
 
 		// create new instance of BurstAPIClient for use in burst API curl calls 
