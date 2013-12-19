@@ -53,7 +53,8 @@ class APIClient {
 			case 'POST':
 				// ref: http://stackoverflow.com/questions/15223191/php-curl-file-upload-multipart-boundary
 				curl_setopt($creq, CURLOPT_POST, 1);
-				curl_setopt($creq, CURLOPT_POSTFIELDS, http_build_query($data));
+				//curl_setopt($creq, CURLOPT_POSTFIELDS, http_build_query($data));
+				curl_setopt($creq, CURLOPT_POSTFIELDS, $data);
 				$headers[] = 'Content-type: multipart/form-data';
 				break;
 

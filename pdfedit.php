@@ -51,6 +51,8 @@ class PDFEditPage extends PageForm {
 	var $burstId = null;		// ID for the DBMO object to interface with
 	var $burstTemplates = array();	// An array to collect all the available burst templates into
 
+	var $error = '';		// A place to capture an error string to control modal display
+
 	private $burstAPI = null;
 
 	public function __construct($args) {
@@ -117,7 +119,7 @@ class PDFEditPage extends PageForm {
 					array('ValRequired'),
 					array("ValLength","min" => 3,"max" => 50)
 				),
-				"control" => array("TextField","size" => 30, "maxlength" => 50, "autocomplete" => "test"),
+				"control" => array("TextField","size" => 30, "maxlength" => 50),
 				"helpstep" => 1
 			),
 			"bursttemplateid" => array(
@@ -141,14 +143,14 @@ class PDFEditPage extends PageForm {
 
 			// we're just going to show a read-only representation
 			$formdata[] = array(
-				"label" => _L('Uploaded PDF'),
+				"label" => _L('PDF Document'),
 				"control" => array('FormHtml', 'html' => $this->burstData->filename)
 			);
 		}
 		else {
 			// Otherwise we need to show the upload formitem to be able to select and upload a new PDF
 			$formdata[] = array(
-				"label" => _L('Upload PDF'),
+				"label" => _L('PDF Document'),
 				"value" => '',
 				"validators" => array(),
 				//"validators" => array(
@@ -181,6 +183,7 @@ class PDFEditPage extends PageForm {
 	public function afterLoad() {
 		$this->form->handleRequest();
 		if ($button = $this->form->getSubmit()) {
+			// TODO - checkDataChange and display a notification if something has changed on us...
 			$postdata = $this->form->getData();
 			$name = $postdata['name'];
 			$bursttemplateid = intval($postdata['bursttemplateid']);
@@ -189,20 +192,27 @@ class PDFEditPage extends PageForm {
 			if ($this->burstId) {
 				// Saving edits!
 				if ($this->burstAPI->putBurstData($this->burstId, $name, $bursttemplateid)) {
-					print "saved!";
+					notice(_L('The PDF Document was successfully updated'));
+				} else {
+					$this->error = _L('There was a problem updating the PDF Document - please try again later');
 				}
-				else print "failed 1";
 			}
 			else {
 				// Uploading anew!
 				if ($this->burstAPI->postBurst($name, $bursttemplateid)) {
-					print "uploaded!";
+					notice(_L('The PDF Document was successfully stored'));
+				} else {
+					$this->error = _L('There was a problem storing the new PDF Document - please try again later');
 				}
-				else print "failed 2";
 			}
-			redirect('pdfmanager.php');
+
+			// If there were no handling errors...
+			if (! strlen($this->error)) {
+				// return to the manager page
+				redirect('pdfmanager.php');
+			}
 		}
-		$this->options['title'] = ($this->burstId) ? _L('Edit PDF Properties') : _L('Upload New PDF');
+		$this->options['title'] = ($this->burstId) ? _L('Edit PDF Document Properties') : _L('Upload New PDF Document');
 	}
 
 	public function beforeRender() {
@@ -215,7 +225,22 @@ class PDFEditPage extends PageForm {
 		else {
 			$html = $this->form->render();
 		}
+		if (strlen($this->error)) {
 
+			// Add an error dialog to the page
+			$html .= $this->modalHtml($this->error);
+
+			// And show it right away
+		}
+
+		return($html);
+	}
+
+	private function modalHtml($content) {
+		// TODO - implement bootstrap modal solution from tips.php
+		$html = <<<END
+Here is a modal with the following important message: {$content}
+END;
 		return($html);
 	}
 }
