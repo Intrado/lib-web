@@ -81,7 +81,7 @@ class PDFEditPage extends PageForm {
 		else {
 			$this->burstData = new JSONObject();
 			$this->burstData->name = '';
-			$this->burstData->bursttemplateid = '';
+			$this->burstData->burstTemplateId = '';
 			$this->burstData->filename = '';
 		}
 
@@ -124,7 +124,7 @@ class PDFEditPage extends PageForm {
 			),
 			"bursttemplateid" => array(
 				"label" => _L('Template'),
-				"value" => $this->burstData->bursttemplateid,
+				"value" => $this->burstData->burstTemplateId,
 				"validators" => array(),
 				"control" => array('SelectMenu', 'values' => (array('' => _L('Select PDF Template')) + $this->burstTemplates)),
 				"helpstep" => 2
