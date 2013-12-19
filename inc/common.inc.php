@@ -16,8 +16,7 @@ mb_internal_encoding('UTF-8');
 $SETTINGS = parse_ini_file("{$incdir}/settings.ini.php",true);
 
 //get the customer URL
-$CUSTOMERURL = substr($_SERVER["SCRIPT_NAME"],1);
-$CUSTOMERURL = strtolower(substr($CUSTOMERURL,0,strpos($CUSTOMERURL,"/")));
+$CUSTOMERURL = customerUrlComponent();
 $BASEURL = "/$CUSTOMERURL";
 
 require_once("{$incdir}/utils.inc.php");
@@ -50,6 +49,12 @@ require_once("{$objdir}/Permission.obj.php");
 require_once("{$objdir}/Rule.obj.php"); //for search and sec profile rules
 require_once("{$objdir}/Organization.obj.php"); //for search and sec profile rules
 require_once("{$objdir}/Section.obj.php"); //for search and sec profile rules
+
+function customerUrlComponent() {
+	$c = substr($_SERVER["SCRIPT_NAME"],1);
+	$c = strtolower(substr($c, 0, strpos($c,'/')));
+	return($c);
+}
 
 /**
  * Any PageObject derived class must invoke this function to executePage()
