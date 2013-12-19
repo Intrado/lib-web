@@ -125,7 +125,9 @@ class PDFEditPage extends PageForm {
 			"bursttemplateid" => array(
 				"label" => _L('Template'),
 				"value" => $this->burstData->burstTemplateId,
-				"validators" => array(),
+				"validators" => array(
+					array('ValRequired')
+				),
 				"control" => array('SelectMenu', 'values' => (array('' => _L('Select PDF Template')) + $this->burstTemplates)),
 				"helpstep" => 2
 			)
