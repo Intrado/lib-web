@@ -13,12 +13,12 @@ require_once("obj/Validator.obj.php");
 require_once("obj/FieldMap.obj.php");
 require_once("inc/feed.inc.php");
 
-require_once("obj/Form.obj.php");
-require_once("obj/FormItem.obj.php");
+// require_once("obj/Form.obj.php");
+// require_once("obj/FormItem.obj.php");
 
 require_once('ifc/Page.ifc.php');
 require_once('obj/PageBase.obj.php');
-require_once('obj/PageForm.obj.php');
+// require_once('obj/PageForm.obj.php');
 
 require_once('obj/APIClient.obj.php');
 require_once('obj/BurstAPIClient.obj.php');
@@ -36,11 +36,10 @@ class PdfManager extends PageBase {
 	var $pageNav = 'notifications:pdfmanager';
 	var $pagingStart = 0;
 	var $pagingLimit = 100;
-	var $sortBy = '';
-	var $orderBy = 'uploaddatems desc';
 	var $isAjaxRequest = false;
 	var $deleteID;
 	var $sqlArgs = array();
+	var $feedResponse;
 	var $feedData;
 	var $total = 0;
 	var $numPages;
@@ -102,11 +101,6 @@ class PdfManager extends PageBase {
 		}
 
 		$this->isAjaxRequest = isset($get['ajax']);
-
-		if (isset($get['feed_sortby'])) {
-			$this->sortBy = $get['feed_sortby'];
-		}
-
 		$this->setPagingStart((isset($get['pagestart'])) ? $get['pagestart'] : 0);
 	}
 
@@ -117,7 +111,10 @@ class PdfManager extends PageBase {
 
 			// fetch all existing burst records
 			$this->feedResponse = $this->burstAPIClient->getBurstList($this->pagingStart, $this->pagingLimit);
-			$this->feedData = $this->feedResponse->bursts;
+			
+			if ($this->feedResponse) {
+				$this->feedData = $this->feedResponse->bursts;
+			} 
 		}
 	}
 
@@ -137,11 +134,7 @@ class PdfManager extends PageBase {
 		startWindow(_L('PDF Report Manager'), 'padding: 3px;', false, true);
 
 		$feedButtons = array(icon_button(_L(' Upload New PDF'), "pdficon_16", null, "pdfedit.php"));
-		$sortoptions = array(
-			"name" => array("icon" => "img/largeicons/tiny20x20/pencil.jpg", "name" => "Filename"),
-			"date" => array("icon" => "img/largeicons/tiny20x20/clock.jpg", "name" => "Upload Date")
-		);
-		feed($feedButtons,$sortoptions);
+		feed($feedButtons, null);
 		echo '<script type="text/javascript" src="script/feed.js.php"></script>
 		<script type="text/javascript">
 			document.observe("dom:loaded", function() {
@@ -153,7 +146,7 @@ class PdfManager extends PageBase {
 	}
 
 	public function burstsAjaxResponse() {
-		if(empty($this->feedData)) {
+		if($this->total == 0) {
 			$data->list[] = array("itemid" => "",
 								  "defaultlink" => "",
 								  "icon" => "img/largeicons/information.jpg",
@@ -161,15 +154,14 @@ class PdfManager extends PageBase {
 								  "content" => "",
 								  "tools" => "");
 		} else {
-			
 			while(!empty($this->feedData)) {
 				$item 			= array_shift($this->feedData);
 				$itemid 		= $item->id;
-				$defaultlink 	= $this->burstsURL . "/" . $itemid. "/pdf";
+				$defaultlink 	= 'pdfedit.php?id=' . $itemid;
 
 				$title 			= escapehtml($item->name);
 				$fileName 		= escapehtml($item->filename);
-				$uploadDate 	= date("M j, Y g:i a", $item->uploaddatems);
+				$uploadDate 	= date("M j, Y g:i a", $item->uploadTimestampMs / 1000);
 				$fileSize 		= $item->bytes;
 				$status 		= $item->status;
 				
@@ -180,13 +172,12 @@ class PdfManager extends PageBase {
 					$tools = action_links (
 						action_link(" Edit", "pencil", 'pdfedit.php?id=' . $itemid),
 						action_link(" Send Email", "email_go", $this->burstsURL . "/" . $itemid. "/send"),
-						action_link(" Download", "disk", $this->burstsURL . "/" . $itemid. "/pdf"),
 						action_link(" Delete", "cross", '#', "deleteBurst(".$itemid.");")
 					);
 				} 
 
 				$content = '<span data-burst-id="'.$itemid.'">';
-				$content .= 'File: &nbsp;<strong>' .$fileName. '</strong><br>';
+				$content .= 'File: &nbsp;<a href="'.$this->burstsURL . '/' . $itemid. '/pdf" title="Download File: '.$fileName.'">' .$fileName. '</a><br>';
 				$content .= 'Size: &nbsp;<strong>' . number_format(($fileSize / pow(2,20)), 1, '.', '') . 'MB</strong><br>';
 				$content .= 'Upload Date: &nbsp;<strong>' .$uploadDate.'</strong><br>';
 				$content .= 'Status: &nbsp;<strong>' .ucwords($status).'</strong></span>';
@@ -199,17 +190,16 @@ class PdfManager extends PageBase {
 									  "tools" 			=> $tools,
 									  "publishmessage" 	=> null);
 			}
-
-			$data->pageinfo = array($this->numPages,
-									$this->pagingLimit,
-									$this->curPage, 
-									"Showing $this->displayStart - $this->displayEnd of $this->total records on $this->numPages pages &nbsp;"
-									);
-
-			header('Content-Type: application/json');
-			echo json_encode(!empty($data) ? $data : false);
-			exit();
 		}
+		$data->pageinfo = array($this->numPages,
+								$this->pagingLimit,
+								$this->curPage, 
+								"Showing $this->displayStart - $this->displayEnd of $this->total records on $this->numPages pages &nbsp;"
+								);
+
+		header('Content-Type: application/json');
+		echo json_encode(!empty($data) ? $data : false);
+		exit();
 	}
 
 	public function setCustomerName() {
@@ -229,7 +219,9 @@ class PdfManager extends PageBase {
 	}
 
 	public function setDisplayPagingDetails() {
-		$this->total = count($this->feedData);
+		if ($this->feedData) {
+			$this->total = count($this->feedData);
+		}
 
 		$this->numPages 	= ceil($this->total / $this->pagingLimit);
 		$this->curPage 		= ceil($this->pagingStart / $this->pagingLimit) + 1;
