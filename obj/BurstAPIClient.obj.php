@@ -74,9 +74,13 @@ class BurstAPIClient extends APIClient {
 		$data = array(
 			'name' => $name,
 			'filename' => $finalFilename,
-			'burstTemplateId' => intval($template),
 			'file' => '@/' . realpath($tempfile) . ";type={$filetype}"
 		);
+
+		// If a burst template ID was selected, it will be a number, otherwise an empty string (which we will not send)
+		if (is_numeric($template) && (intval($template) != 0)) {
+			$data['burstTemplateId'] = intval($template);
+		}
 		$res = $this->apiPost('/upload', $data);
 
 		return($res['code'] == 201 ? true : false);
