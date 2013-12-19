@@ -107,6 +107,9 @@ describe("QuickTip", function() {
 		it("if valid, hides error message container and removes error styling on textarea", function() {
 			var errorCont = errorMsgCont[0];
 			var msgTACont = messageTACont[0];
+			var event = document.createEvent('CustomEvent');
+
+			event.initCustomEvent('keyup', false, false, null);
 
 			// no error yet, so error msg container is hidden and textarea has normal styling
 			expect(qtip.hasClass(errorCont, 'hide')).to.equal(true);
@@ -119,7 +122,8 @@ describe("QuickTip", function() {
 			expect(qtip.hasClass(msgTACont, 'has-error')).to.equal(true);
 
 			messageTA[0].value = "some tip text";
-			messageTA[0].dispatchEvent(new Event('keyup')); // simulate keyup with some text in the textarea
+			messageTA[0].dispatchEvent(event); // simulate keyup with some text in the textarea
+			// messageTA[0].dispatchEvent(new Event('keyup')); // simulate keyup with some text in the textarea
 
 			expect(qtip.renderValidation());
 
