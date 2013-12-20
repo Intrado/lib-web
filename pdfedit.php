@@ -81,7 +81,76 @@ class PDFEditPage extends PageForm {
 		}
 	}
 
-	public function factoryFormPDFUpload() {
+	public function afterLoad() {
+
+		// Normal form handling makes getData() work...
+		$this->form->handleRequest();
+
+		// If the form was submitted...
+		if ($this->form->getSubmit()) {
+
+			// Get the POSTed data from the form
+			$postdata = $this->form->getData();
+			$name = $postdata['name'];
+			$bursttemplateid = intval($postdata['bursttemplateid']);
+
+			// Are we saving edits or uploading anew?
+			if ($this->burstId) {
+				// check if the data hase changed and display a notification if so...
+				if ($this->form->checkForDataChange()) {
+					$_SESSION['burstreload'] = true;
+					redirect("?id={$this->burstId}");
+				}
+				else {
+					// Saving edits!
+					if ($this->burstAPI->putBurstData($this->burstId, $name, $bursttemplateid)) {
+						notice(_L('The PDF Document was successfully updated'));
+					} else {
+						$this->error = _L('There was a problem updating the PDF Document - please try again later');
+					}
+				}
+			}
+			else {
+				// Uploading anew!
+				if ($this->burstAPI->postBurst($name, $bursttemplateid)) {
+					notice(_L('The PDF Document was successfully stored'));
+				} else {
+					$this->error = _L('There was a problem storing the new PDF Document - please try again later');
+				}
+			}
+
+			// If there were no handling errors...
+			if (! strlen($this->error)) {
+				// return to the manager page
+				redirect('pdfmanager.php');
+			}
+		}
+
+		// The page title depends on whether editing existing or uploading anew
+		$this->options['title'] = ($this->burstId) ? _L('Edit PDF Document Properties') : _L('Upload New PDF Document');
+	}
+
+	public function render() {
+
+		// URL hacking or what?
+		if ($this->burstId && ! is_object($this->burstData)) {
+			$html = _L('The requested PDF Document could not be found') . "<br/>\n";
+		}
+		else {
+			$html = $this->form->render();
+		}
+
+		// If there was any error processing the submission...
+		if (strlen($this->error)) {
+
+			// Add an error dialog to the page (it'll be shown when the page renders)
+			$html .= $this->modalHtml($this->error);
+		}
+
+		return($html);
+	}
+
+	protected function factoryFormPDFUpload() {
 		$formdata = array(
 			"name" => array(
 				"label" => _L('Name'),
@@ -152,70 +221,8 @@ class PDFEditPage extends PageForm {
 		return($form);
 	}
 
-	public function afterLoad() {
-		$this->form->handleRequest();
-		if ($button = $this->form->getSubmit()) {
-			$postdata = $this->form->getData();
-			$name = $postdata['name'];
-			$bursttemplateid = intval($postdata['bursttemplateid']);
-
-			// Are we saving edits or uploading anew?
-			if ($this->burstId) {
-				// check if the data hase changed and display a notification if so...
-				if ($this->form->checkForDataChange()) {
-					$_SESSION['burstreload'] = true;
-					redirect("?id={$this->burstId}");
-				}
-				else {
-					// Saving edits!
-					if ($this->burstAPI->putBurstData($this->burstId, $name, $bursttemplateid)) {
-						notice(_L('The PDF Document was successfully updated'));
-					} else {
-						$this->error = _L('There was a problem updating the PDF Document - please try again later');
-					}
-				}
-			}
-			else {
-				// Uploading anew!
-				if ($this->burstAPI->postBurst($name, $bursttemplateid)) {
-					notice(_L('The PDF Document was successfully stored'));
-				} else {
-					$this->error = _L('There was a problem storing the new PDF Document - please try again later');
-				}
-			}
-
-			// If there were no handling errors...
-			if (! strlen($this->error)) {
-				// return to the manager page
-				redirect('pdfmanager.php');
-			}
-		}
-		$this->options['title'] = ($this->burstId) ? _L('Edit PDF Document Properties') : _L('Upload New PDF Document');
-	}
-
-	public function beforeRender() {
-	}
-
-	public function render() {
-		if ($this->burstId && ! is_object($this->burstData)) {
-			$html = _L('The requested PDF Document could not be found') . "<br/>\n";
-		}
-		else {
-			$html = $this->form->render();
-		}
-		if (strlen($this->error)) {
-
-			// Add an error dialog to the page
-			$html .= $this->modalHtml($this->error);
-
-			// And show it right away
-		}
-
-		return($html);
-	}
-
 	// Here's a nifty bootstrap modal implementation lifted from tips.php/js
-	private function modalHtml($content, $heading='Error') {
+	protected function modalHtml($content, $heading='Error') {
 		$html = <<<END
 			<div id="pdfeditmodal" class="modal hide">
 				<div class="modal-header">
