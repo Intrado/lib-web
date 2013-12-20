@@ -31,17 +31,22 @@ class PDFEditPage extends PageForm {
 
 	protected $burstAPI = null;
 
-	public function __construct($apiHostname, $apiCustomer, $apiUser, $apiAuth) {
-		$this->burstAPI = new BurstAPIClient($apiHostname, $apiCustomer, $apiUser, $apiAuth);
-		parent::__construct(array());
-	}
-
 	public function isAuthorized(&$get, &$post, &$request, &$session) {
 		global $USER;
 		return($USER->authorize('canpdfburst'));
 	}
 
 	public function beforeLoad(&$get, &$post, &$request, &$session) {
+		global $USER;
+
+		// Get our REST API Client connection together
+		$apiCustomer = customerUrlComponent();
+		$this->burstAPI = new BurstAPIClient(
+			$_SERVER['SERVER_NAME'],
+			$apiCustomer,
+			$USER->id,
+			$_COOKIE[strtolower($apiCustomer) . '_session']
+		);
 
 		// The the query string/post data has a burst ID specified, then grab it
 		$this->burstId = (isset($request['id']) && intval($request['id'])) ? intval($request['id']) : null;
@@ -281,6 +286,5 @@ END;
 // PAGE INSTANTIATION AND DISPLAY
 // -----------------------------------------------------------------------------
 
-$apiCustomer = customerUrlComponent();
-executePage(new PDFEditPage($_SERVER['SERVER_NAME'], $apiCustomer, $USER->id, $_COOKIE[strtolower($apiCustomer) . '_session']));
+executePage(new PDFEditPage());
 
