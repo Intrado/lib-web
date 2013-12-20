@@ -13,12 +13,8 @@ require_once("obj/Validator.obj.php");
 require_once("obj/FieldMap.obj.php");
 require_once("inc/feed.inc.php");
 
-// require_once("obj/Form.obj.php");
-// require_once("obj/FormItem.obj.php");
-
 require_once('ifc/Page.ifc.php');
 require_once('obj/PageBase.obj.php');
-// require_once('obj/PageForm.obj.php');
 
 require_once('obj/APIClient.obj.php');
 require_once('obj/BurstAPIClient.obj.php');
@@ -77,8 +73,8 @@ class PdfManager extends PageBase {
 		$apiClientArgs = array(
 			'apiHostname' 	=> $_SERVER['SERVER_NAME'],
 			'apiCustomer' 	=> $this->custName,
-			'apiUser'		=> $USER->id,
-			'apiAuth'		=> $_COOKIE[strtolower($this->custName) . '_session']
+			'apiUser'	=> $USER->id,
+			'apiAuth'	=> $_COOKIE[strtolower($this->custName) . '_session']
 		);
 
 		// create new instance of BurstAPIClient for use in burst API curl calls 

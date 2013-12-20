@@ -40,8 +40,7 @@ class PDFEditPage extends PageForm {
 
 	public function isAuthorized(&$get, &$post, &$request, &$session) {
 		global $USER;
-		//return($USER->authorize('canpdfburst'));
-		return(true); // FIXME - white screen of death on use of authorize()
+		return($USER->authorize('canpdfburst'));
 	}
 
 	public function beforeLoad(&$get, &$post, &$request, &$session) {
