@@ -12,7 +12,10 @@ class APIClient {
 	/**
 	 * Constructor
 	 *
-	 * @param array $args An associative array with several arguments to initialize with
+	 * @param string The hostname for REST API access that we can reach server-side (localhost?)
+	 * @param string The "URL Component" for the customer which identifies them uniquely in the URL
+	 * @param integer The ID for the logged in user making the request
+	 * @param string The contents of the session auth cookie for this logged in customer/user 
 	 */
 	public function __construct($apiHostname, $apiCustomer, $apiUser, $apiAuth) {
 
@@ -25,10 +28,41 @@ class APIClient {
 		$this->APIURL = "{$this->customerURL}api/2/users/{$this->apiUser}";
 	}
 
+	/**
+	 * Getter for the APIURL that we formulated in the constructor
+	 *
+	 * This is useful for calling code in some cases because the API is a public facing API and
+	 * it is sometimes necessary to produce a URL through it which is directly accessible to the
+	 * end-user's client.
+	 */
         public function getAPIURL() {
 		return $this->APIURL;
 	}
 
+	/**
+	 * Do the hard work of sending a request to the REST API and get the response
+	 *
+	 * As it is currently written, we use curl library operations to do the socket work for us,
+	 * but the overall implementation of this class is intended to be able to replace the curl
+	 * solution with another one if a better option presents itself - and all that work may be
+	 * performed within this single method; nothing outside of this method is aware that curl
+	 * is the mechanism in use.
+	 *
+	 * Note that different request methods result in different encoding methods for data; PUT
+	 * uses JSON encoding where POST uses regular POST data parameterization; GET/DELETE methods
+	 * tend not to use the data since their arguments are in the query string ($node).
+	 *
+	 * @param string $method The REST API request method, (all caps!) to use for this request
+	 * @param string $node Any trailing URL path/node/querystring that is expected to follow
+	 * the base APIURL; remember that APIURL does NOT already include a trailing slash
+	 * @param mixed $data The data that will be encoded for sending with the request; optional,
+	 * if not supplied, then no data will be sent!
+	 *
+	 * @return array An associative array with REST interface response information; 'headers'
+	 * key supplies all the response headers, 'body' key supplies the entire response body which,
+	 * if it is JSON, for example, the caller will need to do the decoding, and 'code' key
+	 * supplies the numeric REST server response.
+	 */
 	protected function sendRequest($method, $node, $data = null) {
 
 		// Make a new curl request object with some default options
@@ -90,18 +124,50 @@ class APIClient {
 		return($res);
 	}
 
+	/**
+	 * RESTFUL GET operation wrapper
+	 *
+	 * @param string $node Any trailing URL path/node/querystring that is expected to follow
+	 *
+	 * @return array Passes through return data from f.sendRequest()
+	 */
 	protected function apiGet($node = '') {
 		return($this->sendRequest('GET', $node));
 	}
 
+	/**
+	 * RESTFUL PUT operation wrapper
+	 *
+	 * @param string $node Any trailing URL path/node/querystring that is expected to follow
+	 * @param mixed $data The data that will be encoded for sending with the request; optional,
+	 * if not supplied, then no data will be sent!
+	 *
+	 * @return array Passes through return data from f.sendRequest()
+	 */
 	protected function apiPut($node = '', $data = null) {
 		return($this->sendRequest('PUT', $node, $data));
 	}
 
+	/**
+	 * RESTFUL POST operation wrapper
+	 *
+	 * @param string $node Any trailing URL path/node/querystring that is expected to follow
+	 * @param mixed $data The data that will be encoded for sending with the request; optional,
+	 * if not supplied, then no data will be sent!
+	 *
+	 * @return array Passes through return data from f.sendRequest()
+	 */
 	protected function apiPost($node = '', $data = null) {
 		return($this->sendRequest('POST', $node, $data));
 	}
 
+	/**
+	 * RESTFUL DELETE operation wrapper
+	 *
+	 * @param string $node Any trailing URL path/node/querystring that is expected to follow
+	 *
+	 * @return array Passes through return data from f.sendRequest()
+	 */
 	protected function apiDelete($node = '') {
 		return($this->sendRequest('DELETE', $node));
 	}
