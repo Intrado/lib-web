@@ -9,18 +9,27 @@ class APIClient {
 	protected $customerURL = '';
 	protected $APIURL = '';
 
-	public function __construct($args) {
+	/**
+	 * Constructor
+	 *
+	 * @param array $args An associative array with several arguments to initialize with
+	 */
+	public function __construct($apiHostname, $apiCustomer, $apiUser, $apiAuth) {
 
-		$this->apiHostname = $args['apiHostname'];
-		$this->apiCustomer = $args['apiCustomer'];
-		$this->apiUser = $args['apiUser'];
-		$this->apiAuth = $args['apiAuth'];
+		$this->apiHostname = $apiHostname;
+		$this->apiCustomer = $apiCustomer;
+		$this->apiUser = $apiUser;
+		$this->apiAuth = $apiAuth;
 
 		$this->customerURL = "https://{$this->apiHostname}/{$this->apiCustomer}/";
 		$this->APIURL = "{$this->customerURL}api/2/users/{$this->apiUser}";
 	}
 
-	private function sendRequest($method, $node, $data = null) {
+        public function getAPIURL() {
+		return $this->APIURL;
+	}
+
+	protected function sendRequest($method, $node, $data = null) {
 
 		// Make a new curl request object with some default options
 		$creq = curl_init($this->APIURL . $node);
@@ -34,12 +43,8 @@ class APIClient {
 			"X-Auth-SessionId: {$this->apiAuth}"
 		);
 
-		// Set some options based on the REST method
+		// Set some options based on the REST method; GET is default, so no case for that
 		switch ($method) {
-			case 'GET':
-				// Get is the default method type, so maybe there's nothing to do here...
-				//curl_setopt($creq, CURLOPT_GET, 1);
-				break;
 
 			case 'PUT':
 				// ref: http://developer.sugarcrm.com/2011/11/22/howto-do-put-requests-with-php-curl-without-writing-to-a-file/
@@ -53,9 +58,10 @@ class APIClient {
 			case 'POST':
 				// ref: http://stackoverflow.com/questions/15223191/php-curl-file-upload-multipart-boundary
 				curl_setopt($creq, CURLOPT_POST, 1);
-				//curl_setopt($creq, CURLOPT_POSTFIELDS, http_build_query($data));
 				curl_setopt($creq, CURLOPT_POSTFIELDS, $data);
-				$headers[] = 'Content-type: multipart/form-data';
+				if (count($_FILES)) {
+					$headers[] = 'Content-type: multipart/form-data';
+				}
 				break;
 
 			case 'DELETE':

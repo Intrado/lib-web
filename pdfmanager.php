@@ -66,19 +66,10 @@ class PdfManager extends PageBase {
 		$this->options["page"]  = $this->pageNav;
 
 		// scrape customer 'name' out of the URL (for use in 'BurstAPIClient')	
-		$uriParts 	= explode('/', $_SERVER['REQUEST_URI']); // ex /custname/...
-		$this->custName = $uriParts[1];
-
-		// args array to pass to BurstAPIClient contstructor
-		$apiClientArgs = array(
-			'apiHostname' 	=> $_SERVER['SERVER_NAME'],
-			'apiCustomer' 	=> $this->custName,
-			'apiUser'	=> $USER->id,
-			'apiAuth'	=> $_COOKIE[strtolower($this->custName) . '_session']
-		);
+		$this->custName = customerUrlComponent();
 
 		// create new instance of BurstAPIClient for use in burst API curl calls 
-		$this->burstAPIClient = new BurstAPIClient($apiClientArgs);
+		$this->burstAPIClient = new BurstAPIClient($_SERVER['SERVER_NAME'], $this->custName, $USER->id, $_COOKIE[strtolower($this->custName) . '_session']);
 		$this->burstsURL = $this->burstAPIClient->getAPIURL();
 	}
 

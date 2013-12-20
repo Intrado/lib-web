@@ -17,24 +17,22 @@ require_once('obj/APIClient.obj.php');
 require_once('obj/BurstAPIClient.obj.php');
 
 
-// -----------------------------------------------------------------------------
-// CUSTOM PAGE FUNCTIONALITY
-// -----------------------------------------------------------------------------
-
+/**
+ * PDF Edit Page class
+ *
+ */
 class PDFEditPage extends PageForm {
 
-	const MAX_PDF_UPLOAD_BYTES = 209715200; // 200MB
+	protected $burstData = null;		// Associative array for the burst record we're working on
+	protected $burstId = null;		// ID for the DBMO object to interface with
+	protected $burstTemplates = array();	// An array to collect all the available burst templates into
 
-	var $burstData = null;		// Associative array for the burst record we're working on
-	var $burstId = null;		// ID for the DBMO object to interface with
-	var $burstTemplates = array();	// An array to collect all the available burst templates into
+	protected $error = '';			// A place to capture an error string to control modal display
 
-	var $error = '';		// A place to capture an error string to control modal display
+	protected $burstAPI = null;
 
-	private $burstAPI = null;
-
-	public function __construct($args) {
-		$this->burstAPI = new BurstAPIClient($args);
+	public function __construct($apiHostname, $apiCustomer, $apiUser, $apiAuth) {
+		$this->burstAPI = new BurstAPIClient($apiHostname, $apiCustomer, $apiUser, $apiAuth);
 		parent::__construct(array());
 	}
 
@@ -53,8 +51,15 @@ class PDFEditPage extends PageForm {
 
 		// If we're editing an existing one, get its data
 		if ($this->burstId) {
+
+			// Pull in the current data for this PDF Burst record
 			$this->burstData = $this->burstAPI->getBurstData($this->burstId);
+
+			// If we have been flagged as having reloaded on account of data having changed...
 			if ($_SESSION['burstreload']) {
+
+				// Clear the flag and set the error message; this will allow the message to display, but
+				// upon dismissal show the form repopulated with the freshly loaded burst data from above
 				unset($_SESSION['burstreload']);
 				$this->error = _L("This PDF Document's record was changed in another window or session; the current data has been reloaded so that your submission will be current. Please review and reapply any additional changes needed, then resubmit.");
 			}
@@ -73,14 +78,6 @@ class PDFEditPage extends PageForm {
 		$this->form = $this->factoryFormPDFUpload();
 	}
 
-	public function loadBurstTemplates() {
-		if (is_object($res = Query('SELECT `id`, `name` FROM `bursttemplate` WHERE NOT `deleted`;'))) {
-			while ($row = DBGetRow($res, true)) {
-				$this->burstTemplates[$row['id']] = $row['name'];
-			 }
-		}
-	}
-
 	public function afterLoad() {
 
 		// Normal form handling makes getData() work...
@@ -96,6 +93,7 @@ class PDFEditPage extends PageForm {
 
 			// Are we saving edits or uploading anew?
 			if ($this->burstId) {
+
 				// check if the data hase changed and display a notification if so...
 				if ($this->form->checkForDataChange()) {
 					$_SESSION['burstreload'] = true;
@@ -150,6 +148,25 @@ class PDFEditPage extends PageForm {
 		return($html);
 	}
 
+	/**
+	 * Get the list of burst templates directly from the database
+	 *
+	 * There is no API support for this at this time, so we have to go direct. The resulting array
+	 * is stored in an instance property, $this->burstTemplates.
+	 */
+	protected function loadBurstTemplates() {
+		if (is_object($res = Query('SELECT `id`, `name` FROM `bursttemplate` WHERE NOT `deleted`;'))) {
+			while ($row = DBGetRow($res, true)) {
+				$this->burstTemplates[$row['id']] = $row['name'];
+			 }
+		}
+	}
+
+	/**
+	 * Factory method to spit out a form object for PDF uploads
+	 *
+	 * @return object Form
+	 */
 	protected function factoryFormPDFUpload() {
 		$formdata = array(
 			"name" => array(
@@ -221,8 +238,16 @@ class PDFEditPage extends PageForm {
 		return($form);
 	}
 
-	// Here's a nifty bootstrap modal implementation lifted from tips.php/js
-	protected function modalHtml($content, $heading='Error') {
+	/**
+	 * Nifty bootstrap modal implementation lifted from tips.php/js
+	 *
+	 * @param string $content The content that is to appear within the modal body
+	 * @param string $heading A brief string for the title/heading of the modal; optional, defaults to 'Error'
+	 * @param boolean $autoshow A flag to automatically show the modal on page load; optional, defaults to true
+	 *
+	 * @return string Block of HTML code with requisite script tag needed to show automatically via jQuery
+	 */
+	protected function modalHtml($content, $heading='Error', $autoshow=true) {
 		$html = <<<END
 			<div id="pdfeditmodal" class="modal hide">
 				<div class="modal-header">
@@ -235,12 +260,18 @@ class PDFEditPage extends PageForm {
 					<button type="button" class="btn" data-dismiss="modal">Close</button>
 				</div>
 			</div>
+END;
+
+		if ($autoshow) {
+			$html .= <<<END
 			<script language="JavaScript">
 				(function($) {
 					$('#pdfeditmodal').modal('show');
 				}) (jQuery);
 			</script>
 END;
+		}
+
 		return($html);
 	}
 }
@@ -251,13 +282,5 @@ END;
 // -----------------------------------------------------------------------------
 
 $apiCustomer = customerUrlComponent();
-
-$args = Array(
-	'apiHostname' => $_SERVER['SERVER_NAME'],
-	'apiCustomer' => customerUrlComponent(),
-	'apiUser' => $USER->id,
-	'apiAuth' => $_COOKIE[strtolower($apiCustomer) . '_session']
-);
-
-executePage(new PDFEditPage($args));
+executePage(new PDFEditPage($_SERVER['SERVER_NAME'], $apiCustomer, $USER->id, $_COOKIE[strtolower($apiCustomer) . '_session']));
 

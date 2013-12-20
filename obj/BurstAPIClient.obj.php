@@ -2,8 +2,8 @@
 
 class BurstAPIClient extends APIClient {
 
-	public function __construct($args) {
-		parent::__construct($args);
+	public function __construct($apiHostname, $apiCustomer, $apiUser, $apiAuth) {
+		parent::__construct($apiHostname, $apiCustomer, $apiUser, $apiAuth);
 		$this->APIURL .= '/bursts'; // The API endpoint for PDF bursting
 	}
 
@@ -90,10 +90,6 @@ class BurstAPIClient extends APIClient {
 	public function deleteBurst($id) {
 		$res = $this->apiDelete("/{$id}");
 		return($res['code'] == 200 ? true : false);
-	}
-
-	public function getAPIURL() {
-		return $this->APIURL;
 	}
 }
 
