@@ -9,33 +9,12 @@ require_once('obj/Validator.obj.php');
 require_once('obj/Form.obj.php');
 require_once('obj/FormItem.obj.php');
 
-
 require_once('ifc/Page.ifc.php');
 require_once('obj/PageBase.obj.php');
 require_once('obj/PageForm.obj.php');
 
-//require_once('obj/Burst.obj.php');
-
 require_once('obj/APIClient.obj.php');
 require_once('obj/BurstAPIClient.obj.php');
-
-// -----------------------------------------------------------------------------
-// CUSTOM FORM FOR THIS PAGE
-// -----------------------------------------------------------------------------
-
-class TemplateForm extends Form {
-
-	function handleSubmit($button, $data) {
-		//Query('BEGIN');
-		// TODO: Save form data
-		//Query('COMMIT');
-
-		// Where do we want the client to be sent after submission?
-		return('start.php');
-	}
-}
-
-class JSONObject {};
 
 
 // -----------------------------------------------------------------------------
@@ -46,7 +25,6 @@ class PDFEditPage extends PageForm {
 
 	const MAX_PDF_UPLOAD_BYTES = 209715200; // 200MB
 
-	//var $burst = null;		// DBMO for the burst record we're working on
 	var $burstData = null;		// Associative array for the burst record we're working on
 	var $burstId = null;		// ID for the DBMO object to interface with
 	var $burstTemplates = array();	// An array to collect all the available burst templates into
@@ -77,9 +55,13 @@ class PDFEditPage extends PageForm {
 		// If we're editing an existing one, get its data
 		if ($this->burstId) {
 			$this->burstData = $this->burstAPI->getBurstData($this->burstId);
+			if ($_SESSION['burstreload']) {
+				unset($_SESSION['burstreload']);
+				$this->error = _L("This PDF Document's record was changed in another window or session; the current data has been reloaded so that your submission will be current. Please review and reapply any additional changes needed, then resubmit.");
+			}
 		}
 		else {
-			$this->burstData = new JSONObject();
+			$this->burstData = (object) null;
 			$this->burstData->name = '';
 			$this->burstData->burstTemplateId = '';
 			$this->burstData->filename = '';
@@ -93,17 +75,7 @@ class PDFEditPage extends PageForm {
 	}
 
 	public function loadBurstTemplates() {
-		$res = Query("
-			SELECT
-				`id`,
-				`name`
-			FROM
-				`bursttemplate`
-			WHERE
-				NOT `deleted`;
-		");
-
-		if (is_object($res)) {
+		if (is_object($res = Query('SELECT `id`, `name` FROM `bursttemplate` WHERE NOT `deleted`;'))) {
 			while ($row = DBGetRow($res, true)) {
 				$this->burstTemplates[$row['id']] = $row['name'];
 			 }
@@ -192,7 +164,8 @@ class PDFEditPage extends PageForm {
 			if ($this->burstId) {
 				// check if the data hase changed and display a notification if so...
 				if ($this->form->checkForDataChange()) {
-					$this->error = _L("This PDF Document's record has been changed in another window/session; please reload the current document.");
+					$_SESSION['burstreload'] = true;
+					redirect("?id={$this->burstId}");
 				}
 				else {
 					// Saving edits!
@@ -271,13 +244,11 @@ END;
 // PAGE INSTANTIATION AND DISPLAY
 // -----------------------------------------------------------------------------
 
-// Fun with globals and super globals...
-$uriParts = explode('/', $_SERVER['REQUEST_URI']); // ex /custname/...
-$apiCustomer = $uriParts[1];
+$apiCustomer = customerUrlComponent();
 
 $args = Array(
 	'apiHostname' => $_SERVER['SERVER_NAME'],
-	'apiCustomer' => $apiCustomer,
+	'apiCustomer' => customerUrlComponent(),
 	'apiUser' => $USER->id,
 	'apiAuth' => $_COOKIE[strtolower($apiCustomer) . '_session']
 );
