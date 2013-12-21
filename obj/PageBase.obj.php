@@ -64,17 +64,17 @@ abstract class PageBase implements Page {
 		$this->konadir = dirname(dirname(__FILE__));
 
 		// Set some default options
-		$defaults = Array(
+		$this->options = Array(
 			'testmode' => 'false',
 			'noauth_redirect' => 'unauthorized.php',
 			'title' => 'Default Page Title',
-			'page' => 'notifications:jobs',
-			'formname' => '',
-			'validators' => Array()
+			'page' => 'notifications:jobs'
 		);
 
 		// Then merge defaults with the options provided 
-		$this->options = array_merge($defaults, $options);
+		if (is_array($options) && count($options)) {
+			$this->options = array_merge($this->options, $options);
+		}
 
 		// Call a customer initializer if it exists
 		$this->initialize();

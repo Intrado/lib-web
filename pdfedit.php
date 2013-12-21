@@ -31,12 +31,12 @@ class PDFEditPage extends PageForm {
 
 	protected $burstAPI = null;
 
-	public function isAuthorized(&$get, &$post, &$request, &$session) {
+	public function isAuthorized(&$get=array(), &$post=array(), &$request=array(), &$session=array()) {
 		global $USER;
 		return($USER->authorize('canpdfburst'));
 	}
 
-	public function beforeLoad(&$get, &$post, &$request, &$session) {
+	public function beforeLoad(&$get=array(), &$post=array(), &$request=array(), &$session=array()) {
 		global $USER;
 
 		// Get our REST API Client connection together
@@ -52,7 +52,7 @@ class PDFEditPage extends PageForm {
 		$this->burstId = (isset($request['id']) && intval($request['id'])) ? intval($request['id']) : null;
 	}
 
-	public function load(&$get, &$post, &$request, &$session) {
+	public function load(&$get=array(), &$post=array(), &$request=array(), &$session=array()) {
 
 		// If we're editing an existing one, get its data
 		if ($this->burstId) {
@@ -123,7 +123,7 @@ class PDFEditPage extends PageForm {
 			}
 
 			// If there were no handling errors...
-			if (! strlen($this->error)) {
+			if (! $this->error) {
 				// return to the manager page
 				redirect('pdfmanager.php');
 			}
@@ -158,6 +158,8 @@ class PDFEditPage extends PageForm {
 	 *
 	 * There is no API support for this at this time, so we have to go direct. The resulting array
 	 * is stored in an instance property, $this->burstTemplates.
+	 *
+	 * TODO - put this in the API!
 	 */
 	protected function loadBurstTemplates() {
 		if (is_object($res = Query('SELECT `id`, `name` FROM `bursttemplate` WHERE NOT `deleted`;'))) {
@@ -169,6 +171,8 @@ class PDFEditPage extends PageForm {
 
 	/**
 	 * Factory method to spit out a form object for PDF uploads
+	 *
+	 * FIXME - API supports no validation for things like duplicate names, invalid tempalte id's
 	 *
 	 * @return object Form
 	 */
@@ -252,6 +256,7 @@ class PDFEditPage extends PageForm {
 	 *
 	 * @return string Block of HTML code with requisite script tag needed to show automatically via jQuery
 	 */
+	// TODO - see about using defaultmodal in nav.inc.php instead of adding another one here; tips.php should match
 	protected function modalHtml($content, $heading='Error', $autoshow=true) {
 		$html = <<<END
 			<div id="pdfeditmodal" class="modal hide">

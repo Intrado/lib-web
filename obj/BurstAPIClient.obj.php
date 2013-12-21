@@ -25,7 +25,6 @@ class BurstAPIClient extends APIClient {
 
 		// We don't support PUTting ALL fields here, only some...
 		$data = (object) null;
-		//$data->id = intval($id); // redundant. redundant.
 		$data->name = $name;
 		$data->burstTemplateId = $template;
 
@@ -34,11 +33,6 @@ class BurstAPIClient extends APIClient {
 	}
 
 	public function postBurst($name, $template) {
-
-		// this method requires a file to have been uploaded...
-		if (! count($_FILES)) {
-			return(false);
-		}
 
 		// Get the key for the fileSet (in case some screwy future
 		// version supplies multiple sets in a single POST)
@@ -51,12 +45,8 @@ class BurstAPIClient extends APIClient {
 		$tempfile = $_FILES[$fileSetKey]['tmp_name'];
 		$filesize = $_FILES[$fileSetKey]['size'];
 
-		// We are only going to allow PDF file mime types through to the API
-		if ($filetype != 'application/pdf') {
-			return(false);
-		}
-
 		// On some clients filename may include the whole path - we want JUST the filename portion at the end
+		// TODO - see if there's a library function or factor this out into a helper function?
 		$filenameParts1 = explode('/', $filename);
 		$filenameParts2 = explode('\\', $filename);
 		// for clients with a frontslash path separator...
