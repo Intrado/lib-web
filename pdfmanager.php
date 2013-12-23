@@ -40,9 +40,10 @@ class PdfManager extends PageBase {
 	var $curPage;
 	var $displayEnd;
 	var $displayStart;
-	var $custName;
+	var $customerURLComponent;
 	var $burstsURL;
 	var $burstAPIClient;
+	var $authOrgList;
 
 	function PdfManager($options = array()) {
 		if (isset($options)) {
@@ -50,7 +51,7 @@ class PdfManager extends PageBase {
 			parent::PageBase($options);
 		}
 	}
-
+	
 	// @override
 	function isAuthorized($get = array(), $post = array()) {
 		global $USER;
@@ -59,40 +60,33 @@ class PdfManager extends PageBase {
 
 	// @override
 	public function initialize() {
-		global $USER;
-
 		// override some options on PageBase
 		$this->options["title"] = $this->pageTitle;
 		$this->options["page"]  = $this->pageNav;
 
-		// scrape customer 'name' out of the URL (for use in 'BurstAPIClient')	
-		$this->custName = customerUrlComponent();
-
-		// create new instance of BurstAPIClient for use in burst API curl calls 
-		$this->burstAPIClient = new BurstAPIClient($_SERVER['SERVER_NAME'], $this->custName, $USER->id, $_COOKIE[strtolower($this->custName) . '_session']);
-		$this->burstsURL = $this->burstAPIClient->getAPIURL();
+		$this->customerURLComponent = customerUrlComponent();
 	}
 
 	// @override
 	public function beforeLoad($get, $post) { 
+		// get new instance of BurstAPIClient for burst API calls 
+		$this->burstAPIClient = $this->getBurstAPIClient();
+
 		// if delete request, execute delete API call and exit, 
 		// which upon a successful response (200) will reload pdfmanager.php page (via JS in pdfmanager.js)
 		if (isset($post['delete'])) {
-			$response = $this->burstAPIClient->deleteBurst($post['id']);
-			
-			header('Content-Type: application/json');
-			echo json_encode($response);
-			exit();
+			$this->deleteAjaxResponse($post['id']);
+		} else {
+			$this->isAjaxRequest = isset($get['ajax']);
+			$this->setPagingStart((isset($get['pagestart'])) ? $get['pagestart'] : 0);
+			$this->burstsURL = $this->burstAPIClient->getAPIURL();
 		}
-
-		$this->isAjaxRequest = isset($get['ajax']);
-		$this->setPagingStart((isset($get['pagestart'])) ? $get['pagestart'] : 0);
 	}
 
 	// @override
 	public function load() {
 		if ($this->isAjaxRequest) {
-			$this->authOrgList 	= Organization::getAuthorizedOrgKeys();
+			$this->authOrgList 	= $this->getAuthOrgKeys();
 
 			// fetch all existing burst records
 			$this->feedResponse = $this->burstAPIClient->getBurstList($this->pagingStart, $this->pagingLimit);
@@ -170,8 +164,7 @@ class PdfManager extends PageBase {
 									  "icon" 			=> $icon,
 									  "title" 			=> $title,
 									  "content" 		=> $content,
-									  "tools" 			=> $tools,
-									  "publishmessage" 	=> null);
+									  "tools" 			=> $tools);
 			}
 		}
 		$data->pageinfo = array($this->numPages,
@@ -183,6 +176,13 @@ class PdfManager extends PageBase {
 		header('Content-Type: application/json');
 		echo json_encode(!empty($data) ? $data : false);
 		exit();
+	}
+
+	public function deleteAjaxResponse($id) {
+			$response = $this->burstAPIClient->deleteBurst($id);
+			header('Content-Type: application/json');
+			echo json_encode($response);
+			exit();
 	}
 
 	public function setDisplayPagingDetails() {
@@ -198,6 +198,15 @@ class PdfManager extends PageBase {
 
 	public function setPagingStart($pagestart) {
 		$this->pagingStart = 0 + $pagestart;
+	}
+
+	public function getAuthOrgKeys() {
+		return Organization::getAuthorizedOrgKeys();
+	}
+
+	public function getBurstAPIClient() {
+		global $USER;
+		return new BurstAPIClient($_SERVER['SERVER_NAME'], $this->customerURLComponent, $USER->id, $_COOKIE[strtolower($this->customerURLComponent) . '_session']);
 	}
 
 }
