@@ -16,8 +16,8 @@ require_once("inc/feed.inc.php");
 require_once('ifc/Page.ifc.php');
 require_once('obj/PageBase.obj.php');
 
-require_once('obj/APIClient.obj.php');
-require_once('obj/BurstAPIClient.obj.php');
+//require_once('obj/APIClient.obj.php');
+//require_once('obj/BurstAPIClient.obj.php');
 
 /**
  * class PdfManager
@@ -42,14 +42,13 @@ class PdfManager extends PageBase {
 	var $displayStart;
 	var $customerURLComponent;
 	var $burstsURL;
-	var $burstAPIClient;
 	var $authOrgList;
 
-	function PdfManager($options = array()) {
-		if (isset($options)) {
-			$this->options = $options;
-			parent::PageBase($options);
-		}
+	var $csApi;
+
+	function __construct($csApi) {
+                $this->csApi = $csApi;
+		parent::pageBase();
 	}
 	
 	// @override
@@ -65,6 +64,10 @@ class PdfManager extends PageBase {
 		$this->options["page"]  = $this->pageNav;
 
 		$this->customerURLComponent = customerUrlComponent();
+		// create new instance of BurstAPIClient for use in burst API curl calls 
+		//$this->burstAPIClient = new BurstAPIClient($_SERVER['SERVER_NAME'], $this->custName, $USER->id, $_COOKIE[strtolower($this->custName) . '_session']);
+		//$this->burstsURL = $this->burstAPIClient->getAPIURL();
+		$this->burstsURL = $this->csApi->getBurstApiUrl() . '/bursts';
 	}
 
 	// @override
@@ -79,7 +82,6 @@ class PdfManager extends PageBase {
 		} else {
 			$this->isAjaxRequest = isset($get['ajax']);
 			$this->setPagingStart((isset($get['pagestart'])) ? $get['pagestart'] : 0);
-			$this->burstsURL = $this->burstAPIClient->getAPIURL();
 		}
 	}
 
@@ -89,7 +91,8 @@ class PdfManager extends PageBase {
 			$this->authOrgList 	= $this->getAuthOrgKeys();
 
 			// fetch all existing burst records
-			$this->feedResponse = $this->burstAPIClient->getBurstList($this->pagingStart, $this->pagingLimit);
+			//$this->feedResponse = $this->burstAPIClient->getBurstList($this->pagingStart, $this->pagingLimit);
+			$this->feedResponse = $this->csApi->getBurstList($this->pagingStart, $this->pagingLimit);
 			
 			if ($this->feedResponse) {
 				$this->feedData = $this->feedResponse->bursts;
@@ -213,6 +216,6 @@ class PdfManager extends PageBase {
 
 // Initialize PdfManager and execute (render final page)
 // ================================================================
-executePage(new PdfManager());
+executePage(new PdfManager($csApi));
 
 ?>

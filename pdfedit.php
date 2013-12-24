@@ -13,13 +13,9 @@ require_once('ifc/Page.ifc.php');
 require_once('obj/PageBase.obj.php');
 require_once('obj/PageForm.obj.php');
 
-require_once('obj/APIClient.obj.php');
-require_once('obj/BurstAPIClient.obj.php');
-
 
 /**
  * PDF Edit Page class
- *
  */
 class PDFEditPage extends PageForm {
 
@@ -29,7 +25,19 @@ class PDFEditPage extends PageForm {
 
 	protected $error = '';			// A place to capture an error string to control modal display
 
-	protected $burstAPI = null;
+	protected $csApi = null;
+
+	/**
+	 * Constructor
+	 *
+	 * Use dependency injection to make those external things separately testable.
+	 *
+	 * @param object $csApi An instance of CommsuiteApiClient
+	 */
+	public function __construct($csApi) {
+		$this->csApi = $csApi;
+		parent::__construct();
+	}
 
 	public function isAuthorized(&$get=array(), &$post=array(), &$request=array(), &$session=array()) {
 		global $USER;
@@ -37,47 +45,26 @@ class PDFEditPage extends PageForm {
 	}
 
 	public function beforeLoad(&$get=array(), &$post=array(), &$request=array(), &$session=array()) {
-		global $USER;
 
-		// Get our REST API Client connection together
-		$apiCustomer = customerUrlComponent();
-		$this->burstAPI = new BurstAPIClient(
-			$_SERVER['SERVER_NAME'],
-			$apiCustomer,
-			$USER->id,
-			$_COOKIE[strtolower($apiCustomer) . '_session']
-		);
-
-		// The the query string/post data has a burst ID specified, then grab it
+		// Grab the burst ID in the query string/post data if specified
 		$this->burstId = (isset($request['id']) && intval($request['id'])) ? intval($request['id']) : null;
 	}
 
 	public function load(&$get=array(), &$post=array(), &$request=array(), &$session=array()) {
 
-		// If we're editing an existing one, get its data
-		if ($this->burstId) {
+		// Get the data for this burst record
+		$this->burstData = $this->getBurstData($this->burstId);
 
-			// Pull in the current data for this PDF Burst record
-			$this->burstData = $this->burstAPI->getBurstData($this->burstId);
+		// If there was a data reload issue
+		if ($this->checkReload($this->burstId)) {
 
-			// If we have been flagged as having reloaded on account of data having changed...
-			if ($_SESSION['burstreload']) {
-
-				// Clear the flag and set the error message; this will allow the message to display, but
-				// upon dismissal show the form repopulated with the freshly loaded burst data from above
-				unset($_SESSION['burstreload']);
-				$this->error = _L("This PDF Document's record was changed in another window or session; the current data has been reloaded so that your submission will be current. Please review and reapply any additional changes needed, then resubmit.");
-			}
-		}
-		else {
-			$this->burstData = (object) null;
-			$this->burstData->name = '';
-			$this->burstData->burstTemplateId = '';
-			$this->burstData->filename = '';
+			// Add this error message to the page output, but still
+			// allow the form to be displayed to take edits and resubmit
+			$this->error = _L("This PDF Document's record was changed in another window or session; the current data has been reloaded so that your submission will be current. Please review and reapply any additional changes needed, then resubmit.");
 		}
 
 		// Get a list of burst templates
-		$this->loadBurstTemplates();
+		$this->loadBurstTemplatesInto($this->burstTemplates);
 
 		// Make the edit FORM
 		$this->form = $this->factoryFormPDFUpload();
@@ -85,7 +72,7 @@ class PDFEditPage extends PageForm {
 
 	public function afterLoad() {
 
-		// Normal form handling makes getData() work...
+		// Normal form handling makes form->getData() work...
 		$this->form->handleRequest();
 
 		// If the form was submitted...
@@ -96,47 +83,34 @@ class PDFEditPage extends PageForm {
 			$name = $postdata['name'];
 			$bursttemplateid = intval($postdata['bursttemplateid']);
 
-			// Are we saving edits or uploading anew?
-			if ($this->burstId) {
-
-				// check if the data hase changed and display a notification if so...
-				if ($this->form->checkForDataChange()) {
-					$_SESSION['burstreload'] = true;
-					redirect("?id={$this->burstId}");
-				}
-				else {
-					// Saving edits!
-					if ($this->burstAPI->putBurstData($this->burstId, $name, $bursttemplateid)) {
-						notice(_L('The PDF Document was successfully updated'));
-					} else {
-						$this->error = _L('There was a problem updating the PDF Document - please try again later');
-					}
-				}
-			}
-			else {
-				// Uploading anew!
-				if ($this->burstAPI->postBurst($name, $bursttemplateid)) {
-					notice(_L('The PDF Document was successfully stored'));
-				} else {
-					$this->error = _L('There was a problem storing the new PDF Document - please try again later');
-				}
+			// check if the data hase changed and display a notification if so...
+			if (! is_null($this->burstId) && $this->form->checkForDataChange()) {
+				$_SESSION['burstreload'] = true;
+				redirect("?id={$this->burstId}");
 			}
 
-			// If there were no handling errors...
+			// We're storing a new record if burstId is null, otherwise updating an existing record
+			$action = (is_null($this->burstId)) ? 'stored' : 'updated';
+			if ($this->csApi->setBurstData($this->burstId, $name, $bursttemplateid)) {
+				notice(_L("The PDF Document was successfully {$action}"));
+			} else {
+				$this->error = _L("The PDF Document could not be {$action} - please try again later");
+			}
+
+			// If there were no handling errors return to the PDF manager page
 			if (! $this->error) {
-				// return to the manager page
 				redirect('pdfmanager.php');
 			}
 		}
-
-		// The page title depends on whether editing existing or uploading anew
-		$this->options['title'] = ($this->burstId) ? _L('Edit PDF Document Properties') : _L('Upload New PDF Document');
 	}
 
 	public function render() {
 
+		// The page title depends on whether editing existing or uploading anew
+		$this->options['title'] = ($this->burstId) ? _L('Edit PDF Document Properties') : _L('Upload New PDF Document');
+
 		// URL hacking or what?
-		if ($this->burstId && ! is_object($this->burstData)) {
+		if (! (is_null($this->burstId) || is_object($this->burstData))) {
 			$html = _L('The requested PDF Document could not be found') . "<br/>\n";
 		}
 		else {
@@ -154,17 +128,78 @@ class PDFEditPage extends PageForm {
 	}
 
 	/**
+	 * Check if burst reload has been flagged and add an error to the output if so
+	 *
+	 * If the user submitted the form for editing an existing burst record, but the
+	 * server data indicates that the data has changed (in another window/session,
+	 * etc) since they originally displayed the form, then the submission handler
+	 * will set the 'burstreload' flag in the session data which we will catch and
+	 * unset here with a a true return value indicating that there was a problem.
+	 * This allows the form to be redisplayed with now-current data from the server
+	 * and the user will have to start over with edits, if any are still necessary.
+	 *
+	 * @param integer $burstId The ID of the burst record we're looking at; null if new
+	 *
+	 * @return boolean true if there was a reload issue, else false
+	 */
+	public function checkReload($burstId) {
+		if (! is_null($burstId)) {
+			// If we have been flagged as having reloaded on account of data having changed...
+			if (isset($_SESSION['burstreload'])) {
+
+				// Clear the flag and set the error message; this will allow the message to display, but
+				// upon dismissal show the form repopulated with the freshly loaded burst data from above
+				unset($_SESSION['burstreload']);
+				return(true);
+			}
+		}
+
+		return(false);
+	}
+
+	/**
+	 * Get burst data for the specified ID
+	 *
+	 * If the burstId is null then we'll get a new burst record object out of
+	 * this with values suitable for use as form defaults.
+	 *
+	 * @param integer $burstId The ID of the burst record we're interested in
+	 *
+	 * @return object A method-less, data-only onject with the burst data properties
+	 */
+	public function getBurstData($burstId) {
+		// If we're editing an existing one, get its data
+		if (! is_null($burstId)) {
+
+			// Pull in the current data for this PDF Burst record
+			$burstData = $this->csApi->getBurstData($burstId);
+
+		}
+		else {
+			$burstData = (object) null;
+			$burstData->name = '';
+			$burstData->burstTemplateId = '';
+			$burstData->filename = '';
+		}
+
+		return($burstData);
+	}
+
+	/**
 	 * Get the list of burst templates directly from the database
 	 *
 	 * There is no API support for this at this time, so we have to go direct. The resulting array
 	 * is stored in an instance property, $this->burstTemplates.
 	 *
-	 * TODO - put this in the API!
+	 * @todo Put burst template data access into the commsuite API!
+	 *
+	 * @param array $target Associative array to save the discovered list of
+	 * id/name pairs for available burst templates, indexed by id
 	 */
-	protected function loadBurstTemplates() {
+	public function loadBurstTemplatesInto(&$target) {
 		if (is_object($res = Query('SELECT `id`, `name` FROM `bursttemplate` WHERE NOT `deleted`;'))) {
 			while ($row = DBGetRow($res, true)) {
-				$this->burstTemplates[$row['id']] = $row['name'];
+				$target[$row['id']] = $row['name'];
 			 }
 		}
 	}
@@ -172,11 +207,11 @@ class PDFEditPage extends PageForm {
 	/**
 	 * Factory method to spit out a form object for PDF uploads
 	 *
-	 * FIXME - API supports no validation for things like duplicate names, invalid tempalte id's
+	 * FIXME - Commsuite API supports no validation for things like duplicate names, invalid tempalte id's
 	 *
 	 * @return object Form
 	 */
-	protected function factoryFormPDFUpload() {
+	public function factoryFormPDFUpload() {
 		$formdata = array(
 			"name" => array(
 				"label" => _L('Name'),
@@ -200,19 +235,25 @@ class PDFEditPage extends PageForm {
 		);
 
 		// If we already have a burstId
-		if ($this->burstId) {
+		if (! is_null($this->burstId)) {
 			// Then a file has already been uploaded
 
 			// Hide the ID from sight!
 			$formdata['id'] = array(
 				'value' => $this->burstId,
-				'control' => array('HiddenField')
+				'control' => array('HiddenField'),
+				'validators' => Array(
+					array('ValRequired'),
+					array('ValNumber', 'min' => 1)
+				)
 			);
 
 			// we're just going to show a read-only representation
-			$formdata[] = array(
+			$formdata['existingpdf'] = array(
 				"label" => _L('PDF Document'),
-				"control" => array('FormHtml', 'html' => $this->burstData->filename)
+				"control" => array('FormHtml', 'html' => $this->burstData->filename),
+				"validators" => Array(),
+				"helpstep" => 4
 			);
 		}
 		else {
@@ -257,7 +298,7 @@ class PDFEditPage extends PageForm {
 	 * @return string Block of HTML code with requisite script tag needed to show automatically via jQuery
 	 */
 	// TODO - see about using defaultmodal in nav.inc.php instead of adding another one here; tips.php should match
-	protected function modalHtml($content, $heading='Error', $autoshow=true) {
+	public function modalHtml($content, $heading='Error', $autoshow=true) {
 		$html = <<<END
 			<div id="pdfeditmodal" class="modal hide">
 				<div class="modal-header">
@@ -274,11 +315,11 @@ END;
 
 		if ($autoshow) {
 			$html .= <<<END
-			<script language="JavaScript">
-				(function($) {
-					$('#pdfeditmodal').modal('show');
-				}) (jQuery);
-			</script>
+				<script language="JavaScript">
+					(function($) {
+						$('#pdfeditmodal').modal('show');
+					}) (jQuery);
+				</script>
 END;
 		}
 
@@ -291,5 +332,5 @@ END;
 // PAGE INSTANTIATION AND DISPLAY
 // -----------------------------------------------------------------------------
 
-executePage(new PDFEditPage());
+executePage(new PDFEditPage($csApi));
 
