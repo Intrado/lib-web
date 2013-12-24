@@ -65,16 +65,11 @@ class PdfManager extends PageBase {
 
 		$this->customerURLComponent = customerUrlComponent();
 		// create new instance of BurstAPIClient for use in burst API curl calls 
-		//$this->burstAPIClient = new BurstAPIClient($_SERVER['SERVER_NAME'], $this->custName, $USER->id, $_COOKIE[strtolower($this->custName) . '_session']);
-		//$this->burstsURL = $this->burstAPIClient->getAPIURL();
 		$this->burstsURL = $this->csApi->getBurstApiUrl() . '/bursts';
 	}
 
 	// @override
 	public function beforeLoad($get, $post) { 
-		// get new instance of BurstAPIClient for burst API calls 
-		$this->burstAPIClient = $this->getBurstAPIClient();
-
 		// if delete request, execute delete API call and exit, 
 		// which upon a successful response (200) will reload pdfmanager.php page (via JS in pdfmanager.js)
 		if (isset($post['delete'])) {
@@ -91,7 +86,6 @@ class PdfManager extends PageBase {
 			$this->authOrgList 	= $this->getAuthOrgKeys();
 
 			// fetch all existing burst records
-			//$this->feedResponse = $this->burstAPIClient->getBurstList($this->pagingStart, $this->pagingLimit);
 			$this->feedResponse = $this->csApi->getBurstList($this->pagingStart, $this->pagingLimit);
 			
 			if ($this->feedResponse) {
@@ -182,7 +176,7 @@ class PdfManager extends PageBase {
 	}
 
 	public function deleteAjaxResponse($id) {
-			$response = $this->burstAPIClient->deleteBurst($id);
+			$response = $this->csApi->deleteBurst($id);
 			header('Content-Type: application/json');
 			echo json_encode($response);
 			exit();
