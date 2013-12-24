@@ -50,27 +50,6 @@ require_once("{$objdir}/Rule.obj.php"); //for search and sec profile rules
 require_once("{$objdir}/Organization.obj.php"); //for search and sec profile rules
 require_once("{$objdir}/Section.obj.php"); //for search and sec profile rules
 
-function customerUrlComponent() {
-	$c = substr($_SERVER["SCRIPT_NAME"],1);
-	$c = strtolower(substr($c, 0, strpos($c,'/')));
-	return($c);
-}
-
-/**
- * Any PageObject derived class must invoke this function to executePage()
- * This ensures that the test for PHPUNIT environment only needs to exist
- * in this one place.
- */
-function executePage($pageObject) {
-
-	// If PHPUNIT is NOT running
-	if (! defined('PHPUNIT')) {
-
-		// Then execute the page normally
-		$pageObject->execute();
-	}
-}
-
 if ((! defined('PHPUNIT')) && (!isset($isindexpage) || !$isindexpage)) {
 	doStartSession();
 	//force ssl?
@@ -108,5 +87,45 @@ require_once $GLOBALS['THRIFT_ROOT'].'/transport/TSocket.php';
 require_once $GLOBALS['THRIFT_ROOT'].'/transport/TBufferedTransport.php';
 require_once $GLOBALS['THRIFT_ROOT'].'/transport/TFramedTransport.php';
 require_once($GLOBALS['THRIFT_ROOT'].'/packages/commsuite/CommSuite.php');
+
+// Initialize Commsuite REST API access
+require_once("{$objdir}/ApiClient.obj.php");
+require_once("{$objdir}/CommsuiteApiClient.obj.php");
+
+$csApi = setupCommsuiteApi();
+
+function setupCommsuiteApi() {
+	global $USER;
+
+	$apiClient = new ApiClient(
+		$_SERVER['SERVER_NAME'], // TODO - pull this from settings.ini.php
+		customerUrlComponent(),
+		$USER->id,
+		$_COOKIE[strtolower(customerUrlComponent()) . '_session']
+	);
+
+	return(new CommsuiteApiClient($apiClient));
+}
+
+function customerUrlComponent() {
+	$c = substr($_SERVER["SCRIPT_NAME"], 1);
+	$c = strtolower(substr($c, 0, strpos($c, '/')));
+	return($c);
+}
+
+/**
+ * Any PageObject derived class must invoke this function to executePage()
+ * This ensures that the test for PHPUNIT environment only needs to exist
+ * in this one place.
+ */
+function executePage($pageObject) {
+
+	// If PHPUNIT is NOT running
+	if (! defined('PHPUNIT')) {
+
+		// Then execute the page normally
+		$pageObject->execute();
+	}
+}
 
 ?>
