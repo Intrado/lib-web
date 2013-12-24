@@ -10,6 +10,22 @@
  */
 abstract class PageForm extends PageBase {
 
+	function __construct($options = array()) {
+
+		// Layer in support for 'validators' as options for Form-based pages
+		$newoptions = array(
+			'validators' => array()
+		);
+
+		// Then merge defaults with the options provided
+		if (is_array($options) && count($options)) {
+			$newoptions = array_merge($newoptions, $options);
+		}
+
+		parent::__construct($newoptions);
+	}
+
+
 	/**
 	 * Load base data needed to handle submission
 	 *
