@@ -18,3 +18,12 @@ ALTER TABLE `burst`
   CHANGE `bytes` `bytes` BIGINT( 20 ) NOT NULL ,
   ADD INDEX `userid` ( `userid` , `name` , `deleted` )
 $$$
+
+-- $rev 3
+ALTER TABLE `burst`
+  CHANGE `bytes` `size` BIGINT( 20 ) NOT NULL ,
+  DROP `totalpagesfound`,
+  DROP `actualreportscount`
+$$$
+
+  

@@ -2312,3 +2312,15 @@ $$$
 update setting set value='10.1/2' where name='_dbversion'
 $$$
 -- END 10.1/2
+
+-- START 10.1/3
+
+ALTER TABLE `burst`
+  CHANGE `bytes` `size` BIGINT( 20 ) NOT NULL ,
+  DROP `totalpagesfound`,
+  DROP `actualreportscount`
+$$$
+
+update setting set value='10.1/3' where name='_dbversion'
+$$$
+-- END 10.1/3
