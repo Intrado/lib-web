@@ -39,7 +39,7 @@ $NAVTREE = array (
 		array("Surveys","surveys.php",$USER->canSendSurvey() ? "survey" : "dummy",$SUBTAB=="survey"),
 		array("Responses","replies.php?reset=1","leavemessage",$SUBTAB=="responses"),
 		array("Tips","tips.php",getSystemSetting("_hasquicktip", false) ? "tai_canbetopicrecipient" : "dummy",$SUBTAB=="tips"),
-		array("PDFs","pdfmanager.php",NULL,$SUBTAB=="pdfmanager")
+		array("PDFs","pdfmanager.php", 'canpdfburst' ,$SUBTAB=="pdfmanager")
 		)),
 	array("Reports","reports.php",array('createreport',"viewsystemreports", "viewusagestats","viewcalldistribution"),$MAINTAB=="reports",array(
 		array("Reports", "reports.php", array("createreport", "viewsystemreports"), $SUBTAB=="reports"),
