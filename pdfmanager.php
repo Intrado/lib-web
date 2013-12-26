@@ -6,7 +6,6 @@ require_once("inc/table.inc.php");
 require_once("inc/utils.inc.php");
 require_once("inc/securityhelper.inc.php");
 require_once("inc/formatters.inc.php");
-include_once("obj/Phone.obj.php");
 require_once("inc/date.inc.php");
 require_once("obj/Validator.obj.php");
 
@@ -15,9 +14,6 @@ require_once("inc/feed.inc.php");
 
 require_once('ifc/Page.ifc.php');
 require_once('obj/PageBase.obj.php');
-
-//require_once('obj/APIClient.obj.php');
-//require_once('obj/BurstAPIClient.obj.php');
 
 /**
  * class PdfManager
@@ -43,12 +39,14 @@ class PdfManager extends PageBase {
 	var $customerURLComponent;
 	var $burstsURL;
 	var $authOrgList;
-
 	var $csApi;
 
 	function __construct($csApi) {
-                $this->csApi = $csApi;
+		$this->csApi = $csApi;
 		parent::pageBase();
+
+		$this->customerURLComponent = customerUrlComponent();
+		$this->burstsURL = $this->csApi->getBurstApiUrl();
 	}
 	
 	// @override
@@ -62,17 +60,13 @@ class PdfManager extends PageBase {
 		// override some options on PageBase
 		$this->options["title"] = $this->pageTitle;
 		$this->options["page"]  = $this->pageNav;
-
-		$this->customerURLComponent = customerUrlComponent();
-		// create new instance of BurstAPIClient for use in burst API curl calls 
-		$this->burstsURL = $this->csApi->getBurstApiUrl() . '/bursts';
 	}
 
 	// @override
 	public function beforeLoad($get, $post) { 
 		// if delete request, execute delete API call and exit, 
 		// which upon a successful response (200) will reload pdfmanager.php page (via JS in pdfmanager.js)
-		if (isset($post['delete'])) {
+		if (isset($post['delete']) && $post['delete']) {
 			$this->deleteAjaxResponse($post['id']);
 		} else {
 			$this->isAjaxRequest = isset($get['ajax']);
@@ -120,50 +114,24 @@ class PdfManager extends PageBase {
 	}
 
 	public function burstsAjaxResponse() {
+		$data = (object) array(
+			'list' 		=> array(),
+			'pageinfo' 	=> array()
+		);
+
 		if($this->total == 0) {
-			$data->list[] = array("itemid" => "",
+			$data->list[] = array("itemid" 		=> "",
 								  "defaultlink" => "",
-								  "icon" => "img/largeicons/information.jpg",
-								  "title" => _L("No PDF files available."),
-								  "content" => "",
-								  "tools" => "");
+								  "icon" 		=> "img/largeicons/information.jpg",
+								  "title" 		=> _L("No PDF files available."),
+								  "content" 	=> "",
+								  "tools" 		=> "");
 		} else {
-			while(!empty($this->feedData)) {
-				$item 			= array_shift($this->feedData);
-				$itemid 		= $item->id;
-				$defaultlink 	= 'pdfedit.php?id=' . $itemid;
-
-				$title 			= escapehtml($item->name);
-				$fileName 		= escapehtml($item->filename);
-				$uploadDate 	= date("M j, Y g:i a", $item->uploadTimestampMs / 1000);
-				$fileSize 		= $item->bytes;
-				$status 		= $item->status;
-				
-				$icon 			= 'img/pdficon_32.png';
-
-				// if (userOwns("messagegroup", $itemid)) { //TODO: add proper privilege checks for PDFs
-				if (true) {	
-					$tools = action_links (
-						action_link(" Edit", "pencil", 'pdfedit.php?id=' . $itemid),
-						action_link(" Send Email", "email_go", $this->burstsURL . "/" . $itemid. "/send"),
-						action_link(" Delete", "cross", '#', "deleteBurst(".$itemid.");")
-					);
-				} 
-
-				$content = '<span data-burst-id="'.$itemid.'">';
-				$content .= 'File: &nbsp;<a href="'.$this->burstsURL . '/' . $itemid. '/pdf" title="Download File: '.$fileName.'">' .$fileName. '</a><br>';
-				$content .= 'Size: &nbsp;<strong>' . number_format(($fileSize / pow(2,20)), 1, '.', '') . 'MB</strong><br>';
-				$content .= 'Upload Date: &nbsp;<strong>' .$uploadDate.'</strong><br>';
-				$content .= 'Status: &nbsp;<strong>' .ucwords($status).'</strong></span>';
-
-				$data->list[] = array("itemid" 			=> $itemid,
-									  "defaultlink"		=> $defaultlink,
-									  "icon" 			=> $icon,
-									  "title" 			=> $title,
-									  "content" 		=> $content,
-									  "tools" 			=> $tools);
+			foreach ($this->feedData as $burstObj) {
+				$data->list[] = $this->getBurstListItem($burstObj);
 			}
 		}
+
 		$data->pageinfo = array($this->numPages,
 								$this->pagingLimit,
 								$this->curPage, 
@@ -173,6 +141,38 @@ class PdfManager extends PageBase {
 		header('Content-Type: application/json');
 		echo json_encode(!empty($data) ? $data : false);
 		exit();
+	}
+
+	public function getBurstListItem($burstObj) {
+		$id 			= $burstObj->id;
+		$defaultlink 	= 'pdfedit.php?id=' . $id;
+
+		$title 			= escapehtml($burstObj->name);
+		$fileName 		= escapehtml($burstObj->filename);
+		$uploadDate 	= date("M j, Y g:i a", $burstObj->uploadTimestampMs / 1000);
+		$fileSize 		= $burstObj->bytes;
+		$status 		= $burstObj->status;
+
+		$tools = action_links (
+			action_link(" Edit", "pencil", 'pdfedit.php?id=' . $id),
+			action_link(" Send Email", "email_go", $this->burstsURL . "/" . $id. "/send"),
+			action_link(" Download", "pdficon_16", $this->burstsURL . '/' . $id. '/pdf'),
+			action_link(" Delete", "cross", '#', "deleteBurst(".$id.");")
+		);
+
+		$content = '<span data-burst-id="'.$id.'">';
+		$content .= 'File: &nbsp;<a href="'.$this->burstsURL . '/' . $id. '/pdf" title="Download File: '.$fileName.'">' .$fileName. '</a><br>';
+		$content .= 'Size: &nbsp;<strong>' . number_format(($fileSize / pow(2,20)), 1, '.', '') . 'MB</strong><br>';
+		$content .= 'Upload Date: &nbsp;<strong>' .$uploadDate.'</strong><br>';
+		$content .= 'Status: &nbsp;<strong>' .ucwords($status).'</strong></span>';
+
+		$arrItem = array("itemid" 		=> $id,
+						  "defaultlink"	=> $defaultlink,
+						  "icon" 		=> 'img/pdficon_32.png',
+						  "title" 		=> $title,
+						  "content" 	=> $content,
+						  "tools" 		=> $tools);
+		return $arrItem;
 	}
 
 	public function deleteAjaxResponse($id) {
@@ -201,14 +201,9 @@ class PdfManager extends PageBase {
 		return Organization::getAuthorizedOrgKeys();
 	}
 
-	public function getBurstAPIClient() {
-		global $USER;
-		return new BurstAPIClient($_SERVER['SERVER_NAME'], $this->customerURLComponent, $USER->id, $_COOKIE[strtolower($this->customerURLComponent) . '_session']);
-	}
-
 }
 
-// Initialize PdfManager and execute (render final page)
+// Initialize PdfManager and render page
 // ================================================================
 executePage(new PdfManager($csApi));
 
