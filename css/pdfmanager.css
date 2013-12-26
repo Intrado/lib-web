@@ -1,6 +1,9 @@
 .pagetitle {
 	display: none;
 }
+.window_main {
+	margin: 0;
+}
 .window_main .content_row {
 	float: left;
 	height: auto;
