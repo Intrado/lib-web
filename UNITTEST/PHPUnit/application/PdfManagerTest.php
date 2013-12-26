@@ -12,7 +12,6 @@ require_once(realpath(dirname(dirname(__FILE__)) .'/DBStub.php'));
 
 require_once('../../../ifc/Page.ifc.php');
 require_once('../../../obj/PageBase.obj.php');
-require_once('../../../inc/html.inc.php');
 // ----------------------------------------------------------------------------
 
 require_once("{$konadir}/pdfmanager.php");
