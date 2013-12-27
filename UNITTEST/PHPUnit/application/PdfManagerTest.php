@@ -74,7 +74,7 @@ class PdfManagerTest extends PHPUnit_Framework_TestCase {
 								'id' => 14,
 								'name' => 'PDF Workflow - single page app - v2',
 								'filename' => 'PDF Workflow - Non-wizard Single Page App option.pdf',
-								'bytes' => 330542,
+								'size' => 330542,
 								'status' => 'new',
 								'contentId' => 552,
 								'deleted' => 0,
@@ -95,7 +95,7 @@ class PdfManagerTest extends PHPUnit_Framework_TestCase {
 								'id' => 15,
 								'name' => 'PDF Workflow - single page app - v3',
 								'filename' => 'PDF Workflow - v3 - Non-wizard Single Page App option.pdf',
-								'bytes' => 6057932,
+								'size' => 6057932,
 								'status' => 'new',
 								'contentId' => 553,
 								'deleted' => 0,
@@ -219,7 +219,7 @@ class PdfManagerTest extends PHPUnit_Framework_TestCase {
 		$burstItem = $this->pdfManagerMock->feedResponse->bursts[0];
 		$this->assertEquals($burstItem->name, 'PDF Workflow - single page app - v2');
 		$this->assertEquals($burstItem->filename, 'PDF Workflow - Non-wizard Single Page App option.pdf');
-		$this->assertEquals($burstItem->bytes, 330542);
+		$this->assertEquals($burstItem->size, 330542);
 		$this->assertEquals($burstItem->contentId, 552);
 		$this->assertEquals($burstItem->uploadTimestampMs, 1387570964701);
 		$this->assertEquals($burstItem->burstTemplateId, 1);

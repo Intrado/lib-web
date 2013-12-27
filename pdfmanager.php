@@ -150,7 +150,7 @@ class PdfManager extends PageBase {
 		$title 			= escapehtml($burstObj->name);
 		$fileName 		= escapehtml($burstObj->filename);
 		$uploadDate 	= date("M j, Y g:i a", $burstObj->uploadTimestampMs / 1000);
-		$fileSize 		= $burstObj->bytes;
+		$fileSize 		= $burstObj->size;
 		$status 		= $burstObj->status;
 
 		$tools = action_links (
