@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PDFEditPageTest.php - PHPUnit Test Class for PDF Edit Page
+ * PdfEditPageTest.php - PHPUnit Test Class for PDF Edit Page
  *
  * @package unittests
  * @version 1.0
@@ -15,7 +15,7 @@ require_once(realpath(dirname(dirname(__FILE__)) .'/ApiStub.php'));
 /**
  * Test Class for PDF Edit Page
  */
-class PDFEditPageTest extends PHPUnit_Framework_TestCase {
+class PfdEditPageTest extends PHPUnit_Framework_TestCase {
 	const USER_ID = 1;
 	const ACCESS_ID = 3;
 	const FORMNAME = 'pdfuploader';	// The name of our kona form; if it changes in the class, we'll need to update this
@@ -100,9 +100,11 @@ class PDFEditPageTest extends PHPUnit_Framework_TestCase {
 		// 6) API response for a single burst record (with id=1)
 		$queryRules->add('|"method":"GET","node":"\\\/bursts\\\/1","data":null|',
 			array(
-				'headers' => 'Content-type: application/json',
-				'body' => '{"id":1,"name":"testname","filename":"testfile.pdf","size":1234,"status":"new","contentId":1,"ownerUser":{"id":1},"uploadTimeStampms":1234,"burstTemplateId":1}',
-				'code' => 200
+				array(
+					'headers' => 'Content-type: application/json',
+					'body' => '{"id":1,"name":"testname","filename":"testfile.pdf","size":1234,"status":"new","contentId":1,"ownerUser":{"id":1},"uploadTimeStampms":1234,"burstTemplateId":1}',
+					'code' => 200
+				)
 			)
 		);
 
@@ -137,11 +139,13 @@ class PDFEditPageTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function test_newUploadForm() {
+
 		// Load up the edit form with no burst id specified
 		$this->pdfEditPage->beforeLoad();
 		$this->pdfEditPage->load();
 		$this->pdfEditPage->afterLoad();
 		$formhtml = $this->pdfEditPage->render();
+
 		$this->assertTrue(false !== strpos($formhtml, 'multipart/form-data'), 'Missing expected enctype="multipart/form-data"');
 		$this->assertTrue(false !== strpos($formhtml, self::FORMNAME . '_name'), 'Missing name input field');
 		$this->assertTrue(false !== strpos($formhtml, self::FORMNAME . '_bursttemplateid'), 'Missing burst template select field');
@@ -149,16 +153,21 @@ class PDFEditPageTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function test_editExistingForm() {
+
 		// Load up the edit form with burst id = 1
 		$data = array('id' => 1);
+
 		$this->pdfEditPage->beforeLoad($data, $data, $data);
 		$this->pdfEditPage->load();
 		$this->pdfEditPage->afterLoad();
 		$formhtml = $this->pdfEditPage->render();
+
 		$this->assertTrue(false !== strpos($formhtml, 'multipart/form-data'), 'Missing expected enctype="multipart/form-data"');
 		$this->assertTrue(false !== strpos($formhtml, self::FORMNAME . '_name'), 'Missing name input field');
 		$this->assertTrue(false !== strpos($formhtml, self::FORMNAME . '_bursttemplateid'), 'Missing burst template select field');
-		$this->assertTrue(false !== strpos($formhtml, self::FORMNAME . '_thefile'), 'Missing file input field');
+
+		// There should be no file input field now because file is read-only for editing existing records
+		$this->assertFalse(strpos($formhtml, self::FORMNAME . '_thefile'), 'Missing file input field');
 	}
 }
 
