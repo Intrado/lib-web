@@ -42,21 +42,23 @@ class ApiStub {
 		$bogusRequestObject->node = $node;
 		$bogusRequestObject->data = $data;
 		$bogusQuery = json_encode($bogusRequestObject);;
+		$queryResult = Query($bogusQuery);
 
-		$res = Query($bogusQuery);
+		// The one and only data result from the fake query will be the API Response
+		$data = $queryResult->fetch(PDO::FETCH_ASSOC);
 
 		// If QueryRules didn't give us anything useful (i.e. a response with headers/body/code defined)
-		if (! (is_array($res) && count($res))) {
+		if (! is_array($data)) {
 
 			// Then we'll structure a custom, default reply with nothing interesting in it
-			$res = array(
+			$data = array(
 				'headers' => 'Content-type: text/plain',
 				'body' => 'No result data was returned for this operation',
 				'code' => 0
 			);
 		}
 
-		return($res);
+		return($data);
 	}
 
 	public function get($node = '') {
