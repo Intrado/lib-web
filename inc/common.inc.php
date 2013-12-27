@@ -50,6 +50,10 @@ require_once("{$objdir}/Rule.obj.php"); //for search and sec profile rules
 require_once("{$objdir}/Organization.obj.php"); //for search and sec profile rules
 require_once("{$objdir}/Section.obj.php"); //for search and sec profile rules
 
+// Initialize Commsuite REST API access
+require_once("{$objdir}/ApiClient.obj.php");
+require_once("{$objdir}/CommsuiteApiClient.obj.php");
+
 if ((! defined('PHPUNIT')) && (!isset($isindexpage) || !$isindexpage)) {
 	doStartSession();
 	//force ssl?
@@ -93,9 +97,6 @@ require_once $GLOBALS['THRIFT_ROOT'].'/transport/TBufferedTransport.php';
 require_once $GLOBALS['THRIFT_ROOT'].'/transport/TFramedTransport.php';
 require_once($GLOBALS['THRIFT_ROOT'].'/packages/commsuite/CommSuite.php');
 
-// Initialize Commsuite REST API access
-require_once("{$objdir}/ApiClient.obj.php");
-require_once("{$objdir}/CommsuiteApiClient.obj.php");
 
 function setupCommsuiteApi() {
 	global $USER;
