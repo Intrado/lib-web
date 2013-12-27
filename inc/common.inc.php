@@ -74,6 +74,11 @@ if ((! defined('PHPUNIT')) && (!isset($isindexpage) || !$isindexpage)) {
 			redirect("$BASEURL/index.php?logout=1");
 		}
 	}
+
+	$csApi = setupCommsuiteApi();
+}
+else {
+	$csApi = null;
 }
 
 // load customer/user locale 
@@ -91,8 +96,6 @@ require_once($GLOBALS['THRIFT_ROOT'].'/packages/commsuite/CommSuite.php');
 // Initialize Commsuite REST API access
 require_once("{$objdir}/ApiClient.obj.php");
 require_once("{$objdir}/CommsuiteApiClient.obj.php");
-
-$csApi = setupCommsuiteApi();
 
 function setupCommsuiteApi() {
 	global $USER;
