@@ -252,6 +252,7 @@ class PdfEditPage extends PageForm {
 
 			// Hide the ID from sight!
 			$formdata['id'] = array(
+				'label' => 'thisshouldntneedalabel', // FIXME: Form.obj.php breaks without this
 				'value' => $this->burstId,
 				'control' => array('HiddenField'),
 				'validators' => Array(
@@ -263,6 +264,7 @@ class PdfEditPage extends PageForm {
 			// we're just going to show a read-only representation
 			$formdata['existingpdf'] = array(
 				"label" => _L('PDF Document'),
+				'value' => 'thisshouldntneedavalue', // FIXME: Form.obj.php breaks without this
 				"control" => array('FormHtml', 'html' => $this->burstData->filename),
 				"validators" => Array(),
 				"helpstep" => 4
