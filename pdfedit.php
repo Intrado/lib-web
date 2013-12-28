@@ -17,7 +17,7 @@ require_once('obj/PageForm.obj.php');
 /**
  * PDF Edit Page class
  */
-class PDFEditPage extends PageForm {
+class PdfEditPage extends PageForm {
 
 	protected $burstData = null;		// Associative array for the burst record we're working on
 	protected $burstId = null;		// ID for the DBMO object to interface with
@@ -27,10 +27,12 @@ class PDFEditPage extends PageForm {
 
 	protected $csApi = null;
 
+	public $formName = 'pdfuploader';
+
 	/**
 	 * Constructor
 	 *
-	 * Use dependency injection to make those external things separately testable.
+	 * Use dependency injection to make those external things needed separately testable.
 	 *
 	 * @param object $csApi An instance of CommsuiteApiClient
 	 */
@@ -46,8 +48,16 @@ class PDFEditPage extends PageForm {
 
 	public function beforeLoad(&$get=array(), &$post=array(), &$request=array(), &$session=array()) {
 
-		// Grab the burst ID in the query string/post data if specified
-		$this->burstId = (isset($request['id']) && intval($request['id'])) ? intval($request['id']) : null;
+		// The burst ID will be in the form POST data or on the URL queryString, or unset...
+		if (isset($post["{$this->formName}_id"]) && intval($post["{$this->formName}_id"])) {
+			$this->burstId = intval($post["{$this->formName}_id"]);
+		}
+		else if (isset($request['id']) && intval($request['id'])) {
+			$this->burstId = intval($request['id']);
+		}
+		else {
+			$this->burstId = null;
+		}
 	}
 
 	public function load(&$get=array(), &$post=array(), &$request=array(), &$session=array()) {
@@ -60,7 +70,7 @@ class PDFEditPage extends PageForm {
 
 			// Add this error message to the page output, but still
 			// allow the form to be displayed to take edits and resubmit
-			$this->error = _L("This PDF Document's record was changed in another window or session; the current data has been reloaded so that your submission will be current. Please review and reapply any additional changes needed, then resubmit.");
+			$this->error = _L("This PDF Document's record was changed in another window or session. Please review the current data and reapply any additional changes needed, then resubmit.");
 		}
 
 		// Get a list of burst templates
@@ -83,8 +93,10 @@ class PDFEditPage extends PageForm {
 			$name = $postdata['name'];
 			$bursttemplateid = intval($postdata['bursttemplateid']);
 
-			// check if the data hase changed and display a notification if so...
+			// Check if the data has changed and display a notification if so...
 			if (! is_null($this->burstId) && $this->form->checkForDataChange()) {
+
+				// Flag the problem, then redirect back to ourselves to redisplay the form with now-current data
 				$_SESSION['burstreload'] = true;
 				redirect("?id={$this->burstId}");
 			}
@@ -92,14 +104,14 @@ class PDFEditPage extends PageForm {
 			// We're storing a new record if burstId is null, otherwise updating an existing record
 			$action = (is_null($this->burstId)) ? 'stored' : 'updated';
 			if ($this->csApi->setBurstData($this->burstId, $name, $bursttemplateid)) {
-				notice(_L("The PDF Document was successfully {$action}"));
-			} else {
-				$this->error = _L("The PDF Document could not be {$action} - please try again later");
-			}
 
-			// If there were no handling errors return to the PDF manager page
-			if (! $this->error) {
+				// For success, we redirect back to the manager page with this notice to be shown on that page:
+				notice(_L("The PDF Document was successfully {$action}"));
 				redirect('pdfmanager.php');
+			} else {
+
+				// For errors, we fall through to render() and let this error message be shown:
+				$this->error = _L("The PDF Document could not be {$action} - please try again later");
 			}
 		}
 	}
@@ -281,9 +293,9 @@ class PDFEditPage extends PageForm {
 		);
 
 		// A new form with some defaults overridden...
-		$form = new Form('pdfuploader', $formdata, $helpsteps, $buttons, 'vertical');
-		$form->multipart = true;
-		$form->ajaxsubmit = false;
+		$form = new Form($this->formName, $formdata, $helpsteps, $buttons, 'vertical');
+		$form->multipart = (! $this->burstId);	// We only need multi-part encoding if we're uploading a new one
+		$form->ajaxsubmit = false;		// We can't use AJAX form handling for multipart file uploads
 
 		return($form);
 	}
@@ -332,5 +344,5 @@ END;
 // PAGE INSTANTIATION AND DISPLAY
 // -----------------------------------------------------------------------------
 
-executePage(new PDFEditPage($csApi));
+executePage(new PdfEditPage($csApi));
 
