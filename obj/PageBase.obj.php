@@ -51,7 +51,6 @@ abstract class PageBase implements Page {
 	 * All our operational options, protectively set, publicly readable
 	 */
 	var $options;
-	var $form;
 	var $konadir;
 	var $pageOutput = '';
 

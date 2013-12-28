@@ -10,6 +10,8 @@
  */
 abstract class PageForm extends PageBase {
 
+	public $form = null; // This is where the Form.obj will be instantiated
+
 	function __construct($options = array()) {
 
 		// Layer in support for 'validators' as options for Form-based pages
