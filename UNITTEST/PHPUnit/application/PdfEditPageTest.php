@@ -3,6 +3,17 @@
 /**
  * PdfEditPageTest.php - PHPUnit Test Class for PDF Edit Page
  *
+ * NOTE: requires `pecl install phpunit/test_helpers`; this is so that we can
+ * turn calls to exit() or die() in the legacy code base into NO-OP's which
+ * allows PHPUNIT to continue running and delivering test results. This happens
+ * when, for example, the page makes a call to the redirect() utility function:
+ *
+ * 1) Put test_helpers.so into /usr/commsuite/server/php/lib/php/extensions/
+ * 2) Add zend_extension=/usr/commsuite/server/php/lib/php/extensions/test_helpers.so to /usr/commsuite/server/php/lib/php.ini
+ *
+ * ref: https://github.com/php-test-helpers/php-test-helpers
+ * ref: http://thedeveloperworldisyours.com/php/phpunit-tips/
+ *
  * @package unittests
  * @version 1.0
  */
@@ -18,10 +29,10 @@ require_once(realpath(dirname(dirname(__FILE__)) .'/ApiStub.php'));
 class PfdEditPageTest extends PHPUnit_Framework_TestCase {
 	const USER_ID = 1;
 	const ACCESS_ID = 3;
-	const FORMNAME = 'pdfuploader';	// The name of our kona form; if it changes in the class, we'll need to update this
 
 	var $pdfEditPage = null; // The instance of our class under test
 	var $csApi = null;	// An instance of CommsuiteApiClient to satisfy API calls
+	var $formName = '';	// The name of our kona form
 
 	/**
 	 * Before any tests run, before we even include the source file for the class under test
@@ -36,7 +47,7 @@ class PfdEditPageTest extends PHPUnit_Framework_TestCase {
 		$_SERVER['SERVER_NAME'] = 'localhost';
 		$_SERVER['REQUEST_URI'] = '/';
 
-		// 2) The user DBMO initialization query for userID=1
+		// 2) SQL response: The User DBMO initialization query for userID=1
 		$queryRules->add('/from user where id/', array(self::USER_ID),
 			array(
 				array(
@@ -61,7 +72,7 @@ class PfdEditPageTest extends PHPUnit_Framework_TestCase {
 			)
 		);
 
-		// 3) The profile (access) record for this user
+		// 3) SQL response: The profile (access) record for this user
 		$queryRules->add('/from access where id/', array(self::ACCESS_ID),
 			array(
 				array(
@@ -71,7 +82,7 @@ class PfdEditPageTest extends PHPUnit_Framework_TestCase {
 			)
 		);
 
-		// 4) Permissions for this user's profile
+		// 4) SQL response: Permissions for this user's profile
 		$queryRules->add('/from permission where accessid/',
 			array(
 				array(
@@ -83,7 +94,7 @@ class PfdEditPageTest extends PHPUnit_Framework_TestCase {
 			)
 		);
 
-		// 5) A list of burst template records
+		// 5) SQL response: A list of burst template records
 		$queryRules->add('/FROM `bursttemplate` WHERE NOT `deleted`/',
 			array(
 				array(
@@ -97,7 +108,7 @@ class PfdEditPageTest extends PHPUnit_Framework_TestCase {
 			)
 		);
 
-		// 6) API response for a single burst record (with id=1)
+		// 6) API response: a single burst record (with id=1)
 		$queryRules->add('|"method":"GET","node":"\\\/bursts\\\/1","data":null|',
 			array(
 				array(
@@ -126,7 +137,10 @@ class PfdEditPageTest extends PHPUnit_Framework_TestCase {
 		$this->csApi = new CommsuiteApiClient($apiClient);
 
 		// Then go for launch!
-		$this->pdfEditPage = new PDFEditPage($this->csApi);
+		$this->pdfEditPage = new PdfEditPage($this->csApi);
+
+		// Grab the formName; we're going to need it!
+		$this->formName = $this->pdfEditPage->formName;
 	}
 
 	// after each test
@@ -138,6 +152,7 @@ class PfdEditPageTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($this->pdfEditPage->isAuthorized(), 'The user should be authorized to access this page');
 	}
 
+	// it shows an edit form with some properties of a PDF burst record
 	public function test_newUploadForm() {
 
 		// Load up the edit form with no burst id specified
@@ -147,11 +162,12 @@ class PfdEditPageTest extends PHPUnit_Framework_TestCase {
 		$formhtml = $this->pdfEditPage->render();
 
 		$this->assertTrue(false !== strpos($formhtml, 'multipart/form-data'), 'Missing expected enctype="multipart/form-data"');
-		$this->assertTrue(false !== strpos($formhtml, self::FORMNAME . '_name'), 'Missing name input field');
-		$this->assertTrue(false !== strpos($formhtml, self::FORMNAME . '_bursttemplateid'), 'Missing burst template select field');
-		$this->assertTrue(false !== strpos($formhtml, self::FORMNAME . '_thefile'), 'Missing file input field');
+		$this->assertTrue(false !== strpos($formhtml, "{$this->formName}_name"), 'Missing name input field');
+		$this->assertTrue(false !== strpos($formhtml, "{$this->formName}_bursttemplateid"), 'Missing burst template select field');
+		$this->assertTrue(false !== strpos($formhtml, "{$this->formName}_thefile"), 'Missing file input field');
 	}
 
+	// it prepopulates the form fields with values from an existing record if specified (converts the file input into a read-only string)
 	public function test_editExistingForm() {
 
 		// Load up the edit form with burst id = 1
@@ -162,12 +178,53 @@ class PfdEditPageTest extends PHPUnit_Framework_TestCase {
 		$this->pdfEditPage->afterLoad();
 		$formhtml = $this->pdfEditPage->render();
 
-		$this->assertTrue(false !== strpos($formhtml, 'multipart/form-data'), 'Missing expected enctype="multipart/form-data"');
-		$this->assertTrue(false !== strpos($formhtml, self::FORMNAME . '_name'), 'Missing name input field');
-		$this->assertTrue(false !== strpos($formhtml, self::FORMNAME . '_bursttemplateid'), 'Missing burst template select field');
+		// The burst name input field should be present
+		$this->assertTrue(false !== strpos($formhtml, "{$this->formName}_name"), 'Missing name input field');
+
+		// Make sure the name input field has the right value from the burst record
+		$this->assertTrue(false !== strpos($formhtml, 'type="text" value="testname"'), 'Name input field did not have the correct default value');
+
+		// The burst template selection should be present
+		$this->assertTrue(false !== strpos($formhtml, "{$this->formName}_bursttemplateid"), 'Missing burst template select field');
+
+		// The first burst template should be preselected (since that is what our sample data for burst id=1 says)
+		$this->assertTrue(false !== strpos($formhtml, 'option value="1" selected'), 'Burst template field did not have the right default option pre-selected');
 
 		// There should be no file input field now because file is read-only for editing existing records
-		$this->assertFalse(strpos($formhtml, self::FORMNAME . '_thefile'), 'Missing file input field');
+		$this->assertFalse(strpos($formhtml, "{$this->formName}_thefile"), 'File input field should NOT be present on this form');
+
+		// There should be a hidden text field though with the burst ID so that the post handler knows where to send the data
+		$this->assertTrue(false !== strpos($formhtml, "{$this->formName}_id\" type=\"hidden\""), 'Missing hidden id field');
+
+		// And the output should contain some read-only text with the name of the PDF file as well
+		$this->assertTrue(false !== strpos($formhtml, 'class="formcontrol cf">testfile.pdf'), 'Missing read-only PDf filename text');
+	}
+
+	// it handles form submission success by redirecting the client to pdfmanager.php with a notice() message
+	public function test_formSubmitSuccess() {
+
+		// Any call to exit/die will end up in this anonymous function now:
+		set_exit_overload(function() { return(false); });
+		
+		// POST the edit form with burst id = 1 so that we don't have to upload a file for this test
+		$_POST = $_REQUEST = array(
+			'submit' => 'submit',
+			'form' => $this->formName,
+			"{$this->formName}_id" => 1,
+			"{$this->formName}_name" => 'newname!',
+			"{$this->formName}_bursttemplateid" => 1
+		);
+
+		$this->pdfEditPage->beforeLoad($_POST, $_POST, $_REQUEST);
+		$this->pdfEditPage->load();
+
+		// Extract the correct serialnum out of the form and stick it into the POST!
+		$serialnum = $this->pdfEditPage->form->serialnum;
+		$_POST["{$this->formName}-formsnum"] = $_REQUEST["{$this->formName}-formsnum"] = $serialnum;
+		
+		$this->pdfEditPage->afterLoad();
+		
+		unset_exit_overload();
 	}
 }
 
