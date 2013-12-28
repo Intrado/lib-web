@@ -65,7 +65,7 @@ class ApiStub {
 		return($this->sendRequest('GET', $node));
 	}
 
-	public function ppiPut($node = '', $data = null) {
+	public function put($node = '', $data = null) {
 		return($this->sendRequest('PUT', $node, $data));
 	}
 
