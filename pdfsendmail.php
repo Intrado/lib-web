@@ -81,8 +81,8 @@ class PdfSendMail extends PageForm
 
 		$this->form->handleRequest();
 		if ($this->form->getSubmit()) {
-			// if user submits a search, update SESSION['tips'] with latest form data 
-			$_SESSION['tips'] = $this->form->getData();
+			// if user submits a search, update SESSION['sendmail'] with latest form data 
+			$_SESSION['sendmail'] = $this->form->getData();
 			// then reload (redirect to) self (with new data)
 			redirect('pdfsendmail.php');
 		}
@@ -177,10 +177,6 @@ class PdfSendMail extends PageForm
 				"helpstep" => 1
 			),
 		);
-	}
-
-	public function curlRequest() {
-		// https://sandbox.testschoolmessenger.com/kbhigh/api/2/users/8629/roles/1/settings/jobtypes?limit=1000
 	}
 
 }
