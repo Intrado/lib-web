@@ -14,10 +14,15 @@
  * ref: https://github.com/php-test-helpers/php-test-helpers
  * ref: http://thedeveloperworldisyours.com/php/phpunit-tips/
  *
+ * @todo - see if the runkit functions will satisfy the needs that we got out of
+ * test_helpers; runkit seems to be more powerful/capable, so maybe we don't need
+ * both.
+ *
  * @package unittests
  * @version 1.0
  */
 
+require_once(realpath(dirname(dirname(__FILE__)) .'/PhpStub.php'));
 require_once(realpath(dirname(dirname(__FILE__)) .'/konaenv.php'));
 require_once(realpath(dirname(dirname(__FILE__)) .'/DBStub.php'));
 require_once(realpath(dirname(dirname(__FILE__)) .'/ApiStub.php'));
@@ -26,7 +31,7 @@ require_once(realpath(dirname(dirname(__FILE__)) .'/ApiStub.php'));
 /**
  * Test Class for PDF Edit Page
  */
-class PfdEditPageTest extends PHPUnit_Framework_TestCase {
+class PdfEditPageTest extends PHPUnit_Framework_TestCase {
 	const USER_ID = 1;
 	const ACCESS_ID = 3;
 
@@ -108,7 +113,7 @@ class PfdEditPageTest extends PHPUnit_Framework_TestCase {
 			)
 		);
 
-		// 6) API response: a single burst record (with id=1)
+		// 6) API response: retrieve a single burst record (with id=1)
 		$queryRules->add('|"method":"GET","node":"\\\/bursts\\\/1","data":null|',
 			array(
 				array(
@@ -119,6 +124,27 @@ class PfdEditPageTest extends PHPUnit_Framework_TestCase {
 			)
 		);
 
+		// 7) API response: update a single burst record (with id=1)
+		$queryRules->add('|"method":"PUT","node":"\\\/bursts\\\/1","data":{"name":"newname!","burstTemplateId":1}|',
+			array(
+				array(
+					'headers' => 'Content-type: application/json',
+					'body' => '{"id":1,"name":"testname","filename":"testfile.pdf","size":1234,"status":"new","contentId":1,"ownerUser":{"id":1},"uploadTimeStampms":1234,"burstTemplateId":1}',
+					'code' => 200
+				)
+			)
+		);
+
+		// 8) API response: update a single burst record (with id=3, but invalid template id=3)
+		$queryRules->add('|"method":"PUT","node":"\\\/bursts\\\/1","data":{"name":"this one has an invalid template id!","burstTemplateId":3}|',
+			array(
+				array(
+					'headers' => 'Content-type: text/plain',
+					'body' => '',
+					'code' => 404
+				)
+			)
+		);
 
 		// Mock up a USER session
 		require_once("{$konadir}/inc/common.inc.php");
@@ -129,8 +155,8 @@ class PfdEditPageTest extends PHPUnit_Framework_TestCase {
 	}
 
 	// before each test
-	protected function setUp() {
-		global $USER;
+	public function setUp() {
+		global $USER, $HEADERS;
 
 		// Stub out API access
 		$apiClient = new ApiStub('localhost', 'unrealcustomer', $USER->id, 'unrealauthcookiedata');
@@ -141,10 +167,13 @@ class PfdEditPageTest extends PHPUnit_Framework_TestCase {
 
 		// Grab the formName; we're going to need it!
 		$this->formName = $this->pdfEditPage->formName;
+
+		// Clear out any previously captured headers
+		$HEADERS = array();
 	}
 
 	// after each test
-	protected function tearDown() {
+	public function tearDown() {
 		unset($this->pdfEditPage);
 	}
 
@@ -202,6 +231,7 @@ class PfdEditPageTest extends PHPUnit_Framework_TestCase {
 
 	// it handles form submission success by redirecting the client to pdfmanager.php with a notice() message
 	public function test_formSubmitSuccess() {
+		global $HEADERS;
 
 		// Any call to exit/die will end up in this anonymous function now:
 		set_exit_overload(function() { return(false); });
@@ -225,6 +255,44 @@ class PfdEditPageTest extends PHPUnit_Framework_TestCase {
 		$this->pdfEditPage->afterLoad();
 		
 		unset_exit_overload();
+
+		// There should be a location redirect header if the PUT was successful
+		$this->assertTrue(in_array('Location: pdfmanager.php', $HEADERS), 'Expected a successful redirect to pdfmanager.php');
+	}
+
+	// it handles form submission errors by displaying a modal overlay and redisplaying the form
+	public function test_formSubmitFailure() {
+		global $HEADERS;
+
+		// Any call to exit/die will end up in this anonymous function now:
+		set_exit_overload(function() { return(false); });
+		
+		// POST the edit form with burst id = 1 so that we don't have to upload a file for this test
+		$_POST = $_REQUEST = array(
+			'submit' => 'submit',
+			'form' => $this->formName,
+			"{$this->formName}_id" => 1,
+			"{$this->formName}_name" => 'this one has an invalid template id!',
+			"{$this->formName}_bursttemplateid" => 3
+		);
+
+		$this->pdfEditPage->beforeLoad($_POST, $_POST, $_REQUEST);
+		$this->pdfEditPage->load();
+
+		// Extract the correct serialnum out of the form and stick it into the POST!
+		$serialnum = $this->pdfEditPage->form->serialnum;
+		$_POST["{$this->formName}-formsnum"] = $_REQUEST["{$this->formName}-formsnum"] = $serialnum;
+		
+		$this->pdfEditPage->afterLoad();
+		$formhtml = $this->pdfEditPage->render();
+		
+		unset_exit_overload();
+
+		// There should NOT be a redirect to the pdfmanager.php page
+		$this->assertFalse(in_array('Location: pdfmanager.php', $HEADERS), 'There should not have been a redirect to pdfmanager.php');
+
+		// There should be an error modal present in the page output which displays automatically on page load
+		$this->assertTrue(false !== strpos($formhtml, "('#pdfeditmodal').modal('show');"), 'Missing expected error modal');
 	}
 }
 
