@@ -346,5 +346,5 @@ END;
 // PAGE INSTANTIATION AND DISPLAY
 // -----------------------------------------------------------------------------
 
-executePage(new PdfEditPage($csApi));
+executePage(new PdfEditPage(isset($csApi) ? $csApi : null));
 
