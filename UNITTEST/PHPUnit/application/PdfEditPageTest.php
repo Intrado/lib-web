@@ -45,8 +45,14 @@ class PdfEditPageTest extends PHPUnit_Framework_TestCase {
 	 * and such things that are normally set under an Apache context before loading...
 	 */
 	public static function setUpBeforeClass() {
-		global $konadir, $queryRules, $USER;
+		global $queryRules, $USER;
 
+		// 1) Hit the reset switch!
+		$queryRules->reset();
+
+		// Something about being a static method called before instantiation prevents
+		// $konadir from being seen as a regular global as it is normally...
+		$konadir = $GLOBALS['konadir'];
 
 		// Mock up some superglobal "server" data to make it look like we were requested through apache
 		$_SERVER['SERVER_NAME'] = 'localhost';
