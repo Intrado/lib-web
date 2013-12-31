@@ -188,7 +188,10 @@ function Query($query, $dbconnect=false, $args=false) {
 
 function QuickQuery($query, $dbconnect=false, $args=false) {
 	global $queryRules;
-	return(new QueryResult($queryRules->apply($query, $args)));
+	$queryResult = new QueryResult($queryRules->apply($query, $args));
+	$row = $queryResult->fetch(PDO::FETCH_NUM);
+	$value = $row[0];
+	return($value);
 }
 
 
