@@ -16,7 +16,7 @@
  *
  * ; UPDATE 2014-01-02; runkit.so appears to make kona session handling fail; instead it will be loaded
  * ; dynamically in this script, but the configuration directive runkit.internal_override still needs to
- * ; be in the ini file!
+ * ; be in the ini file! test_helpers.so is also being loaded dynamically now.
  */
 
 $HEADERS = array();
@@ -37,5 +37,9 @@ if (function_exists('runkit_function_rename')) {
 }
 else {
 	print "ERROR in PhpStub.php - it looks like PECL runkit is not installed! Check out the code comments here.\n";
+}
+
+if (! dl('test_helpers.so')) {
+	print "ERROR in PhpStub.php - test_helpers could not be loaded dynamically!\n";
 }
 

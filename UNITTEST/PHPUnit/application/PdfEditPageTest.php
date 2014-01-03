@@ -18,6 +18,10 @@
  * test_helpers; runkit seems to be more powerful/capable, so maybe we don't need
  * both.
  *
+ * UPDATE 2014-01-02; test_helpers.so is now being loaded dynamically in PhpStub.php,
+ * so there is no need to put it into php.ini as described above. It DOES need to be
+ * installed and positioned correctly in the filesystem though!
+ *
  * @package unittests
  * @version 1.0
  */
