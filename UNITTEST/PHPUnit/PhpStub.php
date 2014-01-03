@@ -11,9 +11,12 @@
  * rmdir /usr/commsuite/server/php//lib/php/extensions/no-debug-non-zts-20090626
  *
  * ; Add these to /usr/commsuite/server/php/lib/php.ini
- * extension=runkit.so
+ * ; extension=runkit.so
  * runkit.internal_override=1
  *
+ * ; UPDATE 2014-01-02; runkit.so appears to make kona session handling fail; instead it will be loaded
+ * ; dynamically in this script, but the configuration directive runkit.internal_override still needs to
+ * ; be in the ini file!
  */
 
 $HEADERS = array();
@@ -22,6 +25,10 @@ function stub_header($text) {
 	global $HEADERS;
 
 	$HEADERS[] = $text;
+}
+
+if (! dl('runkit.so')) {
+	print "ERROR in PhpStub.php - runkit could not be loaded dynamically!\n";
 }
 
 if (function_exists('runkit_function_rename')) {
