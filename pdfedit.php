@@ -62,19 +62,41 @@ class PdfEditPage extends PageForm {
 
 	public function load(&$get=array(), &$post=array(), &$request=array(), &$session=array()) {
 
-		// Get the data for this burst record
-		$this->burstData = $this->getBurstData($this->burstId);
+		// If we're editing an existing one, get its data
+		if (! is_null($this->burstId)) {
+
+			// Pull in the current data for this PDF Burst record
+			$this->burstData = $this->csApi->getBurstData($this->burstId);
+
+		}
+		else {
+			$this->burstData = (object) null;
+			$this->burstData->name = '';
+			$this->burstData->burstTemplateId = '';
+			$this->burstData->filename = '';
+		}
 
 		// If there was a data reload issue
-		if ($this->checkReload($this->burstId)) {
+		if (! is_null($this->burstId)) {
+			// If we have been flagged as having reloaded on account of data having changed...
+			if (isset($_SESSION['burstreload'])) {
 
-			// Add this error message to the page output, but still
-			// allow the form to be displayed to take edits and resubmit
-			$this->error = _L("This PDF Document's record was changed in another window or session. Please review the current data and reapply any additional changes needed, then resubmit.");
+				// Clear the flag and set the error message; this will allow the message to display, but
+				// upon dismissal show the form repopulated with the freshly loaded burst data from above
+				unset($_SESSION['burstreload']);
+	
+				// Add this error message to the page output, but still
+				// allow the form to be displayed to take edits and resubmit
+				$this->error = _L("This PDF Document's record was changed in another window or session. Please review the current data and reapply any additional changes needed, then resubmit.");
+			}
 		}
 
 		// Get a list of burst templates
-		$this->loadBurstTemplatesInto($this->burstTemplates);
+		if (is_object($res = Query('SELECT `id`, `name` FROM `bursttemplate` WHERE NOT `deleted`;'))) {
+			while ($row = DBGetRow($res, true)) {
+				$this->burstTemplates[$row['id']] = $row['name'];
+			 }
+		}
 
 		// Make the edit FORM
 		$this->form = $this->factoryFormPDFUpload();
@@ -140,83 +162,6 @@ class PdfEditPage extends PageForm {
 	}
 
 	/**
-	 * Check if burst reload has been flagged and add an error to the output if so
-	 *
-	 * If the user submitted the form for editing an existing burst record, but the
-	 * server data indicates that the data has changed (in another window/session,
-	 * etc) since they originally displayed the form, then the submission handler
-	 * will set the 'burstreload' flag in the session data which we will catch and
-	 * unset here with a a true return value indicating that there was a problem.
-	 * This allows the form to be redisplayed with now-current data from the server
-	 * and the user will have to start over with edits, if any are still necessary.
-	 *
-	 * @param integer $burstId The ID of the burst record we're looking at; null if new
-	 *
-	 * @return boolean true if there was a reload issue, else false
-	 */
-	public function checkReload($burstId) {
-		if (! is_null($burstId)) {
-			// If we have been flagged as having reloaded on account of data having changed...
-			if (isset($_SESSION['burstreload'])) {
-
-				// Clear the flag and set the error message; this will allow the message to display, but
-				// upon dismissal show the form repopulated with the freshly loaded burst data from above
-				unset($_SESSION['burstreload']);
-				return(true);
-			}
-		}
-
-		return(false);
-	}
-
-	/**
-	 * Get burst data for the specified ID
-	 *
-	 * If the burstId is null then we'll get a new burst record object out of
-	 * this with values suitable for use as form defaults.
-	 *
-	 * @param integer $burstId The ID of the burst record we're interested in
-	 *
-	 * @return object A method-less, data-only onject with the burst data properties
-	 */
-	public function getBurstData($burstId) {
-		// If we're editing an existing one, get its data
-		if (! is_null($burstId)) {
-
-			// Pull in the current data for this PDF Burst record
-			$burstData = $this->csApi->getBurstData($burstId);
-
-		}
-		else {
-			$burstData = (object) null;
-			$burstData->name = '';
-			$burstData->burstTemplateId = '';
-			$burstData->filename = '';
-		}
-
-		return($burstData);
-	}
-
-	/**
-	 * Get the list of burst templates directly from the database
-	 *
-	 * There is no API support for this at this time, so we have to go direct. The resulting array
-	 * is stored in an instance property, $this->burstTemplates.
-	 *
-	 * @todo Put burst template data access into the commsuite API!
-	 *
-	 * @param array $target Associative array to save the discovered list of
-	 * id/name pairs for available burst templates, indexed by id
-	 */
-	public function loadBurstTemplatesInto(&$target) {
-		if (is_object($res = Query('SELECT `id`, `name` FROM `bursttemplate` WHERE NOT `deleted`;'))) {
-			while ($row = DBGetRow($res, true)) {
-				$target[$row['id']] = $row['name'];
-			 }
-		}
-	}
-
-	/**
 	 * Factory method to spit out a form object for PDF uploads
 	 *
 	 * FIXME - Commsuite API supports no validation for things like duplicate names, invalid tempalte id's
@@ -244,6 +189,11 @@ class PdfEditPage extends PageForm {
 				"control" => array('SelectMenu', 'values' => (array('' => _L('Select PDF Template')) + $this->burstTemplates)),
 				"helpstep" => 2
 			)
+		);
+
+                $helpsteps = array (
+			_L('Templatehelpstep 1'),
+			_L('Templatehelpstep 2')
 		);
 
 		// If we already have a burstId
@@ -281,13 +231,9 @@ class PdfEditPage extends PageForm {
 				"control" => array('FileUpload'),
 				"helpstep" => 3
 			);
+			$helpsteps[] = _L('Templatehelpstep 3');
 		}
 
-                $helpsteps = array (
-			_L('Templatehelpstep 1'),
-			_L('Templatehelpstep 2'),
-			_L('Templatehelpstep 3')
-		);
 
 		$buttons = array(
 			submit_button(_L($this->burstId ? 'Save' : 'Upload'), 'submit', 'tick'),
