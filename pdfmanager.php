@@ -43,10 +43,7 @@ class PdfManager extends PageBase {
 
 	function __construct($csApi) {
 		$this->csApi = $csApi;
-		parent::pageBase();
-
-		$this->customerURLComponent = customerUrlComponent();
-		$this->burstsURL = $this->csApi->getBurstApiUrl();
+		parent::__construct();
 	}
 	
 	// @override
@@ -57,13 +54,16 @@ class PdfManager extends PageBase {
 
 	// @override
 	public function initialize() {
-		// override some options on PageBase
+		// override title and page options on PageBase
 		$this->options["title"] = $this->pageTitle;
 		$this->options["page"]  = $this->pageNav;
 	}
 
 	// @override
 	public function beforeLoad($get, $post) { 
+		$this->customerURLComponent = customerUrlComponent();
+		$this->burstsURL = $this->csApi->getBurstApiUrl();
+
 		// if delete request, execute delete API call and exit, 
 		// which upon a successful response (200) will reload pdfmanager.php page (via JS in pdfmanager.js)
 		if (isset($post['delete']) && $post['delete']) {
