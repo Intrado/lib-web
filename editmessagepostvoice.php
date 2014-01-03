@@ -112,7 +112,7 @@ $formdata = array(
 			array("ValRequired"),
 			array("ValMessageBody", "messagegroupid" => $messagegroup->id)),
 		"control" => array("PhoneMessageEditor",
-			"enablefieldinserts" => "limited",
+			"enablefieldinserts" => false,
 			"messagegroupid" => $messagegroup->id,
 			"phone" => $USER->phone,
 			"languages" => array(Language::getDefaultLanguageCode() => Language::getName(Language::getDefaultLanguageCode())),
