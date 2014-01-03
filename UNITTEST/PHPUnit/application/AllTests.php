@@ -19,7 +19,6 @@ class application_AllTests {
 
 		// List of test classes to exclude
 		$exceptions = Array(
-			'PdfManagerTest',	// FIXME - this class needs something fixed for the csApi initialization; check with Justin Burns on intent
 			'FailSampleTest'	// TODO - disable this exception if you want to see the CI server catch an error and stop the build process.
 		);
 
