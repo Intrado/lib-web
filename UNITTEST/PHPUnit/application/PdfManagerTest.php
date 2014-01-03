@@ -8,15 +8,11 @@
  */
 
 require_once(realpath(dirname(dirname(__FILE__)) .'/konaenv.php'));
-require_once(realpath(dirname(dirname(__FILE__)) .'/DBStub.php'));
-
-require_once('../../../ifc/Page.ifc.php');
-require_once('../../../obj/PageBase.obj.php');
-// ----------------------------------------------------------------------------
-
 require_once("{$konadir}/pdfmanager.php");
 
-// Simple test user class used to set $USER obj
+// Simple TestUser class used to set $USER object
+// We only need the $user->id and $user->getSetting() method for action_link calls (html.inc.php)
+// in PdfManager->getBurstListItem() 
 class TestUser {
 	var $id;
 
@@ -32,21 +28,24 @@ class TestUser {
 
 class PdfManagerTest extends PHPUnit_Framework_TestCase {
 	
-	private $pageBase;
-	private $pdfManager;
-	private $apiClient;
+	var $pageBase;
+	var $pdfManager;
+	var $apiClient;
+	var $csApi;
 
 	public function setup() {
-		global $USER, $csApi;
+		global $USER;
 
 		$USER = new TestUser(1);
 
-		$_SERVER = array(
-			'SERVER_NAME' => 'localhost',
-			'SCRIPT_NAME' => '/custname/pdfmanager.php'
-		);
-		$_COOKIE = array('custname_session' => 'cookie123');
+		// data for ApiClient
+		$_SERVER['SERVER_NAME'] = 'localhost';
+		$_COOKIE['custname_session'] = 'cookie123';
 
+		// data for global function: customerUrlComponent()
+		$_SERVER['SCRIPT_NAME'] = '/custname/pdfmanager.php';
+
+		// create (unmocked) ApiClient object to be passed into CommsuiteApiClient mock object's constructor below
 		$this->apiClient = new ApiClient(
 			$_SERVER['SERVER_NAME'],
 			'custname',
@@ -54,20 +53,22 @@ class PdfManagerTest extends PHPUnit_Framework_TestCase {
 			$_COOKIE['custname_session']
 		);
 
-		// $csApi = new CommsuiteApiClient($this->apiClient);
-
-		$csApi = $this->getMockBuilder('CommsuiteApiClient')
-					  ->setConstructorArgs(array($this->apiClient))
-					  ->getMock();
+		// create mock object of CommsuiteApiClient and stub only the methods used in pdfmanager.php
+		// with fake responses. We don't use/care about the other methods here so by default they will return null
+		// by the mock object. 
+		$this->csApi = $this->getMockBuilder('CommsuiteApiClient')
+							->setConstructorArgs(array($this->apiClient))
+							->getMock();
 		
-		$csApi->expects($this->any())
-			  ->method('getBurstApiUrl')
-			  ->will($this->returnValue('https://localhost/custname/api/2/users/1/bursts'));
+		// define stub for getBurstApiUrl
+		$this->csApi->expects($this->any())
+			  		->method('getBurstApiUrl')
+			  		->will($this->returnValue('https://localhost/custname/api/2/users/1/bursts'));
 
-
-		$csApi->expects($this->any())
-			  ->method('getBurstList')
-			  ->will($this->returnValue(
+		// define stub for getBurstList
+		$this->csApi->expects($this->any())
+			  		->method('getBurstList')
+			  		->will($this->returnValue(
 				  (object) array(
 					'bursts' => array(
 							(object) array(
@@ -119,70 +120,67 @@ class PdfManagerTest extends PHPUnit_Framework_TestCase {
 					)
 				  )));
 
-		$csApi->expects($this->any())
-			  ->method('deleteBurst')
-			  ->will($this->returnValue(true));
+		// define stub for deleteBurst
+		$this->csApi->expects($this->any())
+					->method('deleteBurst')
+					->will($this->returnValue(true));
 
-		$this->pdfManager = new PdfManager($csApi);
+		// create PdfManager object and pass in our configured mock CommsuiteApiClient object
+		$this->pdfManager = new PdfManager($this->csApi);
 
 	}
 
 	public function tearDown() {
-		$this->pdfManager = null;
+		unset($this->pdfManager);
 	}
 
 	public function test_initialize() {
-		global $csApi;
 
-		// creating a new instance of PdfManager calls initialize() in it's constructor,
-		// so there's no need to call it after instantiation below, ex. no need for $this->pdfManager->initialize().
+		// creating a new instance of PdfManager (in setup() above) calls initialize() in it's parent constructor,
+		// so there's no need to call it in this test method, as it has already been called at the start of this test
 
 		$this->assertEquals($this->pdfManager->options['title'], 'PDF Manager');
 		$this->assertEquals($this->pdfManager->options['page'], 'notifications:pdfmanager');
-
-		// custName gets set by call to global function in common.inc: customerUrlComponent()
-		$this->assertEquals($this->pdfManager->customerURLComponent, 'custname');
-
-		// assert that burstsURL is set as expected ()
-		$this->assertEquals('https://localhost/custname/api/2/users/1/bursts', $this->pdfManager->burstsURL);
-
-
 	}
 
 	public function test_beforeLoad_NoDelete() {
-		global $get, $post, $csApi; 
+		global $get, $post; 
 
 		$get['ajax'] = true;
 		$get['pagestart'] = 123;
 
 		$this->pdfManager->beforeLoad($get, $post);
 
-		$this->assertEquals($this->pdfManager->isAjaxRequest, true);
-		$this->assertEquals($this->pdfManager->pagingStart, 123);
+		// custName gets set by call to global function in common.inc: customerUrlComponent()
+		$this->assertEquals('custname', $this->pdfManager->customerURLComponent);
 
+		// assert that burstsURL is set as expected ()
+		$this->assertEquals('https://localhost/custname/api/2/users/1/bursts', $this->pdfManager->burstsURL);
+
+		$this->assertEquals(true, $this->pdfManager->isAjaxRequest);
+		$this->assertEquals(123, $this->pdfManager->pagingStart);
 	}
 
 	public function test_beforeLoad_WithDelete() {
-		global $get, $post, $csApi;
+		global $get, $post;
 
 		$post['delete'] = true;
 		$post['id'] = 234;
 
-		// mock deleteAjaxResponse() method only, so we don't call the real method;
-		// the behaviour of the other methods is not changed
-		// $this->pdfManagerMock = $this->getMock('PdfManager', array('deleteAjaxResponse'));
-
+		// create a mock PdfManager object and only mock the deleteAjaxResponse() method, 
+		// the behaviour of the other methods is not changed.
 		$this->pdfManagerMock = $this->getMockBuilder('PdfManager')
-									 ->setConstructorArgs(array($csApi))
+									 ->setConstructorArgs(array($this->csApi))
 									 ->setMethods(array('deleteAjaxResponse'))
 									 ->getMock();
 
-		// define expectation when calling the deleteAjaxResponse() method with the $post[id] data 
+		// define expectation (stub) when calling the deleteAjaxResponse() method with the $post[id] data 
 		$this->pdfManagerMock->expects($this->once())
 						     ->method('deleteAjaxResponse')
 						     ->with($post['id'])
 						     ->will($this->returnValue(true));
 
+		// define expecation that this method should never get called in this case
 		$this->pdfManagerMock->expects($this->never())
 					   		 ->method('setPagingStart');
 
@@ -190,16 +188,18 @@ class PdfManagerTest extends PHPUnit_Framework_TestCase {
 		$this->pdfManagerMock->beforeLoad($get, $post);
 
 		// isAjaxRequest should not get set, 
-		$this->assertEquals($this->pdfManagerMock->isAjaxRequest, false);
+		$this->assertEquals(false, $this->pdfManagerMock->isAjaxRequest);
 	}
 
 	public function test_load() {
-		global $csApi;
+		// create a mock PdfManager object and only mock the getAuthOrgKeys() method, 
+		// the behaviour of the other methods is not changed.
 		$this->pdfManagerMock = $this->getMockBuilder('PdfManager')
-							 ->setConstructorArgs(array($csApi))
+							 ->setConstructorArgs(array($this->csApi))
 							 ->setMethods(array('getAuthOrgKeys'))
 							 ->getMock();
 		
+		// define stub for getAuthOrgKeys
 		$this->pdfManagerMock->expects($this->any())
 					   ->method('getAuthOrgKeys')
 					   ->will($this->returnValue(array(
@@ -226,16 +226,19 @@ class PdfManagerTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function test_afterLoad() {
-		global $csApi;
-
+		// create a mock PdfManager object and only mock the setDisplayPagingDetails() and 
+		// burstsAjaxResponse() methods, the behaviour of the other methods is not changed.
 		$this->pdfManagerMock = $this->getMockBuilder('PdfManager')
-					 ->setConstructorArgs(array($csApi))
+					 ->setConstructorArgs(array($this->csApi))
 					 ->setMethods(array('setDisplayPagingDetails', 'burstsAjaxResponse'))
 					 ->getMock();
 
+		// defines expectation that method is called once (with no args)
 		$this->pdfManagerMock->expects($this->once())
 					   ->method('setDisplayPagingDetails')
 					   ->with();
+
+		// defines expectation that method is called once (with no args)
 		$this->pdfManagerMock->expects($this->once())
 					   ->method('burstsAjaxResponse')
 					   ->with();
@@ -257,9 +260,7 @@ class PdfManagerTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function test_setDisplayPagingDetails_WithFeedData() {
-		global $csApi;
-
-		$feedResponse = $csApi->getBurstList();
+		$feedResponse = $this->csApi->getBurstList();
 		$this->pdfManager->feedData = $feedResponse->bursts;
 
 		$this->pdfManager->setDisplayPagingDetails();
@@ -272,9 +273,7 @@ class PdfManagerTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function test_displayBurstItem() {
-		global $csApi;
-
-		$feedResponse = $csApi->getBurstList();
+		$feedResponse = $this->csApi->getBurstList();
 		$this->pdfManager->feedData = $feedResponse->bursts;
 
 		foreach ($this->pdfManager->feedData as $burstObj) {
