@@ -14,9 +14,8 @@
  * ref: https://github.com/php-test-helpers/php-test-helpers
  * ref: http://thedeveloperworldisyours.com/php/phpunit-tips/
  *
- * @todo - see if the runkit functions will satisfy the needs that we got out of
- * test_helpers; runkit seems to be more powerful/capable, so maybe we don't need
- * both.
+ * @todo - note that runkit functions CAN NOT satisfy the needs that we get out of
+ * test_helpers
  *
  * UPDATE 2014-01-02; test_helpers.so is now being loaded dynamically in PhpStub.php,
  * so there is no need to put it into php.ini as described above. It DOES need to be
@@ -206,13 +205,34 @@ class PdfEditPageTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(false !== strpos($formhtml, "{$this->formName}_thefile"), 'Missing file input field');
 	}
 
-	// it prepopulates the form fields with values from an existing record if specified (converts the file input into a read-only string)
-	public function test_editExistingForm() {
+	// it redirects the request to edit a specific records after stashing the ID into the session
+	public function test_editExistingRedirect() {
+		global $HEADERS;
+
 
 		// Load up the edit form with burst id = 1
 		$data = array('id' => 1);
 
+		// Any call to exit/die will end up in this anonymous function now:
+		set_exit_overload(function() { return(false); });
+
 		$this->pdfEditPage->beforeLoad($data, $data, $data);
+
+		unset_exit_overload();
+
+		// Strange, but self-referential redirect in CLI actually goes to PHPUNIT binary - hah!
+		$this->assertTrue(in_array('Location: /usr/commsuite/server/php/bin/phpunit', $HEADERS), 'Expected a successful redirect to pdfedit.php');
+	}
+
+
+	// it prepopulates the form fields with values from an existing record if specified (converts the file input into a read-only string)
+	public function test_editExistingForm() {
+
+		// Load up the edit form with burst id = 1
+		$_SESSION['burstid'] = 1;
+		$empty = array();
+
+		$this->pdfEditPage->beforeLoad($empty, $empty, $empty, $_SESSION);
 		$this->pdfEditPage->load();
 		$this->pdfEditPage->afterLoad();
 		$formhtml = $this->pdfEditPage->render();
@@ -233,7 +253,7 @@ class PdfEditPageTest extends PHPUnit_Framework_TestCase {
 		$this->assertFalse(strpos($formhtml, "{$this->formName}_thefile"), 'File input field should NOT be present on this form');
 
 		// There should be a hidden text field though with the burst ID so that the post handler knows where to send the data
-		$this->assertTrue(false !== strpos($formhtml, "{$this->formName}_id\" type=\"hidden\""), 'Missing hidden id field');
+		//$this->assertTrue(false !== strpos($formhtml, "{$this->formName}_id\" type=\"hidden\""), 'Missing hidden id field');
 
 		// And the output should contain some read-only text with the name of the PDF file as well
 		$this->assertTrue(false !== strpos($formhtml, 'class="formcontrol cf">testfile.pdf'), 'Missing read-only PDf filename text');
@@ -250,12 +270,13 @@ class PdfEditPageTest extends PHPUnit_Framework_TestCase {
 		$_POST = $_REQUEST = array(
 			'submit' => 'submit',
 			'form' => $this->formName,
-			"{$this->formName}_id" => 1,
 			"{$this->formName}_name" => 'newname!',
 			"{$this->formName}_bursttemplateid" => 1
 		);
 
-		$this->pdfEditPage->beforeLoad($_POST, $_POST, $_REQUEST);
+		$_SESSION['burstid'] = 1;
+
+		$this->pdfEditPage->beforeLoad($_POST, $_POST, $_REQUEST, $_SESSION);
 		$this->pdfEditPage->load();
 
 		// Extract the correct serialnum out of the form and stick it into the POST!
@@ -281,12 +302,13 @@ class PdfEditPageTest extends PHPUnit_Framework_TestCase {
 		$_POST = $_REQUEST = array(
 			'submit' => 'submit',
 			'form' => $this->formName,
-			"{$this->formName}_id" => 1,
 			"{$this->formName}_name" => 'this one has an invalid template id!',
 			"{$this->formName}_bursttemplateid" => 3
 		);
 
-		$this->pdfEditPage->beforeLoad($_POST, $_POST, $_REQUEST);
+		$_SESSION['burstid'] = 1;
+
+		$this->pdfEditPage->beforeLoad($_POST, $_POST, $_REQUEST, $_SESSION);
 		$this->pdfEditPage->load();
 
 		// Extract the correct serialnum out of the form and stick it into the POST!

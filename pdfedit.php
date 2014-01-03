@@ -48,12 +48,16 @@ class PdfEditPage extends PageForm {
 
 	public function beforeLoad(&$get=array(), &$post=array(), &$request=array(), &$session=array()) {
 
-		// The burst ID will be in the form POST data or on the URL queryString, or unset...
-		if (isset($post["{$this->formName}_id"]) && intval($post["{$this->formName}_id"])) {
-			$this->burstId = intval($post["{$this->formName}_id"]);
+		if (isset($request['id']) && intval($request['id'])) {
+
+			// Peel the burst ID off the URL, stash it in the session...
+			$_SESSION['burstid'] = intval($request['id']);
+
+			// .. then redirect back to ourselves to clean up the URL
+			redirect(); 
 		}
-		else if (isset($request['id']) && intval($request['id'])) {
-			$this->burstId = intval($request['id']);
+		else if (isset($_SESSION['burstid'])) {
+			$this->burstId = $_SESSION['burstid'];
 		}
 		else {
 			$this->burstId = null;
@@ -67,7 +71,6 @@ class PdfEditPage extends PageForm {
 
 			// Pull in the current data for this PDF Burst record
 			$this->burstData = $this->csApi->getBurstData($this->burstId);
-
 		}
 		else {
 			$this->burstData = (object) null;
@@ -128,6 +131,7 @@ class PdfEditPage extends PageForm {
 			if ($this->csApi->setBurstData($this->burstId, $name, $bursttemplateid)) {
 
 				// For success, we redirect back to the manager page with this notice to be shown on that page:
+				unset($_SESSION['burstid']);
 				notice(_L("The PDF Document was successfully {$action}"));
 				redirect('pdfmanager.php');
 			} else {
@@ -198,20 +202,9 @@ class PdfEditPage extends PageForm {
 
 		// If we already have a burstId
 		if (! is_null($this->burstId)) {
-			// Then a file has already been uploaded
 
-			// Hide the ID from sight!
-			$formdata['id'] = array(
-				'label' => 'thisshouldntneedalabel', // FIXME: Form.obj.php breaks without this
-				'value' => $this->burstId,
-				'control' => array('HiddenField'),
-				'validators' => Array(
-					array('ValRequired'),
-					array('ValNumber', 'min' => 1)
-				)
-			);
-
-			// we're just going to show a read-only representation
+			// Then a file has already been uploaded; we're 
+			// just going to show a read-only representation
 			$formdata['existingpdf'] = array(
 				"label" => _L('PDF Document'),
 				'value' => 'thisshouldntneedavalue', // FIXME: Form.obj.php breaks without this
@@ -241,7 +234,7 @@ class PdfEditPage extends PageForm {
 		);
 
 		// A new form with some defaults overridden...
-		$form = new Form($this->formName, $formdata, $helpsteps, $buttons, 'vertical');
+		$form = new Form($this->formName, $formdata, $helpsteps, $buttons);
 		$form->multipart = (! $this->burstId);	// We only need multi-part encoding if we're uploading a new one
 		$form->ajaxsubmit = false;		// We can't use AJAX form handling for multipart file uploads
 
