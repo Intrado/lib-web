@@ -155,7 +155,7 @@ class PdfManager extends PageBase {
 
 		$tools = action_links (
 			action_link(" Edit", "pencil", 'pdfedit.php?id=' . $id),
-			action_link(" Send Email", "email_go", $this->burstsURL . "/" . $id. "/send"),
+			action_link(" Send Email", "email_go", 'pdfsendmail.php?id=' . $id),
 			action_link(" Download", "pdficon_16", $this->burstsURL . '/' . $id. '/pdf'),
 			action_link(" Delete", "cross", '#', "deleteBurst(".$id.");")
 		);

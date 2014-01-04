@@ -1,3 +1,4 @@
+/********** PDF Manager styles *****************/
 .pagetitle {
 	display: none;
 }
@@ -23,4 +24,46 @@
 }
 #feeditems .content_row:hover {
 	background: #fcfcfc;
-} 
+}
+
+/******* PDF Send Mail styles ********/
+#pdfsendmail button.btn[name=submit] {
+    margin-left: 160px;
+}
+#pdfsendmail select, #pdfsendmail input, #pdfsendmail textarea {
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-size: 14px;
+	padding: 6px;
+	border: 1px solid #ccc;
+}
+#pdfsendmail textarea {
+	width: 80%;
+	height: 300px;
+}
+#sendmail-broadcast-instruction {
+    border-bottom: 1px solid #ddd;
+    color: #444444;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 21px;
+    margin: 0 15px 10px;
+    padding-bottom: 10px;
+}
+#pdfsendmail_skipstart, #pdfsendmail_skipend, #pdfsendmail_pagesperreport {
+	width: 50px;
+}
+#pdfsendmail .pdfsendmail-instruction {
+	border-top:1px solid #ccc;
+	margin:15px 15px 0;
+	padding-top:10px;
+}
+#pdfsendmail .pdfsendmail-instruction .secure-lock {
+	background: url("../img/icons/pictos/p2/16/41.png") no-repeat center center transparent;
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	margin-right: 10px;
+}
+#pdfsendmail .bold {
+	font-weight: bold;
+}

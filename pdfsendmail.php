@@ -76,7 +76,7 @@ class PdfSendMail extends PageForm
 	public function afterLoad() {
 
 		$this->setFormData();
-		$this->form = new Form($this->formName, $this->formdata, null, array( submit_button(_L(' Send'), 'send', 'pictos/p1/16/59')));
+		$this->form = new Form($this->formName, $this->formdata, null, array( submit_button(_L(' Send Now'), 'send', 'pictos/p1/16/59')));
 		$this->form->ajaxsubmit = false;
 
 		$this->form->handleRequest();
@@ -91,10 +91,10 @@ class PdfSendMail extends PageForm
 	// @override
 	public function sendPageOutput() {
 		global $TITLE;
-		startWindow('Send Email');
+        echo '<link rel="stylesheet" type="text/css" href="css/pdfmanager.css">';
+		startWindow('Email PDF Reports');
 
-		echo '<link rel="stylesheet" type="text/css" href="css/tips.css">
-			  <div id="tip-icon"></div><div id="tip-search-instruction">Specify a broadcast name and select the desired broadcast type for this message.</div>';
+		echo '<div id="sendmail-broadcast-instruction">Specify a broadcast name and select the desired broadcast type for this message.</div>';
 		// render search form
 		echo $this->form->render();
 		endWindow(); 
@@ -104,12 +104,29 @@ class PdfSendMail extends PageForm
 
 	/*=============== non-override helper methods below =================*/
 
+	public function getUserBroadcastTypes() {
+		return JobType::getUserJobTypes(false);
+	}
 
 	public function setFormData() {
-		$userjobtypes = JobType::getUserJobTypes(false);
-		$jobtypes = array();
-		foreach ($userjobtypes as $id => $jobtype) {
-			$jobtypes[$id] = $jobtype->name;
+		$userBroadcastTypes = $this->getUserBroadcastTypes();
+		$broadcastTypes = array();
+		
+		foreach ($userBroadcastTypes as $id => $jobtype) {
+			$broadcastTypes[$id] = $jobtype->name;
+		}
+
+		// sort broadcastTypes ascending (A-Z) in dropdown for better usability
+		asort($broadcastTypes);
+
+		// check for a 'general' job type in $broadcastTypes and if found, use it as the 'value'
+		// for the broadcasttype control in the formdata, which sets selected item 
+		// in dropdown to 'General' as default selected job type
+		foreach ($broadcastTypes as $id => $value) {
+			if (strcasecmp($value, "general") == 0) {
+				$defaultGeneralTypeId = $id;
+				break;
+			}
 		}
 
 		$this->formdata = array(
@@ -127,9 +144,16 @@ class PdfSendMail extends PageForm
 				"label" => _L('Broadcast Type'),
 				"validators" => array(
 					array('ValRequired'),
-					array("ValInArray", "values" => array_keys($jobtypes))),
-				"value" => $jobtypes[0],
-				"control" => array('SelectMenu', 'values' => $jobtypes),
+					array("ValInArray", "values" => array_keys($broadcastTypes))),
+				"value" => $defaultGeneralTypeId ? $defaultGeneralTypeId : $broadcastTypes[0],
+				"control" => array('SelectMenu', 'values' => $broadcastTypes),
+				"helpstep" => 1
+			),
+			"passwordprotected" => array(
+				"label" => "Require Password",
+				"value" => "",
+				"validators" => array(),
+				"control" => array("Checkbox"),
 				"helpstep" => 1
 			),
 
@@ -176,6 +200,36 @@ class PdfSendMail extends PageForm
 				"control" => array("TextArea"),
 				"helpstep" => 1
 			),
+
+			// PDF splitting/template info
+			// "skipstart" => array(
+			// 	"label" => _L('Skip @ start'),
+			// 	"value" => '0',
+			// 	"validators" => array(),
+			// 	"control" => array("TextField"),
+			// 	"helpstep" => 1
+			// ),
+			// "skipend" => array(
+			// 	"label" => _L('Skip @ end'),
+			// 	"value" => '0',
+			// 	"validators" => array(),
+			// 	"control" => array("TextField"),
+			// 	"helpstep" => 1
+			// ),
+			// "pagesperreport" => array(
+			// 	"label" => _L('Pages / Report'),
+			// 	"value" => '1',
+			// 	"validators" => array(),
+			// 	"control" => array("TextField"),
+			// 	"helpstep" => 1
+			// ),
+			// "template" => array(
+			// 	"label" => _L('Template'),
+			// 	"value" => 'Test Template',
+			// 	"validators" => array(),
+			// 	"control" => array("TextField"),
+			// 	"helpstep" => 1
+			// )
 		);
 	}
 
