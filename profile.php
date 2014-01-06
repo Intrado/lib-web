@@ -748,7 +748,7 @@ $quicktip_formdata = array(
 	_L('QuickTip Controls'),
 	"taicanbetopicrecipient" => array(
 		"label" => _L('Topic Recipient'),
-		"fieldhelp" => _L('Allows users to receive Quick Tip messages.'),
+		"fieldhelp" => _L('Allows users to receive Quick Tip messages. IMPORTANT: Users with this enabled will receive an email each time a tip is submitted.'),
 		"value" => $obj->getValue("tai_canbetopicrecipient"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
@@ -765,7 +765,7 @@ $quicktip_formdata = array(
 );
 
 $quicktip_helpsteps = array(
-	_L('Use these options to configure how users with this profile may interact with the Quick Tip feature. You may give users permission to receive Quick Tip messages with the Topic Recipient option. Users may create or delete Quick Tip topics categories with the Manage Topics option.'));
+	_L('Use these options to configure how users with this profile may interact with the Quick Tip feature. You may give users permission to receive Quick Tip messages with the Topic Recipient option. Important: Users who are topic recipients will be emailed each time a tip is submitted. Users may create or delete Quick Tip topics categories with the Manage Topics option.'));
 
 if (hasProduct('tai')) {
 	$formdata = array_merge($formdata, $tai_formdata);
