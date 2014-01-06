@@ -90,7 +90,7 @@ class PdfEditPage extends PageForm {
 	
 				// Add this error message to the page output, but still
 				// allow the form to be displayed to take edits and resubmit
-				$this->error = _L("This PDF Document's record was changed in another window or session. Please review the current data and reapply any additional changes needed, then resubmit.");
+				$this->error = _L("This PDF document was changed in another window or session. Please review the current data. You may need to redo your previous changes and resubmit.");
 			}
 		}
 
@@ -127,17 +127,17 @@ class PdfEditPage extends PageForm {
 			}
 
 			// We're storing a new record if burstId is null, otherwise updating an existing record
-			$action = (is_null($this->burstId)) ? 'stored' : 'updated';
+			$action = (is_null($this->burstId)) ? 'uploaded' : 'updated';
 			if ($this->csApi->setBurstData($this->burstId, $name, $bursttemplateid)) {
 
 				// For success, we redirect back to the manager page with this notice to be shown on that page:
 				unset($_SESSION['burstid']);
-				notice(_L("The PDF Document was successfully {$action}"));
+				notice(_L("The PDF Document was successfully {$action}."));
 				redirect('pdfmanager.php');
 			} else {
 
 				// For errors, we fall through to render() and let this error message be shown:
-				$this->error = _L("The PDF Document could not be {$action} - please try again later");
+				$this->error = _L("The PDF Document could not be {$action}. Please try again later.");
 			}
 		}
 	}
@@ -149,7 +149,7 @@ class PdfEditPage extends PageForm {
 
 		// URL hacking or what?
 		if (! (is_null($this->burstId) || is_object($this->burstData))) {
-			$html = _L('The requested PDF Document could not be found') . "<br/>\n";
+			$html = _L('The document you have requested could not be found.') . "<br/>\n";
 		}
 		else {
 			$html = $this->form->render();
@@ -176,6 +176,7 @@ class PdfEditPage extends PageForm {
 		$formdata = array(
 			"name" => array(
 				"label" => _L('Name'),
+                "fieldhelp" => _L('Enter a descriptive name for the document you are uploading.'),
 				"value" => $this->burstData->name,
 				"validators" => array(
 					array('ValRequired'),
@@ -186,6 +187,7 @@ class PdfEditPage extends PageForm {
 			),
 			"bursttemplateid" => array(
 				"label" => _L('Template'),
+                "fieldhelp" => _L('Select the template which matches the layout of the PDF file.'),
 				"value" => $this->burstData->burstTemplateId,
 				"validators" => array(
 					array('ValRequired')
@@ -196,8 +198,8 @@ class PdfEditPage extends PageForm {
 		);
 
                 $helpsteps = array (
-			_L('Templatehelpstep 1'),
-			_L('Templatehelpstep 2')
+			_L('Enter a descriptive name for the PDF file you are about to upload.'),
+			_L('Select the document template which matches this PDF file. If you do not already have a template for this type of PDF file, please contact support. A representative will work with you to create a template within 24 hours.')
 		);
 
 		// If we already have a burstId
@@ -217,6 +219,7 @@ class PdfEditPage extends PageForm {
 			// Otherwise we need to show the upload formitem to be able to select and upload a new PDF
 			$formdata['thefile'] = array(
 				"label" => _L('PDF Document'),
+                "fieldhelp" => _L('Click the Choose File button and navigate to the location of the PDF file on your computer.'),
 				"value" => '',
 				"validators" => array(
 					array('ValRequired')
