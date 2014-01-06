@@ -143,7 +143,9 @@ class PdfEditPage extends PageForm {
 	}
 
 	public function render() {
-
+		// define main:subnav tab settings
+		$this->options["page"]  = 'notifications:pdfmanager';
+		
 		// The page title depends on whether editing existing or uploading anew
 		$this->options['title'] = ($this->burstId) ? _L('Edit PDF Document Properties') : _L('Upload New PDF Document');
 
