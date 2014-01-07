@@ -38,6 +38,7 @@ class PdfSendMail extends PageForm
 	private $isAjaxRequest = false;
 
 	public $formdata;
+	public $helpsteps;
 	public $userBroadcastTypes;
 	public $defaultGeneralTypeId;
 	public $emailDomain;
@@ -98,7 +99,7 @@ class PdfSendMail extends PageForm
 	// @override
 	public function afterLoad() {
 		$this->setFormData();
-		$this->form = new Form($this->formName, $this->formdata, null, array( submit_button(_L(' Send Now'), 'send', 'pictos/p1/16/59')));
+		$this->form = new Form($this->formName, $this->formdata, $this->helpsteps, array( submit_button(_L(' Send Now'), 'send', 'pictos/p1/16/59')));
 		$this->form->ajaxsubmit = true;
 
 		$this->form->handleRequest();
@@ -173,10 +174,21 @@ class PdfSendMail extends PageForm
 			}
 		}
 
+		// define help steps used in form 
+		$this->helpsteps = array(
+			_L('Enter a unique name for your email broadcast'),
+			_L('Select a Broadcast type for your email broadcast'),
+			_L('Select (check) the "Require Password" checkbox if you require your recipients to enter a password to view their PDF'),
+			_L('Enter the full name you want users to view when they receive your email'),
+			_L('Enter the email address you want users to view when they receive your email. NOTE: make sure the email address used includes the following domain name: ' . $this->emailDomain),
+			_L('Enter the subject for your email message'),
+			_L('Enter the text for your email message')
+		); 
+
 		$this->formdata = array(
 			"broadcastname" => array(
 				"label" => _L('Broadcast Name'),
-				"fieldhelp" => _L('Enter a unique name for your email broadcast'),
+				"fieldhelp" => $this->helpsteps[0],
 				"value" => '',
 				"validators" => array(
 					array('ValRequired'),
@@ -188,38 +200,38 @@ class PdfSendMail extends PageForm
 			),
 			"broadcasttype" => array(
 				"label" => _L('Broadcast Type'),
-				"fieldhelp" => _L('Select a Broadcast type for your email broadcast'),
+				"fieldhelp" => $this->helpsteps[1],
 				"validators" => array(
 					array('ValRequired'),
 					array("ValInArray", "values" => array_keys($broadcastTypes))),
 				"value" => $this->defaultGeneralTypeId ? $this->defaultGeneralTypeId : $broadcastTypes[0],
 				"control" => array('SelectMenu', 'values' => $broadcastTypes),
-				"helpstep" => 1
+				"helpstep" => 2
 			),
 			"passwordprotected" => array(
 				"label" => "Require Password",
-				"fieldhelp" => _L('Select (check) the "Require Password" checkbox if you require your recipients to enter a password to view their PDF'),
+				"fieldhelp" => $this->helpsteps[2],
 				"value" => "",
 				"validators" => array(),
 				"control" => array("Checkbox"),
-				"helpstep" => 1
+				"helpstep" => 3
 			),
 
 			// email form fields
 			"fromname" => array(
 				"label" => _L('From Name'),
-				"fieldhelp" => _L('Enter the full name you want users to view when they receive your email'),
+				"fieldhelp" => $this->helpsteps[3],
 				"value" => '',
 				"validators" => array(
 					array('ValRequired'),
 					array("ValLength","max" => 50)
 				),
 				"control" => array("TextField","size" => 30, "maxlength" => 50),
-				"helpstep" => 1
+				"helpstep" => 4
 			),
 			"fromemail" => array(
 				"label" => _L('From Email'),
-				"fieldhelp" => _L('Enter the email address you want users to view when they receive your email. NOTE: make sure the email address used includes the following domain name: ' . $this->emailDomain),
+				"fieldhelp" => $this->helpsteps[4],
 				"value" => '',
 				"validators" => array(
 					array('ValRequired'),
@@ -227,29 +239,29 @@ class PdfSendMail extends PageForm
 					array("ValEmail", "domain" => $this->emailDomain)
 				),
 				"control" => array("TextField"),
-				"helpstep" => 1
+				"helpstep" => 5
 			),
 			"subject" => array(
 				"label" => _L('Subject'),
-				"fieldhelp" => _L('Enter the subject for your email message'),
+				"fieldhelp" => $this->helpsteps[5],
 				"value" => '',
 				"validators" => array(
 					array('ValRequired'),
 					array("ValLength","max" => 255)
 				),
 				"control" => array("TextField"),
-				"helpstep" => 1
+				"helpstep" => 6
 			),
 			"messagebody" => array(
 				"label" => "Message",
-				"fieldhelp" => _L('Enter the text for your email message'),
+				"fieldhelp" => $this->helpsteps[6],
 				"value" => "",
 				"validators" => array(
 					array('ValRequired'),
 					array("ValLength","max" => 256000)
 				),
 				"control" => array("TextArea"),
-				"helpstep" => 1
+				"helpstep" => 7
 			)
 		);
 	}
