@@ -19,8 +19,6 @@ require_once('ifc/Page.ifc.php');
 require_once('obj/PageBase.obj.php');
 require_once('obj/PageForm.obj.php');
 
-require_once('FirePHPCore-0.3.2/lib/FirePHPCore/FirePHP.class.php');
-
 /**
  * class PdfSendMail
  * 
@@ -53,11 +51,8 @@ class PdfSendMail extends PageForm
 	private $burstId;
 	private $burst;
 
-	var $firephp;
-
 
 	public function __construct($csApi) {
-		$this->firephp = FirePHP::getInstance(true);
 		$this->csApi = $csApi;
 		parent::__construct();
 	}
@@ -106,7 +101,6 @@ class PdfSendMail extends PageForm
 		if ($this->form->getSubmit()) {
 			// if user submits a search, update SESSION['sendmail'] with latest form data 
 			$_SESSION['sendmail'] = $this->form->getData();
-			 $this->firephp->log($_SESSION['sendmail'], '$_SESSION[sendmail]'); 
 
 			 // TODO: additional handling logic? TBD
 
