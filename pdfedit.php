@@ -178,7 +178,6 @@ class PdfEditPage extends PageForm {
 		$formdata = array(
 			"name" => array(
 				"label" => _L('Name'),
-                "fieldhelp" => _L('Enter a descriptive name for the document you are uploading.'),
 				"value" => $this->burstData->name,
 				"validators" => array(
 					array('ValRequired'),
@@ -189,7 +188,6 @@ class PdfEditPage extends PageForm {
 			),
 			"bursttemplateid" => array(
 				"label" => _L('Template'),
-                "fieldhelp" => _L('Select the template which matches the layout of the PDF file.'),
 				"value" => $this->burstData->burstTemplateId,
 				"validators" => array(
 					array('ValRequired')
@@ -199,28 +197,24 @@ class PdfEditPage extends PageForm {
 			)
 		);
 
-                $helpsteps = array (
-			_L('Enter a descriptive name for the PDF file you are about to upload.'),
-			_L('Select the document template which matches this PDF file. If you do not already have a template for this type of PDF file, please contact support. A representative will work with you to create a template within 24 hours.')
-		);
-
 		// If we already have a burstId
 		if (! is_null($this->burstId)) {
 
 			// Then a file has already been uploaded; we're 
 			// just going to show a read-only representation
 			$formdata['existingpdf'] = array(
-				"label" => _L('PDF Document'),
+				"label" => _L('PDF File'),
+                "fieldhelp" => _L('This is the PDF file which will be processed for delivery.'),
 				'value' => 'thisshouldntneedavalue', // FIXME: Form.obj.php breaks without this
 				"control" => array('FormHtml', 'html' => $this->burstData->filename),
 				"validators" => Array(),
-				"helpstep" => 4
+				"helpstep" => 3
 			);
 		}
 		else {
 			// Otherwise we need to show the upload formitem to be able to select and upload a new PDF
 			$formdata['thefile'] = array(
-				"label" => _L('PDF Document'),
+				"label" => _L('PDF File'),
                 "fieldhelp" => _L('Click the Choose File button and navigate to the location of the PDF file on your computer.'),
 				"value" => '',
 				"validators" => array(
@@ -229,9 +223,31 @@ class PdfEditPage extends PageForm {
 				"control" => array('FileUpload'),
 				"helpstep" => 3
 			);
-			$helpsteps[] = _L('Templatehelpstep 3');
 		}
 
+        //Now we build the help. This creates the Guide help and also inserts the
+        //field help for each form item depending on context (uploading or editing).
+        if (is_null($this->burstId)) {
+            //The page is in "upload file" form.
+            $formdata['name']['fieldhelp'] = _L('Enter a descriptive name for the Document.');
+            $formdata['bursttemplateid']['fieldhelp'] = _L('Select the template which matches the layout of the PDF file. See Guide for more information.');
+            $helpsteps = array(
+                _L('Enter a descriptive name for the Document you wish to process and deliver.'),
+                _L('Select template which should be used when processing the PDF file for delivery. Templates are designed ' .
+                    'to be compatible with specific PDF file layouts. If you do not already have a template for the PDF file you' .
+                    ' wish to upload, please contact support. A representative will work with you to create a template within 24 hours.'),
+                _L('Click the Choose File button to upload a PDF file from your computer.')
+            ) ;
+        } else {
+            //The page is in "edit document" form.
+            $formdata['name']['fieldhelp'] = _L('The name of the Document.');
+            $formdata['bursttemplateid']['fieldhelp'] = _L('This is the template which is used when processing the PDF file for delivery. See Guide for more information.');
+            $helpsteps = array(
+                _L('The name associated with this Document.'),
+                _L('This is the template which will be used when processing the PDF file for delivery. Templates are designed to be compatible with specific PDF file layouts. '),
+                _L('This is the PDF file associated with this delivery Document.')
+            );
+        }
 
 		$buttons = array(
 			submit_button(_L($this->burstId ? 'Save' : 'Upload'), 'submit', 'tick'),
