@@ -12,20 +12,19 @@ require_once("{$konadir}/inc/common.inc.php");
 require_once("{$konadir}/pdfmanager.php");
 
 class PdfManagerTest extends PHPUnit_Framework_TestCase {
-	
-	const USER_ID = 1;
 
 	var $pageBase;
 	var $pdfManager;
 	var $apiClient;
 	var $csApi;
+	var $userID = 1;
 
 	public function setup() {
 		global $USER;
 
-		// create mock User with id=1
+		// create mock User
 		$USER = $this->getMockBuilder('User')
-					->setConstructorArgs(array(1))
+					->setConstructorArgs(array($this->userID))
 					->getMock();
 
 		// data for ApiClient
