@@ -8,21 +8,11 @@
  */
 
 require_once(realpath(dirname(dirname(__FILE__)) .'/konaenv.php'));
+require_once("{$konadir}/inc/common.inc.php");
 require_once("{$konadir}/pdfsendmail.php");
 
-// Simple TestUser class used to set $USER object
-// We only need the $user->id 
-class TestUser {
-	var $id;
-
-	public function __construct($id) {
-		$this->id = $id;
-	}
-
-}
-
 class PdfSendMailTest extends PHPUnit_Framework_TestCase {
-	
+
 	var $pdfSendMail;
 	var $apiClient;
 	var $csApi;
@@ -31,7 +21,10 @@ class PdfSendMailTest extends PHPUnit_Framework_TestCase {
 	public function setup() {
 		global $USER;
 
-		$USER = new TestUser(1);
+		// create mock User with id=1
+		$USER = $this->getMockBuilder('User')
+					->setConstructorArgs(array(1))
+					->getMock();
 
 		// data for ApiClient
 		$_SERVER['SERVER_NAME'] = 'localhost';

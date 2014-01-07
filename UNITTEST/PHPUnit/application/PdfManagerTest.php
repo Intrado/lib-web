@@ -8,26 +8,13 @@
  */
 
 require_once(realpath(dirname(dirname(__FILE__)) .'/konaenv.php'));
+require_once("{$konadir}/inc/common.inc.php");
 require_once("{$konadir}/pdfmanager.php");
-
-// Simple TestUser class used to set $USER object
-// We only need the $user->id and $user->getSetting() method for action_link calls (html.inc.php)
-// in PdfManager->getBurstListItem() 
-class TestUser {
-	var $id;
-
-	public function __construct($id) {
-		$this->id = $id;
-	}
-
-	// mock needed for action_link calls (html.inc.php) in PdfManager->getBurstListItem()
-	public function getSetting() {
-		return true;
-	}
-}
 
 class PdfManagerTest extends PHPUnit_Framework_TestCase {
 	
+	const USER_ID = 1;
+
 	var $pageBase;
 	var $pdfManager;
 	var $apiClient;
@@ -36,7 +23,10 @@ class PdfManagerTest extends PHPUnit_Framework_TestCase {
 	public function setup() {
 		global $USER;
 
-		$USER = new TestUser(1);
+		// create mock User with id=1
+		$USER = $this->getMockBuilder('User')
+					->setConstructorArgs(array(1))
+					->getMock();
 
 		// data for ApiClient
 		$_SERVER['SERVER_NAME'] = 'localhost';
