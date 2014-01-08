@@ -64,7 +64,7 @@ abstract class PageBase implements Page {
 
 		// Set some default options
 		$this->options = Array(
-			'testmode' => 'false',
+			'testmode' => false,
 			'noauth_redirect' => 'unauthorized.php',
 			'title' => 'Default Page Title',
 			'page' => 'notifications:jobs'
