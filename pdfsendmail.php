@@ -11,9 +11,21 @@ require_once('obj/FormItem.obj.php');
 require_once("inc/formatters.inc.php");
 require_once("obj/Validator.obj.php");
 require_once("obj/ValDuplicateNameCheck.val.php");
+require_once("obj/ValMessageBody.val.php");
 
 require_once("obj/Job.obj.php");
 require_once("obj/JobType.obj.php");
+require_once("obj/JobList.obj.php");
+require_once("obj/MessageGroup.obj.php");
+require_once("obj/Message.obj.php");
+require_once("obj/MessagePart.obj.php");
+require_once("obj/Person.obj.php");
+require_once("obj/Email.obj.php");
+require_once("obj/Phone.obj.php");
+require_once("obj/FieldMap.obj.php");
+require_once("obj/PeopleList.obj.php");
+require_once("obj/ListEntry.obj.php");
+require_once("obj/Voice.obj.php");
 
 require_once('ifc/Page.ifc.php');
 require_once('obj/PageBase.obj.php');
@@ -33,22 +45,13 @@ class PdfSendMail extends PageForm
 	private $formName = 'pdfsendmail';
 	private $pageTitle = 'Email PDF Document(s) to Specified Recipients';
 	private $pageNav = 'notifications:pdfmanager';
-	private $isAjaxRequest = false;
 
 	public $formdata;
 	public $helpsteps;
 	public $userBroadcastTypes;
-	public $defaultGeneralTypeId;
+	public $defaultJobTypeId = '';
 	public $emailDomain;
 
-	private $jobName;
-	private $jobType;
-	private $fromName;
-	private $fromEmail;
-	private $subject;
-	private $messageBody;
-
-	private $burstId;
 	private $burst;
 
 
@@ -60,23 +63,24 @@ class PdfSendMail extends PageForm
 	// @override
 	public function isAuthorized($get = array(), $post = array()) {
 		global $USER;
-		return $USER->authorize('canpdfburst');
+		if ($USER->authorize('canpdfburst') && isset($_GET['id']))
+			return true;
+		return false;
 	}
 
 	// @override
 	public function initialize() {
 		// override some options set in PageBase
-		$this->options["formname"] = $this->formName;
 		$this->options["page"]  = $this->pageNav;
 	}
 
 	// @override
 	public function beforeLoad($get = array(), $post = array()) {
-		if (isset($get['id']) && $get['id'] > 0) {
-			$this->burstId = $get['id'];
+		if (isset($get['id']) && $get['id']) {
+			$burstId = intval($get['id']);
 
 			// fetch individual burstData for given burstId
-			$this->burst = $this->getBurst($this->burstId);
+			$this->burst = $this->getBurst($burstId);
 			
 			// set page title using burst->name data (also used for startWindow title)
 			$this->pageTitle = 'Email PDFs from: &nbsp;' . $this->burst->name;
@@ -93,28 +97,134 @@ class PdfSendMail extends PageForm
 
 	// @override
 	public function afterLoad() {
+		global $USER;
+		global $ACCESS;
+
 		$this->setFormData();
 		$this->form = new Form($this->formName, $this->formdata, $this->helpsteps, array( submit_button(_L(' Send Now'), 'send', 'pictos/p1/16/59')));
 		$this->form->ajaxsubmit = true;
 
 		$this->form->handleRequest();
 		if ($this->form->getSubmit()) {
-			// if user submits a search, update SESSION['sendmail'] with latest form data 
-			$_SESSION['sendmail'] = $this->form->getData();
+			$postData = $this->form->getData();
+			$doPasswordProtect = $postData['dopasswordprotect'];
 
-			 // TODO: additional handling logic? TBD
+			Query("BEGIN");
 
-            Query("BEGIN");
+			// FIXME: Create and use an API end point for setting up the job and associated child objects
+			// Create a new job object directly in the DB
+			$job = Job::jobWithDefaults();
+			// If the destination has more than one student, we should send all duplicates
+			$job->setOption("skipemailduplicates",0);
+			$job->name = $postData['broadcastname'];
+			$job->description = "Secure Document Delivery notification";
+			$job->jobtypeid = $postData['broadcasttype'];
+			$job->type = 'notification';
+			// FIXME: Maybe we should calculate based off the user's preferences first, then use the profile only if the current time falls
+			// outside their chosen defaults
+			$callEarly = ($ACCESS->getValue("callearly") ? $ACCESS->getValue("callearly") : "12:00 AM");
+			$callLate = ($ACCESS->getValue("calllate") ? $ACCESS->getValue("calllate") : "11:59 PM");
+			$job->starttime = date("H:i", strtotime($callEarly));
+			$job->endtime = date("H:i", strtotime($callLate));
 
-            $job = Job::jobWithDefaults();
+			// set burst options for this job
+			$job->setOption("burst_id", $this->burst->id);
+			// if password protection for each individually generated bursted pdf...
+			if ($doPasswordProtect) {
+				// FIXME: At some point, the user needs to be able to select the field they wish to use for password protection
+				$job->setOption("burst_passwordprotect", 'pkey');
+			}
 
+			// FIXME: We assume the user is sending this notification inside their call window. If not, the job will cancel immediately
 
-            Query("COMMIT");
-            if ($this->form->isAjaxSubmit()) {
-                $this->form->sendTo("start.php");
-            } else {
-                redirect("start.php");
-            }
+			// Create a message group which has the email message created by the user in this form.
+			// NOTE: No additional messaging types are supported right now
+			$messageGroup = new MessageGroup();
+			$messageGroup->userid = $USER->id;
+			$messageGroup->name = $job->name;
+			$messageGroup->description = $job->description;
+			$messageGroup->modified = $job->modifydate;
+			$messageGroup->deleted = 1;
+			$messageGroup->create();
+
+			// Create the email message and attach it to the message group
+			$message = new Message();
+			$message->userid = $USER->id;
+			$message->messagegroupid = $messageGroup->id;
+			$message->name = $job->name;
+			$message->description = $job->description;
+			$message->type = 'email';
+			$message->subtype = 'plain';
+			$message->autotranslate = 'none';
+			$message->modifydate = $job->modifydate;
+			$message->languagecode = 'en';
+			$message->subject = $postData['subject'];
+			$message->fromname = $postData['fromname'];
+			$message->fromemail = $postData['fromemail'];
+			$message->stuffHeaders();
+			$message->create();
+
+			$messageParts = $message->parse($postData['messagebody']);
+			foreach ($messageParts as $messagePart) {
+				$messagePart->messageid = $message->id;
+				$messagePart->create();
+			}
+
+			// FIXME: Adding a dummy list with the current user's email, till job processor creates one from the burst object
+			// Constants
+			$langfield = FieldMap::getLanguageField();
+			$fnamefield = FieldMap::getFirstNameField();
+			$lnamefield = FieldMap::getLastNameField();
+
+			// New Person
+			$person = new Person();
+			$person->userid = $USER->id;
+			$person->deleted = 0; // NOTE: This person must not be set as deleted, otherwise the list will not include him/her.
+			$person->type = "manualadd";
+			$person->$fnamefield = $USER->firstname;
+			$person->$lnamefield = $USER->lastname;
+			$person->$langfield = "en";
+			$person->create();
+
+			$emailDestination = new Email();
+			$emailDestination->personid = $person->id;
+			$emailDestination->email = $USER->email;
+			$emailDestination->sequence = 0;
+			$emailDestination->editlock = 0;
+			$emailDestination->create();
+
+			$list = new PeopleList();
+			$list->userid = $USER->id;
+			$list->name = $job->name;
+			$list->description = $job->description;
+			$list->modifydate = $job->modifydate;
+			$list->deleted = 1;
+			$list->create();
+
+			$listEntry = new ListEntry();
+			$listEntry->listid = $list->id;
+			$listEntry->type = "add";
+			$listEntry->personid = $person->id;
+			$listEntry->create();
+
+			$job->messagegroupid = $messageGroup->id;
+			$job->create();
+
+			$jobList = new JobList();
+			$jobList->jobid = $job->id;
+			$jobList->listid = $list->id;
+			$jobList->create();
+
+			// run the job
+			$job->runNow();
+
+			Query("COMMIT");
+
+			if ($this->form->isAjaxSubmit()) {
+			    $this->form->sendTo("start.php");
+			} else {
+			    redirect("start.php");
+			}
 
 		}
 	}
@@ -124,7 +234,7 @@ class PdfSendMail extends PageForm
 		global $TITLE;
 		echo '<script type="text/javascript">';
 			// load validator for Broadcast Name; echo's output, so wrap between opening/closing script tags
-			Validator::load_validators(array("ValDuplicateNameCheck"));
+			Validator::load_validators(array("ValDuplicateNameCheck", "ValMessageBody"));
 		echo '</script>';
         
         echo '<link rel="stylesheet" type="text/css" href="css/pdfmanager.css">';
@@ -151,24 +261,10 @@ class PdfSendMail extends PageForm
 	}
 
 	public function setFormData() {
-		$broadcastTypes = array();
-		
-		foreach ($this->userBroadcastTypes as $id => $jobtype) {
-			$broadcastTypes[$id] = $jobtype->name;
-		}
-
-		// sort broadcastTypes ascending (A-Z) in dropdown for better usability
-		asort($broadcastTypes);
-
-		// check for a 'general' job type in $broadcastTypes and if found, use it as the 'value'
-		// for the broadcasttype control in the formdata, which sets selected item 
-		// in dropdown to 'General' as default selected job type
-		foreach ($broadcastTypes as $id => $value) {
-			if (strcasecmp($value, "general") == 0) {
-				$this->defaultGeneralTypeId = $id;
-				break;
-			}
-		}
+		// TODO: preselect a valid and applicable job type
+		$broadcastTypeNames = array();
+		foreach ($this->userBroadcastTypes as $id => $jobType)
+			$broadcastTypeNames[$id] = $jobType->name;
 
 		// define help steps used in form 
 		$this->helpsteps = array(
@@ -188,8 +284,8 @@ class PdfSendMail extends PageForm
 				"value" => '',
 				"validators" => array(
 					array('ValRequired'),
-					array("ValDuplicateNameCheck", "type" => "job"),
-					array("ValLength","min" => 3,"max" => 50)
+					array("ValLength","min" => 3,"max" => 50),
+					array("ValDuplicateNameCheck", "type" => "job")
 				),
 				"control" => array("TextField","size" => 30, "maxlength" => 50),
 				"helpstep" => 1
@@ -197,14 +293,14 @@ class PdfSendMail extends PageForm
 			"broadcasttype" => array(
 				"label" => _L('Broadcast Type'),
 				"fieldhelp" => $this->helpsteps[1],
+				"value" => '',
 				"validators" => array(
 					array('ValRequired'),
-					array("ValInArray", "values" => array_keys($broadcastTypes))),
-				"value" => $this->defaultGeneralTypeId ? $this->defaultGeneralTypeId : $broadcastTypes[0],
-				"control" => array('SelectMenu', 'values' => $broadcastTypes),
+					array("ValInArray", "values" => array_keys($broadcastTypeNames))),
+				"control" => array('RadioButton', 'values' => $broadcastTypeNames),
 				"helpstep" => 2
 			),
-			"passwordprotected" => array(
+			"dopasswordprotect" => array(
 				"label" => "Require Password",
 				"fieldhelp" => $this->helpsteps[2],
 				"value" => "",
@@ -222,7 +318,7 @@ class PdfSendMail extends PageForm
 					array('ValRequired'),
 					array("ValLength","max" => 50)
 				),
-				"control" => array("TextField","size" => 30, "maxlength" => 50),
+				"control" => array("TextField", "size" => 30, "maxlength" => 50),
 				"helpstep" => 4
 			),
 			"fromemail" => array(
@@ -234,7 +330,7 @@ class PdfSendMail extends PageForm
 					array("ValLength","max" => 255),
 					array("ValEmail", "domain" => $this->emailDomain)
 				),
-				"control" => array("TextField"),
+				"control" => array("TextField", "size" => 30, "maxlength" => 255),
 				"helpstep" => 5
 			),
 			"subject" => array(
@@ -245,7 +341,7 @@ class PdfSendMail extends PageForm
 					array('ValRequired'),
 					array("ValLength","max" => 255)
 				),
-				"control" => array("TextField"),
+				"control" => array("TextField", "size" => 30, "maxlength" => 255),
 				"helpstep" => 6
 			),
 			"messagebody" => array(
@@ -254,7 +350,8 @@ class PdfSendMail extends PageForm
 				"value" => "",
 				"validators" => array(
 					array('ValRequired'),
-					array("ValLength","max" => 256000)
+					array("ValLength","max" => 256000),
+					array("ValMessageBody")
 				),
 				"control" => array("TextArea"),
 				"helpstep" => 7
