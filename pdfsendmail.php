@@ -104,16 +104,18 @@ class PdfSendMail extends PageForm
 
 			 // TODO: additional handling logic? TBD
 
-			// define AJAX response object
-			$response = (object) array(
-				'status' => 'success',
-				'nexturl' => 'start.php' // TODO: redirect location TBD
-			);
+            Query("BEGIN");
 
-			 // return JSON response for AJAX form submit handler (form_handle_submit() in form.js.php)
-			header('Content-Type: application/json');
-			echo json_encode(!empty($response) ? $response : false);
-			exit();
+            $job = Job::jobWithDefaults();
+
+
+            Query("COMMIT");
+            if ($this->form->isAjaxSubmit()) {
+                $this->form->sendTo("start.php");
+            } else {
+                redirect("start.php");
+            }
+
 		}
 	}
 
