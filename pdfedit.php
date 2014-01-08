@@ -51,13 +51,13 @@ class PdfEditPage extends PageForm {
 		if (isset($request['id']) && intval($request['id'])) {
 
 			// Peel the burst ID off the URL, stash it in the session...
-			$_SESSION['burstid'] = intval($request['id']);
+			$session['burstid'] = intval($request['id']);
 
 			// .. then redirect back to ourselves to clean up the URL
 			redirect(); 
 		}
-		else if (isset($_SESSION['burstid'])) {
-			$this->burstId = $_SESSION['burstid'];
+		else if (isset($session['burstid'])) {
+			$this->burstId = $session['burstid'];
 		}
 		else {
 			$this->burstId = null;
@@ -82,11 +82,11 @@ class PdfEditPage extends PageForm {
 		// If there was a data reload issue
 		if (! is_null($this->burstId)) {
 			// If we have been flagged as having reloaded on account of data having changed...
-			if (isset($_SESSION['burstreload'])) {
+			if (isset($session['burstreload'])) {
 
 				// Clear the flag and set the error message; this will allow the message to display, but
 				// upon dismissal show the form repopulated with the freshly loaded burst data from above
-				unset($_SESSION['burstreload']);
+				unset($session['burstreload']);
 	
 				// Add this error message to the page output, but still
 				// allow the form to be displayed to take edits and resubmit

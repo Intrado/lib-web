@@ -60,7 +60,7 @@ class PdfManager extends PageBase {
 	}
 
 	// @override
-	public function beforeLoad($get, $post) { 
+	public function beforeLoad(&$get=array(), &$post=array(), &$request=array(), &$session=array()) {	
 		$this->customerURLComponent = customerUrlComponent();
 		$this->burstsURL = $this->csApi->getBurstApiUrl();
 
@@ -71,6 +71,11 @@ class PdfManager extends PageBase {
 		} else {
 			$this->isAjaxRequest = isset($get['ajax']);
 			$this->setPagingStart((isset($get['pagestart'])) ? $get['pagestart'] : 0);
+		}
+
+		// In case a previous attempt to edit a burst record was canceled...
+		if (isset($session['burstid'])) {
+			unset($session['burstid']);
 		}
 	}
 
