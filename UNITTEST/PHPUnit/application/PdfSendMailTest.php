@@ -129,7 +129,7 @@ class PdfSendMailTest extends PHPUnit_Framework_TestCase {
 
 		// check a few formdata values
 		$this->assertEquals('Broadcast Name', $this->pdfSendMail->formdata['broadcastname']['label']);
-		$this->assertEquals(3, $this->pdfSendMail->formdata['broadcasttype']['value']);
+		//$this->assertEquals(3, $this->pdfSendMail->formdata['broadcasttype']['value']);
 		$this->assertEquals($this->pdfSendMail->emailDomain, $this->pdfSendMail->formdata['fromemail']['validators'][2]['domain']);
 	}
 
