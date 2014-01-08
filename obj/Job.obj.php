@@ -273,7 +273,7 @@ class Job extends DBMappedObject {
 
 	//creates a new job object prepopulated with all of the user/system defaults
 	//date/time values are in DB format and should be beautified for forms
-	function jobWithDefaults () {
+	static function jobWithDefaults () {
 		global $USER, $ACCESS;
 		$job = new Job();
 
@@ -281,7 +281,7 @@ class Job extends DBMappedObject {
 		$job->status = "new";
 		$job->userid = $USER->id;
 		$job->createdate = date("Y-m-d H:i:s", time());
-		$job->modifydate = date("Y-m-d H:i:s", time());
+		$job->modifydate = $job->createdate;
 		
 		//call settings
 		$job->setOptionValue("maxcallattempts", min($ACCESS->getValue('callmax'), $USER->getSetting("callmax","4")));
