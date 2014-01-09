@@ -71,7 +71,15 @@ class PdfSendMailTest extends PHPUnit_Framework_TestCase {
 
 		$this->csApi = $this->getMockBuilder('CommsuiteApiClient')
 							->setConstructorArgs(array($this->apiClient))
+							->setMethods(array('getBurstData'))
 							->getMock();
+
+		$burstObj = (object) null;
+		$burstObj->id = 1;
+		$burstObj->name = 'MyBurst';
+		$this->csApi->expects($this->any())
+					->method('getBurstData')
+					->will($this->returnValue($burstObj));
 
 		// define PdfSendMail mock object
 		$this->pdfSendMail = $this->getMockBuilder('PdfSendMail')
@@ -97,6 +105,8 @@ class PdfSendMailTest extends PHPUnit_Framework_TestCase {
 
 
 	public function test_load() {
+		$session = array('pdfsendmail_burstid' => 1);
+		$this->pdfSendMail->beforeLoad($get = array(), $post = array(), $request = array(), $session);
 		$this->pdfSendMail->load();
 		
 		// check jobtypes and email domain instance vars for pdfSendMail object

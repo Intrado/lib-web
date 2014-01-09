@@ -43,7 +43,6 @@ class PdfSendMail extends PageForm
 	
 	private $csApi;
 	private $formName = 'pdfsendmail';
-	private $pageTitle = 'Email PDF Document(s) to Specified Recipients';
 	private $pageNav = 'notifications:pdfmanager';
 
 	public $formdata;
@@ -52,6 +51,7 @@ class PdfSendMail extends PageForm
 	public $defaultJobTypeId = '';
 	public $emailDomain;
 
+	private $burstId;
 	private $burst;
 
 
@@ -61,10 +61,12 @@ class PdfSendMail extends PageForm
 	}
 
 	// @override
-	public function isAuthorized($get = array(), $post = array()) {
+	public function isAuthorized(&$get = array(), &$post = array(), &$request = array(), &$session = array()) {
 		global $USER;
-		if ($USER->authorize('canpdfburst') && isset($_GET['id']))
+		if ($USER->authorize('canpdfburst') &&
+				(isset($get['id']) || isset($session['pdfsendmail_burstid']))) {
 			return true;
+		}
 		return false;
 	}
 
@@ -72,24 +74,29 @@ class PdfSendMail extends PageForm
 	public function initialize() {
 		// override some options set in PageBase
 		$this->options["page"]  = $this->pageNav;
+		$this->options['validators'] = array("ValDuplicateNameCheck", "ValMessageBody");
 	}
 
 	// @override
-	public function beforeLoad($get = array(), $post = array()) {
+	public function beforeLoad(&$get = array(), &$post = array(), &$request = array(), &$session = array()) {
 		if (isset($get['id']) && $get['id']) {
-			$burstId = intval($get['id']);
-
-			// fetch individual burstData for given burstId
-			$this->burst = $this->getBurst($burstId);
-			
-			// set page title using burst->name data (also used for startWindow title)
-			$this->pageTitle = 'Email PDFs from: &nbsp;' . $this->burst->name;
-			$this->options["title"] = $this->pageTitle;
+			$session['pdfsendmail_burstid'] = intval($get['id']);
+			redirect();
 		}
+		$this->burstId = $session['pdfsendmail_burstid'];
 	}
 
 	// @override
 	public function load() {
+		// fetch individual burstData for given burstId
+		$this->burst = $this->csApi->getBurstData($this->burstId);
+		// TODO: Does this make sense here? Should we have another type of authorization check to be sure the loaded objects are any good?
+		if (!$this->burst)
+			redirect('unauthorized.php');
+
+		// set page title using burst->name data (also used for startWindow title)
+		$this->options['title'] = 'Email PDFs from: &nbsp;' . $this->burst->name;
+
 		// fetch user's broadcastTypes and email domain; used in formdata definition in setFormData()
 		$this->userBroadcastTypes 	= $this->getUserBroadcastTypes();
 		$this->emailDomain 			= $this->getUserEmailDomain();
@@ -120,6 +127,7 @@ class PdfSendMail extends PageForm
 			$job->description = "Secure Document Delivery notification";
 			$job->jobtypeid = $postData['broadcasttype'];
 			$job->type = 'notification';
+			// FIXME: We assume the user is sending this notification inside their call window. If not, the job will cancel immediately
 			// FIXME: Maybe we should calculate based off the user's preferences first, then use the profile only if the current time falls
 			// outside their chosen defaults
 			$callEarly = ($ACCESS->getValue("callearly") ? $ACCESS->getValue("callearly") : "12:00 AM");
@@ -134,8 +142,6 @@ class PdfSendMail extends PageForm
 				// FIXME: At some point, the user needs to be able to select the field they wish to use for password protection
 				$job->setOption("burst_passwordprotect", 'pkey');
 			}
-
-			// FIXME: We assume the user is sending this notification inside their call window. If not, the job will cancel immediately
 
 			// Create a message group which has the email message created by the user in this form.
 			// NOTE: No additional messaging types are supported right now
@@ -220,29 +226,22 @@ class PdfSendMail extends PageForm
 
 			Query("COMMIT");
 
+			unset($_SESSION['pdfsendmail_burstid']);
+
 			if ($this->form->isAjaxSubmit()) {
-			    $this->form->sendTo("start.php");
+				$this->form->sendTo("start.php");
 			} else {
-			    redirect("start.php");
+				redirect("start.php");
 			}
 
 		}
 	}
 
 	// @override
-	public function sendPageOutput() {
-		global $TITLE;
-		echo '<script type="text/javascript">';
-			// load validator for Broadcast Name; echo's output, so wrap between opening/closing script tags
-			Validator::load_validators(array("ValDuplicateNameCheck", "ValMessageBody"));
-		echo '</script>';
-        
-        echo '<link rel="stylesheet" type="text/css" href="css/pdfmanager.css">';
-		startWindow($this->pageTitle);
-		echo '<div id="sendmail-broadcast-instruction">Specify a broadcast name and select the desired broadcast type for this message.</div>';
-		echo $this->form->render();
-		endWindow(); 
-		echo '<script type="text/javascript" src="script/pdfmanager.js"></script>';
+	public function render() {
+		$html = '<link rel="stylesheet" type="text/css" href="css/pdfmanager.css">';
+		$html .= parent::render();
+		return $html;
 	}
 
 	/*=============== helper/wrapper methods below =================*/
@@ -253,11 +252,6 @@ class PdfSendMail extends PageForm
 
 	public function getUserEmailDomain() {
 		return getSystemSetting('emaildomain');
-	}
-
-	public function getBurst($id) {
-		// fetches individual burstData for a given burstId
-		return $this->csApi->getBurstData($id);
 	}
 
 	public function setFormData() {
@@ -278,6 +272,7 @@ class PdfSendMail extends PageForm
 		); 
 
 		$this->formdata = array(
+			_L("Broadcast Settings"),
 			"broadcastname" => array(
 				"label" => _L('Broadcast Name'),
 				"fieldhelp" => $this->helpsteps[0],
@@ -300,15 +295,22 @@ class PdfSendMail extends PageForm
 				"control" => array('RadioButton', 'values' => $broadcastTypeNames),
 				"helpstep" => 2
 			),
+			_L("Optional Configuration"),
+			"passwordhelp" => array(
+				'label' => '',
+				'control' => array("FormHtml", 'html' => '<span class="secure-lock"></span>
+					You have the option to password-protect all PDF reports, which will require the recipient to enter a password (i.e. individual ID#) to view their report.'),
+				'helpstep' => 3
+			),
 			"dopasswordprotect" => array(
-				"label" => "Require Password",
+				"label" => _L("Require Password"),
 				"fieldhelp" => $this->helpsteps[2],
-				"value" => "",
+				"value" => '',
 				"validators" => array(),
 				"control" => array("Checkbox"),
 				"helpstep" => 3
 			),
-
+			_L("Email Details"),
 			// email form fields
 			"fromname" => array(
 				"label" => _L('From Name'),
@@ -345,9 +347,9 @@ class PdfSendMail extends PageForm
 				"helpstep" => 6
 			),
 			"messagebody" => array(
-				"label" => "Message",
+				"label" => _L("Message"),
 				"fieldhelp" => $this->helpsteps[6],
-				"value" => "",
+				"value" => '',
 				"validators" => array(
 					array('ValRequired'),
 					array("ValLength","max" => 256000),
