@@ -221,7 +221,14 @@ class PdfEditPageTest extends PHPUnit_Framework_TestCase {
 		unset_exit_overload();
 
 		// Strange, but self-referential redirect in CLI actually goes to PHPUNIT binary - hah!
-		$this->assertTrue(in_array('Location: /usr/commsuite/server/php/bin/phpunit', $HEADERS), 'Expected a successful redirect to pdfedit.php');
+		$location = '';
+		foreach ($HEADERS as $header) {
+			if (strpos($header, 'Location:') == 0) {
+				$location = $header;
+				break;
+			}
+		}
+		$this->assertTrue((strpos($location, '/phpunit') !== FALSE), 'Expected a successful redirect to pdfedit.php');
 	}
 
 
