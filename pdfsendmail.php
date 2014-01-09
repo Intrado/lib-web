@@ -295,11 +295,11 @@ class PdfSendMail extends PageForm
 				"control" => array('RadioButton', 'values' => $broadcastTypeNames),
 				"helpstep" => 2
 			),
-			_L("Optional Configuration"),
+			_L("Secure Documents"),
 			"passwordhelp" => array(
 				'label' => '',
-				'control' => array("FormHtml", 'html' => '<span class="secure-lock"></span>
-					You have the option to password-protect all PDF reports, which will require the recipient to enter a password (i.e. individual ID#) to view their report.'),
+				'control' => array("FormHtml", 'html' => '<div class="password-protect-wrapper"><span class="secure-lock"></span>
+					You have the option to password-protect all PDF documents, which will require the recipient to enter a password (i.e. individual ID#) to view their document.</div>'),
 				'helpstep' => 3
 			),
 			"dopasswordprotect" => array(
@@ -311,7 +311,6 @@ class PdfSendMail extends PageForm
 				"helpstep" => 3
 			),
 			_L("Email Details"),
-			// email form fields
 			"fromname" => array(
 				"label" => _L('From Name'),
 				"fieldhelp" => $this->helpsteps[3],

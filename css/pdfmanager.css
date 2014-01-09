@@ -40,30 +40,17 @@
 	width: 80%;
 	height: 300px;
 }
-#sendmail-broadcast-instruction {
-    border-bottom: 1px solid #ddd;
-    color: #444444;
+#pdfsendmail .password-protect-wrapper {
+    background: #f5f5f5;
+    margin-left: -150px;
+    padding: 15px;
     font-size: 14px;
-    font-weight: normal;
-    line-height: 21px;
-    margin: 0 15px 10px;
-    padding-bottom: 10px;
+    font-weight: bold;
 }
-#pdfsendmail_skipstart, #pdfsendmail_skipend, #pdfsendmail_pagesperreport {
-	width: 50px;
-}
-#pdfsendmail .pdfsendmail-instruction {
-	border-top:1px solid #ccc;
-	margin:15px 15px 0;
-	padding-top:10px;
-}
-.secure-lock {
+#pdfsendmail .secure-lock {
 	background: url("../img/icons/pictos/p2/16/41.png") no-repeat center center transparent;
 	display: inline-block;
 	width: 16px;
 	height: 16px;
 	margin-right: 10px;
-}
-#pdfsendmail .bold {
-	font-weight: bold;
 }
