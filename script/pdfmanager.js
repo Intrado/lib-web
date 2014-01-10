@@ -13,7 +13,7 @@ function deleteBurst(burstID) {
 		$.ajax({
 			url: pdfmanager,
 			type: 'POST',
-			data: {id: burstID, delete: true},
+			data: {'id': burstID, 'delete': true},
 			success: function(res) {
 				window.location = pdfmanager;
 			},
