@@ -46,6 +46,7 @@
     padding: 15px;
     font-size: 14px;
     font-weight: bold;
+    float: left;
 }
 #pdfsendmail .secure-lock {
 	background: url("../img/icons/pictos/p2/16/41.png") no-repeat center center transparent;
