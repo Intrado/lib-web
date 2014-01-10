@@ -38,9 +38,7 @@ require_once('obj/PageForm.obj.php');
  * @author: Justin Burns <jburns@schoolmessenger.com>
  * @date: 12/27/2013
  */
-class PdfSendMail extends PageForm
-{
-	
+class PdfSendMail extends PageForm {
 	private $csApi;
 	private $formName = 'pdfsendmail';
 	private $pageNav = 'notifications:pdfmanager';
@@ -95,7 +93,7 @@ class PdfSendMail extends PageForm
 			redirect('unauthorized.php');
 
 		// set page title using burst->name data (also used for startWindow title)
-		$this->options['title'] = 'Email PDFs from: &nbsp;' . $this->burst->name;
+		$this->options['title'] = _L('Email PDFs from') . ': &nbsp;' . $this->burst->name;
 
 		// fetch user's broadcastTypes and email domain; used in formdata definition in setFormData()
 		$this->userBroadcastTypes 	= $this->getUserBroadcastTypes();
@@ -298,8 +296,11 @@ class PdfSendMail extends PageForm
 			_L("Secure Documents"),
 			"passwordhelp" => array(
 				'label' => '',
-				'control' => array("FormHtml", 'html' => '<div class="password-protect-wrapper"><span class="secure-lock"></span>
-					You have the option to password-protect all PDF documents, which will require the recipient to enter a password (i.e. individual ID#) to view their document.</div>'),
+				'control' => array(
+					"FormHtml",
+					'html' => '<div class="password-protect-wrapper"><span class="secure-lock"></span>' .
+					_L('You have the option to password-protect all PDF documents, which will require the recipient to enter a password (i.e. individual ID#) to view their document.') . '</div>'
+				),
 				'helpstep' => 3
 			),
 			"dopasswordprotect" => array(
