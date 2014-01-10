@@ -23,9 +23,6 @@ require_once('obj/PageBase.obj.php');
  * @date: 12/10/2013
  */
 class PdfManager extends PageBase {
-
-	var $pageTitle = 'PDF Manager';
-	var $pageNav = 'notifications:pdfmanager';
 	var $pagingStart = 0;
 	var $pagingLimit = 100;
 	var $isAjaxRequest = false;
@@ -54,9 +51,8 @@ class PdfManager extends PageBase {
 
 	// @override
 	public function initialize() {
-		// override title and page options on PageBase
-		$this->options["title"] = $this->pageTitle;
-		$this->options["page"]  = $this->pageNav;
+		// override page option on PageBase
+		$this->options["page"]  = 'notifications:pdfmanager';
 	}
 
 	// @override
@@ -120,28 +116,31 @@ class PdfManager extends PageBase {
 
 	public function burstsAjaxResponse() {
 		$data = (object) array(
-			'list' 		=> array(),
-			'pageinfo' 	=> array()
+			'list' => array(),
+			'pageinfo' => array()
 		);
 
-		if($this->total == 0) {
-			$data->list[] = array("itemid" 		=> "",
-								  "defaultlink" => "",
-								  "icon" 		=> "img/largeicons/information.jpg",
-								  "title" 		=> _L("No PDF files available."),
-								  "content" 	=> "",
-								  "tools" 		=> "");
+		if ($this->total == 0) {
+			$data->list[] = array(
+				"itemid" => "",
+				  "defaultlink" => "",
+				  "icon" => "img/largeicons/information.jpg",
+				  "title" => _L("No PDF files available."),
+				  "content" => "",
+				  "tools" => ""
+			  );
 		} else {
 			foreach ($this->feedData as $burstObj) {
 				$data->list[] = $this->getBurstListItem($burstObj);
 			}
 		}
 
-		$data->pageinfo = array($this->numPages,
-								$this->pagingLimit,
-								$this->curPage, 
-								"Showing $this->displayStart - $this->displayEnd of $this->total records on $this->numPages pages &nbsp;"
-								);
+		$data->pageinfo = array(
+			$this->numPages,
+			$this->pagingLimit,
+			$this->curPage, 
+			sprintf(_L('Showing %d - %d of %d records on %d pages'), $this->displayStart, $this->displayEnd, $this->total, $this->numPages) . '&nbsp;'
+		);
 
 		header('Content-Type: application/json');
 		echo json_encode(!empty($data) ? $data : false);
@@ -149,42 +148,45 @@ class PdfManager extends PageBase {
 	}
 
 	public function getBurstListItem($burstObj) {
-		$id 			= $burstObj->id;
-		$defaultlink 	= 'pdfedit.php?id=' . $id;
+		$id = $burstObj->id;
+		$defaultlink = 'pdfedit.php?id=' . $id;
 
-		$title 			= escapehtml($burstObj->name);
-		$fileName 		= escapehtml($burstObj->filename);
-		$uploadDate 	= date("M j, Y g:i a", $burstObj->uploadTimestampMs / 1000);
-		$fileSize 		= $burstObj->size;
-		$status 		= $burstObj->status;
+		$title = escapehtml($burstObj->name);
+		$fileName = escapehtml($burstObj->filename);
+		$uploadDate = date("M j, Y g:i a", $burstObj->uploadTimestampMs / 1000);
+		$fileSize = $burstObj->size;
+		$status = $burstObj->status;
 
 		$tools = action_links (
-			action_link(" Edit", "pencil", 'pdfedit.php?id=' . $id),
-			action_link(" Send Email", "email_go", 'pdfsendmail.php?id=' . $id),
-			action_link(" Download", "pdficon_16", $this->burstsURL . '/' . $id. '/pdf'),
-			action_link(" Delete", "cross", '#', "deleteBurst(".$id.");")
+			action_link(_L(" Edit"), "pencil", 'pdfedit.php?id=' . $id),
+			action_link(_L(" Send Email"), "email_go", 'pdfsendmail.php?id=' . $id),
+			action_link(_L(" Download"), "pdficon_16", $this->burstsURL . '/' . $id. '/pdf'),
+			action_link(_L(" Delete"), "cross", '#', "deleteBurst(".$id.");")
 		);
 
 		$content = '<span data-burst-id="'.$id.'">';
-		$content .= 'File: &nbsp;<a href="'.$this->burstsURL . '/' . $id. '/pdf" title="Download File: '.$fileName.'">' .$fileName. '</a><br>';
-		$content .= 'Size: &nbsp;<strong>' . number_format(($fileSize / pow(2,20)), 1, '.', '') . 'MB</strong><br>';
-		$content .= 'Upload Date: &nbsp;<strong>' .$uploadDate.'</strong><br>';
-		$content .= 'Status: &nbsp;<strong>' .ucwords($status).'</strong></span>';
+		$content .= _L('File') . ': &nbsp;<a href="'.$this->burstsURL . '/' . $id. '/pdf" title="' . _L('Download File') . ': '.$fileName.'">' .$fileName. '</a><br>';
+		$content .= _L('Size') . ': &nbsp;<strong>' . number_format(($fileSize / pow(2,20)), 1, '.', '') . 'MB</strong><br>';
+		$content .= _L('Upload Date') . ': &nbsp;<strong>' .$uploadDate.'</strong><br>';
+		$content .= _L('Status') . ': &nbsp;<strong>' .ucwords($status).'</strong></span>';
 
-		$arrItem = array("itemid" 		=> $id,
-						  "defaultlink"	=> $defaultlink,
-						  "icon" 		=> 'img/pdficon_32.png',
-						  "title" 		=> $title,
-						  "content" 	=> $content,
-						  "tools" 		=> $tools);
+		$arrItem = array(
+			"itemid" => $id,
+			"defaultlink" => $defaultlink,
+			"icon" => 'img/pdficon_32.png',
+			"title" => $title,
+			"content" => $content,
+			"tools" => $tools
+		);
+
 		return $arrItem;
 	}
 
 	public function deleteAjaxResponse($id) {
-			$response = $this->csApi->deleteBurst($id);
-			header('Content-Type: application/json');
-			echo json_encode($response);
-			exit();
+		$response = $this->csApi->deleteBurst($id);
+		header('Content-Type: application/json');
+		echo json_encode($response);
+		exit();
 	}
 
 	public function setDisplayPagingDetails() {
