@@ -157,6 +157,12 @@ class PdfManager extends PageBase {
 		$fileSize = $burstObj->size;
 		$status = $burstObj->status;
 
+        if ($fileSize < 1000000) {
+            $formattedFileSize = number_format(($fileSize / pow(2,10)), 2, '.', '') . 'KB';
+        } else {
+            $formattedFileSize = number_format(($fileSize / pow(2,20)), 2, '.', '') . 'MB';
+        }
+
 		$tools = action_links (
 			action_link(_L(" Edit"), "pencil", 'pdfedit.php?id=' . $id),
 			action_link(_L(" Send Email"), "email_go", 'pdfsendmail.php?id=' . $id),
@@ -166,7 +172,7 @@ class PdfManager extends PageBase {
 
 		$content = '<span data-burst-id="'.$id.'">';
 		$content .= _L('File') . ': &nbsp;<a href="'.$this->burstsURL . '/' . $id. '/pdf" title="' . _L('Download File') . ': '.$fileName.'">' .$fileName. '</a><br>';
-		$content .= _L('Size') . ': &nbsp;<strong>' . number_format(($fileSize / pow(2,20)), 1, '.', '') . 'MB</strong><br>';
+		$content .= _L('Size') . ': &nbsp;<strong>' . $formattedFileSize . '</strong><br>';
 		$content .= _L('Upload Date') . ': &nbsp;<strong>' .$uploadDate.'</strong><br>';
 		$content .= _L('Status') . ': &nbsp;<strong>' .ucwords($status).'</strong></span>';
 
