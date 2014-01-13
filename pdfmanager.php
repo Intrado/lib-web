@@ -52,6 +52,7 @@ class PdfManager extends PageBase {
 	// @override
 	public function initialize() {
 		// override page option on PageBase
+        $this->options["title"] = 'PDF Manager';
 		$this->options["page"]  = 'notifications:pdfmanager';
 	}
 
@@ -102,7 +103,7 @@ class PdfManager extends PageBase {
 	public function sendPageOutput() {
 		echo '<link rel="stylesheet" type="text/css" href="css/pdfmanager.css">';
 		echo '<script type="text/javascript" src="script/pdfmanager.js"></script>';
-		startWindow(_L('PDF Report Manager'), 'padding: 3px;', false, true);
+		startWindow(_L($this->options['title']), 'padding: 3px;', false, true);
 		$feedButtons = array(icon_button(_L(' Upload New PDF'), "pdficon_16", null, "pdfedit.php"));
 		feed($feedButtons, null);
 		echo '<script type="text/javascript" src="script/feed.js.php"></script>
