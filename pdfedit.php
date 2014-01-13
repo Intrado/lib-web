@@ -90,7 +90,7 @@ class PdfEditPage extends PageForm {
 	
 				// Add this error message to the page output, but still
 				// allow the form to be displayed to take edits and resubmit
-				$this->error = _L("This PDF document was changed in another window or session. Please review the current data. You may need to redo your previous changes and resubmit.");
+				$this->error = _L("This PDF document was changed in another window or session during the time you've had it open. Please review the current data. You may need to redo your changes and resubmit.");
 			}
 		}
 
@@ -127,7 +127,7 @@ class PdfEditPage extends PageForm {
 			}
 
 			// We're storing a new record if burstId is null, otherwise updating an existing record
-			$action = (is_null($this->burstId)) ? 'uploaded' : 'updated';
+			$action = (is_null($this->burstId)) ? 'created' : 'updated';
 			if ($this->csApi->setBurstData($this->burstId, $name, $bursttemplateid)) {
 
 				// For success, we redirect back to the manager page with this notice to be shown on that page:
@@ -147,11 +147,14 @@ class PdfEditPage extends PageForm {
 		$this->options["page"]  = 'notifications:pdfmanager';
 		
 		// The page title depends on whether editing existing or uploading anew
-		$this->options['title'] = ($this->burstId) ? _L('Edit PDF Document Properties') : _L('Upload New PDF Document');
+		$this->options['title'] = ($this->burstId) ? _L('Edit Document Properties') : _L('Create New Document');
 
 		// URL hacking or what?
+        //If you are NOT creating a new Document or the burst data we're working on is NOT a valid object in the db
+        //OR you don't have permission to view it because you don't own it, you get this error.
+        // Then the user is probably trying to bypass the page.
 		if (! (is_null($this->burstId) || is_object($this->burstData))) {
-			$html = _L('The document you have requested could not be found.') . "<br/>\n";
+			$html = _L('The Document you have requested could not be found. It may not exist or your account does not have permission to view it.') . "<br/>\n";
 		}
 		else {
 			$html = $this->form->render();
@@ -243,8 +246,8 @@ class PdfEditPage extends PageForm {
             $formdata['name']['fieldhelp'] = _L('The name of the Document.');
             $formdata['bursttemplateid']['fieldhelp'] = _L('This is the template which is used when processing the PDF file for delivery. See Guide for more information.');
             $helpsteps = array(
-                _L('The name associated with this Document.'),
-                _L('This is the template which will be used when processing the PDF file for delivery. Templates are designed to be compatible with specific PDF file layouts. '),
+                _L('This is the name associated with this Document. You may edit this field if you would prefer a different name.'),
+                _L('This is the template which will be used when processing this Document for delivery. Templates are designed to be compatible with specific PDF file layouts. If this is not the correct template for the layout of this PDF file, you may select another. If there is no template for processing this PDF file, please contact support. A representative will work with you to create a template within 24 hours.'),
                 _L('This is the PDF file associated with this delivery Document.')
             );
         }
