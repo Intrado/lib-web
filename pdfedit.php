@@ -149,10 +149,9 @@ class PdfEditPage extends PageForm {
 		// The page title depends on whether editing existing or uploading anew
 		$this->options['title'] = ($this->burstId) ? _L('Edit Document Properties') : _L('Create New Document');
 
-		// URL hacking or what?
         //If you are NOT creating a new Document or the burst data we're working on is NOT a valid object in the db
         //OR you don't have permission to view it because you don't own it, you get this error.
-        // Then the user is probably trying to bypass the page.
+        // The user is probably trying to bypass the page by editing the ID in the URL.
 		if (! (is_null($this->burstId) || is_object($this->burstData))) {
 			$html = _L('The Document you have requested could not be found. It may not exist or your account does not have permission to view it.') . "<br/>\n";
 		}
@@ -171,7 +170,7 @@ class PdfEditPage extends PageForm {
 	}
 
 	/**
-	 * Factory method to spit out a form object for PDF uploads
+	 * Method to create form object content for this page, including guide help.
 	 *
 	 * FIXME - Commsuite API supports no validation for things like duplicate names, invalid tempalte id's
 	 *
@@ -206,7 +205,7 @@ class PdfEditPage extends PageForm {
 			// Then a file has already been uploaded; we're 
 			// just going to show a read-only representation
 			$formdata['existingpdf'] = array(
-				"label" => _L('PDF File'),
+				"label" => _L('File'),
                 "fieldhelp" => _L('This is the PDF file which will be processed for delivery.'),
 				'value' => 'thisshouldntneedavalue', // FIXME: Form.obj.php breaks without this
 				"control" => array('FormHtml', 'html' => $this->burstData->filename),
@@ -217,7 +216,7 @@ class PdfEditPage extends PageForm {
 		else {
 			// Otherwise we need to show the upload formitem to be able to select and upload a new PDF
 			$formdata['thefile'] = array(
-				"label" => _L('PDF File'),
+				"label" => _L('File'),
                 "fieldhelp" => _L('Click the Choose File button and navigate to the location of the PDF file on your computer.'),
 				"value" => '',
 				"validators" => array(
