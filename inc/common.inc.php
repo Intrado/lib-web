@@ -102,10 +102,10 @@ function setupCommsuiteApi() {
 	global $USER;
 
 	$apiClient = new ApiClient(
-		$_SERVER['SERVER_NAME'], // TODO - pull this from settings.ini.php
-		customerUrlComponent(),
-		$USER->id,
-		$_COOKIE[strtolower(customerUrlComponent()) . '_session']
+		"https://{$_SERVER['SERVER_NAME']}/" . customerUrlComponent() ."/api/2/users/{$USER->id}",
+		array(
+			"X-Auth-SessionId: {$_COOKIE[strtolower(customerUrlComponent()) . '_session']}"
+		)
 	);
 
 	return(new CommsuiteApiClient($apiClient));

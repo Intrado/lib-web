@@ -2,12 +2,8 @@
 
 class ApiClient {
 
-	public $apiHostname = '';
-	public $apiCustomer = '';
-	public $apiUser = '';
-	public $apiAuth = '';
-	public $customerUrl = '';
-	public $ApiUrl = '';
+	public $ApiUrl;
+	public $staticHeaders;
 
 	/**
 	 * Constructor
@@ -17,18 +13,10 @@ class ApiClient {
 	 * @param integer The ID for the logged in user making the request
 	 * @param string The contents of the session auth cookie for this logged in customer/user 
 	 */
-	public function __construct($apiHostname, $apiCustomer, $apiUser, $apiAuth) {
+	public function __construct($ApiUrl, $staticHeaders = Array()) {
 
-		$this->apiHostname = $apiHostname;
-		$this->apiCustomer = $apiCustomer;
-		$this->apiUser = $apiUser;
-		$this->apiAuth = $apiAuth;
-
-		// TODO - decide if we want to leverage a lower overhead internal, non-SSL Url (localhost?)
-		// vs a public facing one and how to split the functionality here (trusted only access, etc)
-		// and where to get the configuration data from (settings.ini.php anyone?)
-		$this->customerUrl = "https://{$this->apiHostname}/{$this->apiCustomer}/";
-		$this->ApiUrl = "{$this->customerUrl}api/2/users/{$this->apiUser}";
+		$this->ApiUrl = $ApiUrl;
+		$this->staticHeaders = $staticHeaders;
 	}
 
 	/**
@@ -75,10 +63,8 @@ class ApiClient {
 		curl_setopt($creq, CURLOPT_HEADER, 1);
 
 		// Some initial headers we will need, but there may be more...
-		$headers = array(
-			"Accept: application/json",
-			"X-Auth-SessionId: {$this->apiAuth}"
-		);
+		$headers = $this->staticHeaders;
+		$headers[] = "Accept: application/json";
 
 		// Set some options based on the REST method; GET is default, so no case for that
 		switch ($method) {
