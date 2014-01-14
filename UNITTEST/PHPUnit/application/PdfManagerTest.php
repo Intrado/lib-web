@@ -128,7 +128,7 @@ class PdfManagerTest extends PHPUnit_Framework_TestCase {
 		// creating a new instance of PdfManager (in setup() above) calls initialize() in it's parent constructor,
 		// so there's no need to call it in this test method, as it has already been called at the start of this test
 
-		$this->assertEquals($this->pdfManager->options['title'], 'PDF Manager');
+		$this->assertEquals($this->pdfManager->options['title'], 'Secure Document Delivery');
 		$this->assertEquals($this->pdfManager->options['page'], 'notifications:pdfmanager');
 	}
 
