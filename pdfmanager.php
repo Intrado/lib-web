@@ -102,7 +102,7 @@ class PdfManager extends PageBase {
 	// @override
 	public function sendPageOutput() {
 		echo '<link rel="stylesheet" type="text/css" href="css/pdfmanager.css">';
-		//echo '<script type="text/javascript" src="script/pdfmanager.js"></script>';
+		echo '<script type="text/javascript" src="script/pdfmanager.js"></script>';
 		startWindow(_L("My Documents"), 'padding: 3px;', false, true);
 		$feedButtons = array(icon_button(_L(' Create New Document'), "pdficon_16", null, "pdfedit.php"));
 		feed($feedButtons, null);
