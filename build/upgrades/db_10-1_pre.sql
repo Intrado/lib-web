@@ -26,4 +26,6 @@ ALTER TABLE `burst`
   DROP `actualreportscount`
 $$$
 
-  
+-- $rev 4
+ALTER TABLE `job` ADD `burstid` INT NULL DEFAULT NULL AFTER `questionnaireid`
+$$$

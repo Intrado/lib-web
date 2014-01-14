@@ -2324,3 +2324,11 @@ $$$
 update setting set value='10.1/3' where name='_dbversion'
 $$$
 -- END 10.1/3
+
+-- START 10.1/4
+ALTER TABLE `job` ADD `burstid` INT NULL DEFAULT NULL AFTER `questionnaireid`
+$$$
+
+update setting set value='10.1/4' where name='_dbversion'
+$$$
+-- END 10.1/4
