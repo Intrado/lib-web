@@ -13,7 +13,7 @@ class ApiClient {
 	 * @param integer The ID for the logged in user making the request
 	 * @param string The contents of the session auth cookie for this logged in customer/user 
 	 */
-	public function __construct($ApiUrl, $staticHeaders = Array()) {
+	public function __construct($ApiUrl, $staticHeaders = array()) {
 
 		$this->ApiUrl = $ApiUrl;
 		$this->staticHeaders = $staticHeaders;
