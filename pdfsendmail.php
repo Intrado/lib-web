@@ -133,8 +133,9 @@ class PdfSendMail extends PageForm {
 			$job->starttime = date("H:i", strtotime($callEarly));
 			$job->endtime = date("H:i", strtotime($callLate));
 
-			// set burst options for this job
-			$job->burstid = $this->burst->id;
+			// TODO: create list from burst
+			// TODO: create attachment from burst
+			// TODO: set password protect option on burst attachment
 			// if password protection for each individually generated bursted pdf...
 			if ($doPasswordProtect) {
 				// FIXME: At some point, the user needs to be able to select the field they wish to use for password protection

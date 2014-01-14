@@ -29,3 +29,7 @@ $$$
 -- $rev 4
 ALTER TABLE `job` ADD `burstid` INT NULL DEFAULT NULL AFTER `questionnaireid`
 $$$
+
+-- $rev 5
+ALTER TABLE `job` DROP `burstid`
+$$$
