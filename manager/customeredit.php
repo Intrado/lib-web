@@ -237,6 +237,7 @@ $settings = array(
 	'_hasfeed' => '0',
 	'_allowoldmessagesender' => '0',
 	'_hasquicktip' => '0',
+	'_cmaappid' => '',
 	'autoreport_replyname' => 'SchoolMessenger',
 	'autoreport_replyemail' => 'autoreport@schoolmessenger.com',
 	'_renewaldate' => '',
@@ -630,6 +631,16 @@ $formdata["hasquicktip"] = array(
 	"helpstep" => $helpstepnum
 );
 
+$formdata["cmaappid"] = array(
+	"label" => _L('CMA App. ID'),
+	"value" => (intval($settings['_cmaappid']) ? intval($settings['_cmaappid']) : ''),
+	"validators" => array(
+		array('ValNumber')
+	),
+	"control" => array("TextField","size"=>20),
+	"helpstep" => $helpstepnum
+);
+
 // Answering machine detection methods
 $amdtypes = array(
 	"ivr" => "Default / IVR Intro",
@@ -937,6 +948,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
 			$_dbcon = $savedbcon;
 		}
+
+		// CMA App ID is integer value only at this time.
+		setCustomerSystemSetting('_cmaappid', intval($postdata['cmaappid']), $custdb);
 
 		Query("COMMIT");
 		if($button == "done") {
