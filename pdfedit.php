@@ -146,8 +146,9 @@ class PdfEditPage extends PageForm {
 		// define main:subnav tab settings
 		$this->options["page"]  = 'notifications:pdfmanager';
 		
-		// The page title depends on whether editing existing or uploading anew
-		$this->options['title'] = ($this->burstId) ? _L('Edit Document Properties') : _L('Create New Document');
+        //Note: This is the title of the page. It should not also be the header of the form "window".
+        // This 'title' is set to global $TITLE in the base class.
+		$this->options['title'] = _L('Document Editor');
 
         //If you are NOT creating a new Document or the burst data we're working on is NOT a valid object in the db
         //OR you don't have permission to view it because you don't own it, you get this error.
@@ -263,6 +264,20 @@ class PdfEditPage extends PageForm {
 
 		return($form);
 	}
+
+    /**
+     * Overrides method in base class so that the page title and window header are not duplicated.
+     */
+    function sendPageOutput() {
+        if (is_null($this -> burstId)){
+            startWindow("Create New Document");
+        } else {
+            startWindow("Edit Existing Document");
+        }
+        echo $this->pageOutput;
+        endWindow();
+    }
+
 
 	/**
 	 * Nifty bootstrap modal implementation lifted from tips.php/js
