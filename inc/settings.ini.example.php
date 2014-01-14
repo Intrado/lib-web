@@ -15,6 +15,10 @@ timeout=5500
 host="localhost:7912"
 timeout=5500
 
+; cma service
+[cmaserver]
+host="sandbox.testschoolmessenger.com/cma/1"
+
 ;report server connection information
 [reportserver]
 host="localhost:8089"
