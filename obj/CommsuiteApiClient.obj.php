@@ -96,6 +96,16 @@ class CommsuiteApiClient {
 		$res = $this->apiClient->delete(self::API_BURSTS . "/{$id}");
 		return($res['code'] == 200 ? true : false);
 	}
+
+	/** Get the list of portions for this burst
+	 * GET /2/users/{userid}/bursts/{burstid}/portions
+	 * @param int $burstId the id which identifies the burst
+	 * @return object which contains the list of portions available
+	 */
+	public function getBurstPortionList($burstId) {
+		$res = $this->apiClient->get(self::API_BURSTS . "/{$burstId}/portions");
+		return($res['code'] == 200 ? json_decode($res['body']) : false);
+	}
 }
 
 ?>

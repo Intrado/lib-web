@@ -53,6 +53,9 @@ class PdfSendMail extends PageForm {
 	private $burst;
 
 
+	/**
+	 * @param CommsuiteApiClient $csApi
+	 */
 	public function __construct($csApi) {
 		$this->csApi = $csApi;
 		parent::__construct();
@@ -133,7 +136,6 @@ class PdfSendMail extends PageForm {
 			$job->starttime = date("H:i", strtotime($callEarly));
 			$job->endtime = date("H:i", strtotime($callLate));
 
-			// TODO: create list from burst
 			// TODO: create attachment from burst
 			// TODO: set password protect option on burst attachment
 			// if password protection for each individually generated bursted pdf...
@@ -151,6 +153,7 @@ class PdfSendMail extends PageForm {
 			$messageGroup->modified = $job->modifydate;
 			$messageGroup->deleted = 1;
 			$messageGroup->create();
+			$job->messagegroupid = $messageGroup->id;
 
 			// Create the email message and attach it to the message group
 			$message = new Message();
@@ -175,29 +178,6 @@ class PdfSendMail extends PageForm {
 				$messagePart->create();
 			}
 
-			// FIXME: Adding a dummy list with the current user's email, till job processor creates one from the burst object
-			// Constants
-			$langfield = FieldMap::getLanguageField();
-			$fnamefield = FieldMap::getFirstNameField();
-			$lnamefield = FieldMap::getLastNameField();
-
-			// New Person
-			$person = new Person();
-			$person->userid = $USER->id;
-			$person->deleted = 0; // NOTE: This person must not be set as deleted, otherwise the list will not include him/her.
-			$person->type = "manualadd";
-			$person->$fnamefield = $USER->firstname;
-			$person->$lnamefield = $USER->lastname;
-			$person->$langfield = "en";
-			$person->create();
-
-			$emailDestination = new Email();
-			$emailDestination->personid = $person->id;
-			$emailDestination->email = $USER->email;
-			$emailDestination->sequence = 0;
-			$emailDestination->editlock = 0;
-			$emailDestination->create();
-
 			$list = new PeopleList();
 			$list->userid = $USER->id;
 			$list->name = $job->name;
@@ -205,14 +185,8 @@ class PdfSendMail extends PageForm {
 			$list->modifydate = $job->modifydate;
 			$list->deleted = 1;
 			$list->create();
+			$this->fillListFromBurst($list, $this->burst->id);
 
-			$listEntry = new ListEntry();
-			$listEntry->listid = $list->id;
-			$listEntry->type = "add";
-			$listEntry->personid = $person->id;
-			$listEntry->create();
-
-			$job->messagegroupid = $messageGroup->id;
 			$job->create();
 
 			$jobList = new JobList();
@@ -244,6 +218,19 @@ class PdfSendMail extends PageForm {
 	}
 
 	/*=============== helper/wrapper methods below =================*/
+	/**
+	 * @param PeopleList $list to fill with the pkeys found
+	 * @param int $burstId the id which identifies the burst
+	 */
+	public function fillListFromBurst($list, $burstId) {
+		$pkeys = array();
+		$portionList = $this->csApi->getBurstPortionList($burstId);
+		if ($portionList) {
+			foreach ($portionList->portions as $portion)
+				$pkeys[] = $portion->identifierText;
+		}
+		$list->updateManualAddByPkeys($pkeys);
+	}
 
 	public function getUserBroadcastTypes() {
 		return JobType::getUserJobTypes(false);

@@ -71,15 +71,21 @@ class PdfSendMailTest extends PHPUnit_Framework_TestCase {
 
 		$this->csApi = $this->getMockBuilder('CommsuiteApiClient')
 							->setConstructorArgs(array($this->apiClient))
-							->setMethods(array('getBurstData'))
+							->setMethods(array('getBurstData', 'getBurstPortionList'))
 							->getMock();
 
 		$burstObj = (object) null;
 		$burstObj->id = 1;
 		$burstObj->name = 'MyBurst';
-		$this->csApi->expects($this->any())
-					->method('getBurstData')
-					->will($this->returnValue($burstObj));
+		$this->csApi->expects($this->any())->method('getBurstData')->will($this->returnValue($burstObj));
+
+		$burstPortionObj = (object) null;
+		$burstPortionObj->identifierText = "student_id";
+		$burstPortionObj->firstPage = 1;
+		$burstPortionObj->lastPage = 2;
+		$burstListObj = (object) null;
+		$burstListObj->portions = array($burstPortionObj);
+		$this->csApi->expects($this->any())->method('getBurstPortionList')->will($this->returnValue($burstListObj));
 
 		// define PdfSendMail mock object
 		$this->pdfSendMail = $this->getMockBuilder('PdfSendMail')
@@ -143,8 +149,22 @@ class PdfSendMailTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($this->pdfSendMail->emailDomain, $this->pdfSendMail->formdata['fromemail']['validators'][2]['domain']);
 	}
 
+	public function test_fillListFromBurst() {
+		$list = new MyPersonList();
+		$this->pdfSendMail->fillListFromBurst($list, 1);
 
+		$this->assertCount(1, $list->pkeys);
+		$this->assertContains("student_id", $list->pkeys, "the pkey was not added to the list");
+	}
+}
 
+/* Spy class to capture the pkeys being added to the new list */
+class MyPersonList extends PeopleList {
+	var $pkeys;
+
+	function updateManualAddByPkeys($pkeys, $removeExisting = true) {
+		$this->pkeys = $pkeys;
+	}
 }
 
 ?>
