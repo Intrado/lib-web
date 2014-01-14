@@ -171,7 +171,7 @@ class PdfEditPage extends PageForm {
 	}
 
 	/**
-	 * Method to create form object content for this page, including guide help.
+	 * Method to create form object content for this page, including guide and mouseover help.
 	 *
 	 * FIXME - Commsuite API supports no validation for things like duplicate names, invalid tempalte id's
 	 *
