@@ -24,7 +24,7 @@ require_once("obj/LogoRadioButton.fi.php");
 require_once("obj/LanguagesItem.fi.php");
 require_once("obj/ValInboundNumber.val.php");
 
-// For QuickTip TAI table activation stuffs
+// For Quick Tip TAI table activation stuffs
 require_once("loadtaitemplatedata.php");
 require_once("inc/customersetup.inc.php");
 require_once("../obj/Person.obj.php");
@@ -285,18 +285,17 @@ if ($customerid && $settings['_logocontentid'] != '') {
 	$logos = array( "Saved" => 'No change - Preview: <div style="display:inline;"><img src="customerlogo.img.php?id=' . $customerid .'" width="70px" alt="" /></div>');
 }
 // Content for logo selector
-$logos += array( 	"AutoMessenger" => '<img src="mimg/auto_messenger.jpg" alt="AutoMessenger" title="AutoMessenger" />',
-					"SchoolMessenger" => '<img src="mimg/logo_small.gif" alt="SchoolMessenger" title="SchoolMessenger" />',
-					"Skylert" => '<img src="mimg/sky_alert.jpg" alt="Skylert" title="Skylert" />');
+$logos += array(
+	"AutoMessenger" => '<img src="mimg/auto_messenger.jpg" alt="AutoMessenger" title="AutoMessenger" />',
+	"SchoolMessenger" => '<img src="mimg/logo_small.gif" alt="SchoolMessenger" title="SchoolMessenger" />',
+	"Skylert" => '<img src="mimg/sky_alert.jpg" alt="Skylert" title="Skylert" />'
+);
 
 // Locations and mimetype for default logos
 $defaultlogos = array(
-					"AutoMessenger" => array("filelocation" => "mimg/auto_messenger.jpg",
-											"filetype" => "image/jpeg"),
-					"SchoolMessenger" => array("filelocation" => "mimg/logo_small.gif",
-											"filetype" => "image/gif"),
-					"Skylert" => array("filelocation" => "mimg/sky_alert.jpg",
-										"filetype" => "image/jpeg")
+	"AutoMessenger" => array("filelocation" => "mimg/auto_messenger.jpg", "filetype" => "image/jpeg"),
+	"SchoolMessenger" => array("filelocation" => "mimg/logo_small.gif", "filetype" => "image/gif"),
+	"Skylert" => array("filelocation" => "mimg/sky_alert.jpg", "filetype" => "image/jpeg")
 );
 
 
@@ -325,112 +324,110 @@ if ($settings['inboundnumber'] != "")
 	$tollfreenumbers = array($settings['inboundnumber'] => $settings['inboundnumber']) + $tollfreenumbers;
 
 $formdata["inboundnumber"] = array(
-						"label" => _L('800 Inbound number'),
-						"value" => $settings['inboundnumber'],
-						"validators" => array(
-							array("ValPhone"),
-							array("ValInArray", "values" => array_keys($tollfreenumbers))
-						),
-						"control" => array("SelectMenu", "values" => array("" =>_L("-- Select a Toll Free Number --")) + $tollfreenumbers),
-						"helpstep" => $helpstepnum
+	"label" => _L('800 Inbound number'),
+	"value" => $settings['inboundnumber'],
+	"validators" => array(
+		array("ValPhone"),
+		array("ValInArray", "values" => array_keys($tollfreenumbers))
+	),
+	"control" => array("SelectMenu", "values" => array("" =>_L("-- Select a Toll Free Number --")) + $tollfreenumbers),
+	"helpstep" => $helpstepnum
 );
 
 
 $formdata["maxguardians"] = array(
-						"label" => _L('Max Guardians'),
-						"value" => $settings['maxguardians'],
-						"validators" => array(
-							array('ValNumber', 'min' => $settings['maxguardians']>=0?$settings['maxguardians']:0, 'max' => 99)
-						),
-						"control" => array("TextField","size" => 4, "maxlength" => 4),
-						"helpstep" => $helpstepnum
+	"label" => _L('Max Guardians'),
+	"value" => $settings['maxguardians'],
+	"validators" => array(
+		array('ValNumber', 'min' => $settings['maxguardians']>=0?$settings['maxguardians']:0, 'max' => 99)
+	),
+	"control" => array("TextField","size" => 4, "maxlength" => 4),
+	"helpstep" => $helpstepnum
 );
 
 $formdata["maxphones"] = array(
-						"label" => _L('Max Phones'),
-						"value" => $settings['maxphones'],
-						"validators" => array(
-							array('ValNumber', 'min' => $settings['maxphones']>0?$settings['maxphones']:1, 'max' => 99)
-						),
-						"control" => array("TextField","size" => 4, "maxlength" => 4),
-						"helpstep" => $helpstepnum
+	"label" => _L('Max Phones'),
+	"value" => $settings['maxphones'],
+	"validators" => array(
+		array('ValNumber', 'min' => $settings['maxphones']>0?$settings['maxphones']:1, 'max' => 99)
+	),
+	"control" => array("TextField","size" => 4, "maxlength" => 4),
+	"helpstep" => $helpstepnum
 );
 
 $formdata["maxemails"] = array(
-						"label" => _L('Max Emails'),
-						"value" => $settings['maxemails'],
-						"validators" => array(
-							array('ValNumber', 'min' => $settings['maxemails']>0?$settings['maxemails']:1, 'max' => 99)
-						),
-						"control" => array("TextField","size" => 4, "maxlength" => 4),
-						"helpstep" => $helpstepnum
+	"label" => _L('Max Emails'),
+	"value" => $settings['maxemails'],
+	"validators" => array(
+		array('ValNumber', 'min' => $settings['maxemails']>0?$settings['maxemails']:1, 'max' => 99)
+	),
+	"control" => array("TextField","size" => 4, "maxlength" => 4),
+	"helpstep" => $helpstepnum
 );
 
-
-
 $formdata["autoreportreplyname"] = array(
-						"label" => _L('AutoReport Name'),
-						"value" => $settings['autoreport_replyname'],
-						"validators" => array(
-							array("ValRequired")
-						),
-						"control" => array("TextField","maxlength"=>255,"min"=>3,"size"=>35),
-						"helpstep" => $helpstepnum
+	"label" => _L('AutoReport Name'),
+	"value" => $settings['autoreport_replyname'],
+	"validators" => array(
+		array("ValRequired")
+	),
+	"control" => array("TextField","maxlength"=>255,"min"=>3,"size"=>35),
+	"helpstep" => $helpstepnum
 );
 
 $formdata["autoreportreplyemail"] = array(
-						"label" => _L('AutoReport Email'),
-						"value" => $settings['autoreport_replyemail'],
-						"validators" => array(
-							array("ValRequired"),
-							array("ValLength","max" => 255),
-							array("ValEmail")
-						),
-						"control" => array("TextField","maxlength"=>255,"min"=>3,"size"=>35),
-						"helpstep" => $helpstepnum
+	"label" => _L('AutoReport Email'),
+	"value" => $settings['autoreport_replyemail'],
+	"validators" => array(
+		array("ValRequired"),
+		array("ValLength","max" => 255),
+		array("ValEmail")
+	),
+	"control" => array("TextField","maxlength"=>255,"min"=>3,"size"=>35),
+	"helpstep" => $helpstepnum
 );
 
 $formdata["emaildomain"] = array(
-						"label" => _L('Email Domain'),
-						"value" => $settings['emaildomain'],
-						"validators" => array(
-							array("ValLength","max" => 65535),
-							array("ValDomainList")
-						),
-						"control" => array("TextField","maxlength"=>65535,"min"=>3,"size"=>35),
-						"helpstep" => $helpstepnum
+	"label" => _L('Email Domain'),
+	"value" => $settings['emaildomain'],
+	"validators" => array(
+		array("ValLength","max" => 65535),
+		array("ValDomainList")
+	),
+	"control" => array("TextField","maxlength"=>65535,"min"=>3,"size"=>35),
+	"helpstep" => $helpstepnum
 );
 
 $tinydomains = $SETTINGS['feature']['tinydomain'];
 $formdata["tinydomain"] = array(
-						"label" => _L('Tiny Domain'),
-						"value" => $settings['tinydomain'],
-						"validators" => array(
-							array("ValRequired"),
-							array("ValInArray", "values" => $tinydomains)
-						),
-						"control" => array("SelectMenu", "values" => array("" =>_L("-- Select a Domain --")) + array_combine($tinydomains, $tinydomains)),
-						"helpstep" => $helpstepnum
+	"label" => _L('Tiny Domain'),
+	"value" => $settings['tinydomain'],
+	"validators" => array(
+		array("ValRequired"),
+		array("ValInArray", "values" => $tinydomains)
+	),
+	"control" => array("SelectMenu", "values" => array("" =>_L("-- Select a Domain --")) + array_combine($tinydomains, $tinydomains)),
+	"helpstep" => $helpstepnum
 );
 
 $formdata["softdeletemonths"] = array(
-						"label" => _L('Auto Message Expire Months (soft delete)'),
-						"value" => $settings['softdeletemonths'],
-						"validators" => array(
-							array('ValNumber', 'min' => 0, 'max' => 30000)
-						),
-						"control" => array("TextField","size" => 6, "maxlength" => 6),
-						"helpstep" => $helpstepnum
+	"label" => _L('Auto Message Expire Months (soft delete)'),
+	"value" => $settings['softdeletemonths'],
+	"validators" => array(
+		array('ValNumber', 'min' => 0, 'max' => 30000)
+	),
+	"control" => array("TextField","size" => 6, "maxlength" => 6),
+	"helpstep" => $helpstepnum
 );
 
 $formdata["harddeletemonths"] = array(
-						"label" => _L('Auto Report Expire Months (HARD delete)'),
-						"value" => $settings['harddeletemonths'],
-						"validators" => array(
-							array('ValNumber', 'min' => 0, 'max' => 30000)
-						),
-						"control" => array("TextField","size" => 6, "maxlength" => 6),
-						"helpstep" => $helpstepnum
+	"label" => _L('Auto Report Expire Months (HARD delete)'),
+	"value" => $settings['harddeletemonths'],
+	"validators" => array(
+		array('ValNumber', 'min' => 0, 'max' => 30000)
+	),
+	"control" => array("TextField","size" => 6, "maxlength" => 6),
+	"helpstep" => $helpstepnum
 );
 
 $formdata[] = _L("Languages");
@@ -438,191 +435,199 @@ $formdata[] = _L("Languages");
 
 $languages = $customerid?QuickQueryList("select code, name from language",true,$custdb):array("en" => "English", "es" => "Spanish");
 $formdata["languages"] = array(
-						"label" => _L('Languages'),
-						"value" => json_encode($languages),
-						"validators" => array(
-							array("ValRequired"),
-							array("ValLanguages")),
-						"control" => array("LanguagesItem", 
-							"ttslangs" => $customerid?QuickQueryList("select languagecode from ttsvoice", false, $custdb):array_keys($ttslangs),
-							"googlelangs" => $googlangs),
-						"helpstep" => $helpstepnum
+	"label" => _L('Languages'),
+	"value" => json_encode($languages),
+	"validators" => array(
+		array("ValRequired"),
+		array("ValLanguages")),
+	"control" => array("LanguagesItem", 
+		"ttslangs" => $customerid?QuickQueryList("select languagecode from ttsvoice", false, $custdb):array_keys($ttslangs),
+		"googlelangs" => $googlangs),
+	"helpstep" => $helpstepnum
 );
 
 $formdata[] = _L("SMS");
 // -----------------------------------------------------------------------------
 
 $formdata["hassms"] = array(
-						"label" => _L('Has SMS'),
-						"value" => $settings['_hassms'],
-						"validators" => array(),
-						"control" => array("CheckBox"),
-						"helpstep" => $helpstepnum
+	"label" => _L('Has SMS'),
+	"value" => $settings['_hassms'],
+	"validators" => array(),
+	"control" => array("CheckBox"),
+	"helpstep" => $helpstepnum
 );
+
 $formdata["maxsms"] = array(
-						"label" => _L('Max SMS'),
-						"value" => $settings['maxsms'],
-						"validators" => array(
-							array('ValNumber', 'min' => $settings['maxsms']>0?$settings['maxsms']:1, 'max' => 99)
-						),
-						"control" => array("TextField","size" => 4, "maxlength" => 4),
-						"helpstep" => $helpstepnum
+	"label" => _L('Max SMS'),
+	"value" => $settings['maxsms'],
+	"validators" => array(
+		array('ValNumber', 'min' => $settings['maxsms']>0?$settings['maxsms']:1, 'max' => 99)
+	),
+	"control" => array("TextField","size" => 4, "maxlength" => 4),
+	"helpstep" => $helpstepnum
 );
+
 $formdata["enablesmsoptin"] = array(
-						"label" => _L('SMS - Enable Opt-in'),
-						"value" => $settings['enablesmsoptin'],
-						"validators" => array(),
-						"control" => array("CheckBox"),
-						"helpstep" => $helpstepnum
+	"label" => _L('SMS - Enable Opt-in'),
+	"value" => $settings['enablesmsoptin'],
+	"validators" => array(),
+	"control" => array("CheckBox"),
+	"helpstep" => $helpstepnum
 );
+
 $formdata["smscustomername"] = array(
-						"label" => _L('SMS Customer Name'),
-						"value" => $settings['smscustomername'],
-						"validators" => array(
-							array("ValConditionallyRequired", "field" => "hassms"),
-							array("ValLength","max" => 50),
-							array("ValSmsText")
-						),
-						"requires" => array("hassms"),
-						"control" => array("TextField","maxlength"=>50,"size"=>25),
-						"helpstep" => $helpstepnum
+	"label" => _L('SMS Customer Name'),
+	"value" => $settings['smscustomername'],
+	"validators" => array(
+		array("ValConditionallyRequired", "field" => "hassms"),
+		array("ValLength","max" => 50),
+		array("ValSmsText")
+	),
+	"requires" => array("hassms"),
+	"control" => array("TextField","maxlength"=>50,"size"=>25),
+	"helpstep" => $helpstepnum
 );
+
 $formdata["shortcodegroupname"] = array(
-						"label" => _L("Shortcode Group"),
-						"control" => array("FormHtml","html"=>"<div>".$shortcodegroupname."</div>"),
-						"helpstep" => $helpstepnum
+	"label" => _L("Shortcode Group"),
+	"control" => array("FormHtml","html"=>"<div>".$shortcodegroupname."</div>"),
+	"helpstep" => $helpstepnum
 );
 
 $formdata[] = _L("API");
 // -----------------------------------------------------------------------------
 
 $formdata["hassmapi"] = array(
-						"label" => _L('Has SMAPI'),
-						"value" => $settings['_hassmapi'],
-						"validators" => array(),
-						"control" => array("CheckBox"),
-						"helpstep" => $helpstepnum
+	"label" => _L('Has SMAPI'),
+	"value" => $settings['_hassmapi'],
+	"validators" => array(),
+	"control" => array("CheckBox"),
+	"helpstep" => $helpstepnum
 );
+
 $formdata["oem"] = array(
-						"label" => _L('OEM'),
-						"value" => isset($custinfo)?$custinfo["oem"]:"",
-						"validators" => array(
-							array("ValLength","max" => 50)
-						),
-						"control" => array("TextField","maxlength"=>50,"size"=>4),
-						"helpstep" => $helpstepnum
+	"label" => _L('OEM'),
+	"value" => isset($custinfo)?$custinfo["oem"]:"",
+	"validators" => array(
+		array("ValLength","max" => 50)
+	),
+	"control" => array("TextField","maxlength"=>50,"size"=>4),
+	"helpstep" => $helpstepnum
 );
+
 $formdata["oemid"] = array(
-						"label" => _L('OEM id'),
-						"value" => isset($custinfo)?$custinfo["oemid"]:"",
-						"validators" => array(
-							array("ValLength","max" => 50)
-						),
-						"control" => array("TextField","maxlength"=>50,"size"=>4),
-						"helpstep" => $helpstepnum
+	"label" => _L('OEM id'),
+	"value" => isset($custinfo)?$custinfo["oemid"]:"",
+	"validators" => array(
+		array("ValLength","max" => 50)
+	),
+	"control" => array("TextField","maxlength"=>50,"size"=>4),
+	"helpstep" => $helpstepnum
 );
 
 $formdata[] = _L("Callback");
 // -----------------------------------------------------------------------------
 
 $formdata["hascallback"] = array(
-						"label" => _L('Has Callback'),
-						"value" => $settings['_hascallback'],
-						"validators" => array(),
-						"control" => array("CheckBox"),
-						"helpstep" => $helpstepnum
+	"label" => _L('Has Callback'),
+	"value" => $settings['_hascallback'],
+	"validators" => array(),
+	"control" => array("CheckBox"),
+	"helpstep" => $helpstepnum
 );
 
 $formdata["callbackdefault"] = array(
-						"label" => _L('Callback Default'),
-						"value" => $settings['callbackdefault'],
-						"validators" => array(
-							array("ValInArray", "values" => array("inboundnumber","callerid"))
-						),
-						"control" => array("SelectMenu", "values" => array("inboundnumber" => "Inbound Number","callerid" => "Default CallerID")),
-						"helpstep" => $helpstepnum
+	"label" => _L('Callback Default'),
+	"value" => $settings['callbackdefault'],
+	"validators" => array(
+		array("ValInArray", "values" => array("inboundnumber","callerid"))
+	),
+	"control" => array("SelectMenu", "values" => array("inboundnumber" => "Inbound Number","callerid" => "Default CallerID")),
+	"helpstep" => $helpstepnum
 );
 
 $formdata[] = _L("Additional Features");
 // -----------------------------------------------------------------------------
 
 $formdata["portal"] = array(
-						"label" => _L('Portal'),
-						"value" => $settings['_hasportal']?"contactmanager":($settings['_hasselfsignup']?"selfsignup":"none"),
-						"validators" => array(),
-						"control" => array("SelectMenu","values" => array("none" => "None", "contactmanager" => "Contact Manager", "selfsignup" => "Self-Signup")),
-						"helpstep" => $helpstepnum
+	"label" => _L('Portal'),
+	"value" => $settings['_hasportal']?"contactmanager":($settings['_hasselfsignup']?"selfsignup":"none"),
+	"validators" => array(),
+	"control" => array("SelectMenu","values" => array("none" => "None", "contactmanager" => "Contact Manager", "selfsignup" => "Self-Signup")),
+	"helpstep" => $helpstepnum
 );
 
 $formdata["hassurvey"] = array(
-						"label" => _L('Has Survey'),
-						"value" => $settings['_hassurvey'],
-						"validators" => array(),
-						"control" => array("CheckBox"),
-						"helpstep" => $helpstepnum
+	"label" => _L('Has Survey'),
+	"value" => $settings['_hassurvey'],
+	"validators" => array(),
+	"control" => array("CheckBox"),
+	"helpstep" => $helpstepnum
 );
+
 $formdata["hasldap"] = array(
-						"label" => _L('Has LDAP'),
-						"value" => $settings['_hasldap'],
-						"validators" => array(),
-						"control" => array("CheckBox"),
-						"helpstep" => $helpstepnum
+	"label" => _L('Has LDAP'),
+	"value" => $settings['_hasldap'],
+	"validators" => array(),
+	"control" => array("CheckBox"),
+	"helpstep" => $helpstepnum
 );
 
 $formdata["hasenrollment"] = array(
-						"label" => _L('Has Enrollment'),
-						"value" => $settings['_hasenrollment'],
-						"validators" => array(),
-						"control" => array("CheckBox"),
-						"helpstep" => $helpstepnum
+	"label" => _L('Has Enrollment'),
+	"value" => $settings['_hasenrollment'],
+	"validators" => array(),
+	"control" => array("CheckBox"),
+	"helpstep" => $helpstepnum
 );
 
 $classroomstate = $settings['_hastargetedmessage']?($settings['_hasphonetargetedmessage']?"emailandphone":"emailonly"):"disabled";
 $formdata["hasclassroom"] = array(
-		"label" => _L('Classroom Comments'),
-		"value" => $classroomstate,
-		"validators" => array(
-				array("ValInArray", "values" => array("disabled","emailonly","emailandphone")),
-				array("ValClassroom","currentsetting" => $classroomstate)),
-		"control" => array("SelectMenu","values" => array("disabled" => "Disabled", "emailonly" => "Email Only", "emailandphone" => "Email and Phone")),
-		"helpstep" => $helpstepnum
+	"label" => _L('Classroom Comments'),
+	"value" => $classroomstate,
+	"validators" => array(
+		array("ValInArray", "values" => array("disabled","emailonly","emailandphone")),
+		array("ValClassroom","currentsetting" => $classroomstate)
+	),
+	"control" => array("SelectMenu","values" => array("disabled" => "Disabled", "emailonly" => "Email Only", "emailandphone" => "Email and Phone")),
+	"helpstep" => $helpstepnum
 );
 
 $formdata["hasfacebook"] = array(
-						"label" => _L('Has Facebook'),
-						"value" => $settings['_hasfacebook'],
-						"validators" => array(),
-						"control" => array("CheckBox"),
-						"helpstep" => $helpstepnum
+	"label" => _L('Has Facebook'),
+	"value" => $settings['_hasfacebook'],
+	"validators" => array(),
+	"control" => array("CheckBox"),
+	"helpstep" => $helpstepnum
 );
 $formdata["hastwitter"] = array(
-						"label" => _L('Has Twitter'),
-						"value" => $settings['_hastwitter'],
-						"validators" => array(),
-						"control" => array("CheckBox"),
-						"helpstep" => $helpstepnum
+	"label" => _L('Has Twitter'),
+	"value" => $settings['_hastwitter'],
+	"validators" => array(),
+	"control" => array("CheckBox"),
+	"helpstep" => $helpstepnum
 );
 $formdata["hasfeed"] = array(
-						"label" => _L('Has Feed'),
-						"value" => $settings['_hasfeed'],
-						"validators" => array(),
-						"control" => array("CheckBox"),
-						"helpstep" => $helpstepnum
+	"label" => _L('Has Feed'),
+	"value" => $settings['_hasfeed'],
+	"validators" => array(),
+	"control" => array("CheckBox"),
+	"helpstep" => $helpstepnum
 );
 $formdata["allowoldmessagesender"] = array(
-						"label" => _L('Allow Deprecated Message Sender'),
-						"value" => $settings['_allowoldmessagesender'],
-						"validators" => array(),
-						"control" => array("CheckBox"),
-						"helpstep" => $helpstepnum
+	"label" => _L('Allow Deprecated Message Sender'),
+	"value" => $settings['_allowoldmessagesender'],
+	"validators" => array(),
+	"control" => array("CheckBox"),
+	"helpstep" => $helpstepnum
 );
 
 $formdata["hasquicktip"] = array(
-						"label" => _L('Has QuickTip'),
-						"value" => $settings['_hasquicktip'],
-						"validators" => array(),
-						"control" => array("CheckBox"),
-						"helpstep" => $helpstepnum
+	"label" => _L('Has Quick Tip'),
+	"value" => $settings['_hasquicktip'],
+	"validators" => array(),
+	"control" => array("CheckBox"),
+	"helpstep" => $helpstepnum
 );
 
 // Answering machine detection methods
@@ -635,79 +640,84 @@ $formdata[] = _L("Misc. Settings");
 // -----------------------------------------------------------------------------
 
 $formdata["amdtype"] = array(
-						"label" => _L('AMD Type'),
-						"value" => ($settings['_amdtype']?$settings['_amdtype']:"ivr"),
-						"validators" => array(
-							array("ValInArray", "values" => array_keys($amdtypes))
-						),
-						"control" => array("SelectMenu", "values" => $amdtypes),
-						"helpstep" => $helpstepnum
+	"label" => _L('AMD Type'),
+	"value" => ($settings['_amdtype']?$settings['_amdtype']:"ivr"),
+	"validators" => array(
+		array("ValInArray", "values" => array_keys($amdtypes))
+	),
+	"control" => array("SelectMenu", "values" => $amdtypes),
+	"helpstep" => $helpstepnum
 );
 
 $formdata["renewaldate"] = array(
-						"label" => _L('Renewal Date'),
-						"value" => $settings['_renewaldate'],
-						"validators" => array(
-							array('ValDate', "min" => date("m/d/Y", time()))
-						),
-						"control" => array("TextDate", "size"=>12),
-						"helpstep" => $helpstepnum
+	"label" => _L('Renewal Date'),
+	"value" => $settings['_renewaldate'],
+	"validators" => array(
+		array('ValDate', "min" => date("m/d/Y", time()))
+	),
+	"control" => array("TextDate", "size"=>12),
+	"helpstep" => $helpstepnum
 );
+
 $formdata["callspurchased"] = array(
-						"label" => _L('Calls Purchased'),
-						"value" => $settings['_callspurchased'],
-						"validators" => array(
-							array('ValNumber')
-						),
-						"control" => array("TextField","size"=>4),
-						"helpstep" => $helpstepnum
+	"label" => _L('Calls Purchased'),
+	"value" => $settings['_callspurchased'],
+	"validators" => array(
+		array('ValNumber')
+	),
+	"control" => array("TextField","size"=>4),
+	"helpstep" => $helpstepnum
 );
+
 $formdata["maxusers"] = array(
-						"label" => _L('Users Purchased'),
-						"value" => $settings['_maxusers']!="unlimited"?$settings['_maxusers']:"",
-						"validators" => array(
-							array('ValNumber')
-						),
-						"control" => array("TextField","size"=>4),
-						"helpstep" => $helpstepnum
+	"label" => _L('Users Purchased'),
+	"value" => $settings['_maxusers']!="unlimited"?$settings['_maxusers']:"",
+	"validators" => array(
+		array('ValNumber')
+	),
+	"control" => array("TextField","size"=>4),
+	"helpstep" => $helpstepnum
 );
 
 $formdata["timeslice"] = array(
-						"label" => _L('Timeslice'),
-						"value" => $settings['_timeslice'],
-						"validators" => array(
-							array("ValRequired"),
-							array('ValNumber', "min" => 60, "max" => 18000)
-						),
-						"control" => array("TextField","size"=>4),
-						"helpstep" => $helpstepnum
+	"label" => _L('Timeslice'),
+	"value" => $settings['_timeslice'],
+	"validators" => array(
+		array("ValRequired"),
+		array('ValNumber', "min" => 60, "max" => 18000)
+	),
+	"control" => array("TextField","size"=>4),
+	"helpstep" => $helpstepnum
 );
+
 $formdata["loginlockoutattempts"] = array(
-						"label" => _L('Failed login attempts to cause lockout'),
-						"value" => $settings['loginlockoutattempts'],
-						"validators" => array(
-							array('ValNumber', "min" => 0, "max" => 15)
-						),
-						"control" => array("SelectMenu", "values" => array(0 => "Disable") + array_combine(range(1, 15),range(1, 15))),
-						"helpstep" => $helpstepnum
+	"label" => _L('Failed login attempts to cause lockout'),
+	"value" => $settings['loginlockoutattempts'],
+	"validators" => array(
+		array('ValNumber', "min" => 0, "max" => 15)
+	),
+	"control" => array("SelectMenu", "values" => array(0 => "Disable") + array_combine(range(1, 15),range(1, 15))),
+	"helpstep" => $helpstepnum
 );
+
 $formdata["logindisableattempts"] = array(
-						"label" => _L('Failed login attempts before account disable'),
-						"value" => $settings['logindisableattempts'],
-						"validators" => array(
-							array('ValNumber', "min" => 0, "max" => 15)
-						),
-						"control" => array("SelectMenu", "values" => array(0 => "Disable") + array_combine(range(1, 15),range(1, 15))),
-						"helpstep" => $helpstepnum
+	"label" => _L('Failed login attempts before account disable'),
+	"value" => $settings['logindisableattempts'],
+	"validators" => array(
+		array('ValNumber', "min" => 0, "max" => 15)
+	),
+	"control" => array("SelectMenu", "values" => array(0 => "Disable") + array_combine(range(1, 15),range(1, 15))),
+	"helpstep" => $helpstepnum
 );
+
 $formdata["loginlockouttime"] = array(
-						"label" => _L('Number of minutes for login lockout'),
-						"value" => $settings['loginlockouttime'],
-						"validators" => array(
-							array('ValNumber', "min" => 1, "max" => 60)
-						),
-						"control" => array("SelectMenu", "values" => array_combine(range(1, 60),range(1, 60))),
-						"helpstep" => $helpstepnum
+	"label" => _L('Number of minutes for login lockout'),
+	"value" => $settings['loginlockouttime'],
+	"validators" => array(
+		array('ValNumber', "min" => 1, "max" => 60)
+	),
+	"control" => array("SelectMenu", "values" => array_combine(range(1, 60),range(1, 60))),
+	"helpstep" => $helpstepnum
 );
 
 $thispage = "customeredit.php";
