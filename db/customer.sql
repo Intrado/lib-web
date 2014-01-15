@@ -2334,3 +2334,41 @@ $$$
 update setting set value='10.1/5' where name='_dbversion'
 $$$
 -- END 10.1/5
+
+-- START 10.1/6
+CREATE TABLE IF NOT EXISTS `contentattachment` (
+	`id` int(11) NOT NULL AUTO_INCREMENT,
+	`contentid` bigint(20) NOT NULL,
+	`filename` varchar(255) NOT NULL,
+	`size` int(11) NOT NULL,
+	PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT
+$$$
+
+CREATE TABLE IF NOT EXISTS `burstattachment` (
+	`id` int(11) NOT NULL AUTO_INCREMENT,
+	`burstid` int(11) NOT NULL,
+	`filename` varchar(255) NOT NULL,
+	PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
+
+ALTER TABLE `messageattachment` ADD `type` ENUM( 'content', 'burst' ) NOT NULL ,
+	ADD `contentattachmentid` INT NULL DEFAULT NULL ,
+	ADD `burstattachmentid` INT NULL DEFAULT NULL
+$$$
+
+update setting set value='10.1/6' where name='_dbversion'
+$$$
+-- END 10.1/6
+
+-- START 10.1/7
+ALTER TABLE `messageattachment`
+	DROP `contentid`,
+	DROP `filename`,
+	DROP `size`
+$$$
+
+update setting set value='10.1/7' where name='_dbversion'
+$$$
+-- END 10.1/7

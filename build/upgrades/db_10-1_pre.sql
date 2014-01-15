@@ -33,3 +33,34 @@ $$$
 -- $rev 5
 ALTER TABLE `job` DROP `burstid`
 $$$
+
+
+-- $rev 6
+CREATE TABLE IF NOT EXISTS `contentattachment` (
+	`id` int(11) NOT NULL AUTO_INCREMENT,
+	`contentid` bigint(20) NOT NULL,
+	`filename` varchar(255) NOT NULL,
+	`size` int(11) NOT NULL,
+	PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
+
+CREATE TABLE IF NOT EXISTS `burstattachment` (
+	`id` int(11) NOT NULL AUTO_INCREMENT,
+	`burstid` int(11) NOT NULL,
+	`filename` varchar(255) NOT NULL,
+	PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
+
+ALTER TABLE `messageattachment` ADD `type` ENUM( 'content', 'burst' ) NOT NULL ,
+	ADD `contentattachmentid` INT NULL DEFAULT NULL ,
+	ADD `burstattachmentid` INT NULL DEFAULT NULL
+$$$
+
+-- $rev 7
+ALTER TABLE `messageattachment`
+	DROP `contentid`,
+	DROP `filename`,
+	DROP `size`
+$$$
