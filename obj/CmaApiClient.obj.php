@@ -20,9 +20,11 @@ class CmaApiClient {
      *
      *  @param array $options options/config array
      */
-    public function __construct($options) {
-        $this->apiClient = $options['apiClient'];
-        $this->appId     = $options['appId'];
+    public function __construct($options = array()) {
+        if (count($options)) {
+            $this->apiClient = $options['apiClient'];
+            $this->appId     = $options['appId'];
+        }
     }
 
     /**
