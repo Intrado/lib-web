@@ -17,7 +17,7 @@ timeout=5500
 
 ; cma service
 [cmaserver]
-host="sandbox.testschoolmessenger.com/cma/1"
+apiurl="https://sandbox.testschoolmessenger.com/cma/1"
 
 ;report server connection information
 [reportserver]
