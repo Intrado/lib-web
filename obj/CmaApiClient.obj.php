@@ -13,21 +13,26 @@
 class CmaApiClient {
 
     private $apiClient;
+    private $appId;
 
-    public function __construct($apiClient) {
-        $this->apiClient = $apiClient;
+    /**
+     *  Constructor - initialize CmaApiClient object
+     *
+     *  @param array $options options/config array
+     */
+    public function __construct($options) {
+        $this->apiClient = $options['apiClient'];
+        $this->appId     = $options['appId'];
     }
 
     /**
-     * Gets categories from CMA API
+     * Gets categories from CMA API for a given customer's CMA app Id
      *
-     * @param integer $appId - CMA app id
      * @return array of objects, ex [{"id":1,"name":"School A"},{"id":2,"name":"School B"}, ...] or false
      */
-    public function getCategories($appId) {
-        // full endpoint url = $this->apiClient->ApiUrl . "/{$appId}/categories"
-        $res = $this->apiClient->get("/{$appId}/categories");
-        return($res['code'] == 200 ? json_decode($res['body']) : false);
+    public function getCategories() {
+        $res = $this->apiClient->get("/{$this->appId}/categories");
+        return ($res['code'] == 200 ? json_decode($res['body']) : false);
     }
 }
 

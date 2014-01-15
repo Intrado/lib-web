@@ -31,8 +31,12 @@ class CmaApiClientTest extends PHPUnit_Framework_TestCase {
                 )
         ));
 
-        // create SUT
-        $this->cmaApiClient = new CmaApiClient($this->apiClient);
+        $cmaApiOptions = array(
+            'apiClient' => $this->apiClient,
+            'appId' => $this->appId,
+        );
+
+        $this->cmaApiClient = new CmaApiClient($cmaApiOptions);
 
     }
 
@@ -41,11 +45,11 @@ class CmaApiClientTest extends PHPUnit_Framework_TestCase {
     }
 
     public function test_getCategories() {
-        // getCategories($appId) calls apiClient->get(url); ie stub above
+        // getCategories() calls apiClient->get(url)
         // gets back an array ob objects (from json_decode)
-        $response = $this->cmaApiClient->getCategories($this->appId);
+        $response = $this->cmaApiClient->getCategories();
 
-        // there should be only 2 elements in the $response response
+        // there should be only 2 elements in $response
         $this->assertEquals(2, count($response));
 
         // verify the values in the response
