@@ -333,33 +333,6 @@ function handleRequest() {
 				'languagemap' => Language::getLanguageMap()
 			);
 
-		// Return a whole message including it's message parts formatted into body text and any attachments.
-		case 'previewmessage':
-			if (!isset($_GET['id']))
-				return false;
-			$message = new Message($_GET['id']+0);
-			if ($message->userid !== $USER->id)
-				return false;
-			$message->readHeaders();
-			$parts = DBFindMany("MessagePart","from messagepart where messageid=? order by sequence", false, array($_GET['id']));
-			$attachments = DBFindMany("MessageAttachment","from messageattachment where messageid=?", false, array($_GET['id']));
-			$simple = false;
-			if (count($parts) == 1)
-				foreach ($parts as $id => $part)
-					if ($part->type == "A") $simple = true;
-
-			return array(
-				"lastused"=>$message->lastused,
-				"description"=>$message->description,
-				"fromname"=>$message->fromname,
-				"fromemail"=>$message->fromemail,
-				"subject"=>$message->subject,
-				"type"=>$message->type,
-				"simple"=>$simple,
-				"attachment"=>count($attachments)?cleanObjects($attachments):false,
-				"body"=>count($parts)?$message->format($parts):""
-			);
-
 		case 'messagegrid':
 			// Check if has messagegroupid
 			if (!isset($_GET['id']) || !$_GET['id'])
