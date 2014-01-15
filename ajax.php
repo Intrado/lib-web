@@ -466,10 +466,11 @@ function handleRequest() {
 					inner join message m on (m.messagegroupid = ? and m.id = mp.messageid) 
 					group by af.contentid", false, false, array($mg->id));
 			$attachmentcontentids = QuickQueryList(
-					"select ma.contentid
-					from messageattachment ma
-					inner join message m on (m.messagegroupid = ? and m.id = ma.messageid) 
-					group by ma.contentid", false, false, array($mg->id));
+					"select ca.contentid
+					from message m
+					inner join messageattachment ma on (ma.messageid = m.id)
+					inner join contentattachment ca on (ma.contentattachmentid = ca.id)
+					where m.messagegroupid = ?", false, false, array($mg->id));
 			$contentids = array_merge($imagecontentids, $audiofilecontentids, $attachmentcontentids);
 			foreach ($contentids as $contentid)
 				permitContent($contentid);
