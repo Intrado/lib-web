@@ -20,6 +20,7 @@ require_once("obj/MessagePart.obj.php");
 require_once("obj/Language.obj.php");
 require_once("obj/Voice.obj.php");
 require_once("obj/MessageAttachment.obj.php");
+require_once("obj/ContentAttachment.obj.php");
 
 // form items/validators
 require_once("obj/FormItem.obj.php");
@@ -85,7 +86,7 @@ if ($message) {
 	$parts = DBFindMany("MessagePart", "from messagepart where messageid = ? order by sequence", false, array($message->id));
 	$text = Message::format($parts);
 	// get the attachments
-	$msgattachments = DBFindMany("MessageAttachment", "from messageattachment where messageid = ?", false, array($message->id));
+	$msgattachments = $message->getContentAttachments();
 	foreach ($msgattachments as $msgattachment)
 		$attachments[$msgattachment->contentid] = array("name" => $msgattachment->filename, "size" => $msgattachment->size);
 }
@@ -179,40 +180,12 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		
 		// TODO: this isn't really right... need a special parse that won't check for field inserts?
 		$message->recreateParts($postdata['message'], null, null);
-		
-		// check for existing attachments
-		$existingattachments = QuickQueryList("select contentid, id from messageattachment where messageid = ?", true, false, array($message->id));
-		
+
 		// if there are message attachments, attach them
-		$attachments = json_decode($postdata['attachments']);
+		$attachments = json_decode($postdata['attachments'], true);
 		if ($attachments == null) 
 			$attachments = array();
-
-		$existingattachmentstokeep = array();
-		if ($attachments) {
-			foreach ($attachments as $cid => $details) {
-				// check if this is already attached.
-				if (isset($existingattachments[$cid])) {
-					$existingattachmentstokeep[$existingattachments[$cid]] = true;
-					continue;
-				} else {
-					$msgattachment = new MessageAttachment();
-					$msgattachment->messageid = $message->id;
-					$msgattachment->contentid = $cid;
-					$msgattachment->filename = $details->name;
-					$msgattachment->size = $details->size;
-					$msgattachment->create();
-				}
-			}
-		}
-		// remove attachments that are no longer attached
-		foreach ($existingattachments as $cid => $attachmentid) {
-			if (!isset($existingattachmentstokeep[$attachmentid])) {
-				$attachment = new MessageAttachment($attachmentid);
-				if ($attachment)
-					QuickUpdate("delete from messageattachment where id = ?", false, array($attachment->id));
-			}
-		}
+		$message->replaceContentAttachments($attachments);
 		
 		$messagegroup->updateDefaultLanguageCode();
 		
