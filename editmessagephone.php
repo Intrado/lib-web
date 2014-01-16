@@ -148,7 +148,6 @@ $formdata["message"] = array(
 			array("ValTtsText")
 		),
 		"control" => array("PhoneMessageEditor",
-			"enablefieldinserts" => "limited",
 			"messagegroupid" => $messagegroup->id,
 			"phone" => $USER->phone,
 			"languages" => array($languagecode => Language::getName($languagecode)),

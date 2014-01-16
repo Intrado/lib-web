@@ -335,7 +335,6 @@ class MsgWiz_phoneAdvanced extends WizStep {
 				"value" => "",
 				"validators" => $messagevalidators,
 				"control" => array("PhoneMessageEditor",
-					"enablefieldinserts" => "limited",
 					"messagegroupid" => $messagegroup->id,
 					"phone" => $USER->phone,
 					"languages" => array($langcode => Language::getName($langcode)),
