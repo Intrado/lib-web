@@ -159,22 +159,22 @@ startWindow(_L('Details'), 'padding: 3px;');
 
 	<table width="100%" border="0" cellpadding="3" cellspacing="0">
 		<tr>
-			<th align="right" class="windowRowHeader bottomBorder"><?=_L("Message For")?>:</td>
+			<th align="right" class="windowRowHeader bottomBorder"><?=_L("Message For")?>:</th>
 			<td class="bottomBorder"><?=escapehtml($historicdata['f01']) . " " . escapehtml($historicdata['f02'])?></td>
 		</tr>
 		<tr>
-			<th align="right" class="windowRowHeader bottomBorder"><?=_L("Job Name")?>:</td>
+			<th align="right" class="windowRowHeader bottomBorder"><?=_L("Job Name")?>:</th>
 			<td class="bottomBorder"><?=escapehtml($historicdata['jobname'])?></td>
 		</tr>
 		<tr>
-			<th align="right" class="windowRowHeader bottomBorder"><?=_L("Date")?>:</td>
+			<th align="right" class="windowRowHeader bottomBorder"><?=_L("Date")?>:</th>
 			<td class="bottomBorder"><?=date("M j, Y", strtotime($historicdata['startdate']))?></td>
 		</tr>
 <?
 	if (count($availableMessageLanguages) > 1) {
 ?>
 		<tr>
-			<th align="right" class="windowRowHeader bottomBorder"><?=_L("Language")?>:</td>
+			<th align="right" class="windowRowHeader bottomBorder"><?=_L("Language")?>:</th>
 			<td><table><tr><td>
 			<?
 				NewFormItem($f, $s, 'language', 'selectstart', null, null, "id='language'");
