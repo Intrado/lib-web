@@ -33,3 +33,11 @@ $$$
 -- $rev 5
 ALTER TABLE `job` DROP `burstid`
 $$$
+
+-- $rev 6
+CREATE TABLE `feedcat2cmacatmap` (
+	fk_feedcategory INT NOT NULL,
+	cmacategory INT NOT NULL,
+	INDEX `feedcat` (`fk_feedcategory`)
+);
+$$$
