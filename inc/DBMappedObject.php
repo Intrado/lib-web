@@ -299,8 +299,14 @@ function generateFieldList ($includeid = false, $fieldlist = NULL, $alias = fals
 	}
 }
 
-
-//query = from ... where ...
+/**
+ * @param string $classname
+ * @param string $query from ... where ...
+ * @param string $alias
+ * @param array() $args
+ * @param bool $dbconnect
+ * @return array|bool
+ */
 function DBFindMany ($classname, $query, $alias = false, $args = false, $dbconnect = false) {
 	return _DBFindPDO(true, $classname, $query, $alias, $args, $dbconnect);
 }
