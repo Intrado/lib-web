@@ -33,7 +33,7 @@ class CmaApiClient {
      * @return array of objects, ex [{"id":1,"name":"School A"},{"id":2,"name":"School B"}, ...] or false
      */
     public function getCategories() {
-        $res = $this->apiClient->get("/{$this->appId}/categories");
+        $res = $this->apiClient->get("/apps/{$this->appId}/categories");
         return ($res['code'] == 200 ? json_decode($res['body']) : false);
     }
 }

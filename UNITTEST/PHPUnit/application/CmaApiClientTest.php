@@ -22,7 +22,7 @@ class CmaApiClientTest extends PHPUnit_Framework_TestCase {
         // define stub response for apiClient.get() used for fetching CMA category data
         $this->apiClient->expects($this->any())
             ->method('get')
-            ->with("/{$this->appId}/categories")
+            ->with("/apps/{$this->appId}/categories")
             ->will($this->returnValue(
                 array(
                     'headers' => "Accept: application/json", // dummy header
