@@ -35,6 +35,25 @@ ALTER TABLE `job` DROP `burstid`
 $$$
 
 -- $rev 6
+CREATE TABLE `feedcat2cmacatmap` (
+fk_feedcategory INT NOT NULL,
+cmacategory INT NOT NULL,
+INDEX `feedcat` (`fk_feedcategory`)
+);
+$$$
+
+-- $rev 7
+DROP TABLE `feedcat2cmacatmap`;
+$$$
+CREATE TABLE `cmafeedcategory` (
+	`feedcategoryid` int(11) NOT NULL,
+	`cmacategoryid` int(11) NOT NULL,
+	PRIMARY KEY (`feedcategoryid`,`cmacategoryid`),
+	KEY `feedcategoryid` (`feedcategoryid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+$$$
+
+-- $rev 8
 CREATE TABLE IF NOT EXISTS `contentattachment` (
 	`id` int(11) NOT NULL AUTO_INCREMENT,
 	`contentid` bigint(20) NOT NULL,
@@ -57,31 +76,12 @@ ALTER TABLE `messageattachment` ADD `type` ENUM( 'content', 'burst' ) NOT NULL ,
 	ADD `burstattachmentid` INT NULL DEFAULT NULL
 $$$
 
--- $rev 7
+-- $rev 9
 ALTER TABLE `messageattachment`
 	DROP `contentid`,
 	DROP `filename`,
 	DROP `size`
 $$$
 
--- $rev 8
--- No schema change. subscriber limited user update is handled in db_10-1.php
-
--- $rev 9
-CREATE TABLE `feedcat2cmacatmap` (
-	fk_feedcategory INT NOT NULL,
-	cmacategory INT NOT NULL,
-	INDEX `feedcat` (`fk_feedcategory`)
-);
-$$$
-
 -- $rev 10
-DROP TABLE `feedcat2cmacatmap`;
-$$$
-CREATE TABLE `cmafeedcategory` (
-`feedcategoryid` int(11) NOT NULL,
-	`cmacategoryid` int(11) NOT NULL,
-	PRIMARY KEY (`feedcategoryid`,`cmacategoryid`),
-	KEY `feedcategoryid` (`feedcategoryid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-$$$
+-- No schema change. subscriber limited user update is handled in db_10-1.php

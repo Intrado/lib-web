@@ -2336,6 +2336,23 @@ $$$
 -- END 10.1/5
 
 -- START 10.1/6
+  update setting set value='10.1/6' where name='_dbversion'
+  $$$
+-- END 10.1/6
+
+-- START 10.1/7
+  CREATE TABLE `cmafeedcategory` (
+  `feedcategoryid` int(11) NOT NULL,
+  `cmacategoryid` int(11) NOT NULL,
+  PRIMARY KEY (`feedcategoryid`,`cmacategoryid`),
+  KEY `feedcategoryid` (`feedcategoryid`)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+$$$
+update setting set value='10.1/7' where name='_dbversion'
+$$$
+-- END 10.1/7
+
+-- START 10.1/8
 CREATE TABLE IF NOT EXISTS `contentattachment` (
 	`id` int(11) NOT NULL AUTO_INCREMENT,
 	`contentid` bigint(20) NOT NULL,
@@ -2358,39 +2375,23 @@ ALTER TABLE `messageattachment` ADD `type` ENUM( 'content', 'burst' ) NOT NULL ,
 	ADD `burstattachmentid` INT NULL DEFAULT NULL
 $$$
 
-update setting set value='10.1/6' where name='_dbversion'
+update setting set value='10.1/8' where name='_dbversion'
 $$$
--- END 10.1/6
+-- END 10.1/8
 
--- START 10.1/7
+-- START 10.1/9
 ALTER TABLE `messageattachment`
 	DROP `contentid`,
 	DROP `filename`,
 	DROP `size`
 $$$
 
-update setting set value='10.1/7' where name='_dbversion'
-$$$
--- END 10.1/7
-
--- START 10.1/8
-update setting set value='10.1/8' where name='_dbversion'
-$$$
--- END 10.1/8
-
--- START 10.1/9
 update setting set value='10.1/9' where name='_dbversion'
 $$$
 -- END 10.1/9
 
 -- START 10.1/10
-CREATE TABLE `cmafeedcategory` ( 
-	`feedcategoryid` int(11) NOT NULL, 
-	`cmacategoryid` int(11) NOT NULL, 
-	PRIMARY KEY (`feedcategoryid`,`cmacategoryid`), 
-	KEY `feedcategoryid` (`feedcategoryid`) 
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-$$$
 update setting set value='10.1/10' where name='_dbversion'
 $$$
 -- END 10.1/10
+

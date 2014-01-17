@@ -29,6 +29,14 @@ function upgrade_10_1 ($rev, $shardid, $customerid, $db) {
 			echo "|";
 			apply_sql("upgrades/db_10-1_pre.sql", $customerid, $db, 6);
 
+		case 6:
+			echo "|";
+			apply_sql("upgrades/db_10-1_pre.sql", $customerid, $db, 7);
+
+		case 7:
+			echo "|";
+			apply_sql("upgrades/db_10-1_pre.sql", $customerid, $db, 8);
+
 			GLOBAL $_dbcon;
 			$old_dbcon = $_dbcon;
 			$_dbcon = $db;
@@ -53,11 +61,11 @@ function upgrade_10_1 ($rev, $shardid, $customerid, $db) {
 
 			$_dbcon = $old_dbcon;
 
-		case 6:
+		case 8:
 			echo "|";
-			apply_sql("upgrades/db_10-1_pre.sql", $customerid, $db, 7);
+			apply_sql("upgrades/db_10-1_pre.sql", $customerid, $db, 9);
 
-		case 7:
+		case 9:
 			echo '|';
 			// update the subscriber limited user account
 			$custdbname = "c_$customerid";
@@ -70,14 +78,7 @@ function upgrade_10_1 ($rev, $shardid, $customerid, $db) {
 				or dieWithError("failed to insert customer into auth server", $authdb);
 			createLimitedUser($limitedusername, $limitedpassword, $custdbname, $db, $grantedhost);
 			Query("COMMIT", $authdb);
-		
-		case 8:
-			echo "|";
-			apply_sql("upgrades/db_10-1_pre.sql", $customerid, $db, 9);
-		
-		case 9:
-			echo "|";
-			apply_sql("upgrades/db_10-1_pre.sql", $customerid, $db, 10);
+
 	}
 	
 	//This statement should appear in each upgrade script, when relevent.
