@@ -21,6 +21,8 @@ require_once("../obj/MessageGroup.obj.php");
 require_once("../obj/AudioFile.obj.php");
 require_once("../obj/MessagePart.obj.php");
 require_once("../obj/MessageAttachment.obj.php");
+require_once("../obj/ContentAttachment.obj.php");
+require_once("../obj/BurstAttachment.obj.php");
 require_once("../obj/Voice.obj.php");
 require_once("../obj/Language.obj.php");
 require_once("parentportalutils.inc.php");
