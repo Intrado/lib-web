@@ -69,23 +69,16 @@ if (!QuickQuery("select 1 from reportperson where jobid = ? and personid = ? and
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
-if ($messageattachment->type == 'content' && $messageattachment->contentattachmentid) {
-	$contentAttachment = new ContentAttachment($messageattachment->contentattachmentid);
-	if ($c = contentGet($contentAttachment->contentid)) {
-		list($contentType,$data) = $c;
-		if ($data) {
-			$size = strlen($data);
+if ($d = $messageattachment->getAttachmentData()) {
+	list($filename, $contentType, $data) = $d;
+	$size = strlen($data);
 
-			header("Pragma: private");
-			header("Cache-Control: private");
-			header("Content-Length: $size");
-			header("Content-disposition: attachment; filename=\"" . $contentAttachment->filename . "\"");
-			header("Content-type: " . ($contentType ? $contentType : "application/octet-stream"));
+	header("Pragma: private");
+	header("Cache-Control: private");
+	header("Content-Length: $size");
+	header("Content-disposition: attachment; filename=\"" . $filename . "\"");
+	header("Content-type: " . ($contentType ? $contentType : "application/octet-stream"));
 
-			echo $data;
-		}
-	}
+	echo $data;
 }
-
-
 ?>

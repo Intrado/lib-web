@@ -14,6 +14,27 @@ class MessageAttachment extends DBMappedObject {
 		DBMappedObject::DBMappedObject($id);
 	}
 
+	function getAttachmentData() {
+		$filename = "";
+		$contentType = "";
+		$data = null;
+		switch ($this->type) {
+			case 'content':
+				$contentAttachment = new ContentAttachment($this->contentattachmentid);
+				if ($c = contentGet($contentAttachment->contentid)) {
+					$filename = $contentAttachment->filename;
+					list($contentType,$data) = $c;
+				}
+				break;
+
+			case 'burst':
+				// TODO: Implement me
+		}
+		if ($contentType && $data)
+			return array($filename, $contentType, $data);
+		else
+			return false;
+	}
 }
 
 ?>
