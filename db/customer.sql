@@ -2344,3 +2344,15 @@ fk_feedcategory INT NOT NULL,
 $$$
 -- END 10.1/6
 
+-- START 10.1/7
+DROP TABLE `feedcat2cmacatmap`;
+$$$
+CREATE TABLE `cmafeedcategory` ( 
+	`feedcategoryid` int(11) NOT NULL, 
+	`cmacategoryid` int(11) NOT NULL, 
+	PRIMARY KEY (`feedcategoryid`,`cmacategoryid`), 
+	KEY `feedcategoryid` (`feedcategoryid`) 
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+$$$
+-- END 10.1/7
+
