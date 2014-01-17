@@ -354,7 +354,7 @@ if (errors)
 <h1><?= $errors ? _L("This form contains some errors") : "" ?></h1>
 </noscript>
 
-		<table width="100%" style="color: #<?=$primary?>;" >
+		<table width="100%">
 			<tr>
 				<td>
 					<div style="float:right;">
