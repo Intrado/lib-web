@@ -206,22 +206,20 @@ startWindow(_L('Details'), 'padding: 3px;');
 					</tr>
 <?
 				foreach ($attachments as $attachment) {
-					$filename = "";
-					$size = "???";
-					if ($attachment->type == 'content') {
-						$contentAttachment = new ContentAttachment($attachment->contentattachmentid);
-						$filename = $contentAttachment->filename;
-						$size = max(1,round($contentAttachment->size/1024));
-					} else if ($attachment->type == 'burst') {
-						$burstAttachment = new BurstAttachment($attachment->burstattachmentid);
-						$filename = $burstAttachment->filename;
-					}
-?>
+					$filename = $attachment->getFilename();
+					$size = $attachment->getSize();
+					if ($size === false)
+						$size = "???";
+					else
+						$size = max(1,round($size/1024));
+					?>
 					<tr>
-						<td><a href="messageattachmentdownload.php?pid=<?= $personid ?>&jid=<?= $jobid ?>&attid=<?= $attachment->id ?>"><?= escapehtml($filename)?></a></td>
+						<td><a href="messageattachmentdownload.php?pid=<?= $personid ?>&jid=<?= $jobid ?>&attid=<?= $attachment->id ?>">
+								<?= escapehtml($filename)?></a>
+						</td>
 						<td><?= $size ?>K</td>
 					</tr>
-<?
+				<?
 				}
 ?>
 				</table>
