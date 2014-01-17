@@ -16,6 +16,7 @@ require_once("../inc/appserver.inc.php");
 require_once("../obj/Content.obj.php");
 require_once("../obj/MessageAttachment.obj.php");
 require_once("../obj/ContentAttachment.obj.php");
+require_once("../obj/BurstAttachment.obj.php");
 
 // load the thrift api requirements.
 require_once('thrift/Thrift.php');
