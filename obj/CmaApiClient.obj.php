@@ -12,30 +12,28 @@
 
 class CmaApiClient {
 
-    private $apiClient;
-    private $appId;
+	private $apiClient;
+	private $appId;
 
-    /**
-     *  Constructor - initialize CmaApiClient object
-     *
-     *  @param array $options options/config array
-     */
-    public function __construct($options = array()) {
-        if ($options) {
-            $this->apiClient = $options['apiClient'];
-            $this->appId     = $options['appId'];
-        }
-    }
+	/**
+	 *	Constructor - initialize CmaApiClient object
+	 *
+	 *	@param array $options options/config array
+	 */
+	public function __construct($apiClient, $appId = null) {
+		$this->apiClient = $apiClient;
+		$this->appId = $appId;
+	}
 
-    /**
-     * Gets categories from CMA API for a given customer's CMA app Id
-     *
-     * @return array of objects, ex [{"id":1,"name":"School A"},{"id":2,"name":"School B"}, ...] or false
-     */
-    public function getCategories() {
-        $res = $this->apiClient->get("/apps/{$this->appId}/categories");
-        return ($res['code'] == 200 ? json_decode($res['body']) : false);
-    }
+	/**
+	 * Gets categories from CMA API for a given customer's CMA app Id
+	 *
+	 * @return array of objects, ex [{"id":1,"name":"School A"},{"id":2,"name":"School B"}, ...] or false
+	 */
+	public function getCategories() {
+		$res = $this->apiClient->get("/apps/{$this->appId}/categories");
+		return ($res['code'] == 200 ? json_decode($res['body']) : false);
+	}
 }
 
 ?>
