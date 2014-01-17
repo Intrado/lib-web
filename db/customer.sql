@@ -2334,3 +2334,13 @@ $$$
 update setting set value='10.1/5' where name='_dbversion'
 $$$
 -- END 10.1/5
+
+-- START 10.1/6
+CREATE TABLE `feedcat2cmacatmap` (
+fk_feedcategory INT NOT NULL,
+	cmacategory INT NOT NULL,
+	INDEX `feedcat` (`fk_feedcategory`)
+);
+$$$
+-- END 10.1/6
+
