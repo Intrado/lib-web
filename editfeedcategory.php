@@ -79,15 +79,19 @@ foreach ($categories as $category) {
 		"helpstep" => 1
 	);
 
-    $formdata["feedcategorymapping-".$category->id] = array(
-        "label" => "",
-        'control' => array(
-            "FormHtml",
-            "html" => '<a class="btn feedcategorymapping" href="feedcategorymapping.php?id='.$category->id.'" style="padding:6px 8px;"><img style="margin-right:8px; margin-top:-3px;" src="img/icons/pictos/p1/16/28.png">Map to CMA Category</a>'
-        ),
-        "helpstep" => 1
-    );
+	// Hide this unless a CMA appid is set for the customer
+	if (intval(getCustomerSystemSetting('_cmaappid') > 0)) {
+		$formdata["feedcategorymapping-".$category->id] = array(
+			"label" => "",
+			'control' => array(
+			"FormHtml",
+			"html" => '<a class="btn feedcategorymapping" href="feedcategorymapping.php?id='.$category->id.'" style="padding:6px 8px;"><img style="margin-right:8px; margin-top:-3px;" src="img/icons/pictos/p1/16/28.png">Map to CMA Category</a>'
+			),
+			"helpstep" => 1
+		);
+	}
 }
+
 $formdata[] = _L('New Feed Category');
 $formdata["feedcategoryname-new"] = array(
 	"label" => _L('Name'),
@@ -157,6 +161,10 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			// if the delete button was clicked for this one. set it to deleted.
 			if ($button == "delete-".$category->id) {
 				$category->deleted = 1;
+
+				// Delete any CMA categories mapped to this feed category (if there are any)
+				Query("DELETE FROM `cmafeedcategory` WHERE `feedcategoryid` = ?;", false, array($category->id));
+
 				notice(_L("Feed category %s has been deleted.", $category->name));
 			} else {
 				$category->name = $postdata['feedcategoryname-'.$category->id];

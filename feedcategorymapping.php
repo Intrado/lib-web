@@ -10,22 +10,29 @@
  * @date: 1/15/2014
  */
 
-require_once("inc/common.inc.php");
-require_once("inc/form.inc.php");
+require_once('inc/common.inc.php');
+require_once('inc/form.inc.php');
 require_once('inc/table.inc.php');
-require_once("inc/html.inc.php");
-require_once("inc/utils.inc.php");
-require_once("inc/securityhelper.inc.php");
+require_once('inc/html.inc.php');
+require_once('inc/utils.inc.php');
+require_once('inc/securityhelper.inc.php');
 
+// DBMO stuff
+require_once('obj/FeedCategory.obj.php');
+require_once('inc/DBMappedObject.php');
+
+// Form stuff
 require_once('obj/Form.obj.php');
 require_once('obj/FormItem.obj.php');
-require_once("inc/formatters.inc.php");
-require_once("obj/Validator.obj.php");
+require_once('inc/formatters.inc.php');
+require_once('obj/Validator.obj.php');
 
+// Page object stuff
 require_once('ifc/Page.ifc.php');
 require_once('obj/PageBase.obj.php');
 require_once('obj/PageForm.obj.php');
 
+// API stuff
 require_once('obj/CmaApiClient.obj.php');
 
 
@@ -40,7 +47,8 @@ class FeedCategoryMapping extends PageForm {
 	public $helpsteps;
 
 	private $feedId;
-	private $feedInfo;
+	private $feedCategory;
+
 	private $rawCmaCategories = array();
 	private $cmaCategories = array();
 	private $cmaCategoriesMapped = array();
@@ -54,7 +62,7 @@ class FeedCategoryMapping extends PageForm {
 	// @override
 	public function isAuthorized(&$get = array(), &$post = array(), &$request = array(), &$session = array()) {
 		global $USER;
-		return(getSystemSetting("_hasfeed") && $USER->authorize('managesystem'));
+		return(getSystemSetting("_hasfeed") && $USER->authorize('managesystem') && (intval(getCustomerSystemSetting('_cmaappid') > 0)));
 	}
 
 	// @override
@@ -79,10 +87,12 @@ class FeedCategoryMapping extends PageForm {
 	public function load() {
 
 		// Fetch/query FeedCategory data based on $this->feedId, so we can set the Feed Name label in the form, etc
-		$res = Query("SELECT * FROM `feedcategory` WHERE `id` = '{$this->feedId}'");
-		if (is_object($res)) {
-			$this->feedInfo = $res->fetch(PDO::FETCH_ASSOC);
-			$res = null;
+		$this->feedCategory = DBFind('FeedCategory', 'FROM `feedcategory` WHERE NOT `deleted` AND `id` = ?;', false, array($this->feedId));
+		if (! is_object($this->feedCategory)) {
+
+			// error! deleted feedcategory? nonexistent?
+			unset($_SESSION['feedid']);
+			redirect('editfeedcategory.php');
 		}
 
 		// Fetch CMA Categories; convert array of objects into id=name associative array
@@ -94,12 +104,12 @@ class FeedCategoryMapping extends PageForm {
 		}
 
 		// fetch kona feed category map for this feed id
-		$rawData = QuickQueryMultiRow("SELECT `cmacategory` FROM `feedcat2cmacatmap` WHERE `fk_feedcategory` = '{$this->feedId}'", true);
+		$rawData = QuickQueryMultiRow("SELECT `cmacategoryid` FROM `cmafeedcategory` WHERE `feedcategoryid` = '{$this->feedId}'", true);
 		if (is_array($rawData) && count($rawData)) {
 			foreach ($rawData as $row) {
 
 				// Otherwise mark this one as being currently selected for this kona feed
-				$this->cmaCategoriesMapped[] = $row['cmacategory'];
+				$this->cmaCategoriesMapped[] = $row['cmacategoryid'];
 			}
 		}
 	}
@@ -109,13 +119,12 @@ class FeedCategoryMapping extends PageForm {
 
 		$this->setFormData();
 		$this->form = new Form($this->formName, $this->formdata, $this->helpsteps, array( submit_button(_L('Map Feed'), 'mapfeed', 'pictos/p1/16/59')));
-		$this->form->ajaxsubmit = false;
+		$this->form->ajaxsubmit = true;
 
 		$this->form->handleRequest();
 		if ($this->form->getSubmit()) {
 			$postData = $this->form->getData();
 
-			// TODO: handle response
 			$categoryDrops = $categoryAdds = Array();
 
 			// 1) Make sure all selected categories are in the list of available CMS categories at the time of submission
@@ -140,14 +149,34 @@ class FeedCategoryMapping extends PageForm {
 				}
 			}
 
-			// TODO - DELETE FROM feedcat2cmacatmap WHERE fk_feedcategory = $this->feedId AND cmacategory IN ($categoryDrops);
-			// TODO - INSERT INTO feedcat2cmacatmap SET fk_feedcategory = $this->feedId, cmacategory = $categoryAdds[] -- foreach!
+			$notice = '';
+
+			// 4) Drop the drops
+			if (count($categoryDrops)) {
+				$qparams = array($this->feedId);
+				$qparams = array_merge($qparams, $categoryDrops);
+				$qcats = repeatWithSeparator('?', ',', count($categoryDrops));
+				Query("DELETE FROM `cmafeedcategory` WHERE `feedcategoryid` = ? AND `cmacategoryid` IN ({$qcats});", false, $qparams);
+				$notice .= sprintf(_L('Dropped %d old/invalid CMA category mappings'), count($categoryDrops));
+			}
+
+			// 5) Add the adds
+			if (count($categoryAdds)) {
+				foreach ($categoryAdds as $id) {
+					Query("INSERT INTO `cmafeedcategory` SET `feedcategoryid` = ?, `cmacategoryid` = ?;", false, array($this->feedId, $id));
+				}
+				if (strlen($notice)) $notice .= ' ';
+				$notice .= sprintf(_L('Added %d new CMA category mappings'), count($categoryAdds));
+			}
+
+			// 6) Wrap-up
+			if (strlen($notice)) notice($notice);
+			unset($_SESSION['feedid']);
 
 			if ($this->form->isAjaxSubmit()) {
-				unset($_SESSION['feedid']);
-				$this->form->sendTo("editfeedcategory.php");
+				$this->form->sendTo('editfeedcategory.php');
 			} else {
-				redirect("editfeedcategory.php");
+				redirect('editfeedcategory.php');
 			}
 		}
 	}
@@ -166,7 +195,7 @@ class FeedCategoryMapping extends PageForm {
 				"label" => _L('Feed Name'),
 				'control' => array(
 					"FormHtml",
-					"html" => '<span style="font-size:14px; vertical-align:sub; font-weight:bold;">' . $this->feedInfo['name'] . '</span>'
+					"html" => '<span style="font-size:14px; vertical-align:sub; font-weight:bold;">' . $this->feedCategory->name . '</span>'
 				),
 				"helpstep" => 1
 			),
