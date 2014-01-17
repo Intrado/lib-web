@@ -66,7 +66,7 @@ if ($generalerror) {
 if (!$success) {
 ?>
 <form method="POST" action="forgotpassword.php" name="forgotpassword">
-	<table width="100%" style="color: #<?=$primary?>;" >
+	<table width="100%">
 			<tr>
 				<td colspan="2">
 					<div style="float:right;">

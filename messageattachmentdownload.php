@@ -15,6 +15,8 @@ require_once("inc/content.inc.php");
 include_once("inc/appserver.inc.php");
 require_once("obj/Content.obj.php");
 require_once("obj/MessageAttachment.obj.php");
+require_once("obj/ContentAttachment.obj.php");
+require_once("obj/BurstAttachment.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -34,21 +36,16 @@ $messageattachment = new MessageAttachment($id);
 if (!userOwns("message",$messageattachment->messageid))
 	redirect('unauthorized.php');
 
-if ($c = contentGet($messageattachment->contentid)) {
-	list($contenttype,$data) = $c;
+if ($d = $messageattachment->getAttachmentData()) {
+	list($filename, $contentType, $data) = $d;
+	$size = strlen($data);
 
-	if ($data) {
-		$size = strlen($data);
+	header("Pragma: private");
+	header("Cache-Control: private");
+	header("Content-Length: $size");
+	header("Content-disposition: attachment; filename=\"" . $filename . "\"");
+	header("Content-type: " . ($contentType ? $contentType : "application/octet-stream"));
 
-		header("Pragma: private");
-		header("Cache-Control: private");
-		header("Content-Length: $size");
-		header("Content-disposition: attachment; filename=\"" . $messageattachment->filename . "\"");
-		header("Content-type: application/octet-stream");
-
-		echo $data;
-	}
+	echo $data;
 }
-
-
 ?>

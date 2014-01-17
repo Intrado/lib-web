@@ -105,7 +105,7 @@ require_once("logintop.inc.php");
 
 ?>
 <form method="POST" action="index.php" name="login">
-	<table style="color: #<?=$primary?>;" >
+	<table>
 			<tr>
 				<td colspan="3">
 					<div style="float:right;">

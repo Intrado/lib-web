@@ -7,7 +7,6 @@ require_once("obj/Language.obj.php");
 require_once("obj/Message.obj.php");
 require_once("obj/MessageGroup.obj.php");
 require_once("obj/MessagePart.obj.php");
-require_once("obj/MessageAttachment.obj.php");
 require_once("obj/AudioFile.obj.php");
 require_once("obj/Voice.obj.php");
 require_once("obj/FieldMap.obj.php");
@@ -333,33 +332,6 @@ function handleRequest() {
 				'languagemap' => Language::getLanguageMap()
 			);
 
-		// Return a whole message including it's message parts formatted into body text and any attachments.
-		case 'previewmessage':
-			if (!isset($_GET['id']))
-				return false;
-			$message = new Message($_GET['id']+0);
-			if ($message->userid !== $USER->id)
-				return false;
-			$message->readHeaders();
-			$parts = DBFindMany("MessagePart","from messagepart where messageid=? order by sequence", false, array($_GET['id']));
-			$attachments = DBFindMany("MessageAttachment","from messageattachment where messageid=?", false, array($_GET['id']));
-			$simple = false;
-			if (count($parts) == 1)
-				foreach ($parts as $id => $part)
-					if ($part->type == "A") $simple = true;
-
-			return array(
-				"lastused"=>$message->lastused,
-				"description"=>$message->description,
-				"fromname"=>$message->fromname,
-				"fromemail"=>$message->fromemail,
-				"subject"=>$message->subject,
-				"type"=>$message->type,
-				"simple"=>$simple,
-				"attachment"=>count($attachments)?cleanObjects($attachments):false,
-				"body"=>count($parts)?$message->format($parts):""
-			);
-
 		case 'messagegrid':
 			// Check if has messagegroupid
 			if (!isset($_GET['id']) || !$_GET['id'])
@@ -493,10 +465,11 @@ function handleRequest() {
 					inner join message m on (m.messagegroupid = ? and m.id = mp.messageid) 
 					group by af.contentid", false, false, array($mg->id));
 			$attachmentcontentids = QuickQueryList(
-					"select ma.contentid
-					from messageattachment ma
-					inner join message m on (m.messagegroupid = ? and m.id = ma.messageid) 
-					group by ma.contentid", false, false, array($mg->id));
+					"select ca.contentid
+					from message m
+					inner join messageattachment ma on (ma.messageid = m.id)
+					inner join contentattachment ca on (ma.contentattachmentid = ca.id)
+					where m.messagegroupid = ?", false, false, array($mg->id));
 			$contentids = array_merge($imagecontentids, $audiofilecontentids, $attachmentcontentids);
 			foreach ($contentids as $contentid)
 				permitContent($contentid);

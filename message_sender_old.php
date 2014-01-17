@@ -41,6 +41,7 @@ require_once("obj/MessageGroup.obj.php");
 require_once("obj/Message.obj.php");
 require_once("obj/MessagePart.obj.php");
 require_once("obj/MessageAttachment.obj.php");
+require_once("obj/ContentAttachment.obj.php");
 require_once("obj/FeedCategory.obj.php");
 
 // Validators
@@ -1170,7 +1171,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$messages['email']['html']['en']['none']["fromname"] = $postdata["emailmessagefromname"];
 			$messages['email']['html']['en']['none']["from"] = $postdata["emailmessagefromemail"];
 			$messages['email']['html']['en']['none']["subject"] = $postdata["emailmessagesubject"];
-			$attachments = isset($postdata["emailmessageattachment"])?json_decode($postdata["emailmessageattachment"]):array();
+			$attachments = isset($postdata["emailmessageattachment"])?json_decode($postdata["emailmessageattachment"], true):array();
 			$messages['email']['html']['en']['none']['attachments'] = $attachments;
 
 			// check for and retrieve translations
@@ -1267,14 +1268,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
 							// if there are message attachments, attach them
 							if (isset($data['attachments']) && $data['attachments']) {
-								foreach ($data['attachments'] as $cid => $details) {
-									$msgattachment = new MessageAttachment();
-									$msgattachment->messageid = $message->id;
-									$msgattachment->contentid = $cid;
-									$msgattachment->filename = $details->name;
-									$msgattachment->size = $details->size;
-									$msgattachment->create();
-								}
+								$message->createContentAttachments($data['attachments']);
 							} // end if there are attachments
 						} // end if this message has a body
 					} // end for each autotranslate value

@@ -21,6 +21,7 @@ require_once("obj/MessageGroup.obj.php");
 require_once("obj/MessagePart.obj.php");
 require_once("obj/Language.obj.php");
 require_once("obj/MessageAttachment.obj.php");
+require_once("obj/ContentAttachment.obj.php");
 require_once("obj/Voice.obj.php");
 require_once("obj/PreviewModal.obj.php");
 
@@ -131,7 +132,7 @@ if ($message) {
 	$fromstationery = $message->fromstationery;
 	
 	// get the attachments
-	$msgattachments = DBFindMany("MessageAttachment", "from messageattachment where messageid = ?", false, array($message->id));
+	$msgattachments = $message->getContentAttachments();
 	foreach ($msgattachments as $msgattachment) {
 		permitContent($msgattachment->contentid);
 		$attachments[$msgattachment->contentid] = array("name" => $msgattachment->filename, "size" => $msgattachment->size);
@@ -144,7 +145,7 @@ if ($message) {
 		$fromname = $message2->fromname;
 		$fromemail = $message2->fromemail;
 		$subject = $message2->subject;
-		$msgattachments = DBFindMany("MessageAttachment", "from messageattachment where messageid = ?", false, array($message2->id));
+		$msgattachments = $message2->getContentAttachments();
 		foreach ($msgattachments as $msgattachment) {
 			permitContent($msgattachment->contentid);
 			$attachments[$msgattachment->contentid] = array("name" => $msgattachment->filename, "size" => $msgattachment->size);
@@ -370,11 +371,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$message->recreateParts($postdata['message'], null, false);
 			
 			// if there are message attachments, attach them
-			$attachments = json_decode($postdata['attachments']);
+			$attachments = json_decode($postdata['attachments'], true);
 			if ($attachments == null)
 				$attachments = array();
 			
-			savaAttachments($attachments,$message);
+			$message->replaceContentAttachments($attachments);
 			
 			// Sync with other message subtype if it exists
 			$message2 = $messagegroup->getMessage("email", $subtype=="html"?"plain":"html", $languagecode);
@@ -385,7 +386,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$message2->stuffHeaders();
 				$message2->update();
 				
-				savaAttachments($attachments,$message2);
+				$message2->replaceContentAttachments($attachments,$message2);
 			}
 			
 			$messagegroup->updateDefaultLanguageCode();
@@ -399,36 +400,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$form->sendTo(getEditMessageSendTo($messagegroup->id));
 		else
 			redirect(getEditMessageSendTo($messagegroup->id));
-	}
-}
-
-function savaAttachments($attachments,$message) {
-	// check for existing attachments
-	$existingattachments = QuickQueryList("select contentid, id from messageattachment where messageid = ?", true, false, array($message->id));
-	$existingattachmentstokeep = array();
-	if ($attachments) {
-		foreach ($attachments as $cid => $details) {
-			// check if this is already attached.
-			if (isset($existingattachments[$cid])) {
-				$existingattachmentstokeep[$existingattachments[$cid]] = true;
-				continue;
-			} else {
-				$msgattachment = new MessageAttachment();
-				$msgattachment->messageid = $message->id;
-				$msgattachment->contentid = $cid;
-				$msgattachment->filename = $details->name;
-				$msgattachment->size = $details->size;
-				$msgattachment->create();
-			}
-		}
-	}
-	// remove attachments that are no longer attached
-	foreach ($existingattachments as $cid => $attachmentid) {
-		if (!isset($existingattachmentstokeep[$attachmentid])) {
-			$attachment = new MessageAttachment($attachmentid);
-			if ($attachment)
-				QuickUpdate("delete from messageattachment where id = ?", false, array($attachment->id));
-		}
 	}
 }
 

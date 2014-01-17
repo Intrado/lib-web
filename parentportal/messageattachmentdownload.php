@@ -15,6 +15,8 @@ require_once("../inc/content.inc.php");
 require_once("../inc/appserver.inc.php");
 require_once("../obj/Content.obj.php");
 require_once("../obj/MessageAttachment.obj.php");
+require_once("../obj/ContentAttachment.obj.php");
+require_once("../obj/BurstAttachment.obj.php");
 require_once("parentportalutils.inc.php");
 
 // load the thrift api requirements.
@@ -67,21 +69,16 @@ if (!QuickQuery("select 1 from reportperson where jobid = ? and personid = ? and
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
+if ($d = $messageattachment->getAttachmentData()) {
+	list($filename, $contentType, $data) = $d;
+	$size = strlen($data);
 
-if ($c = contentGet($messageattachment->contentid)) {
-	list($contenttype,$data) = $c;
-	if ($data) {
-		$size = strlen($data);
+	header("Pragma: private");
+	header("Cache-Control: private");
+	header("Content-Length: $size");
+	header("Content-disposition: attachment; filename=\"" . $filename . "\"");
+	header("Content-type: " . ($contentType ? $contentType : "application/octet-stream"));
 
-		header("Pragma: private");
-		header("Cache-Control: private");
-		header("Content-Length: $size");
-		header("Content-disposition: attachment; filename=\"" . $messageattachment->filename . "\"");
-		header("Content-type: application/octet-stream");
-
-		echo $data;
-	}
+	echo $data;
 }
-
-
 ?>

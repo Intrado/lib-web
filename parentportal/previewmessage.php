@@ -21,6 +21,8 @@ require_once("../obj/MessageGroup.obj.php");
 require_once("../obj/AudioFile.obj.php");
 require_once("../obj/MessagePart.obj.php");
 require_once("../obj/MessageAttachment.obj.php");
+require_once("../obj/ContentAttachment.obj.php");
+require_once("../obj/BurstAttachment.obj.php");
 require_once("../obj/Voice.obj.php");
 require_once("../obj/Language.obj.php");
 require_once("parentportalutils.inc.php");
@@ -159,22 +161,22 @@ startWindow(_L('Details'), 'padding: 3px;');
 
 	<table width="100%" border="0" cellpadding="3" cellspacing="0">
 		<tr>
-			<th align="right" class="windowRowHeader bottomBorder"><?=_L("Message For")?>:</td>
+			<th align="right" class="windowRowHeader bottomBorder"><?=_L("Message For")?>:</th>
 			<td class="bottomBorder"><?=escapehtml($historicdata['f01']) . " " . escapehtml($historicdata['f02'])?></td>
 		</tr>
 		<tr>
-			<th align="right" class="windowRowHeader bottomBorder"><?=_L("Job Name")?>:</td>
+			<th align="right" class="windowRowHeader bottomBorder"><?=_L("Job Name")?>:</th>
 			<td class="bottomBorder"><?=escapehtml($historicdata['jobname'])?></td>
 		</tr>
 		<tr>
-			<th align="right" class="windowRowHeader bottomBorder"><?=_L("Date")?>:</td>
+			<th align="right" class="windowRowHeader bottomBorder"><?=_L("Date")?>:</th>
 			<td class="bottomBorder"><?=date("M j, Y", strtotime($historicdata['startdate']))?></td>
 		</tr>
 <?
 	if (count($availableMessageLanguages) > 1) {
 ?>
 		<tr>
-			<th align="right" class="windowRowHeader bottomBorder"><?=_L("Language")?>:</td>
+			<th align="right" class="windowRowHeader bottomBorder"><?=_L("Language")?>:</th>
 			<td><table><tr><td>
 			<?
 				NewFormItem($f, $s, 'language', 'selectstart', null, null, "id='language'");
@@ -204,12 +206,20 @@ startWindow(_L('Details'), 'padding: 3px;');
 					</tr>
 <?
 				foreach ($attachments as $attachment) {
-?>
+					$filename = $attachment->getFilename();
+					$size = $attachment->getSize();
+					if ($size === false)
+						$size = "???";
+					else
+						$size = max(1,round($size/1024));
+					?>
 					<tr>
-						<td><a href="messageattachmentdownload.php?pid=<?= $personid ?>&jid=<?= $jobid ?>&attid=<?= $attachment->id ?>"><?= escapehtml($attachment->filename)?></a></td>
-						<td><?= max(1,round($attachment->size/1024)) ?>K</td>
+						<td><a href="messageattachmentdownload.php?pid=<?= $personid ?>&jid=<?= $jobid ?>&attid=<?= $attachment->id ?>">
+								<?= escapehtml($filename)?></a>
+						</td>
+						<td><?= $size ?>K</td>
 					</tr>
-<?
+				<?
 				}
 ?>
 				</table>

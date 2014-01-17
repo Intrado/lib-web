@@ -104,6 +104,10 @@ class MessageGroup extends DBMappedObject {
 		return $availableMessageLanguages;
 	}
 
+	/**
+	 * @param bool $isDeletedOk
+	 * @return MessageAttachment[]|bool
+	 */
 	function getGlobalEmailAttachments($isDeletedOk = false) {
 		if (!$emailmessage = $this->getFirstMessageOfType('email'))
 			return array();
@@ -135,7 +139,14 @@ class MessageGroup extends DBMappedObject {
 		
 		return $message->format($parts);
 	}
-	
+
+	/**
+	 * @param string $type
+	 * @param string $subtype
+	 * @param string $languagecode
+	 * @param bool $autotranslate
+	 * @return Message or null if not found
+	 */
 	function getMessage($type, $subtype, $languagecode, $autotranslate = false) {
 		foreach ($this->getMessages() as $message) {
 			if ($message->type == $type &&
