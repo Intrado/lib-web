@@ -104,6 +104,10 @@ class MessageGroup extends DBMappedObject {
 		return $availableMessageLanguages;
 	}
 
+	/**
+	 * @param bool $isDeletedOk
+	 * @return MessageAttachment[]|bool
+	 */
 	function getGlobalEmailAttachments($isDeletedOk = false) {
 		if (!$emailmessage = $this->getFirstMessageOfType('email'))
 			return array();
