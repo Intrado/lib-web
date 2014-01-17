@@ -2336,17 +2336,17 @@ $$$
 -- END 10.1/5
 
 -- START 10.1/6
-  update setting set value='10.1/6' where name='_dbversion'
-  $$$
+update setting set value='10.1/6' where name='_dbversion'
+$$$
 -- END 10.1/6
 
 -- START 10.1/7
-  CREATE TABLE `cmafeedcategory` (
+CREATE TABLE `cmafeedcategory` (
   `feedcategoryid` int(11) NOT NULL,
   `cmacategoryid` int(11) NOT NULL,
   PRIMARY KEY (`feedcategoryid`,`cmacategoryid`),
   KEY `feedcategoryid` (`feedcategoryid`)
-  ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
 update setting set value='10.1/7' where name='_dbversion'
 $$$
