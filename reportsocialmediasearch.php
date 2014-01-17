@@ -169,13 +169,11 @@ if (getSystemSetting('_hasfacebook', false)) {
 }
 
 if (getSystemSetting('_hastwitter', false)) {
-	$titles["twhandle"] =  _L("Twitter User");
 	$titles["twstatus"] = _L("Twitter Status");
 	$titles["twcontent"] = _L("Twitter Content");
 }
 
 $data = array();
-$twitterids = array();
 $facebookids = array();
 
 
@@ -218,8 +216,6 @@ if ($showreport || $downloadreport) {
 					break;
 				case "twitter":
  					$post["twhandle"] = $row[5]; // Set id here to be able to map to twitter response
- 					if (!isset($twitterids[$row[5]])) 
- 						$twitterids[$row[5]] = $row[5]; // Set id to be able to identify id if twitter cannot get the screen_name
 					$post["twstatus"] = $row[7] == "1"?"Posted":"Not Posted";
 					$post["twcontent"] = $row[3];
 					// Do not modify, Just print the handle 
@@ -266,20 +262,6 @@ function fmt_csv_fbdestination($row,$index) {
 	$destinations = $row[$index];
 	if ($destinations) {
 		return implode(",",$destinations);
-	} else {
-		return "";
-	}
-}
-
-$twdestinations = array();
-function fmt_twdestination($row,$index) {
-	global $twdestinations;
-	$destination = $row[$index];
-	if ($destination) {
-		// Store twitter destination ids for javascript handling
-		$id = "twd_" . count($twdestinations);
-		$twdestinations[$id] = $destination;
-		return "<div id=\"{$id}\"><img src=\"img/ajax-loader.gif\" alt=\"\"> Loading Twitter User</div>";
 	} else {
 		return "";
 	}
@@ -370,33 +352,6 @@ if ($showreport) {
 	endWindow();
 }
 buttons();
-
-
-// Include Twitter user name lookup i report contians twitter
-if (count($twitterids)) {
-?>
-	<script type="text/javascript">
-	var twcache = $H();
-	function showTwitter(response) {
-	    var names = '';
-	    response.each(function(itm) {
-	    	twcache.set(itm.id,itm.screen_name);
-	    });
-	    var twdestinations = $H(<?= json_encode($twdestinations); ?>);
-		if (twdestinations.size() > 0) {
-			twdestinations.each(function(itm) {
-				var name = twcache.get(itm.value);
-				$(itm.key).update(name?name:itm.value);
-			});
-		}
-	}
-	</script>
-	<? 
-	$twitteridchunks = array_chunk(array_keys($twitterids), 100);
-	foreach($twitteridchunks as $twidchunk) {
-		echo '<script type="text/javascript" src="https://api.twitter.com/1/users/lookup.json?user_id=' . implode(",",$twidchunk) . '&callback=showTwitter"></script>';
-	}
-}
 
 // Include Facebook user name lookup i report contians facebook
 if (count($facebookids)) {

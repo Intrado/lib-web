@@ -328,6 +328,13 @@ table_left and table_right have the arrow controls, set to 8% width for 1024 scr
 .feed_item { border-bottom: 1px solid #ccc; padding: 1em 0.5em; margin-bottom: 5px; }
 .feed_item td { padding: 1em 0.5em; }
 
+a.btn.feedcategorymapping:link, a.btn.feedcategorymapping:hover, a.btn.feedcategorymapping:visited, a.btn.feedcategorymapping:active {
+    color: #333;
+    text-decoration: none;
+}
+#feedcategorymapping button[type=submit] {
+    margin-left: 160px;
+}
 
 /* RCIeditor */
 span.cke_toolgroup {height: 27px;}

@@ -78,6 +78,15 @@ foreach ($categories as $category) {
 			"confirm" => _L("Are you sure you want to delete feed category: %s?",$category->name)),
 		"helpstep" => 1
 	);
+
+    $formdata["feedcategorymapping-".$category->id] = array(
+        "label" => "",
+        'control' => array(
+            "FormHtml",
+            "html" => '<a class="btn feedcategorymapping" href="feedcategorymapping.php?id='.$category->id.'" style="padding:6px 8px;"><img style="margin-right:8px; margin-top:-3px;" src="img/icons/pictos/p1/16/28.png">Map to CMA Category</a>'
+        ),
+        "helpstep" => 1
+    );
 }
 $formdata[] = _L('New Feed Category');
 $formdata["feedcategoryname-new"] = array(
