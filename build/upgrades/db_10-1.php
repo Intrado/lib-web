@@ -1,4 +1,5 @@
 <?
+require_once("upgrades/db_10-1_oldcode.php");
 
 function upgrade_10_1 ($rev, $shardid, $customerid, $db) {
 	global $authdb;
