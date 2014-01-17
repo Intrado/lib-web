@@ -100,6 +100,9 @@ class Message extends DBMappedObject {
 				"ca", array($this->id));
 	}
 
+	/**
+	 * @param array() $emailattachments  looks like array(<contentid>: array("name": <filename>, "size": <file size>))
+	 */
 	function createContentAttachments($emailattachments) {
 		if ($this->type != 'email' && $this->type != 'post')
 			return;
@@ -122,7 +125,7 @@ class Message extends DBMappedObject {
 	/**
 	 * Replaces existing content based attachments with those passed into this method
 	 *
-	 * @param array() $attachments
+	 * @param array() $attachments looks like array(<contentid>: array("name": <filename>, "size": <file size>))
 	 */
 	function replaceContentAttachments($attachments) {
 		if ($this->type != 'email' && $this->type != 'post')
