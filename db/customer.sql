@@ -2372,3 +2372,8 @@ $$$
 update setting set value='10.1/7' where name='_dbversion'
 $$$
 -- END 10.1/7
+
+-- START 10.1/8
+update setting set value='10.1/8' where name='_dbversion'
+$$$
+-- END 10.1/8

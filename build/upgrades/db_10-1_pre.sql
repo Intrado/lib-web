@@ -64,3 +64,6 @@ ALTER TABLE `messageattachment`
 	DROP `filename`,
 	DROP `size`
 $$$
+
+-- $rev 8
+-- No schema change. subscriber limited user update is handled in db_10-1.php

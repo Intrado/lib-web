@@ -58,6 +58,20 @@ function upgrade_10_1 ($rev, $shardid, $customerid, $db) {
 		case 6:
 			echo "|";
 			apply_sql("upgrades/db_10-1_pre.sql", $customerid, $db, 7);
+
+		case 7:
+			echo '|';
+			// update the subscriber limited user account
+			$custdbname = "c_$customerid";
+			$limitedusername = "c_".$customerid."_limited";
+			$limitedpassword = genpassword();
+			$grantedhost = '%';
+			Query("BEGIN", $authdb);
+			QuickUpdate("update customer set limitedusername = ?, limitedpassword = ? where id = ?",
+					$authdb, array($limitedusername, $limitedpassword, $customerid))
+				or dieWithError("failed to insert customer into auth server", $authdb);
+			createLimitedUser($limitedusername, $limitedpassword, $custdbname, $db, $grantedhost);
+			Query("COMMIT", $authdb);
 	}
 	
 	//This statement should appear in each upgrade script, when relevent.
