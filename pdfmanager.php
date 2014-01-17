@@ -126,7 +126,7 @@ class PdfManager extends PageBase {
 				"itemid" => "",
 				  "defaultlink" => "",
 				  "icon" => "img/largeicons/information.jpg",
-				  "title" => _L("No PDF files available."),
+				  "title" => _L("No Documents available."),
 				  "content" => "",
 				  "tools" => ""
 			  );
