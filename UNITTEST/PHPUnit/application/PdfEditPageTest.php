@@ -168,7 +168,7 @@ class PdfEditPageTest extends PHPUnit_Framework_TestCase {
 		global $USER, $HEADERS;
 
 		// Stub out API access
-		$apiClient = new ApiStub('localhost', 'unrealcustomer', $USER->id, 'unrealauthcookiedata');
+		$apiClient = new ApiStub('http://localhost/api');
 		$this->csApi = new CommsuiteApiClient($apiClient);
 
 		// Then go for launch!
