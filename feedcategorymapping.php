@@ -38,10 +38,10 @@ require_once('obj/CmaApiClient.obj.php');
 
 class FeedCategoryMapping extends PageForm {
 
+	public $formName = 'feedcategorymapping';
+
 	private $cmaApi;
-	private $formName = 'feedcategorymapping';
 	private $pageNav = 'admin:settings';
-	private $pageTitle;
 
 	public $formdata;
 	public $helpsteps;
@@ -55,21 +55,20 @@ class FeedCategoryMapping extends PageForm {
 
 	public function __construct($cmaApi) {
 		$this->cmaApi = $cmaApi;
-		$this->pageTitle = _L('Map Feed to CMA Category(s)');
 		parent::__construct();
 	}
 
 	// @override
 	public function isAuthorized(&$get = array(), &$post = array(), &$request = array(), &$session = array()) {
 		global $USER;
-		return(getSystemSetting("_hasfeed") && $USER->authorize('managesystem') && (intval(getCustomerSystemSetting('_cmaappid') > 0)));
+		return(getSystemSetting("_hasfeed") && $USER->authorize('managesystem') && (intval(getSystemSetting('_cmaappid') > 0)));
 	}
 
 	// @override
 	public function initialize() {
 		// override some options set in PageBase
 		$this->options["page"]	= $this->pageNav;
-		$this->options["title"] = $this->pageTitle;
+		$this->options["title"] = _L('Map Feed to CMA Category(s)');
 	}
 
 	// @override
@@ -215,14 +214,12 @@ class FeedCategoryMapping extends PageForm {
 // ================================================================
 
 $cmaApi = new CmaApiClient(
-	array(
-		// TODO: use CMA API url from $SETTINGS once CMA API ready
-		// 'apiClient' => new ApiClient($SETTINGS['cmaserver']['apiurl']),
+	// TODO: use CMA API url from $SETTINGS once CMA API ready
+	// 'apiClient' => new ApiClient($SETTINGS['cmaserver']['apiurl']),
 
-		// use CMA api stub until CMA API ready
-		'apiClient' => new ApiClient("https://{$_SERVER['SERVER_NAME']}/".customerUrlComponent().'/_cma_api_stub.php'),
-		'appId' => getCustomerSystemSetting("_cmaappid") ? getCustomerSystemSetting("_cmaappid") : 1 // TODO: add appropriate logic/handling
-	)
+	// use CMA api stub until CMA API ready
+	new ApiClient("https://{$_SERVER['SERVER_NAME']}/".customerUrlComponent().'/_cma_api_stub.php'),
+	getCustomerSystemSetting("_cmaappid") ? getCustomerSystemSetting("_cmaappid") : 1 // TODO: add appropriate logic/handling
 );
 executePage(new FeedCategoryMapping($cmaApi));
 
