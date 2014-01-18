@@ -2359,7 +2359,7 @@ CREATE TABLE IF NOT EXISTS `contentattachment` (
 	`filename` varchar(255) NOT NULL,
 	`size` int(11) NOT NULL,
 	PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
 
 CREATE TABLE IF NOT EXISTS `burstattachment` (
