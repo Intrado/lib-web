@@ -31,12 +31,7 @@ class CmaApiClientTest extends PHPUnit_Framework_TestCase {
                 )
         ));
 
-        $cmaApiOptions = array(
-            'apiClient' => $this->apiClient,
-            'appId' => $this->appId,
-        );
-
-        $this->cmaApiClient = new CmaApiClient($cmaApiOptions);
+        $this->cmaApiClient = new CmaApiClient($this->apiClient, $this->appId);
 
     }
 
