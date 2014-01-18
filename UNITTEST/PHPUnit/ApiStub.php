@@ -12,21 +12,12 @@
  */
 class ApiStub {
 
-	protected $apiHostname = '';
-	protected $apiCustomer = '';
-	protected $apiUser = '';
-	protected $apiAuth = '';
-	protected $customerUrl = '';
 	protected $ApiUrl = '';
+	protected $staticHeaders = array();
 
-	public function __construct($apiHostname, $apiCustomer, $apiUser, $apiAuth) {
-		$this->apiHostname = $apiHostname;
-		$this->apiCustomer = $apiCustomer;
-		$this->apiUser = $apiUser;
-		$this->apiAuth = $apiAuth;
-
-		$this->customerUrl = "https://{$this->apiHostname}/{$this->apiCustomer}/";
-		$this->ApiUrl = "{$this->customerUrl}api/2/users/{$this->apiUser}";
+        public function __construct($ApiUrl, $staticHeaders = array()) {
+		$this->ApiUrl = $ApiUrl;
+		$this->staticHeaders = $staticHeaders;
 	}
 
         public function getApiUrl() {
