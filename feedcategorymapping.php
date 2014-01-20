@@ -49,7 +49,6 @@ class FeedCategoryMapping extends PageForm {
 	private $feedId;
 	private $feedCategory;
 
-	private $rawCmaCategories = array();
 	private $cmaCategories = array();
 	private $cmaCategoriesMapped = array();
 
@@ -93,6 +92,7 @@ class FeedCategoryMapping extends PageForm {
 			unset($_SESSION['feedid']);
 			redirect('editfeedcategory.php');
 		}
+		$this->options["windowTitle"] = _L('Mappings for: %s', $this->feedCategory->name);
 
 		// Fetch CMA Categories; convert array of objects into id=name associative array
 		$rawCmaCategories = $this->cmaApi->getCategories();
@@ -117,7 +117,7 @@ class FeedCategoryMapping extends PageForm {
 	public function afterLoad() {
 
 		$this->setFormData();
-		$this->form = new Form($this->formName, $this->formdata, $this->helpsteps, array( submit_button(_L('Map Feed'), 'mapfeed', 'pictos/p1/16/59')));
+		$this->form = new Form($this->formName, $this->formdata, $this->helpsteps, array( submit_button(_L('Done'), 'mapfeed', 'pictos/p1/16/59')));
 		$this->form->ajaxsubmit = true;
 
 		$this->form->handleRequest();
@@ -184,12 +184,11 @@ class FeedCategoryMapping extends PageForm {
 
 		// define help steps used in form
 		$this->helpsteps = array(
-			_L('The name of the feed'),
-			_L('Select one or more CMA Categories to map this feed to'),
+			_L('By adding one or more Custom Mobile Apps categories to this Feed category, you can enable mobile device delivery.<br>'.
+				'Messages will be sent to the mobile devices via "Push" notification for any CMA users which have subscribed to the categories selected here.'),
 		);
 
 		$this->formdata = array(
-			_L('Select one or more CMA Categories to map this feed to'),
 			"feedname" => array(
 				"label" => _L('Feed Name'),
 				'control' => array(
@@ -199,12 +198,12 @@ class FeedCategoryMapping extends PageForm {
 				"helpstep" => 1
 			),
 			"cmacategories" => array(
-				"label" => _L('CMA Categories'),
-				"fieldhelp" => $this->helpsteps[1],
+				"label" => _L('CMA Category(s)'),
+				"fieldhelp" => _L('Select one or more CMA Categories to map this feed to'),
 				"value" => $this->cmaCategoriesMapped,
 				"validators" => array(),
 				"control" => array('MultiCheckBox', 'values' => $this->cmaCategories),
-				"helpstep" => 2
+				"helpstep" => 1
 			),
 		);
 	}
