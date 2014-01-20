@@ -43,9 +43,6 @@ class FeedCategoryMapping extends PageForm {
 	private $cmaApi;
 	private $pageNav = 'admin:settings';
 
-	public $formdata;
-	public $helpsteps;
-
 	private $feedId;
 	private $feedCategory;
 
@@ -111,16 +108,16 @@ class FeedCategoryMapping extends PageForm {
 				$this->cmaCategoriesMapped[] = $row['cmacategoryid'];
 			}
 		}
+
+		// Make the edit FORM
+		 $this->form = $this->factoryFormCmaFeedCategories();
 	}
 
 	// @override
 	public function afterLoad() {
 
-		$this->setFormData();
-		$this->form = new Form($this->formName, $this->formdata, $this->helpsteps, array( submit_button(_L('Done'), 'mapfeed', 'pictos/p1/16/59')));
-		$this->form->ajaxsubmit = true;
-
 		$this->form->handleRequest();
+
 		if ($this->form->getSubmit()) {
 			$postData = $this->form->getData();
 
@@ -180,15 +177,15 @@ class FeedCategoryMapping extends PageForm {
 		}
 	}
 
-	public function setFormData() {
+	public function factoryFormCmaFeedCategories() {
 
 		// define help steps used in form
-		$this->helpsteps = array(
+		$helpsteps = array(
 			_L('By adding one or more Custom Mobile Apps categories to this Feed category, you can enable mobile device delivery.<br>'.
 				'Messages will be sent to the mobile devices via "Push" notification for any CMA users which have subscribed to the categories selected here.'),
 		);
 
-		$this->formdata = array(
+		$formdata = array(
 			"feedname" => array(
 				"label" => _L('Feed Name'),
 				'control' => array(
@@ -204,8 +201,13 @@ class FeedCategoryMapping extends PageForm {
 				"validators" => array(),
 				"control" => array('MultiCheckBox', 'values' => $this->cmaCategories),
 				"helpstep" => 1
-			),
+			)
 		);
+
+		$form = new Form($this->formName, $formdata, $helpsteps, array( submit_button(_L('Done'), 'mapfeed', 'pictos/p1/16/59')));
+		$form->ajaxsubmit = true;
+
+		return($form);
 	}
 }
 
