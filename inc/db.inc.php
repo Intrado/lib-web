@@ -120,6 +120,12 @@ function DBEscapeLikeWildcards ($string) {
 	return str_replace("_","\\_",str_replace("%","\\%",$string));
 }
 
+/**
+ * @param string $query
+ * @param object $dbconnect
+ * @param array|bool $args
+ * @return bool
+ */
 function Query ($query, $dbconnect=false, $args=false) {
 	global $_dbcon;
 	$connection = $dbconnect ? $dbconnect : $_dbcon;
@@ -128,6 +134,12 @@ function Query ($query, $dbconnect=false, $args=false) {
 	return DBQueryWrapper($connection, $query, $args);
 }
 
+/**
+ * @param string $query
+ * @param object $dbconnect
+ * @param array|bool $args
+ * @return string|bool
+ */
 function QuickQuery ($query, $dbconnect=false, $args=false) {
 	global $_dbcon;
 	$val = false;
