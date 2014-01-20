@@ -23,6 +23,7 @@ require_once("obj/ValUrl.val.php");
 require_once("obj/LogoRadioButton.fi.php");
 require_once("obj/LanguagesItem.fi.php");
 require_once("obj/ValInboundNumber.val.php");
+require_once("../obj/ValInteger.val.php");
 
 // For Quick Tip TAI table activation stuffs
 require_once("loadtaitemplatedata.php");
@@ -633,9 +634,9 @@ $formdata["hasquicktip"] = array(
 
 $formdata["cmaappid"] = array(
 	"label" => _L('CMA App. ID'),
-	"value" => (intval($settings['_cmaappid']) ? intval($settings['_cmaappid']) : ''),
+	"value" => ($settings['_cmaappid'] ? $settings['_cmaappid'] : ''),
 	"validators" => array(
-		array('ValNumber')
+		array('ValInteger', 'min' => 1)
 	),
 	"control" => array("TextField","size"=>20),
 	"helpstep" => $helpstepnum
@@ -950,7 +951,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		}
 
 		// CMA App ID is integer value only at this time.
-		setCustomerSystemSetting('_cmaappid', intval($postdata['cmaappid']), $custdb);
+		setCustomerSystemSetting('_cmaappid', $postdata['cmaappid'], $custdb);
 
 		Query("COMMIT");
 		if($button == "done") {
@@ -1014,7 +1015,7 @@ document.observe('dom:loaded', function() {
 			checkbox.checked = !confirm("Are you sure you want to DISABLE this customer?");
 	});
 });
-<? Validator::load_validators(array("ValInboundNumber","ValUrlComponent","ValSmsText","ValLanguages","ValUrl","ValClassroom"));?>
+<? Validator::load_validators(array("ValInboundNumber","ValUrlComponent","ValSmsText","ValLanguages","ValUrl","ValClassroom", "ValInteger"));?>
 </script>
 <?
 
