@@ -79,14 +79,15 @@ foreach ($categories as $category) {
 		"helpstep" => 1
 	);
 
-	// Hide this unless a CMA appid is set for the customer
 	if (intval(getCustomerSystemSetting('_cmaappid') > 0)) {
 		$formdata["feedcategorymapping-".$category->id] = array(
 			"label" => "",
-			'control' => array(
-			"FormHtml",
-			"html" => '<a class="btn feedcategorymapping" href="feedcategorymapping.php?id='.$category->id.'" style="padding:6px 8px;"><img style="margin-right:8px; margin-top:-3px;" src="img/icons/pictos/p1/16/28.png">Map to CMA Category</a>'
-			),
+			"value" => "",
+			"validators" => array(),
+			"control" => array("InpageSubmitButton",
+				"submitvalue" => "cmamap-".$category->id,
+				"name" => _L("Map to CMA Category"),
+				"icon" => "pictos/p1/16/28"),
 			"helpstep" => 1
 		);
 	}
@@ -182,18 +183,18 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			expireFeedCategories($CUSTOMERURL, $categoryids);
 		
 		if (substr($button,0,7) == 'delete-' || $button == "newcategory") {
-			if ($ajax)
-				$form->sendTo("editfeedcategory.php");
-			else
-				redirect("editfeedcategory.php");
+			$redirectLocation = "editfeedcategory.php";
+		} else if(substr($button,0,7) == 'cmamap-') {
+			$redirectLocation = "feedcategorymapping.php?id=". substr($button, 7);
 		} else {
 			notice(_L("Feed category changes are now saved."));
-
-			if ($ajax)
-				$form->sendTo("settings.php");
-			else
-				redirect("settings.php");
+			$redirectLocation = "settings.php";
 		}
+
+		if ($ajax)
+			$form->sendTo($redirectLocation);
+		else
+			redirect($redirectLocation);
 	}
 }
 
