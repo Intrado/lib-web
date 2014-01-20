@@ -16,9 +16,10 @@ class CmaApiClient {
 	private $appId;
 
 	/**
-	 *	Constructor - initialize CmaApiClient object
+	 * Constructor - initialize CmaApiClient object
 	 *
-	 *	@param array $options options/config array
+	 * @param ApiClient $apiClient
+	 * @param int $appId
 	 */
 	public function __construct($apiClient, $appId = null) {
 		$this->apiClient = $apiClient;
