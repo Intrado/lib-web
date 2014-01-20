@@ -152,6 +152,9 @@ class FeedCategoryMappingTest extends PHPUnit_Framework_TestCase {
 				),
 				array(
 					'cmacategoryid' => 6
+				),
+				array(
+					'cmacategoryid' => 888
 				)
 			)
 		);
@@ -243,6 +246,9 @@ class FeedCategoryMappingTest extends PHPUnit_Framework_TestCase {
 	}
 	
 	// TODO: It deletes mapping records that are invalid or deselected from the database
+	public function test_formSubmitDeletions() {
+	}
+	
 	// TODO: It adds new mapping records for those that are selected and not already in the database
 	// TODO: It returns to the editfeedcategory.php page after submitting changes
 }
