@@ -257,7 +257,7 @@ abstract class PageBase implements Page {
 	 */
 	function sendPageOutput() {
 		global $TITLE;
-		startWindow($TITLE);
+		startWindow((isset($this->options['windowTitle']) && $this->options['windowTitle']) ? $this->options['windowTitle'] : $TITLE);
 		echo $this->pageOutput;
 		endWindow();
 	}
