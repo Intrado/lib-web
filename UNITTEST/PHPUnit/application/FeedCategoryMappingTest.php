@@ -264,17 +264,17 @@ class FeedCategoryMappingTest extends PHPUnit_Framework_TestCase {
 	// It adds new mapping records for those that are selected and not already in the database
 	// It returns to the editfeedcategory.php page after submitting changes
 	public function test_formSubmission() {
-                global $HEADERS, $queryRules;
+		global $HEADERS, $queryRules;
 
-                // Any call to exit/die will end up in this anonymous function now:
-                set_exit_overload(function() { return(false); });
+		// Any call to exit/die will end up in this anonymous function now:
+		set_exit_overload(function() { return(false); });
 
-                // POST the edit form with burst id = 1 so that we don't have to upload a file for this test
-                $_POST = $_REQUEST = array(
+		// POST the edit form with burst id = 1 so that we don't have to upload a file for this test
+		$_POST = $_REQUEST = array(
 			'submit' => 'mapfeed',
 			'form' => $this->formName,
 			"{$this->formName}_cmacategories" => array(5, 7)
-                );
+		);
 
 		$_SESSION = array('feedid' => self::FEED_ID);
 
@@ -282,8 +282,8 @@ class FeedCategoryMappingTest extends PHPUnit_Framework_TestCase {
 		$this->testPage->beforeLoad($_POST, $_POST, $_REQUEST, $_SESSION);
 		$this->testPage->load();
 
-                // Extract the correct serialnum out of the form and stick it into the POST!
-                $_POST["{$this->formName}-formsnum"] = $_REQUEST["{$this->formName}-formsnum"] = $this->testPage->form->serialnum;
+		// Extract the correct serialnum out of the form and stick it into the POST!
+		$_POST["{$this->formName}-formsnum"] = $_REQUEST["{$this->formName}-formsnum"] = $this->testPage->form->serialnum;
 
 		$this->testPage->afterLoad();
 
