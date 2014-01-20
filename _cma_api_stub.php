@@ -70,7 +70,7 @@
 	// @path /apps/{appId}/categories
 	// if $path exists and has the format: /apps/{appId}/categories, then
 	// return json response with dummy CMA categories above
-	if ($path && preg_match('/^\/apps\/\d+\/categories$/', $path)) {
+	if ($path && preg_match('/\/apps\/\d+\/categories$/', $path)) {
 		// create some dummy/test CMA categories to be returned via json
 		// the CMA categories response is an array of objects, ie [{"id":"1","name":"School A"},{"id":"2","name":"School B"}, ...]
 		$cma_categories = array();
@@ -86,7 +86,7 @@
 		// @path /{version}/apps/{appId}/notifications
 		// if $path exists and has the format: /{version}/apps/{appId}/notifications and
 		// the POST params exits, then return 200 (empty response)
-	} else if ($path && preg_match('/^\/1\/apps\/\d+\/notifications$/', $path) && !empty($_POST)) {
+	} else if ($path && preg_match('/\/1\/apps\/\d+\/notifications$/', $path) && !empty($_POST)) {
 		// do we want to check for all expected POST params (title, body, & categories)?
 		// isset($_POST['title']) && isset($_POST['body']) && isset($_POST['categories'])) {
 		header("HTTP/1.1 200 OK");
