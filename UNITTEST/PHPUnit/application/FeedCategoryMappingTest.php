@@ -30,7 +30,12 @@ class FeedCategoryMappingTest extends PHPUnit_Framework_TestCase {
 	const CMA_APPID = 555;
 	const FEED_ID = 2020;
 
+	var $formName = '';     // The name of our kona form
+
 	private $testPage = null;
+
+	private static $rulekey_drops = '';
+	private static $rulekey_adds = '';
 
         /**
 	 * Before any tests run, before we even include the source file for the class under test
@@ -159,6 +164,16 @@ class FeedCategoryMappingTest extends PHPUnit_Framework_TestCase {
 			)
 		);
 
+		// 10) SQL response: We need a hit count on deleting cmafeedcategory records
+		self::$rulekey_drops = $queryRules->add('/DELETE FROM `cmafeedcategory` WHERE `feedcategoryid`/', Array(self::FEED_ID, 6, 888),
+			true
+		);
+
+		// 11) SQL response: We need a hit cound on adding cmafeedcategory records
+		self::$rulekey_adds = $queryRules->add('/INSERT INTO cmafeedcategory SET feedcategoryid/', Array(self::FEED_ID, 7),
+			true
+		);
+
 		// Mock up a USER session
 		require_once("{$konadir}/inc/common.inc.php");
 		$USER = new User(self::USER_ID);
@@ -245,12 +260,44 @@ class FeedCategoryMappingTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(false !== strpos($formhtml, 'value="6" checked'), 'Missing a check for the sixth CMA category');
 	}
 	
-	// TODO: It deletes mapping records that are invalid or deselected from the database
-	public function test_formSubmitDeletions() {
+	// It deletes mapping records that are invalid or deselected from the database
+	// It adds new mapping records for those that are selected and not already in the database
+	// It returns to the editfeedcategory.php page after submitting changes
+	public function test_formSubmission() {
+                global $HEADERS, $queryRules;
+
+                // Any call to exit/die will end up in this anonymous function now:
+                set_exit_overload(function() { return(false); });
+
+                // POST the edit form with burst id = 1 so that we don't have to upload a file for this test
+                $_POST = $_REQUEST = array(
+			'submit' => 'mapfeed',
+			'form' => $this->formName,
+			"{$this->formName}_cmacategories" => array(5, 7)
+                );
+
+		$_SESSION = array('feedid' => self::FEED_ID);
+
+		$this->testPage->initialize();
+		$this->testPage->beforeLoad($_POST, $_POST, $_REQUEST, $_SESSION);
+		$this->testPage->load();
+
+                // Extract the correct serialnum out of the form and stick it into the POST!
+                $_POST["{$this->formName}-formsnum"] = $_REQUEST["{$this->formName}-formsnum"] = $this->testPage->form->serialnum;
+
+		$this->testPage->afterLoad();
+
+		unset_exit_overload();
+
+		// Make sure the DELETE operation occurred for the ID's that are stored, but no longer selected
+		$this->assertEquals(1, $queryRules->getHits(self::$rulekey_drops), 'There should have been a query to delete the unselected category IDs');
+
+		// Make sure the INSERT operation occurred for the ID'c that are not stored, but are selected for addition
+		$this->assertEquals(1, $queryRules->getHits(self::$rulekey_adds), 'There should have been a query to insert the selected category IDs that are not already mapped');
+
+		// There should be a redirect to the editfeedcategory.php page
+		$this->assertTrue(in_array('Location: editfeedcategory.php', $HEADERS), 'There should have been a redirect to editfeedcategory.php');
 	}
-	
-	// TODO: It adds new mapping records for those that are selected and not already in the database
-	// TODO: It returns to the editfeedcategory.php page after submitting changes
 }
 
 ?>
