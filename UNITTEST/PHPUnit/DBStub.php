@@ -73,10 +73,12 @@ class QueryRules {
 		else {
 			// Add a new rule for this key
 			$this->rules[$rulekey] = array(
+				'rulekey' => $rulekey,
 				'pattern' => $pattern,
 				'data' => array($data),
 				'dataptr' => 0,
-				'hits' => 0
+				'hits' => 0,
+				'args' => $args
 			);
 		}
 
