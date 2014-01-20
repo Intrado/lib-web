@@ -134,14 +134,14 @@ class FeedCategoryMapping extends PageForm {
 			// 2) Drop any categories currently mapped that are NOT in the postedCategories
 			foreach ($this->cmaCategoriesMapped as $id) {
 				if (! in_array($id, $postedCategories)) {
-					$categoryDrops[] = $id;
+					$categoryDrops[] = intval($id);
 				}
 			}	
 
 			// 3) Add any categories not currently mapped that are in the postedCategories
 			foreach ($postedCategories as $id) {
 				if (! in_array($id, $this->cmaCategoriesMapped)) {
-					$categoryAdds[] = $id;
+					$categoryAdds[] = intval($id);
 				}
 			}
 
@@ -159,7 +159,7 @@ class FeedCategoryMapping extends PageForm {
 			// 5) Add the adds
 			if (count($categoryAdds)) {
 				foreach ($categoryAdds as $id) {
-					Query("INSERT INTO `cmafeedcategory` SET `feedcategoryid` = ?, `cmacategoryid` = ?;", false, array($this->feedId, $id));
+					Query("INSERT INTO cmafeedcategory SET feedcategoryid = ?, cmacategoryid = ?;", false, array($this->feedId, $id));
 				}
 				if (strlen($notice)) $notice .= ' ';
 				$notice .= sprintf(_L('Added %d new CMA category mappings'), count($categoryAdds));
