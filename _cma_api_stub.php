@@ -1,5 +1,4 @@
-<?php
-
+<?
 /**
  * @author Justin Burns
  * @date 1/15/2014
@@ -62,41 +61,40 @@
  *
  */
 
-    // ex. [PATH_INFO] => /apps/123/categories
-    // this maps to our CMA API, ex categories endpoint
-    $path = $_SERVER['PATH_INFO'];
+	// ex. [PATH_INFO] => /apps/123/categories
+	// this maps to our CMA API, ex categories endpoint
+	$path = $_SERVER['PATH_INFO'];
 
 
-    // @GET
-    // @path /apps/{appId}/categories
-    // if $path exists and has the format: /apps/{appId}/categories, then
-    // return json response with dummy CMA categories above
-    if ($path && preg_match('/^\/apps\/\d+\/categories$/', $path)) {
-        // create some dummy/test CMA categories to be returned via json
-        // the CMA categories response is an array of objects, ie [{"id":"1","name":"School A"},{"id":"2","name":"School B"}, ...]
-        $cma_categories = array();
-        for ($i = 0; $i < 10; $i += 1) {
-            $cma_categories[] = (object) array('id' => $i, 'name' => 'School ' . $i );
-        }
+	// @GET
+	// @path /apps/{appId}/categories
+	// if $path exists and has the format: /apps/{appId}/categories, then
+	// return json response with dummy CMA categories above
+	if ($path && preg_match('/^\/apps\/\d+\/categories$/', $path)) {
+		// create some dummy/test CMA categories to be returned via json
+		// the CMA categories response is an array of objects, ie [{"id":"1","name":"School A"},{"id":"2","name":"School B"}, ...]
+		$cma_categories = array();
+		for ($i = 0; $i < 10; $i += 1) {
+		    $cma_categories[] = (object) array('id' => $i, 'name' => 'School ' . $i );
+		}
 
-        header('Content-Type: application/json');
-        echo json_encode($cma_categories);
-        exit();
+		header('Content-Type: application/json');
+		echo json_encode($cma_categories);
+		exit();
 
-        // @POST
-        // @path /{version}/apps/{appId}/notifications
-        // if $path exists and has the format: /{version}/apps/{appId}/notifications and
-        // the POST params exits, then return 200 (empty response)
-    } else if ($path && preg_match('/^\/1\/apps\/\d+\/notifications$/', $path) && !empty($_POST)) {
-                // do we want to check for all expected POST params (title, body, & categories)?
-        //       isset($_POST['title']) && isset($_POST['body']) && isset($_POST['categories'])) {
-        header("HTTP/1.1 200 OK");
-        exit();
+		// @POST
+		// @path /{version}/apps/{appId}/notifications
+		// if $path exists and has the format: /{version}/apps/{appId}/notifications and
+		// the POST params exits, then return 200 (empty response)
+	} else if ($path && preg_match('/^\/1\/apps\/\d+\/notifications$/', $path) && !empty($_POST)) {
+		// do we want to check for all expected POST params (title, body, & categories)?
+		// isset($_POST['title']) && isset($_POST['body']) && isset($_POST['categories'])) {
+		header("HTTP/1.1 200 OK");
+		exit();
+	}
 
-    }
-
-    // else return 400; only above to endpoints supported at this time
-    header("HTTP/1.1 400");
-    exit();
+	// else return 400; only above to endpoints supported at this time
+	header("HTTP/1.1 400");
+	exit();
 
 ?>
