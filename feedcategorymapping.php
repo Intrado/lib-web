@@ -212,13 +212,9 @@ class FeedCategoryMapping extends PageForm {
 
 // Initialize FeedCategoryMapping and render page
 // ================================================================
-
+global $SETTINGS;
 $cmaApi = new CmaApiClient(
-	// TODO: use CMA API url from $SETTINGS once CMA API ready
-	// 'apiClient' => new ApiClient($SETTINGS['cmaserver']['apiurl']),
-
-	// use CMA api stub until CMA API ready
-	new ApiClient("https://{$_SERVER['SERVER_NAME']}/".customerUrlComponent().'/_cma_api_stub.php'),
+	new ApiClient($SETTINGS['cmaserver']['apiurl']),
 	getCustomerSystemSetting("_cmaappid") ? getCustomerSystemSetting("_cmaappid") : 1 // TODO: add appropriate logic/handling
 );
 executePage(new FeedCategoryMapping($cmaApi));
