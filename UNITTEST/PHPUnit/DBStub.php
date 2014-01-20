@@ -39,6 +39,8 @@ class QueryRules {
 	 * a query
 	 * @param array $args When three arguments are passed, the second is an
 	 * indexed array of arguments to be injected into a parameterized query
+	 *
+	 * @return string the unique "rule key" for this rule
 	 */
 	public function add() {
 
@@ -77,6 +79,8 @@ class QueryRules {
 				'hits' => 0
 			);
 		}
+
+		return($rulekey);
 	}
 
 	/**
@@ -143,19 +147,15 @@ class QueryRules {
 	 * Get the cuttent hit count for the number of times apply() has landed
 	 * on this query/args combo
 	 *
-	 * @param string $query The SQL query that we want to match against all
-	 * our rules' patterns
-	 * @param array $args When three arguments are passed, the second is an
-	 * indexed array of arguments to be injected into a parameterized query
+	 * @param string $rulekey The unique rule key that f.add() returns
+	 * for the query that we are interested in.
 	 *
 	 * @return mixed Integer count of hits for the matching query/args
 	 * combination or boolean false if there was no match in the rules
 	 */
-	public function getHits($query, $args = array()) {
-		if (false !== ($rulekey = $this->findMatchingRuleKey($query, $args))) {
-			return($this->rules[$rulekey]['hits']);
-		}
-		return(false);
+	public function getHits($rulekey) {
+		if (! isset($this->rules[$rulekey])) return(false);
+		return($this->rules[$rulekey]['hits']);
 	}
 
 	/**
