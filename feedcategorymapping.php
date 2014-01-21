@@ -89,7 +89,7 @@ class FeedCategoryMapping extends PageForm {
 			unset($_SESSION['feedid']);
 			redirect('editfeedcategory.php');
 		}
-		$this->options["windowTitle"] = _L('Mappings for: %s', $this->feedCategory->name);
+		$this->options["windowTitle"] = $this->feedCategory->name;
 
 		// Fetch CMA Categories; convert array of objects into id=name associative array
 		$rawCmaCategories = $this->cmaApi->getCategories();
@@ -186,14 +186,6 @@ class FeedCategoryMapping extends PageForm {
 		);
 
 		$formdata = array(
-			"feedname" => array(
-				"label" => _L('Feed Name'),
-				'control' => array(
-					"FormHtml",
-					"html" => '<span style="font-size:14px; vertical-align:sub; font-weight:bold;">' . $this->feedCategory->name . '</span>'
-				),
-				"helpstep" => 1
-			),
 			"cmacategories" => array(
 				"label" => _L('CMA Category(s)'),
 				"fieldhelp" => _L('Select one or more CMA Categories to map this feed to'),
@@ -204,7 +196,7 @@ class FeedCategoryMapping extends PageForm {
 			)
 		);
 
-		$form = new Form($this->formName, $formdata, $helpsteps, array( submit_button(_L('Done'), 'mapfeed', 'pictos/p1/16/59')));
+		$form = new Form($this->formName, $formdata, $helpsteps, array( submit_button(_L('Done'), 'mapfeed', 'tick')));
 		$form->ajaxsubmit = true;
 
 		return($form);
