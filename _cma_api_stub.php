@@ -85,11 +85,19 @@
 		// @POST
 		// @path /{version}/apps/{appId}/notifications
 		// if $path exists and has the format: /{version}/apps/{appId}/notifications and
-		// the POST params exits, then return 200 (empty response)
+		// the POST params exits, then return 201
 	} else if ($path && preg_match('/\/1\/apps\/\d+\/notifications$/', $path) && !empty($_POST)) {
 		// do we want to check for all expected POST params (title, body, & categories)?
 		// isset($_POST['title']) && isset($_POST['body']) && isset($_POST['categories'])) {
-		header("HTTP/1.1 200 OK");
+		header("HTTP/1.1 201 Created");
+		$cmaNotificationDto = (object) array();
+		$cmaNotificationDto->id = 1;
+		$cmaNotificationDto->title = ""; // TODO: object returns the posted title
+		$cmaNotificationDto->body = ""; // TODO: object returns the posted body
+		$cmaNotificationDto->categories = array(1,2,3); // TODO: object returns the posted category ids
+		$cmaNotificationDto->login = "schoolMessenger"; // TODO: or whoever was logged in with the basic http auth
+		$cmaNotificationDto->lastUpdateMs = time() * 1000;
+		echo json_encode($cmaNotificationDto);
 		exit();
 	}
 
