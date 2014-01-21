@@ -38,7 +38,8 @@ class PdfEditPage extends PageForm {
 	 */
 	public function __construct($csApi) {
 		$this->csApi = $csApi;
-		parent::__construct();
+		$this->options['validators'] = array('ValClientOnlyRequired');
+		parent::__construct($this->options);
 	}
 
 	public function isAuthorized(&$get=array(), &$post=array(), &$request=array(), &$session=array()) {
@@ -62,6 +63,8 @@ class PdfEditPage extends PageForm {
 		else {
 			$this->burstId = null;
 		}
+
+		$this->options['windowTitle'] = ($this->burstId) ? 'Edit Existing Document' : 'Create New Document'; 
 	}
 
 	public function load(&$get=array(), &$post=array(), &$request=array(), &$session=array()) {
@@ -113,11 +116,6 @@ class PdfEditPage extends PageForm {
 		// If the form was submitted...
 		if ($this->form->getSubmit()) {
 
-			// Get the POSTed data from the form
-			$postdata = $this->form->getData();
-			$name = $postdata['name'];
-			$bursttemplateid = intval($postdata['bursttemplateid']);
-
 			// Check if the data has changed and display a notification if so...
 			if (! is_null($this->burstId) && $this->form->checkForDataChange()) {
 
@@ -126,19 +124,27 @@ class PdfEditPage extends PageForm {
 				redirect("?id={$this->burstId}");
 			}
 
-			// We're storing a new record if burstId is null, otherwise updating an existing record
+			// Check for validation errors
 			$action = (is_null($this->burstId)) ? 'created' : 'updated';
-			if ($this->csApi->setBurstData($this->burstId, $name, $bursttemplateid)) {
+			if (($errors = $this->form->validate()) === false) {
 
-				// For success, we redirect back to the manager page with this notice to be shown on that page:
-				unset($_SESSION['burstid']);
-				notice(_L("The PDF Document was successfully {$action}."));
-				redirect('pdfmanager.php');
-			} else {
+				// Get the POSTed data from the form
+				$postdata = $this->form->getData();
+				$name = $postdata['name'];
+				$bursttemplateid = intval($postdata['bursttemplateid']);
 
-				// For errors, we fall through to render() and let this error message be shown:
-				$this->error = _L("The PDF Document could not be {$action}. Please try again later.");
+				// We're storing a new record if burstId is null, otherwise updating an existing record
+				if ($this->csApi->setBurstData($this->burstId, $name, $bursttemplateid)) {
+
+					// For success, we redirect back to the manager page with this notice to be shown on that page:
+					unset($_SESSION['burstid']);
+					notice(_L("The PDF Document was successfully {$action}."));
+					redirect('pdfmanager.php');
+				}
 			}
+
+			// For errors, we fall through to render() and let this error message be shown:
+			$this->error = _L("The PDF Document could not be {$action}. Please try again later." . print_r($errors, true));
 		}
 	}
 
@@ -193,7 +199,8 @@ class PdfEditPage extends PageForm {
 				"label" => _L('Template'),
 				"value" => $this->burstData->burstTemplateId,
 				"validators" => array(
-					array('ValRequired')
+					array('ValRequired'),
+					array('ValInArray', 'values' => array_keys($this->burstTemplates))
 				),
 				"control" => array('SelectMenu', 'values' => (array('' => _L('Select PDF Template')) + $this->burstTemplates)),
 				"helpstep" => 2
@@ -221,7 +228,7 @@ class PdfEditPage extends PageForm {
                 "fieldhelp" => _L('Click the Choose File button and navigate to the location of the PDF file on your computer.'),
 				"value" => '',
 				"validators" => array(
-					array('ValRequired')
+					array('ValClientOnlyRequired')
 				),
 				"control" => array('FileUpload'),
 				"helpstep" => 3
@@ -265,20 +272,6 @@ class PdfEditPage extends PageForm {
 		return($form);
 	}
 
-    /**
-     * Overrides method in base class so that the page title and window header are not duplicated.
-     */
-    function sendPageOutput() {
-        if (is_null($this -> burstId)){
-            startWindow("Create New Document");
-        } else {
-            startWindow("Edit Existing Document");
-        }
-        echo $this->pageOutput;
-        endWindow();
-    }
-
-
 	/**
 	 * Nifty bootstrap modal implementation lifted from tips.php/js
 	 *
@@ -315,6 +308,36 @@ END;
 		}
 
 		return($html);
+	}
+}
+
+/**
+ * This whacky custom validator is made necessary by the fact that PHP cannot
+ * see the file field in the POST data since it goes into the multi-part
+ * section. Therefore we'll fake out the server-side part of the validator by
+ * always making it pass, but on the client side still show that the field is
+ * required since JavaScript CAN see the form field's "value" which would
+ * normally have the filename of the selected file in it.
+ *
+ * Note that if the user touches the field, but makes no file selection, the
+ * server will mark the field as valid, and then the vlient side will not re-
+ * check because it trusts the server as the source of truth. So it will be
+ * incorrectly marked as valid even though it is not.
+ */
+class ValClientOnlyRequired extends Validator {
+	var $isrequired = true;
+
+	function validate ($value, $args) {
+		return true;
+	}
+
+	function getJSValidator () {
+		return
+			'function (name, label, value, args) {
+				if (value.length == 0)
+					return label + " is required";
+				return true;
+			}';
 	}
 }
 
