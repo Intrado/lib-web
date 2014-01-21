@@ -122,7 +122,7 @@ class FeedCategoryMappingTest extends PHPUnit_Framework_TestCase {
 		);
 
 		// 7) SQL response: Get the feedcategory record for the one we're editing
-		$queryRules->add("/select `id`,`name`,`description`,`deleted` FROM `feedcategory` WHERE NOT `deleted` AND `id` =/", array(self::FEED_ID),
+		$queryRules->add("/FROM `feedcategory` WHERE NOT `deleted` AND `id` =/", array(self::FEED_ID),
 			array(
 				array(
 					'id' => self::FEED_ID,
@@ -247,9 +247,6 @@ class FeedCategoryMappingTest extends PHPUnit_Framework_TestCase {
 		$this->testPage->load();
 		$this->testPage->afterLoad();
 		$formhtml = $this->testPage->render();
-
-		// The name of our feed should be present
-		$this->assertTrue(false !== strpos($formhtml, 'bogus feed name'), 'Missing feed name in page output');
 
 		// There should be 10 CMA category checkboxen
 		$this->assertTrue(false !== strpos($formhtml, "{$this->formName}_cmacategories-1"), 'Missing the first CMA category');
