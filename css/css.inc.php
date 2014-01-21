@@ -332,9 +332,6 @@ a.btn.feedcategorymapping:link, a.btn.feedcategorymapping:hover, a.btn.feedcateg
     color: #333;
     text-decoration: none;
 }
-#feedcategorymapping button[type=submit] {
-    margin-left: 160px;
-}
 
 /* RCIeditor */
 span.cke_toolgroup {height: 27px;}
