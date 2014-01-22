@@ -144,7 +144,7 @@ class PdfEditPage extends PageForm {
 			}
 
 			// For errors, we fall through to render() and let this error message be shown:
-			$this->error = _L("The PDF Document could not be {$action}. Please try again later." . print_r($errors, true));
+			$this->error = _L("The PDF Document could not be {$action}. Please try again later.");
 		}
 	}
 
