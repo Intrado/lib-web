@@ -28,12 +28,23 @@ require_once("../obj/Language.obj.php");
 require_once("parentportalutils.inc.php");
 require_once("../inc/appserver.inc.php");
 
-require_once('../thrift/Thrift.php');
-require_once $GLOBALS['THRIFT_ROOT'].'/protocol/TBinaryProtocol.php';
-require_once $GLOBALS['THRIFT_ROOT'].'/transport/TSocket.php';
-require_once $GLOBALS['THRIFT_ROOT'].'/transport/TBufferedTransport.php';
-require_once $GLOBALS['THRIFT_ROOT'].'/transport/TFramedTransport.php';
-require_once($GLOBALS['THRIFT_ROOT'].'/packages/commsuite/CommSuite.php');
+require_once('../Thrift/Base/TBase.php');
+require_once('../Thrift/Protocol/TProtocol.php');
+require_once('../Thrift/Protocol/TBinaryProtocol.php');
+require_once('../Thrift/Protocol/TBinaryProtocolAccelerated.php');
+require_once('../Thrift/Transport/TTransport.php');
+require_once('../Thrift/Transport/TSocket.php');
+require_once('../Thrift/Transport/TBufferedTransport.php');
+require_once('../Thrift/Transport/TFramedTransport.php');
+require_once('../Thrift/Exception/TException.php');
+require_once('../Thrift/Type/TType.php');
+require_once('../Thrift/Type/TMessageType.php');
+require_once('../Thrift/StringFunc/TStringFunc.php');
+require_once('../Thrift/Factory/TStringFuncFactory.php');
+require_once('../Thrift/StringFunc/Core.php');
+require_once('../Thrift/packages/commsuite/Types.php');
+require_once('../Thrift/packages/commsuite/CommSuite.php');
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling

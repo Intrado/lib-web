@@ -63,7 +63,7 @@ class MessageAttachment extends DBMappedObject {
 	 *
 	 * @return array(<filename>, <content type>, <data>)|bool
 	 */
-	function getAttachmentData() {
+	function getAttachmentData($personid = 0) {
 		$filename = "";
 		$contentType = "";
 		$data = null;
@@ -71,9 +71,14 @@ class MessageAttachment extends DBMappedObject {
 			case 'content':
 				if (!$this->contentAttachment)
 					$this->contentAttachment = new ContentAttachment($this->contentattachmentid);
-				if ($c = contentGet($this->contentAttachment->contentid)) {
+//				if ($c = contentGet($this->contentAttachment->contentid)) {
+//					$filename = $this->contentAttachment->filename;
+//					list($contentType,$data) = $c;
+//				}
+				if ($filedata = commsuite_attachmentGet($this->contentAttachment->contentid)) {
 					$filename = $this->contentAttachment->filename;
-					list($contentType,$data) = $c;
+					$contentType = $filedata->contenttype;
+					$data = $filedata->data;
 				}
 				break;
 

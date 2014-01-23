@@ -1,4 +1,18 @@
 <?
+
+
+use Thrift\Protocol\TBinaryProtocol;
+use Thrift\Protocol\TBinaryProtocolAccelerated;
+use Thrift\Transport\TSocket;
+use Thrift\Transport\TFramedTransport;
+use Thrift\Exception\TException;
+use Thrift\Type\TType;
+use Thrift\Type\TMessageType;
+use Thrift\StringFunc\TStringFunc;
+use Thrift\Factory\TStringFuncFactory;
+use Thrift\StringFunc\Core;
+use commsuite\CommSuiteClient;
+
 //////////////////////////////////////////////////////
 // this file includes all CommSuite AppServer methods
 //////////////////////////////////////////////////////
@@ -515,6 +529,44 @@ function commsuite_contentPut ($filename, $contenttype) {
 			$appserverCommsuiteTransport->close();
 			if ($attempts > 2) {
 				error_log("contentPut: Failed 3 times to send request to appserver. filename=".$filename);
+				return false;
+			}
+		}
+	}
+}
+
+function commsuite_attachmentGet ($attachmentid, $personid = 0) {
+	list($appserverCommsuiteProtocol, $appserverCommsuiteTransport) = initCommsuiteApp();
+
+	if ($appserverCommsuiteProtocol == null || $appserverCommsuiteTransport == null) {
+		error_log("Cannot use AppServer, requested: commsuite_attachmentGet ($attachmentid, $personid)");
+		return null;
+	}
+	
+	$attempts = 0;
+	while (true) {
+		try {
+			$client = new CommSuiteClient($appserverCommsuiteProtocol);
+			$appserverCommsuiteTransport->open();
+				
+			// Connect and be sure to catch and log all exceptions
+			return $client->attachmentGet(session_id(), $attachmentid, $personid);
+		} catch (commsuite_NotFoundException $tx) {
+			error_log("attachmentGet: requested attachmentid was not found");
+			return false;
+		} catch (commsuite_SessionInvalidException $e) {
+			error_log("attachmentGet: Invalid Sessionid");
+			return false;
+		} catch (commsuite_NotAvailableException $tx) {
+			error_log("attachmentGet: IOException occured while trying to get attachment");
+			return false;
+		} catch (TException $tx) {
+			$attempts++;
+			// a general thrift exception, like no such server
+			error_log("attachmentGet: Exception Connection to AppServer (" . $tx->getMessage() . ")");
+			$appserverCommsuiteTransport->close();
+			if ($attempts > 2) {
+				error_log("attachmentGet: Failed 3 times to send request to appserver. attachmentid=" . $attachmentid . " personid=" . $personid);
 				return false;
 			}
 		}
