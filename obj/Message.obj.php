@@ -85,14 +85,14 @@ class Message extends DBMappedObject {
 	}
 
 	/**
-	 * @return array(MessageAttachment)|bool
+	 * @return MessageAttachment[]|bool
 	 */
 	function getMessageAttachments() {
 		return DBFindMany("MessageAttachment", "from messageattachment where messageid = ?", null, array($this->id));
 	}
 
 	/**
-	 * @return array(ContentAttachment)|bool
+	 * @return ContentAttachment[]|bool
 	 */
 	function getContentAttachments() {
 		return DBFindMany("ContentAttachment", "from messageattachment ma
