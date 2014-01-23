@@ -1,13 +1,13 @@
 <?
 class BurstAttachment extends DBMappedObject {
-	var $contentid;
+	var $burstid;
 	var $filename;
-	var $size;
+	var $secretfield;
 
-	function ContentAttachment ($id = NULL) {
+	function BurstAttachment ($id = NULL) {
 		$this->_allownulls = true;
 		$this->_tablename = "burstattachment";
-		$this->_fieldlist = array("burstid", "filename");
+		$this->_fieldlist = array("burstid", "filename", "secretfield");
 		DBMappedObject::DBMappedObject($id);
 	}
 }

@@ -85,3 +85,7 @@ $$$
 
 -- $rev 10
 -- No schema change. subscriber limited user update is handled in db_10-1.php
+
+-- $rev 11
+ALTER TABLE `burstattachment` ADD `secretfield` VARCHAR( 32 ) NOT NULL
+$$$

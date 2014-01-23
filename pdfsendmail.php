@@ -19,6 +19,8 @@ require_once("obj/JobList.obj.php");
 require_once("obj/MessageGroup.obj.php");
 require_once("obj/Message.obj.php");
 require_once("obj/MessagePart.obj.php");
+require_once("obj/MessageAttachment.obj.php");
+require_once("obj/BurstAttachment.obj.php");
 require_once("obj/Person.obj.php");
 require_once("obj/Email.obj.php");
 require_once("obj/Phone.obj.php");
@@ -136,14 +138,6 @@ class PdfSendMail extends PageForm {
 			$job->starttime = date("H:i", strtotime($callEarly));
 			$job->endtime = date("H:i", strtotime($callLate));
 
-			// TODO: create attachment from burst
-			// TODO: set password protect option on burst attachment
-			// if password protection for each individually generated bursted pdf...
-			if ($doPasswordProtect) {
-				// FIXME: At some point, the user needs to be able to select the field they wish to use for password protection
-				$job->setOption("burst_passwordprotect", 'pkey');
-			}
-
 			// Create a message group which has the email message created by the user in this form.
 			// NOTE: No additional messaging types are supported right now
 			$messageGroup = new MessageGroup();
@@ -177,6 +171,24 @@ class PdfSendMail extends PageForm {
 				$messagePart->messageid = $message->id;
 				$messagePart->create();
 			}
+
+			// create attachment from burst
+			$burstAttachment = new BurstAttachment();
+			$burstAttachment->burstid = $this->burst->id;
+			// TODO: allow a different name for the attachment
+			$burstAttachment->filename = "attachment.pdf";
+			// TODO: allow the secret field to be selected
+			if ($doPasswordProtect)
+				$burstAttachment->secretfield = 'pkey';
+			else
+				$burstAttachment->secretfield = '';
+			$burstAttachment->create();
+
+			$attachment = new MessageAttachment();
+			$attachment->messageid = $message->id;
+			$attachment->type = 'burst';
+			$attachment->burstattachmentid = $burstAttachment->id;
+			$attachment->create();
 
 			$list = new PeopleList();
 			$list->userid = $USER->id;

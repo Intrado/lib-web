@@ -2395,3 +2395,9 @@ update setting set value='10.1/10' where name='_dbversion'
 $$$
 -- END 10.1/10
 
+-- START 10.1/11
+ALTER TABLE `burstattachment` ADD `secretfield` VARCHAR( 32 ) NOT NULL
+$$$
+update setting set value='10.1/11' where name='_dbversion'
+$$$
+-- END 10.1/11

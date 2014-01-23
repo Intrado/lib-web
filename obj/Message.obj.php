@@ -77,27 +77,53 @@ class Message extends DBMappedObject {
 			$part->create();
 		}
 		// copy the attachments
-		QuickUpdate("insert into messageattachment (messageid,contentid,filename,size) " .
-		"select $newmessage->id, ma.contentid, ma.filename, ma.size " .
-		"from messageattachment ma where ma.messageid=$this->id");
+		$contentAttachments = $this->getContentAttachments();
+		foreach ($contentAttachments as $contentAttachment) {
+			// call create to generate a new attachment record which is a copy of the existing one
+			$contentAttachment->create();
+			$messageAttachment = new MessageAttachment();
+			$messageAttachment->messageid = $newmessage->id;
+			$messageAttachment->type = 'content';
+			$messageAttachment->contentattachmentid = $contentAttachment->id;
+			$messageAttachment->create();
+		}
+		$burstAttachments = $this->getBurstAttachments();
+		foreach ($burstAttachments as $burstAttachment) {
+			// call create to generate a new attachment record which is a copy of the existing one
+			$burstAttachment->create();
+			$messageAttachment = new MessageAttachment();
+			$messageAttachment->messageid = $newmessage->id;
+			$messageAttachment->type = 'burst';
+			$messageAttachment->burstattachmentid = $burstAttachment->id;
+			$messageAttachment->create();
+		}
 		
 		return $newmessage;
 	}
 
 	/**
-	 * @return array(MessageAttachment)|bool
+	 * @return MessageAttachment[]|bool
 	 */
 	function getMessageAttachments() {
 		return DBFindMany("MessageAttachment", "from messageattachment where messageid = ?", null, array($this->id));
 	}
 
 	/**
-	 * @return array(ContentAttachment)|bool
+	 * @return ContentAttachment[]|bool
 	 */
 	function getContentAttachments() {
 		return DBFindMany("ContentAttachment", "from messageattachment ma
 				inner join contentattachment ca on (ma.contentattachmentid = ca.id) where ma.messageid = ? and ma.type = 'content'",
 				"ca", array($this->id));
+	}
+
+	/**
+	 * @return BurstAttachment[]|bool
+	 */
+	function getBurstAttachments() {
+		return DBFindMany("BurstAttachment", "from messageattachment ma
+				inner join burstattachment ba on (ma.burstattachmentid = ba.id) where ma.messageid = ? and ma.type = 'burst'",
+			"ba", array($this->id));
 	}
 
 	/**

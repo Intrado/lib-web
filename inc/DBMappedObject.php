@@ -305,7 +305,7 @@ function generateFieldList ($includeid = false, $fieldlist = NULL, $alias = fals
  * @param string $alias
  * @param array() $args
  * @param bool $dbconnect
- * @return array|bool
+ * @return DBMappedObject[]|bool
  */
 function DBFindMany ($classname, $query, $alias = false, $args = false, $dbconnect = false) {
 	return _DBFindPDO(true, $classname, $query, $alias, $args, $dbconnect);

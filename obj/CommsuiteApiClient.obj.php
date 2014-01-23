@@ -42,34 +42,14 @@ class CommsuiteApiClient {
 			$fileSetKeys = array_keys($_FILES);
 			$fileSetKey = array_shift($fileSetKeys);
 
-			// Get the first filename in this file set
-			$filename = $_FILES[$fileSetKey]['name'];
-			$filetype = $_FILES[$fileSetKey]['type'];
-			$tempfile = $_FILES[$fileSetKey]['tmp_name'];
-			$filesize = $_FILES[$fileSetKey]['size'];
-
-			// On some clients filename may include the whole path - we want JUST the filename portion at the end
-			// TODO - see if there's a library function for filename extraction or factor this out into a helper function?
-			$filenameParts1 = explode('/', $filename);
-			$filenameParts2 = explode('\\', $filename);
-			// for clients with a frontslash path separator...
-			if (count($filenameParts1) > 1) {
-				$finalFilename = $filenameParts1[count($filenameParts1) - 1];
-			}
-			// for clients with a backslash path separator...
-			else if (count($filenameParts2) > 1) {
-				$finalFilename = $filenameParts2[count($filenameParts2) - 1];
-			}
-			// for clients that didn't send the path at all...
-			else {
-				$finalFilename = $filename;
-			}
+			// Trap file upload errors without having to shove them out to the API
+			if (0 != $_FILES[$fileSetKey]['error']) return(false);
 
 			// ref: http://stackoverflow.com/questions/15223191/php-curl-file-upload-multipart-boundary
 			$data = array(
 				'name' => $name,
-				'filename' => $finalFilename,
-				'file' => '@/' . realpath($tempfile) . ";type={$filetype}"
+				'filename' => pathinfo($_FILES[$fileSetKey]['name'], PATHINFO_BASENAME),
+				'file' => '@/' . realpath($_FILES[$fileSetKey]['tmp_name']) . ";type={$_FILES[$fileSetKey]['type']}"
 			);
 
 			// If a burst template ID was selected, it will be a number, otherwise an empty string (which we will not send)
@@ -97,9 +77,13 @@ class CommsuiteApiClient {
 		return($res['code'] == 200 ? true : false);
 	}
 
-	/** Get the list of portions for this burst
+	/**
+	 * Get the list of portions for this burst
+	 * 
 	 * GET /2/users/{userid}/bursts/{burstid}/portions
+	 * 
 	 * @param int $burstId the id which identifies the burst
+	 * 
 	 * @return object which contains the list of portions available
 	 */
 	public function getBurstPortionList($burstId) {
