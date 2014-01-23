@@ -54,6 +54,7 @@ class MessageAttachment extends DBMappedObject {
 					$this->contentAttachment = new ContentAttachment($this->contentattachmentid);
 				$size = $this->contentAttachment->size;
 				break;
+			// case 'burst' unknown burst portion size
 		}
 		return $size;
 	}
@@ -71,19 +72,19 @@ class MessageAttachment extends DBMappedObject {
 			case 'content':
 				if (!$this->contentAttachment)
 					$this->contentAttachment = new ContentAttachment($this->contentattachmentid);
-//				if ($c = contentGet($this->contentAttachment->contentid)) {
-//					$filename = $this->contentAttachment->filename;
-//					list($contentType,$data) = $c;
-//				}
-				if ($filedata = commsuite_attachmentGet($this->contentAttachment->contentid)) {
-					$filename = $this->contentAttachment->filename;
-					$contentType = $filedata->contenttype;
-					$data = $filedata->data;
-				}
+				$filename = $this->contentAttachment->filename;
 				break;
 
 			case 'burst':
-				// TODO: Implement me
+				if (!$this->burstAttachment)
+					$this->burstAttachment = new BurstAttachment($this->burstattachmentid);
+				$filename = $this->burstAttachment->filename;
+				break;
+		}
+		if ($filedata = commsuite_attachmentGet($this->id, $personid)) {
+			$filename = $this->contentAttachment->filename;
+			$contentType = $filedata->contenttype;
+			$data = $filedata->data;
 		}
 		if ($contentType && $data)
 			return array($filename, $contentType, $data);
