@@ -42,21 +42,14 @@ class CommsuiteApiClient {
 			$fileSetKeys = array_keys($_FILES);
 			$fileSetKey = array_shift($fileSetKeys);
 
-			// Get the first filename in this file set
-			$filename = $_FILES[$fileSetKey]['name'];
-			$filetype = $_FILES[$fileSetKey]['type'];
-			$tempfile = $_FILES[$fileSetKey]['tmp_name'];
-			$filesize = $_FILES[$fileSetKey]['size'];
-
-			// On some clients filename may include the whole path - we want JUST the filename portion at the end
-			$pathinfo = pathinfo($filename);
-			$finalFilename = $pathinfo['filename'] . '.' . $pathinfo['extension'];
+			// Trap file upload errors without having to shove them out to the API
+			if (0 != $_FILES[$fileSetKey]['error']) return(false);
 
 			// ref: http://stackoverflow.com/questions/15223191/php-curl-file-upload-multipart-boundary
 			$data = array(
 				'name' => $name,
-				'filename' => $finalFilename,
-				'file' => '@/' . realpath($tempfile) . ";type={$filetype}"
+				'filename' => pathinfo($_FILES[$fileSetKey]['name'], PATHINFO_BASENAME),
+				'file' => '@/' . realpath($_FILES[$fileSetKey]['tmp_name']) . ";type={$_FILES[$fileSetKey]['type']}"
 			);
 
 			// If a burst template ID was selected, it will be a number, otherwise an empty string (which we will not send)
