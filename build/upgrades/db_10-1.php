@@ -80,6 +80,9 @@ function upgrade_10_1 ($rev, $shardid, $customerid, $db) {
 			createLimitedUser($limitedusername, $limitedpassword, $custdbname, $db, $grantedhost);
 			Query("COMMIT", $authdb);
 
+		case 10:
+			echo "|";
+			apply_sql("upgrades/db_10-1_pre.sql", $customerid, $db, 11);
 	}
 	
 	//This statement should appear in each upgrade script, when relevent.
