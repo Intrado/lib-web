@@ -66,7 +66,7 @@ if (!QuickQuery("select 1 from reportperson where jobid = ? and personid = ? and
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
-if ($d = $messageattachment->getAttachmentData()) {
+if ($d = $messageattachment->getAttachmentData($personid)) {
 	list($filename, $contentType, $data) = $d;
 	$size = strlen($data);
 
