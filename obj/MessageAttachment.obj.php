@@ -82,14 +82,16 @@ class MessageAttachment extends DBMappedObject {
 				break;
 		}
 		if ($filedata = commsuite_attachmentGet($this->id, $personid)) {
-			$filename = $this->contentAttachment->filename;
 			$contentType = $filedata->contenttype;
 			$data = $filedata->data;
 		}
-		if ($contentType && $data)
+		if ($contentType && $data) {
+			//error_log("return filename " . $filename);
+			//error_log("return type " . $contentType);
 			return array($filename, $contentType, $data);
-		else
+		} else {
 			return false;
+		}
 	}
 }
 
