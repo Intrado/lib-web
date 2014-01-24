@@ -1001,6 +1001,11 @@ include("nav.inc.php");
 						};
 
 						window.globals.require('initialize');
+
+                        // display a warning message to users if they navigate away from MS
+                        window.onbeforeunload = function () {
+                            return 'WARNING: Leaving this page will result in a loss of any data you may have entered.';
+                        };
 					});
 			});
 
