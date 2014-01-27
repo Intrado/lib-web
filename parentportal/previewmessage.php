@@ -220,15 +220,15 @@ startWindow(_L('Details'), 'padding: 3px;');
 					$filename = $attachment->getFilename();
 					$size = $attachment->getSize();
 					if ($size === false)
-						$size = "???";
+						$size = "";
 					else
-						$size = max(1,round($size/1024));
+						$size = max(1,round($size/1024)) . "K";
 					?>
 					<tr>
 						<td><a href="messageattachmentdownload.php?pid=<?= $personid ?>&jid=<?= $jobid ?>&attid=<?= $attachment->id ?>">
 								<?= escapehtml($filename)?></a>
 						</td>
-						<td><?= $size ?>K</td>
+						<td><?= $size ?></td>
 					</tr>
 				<?
 				}
