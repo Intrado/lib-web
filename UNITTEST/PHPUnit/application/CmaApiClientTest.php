@@ -8,7 +8,7 @@ class CmaApiClientTest extends PHPUnit_Framework_TestCase {
 
     var $apiClient;
     var $cmaApiClient;
-    var $cmaBaseApiUrl = 'https://sandbox.testschoolmessenger.com/cma/1'; // from settings.ini.php
+    var $cmaBaseApiUrl = 'https://sandbox.testschoolmessenger.com/cma'; // from settings.ini.php
     var $appId = 1000;
 
     public function setup() {
@@ -22,7 +22,7 @@ class CmaApiClientTest extends PHPUnit_Framework_TestCase {
         // define stub response for apiClient.get() used for fetching CMA category data
         $this->apiClient->expects($this->any())
             ->method('get')
-            ->with("/apps/{$this->appId}/categories")
+            ->with("/1/apps/{$this->appId}/categories")
             ->will($this->returnValue(
                 array(
                     'headers' => "Accept: application/json", // dummy header

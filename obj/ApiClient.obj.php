@@ -4,8 +4,8 @@ class ApiClient {
 
 	public $ApiUrl;
 	public $staticHeaders;
-    private $username;
-    private $password;
+    private $username = "";
+    private $password = "";
 
 	/**
 	 * Constructor
@@ -76,7 +76,7 @@ class ApiClient {
         curl_setopt($creq, CURLOPT_HEADER, 1);
 
         // if authentication is required for request, add username:password option if fields are set
-        if (isset($this->username) && isset($this->password)) {
+        if (strlen($this->username) > 0 && strlen($this->password) > 0) {
             curl_setopt($creq, CURLOPT_USERPWD, $this->username.":".$this->password);
         }
 
