@@ -4,6 +4,8 @@ class ApiClient {
 
 	public $ApiUrl;
 	public $staticHeaders;
+    private $username;
+    private $password;
 
 	/**
 	 * Constructor
@@ -30,6 +32,17 @@ class ApiClient {
 		return $this->ApiUrl;
 	}
 
+    /**
+     * Setter for username:password authentication data
+     * Necessary for requests that require authentication, ex. some CMA API endpoints
+     *
+     * @param $username
+     * @param $password
+     */
+    public function setAuth($username, $password) {
+        $this->username = $username;
+        $this->password = $password;
+    }
 	/**
 	 * Do the hard work of sending a request to the REST Api and get the response
 	 *
@@ -60,7 +73,12 @@ class ApiClient {
 		$creq = curl_init($this->ApiUrl . $node);
 		curl_setopt($creq, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($creq, CURLOPT_SSL_VERIFYPEER, 0);
-		curl_setopt($creq, CURLOPT_HEADER, 1);
+        curl_setopt($creq, CURLOPT_HEADER, 1);
+
+        // if authentication is required for request, add username:password option if fields are set
+        if (isset($this->username) && isset($this->password)) {
+            curl_setopt($creq, CURLOPT_USERPWD, $this->username.":".$this->password);
+        }
 
 		// Some initial headers we will need, but there may be more...
 		$headers = $this->staticHeaders;
