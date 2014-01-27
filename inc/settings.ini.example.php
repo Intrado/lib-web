@@ -17,7 +17,10 @@ timeout=5500
 
 ; cma service
 [cmaserver]
-apiurl="https://sandbox.testschoolmessenger.com/cma/_cma_api_stub.php"
+; apiurl="https://sandbox.testschoolmessenger.com/cma/_cma_api_stub.php"
+apiurl="http://cmastaging.customschoolapps.net"
+username=
+password=
 
 ;report server connection information
 [reportserver]
