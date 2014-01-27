@@ -99,6 +99,9 @@ class FeedCategoryMapping extends PageForm {
 			}
 		}
 
+        // sort Categories A-Z (API response returns random/different order each request)
+        asort($this->cmaCategories);
+
 		// fetch kona feed category map for this feed id
 		$rawData = QuickQueryMultiRow("SELECT `cmacategoryid` FROM `cmafeedcategory` WHERE `feedcategoryid` = '{$this->feedId}'", true);
 		if (is_array($rawData) && count($rawData)) {
