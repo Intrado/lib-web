@@ -3,7 +3,7 @@
 class MessageAttachment extends DBMappedObject {
 
 	var $messageid;
-	var $type;
+	var $type; // 'content' or 'burst'
 	var $contentattachmentid;
 	var $burstattachmentid;
 
@@ -44,7 +44,7 @@ class MessageAttachment extends DBMappedObject {
 	/**
 	 * Retrieves the size, in bytes, of the attachment or false if no size is available
 	 *
-	 * @return int|bool
+	 * @return int|bool the size of the attachment, or false if we don't know (burst?)
 	 */
 	function getSize() {
 		$size = false;
@@ -62,6 +62,8 @@ class MessageAttachment extends DBMappedObject {
 	/**
 	 * Gets the contents of the attached file and returns it with the name and type
 	 *
+	 * @param int personid the (optional) personid to select the attachment data for
+	 *      This is only necessary for burst type attachment retrieval.
 	 * @return array(<filename>, <content type>, <data>)|bool
 	 */
 	function getAttachmentData($personid = 0) {

@@ -22,8 +22,13 @@ class CmaApiClient {
 	 * @param int $appId
 	 */
 	public function __construct($apiClient, $appId = null) {
+        global $SETTINGS;
+
 		$this->apiClient = $apiClient;
 		$this->appId = $appId;
+
+        // set curl option with username:password necessary for CMA API calls
+        $this->apiClient->setAuth($SETTINGS['cmaserver']['username'], $SETTINGS['cmaserver']['password']);
 	}
 
 	/**
@@ -32,7 +37,7 @@ class CmaApiClient {
 	 * @return array of objects, ex [{"id":1,"name":"School A"},{"id":2,"name":"School B"}, ...] or false
 	 */
 	public function getCategories() {
-		$res = $this->apiClient->get("/apps/{$this->appId}/categories");
+		$res = $this->apiClient->get("/1/apps/{$this->appId}/categories");
 		return ($res['code'] == 200 ? json_decode($res['body']) : false);
 	}
 }
