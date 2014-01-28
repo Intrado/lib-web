@@ -93,8 +93,10 @@ class PdfSendMail extends PageForm {
 		if (!$this->burst)
 			redirect('unauthorized.php');
 
-		// set page title using burst->name data (also used for startWindow title)
-		$this->options['title'] = _L('Email PDFs from') . ': &nbsp;' . $this->burst->name;
+		// set page title
+		$this->options['title'] = _L('Secure Document Delivery');
+		//set window title
+		$this->options['windowTitle'] = _L('Create Delivery Email: ') . $this->burst->name;
 
 		// fetch user's broadcastTypes and email domain; used in formdata definition in setFormData()
 		$this->userBroadcastTypes = $this->getUserBroadcastTypes();
@@ -225,6 +227,7 @@ class PdfSendMail extends PageForm {
 		}
 	}
 
+
 	// @override
 	public function render() {
 		$html = '<link rel="stylesheet" type="text/css" href="css/pdfmanager.css">';
@@ -264,13 +267,13 @@ class PdfSendMail extends PageForm {
 
 		// define help steps used in form 
 		$helpsteps = array(
-			_L('Enter a unique name for your email broadcast'),
-			_L('Select a Broadcast type for your email broadcast'),
-			_L('Select (check) the "Require Password" checkbox if you require your recipients to enter a password to view their PDF'),
-			_L('Enter the full name you want users to view when they receive your email'),
-			_L('Enter the email address you want users to view when they receive your email. NOTE: make sure the email address used includes the following domain name: ' . $this->emailDomain),
-			_L('Enter the subject for your email message'),
-			_L('Enter the text for your email message')
+			_L('Enter a unique name for your Delivery email.'),
+			_L('Select a Broadcast type. Broadcast types determine which destinations will be used when delivering this Document. Make sure you select the most appropriate type.'),
+			_L('If you would like to require recipients to enter a password to be able to view this Document, select Require Password. The password will the recipient\'s individual ID number.'),
+			_L('Enter the sender name which recipients should see when receiving this Delivery email.'),
+			_L('Enter the email address recipients should see when they receive this Delivery email.'),
+			_L('Enter the subject for this Delivery email.'),
+			_L('Enter the message body for this Delivery email. The actual Document for each recipient will be attached to the email.')
 		); 
 
 		$formdata = array(
@@ -303,7 +306,7 @@ class PdfSendMail extends PageForm {
 				'control' => array(
 					"FormHtml",
 					'html' => '<div class="password-protect-wrapper"><span class="secure-lock"></span>' .
-					_L('You have the option to password-protect all PDF documents, which will require the recipient to enter a password (i.e. individual ID#) to view their document.') . '</div>'
+					_L('To require recipients to enter a password when viewing this Document, you must select Require Password.') . '</div>'
 				),
 				'helpstep' => 3
 			),
