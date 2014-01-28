@@ -15,20 +15,20 @@ class CmaApiClient {
 	private $apiClient;
 	private $appId;
 
-	/**
-	 * Constructor - initialize CmaApiClient object
-	 *
-	 * @param ApiClient $apiClient
-	 * @param int $appId
-	 */
-	public function __construct($apiClient, $appId = null) {
-        global $SETTINGS;
-
+    /**
+     * Constructor - initialize CmaApiClient object
+     *
+     * @param ApiClient $apiClient
+     * @param int $appId
+     * @param string $username
+     * @param string $password
+     */
+	public function __construct($apiClient, $appId = null, $username = "", $password = "") {
 		$this->apiClient = $apiClient;
 		$this->appId = $appId;
 
         // set curl option with username:password necessary for CMA API calls
-        $this->apiClient->setAuth($SETTINGS['cmaserver']['username'], $SETTINGS['cmaserver']['password']);
+        $this->apiClient->setAuth($username, $password);
 	}
 
 	/**
