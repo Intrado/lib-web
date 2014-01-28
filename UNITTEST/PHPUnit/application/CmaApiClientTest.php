@@ -8,7 +8,7 @@ class CmaApiClientTest extends PHPUnit_Framework_TestCase {
 
     var $apiClient;
     var $cmaApiClient;
-    var $cmaBaseApiUrl = 'https://sandbox.testschoolmessenger.com/cma'; // from settings.ini.php
+    var $cmaBaseApiUrl = 'https://sandbox.testschoolmessenger.com'; // from settings.ini.php
     var $appId = 1000;
 
     public function setup() {
