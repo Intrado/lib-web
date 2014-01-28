@@ -102,7 +102,7 @@ class PdfSendMail extends PageForm {
 
 		// fetch user's broadcastTypes and email domain; used in formdata definition in setFormData()
 		$this->userBroadcastTypes 	= $this->getUserBroadcastTypes();
-		$this->emailDomain 			= $this->getUserEmailDomain();
+		$this->emailDomain 		= $this->getUserEmailDomain();
 	}
 
 	// @override
@@ -110,12 +110,22 @@ class PdfSendMail extends PageForm {
 		global $USER;
 		global $ACCESS;
 
+		// FIXME - the form needs to be created in load() to be correctly available for testing.
 		$this->setFormData();
 		$this->form = new Form($this->formName, $this->formdata, $this->helpsteps, array( submit_button(_L(' Send Now'), 'send', 'tick')));
 		$this->form->ajaxsubmit = true;
 
 		$this->form->handleRequest();
+
 		if ($this->form->getSubmit()) {
+
+			// run server-side validation...
+			if (($errors = $this->form->validate()) !== false) {
+
+				// not good: there was a server-side validation error if we got here...
+				return;
+			}
+
 			$postData = $this->form->getData();
 			$doPasswordProtect = $postData['dopasswordprotect'];
 

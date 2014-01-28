@@ -181,16 +181,24 @@ class TipSubmissionViewer extends PageForm {
 			"7" => "fmt_contactinfo_col_heading",
 		);
 
+		// FIXME - the form needs to be created in load() to be properly available for testing
 		$this->setFormData();
 		$this->form = new Form($this->formName, $this->formdata, null, array( submit_button(_L(' Search Tips'), 'search', 'pictos/p1/16/64')));
 		$this->form->ajaxsubmit = false;
 
 		$this->form->handleRequest();
 		if ($this->form->getSubmit()) {
-			// if user submits a search, update SESSION['tips'] with latest form data 
-			$_SESSION['tips'] = $this->form->getData();
-			// then reload (redirect to) self (with new data)
-			redirect('tips.php');
+
+			// run server-side validation...
+			if (($errors = $this->form->validate()) === false) {
+
+				// if user submits a search, update SESSION['tips'] with latest form data 
+				$_SESSION['tips'] = $this->form->getData();
+				// then reload (redirect to) self (with new data)
+				redirect('tips.php');
+			}
+
+			// not good: there was a server-side validation error if we got here...
 		}
 	}
 

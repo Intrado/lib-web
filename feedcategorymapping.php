@@ -122,6 +122,14 @@ class FeedCategoryMapping extends PageForm {
 		$this->form->handleRequest();
 
 		if ($this->form->getSubmit()) {
+
+			// run server-side validation...
+			if (($errors = $this->form->validate()) !== false) {
+
+				// not good: there was a server-side validation error if we got here...
+				return;
+			}
+				
 			$postData = $this->form->getData();
 
 			$categoryDrops = $categoryAdds = Array();
