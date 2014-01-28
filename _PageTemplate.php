@@ -143,7 +143,7 @@ class TemplatePage extends PageForm {
 		}
 
 		// If there was a data reload issue
-		if (! is_null($this->burstId)) {
+		if (! is_null($this->id)) {
 
 			// If we have been flagged as having reloaded on account of data having changed...
 			if (isset($session['TEMPLATEreload'])) {
