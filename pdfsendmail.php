@@ -267,20 +267,20 @@ class PdfSendMail extends PageForm {
 
 		// define help steps used in form 
 		$helpsteps = array(
-			_L('Enter a unique name for your Delivery email.'),
+			_L('Enter a unique informative name for your Delivery email. You will see this name on reports.'),
 			_L('Select a Broadcast type. Broadcast types determine which destinations will be used when delivering this Document. Make sure you select the most appropriate type.'),
 			_L('If you would like to require recipients to enter a password to be able to view this Document, select Require Password. The password will the recipient\'s individual ID number.'),
 			_L('Enter the sender name which recipients should see when receiving this Delivery email.'),
-			_L('Enter the email address recipients should see when they receive this Delivery email.'),
+			_L('Enter the email address this Delivery email should appear to come from. Keep in mind that recipients may reply to this address.'),
 			_L('Enter the subject for this Delivery email.'),
-			_L('Enter the message body for this Delivery email. The actual Document for each recipient will be attached to the email.')
+			_L('Enter the message body for this Delivery email. The portion of the Document which should be delivered to each recipient will be attached to this email message.')
 		); 
 
 		$formdata = array(
 			_L("Broadcast Settings"),
 			"broadcastname" => array(
 				"label" => _L('Broadcast Name'),
-				"fieldhelp" => $helpsteps[0],
+				"fieldhelp" => _L('Enter a name for your email.'),
 				"value" => '',
 				"validators" => array(
 					array('ValRequired'),
@@ -292,7 +292,7 @@ class PdfSendMail extends PageForm {
 			),
 			"broadcasttype" => array(
 				"label" => _L('Broadcast Type'),
-				"fieldhelp" => $helpsteps[1],
+				"fieldhelp" => _L('Select the type for this Broadcast.'),
 				"value" => '',
 				"validators" => array(
 					array('ValRequired'),
@@ -312,7 +312,7 @@ class PdfSendMail extends PageForm {
 			),
 			"dopasswordprotect" => array(
 				"label" => _L("Require Password"),
-				"fieldhelp" => $helpsteps[2],
+				"fieldhelp" => _L('Select this option if recipients must enter a password to view this Document.'),
 				"value" => '',
 				"validators" => array(),
 				"control" => array("Checkbox"),
@@ -321,7 +321,7 @@ class PdfSendMail extends PageForm {
 			_L("Email Details"),
 			"fromname" => array(
 				"label" => _L('From Name'),
-				"fieldhelp" => $helpsteps[3],
+				"fieldhelp" => _L('Enter the name of the Document sender.'),
 				"value" => '',
 				"validators" => array(
 					array('ValRequired'),
@@ -332,7 +332,7 @@ class PdfSendMail extends PageForm {
 			),
 			"fromemail" => array(
 				"label" => _L('From Email'),
-				"fieldhelp" => $helpsteps[4],
+				"fieldhelp" => _L('Enter the email address this message should appear to come from.'),
 				"value" => '',
 				"validators" => array(
 					array('ValRequired'),
@@ -344,7 +344,7 @@ class PdfSendMail extends PageForm {
 			),
 			"subject" => array(
 				"label" => _L('Subject'),
-				"fieldhelp" => $helpsteps[5],
+				"fieldhelp" => _L('Enter a subject for this Delivery email.'),
 				"value" => '',
 				"validators" => array(
 					array('ValRequired'),
@@ -355,7 +355,7 @@ class PdfSendMail extends PageForm {
 			),
 			"messagebody" => array(
 				"label" => _L("Message"),
-				"fieldhelp" => $helpsteps[6],
+				"fieldhelp" => _L('Enter an email message to accompany the Document.'),
 				"value" => '',
 				"validators" => array(
 					array('ValRequired'),
