@@ -139,7 +139,7 @@ class FeedCategoryMappingTest extends PHPUnit_Framework_TestCase {
 			$cma_categories[] = (object) array('id' => $i, 'name' => 'School ' . $i );
 		}
 
-		$queryRules->add('|{"method":"GET","node":"\\\/1\\\/apps\\\/\\\/categories","data":null}|',
+		$queryRules->add('|{"method":"GET","node":"\\\/1\\\/apps\\\/\\\/streams\\\/categories","data":null}|',
 			array(
 				array(
 					'headers' => 'Content-type: application/json',
