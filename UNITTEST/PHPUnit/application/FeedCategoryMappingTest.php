@@ -134,16 +134,21 @@ class FeedCategoryMappingTest extends PHPUnit_Framework_TestCase {
 		);
 
 		// 8) API response: Get the list of CMA categories for this appId
-		$cma_categories = array();
+        $cma_categories = array();
 		for ($i = 0; $i < 10; $i += 1) {
 			$cma_categories[] = (object) array('id' => $i, 'name' => 'School ' . $i );
 		}
+
+        $cma_categories_stream = (object) array(
+            'id' => 'categories',
+            'stream' => $cma_categories
+        );
 
 		$queryRules->add('|{"method":"GET","node":"\\\/1\\\/apps\\\/\\\/streams\\\/categories","data":null}|',
 			array(
 				array(
 					'headers' => 'Content-type: application/json',
-					'body' => json_encode($cma_categories),
+					'body' => json_encode($cma_categories_stream),
 					'code' => 200
 				)
 			)
