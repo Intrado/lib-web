@@ -111,7 +111,7 @@ class PdfSendMail extends PageForm {
 		global $ACCESS;
 
 		$this->setFormData();
-		$this->form = new Form($this->formName, $this->formdata, $this->helpsteps, array( submit_button(_L(' Send Now'), 'send', 'pictos/p1/16/59')));
+		$this->form = new Form($this->formName, $this->formdata, $this->helpsteps, array( submit_button(_L(' Send Now'), 'send', 'tick')));
 		$this->form->ajaxsubmit = true;
 
 		$this->form->handleRequest();
