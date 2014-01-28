@@ -27,8 +27,6 @@ class PdfEditPage extends PageForm {
 
 	protected $csApi = null;
 
-	public $formName = 'pdfuploader';
-
 	/**
 	 * Constructor
 	 *
@@ -64,7 +62,7 @@ class PdfEditPage extends PageForm {
 			$this->burstId = null;
 		}
 
-		$this->options['windowTitle'] = ($this->burstId) ? 'Edit Existing Document' : 'Create New Document'; 
+		$this->options['windowTitle'] = ($this->burstId) ? _L('Edit Existing Document') : _L('Create New Document'); 
 	}
 
 	public function load(&$get=array(), &$post=array(), &$request=array(), &$session=array()) {

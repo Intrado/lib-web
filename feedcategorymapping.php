@@ -38,8 +38,6 @@ require_once('obj/CmaApiClient.obj.php');
 
 class FeedCategoryMapping extends PageForm {
 
-	public $formName = 'feedcategorymapping';
-
 	private $cmaApi;
 	private $pageNav = 'admin:settings';
 
