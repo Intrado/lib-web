@@ -113,7 +113,7 @@ class FeedCategoryMapping extends PageForm {
 		}
 
 		// Make the edit FORM
-		 $this->form = $this->factoryFormCmaFeedCategories();
+		$this->form = $this->factoryFormCmaFeedCategories();
 	}
 
 	// @override

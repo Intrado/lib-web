@@ -42,11 +42,7 @@ require_once('obj/PageForm.obj.php');
  */
 class PdfSendMail extends PageForm {
 	private $csApi;
-	private $formName = 'pdfsendmail';
-	private $pageNav = 'notifications:pdfmanager';
 
-	public $formdata;
-	public $helpsteps;
 	public $userBroadcastTypes;
 	public $defaultJobTypeId = '';
 	public $emailDomain;
@@ -76,7 +72,7 @@ class PdfSendMail extends PageForm {
 	// @override
 	public function initialize() {
 		// override some options set in PageBase
-		$this->options["page"]  = $this->pageNav;
+		$this->options["page"]  = 'notifications:pdfmanager';
 		$this->options['validators'] = array("ValDuplicateNameCheck", "ValMessageBody");
 	}
 
@@ -101,19 +97,17 @@ class PdfSendMail extends PageForm {
 		$this->options['title'] = _L('Email PDFs from') . ': &nbsp;' . $this->burst->name;
 
 		// fetch user's broadcastTypes and email domain; used in formdata definition in setFormData()
-		$this->userBroadcastTypes 	= $this->getUserBroadcastTypes();
-		$this->emailDomain 		= $this->getUserEmailDomain();
+		$this->userBroadcastTypes = $this->getUserBroadcastTypes();
+		$this->emailDomain = $this->getUserEmailDomain();
+
+		// Make the edit FORM
+		$this->form = $this->factoryPdfSendMailForm();
 	}
 
 	// @override
 	public function afterLoad() {
 		global $USER;
 		global $ACCESS;
-
-		// FIXME - the form needs to be created in load() to be correctly available for testing.
-		$this->setFormData();
-		$this->form = new Form($this->formName, $this->formdata, $this->helpsteps, array( submit_button(_L(' Send Now'), 'send', 'tick')));
-		$this->form->ajaxsubmit = true;
 
 		$this->form->handleRequest();
 
@@ -228,7 +222,6 @@ class PdfSendMail extends PageForm {
 			} else {
 				redirect("start.php");
 			}
-
 		}
 	}
 
@@ -262,14 +255,15 @@ class PdfSendMail extends PageForm {
 		return getSystemSetting('emaildomain');
 	}
 
-	public function setFormData() {
+	public function factoryPdfSendMailForm() {
+
 		// TODO: preselect a valid and applicable job type
 		$broadcastTypeNames = array();
 		foreach ($this->userBroadcastTypes as $id => $jobType)
 			$broadcastTypeNames[$id] = $jobType->name;
 
 		// define help steps used in form 
-		$this->helpsteps = array(
+		$helpsteps = array(
 			_L('Enter a unique name for your email broadcast'),
 			_L('Select a Broadcast type for your email broadcast'),
 			_L('Select (check) the "Require Password" checkbox if you require your recipients to enter a password to view their PDF'),
@@ -279,11 +273,11 @@ class PdfSendMail extends PageForm {
 			_L('Enter the text for your email message')
 		); 
 
-		$this->formdata = array(
+		$formdata = array(
 			_L("Broadcast Settings"),
 			"broadcastname" => array(
 				"label" => _L('Broadcast Name'),
-				"fieldhelp" => $this->helpsteps[0],
+				"fieldhelp" => $helpsteps[0],
 				"value" => '',
 				"validators" => array(
 					array('ValRequired'),
@@ -295,7 +289,7 @@ class PdfSendMail extends PageForm {
 			),
 			"broadcasttype" => array(
 				"label" => _L('Broadcast Type'),
-				"fieldhelp" => $this->helpsteps[1],
+				"fieldhelp" => $helpsteps[1],
 				"value" => '',
 				"validators" => array(
 					array('ValRequired'),
@@ -315,7 +309,7 @@ class PdfSendMail extends PageForm {
 			),
 			"dopasswordprotect" => array(
 				"label" => _L("Require Password"),
-				"fieldhelp" => $this->helpsteps[2],
+				"fieldhelp" => $helpsteps[2],
 				"value" => '',
 				"validators" => array(),
 				"control" => array("Checkbox"),
@@ -324,7 +318,7 @@ class PdfSendMail extends PageForm {
 			_L("Email Details"),
 			"fromname" => array(
 				"label" => _L('From Name'),
-				"fieldhelp" => $this->helpsteps[3],
+				"fieldhelp" => $helpsteps[3],
 				"value" => '',
 				"validators" => array(
 					array('ValRequired'),
@@ -335,7 +329,7 @@ class PdfSendMail extends PageForm {
 			),
 			"fromemail" => array(
 				"label" => _L('From Email'),
-				"fieldhelp" => $this->helpsteps[4],
+				"fieldhelp" => $helpsteps[4],
 				"value" => '',
 				"validators" => array(
 					array('ValRequired'),
@@ -347,7 +341,7 @@ class PdfSendMail extends PageForm {
 			),
 			"subject" => array(
 				"label" => _L('Subject'),
-				"fieldhelp" => $this->helpsteps[5],
+				"fieldhelp" => $helpsteps[5],
 				"value" => '',
 				"validators" => array(
 					array('ValRequired'),
@@ -358,7 +352,7 @@ class PdfSendMail extends PageForm {
 			),
 			"messagebody" => array(
 				"label" => _L("Message"),
-				"fieldhelp" => $this->helpsteps[6],
+				"fieldhelp" => $helpsteps[6],
 				"value" => '',
 				"validators" => array(
 					array('ValRequired'),
@@ -369,6 +363,11 @@ class PdfSendMail extends PageForm {
 				"helpstep" => 7
 			)
 		);
+
+		$form = new Form('pdfsendmail', $formdata, $helpsteps, array( submit_button(_L(' Send Now'), 'send', 'tick')));
+		$form->ajaxsubmit = true;
+
+		return($form);
 	}
 
 }
