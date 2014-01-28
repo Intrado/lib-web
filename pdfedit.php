@@ -150,15 +150,15 @@ class PdfEditPage extends PageForm {
 
 	public function render() {
 		// define main:subnav tab settings
-		$this->options["page"]  = 'notifications:pdfmanager';
+		$this->options["page"]	= 'notifications:pdfmanager';
 		
-        //Note: This is the title of the page. It should not also be the header of the form "window".
-        // This 'title' is set to global $TITLE in the base class.
+		//Note: This is the title of the page. It should not also be the header of the form "window".
+		// This 'title' is set to global $TITLE in the base class.
 		$this->options['title'] = _L('Document Editor');
 
-        //If you are NOT creating a new Document or the burst data we're working on is NOT a valid object in the db
-        //OR you don't have permission to view it because you don't own it, you get this error.
-        // The user is probably trying to bypass the page by editing the ID in the URL.
+		//If you are NOT creating a new Document or the burst data we're working on is NOT a valid object in the db
+		//OR you don't have permission to view it because you don't own it, you get this error.
+		// The user is probably trying to bypass the page by editing the ID in the URL.
 		if (! (is_null($this->burstId) || is_object($this->burstData))) {
 			$html = _L('The Document you have requested could not be found. It may not exist or your account does not have permission to view it.') . "<br/>\n";
 		}
@@ -214,7 +214,7 @@ class PdfEditPage extends PageForm {
 			// just going to show a read-only representation
 			$formdata['existingpdf'] = array(
 				"label" => _L('File'),
-                "fieldhelp" => _L('This is the PDF file which will be processed for delivery.'),
+				"fieldhelp" => _L('This is the PDF file which will be processed for delivery.'),
 				'value' => 'thisshouldntneedavalue', // FIXME: Form.obj.php breaks without this
 				"control" => array('FormHtml', 'html' => $this->burstData->filename),
 				"validators" => Array(),
@@ -225,7 +225,7 @@ class PdfEditPage extends PageForm {
 			// Otherwise we need to show the upload formitem to be able to select and upload a new PDF
 			$formdata['thefile'] = array(
 				"label" => _L('File'),
-                "fieldhelp" => _L('Click the Choose File button and navigate to the location of the PDF file on your computer.'),
+				"fieldhelp" => _L('Click the Choose File button and navigate to the location of the PDF file on your computer.'),
 				"value" => '',
 				"validators" => array(
 					array('ValClientOnlyRequired')
@@ -235,29 +235,29 @@ class PdfEditPage extends PageForm {
 			);
 		}
 
-        //Now we build the help. This creates the Guide help and also inserts the
-        //field help for each form item depending on context (uploading or editing).
-        if (is_null($this->burstId)) {
-            //The page is in "upload file" form.
-            $formdata['name']['fieldhelp'] = _L('Enter a descriptive name for the Document.');
-            $formdata['bursttemplateid']['fieldhelp'] = _L('Select the template which matches the layout of the PDF file. See Guide for more information.');
-            $helpsteps = array(
-                _L('Enter a descriptive name for the Document you wish to process and deliver.'),
-                _L('Select template which should be used when processing the PDF file for delivery. Templates are designed ' .
-                    'to be compatible with specific PDF file layouts. If you do not already have a template for the PDF file you' .
-                    ' wish to upload, please contact support. A representative will work with you to create a template within 24 hours.'),
-                _L('Click the Choose File button to upload a PDF file from your computer.')
-            ) ;
-        } else {
-            //The page is in "edit document" form.
-            $formdata['name']['fieldhelp'] = _L('The name of the Document.');
-            $formdata['bursttemplateid']['fieldhelp'] = _L('This is the template which is used when processing the PDF file for delivery. See Guide for more information.');
-            $helpsteps = array(
-                _L('This is the name associated with this Document. You may edit this field if you would prefer a different name.'),
-                _L('This is the template which will be used when processing this Document for delivery. Templates are designed to be compatible with specific PDF file layouts. If this is not the correct template for the layout of this PDF file, you may select another. If there is no template for processing this PDF file, please contact support. A representative will work with you to create a template within 24 hours.'),
-                _L('This is the PDF file associated with this delivery Document.')
-            );
-        }
+		//Now we build the help. This creates the Guide help and also inserts the
+		//field help for each form item depending on context (uploading or editing).
+		if (is_null($this->burstId)) {
+			//The page is in "upload file" form.
+			$formdata['name']['fieldhelp'] = _L('Enter a descriptive name for the Document.');
+			$formdata['bursttemplateid']['fieldhelp'] = _L('Select the template which matches the layout of the PDF file. See Guide for more information.');
+			$helpsteps = array(
+				_L('Enter a descriptive name for the Document you wish to process and deliver.'),
+				_L('Select template which should be used when processing the PDF file for delivery. Templates are designed ' .
+					'to be compatible with specific PDF file layouts. If you do not already have a template for the PDF file you' .
+					' wish to upload, please contact support. A representative will work with you to create a template within 24 hours.'),
+				_L('Click the Choose File button to upload a PDF file from your computer.')
+			) ;
+		} else {
+			//The page is in "edit document" form.
+			$formdata['name']['fieldhelp'] = _L('The name of the Document.');
+			$formdata['bursttemplateid']['fieldhelp'] = _L('This is the template which is used when processing the PDF file for delivery. See Guide for more information.');
+			$helpsteps = array(
+				_L('This is the name associated with this Document. You may edit this field if you would prefer a different name.'),
+				_L('This is the template which will be used when processing this Document for delivery. Templates are designed to be compatible with specific PDF file layouts. If this is not the correct template for the layout of this PDF file, you may select another. If there is no template for processing this PDF file, please contact support. A representative will work with you to create a template within 24 hours.'),
+				_L('This is the PDF file associated with this delivery Document.')
+			);
+		}
 
 		$buttons = array(
 			submit_button(_L($this->burstId ? 'Save' : 'Upload'), 'submit', 'tick'),
