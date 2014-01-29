@@ -93,3 +93,9 @@ $$$
 -- $rev 12
 ALTER TABLE `reportcontact` CHANGE `sequence` `sequence` SMALLINT NOT NULL
 $$$
+
+-- $rev 13
+ALTER TABLE `reportemaildelivery` CHANGE `sequence` `sequence` SMALLINT NULL DEFAULT NULL
+$$$
+ALTER TABLE `reportemailtracking` CHANGE `sequence` `sequence` SMALLINT NOT NULL
+$$$
