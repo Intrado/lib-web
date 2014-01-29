@@ -2401,3 +2401,10 @@ $$$
 update setting set value='10.1/11' where name='_dbversion'
 $$$
 -- END 10.1/11
+
+-- START 10.1/12
+	ALTER TABLE `reportcontact` CHANGE `sequence` `sequence` SMALLINT NOT NULL
+	$$$
+	update setting set value='10.1/12' where name='_dbversion'
+	$$$
+-- END 10.1/12
