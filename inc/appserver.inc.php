@@ -12,6 +12,11 @@ use Thrift\StringFunc\TStringFunc;
 use Thrift\Factory\TStringFuncFactory;
 use Thrift\StringFunc\Core;
 use commsuite\CommSuiteClient;
+use commsuite\Exception;
+use commsuite\NotFoundException;
+use commsuite\SessionInvalidException;
+use commsuite\NotAvailableException;
+
 
 //////////////////////////////////////////////////////
 // this file includes all CommSuite AppServer methods
@@ -110,7 +115,7 @@ function messageViewForJobPerson($messageid, $jobid, $personid) {
 			$appserverCommsuiteTransport->open();
 			try {
 				$result = $client->emailMessageViewForJobPerson(session_id(), $messageid, $jobid, $personid);
-			} catch (commsuite_CommSuite_MessageRendererException $e) {
+			} catch (Exception $e) {
 				error_log("Unable to render messageid=".$messageid." jobid=".$jobid." personid=".$personid);
 				return false;
 			}
@@ -153,7 +158,7 @@ function messagePreviewForPriority($messageid, $jobpriority) {
 			$appserverCommsuiteTransport->open();
 			try {
 				$result = $client->emailMessagePreviewForPriority(session_id(), $messageid, $jobpriority);
-			} catch (commsuite_CommSuite_MessageRendererException $e) {
+			} catch (Exception $e) {
 				error_log("Unable to render messageid=".$messageid." jobpriority=".$jobpriority);
 				return false;
 			}
@@ -181,7 +186,7 @@ function emailMessageViewForMessageParts($message,$parts,$jobpriority) {
 		return null;
 	} 
 	
-	$messagedto = new commsuite_MessageDTO();
+	$messagedto = new \commsuite\MessageDTO();
 	$messagedto->type = $message->type;
 	$messagedto->subtype = $message->subtype;
 	$messagedto->data = $message->data;
@@ -189,16 +194,16 @@ function emailMessageViewForMessageParts($message,$parts,$jobpriority) {
 	$partdtos = array();
 	foreach($parts as $part) {
 		if ($part->type == "T" || $part->type == "V" || $part->type == "I" ) {
-			$partdto = new commsuite_MessagePartDTO();
+			$partdto = new \commsuite\MessagePartDTO();
 			switch ($part->type) {
 				case "T":
-					$partdto->type = commsuite_MessagePartTypeDTO::T;
+					$partdto->type = \commsuite\MessagePartTypeDTO::T;
 					break;
 				case "V":
-					$partdto->type = commsuite_MessagePartTypeDTO::V;
+					$partdto->type = \commsuite\MessagePartTypeDTO::V;
 					break;
 				case "I":
-					$partdto->type = commsuite_MessagePartTypeDTO::I;
+					$partdto->type = \commsuite\MessagePartTypeDTO::I;
 					break;
 			}
 			
@@ -259,7 +264,7 @@ function ttsGetForTextLanguageGenderFormat($text, $language, $gender, $format) {
 			// Connect and be sure to catch and log all exceptions
 			try {
 				$result = $client->ttsGetForTextLanguageGenderFormat($text, $language, $gender,$format);
-			} catch (commsuite_NotFoundException $e) {
+			} catch (NotFoundException $e) {
 				error_log("ttsGetForTextLanguageGenderFormat: Contentid not found for Language $language, Gender: $gender and Text: $text");
 				return false;
 			}
@@ -296,10 +301,10 @@ function audioFileGetForFormat($contentid, $format) {
 			// Connect and be sure to catch and log all exceptions
 			try {
 				$result = $client->audioFileGetForFormat(session_id(), $contentid, $format);
-			} catch (commsuite_SessionInvalidException $e) {
+			} catch (SessionInvalidException $e) {
 				error_log("audioFileGetForFormat: Invalid Sessionid");
 				return false;
-			} catch (commsuite_NotFoundException $e) {
+			} catch (NotFoundException $e) {
 				error_log("audioFileGetForFormat: Contentid $contentid not found");
 				return false;
 			}
@@ -336,10 +341,10 @@ function phoneMessageGetMp3AudioFile($parts) {
 			// Connect and be sure to catch and log all exceptions
 			try {
 				$result = $client->phoneMessageGetMp3AudioFile(session_id(), $parts);
-			} catch (commsuite_SessionInvalidException $e) {
+			} catch (SessionInvalidException $e) {
 				error_log("phoneMessageGetMp3AudioFile: Invalid Sessionid");
 				return false;
-			} catch (commsuite_NotFoundException $e) {
+			} catch (NotFoundException $e) {
 				error_log("phoneMessageGetMp3AudioFile: Content not found");
 				return false;
 			}
@@ -407,7 +412,7 @@ function generateFeed($urlcomponent, $categories, $maxPost, $maxDays) {
 			// Connect and be sure to catch and log all exceptions
 			$result = $client->generateFeed($urlcomponent, $categories, $maxPost, $maxDays);
 			return $result;
-		} catch (commsuite_NotFoundException $tx) {
+		} catch (NotFoundException $tx) {
 			header('HTTP/1.1 404 Not Found');
 			echo "
 						<html>
@@ -423,7 +428,7 @@ function generateFeed($urlcomponent, $categories, $maxPost, $maxDays) {
 						";
 			exit();
 				
-		} catch (commsuite_NotAvailableException $tx) {
+		} catch (NotAvailableException $tx) {
 			header('HTTP/1.1 403 Not Available');
 			echo "
 						<html>
@@ -504,7 +509,7 @@ function commsuite_contentPut ($filename, $contenttype) {
 		return null;
 	}
 	
-	$filedata = new commsuite_FileData();
+	$filedata = new \commsuite\FileData();
 	$filedata->contenttype = $contenttype;
 	$filedata->data = file_get_contents($filename);
 	
@@ -516,10 +521,10 @@ function commsuite_contentPut ($filename, $contenttype) {
 			
 			// Connect and be sure to catch and log all exceptions
 			return $client->contentPut(session_id(), $filedata);
-		} catch (commsuite_SessionInvalidException $e) {
+		} catch (SessionInvalidException $e) {
 			error_log("contentPut: Invalid Sessionid");
 			return false;
-		} catch (commsuite_NotAvailableException $tx) {
+		} catch (NotAvailableException $tx) {
 			error_log("contentPut: IOException occured while trying to put content");
 			return false;
 		} catch (TException $tx) {
@@ -551,13 +556,13 @@ function commsuite_attachmentGet ($attachmentid, $personid = 0) {
 				
 			// Connect and be sure to catch and log all exceptions
 			return $client->attachmentGet(session_id(), $attachmentid, $personid);
-		} catch (commsuite_NotFoundException $tx) {
+		} catch (NotFoundException $tx) {
 			error_log("attachmentGet: requested attachmentid was not found");
 			return false;
-		} catch (commsuite_SessionInvalidException $e) {
+		} catch (SessionInvalidException $e) {
 			error_log("attachmentGet: Invalid Sessionid");
 			return false;
-		} catch (commsuite_NotAvailableException $tx) {
+		} catch (NotAvailableException $tx) {
 			error_log("attachmentGet: IOException occured while trying to get attachment");
 			return false;
 		} catch (TException $tx) {
@@ -589,13 +594,13 @@ function commsuite_contentGet ($contentid) {
 				
 			// Connect and be sure to catch and log all exceptions
 			return $client->contentGet(session_id(), $contentid);
-		} catch (commsuite_NotFoundException $tx) {
+		} catch (NotFoundException $tx) {
 			error_log("contentGet: requested contentid was not found");
 			return false;
-		} catch (commsuite_SessionInvalidException $e) {
+		} catch (SessionInvalidException $e) {
 			error_log("contentGet: Invalid Sessionid");
 			return false;
-		} catch (commsuite_NotAvailableException $tx) {
+		} catch (NotAvailableException $tx) {
 			error_log("contentGet: IOException occured while trying to get content");
 			return false;
 		} catch (TException $tx) {
@@ -627,10 +632,10 @@ function commsuite_contentGetForCustomerId ($customerid, $contentid) {
 
 			// Connect and be sure to catch and log all exceptions
 			return $client->contentGetForCustomerId($customerid, $contentid);
-		} catch (commsuite_NotFoundException $tx) {
+		} catch (NotFoundException $tx) {
 			error_log("contentGet: requested contentid was not found");
 			return false;
-		} catch (commsuite_NotAvailableException $tx) {
+		} catch (NotAvailableException $tx) {
 			error_log("contentGet: IOException occured while trying to get content");
 			return false;
 		} catch (TException $tx) {
@@ -662,10 +667,10 @@ function commsuite_contentDelete ($contentid) {
 			
 			$client->contentDelete(session_id(), $contentid);
 			return true;
-		} catch (commsuite_SessionInvalidException $e) {
+		} catch (SessionInvalidException $e) {
 			error_log("contentDelete: Invalid Sessionid");
 			return false;
-		} catch (commsuite_NotAvailableException $tx) {
+		} catch (NotAvailableException $tx) {
 			error_log("contentDelete: IOException occured while trying to get content");
 			return false;
 		} catch (TException $tx) {
