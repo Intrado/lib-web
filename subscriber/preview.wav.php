@@ -24,6 +24,8 @@ require_once("{$thriftdir}/Transport/TSocket.php");
 require_once("{$thriftdir}/Transport/TBufferedTransport.php");
 require_once("{$thriftdir}/Transport/TFramedTransport.php");
 require_once("{$thriftdir}/Exception/TException.php");
+require_once("{$thriftdir}/Exception/TProtocolException.php");
+require_once("{$thriftdir}/Exception/TApplicationException.php");
 require_once("{$thriftdir}/Type/TType.php");
 require_once("{$thriftdir}/Type/TMessageType.php");
 require_once("{$thriftdir}/StringFunc/TStringFunc.php");

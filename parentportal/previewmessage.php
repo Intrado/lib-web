@@ -28,22 +28,25 @@ require_once("../obj/Language.obj.php");
 require_once("parentportalutils.inc.php");
 require_once("../inc/appserver.inc.php");
 
-require_once('../Thrift/Base/TBase.php');
-require_once('../Thrift/Protocol/TProtocol.php');
-require_once('../Thrift/Protocol/TBinaryProtocol.php');
-require_once('../Thrift/Protocol/TBinaryProtocolAccelerated.php');
-require_once('../Thrift/Transport/TTransport.php');
-require_once('../Thrift/Transport/TSocket.php');
-require_once('../Thrift/Transport/TBufferedTransport.php');
-require_once('../Thrift/Transport/TFramedTransport.php');
-require_once('../Thrift/Exception/TException.php');
-require_once('../Thrift/Type/TType.php');
-require_once('../Thrift/Type/TMessageType.php');
-require_once('../Thrift/StringFunc/TStringFunc.php');
-require_once('../Thrift/Factory/TStringFuncFactory.php');
-require_once('../Thrift/StringFunc/Core.php');
-require_once('../Thrift/packages/commsuite/Types.php');
-require_once('../Thrift/packages/commsuite/CommSuite.php');
+$thriftdir = '../Thrift';
+require_once("${thriftdir}/Base/TBase.php");
+require_once("{$thriftdir}/Protocol/TProtocol.php");
+require_once("{$thriftdir}/Protocol/TBinaryProtocol.php");
+require_once("{$thriftdir}/Protocol/TBinaryProtocolAccelerated.php");
+require_once("{$thriftdir}/Transport/TTransport.php");
+require_once("{$thriftdir}/Transport/TSocket.php");
+require_once("{$thriftdir}/Transport/TBufferedTransport.php");
+require_once("{$thriftdir}/Transport/TFramedTransport.php");
+require_once("{$thriftdir}/Exception/TException.php");
+require_once("{$thriftdir}/Exception/TProtocolException.php");
+require_once("{$thriftdir}/Exception/TApplicationException.php");
+require_once("{$thriftdir}/Type/TType.php");
+require_once("{$thriftdir}/Type/TMessageType.php");
+require_once("{$thriftdir}/StringFunc/TStringFunc.php");
+require_once("{$thriftdir}/Factory/TStringFuncFactory.php");
+require_once("{$thriftdir}/StringFunc/Core.php");
+require_once("{$thriftdir}/packages/commsuite/Types.php");
+require_once("{$thriftdir}/packages/commsuite/CommSuite.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////

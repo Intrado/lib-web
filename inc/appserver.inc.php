@@ -12,7 +12,6 @@ use Thrift\StringFunc\TStringFunc;
 use Thrift\Factory\TStringFuncFactory;
 use Thrift\StringFunc\Core;
 use commsuite\CommSuiteClient;
-use commsuite\Exception;
 use commsuite\NotFoundException;
 use commsuite\SessionInvalidException;
 use commsuite\NotAvailableException;
@@ -226,8 +225,8 @@ function emailMessageViewForMessageParts($message,$parts,$jobpriority) {
 			$appserverCommsuiteTransport->open();
 			try {
 				$result = $client->emailMessageViewForMessageParts(session_id(), $messagedto,$partdtos, $jobpriority);
-			} catch (emailMessageViewForMessageParts $e) {
-				error_log("phoneMessageGetMp3AudioFile: Invalid Sessionid");
+			} catch (SessionInvalidException $e) {
+				error_log("emailMessageViewForMessageParts: Invalid Sessionid");
 				return false;
 			}
 			$appserverCommsuiteTransport->close();
