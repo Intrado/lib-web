@@ -38,8 +38,6 @@ require_once('obj/CmaApiClient.obj.php');
 
 class FeedCategoryMapping extends PageForm {
 
-	public $formName = 'feedcategorymapping';
-
 	private $cmaApi;
 	private $pageNav = 'admin:settings';
 
@@ -99,8 +97,8 @@ class FeedCategoryMapping extends PageForm {
 			}
 		}
 
-        // sort Categories A-Z (API response returns random/different order each request)
-        asort($this->cmaCategories);
+		// sort Categories A-Z (API response returns random/different order each request)
+		asort($this->cmaCategories);
 
 		// fetch kona feed category map for this feed id
 		$rawData = QuickQueryMultiRow("SELECT `cmacategoryid` FROM `cmafeedcategory` WHERE `feedcategoryid` = '{$this->feedId}'", true);
@@ -113,7 +111,7 @@ class FeedCategoryMapping extends PageForm {
 		}
 
 		// Make the edit FORM
-		 $this->form = $this->factoryFormCmaFeedCategories();
+		$this->form = $this->factoryFormCmaFeedCategories();
 	}
 
 	// @override
@@ -122,6 +120,14 @@ class FeedCategoryMapping extends PageForm {
 		$this->form->handleRequest();
 
 		if ($this->form->getSubmit()) {
+
+			// run server-side validation...
+			if (($errors = $this->form->validate()) !== false) {
+
+				// not good: there was a server-side validation error if we got here...
+				return;
+			}
+				
 			$postData = $this->form->getData();
 
 			$categoryDrops = $categoryAdds = Array();
@@ -211,9 +217,7 @@ class FeedCategoryMapping extends PageForm {
 global $SETTINGS;
 $cmaApi = new CmaApiClient(
 	new ApiClient($SETTINGS['cmaserver']['apiurl']),
-	getCustomerSystemSetting("_cmaappid") ? getCustomerSystemSetting("_cmaappid") : 1, // TODO: add appropriate logic/handling
-    $SETTINGS['cmaserver']['username'],
-    $SETTINGS['cmaserver']['password']
+	getCustomerSystemSetting("_cmaappid") ? getCustomerSystemSetting("_cmaappid") : 1 // TODO: add appropriate logic/handling
 );
 executePage(new FeedCategoryMapping($cmaApi));
 

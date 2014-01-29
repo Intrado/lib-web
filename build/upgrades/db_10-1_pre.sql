@@ -89,3 +89,7 @@ $$$
 -- $rev 11
 ALTER TABLE `burstattachment` ADD `secretfield` VARCHAR( 32 ) NOT NULL
 $$$
+
+-- $rev 12
+ALTER TABLE `reportcontact` CHANGE `sequence` `sequence` SMALLINT NOT NULL
+$$$

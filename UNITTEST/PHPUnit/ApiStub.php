@@ -14,8 +14,6 @@ class ApiStub {
 
 	protected $ApiUrl = '';
 	protected $staticHeaders = array();
-    protected $username = "";
-    protected $password = "";
 
         public function __construct($ApiUrl, $staticHeaders = array()) {
 		$this->ApiUrl = $ApiUrl;
@@ -25,11 +23,6 @@ class ApiStub {
         public function getApiUrl() {
 		return $this->ApiUrl;
 	}
-
-    public function setAuth($username, $password) {
-        $this->username = $username;
-        $this->password = $password;
-    }
 
 	public function sendRequest($method, $node, $data = null) {
 

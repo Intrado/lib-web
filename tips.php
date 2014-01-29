@@ -26,7 +26,7 @@ function fmt_tip_message ($row, $index) {
 	$max = 140;
 	if (strlen($msg) > $max) {
 		$s  = '<span class="tip-message-trimmed">' . escapehtml(substr($msg, 0, $max - 3)) . '... ';
-		$s .= '<a href="#" class="tip-read-more">Read More</a></span>';
+		$s .= '<a href="#" class="tip-read-more">' . _L('Read More') . '</a></span>';
 		$s .= '<span class="tip-message-full" style="display:none">' . escapehtml($msg) . '</span>';
 		return $s;
 	} else
@@ -59,20 +59,20 @@ function fmt_contact_info ($row, $index) {
 	if ($hasFirst || $hasLast || $hasEmail || $hasPhone) {
 		$str .= '<span class="tip-contact-details">';
 		if ($hasFirst && $hasLast) {
-			$str .= '<div>Name:&nbsp;'.$first.' '.$last.'</div>';
+			$str .= '<div>' . _L('Name:') . '&nbsp;'.$first.' '.$last.'</div>';
 		}
 		else if ($hasFirst && !$hasLast) {
-			$str .= '<div>First&nbsp;Name:&nbsp;'.$first.'</div>';
+			$str .= '<div>' . _L('First&nbsp;Name') . '&nbsp;'.$first.'</div>';
 		}
 		else if (!$hasFirst && $hasLast) {
-			$str .= '<div>Last&nbsp;Name:&nbsp;'.$last.'</div>';
+			$str .= '<div>' . _L('Last&nbsp;Name') . ':&nbsp;'.$last.'</div>';
 		}
 
 		if ($hasEmail) {
-			$str .= '<div>Email:&nbsp;'.$email.'</div>';
+			$str .= '<div>' . _L('Email:') . '&nbsp;'.$email.'</div>';
 		}
 		if ($hasPhone) {
-			$str .= '<div>Phone:&nbsp;'.$phone.'</div>';
+			$str .= '<div>' . _L('Phone:') . '&nbsp;'.$phone.'</div>';
 		}
 		$str .= '</span>';
 	}
@@ -105,9 +105,6 @@ function fmt_contactinfo_col_heading() {
  */
 class TipSubmissionViewer extends PageForm {
 
-	var $formName = 'tips';
-	var $pageTitle = 'Tip Submissions';
-	var $pageNav = 'notifications:tips';
 	var $pagingStart = 0;
 	var $pagingLimit = 100;
 	var $options;
@@ -131,9 +128,8 @@ class TipSubmissionViewer extends PageForm {
 	// @override
 	function initialize() {
 		// override some options set in PageBase
-		$this->options["formname"] = $this->formName;
-		$this->options["title"] = $this->pageTitle;
-		$this->options["page"]  = $this->pageNav;
+		$this->options["title"] = _L('Tip Submissions');
+		$this->options["page"]  = 'notifications:tips';
 	}
 
 	// @override
@@ -155,6 +151,9 @@ class TipSubmissionViewer extends PageForm {
 
 		// gets table data based on search/filter settings
 		$this->doSearchQuery();
+
+		// Make the edit FORM
+		$this->form = $this->factoryFormTipSubmissions();
 	}
 
 	// @override
@@ -181,16 +180,20 @@ class TipSubmissionViewer extends PageForm {
 			"7" => "fmt_contactinfo_col_heading",
 		);
 
-		$this->setFormData();
-		$this->form = new Form($this->formName, $this->formdata, null, array( submit_button(_L(' Search Tips'), 'search', 'pictos/p1/16/64')));
-		$this->form->ajaxsubmit = false;
-
 		$this->form->handleRequest();
+
 		if ($this->form->getSubmit()) {
-			// if user submits a search, update SESSION['tips'] with latest form data 
-			$_SESSION['tips'] = $this->form->getData();
-			// then reload (redirect to) self (with new data)
-			redirect('tips.php');
+
+			// run server-side validation...
+			if (($errors = $this->form->validate()) === false) {
+
+				// if user submits a search, update SESSION['tips'] with latest form data 
+				$_SESSION['tips'] = $this->form->getData();
+				// then reload (redirect to) self (with new data)
+				redirect('tips.php');
+			}
+
+			// not good: there was a server-side validation error if we got here...
 		}
 	}
 
@@ -200,7 +203,9 @@ class TipSubmissionViewer extends PageForm {
 		startWindow($TITLE);
 
 		echo '<link rel="stylesheet" type="text/css" href="css/tips.css">
-			  <div id="tip-icon"></div><div id="tip-search-instruction">Search Tip Submissions based on '.$this->orgFieldName.', Topic, and/or Date.</div>';
+			<div id="tip-icon"></div><div id="tip-search-instruction">' .
+			sprintf(_L('Search Tip Submissions based on %s, Topic, and/or Date.'), $this->orgFieldName) . '</div>';
+
 		// render search form
 		echo $this->form->render();
 
@@ -224,7 +229,7 @@ class TipSubmissionViewer extends PageForm {
 
 	/*=============== non-override helper methods below =================*/
 
-	function setFormData() {
+	function factoryFormTipSubmissions() {
 		$orgArray[0] = 'All ' . $this->orgFieldName . 's';
 		foreach ($this->authOrgList as $id => $value) {
 			$orgArray[$id] = escapehtml($value);
@@ -232,10 +237,10 @@ class TipSubmissionViewer extends PageForm {
 
 		$catArray[0] = "All Topics";
 		$catList = QuickQueryList("
-					SELECT tt.id, tt.name FROM tai_topic tt
-					INNER JOIN tai_organizationtopic tot on (tot.topicid = tt.id)
-					WHERE tot.organizationid = (SELECT id FROM organization WHERE parentorganizationid IS NULL)
-					ORDER BY tt.name ASC", true);
+			SELECT tt.id, tt.name FROM tai_topic tt
+			INNER JOIN tai_organizationtopic tot on (tot.topicid = tt.id)
+			WHERE tot.organizationid = (SELECT id FROM organization WHERE parentorganizationid IS NULL)
+			ORDER BY tt.name ASC", true);
 		foreach ($catList as $id => $value) {
 			$catArray[$id] = escapehtml($value);
 		}
@@ -243,52 +248,59 @@ class TipSubmissionViewer extends PageForm {
 		$dateObj = json_decode($this->date, true);
 		$dateType = $dateObj['reldate'];
 		$dateArr = array(
-			"reldate" 	=> isset($dateObj['reldate']) ? $dateObj['reldate'] : 'today',
-			"xdays" 	=> isset($dateObj['xdays']) ? $dateObj['xdays'] : '',
+			"reldate" => isset($dateObj['reldate']) ? $dateObj['reldate'] : 'today',
+			"xdays" => isset($dateObj['xdays']) ? $dateObj['xdays'] : '',
 			"startdate" => isset($dateObj['startdate']) ? $dateObj['startdate'] : '',
-			"enddate" 	=> isset($dateObj['enddate']) ? $dateObj['enddate'] : ''
+			"enddate" => isset($dateObj['enddate']) ? $dateObj['enddate'] : ''
 		);
 		
-		$this->formdata['orgid'] = array(
-			"label" 		=> _L($this->orgFieldName),
-			"fieldhelp" 	=> _L("Select a ".$this->orgFieldName." to filter Tip search results on. "),
-			"value" 		=> $this->orgId ? $this->orgId : $orgArray[0],
-			"validators" 	=> array(array("ValInArray", "values" => array_keys($orgArray))),
-			"control" 		=> array("SelectMenu", "values" => $orgArray),
-			"helpstep" 		=> 1
+		$formdata['orgid'] = array(
+			"label" => _L($this->orgFieldName),
+			"fieldhelp" => sprintf(_L('Select a %s to filter Tip search results on.'), $this->orgFieldName),
+			"value" => $this->orgId ? $this->orgId : $orgArray[0],
+			"validators" => array(array("ValInArray", "values" => array_keys($orgArray))),
+			"control" => array("SelectMenu", "values" => $orgArray),
+			"helpstep" => 1
 		);
 
-		$this->formdata['categoryid'] = array(
-			"label" 		=> _L("Topic"),
-			"fieldhelp" 	=> _L("Select a Topic to filter Tip search results on."),
-			"value" 		=> $this->categoryId ? $this->categoryId : $catArray[0],
-			"validators" 	=> array(array("ValInArray", "values" => array_keys($catArray))),
-			"control" 		=> array("SelectMenu", "values" => $catArray),
-			"helpstep" 		=> 1
+		$formdata['categoryid'] = array(
+			"label" => _L("Topic"),
+			"fieldhelp" => _L('Select a Topic to filter Tip search results on.'),
+			"value" => $this->categoryId ? $this->categoryId : $catArray[0],
+			"validators" => array(array("ValInArray", "values" => array_keys($catArray))),
+			"control" => array("SelectMenu", "values" => $catArray),
+			"helpstep" => 1
 		);
 
-		$this->formdata['date'] = array(
-			"label" 		=> _L("Date"),
-			"fieldhelp" 	=> _L("Select the date to filter Tip search results on."),
-			"value" 		=> json_encode($dateArr),
-			"control" 		=> array("ReldateOptions"),
-			"validators" 	=> array(array("ValReldate")),
-			"helpstep" 		=> 1
+		$formdata['date'] = array(
+			"label" => _L("Date"),
+			"fieldhelp" => _L('Select the date to filter Tip search results on.'),
+			"value" => json_encode($dateArr),
+			"control" => array("ReldateOptions"),
+			"validators" => array(array("ValReldate")),
+			"helpstep" => 1
 		);
+
+		$form = new Form('tips', $formdata, null, array( submit_button(_L('Search Tips'), 'search', 'pictos/p1/16/64')));
+		$form->ajaxsubmit = false;
+
+		return($form);
 	}
 
 	function getQueryString() {
 		$this->sqlArgs = array();
 
 		$query = "
-			SELECT SQL_CALC_FOUND_ROWS o.orgkey, tai_topic.name, tm.body, tma.filename, tma.size, tma.messageid, from_unixtime(tm.modifiedtimestamp) as date1, 
-					u.firstname, u.lastname, u.email, u.phone 
-			FROM tai_message tm 
-			INNER JOIN tai_thread tt on (tm.threadid = tt.id) 
-			INNER JOIN organization o on (o.id = tt.organizationid)
-			INNER JOIN tai_topic on (tt.topicid = tai_topic.id)
-			INNER JOIN user u on (u.id = tm.senderuserid) 
-			LEFT JOIN tai_messageattachment tma on (tma.messageid = tm.id)
+			SELECT SQL_CALC_FOUND_ROWS
+				o.orgkey, tai_topic.name, tm.body, tma.filename, tma.size, tma.messageid,
+				from_unixtime(tm.modifiedtimestamp) as date1, u.firstname, u.lastname, u.email, u.phone 
+			FROM
+				tai_message tm 
+				INNER JOIN tai_thread tt on (tm.threadid = tt.id) 
+				INNER JOIN organization o on (o.id = tt.organizationid)
+				INNER JOIN tai_topic on (tt.topicid = tai_topic.id)
+				INNER JOIN user u on (u.id = tm.senderuserid) 
+				LEFT JOIN tai_messageattachment tma on (tma.messageid = tm.id)
 			WHERE 1 ";
 
 		// limit results to only those orgs in the user's authorized org list
@@ -344,7 +356,7 @@ class TipSubmissionViewer extends PageForm {
 		$str =	'
 			<div id="tip-view-attachment" class="modal hide">
 				<div class="modal-header">
-					<h3 id="attachment-details">Tip Attachment</h3>
+					<h3 id="attachment-details">' . _L('Tip Attachment') . '</h3>
 				</div>
 				<div class="modal-body">
 					<div id="tip-attachment-content">
@@ -352,7 +364,7 @@ class TipSubmissionViewer extends PageForm {
 					</div>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn" data-dismiss="modal">Close</button>
+					<button type="button" class="btn" data-dismiss="modal">' . _L('Close') . '</button>
 				</div>
 			</div>';
 		echo $str;

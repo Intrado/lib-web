@@ -70,7 +70,7 @@
 	// @path /apps/{appId}/categories
 	// if $path exists and has the format: /apps/{appId}/categories, then
 	// return json response with dummy CMA categories above
-	if ($path && preg_match('/\/apps\/\d+\/categories$/', $path)) {
+	if ($path && preg_match('/\/1\/apps\/\d+\/streams\/categories$/', $path)) {
 		// create some dummy/test CMA categories to be returned via json
 		// the CMA categories response is an array of objects, ie [{"id":"1","name":"School A"},{"id":"2","name":"School B"}, ...]
 		$cma_categories = array();
@@ -78,8 +78,10 @@
 		    $cma_categories[] = (object) array('id' => $i, 'name' => 'School ' . $i );
 		}
 
+		$cma_streams_categories = (object) array('stream' => $cma_categories);
+
 		header('Content-Type: application/json');
-		echo json_encode($cma_categories);
+		echo json_encode($cma_streams_categories);
 		exit();
 
 		// @POST

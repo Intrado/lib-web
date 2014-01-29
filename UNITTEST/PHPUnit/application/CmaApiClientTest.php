@@ -22,11 +22,11 @@ class CmaApiClientTest extends PHPUnit_Framework_TestCase {
         // define stub response for apiClient.get() used for fetching CMA category data
         $this->apiClient->expects($this->any())
             ->method('get')
-            ->with("/1/apps/{$this->appId}/categories")
+            ->with("/1/apps/{$this->appId}/streams/categories")
             ->will($this->returnValue(
                 array(
                     'headers' => "Accept: application/json", // dummy header
-                    'body' => '[{"id":"1","name":"School A"},{"id":"2","name":"School B"}]', // dummy CMA categories response
+                    'body' => '{"id":"categories","stream":[{"id":"1","name":"School A"},{"id":"2","name":"School B"}]}', // dummy CMA categories response
                     'code' => 200
                 )
         ));

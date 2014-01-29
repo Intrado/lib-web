@@ -42,11 +42,7 @@ require_once('obj/PageForm.obj.php');
  */
 class PdfSendMail extends PageForm {
 	private $csApi;
-	private $formName = 'pdfsendmail';
-	private $pageNav = 'notifications:pdfmanager';
 
-	public $formdata;
-	public $helpsteps;
 	public $userBroadcastTypes;
 	public $defaultJobTypeId = '';
 	public $emailDomain;
@@ -76,7 +72,7 @@ class PdfSendMail extends PageForm {
 	// @override
 	public function initialize() {
 		// override some options set in PageBase
-		$this->options["page"]  = $this->pageNav;
+		$this->options["page"]  = 'notifications:pdfmanager';
 		$this->options['validators'] = array("ValDuplicateNameCheck", "ValMessageBody");
 	}
 
@@ -97,12 +93,17 @@ class PdfSendMail extends PageForm {
 		if (!$this->burst)
 			redirect('unauthorized.php');
 
-		// set page title using burst->name data (also used for startWindow title)
-		$this->options['title'] = _L('Email PDFs from') . ': &nbsp;' . $this->burst->name;
+		// set page title
+		$this->options['title'] = _L('Secure Document Delivery');
+		//set window title
+		$this->options['windowTitle'] = _L('Create Delivery Email: ') . $this->burst->name;
 
 		// fetch user's broadcastTypes and email domain; used in formdata definition in setFormData()
-		$this->userBroadcastTypes 	= $this->getUserBroadcastTypes();
-		$this->emailDomain 			= $this->getUserEmailDomain();
+		$this->userBroadcastTypes = $this->getUserBroadcastTypes();
+		$this->emailDomain = $this->getUserEmailDomain();
+
+		// Make the edit FORM
+		$this->form = $this->factoryPdfSendMailForm();
 	}
 
 	// @override
@@ -110,12 +111,17 @@ class PdfSendMail extends PageForm {
 		global $USER;
 		global $ACCESS;
 
-		$this->setFormData();
-		$this->form = new Form($this->formName, $this->formdata, $this->helpsteps, array( submit_button(_L(' Send Now'), 'send', 'tick')));
-		$this->form->ajaxsubmit = true;
-
 		$this->form->handleRequest();
+
 		if ($this->form->getSubmit()) {
+
+			// run server-side validation...
+			if (($errors = $this->form->validate()) !== false) {
+
+				// not good: there was a server-side validation error if we got here...
+				return;
+			}
+
 			$postData = $this->form->getData();
 			$doPasswordProtect = $postData['dopasswordprotect'];
 
@@ -218,9 +224,9 @@ class PdfSendMail extends PageForm {
 			} else {
 				redirect("start.php");
 			}
-
 		}
 	}
+
 
 	// @override
 	public function render() {
@@ -252,28 +258,29 @@ class PdfSendMail extends PageForm {
 		return getSystemSetting('emaildomain');
 	}
 
-	public function setFormData() {
+	public function factoryPdfSendMailForm() {
+
 		// TODO: preselect a valid and applicable job type
 		$broadcastTypeNames = array();
 		foreach ($this->userBroadcastTypes as $id => $jobType)
 			$broadcastTypeNames[$id] = $jobType->name;
 
 		// define help steps used in form 
-		$this->helpsteps = array(
-			_L('Enter a unique name for your email broadcast'),
-			_L('Select a Broadcast type for your email broadcast'),
-			_L('Select (check) the "Require Password" checkbox if you require your recipients to enter a password to view their PDF'),
-			_L('Enter the full name you want users to view when they receive your email'),
-			_L('Enter the email address you want users to view when they receive your email. NOTE: make sure the email address used includes the following domain name: ' . $this->emailDomain),
-			_L('Enter the subject for your email message'),
-			_L('Enter the text for your email message')
+		$helpsteps = array(
+			_L('Enter a unique informative name for your Delivery email. You will see this name on reports.'),
+			_L('Select a Broadcast type. Broadcast types determine which destinations will be used when delivering this Document. Make sure you select the most appropriate type.'),
+			_L('If you would like to require recipients to enter a password to be able to view this Document, select Require Password. The password will the recipient\'s individual ID number.'),
+			_L('Enter the sender name which recipients should see when receiving this Delivery email.'),
+			_L('Enter the email address this Delivery email should appear to come from. Keep in mind that recipients may reply to this address.'),
+			_L('Enter the subject for this Delivery email.'),
+			_L('Enter the message body for this Delivery email. The portion of the Document which should be delivered to each recipient will be attached to this email message.')
 		); 
 
-		$this->formdata = array(
+		$formdata = array(
 			_L("Broadcast Settings"),
 			"broadcastname" => array(
 				"label" => _L('Broadcast Name'),
-				"fieldhelp" => $this->helpsteps[0],
+				"fieldhelp" => _L('Enter a name for your email.'),
 				"value" => '',
 				"validators" => array(
 					array('ValRequired'),
@@ -285,7 +292,7 @@ class PdfSendMail extends PageForm {
 			),
 			"broadcasttype" => array(
 				"label" => _L('Broadcast Type'),
-				"fieldhelp" => $this->helpsteps[1],
+				"fieldhelp" => _L('Select the type for this Broadcast.'),
 				"value" => '',
 				"validators" => array(
 					array('ValRequired'),
@@ -299,13 +306,13 @@ class PdfSendMail extends PageForm {
 				'control' => array(
 					"FormHtml",
 					'html' => '<div class="password-protect-wrapper"><span class="secure-lock"></span>' .
-					_L('You have the option to password-protect all PDF documents, which will require the recipient to enter a password (i.e. individual ID#) to view their document.') . '</div>'
+					_L('To require recipients to enter a password when viewing this Document, you must select Require Password.') . '</div>'
 				),
 				'helpstep' => 3
 			),
 			"dopasswordprotect" => array(
 				"label" => _L("Require Password"),
-				"fieldhelp" => $this->helpsteps[2],
+				"fieldhelp" => _L('Select this option if recipients must enter a password to view this Document.'),
 				"value" => '',
 				"validators" => array(),
 				"control" => array("Checkbox"),
@@ -314,7 +321,7 @@ class PdfSendMail extends PageForm {
 			_L("Email Details"),
 			"fromname" => array(
 				"label" => _L('From Name'),
-				"fieldhelp" => $this->helpsteps[3],
+				"fieldhelp" => _L('Enter the name of the Document sender.'),
 				"value" => '',
 				"validators" => array(
 					array('ValRequired'),
@@ -325,7 +332,7 @@ class PdfSendMail extends PageForm {
 			),
 			"fromemail" => array(
 				"label" => _L('From Email'),
-				"fieldhelp" => $this->helpsteps[4],
+				"fieldhelp" => _L('Enter the email address this message should appear to come from.'),
 				"value" => '',
 				"validators" => array(
 					array('ValRequired'),
@@ -337,7 +344,7 @@ class PdfSendMail extends PageForm {
 			),
 			"subject" => array(
 				"label" => _L('Subject'),
-				"fieldhelp" => $this->helpsteps[5],
+				"fieldhelp" => _L('Enter a subject for this Delivery email.'),
 				"value" => '',
 				"validators" => array(
 					array('ValRequired'),
@@ -348,7 +355,7 @@ class PdfSendMail extends PageForm {
 			),
 			"messagebody" => array(
 				"label" => _L("Message"),
-				"fieldhelp" => $this->helpsteps[6],
+				"fieldhelp" => _L('Enter an email message to accompany the Document.'),
 				"value" => '',
 				"validators" => array(
 					array('ValRequired'),
@@ -359,6 +366,11 @@ class PdfSendMail extends PageForm {
 				"helpstep" => 7
 			)
 		);
+
+		$form = new Form($this->formName, $formdata, $helpsteps, array( submit_button(_L(' Send Now'), 'send', 'tick')));
+		$form->ajaxsubmit = true;
+
+		return($form);
 	}
 
 }

@@ -135,20 +135,6 @@ class PdfSendMailTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('schoolmessenger.com', $this->pdfSendMail->emailDomain);
 	}
 
-	public function test_setFormData() {
-		// call load() to set userBroadcastTypes & emailDomain vars
-		$this->pdfSendMail->load();
-
-		// setFormData() iterates over user userBroadcastTypes, sorts them A-Z, and is used to create the dropdown control
-		// it also sets the formdata instance var with the big array of control/form inputs
-		$this->pdfSendMail->setFormData();
-
-		// check a few formdata values
-		$this->assertEquals('Broadcast Name', $this->pdfSendMail->formdata['broadcastname']['label']);
-		//$this->assertEquals(3, $this->pdfSendMail->formdata['broadcasttype']['value']);
-		$this->assertEquals($this->pdfSendMail->emailDomain, $this->pdfSendMail->formdata['fromemail']['validators'][2]['domain']);
-	}
-
 	public function test_fillListFromBurst() {
 		$list = new MyPersonList();
 		$this->pdfSendMail->fillListFromBurst($list, 1);
