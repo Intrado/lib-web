@@ -111,8 +111,11 @@ class JobDetailReport extends ReportGenerator{
 		$orgfieldquery = generateOrganizationFieldQuery("rp.personid", true);
 		$fieldquery = generateFields("rp");
 		$gfieldquery = generateGFieldQuery("rp.personid", true, $hackPDF);
+
+		// NOTE: the sub-selelect on reportemaildelivery prevents the possibly
+		// multiple-rows per contact from multiplying rp rows as a result of a join
 		$this->query =
-			"select DISTINCT SQL_CALC_FOUND_ROWS
+			"select SQL_CALC_FOUND_ROWS
 				j.name as jobname,
 				u.login,
 				rp.pkey,
@@ -133,8 +136,8 @@ class JobDetailReport extends ReportGenerator{
 					) as destination,
 				from_unixtime(rc.starttime/1000) as lastattempt,
 				coalesce(if(rc.result='X' and rc.numattempts<3,'F',rc.result), rp.status) as result,
-				if(rc.email, red.statuscode, 0) as emailstatuscode,
-				if(rc.email, ret.requestduration, 0) as emailreadduration,
+				(SELECT statuscode FROM reportemaildelivery WHERE jobid=rc.jobid AND personid = rc.personid AND sequence = rc.sequence ORDER BY timestamp DESC LIMIT 1) as emailstatuscode,
+				ret.requestduration as emailreadduration,
 				rp.status,
 				rc.numattempts as numattempts,
 				rc.resultdata,
@@ -158,7 +161,6 @@ class JobDetailReport extends ReportGenerator{
 				left join destlabel dl on (rc.type = dl.type and rc.sequence = dl.sequence)
 				left join voicereply vr on (vr.jobid = rp.jobid and vr.personid = rp.personid and vr.sequence = rc.sequence and vr.userid = " . $USER->id . " and rc.type='phone')
 				left join language l on (l.code = rp." . FieldMap::GetLanguageField() . ")
-				left join reportemaildelivery red on (rc.jobid = red.jobid and rc.personid = red.personid and rc.sequence = red.sequence)
 				left join reportemailtracking ret on (rc.jobid = ret.jobid and rc.personid = ret.personid and rc.sequence = ret.sequence)
 			where
 				1
@@ -167,6 +169,7 @@ class JobDetailReport extends ReportGenerator{
 			$orgsql
 			$orderquery
 			";
+
 		//query to test resulting dataset
 		$this->testquery =
 			"select count(*)
