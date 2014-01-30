@@ -76,7 +76,7 @@ class JobAutoReport extends ReportGenerator{
 							(mg.id = j.messagegroupid)
 			left join surveyquestionnaire sq on (sq.id = j.questionnaireid)
 			left join surveyweb sw on (sw.personid = rp.personid and sw.jobid = rp.jobid)
-			left join destlabel dl on (rc.type = dl.type and rc.sequence = dl.sequence)
+			left join destlabel dl on (rc.type = dl.type and (rc.sequence % (select value from jobsetting where jobid = j.id and name = concat('max', dl.type, 's'))) = dl.sequence)
 			left join voicereply vr on (vr.jobid = rp.jobid and vr.personid = rp.personid and vr.sequence = rc.sequence and vr.userid = " . $USER->id . " and rc.type='phone')
 			where 1 "
 			. $searchquery
@@ -86,7 +86,7 @@ class JobAutoReport extends ReportGenerator{
 
 	}
 
-
+  
 	function setReportFile(){
 		$this->reportfile = "jobautoreport.jasper";
 	}

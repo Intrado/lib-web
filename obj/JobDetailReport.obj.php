@@ -158,7 +158,7 @@ class JobDetailReport extends ReportGenerator{
 				left join messagegroup mg on (mg.id = j.messagegroupid)
 				left join surveyquestionnaire sq on (sq.id = j.questionnaireid)
 				left join surveyweb sw on (sw.personid = rp.personid and sw.jobid = rp.jobid)
-				left join destlabel dl on (rc.type = dl.type and rc.sequence = dl.sequence)
+				left join destlabel dl on (rc.type = dl.type and (rc.sequence % (select value from jobsetting where jobid = j.id and name = concat('max', dl.type, 's'))) = dl.sequence)
 				left join voicereply vr on (vr.jobid = rp.jobid and vr.personid = rp.personid and vr.sequence = rc.sequence and vr.userid = " . $USER->id . " and rc.type='phone')
 				left join language l on (l.code = rp." . FieldMap::GetLanguageField() . ")
 				left join reportemailtracking ret on (rc.jobid = ret.jobid and rc.personid = ret.personid and rc.sequence = ret.sequence)
@@ -181,7 +181,7 @@ class JobDetailReport extends ReportGenerator{
 							(mg.id = j.messagegroupid)
 				left join surveyquestionnaire sq on (sq.id = j.questionnaireid)
 				left join surveyweb sw on (sw.personid = rp.personid and sw.jobid = rp.jobid)
-				left join destlabel dl on (rc.sequence = dl.sequence)
+				left join destlabel dl on ((rc.sequence % (select value from jobsetting where jobid = job.id and name = concat('max', dl.type, 's'))) = dl.sequence)
 				left join voicereply vr on (vr.jobid = rp.jobid and vr.personid = rp.personid and vr.sequence = rc.sequence and u.id = vr.userid)
 				where 1
 				$searchquery
