@@ -99,3 +99,11 @@ ALTER TABLE `reportemaildelivery` CHANGE `sequence` `sequence` SMALLINT NULL DEF
 $$$
 ALTER TABLE `reportemailtracking` CHANGE `sequence` `sequence` SMALLINT NOT NULL
 $$$
+
+-- $rev 14
+insert ignore into jobsetting (jobid, name, value) (
+	select j.id, s.name, s.value
+	from job j, setting s
+	where s.organizationid is null and s.name in ('maxphones', 'maxemails', 'maxsms')
+)
+$$$
