@@ -2403,8 +2403,22 @@ $$$
 -- END 10.1/11
 
 -- START 10.1/12
-	ALTER TABLE `reportcontact` CHANGE `sequence` `sequence` SMALLINT NOT NULL
-	$$$
-	update setting set value='10.1/12' where name='_dbversion'
-	$$$
+ALTER TABLE `reportcontact` CHANGE `sequence` `sequence` SMALLINT NOT NULL
+$$$
+update setting set value='10.1/12' where name='_dbversion'
+$$$
 -- END 10.1/12
+
+-- START 10.1/13
+ALTER TABLE `reportemaildelivery` CHANGE `sequence` `sequence` SMALLINT NULL DEFAULT NULL
+$$$
+ALTER TABLE `reportemailtracking` CHANGE `sequence` `sequence` SMALLINT NOT NULL
+$$$
+update setting set value='10.1/13' where name='_dbversion'
+$$$
+-- END 10.1/13
+
+-- START 10.1/14
+update setting set value='10.1/14' where name='_dbversion'
+$$$
+-- END 10.1/14
