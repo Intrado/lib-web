@@ -47,8 +47,9 @@ require_once("{$thriftdir}/packages/pagelink/PageLink.php");
 use Thrift\Protocol\TBinaryProtocolAccelerated;
 use Thrift\Transport\TFramedTransport;
 use Thrift\Transport\TSocket;
-use Thrift\Packages\pagelink\PageLinkClient;
 use Thrift\Exception\TException;
+
+use pagelink\PageLinkClient;
 
 class PageLinkService {
 	var $transport;
