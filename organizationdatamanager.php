@@ -68,7 +68,7 @@ if (isset($_GET["delete"]) && isset($_GET["orgid"])) {
 												from personassociation pa
 													inner join person p on
 														(pa.personid = p.id)
-												where not p.deleted and p.type = 'subscriber' and pa.organizationid = o.id)",
+												where not p.deleted and pa.organizationid = o.id)",
 											false, array($org["id"]));
 		$userroleassociationorgid = QuickQuery("select o.id
 											from organization o
@@ -118,33 +118,29 @@ if (isset($_GET['deleteunassociated'])) {
 												inner join user u on
 													(l.userid = u.id)
 											where not l.deleted and le.type = 'organization'
-												and not u.deleted
-											group by le.organizationid");
+												and not u.deleted");
 	
 	$userassociationorgids = QuickQueryList("select ua.organizationid
 											from userassociation ua
 												inner join user u on
 													(ua.userid = u.id)
-											where not u.deleted and ua.type = 'organization'
-											group by ua.organizationid");
+											where not u.deleted and ua.type = 'organization'");
 	
 	$persondatavaluesorgids = QuickQueryList("select (value + 0) as orgid
 											from persondatavalues
-											where fieldnum = 'oid'
-											group by orgid");
+											where fieldnum = 'oid'");
 	
 	$personassociationorgids = QuickQueryList("select pa.organizationid
 											from personassociation pa
 												inner join person p on
 													(pa.personid = p.id)
-											where not p.deleted and p.type = 'subscriber' and pa.type = 'organization'
-											group by pa.organizationid");
+											where not p.deleted and pa.type = 'organization'");
 	
 	$userroleassociationorgid = QuickQueryList("select r.organizationid
 											from role r
 											inner join user u on
 											(r.userid = u.id)
-											where not u.deleted	group by r.organizationid");
+											where not u.deleted");
 	
 	$childorganisationassociationorgid = QuickQueryList("select o.id
 											from organization o
@@ -180,14 +176,12 @@ if (isset($_GET['deleteunassociated'])) {
 		foreach ($unassociatedorgids as $orgid) {
 			$batch[] = $orgid;
 			if (count($batch) == 1000) {
-				QuickUpdate("delete from personassociation where importid is not null and organizationid in (". DBParamListString(count($batch)). ")", false, $batch);
 				QuickUpdate("update organization set deleted = 1 where id in (". DBParamListString(count($batch)). ")", false, $batch);
 				$batch = array();
 			}
 		}
 		// get the last of the batch ids
 		if ($batch) {
-			QuickUpdate("delete from personassociation where importid is not null and organizationid in (". DBParamListString(count($batch)). ")", false, $batch);
 			QuickUpdate("update organization set deleted = 1 where id in (". DBParamListString(count($batch)). ")", false, $batch);
 			$batch = array();
 		}
