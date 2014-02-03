@@ -34,7 +34,6 @@ if (isset($_GET['generate'])) {
 	$buttons = array();
 	include_once("contactsearchformdata.inc.php");
 
-	$_SESSION["generateBulkTokens_uuid"] = $_GET['uuid'];
 	$renderedlist->pagelimit = 1000;
 	$pageoffset = 0;
 	$renderedlist->setPageOffset($pageoffset);
@@ -65,7 +64,6 @@ if (isset($_GET['generate'])) {
 	else
 		notice(_L("All activation codes have been generated."));
 
-	unset($_SESSION["generateBulkTokens_uuid"]);
 	redirect("activationcodemanager.php");
 }
 
