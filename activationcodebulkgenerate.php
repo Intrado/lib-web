@@ -11,6 +11,10 @@ require_once("inc/reportutils.inc.php");
 require_once("inc/list.inc.php");
 
 require_once("obj/Form.obj.php");
+require_once("obj/Person.obj.php");
+require_once("obj/Phone.obj.php");
+require_once("obj/Email.obj.php");
+require_once("obj/Sms.obj.php");
 require_once("obj/UserSetting.obj.php");
 require_once("obj/RenderedList.obj.php");
 require_once("obj/RenderedListCM.obj.php");
@@ -51,11 +55,7 @@ if (isset($_GET['generate'])) {
 		if ($tries < 0)
 			$failedCount += count($personids);
 
-		if (isset($_SESSION['hideactivecodes']) && $_SESSION['hideactivecodes'])
-			$pageoffset = 0; // resultset changes as new personportaltoken get generated, always fetch first page of updated results
-		else
-			$pageoffset += $renderedlist->pagelimit;
-
+		$pageoffset += $renderedlist->pagelimit;
 		$renderedlist->setPageOffset($pageoffset);
 		$personids = QuickQueryList($renderedlist->getPersonSql(true));
 	}
