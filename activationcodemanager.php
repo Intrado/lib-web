@@ -57,7 +57,6 @@ if (!getSystemSetting("_hasportal", false) || !$USER->authorize('portalaccess'))
 // Action/Request Processing
 ////////////////////////////////////////////////////////////////////////////////
 
-
 //handle list search mode switches (contactsearchformdata.inc.php)
 if (isset($_GET['listsearchmode'])) {
 
@@ -77,8 +76,6 @@ if (isset($_GET['listsearchmode'])) {
 		$_SESSION['listsearch'] = array("showall" => true);
 	}
 }
-
-
 
 if (isset($_GET['hideactivecodes']))
 	$_SESSION['hideactivecodes'] = $_GET['hideactivecodes'] == "true" ? true : false;
@@ -103,11 +100,11 @@ if (isset($_SESSION['hideassociated']) && $_SESSION['hideassociated']) {
 }
 
 $renderedlist->setExtraWhereSql($extrawheresql);
-		
+
 $pagelimit = 100;
 $renderedlist->pagelimit = $pagelimit;
 
-$generateBulkTokens = $USER->authorize('generatebulktokens');
+$canGenerateBulkTokens = $USER->authorize('generatebulktokens');
 
 // FORM DATA
 
@@ -117,12 +114,12 @@ $checkHideAssociated = (!empty($_SESSION['hideassociated'])) ? 'checked' : '';
 $buttons = array(
 	icon_button(_L('Download CSV'), "disk",null,"activationcodemanager.php/report.csv?csv=true")
 );
-if ($generateBulkTokens)
-	$buttons[] = icon_button("Generate Activation Codes", "key_go", "if(confirmGenerate()) window.location='?generate=1'", "activationcodemanager.php");	
+if ($canGenerateBulkTokens) {
+	$buttons[] = icon_button("Generate Activation Codes", "key_go", "if(confirmGenerate()) window.location='activationcodebulkgenerate.php'", "activationcodebulkgenerate.php");
+}
 
 $buttons[] = icon_button(_L('Back to Contacts'),"fugue/arrow_180",null,"contacts.php");
-	
-	
+
 $redirectpage = "activationcodemanager.php";
 
 $additionalformdata = array();
@@ -138,16 +135,12 @@ $additionalformdata["filter"] = array(
 $disablerenderedlistajax = true;
 include_once("contactsearchformdata.inc.php");
 
-
-
-
 // Prepare RenderedList options
-
 $validsortfields = array("pkey" => "ID#");
 foreach (FieldMap::getAuthorizedFieldMapsLike("f") as $fieldmap) {
 	$validsortfields[$fieldmap->fieldnum] = $fieldmap->name;
 }
-	
+
 $ordering = isset($_SESSION['showlistorder']) ? $_SESSION['showlistorder'] : array(array("f02", false),array("f01",false));
 for ($x = 0; $x < 3; $x++) {
 	if (!isset($_GET["sort$x"]))
@@ -165,7 +158,6 @@ $renderedlist->setPageOffset($pagestart);
 $renderedlist->orderby = $ordering;
 
 $data = $renderedlist->getPageData();
-
 $total = $renderedlist->getTotal();
 
 // find if any active tokens in display results
@@ -177,37 +169,6 @@ if ($personsql != "") {
 		$query = "select 1 from portalpersontoken where exists (select * from portalpersontoken where personid in (".repeatWithSeparator("?", ",", count($personids)).") and token is not null and expirationdate > curdate() limit 1)";
 		$hasactivecodes = QuickQuery($query, false, $personids);
 	}
-}
-
-// this needs to be after the rules for renderedlist are loaded, etc. cannot go up top with the usual GET handlers
-// check if generating tokens
-if ($generateBulkTokens && isset($_GET['generate'])) {
-	$totalgenerated = 0;
-	$pageoffset = 0;
-	$renderedlist->setPageOffset($pageoffset);
-	$personsql = $renderedlist->getPersonSql(true);
-	$personids = QuickQueryList($personsql);
-	while (count($personids) > 0) {
-		$count = generatePersonTokens($personids);
-		if ($count)
-			$totalgenerated += $count;
-		else
-			$count = 0; // failure
-		
-		if (isset($_SESSION['hideactivecodes']) && $_SESSION['hideactivecodes'])
-			$pageoffset = 0; // resultset changes as new personportaltoken get generated, always fetch first page of updated results
-		else
-			$pageoffset += $pagelimit;
-		$renderedlist->setPageOffset($pageoffset);
-		$personsql = $renderedlist->getPersonSql(true);
-		$personids = QuickQueryList($personsql);
-	}
-	if ($totalgenerated > 0)
-		notice(_L("%s activation codes have been generated.", number_format($totalgenerated)));
-	else
-		notice(_L("An unexpected error occurred.  Please try again."));
-			
-	redirect();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
