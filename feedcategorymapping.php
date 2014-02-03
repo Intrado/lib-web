@@ -217,7 +217,7 @@ class FeedCategoryMapping extends PageForm {
 global $SETTINGS;
 $cmaApi = new CmaApiClient(
 	new ApiClient($SETTINGS['cmaserver']['apiurl']),
-	getCustomerSystemSetting("_cmaappid") ? getCustomerSystemSetting("_cmaappid") : 1 // TODO: add appropriate logic/handling
+	getCustomerSystemSetting("_cmaappid") ? getCustomerSystemSetting("_cmaappid") : ''
 );
 executePage(new FeedCategoryMapping($cmaApi));
 

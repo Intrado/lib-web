@@ -24,6 +24,9 @@ require_once("obj/LogoRadioButton.fi.php");
 require_once("obj/LanguagesItem.fi.php");
 require_once("obj/ValInboundNumber.val.php");
 require_once("../obj/ValInteger.val.php");
+require_once("../obj/ApiClient.obj.php");
+require_once("../obj/CmaApiClient.obj.php");
+require_once("../obj/ValCmaAppId.val.php");
 
 // For Quick Tip TAI table activation stuffs
 require_once("loadtaitemplatedata.php");
@@ -636,7 +639,8 @@ $formdata["cmaappid"] = array(
 	"label" => _L('CMA App. ID'),
 	"value" => ($settings['_cmaappid'] ? $settings['_cmaappid'] : ''),
 	"validators" => array(
-		array('ValInteger', 'min' => 1)
+		array('ValInteger', 'min' => 1),
+		array('ValCmaAppId')
 	),
 	"control" => array("TextField","size"=>20),
 	"helpstep" => $helpstepnum
@@ -1015,7 +1019,7 @@ document.observe('dom:loaded', function() {
 			checkbox.checked = !confirm("Are you sure you want to DISABLE this customer?");
 	});
 });
-<? Validator::load_validators(array("ValInboundNumber","ValUrlComponent","ValSmsText","ValLanguages","ValUrl","ValClassroom", "ValInteger"));?>
+<? Validator::load_validators(array("ValInboundNumber","ValUrlComponent","ValSmsText","ValLanguages","ValUrl","ValClassroom", "ValInteger", 'ValCmaAppId'));?>
 </script>
 <?
 

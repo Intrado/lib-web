@@ -82,14 +82,7 @@
 
 		header('Content-Type: application/json');
 		echo json_encode($cma_streams_categories);
-		exit();
 
-		// @POST
-		// @path /{version}/apps/{appId}/notifications
-		// if $path exists and has the format: /{version}/apps/{appId}/notifications and
-		// the POST params exits, then return 201
-		
-		//                         '/\/1/\/apps\/\d+\/
 	} else if ($path && preg_match('/\/1\/apps\/\d+\/notifications$/', $path)) {
 		// do we want to check for all expected POST params (title, body, & categories)?
 		// note to fetch POST and decode the JSON into the object with these fields
@@ -103,11 +96,15 @@
 		$cmaNotificationDto->login = "schoolMessenger"; // TODO: or whoever was logged in with the basic http auth
 		$cmaNotificationDto->lastUpdateMs = time() * 1000;
 		echo json_encode($cmaNotificationDto);
-		exit();
-	}
+	} else if ($path && preg_match('/\/1\/apps\/\d+$/', $path)) {
+		// check if an appid is valid
+		header("HTTP/1.1 200 OK");
+		$response = (object) array();
+		echo json_encode($response);
+	} else {
 
-	// else return 400; only above to endpoints supported at this time
-	header("HTTP/1.1 400");
-	exit();
+		// else return 400; only above to endpoints supported at this time
+		header("HTTP/1.1 400");
+	}
 
 ?>
