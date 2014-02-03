@@ -25,6 +25,9 @@ require_once("{$thriftdir}/StringFunc/Core.php");
 require_once("{$thriftdir}/packages/messagelink/Types.php");
 require_once("{$thriftdir}/packages/messagelink/MessageLink.php");
 
+use messagelink\MessageLinkClient;
+use messagelink\MessageLinkCodeNotFoundException;
+
 
 session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 

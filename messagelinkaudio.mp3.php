@@ -29,6 +29,9 @@ require_once("{$thriftdir}/StringFunc/Core.php");
 require_once("{$thriftdir}/packages/messagelink/Types.php");
 require_once("{$thriftdir}/packages/messagelink/MessageLink.php");
 
+use messagelink\MessageLinkClient;
+use messagelink\MessageLinkCodeNotFoundException;
+
 list($appserverprotocol, $appservertransport) = initMessageLinkApp();
 if($appserverprotocol == null || $appservertransport == null) {
 	error_log("Cannot use AppServer");

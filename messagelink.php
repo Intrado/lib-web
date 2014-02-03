@@ -31,6 +31,9 @@ require_once("{$thriftdir}/StringFunc/Core.php");
 require_once("{$thriftdir}/packages/messagelink/Types.php");
 require_once("{$thriftdir}/packages/messagelink/MessageLink.php");
 
+use messagelink\MessageLinkClient;
+use messagelink\MessageLinkCodeNotFoundException;
+
 require_once("inc/utils.inc.php");
 require_once("inc/table.inc.php");
 

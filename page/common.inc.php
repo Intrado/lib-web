@@ -50,6 +50,8 @@ use Thrift\Transport\TSocket;
 use Thrift\Exception\TException;
 
 use pagelink\PageLinkClient;
+use pagelink\NotFoundException;
+
 
 class PageLinkService {
 	var $transport;
