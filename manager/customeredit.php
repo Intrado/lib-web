@@ -639,7 +639,6 @@ $formdata["cmaappid"] = array(
 	"label" => _L('CMA App. ID'),
 	"value" => ($settings['_cmaappid'] ? $settings['_cmaappid'] : ''),
 	"validators" => array(
-		array('ValInteger', 'min' => 1),
 		array('ValCmaAppId')
 	),
 	"control" => array("TextField","size"=>20),

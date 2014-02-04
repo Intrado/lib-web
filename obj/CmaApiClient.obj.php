@@ -53,7 +53,6 @@ class CmaApiClient {
 	 */
 	public function isValidAppId() {
 		$res = $this->apiClient->get("/1/apps/{$this->appId}");
-		// now get the categories array from the 'stream' prop
 		return ($res['code'] == 200);
 	}
 }

@@ -55,7 +55,7 @@ class FeedCategoryMapping extends PageForm {
 	// @override
 	public function isAuthorized(&$get = array(), &$post = array(), &$request = array(), &$session = array()) {
 		global $USER;
-		return(getSystemSetting("_hasfeed") && $USER->authorize('managesystem') && (intval(getSystemSetting('_cmaappid') > 0)));
+		return(getSystemSetting("_hasfeed") && $USER->authorize('managesystem') && getSystemSetting('_cmaappid'));
 	}
 
 	// @override
