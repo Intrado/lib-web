@@ -34,6 +34,15 @@ if (!getSystemSetting("_hasportal", false) || !$USER->authorize('portalaccess') 
 if (isset($_GET['generate'])) {
 	// basic rendered list initialization
 	$renderedlist = new RenderedListCM();
+	$extrawheresql = "";
+	if (isset($_SESSION['hideactivecodes']) && $_SESSION['hideactivecodes']) {
+		$extrawheresql .= " and not exists (select * from portalpersontoken ppt where ppt.personid = p.id and ppt.expirationdate >= curdate()) ";
+	}
+	if (isset($_SESSION['hideassociated']) && $_SESSION['hideassociated']) {
+		$extrawheresql .= " and not exists (select * from portalperson pp2 where pp2.personid = p.id) ";
+	}
+	$renderedlist->setExtraWhereSql($extrawheresql);
+
 	$disablerenderedlistajax = true;
 	$buttons = array();
 	include_once("contactsearchformdata.inc.php");
@@ -55,7 +64,11 @@ if (isset($_GET['generate'])) {
 		if ($tries < 0)
 			$failedCount += count($personids);
 
+		if (isset($_SESSION['hideactivecodes']) && $_SESSION['hideactivecodes'])
+			$pageoffset = 0; // resultset changes as new personportaltoken get generated, always fetch first page of updated results
+		else
 		$pageoffset += $renderedlist->pagelimit;
+
 		$renderedlist->setPageOffset($pageoffset);
 		$personids = QuickQueryList($renderedlist->getPersonSql(true));
 	}
@@ -79,7 +92,7 @@ include_once("nav.inc.php");
 startWindow(_L("Bulk Code Generation"));
 ?>
 	<div>
-		<?= _L('Your request is being processed. Please wait, and you will be redirected once it completes')?>&nbsp;<img src="img/ajax-loader.gif" />
+		<?= _L('Your request is being processed. Please wait, and you will be redirected once it completes.')?>&nbsp;<img src="img/ajax-loader.gif" />
 	</div>
 <?
 endWindow();
