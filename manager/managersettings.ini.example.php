@@ -18,6 +18,11 @@ user="root"
 pass=""
 db="authserver"
 
+; cma service
+[cmaserver]
+apiurl="https://sandbox.testschoolmessenger.com/cma/_cma_api_stub.php"
+; apiurl="http://cmastaging.customschoolapps.net"
+
 ;diskdb for manager use
 [diskdb]
 persistent=true
