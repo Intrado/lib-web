@@ -138,6 +138,9 @@ Classroom_Messaging\Creating_Custom_Comments.htm
 Classroom_Messaging\Editing_Classroom_Comments.htm
 Classroom_Messaging\Managing_Comments.htm
 Classroom_Messaging\Scheduling_Classroom_Messaging.htm
+Custom_Mobile_App_Integration\About_Custom_Mobile_Apps.htm
+Custom_Mobile_App_Integration\Mapping_App_Categories_to_RSS_Feeds.htm
+Custom_Mobile_App_Integration\Sending_Push_Notifications.htm
 Email_Tracking\Maximizing_Data.htm
 Email_Tracking\Overview.htm
 Getting_Started\Send_a_Basic_Message.htm
@@ -284,6 +287,7 @@ AddHTMLEmail.jpg
 GreenPlusIcon.jpg
 light_bulb__exclamation.png
 SocialMediaLog.jpg
+CMA-CreatePushContent.jpg
 SystemContacts.jpg
 AdminFieldDefinitions.jpg
 AdminSettingsSMSLabels.jpg
@@ -335,6 +339,7 @@ StationeryMessageBuilderPub.jpg
 StationeryThemeControls.jpg
 AddFeed.jpg
 FacebookLink.gif
+CMA-MapCategoriesToFeeds.jpg
 SDD-CreateNewDoc.jpg
 QuickTipTopicManager.jpg
 SelfSignupSelectField.jpg
@@ -526,6 +531,7 @@ whxdata\package_167.xml
 whxdata\package_168.xml
 whxdata\package_169.xml
 whxdata\package_170.xml
+whxdata\package_171.xml
 whxdata\packageindex.xml
 whxdata\synonym.xml
 whxdata\topictable_0.xml
@@ -567,6 +573,7 @@ whgdata\whlstt29.htm
 whgdata\whlstt30.htm
 whgdata\whlstt31.htm
 whgdata\whlstt32.htm
+whgdata\whlstt33.htm
 whgdata\whlsti0.htm
 whgdata\whlstfl0.htm
 whgdata\whlstfl1.htm
@@ -716,6 +723,7 @@ whgdata\whlstf119.htm
 whgdata\whlstf120.htm
 whgdata\whlstf121.htm
 whgdata\whlstf122.htm
+whgdata\whlstf123.htm
 whgdata\whlstg0.htm
 CommSuite_User_Guide.htm
 CommSuite_User_Guide_csh.htm
