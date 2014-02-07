@@ -515,17 +515,9 @@ function getFeedJsVars() {
 	// replace any placeholders in the js with the form values
 	$vars = str_replace('$IFRAMEHEIGHT', $postdata["iframeheight"], $vars);
 	$vars = str_replace('$IFRAMEWIDTH', $postdata["iframewidth"], $vars);
-
-	// If the tiny domain is on the same host as this page (i.e. in sandbox environment)
-	// then we will preserve the current protocol, otherwise tinyurl is ALWAYS http protocol!
-	$tinydomain = getSystemSetting("tinydomain","alrt4.me");
-	if (preg_match('/(.*?)\:/', $tinydomain, $matches)) {
-		$tinyhost = $matches[1];
-	}
-	else $tinyhost = $tinydomain;
-	$protocol = (strtolower($tinyhost) == strtolower($_SERVER['SERVER_NAME'])) ? '' : 'http:';
-
-	$vars = str_replace('$TINYURL', "{$protocol}//" . getSystemSetting("tinydomain","alrt4.me"), $vars);
+	// We will allow http/s protocol matching for this preview function even though
+	// the URL's in the feed for media links and such will be http only for now
+	$vars = str_replace('$TINYURL', "//" . getSystemSetting("tinydomain","alrt4.me"), $vars);
 	$vars = str_replace('$FONTFAMILY', (($postdata["fontfamily"] == "default")?"":"font-family:".$postdata["fontfamily"].";"), $vars);
 	$vars = str_replace('$TITLECOLOR', "#".$postdata["titlecolor"], $vars);
 	$vars = str_replace('$BORDERSTYLE', $postdata["borderstyle"], $vars);
