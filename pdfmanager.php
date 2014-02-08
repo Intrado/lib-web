@@ -46,7 +46,7 @@ class PdfManager extends PageBase {
 	// @override
 	function isAuthorized($get = array(), $post = array()) {
 		global $USER;
-		return $USER->authorize('canpdfburst');
+		return getSystemSetting("_haspdfburst", false) && $USER->authorize('canpdfburst');
 	}
 
 	// @override

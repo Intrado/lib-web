@@ -817,6 +817,8 @@ if (!getSystemSetting('_hastwitter', false))
 if (!getSystemSetting('_hasfeed', false))
 	unset($formdata['feedpost']);
 
+if (!getSystemSetting('_haspdfburst', false))
+	unset($formdata['canpdfburst']);
 
 $buttons = array(submit_button(_L('Save'),"submit","tick"));
 $form = new Form("accessprofile",$formdata,$helpsteps,$buttons);

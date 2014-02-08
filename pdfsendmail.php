@@ -62,7 +62,7 @@ class PdfSendMail extends PageForm {
 	// @override
 	public function isAuthorized(&$get = array(), &$post = array(), &$request = array(), &$session = array()) {
 		global $USER;
-		if ($USER->authorize('canpdfburst') &&
+		if (getSystemSetting("_haspdfburst", false) && $USER->authorize('canpdfburst') &&
 				(isset($get['id']) || isset($session['pdfsendmail_burstid']))) {
 			return true;
 		}

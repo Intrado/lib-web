@@ -241,6 +241,7 @@ $settings = array(
 	'_hasfeed' => '0',
 	'_allowoldmessagesender' => '0',
 	'_hasquicktip' => '0',
+	'_haspdfburst' => '0',
 	'_cmaappid' => '',
 	'autoreport_replyname' => 'SchoolMessenger',
 	'autoreport_replyemail' => 'autoreport@schoolmessenger.com',
@@ -635,6 +636,14 @@ $formdata["hasquicktip"] = array(
 	"helpstep" => $helpstepnum
 );
 
+$formdata ["haspdfburst"] = array (
+	"label" => _L('Has Secure Document Delivery'),
+	"value" => $settings ['_haspdfburst'],
+	"validators" => array(),
+	"control" => array("CheckBox"),
+	"helpstep" => $helpstepnum 
+);
+
 $formdata["cmaappid"] = array(
 	"label" => _L('CMA App. ID'),
 	"value" => ($settings['_cmaappid'] ? $settings['_cmaappid'] : ''),
@@ -933,6 +942,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		setCustomerSystemSetting('logindisableattempts', $postdata['logindisableattempts'], $custdb);
 		setCustomerSystemSetting('loginlockouttime', $postdata['loginlockouttime'], $custdb);
 
+		// SSD feature...
+		setCustomerSystemSetting('_haspdfburst', $postdata["haspdfburst"] ? '1' : '0', $custdb);
+		
 		// QuickTip requires that we add the [dis|en]able the feature...
 		setCustomerSystemSetting('_hasquicktip', $postdata["hasquicktip"] ? '1' : '0', $custdb);
 
