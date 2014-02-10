@@ -67,6 +67,14 @@ foreach ($categories as $category) {
 		"control" => array("TextArea","size" => 30, "cols" => 34),
 		"helpstep" => 1
 	);
+    $formdata["feedcategorydesktopalert-".$category->id] = array(
+        "label" => _L('Use for Desktop Alerts'),
+        "fieldhelp" => _L('Messages posted to this category will be available in your Desktop Alerts feed.'),
+        "value" => "",
+        "validators" => array(),
+        "control" => array("checkbox"),
+        "helpstep" => 1
+    );
 	$formdata["feedcategorydelete-".$category->id] = array(
 		"label" => "",
 		"value" => "",
@@ -115,6 +123,14 @@ $formdata["feedcategorydesc-new"] = array(
 	"control" => array("TextArea","size" => 30, "cols" => 34),
 	"requires" => array("feedcategoryname-new"),
 	"helpstep" => 1
+);
+$formdata["feedcategorydesktopalert-new"] = array(
+    "label" => _L('Use for Desktop Alerts'),
+    "fieldhelp" => _L('Messages posted to this category will be available in your Desktop Alerts feed.'),
+    "value" => "",
+    "validators" => array(),
+    "control" => array("checkbox"),
+    "helpstep" => 1
 );
 $formdata["feedcategoryadd-new"] = array(
 	"label" => "",
