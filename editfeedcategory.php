@@ -42,6 +42,9 @@ class ValFeedName extends Validator {
 // get the current non-deleted categories from the db
 $categories = DBFindMany("FeedCategory", "from feedcategory where not deleted order by id");
 
+// TODO: get feed types when available
+$feedTypes = array("RSS", "Desktop Alerts", "Push Notifications");
+
 $formdata = array();
 foreach ($categories as $category) {
 	$formdata[] = _L('Category: %s', $category->name);
@@ -67,12 +70,14 @@ foreach ($categories as $category) {
 		"control" => array("TextArea","size" => 30, "cols" => 34),
 		"helpstep" => 1
 	);
-    $formdata["feedcategorydesktopalert-".$category->id] = array(
-        "label" => _L('Use for Desktop Alerts'),
-        "fieldhelp" => _L('Messages posted to this category will be available in your Desktop Alerts feed.'),
+    $formdata["feedcategorytypes-".$category->id] = array(
+        "label" => _L('Feed Type(s)'),
+        "fieldhelp" => _L(''),
         "value" => "",
-        "validators" => array(),
-        "control" => array("checkbox"),
+        "validators" => array(
+            array("ValInArray", "values" => array_keys($feedTypes))
+        ),
+        "control" => array("MultiCheckBox", "values" => $feedTypes),
         "helpstep" => 1
     );
 	$formdata["feedcategorydelete-".$category->id] = array(
@@ -124,12 +129,14 @@ $formdata["feedcategorydesc-new"] = array(
 	"requires" => array("feedcategoryname-new"),
 	"helpstep" => 1
 );
-$formdata["feedcategorydesktopalert-new"] = array(
-    "label" => _L('Use for Desktop Alerts'),
-    "fieldhelp" => _L('Messages posted to this category will be available in your Desktop Alerts feed.'),
+$formdata["feedcategorytypes-new"] = array(
+    "label" => _L('Feed Type(s)'),
+    "fieldhelp" => _L(''),
     "value" => "",
-    "validators" => array(),
-    "control" => array("checkbox"),
+    "validators" => array(
+        array("ValInArray", "values" => array_keys($feedTypes))
+    ),
+    "control" => array("MultiCheckBox", "values" => $feedTypes),
     "helpstep" => 1
 );
 $formdata["feedcategoryadd-new"] = array(
