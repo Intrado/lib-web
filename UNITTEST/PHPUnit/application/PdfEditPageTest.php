@@ -154,7 +154,10 @@ class PdfEditPageTest extends PHPUnit_Framework_TestCase {
 				)
 			)
 		);
-
+		
+		//9) SQL response: make sure SDD is enabled for the customer
+		$queryRules->add('/select value from setting where name/',  array('_haspdfburst'), array(array(1)));
+		
 		// Mock up a USER session
 		require_once("{$konadir}/inc/common.inc.php");
 		$USER = new User(self::USER_ID);
