@@ -2422,3 +2422,18 @@ $$$
 update setting set value='10.1/14' where name='_dbversion'
 $$$
 -- END 10.1/14
+
+
+-- START 10.2/1
+
+CREATE TABLE `feedcategorytype` (
+ `feedcategoryid` int(11) NOT NULL,
+ `type` enum('rss','desktop','push') NOT NULL,
+ PRIMARY KEY (`feedcategoryid`,`type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
+
+update setting set value='10.2/1' where name='_dbversion'
+$$$
+-- END 10.2/1
+
