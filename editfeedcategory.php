@@ -73,7 +73,7 @@ foreach ($categories as $category) {
     $formdata["feedcategorytypes-".$category->id] = array(
         "label" => _L('Feed Type(s)'),
         "fieldhelp" => _L(''),
-        "value" => "",
+        "value" => array(),
         "validators" => array(
             array("ValInArray", "values" => array_keys($feedTypes))
         ),
@@ -132,7 +132,7 @@ $formdata["feedcategorydesc-new"] = array(
 $formdata["feedcategorytypes-new"] = array(
     "label" => _L('Feed Type(s)'),
     "fieldhelp" => _L(''),
-    "value" => "",
+    "value" => array(),
     "validators" => array(
         array("ValInArray", "values" => array_keys($feedTypes))
     ),
