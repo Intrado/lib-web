@@ -51,7 +51,6 @@ abstract class PageBase implements Page {
 	 * All our operational options, protectively set, publicly readable
 	 */
 	var $options;
-	var $form;
 	var $konadir;
 	var $pageOutput = '';
 
@@ -64,17 +63,17 @@ abstract class PageBase implements Page {
 		$this->konadir = dirname(dirname(__FILE__));
 
 		// Set some default options
-		$defaults = Array(
-			'testmode' => 'false',
+		$this->options = Array(
+			'testmode' => false,
 			'noauth_redirect' => 'unauthorized.php',
 			'title' => 'Default Page Title',
-			'page' => 'notifications:jobs',
-			'formname' => '',
-			'validators' => Array()
+			'page' => 'notifications:jobs'
 		);
 
 		// Then merge defaults with the options provided 
-		$this->options = array_merge($defaults, $options);
+		if (is_array($options) && count($options)) {
+			$this->options = array_merge($this->options, $options);
+		}
 
 		// Call a customer initializer if it exists
 		$this->initialize();
@@ -98,7 +97,7 @@ abstract class PageBase implements Page {
 	function execute() {
 
 		// Check authorization
-		if (! $this->isAuthorized($_GET, $_POST)) {
+		if (! $this->isAuthorized($_GET, $_POST, $_REQUEST, $_SESSION)) {
 
 			// Redirect if unauthorized
 			$location = $this->options['noauth_redirect'];
@@ -114,10 +113,10 @@ abstract class PageBase implements Page {
 		}
 
 		// Pull request data into instance properties
-		$this->beforeLoad($_GET, $_POST);
+		$this->beforeLoad($_GET, $_POST, $_REQUEST, $_SESSION);
 
 		// Load the form and any supplemental database data that it needs
-		$this->load();
+		$this->load($_GET, $_POST, $_REQUEST, $_SESSION);
 
 		// Do whatever we need to do after loading
 		$this->afterLoad();
@@ -147,7 +146,7 @@ abstract class PageBase implements Page {
 	 *
 	 * @return boolean true if the user is authorized to continue, else false
 	 */
-	function isAuthorized($get = array(), $post = array()) {
+	function isAuthorized($get = array(), $post = array(), $request = array(), $session = array()) {
 		return(false);
 	}
 
@@ -166,7 +165,7 @@ abstract class PageBase implements Page {
 	 * @param array $get Associative array of name/value pairs akin to $_GET
 	 * @param array $post Associative array of name/value pairs akin to $_POST
 	 */
-	function beforeLoad($get = array(), $post = array()) {
+	function beforeLoad($get = array(), $post = array(), $request = array(), $session = array()) {
 	}
 
 	/**
@@ -180,7 +179,7 @@ abstract class PageBase implements Page {
 	 * the submission to to proceed. By the time we leave here there should
 	 * be nothing left to be discovered to save the submitted data.
 	 */
-	function load() {
+	function load($get = array(), $post = array(), $request = array(), $session = array()) {
 	}
 
 	/**
@@ -258,7 +257,7 @@ abstract class PageBase implements Page {
 	 */
 	function sendPageOutput() {
 		global $TITLE;
-		startWindow($TITLE);
+		startWindow((isset($this->options['windowTitle']) && $this->options['windowTitle']) ? $this->options['windowTitle'] : $TITLE);
 		echo $this->pageOutput;
 		endWindow();
 	}

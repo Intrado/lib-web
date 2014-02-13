@@ -19,14 +19,19 @@ if (!$USER->authorize('metadata'))
 ///////////////////////////////////////////////////////////////////////////////
 if (isset($_GET['orgid'])) {
 	$orgid = $_GET['orgid'];
-	$orgkey = QuickQuery("select orgkey from organization where id = ?", false, array($orgid));
-} else {
-	redirect("organizationdatamanager.php");
+	$_SESSION['organizationassociation'] = array('orgid' => $orgid);
+	redirect();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
+if (isset($_SESSION['organizationassociation']) && isset($_SESSION['organizationassociation']['orgid'])) {
+	$orgid = $_SESSION['organizationassociation']['orgid'];
+	$orgkey = QuickQuery("select orgkey from organization where id = ?", false, array($orgid));
+} else {
+	redirect("organizationdatamanager.php");
+}
 
 function fmt_login ($row, $index) {
 	if ($row[$index])
@@ -93,12 +98,19 @@ $associatedorgdata = QuickQueryMultiRow("(select SQL_CALC_FOUND_ROWS l.id as id,
 												(p.id = pa.personid)
 										where not p.deleted and p.type = 'subscriber' and pa.organizationid = ?)
 										union
+										(select '' as id, 'Person Import' as type, concat(p.pkey, ': ', p.f02, ', ', p.f01) as name, '' as login,
+											'' as userimportid, '' as userid, '' as userenabled
+										from person p
+											inner join personassociation pa on
+												(p.id = pa.personid)
+										where not p.deleted and p.importid is not null and pa.organizationid = ?)
+										union
 										(select id, 'Child Organization' as type, orgkey as name, '' as login,
 											'' as userimportid, '' as userid, '' as userenabled
 											from organization where not deleted and parentorganizationid = ?)
 										order by login, type
 										limit $start, $limit",
-										true, false, array($orgid, $orgid, $orgid, $orgid, $orgid, $orgid));
+										true, false, array($orgid, $orgid, $orgid, $orgid, $orgid, $orgid, $orgid));
 
 $total = QuickQuery("select FOUND_ROWS()");
 

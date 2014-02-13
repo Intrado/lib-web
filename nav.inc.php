@@ -38,7 +38,8 @@ $NAVTREE = array (
 		array("Classroom","classroommessageoverview.php",getSystemSetting("_hastargetedmessage", false) ? "targetedmessage" : "dummy",$SUBTAB=="classroom"),
 		array("Surveys","surveys.php",$USER->canSendSurvey() ? "survey" : "dummy",$SUBTAB=="survey"),
 		array("Responses","replies.php?reset=1","leavemessage",$SUBTAB=="responses"),
-		array("Tips","tips.php",getSystemSetting("_hasquicktip", false) ? "tai_canbetopicrecipient" : "dummy",$SUBTAB=="tips")
+		array("Tips","tips.php",getSystemSetting("_hasquicktip", false) ? "tai_canbetopicrecipient" : "dummy",$SUBTAB=="tips"),
+		array("SDD","pdfmanager.php", 'canpdfburst' ,$SUBTAB=="pdfmanager")
 		)),
 	array("Reports","reports.php",array('createreport',"viewsystemreports", "viewusagestats","viewcalldistribution"),$MAINTAB=="reports",array(
 		array("Reports", "reports.php", array("createreport", "viewsystemreports"), $SUBTAB=="reports"),

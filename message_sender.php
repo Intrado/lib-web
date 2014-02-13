@@ -41,6 +41,7 @@ require_once("obj/MessageGroup.obj.php");
 require_once("obj/Message.obj.php");
 require_once("obj/MessagePart.obj.php");
 require_once("obj/MessageAttachment.obj.php");
+require_once("obj/ContentAttachment.obj.php");
 require_once("obj/FeedCategory.obj.php");
 
 // Validators
@@ -1000,6 +1001,11 @@ include("nav.inc.php");
 						};
 
 						window.globals.require('initialize');
+
+                        // display a warning message to users if they navigate away from MS
+                        window.onbeforeunload = function () {
+                            return 'WARNING: Leaving this page will result in a loss of any data you may have entered.';
+                        };
 					});
 			});
 
@@ -1304,7 +1310,7 @@ class MessageSenderProcessor {
 			$messages['email']['html']['en']['none']["fromname"] = $postdata["emailmessagefromname"];
 			$messages['email']['html']['en']['none']["from"] = $postdata["emailmessagefromemail"];
 			$messages['email']['html']['en']['none']["subject"] = $postdata["emailmessagesubject"];
-			$attachments = isset($postdata["emailmessageattachment"])?json_decode($postdata["emailmessageattachment"]):array();
+			$attachments = isset($postdata["emailmessageattachment"])?json_decode($postdata["emailmessageattachment"], true):array();
 			$messages['email']['html']['en']['none']['attachments'] = $attachments;
 			if (isset($postdata["emailmessagefromstationery"])) {
 				$messages['email']['html']['en']['none']['fromstationery'] = $postdata["emailmessagefromstationery"];
@@ -1405,14 +1411,7 @@ class MessageSenderProcessor {
 
 							// if there are message attachments, attach them
 							if (isset($data['attachments']) && $data['attachments']) {
-								foreach ($data['attachments'] as $cid => $details) {
-									$msgattachment = new MessageAttachment();
-									$msgattachment->messageid = $message->id;
-									$msgattachment->contentid = $cid;
-									$msgattachment->filename = $details->name;
-									$msgattachment->size = $details->size;
-									$msgattachment->create();
-								}
+								$message->createContentAttachments($data['attachments']);
 							} // end if there are attachments
 						} // end if this message has a body
 					} // end for each autotranslate value

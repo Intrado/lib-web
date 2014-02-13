@@ -18,16 +18,33 @@ require_once("../obj/MessageGroup.obj.php");
 require_once("../obj/AudioFile.obj.php");
 require_once("../obj/MessagePart.obj.php");
 require_once("../obj/MessageAttachment.obj.php");
+require_once("../obj/ContentAttachment.obj.php");
+require_once("../obj/BurstAttachment.obj.php");
 require_once("../obj/Voice.obj.php");
 require_once("../obj/Language.obj.php");
 require_once("../inc/appserver.inc.php");
 
-require_once('../thrift/Thrift.php');
-require_once $GLOBALS['THRIFT_ROOT'].'/protocol/TBinaryProtocol.php';
-require_once $GLOBALS['THRIFT_ROOT'].'/transport/TSocket.php';
-require_once $GLOBALS['THRIFT_ROOT'].'/transport/TBufferedTransport.php';
-require_once $GLOBALS['THRIFT_ROOT'].'/transport/TFramedTransport.php';
-require_once($GLOBALS['THRIFT_ROOT'].'/packages/commsuite/CommSuite.php');
+// load the thrift api requirements.
+$thriftdir = '../Thrift';
+require_once("{$thriftdir}/Base/TBase.php");
+require_once("{$thriftdir}/Protocol/TProtocol.php");
+require_once("{$thriftdir}/Protocol/TBinaryProtocol.php");
+require_once("{$thriftdir}/Protocol/TBinaryProtocolAccelerated.php");
+require_once("{$thriftdir}/Transport/TTransport.php");
+require_once("{$thriftdir}/Transport/TSocket.php");
+require_once("{$thriftdir}/Transport/TBufferedTransport.php");
+require_once("{$thriftdir}/Transport/TFramedTransport.php");
+require_once("{$thriftdir}/Exception/TException.php");
+require_once("{$thriftdir}/Exception/TTransportException.php");
+require_once("{$thriftdir}/Exception/TProtocolException.php");
+require_once("{$thriftdir}/Exception/TApplicationException.php");
+require_once("{$thriftdir}/Type/TType.php");
+require_once("{$thriftdir}/Type/TMessageType.php");
+require_once("{$thriftdir}/StringFunc/TStringFunc.php");
+require_once("{$thriftdir}/Factory/TStringFuncFactory.php");
+require_once("{$thriftdir}/StringFunc/Core.php");
+require_once("{$thriftdir}/packages/commsuite/Types.php");
+require_once("{$thriftdir}/packages/commsuite/CommSuite.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
@@ -149,22 +166,22 @@ startWindow(_L('Details'), 'padding: 3px;');
 
 	<table width="100%" border="0" cellpadding="3" cellspacing="0">
 		<tr>
-			<th align="right" class="windowRowHeader bottomBorder"><?=_L("Message For")?>:</td>
+			<th align="right" class="windowRowHeader bottomBorder"><?=_L("Message For")?>:</th>
 			<td class="bottomBorder"><?=escapehtml($historicdata['f01']) . " " . escapehtml($historicdata['f02'])?></td>
 		</tr>
 		<tr>
-			<th align="right" class="windowRowHeader bottomBorder"><?=_L("Job Name")?>:</td>
+			<th align="right" class="windowRowHeader bottomBorder"><?=_L("Job Name")?>:</th>
 			<td class="bottomBorder"><?=escapehtml($historicdata['jobname'])?></td>
 		</tr>
 		<tr>
-			<th align="right" class="windowRowHeader bottomBorder"><?=_L("Date")?>:</td>
+			<th align="right" class="windowRowHeader bottomBorder"><?=_L("Date")?>:</th>
 			<td class="bottomBorder"><?=date("M j, Y", strtotime($historicdata['startdate']))?></td>
 		</tr>
 <?
 	if (count($availableMessageLanguages) > 1) {
 ?>
 		<tr>
-			<th align="right" class="windowRowHeader bottomBorder"><?=_L("Language")?>:</td>
+			<th align="right" class="windowRowHeader bottomBorder"><?=_L("Language")?>:</th>
 			<td><table><tr><td>
 			<?
 				NewFormItem($f, $s, 'language', 'selectstart', null, null, "id='language'");
@@ -194,10 +211,18 @@ startWindow(_L('Details'), 'padding: 3px;');
 					</tr>
 <?
 				foreach ($attachments as $attachment) {
+					$filename = $attachment->getFilename();
+					$size = $attachment->getSize();
+					if ($size === false)
+						$size = "";
+					else
+						$size = max(1,round($size/1024)) . "K";
 ?>
 					<tr>
-						<td><a href="messageattachmentdownload.php?pid=<?= $personid ?>&jid=<?= $jobid ?>&attid=<?= $attachment->id ?>"><?= escapehtml($attachment->filename)?></a></td>
-						<td><?= max(1,round($attachment->size/1024)) ?>K</td>
+						<td><a href="messageattachmentdownload.php?pid=<?= $personid ?>&jid=<?= $jobid ?>&attid=<?= $attachment->id ?>">
+								<?= escapehtml($filename)?></a>
+						</td>
+						<td><?= $size ?></td>
 					</tr>
 <?
 				}

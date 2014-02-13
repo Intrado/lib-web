@@ -78,7 +78,21 @@ foreach ($categories as $category) {
 			"confirm" => _L("Are you sure you want to delete feed category: %s?",$category->name)),
 		"helpstep" => 1
 	);
+
+	if (intval(getCustomerSystemSetting('_cmaappid') > 0)) {
+		$formdata["feedcategorymapping-".$category->id] = array(
+			"label" => "",
+			"value" => "",
+			"validators" => array(),
+			"control" => array("InpageSubmitButton",
+				"submitvalue" => "cmamap-".$category->id,
+				"name" => _L("Map to CMA Category"),
+				"icon" => "pictos/p1/16/28"),
+			"helpstep" => 1
+		);
+	}
 }
+
 $formdata[] = _L('New Feed Category');
 $formdata["feedcategoryname-new"] = array(
 	"label" => _L('Name'),
@@ -148,6 +162,10 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			// if the delete button was clicked for this one. set it to deleted.
 			if ($button == "delete-".$category->id) {
 				$category->deleted = 1;
+
+				// Delete any CMA categories mapped to this feed category (if there are any)
+				Query("DELETE FROM `cmafeedcategory` WHERE `feedcategoryid` = ?;", false, array($category->id));
+
 				notice(_L("Feed category %s has been deleted.", $category->name));
 			} else {
 				$category->name = $postdata['feedcategoryname-'.$category->id];
@@ -165,18 +183,18 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			expireFeedCategories($CUSTOMERURL, $categoryids);
 		
 		if (substr($button,0,7) == 'delete-' || $button == "newcategory") {
-			if ($ajax)
-				$form->sendTo("editfeedcategory.php");
-			else
-				redirect("editfeedcategory.php");
+			$redirectLocation = "editfeedcategory.php";
+		} else if(substr($button,0,7) == 'cmamap-') {
+			$redirectLocation = "feedcategorymapping.php?id=". substr($button, 7);
 		} else {
 			notice(_L("Feed category changes are now saved."));
-
-			if ($ajax)
-				$form->sendTo("settings.php");
-			else
-				redirect("settings.php");
+			$redirectLocation = "settings.php";
 		}
+
+		if ($ajax)
+			$form->sendTo($redirectLocation);
+		else
+			redirect($redirectLocation);
 	}
 }
 

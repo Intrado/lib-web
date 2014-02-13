@@ -515,6 +515,8 @@ function getFeedJsVars() {
 	// replace any placeholders in the js with the form values
 	$vars = str_replace('$IFRAMEHEIGHT', $postdata["iframeheight"], $vars);
 	$vars = str_replace('$IFRAMEWIDTH', $postdata["iframewidth"], $vars);
+	// We will allow http/s protocol matching for this preview function even though
+	// the URL's in the feed for media links and such will be http only for now
 	$vars = str_replace('$TINYURL', "//" . getSystemSetting("tinydomain","alrt4.me"), $vars);
 	$vars = str_replace('$FONTFAMILY', (($postdata["fontfamily"] == "default")?"":"font-family:".$postdata["fontfamily"].";"), $vars);
 	$vars = str_replace('$TITLECOLOR', "#".$postdata["titlecolor"], $vars);

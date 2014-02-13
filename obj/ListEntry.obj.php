@@ -3,7 +3,7 @@
 class ListEntry extends DBMappedObject {
 
 	var $listid;
-	var $type; // 'rule', 'organization', 'section'
+	var $type; // 'rule','add','negate','organization','section'
 	var $ruleid;
 	var $personid;
 	var $organizationid;

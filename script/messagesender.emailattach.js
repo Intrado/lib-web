@@ -33,7 +33,7 @@ window.stopUpload = function (id, name, size, errormessage) {
 		for(var contentid in values) {
 			var content = values[contentid];
 			var downloadlinkContainer = $('<div class="downloadlinkContainer"></div>');
-			var attachment = $('<a data-attachment-id="' + contentid + '" class="emailAttachment" href="_emailattachment.php?id='  + contentid +  '&name=' + encodeURIComponent(encodeURIComponent(content.name)) + '" >' + content.name + '</a>');
+			var attachment = $('<a data-attachment-id="' + contentid + '" class="emailAttachment" target="_blank" href="_emailattachment.php?id='  + contentid +  '&name=' + encodeURIComponent(encodeURIComponent(content.name)) + '" >' + content.name + '</a>');
 			var filesize = " &nbsp; (" + Math.round(content.size/1024) + " KB) &nbsp; ";
 			var removelink = $('<a class="removeAttachment" data-attachment-id="' + contentid + '" href="#" title="Remove attachment" rel="tooltip" data-placement="right"><i class="icon-remove margT0 padR0"></i></a>');
 

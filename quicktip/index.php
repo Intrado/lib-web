@@ -163,7 +163,7 @@ class TipSubmissionHandler {
 			$html .= '</select>
 					<div id="tip-message-control-group" class="form-group">
 						<label for="message" class="control-label">Message <span class="sup" title="Required field">*</span></label>
-						<textarea id="message" class="form-control" name="message" rows="8" placeholder="Enter your tip here..." tabindex="3" max-length="10000"></textarea>
+						<textarea id="message" class="form-control" name="message" rows="8" placeholder="Enter your tip here..." tabindex="3" maxlength="10000"></textarea>
 					</div>
 				</fieldset>
 				<fieldset>
@@ -176,13 +176,13 @@ class TipSubmissionHandler {
 					<p>You have the option to leave your personal contact information. If provided, you may be contacted for more information if necessary.</p>
 					<fieldset>
 						<label for="firstname">First</label>
-						<input id="firstname" name="firstname" type="text" placeholder="First name" value="" title="Enter your first name" tabindex="5" max-length="50">
+						<input id="firstname" name="firstname" type="text" placeholder="First name" value="" title="Enter your first name" tabindex="5" maxlength="50">
 						<label for="lastname">Last</label>
-						<input id="lastname" name="lastname" type="text" placeholder="Last name" value="" title="Enter your last name" tabindex="6" max-length="50">
+						<input id="lastname" name="lastname" type="text" placeholder="Last name" value="" title="Enter your last name" tabindex="6" maxlength="50">
 					</fieldset>
 					<fieldset>
 						<label for="email">Email</label>
-						<input id="email" name="email" type="email" placeholder="Email address" value="" title="Enter your email address, ex. janedoe@example.com" tabindex="7" max-length="255">
+						<input id="email" name="email" type="email" placeholder="Email address" value="" title="Enter your email address, ex. janedoe@example.com" tabindex="7" maxlength="255">
 					</fieldset>
 					<fieldset>
 						<label for="phone">Phone</label>

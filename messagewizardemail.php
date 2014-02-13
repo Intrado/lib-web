@@ -19,6 +19,7 @@ require_once("inc/translate.inc.php");
 require_once("obj/MessageGroup.obj.php");
 require_once("obj/FieldMap.obj.php");
 require_once("obj/MessageAttachment.obj.php");
+require_once("obj/ContentAttachment.obj.php");
 require_once("inc/previewfields.inc.php");
 require_once("obj/PreviewModal.obj.php");
 
@@ -535,7 +536,7 @@ class FinishMessageWizard extends WizFinish {
 			$messages[$sourcelangcode][$autotrans]["fromname"] = $postdata["/create/email"]["fromname"];
 			$messages[$sourcelangcode][$autotrans]["from"] = $postdata["/create/email"]["from"];
 			$messages[$sourcelangcode][$autotrans]["subject"] = $postdata["/create/email"]["subject"];
-			$messages[$sourcelangcode][$autotrans]['attachments'] = $this->parent->dataHelper("/create/email:attachments",true);
+			$messages[$sourcelangcode][$autotrans]['attachments'] = json_decode($this->parent->dataHelper("/create/email:attachments"), true);
 			if ($messages[$sourcelangcode][$autotrans]['attachments'] == null) 
 				$messages[$sourcelangcode][$autotrans]['attachments'] = array();
 			
@@ -607,31 +608,7 @@ class FinishMessageWizard extends WizFinish {
 				$existingattachments = QuickQueryList("select contentid, id from messageattachment where messageid = ?", true, false, array($message->id));
 				
 				// if there are message attachments, attach them
-				$existingattachmentstokeep = array();
-				if (isset($data['attachments']) && $data['attachments']) {
-					foreach ($data['attachments'] as $cid => $details) {
-						// check if this is already attached.
-						if (isset($existingattachments[$cid])) {
-							$existingattachmentstokeep[$existingattachments[$cid]] = true;
-							continue;
-						} else {
-							$msgattachment = new MessageAttachment();
-							$msgattachment->messageid = $message->id;
-							$msgattachment->contentid = $cid;
-							$msgattachment->filename = $details->name;
-							$msgattachment->size = $details->size;
-							$msgattachment->create();
-						}
-					}
-				}
-				// remove attachments that are no longer attached
-				foreach ($existingattachments as $cid => $attachmentid) {
-					if (!isset($existingattachmentstokeep[$attachmentid])) {
-						$attachment = new MessageAttachment($attachmentid);
-						if ($attachment)
-							QuickUpdate("delete from messageattachment where id = ?", false, array($attachment->id));
-					}
-				}
+				$message->replaceContentAttachments($data['attachments']);
 				
 				// remove old messages based on the auto translate value
 				// we need to get rid of recorded messages if this is now a TTS message for example

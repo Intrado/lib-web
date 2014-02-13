@@ -74,18 +74,18 @@ if(isset($_GET['partnum'])) {
 	$parts = $_SESSION["previewmessage"]["parts"];
 	
 	foreach ($parts as $part) {
-		$messagepartdto = new commsuite_MessagePartDTO();
+		$messagepartdto = new \commsuite\MessagePartDTO();
 		
 		switch($part["type"]) {
 			case "T":
-				$messagepartdto->type = commsuite_MessagePartTypeDTO::T;
+				$messagepartdto->type = \commsuite\MessagePartTypeDTO::T;
 				$voice = new Voice($part["voiceid"]);
 				$messagepartdto->gender = $voice->gender;
 				$messagepartdto->languagecode = $voice->language;
 				$messagepartdto->txt = $part["txt"];
 				break;
 			case "A":
-				$messagepartdto->type = commsuite_MessagePartTypeDTO::A;
+				$messagepartdto->type = \commsuite\MessagePartTypeDTO::A;
 				$messagepartdto->contentid = QuickQuery("select contentid from audiofile where id=?",false,array($part["audiofileid"])) + 0;
 				break;
 		}

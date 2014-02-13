@@ -10,7 +10,7 @@
  * @version 1.0
  */
 
-$konadir = dirname(dirname(dirname(__FILE__)));
+$GLOBALS['konadir'] = $konadir = dirname(dirname(dirname(__FILE__)));
 
 // ...because this is missing from our php.ini
 date_default_timezone_set('America/Los_Angeles');

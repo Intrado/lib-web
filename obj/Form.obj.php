@@ -16,6 +16,7 @@ class Form {
 	var $validationresults = null;
 	var $ajaxsubmit = true;
 	var $rendermode = "normal";
+	var $multipart = false;
 
 	function Form ($name, $formdata, $helpsteps = null, $buttons = null, $rendermode = "normal") {
 		$this->name = $name;
@@ -364,10 +365,12 @@ class Form {
 		
 		if (!$ignorelibraries)
 			$str .= $this->renderJavascriptLibraries();
-		
+
+		$enctype = ($this->multipart) ? ' enctype="multipart/form-data"' : '';
+
 		$str .= '
 		<div class="newform_container cf">
-		<form class="newform" id="'.$this->name.'" name="'.$this->name.'" method="POST" action="'.$posturl.'">
+		<form class="newform" id="'.$this->name.'" name="'.$this->name.'" method="POST" action="'.$posturl.'"' . $enctype . '>
 		<!--[if IE]><input type="text" style="display: none;" disabled="disabled" size="1" /><![endif]-->
 		<input name="'.$this->name.'-formsnum" type="hidden" value="' . $this->serialnum . '">
 		<table summary="Form" class="form_table" ><tr><td valign="top"> <!-- FORM CONTENT -->';

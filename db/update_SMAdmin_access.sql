@@ -57,6 +57,7 @@ INSERT INTO `permission` (accessid,name,value) VALUES
 						 (@smaccessid, 'monitorevent', '1'),
 						 (@smaccessid, 'monitorsystemwideevent', '1'),
 						 (@smaccessid, 'createstationery', '1'),
-						 (@smaccessid, 'forcestationery', '0');
+						 (@smaccessid, 'forcestationery', '0'),
+						 (@smaccessid, 'canpdfburst', '1');
 $$$
 						

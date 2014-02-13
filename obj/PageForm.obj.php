@@ -10,6 +10,25 @@
  */
 abstract class PageForm extends PageBase {
 
+	public $form = null; // This is where the Form.obj will be instantiated
+	public $formName = 'theform'; // This needs to be overridden if a given page has more than one form
+
+	function __construct($options = array()) {
+
+		// Layer in support for 'validators' as options for Form-based pages
+		$newoptions = array(
+			'validators' => array()
+		);
+
+		// Then merge defaults with the options provided
+		if (is_array($options) && count($options)) {
+			$newoptions = array_merge($newoptions, $options);
+		}
+
+		parent::__construct($newoptions);
+	}
+
+
 	/**
 	 * Load base data needed to handle submission
 	 *
@@ -22,18 +41,6 @@ abstract class PageForm extends PageBase {
 	 * be nothing left to be discovered to save the submitted data.
 	 */
 	function load() {
-
-		// By default this method instantiates an empty form; the
-		// derived class must implement this method to show a useful
-		// form.
-		if (strlen($this->options['formname'])) {
-
-			// Initialize some bogus data
-			$formdata = $helpsteps = $buttons = array();
-
-			// And instantiate a form object
-			$this->form = new TemplateForm($this->options['formname'], $formdata, $helpsteps, $buttons, 'vertical');
-		}
 	}
 
 	/**
@@ -41,18 +48,10 @@ abstract class PageForm extends PageBase {
 	 *
 	 * Anything after loading the base data necessary for form submission
 	 * and related to the actual process of submitting the form goes here.
-	 *
-	 * This method *may* be overridden, however its function is so basic
-	 * that in most cases it will probably suffice as is. It will likely
-	 * need an override for anypage that has more than one form on it...
 	 */
 	function afterLoad() {
-		// If we have a primary form
-		if (strlen($this->options['formname'])) {
-
-			// Submit the form (if it is a submission!)
-			$this->form->handleRequest(); // Calls $this->form->handleSubmit()
-		}
+		// Submit the form (if it is a submission!)
+		$this->form->handleRequest();
 	}
 
 	/**

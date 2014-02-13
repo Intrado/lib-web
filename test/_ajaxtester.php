@@ -422,12 +422,6 @@ testcaseData['ASSERT FALSE--ajax.php?type=persondatavalues&fieldnum=$_SESSION'] 
 testcaseData['ajax.php?type=persondatavalues&fieldnum=f01'] = '';
 testcaseData['ajax.php?type=persondatavalues&fieldnum=f06'] = '';
 testcaseData['ajax.php?type=rulewidgetsettings'] = '';
-testcaseData['ASSERT FALSE--ajax.php?type=previewmessage'] = '';
-testcaseData['ASSERT FALSE--ajax.php?type=previewmessage&id'] = '';
-testcaseData['ASSERT FALSE--ajax.php?type=previewmessage&id='] = '';
-testcaseData['ASSERT FALSE--ajax.php?type=previewmessage&id=???\';;;'] = '';
-testcaseData['ASSERT FALSE--ajax.php?type=previewmessage&id=$_SESSION'] = '';
-testcaseData['ajax.php?type=previewmessage&id=1'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=messagefields'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=messagefields&id'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=messagefields&id='] = '';

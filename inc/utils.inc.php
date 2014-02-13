@@ -550,11 +550,35 @@ function resequence($objectarray, $field){
 //fetch destination labels and store them into a static array
 function fetch_labels($type, $sequence, $refresh=false){
 	static $labels = array();
-	if(isset($labels[$type][$sequence]) && !$refresh)
-		return $labels[$type][$sequence];
+	static $maxtypes = null;
+	if ($maxtypes == null) {
+		$maxtypes = array();
+		$settings = QuickQueryList("select name, value from setting where organizationid is null and name in ('maxphones', 'maxemails', 'maxsms')", true);
+		foreach ($settings as $name => $value) {
+			switch ($name) {
+				case 'maxphones':
+					$maxtypes['phone'] = $value;
+					break;
+				case 'maxemails':
+					$maxtypes['email'] = $value;
+					break;
+				case 'maxsms':
+					$maxtypes['sms'] = $value;
+					break;
+			}
+		}
+	}
+	// prevent division by zero, where the max is zero or unset
+	if (!$maxtypes[$type])
+		return "";
 
-	$labels[$type][$sequence] = QuickQuery("select label from destlabel where type = ? and sequence = ?", false, array($type, $sequence));
-	return $labels[$type][$sequence];
+	// mod the sequence against the max value for this type (might be an appended person's contact data)
+	$actualSequence = ($sequence % $maxtypes[$type]);
+	if(isset($labels[$type][$actualSequence]) && !$refresh)
+		return $labels[$type][$actualSequence];
+
+	$labels[$type][$actualSequence] = QuickQuery("select label from destlabel where type = ? and sequence = ?", false, array($type, $actualSequence));
+	return $labels[$type][$actualSequence];
 }
 
 function destination_label($type, $sequence){

@@ -441,7 +441,6 @@ class PreviewModal {
 						} else {
 							if (post_parameters && typeof(post_parameters) != 'undefined' && typeof(post_parameters.subtype) != 'undefined' ) {
 								var iframe = $("<iframe/>", {src: "blank.html"});
-console.log('here!');
 								iframe.attr('id', 'preview_iframe');
 								iframe.attr('data-msie-height-hack', '122');
 								body.html(iframe);

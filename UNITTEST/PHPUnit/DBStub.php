@@ -39,6 +39,8 @@ class QueryRules {
 	 * a query
 	 * @param array $args When three arguments are passed, the second is an
 	 * indexed array of arguments to be injected into a parameterized query
+	 *
+	 * @return string the unique "rule key" for this rule
 	 */
 	public function add() {
 
@@ -71,15 +73,31 @@ class QueryRules {
 		else {
 			// Add a new rule for this key
 			$this->rules[$rulekey] = array(
+				'rulekey' => $rulekey,
 				'pattern' => $pattern,
 				'data' => array($data),
-				'dataptr' => 0
+				'dataptr' => 0,
+				'hits' => 0,
+				'args' => $args
 			);
 		}
+
+		return($rulekey);
 	}
 
 	/**
 	 * Helper function to make a distinct rulekey for each query pattern / argument set supplied
+	 *
+	 * @param string $pattern A regular expression pattern that matches the
+	 * query of interest; note that parameterized queries will NOT have data
+	 * inserted into them when the pattern is applied, so make sure to leave
+	 * the '?' intact
+	 * @param array $args When three arguments are passed, the second is an
+	 * indexed array of arguments to be injected into a parameterized query
+	 *
+	 * @return string The "rule key" is a combination of the pattern and the
+	 * supplied arguments making the response to this query uniform any time
+	 * it is applied with a matching pattern/argument set.
 	 */
 	private function makeRulekey($pattern, $args) {
 
@@ -99,38 +117,79 @@ class QueryRules {
 	 *
 	 * @param string $query The SQL query that we want to match against all
 	 * our rules' patterns
+	 * @param array $args When three arguments are passed, the second is an
+	 * indexed array of arguments to be injected into a parameterized query
 	 *
 	 * @return array Data associated with whatever pattern matches first, or
 	 * an empty array if there were no pattern matches
 	 */
 	public function apply($query, $args = array()) {
 
-		// For each rule defined...
-		if (count($this->rules)) {
+		// If there is a rulekey for this query/args combination
+		if (false !== ($rulekey = $this->findMatchingRuleKey($query, $args))) {
 
-			foreach ($this->rules as $rulekey => $rule) {
+			// Get the data for this rule at its current data pointer location
+			$data = $this->rules[$rulekey]['data'][$this->rules[$rulekey]['dataptr']];
 
-				// If the pattern matches this query...
-				if (preg_match($rule['pattern'], $query, $matches)) {
-		
-					// And if the distinct rule key matchs the supplied arguments
-					if ($rulekey == $this->makeRulekey($rule['pattern'], $args)) {
+			// Advance the data pointer location in a looping fashion
+			$this->rules[$rulekey]['dataptr'] = ($this->rules[$rulekey]['dataptr'] + 1) % count($this->rules[$rulekey]['data']);
 
-						// Get the data for this rule at its current data pointer location
-						$data = $rule['data'][$rule['dataptr']];
+			// Increment the hit count for this rule
+			$this->rules[$rulekey]['hits']++;
 
-						// Advance the data pointer location in a looping fashion
-						$rule['dataptr'] = ($rule['dataptr'] + 1) % count($rule['data']);
-
-						return($data);
-					}
-				}
-			}
+			return($data);
 		}
 
 		// Well, no rules matched, so empty array data result it is
 		print("QueryRules::apply() - No rule matching query: [{$query}]\nargs: " . print_r($args, true) ."\n\n");
 		return(array());
+	}
+
+	/**
+	 * Get the cuttent hit count for the number of times apply() has landed
+	 * on this query/args combo
+	 *
+	 * @param string $rulekey The unique rule key that f.add() returns
+	 * for the query that we are interested in.
+	 *
+	 * @return mixed Integer count of hits for the matching query/args
+	 * combination or boolean false if there was no match in the rules
+	 */
+	public function getHits($rulekey) {
+		if (! isset($this->rules[$rulekey])) return(false);
+		return($this->rules[$rulekey]['hits']);
+	}
+
+	/**
+	 * Find the rule, if any, matching this query
+	 *
+	 * @param string $query The SQL query that we want to match against all
+	 * our rules' patterns
+	 * @param array $args When three arguments are passed, the second is an
+	 * indexed array of arguments to be injected into a parameterized query
+	 *
+	 * @return mixed String representation of the rulekey whose pattern/args
+	 * match the supplied query/args, or boolean false if there was no match
+	 * in the rules
+	 */
+	private function findMatchingRuleKey($query, $args = array()) {
+
+		if (! count($this->rules)) return(false);
+
+		// For each rule defined...
+		foreach ($this->rules as $rulekey => $rule) {
+
+			// If the pattern matches this query...
+			if (preg_match($rule['pattern'], $query, $matches)) {
+	
+				// And if the distinct rule key matchs the supplied arguments
+				if ($rulekey == $this->makeRulekey($rule['pattern'], $args)) {
+					return($rulekey);
+				}
+			}
+		}
+
+		return(false);
 	}
 }
 
@@ -188,9 +247,19 @@ function Query($query, $dbconnect=false, $args=false) {
 
 function QuickQuery($query, $dbconnect=false, $args=false) {
 	global $queryRules;
-	return(new QueryResult($queryRules->apply($query, $args)));
+	$queryResult = new QueryResult($queryRules->apply($query, $args));
+	$row = $queryResult->fetch(PDO::FETCH_NUM);
+	$value = $row[0];
+	return($value);
 }
 
+function QuickQueryMultiRow($query, $assoc = false, $dbconnect = false, $args = false) {
+	global $queryRules;
+	$queryResult = new QueryResult($queryRules->apply($query, $args));
+	$list = array();
+	while ($row = $queryResult->fetch($assoc ? PDO::FETCH_ASSOC : PDO::FETCH_NUM)) $list[] = $row;
+	return($list);
+}
 
 // functions lifted verbatim from db.inc.php
 

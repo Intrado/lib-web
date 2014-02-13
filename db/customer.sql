@@ -2269,17 +2269,156 @@ $$$
 -- START 10.0/6
 update setting set value='10.0/6' where name='_dbversion'
 $$$
-alter table `burst` drop column `pagesskipstart`;
+alter table `burst` drop column `pagesskipstart`
 $$$
-alter table `burst` drop column `pagesskipend`;
+alter table `burst` drop column `pagesskipend`
 $$$
-alter table `burst` drop column `pagesperreport`;
+alter table `burst` drop column `pagesperreport`
 $$$
-alter table `bursttemplate` add column `pagesskipstart` int(3) default 0 after `y`;
+alter table `bursttemplate` add column `pagesskipstart` int(3) default 0 after `y`
 $$$
-alter table `bursttemplate` add column `pagesskipend` int(3) default 0 after `pagesskipstart`;
+alter table `bursttemplate` add column `pagesskipend` int(3) default 0 after `pagesskipstart`
 $$$
-alter table `bursttemplate` add column `pagesperreport` int(3) default 1 after `pagesskipend`;
+alter table `bursttemplate` add column `pagesperreport` int(3) default 1 after `pagesskipend`
 $$$
 -- END 10.0/6
 
+-- START 10.1/1
+ALTER TABLE `bursttemplate` CHANGE `created` `createdtimestampms` BIGINT NULL DEFAULT NULL
+$$$
+
+update setting set value='10.1/1' where name='_dbversion'
+$$$
+-- END 10.1/1
+
+-- START 10.1/2
+
+ALTER TABLE `bursttemplate` 
+  CHANGE `name` `name` VARCHAR( 100 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
+  CHANGE `x` `x` DOUBLE( 12, 8 ) NOT NULL , 
+  CHANGE `y` `y` DOUBLE( 12, 8 ) NOT NULL ,
+  CHANGE `pagesskipstart` `pagesskipstart` INT( 3 ) NOT NULL DEFAULT '0' ,
+  CHANGE `pagesskipend` `pagesskipend` INT( 3 ) NOT NULL DEFAULT '0' ,
+  CHANGE `pagesperreport` `pagesperreport` INT( 3 ) NOT NULL DEFAULT '1' ,
+  CHANGE `createdtimestampms` `createdtimestampms` BIGINT( 20 ) NOT NULL
+$$$
+
+ALTER TABLE `burst` 
+  CHANGE `contentid` `contentid` BIGINT( 20 ) NOT NULL ,
+  CHANGE `bytes` `bytes` BIGINT( 20 ) NOT NULL ,
+  ADD INDEX `userid` ( `userid` , `name` , `deleted` )
+$$$
+
+update setting set value='10.1/2' where name='_dbversion'
+$$$
+-- END 10.1/2
+
+-- START 10.1/3
+
+ALTER TABLE `burst`
+  CHANGE `bytes` `size` BIGINT( 20 ) NOT NULL ,
+  DROP `totalpagesfound`,
+  DROP `actualreportscount`
+$$$
+
+update setting set value='10.1/3' where name='_dbversion'
+$$$
+-- END 10.1/3
+
+-- START 10.1/4
+update setting set value='10.1/4' where name='_dbversion'
+$$$
+-- END 10.1/4
+
+-- START 10.1/5
+update setting set value='10.1/5' where name='_dbversion'
+$$$
+-- END 10.1/5
+
+-- START 10.1/6
+update setting set value='10.1/6' where name='_dbversion'
+$$$
+-- END 10.1/6
+
+-- START 10.1/7
+CREATE TABLE `cmafeedcategory` (
+  `feedcategoryid` int(11) NOT NULL,
+  `cmacategoryid` int(11) NOT NULL,
+  PRIMARY KEY (`feedcategoryid`,`cmacategoryid`),
+  KEY `feedcategoryid` (`feedcategoryid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
+update setting set value='10.1/7' where name='_dbversion'
+$$$
+-- END 10.1/7
+
+-- START 10.1/8
+CREATE TABLE IF NOT EXISTS `contentattachment` (
+	`id` int(11) NOT NULL AUTO_INCREMENT,
+	`contentid` bigint(20) NOT NULL,
+	`filename` varchar(255) NOT NULL,
+	`size` int(11) NOT NULL,
+	PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
+
+CREATE TABLE IF NOT EXISTS `burstattachment` (
+	`id` int(11) NOT NULL AUTO_INCREMENT,
+	`burstid` int(11) NOT NULL,
+	`filename` varchar(255) NOT NULL,
+	PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
+
+ALTER TABLE `messageattachment` ADD `type` ENUM( 'content', 'burst' ) NOT NULL ,
+	ADD `contentattachmentid` INT NULL DEFAULT NULL ,
+	ADD `burstattachmentid` INT NULL DEFAULT NULL
+$$$
+
+update setting set value='10.1/8' where name='_dbversion'
+$$$
+-- END 10.1/8
+
+-- START 10.1/9
+ALTER TABLE `messageattachment`
+	DROP `contentid`,
+	DROP `filename`,
+	DROP `size`
+$$$
+
+update setting set value='10.1/9' where name='_dbversion'
+$$$
+-- END 10.1/9
+
+-- START 10.1/10
+update setting set value='10.1/10' where name='_dbversion'
+$$$
+-- END 10.1/10
+
+-- START 10.1/11
+ALTER TABLE `burstattachment` ADD `secretfield` VARCHAR( 32 ) NOT NULL
+$$$
+update setting set value='10.1/11' where name='_dbversion'
+$$$
+-- END 10.1/11
+
+-- START 10.1/12
+ALTER TABLE `reportcontact` CHANGE `sequence` `sequence` SMALLINT NOT NULL
+$$$
+update setting set value='10.1/12' where name='_dbversion'
+$$$
+-- END 10.1/12
+
+-- START 10.1/13
+ALTER TABLE `reportemaildelivery` CHANGE `sequence` `sequence` SMALLINT NULL DEFAULT NULL
+$$$
+ALTER TABLE `reportemailtracking` CHANGE `sequence` `sequence` SMALLINT NOT NULL
+$$$
+update setting set value='10.1/13' where name='_dbversion'
+$$$
+-- END 10.1/13
+
+-- START 10.1/14
+update setting set value='10.1/14' where name='_dbversion'
+$$$
+-- END 10.1/14

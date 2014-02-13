@@ -313,6 +313,14 @@ _L('Advanced %s Options', getJobTitle()),
 		"control" => array("CheckBox"),
 		"helpstep" => 5
 	),
+	"canpdfburst" => array(
+		"label" => _L('Create Secure Document Delivery'),
+		"fieldhelp" => _L('Allows users to upload and send secure documents.'),
+		"value" => $obj->getValue("canpdfburst"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 5
+	),
 	"survey" => array(
 		"label" => _L('Create Surveys'),
 		"fieldhelp" => _L('Allows users to build surveys and collect responses via phone and email.'),
@@ -528,12 +536,12 @@ _L('Systemwide View Options'),
 	_L('Choose how you want users with this profile to be able to access the system. Then select whether they should be able to edit their own account information or not.'),
 	_L('Select whether or not this profile will display current job statistics on the start page.').'<br><br>'._L('You may also choose to display the shortcuts menu, allowing users to quickly access the most common tasks.'),
 	_L('Select the combination of messaging options most appropriate for the users of this profile. Click on the individual options for more information about their functions.'),
-	_L('Users can send one time jobs by default. This section allows you to enable repeating job and survey creation. You can also limit the number of days a job can run and allow users to change their Caller ID.'),
+	_L('This section allows you to enable additional Broadcast options, beyond the ability to send single Broadcasts. Repeating Broadcasts allow users to create a regularly scheduled Broadcast, such as an attendance message. Secure Document Delivery enables the ability to upload and distribute individual PDF files from a large PDF file, such as automatically generated report cards. Enabling surveys allows users to create phone and web based surveys. You may also limit the number of days a Broadcast can run and allow users to change their Caller ID.'),
 	_L('This section determines whether the user can create and edit lists as well as the types of lists they can create. Enabling Create & Edit Lists does not allow users to contact people outside of their restrictions.').'<br><br>'._L('Uploading lists by ID number allows users to create lists of ID numbers, referencing contacts that exist in the database.').'<br><br>'._L('Uploading lists by contact data will let users create lists from CSV files containing any contact information, regardless of whether the contact exists in the database. This method allows users to contact anyone they upload to their address book.'),
 	_L('Select the object types the user can subscribe to or publish.'),
 	_L('Select the fields users should be able to see. They can use these fields for lists, messages, and reports. Leave everything blank to allow unlimited access.').'<br><br>'._L('You may also use this section to allow access to the Contacts Tab and allow users to edit contact details.'),
 	_L('Choose whether the user can create reports or not.'),
-	_L('Choose whether the user can monitor events like job sent and/or completed.'),
+	_L('Choose whether the user can monitor events such as Broadcasts which were sent or completed.'),
 	_L('The options in this section control views of all of the activity in the system.')
 );
 	
@@ -740,7 +748,7 @@ $quicktip_formdata = array(
 	_L('QuickTip Controls'),
 	"taicanbetopicrecipient" => array(
 		"label" => _L('Topic Recipient'),
-		"fieldhelp" => _L('Allows users to receive Quick Tip messages.'),
+		"fieldhelp" => _L('Allows users to receive Quick Tip messages. IMPORTANT: Users with this enabled will receive an email each time a tip is submitted.'),
 		"value" => $obj->getValue("tai_canbetopicrecipient"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
@@ -757,7 +765,7 @@ $quicktip_formdata = array(
 );
 
 $quicktip_helpsteps = array(
-	_L('Use these options to configure how users with this profile may interact with the Quick Tip feature. You may give users permission to receive Quick Tip messages with the Topic Recipient option. Users may create or delete Quick Tip topics categories with the Manage Topics option.'));
+	_L('Use these options to configure how users with this profile may interact with the Quick Tip feature. You may give users permission to receive Quick Tip messages with the Topic Recipient option. Important: Users who are topic recipients will be emailed each time a tip is submitted. Users may create or delete Quick Tip topics categories with the Manage Topics option.'));
 
 if (hasProduct('tai')) {
 	$formdata = array_merge($formdata, $tai_formdata);
@@ -870,6 +878,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$obj->setPermission("subscribe", $subscribed);
 			$obj->setPermission("datafields", $allowedfields);
 			$obj->setPermission("createrepeat", (bool)$postdata['createrepeat']);
+			$obj->setPermission("canpdfburst", (bool)$postdata['canpdfburst']);
 			$obj->setPermission("maxjobdays", $postdata['maxjobdays']);
 			$obj->setPermission("blocknumbers", $postdata['callblockingperms'] != "none");
 			$obj->setPermission("callblockingperms", $postdata['callblockingperms']);

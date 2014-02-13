@@ -19,13 +19,31 @@ class TipsTest extends PHPUnit_Framework_TestCase {
 	const USER_ID = 1;
 	const ACCESS_ID = 3;
 
+        /**
+	 * Before any tests run, before we even include the source file for the class under test
+	 * we may want to prepare some things that the file depends on such as environment variables
+	 * and such things that are normally set under an Apache context before loading...
+	 */
+	public static function setUpBeforeClass() {
+		global $queryRules;
+
+		// 1) Hit the reset switch!
+		$queryRules->reset();
+	}
+
 	public function test_isAuthorized() {
 		global $queryRules, $USER;
 
 		// Make some query rules:
 
 		// 1) The getCustomerSetting('_hasquicktip') query
-		$queryRules->add('/select value from setting where name = ?/', array('_hasquicktip'), 0);
+		$queryRules->add('/select value from setting where name = ?/', array('_hasquicktip'),
+			array(
+				array(
+					1
+				)
+			)
+		);
 
 		// 2) The user DBMO initialization query for userID=1
 		$queryRules->add('/from user where id/', array(self::USER_ID),
@@ -66,10 +84,10 @@ class TipsTest extends PHPUnit_Framework_TestCase {
 		$queryRules->add('/from permission where accessid/',
 			array(
 				array(
-					1,
-					self::ACCESS_ID,
-					'tai_canbetopicrecipient',
-					1
+					'id' => 1,
+					'accessid' => self::ACCESS_ID,
+					'name' => 'tai_canbetopicrecipient',
+					'value' => 1
 				)
 			)
 		);

@@ -457,4 +457,13 @@ class ReldateOptions extends FormItem {
 	}
 }
 
+// TODO - "someone" should check into why onchange is needed as a custom implementation here instead of using the native browser change event which seems not to occur on the file input types; anything we can improve?
+class FileUpload extends FormItem {
+	function render ($value) {
+		$n = $this->form->name."_".$this->name;
+		$str = '<input type="file" id='.$n.' name="'.$n.'" onchange="form_do_validation($(\'' . $this->form->name . '\'), $(\'' . $n . '\'));"/>';
+		return $str;
+	}
+}
+
 ?>

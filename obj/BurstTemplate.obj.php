@@ -5,6 +5,9 @@ class BurstTemplate extends DBMappedObject {
 	var $name;
 	var $x;
 	var $y;
+	var $pagesskipstart;
+	var $pagesskipend;
+	var $pagesperreport;
 	var $created;
 	var $deleted;
 

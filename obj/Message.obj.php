@@ -6,7 +6,7 @@ class Message extends DBMappedObject {
 	var $name;
 	var $description;
 	var $data = ""; // Serialized header data.
-	var $type;
+	var $type; //enum('phone', 'email', 'print', 'sms', 'post')
 	var $subtype; // phone => 'voice'; email => 'html'; 'plain'; sms => 'plain'
 	var $autotranslate; // 'none', 'source', 'translated', 'overridden'
 	var $modifydate;
@@ -77,32 +77,105 @@ class Message extends DBMappedObject {
 			$part->create();
 		}
 		// copy the attachments
-		QuickUpdate("insert into messageattachment (messageid,contentid,filename,size) " .
-		"select $newmessage->id, ma.contentid, ma.filename, ma.size " .
-		"from messageattachment ma where ma.messageid=$this->id");
+		$contentAttachments = $this->getContentAttachments();
+		foreach ($contentAttachments as $contentAttachment) {
+			// call create to generate a new attachment record which is a copy of the existing one
+			$contentAttachment->create();
+			$messageAttachment = new MessageAttachment();
+			$messageAttachment->messageid = $newmessage->id;
+			$messageAttachment->type = 'content';
+			$messageAttachment->contentattachmentid = $contentAttachment->id;
+			$messageAttachment->create();
+		}
+		$burstAttachments = $this->getBurstAttachments();
+		foreach ($burstAttachments as $burstAttachment) {
+			// call create to generate a new attachment record which is a copy of the existing one
+			$burstAttachment->create();
+			$messageAttachment = new MessageAttachment();
+			$messageAttachment->messageid = $newmessage->id;
+			$messageAttachment->type = 'burst';
+			$messageAttachment->burstattachmentid = $burstAttachment->id;
+			$messageAttachment->create();
+		}
 		
 		return $newmessage;
 	}
 
-	function createMessageAttachments($emailattachments) {
-		if ($this->type != 'email')
-			return null;
-			
-		$messageattachments = array();
-		
-		foreach($emailattachments as $contentid => $attachment) {
+	/**
+	 * @return MessageAttachment[]|bool
+	 */
+	function getMessageAttachments() {
+		return DBFindMany("MessageAttachment", "from messageattachment where messageid = ?", null, array($this->id));
+	}
+
+	/**
+	 * @return ContentAttachment[]|bool
+	 */
+	function getContentAttachments() {
+		return DBFindMany("ContentAttachment", "from messageattachment ma
+				inner join contentattachment ca on (ma.contentattachmentid = ca.id) where ma.messageid = ? and ma.type = 'content'",
+				"ca", array($this->id));
+	}
+
+	/**
+	 * @return BurstAttachment[]|bool
+	 */
+	function getBurstAttachments() {
+		return DBFindMany("BurstAttachment", "from messageattachment ma
+				inner join burstattachment ba on (ma.burstattachmentid = ba.id) where ma.messageid = ? and ma.type = 'burst'",
+			"ba", array($this->id));
+	}
+
+	/**
+	 * @param array() $emailattachments  looks like array(<contentid>: array("name": <filename>, "size": <file size>))
+	 */
+	function createContentAttachments($emailattachments) {
+		if ($this->type != 'email' && $this->type != 'post')
+			return;
+
+		foreach ($emailattachments as $cid => $details) {
+			$contentAttachment = new ContentAttachment();
+			$contentAttachment->contentid = $cid;
+			$contentAttachment->filename = $details['name'];
+			$contentAttachment->size = $details['size'];
+			$contentAttachment->create();
+
 			$msgattachment = new MessageAttachment();
 			$msgattachment->messageid = $this->id;
-			$msgattachment->contentid = $contentid;
-			$msgattachment->filename = $attachment['name'];
-			$msgattachment->size = $attachment['size'];
-			
+			$msgattachment->type = 'content';
+			$msgattachment->contentattachmentid = $contentAttachment->id;
 			$msgattachment->create();
-			
-			$messageattachments[] = $msgattachment;
 		}
-		
-		return $messageattachments;
+	}
+
+	/**
+	 * Replaces existing content based attachments with those passed into this method
+	 *
+	 * @param array() $attachments looks like array(<contentid>: array("name": <filename>, "size": <file size>))
+	 */
+	function replaceContentAttachments($attachments) {
+		if ($this->type != 'email' && $this->type != 'post')
+			return;
+
+		$messageAttachments = $this->getMessageAttachments();
+		$contentAttachments = $this->getContentAttachments();
+
+		// remove existing attachments
+		foreach ($contentAttachments as $id => $contentAttachment) {
+			if (isset($attachments[$contentAttachment->contentid])) {
+				// unset from the attachments array, it's already in the DB
+				unset($attachments[$contentAttachment->contentid]);
+			} else {
+				// no longer a desired attachment, remove it and it's parent
+				foreach ($messageAttachments as $ma_id => $messageAttachment){
+					if ($messageAttachment->contentattachmentid == $id)
+						$messageAttachment->destroy();
+				}
+				$contentAttachment->destroy();
+			}
+		}
+		// create new attachments
+		$this->createContentAttachments($attachments);
 	}
 	
 	// Updates the first message part with a voiceid, keeping the language the same, only changing the gender.

@@ -17,36 +17,59 @@
 class application_AllTests {
 	public static function suite() {
 
-		// List of test classes to include; TODO: expand as needed:
-		$classes = Array(
-			//'FailSampleTest', // TODO - activate this line if you want to see the CI server catch an error and stop the build process.
-			'ValTranslationLengthTest',
-			'EasyCallTest',
-			//'HeadersTest', // TODO - this test is disabled because PHP has a bug in headers_list(), and we don't have the alternative apache_request_headers() compiled in; fix one or the other
-			'ReportClassroomMessagingTest',
-			'FormattersTest',
-			'TopicDataFormatterTest',
-			'TopicDataManagerTest',
-			'TipsTest'
+		// List of test classes to exclude
+		$exceptions = Array(
+			'FailSampleTest'	// TODO - disable this exception if you want to see the CI server catch an error and stop the build process.
 		);
-
-		$classdir = dirname(__FILE__);
 
 		// Create a new test suite
 		$suite = new PHPUnit_Framework_TestSuite('PHPUnit Application');
 
-		if (count($classes)) foreach ($classes as $class) {
+		// Get a list of all the files in this directory (includes ourself, so watch it!)
+		$classdir = dirname(__FILE__);
+		$testclasses = self::get_file_list($classdir);
+		if ($testclasses === false) die("Failed to open log file dir [{$classdir}]\n\n");
+		if (! count($testclasses)) die("Didn't find any files in logdir [{$classdir}]\n\n");
+		sort($testclasses, SORT_STRING);
+
+		foreach ($testclasses as $testclass) {
+			// We expect the classname to be the same as the filename sans extension
+			$classname = substr($testclass, 0, strlen($testclass) - 4);
+			print "class: {$testclass} -> {$classname} ... ";
+			if (in_array($classname, $exceptions)) {
+				print "SKIPPING!\n";
+				continue;
+			}
+			print "ADDING to test suite...\n";
 
 			// Include individual test classes that are to be part of the suite
-			require_once("{$classdir}/{$class}.php");
+			require_once("{$classdir}/{$testclass}");
 
 			// Add each individual test class to this test suite
-			$suite->addTestSuite($class);
-
+			$suite->addTestSuite($classname);
 		}
 
 		// Then return the whole suite
 		return($suite);
+	}
+
+	public static function get_file_list($dir) {
+		$fileset = array();
+
+		if (! ($dh = opendir($dir))) return(false);
+		while (($filename = readdir($dh)) !== false) {
+
+			// Skip "hidden" files beginning with a '.'
+			if ($filename{0} == '.') continue;
+
+			// And skip anything not ending with '*Test.php' (which includes ourselves)
+			if (strpos($filename, 'Test.php') === false) continue;
+
+			array_push($fileset, $filename);
+		}
+		closedir($dh);
+
+		return($fileset);
 	}
 }
 ?>
