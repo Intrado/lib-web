@@ -318,7 +318,7 @@ class TipSubmissionHandler {
 		<html lang="en">
 			<head>
 				<meta charset="utf-8">
-				<title>Quick Tip - '. ((isset($this->message)) ? 'Thank You for the Tip!' : 'Submit an Annoymous Tip') .' - Powered by '.$this->productName.'</title>
+				<title>Quick Tip - '. ((isset($this->message)) ? 'Thank You for the Tip!' : 'Submit an Anonymous Tip') .' - Powered by '.$this->productName.'</title>
 				<link rel="stylesheet" type="text/css" href="tip.css">
 			</head>
 			<body>		
