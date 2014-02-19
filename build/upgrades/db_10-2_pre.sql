@@ -7,4 +7,11 @@ CREATE TABLE `feedcategorytype` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
 
+-- $rev 2
+
+ALTER TABLE `messagepart` CHANGE `type` `type` ENUM( 'A', 'T', 'V', 'I', 'MAL' ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'A',
+  ADD `messageattachmentid` INT NULL AFTER `imagecontentid`
+$$$
+
+
 

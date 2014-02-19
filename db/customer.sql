@@ -2437,3 +2437,13 @@ update setting set value='10.2/1' where name='_dbversion'
 $$$
 -- END 10.2/1
 
+-- START 10.2/2
+
+ALTER TABLE `messagepart` CHANGE `type` `type` ENUM( 'A', 'T', 'V', 'I', 'MAL' ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'A',
+  ADD `messageattachmentid` INT NULL AFTER `imagecontentid`
+$$$
+
+update setting set value='10.2/2' where name='_dbversion'
+$$$
+-- END 10.2/2
+
