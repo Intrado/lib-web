@@ -27,6 +27,10 @@ function stub_header($text) {
 	$HEADERS[] = $text;
 }
 
+function stub_error_log($msg) {
+	// Nothing. just eat it
+}
+
 if (! dl('runkit.so')) {
 	print "ERROR in PhpStub.php - runkit could not be loaded dynamically!\n";
 }
@@ -34,6 +38,8 @@ if (! dl('runkit.so')) {
 if (function_exists('runkit_function_rename')) {
 	runkit_function_rename('header', 'orig_header');
 	runkit_function_rename('stub_header', 'header');
+	runkit_function_rename('error_log', 'orig_error_log');
+	runkit_function_rename('stub_error_log', 'error_log');
 }
 else {
 	print "ERROR in PhpStub.php - it looks like PECL runkit is not installed! Check out the code comments here.\n";
