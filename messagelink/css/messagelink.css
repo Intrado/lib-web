@@ -1,0 +1,106 @@
+body {
+    background: #fff;
+}
+
+#header {
+    background: linear-gradient(to bottom, #08c, #08c);
+    height: 60px;
+    color: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+#header #brand {
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 12px;
+    letter-spacing: -1px;
+}
+#header #brand-sub {
+    font-size: 14px;
+    font-weight: bold;
+    margin-top: 20px;
+}
+#header-summary-container {
+    /*background: #444;*/
+    border-bottom: 1px solid #ededed;
+    color: #777;
+}
+.circle-wrapper {
+    background: #eee;
+    height: 100px;
+    width: 100px;
+    border-radius: 50%;
+}
+.circle-wrapper .circle-icon {
+    color: #fff;
+    margin-top: 19px;
+    margin-left: 29px;
+    opacity: 0.8;
+}
+#header-summary-container .col-xs-2 {
+    padding-top: 40px;
+    font-size: 48px;
+}
+#email-details-table td.email-field {
+    text-align: right;
+}
+#email-details-table td.email-field:nth-child(1) {
+    width: 80px;
+}
+#email-details-table {
+    margin-top: 20px;
+}
+#email-details-table .recipient {
+    font-size: 24px;
+    height: 56px;
+}
+#email-details-table td.email-detail {
+    font-weight: bold;
+}
+#email-details-table td.email-detail .text-muted, #email-details-table td.email-detail .normal {
+    font-weight: normal;
+}
+#email-details-table.table thead > tr > th,
+#email-details-table.table tbody > tr > th,
+#email-details-table.table tfoot > tr > th,
+#email-details-table.table thead > tr > td,
+#email-details-table.table tbody > tr > td,
+#email-details-table.table tfoot > tr > td {
+    border-top: 0;
+}
+#password-container {
+    padding-top: 40px;
+}
+.well {
+    border-radius: 6px;
+    padding: 40px;
+}
+.well .instruction {
+    font-size: 16px;
+}
+#secure-document-wrapper {
+    border-bottom: 1px solid #ccc;
+    border-top: 1px solid #ccc;
+    padding: 20px 0;
+    margin: 20px 0;
+}
+#secure-document-wrapper #filename {
+    font-weight: bold;
+    font-size: 16px;
+    margin: 0 15px;
+}
+#forgot-password {
+    margin-top: 10px;
+}
+#contentWrapper {
+    z-index: 10;
+}
+#footer {
+    background: #f5f5f5;
+    bottom: 0;
+    color: #999;
+    height: 80px;
+    padding-top: 47px;
+    position: absolute;
+    width: 100%;
+    z-index: 1;
+}
