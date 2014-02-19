@@ -120,7 +120,29 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 .newform .formcontrol .radiobox input[type="radio"],
 .newform .formcontrol .radiobox input[type="checkbox"] { margin: 0 5px 0 0; }
 
-.newform .formcontrol .multicheckbox { float: left; display: inline; width: 250px; padding: 1px 0 0; margin: 0 20px 0 0; }
+.multicheckbox { float: left; display: inline; width: 250px; padding: 1px 0 0; margin: 0 20px 0 0; }
+
+table.multicheckbox {
+	float: none;
+	display: table;
+	width: 100%;
+}
+.multicheckbox tbody tr{
+	cursor: pointer;
+}
+.multicheckbox tbody tr:hover{
+	background-color: #EEEEEE;
+}
+.multicheckbox th{
+	border-bottom: 1px solid #d3d3d3;
+	font-weight: bold;
+}
+.feedcategoryselector tbody td:first-child{
+	width: 20px;
+}
+.feedcategoryselector img.categorytype{
+	margin-right: 5px;
+}
 
 .newform .formcontrol #accessprofile_publish,
 .newform .formcontrol #accessprofile_subscribe,
@@ -148,7 +170,7 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 
 .newform select, .newform input { -webkit-transition: all 0.3s ease-out; -moz-transition: all 0.3s ease-out; -ms-transition: all 0.3s ease-out; -o-transition: all 0.3s ease-out; transition: all 0.3s ease-out; }
 
-.newform .MultiCheckbox { /*float: left; display: inline;*/ width: 250px; margin: 5px 0 0 0; padding: 7px 0 0; overflow-y:auto; 
+.newform .MultiCheckbox { /*float: left; display: inline;*/ width: 250px; margin: 5px 0 0 0; padding: 7px 0 0; overflow-y:auto;
 position: relative;}
 .newform .MultiCheckbox li { /*height: 25px;*/ }
 .newform .MultiCheckbox input[type="checkbox"] { f/*loat: left;*/ /* display: inline;*/ margin: 0 5px 0 0; }

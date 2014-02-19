@@ -5,11 +5,23 @@ class FeedCategory extends DBMappedObject {
 	var $description;
 	var $deleted = 0;
 
+	// local cache of mapped types
+	private $types = false;
+
 	function FeedCategory ($id = NULL) {
 		$this->_allownulls = true;
 		$this->_tablename = "feedcategory";
 		$this->_fieldlist = array("name", "description", "deleted");
 		DBMappedObject::DBMappedObject($id);
+	}
+
+	/** Get the types associated with this feed category
+	 * @return array of strings
+	 */
+	public function getTypes() {
+		if (!$this->types)
+			$this->types = QuickQueryList("select type from feedcategorytype where feedcategoryid = ?", false, false, array($this->id));
+		return $this->types;
 	}
 
 	// returns all allowed feed categories for the current user

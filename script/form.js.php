@@ -681,6 +681,21 @@ function form_do_hover(hovers) {
 	});
 }
 
+// Takes a json encoded object of id to hover text associations and adds protoTip hover helps
+function form_do_hover_by_selector(hovers) {
+	Object.keys(hovers).each(function(selector) {
+		$$(selector).each(function(element) {
+			element.style.cursor="help";
+			new Tip(element, hovers[selector], {
+				style: "protogrey",
+				stem: "bottomLeft",
+				hook: { tip: "bottomLeft", mouse: true },
+				offset: { x: 10, y: 0 }
+			});
+		});
+	});
+}
+
 // Gives visual clue of how many characters are left
 function form_count_field_characters(count,target,event) {
 	var e = event.element();
