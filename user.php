@@ -882,22 +882,23 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				foreach($postdata['surveytypes'] as $type)
 					QuickUpdate("insert into userjobtypes values (?, ?)", false, array($edituser->id, $type));
 			
-			// Feed Category settings
-			if (getSystemSetting("_hasfeed", false)) {
-				QuickUpdate("delete from userfeedcategory where userid =?", false, array($edituser->id));
-				if (isset($postdata['feedcategories']) && count($postdata['feedcategories'])) {
-					$fcargs = array();
-					$fcquery = "insert into userfeedcategory (userid, feedcategoryid) values ";
-					$fccount = 0;
-					foreach ($postdata['feedcategories'] as $fcid) {
-						if ($fccount++ > 0)
-							$fcquery .= ",";
-						$fcquery .= "(?,?)";
-						$fcargs[] = $edituser->id;
-						$fcargs[] = $fcid;
-					}
-					QuickUpdate($fcquery, false, $fcargs);
+		}
+
+		// Feed Category settings
+		if (getSystemSetting("_hasfeed", false)) {
+			QuickUpdate("delete from userfeedcategory where userid =?", false, array($edituser->id));
+			if (isset($postdata['feedcategories']) && count($postdata['feedcategories'])) {
+				$fcargs = array();
+				$fcquery = "insert into userfeedcategory (userid, feedcategoryid) values ";
+				$fccount = 0;
+				foreach ($postdata['feedcategories'] as $fcid) {
+					if ($fccount++ > 0)
+						$fcquery .= ",";
+					$fcquery .= "(?,?)";
+					$fcargs[] = $edituser->id;
+					$fcargs[] = $fcid;
 				}
+				QuickUpdate($fcquery, false, $fcargs);
 			}
 		}
 
