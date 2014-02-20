@@ -112,7 +112,8 @@ class MultiCheckBoxTable extends FormItem {
 					else
 						checkbox.attr("checked", "checked");
 					var form = checkbox.closest("form");
-					form_do_validation(form[0], checkbox[0])
+					// call validation with the native dom objects
+					form_do_validation(form[0], checkbox[0]);
 				}
 			})(jQuery);
 		</script>';

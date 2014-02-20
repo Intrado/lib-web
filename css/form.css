@@ -134,6 +134,7 @@ table.multicheckbox {
 	background-color: #EEEEEE;
 }
 .multicheckbox .header{
+	cursor: default;
 	border-bottom: 1px solid #d3d3d3;
 	font-weight: bold;
 }

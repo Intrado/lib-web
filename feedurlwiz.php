@@ -68,6 +68,7 @@ class FeedUrlWiz_feedoptions extends WizStep {
 		// Tack the "other" feeds not specifically restricted for this user onto the end of the list;
 		// This causes their restricted feeds to "float" to the top to make it easier for them to find
 		if ($otherfeedcategories && count($otherfeedcategories)) {
+			// insert a "false" id, to create a separator row
 			$feedcategories[0] = "";
 			foreach ($otherfeedcategories as $key => $feedcategory) {
 				$feedcategories[$key] = $feedcategory;
