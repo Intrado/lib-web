@@ -39,6 +39,8 @@ class FeedCategory extends DBMappedObject {
 			QuickUpdate("insert into feedcategorytype (feedcategoryid, type) values ". repeatWithSeparator("({$this->id}, ?)", ",", count($types)),
 				false, $types);
 		}
+		// reset the local cache
+		$this->types = false;
 	}
 
 	// returns all allowed feed categories for the current user
