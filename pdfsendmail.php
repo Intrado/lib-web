@@ -172,12 +172,6 @@ class PdfSendMail extends PageForm {
 			$message->stuffHeaders();
 			$message->create();
 
-			$messageParts = $message->parse($postData['messagebody']);
-			foreach ($messageParts as $messagePart) {
-				$messagePart->messageid = $message->id;
-				$messagePart->create();
-			}
-
 			// create attachment from burst
 			$burstAttachment = new BurstAttachment();
 			$burstAttachment->burstid = $this->burst->id;
@@ -195,6 +189,26 @@ class PdfSendMail extends PageForm {
 			$attachment->type = 'burst';
 			$attachment->burstattachmentid = $burstAttachment->id;
 			$attachment->create();
+
+			$messageParts = array();
+
+			$bodyPart = new MessagePart();
+			$bodyPart->type = "T";
+			$bodyPart->txt = $postData['messagebody'];
+			$messageParts[] = $bodyPart;
+
+			# create new MessagePart for Message Attachment Link (MAL) and append after messagebody
+			$malPart = new MessagePart();
+			$malPart->type = "MAL";
+			$malPart->messageattachmentid = $attachment->id;
+			$messageParts[] = $malPart;
+
+			$sequence = 0;
+			foreach ($messageParts as $messagePart) {
+				$messagePart->messageid = $message->id;
+				$messagePart->sequence = $sequence++;
+				$messagePart->create();
+			}
 
 			$list = new PeopleList();
 			$list->userid = $USER->id;
@@ -367,7 +381,7 @@ class PdfSendMail extends PageForm {
 			)
 		);
 
-		$form = new Form($this->formName, $formdata, $helpsteps, array( submit_button(_L(' Send Now'), 'send', 'tick')));
+		$form = new Form("pdfsendmail", $formdata, $helpsteps, array( submit_button(_L(' Send Now'), 'send', 'tick')));
 		$form->ajaxsubmit = true;
 
 		return($form);
