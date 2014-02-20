@@ -67,6 +67,7 @@ class MultiCheckBoxTable extends FormItem {
 			$firstColumn = '<input type="checkbox" value="'.escapehtml($checkvalue).'" '.($checked ? 'checked' : '').' name="'.$formItemName.'[]" />';
 			array_unshift($columns, $firstColumn);
 
+			$str .= '<tr class="hover">';
 			$columnCounter = 0;
 			foreach ($columns as $column) {
 				$hoverId = $formItemName.'-'.$counter++;
@@ -102,6 +103,8 @@ class MultiCheckBoxTable extends FormItem {
 						checkbox.removeAttr("checked");
 					else
 						checkbox.attr("checked", "checked");
+					var form = checkbox.closest("form");
+					form_do_validation(form[0], checkbox[0])
 				}
 			})(jQuery);
 		</script>';

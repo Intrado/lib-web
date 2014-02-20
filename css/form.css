@@ -130,7 +130,7 @@ table.multicheckbox {
 .multicheckbox tbody tr{
 	cursor: pointer;
 }
-.multicheckbox tbody tr:hover{
+.multicheckbox tbody tr.hover:hover{
 	background-color: #EEEEEE;
 }
 .multicheckbox th{
