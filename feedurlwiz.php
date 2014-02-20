@@ -45,7 +45,6 @@ class FeedUrlWiz_feedoptions extends WizStep {
 		unset($_SESSION['wizard_feedurl']["data"]["/feedurl"]["feedurl"]);
 		
 		global $USER;
-		$feedcategories = array();
 
 		$formdata = array(
 			_L('Feed Settings')
@@ -53,9 +52,9 @@ class FeedUrlWiz_feedoptions extends WizStep {
 
 		// get all the feed categories this user is restricted to (if any)
 		if (QuickQuery("select 1 from userfeedcategory where userid = ? limit 1", false, array($USER->id)))
-			$myfeedcategories = FeedCategory::getAllowedFeedCategories();
+			$feedcategories = FeedCategory::getAllowedFeedCategories();
 		else
-			$myfeedcategories = array();
+			$feedcategories = array();
 
 		// Get the "other" feed categories not already assigned to this user		
 		$otherfeedcategories = DBFindMany("FeedCategory", 
@@ -65,21 +64,25 @@ class FeedUrlWiz_feedoptions extends WizStep {
 			order by feedcategory.name",
 			false, array($USER->id));
 
+		$feedCategoryIds = array_merge(array_keys($feedcategories), array_keys($otherfeedcategories));
 		// Tack the "other" feeds not specifically restricted for this user onto the end of the list;
 		// This causes their restricted feeds to "float" to the top to make it easier for them to find
-		foreach ($otherfeedcategories as $key => $feedcategory) {
-			$myfeedcategories[$key] = $feedcategory;
+		if ($otherfeedcategories && count($otherfeedcategories)) {
+			$feedcategories[0] = "";
+			foreach ($otherfeedcategories as $key => $feedcategory) {
+				$feedcategories[$key] = $feedcategory;
+			}
 		}
 
-		if (count($myfeedcategories)) {
+		if (count($feedcategories)) {
 			$formdata["feedcategories"] = array(
 				"label" => _L('Feed categories'),
 				"fieldhelp" => _L('Select which categories you wish to include in this feed.'),
 				"value" => "",
 				"validators" => array(
 					array("ValRequired"),
-					array("ValInArray", "values" => array_keys($myfeedcategories))),
-				"control" => array("FeedCategorySelector", "feedcategories" => $myfeedcategories),
+					array("ValInArray", "values" => $feedCategoryIds)),
+				"control" => array("FeedCategorySelector", "feedcategories" => $feedcategories),
 				"helpstep" => 1
 			);
 		} else {
