@@ -486,10 +486,9 @@ if (getSystemSetting("_hassurvey", true)) {
 	);
 }
 if (getSystemSetting("_hasfeed", false)) {
-	
 	$formdata["feedcategories"] = array(
 		"label" => _L("Feed Category Restriction"),
-		"fieldhelp" => _L('If the user should only be able to send to specific feed categorie, check them here. Checking nothing will allow the user to send to any feed category.'),
+		"fieldhelp" => _L('If the user should only be able to send to specific feed categories, check them here. Checking nothing will allow the user to send to any feed category.'),
 		"value" => $userfeedcategories,
 		"validators" => array(
 			array("ValInArray", "values" => array_keys($feedcategories))
