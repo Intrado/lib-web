@@ -85,16 +85,17 @@ foreach ($categories as $category) {
 		}
 	}
 	
-    $formdata["feedcategorytypes-".$category->id] = array(
-        "label" => _L('Feed Type(s)'),
-        "fieldhelp" => _L(''),
-        "value" => $values,
-        "validators" => array(
-            array("ValInArray", "values" => array_keys($feedTypeKeys))
-        ),
-        "control" => array("MultiCheckBox", "values" => $feedTypeLabels),
-        "helpstep" => 1
-    );
+	$formdata["feedcategorytypes-".$category->id] = array(
+		"label" => _L('Feed Type(s)'),
+		"fieldhelp" => _L(''),
+		"value" => $values,
+		"validators" => array(
+			array("ValInArray", "values" => array_keys($feedTypeKeys))
+		),
+		"control" => array("MultiCheckBox", "values" => $feedTypeLabels),
+		"helpstep" => 1
+	);
+
 	$formdata["feedcategorydelete-".$category->id] = array(
 		"label" => "",
 		"value" => "",
