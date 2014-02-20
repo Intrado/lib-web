@@ -11,7 +11,7 @@
  */
 
 class FeedCategorySelector extends MultiCheckBoxTable {
-	var $availableCategories;
+	var $availableCategories = array();
 
 	/**
 	 * @param Form $form the parent form
@@ -33,28 +33,36 @@ class FeedCategorySelector extends MultiCheckBoxTable {
 
 		$columns = array();
 		$hovers = array();
-		foreach ($this->availableCategories as $feedCategory) {
-			$typeHtml = "";
-			foreach ($feedCategory->getTypes() as $type) {
-				switch ($type) {
-					case "rss":
-						$typeHtml .= '<img class="categorytype rss" src="img/icons/pictos/p1/16/80.png" />';
-						break;
-					case "desktop":
-						$typeHtml .= '<img class="categorytype desktop" src="img/icons/pictos/p1/16/160.png" />';
-						break;
-					case "push":
-						$typeHtml .= '<img class="categorytype push" src="img/icons/pictos/p2/16/70.png" />';
-				}
+		foreach ($this->availableCategories as $id => $feedCategory) {
+			if ($id) {
+				$columns[$feedCategory->id] = array(escapeHtml($feedCategory->name), self::renderCategoryTypeHtml($feedCategory));
+				$hovers[$feedCategory->id] = $feedCategory->description;
+			} else {
+				$columns[false] = array(_L("Other Feed Categories"), "");
 			}
-			$columns[$feedCategory->id] = array(escapeHtml($feedCategory->name), $typeHtml);
-			$hovers[$feedCategory->id] = $feedCategory->description;
 		}
 		$this->headers = array("", _L("Feed Category Name"), _L("Feed Types"));
 		$this->columns = count($columns)? $columns: false;
 		$this->hovers = count($hovers)? $hovers: false;
 
 		return parent::render($value);
+	}
+
+	private static function renderCategoryTypeHtml($feedCategory) {
+		$typeHtml = "";
+		foreach ($feedCategory->getTypes() as $type) {
+			switch ($type) {
+				case "rss":
+					$typeHtml .= '<img class="categorytype rss" src="img/icons/pictos/p1/16/80.png" />';
+					break;
+				case "desktop":
+					$typeHtml .= '<img class="categorytype desktop" src="img/icons/pictos/p1/16/160.png" />';
+					break;
+				case "push":
+					$typeHtml .= '<img class="categorytype push" src="img/icons/pictos/p2/16/70.png" />';
+			}
+		}
+		return $typeHtml;
 	}
 
 	function renderJavascript($value) {

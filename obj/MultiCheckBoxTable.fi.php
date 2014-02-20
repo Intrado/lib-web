@@ -56,18 +56,26 @@ class MultiCheckBoxTable extends FormItem {
 		$str = "<table id='$formItemName' class='multicheckbox$additionalClass'>
 					<thead><tr>";
 		foreach ($this->headers as $header)
-			$str .= '<th>'. $header. '</th>';
+			$str .= '<th class="header">'. $header. '</th>';
 		$str .= '</tr></thead><tbody>';
 
 		// add all the data columns. The first one is the checkbox.
 		$hoverdata = array();
 		$counter = 1;
 		foreach ($this->columns as $checkvalue => $columns) {
-			$checked = $value == $checkvalue || (is_array($value) && in_array($checkvalue, $value));
-			$firstColumn = '<input type="checkbox" value="'.escapehtml($checkvalue).'" '.($checked ? 'checked' : '').' name="'.$formItemName.'[]" />';
-			array_unshift($columns, $firstColumn);
+			// if the checkbox value is not false, create an input and check it if the value indicates it should be so
+			// then append it as the first column
+			if ($checkvalue != false) {
+				$checked = $value == $checkvalue || (is_array($value) && in_array($checkvalue, $value));
+				$str .= '<tr class="hover">';
+				$firstColumn = '<input type="checkbox" value="'.escapehtml($checkvalue).'" '.($checked ? 'checked' : '').' name="'.$formItemName.'[]" />';
+				array_unshift($columns, $firstColumn);
+			} else {
+				// otherwise, it's a break in the table and the columns should be treated as headers with the first column empty
+				$str .= '<tr class="header">';
+				array_unshift($columns, "");
+			}
 
-			$str .= '<tr class="hover">';
 			$columnCounter = 0;
 			foreach ($columns as $column) {
 				$hoverId = $formItemName.'-'.$counter++;

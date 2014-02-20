@@ -53,7 +53,11 @@ class FeedCategorySelectorTest extends PHPUnit_Framework_TestCase {
 		$fourth->description = "This is the fourth category description";
 		$fourth->spyTypes = array("push");
 
-		$feedCategories = array($first, $second, $third, $fourth);
+		$feedCategories = array(
+			$first->id => $first,
+			$second->id => $second,
+			$third->id => $third,
+			$fourth->id => $fourth);
 
 		$args = array("feedcategories" => $feedCategories);
 		$formItem = new FeedCategorySelector($this->form, "testitem", $args);
@@ -83,7 +87,7 @@ class FeedCategorySelectorTest extends PHPUnit_Framework_TestCase {
 		$category->description = "This is the very first category description";
 		$category->spyTypes = array("rss", "desktop", "push");
 
-		$feedCategories = array($category);
+		$feedCategories = array($category->id => $category);
 
 		$args = array("feedcategories" => $feedCategories);
 		$formItem = new FeedCategorySelector($this->form, "testitem", $args);
