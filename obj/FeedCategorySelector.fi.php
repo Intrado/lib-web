@@ -63,7 +63,7 @@ class FeedCategorySelector extends MultiCheckBoxTable {
 			".{$this->cssClass} img.desktop" => _L('Desktop Alert'),
 			".{$this->cssClass} img.push" => _L('Push Notification')
 		);
-		return 'form_do_hover_by_selector('. json_encode($hoverdata). ');';
+		return parent::renderJavascript($value). ' form_do_hover_by_selector('. json_encode($hoverdata). ');';
 	}
 }
 ?>

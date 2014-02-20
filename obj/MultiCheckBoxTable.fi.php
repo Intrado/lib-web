@@ -53,7 +53,7 @@ class MultiCheckBoxTable extends FormItem {
 		// create the table and fill in the column headers
 		// add an additional class, if provided. Note the addition of a space here, and not below
 		$additionalClass = ($this->cssClass)? $additionalClass = " $this->cssClass": "";
-		$str = "<table class='multicheckbox$additionalClass'>
+		$str = "<table id='$formItemName' class='multicheckbox$additionalClass'>
 					<thead><tr>";
 		foreach ($this->headers as $header)
 			$str .= '<th>'. $header. '</th>';
@@ -105,6 +105,19 @@ class MultiCheckBoxTable extends FormItem {
 				}
 			})(jQuery);
 		</script>';
+	}
+
+	function renderJavascript($value) {
+		$formItemName = $this->form->name."_".$this->name;
+		// attach the form event handler to all the checkboxes so validation can occur on user interaction
+		return '
+			var inputs = document.getElementsByName("'.$formItemName.'[]");
+			for (var i = 0; i < inputs.length; i++) {
+				inputs[i].observe("click",form_event_handler);
+				inputs[i].observe("blur",form_event_handler);
+				inputs[i].observe("change",form_event_handler);
+			};
+		';
 	}
 }
 ?>
