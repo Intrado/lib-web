@@ -42,14 +42,8 @@ class ValFeedName extends Validator {
 // get the current non-deleted categories from the db
 $categories = DBFindMany("FeedCategory", "from feedcategory where not deleted order by id");
 
-// TODO: get feed types when available
-$feedTypes = array(
-	"rss" => "RSS",
-	"desktop" => "Desktop Alerts",
-	"push" => "Push Notifications" 
-);
-$feedTypeKeys = array_keys($feedTypes);
-$feedTypeLabels = array_values($feedTypes);
+// get feed types
+$feedTypes = FeedCategory::getAllTypes();
  
 $formdata = array();
 foreach ($categories as $category) {
@@ -66,6 +60,7 @@ foreach ($categories as $category) {
 		"control" => array("TextField","size" => 30, "maxlength" => 50),
 		"helpstep" => 1
 	);
+
 	$formdata["feedcategorydesc-".$category->id] = array(
 		"label" => _L('Description'),
 		"fieldhelp" => _L('This is a short description, describing the content appropriate to this feed category.'),
@@ -76,23 +71,16 @@ foreach ($categories as $category) {
 		"control" => array("TextArea","size" => 30, "cols" => 34),
 		"helpstep" => 1
 	);
-	
-	$types = QuickQueryList("select type from feedcategorytype where feedcategoryid=?", false, false, array($category->id));
-	$values = array();
-	for($i = 0; $i < count($feedTypeKeys); ++ $i) {
-		if (in_array($feedTypeKeys[$i], $types)) {
-			$values [] = $i;
-		}
-	}
-	
+
+	$currentFeedTypes = QuickQueryList("select type from feedcategorytype where feedcategoryid=?", false, false, array($category->id));
 	$formdata["feedcategorytypes-".$category->id] = array(
 		"label" => _L('Feed Type(s)'),
 		"fieldhelp" => _L(''),
-		"value" => $values,
+		"value" => $currentFeedTypes,
 		"validators" => array(
-			array("ValInArray", "values" => array_keys($feedTypeKeys))
+			array("ValInArray", "values" => array_keys($feedTypes))
 		),
-		"control" => array("MultiCheckBox", "values" => $feedTypeLabels),
+		"control" => array("MultiCheckBox", "values" => $feedTypes),
 		"helpstep" => 1
 	);
 
@@ -146,14 +134,14 @@ $formdata["feedcategorydesc-new"] = array(
 	"helpstep" => 1
 );
 $formdata["feedcategorytypes-new"] = array(
-    "label" => _L('Feed Type(s)'),
-    "fieldhelp" => _L(''),
-    "value" => array(),
-    "validators" => array(
-        array("ValInArray", "values" => array_keys($feedTypeKeys))
-    ),
-    "control" => array("MultiCheckBox", "values" => $feedTypeLabels),
-    "helpstep" => 1
+	"label" => _L('Feed Type(s)'),
+	"fieldhelp" => _L(''),
+	"value" => "",
+	"validators" => array(
+		array("ValInArray", "values" => array_keys($feedTypes))
+	),
+	"control" => array("MultiCheckBox", "values" => $feedTypes),
+	"helpstep" => 1
 );
 $formdata["feedcategoryadd-new"] = array(
 	"label" => "",
@@ -166,13 +154,6 @@ $formdata["feedcategoryadd-new"] = array(
 $buttons = array(submit_button(_L('Save'),"submit","tick","settings.php"),
 				icon_button(_L('Cancel'),"cross",null,"settings.php"));
 $form = new Form("editfeedcategory",$formdata,null,$buttons);
-
-function createCategoryTypes($categoryId, $types) {
-	global $feedTypeKeys;
-	foreach ($types as $t) {
-		QuickUpdate("insert into feedcategorytype values(?,?)", false, array($categoryId, $feedTypeKeys[$t]));
-	}
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data Handling
@@ -201,7 +182,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$nfc->description = $postdata['feedcategorydesc-new'];
 			$nfc->create();
 			$types = $postdata['feedcategorytypes-new'];
-			createCategoryTypes($nfc->id, $types);			
+			$nfc->updateTypes($types);
 			notice(_L("New category %s created.", $nfc->name));
 		}
 		
@@ -220,7 +201,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$category->description = $postdata['feedcategorydesc-'.$category->id];
 				QuickUpdate("delete from feedcategorytype where feedcategoryid=?", false, array($category->id));
 				$types = $postdata['feedcategorytypes-' . $category->id];
-				createCategoryTypes($category->id, $types);
+				$category->updateTypes($types);
 			}
 			$category->update();
 			// TODO: maybe only invalidate feed categories that changed?

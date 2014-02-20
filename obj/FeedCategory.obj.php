@@ -5,6 +5,12 @@ class FeedCategory extends DBMappedObject {
 	var $description;
 	var $deleted = 0;
 
+	private static $feedTypes = array(
+		"rss" => "RSS",
+		"desktop" => "Desktop Alerts",
+		"push" => "Push Notifications"
+	);
+
 	// local cache of mapped types
 	private $types = false;
 
@@ -22,6 +28,17 @@ class FeedCategory extends DBMappedObject {
 		if (!$this->types)
 			$this->types = QuickQueryList("select type from feedcategorytype where feedcategoryid = ?", false, false, array($this->id));
 		return $this->types;
+	}
+
+	/** Replace the current category types with these
+	 * @param array $types is a list of types
+	 */
+	public function updateTypes($types) {
+		QuickUpdate("delete from feedcategorytype where feedcategoryid = ?", false, array($this->id));
+		if ($types && count($types)) {
+			QuickUpdate("insert into feedcategorytype (feedcategoryid, type) values ". repeatWithSeparator("({$this->id}, ?)", ",", count($types)),
+				false, $types);
+		}
 	}
 
 	// returns all allowed feed categories for the current user
@@ -68,7 +85,9 @@ class FeedCategory extends DBMappedObject {
 		return QuickQueryList("select id, description from feedcategory where not deleted", true, false);
 	}
 	
-	
+	static function getAllTypes() {
+		return self::$feedTypes;
+	}
 }
 
 ?>
