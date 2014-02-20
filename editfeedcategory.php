@@ -199,7 +199,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			} else {
 				$category->name = $postdata['feedcategoryname-'.$category->id];
 				$category->description = $postdata['feedcategorydesc-'.$category->id];
-				QuickUpdate("delete from feedcategorytype where feedcategoryid=?", false, array($category->id));
 				$types = $postdata['feedcategorytypes-' . $category->id];
 				$category->updateTypes($types);
 			}
