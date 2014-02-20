@@ -12,6 +12,8 @@ require_once("inc/utils.inc.php");
 require_once("obj/Validator.obj.php");
 require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
+require_once("obj/MultiCheckBoxTable.fi.php");
+require_once("obj/FeedCategorySelector.fi.php");
 require_once("obj/Job.obj.php");
 require_once("obj/JobType.obj.php");
 require_once("obj/Phone.obj.php"); // Required by job
@@ -693,10 +695,6 @@ if ($submittedmode || $completedmode) {
 		// if the user can post to feeds, allow them to choose feed categories (provided the message group has feed)
 		$feedcategories = FeedCategory::getAllowedFeedCategories($jobid);
 		
-		$categories = array();
-		foreach ($feedcategories as $category)
-			$categories[$category->id] = $category->name;
-		
 		if (count($feedcategories) && getSystemSetting("_hasfeed") && $USER->authorize("feedpost") && $messagegroup->hasMessage("post", "feed")) {
 			
 			$helpsteps[] = _L("If your message group contains a Feed post, this will allow you to select the categories the message will appear in.");
@@ -706,8 +704,8 @@ if ($submittedmode || $completedmode) {
 				"fieldhelp" => _L('Select which categories you wish to include in this feed.'),
 				"value" => (count($job->getJobPosts("feed"))?array_keys($job->getJobPosts("feed")):""),
 				"validators" => array(
-					array("ValInArray", "values" => array_keys($categories))),
-				"control" => array("MultiCheckBox", "values"=>$categories, "hover" => FeedCategory::getFeedDescriptions()),
+					array("ValInArray", "values" => array_keys($feedcategories))),
+				"control" => array("FeedCategorySelector", "feedcategories"=>$feedcategories),
 				"helpstep" => ++$helpstepnum
 			);
 		}
@@ -870,19 +868,16 @@ if ($submittedmode || $completedmode) {
 	if (count($feedcategories) && getSystemSetting("_hasfeed") && $USER->authorize("feedpost")) {
 		$helpsteps[] = _L("If your message contains an RSS feed component, select which category best describes the content of your RSS feed message part.");
 		
-		$categories = array();
-		foreach ($feedcategories as $category)
-			$categories[$category->id] = $category->name;
-		
 		$formdata["feedcategories"] = array(
 			"label" => _L("Feed categories"),
 			"fieldhelp" => _L("Select the most appropriate category for the RSS feed component of your message."),
 			"value" => (count($job->getJobPosts("feed"))?array_keys($job->getJobPosts("feed")):""),
 			"validators" => array(
-				array("ValFeedCategoryWithMessage", "values" => array_keys($categories))),
-			"control" => array("MultiCheckBox", "values"=>$categories, "hover" => FeedCategory::getFeedDescriptions()),
+				array("ValFeedCategoryWithMessage", "values" => array_keys($feedcategories))),
+			"control" => array("FeedCategorySelector", "feedcategories"=>$feedcategories),
 			"requires" => array("message"),
-			"helpstep" => ++$helpstepnum);
+			"helpstep" => ++$helpstepnum
+		);
 	}
 	
 	$helpsteps[] = _L("<ul><li>Auto Report - Selecting this option causes the system to email ".

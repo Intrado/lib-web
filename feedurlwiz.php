@@ -15,6 +15,8 @@ require_once("obj/ColorPicker.fi.php");
 require_once("obj/ColorPicker.val.php");
 require_once("obj/InpageSubmitButton.fi.php");
 require_once("obj/FeedCategory.obj.php");
+require_once("obj/MultiCheckBoxTable.fi.php");
+require_once("obj/FeedCategorySelector.fi.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -44,75 +46,75 @@ class FeedUrlWiz_feedoptions extends WizStep {
 		
 		global $USER;
 		$feedcategories = array();
+
+		$formdata = array(
+			_L('Feed Settings')
+		);
+
 		// get all the feed categories this user is restricted to (if any)
 		if (QuickQuery("select 1 from userfeedcategory where userid = ? limit 1", false, array($USER->id)))
 			$myfeedcategories = FeedCategory::getAllowedFeedCategories();
 		else
 			$myfeedcategories = array();
-		
+
+		// Get the "other" feed categories not already assigned to this user		
 		$otherfeedcategories = DBFindMany("FeedCategory", 
 			"from feedcategory
 			where not deleted
 			and not exists (select 1 from userfeedcategory where userid = ? and feedcategoryid = feedcategory.id)
 			order by feedcategory.name",
 			false, array($USER->id));
-		
-		// display user feed categories under the "My Feed Categories" header
+
+		// Tack the "other" feeds not specifically restricted for this user onto the end of the list;
+		// This causes their restricted feeds to "float" to the top to make it easier for them to find
+		foreach ($otherfeedcategories as $key => $feedcategory) {
+			$myfeedcategories[$key] = $feedcategory;
+		}
+
 		if (count($myfeedcategories)) {
-			$feedcategories['my'] = "#-My Feed Categories-#";
-			foreach ($myfeedcategories as $category) {
-				$feedcategories[$category->id] = $category->name;
-			}
-		}
-		
-		// if there are user and other feed categories, provide a seperator and a header for other
-		if (count($myfeedcategories) && count($otherfeedcategories)) {
-			$feedcategories['line'] = "#-#";
-			$feedcategories['other'] = "#-Other Feed Categories-#";
-		}
-		
-		// add all other feed categories that do not match user restriction
-		if (count($otherfeedcategories)) {
-			foreach ($otherfeedcategories as $category) {
-				$feedcategories[$category->id] = $category->name;
-			}
-		}
-		
-		// if there are no feed categories!
-		if (!count($feedcategories))
-			$feedcategories['none'] = "#-". _L("There are no feed categories!"). "-#";
-		
-		$formdata = array(_L('Feed Settings'),
-			"feedcategories" => array(
-				"label" => _L("Feed categories"),
+			$formdata["feedcategories"] = array(
+				"label" => _L('Feed categories'),
 				"fieldhelp" => _L('Select which categories you wish to include in this feed.'),
 				"value" => "",
 				"validators" => array(
 					array("ValRequired"),
-					array("ValInArray", "values" => array_keys($feedcategories))),
-				"control" => array("MultiCheckBox", "values"=>$feedcategories, "hover" => FeedCategory::getFeedDescriptions()),
+					array("ValInArray", "values" => array_keys($myfeedcategories))),
+				"control" => array("FeedCategorySelector", "feedcategories" => $myfeedcategories),
 				"helpstep" => 1
-			),
-			"itemcount" => array(
-				"label" => _L('Items to display'),
-				"fieldhelp" => _L('Select the maximum number of items this feed should display.'),
-				"value" => "20",
+			);
+		} else {
+			// if there are no feed categories!
+			$formdata["feedcategories"] = array(
+				"label" => _L('Feed categories'),
+				"fieldhelp" => _L(''),
+				"value" => "",
 				"validators" => array(
 					array("ValRequired"),
-					array("ValNumber", "min" => 1, "max" => 100)),
-				"control" => array("TextField", "size" => 5),
+					array("ValInArray", "values" => array())),
+				"control" => array("MultiCheckBox", "values" => array("#-". _L("There are no feed categories!"). "-#")),
 				"helpstep" => 1
-			),
-			"maxage" => array(
-				"label" => _L('Max age (days)'),
-				"fieldhelp" => _L('Choose the maximum age (in days) of messages displayed on this feed.'),
-				"value" => "30",
-				"validators" => array(
-					array("ValRequired"),
-					array("ValNumber", "min" => 1, "max" => 90)),
-				"control" => array("TextField", "size" => 5),
-				"helpstep" => 1
-			)
+			);
+		}
+
+		$formdata["itemcount"] = array(
+			"label" => _L('Items to display'),
+			"fieldhelp" => _L('Select the maximum number of items this feed should display.'),
+			"value" => "20",
+			"validators" => array(
+				array("ValRequired"),
+				array("ValNumber", "min" => 1, "max" => 100)),
+			"control" => array("TextField", "size" => 5),
+			"helpstep" => 1
+		);
+		$formdata["maxage"] = array(
+			"label" => _L('Max age (days)'),
+			"fieldhelp" => _L('Choose the maximum age (in days) of messages displayed on this feed.'),
+			"value" => "30",
+			"validators" => array(
+				array("ValRequired"),
+				array("ValNumber", "min" => 1, "max" => 90)),
+			"control" => array("TextField", "size" => 5),
+			"helpstep" => 1
 		);
 		
 		$helpsteps = array(_L("<p>This wizard will guide you through the process of creating an RSS feed URL to share with subscribers and a widget for your website which will display feed items as they are syndicated.</p><p><b>Categories</b> - Select the categories of feed items that should be included in this RSS feed.</p><p><b>Items to display</b> - Enter the maximum number of feed items that should display at any time.</p><p><b>Max age</b> - Enter the maximum number of days a feed item should display. </p>"));

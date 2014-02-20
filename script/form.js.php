@@ -212,6 +212,7 @@ function form_validation_display(element,resultcode, msgtext) {
 
 	//if radio button or multicheckbox, get the id of the container div
 	var name = $(e.up(".radiobox") || e.up(".multicheckbox") || e).id ;
+console.log('hey! ' + name);
 
 	var fieldarea = $(name + "_fieldarea");
 
@@ -238,6 +239,9 @@ function form_validation_display(element,resultcode, msgtext) {
 			icon.alt = icon.title = "";
 		}
 	}
+
+console.log('css! ' + css);
+console.log('style! ' + style);
 
 	//set up the validation transition effects
 

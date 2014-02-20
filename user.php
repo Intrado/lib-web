@@ -10,6 +10,8 @@ require_once("inc/utils.inc.php");
 require_once("obj/Validator.obj.php");
 require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
+require_once("obj/MultiCheckBoxTable.fi.php");
+require_once("obj/FeedCategorySelector.fi.php");
 require_once("obj/Phone.obj.php");
 require_once("obj/Rule.obj.php");
 require_once("obj/ValRules.val.php");
@@ -21,7 +23,7 @@ require_once("obj/InpageSubmitButton.fi.php");
 require_once("obj/RestrictedValues.fi.php");
 require_once("obj/CallerID.fi.php");
 require_once("obj/Import.obj.php");
-
+require_once('obj/FeedCategory.obj.php');
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -76,7 +78,9 @@ $usersurveytypes = QuickQueryList("select id from jobtype where id in (select jo
 $surveytypes = QuickQueryList("select id, name from jobtype where not deleted and issurvey order by systempriority, name asc", true);
 
 $userfeedcategories = QuickQueryList("select id from feedcategory where id in (select feedcategoryid from userfeedcategory where userid=?) and not deleted", false, false, array($edituser->id));
-$feedcategories = QuickQueryList("select id, name from feedcategory where not deleted", true);
+
+// Get the complete set of feed categories available
+$feedcategories = DBFindMany("feedcategory", "from feedcategory where not deleted order by name");
 
 $IS_LDAP = getSystemSetting('_hasldap', '0');
 
@@ -490,7 +494,7 @@ if (getSystemSetting("_hasfeed", false)) {
 		"validators" => array(
 			array("ValInArray", "values" => array_keys($feedcategories))
 		),
-		"control" => array("MultiCheckBox", "values"=>$feedcategories),
+		"control" => array("FeedCategorySelector", "feedcategories"=>$feedcategories),
 		"helpstep" => 2
 	);
 }
