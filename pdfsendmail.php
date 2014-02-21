@@ -197,6 +197,13 @@ class PdfSendMail extends PageForm {
 			$bodyPart->txt = $postData['messagebody'];
 			$messageParts[] = $bodyPart;
 
+			# add an instructional messagePart (text plus some padding/new lines)
+			# between the body and mal (link) message parts
+			$malInstructPart = new MessagePart();
+			$malInstructPart->type = "T";
+			$malInstructPart->txt = "\n\nClick the link below to download your attachment.\n";
+			$messageParts[] = $malInstructPart;
+
 			# create new MessagePart for Message Attachment Link (MAL) and append after messagebody
 			$malPart = new MessagePart();
 			$malPart->type = "MAL";
