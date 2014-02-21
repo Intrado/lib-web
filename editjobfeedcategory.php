@@ -13,6 +13,9 @@ require_once("obj/FormItem.obj.php");
 require_once("obj/FeedCategory.obj.php");
 require_once("obj/Job.obj.php");
 require_once("inc/appserver.inc.php");
+require_once("obj/MultiCheckBoxTable.fi.php");
+require_once("obj/FeedCategorySelector.fi.php");
+require_once("obj/FeedCategory.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -44,10 +47,6 @@ $currentcategories = QuickQueryList("select destination from jobpost where type 
 
 $feedcategories = FeedCategory::getAllowedFeedCategories($jobid);
 
-$categories = array();
-foreach ($feedcategories as $category)
-	$categories[$category->id] = $category->name;
-
 $formdata = array(
 	$jobdetails["name"],
 	"feedcategories" => array(
@@ -55,8 +54,9 @@ $formdata = array(
 		"fieldhelp" => _L('Select the most appropriate category for the RSS feed component of your message.'),
 		"value" => (count($currentcategories)?$currentcategories:""),
 		"validators" => array(
-			array("ValInArray", "values" => array_keys($categories))),
+			array("ValInArray", "values" => array_keys($feedcategories))),
 		"control" => array("MultiCheckBox", "values"=>$categories, "hover" => FeedCategory::getFeedDescriptions()),
+		"control" => array("FeedCategorySelector", "feedcategories"=>$feedcategories),
 		"helpstep" => 1
 	)
 );
