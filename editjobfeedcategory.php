@@ -55,7 +55,6 @@ $formdata = array(
 		"value" => (count($currentcategories)?$currentcategories:""),
 		"validators" => array(
 			array("ValInArray", "values" => array_keys($feedcategories))),
-		"control" => array("MultiCheckBox", "values"=>$categories, "hover" => FeedCategory::getFeedDescriptions()),
 		"control" => array("FeedCategorySelector", "feedcategories"=>$feedcategories),
 		"helpstep" => 1
 	)
