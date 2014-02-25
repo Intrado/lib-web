@@ -380,8 +380,7 @@ class PdfSendMail extends PageForm {
 				"value" => '',
 				"validators" => array(
 					array('ValRequired'),
-					array("ValLength","max" => 256000),
-					array("ValMessageBody")
+					array("ValLength","max" => 65535)
 				),
 				"control" => array("TextArea"),
 				"helpstep" => 7
