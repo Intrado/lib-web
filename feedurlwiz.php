@@ -65,14 +65,21 @@ class FeedUrlWiz_feedoptions extends WizStep {
 			false, array($USER->id));
 
 		$feedCategoryIds = array_merge(array_keys($feedcategories), array_keys($otherfeedcategories));
-		// Tack the "other" feeds not specifically restricted for this user onto the end of the list;
-		// This causes their restricted feeds to "float" to the top to make it easier for them to find
-		if ($otherfeedcategories && count($otherfeedcategories)) {
-			// insert a "false" id, to create a separator row
-			$feedcategories[0] = "";
-			foreach ($otherfeedcategories as $key => $feedcategory) {
-				$feedcategories[$key] = $feedcategory;
+
+		// if the user has any restricted feed categories...
+		if ($feedcategories && count($feedcategories)) {
+			// Tack the "other" feeds not specifically restricted for this user onto the end of the list;
+			// This causes their restricted feeds to "float" to the top to make it easier for them to find
+			if ($otherfeedcategories && count($otherfeedcategories)) {
+				// insert a "false" id, to create a separator row
+				$feedcategories[0] = "";
+				foreach ($otherfeedcategories as $key => $feedcategory) {
+					$feedcategories[$key] = $feedcategory;
+				}
 			}
+		} else {
+			// no user restricted categories, just show the whole list
+			$feedcategories = $otherfeedcategories;
 		}
 
 		if (count($feedcategories)) {
