@@ -714,6 +714,7 @@ class Info {
   public $jobstarttime = null;
   public $recipient = null;
   public $messageInfo = null;
+  public $productName = null;
 
   public function __construct($vals=null) {
     if (!isset(self::$_TSPEC)) {
@@ -752,6 +753,10 @@ class Info {
           'type' => TType::STRUCT,
           'class' => '\messagelink\MessageInfo',
           ),
+        11 => array(
+          'var' => 'productName',
+          'type' => TType::STRING,
+          ),
         );
     }
     if (is_array($vals)) {
@@ -778,6 +783,9 @@ class Info {
       }
       if (isset($vals['messageInfo'])) {
         $this->messageInfo = $vals['messageInfo'];
+      }
+      if (isset($vals['productName'])) {
+        $this->productName = $vals['productName'];
       }
     }
   }
@@ -859,6 +867,13 @@ class Info {
             $xfer += $input->skip($ftype);
           }
           break;
+        case 11:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->productName);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
         default:
           $xfer += $input->skip($ftype);
           break;
@@ -916,6 +931,11 @@ class Info {
       }
       $xfer += $output->writeFieldBegin('messageInfo', TType::STRUCT, 10);
       $xfer += $this->messageInfo->write($output);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->productName !== null) {
+      $xfer += $output->writeFieldBegin('productName', TType::STRING, 11);
+      $xfer += $output->writeString($this->productName);
       $xfer += $output->writeFieldEnd();
     }
     $xfer += $output->writeFieldStop();
