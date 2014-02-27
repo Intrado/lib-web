@@ -17,6 +17,692 @@ use Thrift\Protocol\TBinaryProtocolAccelerated;
 use Thrift\Exception\TApplicationException;
 
 
+class PhoneMessageInfo {
+  static $_TSPEC;
+
+  public $languageCode = null;
+  public $nummessageparts = null;
+
+  public function __construct($vals=null) {
+    if (!isset(self::$_TSPEC)) {
+      self::$_TSPEC = array(
+        1 => array(
+          'var' => 'languageCode',
+          'type' => TType::STRING,
+          ),
+        2 => array(
+          'var' => 'nummessageparts',
+          'type' => TType::BYTE,
+          ),
+        );
+    }
+    if (is_array($vals)) {
+      if (isset($vals['languageCode'])) {
+        $this->languageCode = $vals['languageCode'];
+      }
+      if (isset($vals['nummessageparts'])) {
+        $this->nummessageparts = $vals['nummessageparts'];
+      }
+    }
+  }
+
+  public function getName() {
+    return 'PhoneMessageInfo';
+  }
+
+  public function read($input)
+  {
+    $xfer = 0;
+    $fname = null;
+    $ftype = 0;
+    $fid = 0;
+    $xfer += $input->readStructBegin($fname);
+    while (true)
+    {
+      $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+      if ($ftype == TType::STOP) {
+        break;
+      }
+      switch ($fid)
+      {
+        case 1:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->languageCode);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 2:
+          if ($ftype == TType::BYTE) {
+            $xfer += $input->readByte($this->nummessageparts);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        default:
+          $xfer += $input->skip($ftype);
+          break;
+      }
+      $xfer += $input->readFieldEnd();
+    }
+    $xfer += $input->readStructEnd();
+    return $xfer;
+  }
+
+  public function write($output) {
+    $xfer = 0;
+    $xfer += $output->writeStructBegin('PhoneMessageInfo');
+    if ($this->languageCode !== null) {
+      $xfer += $output->writeFieldBegin('languageCode', TType::STRING, 1);
+      $xfer += $output->writeString($this->languageCode);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->nummessageparts !== null) {
+      $xfer += $output->writeFieldBegin('nummessageparts', TType::BYTE, 2);
+      $xfer += $output->writeByte($this->nummessageparts);
+      $xfer += $output->writeFieldEnd();
+    }
+    $xfer += $output->writeFieldStop();
+    $xfer += $output->writeStructEnd();
+    return $xfer;
+  }
+
+}
+
+class AttachmentInfo {
+  static $_TSPEC;
+
+  public $filename = null;
+  public $contentType = null;
+  public $size = null;
+  public $isPasswordProtected = null;
+  public $code = null;
+
+  public function __construct($vals=null) {
+    if (!isset(self::$_TSPEC)) {
+      self::$_TSPEC = array(
+        1 => array(
+          'var' => 'filename',
+          'type' => TType::STRING,
+          ),
+        2 => array(
+          'var' => 'contentType',
+          'type' => TType::STRING,
+          ),
+        3 => array(
+          'var' => 'size',
+          'type' => TType::I32,
+          ),
+        4 => array(
+          'var' => 'isPasswordProtected',
+          'type' => TType::BOOL,
+          ),
+        5 => array(
+          'var' => 'code',
+          'type' => TType::STRING,
+          ),
+        );
+    }
+    if (is_array($vals)) {
+      if (isset($vals['filename'])) {
+        $this->filename = $vals['filename'];
+      }
+      if (isset($vals['contentType'])) {
+        $this->contentType = $vals['contentType'];
+      }
+      if (isset($vals['size'])) {
+        $this->size = $vals['size'];
+      }
+      if (isset($vals['isPasswordProtected'])) {
+        $this->isPasswordProtected = $vals['isPasswordProtected'];
+      }
+      if (isset($vals['code'])) {
+        $this->code = $vals['code'];
+      }
+    }
+  }
+
+  public function getName() {
+    return 'AttachmentInfo';
+  }
+
+  public function read($input)
+  {
+    $xfer = 0;
+    $fname = null;
+    $ftype = 0;
+    $fid = 0;
+    $xfer += $input->readStructBegin($fname);
+    while (true)
+    {
+      $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+      if ($ftype == TType::STOP) {
+        break;
+      }
+      switch ($fid)
+      {
+        case 1:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->filename);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 2:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->contentType);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 3:
+          if ($ftype == TType::I32) {
+            $xfer += $input->readI32($this->size);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 4:
+          if ($ftype == TType::BOOL) {
+            $xfer += $input->readBool($this->isPasswordProtected);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 5:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->code);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        default:
+          $xfer += $input->skip($ftype);
+          break;
+      }
+      $xfer += $input->readFieldEnd();
+    }
+    $xfer += $input->readStructEnd();
+    return $xfer;
+  }
+
+  public function write($output) {
+    $xfer = 0;
+    $xfer += $output->writeStructBegin('AttachmentInfo');
+    if ($this->filename !== null) {
+      $xfer += $output->writeFieldBegin('filename', TType::STRING, 1);
+      $xfer += $output->writeString($this->filename);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->contentType !== null) {
+      $xfer += $output->writeFieldBegin('contentType', TType::STRING, 2);
+      $xfer += $output->writeString($this->contentType);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->size !== null) {
+      $xfer += $output->writeFieldBegin('size', TType::I32, 3);
+      $xfer += $output->writeI32($this->size);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->isPasswordProtected !== null) {
+      $xfer += $output->writeFieldBegin('isPasswordProtected', TType::BOOL, 4);
+      $xfer += $output->writeBool($this->isPasswordProtected);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->code !== null) {
+      $xfer += $output->writeFieldBegin('code', TType::STRING, 5);
+      $xfer += $output->writeString($this->code);
+      $xfer += $output->writeFieldEnd();
+    }
+    $xfer += $output->writeFieldStop();
+    $xfer += $output->writeStructEnd();
+    return $xfer;
+  }
+
+}
+
+class EmailMessageInfo {
+  static $_TSPEC;
+
+  public $languageCode = null;
+  public $fromName = null;
+  public $fromEmail = null;
+  public $subject = null;
+  public $plainBody = null;
+  public $attachmentLookup = null;
+
+  public function __construct($vals=null) {
+    if (!isset(self::$_TSPEC)) {
+      self::$_TSPEC = array(
+        1 => array(
+          'var' => 'languageCode',
+          'type' => TType::STRING,
+          ),
+        2 => array(
+          'var' => 'fromName',
+          'type' => TType::STRING,
+          ),
+        3 => array(
+          'var' => 'fromEmail',
+          'type' => TType::STRING,
+          ),
+        4 => array(
+          'var' => 'subject',
+          'type' => TType::STRING,
+          ),
+        5 => array(
+          'var' => 'plainBody',
+          'type' => TType::STRING,
+          ),
+        7 => array(
+          'var' => 'attachmentLookup',
+          'type' => TType::MAP,
+          'ktype' => TType::STRING,
+          'vtype' => TType::STRUCT,
+          'key' => array(
+            'type' => TType::STRING,
+          ),
+          'val' => array(
+            'type' => TType::STRUCT,
+            'class' => '\messagelink\AttachmentInfo',
+            ),
+          ),
+        );
+    }
+    if (is_array($vals)) {
+      if (isset($vals['languageCode'])) {
+        $this->languageCode = $vals['languageCode'];
+      }
+      if (isset($vals['fromName'])) {
+        $this->fromName = $vals['fromName'];
+      }
+      if (isset($vals['fromEmail'])) {
+        $this->fromEmail = $vals['fromEmail'];
+      }
+      if (isset($vals['subject'])) {
+        $this->subject = $vals['subject'];
+      }
+      if (isset($vals['plainBody'])) {
+        $this->plainBody = $vals['plainBody'];
+      }
+      if (isset($vals['attachmentLookup'])) {
+        $this->attachmentLookup = $vals['attachmentLookup'];
+      }
+    }
+  }
+
+  public function getName() {
+    return 'EmailMessageInfo';
+  }
+
+  public function read($input)
+  {
+    $xfer = 0;
+    $fname = null;
+    $ftype = 0;
+    $fid = 0;
+    $xfer += $input->readStructBegin($fname);
+    while (true)
+    {
+      $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+      if ($ftype == TType::STOP) {
+        break;
+      }
+      switch ($fid)
+      {
+        case 1:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->languageCode);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 2:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->fromName);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 3:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->fromEmail);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 4:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->subject);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 5:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->plainBody);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 7:
+          if ($ftype == TType::MAP) {
+            $this->attachmentLookup = array();
+            $_size0 = 0;
+            $_ktype1 = 0;
+            $_vtype2 = 0;
+            $xfer += $input->readMapBegin($_ktype1, $_vtype2, $_size0);
+            for ($_i4 = 0; $_i4 < $_size0; ++$_i4)
+            {
+              $key5 = '';
+              $val6 = new \messagelink\AttachmentInfo();
+              $xfer += $input->readString($key5);
+              $val6 = new \messagelink\AttachmentInfo();
+              $xfer += $val6->read($input);
+              $this->attachmentLookup[$key5] = $val6;
+            }
+            $xfer += $input->readMapEnd();
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        default:
+          $xfer += $input->skip($ftype);
+          break;
+      }
+      $xfer += $input->readFieldEnd();
+    }
+    $xfer += $input->readStructEnd();
+    return $xfer;
+  }
+
+  public function write($output) {
+    $xfer = 0;
+    $xfer += $output->writeStructBegin('EmailMessageInfo');
+    if ($this->languageCode !== null) {
+      $xfer += $output->writeFieldBegin('languageCode', TType::STRING, 1);
+      $xfer += $output->writeString($this->languageCode);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->fromName !== null) {
+      $xfer += $output->writeFieldBegin('fromName', TType::STRING, 2);
+      $xfer += $output->writeString($this->fromName);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->fromEmail !== null) {
+      $xfer += $output->writeFieldBegin('fromEmail', TType::STRING, 3);
+      $xfer += $output->writeString($this->fromEmail);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->subject !== null) {
+      $xfer += $output->writeFieldBegin('subject', TType::STRING, 4);
+      $xfer += $output->writeString($this->subject);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->plainBody !== null) {
+      $xfer += $output->writeFieldBegin('plainBody', TType::STRING, 5);
+      $xfer += $output->writeString($this->plainBody);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->attachmentLookup !== null) {
+      if (!is_array($this->attachmentLookup)) {
+        throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
+      }
+      $xfer += $output->writeFieldBegin('attachmentLookup', TType::MAP, 7);
+      {
+        $output->writeMapBegin(TType::STRING, TType::STRUCT, count($this->attachmentLookup));
+        {
+          foreach ($this->attachmentLookup as $kiter7 => $viter8)
+          {
+            $xfer += $output->writeString($kiter7);
+            $xfer += $viter8->write($output);
+          }
+        }
+        $output->writeMapEnd();
+      }
+      $xfer += $output->writeFieldEnd();
+    }
+    $xfer += $output->writeFieldStop();
+    $xfer += $output->writeStructEnd();
+    return $xfer;
+  }
+
+}
+
+class PersonInfo {
+  static $_TSPEC;
+
+  public $firstName = null;
+  public $lastName = null;
+  public $languageCode = null;
+
+  public function __construct($vals=null) {
+    if (!isset(self::$_TSPEC)) {
+      self::$_TSPEC = array(
+        1 => array(
+          'var' => 'firstName',
+          'type' => TType::STRING,
+          ),
+        2 => array(
+          'var' => 'lastName',
+          'type' => TType::STRING,
+          ),
+        3 => array(
+          'var' => 'languageCode',
+          'type' => TType::STRING,
+          ),
+        );
+    }
+    if (is_array($vals)) {
+      if (isset($vals['firstName'])) {
+        $this->firstName = $vals['firstName'];
+      }
+      if (isset($vals['lastName'])) {
+        $this->lastName = $vals['lastName'];
+      }
+      if (isset($vals['languageCode'])) {
+        $this->languageCode = $vals['languageCode'];
+      }
+    }
+  }
+
+  public function getName() {
+    return 'PersonInfo';
+  }
+
+  public function read($input)
+  {
+    $xfer = 0;
+    $fname = null;
+    $ftype = 0;
+    $fid = 0;
+    $xfer += $input->readStructBegin($fname);
+    while (true)
+    {
+      $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+      if ($ftype == TType::STOP) {
+        break;
+      }
+      switch ($fid)
+      {
+        case 1:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->firstName);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 2:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->lastName);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 3:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->languageCode);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        default:
+          $xfer += $input->skip($ftype);
+          break;
+      }
+      $xfer += $input->readFieldEnd();
+    }
+    $xfer += $input->readStructEnd();
+    return $xfer;
+  }
+
+  public function write($output) {
+    $xfer = 0;
+    $xfer += $output->writeStructBegin('PersonInfo');
+    if ($this->firstName !== null) {
+      $xfer += $output->writeFieldBegin('firstName', TType::STRING, 1);
+      $xfer += $output->writeString($this->firstName);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->lastName !== null) {
+      $xfer += $output->writeFieldBegin('lastName', TType::STRING, 2);
+      $xfer += $output->writeString($this->lastName);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->languageCode !== null) {
+      $xfer += $output->writeFieldBegin('languageCode', TType::STRING, 3);
+      $xfer += $output->writeString($this->languageCode);
+      $xfer += $output->writeFieldEnd();
+    }
+    $xfer += $output->writeFieldStop();
+    $xfer += $output->writeStructEnd();
+    return $xfer;
+  }
+
+}
+
+class MessageInfo {
+  static $_TSPEC;
+
+  public $defaultLanguageCode = null;
+  public $selectedPhoneMessage = null;
+  public $selectedEmailMessage = null;
+
+  public function __construct($vals=null) {
+    if (!isset(self::$_TSPEC)) {
+      self::$_TSPEC = array(
+        1 => array(
+          'var' => 'defaultLanguageCode',
+          'type' => TType::STRING,
+          ),
+        2 => array(
+          'var' => 'selectedPhoneMessage',
+          'type' => TType::STRUCT,
+          'class' => '\messagelink\PhoneMessageInfo',
+          ),
+        3 => array(
+          'var' => 'selectedEmailMessage',
+          'type' => TType::STRUCT,
+          'class' => '\messagelink\EmailMessageInfo',
+          ),
+        );
+    }
+    if (is_array($vals)) {
+      if (isset($vals['defaultLanguageCode'])) {
+        $this->defaultLanguageCode = $vals['defaultLanguageCode'];
+      }
+      if (isset($vals['selectedPhoneMessage'])) {
+        $this->selectedPhoneMessage = $vals['selectedPhoneMessage'];
+      }
+      if (isset($vals['selectedEmailMessage'])) {
+        $this->selectedEmailMessage = $vals['selectedEmailMessage'];
+      }
+    }
+  }
+
+  public function getName() {
+    return 'MessageInfo';
+  }
+
+  public function read($input)
+  {
+    $xfer = 0;
+    $fname = null;
+    $ftype = 0;
+    $fid = 0;
+    $xfer += $input->readStructBegin($fname);
+    while (true)
+    {
+      $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+      if ($ftype == TType::STOP) {
+        break;
+      }
+      switch ($fid)
+      {
+        case 1:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->defaultLanguageCode);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 2:
+          if ($ftype == TType::STRUCT) {
+            $this->selectedPhoneMessage = new \messagelink\PhoneMessageInfo();
+            $xfer += $this->selectedPhoneMessage->read($input);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 3:
+          if ($ftype == TType::STRUCT) {
+            $this->selectedEmailMessage = new \messagelink\EmailMessageInfo();
+            $xfer += $this->selectedEmailMessage->read($input);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        default:
+          $xfer += $input->skip($ftype);
+          break;
+      }
+      $xfer += $input->readFieldEnd();
+    }
+    $xfer += $input->readStructEnd();
+    return $xfer;
+  }
+
+  public function write($output) {
+    $xfer = 0;
+    $xfer += $output->writeStructBegin('MessageInfo');
+    if ($this->defaultLanguageCode !== null) {
+      $xfer += $output->writeFieldBegin('defaultLanguageCode', TType::STRING, 1);
+      $xfer += $output->writeString($this->defaultLanguageCode);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->selectedPhoneMessage !== null) {
+      if (!is_object($this->selectedPhoneMessage)) {
+        throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
+      }
+      $xfer += $output->writeFieldBegin('selectedPhoneMessage', TType::STRUCT, 2);
+      $xfer += $this->selectedPhoneMessage->write($output);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->selectedEmailMessage !== null) {
+      if (!is_object($this->selectedEmailMessage)) {
+        throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
+      }
+      $xfer += $output->writeFieldBegin('selectedEmailMessage', TType::STRUCT, 3);
+      $xfer += $this->selectedEmailMessage->write($output);
+      $xfer += $output->writeFieldEnd();
+    }
+    $xfer += $output->writeFieldStop();
+    $xfer += $output->writeStructEnd();
+    return $xfer;
+  }
+
+}
+
 class Info {
   static $_TSPEC;
 
@@ -26,7 +712,8 @@ class Info {
   public $jobname = null;
   public $jobdescription = null;
   public $jobstarttime = null;
-  public $nummessageparts = null;
+  public $recipient = null;
+  public $messageInfo = null;
 
   public function __construct($vals=null) {
     if (!isset(self::$_TSPEC)) {
@@ -55,9 +742,15 @@ class Info {
           'var' => 'jobstarttime',
           'type' => TType::I32,
           ),
-        8 => array(
-          'var' => 'nummessageparts',
-          'type' => TType::BYTE,
+        9 => array(
+          'var' => 'recipient',
+          'type' => TType::STRUCT,
+          'class' => '\messagelink\PersonInfo',
+          ),
+        10 => array(
+          'var' => 'messageInfo',
+          'type' => TType::STRUCT,
+          'class' => '\messagelink\MessageInfo',
           ),
         );
     }
@@ -80,8 +773,11 @@ class Info {
       if (isset($vals['jobstarttime'])) {
         $this->jobstarttime = $vals['jobstarttime'];
       }
-      if (isset($vals['nummessageparts'])) {
-        $this->nummessageparts = $vals['nummessageparts'];
+      if (isset($vals['recipient'])) {
+        $this->recipient = $vals['recipient'];
+      }
+      if (isset($vals['messageInfo'])) {
+        $this->messageInfo = $vals['messageInfo'];
       }
     }
   }
@@ -147,9 +843,18 @@ class Info {
             $xfer += $input->skip($ftype);
           }
           break;
-        case 8:
-          if ($ftype == TType::BYTE) {
-            $xfer += $input->readByte($this->nummessageparts);
+        case 9:
+          if ($ftype == TType::STRUCT) {
+            $this->recipient = new \messagelink\PersonInfo();
+            $xfer += $this->recipient->read($input);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 10:
+          if ($ftype == TType::STRUCT) {
+            $this->messageInfo = new \messagelink\MessageInfo();
+            $xfer += $this->messageInfo->read($input);
           } else {
             $xfer += $input->skip($ftype);
           }
@@ -197,9 +902,20 @@ class Info {
       $xfer += $output->writeI32($this->jobstarttime);
       $xfer += $output->writeFieldEnd();
     }
-    if ($this->nummessageparts !== null) {
-      $xfer += $output->writeFieldBegin('nummessageparts', TType::BYTE, 8);
-      $xfer += $output->writeByte($this->nummessageparts);
+    if ($this->recipient !== null) {
+      if (!is_object($this->recipient)) {
+        throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
+      }
+      $xfer += $output->writeFieldBegin('recipient', TType::STRUCT, 9);
+      $xfer += $this->recipient->write($output);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->messageInfo !== null) {
+      if (!is_object($this->messageInfo)) {
+        throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
+      }
+      $xfer += $output->writeFieldBegin('messageInfo', TType::STRUCT, 10);
+      $xfer += $this->messageInfo->write($output);
       $xfer += $output->writeFieldEnd();
     }
     $xfer += $output->writeFieldStop();
@@ -393,6 +1109,103 @@ class Audio {
 
 }
 
+class Attachment {
+  static $_TSPEC;
+
+  public $info = null;
+  public $data = null;
+
+  public function __construct($vals=null) {
+    if (!isset(self::$_TSPEC)) {
+      self::$_TSPEC = array(
+        1 => array(
+          'var' => 'info',
+          'type' => TType::STRUCT,
+          'class' => '\messagelink\AttachmentInfo',
+          ),
+        2 => array(
+          'var' => 'data',
+          'type' => TType::STRING,
+          ),
+        );
+    }
+    if (is_array($vals)) {
+      if (isset($vals['info'])) {
+        $this->info = $vals['info'];
+      }
+      if (isset($vals['data'])) {
+        $this->data = $vals['data'];
+      }
+    }
+  }
+
+  public function getName() {
+    return 'Attachment';
+  }
+
+  public function read($input)
+  {
+    $xfer = 0;
+    $fname = null;
+    $ftype = 0;
+    $fid = 0;
+    $xfer += $input->readStructBegin($fname);
+    while (true)
+    {
+      $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+      if ($ftype == TType::STOP) {
+        break;
+      }
+      switch ($fid)
+      {
+        case 1:
+          if ($ftype == TType::STRUCT) {
+            $this->info = new \messagelink\AttachmentInfo();
+            $xfer += $this->info->read($input);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 2:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->data);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        default:
+          $xfer += $input->skip($ftype);
+          break;
+      }
+      $xfer += $input->readFieldEnd();
+    }
+    $xfer += $input->readStructEnd();
+    return $xfer;
+  }
+
+  public function write($output) {
+    $xfer = 0;
+    $xfer += $output->writeStructBegin('Attachment');
+    if ($this->info !== null) {
+      if (!is_object($this->info)) {
+        throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
+      }
+      $xfer += $output->writeFieldBegin('info', TType::STRUCT, 1);
+      $xfer += $this->info->write($output);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->data !== null) {
+      $xfer += $output->writeFieldBegin('data', TType::STRING, 2);
+      $xfer += $output->writeString($this->data);
+      $xfer += $output->writeFieldEnd();
+    }
+    $xfer += $output->writeFieldStop();
+    $xfer += $output->writeStructEnd();
+    return $xfer;
+  }
+
+}
+
 class MessageLinkCodeNotFoundException extends TException {
   static $_TSPEC;
 
@@ -436,6 +1249,106 @@ class MessageLinkCodeNotFoundException extends TException {
   public function write($output) {
     $xfer = 0;
     $xfer += $output->writeStructBegin('MessageLinkCodeNotFoundException');
+    $xfer += $output->writeFieldStop();
+    $xfer += $output->writeStructEnd();
+    return $xfer;
+  }
+
+}
+
+class MessageAttachmentCodeNotFoundException extends TException {
+  static $_TSPEC;
+
+
+  public function __construct() {
+    if (!isset(self::$_TSPEC)) {
+      self::$_TSPEC = array(
+        );
+    }
+  }
+
+  public function getName() {
+    return 'MessageAttachmentCodeNotFoundException';
+  }
+
+  public function read($input)
+  {
+    $xfer = 0;
+    $fname = null;
+    $ftype = 0;
+    $fid = 0;
+    $xfer += $input->readStructBegin($fname);
+    while (true)
+    {
+      $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+      if ($ftype == TType::STOP) {
+        break;
+      }
+      switch ($fid)
+      {
+        default:
+          $xfer += $input->skip($ftype);
+          break;
+      }
+      $xfer += $input->readFieldEnd();
+    }
+    $xfer += $input->readStructEnd();
+    return $xfer;
+  }
+
+  public function write($output) {
+    $xfer = 0;
+    $xfer += $output->writeStructBegin('MessageAttachmentCodeNotFoundException');
+    $xfer += $output->writeFieldStop();
+    $xfer += $output->writeStructEnd();
+    return $xfer;
+  }
+
+}
+
+class MessageAttachmentRequestUnauthorizedException extends TException {
+  static $_TSPEC;
+
+
+  public function __construct() {
+    if (!isset(self::$_TSPEC)) {
+      self::$_TSPEC = array(
+        );
+    }
+  }
+
+  public function getName() {
+    return 'MessageAttachmentRequestUnauthorizedException';
+  }
+
+  public function read($input)
+  {
+    $xfer = 0;
+    $fname = null;
+    $ftype = 0;
+    $fid = 0;
+    $xfer += $input->readStructBegin($fname);
+    while (true)
+    {
+      $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+      if ($ftype == TType::STOP) {
+        break;
+      }
+      switch ($fid)
+      {
+        default:
+          $xfer += $input->skip($ftype);
+          break;
+      }
+      $xfer += $input->readFieldEnd();
+    }
+    $xfer += $input->readStructEnd();
+    return $xfer;
+  }
+
+  public function write($output) {
+    $xfer = 0;
+    $xfer += $output->writeStructBegin('MessageAttachmentRequestUnauthorizedException');
     $xfer += $output->writeFieldStop();
     $xfer += $output->writeStructEnd();
     return $xfer;
