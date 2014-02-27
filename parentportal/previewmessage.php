@@ -150,9 +150,6 @@ if ($email) {
 	if ($message == null)
 		$message = $messagegroup->getMessage("email", "plain", $_SESSION['previewmessage_langcode']);
 	
-	$message = $messagegroup->getMessage("email", "html", $_SESSION['previewmessage_langcode']);
-	if ($message == null)
-		$message = $messagegroup->getMessage("email", "plain", $_SESSION['previewmessage_langcode']);
 	if (count($attachments) > 0) {
 		$parts = DBFindMany("MessagePart", "from messagepart where type = 'MAL' and messageid = ?", false, array($message->id));
 		$linkAttachments = array();
