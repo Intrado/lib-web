@@ -68,17 +68,25 @@ class Message extends DBMappedObject {
 		if (!is_null($messagegroupid))
 			$newmessage->messagegroupid = $messagegroupid;
 		$newmessage->create();
-
-		// copy the parts
-		$parts = DBFindMany("MessagePart", "from messagepart where messageid=$this->id");
-		foreach ($parts as $part) {
-			$part->id = null;
-			$part->messageid = $newmessage->id;
-			$part->create();
+		
+		// need a map of original attachmentID to copied attachmentID to set on the copied message parts of type MAL
+		$attachmentIds = array(); // index is the original messageattachment.id the value is the copied id
+		// fetch attachments and split by type so we can lookup the darn messageattachment ids (not the contentmessageattachments)
+		$origMessageAttachments = $this->getMessageAttachments();
+		$origContentMessageAttachmentLookup = array();
+		$origBurstMessageAttachmentLookup = array();
+		foreach ($origMessageAttachments as $ma) {
+			if ($ma->type == 'content') {
+				$origContentMessageAttachmentLookup[$ma->contentattachmentid] = $ma;
+			} else if ($ma->type == 'burst') {
+				$origBurstMessageAttachmentLookup[$ma->burstattachmentid] = $ma;
+			}
 		}
+
 		// copy the attachments
 		$contentAttachments = $this->getContentAttachments();
 		foreach ($contentAttachments as $contentAttachment) {
+			$origMessageAttachment = $origContentMessageAttachmentLookup[$contentAttachment->id];
 			// call create to generate a new attachment record which is a copy of the existing one
 			$contentAttachment->create();
 			$messageAttachment = new MessageAttachment();
@@ -86,9 +94,11 @@ class Message extends DBMappedObject {
 			$messageAttachment->type = 'content';
 			$messageAttachment->contentattachmentid = $contentAttachment->id;
 			$messageAttachment->create();
+			$attachmentIds[$origMessageAttachment->id] = $messageAttachment->id;
 		}
 		$burstAttachments = $this->getBurstAttachments();
 		foreach ($burstAttachments as $burstAttachment) {
+			$origMessageAttachment = $origBurstMessageAttachmentLookup[$burstAttachment->id];
 			// call create to generate a new attachment record which is a copy of the existing one
 			$burstAttachment->create();
 			$messageAttachment = new MessageAttachment();
@@ -96,6 +106,18 @@ class Message extends DBMappedObject {
 			$messageAttachment->type = 'burst';
 			$messageAttachment->burstattachmentid = $burstAttachment->id;
 			$messageAttachment->create();
+			$attachmentIds[$origMessageAttachment->id] = $messageAttachment->id;
+		}
+		
+		// copy the parts
+		$parts = DBFindMany("MessagePart", "from messagepart where messageid=$this->id");
+		foreach ($parts as $part) {
+			$part->id = null;
+			$part->messageid = $newmessage->id;
+			if ($part->type == 'MAL') {
+				$part->messageattachmentid = $attachmentIds[$part->messageattachmentid]; // copied part must reference the copied messageattachment
+			}
+			$part->create();
 		}
 		
 		return $newmessage;
