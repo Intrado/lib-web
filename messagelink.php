@@ -196,7 +196,7 @@ if ($appservererror) {
 		<script type="text/javascript" language="javascript" src="script/prototype.js"></script>	
 		<script type="text/javascript" language="javascript" src="script/niftyplayer.js.php"></script>
 		<script language="JavaScript" type="text/javascript">
-	 		embedPlayer("<?= (isset($_SERVER["HTTPS"])?"https://":"http://") . $_SERVER['HTTP_HOST'] ?>/m/messagelinkaudio.mp3.php?code=<?=escapehtml($code)?>","player",<?= $messageinfo->nummessageparts ?>);
+	 		embedPlayer("<?= (isset($_SERVER["HTTPS"])?"https://":"http://") . $_SERVER['HTTP_HOST'] ?>/m/messagelinkaudio.mp3.php?code=<?=escapehtml($code)?>","player",<?= $messageinfo->messageInfo->selectedPhoneMessage->nummessageparts ?>);
 		</script>
 		<br /><a href="messagelinkaudio.mp3.php?download&code=<?=escapehtml($code)?>">Click here to download</a>
 	</div>
