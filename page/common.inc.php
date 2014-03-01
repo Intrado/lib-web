@@ -168,7 +168,7 @@ function reliablePageLinkCall ($method, $args = array()) {
 
 			$PLS->transport->close();
 			break;
-		} catch (pagelink_NotFoundException $nfe) {
+		} catch (NotFoundException $nfe) {
 			error_log("WARN: code not found:" . urlencode($CODE));
 			do404(); //terminates early
 		} catch (TException $tx) {

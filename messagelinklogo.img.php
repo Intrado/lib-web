@@ -51,7 +51,7 @@ while(true) {
 		$contenttype = $logo->contenttype;
 		$appservertransport->close();
 		break;
-	} catch (messagelink_MessageLinkCodeNotFoundException $e) {
+	} catch (MessageLinkCodeNotFoundException $e) {
 		error_log("Unable to find the messagelinkcode: " . $code);
 		$data = file_get_contents("img/logo_small.gif");
 		$contenttype = "image/gif";
