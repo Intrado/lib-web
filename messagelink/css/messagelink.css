@@ -3,7 +3,8 @@ body {
 }
 
 #header {
-    background: linear-gradient(to bottom, #08c, #08c);
+    background: #08c;
+    background-image: linear-gradient(to bottom, #34BCFD, #08c);
     height: 60px;
     color: #fff;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -49,9 +50,10 @@ body {
 #email-details-table {
     margin-top: 20px;
 }
-#email-details-table .recipient {
-    font-size: 24px;
-    height: 56px;
+#email-details-table .summary {
+    border-bottom: 1px solid #ddd;
+    font-size: 22px;
+    height: 50px;
 }
 #email-details-table td.email-detail {
     font-weight: bold;
@@ -67,37 +69,81 @@ body {
 #email-details-table.table tfoot > tr > td {
     border-top: 0;
 }
-#password-container {
+#password-container, #download-container, #error-container {
     padding-top: 40px;
 }
+#password-container form .form-group, #download-container form .form-group {
+    margin-bottom: 0;
+}
+#document-wrapper {}
 .well {
     border-radius: 6px;
-    padding: 40px;
+    padding: 20px 40px 30px;
 }
 .well .instruction {
-    font-size: 16px;
+    margin-bottom: 20px;
 }
-#secure-document-wrapper {
+.well .instruction.download {
+    font-size: 20px;
+    font-weight: bold;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 10px;
+}
+.well .instruction.download .directlink{
+    font-size: 14px;
+    font-weight: normal;
+    margin-top: 15px;
+}
+.summary-heading {
+    font-size: 20px;
+    font-weight: bold;
+    letter-spacing: -1px;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+#document-wrapper, #secure-document-wrapper {
     border-bottom: 1px solid #ccc;
     border-top: 1px solid #ccc;
     padding: 20px 0;
     margin: 20px 0;
 }
+#document-wrapper #filename,
 #secure-document-wrapper #filename {
     font-weight: bold;
     font-size: 16px;
+}
+#secure-document-wrapper #filename {
     margin: 0 15px;
 }
-#forgot-password {
-    margin-top: 10px;
+#download-container #document-wrapper {
+    border-bottom: 0;
+    margin-bottom: 0;
+    padding-bottom: 0;
 }
 #contentWrapper {
     z-index: 10;
 }
+#error-container .alert-danger {
+    padding: 30px;
+    font-size: 16px;
+}
+#error-container .label-danger {
+    font-size: 18px;
+    padding-top: 6px;
+}
+#errorMessage {
+    padding-top: 15px;
+    margin-top: 20px;
+    border-top-width: 1px;
+    border-top-style: solid;
+}
 #footer {
-    background: #f5f5f5;
+    background: #444;
     bottom: 0;
-    color: #999;
+    color: #aaa;
+    font-size: 12px;
     height: 80px;
     padding-top: 47px;
     position: absolute;
