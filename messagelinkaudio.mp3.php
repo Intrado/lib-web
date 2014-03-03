@@ -60,7 +60,7 @@ while(true) {
 			header("Content-Length: " . strlen($audio->data));
 			header("Connection: close");
 			echo $audio->data;
-		} catch (messagelink_MessageLinkCodeNotFoundException $e) {
+		} catch (MessageLinkCodeNotFoundException $e) {
 			echo "The requested information was not found. The message you are looking for does not exist or has expired.";
 			error_log("Unable to find the messagelinkcode: " . $code . " Attempt: " . $attempts);
 		}
