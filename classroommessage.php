@@ -19,6 +19,7 @@ require_once("obj/Schedule.obj.php");
 require_once("inc/classroom.inc.php");
 require_once("obj/MessageGroup.obj.php");
 require_once("obj/Message.obj.php");
+require_once("obj/Person.obj.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -147,15 +148,14 @@ if (isset($_POST['eventContacts']) && isset($_POST['eventMessage']) && isset($_P
 //Handle ajax request. when swithcing sections
 if (isset($_GET['sectionid'])) {
 	header('Content-Type: application/json');
-	$id = $_GET['sectionid'];
+	$sectionId = $_GET['sectionid'];
+	$firstnamefield = FieldMap::getFirstNameField();
+	$lastnamefield = FieldMap::getLastNameField();
 	$response = false;
 
-	$usersection = QuickQuery("select count(*) from userassociation ua where sectionid = ? and userid = ?",
-							false,array($id,$USER->id));
+	$usersection = QuickQuery("select count(*) from userassociation ua where sectionid = ? and userid = ?", false,array($sectionId,$USER->id));
 	if($usersection > 0) {
 		// User can access this section
-		$firstnamefield = FieldMap::getFirstNameField();
-		$lastnamefield = FieldMap::getLastNameField();
 
 		switch ($_GET['orderby']) {
 			default:
@@ -172,36 +172,21 @@ if (isset($_GET['sectionid'])) {
 				break;
 		}
 
-		$res = Query("
-			select
-				p.id,
-				p.pkey,
-				p.{$firstnamefield} AS firstname,
-				p.{$lastnamefield} AS lastname
-			from
-				person p 
-				join personassociation pa on (p.id = pa.personid)
-			where
-				pa.type = 'section'
-				and sectionid = ?
-				and not p.deleted
-			order by
-				{$orderby};
-			", false, array($id));
-
-		$contactids = array();
-		while($row = DBGetRow($res)){
+		$people = DBFindMany("Person", "from person p inner join personassociation pa on (p.id = pa.personid)
+				where pa.type = 'section' and pa.sectionid = ? and not p.deleted order by $orderby", 'p', array($sectionId));
+		$response->people = array();
+		foreach ($people as $person) {
 			$obj = null;
-			$obj->pid = intval($row[0]);
-			$contactids[] = $obj->pkey = escapehtml($row[1]);
-			//$obj->name = escapehtml($row[2]);
-			$obj->firstname = escapehtml($row[2]);
-			$obj->lastname = escapehtml($row[3]);
-			//$response->people[$row[0]] = $obj;
+			$obj->pid = $person->id;
+			$obj->pkey = escapehtml($person->pkey);
+			$obj->firstname = escapehtml($person->$firstnamefield);
+			$obj->lastname = escapehtml($person->$lastnamefield);
 			$response->people[] = $obj;
 		}
-		if(isset($response->people) && count($response->people) > 0) {
-			//$contactids = array_keys($response->people);
+
+		if($people && count($people) > 0) {
+			$args = array($USER->id, $sectionId);
+			$args = array_merge($args, array_keys($people));
 			$query = "
 				select
 					tm.targetedmessagecategoryid,
@@ -216,8 +201,8 @@ if (isset($_GET['sectionid'])) {
 					e.userid = ?
 					and e.sectionid = ?
 					and Date(e.occurence) = CURDATE()
-					and pa.personid in (" . implode(",",$contactids) . ")";
-			$response->cache = QuickQueryMultiRow($query,false,false,array($USER->id,$id));
+					and pa.personid in (" . repeatWithSeparator('?', ',', count($people)) . ")";
+			$response->cache = QuickQueryMultiRow($query, false, false, $args);
 		} else {
 			$response = false;
 		}
