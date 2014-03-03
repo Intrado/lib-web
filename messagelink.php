@@ -79,7 +79,7 @@ if (!$badcode) {
 				$appservertransport->open();
 				try {
 					$messageinfo = $client->getInfo($code);
-				} catch (messagelink_MessageLinkCodeNotFoundException $e) {
+				} catch (MessageLinkCodeNotFoundException $e) {
 					$badcode = true;
 					error_log("Unable to find the messagelinkcode: " . urlencode($code));
 				}
