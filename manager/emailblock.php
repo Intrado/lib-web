@@ -23,7 +23,6 @@ require_once("../obj/User.obj.php");
 if (!$MANAGERUSER->authorized("emailblock"))
 	exit("Not Authorized");
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
@@ -31,14 +30,14 @@ if (!$MANAGERUSER->authorized("emailblock"))
 $helpstepnum = 1;
 
 $formdata = array(
-	"emailaddress" => array(
-		"label" => _L('Email Address'),
+	"emailaddresses" => array(
+		"label" => _L('Email Addresses'),
+		"fieldhelp" => _L("Enter one email address per line."), 
 		"value" => "",
 		"validators" => array(
 			array("ValRequired"),
-			array("ValEmail")
 		),
-		"control" => array("TextField","size" => 30, "maxlength" => 255),
+		"control" => array("TextArea","rows" => 20, "cols" => 80),
 		"helpstep" => $helpstepnum
 	),
 	"description" => array(
@@ -85,48 +84,60 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			loadManagerConnectionData();
 			global $CUSTOMERINFO;
 
+			//split emails by line and filtering out invalid ones
+			$emails = preg_split ('/$\R?^/m', trim($postdata['emailaddresses']));
+			$emails = array_map("trim", $emails);
+			$emails = array_filter($emails, "validEmail");
+
 			// iterate over all the customer databases
 			foreach ($CUSTOMERINFO as $cid => $cust) {
 
 				// need to get a connection to the customer database, NOT read-only! We will be inserting data.
 				$custdb = getPooledCustomerConnection($cid,false);
-				
-				// check if there is a person who matches the email address
-				$email = DBFind("Email", "from email where email = ?", false, array($postdata['emailaddress']), $custdb);
-				if ($email === false)
-					continue;
-				
+
 				// need to get the schoolmessenger user so we can associated the block record with it
 				$smUser = DBFind("User", "from user where login = 'schoolmessenger' and not deleted", false, null, $custdb);
 				if ($smUser === false) {
 					// This should never happen, there should always be a schoolmessenger super admin user account!
-					error_log("Error blocking email address: '". $postdata['emailaddress']. "' reason: No 'schoolmessenger' user was found");
+					error_log("Error blocking emails for customer $cid reason: No 'schoolmessenger' user was found");
 					continue;
 				}
-				// insert the block record (insert on duplicate key skip)
-				$count = QuickUpdate("insert into blockeddestination (userid, description, destination, type, createdate, blockmethod)
-						values (?, ?, ?, 'email', now(), 'manual') on duplicate key update userid = userid",
-						$custdb, array($smUser->id, $postdata['description'], $postdata['emailaddress']));
-				
-				// keep track of which customers blocked this address
-				if ($count > 0)
-					$customersBlocked[$cid] = "Successfully Blocked";
-				else
-					$customersBlocked[$cid] = "Already Blocked";
+
+				//insert/overwrite blockeddestination for all emails found in the email table
+				$query = "insert into blockeddestination (userid, description, destination, type, createdate, blockmethod)
+							select distinct ? as userid, ? as description, e.email as destination, 'email' as type, now() as createdate, 'manual' as blockmethod 
+							from email e where e.email in (".repeatWithSeparator("?", ",", count($emails)).")
+							group by e.email
+						on duplicate key update userid = values(userid), description = values(description), blockmethod=values(blockmethod), 
+										createdate=values(createdate), failattempts = null
+				";
+				$args = array_merge(array($smUser->id, $postdata['description']), $emails);
+
+				QuickUpdate($query, $custdb, $args);
+
+				//get a count of matching emails blocked. this should match what above inserted/overwrote but 
+				//QuickUpdate return value for affected rows is unreliable when using "insert ... select ... on duplicate key update"
+				$query = "select count(*) from blockeddestination bd where bd.type = 'email' and bd.destination in (".repeatWithSeparator("?", ",", count($emails)).")";
+				$count = QuickQuery($query, $custdb, $emails);
+				$customersBlocked[$cid] = $count;
 			}
 			
 			// format some html to return to the client for display
 			$html = "";
-			if ($customersBlocked) {
-				$html = "<table class='list'><tbody>
-					<tr class='listHeader'><th>Customer Id</th><th>Block Status</th></tr>";
+			$instanceCount = array_sum($customersBlocked);
+			if ($instanceCount > 0) {
+				$html = "<h3>Blocking " . count($emails) . " valid emails. $instanceCount instances.</h3>";
+				$html .= "<table class='list'><tbody>
+					<tr class='listHeader'><th>Customer Id</th><th>(Re)Block Count</th></tr>";
 				$count = 1;
-				foreach ($customersBlocked as $cid => $blockStatus) {
+				foreach ($customersBlocked as $cid => $blockCount) {
+					if ($blockCount == 0)
+						continue;
 					if ($count++ % 2 == 0)
 						$class = "listAlt";
 					else
 						$class = "";
-					$html .= "<tr class = '$class'><td>$cid</td><td>$blockStatus</td></tr>";
+					$html .= "<tr class = '$class'><td>$cid</td><td>$blockCount</td></tr>";
 				}
 				$html .= "</tbody></table>";
 			} else {
