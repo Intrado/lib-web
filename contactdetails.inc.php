@@ -737,7 +737,7 @@ foreach ($fieldmaps as $map) {
 
 				<tr>
 					<td>Activation Code:</td>
-					<td><?=$tokendata['token'] ?></td>
+					<td id="activation_code"><?=$tokendata['token'] ?></td>
 				</tr>
 				<tr>
 					<td>Expiration Date:</td>
