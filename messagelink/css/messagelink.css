@@ -1,10 +1,17 @@
+html, body {
+    height: 100%;
+}
 body {
     background: #fff;
 }
-
+#wrap {
+    height: auto !important;
+    margin: 0 auto -80px;
+    min-height: 100%;
+}
 #header {
     background: #08c;
-    background-image: linear-gradient(to bottom, #34BCFD, #08c);
+    background-image: linear-gradient(to bottom, #19a1e4, #078bce);
     height: 60px;
     color: #fff;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -41,38 +48,10 @@ body {
     padding-top: 40px;
     font-size: 48px;
 }
-#email-details-table td.email-field {
-    text-align: right;
-}
-#email-details-table td.email-field:nth-child(1) {
-    width: 80px;
-}
-#email-details-table {
-    margin-top: 20px;
-}
-#email-details-table .summary {
-    border-bottom: 1px solid #ddd;
-    font-size: 22px;
-    height: 50px;
-}
-#email-details-table td.email-detail {
-    font-weight: bold;
-}
-#email-details-table td.email-detail .text-muted, #email-details-table td.email-detail .normal {
-    font-weight: normal;
-}
-#email-details-table.table thead > tr > th,
-#email-details-table.table tbody > tr > th,
-#email-details-table.table tfoot > tr > th,
-#email-details-table.table thead > tr > td,
-#email-details-table.table tbody > tr > td,
-#email-details-table.table tfoot > tr > td {
-    border-top: 0;
-}
-#password-container, #download-container, #error-container {
+#messagelink-container, #password-container, #download-container, #error-container {
     padding-top: 40px;
 }
-#password-container form .form-group, #download-container form .form-group {
+form .form-group {
     margin-bottom: 0;
 }
 #document-wrapper {}
@@ -89,10 +68,15 @@ body {
     border-bottom: 1px solid #ddd;
     margin-bottom: 10px;
 }
-.well .instruction.download .directlink{
+.well .instruction.download .directlink {
     font-size: 14px;
     font-weight: normal;
     margin-top: 15px;
+}
+.well .instruction.download #download-error-message-container {
+    font-weight: bold;
+    font-size: 14px;
+    margin: 15px 0;
 }
 .summary-heading {
     font-size: 20px;
@@ -102,28 +86,47 @@ body {
     padding-bottom: 10px;
     border-bottom: 1px solid #ddd;
 }
-
-#document-wrapper, #secure-document-wrapper {
+#messagelink-container .audiofile {
+    margin-top: 15px;
+}
+#document-wrapper, #secure-document-wrapper, #message-file-wrapper {
     border-bottom: 1px solid #ccc;
     border-top: 1px solid #ccc;
-    padding: 20px 0;
+    padding: 15px 0;
     margin: 20px 0;
 }
 #document-wrapper #filename,
 #secure-document-wrapper #filename {
     font-weight: bold;
-    font-size: 16px;
 }
-#secure-document-wrapper #filename {
-    margin: 0 15px;
+#document-wrapper .control-label, #secure-document-wrapper .control-label {
+    padding-top: 0;
 }
-#download-container #document-wrapper {
+#download-container #document-wrapper, #messagelink-container #message-file-wrapper {
     border-bottom: 0;
     margin-bottom: 0;
     padding-bottom: 0;
 }
-#contentWrapper {
+#content-wrapper {
     z-index: 10;
+}
+#view-message-modal .modal-body {
+    max-height: 300px;
+    overflow: auto;
+}
+#message-modal-trigger, #directlink {
+    cursor: pointer;
+}
+#message-modal-trigger span.glyphicon {
+    margin-right: 8px;
+}
+#download-error-message-container {
+    display: none;
+    margin-top: 10px;
+    margin-bottom: 0;
+}
+#download-error-message {
+    font-weight: bold;
 }
 #error-container .alert-danger {
     padding: 30px;
@@ -133,20 +136,18 @@ body {
     font-size: 18px;
     padding-top: 6px;
 }
-#errorMessage {
+#error-message {
     padding-top: 15px;
     margin-top: 20px;
     border-top-width: 1px;
     border-top-style: solid;
 }
+#footer, #push {
+    height: 80px;
+}
 #footer {
     background: #444;
-    bottom: 0;
     color: #aaa;
     font-size: 12px;
-    height: 80px;
     padding-top: 47px;
-    position: absolute;
-    width: 100%;
-    z-index: 1;
 }

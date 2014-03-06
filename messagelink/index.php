@@ -3,7 +3,7 @@ setlocale(LC_ALL, 'en_US.UTF-8');
 mb_internal_encoding('UTF-8');
 
 // $SETTINGS required by appserver.inc.php
-$SETTINGS = parse_ini_file("../inc/settings.ini.php",true);
+$SETTINGS = parse_ini_file("inc/settings.ini.php",true);
 
 date_default_timezone_set("US/Pacific");
 
@@ -14,7 +14,7 @@ function escapeHtml($string) {
 	return htmlentities($string, ENT_COMPAT, 'UTF-8') ;
 }
 
-require_once("../inc/appserver.inc.php");
+require_once("inc/appserver.inc.php");
 
 $thriftRequires = array(
     "Base/TBase.php",
@@ -39,11 +39,11 @@ $thriftRequires = array(
 );
 
 foreach ($thriftRequires as $require) {
-    require_once("../Thrift/{$require}");
+    require_once("Thrift/{$require}");
 }
 
 require_once("messagelinkitemview.obj.php");
-require_once("linkcontroller.obj.php");
+require_once("messagelinkcontroller.obj.php");
 
 /*********************************************************************************/
 
@@ -57,12 +57,12 @@ if (isset($_GET['mal'])) {
 }
 
 /*
- * Create new (Message|Attachment) LinkController with request params,
+ * Create new (Message|Attachment)LinkController with request params,
  * Initialize the (thrift) MessageLinkClient and render the appropriate view
  */
-$linkController = new LinkController($request);
-$linkController->initApp();
-$linkController->renderView();
+$messageLinkController = new MessageLinkController($request);
+$messageLinkController->initApp();
+$messageLinkController->renderView();
 
 ?>
 
