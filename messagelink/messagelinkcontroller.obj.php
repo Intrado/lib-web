@@ -116,7 +116,7 @@ class MessageLinkController {
 							"productName" => "SchoolMessenger"
 						);
 
-						if (isset($this->request['s']) && strlen($this->request['s']) > 0 ) {
+						if (isset($this->request['s']) && !empty($this->request['s']) ) {
 							// add fields required by both ML or SDD UI's
 							$this->modelData->messageLinkCode = $this->request['s'];
 							$this->modelData->footer = $footerView;
