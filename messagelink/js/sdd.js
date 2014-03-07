@@ -24,10 +24,6 @@ function SDD() {
 	this.errorMsgContainer = $("#download-error-message-container");
 	this.errorMsg = $("#download-error-message");
 
-	this.password = $("#password");
-	this.countElem = $("#download-count");
-
-
 	/**
 	 *	Initializes appropriate event handler(s) depending on the resulting SDD page (Password or Download).
 	 *
@@ -36,6 +32,9 @@ function SDD() {
 	 * init SDD Download page-specific event handler
 	 */
 	this.initialize = function() {
+		this.password = $("#password");
+		this.countElem = $("#download-count");
+
 		if ($this.password.length) {
 			$this.downloadB  = $("#downloadB");
 			$this.addPasswordKeyupHandler();
@@ -92,7 +91,9 @@ function SDD() {
 	 * @param elem
 	 */
 	this.disableElem = function(elem) {
-		elem.attr('disabled', 'disabled').addClass('disabled');
+		if (elem) {
+			elem.attr('disabled', 'disabled').addClass('disabled');
+		}
 	};
 
 	/**
@@ -100,14 +101,20 @@ function SDD() {
 	 * @param elem
 	 */
 	this.enableElem = function(elem) {
-		elem.removeAttr('disabled').removeClass('disabled');
+		if (elem) {
+			elem.removeAttr('disabled').removeClass('disabled');
+		}
 	};
 
 	/**
 	 *
 	 */
 	this.countdownTimerFcn = function() {
-		$this.count -= 1;
+		// only decrement if count > 0
+		if ($this.count > 0) {
+			$this.count -= 1;
+		}
+
 		if ($this.count == 0) {
 			$this.stopCountdownTimer();
 			$this.requestDocument($this.messageLinkCode, $this.attachmentLinkCode, null);
@@ -139,7 +146,6 @@ function SDD() {
 		if ($this.downloadB) {
 			$this.downloadB.on('click', function(e) {
 				e.preventDefault();
-				// request document
 				$this.requestDocument($this.messageLinkCode, $this.attachmentLinkCode, $this.password.val());
 			});
 		}
@@ -149,10 +155,13 @@ function SDD() {
 	 *
 	 */
 	this.addDirectLinkClickHandler = function() {
-		$(".directlink").on('click', function(e) {
-			e.preventDefault();
-			$this.requestDocument($this.messageLinkCode, $this.attachmentLinkCode, null);
-		});
+		var directLink = $(".directlink");
+		if (directLink) {
+			directLink.on('click', function(e) {
+				e.preventDefault();
+				$this.requestDocument($this.messageLinkCode, $this.attachmentLinkCode, null);
+			});
+		}
 	};
 
 	/**
@@ -170,9 +179,5 @@ function SDD() {
 	this.stopCountdownTimer = function() {
 		clearInterval($this.counter);
 	};
-
-
-	/****************** Execute **************************/
-	this.initialize();
 
 }

@@ -68,7 +68,7 @@ form .form-group {
     border-bottom: 1px solid #ddd;
     margin-bottom: 10px;
 }
-.well .instruction.download .directlink {
+.well .instruction.download p {
     font-size: 14px;
     font-weight: normal;
     margin-top: 15px;
@@ -114,7 +114,7 @@ form .form-group {
     max-height: 300px;
     overflow: auto;
 }
-#message-modal-trigger, #directlink {
+#message-modal-trigger, .directlink {
     cursor: pointer;
 }
 #message-modal-trigger span.glyphicon {

@@ -107,7 +107,7 @@ class MessageLinkController {
 											"filename" => "Spring Grades 2014 - Soquel High School.pdf",
 											"contentType" => "text/pdf",
 											"size" => null,
-											"isPasswordProtected" => true,
+											"isPasswordProtected" => false,
 											"code" => "123"
 										)
 									),
@@ -116,7 +116,7 @@ class MessageLinkController {
 							"productName" => "SchoolMessenger"
 						);
 
-						if (isset($this->request['s'])) {
+						if (isset($this->request['s']) && strlen($this->request['s']) > 0 ) {
 							// add fields required by both ML or SDD UI's
 							$this->modelData->messageLinkCode = $this->request['s'];
 							$this->modelData->footer = $footerView;
@@ -136,7 +136,7 @@ class MessageLinkController {
 
 
 							// request is for SDD; create SDD UI
-							} else if (isset($this->request['mal'])) {
+							} else if (isset($this->request['mal']) && !empty($this->request['mal'])) {
 
 								// ensure selectedEmailMessage object and its child property attachmentLookup exist
 								// before creating the SDD view
@@ -148,6 +148,8 @@ class MessageLinkController {
 								} else {
 									$this->view = $this->getCustomerErrorMessageView();
 								}
+							} else {
+								$this->view = $this->getCustomerErrorMessageView();
 							}
 
 						// no 's' code, show error message

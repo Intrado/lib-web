@@ -13,6 +13,7 @@
 	<script type="text/javascript">
 		$(function () {
 			var sdd = new SDD();
+			sdd.initialize();
 		});
 	</script>
 </head>
