@@ -63,7 +63,7 @@ describe("SDD (Secure Document Delivery)", function() {
 
 		});
 
-		it("should call initCount(), addDirectLinkClickHandler(), and startCountdownTimer() if $('#countElem') elem in DOM", function() {
+		it("should call addDirectLinkClickHandler(), and startCountdownTimer() if $('#countElem') elem in DOM", function() {
 
 			var countElem = $("<span>").attr({"id":"download-count"});
 			contentWrapper.append(countElem);
@@ -196,20 +196,6 @@ describe("SDD (Secure Document Delivery)", function() {
 			sdd.enableElem(elem);
 			expect(elem.hasClass('disabled')).to.equal(false);
 			expect(elem.attr('disabled')).to.equal(undefined);
-
-		});
-	});
-
-	describe("initCount(count)", function() {
-		it("should set instance this.count to the count arg", function() {
-			var elem = $("<button>");
-			contentWrapper.append(elem);
-			expect(elem.hasClass('disabled')).to.equal(false);
-			expect(elem.attr('disabled')).to.equal(undefined);
-
-			sdd.disableElem(elem);
-			expect(elem.hasClass('disabled')).to.equal(true);
-			expect(elem.attr('disabled')).to.equal('disabled');
 
 		});
 	});
