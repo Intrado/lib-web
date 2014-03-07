@@ -3,7 +3,7 @@ setlocale(LC_ALL, 'en_US.UTF-8');
 mb_internal_encoding('UTF-8');
 
 // $SETTINGS required by appserver.inc.php
-$SETTINGS = parse_ini_file("inc/settings.ini.php",true);
+$SETTINGS = parse_ini_file("messagelinksettings.ini.php",true);
 
 date_default_timezone_set("US/Pacific");
 
@@ -16,34 +16,32 @@ function escapeHtml($string) {
 
 require_once("inc/appserver.inc.php");
 
-$thriftRequires = array(
-	"Base/TBase.php",
-	"Protocol/TProtocol.php",
-	"Protocol/TBinaryProtocol.php",
-	"Protocol/TBinaryProtocolAccelerated.php",
-	"Transport/TTransport.php",
-	"Transport/TSocket.php",
-	"Transport/TBufferedTransport.php",
-	"Transport/TFramedTransport.php",
-	"Exception/TException.php",
-	"Exception/TTransportException.php",
-	"Exception/TProtocolException.php",
-	"Exception/TApplicationException.php",
-	"Type/TType.php",
-	"Type/TMessageType.php",
-	"StringFunc/TStringFunc.php",
-	"Factory/TStringFuncFactory.php",
-	"StringFunc/Core.php",
-	"packages/messagelink/Types.php",
-	"packages/messagelink/MessageLink.php"
-);
-
-foreach ($thriftRequires as $require) {
-	require_once("Thrift/{$require}");
-}
+// load the thrift api requirements.
+$thriftdir = '../Thrift';
+require_once("{$thriftdir}/Base/TBase.php");
+require_once("{$thriftdir}/Protocol/TProtocol.php");
+require_once("{$thriftdir}/Protocol/TBinaryProtocol.php");
+require_once("{$thriftdir}/Protocol/TBinaryProtocolAccelerated.php");
+require_once("{$thriftdir}/Transport/TTransport.php");
+require_once("{$thriftdir}/Transport/TSocket.php");
+require_once("{$thriftdir}/Transport/TBufferedTransport.php");
+require_once("{$thriftdir}/Transport/TFramedTransport.php");
+require_once("{$thriftdir}/Exception/TException.php");
+require_once("{$thriftdir}/Exception/TTransportException.php");
+require_once("{$thriftdir}/Exception/TProtocolException.php");
+require_once("{$thriftdir}/Exception/TApplicationException.php");
+require_once("{$thriftdir}/Type/TType.php");
+require_once("{$thriftdir}/Type/TMessageType.php");
+require_once("{$thriftdir}/StringFunc/TStringFunc.php");
+require_once("{$thriftdir}/Factory/TStringFuncFactory.php");
+require_once("{$thriftdir}/StringFunc/Core.php");
+require_once("{$thriftdir}/packages/messagelink/Types.php");
+require_once("{$thriftdir}/packages/messagelink/MessageLink.php");
 
 use messagelink\MessageLinkClient;
 use messagelink\MessageLinkCodeNotFoundException;
+use messagelink\MessageAttachmentCodeNotFoundException;
+use messagelink\MessageAttachmentRequestUnauthorizedException;
 
 /*****************************************************************/
 
@@ -83,20 +81,20 @@ if($protocol == null || $transport == null) {
 			$transport->open();
 			try {
 				// request attachment
-				$attachmentInfo = $client->getAttachmentInfo($_GET['messageLinkCode'], $_GET['attachmentLinkCode'], $_GET['password']);
+				$attachmentInfo = $client->getEmailAttachment($_GET['messageLinkCode'], $_GET['attachmentLinkCode'], $_GET['password']);
 
 			// invalid MessageLinkCode ('s')
-			} catch (messagelink_MessageLinkCodeNotFoundException $e) {
+			} catch (MessageLinkCodeNotFoundException $e) {
 				error_log("Unable to find the messagelinkcode: " . urlencode($_GET['messageLinkCode']));
 				echoErrorResponse("The requested document was not found. The document you are looking for does not exist or has expired.");
 
 			// invalid AttachmentLinkCode ('mal')
-			} catch (messagelink_MessageAttachmentCodeNotFoundException $e) {
+			} catch (MessageAttachmentCodeNotFoundException $e) {
 				error_log("Unable to find the attachmentlinkcode: " . urlencode($_GET['attachmentLinkCode']));
 				echoErrorResponse("The requested document was not found. The document you are looking for does not exist or has expired.");
 
 			// invalid password
-			} catch (messagelink_MessageAttachmentRequestUnauthorizedException $e) {
+			} catch (MessageAttachmentRequestUnauthorizedException $e) {
 				echoErrorResponse("The password entered was incorrect.");
 			}
 
@@ -127,8 +125,9 @@ header('Content-type: ' . $attachmentInfo->info->contentType);
 header("Pragma: private");
 header("Cache-Control: private");
 header("Content-Length: " . strlen($attachmentInfo->data));
+header("Content-disposition: attachment; filename=\"" . $attachmentInfo->info->filename . "\"");
 header("Connection: close");
-echo $contentInfo->data;
+echo $attachmentInfo->data;
 exit();
 
 ?>
