@@ -243,7 +243,7 @@ describe("SDD (Secure Document Delivery)", function() {
 
 			sdd.countdownTimerFcn();
 			expect(stopCountdownTimerStub).to.have.been.calledOnce;
-			expect(requestDocumentStub).to.have.been.calledWith('1234', '5678', null);
+			expect(requestDocumentStub).to.have.been.calledWith();
 
 			stopCountdownTimerStub.restore();
 			requestDocumentStub.restore();
@@ -340,7 +340,7 @@ describe("SDD (Secure Document Delivery)", function() {
 
 			expect(requestDocumentStub).to.not.have.been.called;
 			downloadB.trigger('click');
-			expect(requestDocumentStub).to.have.been.calledWith('1234', '5678', 'secretpassword123');
+			expect(requestDocumentStub).to.have.been.calledWith('secretpassword123');
 			requestDocumentStub.restore();
 		});
 	});
@@ -355,7 +355,7 @@ describe("SDD (Secure Document Delivery)", function() {
 
 			expect(requestDocumentStub).to.not.have.been.called;
 			directlink.trigger('click');
-			expect(requestDocumentStub).to.have.been.calledWith('1234', '5678', null);
+			expect(requestDocumentStub).to.have.been.calledWith();
 			requestDocumentStub.restore();
 		});
 	});

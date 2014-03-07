@@ -117,7 +117,7 @@ function SDD() {
 
 		if ($this.count == 0) {
 			$this.stopCountdownTimer();
-			$this.requestDocument($this.messageLinkCode, $this.attachmentLinkCode, null);
+			$this.requestDocument();
 		}
 		$this.countElem.html($this.count);
 	};
@@ -146,7 +146,7 @@ function SDD() {
 		if ($this.downloadB) {
 			$this.downloadB.on('click', function(e) {
 				e.preventDefault();
-				$this.requestDocument($this.messageLinkCode, $this.attachmentLinkCode, $this.password.val());
+				$this.requestDocument($this.password.val());
 			});
 		}
 	}
@@ -159,7 +159,7 @@ function SDD() {
 		if (directLink) {
 			directLink.on('click', function(e) {
 				e.preventDefault();
-				$this.requestDocument($this.messageLinkCode, $this.attachmentLinkCode, null);
+				$this.requestDocument();
 			});
 		}
 	};
