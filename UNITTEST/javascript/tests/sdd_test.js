@@ -388,7 +388,7 @@ describe("SDD (Secure Document Delivery)", function() {
 	});
 
 	describe("stopCountdownTimer()", function() {
-		it("should call setInterval(countdownTimerFcn, 1000)", function() {
+		it("should stop the counter by calling clearInterval(this.counter)", function() {
 			var clearIntervalStub = sinon.stub(window, "clearInterval");
 
 			// dummy return result from setInterval(...)
