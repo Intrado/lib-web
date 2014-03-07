@@ -1,8 +1,8 @@
 ;<?/* this prevents browsers from seeing anything
 
-; commsuite appserver service
-[appserver_commsuite]
-host="localhost:7912"
+; messagelink appserver service
+[appserver]
+host="localhost:7911"
 timeout=5500
 
 ;*/?>
