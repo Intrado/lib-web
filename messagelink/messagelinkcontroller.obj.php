@@ -103,15 +103,15 @@ class MessageLinkController {
 									"subject" => "Test email subject",
 									"plainBody" => "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas in dui pharetra, vestibulum nibh fringilla, convallis ligula. Aenean accumsan lectus sed turpis iaculis, non viverra nisi dignissim. Donec luctus neque dapibus lorem ultrices, in fringilla nisi tempus. Aenean hendrerit luctus porta. Nulla pretium metus porttitor ipsum vehicula, ac venenatis ipsum vehicula. Phasellus hendrerit, nulla vel dictum varius, tellus nisl scelerisque sem, sed ultricies nisi urna vel dolor. Vivamus pretium tincidunt porta.",
 									"attachmentLookup" => array(
-										"123" => (Object) array(
+										"5ab32aade03b0b150d06ded6dd78bdb066ba4d9cf06112cdcc96e56991a8d2fd" => (Object) array(
 											"filename" => "Spring Grades 2014 - Soquel High School.pdf",
-											"contentType" => "text/pdf",
+											"contentType" => "application/pdf",
 											"size" => null,
-											"isPasswordProtected" => false,
-											"code" => "123"
+											"isPasswordProtected" => true,
+											"code" => "5ab32aade03b0b150d06ded6dd78bdb066ba4d9cf06112cdcc96e56991a8d2fd"
 										)
 									),
-								),
+								), //http://sandbox/m/messagelink/?s=Mv0ZyFhMzSM&mal=5ab32aade03b0b150d06ded6dd78bdb066ba4d9cf06112cdcc96e56991a8d2fd
 							),
 							"productName" => "SchoolMessenger"
 						);
