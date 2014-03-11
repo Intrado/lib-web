@@ -21,6 +21,7 @@ interface MessageLinkIf {
   public function getLogo($code);
   public function getAudioPart($code, $partnum);
   public function getAudioFull($code);
+  public function getAttachmentInfo($code, $attachmentCode, $secret);
   public function getEmailAttachment($code, $attachmentCode, $secret);
 }
 
@@ -250,6 +251,68 @@ class MessageLinkClient implements \messagelink\MessageLinkIf {
       throw $result->nfe;
     }
     throw new \Exception("getAudioFull failed: unknown result");
+  }
+
+  public function getAttachmentInfo($code, $attachmentCode, $secret)
+  {
+    $this->send_getAttachmentInfo($code, $attachmentCode, $secret);
+    return $this->recv_getAttachmentInfo();
+  }
+
+  public function send_getAttachmentInfo($code, $attachmentCode, $secret)
+  {
+    $args = new \messagelink\MessageLink_getAttachmentInfo_args();
+    $args->code = $code;
+    $args->attachmentCode = $attachmentCode;
+    $args->secret = $secret;
+    $bin_accel = ($this->output_ instanceof TBinaryProtocolAccelerated) && function_exists('thrift_protocol_write_binary');
+    if ($bin_accel)
+    {
+      thrift_protocol_write_binary($this->output_, 'getAttachmentInfo', TMessageType::CALL, $args, $this->seqid_, $this->output_->isStrictWrite());
+    }
+    else
+    {
+      $this->output_->writeMessageBegin('getAttachmentInfo', TMessageType::CALL, $this->seqid_);
+      $args->write($this->output_);
+      $this->output_->writeMessageEnd();
+      $this->output_->getTransport()->flush();
+    }
+  }
+
+  public function recv_getAttachmentInfo()
+  {
+    $bin_accel = ($this->input_ instanceof TBinaryProtocolAccelerated) && function_exists('thrift_protocol_read_binary');
+    if ($bin_accel) $result = thrift_protocol_read_binary($this->input_, '\messagelink\MessageLink_getAttachmentInfo_result', $this->input_->isStrictRead());
+    else
+    {
+      $rseqid = 0;
+      $fname = null;
+      $mtype = 0;
+
+      $this->input_->readMessageBegin($fname, $mtype, $rseqid);
+      if ($mtype == TMessageType::EXCEPTION) {
+        $x = new TApplicationException();
+        $x->read($this->input_);
+        $this->input_->readMessageEnd();
+        throw $x;
+      }
+      $result = new \messagelink\MessageLink_getAttachmentInfo_result();
+      $result->read($this->input_);
+      $this->input_->readMessageEnd();
+    }
+    if ($result->success !== null) {
+      return $result->success;
+    }
+    if ($result->nfe !== null) {
+      throw $result->nfe;
+    }
+    if ($result->malnfe !== null) {
+      throw $result->malnfe;
+    }
+    if ($result->unauthex !== null) {
+      throw $result->unauthex;
+    }
+    throw new \Exception("getAttachmentInfo failed: unknown result");
   }
 
   public function getEmailAttachment($code, $attachmentCode, $secret)
@@ -1013,6 +1076,261 @@ class MessageLink_getAudioFull_result {
     if ($this->nfe !== null) {
       $xfer += $output->writeFieldBegin('nfe', TType::STRUCT, 1);
       $xfer += $this->nfe->write($output);
+      $xfer += $output->writeFieldEnd();
+    }
+    $xfer += $output->writeFieldStop();
+    $xfer += $output->writeStructEnd();
+    return $xfer;
+  }
+
+}
+
+class MessageLink_getAttachmentInfo_args {
+  static $_TSPEC;
+
+  public $code = null;
+  public $attachmentCode = null;
+  public $secret = null;
+
+  public function __construct($vals=null) {
+    if (!isset(self::$_TSPEC)) {
+      self::$_TSPEC = array(
+        1 => array(
+          'var' => 'code',
+          'type' => TType::STRING,
+          ),
+        2 => array(
+          'var' => 'attachmentCode',
+          'type' => TType::STRING,
+          ),
+        3 => array(
+          'var' => 'secret',
+          'type' => TType::STRING,
+          ),
+        );
+    }
+    if (is_array($vals)) {
+      if (isset($vals['code'])) {
+        $this->code = $vals['code'];
+      }
+      if (isset($vals['attachmentCode'])) {
+        $this->attachmentCode = $vals['attachmentCode'];
+      }
+      if (isset($vals['secret'])) {
+        $this->secret = $vals['secret'];
+      }
+    }
+  }
+
+  public function getName() {
+    return 'MessageLink_getAttachmentInfo_args';
+  }
+
+  public function read($input)
+  {
+    $xfer = 0;
+    $fname = null;
+    $ftype = 0;
+    $fid = 0;
+    $xfer += $input->readStructBegin($fname);
+    while (true)
+    {
+      $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+      if ($ftype == TType::STOP) {
+        break;
+      }
+      switch ($fid)
+      {
+        case 1:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->code);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 2:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->attachmentCode);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 3:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->secret);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        default:
+          $xfer += $input->skip($ftype);
+          break;
+      }
+      $xfer += $input->readFieldEnd();
+    }
+    $xfer += $input->readStructEnd();
+    return $xfer;
+  }
+
+  public function write($output) {
+    $xfer = 0;
+    $xfer += $output->writeStructBegin('MessageLink_getAttachmentInfo_args');
+    if ($this->code !== null) {
+      $xfer += $output->writeFieldBegin('code', TType::STRING, 1);
+      $xfer += $output->writeString($this->code);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->attachmentCode !== null) {
+      $xfer += $output->writeFieldBegin('attachmentCode', TType::STRING, 2);
+      $xfer += $output->writeString($this->attachmentCode);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->secret !== null) {
+      $xfer += $output->writeFieldBegin('secret', TType::STRING, 3);
+      $xfer += $output->writeString($this->secret);
+      $xfer += $output->writeFieldEnd();
+    }
+    $xfer += $output->writeFieldStop();
+    $xfer += $output->writeStructEnd();
+    return $xfer;
+  }
+
+}
+
+class MessageLink_getAttachmentInfo_result {
+  static $_TSPEC;
+
+  public $success = null;
+  public $nfe = null;
+  public $malnfe = null;
+  public $unauthex = null;
+
+  public function __construct($vals=null) {
+    if (!isset(self::$_TSPEC)) {
+      self::$_TSPEC = array(
+        0 => array(
+          'var' => 'success',
+          'type' => TType::STRUCT,
+          'class' => '\messagelink\AttachmentInfo',
+          ),
+        1 => array(
+          'var' => 'nfe',
+          'type' => TType::STRUCT,
+          'class' => '\messagelink\MessageLinkCodeNotFoundException',
+          ),
+        2 => array(
+          'var' => 'malnfe',
+          'type' => TType::STRUCT,
+          'class' => '\messagelink\MessageAttachmentCodeNotFoundException',
+          ),
+        3 => array(
+          'var' => 'unauthex',
+          'type' => TType::STRUCT,
+          'class' => '\messagelink\MessageAttachmentRequestUnauthorizedException',
+          ),
+        );
+    }
+    if (is_array($vals)) {
+      if (isset($vals['success'])) {
+        $this->success = $vals['success'];
+      }
+      if (isset($vals['nfe'])) {
+        $this->nfe = $vals['nfe'];
+      }
+      if (isset($vals['malnfe'])) {
+        $this->malnfe = $vals['malnfe'];
+      }
+      if (isset($vals['unauthex'])) {
+        $this->unauthex = $vals['unauthex'];
+      }
+    }
+  }
+
+  public function getName() {
+    return 'MessageLink_getAttachmentInfo_result';
+  }
+
+  public function read($input)
+  {
+    $xfer = 0;
+    $fname = null;
+    $ftype = 0;
+    $fid = 0;
+    $xfer += $input->readStructBegin($fname);
+    while (true)
+    {
+      $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+      if ($ftype == TType::STOP) {
+        break;
+      }
+      switch ($fid)
+      {
+        case 0:
+          if ($ftype == TType::STRUCT) {
+            $this->success = new \messagelink\AttachmentInfo();
+            $xfer += $this->success->read($input);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 1:
+          if ($ftype == TType::STRUCT) {
+            $this->nfe = new \messagelink\MessageLinkCodeNotFoundException();
+            $xfer += $this->nfe->read($input);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 2:
+          if ($ftype == TType::STRUCT) {
+            $this->malnfe = new \messagelink\MessageAttachmentCodeNotFoundException();
+            $xfer += $this->malnfe->read($input);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 3:
+          if ($ftype == TType::STRUCT) {
+            $this->unauthex = new \messagelink\MessageAttachmentRequestUnauthorizedException();
+            $xfer += $this->unauthex->read($input);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        default:
+          $xfer += $input->skip($ftype);
+          break;
+      }
+      $xfer += $input->readFieldEnd();
+    }
+    $xfer += $input->readStructEnd();
+    return $xfer;
+  }
+
+  public function write($output) {
+    $xfer = 0;
+    $xfer += $output->writeStructBegin('MessageLink_getAttachmentInfo_result');
+    if ($this->success !== null) {
+      if (!is_object($this->success)) {
+        throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
+      }
+      $xfer += $output->writeFieldBegin('success', TType::STRUCT, 0);
+      $xfer += $this->success->write($output);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->nfe !== null) {
+      $xfer += $output->writeFieldBegin('nfe', TType::STRUCT, 1);
+      $xfer += $this->nfe->write($output);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->malnfe !== null) {
+      $xfer += $output->writeFieldBegin('malnfe', TType::STRUCT, 2);
+      $xfer += $this->malnfe->write($output);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->unauthex !== null) {
+      $xfer += $output->writeFieldBegin('unauthex', TType::STRUCT, 3);
+      $xfer += $this->unauthex->write($output);
       $xfer += $output->writeFieldEnd();
     }
     $xfer += $output->writeFieldStop();
