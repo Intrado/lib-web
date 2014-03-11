@@ -24,8 +24,8 @@
  */
 class MessageLinkItemView {
 
-	protected $template;
-	protected $vars = array();
+	public $template;
+	public $vars = array();
 
 	/**
 	 * @param string $template name of template file to use for view
@@ -55,10 +55,29 @@ class MessageLinkItemView {
 	 */
 	public function render() {
 		if (file_exists($this->template)) {
-			include($this->template);
+			$this->includeTemplate($this->template);
 		} else {
-			throw new Exception('Template file: ' . $this->template  . ' does not exist.');
+			$this->throwException('Template file: ' . $this->template  . ' does not exist.');
 		}
+	}
+
+	/**
+	 * @param $template
+	 */
+	public function includeTemplate($template) {
+		include($template);
+	}
+
+	/**
+	 * @param $exceptionMessage
+	 * @throws Exception
+	 */
+	public function throwException($exceptionMessage) {
+		throw new Exception($exceptionMessage);
+	}
+
+	public function getTemplate() {
+		return $this->template;
 	}
 }
 ?>
