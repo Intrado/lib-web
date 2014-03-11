@@ -3,7 +3,7 @@
 require_once(realpath(dirname(dirname(__FILE__)) .'/konaenv.php'));
 require_once("{$konadir}/messagelink/messagelinkitemview.obj.php");
 
-class MessageLinkItemTest extends PHPUnit_Framework_TestCase {
+class MessageLinkItemViewTest extends PHPUnit_Framework_TestCase {
 
 	var $view;
 	var $template = "sddmessagelink.tpl.php";
