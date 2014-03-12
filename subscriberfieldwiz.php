@@ -189,7 +189,7 @@ class FinishSubscriberFieldWizard extends WizFinish {
 			}
 			$datavalues = explode("\n", $postdata['/staticvalues']['values']);
 			// if static list field, with single value
-			if ($fieldmap->isOptionEnabled('multisearch') && count($datavalues) === 1 && strpos($fieldmap->fieldnum, 'f') === 0) {
+			if ($fieldmap->isOptionEnabled('multisearch') && count($datavalues) == 1 && strpos($fieldmap->fieldnum, 'f') == 0) {
 				$value = trimStaticValue($datavalues[0]);
 				QuickUpdate("update person set ".$fieldmap->fieldnum."=? where type='subscriber'", false, array($value));
 			}
