@@ -29,6 +29,7 @@ function escapeHtml($string) {
 	<title><?= $this->pageTitle ?></title>
 </head>
 <body>
+<? include_once("analyticstracking.php") ?>
 <div id="wrap">
 	<div id=content-wrapper>
 		<div id="header">
