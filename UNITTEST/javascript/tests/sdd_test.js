@@ -92,40 +92,55 @@ describe("SDD (Secure Document Delivery)", function() {
 
 	describe("requestDocument(password)", function() {
 
-		it("if 'password' arg provided, should perform AJAX 'GET' request with messageLinkCode, attachmentLinkCode, and password params", function() {
+		it("if 'password' arg provided, should perform AJAX 'POST' request with s, mal, p (password), and v (verify) params", function() {
 			var ajaxStub = sinon.stub(jQuery, "ajax");
 
 			// request with password (password-protected)
 			sdd.requestDocument('secretpassword123');
 
 			expect(ajaxStub).to.have.been.called;
+
 			var args = ajaxStub.args[0][0];
 			expect(args.url).to.equal("../messagelink/requestdocument.php");
-			expect(args.type).to.equal("GET");
-			expect(args.data.messageLinkCode).to.equal('1234');
-			expect(args.data.attachmentLinkCode).to.equal('5678');
-			expect(args.data.password).to.equal('secretpassword123');
+			expect(args.type).to.equal("POST");
+			expect(args.data.s).to.equal('1234');
+			expect(args.data.mal).to.equal('5678');
+			expect(args.data.p).to.equal('secretpassword123');
+			expect(args.data.v).to.equal(true);
 			ajaxStub.restore();
 		});
 
-		it("if 'password' arg NOT provided, should perform AJAX 'GET' request with messageLinkCode, attachmentLinkCode, and NO password param", function() {
+		it("if 'password' arg NOT provided, should perform AJAX 'POST' request with s, mal, and NO p (password) or v (verify) params", function() {
 			var ajaxStub = sinon.stub(jQuery, "ajax");
 
 			// request without password (non-password-protected)
 			sdd.requestDocument();
 
 			expect(ajaxStub).to.have.been.called;
-			args = ajaxStub.args[0][0];
+			var args = ajaxStub.args[0][0];
 			expect(args.url).to.equal("../messagelink/requestdocument.php");
-			expect(args.type).to.equal("GET");
-			expect(args.data.messageLinkCode).to.equal('1234');
-			expect(args.data.attachmentLinkCode).to.equal('5678');
-			expect(args.data.password).to.equal(null);
+			expect(args.type).to.equal("POST");
+			expect(args.data.s).to.equal('1234');
+			expect(args.data.mal).to.equal('5678');
+			expect(args.data.p).to.equal(null);
+			expect(args.data.v).to.equal(undefined);
 			ajaxStub.restore();
 		});
 
+		it("should call this.postToUrl(url, params) in success callback", function() {
+			var ajaxStub = sinon.stub(jQuery, "ajax").yieldsTo('success', {res: {}});
+			var postToUrlStub = sinon.stub(sdd, "postToUrl");
+
+			sdd.requestDocument('secretpassword123');
+			var postArgs = {s:'1234',mal:'5678',p:'secretpassword123'};
+			expect(postToUrlStub).to.have.been.calledWith("../messagelink/requestdocument.php", postArgs);
+
+			ajaxStub.restore();
+			postToUrlStub.restore();
+		});
+
 		it("should show the provided error message, from the error response, if error callback called", function() {
-			var ajaxStub = sinon.stub(jQuery, "ajax").yieldsTo('error', {errorMessage: 'ERROR: server unavailable.'});
+			var ajaxStub = sinon.stub(jQuery, "ajax").yieldsTo('error', {responseJSON: {errorMessage: 'ERROR: server unavailable.'}});
 
 			expect(sdd.errorMsgContainer.is(":visible")).to.equal(false);
 
@@ -138,6 +153,7 @@ describe("SDD (Secure Document Delivery)", function() {
 
 		it("should show a generic default error message, if no error response message provided, if error callback called", function() {
 			var ajaxStub = sinon.stub(jQuery, "ajax").yieldsTo('error', {});
+			var postToUrlStub = sinon.stub(sdd, "postToUrl");
 
 			expect(sdd.errorMsgContainer.is(":visible")).to.equal(false);
 
@@ -146,8 +162,26 @@ describe("SDD (Secure Document Delivery)", function() {
 			expect(sdd.errorMsgContainer.is(":visible")).to.equal(true);
 			expect(sdd.errorMsg.text()).to.equal('An error occurred while trying to retrieve your document. Please try again.');
 			ajaxStub.restore();
+			postToUrlStub.restore();
 		});
 
+	});
+
+	describe("getPostForm(path, params)", function() {
+		it("should create a form dynamically and add hidden form elements based on the params provided", function() {
+			var path = "../messagelink/requestdocument.php";
+			var params = {s:'1234',mal:'5678',p:'secretpassword123'};
+
+			var form = sdd.getPostForm(path, params);
+
+			expect(form.attr('method')).to.equal('post');
+			expect(form.attr('action')).to.equal(path);
+			expect(form.children("input[type=hidden]").length).to.equal(3);
+			expect(form.children("input[type=hidden][name=s]").val()).to.equal('1234');
+			expect(form.children("input[type=hidden][name=mal]").val()).to.equal('5678');
+			expect(form.children("input[type=hidden][name=p]").val()).to.equal('secretpassword123');
+
+		});
 	});
 
 	describe("getPassword()", function() {

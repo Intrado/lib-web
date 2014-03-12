@@ -29,6 +29,7 @@ function escapeHtml($string) {
 	<title><?= $this->pageTitle ?></title>
 </head>
 <body>
+<? include_once("analyticstracking.php") ?>
 <div id="wrap">
 	<div id=content-wrapper>
 		<div id="header">
@@ -105,28 +106,6 @@ function escapeHtml($string) {
 									</div>
 								</div>
 							<? if ($this->attachmentInfo): ?>
-								<div class="form-group">
-									<label class="col-sm-2 control-label">Message:</label>
-									<div class="col-sm-10">
-										<p class="form-control-static"><a id="message-modal-trigger" data-toggle="modal" data-target="#view-message-modal"><span class="glyphicon glyphicon-expand"></span>View message body</a></p>
-									</div>
-								</div>
-								<div class="modal" id="view-message-modal" tabindex="-1" role="dialog" aria-labelledby="email-message-body" aria-hidden="true">
-									<div class="modal-dialog">
-										<div class="modal-content">
-											<div class="modal-header">
-												<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-												<h4 class="modal-title" id="email-message-body">Email Message Body</h4>
-											</div>
-											<div class="modal-body">
-												<?= escapeHtml($this->emailMessage->plainBody) ?>
-											</div>
-											<div class="modal-footer">
-												<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-											</div>
-										</div>
-									</div>
-								</div>
 								<? if ($this->attachmentInfo->isPasswordProtected): ?>
 									<div id="secure-document-wrapper">
 										<div class="form-group">

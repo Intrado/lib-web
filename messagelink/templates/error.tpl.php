@@ -1,3 +1,9 @@
+<?
+function escapeHtml($string) {
+	return htmlentities($string, ENT_COMPAT, 'UTF-8') ;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,7 +28,7 @@
 				<div class="col-md-8 col-md-offset-2">
 					<div class="alert alert-danger">
 						<span class="label label-danger"><span class="glyphicon glyphicon-exclamation-sign" style=""></span></span> &nbsp;
-						<strong>Oops! &nbsp; There was an error processing your request.</strong>
+						<strong>There was an error processing your request.</strong>
 						<div id="error-message"><strong>ERROR:</strong> &nbsp;<?= $this->errorMessage ?></div>
 					</div>
 				</div>

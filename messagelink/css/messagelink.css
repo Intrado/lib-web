@@ -110,15 +110,8 @@ form .form-group {
 #content-wrapper {
     z-index: 10;
 }
-#view-message-modal .modal-body {
-    max-height: 300px;
-    overflow: auto;
-}
-#message-modal-trigger, .directlink {
+.directlink {
     cursor: pointer;
-}
-#message-modal-trigger span.glyphicon {
-    margin-right: 8px;
 }
 #download-error-message-container {
     display: none;
