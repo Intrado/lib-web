@@ -52,24 +52,32 @@ function SDD() {
 	 * @return {*}
 	 */
 	this.requestDocument = function(password) {
+		var requestParams = {
+			"s": $this.messageLinkCode,
+			"mal": $this.attachmentLinkCode,
+			"p": password ? password : null
+		};
+
+		// if password provided, include v ("verify") param to verify password server-side,
+		if (password) {
+			requestParams['v'] = true;
+		}
+
 		return $.ajax({
 			url: "../messagelink/requestdocument.php",
-			type: "GET",
-			data: {
-				"messageLinkCode": $this.messageLinkCode,
-				"attachmentLinkCode": $this.attachmentLinkCode,
-				"password": password ? password : null
-			},
+			type: "POST",
+			data: requestParams,
 			success: function(res) {
-				// download is invoked via target script "../messagelink/requestdocument.php",
-				// nothing to do here except ensure error message is hidden
+				// ensure the verify 'v' param is removed from requestParams, i.e. was successful
+				delete requestParams['v'];
 
-				// ensure error message is hidden
-				$this.errorMsgContainer.hide();
+				// now download the document, i.e. redirect user to direct URL,
+				// which should invoke the browser's download/save as dialog
+				$this.postToUrl("../messagelink/requestdocument.php", requestParams);
 			},
 			error: function(res) {
-				if (res && res.errorMessage) {
-					$this.errorMsg.html(res.errorMessage);
+				if (res && res.responseJSON && res.responseJSON.errorMessage) {
+					$this.errorMsg.html(res.responseJSON.errorMessage);
 				} else {
 					$this.errorMsg.html("An error occurred while trying to retrieve your document. Please try again.").show();
 				}
@@ -77,6 +85,48 @@ function SDD() {
 			}
 		});
 	};
+
+	/**
+	 *
+	 * Builds and submits form dynamically via jQuery. Upon submit, removes form from DOM.
+	 * For use in submitting a non-AJAX POST request to ../messagelink/requestDocument.php to download document (ex. pdf)
+	 *
+	 * borrowed/modified from http://stackoverflow.com/questions/133925/javascript-post-request-like-a-form-submit
+	 *
+	 * @param path
+	 * @param params
+	 */
+	this.postToUrl = function(path, params) {
+		var form = $this.getPostForm(path, params);
+
+		// the form must be in the document to submit
+		$("body").append(form);
+		form.submit();
+
+		// clean up/remove the form from the DOM now that we've submitted
+		form.remove();
+	}
+
+	/**
+	 *
+	 * @param string path - url to post to
+	 * @param object params - object containing all the required post params, ex. s, mal, p, v.
+	 * @return jQuery object representing the form, contains child hidden input elements
+	 */
+	this.getPostForm = function(path, params) {
+		var form = $("<form>").attr({method: "post", action: path});
+
+		// append hidden elements to the form, based on params object
+		for(var key in params) {
+			if(params.hasOwnProperty(key)) {
+				var hiddenField = $("<input>");
+				hiddenField.attr({type: "hidden", name: key, value: params[key]});
+				form.append(hiddenField);
+			}
+		}
+
+		return form;
+	}
 
 	/**
 	 *
@@ -135,6 +185,10 @@ function SDD() {
 				} else {
 					$this.disableElem($this.downloadB);
 				}
+
+				if (e.which !== 13) {
+					$this.errorMsgContainer.hide();
+				}
 			});
 		}
 	};
@@ -146,7 +200,7 @@ function SDD() {
 		if ($this.downloadB) {
 			$this.downloadB.on('click', function(e) {
 				e.preventDefault();
-				$this.requestDocument($this.password.val());
+				$this.requestDocument($this.getPassword());
 			});
 		}
 	}

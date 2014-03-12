@@ -10,10 +10,6 @@ date_default_timezone_set("US/Pacific");
 //for logging
 apache_note("CS_APP","ml");
 
-function escapeHtml($string) {
-	return htmlentities($string, ENT_COMPAT, 'UTF-8') ;
-}
-
 require_once("inc/appserver.inc.php");
 
 // load the thrift api requirements.
@@ -59,7 +55,7 @@ function echoErrorResponse($errorMessage) {
 
 $response = array();
 
-if (!isset($_GET['messageLinkCode']) || !isset($_GET['attachmentLinkCode'])) {
+if (!isset($_POST['s']) || !isset($_POST['mal'])) {
 	header("HTTP/1.0 400 Bad Request");
 	exit();
 }
@@ -69,7 +65,7 @@ $response = array();
 list($protocol, $transport) = initMessageLinkApp();
 
 if($protocol == null || $transport == null) {
-	error_log("Cannot use AppServer");
+	error_log("Cannot use AppServer; MessageLinkClient failed to be initialized");
 	// thrift protocol/transport failed to get initialized, stop now
 	echoErrorResponse("An error occurred while trying to retrieve your document. Server unavailable.");
 
@@ -80,17 +76,23 @@ if($protocol == null || $transport == null) {
 			$client = new MessageLinkClient($protocol);
 			$transport->open();
 			try {
-				// request attachment
-				$attachmentInfo = $client->getEmailAttachment($_GET['messageLinkCode'], $_GET['attachmentLinkCode'], $_GET['password']);
+				if (isset($_POST['v']) && $_POST['v'] == true) {
+					// NOTE: getAttachmentInfo() currently used to verify user-entered password
+					// returning an AttachmentInfo object if successful, else an exception
+					$attachmentInfo = $client->getAttachmentInfo($_POST['s'], $_POST['mal'], $_POST['p']);
+				} else {
+					// get attachment (pdf) content
+					$emailAttachment = $client->getEmailAttachment($_POST['s'], $_POST['mal'], $_POST['p']);
+				}
 
 			// invalid MessageLinkCode ('s')
 			} catch (MessageLinkCodeNotFoundException $e) {
-				error_log("Unable to find the messagelinkcode: " . urlencode($_GET['messageLinkCode']));
+				error_log("Unable to find the messagelinkcode: " . urlencode($_POST['s']));
 				echoErrorResponse("The requested document was not found. The document you are looking for does not exist or has expired.");
 
 			// invalid AttachmentLinkCode ('mal')
 			} catch (MessageAttachmentCodeNotFoundException $e) {
-				error_log("Unable to find the attachmentlinkcode: " . urlencode($_GET['attachmentLinkCode']));
+				error_log("Unable to find the attachmentlinkcode: " . urlencode($_POST['mal']));
 				echoErrorResponse("The requested document was not found. The document you are looking for does not exist or has expired.");
 
 			// invalid password
@@ -118,16 +120,23 @@ if($protocol == null || $transport == null) {
 	}
 }
 
-// if we make it this far, the user was successful at requesting attachment.
+// if we make it this far, the user was successful at verifying password / requesting attachment.
+
 header("HTTP/1.0 200 OK");
 header("Expires: " . gmdate('D, d M Y H:i:s', time() + 60*60) . " GMT"); //exire in 1 hour, but if theme changes so will hash pointing to this file
-header('Content-type: ' . $attachmentInfo->info->contentType);
 header("Pragma: private");
 header("Cache-Control: private");
-header("Content-Length: " . strlen($attachmentInfo->data));
-header("Content-disposition: attachment; filename=\"" . $attachmentInfo->info->filename . "\"");
 header("Connection: close");
-echo $attachmentInfo->data;
-exit();
+
+if (isset($attachmentInfo)) {
+	header('Content-type: application/json');
+	echo json_encode($attachmentInfo);
+
+} else if (isset($emailAttachment)) {
+	header('Content-type: ' . $emailAttachment->info->contentType);
+	header("Content-Length: " . strlen($emailAttachment->data));
+	header("Content-disposition: attachment; filename=\"" . $emailAttachment->info->filename . "\"");
+	echo $emailAttachment->data;
+}
 
 ?>
