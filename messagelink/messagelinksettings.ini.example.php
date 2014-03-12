@@ -7,7 +7,6 @@ timeout=5500
 
 ; Google Analytics tracking code
 [ga]
-;code="UA-36296468-4"
-code="UA-testing-code"
+code=
 
 ;*/?>
