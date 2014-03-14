@@ -3,7 +3,7 @@
 global $SETTINGS;
 ?>
 
-<? if (isset($SETTINGS['ga']['code']) && strlen($SETTINGS['ga']['code']) > 0) :?>
+<? if (isset($SETTINGS['ga']['code']) && !empty($SETTINGS['ga']['code'])) :?>
 	<script>
 		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),

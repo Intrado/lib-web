@@ -6,7 +6,7 @@ host="localhost:7911"
 timeout=5500
 
 ; Google Analytics tracking code
-[ga]
-code=
+;[ga]
+;code=
 
 ;*/?>
