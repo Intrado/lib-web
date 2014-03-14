@@ -111,10 +111,12 @@ class ValClassroom extends Validator {
 	
 	function validate ($value, $args) {
 		global $custdb;
-		
+
 		//error_log("Val " . $value);
 		
-		if ($value != $args['currentsetting'] && $value == "emailandphone") {
+		// for new customer, $custdb is null so we skip this validation
+		// for edit customer, we validate no alerts today
+		if ($custdb != null && $value != $args['currentsetting'] && $value == "emailandphone") {
 			if (QuickQuery("SELECT 1 FROM `alert` WHERE date = curdate()",$custdb))
 				return "Unable to set classroom to \"Email and Phone\" since there are active classroom alerts for today for this customer";
 		}
