@@ -958,7 +958,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			tai_setup($customerid);
 
 			$templateName = 'quicktipalert';
-			$hasQtAlertTemplate = QuickQuery('select 1 from template where name = ?', $custdb, array($templateName));
+			$hasQtAlertTemplate = QuickQuery('select 1 from template where type = ?', $custdb, array($templateName));
 			if (!$hasQtAlertTemplate) {
 				$messageGroupId = createEmailTemplateMessageGroup($templateName, $templates[$templateName]);
 				QuickQuery('insert into template (type, messagegroupid) values (?,?)', $custdb, array($templateName, $messageGroupId));
