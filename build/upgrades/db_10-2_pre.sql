@@ -13,5 +13,9 @@ ALTER TABLE `messagepart` CHANGE `type` `type` ENUM( 'A', 'T', 'V', 'I', 'MAL' )
   ADD `messageattachmentid` INT NULL AFTER `imagecontentid`
 $$$
 
+-- $rev 3
+
+ALTER TABLE `bursttemplate` ADD COLUMN `identifierTextPattern` VARCHAR(150);
+$$$
 
 

@@ -128,6 +128,14 @@ $formdata["ppstudent"] = array(
 	"helpstep" => $helpstepnum
 );
 
+$formdata["pattern"] = array(
+	"label" => _L('Identifier Text Pattern (regex rule)'),
+	"value" => $bursttemplate->identifiertextpattern,
+	"validators" => array(),
+	"control" => array("TextField", "size" => 50, "maxlength" => 150),
+	"helpstep" => $helpstepnum
+);
+
 $buttons = array(
 	submit_button(_L('Save'),"submit","tick"),
 	icon_button(_L('Cancel'),"cross",null,"bursttemplates.php?cid={$bursttemplatecid}")
@@ -168,6 +176,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$bursttemplate->pagesskipstart = $postdata["skipstart"];
 		$bursttemplate->pagesskipend = $postdata["skipend"];
 		$bursttemplate->pagesperreport = $postdata["ppstudent"];
+		$bursttemplate->identifiertextpattern = $postdata["pattern"];
 
 		if ($bursttemplateid)
 			$bursttemplate->update();

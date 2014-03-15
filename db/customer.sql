@@ -2447,3 +2447,8 @@ update setting set value='10.2/2' where name='_dbversion'
 $$$
 -- END 10.2/2
 
+-- START 10.2/3
+ALTER TABLE `bursttemplate` ADD COLUMN `identifierTextPattern` VARCHAR(150);
+$$$
+-- END 10.2/3
+

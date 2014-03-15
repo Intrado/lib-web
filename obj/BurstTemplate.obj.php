@@ -10,13 +10,12 @@ class BurstTemplate extends DBMappedObject {
 	var $pagesperreport;
 	var $created;
 	var $deleted;
+	var $identifiertextpattern;
 
 	function BurstTemplate ($id = NULL) {
 		$this->_allownulls = true;
 		$this->_tablename = "bursttemplate";
-		// TODO - how do you handle assignments to a function in SQL using DBMO such as '... created = NOW() ...'
-		//$this->_fieldlist = array("name", "x", "y", "created", "deleted");
-		$this->_fieldlist = array("name", "x", "y", "pagesskipstart", "pagesskipend", "pagesperreport");
+		$this->_fieldlist = array("name", "x", "y", "pagesskipstart", "pagesskipend", "pagesperreport", "identifiertextpattern");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}
