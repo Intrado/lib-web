@@ -109,7 +109,7 @@ function escapeHtml($string) {
 								<? if ($this->attachmentInfo->isPasswordProtected): ?>
 									<div id="secure-document-wrapper">
 										<div class="form-group">
-											<label class="col-sm-2 control-label">Document</label>
+											<label class="col-sm-2 control-label">Document:</label>
 											<div class="col-sm-10">
 												<span id="filename"><?= $this->attachmentInfo->filename ?></span>
 											</div>
@@ -138,7 +138,7 @@ function escapeHtml($string) {
 								<? else: ?>
 										<div id="document-wrapper">
 											<div class="form-group">
-												<label class="col-sm-2 control-label">Document</label>
+												<label class="col-sm-2 control-label">Document:</label>
 												<div class="col-sm-10">
 													<span id="filename"><?= $this->attachmentInfo->filename ?></span>
 												</div>

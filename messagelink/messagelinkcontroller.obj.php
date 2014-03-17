@@ -1,30 +1,4 @@
 <?
-require_once("inc/appserver.inc.php");
-
-// load the thrift api requirements.
-$thriftdir = '../Thrift';
-require_once("{$thriftdir}/Base/TBase.php");
-require_once("{$thriftdir}/Protocol/TProtocol.php");
-require_once("{$thriftdir}/Protocol/TBinaryProtocol.php");
-require_once("{$thriftdir}/Protocol/TBinaryProtocolAccelerated.php");
-require_once("{$thriftdir}/Transport/TTransport.php");
-require_once("{$thriftdir}/Transport/TSocket.php");
-require_once("{$thriftdir}/Transport/TBufferedTransport.php");
-require_once("{$thriftdir}/Transport/TFramedTransport.php");
-require_once("{$thriftdir}/Exception/TException.php");
-require_once("{$thriftdir}/Exception/TTransportException.php");
-require_once("{$thriftdir}/Exception/TProtocolException.php");
-require_once("{$thriftdir}/Exception/TApplicationException.php");
-require_once("{$thriftdir}/Type/TType.php");
-require_once("{$thriftdir}/Type/TMessageType.php");
-require_once("{$thriftdir}/StringFunc/TStringFunc.php");
-require_once("{$thriftdir}/Factory/TStringFuncFactory.php");
-require_once("{$thriftdir}/StringFunc/Core.php");
-require_once("{$thriftdir}/packages/messagelink/Types.php");
-require_once("{$thriftdir}/packages/messagelink/MessageLink.php");
-
-use messagelink\MessageLinkClient;
-use messagelink\MessageLinkCodeNotFoundException;
 
 /**
  * Simple controller class to handle message/attachment link request param(s), fetch (model) data via
@@ -56,213 +30,148 @@ use messagelink\MessageLinkCodeNotFoundException;
 class MessageLinkController {
 
 	public $request;
+	public $model;
 	public $view;
-	public $modelData;
-	public $errorVars = array("productName" => "SchoolMessenger");
+	public $customerErrorMessage = "The requested information was not found. The content you are looking for does not exist or has expired.";
 
 	/**
 	 * @param array $request params ('s', 'mal') from initial entry/page request
+	 * @param object $protocol TProtocol thrift protocol object
+	 * @param object $transport TTransport thrift transport object
 	 */
-	public function __construct($request = array()) {
+	public function __construct($request = array(), $protocol, $transport) {
 		if (is_array($request) && count($request) > 0) {
 			$this->request = $request;
 		}
+
+		if (isset($protocol)) {
+			$this->protocol = $protocol;
+		}
+
+		if (isset($transport)) {
+			$this->transport = $transport;
+		}
 	}
 
 	/**
-	 * Initializes MessageLink thrift app protocol/transport layers and creates views
-	 * (MessageLink, SDD Password, or SDD Download) depending on request params.
-	 * Displays appropriate error message view if request params or thrift protocol/transport objects are invalid/null.
+	 *
+	 * @param object $model MessageLinkClient
 	 */
-	public function initApp() {
+	public function initView($model = null) {
+		if (isset($model)) {
+			$this->model = $model;
+		}
 
-		// calls appserver.inc.php > initMessageLinkApp() to initialize MessageLink thrift protocol/transport objects
-		list($protocol, $transport) = $this->getMessageLinkProtocolTransport();
-
-		// verify MessageLink thrift protocol and transport objects exist; if not, create error message view
-		if ($protocol == null || $transport == null) {
+		// verify MessageLink thrift protocol and transport objects exist,
+		// if not, create error message view
+		if (!isset($this->model) || empty($this->model) || !isset($this->protocol) || !isset($this->transport)) {
 			$this->logError("Cannot use AppServer; MessageLinkClient failed to be initialized");
-			$this->view = $this->getGeneralErrorMessageView();
+			$this->view = $this->getErrorMessageView();
+			return;
+		}
+
+		// fetch response data (model->attributes) for the given messagelink ('s') code;
+		$this->model->fetchRequestCodeData($this->request['s']);
+
+		// if messagelink code ('s') is invalid, model->attributes will be undefined; create error message view
+		if (!$this->model->getAttributes()) {
+			// MessageLinkClient threw an exception due to invalid s code, show error message view
+			$this->view = $this->getErrorMessageView($this->customerErrorMessage);
+			return;
+		}
+
+		// if we make it this far, it means we've successfully fetched model data for the given 's' code
+		// now inspect s and mal to determine which view to create (ML, SDD, or Error view)
+		if (isset($this->request['s']) && !empty($this->request['s']) ) {
+			// add field to model->attributes required by both ML or SDD UI's
+			$this->model->setAttributes(array("messageLinkCode" => $this->request['s']));
+
+			if (!isset($this->request['mal'])) {
+				// request is for messagelink, not SDD; create MessageLink UI.
+				$this->view = $this->getAppView('ML');
+
+			} else if (isset($this->request['mal']) && !empty($this->request['mal'])) {
+				// add field to model->attributes required by SDD UI
+				$this->model->setAttributes(array("attachmentLinkCode" => $this->request['mal']));
+
+				// request is for SDD; create SDD UI;
+				$this->view = $this->getAppView('SDD');
+
+			} else {
+				// show error if mal code set but empty, ex. mal=
+				$this->logError("Unable to find the attachmentlinkcode: " . urlencode($this->request['mal']));
+				$this->view = $this->getErrorMessageView($this->customerErrorMessage);
+			}
 
 		} else {
-			// MessageLink thrift app was initialized successfully;
-			$attempts = 0;
-			while (true) {
-				try {
-					// now get a new MessageLinkClient, considered the "model" in this case
-					// and open its transport connection
-					$model = $this->getMessageLinkClient($protocol);
-					$this->openThriftTransport($transport);
-
-					try {
-						// get server-side response data (modelData) for the given messagelink ('s') code;
-						// NOTE: if messagelink code ('s') is invalid, the client will throw an exception here
-						// which we catch and create an error message view
-						$this->modelData = $model->getInfo($this->request['s']);
-
-						if (isset($this->request['s']) && !empty($this->request['s']) ) {
-							// add field to modelData required by both ML or SDD UI's
-							$this->modelData->messageLinkCode = $this->request['s'];
-
-							if (!isset($this->request['mal'])) {
-								// request is for messagelink, not SDD; create MessageLink UI.
-								$this->view = $this->getAppView('ML', $this->modelData);
-
-							} else if (isset($this->request['mal']) && !empty($this->request['mal'])) {
-								// add field to modelData required by SDD UI
-								$this->modelData->attachmentLinkCode = $this->request['mal'];
-
-								// request is for SDD; create SDD UI;
-								$this->view = $this->getAppView('SDD', $this->modelData);
-
-							} else {
-								// show error if mal code set but empty, ex. mal=
-								$this->view = $this->getCustomerErrorMessageView();
-							}
-
-						} else {
-							// show error is s code is not set, ie no s param at all in query string,
-							// or if s is set and empty, ex s=
-							$this->view = $this->getCustomerErrorMessageView();
-						}
-
-					} catch (MessageLinkCodeNotFoundException $e) {
-						// MessageLinkClient threw an exception due to invalid s code, show error message
-						$this->logError("Unable to find the messagelinkcode: " . urlencode($this->request['s']));
-						$this->view = $this->getCustomerErrorMessageView();
-					}
-					$this->closeThriftTransport($transport);
-					break;
-
-				} catch (TException $tx) {
-					// MessageLinkClient instantiation was unsuccessfull
-
-					$attempts++;
-					$this->logError("getInfo: Exception Connection to AppServer (" . $tx->getMessage() . ")");
-					$this->closeThriftTransport($transport);
-
-					// if $attempts > 2, show error message, else instantiate MessageLinkClient again
-					if ($attempts > 2) {
-						$this->logError("getInfo: Failed 3 times to get content from appserver");
-						$this->view = $this->getGeneralErrorMessageView();
-						break;
-					}
-				}
-			}
+			// show error if s code is not set, ie no s param at all in query string,
+			// or if s is set and empty, ex s=
+			$this->logError("Unable to find the messagelinkcode: " . urlencode($this->request['s']));
+			$this->view = $this->getErrorMessageView($this->customerErrorMessage);
 		}
-	}
-
-	/**
-	 * @return array ex. list($protocol, $transport)
-	 */
-	public function getMessageLinkProtocolTransport() {
-		return initMessageLinkApp();
-	}
-
-	/**
-	 * @param $protocol MessageLink thrift protocol
-	 * @return messagelink\MessageLinkClient
-	 */
-	public function getMessageLinkClient($protocol) {
-		return new MessageLinkClient($protocol);
-	}
-
-	/**
-	 * @param $transport MessageLink thrift transport
-	 */
-	public function openThriftTransport($transport) {
-		if (is_object($transport)) {
-			$transport->open();
-		}
-	}
-
-	/**
-	 * @param $transport MessageLink thrift transport
-	 */
-	public function closeThriftTransport($transport) {
-		if (is_object($transport)) {
-			$transport->close();
-		}
-	}
-
-	/**
-	 * @param string $template filename of template to use for view
-	 * @param array $modelData data containing required template variables
-	 * @return MessageLinkItemView
-	 */
-	public function getItemView($template, $modelData = array()) {
-		return new MessageLinkItemView($template, $modelData);
 	}
 
 	
 	/**
 	 * @param string $app 'SDD' or 'ML'
-	 * @param object $modelData containing data from MessageLinkClient->getInfo() call
 	 * @return MessageLinkItemView
 	 */
-	public function getAppView($app, $modelData) {
+	public function getAppView($app) {
 
-		$showErrorMsg = true;
-		
-		// ensure selectedEmailMessage object and its child property
-		// attachmentLookup exist before creating the SDD view
+		$pageTitleAppendage = $this->model->get("customerdisplayname") ." - Powered by " . $this->model->get("productName");
+		$messageInfo = $this->model->getAttributes()->messageInfo;
+
 		if ($app == 'SDD' &&
-			isset($modelData->messageInfo->selectedEmailMessage) &&
-			isset($modelData->messageInfo->selectedEmailMessage->attachmentLookup)) {
+			isset($messageInfo->selectedEmailMessage) &&
+			isset($messageInfo->selectedEmailMessage->attachmentLookup)) {
+			// ensure selectedEmailMessage object and its child property
+			// attachmentLookup exist before creating the SDD view
 
-			// add additional field(s) to modelData, required in SDD UI
-			$this->modelData->pageTitle = "Secure Document Delivery from ". $this->modelData->customerdisplayname ." - Powered by " . $this->modelData->productName;
-			$this->modelData->emailMessage = $this->modelData->messageInfo->selectedEmailMessage;
-			$this->modelData->attachmentInfo = $this->modelData->emailMessage->attachmentLookup[$this->request['mal']];
+			// add additional attr(s) to model->attributes, required in SDD UI
+			$this->model->setAttributes(array(
+				"pageTitle" => "Secure Document Delivery from ". $pageTitleAppendage,
+				"emailMessage" => $emailMessage = $messageInfo->selectedEmailMessage,
+				"attachmentInfo" => $attachmentInfo = isset($emailMessage->attachmentLookup[$this->request['mal']]) ?
+					$emailMessage->attachmentLookup[$this->request['mal']] : null
+			));
 
-			if (!is_object($this->modelData->attachmentInfo)) {
-				return $this->getCustomerErrorMessageView();
+			if (!is_object($attachmentInfo)) {
+				return $this->getErrorMessageView($this->customerErrorMessage);
 			}
-			$showErrorMsg = false;
 
+		} else if ($app == 'ML' &&
+			isset($messageInfo->selectedPhoneMessage) &&
+			isset($messageInfo->selectedPhoneMessage->nummessageparts)) {
 			// ensure selectedPhoneMessage object and its child property nummessageparts exist
 			// before creating the MessageLink view
-		} else if ($app == 'ML' &&
-			isset($modelData->messageInfo->selectedPhoneMessage) &&
-			isset($modelData->messageInfo->selectedPhoneMessage->nummessageparts)) {
 
-			// add additional field(s) to modelData, required in MessageLink UI
-			$this->modelData->pageTitle = "Voice Message Delivery from ". $this->modelData->customerdisplayname ." - Powered by " . $this->modelData->productName;
-			$showErrorMsg = false;
+			// add pageTitle to model->attributes, required in MessageLink UI
+			$this->model->setAttributes(array("pageTitle" => "Voice Message Delivery from ". $pageTitleAppendage));
+		} else {
+			return $this->getErrorMessageView($this->customerErrorMessage);
 		}
 
-		return !$showErrorMsg ? $this->getItemView("sddmessagelink.tpl.php", (array) $this->modelData) : $this->getCustomerErrorMessageView();
-	}
-	
-	/**
-	 * @param $data
-	 * @return MessageLinkItemView
-	 */
-	public function getErrorView($modelData = array()) {
-		return $this->getItemView("error.tpl.php", $modelData);
+		return $this->getItemView("sddmessagelink.tpl.php");
 	}
 
 	/**
-	 * Generic Error message view
-	 *
+	 * @param string $errorMessage
 	 * @return MessageLinkItemView
 	 */
-	public function getGeneralErrorMessageView() {
-		return $this->getErrorView(array_merge($this->errorVars, array(
-			"errorMessage" => "An error occurred while trying to retrieve your message. Please try again."
-		)));
-	}
+	public function getErrorMessageView($errorMessage = null) {
+		$errorAttributes = array(
+			"pageTitle" => "SchoolMessenger",
+			"productName" => "SchoolMessenger",
+			"errorMessage" => $errorMessage ? $errorMessage : "An error occurred while trying to retrieve your message. Please try again."
+		);
 
-	/**
-	 * Generic Error message view that contains the customer's display name
-	 *
-	 * @return MessageLinkItemView
-	 */
-	public function getCustomerErrorMessageView() {
-		return $this->getErrorView(array_merge($this->errorVars, array(
-			"customerdisplayname" => $this->modelData->customerdisplayname,
-			"errorMessage" => "The requested information was not found. The content you are looking for does not exist or has expired."
-		)));
+		// handles view rendering if no model passed into initView(model)
+		if (!isset($this->model)) {
+			return $this->getItemView("error.tpl.php", $this->model = $errorAttributes);
+		}
+
+		$this->model->setAttributes($errorAttributes);
+		return $this->getItemView("error.tpl.php");
 	}
 
 	/**
@@ -273,12 +182,27 @@ class MessageLinkController {
 	}
 
 	/**
-	 * Renders the main controller's view (the complete/final page for MessageLink, SDD (password or download), or an Error view
+	 * @param string $template filename of template to use for view
+	 * @param null $modelAttrs optional model attributes that can be passed in which override this->model->attributes
+	 * @return MessageLinkItemView
+	 */
+	public function getItemView($template, $modelAttrs = null) {
+		$modelAttributes = (is_array($modelAttrs)) ? $modelAttrs : (array) $this->model->getAttributes();
+		return new MessageLinkItemView($template, $modelAttributes);
+	}
+
+	/**
+	 * Renders the main controller's view (the complete/final page
+	 * for MessageLink, SDD (password or download), or an Error view
 	 */
 	public function renderView() {
-		$this->view->render();
+		if (isset($this->view)) {
+			$this->view->render();
+		}
 	}
 
 }
+
+
 
 ?>

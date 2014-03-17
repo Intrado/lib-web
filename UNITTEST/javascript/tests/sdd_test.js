@@ -242,7 +242,6 @@ describe("SDD (Secure Document Delivery)", function() {
 			// manually set countElem since initialize() isn't called
 			sdd.countElem = countElem;
 
-			var stopCountdownTimerStub = sinon.stub(sdd, "stopCountdownTimer");
 			var requestDocumentStub = sinon.stub(sdd, "requestDocument");
 
 			sdd.count = 5;
@@ -270,16 +269,13 @@ describe("SDD (Secure Document Delivery)", function() {
 			// manually set countElem since initialize() isn't called
 			sdd.countElem = countElem;
 
-			var stopCountdownTimerStub = sinon.stub(sdd, "stopCountdownTimer");
 			var requestDocumentStub = sinon.stub(sdd, "requestDocument");
 
 			sdd.count = 0;
 
 			sdd.countdownTimerFcn();
-			expect(stopCountdownTimerStub).to.have.been.calledOnce;
 			expect(requestDocumentStub).to.have.been.calledWith();
 
-			stopCountdownTimerStub.restore();
 			requestDocumentStub.restore();
 		});
 
@@ -418,20 +414,6 @@ describe("SDD (Secure Document Delivery)", function() {
 
 			countdownTimerFcnStub.restore();
 			setIntervalStub.restore();
-		});
-	});
-
-	describe("stopCountdownTimer()", function() {
-		it("should stop the counter by calling clearInterval(this.counter)", function() {
-			var clearIntervalStub = sinon.stub(window, "clearInterval");
-
-			// dummy return result from setInterval(...)
-			sdd.counter = 'unique ID';
-
-			sdd.stopCountdownTimer();
-			expect(clearIntervalStub).to.have.been.calledWith(sdd.counter);
-
-			clearIntervalStub.restore();
 		});
 	});
 

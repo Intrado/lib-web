@@ -166,7 +166,7 @@ function SDD() {
 		}
 
 		if ($this.count == 0) {
-			$this.stopCountdownTimer();
+			clearInterval($this.counter);
 			$this.requestDocument();
 		}
 		$this.countElem.html($this.count);
@@ -225,13 +225,6 @@ function SDD() {
 		if ($this.countdownTimerFcn) {
 			$this.counter = setInterval($this.countdownTimerFcn, 1000);
 		}
-	};
-
-	/**
-	 *
-	 */
-	this.stopCountdownTimer = function() {
-		clearInterval($this.counter);
 	};
 
 }

@@ -38,6 +38,7 @@ class MessageLinkItemView {
 	}
 
 	/**
+	 *
 	 * @param string $name
 	 * @return mixed
 	 */
@@ -65,7 +66,7 @@ class MessageLinkItemView {
 	 * @param $template
 	 */
 	public function includeTemplate($template) {
-		include($template);
+		include_once($template);
 	}
 
 	/**

@@ -2,7 +2,7 @@ html, body {
     height: 100%;
 }
 body {
-    background: #fff;
+    background: #f9f9f9;
 }
 #wrap {
     height: auto !important;
@@ -56,6 +56,8 @@ form .form-group {
 }
 #document-wrapper {}
 .well {
+    background: #fff;
+    border-color: #ddd;
     border-radius: 6px;
     padding: 20px 40px 30px;
 }
