@@ -2450,5 +2450,16 @@ $$$
 -- START 10.2/3
 ALTER TABLE `bursttemplate` ADD COLUMN `identifierTextPattern` VARCHAR(150);
 $$$
+
+update setting set value='10.2/3' where name='_dbversion'
+$$$
 -- END 10.2/3
+
+-- START 10.2/4
+ALTER TABLE `bursttemplate` CHANGE `identifierTextPattern` `identifiertextpattern` VARCHAR( 150 ) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL 
+$$$
+
+update setting set value='10.2/4' where name='_dbversion'
+$$$
+-- END 10.2/4
 

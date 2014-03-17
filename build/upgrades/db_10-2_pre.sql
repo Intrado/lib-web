@@ -18,4 +18,7 @@ $$$
 ALTER TABLE `bursttemplate` ADD COLUMN `identifierTextPattern` VARCHAR(150);
 $$$
 
+-- $rev 4
+ALTER TABLE `bursttemplate` CHANGE `identifierTextPattern` `identifiertextpattern` VARCHAR( 150 ) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL
+$$$
 
