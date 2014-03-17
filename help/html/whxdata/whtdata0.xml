@@ -126,6 +126,8 @@
     <item name="Managing Access Profiles" url="System_Administration/User_Management/Managing_Access_Profiles.htm" />
   </book>
   <book name="Blocking Phone/Email/SMS" >
+    <item name="About Blocked Lists" url="System_Administration/System_Settings/About_Blocked_Lists.htm" />
+    <item name="Managing Blocked Lists" url="System_Administration/System_Settings/Managing_Blocked_Lists.htm" />
     <item name="Blocking Email Addresses" url="System_Administration/System_Settings/Blocking_Email_Addresses.htm" />
     <item name="Blocking Phone Numbers" url="System_Administration/System_Settings/Blocking_Phone_Numbers.htm" />
   </book>
