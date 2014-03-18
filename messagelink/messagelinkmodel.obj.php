@@ -32,25 +32,20 @@ class MessageLinkModel {
 	 */
 	public function initialize() {
 		if (isset($this->protocol) && isset($this->transport)) {
-			$attempts = 0;
 			// get a new MessageLinkClient, considered the "model"
 			// and open the transport connection
 			$this->client = new MessageLinkClient($this->protocol);
 
-			while (true) {
+			// try a maximum of 3 attempts to open the thrift transport layer
+			for ($attempts = 1; $attempts <= 3; $attempts++) {
 				try {
 					$this->transport->open();
 					break;
 				} catch (TException $tx) {
-					// MessageLinkClient instantiation was unsuccessfull
-					$attempts++;
-					error_log("getInfo: Exception Connection to AppServer (" . $tx->getMessage() . ")");
+					error_log("TTransport->open exception: Connection to AppServer (" . $tx->getMessage() . ")");
 					$this->transport->close();
-
-					// if $attempts > 2, show error message, else instantiate MessageLinkClient again
-					if ($attempts > 2) {
+					if ($attempts == 3) {
 						error_log("getInfo: Failed 3 times to get content from appserver");
-						break;
 					}
 				}
 			}
