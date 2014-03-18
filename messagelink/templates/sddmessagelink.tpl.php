@@ -162,7 +162,7 @@ function escapeHtml($string) {
 										</div>
 									</div>
 									<div class="form-group audiofile">
-										<label class="col-sm-2 control-label">Audio File:</label>
+										<label class="col-sm-2 control-label">Audio&nbsp;File:</label>
 										<div class="col-sm-10">
 											<a id="download" href="../messagelinkaudio.mp3.php?download&code=<?= escapehtml($this->messageLinkCode) ?>" class="btn btn-primary"><span class="glyphicon glyphicon-download"></span> &nbsp;Download</a>
 										</div>
