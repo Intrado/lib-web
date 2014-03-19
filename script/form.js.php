@@ -681,7 +681,7 @@ function form_do_hover(hovers) {
 	});
 }
 
-// Takes a json encoded object of id to hover text associations and adds protoTip hover helps
+// Takes a json encoded object of css selector to hover text associations and adds protoTip hover helps
 function form_do_hover_by_selector(hovers) {
 	Object.keys(hovers).each(function(selector) {
 		$$(selector).each(function(element) {
