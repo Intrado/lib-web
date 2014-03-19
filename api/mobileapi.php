@@ -64,7 +64,7 @@ function doJobCancel($cancelid) {
 	if ($didCancel)
 		return array("resultcode" => "success", "resultdescription" => "");
 	else
-		return array("resultcode" => "failure", "resultdescription" => _L("There was a problem trying to cancel this job."));
+		return array("resultcode" => "failure", "resultdescription" => _L("There was a problem trying to cancel this broadcast."));
 }
 
 function doJobArchive($archiveid) {

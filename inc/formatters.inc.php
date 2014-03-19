@@ -216,7 +216,7 @@ function jobs_actionlinks ($obj) {
 	
 		$editrepeatingbtn = action_link(_L("Edit"),"pencil","jobrepeating.php?id=$id");
 	
-		$cancelbtn = action_link(_L("Cancel"),"stop","jobs.php?cancel=$id", "return confirm('Are you sure you want to cancel this job?');");
+		$cancelbtn = action_link(_L("Cancel"),"stop","jobs.php?cancel=$id", "return confirm('Are you sure you want to cancel this broadcast?');");
 	
 		$reportbtn = action_link(_L("Report"),"layout", $type == "survey" ? "reportsurveysummary.php?jobid=$id" : "reportjobsummary.php?jobid=$id");
 	
@@ -228,7 +228,7 @@ function jobs_actionlinks ($obj) {
 	
 		$archivebtn = action_link(_L("Archive"),"fugue/broom","jobs.php?archive=$id");
 	
-		$runrepeatbtn = action_link(_L("Run Now"),"page_go","jobs.php?runrepeating=$id&uuid=rr".uniqid(), "return confirm('Are you sure you want to run this job now?');");
+		$runrepeatbtn = action_link(_L("Run Now"),"page_go","jobs.php?runrepeating=$id&uuid=rr".uniqid(), "return confirm('Are you sure you want to run this broadcast now?');");
 	
 		$viewresponses = action_link(_L("Responses"),"comment","replies.php?jobid=$id");
 	
@@ -506,7 +506,7 @@ function fmt_jobs_actions_customer($row, $index) {
 	}
 
 	if ($USER->authorize('managesystemjobs')) {
-		$cancelLink = action_link(_L("Cancel"),"stop","jobs.php?cancel=$id", "return confirm('Are you sure you want to cancel this job?');");
+		$cancelLink = action_link(_L("Cancel"),"stop","jobs.php?cancel=$id", "return confirm('Are you sure you want to cancel this broadcast?');");
 		$archiveLink = action_link(_L("Archive"),"fugue/broom","jobs.php?archive=$id");
 		$deleteLink =  action_link(_L("Delete"),"cross","jobs.php?delete=$id","return confirmDelete();");
 	} else {
@@ -516,7 +516,7 @@ function fmt_jobs_actions_customer($row, $index) {
 	}
 
 	if ($USER->authorize('managesystemjobs') || $USER->id == $jobownerid) {
-		$runrepeatLink = action_link(_L("Run Now"),"page_go","jobs.php?runrepeating=$id&uuid=".uniqid(), "return confirm('Are you sure you want to run this job now?');");
+		$runrepeatLink = action_link(_L("Run Now"),"page_go","jobs.php?runrepeating=$id&uuid=".uniqid(), "return confirm('Are you sure you want to run this broadcast now?');");
 	} else {
 		$runrepeatLink = "";
 	}
