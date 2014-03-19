@@ -162,8 +162,13 @@ class MessageLinkController {
 		$errorAttributes = array(
 			"pageTitle" => "SchoolMessenger",
 			"productName" => "SchoolMessenger",
+			"customerdisplayname" => "",
 			"errorMessage" => $errorMessage ? $errorMessage : "An error occurred while trying to retrieve your message. Please try again."
 		);
+
+		if (isset($this->model->attributes)) {
+			$errorAttributes["customerdisplayname"] = $this->model->get("customerdisplayname");
+		}
 
 		// handles view rendering if no model passed into initView(model)
 		if (!isset($this->model)) {
