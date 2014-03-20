@@ -1,7 +1,7 @@
 <?
 
 require_once(realpath(dirname(dirname(__FILE__)) .'/konaenv.php'));
-require_once("{$konadir}/inc/common.inc.php");
+//require_once("{$konadir}/inc/common.inc.php");
 require_once("{$konadir}/messagelink/messagelinkcontroller.obj.php");
 require_once("{$konadir}/messagelink/messagelinkitemview.obj.php");
 require_once("{$konadir}/messagelink/messagelinkmodel.obj.php");
