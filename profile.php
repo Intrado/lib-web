@@ -817,8 +817,10 @@ if (!getSystemSetting('_hastwitter', false))
 if (!getSystemSetting('_hasfeed', false))
 	unset($formdata['feedpost']);
 
-if (!getSystemSetting('_haspdfburst', false))
-	unset($formdata['canpdfburst']);
+if (!getSystemSetting('_haspdfburst', false)) {
+	if (isset($formdata['canpdfburst']))
+		unset($formdata['canpdfburst']);
+}
 
 $buttons = array(submit_button(_L('Save'),"submit","tick"));
 $form = new Form("accessprofile",$formdata,$helpsteps,$buttons);
@@ -880,7 +882,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$obj->setPermission("subscribe", $subscribed);
 			$obj->setPermission("datafields", $allowedfields);
 			$obj->setPermission("createrepeat", (bool)$postdata['createrepeat']);
-			$obj->setPermission("canpdfburst", (bool)$postdata['canpdfburst']);
+			$obj->setPermission("canpdfburst", isset($postdata['canpdfburst']) ? (bool)$postdata['canpdfburst'] : false);
 			$obj->setPermission("maxjobdays", $postdata['maxjobdays']);
 			$obj->setPermission("blocknumbers", $postdata['callblockingperms'] != "none");
 			$obj->setPermission("callblockingperms", $postdata['callblockingperms']);
