@@ -468,7 +468,8 @@ class MessageLinkControllerTest extends PHPUnit_Framework_TestCase {
 		$errorAttributes = array(
 			"pageTitle" => "SchoolMessenger",
 			"productName" => "SchoolMessenger",
-			"errorMessage" => "An error occurred while trying to retrieve your message. Please try again."
+			"errorMessage" => "An error occurred while trying to retrieve your message. Please try again.",
+			'customerdisplayname' => ''
 		);
 
 		// create a mock controller and stub all methods in logic path involved in
