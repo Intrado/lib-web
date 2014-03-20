@@ -37,7 +37,7 @@ function SDD() {
 
 		if ($this.password.length) {
 			$this.downloadB  = $("#downloadB");
-			$this.addPasswordKeyupHandler();
+			$this.addPasswordInputHandler();
 			$this.addDownloadBtnClickHandler();
 		} else if ($this.countElem.length) {
 			$this.count = 5;
@@ -175,7 +175,7 @@ function SDD() {
 	/**
 	 *
 	 */
-	this.addPasswordKeyupHandler = function() {
+	this.addPasswordInputHandler = function() {
 		if ($this.password) {
 			$this.password.on("keyup", function(e) {
 				var pwdVal = $this.getPassword();
@@ -188,6 +188,21 @@ function SDD() {
 
 				if (e.which !== 13) {
 					$this.errorMsgContainer.hide();
+				}
+			});
+
+			$this.password.on("keydown", function(e) {
+				var pwdVal = $this.getPassword();
+
+				if (pwdVal.length > 0) {
+					if (e.which === 13) {
+						$this.downloadB.trigger('click');
+						return false;
+					}
+				} else {
+					if (e.which === 13) {
+						return false;
+					}
 				}
 			});
 		}
