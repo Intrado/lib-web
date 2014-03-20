@@ -604,9 +604,6 @@ class FinishMessageWizard extends WizFinish {
 				// create the message parts
 				$message->recreateParts($data['text'], null, isset($data['gender'])?$data['gender']:false);
 				
-				// check for existing attachments
-				$existingattachments = QuickQueryList("select contentid, id from messageattachment where messageid = ?", true, false, array($message->id));
-				
 				// if there are message attachments, attach them
 				$message->replaceContentAttachments($data['attachments']);
 				
