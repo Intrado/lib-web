@@ -196,7 +196,7 @@ function SDD() {
 
 				if (pwdVal.length > 0) {
 					if (e.which === 13) {
-						$this.downloadB.trigger('click');
+						$this.requestDocument($this.getPassword());
 						return false;
 					}
 				} else {
