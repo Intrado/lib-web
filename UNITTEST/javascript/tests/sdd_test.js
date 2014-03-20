@@ -37,12 +37,12 @@ describe("SDD (Secure Document Delivery)", function() {
 
 	describe("initialize", function() {
 
-		it("should call addPasswordKeyupHandler() and addDownloadBtnClickHandler() if $('#password') elem in DOM", function() {
+		it("should call addPasswordInputHandler() and addDownloadBtnClickHandler() if $('#password') elem in DOM", function() {
 
 			var password = $("<input>").attr({"id":"password"});
 			contentWrapper.append(password);
 
-			var addPasswordStub = sinon.stub(sdd, "addPasswordKeyupHandler");
+			var addPasswordStub = sinon.stub(sdd, "addPasswordInputHandler");
 			var addDownloadStub = sinon.stub(sdd, "addDownloadBtnClickHandler");
 			var addDirectLinkStub = sinon.stub(sdd, "addDirectLinkClickHandler");
 			var addCountdownTimerStub = sinon.stub(sdd, "startCountdownTimer");
@@ -68,7 +68,7 @@ describe("SDD (Secure Document Delivery)", function() {
 			var countElem = $("<span>").attr({"id":"download-count"});
 			contentWrapper.append(countElem);
 
-			var addPasswordStub = sinon.stub(sdd, "addPasswordKeyupHandler");
+			var addPasswordStub = sinon.stub(sdd, "addPasswordInputHandler");
 			var addDownloadStub = sinon.stub(sdd, "addDownloadBtnClickHandler");
 			var addDirectLinkStub = sinon.stub(sdd, "addDirectLinkClickHandler");
 			var addCountdownTimerStub = sinon.stub(sdd, "startCountdownTimer");
@@ -293,7 +293,7 @@ describe("SDD (Secure Document Delivery)", function() {
 		});
 	});
 
-	describe("addPasswordKeyupHandler()", function() {
+	describe("addPasswordInputHandler()", function() {
 		it("should enable the Download button upon keyup events in the $('#password') input if a valid password with 'trimmed' string length > 0 is present", function() {
 			var password = $("<input>").attr({"id":"password"});
 			var downloadB = $("<button>").attr({"id":"downloadB", "disabled":"disabled"}).addClass('disabled');
@@ -304,7 +304,7 @@ describe("SDD (Secure Document Delivery)", function() {
 			sdd.password = password;
 			sdd.downloadB = downloadB;
 
-			sdd.addPasswordKeyupHandler();
+			sdd.addPasswordInputHandler();
 
 			expect(sdd.downloadB.hasClass('disabled')).to.equal(true);
 			// now enter password and trigger keyup event
@@ -326,7 +326,7 @@ describe("SDD (Secure Document Delivery)", function() {
 			sdd.password = password;
 			sdd.downloadB = downloadB;
 
-			sdd.addPasswordKeyupHandler();
+			sdd.addPasswordInputHandler();
 
 			// now empty password field and trigger keyup to simulate user clearing password field
 			password.trigger('keyup');
