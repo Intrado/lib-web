@@ -144,8 +144,9 @@ if ($email) {
 	// call appserver to render email
 	$view = messageViewForJobPerson($message->id, $jobid, $personid);
 	$messagetext = $view->emailbody;
-	if ($message->subtype === "plain")
-		$messagetext = nl2br(escapehtml($messagetext));
+	if ($message->subtype === "plain") {
+		$messagetext = preg_replace("/(\bhttps?:\/\/[^\s<]+)/i", '<a href="\1">\1</a>', nl2br(escapehtml($messagetext)));
+	}
 } else if ($sms) {
 	$messagetext = $messagegroup->getMessageText("sms", "plain", "en", "none");
 }
