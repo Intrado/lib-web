@@ -1,9 +1,4 @@
 <?
-//shortcut for messagelinks
-if(isset($_GET['s'])){
-	include("messagelink.php");
-	exit();
-}
 
 $isindexpage = true;
 require_once("inc/common.inc.php");
