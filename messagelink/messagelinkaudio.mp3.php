@@ -1,10 +1,14 @@
 <?
 
-$SETTINGS = parse_ini_file("inc/settings.ini.php",true);
+if(!isset($_GET['code'])) {
+	exit();
+}
 
-require_once("inc/appserver.inc.php");
+$SETTINGS = parse_ini_file("../inc/settings.ini.php",true);
+
+require_once("../inc/appserver.inc.php");
 // load the thrift api requirements.
-$thriftdir = 'Thrift';
+$thriftdir = '../Thrift';
 require_once("{$thriftdir}/Base/TBase.php");
 require_once("{$thriftdir}/Protocol/TProtocol.php");
 require_once("{$thriftdir}/Protocol/TBinaryProtocol.php");
@@ -28,52 +32,59 @@ require_once("{$thriftdir}/packages/messagelink/MessageLink.php");
 use messagelink\MessageLinkClient;
 use messagelink\MessageLinkCodeNotFoundException;
 
-
-session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
-
-if (isset($_GET['code'])) {
-	$code = $_GET['code'];
-}
-
 list($appserverprotocol, $appservertransport) = initMessageLinkApp();
 if($appserverprotocol == null || $appservertransport == null) {
 	error_log("Cannot use AppServer");
-	exit(0);
+	exit();
 }
 $attempts = 0;
 while(true) {
 	try {
 		$client = new MessageLinkClient($appserverprotocol);
+		
 		// Open up the connection
 		$appservertransport->open();
-		$logo = $client->getLogo($code);
-		$data = $logo->data;
-		$contenttype = $logo->contenttype;
-		$appservertransport->close();
-		break;
-	} catch (MessageLinkCodeNotFoundException $e) {
-		error_log("Unable to find the messagelinkcode: " . $code);
-		$data = file_get_contents("img/logo_small.gif");
-		$contenttype = "image/gif";
+		
+		$code = $_GET['code'];
+		
+		try {
+			// Get either the part or the full message
+			$audio = isset($_GET['partnum'])?$client->getAudioPart($code,$_GET['partnum']):$client->getAudioFull($code);
+			header("HTTP/1.0 200 OK");
+			header("Content-Type: $audio->contenttype");
+			if (isset($_GET['download'])) {
+				header("Content-disposition: attachment; filename=message.mp3");
+			}
+			header('Pragma: private');
+			header('Cache-control: private, must-revalidate');
+			header("Content-Length: " . strlen($audio->data));
+			header("Connection: close");
+			echo $audio->data;
+		} catch (MessageLinkCodeNotFoundException $e) {
+			echo "The requested information was not found. The message you are looking for does not exist or has expired.";
+			error_log("Unable to find the messagelinkcode: " . $code . " Attempt: " . $attempts);
+		}
+		// And finally, we close the thrift connection
 		$appservertransport->close();
 		break;
 	} catch (TException $tx) {
 		$attempts++;
 		// a general thrift exception, like no such server
-		error_log("getLogo: Exception Connection to AppServer (" . $tx->getMessage() . ")");
+		
+		error_log((isset($_GET['partnum'])?"getAudioPart":"getAudioFull") .
+		 ": Exception Connection to AppServer (" . $tx->getMessage() . ") Attempt: " . $attempts);
 		$appservertransport->close();
 		if($attempts > 2) {
-			error_log("getLogo: Failed 3 times to get content from appserver");
-			$data = file_get_contents("img/logo_small.gif");
-			$contenttype = "image/gif";
+			header("HTTP/1.0 500 Internal Server Error");
+			
+			echo "An error occurred trying to generate the preview file. Please try again.";
+			error_log((isset($_GET['partnum'])?"getAudioPart":"getAudioFull") .
+						 ": Failed 3 times to get content from appserver");
 			break;
 		}
 	}
 }
-header("Content-type: " . $contenttype);
-header("Pragma: ");
-header("Cache-Control: private");
-header("Expires: " . gmdate('D, d M Y H:i:s', time() + 60*60) . " GMT"); //exire in 1 hour, but if theme changes so will hash pointing to this file
-echo $data;
+
+
 
 ?>
