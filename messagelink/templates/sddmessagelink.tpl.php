@@ -157,14 +157,14 @@ function escapeHtml($string) {
 										<div class="col-sm-10">
 											<div id="player" style="display:inline-block;"></div>
 											<script type="text/javascript">
-												embedPlayer("<?= (isset($_SERVER["HTTPS"])?"https://":"http://") . $_SERVER['HTTP_HOST'] ?>/m/messagelinkaudio.mp3.php?code=<?= escapehtml($this->messageLinkCode) ?>","#player", "<?= $this->messageInfo->selectedPhoneMessage->nummessageparts ?>");
+												embedPlayer("<?= (isset($_SERVER["HTTPS"])?"https://":"http://") . $_SERVER['HTTP_HOST'] ?>/m/messagelink/messagelinkaudio.mp3.php?code=<?= escapehtml($this->messageLinkCode) ?>","#player", "<?= $this->messageInfo->selectedPhoneMessage->nummessageparts ?>");
 											</script>
 										</div>
 									</div>
 									<div class="form-group audiofile">
 										<label class="col-sm-2 control-label">Audio&nbsp;File:</label>
 										<div class="col-sm-10">
-											<a id="download" href="../messagelinkaudio.mp3.php?download&code=<?= escapehtml($this->messageLinkCode) ?>" class="btn btn-primary"><span class="glyphicon glyphicon-download"></span> &nbsp;Download</a>
+											<a id="download" href="messagelinkaudio.mp3.php?download&code=<?= escapehtml($this->messageLinkCode) ?>" class="btn btn-primary"><span class="glyphicon glyphicon-download"></span> &nbsp;Download</a>
 										</div>
 									</div>
 								</div>
