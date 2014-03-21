@@ -157,7 +157,7 @@ function escapeHtml($string) {
 										<div class="col-sm-10">
 											<div id="player" style="display:inline-block;"></div>
 											<script type="text/javascript">
-												embedPlayer("<?= (isset($_SERVER["HTTPS"])?"https://":"http://") . $_SERVER['HTTP_HOST'] ?>/m/messagelink/messagelinkaudio.mp3.php?code=<?= escapehtml($this->messageLinkCode) ?>","#player", "<?= $this->messageInfo->selectedPhoneMessage->nummessageparts ?>");
+												embedPlayer("<?= $_SERVER['SCRIPT_URI'] ?>messagelinkaudio.mp3.php?code=<?= escapehtml($this->messageLinkCode) ?>","#player", "<?= $this->messageInfo->selectedPhoneMessage->nummessageparts ?>");
 											</script>
 										</div>
 									</div>

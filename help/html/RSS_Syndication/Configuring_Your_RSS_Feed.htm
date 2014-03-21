@@ -8,6 +8,25 @@
 <link rel="StyleSheet" href="../main.css" type="text/css" />
 <script type="text/javascript" language="JavaScript">
 //<![CDATA[
+function ehlp_showtip(current,e,text)
+{
+  if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape'))
+  {
+    document.tooltip.document.write("<layer bgColor='yellow' style='border:1px solid black;font-size:12px;'>"+ text + "</layer>");
+    document.tooltip.document.close();
+    document.tooltip.left=e.pageX+5;
+    document.tooltip.top=e.pageY+5;
+    document.tooltip.visibility="show";
+  }
+}
+function ehlp_hidetip()
+{
+  document.tooltip.visibility="hidden";
+}
+//]]>
+</script>
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
 function reDo() {
   if (innerWidth != origWidth || innerHeight != origHeight)
      location.reload();
@@ -110,6 +129,26 @@ else
 		<li><p style="line-height: 150%;">Enter a category name and description, 
 		 for example &quot;Sports&quot; and &quot;Sports news for Springfield 
 		 HS&quot;.</p></li>
+		<li><p style="line-height: 150%;">Select what type of feed it will 
+		 be from the options in the Feed Type section.</p></li>
+		<ul type="disc">
+			<li><p style="line-height: 150%;">RSS will create a regular 
+			 RSS feed that community members may subscribe to.</p></li>
+			<li><p style="line-height: 150%;">Desktop Alerts are for feeds 
+			 that will be posted to the Desktop Alert system.</p></li>
+			<li><p style="line-height: 150%;">Push Notifications are sent 
+			 to users of your Custom Mobile App. </p></li>
+		</ul>
+	</ol>
+</ol>
+<p class="important" style="margin-left: 120px;"><span style="font-weight: bold;"><b><img src="../exclamation.png" alt="exclamation.png" style="border: none;" border="0" /> 
+ Important: </b></span>&#160;Checking the Push Notifications option will cause 
+ the Push Notification icon to appear for users while creating messages, 
+ however for the push notification to be sent you <span style="font-weight: bold;"><b>must</b></span> 
+ also be sure to <a href="../Custom_Mobile_App_Integration/Mapping_App_Categories_to_RSS_Feeds.htm" title="Click to view the Mapping App Categories help topic." onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to view the Mapping App Categories help topic.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">map 
+ the feed to a category in your app</a>.</p>
+<ol type="1">
+	<ol start="4" type="1">
 		<li><p style="line-height: 150%;">Click the &quot;Add New Category&quot; 
 		 button for any additional categories.</p></li>
 		<li><p style="line-height: 150%;">Click Save when you are done.</p></li>
@@ -183,7 +222,12 @@ else
 	<p><span style="font-size: xx-small;"><font size="1" style="font-size: xx-small;">©1999 - 2014 Reliance Communications, 
 	 Inc.</font></span></p>
 </div>
-<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+ if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape'))
+  document.write("<div id='tooltip' class='WebHelpPopupMenu'></div>");
+//]]>
+</script><script type="text/javascript" language="javascript1.2">//<![CDATA[
 <!--
 if (window.writeIntopicBar)
 	writeIntopicBar(0);
