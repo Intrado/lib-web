@@ -89,11 +89,6 @@ function googleTranslateV2($text, $sourcelanguage, $targetlanguages) {
 	$apiKey = $SETTINGS['translation']['apikey'];
 	$referer = (isset($SETTINGS['translation']['referer']) && $SETTINGS['translation']['referer'])?$SETTINGS['translation']['referer']:"http://asp.schoolmessenger.com";
 	$apiUrl = 'https://www.googleapis.com/language/translate/v2';
-
-	$apiUrl = parse_url($apiUrl);
-	
-	$host = $apiUrl['host'];
-	$path = $apiUrl['path'];
 	
 	//Cap translation
 	if (mb_strlen($text) > 5000) {
@@ -122,51 +117,14 @@ function googleTranslateV2($text, $sourcelanguage, $targetlanguages) {
 			'source' => $sourcelanguage,
 			'target' => $targetlanguage
 		);
-		
-		$data = http_build_query($post_data);
-		
-		// TODO timeout is currently 5 seconds
-		$fp = fsockopen("ssl://" . $host, 443, $errno, $errstr, 5);
-		
-		if ($fp){
-			// send the request headers:
-			fputs($fp, "POST $path HTTP/1.1\r\n");
-			fputs($fp, "Host: $host\r\n");
-		
-			if ($referer != '')
-				fputs($fp, "Referer: $referer\r\n");
-			fputs($fp, "Content-type: application/x-www-form-urlencoded\r\n");
-			fputs($fp, "Content-length: ". strlen($data) ."\r\n");
-			fputs($fp, "X-HTTP-Method-Override: GET\r\n");
-			fputs($fp, "Connection: close\r\n\r\n");
-			fputs($fp, $data);
-		
-			$result = '';
-			while(!feof($fp)) {
-				$result .= fgets($fp, 128);
-			}
-			fclose($fp);
-		} else {
-			error_log("Unable to send translation request: (From: $sourcelanguage to $targetlanguage) Truncated text: " . substr($text,0, 20));
-			$translations[] = false;
-			continue;
-		}
-		
-		$result = explode("\r\n\r\n", $result, 2);
-		$header = isset($result[0]) ? $result[0] : '';
-		$content = isset($result[1]) ? $result[1] : '';
-		
-		$statuscode = substr($header, 9, 3);
-		if ($statuscode !== "200")
-			error_log("Google Translation Error: $content");
-		
-		$obj = json_decode($content);
+
+		$obj = doGoogleTranslateRequest_curl($apiUrl, $post_data, $referer);
+
 		if(isset($obj->data->translations[0]->translatedText)) {
 			$translation = preg_replace('/<input value="(.+?)"\\/>/', '$1', html_entity_decode($obj->data->translations[0]->translatedText,ENT_QUOTES,"UTF-8"));
 		} else {
 			$translation = false;
 		}
-		
 		$_SESSION["translationcache"][$key] = $translation;
 		$translations[] = $translation;
 	}
@@ -188,6 +146,76 @@ function makeTranslatableString($str) {
 	$str = preg_replace('/({{.*?}})/', '<input value="$1"/>', $str);
 	$str = preg_replace('/(\\[\\[.*?\\]\\])/', '<input value="$1"/>', $str);
 	return $str;
+}
+
+function doGoogleTranslateRequest_curl($apiUrl, $post_data, $referrer) {
+	$headers = array(
+		"Referrer: $referrer",
+		"Content-type: application/x-www-form-urlencoded",
+		"X-HTTP-Method-Override: GET",
+		"Connection: close"
+	);
+
+	// set up the curl request to the api url with post data and custom headers
+	$handle = curl_init($apiUrl);
+	curl_setopt($handle, CURLOPT_HTTPHEADER, $headers);
+	curl_setopt($handle, CURLOPT_POST, count($post_data));
+	curl_setopt($handle, CURLOPT_POSTFIELDS, http_build_query($post_data));
+	curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
+
+	$response = curl_exec($handle);
+	$statusCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
+	if ($statusCode != 200)
+		error_log("Google Translation Error $statusCode: $response");
+	$obj = json_decode($response);
+	curl_close($handle);
+
+	return $obj;
+}
+
+function doGoogleTranslateRequest_fp($apiUrl, $post_data, $referer) {
+	$apiUrl_parsed = parse_url($apiUrl);
+	$host = $apiUrl_parsed['host'];
+	$path = $apiUrl_parsed['path'];
+
+	$data = http_build_query($post_data);
+
+	// TODO timeout is currently 5 seconds
+	$fp = fsockopen("ssl://" . $host, 443, $errno, $errstr, 5);
+
+	if ($fp){
+		// send the request headers:
+		fputs($fp, "POST $path HTTP/1.1\r\n");
+		fputs($fp, "Host: $host\r\n");
+
+		if ($referer != '')
+			fputs($fp, "Referer: $referer\r\n");
+		fputs($fp, "Content-type: application/x-www-form-urlencoded\r\n");
+		fputs($fp, "Content-length: ". strlen($data) ."\r\n");
+		fputs($fp, "X-HTTP-Method-Override: GET\r\n");
+		fputs($fp, "Connection: close\r\n\r\n");
+		fputs($fp, $data);
+
+		$result = '';
+		while(!feof($fp)) {
+			$result .= fgets($fp, 128);
+		}
+		fclose($fp);
+
+		$result = explode("\r\n\r\n", $result, 2);
+		$header = isset($result[0]) ? $result[0] : '';
+		$content = isset($result[1]) ? $result[1] : '';
+		$statuscode = substr($header, 9, 3);
+
+		if ($statuscode !== "200")
+			error_log("Google Translation Error: $content");
+		$obj = json_decode($content);
+	} else {
+		error_log("Unable to send translation request: (From: {$post_data['source']} to {$post_data['target']}) Truncated text: " . substr($post_data['q'],0, 20));
+		$obj = false;
+	}
+
+	return $obj;
 }
 
 ?>
