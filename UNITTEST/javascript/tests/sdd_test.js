@@ -5,7 +5,8 @@ describe("SDD (Secure Document Delivery)", function() {
 		errorMsgContainer,
 		errorMsg,
 		contentWrapper,
-		sdd;
+		sdd,
+		requestDocumentUrl = "requestdocument.php";
 
 	beforeEach(function() {
 		// create some dummy elements
@@ -101,7 +102,7 @@ describe("SDD (Secure Document Delivery)", function() {
 			expect(ajaxStub).to.have.been.called;
 
 			var args = ajaxStub.args[0][0];
-			expect(args.url).to.equal("../messagelink/requestdocument.php");
+			expect(args.url).to.equal(requestDocumentUrl);
 			expect(args.type).to.equal("POST");
 			expect(args.data.s).to.equal('1234');
 			expect(args.data.mal).to.equal('5678');
@@ -118,7 +119,7 @@ describe("SDD (Secure Document Delivery)", function() {
 
 			expect(ajaxStub).to.have.been.called;
 			var args = ajaxStub.args[0][0];
-			expect(args.url).to.equal("../messagelink/requestdocument.php");
+			expect(args.url).to.equal(requestDocumentUrl);
 			expect(args.type).to.equal("POST");
 			expect(args.data.s).to.equal('1234');
 			expect(args.data.mal).to.equal('5678');
@@ -133,7 +134,7 @@ describe("SDD (Secure Document Delivery)", function() {
 
 			sdd.requestDocument('secretpassword123');
 			var postArgs = {s:'1234',mal:'5678',p:'secretpassword123'};
-			expect(postToUrlStub).to.have.been.calledWith("../messagelink/requestdocument.php", postArgs);
+			expect(postToUrlStub).to.have.been.calledWith(requestDocumentUrl, postArgs);
 
 			ajaxStub.restore();
 			postToUrlStub.restore();
@@ -169,7 +170,7 @@ describe("SDD (Secure Document Delivery)", function() {
 
 	describe("getPostForm(path, params)", function() {
 		it("should create a form dynamically and add hidden form elements based on the params provided", function() {
-			var path = "../messagelink/requestdocument.php";
+			var path = requestDocumentUrl;
 			var params = {s:'1234',mal:'5678',p:'secretpassword123'};
 
 			var form = sdd.getPostForm(path, params);
