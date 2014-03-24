@@ -18,6 +18,8 @@ function SDD() {
 
 	var $this = this;
 
+	this.requestDocumentUrl = "requestdocument.php";
+
 	this.messageLinkCode = $("#message-link-code").val();
 	this.attachmentLinkCode = $("#attachment-link-code").val();
 
@@ -63,8 +65,9 @@ function SDD() {
 			requestParams['v'] = true;
 		}
 
+		var requestDocumentUrl = this.requestDocumentUrl;
 		return $.ajax({
-			url: "../messagelink/requestdocument.php",
+			url: requestDocumentUrl,
 			type: "POST",
 			data: requestParams,
 			success: function(res) {
@@ -73,7 +76,7 @@ function SDD() {
 
 				// now download the document, i.e. redirect user to direct URL,
 				// which should invoke the browser's download/save as dialog
-				$this.postToUrl("../messagelink/requestdocument.php", requestParams);
+				$this.postToUrl(requestDocumentUrl, requestParams);
 			},
 			error: function(res) {
 				if (res && res.responseJSON && res.responseJSON.errorMessage) {
