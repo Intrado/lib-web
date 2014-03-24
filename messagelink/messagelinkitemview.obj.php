@@ -43,7 +43,10 @@ class MessageLinkItemView {
 	 * @return mixed
 	 */
 	public function __get($name) {
-		return $this->vars[$name];
+		$value = null;
+		if (isset($this->vars[$name]))
+			$value = $this->vars[$name];
+		return $value;
 	}
 
 	/**
