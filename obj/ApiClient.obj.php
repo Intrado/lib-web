@@ -60,7 +60,7 @@ class ApiClient {
 		$creq = curl_init($this->ApiUrl . $node);
 		curl_setopt($creq, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($creq, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($creq, CURLOPT_HEADER, 1);
+		curl_setopt($creq, CURLOPT_HEADER, 1);
 
 		// Some initial headers we will need, but there may be more...
 		$headers = $this->staticHeaders;
