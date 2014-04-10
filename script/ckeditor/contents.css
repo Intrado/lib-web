@@ -1,13 +1,13 @@
 /*
-Copyright (c) 2003-2013, CKSource - Frederico Knabben. All rights reserved.
-For licensing, see LICENSE.html or http://ckeditor.com/license
+Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+For licensing, see LICENSE.md or http://ckeditor.com/license
 */
 
 body
 {
 	/* Font */
 	font-family: sans-serif, Arial, Verdana, "Trebuchet MS";
-	font-size: 14px; /* Set font size same as default in MS */
+	font-size: 12px;
 
 	/* Text color */
 	color: #333;
@@ -20,8 +20,8 @@ body
 
 .cke_editable
 {
-	font-size: 14px; /* Set font size same as default in MS */
-	line-height: 1.6em;
+	font-size: 13px;
+	line-height: 1.6;
 }
 
 blockquote
@@ -64,7 +64,7 @@ ol,ul,dl
 h1,h2,h3,h4,h5,h6
 {
 	font-weight: normal;
-	line-height: 1.2em;
+	line-height: 1.2;
 }
 
 hr
@@ -73,23 +73,20 @@ hr
 	border-top: 1px solid #ccc;
 }
 
-img.right {
-    border: 1px solid #ccc;
-    float: right;
-    margin-left: 15px;
-    padding: 5px;
+img.right
+{
+	border: 1px solid #ccc;
+	float: right;
+	margin-left: 15px;
+	padding: 5px;
 }
 
-img.left {
-    border: 1px solid #ccc;
-    float: left;
-    margin-right: 15px;
-    padding: 5px;
-}
-
-img:hover {
-	opacity: .9;
-	filter: alpha(opacity = 90);
+img.left
+{
+	border: 1px solid #ccc;
+	float: left;
+	margin-right: 15px;
+	padding: 5px;
 }
 
 pre
@@ -98,7 +95,37 @@ pre
 	word-wrap: break-word; /* IE7 */
 }
 
-div.cke_contents > iframe::-webkit-scrollbar { display: none; }
+.marker
+{
+	background-color: Yellow;
+}
 
-div.cke_contents > iframe { overflow-y: hidden; }
+span[lang]
+{
+   font-style: italic;
+}
+
+figure
+{
+	text-align: center;
+	border: solid 1px #ccc;
+	border-radius: 2px;
+	background: rgba(0,0,0,0.05);
+	padding: 10px;
+	margin: 10px 20px;
+	display: block; /* For IE8 */
+}
+
+figure figcaption
+{
+	text-align: center;
+	display: block; /* For IE8 */
+}
+
+/* SMK added 2012-12-14 so that we can see the boundaries of editable content blocks */
+.editableBlock {
+	outline: #FFFFFF dashed 1px;
+	border: 1px dashed #000000;
+	box-shadow: 0 0 0 1px #FFFFFF;
+}
 
