@@ -766,4 +766,6 @@ update portaluseridentification set confirmed = 1 where type != 'local';
 -- all contact manager users are autoconfirmed
 update portaluseridentification pui set pui.confirmed = 1 where type = 'local' and pui.portaluserid in (select pc.portaluserid from portalcustomer pc join customerproduct cp on (pc.customerid = cp.customerid) where cp.product = 'cm' and cp.enabled);
 
+-- ASP 10.3 release of InfoCenter
+ALTER TABLE `customerproduct` CHANGE `product` `product` ENUM( 'cs', 'tai', 'cm', 'ic' ) NOT NULL;
 

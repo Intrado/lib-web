@@ -2463,3 +2463,18 @@ update setting set value='10.2/4' where name='_dbversion'
 $$$
 -- END 10.2/4
 
+
+-- START 10.3/1
+
+-- note this is a short lived table and will be replaced in near future after more infocenter schema is worked out
+CREATE TABLE `ic_portalperson` (
+ `portaluserid` int(11) NOT NULL,
+ `personid` int(11) NOT NULL,
+ PRIMARY KEY (`portaluserid`,`personid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
+
+update setting set value='10.3/1' where name='_dbversion'
+$$$
+-- END 10.3/1
+
