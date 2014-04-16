@@ -45,7 +45,7 @@ function escapeHtml($string) {
 			</div>
 			<div class="col-xs-4">
 				<div class="pull-right">
-					<a href="../privacy.html">Privacy Policy</a> &nbsp;|&nbsp; <a href="../terms.html">Terms of Use</a>
+					<a href="privacy.html">Privacy Policy</a> &nbsp;|&nbsp; <a href="terms.html">Terms of Use</a>
 				</div>
 			</div>
 		</div>
