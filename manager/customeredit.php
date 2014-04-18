@@ -982,15 +982,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
  */
 function updateCustomerProduct($customerid, $product, $enabled) {
 	if ($enabled) {
-		$customerProductFieldMap = QuickQueryRow("select * from customerproduct where customerid = ? and product = ?", true, false, array($customerid, $product));
-		if ($customerProductFieldMap === false) {
-			// insert and enable product
-			$query = "INSERT INTO `customerproduct` (`customerid`,`product`,`createdtimestamp`,`modifiedtimestamp`,`enabled`) VALUES (?,?,?,?,1)";
-			QuickUpdate($query, false, array($customerid, $product, time(), time()));
-		} else if ($customerProductFieldMap['enabled'] == 0) {
-			// enable product
-			QuickUpdate("update customerproduct set enabled = 1, modifiedtimestamp = ? where customerid = ? and product = ?", false, array(time(), $customerid, $product));
-		} // else ignore, already enabled product
+		// insert and enable product
+		$query = "INSERT INTO `customerproduct` (`customerid`,`product`,`createdtimestamp`,`modifiedtimestamp`,`enabled`) VALUES (?,?,?,?,1) ON DUPLICATE KEY UPDATE enabled = 1, modifiedtimestamp = ? ";
+		QuickUpdate($query, false, array($customerid, $product, time(), time(), time()));
 	} else {
 		// disable product
 		QuickUpdate("update customerproduct set enabled = 0, modifiedtimestamp = ? where customerid = ? and product = ?", false, array(time(), $customerid, $product));
