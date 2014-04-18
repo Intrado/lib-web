@@ -975,19 +975,14 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
 
 /**
- * 
+ * Enable/disable product in authserver.customerproduct
  * @param type $customerid customer id
  * @param type $product product name
  * @param type $enabled is product enabled or not
  */
 function updateCustomerProduct($customerid, $product, $enabled) {
-	if ($enabled) {
-		$query = "INSERT INTO `customerproduct` (`customerid`,`product`,`createdtimestamp`,`modifiedtimestamp`,`enabled`) VALUES (?,?,?,?,1) ON DUPLICATE KEY UPDATE enabled = 1, modifiedtimestamp = ?";
-		QuickUpdate($query, false, array($customerid, $product, time(), time(), time()));
-	} else {
-		// disable product
-		QuickUpdate("update customerproduct set enabled = 0, modifiedtimestamp = ? where customerid = ? and product = ?", false, array(time(), $customerid, $product));
-	}
+	$query = "INSERT INTO `customerproduct` (`customerid`,`product`,`createdtimestamp`,`modifiedtimestamp`,`enabled`) VALUES (?,?,?,?,1) ON DUPLICATE KEY UPDATE enabled = ?, modifiedtimestamp = ?";
+	QuickUpdate($query, false, array($customerid, $product, time(), time(), $enabled ? 1 : 0, time()));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
