@@ -270,6 +270,8 @@ foreach ($customers as $cust) {
 			$customerfeatures[] = "Twitter";
 		if (getCustomerSystemSetting('_hasfeed', false, true, $custdb))
 			$customerfeatures[] = "Feed";
+		if (getCustomerSystemSetting('_hasinfocenter', false, true, $custdb))
+			$customerfeatures[] = "InfoCenter";
 
 		$row[10] = implode(", ", $customerfeatures);
 		$row[11] = getCustomerSystemSetting('_dmmethod', "", true, $custdb);
