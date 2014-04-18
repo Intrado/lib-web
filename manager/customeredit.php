@@ -981,8 +981,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
  * @param type $enabled is product enabled or not
  */
 function updateCustomerProduct($customerid, $product, $enabled) {
-	$query = "INSERT INTO `customerproduct` (`customerid`,`product`,`createdtimestamp`,`modifiedtimestamp`,`enabled`) VALUES (?,?,?,?,1) ON DUPLICATE KEY UPDATE enabled = ?, modifiedtimestamp = ?";
-	QuickUpdate($query, false, array($customerid, $product, time(), time(), $enabled ? 1 : 0, time()));
+	$hasproduct = $enabled ? 1 : 0;
+	$query = "INSERT INTO `customerproduct` (`customerid`,`product`,`createdtimestamp`,`modifiedtimestamp`,`enabled`) VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE enabled = ?, modifiedtimestamp = ?";
+	QuickUpdate($query, false, array($customerid, $product, time(), time(), $hasproduct, $hasproduct, time()));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
