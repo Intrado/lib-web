@@ -769,3 +769,5 @@ update portaluseridentification pui set pui.confirmed = 1 where type = 'local' a
 -- ASP 10.3 release of InfoCenter
 ALTER TABLE `customerproduct` CHANGE `product` `product` ENUM( 'cs', 'tai', 'cm', 'ic' ) NOT NULL;
 
+-- Add an index to the type and username to avoid table scans when executing logins and lookups
+ALTER TABLE `portaluseridentification` ADD INDEX `type_username` ( `type` , `username` );
