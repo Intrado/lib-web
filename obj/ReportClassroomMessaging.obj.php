@@ -78,7 +78,8 @@ class ReportClassroomMessaging extends ReportGenerator {
 
 
 		// The query including clauses from above as WHERE clause "filters"
-		$this->queryResult = Query("
+		$q = 
+		"
 			select
 				u.login,
 				concat(u.firstname, ' ', u.lastname) as teacher,
@@ -112,7 +113,9 @@ class ReportClassroomMessaging extends ReportGenerator {
 				{$eventsql}
 				{$orgsql}
 				{$datesql};
-		");
+		";
+		//error_log($q);
+		$this->queryResult = Query($q);
 
 		return(is_object($this->queryResult));
 	}
@@ -149,6 +152,7 @@ class ReportClassroomMessaging extends ReportGenerator {
 
 		// For every row in the result data
 		while ($row = $this->queryResult->fetch(PDO::FETCH_ASSOC)) {
+			error_log("row " . print_r($row, true));
 			echo $fmt->fmt_csv_line($row, array_keys($titles), $formatters) . "\n";
 		}
 	}
