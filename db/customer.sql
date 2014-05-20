@@ -2524,3 +2524,12 @@ update setting set value='10.3/2' where name='_dbversion'
 $$$
 -- END 10.3/2
 
+-- START 10.3/3
+
+DROP TABLE `ic_portalperson`
+$$$
+
+update setting set value='10.3/3' where name='_dbversion'
+$$$
+-- END 10.3/3
+

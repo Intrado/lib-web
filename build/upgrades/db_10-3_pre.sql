@@ -50,3 +50,7 @@ CREATE TABLE `useraccess` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
  
+-- $rev 3
+
+DROP TABLE `ic_portalperson`
+$$$
