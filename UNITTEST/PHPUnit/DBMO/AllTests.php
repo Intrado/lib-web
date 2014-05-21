@@ -14,7 +14,7 @@
  * @version 1.0
  */
 
-class application_AllTests {
+class DBMO_AllTests {
 	public static function suite() {
 
 		// List of test classes to exclude
@@ -23,7 +23,7 @@ class application_AllTests {
 		);
 
 		// Create a new test suite
-		$suite = new PHPUnit_Framework_TestSuite('PHPUnit Application');
+		$suite = new PHPUnit_Framework_TestSuite('PHPUnit DBMO');
 
 		// Get a list of all the files in this directory (includes ourself, so watch it!)
 		$classdir = dirname(__FILE__);
