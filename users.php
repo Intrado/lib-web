@@ -42,7 +42,7 @@ if (isset($_GET['download'])) {
 			left join rule r on (ua.ruleid = r.id)
 			left join access a on (a.id = u.accessid)
 			left join usersetting us on (us.userid = u.id and us.name = 'callerid')
-		where not u.deleted and u.login != 'schoolmessenger'");
+		where not u.deleted and u.login != 'schoolmessenger' and u.accessid is not null");
 
 	// set header
 	header("Pragma: private");
@@ -57,7 +57,7 @@ if (isset($_GET['download'])) {
 }
 
 
-$usercount = QuickQuery("select count(*) from user where enabled = 1 and login != 'schoolmessenger'");
+$usercount = QuickQuery("select count(*) from user where enabled = 1 and login != 'schoolmessenger' and accessid is not null");
 $maxusers = getSystemSetting("_maxusers","unlimited");
 
 $maxreached = $maxusers != "unlimited" && $usercount >= $maxusers;
@@ -280,10 +280,10 @@ function show_user_table($containerID) {
 
 	// ACCOUNT ENABLED/DISABLED, COMMSUITE/NOT COMMSUITE
 	if ($containerID == 'inactiveUsersContainer') {
-		$criteriaSQL = "not enabled and deleted=0";
+		$criteriaSQL = "not enabled and deleted=0 and accessid is not null";
 		$formatters["Actions"] = "fmt_actions_disabled_account";
 	} else {		
-		$criteriaSQL = "enabled and deleted=0 and login != 'schoolmessenger'";
+		$criteriaSQL = "enabled and deleted=0 and login != 'schoolmessenger' and accessid is not null";
 		$formatters["Actions"] = "fmt_actions_enabled_account";
 	}
 
