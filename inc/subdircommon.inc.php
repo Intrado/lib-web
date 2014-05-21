@@ -33,6 +33,7 @@ if (! defined('PHPUNIT')) {
 	init_memcache();
 }
 require_once("{$incdir}/DBMappedObject.php");
+require_once("{$incdir}/DBMappedObjectHelpers.php");
 require_once("{$incdir}/DBRelationMap.php");
 require_once("XML/RPC.php");
 require_once("{$incdir}/auth.inc.php");

@@ -9,6 +9,7 @@ require_once("../inc/utils.inc.php");
 require_once("../inc/securityhelper.inc.php");
 require_once("../inc/memcache.inc.php");
 require_once("../inc/DBMappedObject.php");
+require_once("../inc/DBMappedObjectHelpers.php");
 require_once("../inc/DBRelationMap.php");
 require_once("../inc/date.inc.php");
 require_once("../obj/User.obj.php");

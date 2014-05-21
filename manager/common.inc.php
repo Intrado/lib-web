@@ -25,6 +25,7 @@ require_once("../inc/db.inc.php");
 require_once("../inc/utils.inc.php");
 require_once("../inc/memcache.inc.php");
 require_once("../inc/DBMappedObject.php");
+require_once("../inc/DBMappedObjectHelpers.php");
 require_once("../inc/DBRelationMap.php");
 require_once("managerutils.inc.php");
 require_once("dbmo/authserver/AspAdminUser.obj.php");
