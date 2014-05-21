@@ -86,7 +86,9 @@ class FieldMap extends DBMappedObject {
 		$results = array();
 		foreach (FieldMap::$specialFields as $option => $field) {
 			$fieldNum = FieldMap::getFieldnumWithOption($option, $field->fieldnum);
-			if (($requireDefault && isset($field->fieldnum)) || (!$requireDefault && isset($fieldNum))) {
+			$defaultsOnly = ($requireDefault && isset($field->fieldnum));
+			$customerDefined = (!$requireDefault && isset($fieldNum));
+			if ($defaultsOnly || $customerDefined) {
 				$results[] = $fieldNum;
 			}
 		}
@@ -197,10 +199,10 @@ class FieldMap extends DBMappedObject {
 	}
 
 	// Returns an associative array, indexed by fieldnum.
-	static function retrieveFieldMaps() {
+	static function retrieveFieldMaps($force=false) {
 		static $fieldmapscache = false;
-		
-		if (!$fieldmapscache) {
+
+		if (($force===true) || (! $fieldmapscache)) {
 			$results = DBFindMany('FieldMap', 'from fieldmap order by fieldnum');
 			$fieldmapscache = array();			
 			foreach ($results as $fieldmap)
@@ -362,7 +364,8 @@ class FieldMap extends DBMappedObject {
 	}
 }
 
-//ref:http://stackoverflow.com/questions/693691/how-to-initialize-static-variables
+// Initialize static property after class definition due to use of method calls...
+// ref: http://stackoverflow.com/questions/693691/how-to-initialize-static-variables
 FieldMap::$specialFields = array(
 	"firstname" => FieldMap::newFieldMap("firstname", "f01", "text,firstname", "First Name"),
 	"lastname" => FieldMap::newFieldMap("lastname", "f02", "text,lastname", "Last Name"),
@@ -372,4 +375,5 @@ FieldMap::$specialFields = array(
 	"absentcount" => FieldMap::newFieldMap("absentcount", null, "multisearch,absentcount", "Absent Count"),
 	"tardycount" => FieldMap::newFieldMap("tardycount", null, "multisearch,tardycount", "Tardy Count")
 );
+
 ?>
