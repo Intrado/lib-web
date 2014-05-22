@@ -106,9 +106,9 @@ class FieldMapTest extends PHPUnit_Framework_TestCase {
 			$results[] = array(
 				'id' => '10',
 				'fieldnum' => 'f07',
-				'name' => 'Absent Count',
-				'options' => 'searchable,multisearch,absentcount',
-				'type' => 'absentcount'
+				'name' => 'Absence Count',
+				'options' => 'searchable,multisearch,absencecount',
+				'type' => 'absencecount'
 			);
 		}
 
@@ -130,7 +130,7 @@ class FieldMapTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(($this->fieldMap->getGradeField() == 'f04'), 'FieldNum for grade was wrong');
 		$this->assertTrue(($this->fieldMap->getLunchBalanceField() == 'f05'), 'FieldNum for lunch balance was wrong');
 		$this->assertTrue(($this->fieldMap->getTardyCountField() == 'f06'), 'FieldNum for tardy count was wrong');
-		$this->assertTrue(($this->fieldMap->getAbsentCountField() == 'f07'), 'FieldNum for absent count was wrong');
+		$this->assertTrue(($this->fieldMap->getAbsenceCountField() == 'f07'), 'FieldNum for absence count was wrong');
 	}
 
 

@@ -66,8 +66,8 @@ class FieldMap extends DBMappedObject {
 		return FieldMap::getFieldnumWithOption('lunchbalance', FieldMap::$specialFields['lunchbalance']->fieldnum);
 	}
 
-	static function getAbsentCountField() {
-		return FieldMap::getFieldnumWithOption('absentcount', FieldMap::$specialFields['absentcount']->fieldnum);
+	static function getAbsenceCountField() {
+		return FieldMap::getFieldnumWithOption('absencecount', FieldMap::$specialFields['absencecount']->fieldnum);
 	}
 
 	static function getTardyCountField() {
@@ -372,7 +372,7 @@ FieldMap::$specialFields = array(
 	"language" => FieldMap::newFieldMap("language", "f03", "multisearch,language", "Language"),
 	"grade" => FieldMap::newFieldMap("grade", null, "multisearch,grade","Grade"),
 	"lunchbalance" => FieldMap::newFieldMap("lunchbalance", null, "multisearch,lunchbalance", "Lunch Balance"),
-	"absentcount" => FieldMap::newFieldMap("absentcount", null, "multisearch,absentcount", "Absent Count"),
+	"absencecount" => FieldMap::newFieldMap("absencecount", null, "multisearch,absencecount", "Absence Count"),
 	"tardycount" => FieldMap::newFieldMap("tardycount", null, "multisearch,tardycount", "Tardy Count")
 );
 
