@@ -91,7 +91,7 @@ class FieldMapTest extends PHPUnit_Framework_TestCase {
 				'id' => '8',
 				'fieldnum' => 'f05',
 				'name' => 'Lunch Balance',
-				'options' => 'searchable,multisearch,lunchbalance',
+				'options' => 'searchable,numeric,lunchbalance',
 				'type' => 'lunchbalance'
 			);
 
@@ -99,7 +99,7 @@ class FieldMapTest extends PHPUnit_Framework_TestCase {
 				'id' => '9',
 				'fieldnum' => 'f06',
 				'name' => 'Tardy Count',
-				'options' => 'searchable,multisearch,tardycount,numeric',
+				'options' => 'searchable,numeric,tardycount',
 				'type' => 'tardycount'
 			);
 
@@ -107,7 +107,7 @@ class FieldMapTest extends PHPUnit_Framework_TestCase {
 				'id' => '10',
 				'fieldnum' => 'f07',
 				'name' => 'Absence Count',
-				'options' => 'searchable,multisearch,absencecount,numeric',
+				'options' => 'searchable,numeric,absencecount',
 				'type' => 'absencecount'
 			);
 		}
