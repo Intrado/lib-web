@@ -372,8 +372,8 @@ FieldMap::$specialFields = array(
 	"language" => FieldMap::newFieldMap("language", "f03", "multisearch,language", "Language"),
 	"grade" => FieldMap::newFieldMap("grade", null, "multisearch,grade","Grade"),
 	"lunchbalance" => FieldMap::newFieldMap("lunchbalance", null, "multisearch,lunchbalance", "Lunch Balance"),
-	"absencecount" => FieldMap::newFieldMap("absencecount", null, "multisearch,absencecount", "Absence Count"),
-	"tardycount" => FieldMap::newFieldMap("tardycount", null, "multisearch,tardycount", "Tardy Count")
+	"absencecount" => FieldMap::newFieldMap("absencecount", null, "multisearch,absencecount,numeric", "Absence Count"),
+	"tardycount" => FieldMap::newFieldMap("tardycount", null, "multisearch,tardycount,numeric", "Tardy Count")
 );
 
 ?>
