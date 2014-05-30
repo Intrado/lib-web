@@ -2533,3 +2533,119 @@ update setting set value='10.3/3' where name='_dbversion'
 $$$
 -- END 10.3/3
 
+-- START 10.3/4
+
+ALTER  TABLE  `ttsvoice`  ADD  `name` VARCHAR( 50  )  NOT  NULL ,
+  ADD  `enabled` TINYINT NOT  NULL DEFAULT  '0'
+$$$
+
+-- Loquendo voices enabled for old customers
+UPDATE `ttsvoice` SET `name` = 'Susan', `enabled` = '0' 
+  WHERE `language` = 'english' and `gender` = 'female'
+$$$
+
+UPDATE `ttsvoice` SET `name` = 'Dave', `enabled` = '0' 
+  WHERE `language` = 'english' and `gender` = 'male'
+$$$
+
+UPDATE `ttsvoice` SET `name` = 'Esperanza', `enabled` = '0' 
+  WHERE `language` = 'spanish' and `gender` = 'female'
+$$$
+
+UPDATE `ttsvoice` SET `name` = 'Carlos', `enabled` = '0' 
+  WHERE `language` = 'spanish' and `gender` = 'male'
+$$$
+
+UPDATE `ttsvoice` SET `name` = 'Montserrat', `enabled` = '0' 
+  WHERE `language` = 'catalan' and `gender` = 'female'
+$$$
+
+UPDATE `ttsvoice` SET `name` = 'Jordi', `enabled` = '0' 
+  WHERE `language` = 'catalan' and `gender` = 'male'
+$$$
+
+UPDATE `ttsvoice` SET `name` = 'Lisheng', `enabled` = '0' 
+  WHERE `language` = 'chinese' and `gender` = 'female'
+$$$
+
+UPDATE `ttsvoice` SET `name` = 'Saskia', `enabled` = '0' 
+  WHERE `language` = 'dutch' and `gender` = 'female'
+$$$
+
+UPDATE `ttsvoice` SET `name` = 'Willem', `enabled` = '0' 
+  WHERE `language` = 'dutch' and `gender` = 'male'
+$$$
+
+UPDATE `ttsvoice` SET `name` = 'Milla', `enabled` = '0' 
+  WHERE `language` = 'finnish' and `gender` = 'female'
+$$$
+
+UPDATE `ttsvoice` SET `name` = 'Florence', `enabled` = '0' 
+  WHERE `language` = 'french' and `gender` = 'female'
+$$$
+
+UPDATE `ttsvoice` SET `name` = 'Bernard', `enabled` = '0' 
+  WHERE `language` = 'french' and `gender` = 'male'
+$$$
+
+UPDATE `ttsvoice` SET `name` = 'Katrin', `enabled` = '0' 
+  WHERE `language` = 'german' and `gender` = 'female'
+$$$
+
+UPDATE `ttsvoice` SET `name` = 'Stefan', `enabled` = '0' 
+  WHERE `language` = 'german' and `gender` = 'male'
+$$$
+
+UPDATE `ttsvoice` SET `name` = 'Afroditi', `enabled` = '0' 
+  WHERE `language` = 'greek' and `gender` = 'female'
+$$$
+
+UPDATE `ttsvoice` SET `name` = 'Paola', `enabled` = '0' 
+  WHERE `language` = 'italian' and `gender` = 'female'
+$$$
+
+UPDATE `ttsvoice` SET `name` = 'Matteo', `enabled` = '0' 
+  WHERE `language` = 'italian' and `gender` = 'male'
+$$$
+
+UPDATE `ttsvoice` SET `name` = 'Zosia', `enabled` = '0' 
+  WHERE `language` = 'polish' and `gender` = 'female'
+$$$
+
+UPDATE `ttsvoice` SET `name` = 'Krzysztof', `enabled` = '0' 
+  WHERE `language` = 'polish' and `gender` = 'male'
+$$$
+
+UPDATE `ttsvoice` SET `name` = 'Amalia', `enabled` = '0' 
+  WHERE `language` = 'portuguese' and `gender` = 'female'
+$$$
+
+UPDATE `ttsvoice` SET `name` = 'Eusebio', `enabled` = '0' 
+  WHERE `language` = 'portuguese' and `gender` = 'male'
+$$$
+
+UPDATE `ttsvoice` SET `name` = 'Olga', `enabled` = '0' 
+  WHERE `language` = 'russian' and `gender` = 'female'
+$$$
+
+UPDATE `ttsvoice` SET `name` = 'Annika', `enabled` = '0' 
+  WHERE `language` = 'swedish' and `gender` = 'female'
+$$$
+
+UPDATE `ttsvoice` SET `name` = 'Sven', `enabled` = '0' 
+  WHERE `language` = 'swedish' and `gender` = 'male'
+$$$
+
+-- NeoSpeech voices enabled for new customers
+
+INSERT INTO `ttsvoice` (`language`, `languagecode`, `gender`, `name`, `enabled`) VALUES 
+  ('english', 'en', 'female', 'Julie', 1),
+  ('english', 'en', 'male', 'James', 1),
+  ('turkish', 'tr', 'male', 'Hasari', 1)
+$$$
+
+
+update setting set value='10.3/4' where name='_dbversion'
+$$$
+-- END 10.3/4
+
