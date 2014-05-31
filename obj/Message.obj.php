@@ -291,6 +291,7 @@ class Message extends DBMappedObject {
 			$pos_f = strpos($data,"<<");
 			$pos_a = strpos($data,"{{");
 			$pos_l = strpos($data,"[[");
+			$pos_mal = strpos($data,"<{");	// <{burst|content:#\d+}>
 			
 			// get imageupload tags
 			$matches = array();
@@ -304,41 +305,34 @@ class Message extends DBMappedObject {
 			}
 			
 			$poses = array();
-			if($pos_f !== false)
-				$poses[] = $pos_f;
-			if($pos_a !== false)
-				$poses[] = $pos_a;
-			if($pos_l !== false)
-				$poses[] = $pos_l;
-			if($pos_i !== false)
-				$poses[] = $pos_i;
+			if ($pos_f !== false) $poses[] = $pos_f;
+			if ($pos_a !== false) $poses[] = $pos_a;
+			if ($pos_l !== false) $poses[] = $pos_l;
+			if ($pos_i !== false) $poses[] = $pos_i;
+			if ($pos_mal !== false) $poses[] = $pos_mal;
 
-			if(!count($poses))
-				break;
+			if (! count($poses)) break;
 
 			$pos = min($poses);
-			if($pos !== false){
-				if($pos === $pos_f)
-					$type = "V";
-				if($pos === $pos_a)
-					$type = "A";
-				if($pos === $pos_l)
-					$type = "newlang";
-				if($pos === $pos_i)
-					$type = "I";
+			if ($pos !== false){
+				if($pos === $pos_f) $type = 'V';
+				if($pos === $pos_a) $type = 'A';
+				if($pos === $pos_l) $type = 'newlang';
+				if($pos === $pos_i) $type = 'I';
+				if($pos === $pos_mal) $type = 'MAL';
 			}
 
 			//make a text part up to the pos of the field
-			$txt = substr($data,0,$pos);
+			$txt = substr($data, 0, $pos);
 			while (strlen($txt) > 0) {
 				$part = new MessagePart();
-				$part->type="T";
+				$part->type = "T";
 				if (strlen($txt) <= 65535) {
 					$part->txt = $txt;
 					$txt = "";
 				} else {
-					$part->txt = substr($txt,0,65535);
-					$txt = substr($txt,65535);
+					$part->txt = substr($txt, 0, 65535);
+					$txt = substr($txt, 65535);
 				}
 				//$part->messageid = $this->id; // assign ID afterwards so ID is set
 				$part->sequence = $partcount++;
@@ -347,27 +341,18 @@ class Message extends DBMappedObject {
 				$parts[] = $part;
 			}
 
-			if ($type == 'I') {
-				// find the start of the id
-				$pos += mb_strlen($uploadimageurl);
-			} else
-				$pos += 2; // pass over the begintoken
+			// Skip ahead past the beginning of the token; images are bigger than the rest due to HTML markup
+			$pos += ($type == 'I') ? mb_strlen($uploadimageurl) : 2;
 
-			switch($type){
-				case "A":
-					$endtoken = "}}";
-					break;
-				case "V":
-					$endtoken = ">>";
-					break;
-				case "newlang":
-					$endtoken = "]]";
-					break;
-				case "I":
-					$endtoken = '">';
+			// Assuming at least one char for audio/field name, find the end of the token
+			switch ($type){
+				case "A": $endtoken = "}}"; break;
+				case "V": $endtoken = ">>"; break;
+				case "newlang": $endtoken = "]]"; break;
+				case "I": $endtoken = '">'; break;
+				case "MAL": $endtoken = '}>'; break;
 			}
-			//$endtoken = ($type == "A") ? "}}" : ">>";
-			$length = @strpos($data,$endtoken,$pos+1); // assume at least one char for audio/field name
+			$length = @strpos($data, $endtoken, $pos + 1);
 
 			if ($length === false) {
 				$errors[] = "Can't find end of field, was expecting '$endtoken'";
@@ -378,15 +363,43 @@ class Message extends DBMappedObject {
 				$token  = substr($data,$pos,$length);
 				$part = new MessagePart();
 				$part->type = $type;
-				//$part->messageid = $this->id; // assign ID afterwards so ID is set
-
 
 				switch ($type) {
+
+					// Message Attachment Links
+					case 'MAL':
+
+						// Look for the message attachment ID within the token
+						if (strpos($token, ":#") !== false) {
+							list($maltype, $malid) = explode(":#", $token);
+						} else {
+							$maltype = $token;
+							$malid = false;
+						}
+
+						// if we have the message attachment ID, check for it
+						if ($malid) {
+							$malid = QuickQuery('SELECT id FROM messageattachment WHERE id = ?', false, array($malid));
+						}
+
+						// If we don't have a good message attachment ID to work with...
+						if (! $malid) {
+							// TODO - add support for discovering the message attachment ID automagically (?)
+							error_log_helper("WARNING: automatic discovery of the message attachment ID is not supported; it must be provided in the field insert"); 
+						}
+
+						// Finish preparing the message part
+						$part->sequence = $partcount++;
+						$part->messageattachmentid = $malid;
+						$parts[] = $part;
+
+						break;
+
 					case "A":
 						$part->sequence = $partcount++;
 						
-						if (strpos($token,":#") !== false) {
-							list($afname,$afidtag) = explode(":#",$token);
+						if (strpos($token, ":#") !== false) {
+							list($afname,$afidtag) = explode(":#", $token);
 						} else {
 							$afname = $token;
 							$afidtag = false;
@@ -398,7 +411,7 @@ class Message extends DBMappedObject {
 							$audioid = QuickQuery("select id from audiofile where userid=? and not deleted and id=?", false, array($USER->id,$afidtag));
 						
 						//if we didn't find one by ID, fall back to other methods
-						if (!$audioid) {
+						if (! $audioid) {
 							//if we have an array of audiofileids, scan for the named af in them
 							 if (is_array($audiofileids)) {
 								if (count($audiofileids) > 0) {
@@ -422,10 +435,11 @@ class Message extends DBMappedObject {
 						}
 
 						break;
+
 					case "V":
 						$part->sequence = $partcount++;
-						if (strpos($token,":") !== false) {
-							list($fieldname,$defvalue) = explode(":",$token);
+						if (strpos($token, ":") !== false) {
+							list($fieldname, $defvalue) = explode(":", $token);
 						} else {
 							$fieldname = $token;
 							$defvalue = "";
@@ -444,20 +458,22 @@ class Message extends DBMappedObject {
 							$errors[] = "Can't find field named '$fieldname'";
 						}
 						break;
+
 					case "newlang":
-						if(isset($defaultvoice->gender)){
+						if (isset($defaultvoice->gender)){
 							$currvoiceid = QuickQuery("select id from ttsvoice where language = ? and gender = ?",
 								false, array(strtolower($token), $defaultvoice->gender));
-							if($currvoiceid == false){
+							if ($currvoiceid == false){
 								$currvoiceid = QuickQuery("select id from ttsvoice where language = ? and gender = ?",false, array(strtolower($token),
-									($defaultvoice->gender=="female"?"male":"female")));
+									($defaultvoice->gender == "female" ? "male" : "female")));
 							}
-							if($currvoiceid == false){
+							if ($currvoiceid == false){
 								$errors[] = "Can't find that language: " . $token . ".";
 								$currvoiceid = null;
 							}
 						}
 						break;
+
 					case "I":
 						$part->sequence = $partcount++;
 						$query = "select id from content where id=?";
@@ -472,13 +488,10 @@ class Message extends DBMappedObject {
 						break;
 				}
 			}
-			//skip the end if we found it
-			if ($length)
-				$skip = $pos + $length + strlen($endtoken);
-			else
-				$skip = $pos + $length ;
 
-			$data = substr($data,$skip );
+			//skip the end if we found it
+			$skip = $pos + $length + ($length ? strlen($endtoken) : 0);
+			$data = substr($data, $skip);
 		}
 
 		//get trailing txt part;
@@ -490,13 +503,12 @@ class Message extends DBMappedObject {
 				$part->txt = $data;
 				$data = "";
 			} else {
-				$part->txt = substr($data,0,65535);
-				$data = substr($data,65535);
+				$part->txt = substr($data, 0, 65535);
+				$data = substr($data, 65535);
 			}
 
 			$part->sequence = $partcount++;
-			if($currvoiceid !== null)
-				$part->voiceid = $currvoiceid;
+			if ($currvoiceid !== null) $part->voiceid = $currvoiceid;
 
 			$parts[] = $part;
 		}
@@ -511,9 +523,9 @@ class Message extends DBMappedObject {
 		$voices = DBFindMany("Voice", "from ttsvoice");
 		$currvoiceid=null;
 		foreach ($parts as $part) {
-			if($currvoiceid == null){
+			if( $currvoiceid == null){
 				$currvoiceid = $part->voiceid;
-			} else if($part->voiceid && $part->voiceid != $currvoiceid){
+			} else if( $part->voiceid && $part->voiceid != $currvoiceid){
 				$voicestr = "[[" . ucfirst($voices[$part->voiceid]->language) . "]]";
 				$data .= $voicestr;
 				$currvoiceid = $part->voiceid;
@@ -521,25 +533,36 @@ class Message extends DBMappedObject {
 			
 			$partstr = '';
 			switch ($part->type) {
-			case 'A':
-				$part->audiofile = new AudioFile($part->audiofileid);
-				$partstr .= "{{" . $part->audiofile->name . ":#" . $part->audiofileid . "}}";
-				break;
-			case 'T':
-				$partstr .= $part->txt;
-				break;
-			case 'V':
-				$partstr .= "<<";
-				//special field
-				$partstr .= $map[$part->fieldnum];
-				if ($part->defaultvalue !== null && strlen($part->defaultvalue) > 0)
-					$partstr .= ":" . $part->defaultvalue;
-				$partstr .= ">>";
-				break;
-			case 'I':
-				$partstr .= '<img src="viewimage.php?id=' . $part->imagecontentid . '">';
-				permitContent($part->imagecontentid);
-				break;
+
+				case 'MAL':
+
+					// Find the message attachment for this message attachment link part
+					$messageAttachment = new MessageAttachment($part->messageattachmentid);
+					$partstr .= '<{' . $messageAttachment->type . ':#' . $part->messageattachmentid . '}>';
+					break;
+
+				case 'A':
+					$part->audiofile = new AudioFile($part->audiofileid);
+					$partstr .= "{{" . $part->audiofile->name . ":#" . $part->audiofileid . "}}";
+					break;
+
+				case 'T':
+					$partstr .= $part->txt;
+					break;
+
+				case 'V':
+					$partstr .= "<<";
+					//special field
+					$partstr .= $map[$part->fieldnum];
+					if ($part->defaultvalue !== null && strlen($part->defaultvalue) > 0)
+						$partstr .= ":" . $part->defaultvalue;
+					$partstr .= ">>";
+					break;
+
+				case 'I':
+					$partstr .= '<img src="viewimage.php?id=' . $part->imagecontentid . '">';
+					permitContent($part->imagecontentid);
+					break;
 			}
 			
 			if ($partstr != '')
