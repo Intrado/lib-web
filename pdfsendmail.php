@@ -29,6 +29,8 @@ require_once("obj/PeopleList.obj.php");
 require_once("obj/ListEntry.obj.php");
 require_once("obj/Voice.obj.php");
 
+require_once("obj/HtmlTextArea.fi.php");
+
 require_once('ifc/Page.ifc.php');
 require_once('obj/PageBase.obj.php');
 require_once('obj/PageForm.obj.php');
@@ -162,7 +164,7 @@ class PdfSendMail extends PageForm {
 			$message->name = $job->name;
 			$message->description = $job->description;
 			$message->type = 'email';
-			$message->subtype = 'plain';
+			$message->subtype = 'html';
 			$message->autotranslate = 'none';
 			$message->modifydate = $job->modifydate;
 			$message->languagecode = 'en';
@@ -178,10 +180,7 @@ class PdfSendMail extends PageForm {
 			// TODO: allow a different name for the attachment
 			$burstAttachment->filename = "attachment.pdf";
 			// TODO: allow the secret field to be selected
-			if ($doPasswordProtect)
-				$burstAttachment->secretfield = 'pkey';
-			else
-				$burstAttachment->secretfield = '';
+			$burstAttachment->secretfield = ($doPasswordProtect) ? 'pkey' : '';
 			$burstAttachment->create();
 
 			$attachment = new MessageAttachment();
@@ -190,26 +189,13 @@ class PdfSendMail extends PageForm {
 			$attachment->burstattachmentid = $burstAttachment->id;
 			$attachment->create();
 
-			$messageParts = array();
+			// So Message->parse() can see it, swap HTML's placeholder link with "mal" field insert with the ID in it
+			$htmlBody = str_replace('<a href="#burstidplaceholder">', '<a href="<{burst:#' . $attachment->id . '}>">', $postData['messagebody']);
 
-			$bodyPart = new MessagePart();
-			$bodyPart->type = "T";
-			$bodyPart->txt = $postData['messagebody'];
-			$messageParts[] = $bodyPart;
+			// Parse the message parts out of the HTML body (for field inserts, etc)
+			$messageParts = Message::parse($htmlBody);
 
-			# add an instructional messagePart (text plus some padding/new lines)
-			# between the body and mal (link) message parts
-			$malInstructPart = new MessagePart();
-			$malInstructPart->type = "T";
-			$malInstructPart->txt = "\n\nClick the link below to download your document.\n";
-			$messageParts[] = $malInstructPart;
-
-			# create new MessagePart for Message Attachment Link (MAL) and append after messagebody
-			$malPart = new MessagePart();
-			$malPart->type = "MAL";
-			$malPart->messageattachmentid = $attachment->id;
-			$messageParts[] = $malPart;
-
+			// And create a MessagePart for each one
 			$sequence = 0;
 			foreach ($messageParts as $messagePart) {
 				$messagePart->messageid = $message->id;
@@ -375,14 +361,15 @@ class PdfSendMail extends PageForm {
 				"helpstep" => 6
 			),
 			"messagebody" => array(
-				"label" => _L("Message"),
+				"label" => _L('Message'),
 				"fieldhelp" => _L('Enter an email message to accompany the Document.'),
-				"value" => '',
+				"value" => file_get_contents('layouts/SDDBurstEmailLayout.html'),
 				"validators" => array(
-					array('ValRequired'),
-					array("ValLength","max" => 65535)
+					array("ValRequired"),
+					array("ValMessageBody"),
+					array("ValLength","max" => 256000)
 				),
-				"control" => array("TextArea"),
+				"control" => array('HtmlTextArea', 'subtype' => 'html', 'rows' => 20, 'editor_mode' => 'inline'),
 				"helpstep" => 7
 			)
 		);
@@ -392,7 +379,6 @@ class PdfSendMail extends PageForm {
 
 		return($form);
 	}
-
 }
 
 // Initialize PdfSendMail and render page
