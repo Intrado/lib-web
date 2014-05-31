@@ -2649,3 +2649,20 @@ update setting set value='10.3/4' where name='_dbversion'
 $$$
 -- END 10.3/4
 
+
+-- START 10.3/5
+
+-- new customer is neospeech
+insert into setting (name, value) values ('_defaultttsprovider', 'neospeech')
+$$$
+
+-- TODO this voice is temporary until we get the list of language-gender-name for neospeech
+update ttsvoice set enabled = '1' where name = 'Hasari'
+$$$
+
+-- TODO set enabled loquendo voices once we know which neospeech languages we have
+update ttsvoice set enabled = '1' where name = 'Sven'
+
+update setting set value='10.3/5' where name='_dbversion'
+$$$
+-- END 10.3/5

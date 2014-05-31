@@ -166,3 +166,13 @@ INSERT INTO `ttsvoice` (`language`, `languagecode`, `gender`, `name`, `enabled`)
   ('turkish', 'tr', 'male', 'Hasari', 0)
 $$$
 
+-- $rev 5
+
+-- upgrade customer provider is loquendo, manual switch to neospeech using asp manager
+insert into setting (name, value) values ('_defaultttsprovider', 'loquendo')
+$$$
+
+-- this voice is temporary until we get the list of language-gender-name for neospeech
+update ttsvoice set enabled = '1' where name = 'Hasari'
+$$$
+
