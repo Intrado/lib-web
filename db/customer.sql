@@ -2666,3 +2666,14 @@ update ttsvoice set enabled = '1' where name = 'Sven'
 update setting set value='10.3/5' where name='_dbversion'
 $$$
 -- END 10.3/5
+
+
+ALTER TABLE `ttsvoice` ADD `provider` ENUM( 'loquendo', 'neospeech' ) NOT NULL DEFAULT 'loquendo'
+$$$
+
+update ttsvoice set provider = 'neospeech' where name in ('James','Julie','Hasari')
+$$$
+
+update setting set value='10.3/6' where name='_dbversion'
+$$$
+-- END 10.3/6

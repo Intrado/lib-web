@@ -7,11 +7,12 @@ class Voice extends DBMappedObject {
 	var $gender;
 	var $name;
 	var $enabled;
+	var $provider;
 
 	function Voice ($id = NULL) {
 		$this->_allownulls = true;
 		$this->_tablename = "ttsvoice";
-		$this->_fieldlist = array("language", "languagecode", "gender", "name", "enabled");
+		$this->_fieldlist = array("language", "languagecode", "gender", "name", "enabled", "provider");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}
@@ -20,7 +21,7 @@ class Voice extends DBMappedObject {
 	static function getTTSVoices() {
 		static $voices = false;	
 		if ($voices === false) {
-			$tmp = DBFindMany("Voice","from ttsvoice t join language l on (t.languagecode = l.code) order by t.language", "t");
+			$tmp = DBFindMany("Voice","from ttsvoice t join language l on (t.languagecode = l.code) where t.enabled order by t.language", "t");
 			$voices = array();
 			foreach ($tmp as $voice) {
 				$voices[$voice->languagecode.":".$voice->gender] = $voice;
