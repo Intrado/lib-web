@@ -246,7 +246,7 @@ function emailMessageViewForMessageParts($message,$parts,$jobpriority) {
 }
 
 
-function ttsGetForTextLanguageGenderFormat($text, $language, $gender, $format) {
+function ttsGetForTextLanguageGenderNameFormat($text, $language, $gender, $name, $format) {
 	list($appserverCommsuiteProtocol,$appserverCommsuiteTransport) = initCommsuiteApp();
 	
 	if ($appserverCommsuiteProtocol == null || $appserverCommsuiteTransport == null) {
@@ -262,9 +262,9 @@ function ttsGetForTextLanguageGenderFormat($text, $language, $gender, $format) {
 			
 			// Connect and be sure to catch and log all exceptions
 			try {
-				$result = $client->ttsGetForTextLanguageGenderFormat($text, $language, $gender,$format);
+				$result = $client->ttsGetForTextLanguageGenderNameFormat($text, $language, $gender, $name, $format);
 			} catch (NotFoundException $e) {
-				error_log("ttsGetForTextLanguageGenderFormat: Contentid not found for Language $language, Gender: $gender and Text: $text");
+				error_log("ttsGetForTextLanguageGenderNameFormat: Contentid not found for Language $language, Gender: $gender, Name: $name and Text: $text");
 				return false;
 			}
 			$appserverCommsuiteTransport->close();
@@ -272,10 +272,10 @@ function ttsGetForTextLanguageGenderFormat($text, $language, $gender, $format) {
 		} catch (TException $tx) {
 			$attempts++;
 			// a general thrift exception, like no such server
-			error_log("ttsGetForTextLanguageGenderFormat: Exception Connection to AppServer (" . $tx->getMessage() . ")");
+			error_log("ttsGetForTextLanguageGenderNameFormat: Exception Connection to AppServer (" . $tx->getMessage() . ")");
 			$appserverCommsuiteTransport->close();
 			if ($attempts > 2) {
-				error_log("ttsGetForTextLanguageGenderFormat: Failed 3 times to get content from appserver");
+				error_log("ttsGetForTextLanguageGenderNameFormat: Failed 3 times to get content from appserver");
 				return false;
 			}
 		}

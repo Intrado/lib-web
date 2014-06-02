@@ -29,7 +29,7 @@ if(isset($_GET['partnum'])) {
 	switch($part["type"]) {
 		case "T":
 			$voice = new Voice($part["voiceid"]);
-			$audiopart = ttsGetForTextLanguageGenderFormat($part["txt"], $voice->language, $voice->gender, "mp3");
+			$audiopart = ttsGetForTextLanguageGenderNameFormat($part["txt"], $voice->language, $voice->gender, $voice->name, "mp3");
 			break;
 		case "A":
 			$contentid = QuickQuery("select contentid from audiofile where id=?",false,array($part["audiofileid"]));
