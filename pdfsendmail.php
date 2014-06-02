@@ -363,7 +363,7 @@ class PdfSendMail extends PageForm {
 			"messagebody" => array(
 				"label" => _L('Message'),
 				"fieldhelp" => _L('Enter an email message to accompany the Document.'),
-				"value" => file_get_contents('layouts/SDDBurstEmailLayout.html'),
+				"value" => file_get_contents(dirname(__FILE__) . '/layouts/SDDBurstEmailLayout.html'),
 				"validators" => array(
 					array("ValRequired"),
 					array("ValMessageBody"),
