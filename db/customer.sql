@@ -2662,6 +2662,7 @@ $$$
 
 -- TODO set enabled loquendo voices once we know which neospeech languages we have
 update ttsvoice set enabled = '1' where name = 'Sven'
+$$$
 
 update setting set value='10.3/5' where name='_dbversion'
 $$$
