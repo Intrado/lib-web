@@ -19,7 +19,7 @@ Service &amp; Support:&nbsp;<a href="mailto:<?=$_SESSION['_supportemail']?>"><?=
 <br>
 Use of this system is subject to the <a href="privacy.html" target="_blank">Privacy Policy</a> and <a href="terms.html" target="_blank">Terms of Service</a>
 <br>
-&copy; 1999-<? echo date('Y'); ?> Reliance Communications, Inc. All Rights Reserved.
+&copy; 1999-<? echo date('Y'); ?> SchoolMessenger. All Rights Reserved.
 
 </div>
 <?
