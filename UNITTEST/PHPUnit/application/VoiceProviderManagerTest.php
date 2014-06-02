@@ -11,13 +11,11 @@ require_once("{$konadir}/obj/VoiceProviderManager.obj.php");
 class PDOMock extends PDO {
 
 	public function __construct() {
-
 	}
 
 }
 
 function QuickUpdate($query, $db, $args) {
-
 }
 
 /**
@@ -54,6 +52,7 @@ class VoiceProviderManagerTest extends PHPUnit_Framework_TestCase {
 				'gender' => 'male',
 				'name' => 'Dave',
 				'enabled' => '1',
+				'provider' => 'loquendo'
 			),
 			array(
 				'id' => '2',
@@ -62,6 +61,7 @@ class VoiceProviderManagerTest extends PHPUnit_Framework_TestCase {
 				'gender' => 'female',
 				'name' => 'Susan',
 				'enabled' => '0',
+				'provider' => 'loquendo'
 			),
 			array(
 				'id' => '3',
@@ -70,6 +70,7 @@ class VoiceProviderManagerTest extends PHPUnit_Framework_TestCase {
 				'gender' => 'male',
 				'name' => 'James',
 				'enabled' => '0',
+				'provider' => 'neospeech'
 			),
 			array(
 				'id' => '4',
@@ -78,6 +79,7 @@ class VoiceProviderManagerTest extends PHPUnit_Framework_TestCase {
 				'gender' => 'female',
 				'name' => 'Julie',
 				'enabled' => '0',
+				'provider' => 'neospeech'
 			),
 			array(
 				'id' => '5',
@@ -86,6 +88,7 @@ class VoiceProviderManagerTest extends PHPUnit_Framework_TestCase {
 				'gender' => 'male',
 				'name' => 'Carlos',
 				'enabled' => '1',
+				'provider' => 'loquendo'
 			)
 		);
 
@@ -99,9 +102,9 @@ class VoiceProviderManagerTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function test_loadVoices() {
-		$loquendoVoices = $this->voiceManager->loquendoVoices;
-		$neoSpeechVoices = $this->voiceManager->loquendoVoices;
-		$this->assertTrue((count($loquendoVoices) == 2), "2 overlapping Loquendo voices expected but found: " . count($loquendoVoices));
+		$loquendoVoices = $this->voiceManager->providerVoices["loquendo"];
+		$neoSpeechVoices = $this->voiceManager->providerVoices["neospeech"];
+		$this->assertTrue((count($loquendoVoices) == 3), "3 overlapping Loquendo voices expected but found: " . count($loquendoVoices));
 		$this->assertTrue((count($neoSpeechVoices) == 2), "2 overlapping NeoSpeech voices expected but found: " . count($neoSpeechVoices));
 	}
 
@@ -113,20 +116,19 @@ class VoiceProviderManagerTest extends PHPUnit_Framework_TestCase {
 				->setConstructorArgs(array($this->db))
 				->setMethods(array('switchVoices'))
 				->getMock();
-		//$mockManager->loadVoices();
-		$loquendoVoices = $mockManager->loquendoVoices;
-		$neoSpeechVoices = $mockManager->neoSpeechVoices;
-		$this->assertTrue((count($loquendoVoices) == 2), "2 overlapping Loquendo voices expected but found: " . count($loquendoVoices));
+
+		$loquendoVoices = $this->voiceManager->providerVoices["loquendo"];
+		$neoSpeechVoices = $mockManager->getCommonVoices("loquendo");
 		$this->assertTrue((count($neoSpeechVoices) == 2), "2 overlapping NeoSpeech voices expected but found: " . count($neoSpeechVoices));
 
-		$fromMale = clone $neoSpeechVoices["en:male"];
+		$fromMale = clone $neoSpeechVoices["en:male"][0];
 		$toMale = clone $loquendoVoices["en:male"];
 
 		$mockManager->expects($this->at(0))
 				->method('switchVoices')
 				->with($fromMale, $toMale);
 
-		$fromFemale = clone $neoSpeechVoices["en:female"];
+		$fromFemale = clone $neoSpeechVoices["en:female"][0];
 		$toFemale = clone $loquendoVoices["en:female"];
 
 		$mockManager->expects($this->at(1))
@@ -145,20 +147,19 @@ class VoiceProviderManagerTest extends PHPUnit_Framework_TestCase {
 				->setMethods(array('switchVoices'))
 				->getMock();
 		//$mockManager->loadVoices();
-		$loquendoVoices = $mockManager->loquendoVoices;
-		$neoSpeechVoices = $mockManager->neoSpeechVoices;
+		$neoSpeechVoices = $this->voiceManager->providerVoices["neospeech"];
+		$loquendoVoices = $mockManager->getCommonVoices("neospeech");
 		$this->assertTrue((count($loquendoVoices) == 2), "2 overlapping Loquendo voices expected but found: " . count($loquendoVoices));
-		$this->assertTrue((count($neoSpeechVoices) == 2), "2 overlapping NeoSpeech voices expected but found: " . count($neoSpeechVoices));
 
 		$toMale = clone $neoSpeechVoices["en:male"];
-		$fromMale = clone $loquendoVoices["en:male"];
+		$fromMale = clone $loquendoVoices["en:male"][0];
 
 		$mockManager->expects($this->at(0))
 				->method('switchVoices')
 				->with($fromMale, $toMale);
 
 		$toFemale = clone $neoSpeechVoices["en:female"];
-		$fromFemale = clone $loquendoVoices["en:female"];
+		$fromFemale = clone $loquendoVoices["en:female"][0];
 
 		$mockManager->expects($this->at(1))
 				->method('switchVoices')

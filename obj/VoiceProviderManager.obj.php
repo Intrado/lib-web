@@ -16,16 +16,10 @@ function switchTTSProviderTo($provider, $customerDB) {
  */
 class VoiceProviderManager {
 
-	//Loquendo voic names
-	var $loquendoVoiceNames = array('Susan', 'Dave', 'Esperanza', 'Carlos', 'Montserrat', 'Jordi', 'Lisheng', 'Saskia', 'Willem', 'Milla', 'Florence', 'Bernard', 'Katrin', 'Stefan', 'Afroditi', 'Paola', 'Matteo', 'Zosia', 'Krzysztof', 'Amalia', 'Eusebio', 'Olga', 'Annika', 'Sven');
-	//NeoSpeech voic names
-	var $neoSpeechVoiceNames = array("James", "Julie");
 	//customer DB connection
 	var $customerDB;
-	//key is languagecode:gender
-	//NOTE this is are parallel arrays: both have the same keys
-	var $loquendoVoices = array();
-	var $neoSpeechVoices = array();
+	//List of voices for each provider: key is provider and languagecode:gender
+	var $providerVoices = array();
 
 	function __construct($customerDB) {
 		$this->customerDB = $customerDB;
@@ -38,29 +32,46 @@ class VoiceProviderManager {
 	function loadVoices() {
 		//get all voices
 		$voices = DBFindMany("Voice", "from ttsvoice", false, false, $this->customerDB);
-		//key is languagecode:gender
-		$allLoquendoVoices = array();
-		$allNeoSpeechVoices = array();
-		//create a list of voices for both loquendo and neospeech
 		foreach ($voices as $voice) {
 			$voiceLanguageGenderKey = $voice->languagecode . ":" . $voice->gender;
-			if (in_array($voice->name, $this->loquendoVoiceNames)) {
-				$allLoquendoVoices[$voiceLanguageGenderKey] = $voice;
-			} else if (in_array($voice->name, $this->neoSpeechVoiceNames)) {
-				$allNeoSpeechVoices[$voiceLanguageGenderKey] = $voice;
-			} else {
-				error_log("No TTS provided found for voice name=" . $voice->name);
+			if (!isset($this->providerVoices[$voice->provider])) {
+				$this->providerVoices[$voice->provider] = array();
 			}
+			$this->providerVoices[$voice->provider][$voiceLanguageGenderKey] = $voice;
 		}
+	}
 
-		//find common voices based on language code and gender
-		foreach ($allLoquendoVoices as $key => $voice) {
-			if (isset($allNeoSpeechVoices[$key])) {
-				$voiceLanguageGenderKey = $voice->languagecode . ":" . $voice->gender;
-				$this->loquendoVoices[$voiceLanguageGenderKey] = $voice;
-				$this->neoSpeechVoices[$voiceLanguageGenderKey] = $allNeoSpeechVoices[$key];
+	/**
+	 * Return common voices 
+	 * @param string $provider tts provider
+	 * @return array common voices to this provider
+	 */
+	function getCommonVoices($provider) {
+		$commonVoices = array();
+		$providerVoices = $this->providerVoices[$provider];
+		foreach ($this->providerVoices as $ttsProvider => $voices) {
+			if ($provider != $ttsProvider) {
+				foreach ($voices as $key => $voice) {
+					if (isset($providerVoices[$key])) { //has same entry in common voices?
+						if (!isset($commonVoices[$key])) {
+							$commonVoices[$key] = array();
+						}
+						$commonVoices[$key][] = $voice;
+					}
+				}
 			}
 		}
+		return $commonVoices;
+	}
+
+	/**
+	 * enable or disable voice
+	 *
+	 * @param Voice $voice to toggle
+	 */
+	function toggleVoice($voice, $enable) {
+		//disable old provider
+		QuickUpdate("update ttsvoice set enabled=? where id=?", $this->customerDB, array($enable, $voice->id));
 	}
 
 	/**
@@ -70,10 +81,6 @@ class VoiceProviderManager {
 	 * @param Voice $toVoice to enable
 	 */
 	function switchVoices($fromVoice, $toVoice) {
-		//disable old provider
-		QuickUpdate("update ttsvoice set enabled=0 where id=?", $this->customerDB, array($fromVoice->id));
-		//enable new provider
-		QuickUpdate("update ttsvoice set enabled=1 where id=?", $this->customerDB, array($toVoice->id));
 		//update message parts
 		QuickUpdate("update messagepart set voiceid=? where voiceid=?", $this->customerDB, array($toVoice->id, $fromVoice->id));
 	}
@@ -84,22 +91,19 @@ class VoiceProviderManager {
 	 */
 	function switchProviderTo($provider) {
 		Query("BEGIN", $this->customerDB, false);
-		switch ($provider) {
-			case "loquendo":
-				foreach ($this->loquendoVoices as $key => $loquendoVoice) {
-					$this->switchVoices($this->neoSpeechVoices[$key], $loquendoVoice);
-				}
-				break;
-			case "neospeech":
-				foreach ($this->loquendoVoices as $key => $loquendoVoice) {
-					$this->switchVoices($loquendoVoice, $this->neoSpeechVoices[$key]);
-				}
-				break;
-			default:
-				error_log("Unknown tts provider=" . $provider);
+
+		$voicesToEnable = $this->providerVoices[$provider];
+		$commonVoices = $this->getCommonVoices($provider);
+		foreach ($commonVoices as $key => $voices) {
+			$this->toggleVoice($voicesToEnable[$key], 1);
+			foreach ($voices as $voice) {
+				$this->toggleVoice($voice, 0);
+				$this->switchVoices($voice, $voicesToEnable[$key]);
+			}
 		}
 		//now change deafult provider
 		setCustomerSystemSetting('_defaultttsprovider', $provider, $this->customerDB);
+
 		Query("COMMIT", $this->customerDB, false);
 	}
 
