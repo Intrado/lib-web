@@ -461,10 +461,10 @@ class Message extends DBMappedObject {
 
 					case "newlang":
 						if (isset($defaultvoice->gender)){
-							$currvoiceid = QuickQuery("select id from ttsvoice where language = ? and gender = ?",
+							$currvoiceid = QuickQuery("select id from ttsvoice where language = ? and gender = ? and enabled",
 								false, array(strtolower($token), $defaultvoice->gender));
 							if ($currvoiceid == false){
-								$currvoiceid = QuickQuery("select id from ttsvoice where language = ? and gender = ?",false, array(strtolower($token),
+								$currvoiceid = QuickQuery("select id from ttsvoice where language = ? and gender = ? and enabled",false, array(strtolower($token),
 									($defaultvoice->gender == "female" ? "male" : "female")));
 							}
 							if ($currvoiceid == false){
@@ -520,7 +520,7 @@ class Message extends DBMappedObject {
 	static function format ($parts) {
 		$map = FieldMap::getFieldInsertNames();
 		$data = "";
-		$voices = DBFindMany("Voice", "from ttsvoice");
+		$voices = DBFindMany("Voice", "from ttsvoice where enabled");
 		$currvoiceid=null;
 		foreach ($parts as $part) {
 			if( $currvoiceid == null){
@@ -644,7 +644,7 @@ class Message extends DBMappedObject {
 	}
 	static function playParts($renderedparts, $audioformat = "wav",$intro = "") {
 
-		$voices = DBFindMany("Voice","from ttsvoice");
+		$voices = DBFindMany("Voice","from ttsvoice where enabled");
 
 		// -- get the wav files --
 		$wavfiles = array();
@@ -717,7 +717,7 @@ class Message extends DBMappedObject {
 		$size = -1;
 		$parts = DBFindMany('MessagePart', 'from messagepart where messageid=? order by sequence', false, array($id));
 		$renderedparts = Message::renderPhoneParts($parts, $fields);
-		$voices = DBFindMany("Voice","from ttsvoice");
+		$voices = DBFindMany("Voice","from ttsvoice where enabled");
 
 		// -- get the wav files --
 		$wavfiles = array();

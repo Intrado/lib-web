@@ -48,7 +48,7 @@ function renderMessageParts($messagedata) {
 	$parts = $messagedata['messageparts'];
 
 	$renderedparts = Message::renderPhoneParts($parts, $fields);
-	$voices = DBFindMany("Voice","from ttsvoice");
+	$voices = DBFindMany("Voice","from ttsvoice where enabled");
 
 	foreach ($renderedparts as $part) {
 		if ($part[0] == "a") {
@@ -60,7 +60,7 @@ function renderMessageParts($messagedata) {
 		} else if ($part[0] == "t") {
 			$voice = $voices[$part[2]];
 			?>
-			<tts language="<?echo $voice->language?>" gender="<?echo $voice->gender?>"><![CDATA[ <?=str_replace(']]>', '', $part[1])?>]]></tts>
+			<tts language="<?echo $voice->language?>" gender="<?echo $voice->gender?>" name="<?echo $voice->name?>"><![CDATA[ <?=str_replace(']]>', '', $part[1])?>]]></tts>
 			<?
 		}
 	}
