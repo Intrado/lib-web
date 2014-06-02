@@ -34,6 +34,8 @@ require_once("inc/customersetup.inc.php");
 require_once("../obj/Person.obj.php");
 require_once("../obj/User.obj.php");
 require_once("../obj/Organization.obj.php");
+require_once("../obj/Voice.obj.php");
+require_once("../obj/VoiceProviderManager.obj.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -440,6 +442,15 @@ $formdata["harddeletemonths"] = array(
 );
 
 $formdata[] = _L("Languages");
+
+$formdata["ttsprovider"] = array(
+	"label" => _L('TTS Provider'),
+	"value" => $settings['_defaultttsprovider'],
+	"validators" => array(),
+	"control" => array("SelectMenu","values" => array("loquendo" => "Loquendo", "neospeech" => "NeoSpeech")),
+	"helpstep" => $helpstepnum
+);
+
 // -----------------------------------------------------------------------------
 
 $languages = $customerid?QuickQueryList("select code, name from language",true,$custdb):array("en" => "English", "es" => "Spanish");
@@ -889,6 +900,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		setCustomerSystemSetting('_hasldap', $postdata["hasldap"]?'1':'0', $custdb);
 		setCustomerSystemSetting('_hasenrollment', $postdata["hasenrollment"]?'1':'0', $custdb);
 		
+		$originalProvider = $settings['_defaultttsprovider'];
+		if($originalProvider != $postdata["ttsprovider"]){
+			switchTTSProviderTo($postdata["ttsprovider"], $custdb);
+		}
+
 		$phonetargetedmessage = false;
 		switch($postdata["hasclassroom"]) {
 			case "disabled":

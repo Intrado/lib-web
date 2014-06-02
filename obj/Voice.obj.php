@@ -5,11 +5,13 @@ class Voice extends DBMappedObject {
 	var $language;
 	var $languagecode;
 	var $gender;
-	
+	var $name;
+	var $enabled;
+
 	function Voice ($id = NULL) {
 		$this->_allownulls = true;
 		$this->_tablename = "ttsvoice";
-		$this->_fieldlist = array("language", "languagecode", "gender");
+		$this->_fieldlist = array("language", "languagecode", "gender", "name", "enabled");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}
@@ -35,7 +37,7 @@ class Voice extends DBMappedObject {
 		}
 		return $codes;
 	}
-	
+
 	static function getPreferredVoice($languagecode, $gender) {
 		$voices = Voice::GetTTSVoices();
 		if (isset($voices["$languagecode:$gender"]))
