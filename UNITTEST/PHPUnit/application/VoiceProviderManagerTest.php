@@ -118,7 +118,7 @@ class VoiceProviderManagerTest extends PHPUnit_Framework_TestCase {
 				->getMock();
 
 		$loquendoVoices = $this->voiceManager->providerVoices["loquendo"];
-		$neoSpeechVoices = $mockManager->getCommonVoices("loquendo");
+		$neoSpeechVoices = $mockManager->getOverlappingVoicesForProvider("loquendo");
 		$this->assertTrue((count($neoSpeechVoices) == 2), "2 overlapping NeoSpeech voices expected but found: " . count($neoSpeechVoices));
 
 		$fromMale = clone $neoSpeechVoices["en:male"][0];
@@ -146,9 +146,9 @@ class VoiceProviderManagerTest extends PHPUnit_Framework_TestCase {
 				->setConstructorArgs(array($this->db))
 				->setMethods(array('switchVoices'))
 				->getMock();
-		//$mockManager->loadVoices();
+
 		$neoSpeechVoices = $this->voiceManager->providerVoices["neospeech"];
-		$loquendoVoices = $mockManager->getCommonVoices("neospeech");
+		$loquendoVoices = $mockManager->getOverlappingVoicesForProvider("neospeech");
 		$this->assertTrue((count($loquendoVoices) == 2), "2 overlapping Loquendo voices expected but found: " . count($loquendoVoices));
 
 		$toMale = clone $neoSpeechVoices["en:male"];
