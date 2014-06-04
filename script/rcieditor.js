@@ -481,7 +481,7 @@
 					}
 	
 					// A little data sanitizing for the raw textarea form content
-					htmleditorobject.instance.setData(html.replace(/<</g, "&lt;&lt;").replace(/>>/g, "&gt;&gt;"));
+					htmleditorobject.instance.setData(html.replace(/<</g, "&lt;&lt;").replace(/>>/g, "&gt;&gt;").replace(/<{/g, "&lt;{").replace(/}>/g, "}&gt;"));
 					break;
 			}
 	
@@ -768,7 +768,7 @@
 				}
 			});
 	
-			var html = this.cleanFieldInserts(tempdiv.html()).replace(/&lt;&lt;/g, '<<').replace(/&gt;&gt;/g, '>>');
+			var html = this.cleanFieldInserts(tempdiv.html()).replace(/&lt;&lt;/g, '<<').replace(/&gt;&gt;/g, '>>').replace(/&lt;{/g, '<{').replace(/}&gt;/g, '}>');
 	
 			// CKEditor inserts blank tags even if the user has deleted everything.
 			// check if there is an image or href tag... if not, strip the tags and see if there is any text
@@ -792,6 +792,7 @@
 		 *
 		 * Example: &lt;&lt;First <b>Name</b>&gt;&gt; becomes <b>&lt;&lt;First Name&gt;&gt;
 		 * NOTE: It is assumed that the tokens are &lt;&lt; and &gt;&gt; instead of << and >>.
+		 * 					   &lt;{ and }&gt; instead of <{ and }>.
 		 *
 		 * @param string html The HTML code from the editor that we want to clean up
 		 *
