@@ -371,27 +371,28 @@ class Message extends DBMappedObject {
 
 						// Look for the message attachment ID within the token
 						if (strpos($token, ":#") !== false) {
+							// Note $maltype is unused, it's available for convinience though!
 							list($maltype, $malid) = explode(":#", $token);
 						} else {
-							$maltype = $token;
 							$malid = false;
 						}
 
 						// if we have the message attachment ID, check for it
-						if ($malid) {
-							$malid = QuickQuery('SELECT id FROM messageattachment WHERE id = ?', false, array($malid));
-						}
+						if ($malid !== false) {
+							$malidFound = QuickQuery('SELECT id FROM messageattachment WHERE id = ?', false, array($malid));
 
-						// If we don't have a good message attachment ID to work with...
-						if (! $malid) {
-							// TODO - add support for discovering the message attachment ID automagically (?)
-							error_log_helper("WARNING: automatic discovery of the message attachment ID is not supported; it must be provided in the field insert"); 
-						}
+							// If we don't have a good message attachment ID to work with...
+							if (! $malidFound) {
+								// TODO - add support for discovering the message attachment ID automagically (?)
+								error_log_helper("WARNING: automatic discovery of the message attachment ID is not supported; it must be provided in the field insert"); 
+								$errors[] = "Can't find message attachment";
+							}
 
-						// Finish preparing the message part
-						$part->sequence = $partcount++;
-						$part->messageattachmentid = $malid;
-						$parts[] = $part;
+							// Finish preparing the message part
+							$part->sequence = $partcount++;
+							$part->messageattachmentid = $malidFound;
+							$parts[] = $part;
+						}
 
 						break;
 
