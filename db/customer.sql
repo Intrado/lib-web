@@ -2678,3 +2678,23 @@ $$$
 update setting set value='10.3/6' where name='_dbversion'
 $$$
 -- END 10.3/6
+
+INSERT INTO `ttsvoice` (`language`, `languagecode`, `gender`, `name`, `enabled`, `provider`) VALUES
+  ('spanish', 'es', 'female', 'Violeta', 1, 'neospeech'),
+  ('korean', 'ko', 'male', 'Junwoo', 1, 'neospeech'),
+  ('korean', 'ko', 'female', 'Yumi', 1, 'neospeech'),
+  ('japanese', 'ja', 'male', 'Show', 1, 'neospeech'),
+  ('japanese', 'ja', 'female', 'Misaki', 1, 'neospeech'),
+  ('chinese', 'zh', 'male', 'Liang', 1, 'neospeech'),
+  ('chinese', 'zh', 'female', 'Hui', 1, 'neospeech')
+$$$
+
+update ttsvoice set enabled = 0 where name in ('Lisheng', 'Esperanza')
+$$$
+
+delete from ttsvoice where name = 'Hasari'
+$$$
+
+update setting set value='10.3/7' where name='_dbversion'
+$$$
+-- END 10.3/7

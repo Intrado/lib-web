@@ -183,3 +183,18 @@ $$$
 
 update ttsvoice set provider = 'neospeech' where name in ('James','Julie','Hasari')
 $$$
+
+-- $rev 7
+
+INSERT INTO `ttsvoice` (`language`, `languagecode`, `gender`, `name`, `enabled`, `provider`) VALUES
+  ('spanish', 'es', 'female', 'Violeta', 0, 'neospeech'),
+  ('korean', 'ko', 'male', 'Junwoo', 1, 'neospeech'),
+  ('korean', 'ko', 'female', 'Yumi', 1, 'neospeech'),
+  ('japanese', 'ja', 'male', 'Show', 1, 'neospeech'),
+  ('japanese', 'ja', 'female', 'Misaki', 1, 'neospeech'),
+  ('chinese', 'zh', 'male', 'Liang', 1, 'neospeech'),
+  ('chinese', 'zh', 'female', 'Hui', 0, 'neospeech')
+$$$
+
+delete from ttsvoice where name = 'Hasari'
+$$$
