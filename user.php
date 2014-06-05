@@ -65,7 +65,7 @@ $hasenrollment = getSystemSetting('_hasenrollment', false);
 
 $hasstaffid = ($edituser->staffpkey) ? true : false;
 
-$accessprofiles = QuickQueryList("select id, name from access where name != 'SchoolMessenger Admin' order by name", true);
+$accessprofiles = QuickQueryList("select id, name from access where name != 'SchoolMessenger Admin' and type = 'cs' order by name", true);
 
 if (!count($accessprofiles)) {
 	redirect("users.php?noprofiles");

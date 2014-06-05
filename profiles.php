@@ -65,7 +65,7 @@ $titles = array(	"name" => "Name",
 					"Actions" => "Actions"
 					);
 
-$data = DBFindMany("Access","from access where name != 'SchoolMessenger Admin' order by name");
+$data = DBFindMany("Access","from access where name != 'SchoolMessenger Admin' and type = 'cs' order by name");
 
 startWindow('Profile List ' . help('Security_ProfileList'), 'padding: 3px;');
 
