@@ -118,7 +118,7 @@ class VoiceProviderManagerTest extends PHPUnit_Framework_TestCase {
 	public function test_switchToLoquendo() {
 		global $queryRules;
 		$queryRules->add("/from setting where name/", array('_defaultttsprovider'), array(array("_defaultttsprovider" => "neospeech")));
-		$queryRules->add("/select 1 from custdm where enabledstate != 'disabled' limit 1/", false, array(array(0)));
+		$queryRules->add("/select 1 from custdm where enablestate != 'disabled' limit 1/", false, array(array(0)));
 
 
 		$mockManager = $this->getMockBuilder('VoiceProviderManager')
@@ -150,7 +150,7 @@ class VoiceProviderManagerTest extends PHPUnit_Framework_TestCase {
 	public function test_switchToNeoSpeech() {
 		global $queryRules;
 		$queryRules->add("/from setting where name/", array('_defaultttsprovider'), array(array("_defaultttsprovider" => "loquendo")));
-		$queryRules->add("/select 1 from custdm where enabledstate != 'disabled' limit 1/", false, array(array(0)));
+		$queryRules->add("/select 1 from custdm where enablestate != 'disabled' limit 1/", false, array(array(0)));
 
 		$mockManager = $this->getMockBuilder('VoiceProviderManager')
 				->setConstructorArgs(array($this->db))
@@ -181,7 +181,7 @@ class VoiceProviderManagerTest extends PHPUnit_Framework_TestCase {
 	public function test_switchToLoquendoWhenSmartCallEnabled() {
 		global $queryRules;
 		$queryRules->add("/from setting where name/", array('_defaultttsprovider'), array(array("_defaultttsprovider" => "neospeech")));
-		$queryRules->add("/select 1 from custdm where enabledstate != 'disabled' limit 1/", false, array(array(1)));
+		$queryRules->add("/select 1 from custdm where enablestate != 'disabled' limit 1/", false, array(array(1)));
 
 
 		$mockManager = $this->getMockBuilder('VoiceProviderManager')
@@ -200,7 +200,7 @@ class VoiceProviderManagerTest extends PHPUnit_Framework_TestCase {
 	public function test_switchToLoquendoWhenSmartCallSelected() {
 		global $queryRules;
 		$queryRules->add("/from setting where name/", array('_defaultttsprovider'), array(array("_defaultttsprovider" => "neospeech")));
-		$queryRules->add("/select 1 from custdm where enabledstate != 'disabled' limit 1/", false, array(array(0)));
+		$queryRules->add("/select 1 from custdm where enablestate != 'disabled' limit 1/", false, array(array(0)));
 
 
 		$mockManager = $this->getMockBuilder('VoiceProviderManager')
@@ -219,7 +219,7 @@ class VoiceProviderManagerTest extends PHPUnit_Framework_TestCase {
 	public function test_switchToNeoSpeechWhenSmartCallEnabled() {
 		global $queryRules;
 		$queryRules->add("/from setting where name/", array('_defaultttsprovider'), array(array("_defaultttsprovider" => "neospeech")));
-		$queryRules->add("/select 1 from custdm where enabledstate != 'disabled' limit 1/", false, array(array(1)));
+		$queryRules->add("/select 1 from custdm where enablestate != 'disabled' limit 1/", false, array(array(1)));
 
 
 		$mockManager = $this->getMockBuilder('VoiceProviderManager')
@@ -238,7 +238,7 @@ class VoiceProviderManagerTest extends PHPUnit_Framework_TestCase {
 	public function test_switchToNeoSpeechWhenSmartCallSelected() {
 		global $queryRules;
 		$queryRules->add("/from setting where name/", array('_defaultttsprovider'), array(array("_defaultttsprovider" => "neospeech")));
-		$queryRules->add("/select 1 from custdm where enabledstate != 'disabled' limit 1/", false, array(array(0)));
+		$queryRules->add("/select 1 from custdm where enablestate != 'disabled' limit 1/", false, array(array(0)));
 
 
 		$mockManager = $this->getMockBuilder('VoiceProviderManager')

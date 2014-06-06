@@ -99,7 +99,7 @@ class VoiceProviderManager {
 	 * @param string $dmMethod dm method
 	 */
 	function isSmartCallEnabled($dmMethod) {
-		$enabledSmartCall = QuickQuery("select 1 from custdm where enabledstate != 'disabled' limit 1", false, false);
+		$enabledSmartCall = QuickQuery("select 1 from custdm where enablestate != 'disabled' limit 1", $this->customerDB, false);
 		return ($dmMethod != 'asp' || $enabledSmartCall);
 	}
 
