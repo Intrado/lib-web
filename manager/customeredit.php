@@ -901,8 +901,10 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		setCustomerSystemSetting('_hasenrollment', $postdata["hasenrollment"]?'1':'0', $custdb);
 		
 		$originalProvider = $settings['_defaultttsprovider'];
-		if($originalProvider != $postdata["ttsprovider"]){
-			switchTTSProviderTo($postdata["ttsprovider"], $custdb);
+		$originalDMMethod = $settings['_dmmethod'];
+		//check either DM method is changed or provider is changed.
+		if ($originalProvider != $postdata["ttsprovider"] || $originalDMMethod != $postdata["dmmethod"]) {
+			switchTTSProviderTo($postdata["ttsprovider"], $postdata["dmmethod"], $custdb);
 		}
 
 		$phonetargetedmessage = false;

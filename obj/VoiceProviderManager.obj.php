@@ -4,11 +4,12 @@
  * Switches to TTS provider
  *
  * @param string $provider tts provider
+ * @param string $dmMethod  DM method for the customer
  * @param type $customerDB customer DB
  */
-function switchTTSProviderTo($provider, $customerDB) {
+function switchTTSProviderTo($provider, $dmMethod, $customerDB) {
 	$ttsProviderManager = new VoiceProviderManager($customerDB);
-	$ttsProviderManager->switchProviderTo($provider);
+	$ttsProviderManager->switchProviderTo($provider, $dmMethod);
 }
 
 /**
@@ -34,7 +35,7 @@ class VoiceProviderManager {
 		$voices = DBFindMany("Voice", "from ttsvoice", false, false, $this->customerDB);
 		foreach ($voices as $voice) {
 			$voiceLanguageGenderKey = $voice->languagecode . ":" . $voice->gender;
-			if (! isset($this->providerVoices[$voice->provider])) {
+			if (!isset($this->providerVoices[$voice->provider])) {
 				$this->providerVoices[$voice->provider] = array();
 			}
 			$this->providerVoices[$voice->provider][$voiceLanguageGenderKey] = $voice;
@@ -47,7 +48,7 @@ class VoiceProviderManager {
 	 * Provider A's voices=[en:male(id1), en:female(id2), es:male(id3)] 
 	 * Provider B's voices=[en:male(id4), en:female(id5), es:female(id6)]
 	 * Provider C's voices=[en:male(id7), tr:female(id8), es:male(id9)]
-	 *	getOverlappingVoicesForProvider($provider)  where provider is A, returns [en:male(id4), en:female(id5), en:male(id7), es:male(id9)]
+	 * 	getOverlappingVoicesForProvider($provider)  where provider is A, returns [en:male(id4), en:female(id5), en:male(id7), es:male(id9)]
 	 * 
 	 * 
 	 * @param string $provider tts provider
@@ -60,7 +61,7 @@ class VoiceProviderManager {
 			if ($provider != $ttsProvider) {
 				foreach ($voices as $key => $voice) {
 					if (isset($providerVoices[$key])) { //exists in provider voices
-						if (! isset($commonVoices[$key])) {
+						if (!isset($commonVoices[$key])) {
 							$commonVoices[$key] = array();
 						}
 						$commonVoices[$key][] = $voice;
@@ -93,12 +94,44 @@ class VoiceProviderManager {
 	}
 
 	/**
-	 * Switch customer to TTS provider
-	 * @param string $provider TTS provider
+	 * Check to see if smart call is enabled or not.
+	 * 
+	 * @param string $dmMethod dm method
 	 */
-	function switchProviderTo($provider) {
-		Query("BEGIN", $this->customerDB, false);
+	function isSmartCallEnabled($dmMethod) {
+		$enabledSmartCall = QuickQuery("select 1 from custdm where enabledstate != 'disabled' limit 1", false, false);
+		return ($dmMethod != 'asp' || $enabledSmartCall);
+	}
 
+	/**
+	 * Sets everything to Loquendo for Smart Call
+	 * @param type $provider
+	 */
+	function enableSmartCall($provider) {
+		//disable all
+		QuickUpdate("update ttsvoice set enabled = 0 ", $this->customerDB, false);
+		QuickUpdate("update ttsvoice set enabled = 1 where provider=? ", $this->customerDB, array($provider));
+		setCustomerSystemSetting('_defaultttsprovider', $provider, $this->customerDB);
+	}
+
+	/**
+	 * Switch customer to TTS provider
+	 * 
+	 * @param string $provider TTS provider
+	 * @param string $dmMethod DM method
+	 */
+	function switchProviderTo($provider, $dmMethod) {
+		Query("BEGIN", $this->customerDB, false);
+		//first check if smart call is enabled or not. If it is, change everything to Loquendo
+		if ($this->isSmartCallEnabled($dmMethod)) { //Smart Call
+			//default to loquendo
+			$provider = 'loquendo';
+			$this->enableSmartCall($provider);
+		} else {
+			//enable all in case customer switched from Smart Call to ASP
+			QuickUpdate("update ttsvoice set enabled = 1 ", $this->customerDB, false);
+		}
+		//following call will switch overlapping voices to given provider.
 		$voicesToEnable = $this->providerVoices[$provider];
 		$commonVoices = $this->getOverlappingVoicesForProvider($provider);
 		foreach ($commonVoices as $key => $voices) {
