@@ -445,9 +445,9 @@ $formdata[] = _L("Languages");
 
 $formdata["ttsprovider"] = array(
 	"label" => _L('TTS Provider'),
-	"value" => $settings['_defaultttsprovider'],
+	"value" => ($settings['_defaultttsprovider'] ? $settings['_defaultttsprovider'] : 'neospeech'),
 	"validators" => array(),
-	"control" => array("SelectMenu","values" => array("loquendo" => "Loquendo", "neospeech" => "NeoSpeech")),
+	"control" => array("SelectMenu", "values" => array("loquendo" => "Loquendo", "neospeech" => "NeoSpeech")),
 	"helpstep" => $helpstepnum
 );
 
