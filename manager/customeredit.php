@@ -257,7 +257,8 @@ $settings = array(
 	'loginlockoutattempts' => '5',
 	'logindisableattempts' => '0',
 	'loginlockouttime' => '5',
-	'_amdtype' => "ivr"
+	'_amdtype' => "ivr",
+	'_defaultttsprovider' => 'neospeech'
 );
 
 $timezones = array(
@@ -445,7 +446,7 @@ $formdata[] = _L("Languages");
 
 $formdata["ttsprovider"] = array(
 	"label" => _L('TTS Provider'),
-	"value" => ($settings['_defaultttsprovider'] ? $settings['_defaultttsprovider'] : 'neospeech'),
+	"value" => $settings['_defaultttsprovider'],
 	"validators" => array(),
 	"control" => array("SelectMenu", "values" => array("loquendo" => "Loquendo", "neospeech" => "NeoSpeech")),
 	"helpstep" => $helpstepnum
