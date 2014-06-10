@@ -204,21 +204,18 @@ function tai_setup($customerid) {
 	$schoolmessengeruser->personid = $person->id;
 	$schoolmessengeruser->update();
 
-	// create root organization
-	$rootorgkey = "District"; // be paranoid and loop until unique orgkey found, may already exist
-	$query = "select 1 from organization where orgkey like ?";
-	$i = 0;
-	while (QuickQuery($query, null, array("%" . $rootorgkey . "%"))) {
-		$i++;
-		$rootorgkey .= "".$i;
+	// create or use the root organization
+	$rootorgkey = "District";
+	$org = DBFind("Organization", "from organization where orgkey like ?", false, array($rootorgkey));
+	if (!$org || !$org->id) {
+		$org = new Organization();
+		$org->orgkey = $rootorgkey;
+		$org->create();
 	}
-	$org = new Organization();
-	$org->orgkey = $rootorgkey;
-	$org->create();
 	
-	// make all existing orgs children of the new root org
-	$query = "update organization set parentorganizationid = ? where orgkey not like ?";
-	QuickUpdate($query, null, array($org->id, $rootorgkey));
+	// make all existing orgs children of the root org
+	$query = "update organization set parentorganizationid = ? where id != ?";
+	QuickUpdate($query, null, array($org->id, $org->id));
 	
 	// create role for schoolmessenger user
 	$query = "INSERT INTO `role` (`userid`, `accessid`, `organizationid`) VALUES (?, ?, ?)";

@@ -40,7 +40,7 @@ require_once('obj/PageForm.obj.php');
  * 
  * @description: TODO
  * @author: Justin Burns <jburns@schoolmessenger.com>
- * @date: 12/27/2013
+ * @author: Sean Kelly <skelly@schoolmessenger.com>
  */
 class PdfSendMail extends PageForm {
 	private $csApi;
@@ -51,6 +51,7 @@ class PdfSendMail extends PageForm {
 
 	private $burstId;
 	private $burst;
+	private $custname;
 
 
 	/**
@@ -67,6 +68,9 @@ class PdfSendMail extends PageForm {
 		if (getSystemSetting("_haspdfburst", false) && $USER->authorize('canpdfburst') &&
 				(isset($get['id']) || isset($session['pdfsendmail_burstid']))) {
 			return true;
+				}
+		if (isset($session['custname'])) {
+			$this->custname = $session['custname'];
 		}
 		return false;
 	}
@@ -190,7 +194,10 @@ class PdfSendMail extends PageForm {
 			$attachment->create();
 
 			// So Message->parse() can see it, swap HTML's placeholder link with "mal" field insert with the ID in it
-			$htmlBody = str_replace('<a href="#burstidplaceholder">', '<a href="<{burst:#' . $attachment->id . '}>">', $postData['messagebody']);
+			$htmlBody = str_replace('#MESSAGEATTACHMENTLINKPLACEHOLDER', '<{burst:#' . $attachment->id . '}>', $postData['messagebody']);
+
+			$customerName = escapehtml($this->custname);
+			$htmlBody = str_replace('#CUSTOMERNAMEPLACEHOLDER', $customerName, $htmlBody);
 
 			// Parse the message parts out of the HTML body (for field inserts, etc)
 			$messageParts = Message::parse($htmlBody);
@@ -283,6 +290,13 @@ class PdfSendMail extends PageForm {
 			_L('Enter the message body for this Delivery email. The portion of the Document which should be delivered to each recipient will be attached to this email message.')
 		); 
 
+		// Pull the static message layout from disk
+		$messageBody = file_get_contents(dirname(__FILE__) . '/layouts/SDDBurstEmailLayout.html');
+
+		// Replace the automagical customer name of it is present
+		$customerName = escapehtml($this->custname);
+		$messageBody = str_replace('#CUSTOMERNAMEPLACEHOLDER', $customerName, $messageBody);
+
 		$formdata = array(
 			_L("Broadcast Settings"),
 			"broadcastname" => array(
@@ -363,7 +377,7 @@ class PdfSendMail extends PageForm {
 			"messagebody" => array(
 				"label" => _L('Message'),
 				"fieldhelp" => _L('Enter an email message to accompany the Document.'),
-				"value" => file_get_contents(dirname(__FILE__) . '/layouts/SDDBurstEmailLayout.html'),
+				"value" => $messageBody,
 				"validators" => array(
 					array("ValRequired"),
 					array("ValMessageBody"),

@@ -111,7 +111,10 @@ class PdfSendMailTest extends PHPUnit_Framework_TestCase {
 
 
 	public function test_load() {
-		$session = array('pdfsendmail_burstid' => 1);
+		$session = array(
+			'pdfsendmail_burstid' => 1,
+			'custname' => 'Test School District'
+		);
 		$this->pdfSendMail->beforeLoad($get = array(), $post = array(), $request = array(), $session);
 		$this->pdfSendMail->load();
 		
