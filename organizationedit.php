@@ -171,7 +171,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
 		if ($hasTai) {
 			// It is assumed that there is only ever one root organization and it has no parent
-			$rootOrganization = DBFind("Organization", "from organization where parentorganizationid is null");
+			$rootOrganization = DBFind("Organization", "from organization where parentorganizationid is null and not deleted");
 
 			// TODO: This is a sledgehammer approach to making sure all orgs have the correct parent, Probably not necessary for all changes
 			QuickUpdate("UPDATE organization SET parentorganizationid = ? WHERE id != ?", false, array($rootOrganization->id, $rootOrganization->id));
