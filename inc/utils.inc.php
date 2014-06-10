@@ -688,4 +688,34 @@ function removeIllegalXmlChars($data) {
 	return preg_replace('/[\x00-\x08\x0b\x0c\x0e-\x1f]/', '', $data);
 }
 
+/**
+ * Converts the given .wav into .mp3
+ * @param string $filename existing wav file
+ */
+function convertWavToMp3($filename) {
+	if (!file_exists($filename)) {
+		echo _L("An error occurred trying to generate the preview file. Please try again.");
+	}
+	
+	$outnamemp3 = secure_tmpname("preview",".mp3");
+	$cmd = 'lame -S -b24 "' . $filename . '" "' . $outnamemp3 . '"';
+	$result = exec($cmd, $res1, $res2);
+	if (!$res2) {
+		$data = file_get_contents($outnamemp3);
+		header("HTTP/1.0 200 OK");
+		header("Content-Type: audio/mpeg");
+		if (isset($_GET['download']))
+			header("Content-disposition: attachment; filename=message.mp3");
+		header('Pragma: private');
+		header('Cache-control: private, must-revalidate');
+		header("Content-Length: " . strlen($data));
+		header("Connection: close");
+		echo $data;
+	} else {
+		echo _L("An error occurred trying to generate the preview file. Please try again.");
+	}
+	@unlink($outnamemp3);
+}
+
+
 ?>

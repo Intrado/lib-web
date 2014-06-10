@@ -42,7 +42,7 @@ if(isset($_GET['id'])) {
 			"es/DefaultIntro.wav",
 			"es/EmergencyIntro.wav"
 		))) {
-		Message::playParts(array(),"mp3",$mediapath . $mediafile);		
+		convertWavToMp3($mediapath . $mediafile);
 		exit();
 		
 	} else {
@@ -50,7 +50,7 @@ if(isset($_GET['id'])) {
 		if($mediafile !== false) {
 			$mediafile = substr($mediafile,1);
 			if($mediafile == "DefaultIntro.wav" || $mediafile == "EmergencyIntro.wav") {
-				Message::playParts(array(),"mp3",$mediapath . $mediafile);				
+				convertWavToMp3($mediapath . $mediafile);
 				exit();
 			}
 		}

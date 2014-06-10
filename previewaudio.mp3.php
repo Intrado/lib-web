@@ -56,20 +56,21 @@ if(isset($_GET['partnum'])) {
 				"es/DefaultIntro.wav",
 				"es/EmergencyIntro.wav"
 			))) {
-			Message::playParts(array(),"mp3",$mediapath . $mediafile);		
-			exit();
+				convertWavToMp3($mediapath . $mediafile);
+				exit();
 			
 		} else {
 			$mediafile = strrchr($mediafile,'/');
 			if($mediafile !== false) {
 				$mediafile = substr($mediafile,1);
 				if($mediafile == "DefaultIntro.wav" || $mediafile == "EmergencyIntro.wav") {
-					Message::playParts(array(),"mp3",$mediapath . $mediafile);				
+					convertWavToMp3($mediapath . $mediafile);
 					exit();
 				}
 			}
 		}
 } else {
+	//FIXME use Message::playAudio() by passing parts instead of messageid?
 	$messagepartdtos = array();
 	$parts = $_SESSION["previewmessage"]["parts"];
 	
