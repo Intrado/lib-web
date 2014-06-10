@@ -241,7 +241,7 @@ foreach ($customers as $cust) {
 
 		$row[7] = getCustomerSystemSetting('_maxusers', false, true, $custdb);
 
-		$row[8] = QuickQuery("SELECT COUNT(*) FROM user where enabled = '1' and login != 'schoolmessenger'", $custdb);
+		$row[8] = QuickQuery("SELECT COUNT(*) FROM user where enabled = '1' and login != 'schoolmessenger' and accessid is not null", $custdb);
 		$row[9] = QuickQuery("SELECT COUNT(*) FROM job INNER JOIN user ON(job.userid = user.id)	WHERE job.status = 'active'", $custdb);
 		
 		$customerfeatures = array();

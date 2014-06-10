@@ -134,7 +134,7 @@ $formdata["jobtypes"] = array(
 );
 
 if ($USER->authorize('monitorsystemwideevent')) {
-	$users = QuickQueryList("select id, concat(firstname,' ', lastname,' (',login,')') as name from user where enabled = 1 and login != 'schoolmessenger'",true);
+	$users = QuickQueryList("select id, concat(firstname,' ', lastname,' (',login,')') as name from user where enabled = 1 and login != 'schoolmessenger' and accessid is not null",true);
 	$selectedusers = $monitor->id?QuickQuery("select val from monitorfilter where type='userid' and monitorid=?",false,array($monitor->id)):'';
 	$formdata["users"] = array(
 			"label" => _L('Users'),

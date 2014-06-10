@@ -147,7 +147,7 @@ foreach ($customers as $cust) {
 		$row[2] = getCustomerSystemSetting('displayname', false, true, $custdb);
 		$row[4] = getCustomerSystemSetting('timezone', false, true, $custdb);
 		$row[5] = $cust[6];
-		$row[8] = QuickQuery("SELECT COUNT(*) FROM user where enabled = '1' and login != 'schoolmessenger'", $custdb);
+		$row[8] = QuickQuery("SELECT COUNT(*) FROM user where enabled = '1' and login != 'schoolmessenger' and accessid is not null", $custdb);
 		$row[12] = $cust[3];
 		$row[13] = $cust[4];
 		$row[14] = $cust[5];

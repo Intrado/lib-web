@@ -125,7 +125,7 @@ $defaultlanguage = Language::getName(Language::getDefaultLanguageCode());
 $languagemap = Language::getLanguageMap();
 
 // get all active user logins
-$activeusers = QuickQueryList("select id, login from user where not deleted and enabled and login != 'schoolmessenger'", true, false, array());
+$activeusers = QuickQueryList("select id, login from user where not deleted and enabled and login != 'schoolmessenger' and accessid is not null", true, false, array());
 
 // Do job template form stuff
 $formdata = array(_L("%s Template",getJobTitle()));
