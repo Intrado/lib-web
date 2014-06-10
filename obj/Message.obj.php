@@ -645,13 +645,37 @@ class Message extends DBMappedObject {
 	 * @param array $fields key=fieldnum, value=fieldvalue for field inserts
 	 */
 	static function playAudio($id, $fields) {
+		$audiofull = Message::getMp3AudioFull($id, $fields);
+
+		if (!$audiofull) {
+			header("HTTP/1.0 404 Not Found");
+		} else {
+			header("HTTP/1.0 200 OK");
+			header("Content-Type: $audiofull->contenttype");
+			if (isset($_GET['download']))
+				header("Content-disposition: attachment; filename=message.mp3");
+			header('Pragma: private');
+			header('Cache-control: private, must-revalidate');
+			header("Content-Length: " . strlen($audiofull->data));
+			header("Connection: close");
+			echo $audiofull->data;
+		}
+	}
+
+	/**
+	 * Constructs message parts from a provided message id and calls appserver to render the mp3 audio
+	 * @param int $id message id
+	 * @param array $fields fieldnum to value map
+	 * @return object|null the rendered audio, contains fields contenttype and data
+	 */
+	static function getMp3AudioFull($id, $fields) {
 		$parts = DBFindMany('MessagePart', 'from messagepart where messageid=? order by sequence', false, array($id));
-		
+
 		// call appserver to render audio
 		$messagepartdtos = array();
 		foreach ($parts as $part) {
 			$messagepartdto = new \commsuite\MessagePartDTO();
-		
+
 			switch($part->type) {
 				case "T":
 					$messagepartdto->type = \commsuite\MessagePartTypeDTO::T;
@@ -678,28 +702,13 @@ class Message extends DBMappedObject {
 					$messagepartdto->fieldnum = $part->fieldnum;
 					break;
 			}
-		
+
 			$messagepartdtos[] = $messagepartdto;
 		}
-		
+
 		// call appserver to render
-		$audiofull = phoneMessageGetMp3AudioFile($messagepartdtos);
-		
-		if (!$audiofull) {
-			header("HTTP/1.0 404 Not Found");
-		} else {
-			header("HTTP/1.0 200 OK");
-			header("Content-Type: $audiofull->contenttype");
-			if (isset($_GET['download']))
-				header("Content-disposition: attachment; filename=message.mp3");
-			header('Pragma: private');
-			header('Cache-control: private, must-revalidate');
-			header("Content-Length: " . strlen($audiofull->data));
-			header("Connection: close");
-			echo $audiofull->data;
-		}
+		return phoneMessageGetMp3AudioFile($messagepartdtos);
 	}
-	
 	
 	/**
 	 * DEPRECATED
@@ -783,40 +792,25 @@ class Message extends DBMappedObject {
 	// The only reliable way to check the message length is to render it. Return negative value on error.
 	static function getAudioLength($id, $fields) {
 		$size = -1;
-		$parts = DBFindMany('MessagePart', 'from messagepart where messageid=? order by sequence', false, array($id));
-		$renderedparts = Message::renderPhoneParts($parts, $fields);
-		$voices = DBFindMany("Voice","from ttsvoice where enabled");
 
-		// -- get the wav files --
-		$wavfiles = array();
-		//FIXME do not use renderTts()
-		// call appserver, sox mp3 to wav to fetch length
-		foreach ($renderedparts as $part) {
-			if ($part[0] == "a") {
-				list($contenttype,$data) = contentGet($part[1]);
-				$wavfiles[] = writeWav($data);
-			} else if ($part[0] == "t") {
-				$voice = $voices[$part[2]];
-				list($contenttype,$data) = renderTts($part[1],$voice->language,$voice->gender);
-				$wavfiles[] = writeWav($data);
-			}
-		}
-		//finally, merge the wav files
-		$outname = secure_tmpname("preview",".wav");
+		// Get the mp3 version of the message and write it to a temp file
+		$mp3Audio = Message::getMp3AudioFull($id, $fields);
+		$mp3Name = secure_tmpname("preview_parts",".mp3");
+		if (file_put_contents($mp3Name,$mp3Audio->data));
+		$mp3Audio = null;
 
-		$messageparts = empty($wavfiles)?'':'"' . implode('" "',$wavfiles) . '" ';
-		$cmd = 'sox ' . $messageparts . '"' . $outname . '"';
+		// Convert it to a wav
+		$wavName = secure_tmpname("preview_parts",".wav");
+		$cmd = 'sox "' . $mp3Name . '" -r 8000 -c 1 -s -w "' . $wavName . '"';
 		$result = exec($cmd, $res1, $res2);
+		@unlink($mp3Name);
 
-		foreach ($wavfiles as $file)
-			@unlink($file);
-
-		if (!$res2 && file_exists($outname)) {
-			$data = file_get_contents ($outname); // readfile seems to cause problems
-			$size = strlen($data);
+		// Read the size, in bytes, of the rendered audio
+		if (!$res2 && file_exists($wavName)) {
+			$size = filesize($wavName);
 		}
+		@unlink($wavName);
 
-		@unlink($outname);
 		return $size;
 	}
 }
