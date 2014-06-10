@@ -61,6 +61,6 @@ if (isset($_GET['jid'])) {
 	$messageid = QuickQuery("select id from message where messagegroupid = ? and type = 'phone' and languagecode = ? and autotranslate in ('none', 'translated')", false, array($messagegroupid, $languagecode));
 
 //error_log("playing messageid=".$messageid." lang=".$languagecode);
-	Message::playAudio($messageid, $historicdata, "mp3");
+	Message::playAudio($messageid, $historicdata);
 }
 ?>

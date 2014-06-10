@@ -612,6 +612,7 @@ class Message extends DBMappedObject {
 	}
 
 	// preview phone message, returns array
+	// DEPRECATED only manager/ inbound/ files are allowed to use this any more
 	static function renderPhoneParts($parts, $fields) {
 		// -- digest the message --
 		$renderedparts = array();
@@ -638,28 +639,94 @@ class Message extends DBMappedObject {
 		return $renderedparts;
 	}
 
-	static function playAudio($id, $fields,$audioformat = "wav",$intro = "") {
+	/**
+	 * play mp3 audofile of message with field inserts
+	 * @param int $id message
+	 * @param array $fields key=fieldnum, value=fieldvalue for field inserts
+	 */
+	static function playAudio($id, $fields) {
 		$parts = DBFindMany('MessagePart', 'from messagepart where messageid=? order by sequence', false, array($id));
-		$renderedparts = Message::renderPhoneParts($parts, $fields);
-		Message::playParts($renderedparts,$audioformat,$intro);
+		
+		// call appserver to render audio
+		$messagepartdtos = array();
+		foreach ($parts as $part) {
+			$messagepartdto = new \commsuite\MessagePartDTO();
+		
+			switch($part->type) {
+				case "T":
+					$messagepartdto->type = \commsuite\MessagePartTypeDTO::T;
+					$voice = new Voice($part->voiceid);
+					$messagepartdto->name = $voice->name;
+					$messagepartdto->gender = $voice->gender;
+					$messagepartdto->languagecode = $voice->language;
+					$messagepartdto->txt = $part->txt;
+					break;
+				case "A":
+					$messagepartdto->type = \commsuite\MessagePartTypeDTO::A;
+					$messagepartdto->contentid = QuickQuery("select contentid from audiofile where id=?",false,array($part->audiofileid)) + 0;
+					break;
+				case "V":
+					if (!isset($fields[$part->fieldnum]) || !($value = $fields[$part->fieldnum])) {
+						$value = $part->defaultvalue;
+					}
+					$messagepartdto->type = \commsuite\MessagePartTypeDTO::V;
+					$voice = new Voice($part->voiceid);
+					$messagepartdto->name = $voice->name;
+					$messagepartdto->gender = $voice->gender;
+					$messagepartdto->languagecode = $voice->language;
+					$messagepartdto->defaultvalue = $value;
+					$messagepartdto->fieldnum = $part->fieldnum;
+					break;
+			}
+		
+			$messagepartdtos[] = $messagepartdto;
+		}
+		
+		// call appserver to render
+		$audiofull = phoneMessageGetMp3AudioFile($messagepartdtos);
+		
+		if (!$audiofull) {
+			header("HTTP/1.0 404 Not Found");
+		} else {
+			header("HTTP/1.0 200 OK");
+			header("Content-Type: $audiofull->contenttype");
+			if (isset($_GET['download']))
+				header("Content-disposition: attachment; filename=message.mp3");
+			header('Pragma: private');
+			header('Cache-control: private, must-revalidate');
+			header("Content-Length: " . strlen($audiofull->data));
+			header("Connection: close");
+			echo $audiofull->data;
+		}
 	}
-	static function playParts($renderedparts, $audioformat = "wav",$intro = "") {
+	
+	
+	/**
+	 * DEPRECATED
+	 * need Utils method to playMedia() without any parts - to convert wav to mp3
+	 * @param unknown $renderedparts
+	 * @param string $audioformat
+	 * @param string $intro
+	 */
+	static function playParts($renderedparts, $audioformat = "wav", $intro = "") {
 
 		$voices = DBFindMany("Voice","from ttsvoice where enabled");
 
 		// -- get the wav files --
 		$wavfiles = array();
-
+		
 		foreach ($renderedparts as $part) {
 			if ($part[0] == "a") {
 				list($contenttype,$data) = contentGet($part[1]);
 				$wavfiles[] = writeWav($data);
 			} else if ($part[0] == "t") {
 				$voice = $voices[$part[2]];
-				list($contenttype,$data) = renderTts($part[1],$voice->language,$voice->gender);
+				list($contenttype,$data) = renderTts($part[1],$voice->language,$voice->gender); // FIXME GJB send voice name
 				$wavfiles[] = writeWav($data);
 			}
 		}
+		
+		// if intro message, add it
 		if($intro && file_exists($intro)){
 			$intro = $intro?('"' . $intro . '" "media/2secondsilence.wav" '):'';
 		}
@@ -722,7 +789,8 @@ class Message extends DBMappedObject {
 
 		// -- get the wav files --
 		$wavfiles = array();
-
+		//FIXME do not use renderTts()
+		// call appserver, sox mp3 to wav to fetch length
 		foreach ($renderedparts as $part) {
 			if ($part[0] == "a") {
 				list($contenttype,$data) = contentGet($part[1]);

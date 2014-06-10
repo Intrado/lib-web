@@ -80,6 +80,7 @@ if(isset($_GET['partnum'])) {
 			case "T":
 				$messagepartdto->type = \commsuite\MessagePartTypeDTO::T;
 				$voice = new Voice($part["voiceid"]);
+				$messagepartdto->name = $voice->name;
 				$messagepartdto->gender = $voice->gender;
 				$messagepartdto->languagecode = $voice->language;
 				$messagepartdto->txt = $part["txt"];

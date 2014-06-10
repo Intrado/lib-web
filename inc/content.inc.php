@@ -70,8 +70,15 @@ function contentDelete($contentid) {
 	commsuite_contentDelete($contentid);
 }
 
+/**
+ * DEPRECATED only here for manager/preview.wav.php
+ * @param unknown $text
+ * @param unknown $language
+ * @param unknown $gender
+ * @return Ambigous <boolean, multitype:unknown Ambigous <NULL, unknown> >|boolean
+ */
 function renderTts ($text,$language,$gender) {
-	list($fp,$server) = connectToContentServer("tts");
+	list($fp,$server) = connectToContentServer("tts"); // FIXME voice name
 	list($host,$port,$path) = $server;
 	if ($fp) {
 		// tts priority 0=normal, 1=high

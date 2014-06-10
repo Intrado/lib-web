@@ -30,7 +30,7 @@ if(isset($_GET['id'])) {
 					$fields[$fieldnum] = $_REQUEST[$fieldnum];
 			}
 		}
-		Message::playAudio($message->id, $fields,"mp3");
+		Message::playAudio($message->id, $fields);
 		exit();
 	}
 } else if(isset($_GET['mediafile'])) {
@@ -46,7 +46,7 @@ if(isset($_GET['id'])) {
 		exit();
 		
 	} else {
-		$mediafile = strrchr($mediafile,'/');
+		$mediafile = strrchr($mediafile,'/'); //FIXME this is a mess
 		if($mediafile !== false) {
 			$mediafile = substr($mediafile,1);
 			if($mediafile == "DefaultIntro.wav" || $mediafile == "EmergencyIntro.wav") {
