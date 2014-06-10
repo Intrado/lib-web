@@ -68,9 +68,6 @@ class PdfSendMail extends PageForm {
 		if (getSystemSetting("_haspdfburst", false) && $USER->authorize('canpdfburst') &&
 				(isset($get['id']) || isset($session['pdfsendmail_burstid']))) {
 			return true;
-				}
-		if (isset($session['custname'])) {
-			$this->custname = $session['custname'];
 		}
 		return false;
 	}
@@ -89,6 +86,9 @@ class PdfSendMail extends PageForm {
 			redirect();
 		}
 		$this->burstId = $session['pdfsendmail_burstid'];
+		if (isset($session['custname'])) {
+			$this->custname = $session['custname'];
+		}
 	}
 
 	// @override
