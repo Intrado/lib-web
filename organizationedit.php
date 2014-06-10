@@ -155,12 +155,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			QuickUpdate("update listentry set organizationid = ? where organizationid = ?", false, array($org->id, $originalorg->id));
 
 			if ($hasTai) {
-
-				// It is assumed that there is only ever one root organization and it has no parent
-				$rootOrganization = DBFind("Organization", "from organization where parentorganizationid is null");
-
-				// TODO: This is a sledgehammer approach to making sure all orgs have the correct parent, Probably not necessary for all changes
-				QuickUpdate("update organization set parentorganizationid = ? where id != ?", false, array($rootOrganization->id, $rootOrganization->id));
 				QuickUpdate('UPDATE tai_organizationtopic SET organizationid = ? WHERE organizationid = ?', false, array($org->id, $originalorg->id));
 			}
 			// check persondatavalues and update/create/delete entries
@@ -174,7 +168,15 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		} else {
 			notice(_L('%1$s has been created.', $orgkey));
 		}
-		
+
+		if ($hasTai) {
+			// It is assumed that there is only ever one root organization and it has no parent
+			$rootOrganization = DBFind("Organization", "from organization where parentorganizationid is null");
+
+			// TODO: This is a sledgehammer approach to making sure all orgs have the correct parent, Probably not necessary for all changes
+			QuickUpdate("UPDATE organization SET parentorganizationid = ? WHERE id != ?", false, array($rootOrganization->id, $rootOrganization->id));
+		}
+
 		Query("COMMIT");
 		
 		if ($ajax)
