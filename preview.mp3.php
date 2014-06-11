@@ -13,6 +13,7 @@ require_once("obj/FieldMap.obj.php");
 require_once("obj/MessageGroup.obj.php");
 require_once("obj/Job.obj.php");
 
+$data = "";
 if(isset($_GET['id'])) {
 	//session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 	$message = new Message($_GET['id'] + 0);
@@ -30,8 +31,14 @@ if(isset($_GET['id'])) {
 					$fields[$fieldnum] = $_REQUEST[$fieldnum];
 			}
 		}
-		Message::playAudio($message->id, $fields);
-		exit();
+
+		$audioFull = Message::getMp3AudioFull($message->id, $fields);
+
+		if ($audioFull) {
+			$data = $audioFull->data;
+		} else {
+			$data = false;
+		}
 	}
 } else if(isset($_GET['mediafile'])) {
 	$mediapath = "media/";
@@ -42,29 +49,31 @@ if(isset($_GET['id'])) {
 			"es/DefaultIntro.wav",
 			"es/EmergencyIntro.wav"
 		))) {
-		convertWavToMp3($mediapath . $mediafile);
-		exit();
-		
+		$data = convertWavToMp3($mediapath . $mediafile);
+
 	} else {
 		$mediafile = strrchr($mediafile,'/'); //FIXME this is a mess
 		if($mediafile !== false) {
 			$mediafile = substr($mediafile,1);
 			if($mediafile == "DefaultIntro.wav" || $mediafile == "EmergencyIntro.wav") {
-				convertWavToMp3($mediapath . $mediafile);
-				exit();
+				$data = convertWavToMp3($mediapath . $mediafile);
 			}
 		}
 	}
-} 
+}
 
+if ($data === false) {
+	header("HTTP/1.0 404 Not Found");
+} else {
+	header("HTTP/1.0 200 OK");
+	header('Pragma: private');
+	header('Cache-control: private, must-revalidate');
+	if (isset($_GET['download']))
+		header("Content-disposition: attachment; filename=message.mp3");
+	header("Content-Type: audio/mpeg");
+	header("Content-Length: " . strlen($data));
+	header("Connection: close");
 
-header("HTTP/1.0 200 OK");
-header("Content-Type: audio/mpeg");
-header("Content-disposition: attachment; filename=message.mp3");
-header('Pragma: private');
-header('Cache-control: private, must-revalidate');
-header("Content-Length: 0");
-header("Connection: close");
-
-
+	echo $data;
+}
 ?>

@@ -1,4 +1,9 @@
 <?
+// FIXME: This code is a copy/paste from subscriber (or vice-versa)
+/*
+ * I know this says it's for wav files... but it actually spits out mp3s
+ */
+
 //Used only in portal
 require_once("common.inc.php");
 
@@ -45,6 +50,7 @@ if(isset($_GET['pid'])){
 	}
 }
 
+$data = "";
 if (isset($_GET['jid']) && isset($_GET['pid'])) {
 	$jid = DBSafe($_GET['jid']);
 	$pid = DBSafe($_GET['pid']);
@@ -67,7 +73,27 @@ if (isset($_GET['jid']) && isset($_GET['pid'])) {
 	$messagegroupid = QuickQuery("select messagegroupid from job where id = ?", false, array($jid));
 	$messageid = QuickQuery("select id from message where messagegroupid = ? and type = 'phone' and languagecode = ? and autotranslate in ('none', 'translated')", false, array($messagegroupid, $languagecode));
 
-//error_log("playing messageid=".$messageid." lang=".$languagecode);
-	Message::playAudio($messageid, $historicdata);
+	$audioFull = Message::getMp3AudioFull($messageid, $historicdata);
+
+	if ($audioFull) {
+		$data = $audioFull->data;
+	} else {
+		$data = false;
+	}
+}
+
+if ($data === false) {
+	header("HTTP/1.0 404 Not Found");
+} else {
+	header("HTTP/1.0 200 OK");
+	header('Pragma: private');
+	header('Cache-control: private, must-revalidate');
+	if (isset($_GET['download']))
+		header("Content-disposition: attachment; filename=message.mp3");
+	header("Content-Type: audio/mpeg");
+	header("Content-Length: " . strlen($data));
+	header("Connection: close");
+
+	echo $data;
 }
 ?>

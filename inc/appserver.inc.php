@@ -283,6 +283,11 @@ function ttsGetForTextLanguageGenderNameFormat($text, $language, $gender, $name,
 	return $result;
 }
 
+/**
+ * @param int $contentid
+ * @param string $format
+ * @return bool|object false, if requesting the audiofile data failed or an object with fields contenttype and data
+ */
 function audioFileGetForFormat($contentid, $format) {
 	list($appserverCommsuiteProtocol,$appserverCommsuiteTransport) = initCommsuiteApp();
 	

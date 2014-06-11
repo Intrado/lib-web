@@ -640,29 +640,6 @@ class Message extends DBMappedObject {
 	}
 
 	/**
-	 * play mp3 audofile of message with field inserts
-	 * @param int $id message
-	 * @param array $fields key=fieldnum, value=fieldvalue for field inserts
-	 */
-	static function playAudio($id, $fields) {
-		$audiofull = Message::getMp3AudioFull($id, $fields);
-
-		if (!$audiofull) {
-			header("HTTP/1.0 404 Not Found");
-		} else {
-			header("HTTP/1.0 200 OK");
-			header("Content-Type: $audiofull->contenttype");
-			if (isset($_GET['download']))
-				header("Content-disposition: attachment; filename=message.mp3");
-			header('Pragma: private');
-			header('Cache-control: private, must-revalidate');
-			header("Content-Length: " . strlen($audiofull->data));
-			header("Connection: close");
-			echo $audiofull->data;
-		}
-	}
-
-	/**
 	 * Constructs message parts from a provided message id and calls appserver to render the mp3 audio
 	 * @param int $id message id
 	 * @param array $fields fieldnum to value map
