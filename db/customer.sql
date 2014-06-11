@@ -2698,3 +2698,8 @@ $$$
 update setting set value='10.3/7' where name='_dbversion'
 $$$
 -- END 10.3/7
+
+-- swapping login pictures in upgrade
+update setting set value='10.3/8' where name='_dbversion'
+$$$
+-- END 10.3/8

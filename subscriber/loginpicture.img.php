@@ -15,7 +15,7 @@ if ($map !== false) {
 	$contenttype = $map['loginPictureType'];
 	$ext = substr($contenttype, strpos($contenttype, "/")+1);
 } else {
-	$data = file_get_contents("../img/header_highered3.gif");  // TODO why need the ../ should symlink be set?
+	$data = file_get_contents("../img/login_subscriber.jpg");  // TODO why need the ../ should symlink be set?
 	$contenttype = "image/gif";
 	$ext = ".gif";
 }

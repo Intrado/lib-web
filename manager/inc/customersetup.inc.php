@@ -125,7 +125,7 @@ function cs_setup($customerid,$custdb) {
 
 	// Login Picture
 	QuickUpdate("INSERT INTO content (contenttype, data) values
-											('image/gif', '" . base64_encode(file_get_contents("mimg/classroom_girl.jpg")) . "')",$custdb);
+											('image/jpg', '" . base64_encode(file_get_contents("img/login_sm.jpg")) . "')",$custdb);
 	$loginpicturecontentid = $custdb->lastInsertId();
 
 	$query = "INSERT INTO `setting` (`name`, `value`) VALUES
@@ -134,7 +134,7 @@ function cs_setup($customerid,$custdb) {
 
 				// Subscriber Login Picture
 	QuickUpdate("INSERT INTO content (contenttype, data) values
-											('image/gif', '" . base64_encode(file_get_contents("mimg/header_highered3.gif")) . "')",$custdb);
+											('image/jpg', '" . base64_encode(file_get_contents("img/login_subscriber.jpg")) . "')",$custdb);
 				$subscriberloginpicturecontentid = $custdb->lastInsertId();
 
 	$query = "INSERT INTO `setting` (`name`, `value`) VALUES
