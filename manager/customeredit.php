@@ -199,7 +199,9 @@ $ttslangs = array(
 	'pl' => 'polish',
 	'pt' => 'portuguese',
 	'ru' => 'russian',
-	'sv' => 'swedish'
+	'sv' => 'swedish',
+    'ko' => 'korean',
+    'ja' => 'japanese'
 );
 
 // default settings
