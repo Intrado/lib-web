@@ -48,7 +48,7 @@ class Voice extends DBMappedObject {
 		else if (isset($voices["$languagecode:male"]))
 			return $voices["$languagecode:male"]->id;
 		else
-			return $gender == "male"?1:2; // default to english
+			return $gender == "male" ? $voices["en:male"]->id : $voices["en:female"]->id; // default to english
 	}
 }
 
