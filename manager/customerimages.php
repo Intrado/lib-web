@@ -44,7 +44,7 @@ if(isset($_POST['submit'])) {
 		"uploadloginpicture" => "_loginpicturecontentid",
 		"uploadsubscriberloginpicture" => "_subscriberloginpicturecontentid"
 	);
-	$imagetypes = array("image/jpeg","image/gif","image/png"); // list of allowed image types
+	$imagetypes = array("image/jpeg","image/gif","image/png","image/pjpeg","image/jpg","image/x-png"); // list of allowed image types
 	$imagenames = array(); // store temp file names
 	
 	
