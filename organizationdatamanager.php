@@ -134,7 +134,7 @@ if (isset($_GET['deleteunassociated'])) {
 											from personassociation pa
 												inner join person p on
 													(pa.personid = p.id)
-											where not p.deleted and pa.type = 'organization'");
+											where not p.deleted and pa.type = 'organization' and pa.organizationid is not null");
 	
 	$userroleassociationorgid = QuickQueryList("select r.organizationid
 											from role r
@@ -142,11 +142,9 @@ if (isset($_GET['deleteunassociated'])) {
 											(r.userid = u.id)
 											where not u.deleted");
 	
-	$childorganisationassociationorgid = QuickQueryList("select o.id
+	$childorganisationassociationorgid = QuickQueryList("select distinct o.parentorganizationid
 											from organization o
-											where exists
-											(select * from organization oo
-											where not oo.deleted and oo.parentorganizationid = o.id)");
+											where not o.deleted");
 	
 	$associatedorgids = array();
 	foreach ($listentryorgids as $orgid)
