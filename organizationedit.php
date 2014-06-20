@@ -114,71 +114,78 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 		
 		$orgkey = trim($postdata['orgkey']);
-		Query("BEGIN");
 
-		// if the org already exists make it our target org (We can only get this if it's deleted due to form validation)
-		$orgWithTargetKey = DBFind("Organization", "from organization where orgkey = ?", false, array($orgkey));
-		if ($orgWithTargetKey) {
-			$org = $orgWithTargetKey;
-			$org->orgkey = $orgkey;
-			$org->deleted = 0;
-			$org->modifiedtimestamp = time();
-		// if it's a new org then crete a new one
+		// Did any data change?
+		if (isset($originalorg) && (strtolower($originalorg->orgkey) == strtolower($orgkey))) {
+			// nothing to do, organization key matches original
 		} else {
-			$org = new Organization();
-			$org->orgkey = $orgkey;
-			$org->deleted = 0;
-			$org->createdtimestamp = time();
-			$org->modifiedtimestamp = $org->createdtimestamp;
-		}
+			// Name change occurred
+			Query("BEGIN");
 
-		// Always set the organization's parent to the original objects parent
-		if (isset($originalorg)) {
-			$org->parentorganizationid = $originalorg->parentorganizationid;
-		}
+			// if the org already exists make it our target org (We can only get this if it's deleted due to form validation)
+			$orgWithTargetKey = DBFind("Organization", "from organization where orgkey = ?", false, array($orgkey));
+			if ($orgWithTargetKey) {
+				$org = $orgWithTargetKey;
+				$org->orgkey = $orgkey;
+				$org->deleted = 0;
+				$org->modifiedtimestamp = time();
+				// if it's a new org then crete a new one
+			} else {
+				$org = new Organization();
+				$org->orgkey = $orgkey;
+				$org->deleted = 0;
+				$org->createdtimestamp = time();
+				$org->modifiedtimestamp = $org->createdtimestamp;
+			}
 
-		if ($org->id)
-			$org->update();
-		else
-			$org->create();
+			// Always set the organization's parent to the original objects parent
+			if (isset($originalorg)) {
+				$org->parentorganizationid = $originalorg->parentorganizationid;
+			}
 
-		// if the original org and the new org are not the same, update associations and delete the original
-		if (isset($originalorg)) {
-			// update the original organization first.
-			$originalorg->deleted = 1;
-			$originalorg->modifiedtimestamp = time();
-			$originalorg->update();
+			if ($org->id)
+				$org->update();
+			else
+				$org->create();
 
-			QuickUpdate("update role set organizationid = ? where organizationid = ?", false, array($org->id, $originalorg->id));
-			QuickUpdate("update userassociation set organizationid = ? where organizationid = ?", false, array($org->id, $originalorg->id));
-			QuickUpdate("update personassociation set organizationid = ? where organizationid = ?", false, array($org->id, $originalorg->id));
-			QuickUpdate("update listentry set organizationid = ? where organizationid = ?", false, array($org->id, $originalorg->id));
+			// if the original org and the new org are not the same, update associations and delete the original
+			if (isset($originalorg)) {
+				// update the original organization first.
+				$originalorg->deleted = 1;
+				$originalorg->modifiedtimestamp = time();
+				$originalorg->update();
+
+				QuickUpdate("update role set organizationid = ? where organizationid = ?", false, array($org->id, $originalorg->id));
+				QuickUpdate("update userassociation set organizationid = ? where organizationid = ?", false, array($org->id, $originalorg->id));
+				QuickUpdate("update personassociation set organizationid = ? where organizationid = ?", false, array($org->id, $originalorg->id));
+				QuickUpdate("update listentry set organizationid = ? where organizationid = ?", false, array($org->id, $originalorg->id));
+
+				if ($hasTai) {
+					QuickUpdate('UPDATE tai_organizationtopic SET organizationid = ? WHERE organizationid = ?', false, array($org->id, $originalorg->id));
+				}
+				// check persondatavalues and update/create/delete entries
+				$originalorgpdvid = QuickQuery("select id from persondatavalues where fieldnum = 'oid' and value = ?", false, array($originalorg->id));
+				// if the original org exists in persondatavalues, remove it and insert the new org id
+				if ($originalorgpdvid) {
+					QuickUpdate("delete from persondatavalues where id = ?", false, array($originalorgpdvid));
+					QuickUpdate("insert into persondatavalues values (null, 'oid', ?, 0, 1)", false, array($org->id));
+				}
+				notice(_L('Organization %1$s has been updated', $orgkey));
+			} else {
+				notice(_L('%1$s has been created.', $orgkey));
+			}
 
 			if ($hasTai) {
-				QuickUpdate('UPDATE tai_organizationtopic SET organizationid = ? WHERE organizationid = ?', false, array($org->id, $originalorg->id));
+				// It is assumed that there is only ever one root organization and it has no parent
+				$rootOrganization = DBFind("Organization", "from organization where parentorganizationid is null and not deleted");
+
+				// TODO: This is a sledgehammer approach to making sure all orgs have the correct parent, Probably not necessary for all changes
+				QuickUpdate("UPDATE organization SET parentorganizationid = ? WHERE id != ?", false, array($rootOrganization->id, $rootOrganization->id));
 			}
-			// check persondatavalues and update/create/delete entries
-			$originalorgpdvid = QuickQuery("select id from persondatavalues where fieldnum = 'oid' and value = ?", false, array($originalorg->id));
-			// if the original org exists in persondatavalues, remove it and insert the new org id
-			if ($originalorgpdvid) {
-				QuickUpdate("delete from persondatavalues where id = ?", false, array($originalorgpdvid));
-				QuickUpdate("insert into persondatavalues values (null, 'oid', ?, 0, 1)", false, array($org->id));
-			}
-			notice(_L('Organization %1$s has been updated', $orgkey));
-		} else {
-			notice(_L('%1$s has been created.', $orgkey));
+
+			Query("COMMIT");
 		}
 
-		if ($hasTai) {
-			// It is assumed that there is only ever one root organization and it has no parent
-			$rootOrganization = DBFind("Organization", "from organization where parentorganizationid is null and not deleted");
-
-			// TODO: This is a sledgehammer approach to making sure all orgs have the correct parent, Probably not necessary for all changes
-			QuickUpdate("UPDATE organization SET parentorganizationid = ? WHERE id != ?", false, array($rootOrganization->id, $rootOrganization->id));
-		}
-
-		Query("COMMIT");
-		
 		if ($ajax)
 			$form->sendTo("organizationdatamanager.php");
 		else
