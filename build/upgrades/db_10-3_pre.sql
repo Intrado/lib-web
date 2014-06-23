@@ -198,3 +198,17 @@ $$$
 
 delete from ttsvoice where name = 'Hasari'
 $$$
+
+-- $rev 8
+-- No sql changes
+
+-- $rev 9
+-- Update neospeech english female voice
+update ttsvoice set name = 'Ashley' where name = 'Julie'
+$$$
+
+-- Add neospeech spanish male voice
+insert into ttsvoice (language, languagecode, gender, name, enabled, provider) select
+'spanish' as language, 'es' as languagecode, 'male' as gender, 'Francisco' as name, enabled, 'neospeech' as provider
+from ttsvoice where name = 'Violeta'
+$$$

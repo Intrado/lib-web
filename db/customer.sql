@@ -2703,3 +2703,18 @@ $$$
 update setting set value='10.3/8' where name='_dbversion'
 $$$
 -- END 10.3/8
+
+-- START 10.3/9
+-- Update neospeech english female voice
+update ttsvoice set name = 'Ashley' where name = 'Julie'
+$$$
+
+-- Add neospeech spanish male voice
+insert into ttsvoice (language, languagecode, gender, name, enabled, provider) select
+'spanish' as language, 'es' as languagecode, 'male' as gender, 'Francisco' as name, enabled, 'neospeech' as provider
+from ttsvoice where name = 'Violeta'
+$$$
+
+update setting set value='10.3/9' where name='_dbversion'
+$$$
+-- END 10.3/8
