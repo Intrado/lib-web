@@ -91,6 +91,10 @@ function upgrade_10_3($rev, $shardid, $customerid, $db) {
 			echo "|";
 			apply_sql("upgrades/db_10-3_pre.sql", $customerid, $db, 9);
 
+		case 9:
+			echo "|";
+			apply_sql("upgrades/db_10-3_pre.sql", $customerid, $db, 10);
+
 	}
 	//This statement should appear in each upgrade script, when relevent.
 	apply_sql("../db/update_SMAdmin_access.sql", $customerid, $db);

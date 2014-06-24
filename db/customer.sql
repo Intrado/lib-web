@@ -2717,4 +2717,12 @@ $$$
 
 update setting set value='10.3/9' where name='_dbversion'
 $$$
--- END 10.3/8
+-- END 10.3/9
+
+-- START 10.3/10
+update ttsvoice set enabled = 0 where name = 'Carlos'
+$$$
+
+update setting set value='10.3/10' where name='_dbversion'
+$$$
+-- END 10.3/10
