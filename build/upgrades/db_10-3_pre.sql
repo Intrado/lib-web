@@ -212,3 +212,9 @@ insert into ttsvoice (language, languagecode, gender, name, enabled, provider) s
 'spanish' as language, 'es' as languagecode, 'male' as gender, 'Francisco' as name, enabled, 'neospeech' as provider
 from ttsvoice where name = 'Violeta'
 $$$
+
+-- $rev 10
+-- set Carlos to the same enable state as Esperanza
+update ttsvoice t1 inner join (select enabled from ttsvoice where name = 'Esperanza' limit 1) t2
+set t1.enabled = t2.enabled where name = 'Carlos'
+$$$
