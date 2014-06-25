@@ -34,6 +34,8 @@ require_once("inc/customersetup.inc.php");
 require_once("../obj/Person.obj.php");
 require_once("../obj/User.obj.php");
 require_once("../obj/Organization.obj.php");
+require_once("../obj/Voice.obj.php");
+require_once("../obj/VoiceProviderManager.obj.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -197,7 +199,9 @@ $ttslangs = array(
 	'pl' => 'polish',
 	'pt' => 'portuguese',
 	'ru' => 'russian',
-	'sv' => 'swedish'
+	'sv' => 'swedish',
+    'ko' => 'korean',
+    'ja' => 'japanese'
 );
 
 // default settings
@@ -238,6 +242,7 @@ $settings = array(
 	'_hasphonetargetedmessage' => '0',
 	'_hasselfsignup' => '',
 	'_hasportal' => '',
+	'_hasinfocenter' => '',
 	'_hasfacebook' => '0',
 	'_hastwitter' => '0',
 	'_hasfeed' => '0',
@@ -254,7 +259,8 @@ $settings = array(
 	'loginlockoutattempts' => '5',
 	'logindisableattempts' => '0',
 	'loginlockouttime' => '5',
-	'_amdtype' => "ivr"
+	'_amdtype' => "ivr",
+	'_defaultttsprovider' => 'neospeech'
 );
 
 $timezones = array(
@@ -439,6 +445,15 @@ $formdata["harddeletemonths"] = array(
 );
 
 $formdata[] = _L("Languages");
+
+$formdata["ttsprovider"] = array(
+	"label" => _L('TTS Provider'),
+	"value" => $settings['_defaultttsprovider'],
+	"validators" => array(),
+	"control" => array("SelectMenu", "values" => array("loquendo" => "Loquendo", "neospeech" => "NeoSpeech")),
+	"helpstep" => $helpstepnum
+);
+
 // -----------------------------------------------------------------------------
 
 $languages = $customerid?QuickQueryList("select code, name from language",true,$custdb):array("en" => "English", "es" => "Spanish");
@@ -556,12 +571,19 @@ $formdata["callbackdefault"] = array(
 
 $formdata[] = _L("Additional Features");
 // -----------------------------------------------------------------------------
+$portaloption = 'none';
+if ($settings['_hasportal'])
+	$portaloption = "contactmanager";
+elseif ($settings['_hasselfsignup'])
+	$portaloption = "selfsignup";
+elseif ($settings['_hasinfocenter'])
+	$portaloption = "infocenter";
 
 $formdata["portal"] = array(
 	"label" => _L('Portal'),
-	"value" => $settings['_hasportal']?"contactmanager":($settings['_hasselfsignup']?"selfsignup":"none"),
+	"value" => $portaloption,
 	"validators" => array(),
-	"control" => array("SelectMenu","values" => array("none" => "None", "contactmanager" => "Contact Manager", "selfsignup" => "Self-Signup")),
+	"control" => array("SelectMenu","values" => array("none" => "None", "contactmanager" => "Contact Manager", "selfsignup" => "Self-Signup", "infocenter" => "InfoCenter")),
 	"helpstep" => $helpstepnum
 );
 
@@ -867,40 +889,27 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		
 		setCustomerSystemSetting('_hascallback', $postdata["hascallback"]?'1':'0', $custdb);
 		setCustomerSystemSetting('callbackdefault', $postdata["callbackdefault"], $custdb);
-		
-		switch($postdata["portal"] ) {
-			case "contactmanager": 
-				setCustomerSystemSetting('_hasportal', 1, $custdb);
-				setCustomerSystemSetting('_hasselfsignup', 0, $custdb);
-				break;
-			case "selfsignup":
-				setCustomerSystemSetting('_hasportal', 0, $custdb);
-				setCustomerSystemSetting('_hasselfsignup', 1, $custdb);
-				break;
-			default:
-				setCustomerSystemSetting('_hasportal', 0, $custdb);
-				setCustomerSystemSetting('_hasselfsignup', 0, $custdb);
-		}
+
+		//update settings
+		setCustomerSystemSetting('_hasportal', ($postdata["portal"] === 'contactmanager') ? '1' : '0', $custdb);
+		setCustomerSystemSetting('_hasselfsignup', ($postdata["portal"] === 'selfsignup') ? '1' : '0', $custdb);
+		setCustomerSystemSetting('_hasinfocenter', ($postdata["portal"] === 'infocenter') ? '1' : '0', $custdb);
+
 		//handle authserver.customerproduct table
-		$customerProductFieldMap = QuickQueryRow("select * from customerproduct where customerid = ? and product = 'cm'", true, false, array($customerid));
-		if ($postdata["portal"] == "contactmanager") {
-			if ($customerProductFieldMap === false) {
-				// insert and enable cm
-				$query = "INSERT INTO `customerproduct` (`customerid`,`product`,`createdtimestamp`,`modifiedtimestamp`,`enabled`) VALUES (?,'cm',?,?,1)";
-				QuickUpdate($query, false, array($customerid, time(), time()));
-			} else if ($customerProductFieldMap['enabled'] == 0) {
-				// enable cm
-				QuickUpdate("update customerproduct set enabled = 1, modifiedtimestamp = ? where customerid = ? and product = 'cm'", false, array(time(), $customerid));
-			} // else ignore, already enabled cm
-		} else {
-			// disable cm
-			QuickUpdate("update customerproduct set enabled = 0, modifiedtimestamp = ? where customerid = ? and product = 'cm'", false, array(time(), $customerid));
-		}
-		
+		updateCustomerProduct($customerid, 'cm', $postdata["portal"] === 'contactmanager');
+		updateCustomerProduct($customerid, 'ic', $postdata["portal"] === 'infocenter');
+
 		setCustomerSystemSetting('_hassurvey', $postdata["hassurvey"]?'1':'0', $custdb);
 		setCustomerSystemSetting('_hasldap', $postdata["hasldap"]?'1':'0', $custdb);
 		setCustomerSystemSetting('_hasenrollment', $postdata["hasenrollment"]?'1':'0', $custdb);
 		
+		$originalProvider = $settings['_defaultttsprovider'];
+		$originalDMMethod = $settings['_dmmethod'];
+		//check either DM method is changed or provider is changed.
+		if ($originalProvider != $postdata["ttsprovider"] || $originalDMMethod != $postdata["dmmethod"]) {
+			switchTTSProviderTo($postdata["ttsprovider"], $postdata["dmmethod"], $custdb);
+		}
+
 		$phonetargetedmessage = false;
 		switch($postdata["hasclassroom"]) {
 			case "disabled":
@@ -983,6 +992,19 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				redirect($thispage);
 		}
 	}
+}
+
+
+/**
+ * Enable/disable product in authserver.customerproduct
+ * @param type $customerid customer id
+ * @param type $product product name
+ * @param type $enabled is product enabled or not
+ */
+function updateCustomerProduct($customerid, $product, $enabled) {
+	$hasproduct = $enabled ? 1 : 0;
+	$query = "INSERT INTO `customerproduct` (`customerid`,`product`,`createdtimestamp`,`modifiedtimestamp`,`enabled`) VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE enabled = ?, modifiedtimestamp = ?";
+	QuickUpdate($query, false, array($customerid, $product, time(), time(), $hasproduct, $hasproduct, time()));
 }
 
 ////////////////////////////////////////////////////////////////////////////////

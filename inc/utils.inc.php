@@ -688,4 +688,27 @@ function removeIllegalXmlChars($data) {
 	return preg_replace('/[\x00-\x08\x0b\x0c\x0e-\x1f]/', '', $data);
 }
 
+/**
+ * Converts the given .wav into .mp3
+ * @param string $filename existing wav file
+ * @return bool|string false if unable to convert, or if file is not found. Otherwise the raw mp3 data is returned
+ */
+function convertWavToMp3($filename) {
+	$data = false;
+	if (file_exists($filename)) {
+		$mp3Filename = secure_tmpname("preview", ".mp3");
+		$cmd = 'lame -S -b24 "' . $filename . '" "' . $mp3Filename . '"';
+		$result = exec($cmd, $res1, $res2);
+		if (!$res2) {
+			$data = file_get_contents($mp3Filename);
+		} else {
+			error_log_helper("An error occurred trying to convert the file '" . $filename . "' to an mp3");
+		}
+		@unlink($mp3Filename);
+	} else {
+		error_log_helper("The file to convert does not exist: '" . $filename . "'");
+	}
+	return $data;
+}
+
 ?>

@@ -21,7 +21,7 @@ interface CommSuiteIf {
   public function emailMessageViewForJobPerson($sessionid, $messageid, $jobid, $personid);
   public function emailMessageViewForMessageParts($sessionid, \commsuite\MessageDTO $message, $parts, $jobpriority);
   public function audioFileGetForFormat($sessionid, $contentid, $format);
-  public function ttsGetForTextLanguageGenderFormat($text, $language, $gender, $format);
+  public function ttsGetForTextLanguageGenderNameFormat($text, $language, $gender, $name, $format);
   public function phoneMessageGetMp3AudioFile($sessionid, $parts);
   public function processIncomingSms($smsParams);
   public function generateFeed($urlcomponent, $categoryIds, $maxPost, $maxDays);
@@ -276,37 +276,38 @@ class CommSuiteClient implements \commsuite\CommSuiteIf {
     throw new \Exception("audioFileGetForFormat failed: unknown result");
   }
 
-  public function ttsGetForTextLanguageGenderFormat($text, $language, $gender, $format)
+  public function ttsGetForTextLanguageGenderNameFormat($text, $language, $gender, $name, $format)
   {
-    $this->send_ttsGetForTextLanguageGenderFormat($text, $language, $gender, $format);
-    return $this->recv_ttsGetForTextLanguageGenderFormat();
+    $this->send_ttsGetForTextLanguageGenderNameFormat($text, $language, $gender, $name, $format);
+    return $this->recv_ttsGetForTextLanguageGenderNameFormat();
   }
 
-  public function send_ttsGetForTextLanguageGenderFormat($text, $language, $gender, $format)
+  public function send_ttsGetForTextLanguageGenderNameFormat($text, $language, $gender, $name, $format)
   {
-    $args = new \commsuite\CommSuite_ttsGetForTextLanguageGenderFormat_args();
+    $args = new \commsuite\CommSuite_ttsGetForTextLanguageGenderNameFormat_args();
     $args->text = $text;
     $args->language = $language;
     $args->gender = $gender;
+    $args->name = $name;
     $args->format = $format;
     $bin_accel = ($this->output_ instanceof TBinaryProtocolAccelerated) && function_exists('thrift_protocol_write_binary');
     if ($bin_accel)
     {
-      thrift_protocol_write_binary($this->output_, 'ttsGetForTextLanguageGenderFormat', TMessageType::CALL, $args, $this->seqid_, $this->output_->isStrictWrite());
+      thrift_protocol_write_binary($this->output_, 'ttsGetForTextLanguageGenderNameFormat', TMessageType::CALL, $args, $this->seqid_, $this->output_->isStrictWrite());
     }
     else
     {
-      $this->output_->writeMessageBegin('ttsGetForTextLanguageGenderFormat', TMessageType::CALL, $this->seqid_);
+      $this->output_->writeMessageBegin('ttsGetForTextLanguageGenderNameFormat', TMessageType::CALL, $this->seqid_);
       $args->write($this->output_);
       $this->output_->writeMessageEnd();
       $this->output_->getTransport()->flush();
     }
   }
 
-  public function recv_ttsGetForTextLanguageGenderFormat()
+  public function recv_ttsGetForTextLanguageGenderNameFormat()
   {
     $bin_accel = ($this->input_ instanceof TBinaryProtocolAccelerated) && function_exists('thrift_protocol_read_binary');
-    if ($bin_accel) $result = thrift_protocol_read_binary($this->input_, '\commsuite\CommSuite_ttsGetForTextLanguageGenderFormat_result', $this->input_->isStrictRead());
+    if ($bin_accel) $result = thrift_protocol_read_binary($this->input_, '\commsuite\CommSuite_ttsGetForTextLanguageGenderNameFormat_result', $this->input_->isStrictRead());
     else
     {
       $rseqid = 0;
@@ -320,7 +321,7 @@ class CommSuiteClient implements \commsuite\CommSuiteIf {
         $this->input_->readMessageEnd();
         throw $x;
       }
-      $result = new \commsuite\CommSuite_ttsGetForTextLanguageGenderFormat_result();
+      $result = new \commsuite\CommSuite_ttsGetForTextLanguageGenderNameFormat_result();
       $result->read($this->input_);
       $this->input_->readMessageEnd();
     }
@@ -330,7 +331,7 @@ class CommSuiteClient implements \commsuite\CommSuiteIf {
     if ($result->nfe !== null) {
       throw $result->nfe;
     }
-    throw new \Exception("ttsGetForTextLanguageGenderFormat failed: unknown result");
+    throw new \Exception("ttsGetForTextLanguageGenderNameFormat failed: unknown result");
   }
 
   public function phoneMessageGetMp3AudioFile($sessionid, $parts)
@@ -1920,12 +1921,13 @@ class CommSuite_audioFileGetForFormat_result {
 
 }
 
-class CommSuite_ttsGetForTextLanguageGenderFormat_args {
+class CommSuite_ttsGetForTextLanguageGenderNameFormat_args {
   static $_TSPEC;
 
   public $text = null;
   public $language = null;
   public $gender = null;
+  public $name = null;
   public $format = null;
 
   public function __construct($vals=null) {
@@ -1944,6 +1946,10 @@ class CommSuite_ttsGetForTextLanguageGenderFormat_args {
           'type' => TType::STRING,
           ),
         4 => array(
+          'var' => 'name',
+          'type' => TType::STRING,
+          ),
+        5 => array(
           'var' => 'format',
           'type' => TType::STRING,
           ),
@@ -1959,6 +1965,9 @@ class CommSuite_ttsGetForTextLanguageGenderFormat_args {
       if (isset($vals['gender'])) {
         $this->gender = $vals['gender'];
       }
+      if (isset($vals['name'])) {
+        $this->name = $vals['name'];
+      }
       if (isset($vals['format'])) {
         $this->format = $vals['format'];
       }
@@ -1966,7 +1975,7 @@ class CommSuite_ttsGetForTextLanguageGenderFormat_args {
   }
 
   public function getName() {
-    return 'CommSuite_ttsGetForTextLanguageGenderFormat_args';
+    return 'CommSuite_ttsGetForTextLanguageGenderNameFormat_args';
   }
 
   public function read($input)
@@ -2007,6 +2016,13 @@ class CommSuite_ttsGetForTextLanguageGenderFormat_args {
           break;
         case 4:
           if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->name);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 5:
+          if ($ftype == TType::STRING) {
             $xfer += $input->readString($this->format);
           } else {
             $xfer += $input->skip($ftype);
@@ -2024,7 +2040,7 @@ class CommSuite_ttsGetForTextLanguageGenderFormat_args {
 
   public function write($output) {
     $xfer = 0;
-    $xfer += $output->writeStructBegin('CommSuite_ttsGetForTextLanguageGenderFormat_args');
+    $xfer += $output->writeStructBegin('CommSuite_ttsGetForTextLanguageGenderNameFormat_args');
     if ($this->text !== null) {
       $xfer += $output->writeFieldBegin('text', TType::STRING, 1);
       $xfer += $output->writeString($this->text);
@@ -2040,8 +2056,13 @@ class CommSuite_ttsGetForTextLanguageGenderFormat_args {
       $xfer += $output->writeString($this->gender);
       $xfer += $output->writeFieldEnd();
     }
+    if ($this->name !== null) {
+      $xfer += $output->writeFieldBegin('name', TType::STRING, 4);
+      $xfer += $output->writeString($this->name);
+      $xfer += $output->writeFieldEnd();
+    }
     if ($this->format !== null) {
-      $xfer += $output->writeFieldBegin('format', TType::STRING, 4);
+      $xfer += $output->writeFieldBegin('format', TType::STRING, 5);
       $xfer += $output->writeString($this->format);
       $xfer += $output->writeFieldEnd();
     }
@@ -2052,7 +2073,7 @@ class CommSuite_ttsGetForTextLanguageGenderFormat_args {
 
 }
 
-class CommSuite_ttsGetForTextLanguageGenderFormat_result {
+class CommSuite_ttsGetForTextLanguageGenderNameFormat_result {
   static $_TSPEC;
 
   public $success = null;
@@ -2084,7 +2105,7 @@ class CommSuite_ttsGetForTextLanguageGenderFormat_result {
   }
 
   public function getName() {
-    return 'CommSuite_ttsGetForTextLanguageGenderFormat_result';
+    return 'CommSuite_ttsGetForTextLanguageGenderNameFormat_result';
   }
 
   public function read($input)
@@ -2130,7 +2151,7 @@ class CommSuite_ttsGetForTextLanguageGenderFormat_result {
 
   public function write($output) {
     $xfer = 0;
-    $xfer += $output->writeStructBegin('CommSuite_ttsGetForTextLanguageGenderFormat_result');
+    $xfer += $output->writeStructBegin('CommSuite_ttsGetForTextLanguageGenderNameFormat_result');
     if ($this->success !== null) {
       if (!is_object($this->success)) {
         throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);

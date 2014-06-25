@@ -22,6 +22,7 @@ if(!isset($_GET['uid']) && !isset($_SESSION["previewmessage"])) {
 	}
 }
 
+$data = "";
 if(isset($_GET['partnum'])) {
 	$partnum = $_GET['partnum'] - 1;
 	$part = $_SESSION["previewmessage"]["parts"][$partnum];
@@ -29,7 +30,7 @@ if(isset($_GET['partnum'])) {
 	switch($part["type"]) {
 		case "T":
 			$voice = new Voice($part["voiceid"]);
-			$audiopart = ttsGetForTextLanguageGenderFormat($part["txt"], $voice->language, $voice->gender, "mp3");
+			$audiopart = ttsGetForTextLanguageGenderNameFormat($part["txt"], $voice->language, $voice->gender, $voice->name, "mp3");
 			break;
 		case "A":
 			$contentid = QuickQuery("select contentid from audiofile where id=?",false,array($part["audiofileid"]));
@@ -37,39 +38,31 @@ if(isset($_GET['partnum'])) {
 			break;
 	}
 	if (!$audiopart) {
-		header("HTTP/1.0 404 Not Found");
+		$data = false;
 	} else {
-		header("HTTP/1.0 200 OK");
-		header("Content-Type: $audiopart->contenttype");
-		header('Pragma: private');
-		header('Cache-control: private, must-revalidate');
-		header("Content-Length: " . strlen($audiopart->data));
-		header("Connection: close");
-		echo $audiopart->data;
+		$data = $audiopart->data;
 	}
 } else if($ismediafile) {
 		$mediapath = "media/";
 		$mediafile = $_SESSION["previewmessage"]["mediafile"];
 		if(in_array($mediafile, array(
-				"DefaultIntro.wav",
-				"EmergencyIntro.wav",
-				"es/DefaultIntro.wav",
-				"es/EmergencyIntro.wav"
-			))) {
-			Message::playParts(array(),"mp3",$mediapath . $mediafile);		
-			exit();
-			
+					"DefaultIntro.wav",
+					"EmergencyIntro.wav",
+					"es/DefaultIntro.wav",
+					"es/EmergencyIntro.wav"
+				))) {
+			$data = convertWavToMp3($mediapath . $mediafile);
 		} else {
 			$mediafile = strrchr($mediafile,'/');
 			if($mediafile !== false) {
 				$mediafile = substr($mediafile,1);
 				if($mediafile == "DefaultIntro.wav" || $mediafile == "EmergencyIntro.wav") {
-					Message::playParts(array(),"mp3",$mediapath . $mediafile);				
-					exit();
+					$data = convertWavToMp3($mediapath . $mediafile);
 				}
 			}
 		}
 } else {
+	//FIXME use Message::playAudio() by passing parts instead of messageid?
 	$messagepartdtos = array();
 	$parts = $_SESSION["previewmessage"]["parts"];
 	
@@ -80,6 +73,7 @@ if(isset($_GET['partnum'])) {
 			case "T":
 				$messagepartdto->type = \commsuite\MessagePartTypeDTO::T;
 				$voice = new Voice($part["voiceid"]);
+				$messagepartdto->name = $voice->name;
 				$messagepartdto->gender = $voice->gender;
 				$messagepartdto->languagecode = $voice->language;
 				$messagepartdto->txt = $part["txt"];
@@ -99,18 +93,25 @@ if(isset($_GET['partnum'])) {
 	$audiofull = phoneMessageGetMp3AudioFile($messagepartdtos);
 	
 	if (!$audiofull) {
-		header("HTTP/1.0 404 Not Found");
+		$data = false;
 	} else {
-		header("HTTP/1.0 200 OK");
-		header("Content-Type: $audiofull->contenttype");
-		if (isset($_GET['download']))
-			header("Content-disposition: attachment; filename=message.mp3");
-		header('Pragma: private');
-		header('Cache-control: private, must-revalidate');
-		header("Content-Length: " . strlen($audiofull->data));
-		header("Connection: close");
-		echo $audiofull->data;
+		$data = $audiofull->data;
 	}
-} 
+}
+
+if ($data === false) {
+	header("HTTP/1.0 404 Not Found");
+} else {
+	header("HTTP/1.0 200 OK");
+	header('Pragma: private');
+	header('Cache-control: private, must-revalidate');
+	if (isset($_GET['download']))
+		header("Content-disposition: attachment; filename=message.mp3");
+	header("Content-Type: audio/mpeg");
+	header("Content-Length: " . strlen($data));
+	header("Connection: close");
+
+	echo $data;
+}
 
 ?>

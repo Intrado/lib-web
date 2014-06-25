@@ -306,6 +306,7 @@ class MessagePartDTO {
   public $defaultvalue = null;
   public $languagecode = null;
   public $gender = null;
+  public $name = null;
   public $messageattachmentid = null;
 
   public function __construct($vals=null) {
@@ -340,6 +341,10 @@ class MessagePartDTO {
           'type' => TType::STRING,
           ),
         8 => array(
+          'var' => 'name',
+          'type' => TType::STRING,
+          ),
+        9 => array(
           'var' => 'messageattachmentid',
           'type' => TType::I32,
           ),
@@ -366,6 +371,9 @@ class MessagePartDTO {
       }
       if (isset($vals['gender'])) {
         $this->gender = $vals['gender'];
+      }
+      if (isset($vals['name'])) {
+        $this->name = $vals['name'];
       }
       if (isset($vals['messageattachmentid'])) {
         $this->messageattachmentid = $vals['messageattachmentid'];
@@ -442,6 +450,13 @@ class MessagePartDTO {
           }
           break;
         case 8:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->name);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 9:
           if ($ftype == TType::I32) {
             $xfer += $input->readI32($this->messageattachmentid);
           } else {
@@ -496,8 +511,13 @@ class MessagePartDTO {
       $xfer += $output->writeString($this->gender);
       $xfer += $output->writeFieldEnd();
     }
+    if ($this->name !== null) {
+      $xfer += $output->writeFieldBegin('name', TType::STRING, 8);
+      $xfer += $output->writeString($this->name);
+      $xfer += $output->writeFieldEnd();
+    }
     if ($this->messageattachmentid !== null) {
-      $xfer += $output->writeFieldBegin('messageattachmentid', TType::I32, 8);
+      $xfer += $output->writeFieldBegin('messageattachmentid', TType::I32, 9);
       $xfer += $output->writeI32($this->messageattachmentid);
       $xfer += $output->writeFieldEnd();
     }

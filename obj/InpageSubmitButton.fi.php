@@ -22,7 +22,7 @@ class InpageSubmitButton extends FormItem {
 		// create a submit button
 		$onclick = 'return form_submit(event,\''.escapehtml($submitvalue).'\');';
 		if (isset($this->args['confirm']) && $this->args['confirm'])
-			$onclick = 'if (confirm(\''.escapehtml($this->args['confirm']).'\')) { '.$onclick.' } else { return false; }';
+			$onclick = 'if (confirm(\''.escapehtml(addslashes($this->args['confirm'])).'\')) { '.$onclick.' } else { return false; }';
 		
 		if (isset($this->args['icon']) && $this->args['icon'])
 			$str .= icon_button($this->args['name'],$this->args['icon'],$onclick);

@@ -14,7 +14,8 @@ class AllTests {
 		// List of second tier "All Tests"; TODO: expand as needed:
 		$tests = Array(
 			'environment',
-			'application'
+			'application',
+			'DBMO'
 		);
 
 		// Get the directory of this file (CWD for CLI is unknown)

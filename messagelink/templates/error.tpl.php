@@ -41,7 +41,7 @@ function escapeHtml($string) {
 	<div class="container">
 		<div class="row">
 			<div class="col-xs-8">
-				&copy; Copyright 1999-<?= date('Y') ?> Reliance Communications Inc. &nbsp;|&nbsp; All Rights Reserved.
+				&copy; Copyright 1999-<?= date('Y') ?> SchoolMessenger &nbsp;|&nbsp; All Rights Reserved.
 			</div>
 			<div class="col-xs-4">
 				<div class="pull-right">

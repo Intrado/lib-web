@@ -191,6 +191,10 @@ class QueryRules {
 
 		return(false);
 	}
+
+	public function dumpRules() {
+		print_r($this->rules);
+	}
 }
 
 global $queryRules;

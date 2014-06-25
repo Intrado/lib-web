@@ -15,6 +15,7 @@ require_once("inc/auth.inc.php");
 require_once("inc/table.inc.php");
 require_once("inc/html.inc.php");
 require_once("inc/DBMappedObject.php");
+require_once("inc/DBMappedObjectHelpers.php");
 require_once("obj/Job.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////

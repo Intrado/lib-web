@@ -20,7 +20,7 @@ if ($map !== false) {
 	$contenttype = $map['loginPictureType'];
 	$ext = substr($contenttype, strpos($contenttype, "/")+1);
 } else {
-	$data = file_get_contents("img/classroom_girl.jpg");
+	$data = file_get_contents("img/login_sm.jpg");
 	$contenttype = "image/jpeg";
 	$ext = ".jpg";
 }

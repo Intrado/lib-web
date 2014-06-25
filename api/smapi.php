@@ -113,7 +113,7 @@ class SMAPI {
 	 */
 	function createMessageParts ($messageid, $messagetext, $gender = 'female') {
 		$errors = array();
-		$voiceid = QuickQuery("select id from ttsvoice where language = 'english' and gender = ?", false, array($gender));
+		$voiceid = QuickQuery("select id from ttsvoice where language = 'english' and gender = ? and enabled", false, array($gender));
 		$parts = Message::parse($messagetext, $errors, $voiceid);
 		foreach ($parts as $part) {
 			$part->messageid = $messageid;
@@ -393,7 +393,7 @@ class SMAPI {
 				$part->create();
 			} else {
 				$errors = array();
-				$voiceid = QuickQuery("select id from ttsvoice where language = 'english' and gender = 'female'");
+				$voiceid = QuickQuery("select id from ttsvoice where language = 'english' and gender = 'female' and enabled");
 				$parts = Message::parse($messagetext, $errors, $voiceid);
 				foreach ($parts as $part) {
 					$part->messageid = $message->id;
@@ -2407,6 +2407,7 @@ require_once("../inc/db.inc.php");
 require_once("../inc/utils.inc.php");
 require_once("../inc/memcache.inc.php");
 require_once("../inc/DBMappedObject.php");
+require_once("../inc/DBMappedObjectHelpers.php");
 require_once("../inc/DBRelationMap.php");
 require_once("../inc/sessionhandler.inc.php");
 

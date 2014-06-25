@@ -55,7 +55,8 @@ $versions = array (
 		"9.7/5",
 		"10.0/6",
 		"10.1/14",
-		"10.2/4"
+		"10.2/4",
+		"10.3/10"
 		//etc
 	),
 	
@@ -125,6 +126,7 @@ require_once("../inc/db.inc.php");
 require_once("../inc/utils.inc.php");
 require_once("../inc/memcache.inc.php");
 require_once("../inc/DBMappedObject.php");
+require_once("../inc/DBMappedObjectHelpers.php");
 require_once("../inc/DBRelationMap.php");
 
 $updater = mt_rand();
@@ -239,6 +241,7 @@ function update_customer($db, $customerid, $shardid) {
 	require_once("upgrades/db_10-0.php");
 	require_once("upgrades/db_10-1.php");
 	require_once("upgrades/db_10-2.php");
+	require_once("upgrades/db_10-3.php");
 
 
 	// for each version, upgrade to the next
@@ -356,6 +359,11 @@ function update_customer($db, $customerid, $shardid) {
 				break;
 			case "10.2":
 				if (!upgrade_10_2($rev, $shardid, $customerid, $db)) {
+					exit("Error upgrading DB");
+				}
+				break;
+			case "10.3":
+				if (!upgrade_10_3($rev, $shardid, $customerid, $db)) {
 					exit("Error upgrading DB");
 				}
 				break;

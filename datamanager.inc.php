@@ -41,11 +41,8 @@ function validate($name, $type, $allnamessofar) {
 if (isset($_GET['delete'])) {
 	$id = DBSafe($_GET['delete']);
 	$fm = new FieldMap($id);
-	if (!$fm->isOptionEnabled('firstname') &&
-		!$fm->isOptionEnabled('lastname') &&
-		!$fm->isOptionEnabled('language')) {
+	if (! in_array($fm->fieldnum, FieldMap::getSpecialFieldNumbers(true))) {
 		// do not destroy required fields
-
 		$fm->destroy();
 		notice(_L("The field, %s, is now deleted.", escapehtml($fm->name)));
 	}
@@ -54,10 +51,7 @@ if (isset($_GET['delete'])) {
 
 if (isset($_GET['clear'])) {
 	$fieldnum = DBSafe($_GET['clear']);
-	if ($fieldnum === FieldMap::getFirstNameField() ||
-		$fieldnum === FieldMap::getLastNameField() ||
-		$fieldnum === FieldMap::getLanguageField()
-		) {
+	if (in_array($fieldnum, FieldMap::getSpecialFieldNumbers(true))) {
 		// do not clear data of required fields
 		redirect();
 	}
@@ -80,9 +74,12 @@ if (isset($_GET['clear'])) {
 
 switch ($DATATYPE) {
 case "person" :
-	$VALID_TYPES = array('text', 'reldate', 'multisearch', 'numeric', 'multisearch,language', 'multisearch,grade',
-						 'text,firstname', 'text,lastname', 'grade', 'firstname', 'lastname', 'language');
-	$numfields = 20;
+		$VALID_TYPES = array('text', 'reldate', 'multisearch', 'numeric');
+		foreach (FieldMap::$specialFields as $name => $field) {
+			$VALID_TYPES[] = $name;
+			$VALID_TYPES[] = $field->options;
+		}
+		$numfields = 20;
 	$dt = "f%";
 break;
 case "group" :
@@ -189,21 +186,12 @@ if (CheckFormSubmit($form, $section) || CheckFormSubmit($form, 'add')) {
 							$updatefield = DBFind("FieldMap", "from fieldmap where fieldnum = '$fieldnum'");
 							$updatefield->name = cleanedname($name);
 
-							if ($fieldnum != FieldMap::getFirstNameField() &&
-								$fieldnum != FieldMap::getLastNameField() &&
-								$fieldnum != FieldMap::getLanguageField() &&
-								$fieldnum != FieldMap::getGradeField()
-								) {
-
+							if (! in_array($fieldnum, FieldMap::getSpecialFieldNumbers())) {
 								// only update type for non-specialfield
 								if ($type !== null) $updatefield->updateFieldType($type);
 							}
-							if ($fieldnum != FieldMap::getFirstNameField() &&
-								$fieldnum != FieldMap::getLastNameField() &&
-								$fieldnum != FieldMap::getLanguageField()
-								) {
-
-								if ($searchable)
+							if (! in_array($fieldnum, FieldMap::getSpecialFieldNumbers(true))) {
+							if ($searchable)
 									$updatefield->addOption('searchable');
 								else
 									$updatefield->removeOption('searchable');
@@ -240,25 +228,7 @@ if( $reloadform )
 		$name = $field->name;
 		$searchable = $field->isOptionEnabled('searchable');
 
-		if ($field->isOptionEnabled('language')) {
-			$type = 'language';
-		} else if ($field->isOptionEnabled('grade')) {
-			$type = 'grade';
-		} else if ($field->isOptionEnabled('firstname')) {
-			$type = 'firstname';
-		} else if ($field->isOptionEnabled('lastname')) {
-			$type = 'lastname';
-		} else if ($field->isOptionEnabled('text')) {
-			$type = 'text';
-		} else if ($field->isOptionEnabled('reldate')) {
-			$type = 'reldate';
-		} else if ($field->isOptionEnabled('multisearch')) {
-			$type = 'multisearch';
-		} else if ($field->isOptionEnabled('numeric')) {
-			$type = 'numeric';
-		} else {
-			$type = 'text';
-		}
+		$type = $field->getOptionType();
 
 		PutFormData($form, $section, 'name_' . $fieldnum, $name, 'text');
 		PutFormData($form, $section, 'type_' . $fieldnum, $type, 'text');
@@ -320,19 +290,19 @@ startWindow('Fields ' . help($hover), 'padding: 3px;');
 
 switch ($DATATYPE) {
 case "person" :
-	$types = array("Text" => 'text',
-					"Date" => 'reldate',
-					"List" => 'multisearch',
-					"Numeric" => 'numeric');
+	$types = array(
+			"Text" => 'text',
+			"Date" => 'reldate',
+			"List" => 'multisearch',
+			"Numeric" => 'numeric');
 
-		if(!FieldMap::getName(FieldMap::getFirstNameField()))
-			$types["First Name"] = 'text,firstname';
-		if(!FieldMap::getName(FieldMap::getLastNameField()))
-			$types["Last Name"] = 'text,lastname';
-		if(!FieldMap::getName(FieldMap::getLanguageField()))
-			$types["Language"] = 'multisearch,language';
-		if(!FieldMap::getGradeField())
-			$types["Grade"] = 'multisearch,grade';
+		//if any of the special fields is not defined add its type.
+		foreach (FieldMap::$specialFields as $name => $field) {
+			if (!FieldMap::getFieldnumWithOption($name, $field->fieldnum)) {
+				$types[$field->label] = $field->options;
+			}
+		}
+
 break;
 case "group" :
 		$types = array("List" => 'multisearch');
@@ -369,11 +339,7 @@ break;
 }
 
 			// These items are special cases
-			if ($fieldnum != $field->getFirstNameField() &&
-				$fieldnum != $field->getLastNameField() &&
-				$fieldnum != $field->getLanguageField() &&
-				$fieldnum != $field->getGradeField()
-				) {
+			if (! in_array($fieldnum, FieldMap::getSpecialFieldNumbers())) {
 ?>
 				<td><? NewFormItem($form, $section, "name_$fieldnum", 'text', '20'); ?></td>
 				<td>
@@ -425,20 +391,16 @@ break;
 <?
 					$issearch = 'DISABLED';
 					// firstname, lastname, language are always searchable, so checkbox disabled
-					if ($fieldnum != $field->getFirstNameField() &&
-						$fieldnum != $field->getLastNameField() &&
-						$fieldnum != $field->getLanguageField()) {
-							$issearch = '';
-						}
+					if (! in_array($fieldnum, FieldMap::getSpecialFieldNumbers(true))) {
+						$issearch = '';
+					}
 					NewFormItem($form, $section, 'searchable_' . $fieldnum, 'checkbox', null, null, $issearch);
 ?>
 					</td>
 					<td>
 <?
 					// firstname, lastname, language are unremovable
-					if ($fieldnum != $field->getFirstNameField() &&
-						$fieldnum != $field->getLastNameField() &&
-						$fieldnum != $field->getLanguageField()) {
+					if (! in_array($fieldnum, FieldMap::getSpecialFieldNumbers(true))) {
 ?>
 					<?= action_links(
 							action_link(_L("Delete"),"cross","$datapage?delete=$field->id","return confirmDelete();"),

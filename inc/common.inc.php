@@ -21,6 +21,7 @@ $CUSTOMERURL = customerUrlComponent();
 $BASEURL = "/$CUSTOMERURL";
 
 require_once("{$incdir}/utils.inc.php");
+
 // If PHPUNIT is NOT running
 if (! defined('PHPUNIT')) {
 	// db.inc.php's library functions  will be stubbed out in PHPUnit context
@@ -30,6 +31,7 @@ require_once("{$incdir}/memcache.inc.php");
 
 // If PHPUNIT is NOT running
 if (! defined('PHPUNIT')) {
+
 	// Use apache_note() function to add details to the apache logs
 	apache_note("CS_APP","cs"); //for logging
 	apache_note("CS_CUST",urlencode($CUSTOMERURL)); //for logging
@@ -39,6 +41,7 @@ if (! defined('PHPUNIT')) {
 }
 
 require_once("{$incdir}/DBMappedObject.php");
+require_once("{$incdir}/DBMappedObjectHelpers.php");
 require_once("{$incdir}/DBRelationMap.php");
 require_once("XML/RPC.php");
 require_once("{$incdir}/auth.inc.php");

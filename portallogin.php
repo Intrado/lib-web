@@ -12,7 +12,6 @@ header('P3P: policyref="/w3c/p3p.xml", CP="NOI DSP COR CUR ADM DEV OUR BUS"');
 
 $isindexpage = true;
 require_once("inc/common.inc.php");
-require_once("inc/DBMappedObject.php");
 require_once("obj/User.obj.php");
 require_once("obj/Access.obj.php");
 

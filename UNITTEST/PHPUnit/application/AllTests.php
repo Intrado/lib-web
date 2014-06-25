@@ -28,8 +28,11 @@ class application_AllTests {
 		// Get a list of all the files in this directory (includes ourself, so watch it!)
 		$classdir = dirname(__FILE__);
 		$testclasses = self::get_file_list($classdir);
-		if ($testclasses === false) die("Failed to open log file dir [{$classdir}]\n\n");
-		if (! count($testclasses)) die("Didn't find any files in logdir [{$classdir}]\n\n");
+		if ($testclasses === false) die("Failed to open working dir [{$classdir}]\n\n");
+		if (! count($testclasses)) {
+			print("Didn't find any files in working dir [{$classdir}]\n\n");
+			return($suite);
+		}
 		sort($testclasses, SORT_STRING);
 
 		foreach ($testclasses as $testclass) {

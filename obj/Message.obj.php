@@ -291,6 +291,7 @@ class Message extends DBMappedObject {
 			$pos_f = strpos($data,"<<");
 			$pos_a = strpos($data,"{{");
 			$pos_l = strpos($data,"[[");
+			$pos_mal = strpos($data,"<{");	// <{burst|content:#\d+}>
 			
 			// get imageupload tags
 			$matches = array();
@@ -304,41 +305,34 @@ class Message extends DBMappedObject {
 			}
 			
 			$poses = array();
-			if($pos_f !== false)
-				$poses[] = $pos_f;
-			if($pos_a !== false)
-				$poses[] = $pos_a;
-			if($pos_l !== false)
-				$poses[] = $pos_l;
-			if($pos_i !== false)
-				$poses[] = $pos_i;
+			if ($pos_f !== false) $poses[] = $pos_f;
+			if ($pos_a !== false) $poses[] = $pos_a;
+			if ($pos_l !== false) $poses[] = $pos_l;
+			if ($pos_i !== false) $poses[] = $pos_i;
+			if ($pos_mal !== false) $poses[] = $pos_mal;
 
-			if(!count($poses))
-				break;
+			if (! count($poses)) break;
 
 			$pos = min($poses);
-			if($pos !== false){
-				if($pos === $pos_f)
-					$type = "V";
-				if($pos === $pos_a)
-					$type = "A";
-				if($pos === $pos_l)
-					$type = "newlang";
-				if($pos === $pos_i)
-					$type = "I";
+			if ($pos !== false){
+				if($pos === $pos_f) $type = 'V';
+				if($pos === $pos_a) $type = 'A';
+				if($pos === $pos_l) $type = 'newlang';
+				if($pos === $pos_i) $type = 'I';
+				if($pos === $pos_mal) $type = 'MAL';
 			}
 
 			//make a text part up to the pos of the field
-			$txt = substr($data,0,$pos);
+			$txt = substr($data, 0, $pos);
 			while (strlen($txt) > 0) {
 				$part = new MessagePart();
-				$part->type="T";
+				$part->type = "T";
 				if (strlen($txt) <= 65535) {
 					$part->txt = $txt;
 					$txt = "";
 				} else {
-					$part->txt = substr($txt,0,65535);
-					$txt = substr($txt,65535);
+					$part->txt = substr($txt, 0, 65535);
+					$txt = substr($txt, 65535);
 				}
 				//$part->messageid = $this->id; // assign ID afterwards so ID is set
 				$part->sequence = $partcount++;
@@ -347,27 +341,18 @@ class Message extends DBMappedObject {
 				$parts[] = $part;
 			}
 
-			if ($type == 'I') {
-				// find the start of the id
-				$pos += mb_strlen($uploadimageurl);
-			} else
-				$pos += 2; // pass over the begintoken
+			// Skip ahead past the beginning of the token; images are bigger than the rest due to HTML markup
+			$pos += ($type == 'I') ? mb_strlen($uploadimageurl) : 2;
 
-			switch($type){
-				case "A":
-					$endtoken = "}}";
-					break;
-				case "V":
-					$endtoken = ">>";
-					break;
-				case "newlang":
-					$endtoken = "]]";
-					break;
-				case "I":
-					$endtoken = '">';
+			// Assuming at least one char for audio/field name, find the end of the token
+			switch ($type){
+				case "A": $endtoken = "}}"; break;
+				case "V": $endtoken = ">>"; break;
+				case "newlang": $endtoken = "]]"; break;
+				case "I": $endtoken = '">'; break;
+				case "MAL": $endtoken = '}>'; break;
 			}
-			//$endtoken = ($type == "A") ? "}}" : ">>";
-			$length = @strpos($data,$endtoken,$pos+1); // assume at least one char for audio/field name
+			$length = @strpos($data, $endtoken, $pos + 1);
 
 			if ($length === false) {
 				$errors[] = "Can't find end of field, was expecting '$endtoken'";
@@ -378,15 +363,44 @@ class Message extends DBMappedObject {
 				$token  = substr($data,$pos,$length);
 				$part = new MessagePart();
 				$part->type = $type;
-				//$part->messageid = $this->id; // assign ID afterwards so ID is set
-
 
 				switch ($type) {
+
+					// Message Attachment Links
+					case 'MAL':
+
+						// Look for the message attachment ID within the token
+						if (strpos($token, ":#") !== false) {
+							// Note $maltype is unused, it's available for convinience though!
+							list($maltype, $malid) = explode(":#", $token);
+						} else {
+							$malid = false;
+						}
+
+						// if we have the message attachment ID, check for it
+						if ($malid !== false) {
+							$malidFound = QuickQuery('SELECT id FROM messageattachment WHERE id = ?', false, array($malid));
+
+							// If we don't have a good message attachment ID to work with...
+							if (! $malidFound) {
+								// TODO - add support for discovering the message attachment ID automagically (?)
+								error_log_helper("WARNING: automatic discovery of the message attachment ID is not supported; it must be provided in the field insert"); 
+								$errors[] = "Can't find message attachment";
+							}
+
+							// Finish preparing the message part
+							$part->sequence = $partcount++;
+							$part->messageattachmentid = $malidFound;
+							$parts[] = $part;
+						}
+
+						break;
+
 					case "A":
 						$part->sequence = $partcount++;
 						
-						if (strpos($token,":#") !== false) {
-							list($afname,$afidtag) = explode(":#",$token);
+						if (strpos($token, ":#") !== false) {
+							list($afname,$afidtag) = explode(":#", $token);
 						} else {
 							$afname = $token;
 							$afidtag = false;
@@ -398,7 +412,7 @@ class Message extends DBMappedObject {
 							$audioid = QuickQuery("select id from audiofile where userid=? and not deleted and id=?", false, array($USER->id,$afidtag));
 						
 						//if we didn't find one by ID, fall back to other methods
-						if (!$audioid) {
+						if (! $audioid) {
 							//if we have an array of audiofileids, scan for the named af in them
 							 if (is_array($audiofileids)) {
 								if (count($audiofileids) > 0) {
@@ -422,10 +436,11 @@ class Message extends DBMappedObject {
 						}
 
 						break;
+
 					case "V":
 						$part->sequence = $partcount++;
-						if (strpos($token,":") !== false) {
-							list($fieldname,$defvalue) = explode(":",$token);
+						if (strpos($token, ":") !== false) {
+							list($fieldname, $defvalue) = explode(":", $token);
 						} else {
 							$fieldname = $token;
 							$defvalue = "";
@@ -444,20 +459,22 @@ class Message extends DBMappedObject {
 							$errors[] = "Can't find field named '$fieldname'";
 						}
 						break;
+
 					case "newlang":
-						if(isset($defaultvoice->gender)){
-							$currvoiceid = QuickQuery("select id from ttsvoice where language = ? and gender = ?",
+						if (isset($defaultvoice->gender)){
+							$currvoiceid = QuickQuery("select id from ttsvoice where language = ? and gender = ? and enabled",
 								false, array(strtolower($token), $defaultvoice->gender));
-							if($currvoiceid == false){
-								$currvoiceid = QuickQuery("select id from ttsvoice where language = ? and gender = ?",false, array(strtolower($token),
-									($defaultvoice->gender=="female"?"male":"female")));
+							if ($currvoiceid == false){
+								$currvoiceid = QuickQuery("select id from ttsvoice where language = ? and gender = ? and enabled",false, array(strtolower($token),
+									($defaultvoice->gender == "female" ? "male" : "female")));
 							}
-							if($currvoiceid == false){
+							if ($currvoiceid == false){
 								$errors[] = "Can't find that language: " . $token . ".";
 								$currvoiceid = null;
 							}
 						}
 						break;
+
 					case "I":
 						$part->sequence = $partcount++;
 						$query = "select id from content where id=?";
@@ -472,13 +489,10 @@ class Message extends DBMappedObject {
 						break;
 				}
 			}
-			//skip the end if we found it
-			if ($length)
-				$skip = $pos + $length + strlen($endtoken);
-			else
-				$skip = $pos + $length ;
 
-			$data = substr($data,$skip );
+			//skip the end if we found it
+			$skip = $pos + $length + ($length ? strlen($endtoken) : 0);
+			$data = substr($data, $skip);
 		}
 
 		//get trailing txt part;
@@ -490,13 +504,12 @@ class Message extends DBMappedObject {
 				$part->txt = $data;
 				$data = "";
 			} else {
-				$part->txt = substr($data,0,65535);
-				$data = substr($data,65535);
+				$part->txt = substr($data, 0, 65535);
+				$data = substr($data, 65535);
 			}
 
 			$part->sequence = $partcount++;
-			if($currvoiceid !== null)
-				$part->voiceid = $currvoiceid;
+			if ($currvoiceid !== null) $part->voiceid = $currvoiceid;
 
 			$parts[] = $part;
 		}
@@ -508,12 +521,12 @@ class Message extends DBMappedObject {
 	static function format ($parts) {
 		$map = FieldMap::getFieldInsertNames();
 		$data = "";
-		$voices = DBFindMany("Voice", "from ttsvoice");
+		$voices = DBFindMany("Voice", "from ttsvoice where enabled");
 		$currvoiceid=null;
 		foreach ($parts as $part) {
-			if($currvoiceid == null){
+			if( $currvoiceid == null){
 				$currvoiceid = $part->voiceid;
-			} else if($part->voiceid && $part->voiceid != $currvoiceid){
+			} else if( $part->voiceid && $part->voiceid != $currvoiceid){
 				$voicestr = "[[" . ucfirst($voices[$part->voiceid]->language) . "]]";
 				$data .= $voicestr;
 				$currvoiceid = $part->voiceid;
@@ -521,25 +534,36 @@ class Message extends DBMappedObject {
 			
 			$partstr = '';
 			switch ($part->type) {
-			case 'A':
-				$part->audiofile = new AudioFile($part->audiofileid);
-				$partstr .= "{{" . $part->audiofile->name . ":#" . $part->audiofileid . "}}";
-				break;
-			case 'T':
-				$partstr .= $part->txt;
-				break;
-			case 'V':
-				$partstr .= "<<";
-				//special field
-				$partstr .= $map[$part->fieldnum];
-				if ($part->defaultvalue !== null && strlen($part->defaultvalue) > 0)
-					$partstr .= ":" . $part->defaultvalue;
-				$partstr .= ">>";
-				break;
-			case 'I':
-				$partstr .= '<img src="viewimage.php?id=' . $part->imagecontentid . '">';
-				permitContent($part->imagecontentid);
-				break;
+
+				case 'MAL':
+
+					// Find the message attachment for this message attachment link part
+					$messageAttachment = new MessageAttachment($part->messageattachmentid);
+					$partstr .= '<{' . $messageAttachment->type . ':#' . $part->messageattachmentid . '}>';
+					break;
+
+				case 'A':
+					$part->audiofile = new AudioFile($part->audiofileid);
+					$partstr .= "{{" . $part->audiofile->name . ":#" . $part->audiofileid . "}}";
+					break;
+
+				case 'T':
+					$partstr .= $part->txt;
+					break;
+
+				case 'V':
+					$partstr .= "<<";
+					//special field
+					$partstr .= $map[$part->fieldnum];
+					if ($part->defaultvalue !== null && strlen($part->defaultvalue) > 0)
+						$partstr .= ":" . $part->defaultvalue;
+					$partstr .= ">>";
+					break;
+
+				case 'I':
+					$partstr .= '<img src="viewimage.php?id=' . $part->imagecontentid . '">';
+					permitContent($part->imagecontentid);
+					break;
 			}
 			
 			if ($partstr != '')
@@ -588,6 +612,7 @@ class Message extends DBMappedObject {
 	}
 
 	// preview phone message, returns array
+	// DEPRECATED only manager/ inbound/ files are allowed to use this any more
 	static function renderPhoneParts($parts, $fields) {
 		// -- digest the message --
 		$renderedparts = array();
@@ -614,117 +639,76 @@ class Message extends DBMappedObject {
 		return $renderedparts;
 	}
 
-	static function playAudio($id, $fields,$audioformat = "wav",$intro = "") {
+	/**
+	 * Constructs message parts from a provided message id and calls appserver to render the mp3 audio
+	 * @param int $id message id
+	 * @param array $fields fieldnum to value map
+	 * @return object|null the rendered audio, contains fields contenttype and data
+	 */
+	static function getMp3AudioFull($id, $fields) {
 		$parts = DBFindMany('MessagePart', 'from messagepart where messageid=? order by sequence', false, array($id));
-		$renderedparts = Message::renderPhoneParts($parts, $fields);
-		Message::playParts($renderedparts,$audioformat,$intro);
-	}
-	static function playParts($renderedparts, $audioformat = "wav",$intro = "") {
 
-		$voices = DBFindMany("Voice","from ttsvoice");
+		// call appserver to render audio
+		$messagepartdtos = array();
+		foreach ($parts as $part) {
+			$messagepartdto = new \commsuite\MessagePartDTO();
 
-		// -- get the wav files --
-		$wavfiles = array();
-
-		foreach ($renderedparts as $part) {
-			if ($part[0] == "a") {
-				list($contenttype,$data) = contentGet($part[1]);
-				$wavfiles[] = writeWav($data);
-			} else if ($part[0] == "t") {
-				$voice = $voices[$part[2]];
-				list($contenttype,$data) = renderTts($part[1],$voice->language,$voice->gender);
-				$wavfiles[] = writeWav($data);
+			switch($part->type) {
+				case "T":
+					$messagepartdto->type = \commsuite\MessagePartTypeDTO::T;
+					$voice = new Voice($part->voiceid);
+					$messagepartdto->name = $voice->name;
+					$messagepartdto->gender = $voice->gender;
+					$messagepartdto->languagecode = $voice->language;
+					$messagepartdto->txt = $part->txt;
+					break;
+				case "A":
+					$messagepartdto->type = \commsuite\MessagePartTypeDTO::A;
+					$messagepartdto->contentid = QuickQuery("select contentid from audiofile where id=?",false,array($part->audiofileid)) + 0;
+					break;
+				case "V":
+					if (!isset($fields[$part->fieldnum]) || !($value = $fields[$part->fieldnum])) {
+						$value = $part->defaultvalue;
+					}
+					$messagepartdto->type = \commsuite\MessagePartTypeDTO::V;
+					$voice = new Voice($part->voiceid);
+					$messagepartdto->name = $voice->name;
+					$messagepartdto->gender = $voice->gender;
+					$messagepartdto->languagecode = $voice->language;
+					$messagepartdto->defaultvalue = $value;
+					$messagepartdto->fieldnum = $part->fieldnum;
+					break;
 			}
-		}
-		if($intro && file_exists($intro)){
-			$intro = $intro?('"' . $intro . '" "media/2secondsilence.wav" '):'';
-		}
 
-		//finally, merge the wav files
-		$outname = secure_tmpname("preview",".wav");
-
-		$messageparts = empty($wavfiles)?'':'"' . implode('" "',$wavfiles) . '" ';
-		$cmd = 'sox ' . $intro . $messageparts . '"' . $outname . '"';
-		$result = exec($cmd, $res1, $res2);
-
-		foreach ($wavfiles as $file)
-			@unlink($file);
-
-		if (!$res2 && file_exists($outname)) {
-			if($audioformat == "mp3") {
-				$outnamemp3 = secure_tmpname("preview",".mp3");
-				$cmd = 'lame -S -b24 "' . $outname . '" "' . $outnamemp3 . '"';
-				$result = exec($cmd, $res1, $res2);
-				if (!$res2 && file_exists($outname)) {
-					$data = file_get_contents ($outnamemp3); //readfile seems to cause problems
-					header("HTTP/1.0 200 OK");
-					header("Content-Type: audio/mpeg");
-					if (isset($_GET['download'])) 
-						header("Content-disposition: attachment; filename=message.mp3");
-					header('Pragma: private');
-					header('Cache-control: private, must-revalidate');
-					header("Content-Length: " . strlen($data));
-					header("Connection: close");
-					echo $data;
-				} else {
-					echo _L("An error occurred trying to generate the preview file. Please try again.");
-				}
-				@unlink($outnamemp3);
-			} else {
-				$data = file_get_contents ($outname); // readfile seems to cause problems
-				header("HTTP/1.0 200 OK");
-				header("Content-Type: audio/wav");
-				if (isset($_GET['download']))
-					header("Content-disposition: attachment; filename=message.wav");
-				header('Pragma: private');
-				header('Cache-control: private, must-revalidate');
-				header("Content-Length: " . strlen($data));
-				header("Connection: close");
-				echo $data;
-			}
-		} else {
-			echo _L("An error occurred trying to generate the preview file. Please try again.");
+			$messagepartdtos[] = $messagepartdto;
 		}
 
-		@unlink($outname);
+		// call appserver to render
+		return phoneMessageGetMp3AudioFile($messagepartdtos);
 	}
-
+	
 	// The only reliable way to check the message length is to render it. Return negative value on error.
 	static function getAudioLength($id, $fields) {
 		$size = -1;
-		$parts = DBFindMany('MessagePart', 'from messagepart where messageid=? order by sequence', false, array($id));
-		$renderedparts = Message::renderPhoneParts($parts, $fields);
-		$voices = DBFindMany("Voice","from ttsvoice");
 
-		// -- get the wav files --
-		$wavfiles = array();
+		// Get the mp3 version of the message and write it to a temp file
+		$mp3Audio = Message::getMp3AudioFull($id, $fields);
+		$mp3Name = secure_tmpname("preview_parts",".mp3");
+		if (file_put_contents($mp3Name,$mp3Audio->data));
+		$mp3Audio = null;
 
-		foreach ($renderedparts as $part) {
-			if ($part[0] == "a") {
-				list($contenttype,$data) = contentGet($part[1]);
-				$wavfiles[] = writeWav($data);
-			} else if ($part[0] == "t") {
-				$voice = $voices[$part[2]];
-				list($contenttype,$data) = renderTts($part[1],$voice->language,$voice->gender);
-				$wavfiles[] = writeWav($data);
-			}
-		}
-		//finally, merge the wav files
-		$outname = secure_tmpname("preview",".wav");
-
-		$messageparts = empty($wavfiles)?'':'"' . implode('" "',$wavfiles) . '" ';
-		$cmd = 'sox ' . $messageparts . '"' . $outname . '"';
+		// Convert it to a wav
+		$wavName = secure_tmpname("preview_parts",".wav");
+		$cmd = 'sox "' . $mp3Name . '" -r 8000 -c 1 -s -w "' . $wavName . '"';
 		$result = exec($cmd, $res1, $res2);
+		@unlink($mp3Name);
 
-		foreach ($wavfiles as $file)
-			@unlink($file);
-
-		if (!$res2 && file_exists($outname)) {
-			$data = file_get_contents ($outname); // readfile seems to cause problems
-			$size = strlen($data);
+		// Read the size, in bytes, of the rendered audio
+		if (!$res2 && file_exists($wavName)) {
+			$size = filesize($wavName);
 		}
+		@unlink($wavName);
 
-		@unlink($outname);
 		return $size;
 	}
 }

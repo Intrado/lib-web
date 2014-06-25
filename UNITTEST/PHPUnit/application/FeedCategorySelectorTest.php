@@ -18,6 +18,7 @@ require_once("{$konadir}/obj/FormItem.obj.php");
 require_once("{$konadir}/obj/MultiCheckBoxTable.fi.php");
 require_once("{$konadir}/obj/FeedCategorySelector.fi.php");
 require_once("{$konadir}/inc/DBMappedObject.php");
+require_once("{$konadir}/inc/DBMappedObjectHelpers.php");
 require_once("{$konadir}/obj/FeedCategory.obj.php");
 
 class FeedCategorySelectorTest extends PHPUnit_Framework_TestCase {

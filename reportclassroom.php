@@ -130,7 +130,7 @@ if($options['classroomreporttype'] == 'person') {
 					"0" => "fmt_null");
 } else if($options['classroomreporttype'] == 'organization') {
 	$TITLE = _L('Classroom Comment Report (From: %s To: %s)',$startdate,$enddate);
-	$result = Query("
+	$q = "
 		SELECT
 			o.orgkey,tm.id,tm.overridemessagegroupid, tm.messagekey, count( tm.messagekey )
 		FROM
@@ -142,8 +142,9 @@ if($options['classroomreporttype'] == 'person') {
 			1
 			$orgsql
 			$datesql
-		GROUP BY tm.messagekey
-	");
+		GROUP BY o.id, tm.messagekey
+	";
+	$result = Query($q);
 
 	$overrideids = array();
 	$data = array();

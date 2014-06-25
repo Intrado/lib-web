@@ -19,7 +19,6 @@ require_once('inc/securityhelper.inc.php');
 
 // DBMO stuff
 require_once('obj/FeedCategory.obj.php');
-require_once('inc/DBMappedObject.php');
 
 // Form stuff
 require_once('obj/Form.obj.php');

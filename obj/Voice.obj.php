@@ -5,11 +5,14 @@ class Voice extends DBMappedObject {
 	var $language;
 	var $languagecode;
 	var $gender;
-	
+	var $name;
+	var $enabled;
+	var $provider;
+
 	function Voice ($id = NULL) {
 		$this->_allownulls = true;
 		$this->_tablename = "ttsvoice";
-		$this->_fieldlist = array("language", "languagecode", "gender");
+		$this->_fieldlist = array("language", "languagecode", "gender", "name", "enabled", "provider");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}
@@ -18,7 +21,7 @@ class Voice extends DBMappedObject {
 	static function getTTSVoices() {
 		static $voices = false;	
 		if ($voices === false) {
-			$tmp = DBFindMany("Voice","from ttsvoice t join language l on (t.languagecode = l.code) order by t.language", "t");
+			$tmp = DBFindMany("Voice","from ttsvoice t join language l on (t.languagecode = l.code) where t.enabled order by t.language", "t");
 			$voices = array();
 			foreach ($tmp as $voice) {
 				$voices[$voice->languagecode.":".$voice->gender] = $voice;
@@ -35,7 +38,7 @@ class Voice extends DBMappedObject {
 		}
 		return $codes;
 	}
-	
+
 	static function getPreferredVoice($languagecode, $gender) {
 		$voices = Voice::GetTTSVoices();
 		if (isset($voices["$languagecode:$gender"]))
@@ -45,7 +48,7 @@ class Voice extends DBMappedObject {
 		else if (isset($voices["$languagecode:male"]))
 			return $voices["$languagecode:male"]->id;
 		else
-			return $gender == "male"?1:2; // default to english
+			return $gender == "male" ? $voices["en:male"]->id : $voices["en:female"]->id; // default to english
 	}
 }
 

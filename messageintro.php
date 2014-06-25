@@ -121,7 +121,7 @@ if($messages == false) {
 
 $languages = QuickQueryList("select name, code from language where name != 'English'",true);
 
-$users = DBFindMany("User","from user where enabled and deleted=0 and login != 'schoolmessenger' order by firstname, lastname");
+$users = DBFindMany("User","from user where enabled and deleted=0 and login != 'schoolmessenger' and accessid is not null order by firstname, lastname");
 
 $userselect = array("" => "Select Messages From User (Optional)");
 foreach($users as $user) {
