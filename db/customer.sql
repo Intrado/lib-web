@@ -2748,3 +2748,12 @@ $$$
 
 
 -- END 11.0/1
+
+-- START 11.0/2
+ALTER  TABLE  `importfield`  CHANGE  `mapto`  `mapto` VARCHAR( 50  )  CHARACTER  SET utf8 COLLATE utf8_general_ci NOT  NULL DEFAULT  ''
+$$$
+
+update setting set value='11.0/2' where name='_dbversion'
+$$$
+
+-- END 11.0/2
