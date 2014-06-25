@@ -2726,3 +2726,25 @@ $$$
 update setting set value='10.3/10' where name='_dbversion'
 $$$
 -- END 10.3/10
+
+-- START 11.0/1
+CREATE TABLE `enrollment` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `personid` int(11) NOT NULL,
+  `sectionid` int(11) NOT NULL,
+  `lettergrade` varchar(20) NOT NULL,
+  `percentgrade` varchar(20) NOT NULL,
+  `importid` int(11) NOT NULL,
+  `importstatus` enum('none','checking','new') NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `personid` (`personid`),
+  KEY `sectionid` (`sectionid`),
+  KEY `importid` (`importid`,`importstatus`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
+
+update setting set value='11.0/1' where name='_dbversion'
+$$$
+
+
+-- END 11.0/1
