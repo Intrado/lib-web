@@ -497,15 +497,6 @@ if (getSystemSetting("_hasfeed", false)) {
 		"helpstep" => 2
 	);
 }
-if (getSystemSetting('_allowoldmessagesender', false)) {
-	$formdata["allowoldmessagesender"] = array(
-		"label" => _L('Use Classic Message Sender'),
-		"value" => $edituser->getSetting('_allowoldmessagesender', false),
-		"validators" => array(),
-		"control" => array("CheckBox"),
-		"helpstep" => 2
-	);
-}
 
 $formdata[] = _L("Data View");
 
@@ -942,10 +933,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$args = array_merge(array($edituser->id),$userLinksRemoved);
 				QuickUpdate("delete from userlink where userid=? and subordinateuserid in (" . DBParamListString($removeCount) . ")",false,$args);
 			}
-		}
-		
-		if (isset($postdata['allowoldmessagesender'])) {
-			$edituser->setSetting('_allowoldmessagesender', ($postdata['allowoldmessagesender'] ? 1 : 0));
 		}
 		
 		Query("COMMIT");

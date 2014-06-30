@@ -21,3 +21,11 @@ $$$
 ALTER  TABLE  `importfield`  CHANGE  `mapto`  `mapto` VARCHAR( 50 )  CHARACTER  SET utf8 COLLATE utf8_general_ci NOT  NULL DEFAULT  ''
 $$$
 
+-- $rev 3
+-- Remove settings which allow access to the deprecated message sender
+delete from setting where name = "_allowoldmessagesender"
+$$$
+
+delete from usersetting where name = "_allowoldmessagesender"
+$$$
+
