@@ -23,5 +23,14 @@ $$$
 
 -- $rev 3
 
+-- Remove settings which allow access to the deprecated message sender
+delete from setting where name = "_allowoldmessagesender"
+$$$
+
+delete from usersetting where name = "_allowoldmessagesender"
+$$$
+
+-- $rev 4
+-- copy enrollment data from personassociation.sectionid
 insert into enrollment (personid, sectionid, importid, importstatus) select personid, sectionid, importid, 'new' from personassociation where sectionid is not null
 $$$

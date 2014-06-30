@@ -2758,8 +2758,14 @@ $$$
 
 -- END 11.0/2
 
--- rev 3 no-op copy data to enrollment table
+-- rev 3 no-op delete setting
 update setting set value='11.0/3' where name='_dbversion'
 $$$
 
 -- END 11.0/3
+
+-- rev 4 no-op copy data to enrollment table
+update setting set value='11.0/4' where name='_dbversion'
+$$$
+
+-- END 11.0/4
