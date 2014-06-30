@@ -125,7 +125,26 @@ class ValClassroom extends Validator {
 		return true;
 	}
 }
-	
+
+class ValPortalSelection extends Validator {
+
+	function validate ($value, $args, $requiredvalues) {
+		if ($value == 'infocenter' and $requiredvalues[$args['maxguardianfield']] < 1)
+			return "$this->label cannot be InfoCenter if Max Guardians is less than one";
+		return true;
+	}
+
+	function getJSValidator () {
+		return
+			'function (name, label, value, args, requiredvalues) {
+				if (value == "infocenter" && requiredvalues[args["maxguardianfield"]] < 1)
+					return label + " cannot be InfoCenter if Max Guardians is less than one"
+
+				return true;
+			}';
+	}
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
@@ -579,11 +598,16 @@ elseif ($settings['_hasselfsignup'])
 elseif ($settings['_hasinfocenter'])
 	$portaloption = "infocenter";
 
+$portals = array("none" => "None", "contactmanager" => "Contact Manager", "selfsignup" => "Self-Signup", "infocenter" => "InfoCenter");
 $formdata["portal"] = array(
 	"label" => _L('Portal'),
 	"value" => $portaloption,
-	"validators" => array(),
-	"control" => array("SelectMenu","values" => array("none" => "None", "contactmanager" => "Contact Manager", "selfsignup" => "Self-Signup", "infocenter" => "InfoCenter")),
+	"validators" => array(
+		array("ValInArray", "values" => array_keys($portals)),
+		array("ValPortalSelection", "maxguardianfield" => "maxguardians")
+	),
+	"control" => array("SelectMenu","values" => $portals),
+	"requires" => array("maxguardians"),
 	"helpstep" => $helpstepnum
 );
 
@@ -1054,7 +1078,8 @@ document.observe('dom:loaded', function() {
 			checkbox.checked = !confirm("Are you sure you want to DISABLE this customer?");
 	});
 });
-<? Validator::load_validators(array("ValInboundNumber","ValUrlComponent","ValSmsText","ValLanguages","ValUrl","ValClassroom", "ValInteger", 'ValCmaAppId'));?>
+<? Validator::load_validators(array("ValInboundNumber","ValUrlComponent","ValSmsText","ValLanguages","ValUrl","ValClassroom", "ValInteger",
+	'ValCmaAppId', 'ValPortalSelection'));?>
 </script>
 <?
 
