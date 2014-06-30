@@ -2757,3 +2757,9 @@ update setting set value='11.0/2' where name='_dbversion'
 $$$
 
 -- END 11.0/2
+
+-- rev 3 no-op copy data to enrollment table
+update setting set value='11.0/3' where name='_dbversion'
+$$$
+
+-- END 11.0/3
