@@ -21,3 +21,7 @@ $$$
 ALTER  TABLE  `importfield`  CHANGE  `mapto`  `mapto` VARCHAR( 50 )  CHARACTER  SET utf8 COLLATE utf8_general_ci NOT  NULL DEFAULT  ''
 $$$
 
+-- $rev 3
+
+insert into enrollment (personid, sectionid, importid, importstatus) select personid, sectionid, importid, 'new' from personassociation where sectionid is not null
+$$$
