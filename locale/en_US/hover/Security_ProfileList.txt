@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#the_admin_tab/managing_access_profiles.htm
-The Profile List area displays all the access profiles that have been created for the system. You may edit any profile by clicking the Edit link to the right of the name. You may also delete any profile that you no longer have a need for and that is not assigned to any active users.

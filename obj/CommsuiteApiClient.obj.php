@@ -3,19 +3,47 @@
 class CommsuiteApiClient {
 
 	const API_BURSTS = '/bursts';
-
+	const API_PROFILES = '/profiles';
+	
 	private $apiClient = null;
 
 	public function __construct($apiClient) {
 		$this->apiClient = $apiClient;
 	}
-
+	
+	// ---------------------------------------------------------------------
+	// Access Profiles
+	// ---------------------------------------------------------------------
+	
+	public function getProfileApiUrl() {
+		return($this->apiClient->getApiUrl() . API_PROFILES);
+	}
+	
+	public function getProfileList() {
+		//TODO call the API
+		//$res = $this->apiClient->get(self::API_PROFILES);
+		//return($res['code'] == 200 ? json_decode($res['body']) : false);
+		
+		$profileList = array();
+		$accessList = DBFindMany("Access","from access where name != 'SchoolMessenger Admin'");
+		foreach ($accessList as $a) {
+			$access = new stdClass();
+			$access->id = $a->id;
+			$access->name = $a->name;
+			$access->description = $a->description;
+			$access->type = $a->type;
+			$profileList[] = $access;
+		}
+		
+		return $profileList;
+	}
+		
 	// ---------------------------------------------------------------------
 	// PDF Bursting
 	// ---------------------------------------------------------------------
 
 	public function getBurstApiUrl() {
-		return($this->apiClient->getApiUrl() . '/bursts');
+		return($this->apiClient->getApiUrl() . API_BURSTS);
 	}
 
 	public function getBurstList($start = null, $limit = null) {

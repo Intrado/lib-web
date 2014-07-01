@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#the_admin_tab/managing_access_profiles.htm
-To create a new access profile click the Add New Access Profile button. This will open the Access Profile Editor window, where you can complete the profile configuration.
