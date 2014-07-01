@@ -123,7 +123,7 @@ $templates['messagelink']['en']['sms']['body'] = '${displayname} sent a msg. To 
 // messagelink english html
 $templates['messagelink']['en']['html']['subject'] = '${displayname} sent a new message';
 $templates['messagelink']['en']['html']['fromname'] = '${productname}';
-$templates['messagelink']['en']['html']['fromaddr'] = 'contactme@schoolmessenger.com';
+$templates['messagelink']['en']['html']['fromaddr'] = 'contactme@accounts.schoolmessenger.com';
 $templates['messagelink']['en']['html']['body'] = '
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -184,7 +184,7 @@ $templates['messagelink']['en']['html']['body'] = '
 // messagelink english plain
 $templates['messagelink']['en']['plain']['subject'] = '${displayname} sent a new message';
 $templates['messagelink']['en']['plain']['fromname'] = '${productname}';
-$templates['messagelink']['en']['plain']['fromaddr'] = 'contactme@schoolmessenger.com';
+$templates['messagelink']['en']['plain']['fromaddr'] = 'contactme@accounts.schoolmessenger.com';
 $templates['messagelink']['en']['plain']['body'] = '
 You are receiving this message because your contact information is associated with <b>${f01} ${f02}</b>.
 
@@ -210,7 +210,7 @@ ${logoclickurl}
 // messagelink spanish html
 $templates['messagelink']['es']['html']['subject'] = '${displayname} le envió un mensaje nuevo';
 $templates['messagelink']['es']['html']['fromname'] = '${productname}';
-$templates['messagelink']['es']['html']['fromaddr'] = 'contactme@schoolmessenger.com';
+$templates['messagelink']['es']['html']['fromaddr'] = 'contactme@accounts.schoolmessenger.com';
 $templates['messagelink']['es']['html']['body'] = '
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -275,7 +275,7 @@ $templates['messagelink']['es']['html']['body'] = '
 // messagelink spanish plain
 $templates['messagelink']['es']['plain']['subject'] = '${displayname} le envió un mensaje nuevo';
 $templates['messagelink']['es']['plain']['fromname'] = '${productname}';
-$templates['messagelink']['es']['plain']['fromaddr'] = 'contactme@schoolmessenger.com';
+$templates['messagelink']['es']['plain']['fromaddr'] = 'contactme@accounts.schoolmessenger.com';
 $templates['messagelink']['es']['plain']['body'] = '
 Usted esta recibiendo este mensaje porque su información de contacto esta asociada con ${f01} ${f02}.
  
@@ -303,7 +303,7 @@ ${productname} es un servicio de notificación usado por los sistemas escolares 
 // subscriber english html
 $templates['subscriber-accountexpire']['en']['html']['subject'] = '${displayname} ${productname} Account Termination Warning';
 $templates['subscriber-accountexpire']['en']['html']['fromname'] = '${productname}';
-$templates['subscriber-accountexpire']['en']['html']['fromaddr'] = 'contactme@schoolmessenger.com';
+$templates['subscriber-accountexpire']['en']['html']['fromaddr'] = 'contactme@accounts.schoolmessenger.com';
 $templates['subscriber-accountexpire']['en']['html']['body'] = '
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -368,7 +368,7 @@ $templates['subscriber-accountexpire']['en']['html']['body'] = '
 // subscriber english plain
 $templates['subscriber-accountexpire']['en']['plain']['subject'] = '${displayname} ${productname} Account Termination Warning';
 $templates['subscriber-accountexpire']['en']['plain']['fromname'] = '${productname}';
-$templates['subscriber-accountexpire']['en']['plain']['fromaddr'] = 'contactme@schoolmessenger.com';
+$templates['subscriber-accountexpire']['en']['plain']['fromaddr'] = 'contactme@accounts.schoolmessenger.com';
 $templates['subscriber-accountexpire']['en']['plain']['body'] = '
 The ${productname} account you created to manage your contact preferences for ${displayname} has not been logged into recently. Your account will be automatically disabled in ${daystotermination} days if you do not log into it.
 
@@ -393,7 +393,7 @@ ${productname} is a notification service used by the nation\'s leading school sy
 // subscriber spanish html
 $templates['subscriber-accountexpire']['es']['html']['subject'] = '${displayname} ${productname} Advertencia Cancelación de cuenta';
 $templates['subscriber-accountexpire']['es']['html']['fromname'] = '${productname}';
-$templates['subscriber-accountexpire']['es']['html']['fromaddr'] = 'contactme@schoolmessenger.com';
+$templates['subscriber-accountexpire']['es']['html']['fromaddr'] = 'contactme@accounts.schoolmessenger.com';
 $templates['subscriber-accountexpire']['es']['html']['body'] = '
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -456,7 +456,7 @@ $templates['subscriber-accountexpire']['es']['html']['body'] = '
 // subscriber spanish plain
 $templates['subscriber-accountexpire']['es']['plain']['subject'] = '${displayname} ${productname} Advertencia Cancelación de cuenta';
 $templates['subscriber-accountexpire']['es']['plain']['fromname'] = '${productname}';
-$templates['subscriber-accountexpire']['es']['plain']['fromaddr'] = 'contactme@schoolmessenger.com';
+$templates['subscriber-accountexpire']['es']['plain']['fromaddr'] = 'contactme@accounts.schoolmessenger.com';
 $templates['subscriber-accountexpire']['es']['plain']['body'] = '
 La cuenta de ${productname} que usted creó para administrar sus preferencias de contacto para ${displayname} no ha sido ingresada recientemente. Su cuenta sera inabilitada automaticamente en ${daystotermination} si usted no ingresa.
 
@@ -515,7 +515,7 @@ ${productname} is a notification service used by the nation\'s leading school sy
 // monitor english html
 $templates['monitor']['en']['html']['subject'] = 'Monitor Alert: ${monitoralert}';
 $templates['monitor']['en']['html']['fromname'] = '${productname}';
-$templates['monitor']['en']['html']['fromaddr'] = 'noreply@schoolmessenger.com';
+$templates['monitor']['en']['html']['fromaddr'] = 'noreply@accounts.schoolmessenger.com';
 $templates['monitor']['en']['html']['body'] = '
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -604,7 +604,7 @@ DO NOT REPLY: This is an automatically generated email. Please do not send a rep
 // monitor english plain
 $templates['monitor']['en']['plain']['subject'] = 'Monitor Alert: ${monitoralert}';
 $templates['monitor']['en']['plain']['fromname'] = '${productname}';
-$templates['monitor']['en']['plain']['fromaddr'] = 'noreply@schoolmessenger.com';
+$templates['monitor']['en']['plain']['fromaddr'] = 'noreply@accounts.schoolmessenger.com';
 $templates['monitor']['en']['plain']['body'] = '
 <!-- $beginBlock job-active -->
 Job from ${displayname}
@@ -662,7 +662,7 @@ DO NOT REPLY: This is an automatically generated email. Please do not send a rep
 	// quicktip english html
 	$templates['quicktipalert']['en']['html']['subject'] = 'New QuickTip Alert';
 	$templates['quicktipalert']['en']['html']['fromname'] = '${productname}';
-	$templates['quicktipalert']['en']['html']['fromaddr'] = 'noreply@schoolmessenger.com';
+	$templates['quicktipalert']['en']['html']['fromaddr'] = 'noreply@accounts.schoolmessenger.com';
 	$templates['quicktipalert']['en']['html']['body'] = '
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
@@ -702,7 +702,7 @@ DO NOT REPLY: This is an automatically generated email. Please do not send a rep
 	// quicktip english html
 	$templates['quicktipalert']['en']['plain']['subject'] = 'New QuickTip Alert';
 	$templates['quicktipalert']['en']['plain']['fromname'] = '${productname}';
-	$templates['quicktipalert']['en']['plain']['fromaddr'] = 'noreply@schoolmessenger.com';
+	$templates['quicktipalert']['en']['plain']['fromaddr'] = 'noreply@accounts.schoolmessenger.com';
 	$templates['quicktipalert']['en']['plain']['body'] = '
 ${productname} QuickTip
 New Tip Alert
