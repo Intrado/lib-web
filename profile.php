@@ -48,7 +48,8 @@ class ValDupeProfileName extends Validator {
 	var $onlyserverside = true;
 
 	function validate ($value, $args) {
-		$query = "select count(*) from access where name = ? and id != ?";
+		// unique name within same type of profile
+		$query = "select count(*) from access where type = 'cs' and name = ? and id != ?";
 		$res = QuickQuery($query,false,array($value,$args['accessid']+0));
 		if ($res)
 			return _L('An access profile with that name already exists. Please choose another');
