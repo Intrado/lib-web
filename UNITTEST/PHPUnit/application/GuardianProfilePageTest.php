@@ -84,7 +84,7 @@ class GuardianProfilePageTest extends PHPUnit_Framework_TestCase {
 				self::ACCESS_ID,
 				'infocenter',
 				1
-			),array(
+			), array(
 				2,
 				self::ACCESS_ID,
 				'manageprofile',
@@ -137,6 +137,90 @@ class GuardianProfilePageTest extends PHPUnit_Framework_TestCase {
 		$this->profileEditPage->afterLoad();
 		$formhtml = $this->profileEditPage->render();
 		$this->assertTrue(false !== strpos($formhtml, "{$this->formName}_name"), 'Missing name input field');
+	}
+
+	// it redirects the request to edit a specific records after stashing the ID into the session
+	public function test_editExistingRedirect() {
+		global $HEADERS;
+
+
+		// Load up the edit form with burst id = 1
+		$data = array('id' => 1);
+
+		// Any call to exit/die will end up in this anonymous function now:
+		set_exit_overload(function() {
+			return(false);
+		});
+
+		$this->profileEditPage->beforeLoad($data, $data, $data);
+
+		unset_exit_overload();
+
+		// Strange, but self-referential redirect in CLI actually goes to PHPUNIT binary - hah!
+		$location = '';
+		foreach ($HEADERS as $header) {
+			if (strpos($header, 'Location:') == 0) {
+				$location = $header;
+				break;
+			}
+		}
+		$this->assertTrue((strpos($location, '/phpunit') !== FALSE), 'Expected a successful redirect to pdfedit.php');
+	}
+
+	// it prepopulates the form fields with values from an existing record if specified (converts the file input into a read-only string)
+	public function test_editExistingForm() {
+		global $queryRules;
+
+		$_SESSION['profileid'] = 1;
+		$empty = array();
+
+		$profile = new stdClass();
+		$profile->id = 1;
+		$profile->name = "existing name";
+		$profile->description = "existing name description";
+		$profile->type = "guardian";
+
+
+		//validator for unique names
+		$queryRules->add("/from access where type/", array($profile->name, $profile->id), array(array(true)));
+		$queryRules->add('/from access where id/', array($profile->id), array(
+			array(
+				$profile->name,
+				$profile->description,
+				'guardian'
+			))
+		);
+		$apiClient = new ApiStub('http://localhost/api');
+
+		$mockApi = $this->getMockBuilder('CommsuiteApiClient')
+				->setConstructorArgs(array($apiClient))
+				->setMethods(array())
+				->getMock();
+
+
+
+		$mockApi->expects($this->any())
+				->method('getProfile')
+				->will($this->returnValue($profile));
+
+
+		$page = new GuardianProfilePage($mockApi);
+
+
+		$page->beforeLoad($empty, $empty, $empty, $_SESSION);
+		$page->load();
+		$page->afterLoad();
+		$formhtml = $page->render();
+
+
+		// The profile name input field should be present
+		$this->assertTrue(false !== strpos($formhtml, "{$this->formName}_name"), 'Missing name input field');
+
+		// Make sure the name input field has the right value from the profile record
+		$this->assertTrue(false !== strpos($formhtml, 'type="text" value="existing name"'), 'Name input field did not have the correct default value');
+
+		//checkbox
+		$this->assertTrue(false !== strpos($formhtml, 'type="checkbox" value="true" checked'), 'InfoCenter checkbox did not have the right default option pre-selected');
 	}
 
 }
