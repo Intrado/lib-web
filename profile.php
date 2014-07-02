@@ -850,8 +850,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		Query("BEGIN");
 			$obj->moduserid = $USER->id;
 			$obj->modified = date("Y-m-d g:i:s");
-			if(!$obj->id)
+			// if new obj
+			if(!$obj->id) {
 				$obj->created = date("Y-m-d g:i:s");
+				$obj->type = 'cs';
+			}
 
 			$obj->name = $postdata['name'];
 			$obj->description = $postdata['description'];
