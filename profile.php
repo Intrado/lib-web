@@ -48,7 +48,8 @@ class ValDupeProfileName extends Validator {
 	var $onlyserverside = true;
 
 	function validate ($value, $args) {
-		$query = "select count(*) from access where name = ? and id != ?";
+		// unique name within same type of profile
+		$query = "select count(*) from access where type = 'cs' and name = ? and id != ?";
 		$res = QuickQuery($query,false,array($value,$args['accessid']+0));
 		if ($res)
 			return _L('An access profile with that name already exists. Please choose another');
@@ -850,8 +851,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		Query("BEGIN");
 			$obj->moduserid = $USER->id;
 			$obj->modified = date("Y-m-d g:i:s");
-			if(!$obj->id)
+			// if new obj
+			if(!$obj->id) {
 				$obj->created = date("Y-m-d g:i:s");
+				$obj->type = 'cs';
+			}
 
 			$obj->name = $postdata['name'];
 			$obj->description = $postdata['description'];
