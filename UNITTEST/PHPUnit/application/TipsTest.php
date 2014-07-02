@@ -75,7 +75,8 @@ class TipsTest extends PHPUnit_Framework_TestCase {
 			array(
 				array(
 					'name',
-					'description'
+					'description',
+					'cs'
 				)
 			)
 		);
