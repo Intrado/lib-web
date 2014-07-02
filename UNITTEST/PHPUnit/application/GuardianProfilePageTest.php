@@ -223,6 +223,74 @@ class GuardianProfilePageTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(false !== strpos($formhtml, 'type="checkbox" value="true" checked'), 'InfoCenter checkbox did not have the right default option pre-selected');
 	}
 
+	// it handles form submission success by redirecting the client to profiles.php with a notice() message
+	public function test_formSubmit() {
+		global $HEADERS;
+		global $queryRules;
+
+		// Any call to exit/die will end up in this anonymous function now:
+		set_exit_overload(function() {
+			return(false);
+		});
+
+		// POST the edit form with burst id = 1 so that we don't have to upload a file for this test
+		$_POST = $_REQUEST = array(
+			'submit' => 'submit',
+			'form' => $this->formName,
+			"{$this->formName}_name" => "existing name",
+		);
+
+
+		$_SESSION['profileid'] = 1;
+
+		$profile = new stdClass();
+		$profile->id = 1;
+		$profile->name = "existing name";
+		$profile->description = "existing name description";
+		$profile->type = "guardian";
+
+
+		//validator for unique names
+		$queryRules->add("/from access where type/", array($profile->name, $profile->id), array(array(false)));
+		$queryRules->add('/from access where id/', array($profile->id), array(null)
+		);
+		$apiClient = new ApiStub('http://localhost/api');
+
+		$mockApi = $this->getMockBuilder('CommsuiteApiClient')
+				->setConstructorArgs(array($apiClient))
+				->setMethods(array("getProfile", "setProfile"))
+				->getMock();
+
+
+
+		$mockApi->expects($this->any())
+				->method('getProfile')
+				->will($this->returnValue($profile));
+
+		$mockApi->expects($this->any())
+				->method('setProfile')
+				->will($this->returnValue(true));
+
+
+
+		$page = new GuardianProfilePage($mockApi);
+
+
+		$page->beforeLoad($_POST, $_POST, $_REQUEST, $_SESSION);
+		$page->load();
+
+		// Extract the correct serialnum out of the form and stick it into the POST!
+		$serialnum = $page->form->serialnum;
+		$_POST["{$this->formName}-formsnum"] = $_REQUEST["{$this->formName}-formsnum"] = $serialnum;
+
+		$page->afterLoad();
+
+		unset_exit_overload();
+
+		// There should be a location redirect header if the PUT was successful
+		$this->assertTrue(in_array('Location: profiles.php', $HEADERS), 'Expected a successful redirect to profiles.php');
+	}
+
 }
 
 ?>

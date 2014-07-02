@@ -72,8 +72,8 @@ class GuardianProfilePage extends PageForm {
 			$this->profile->description = '';
 			$this->profile->type = '';
 		}
-		
-		if (! is_null($this->profileId)) {
+
+		if (!is_null($this->profileId)) {
 			// If we have been flagged as having reloaded on account of data having changed...
 			if (isset($session['profilereload'])) {
 				unset($session['profilereload']);
@@ -88,9 +88,7 @@ class GuardianProfilePage extends PageForm {
 
 		// Normal form handling makes form->getData() work...
 		$this->form->handleRequest();
-		$datachange = false;
 		// If the form was submitted...
-
 		if ($this->form->getSubmit()) {
 			if (!is_null($this->profileId) && $this->form->checkForDataChange()) {
 				$_SESSION['profilereload'] = true;
@@ -201,18 +199,21 @@ class GuardianProfilePage extends PageForm {
 ////////////////////////////////////////////////////////////////////////////////
 
 class ValDupeProfileName extends Validator {
+
 	var $onlyserverside = true;
 
-	function validate ($value, $args) {
+	function validate($value, $args) {
 		// unique name within same type of profile
 		$query = "select count(*) from access where type = 'guardian' and name = ? and id != ?";
-		$res = QuickQuery($query,false,array($value,$args['accessid']+0));
+		$res = QuickQuery($query, false, array($value, $args['accessid'] + 0));
 		if ($res)
 			return _L('An access profile with that name already exists. Please choose another');
 
 		return true;
 	}
+
 }
+
 // -----------------------------------------------------------------------------
 // PAGE INSTANTIATION AND DISPLAY
 // -----------------------------------------------------------------------------
