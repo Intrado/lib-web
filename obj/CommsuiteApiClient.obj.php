@@ -37,7 +37,50 @@ class CommsuiteApiClient {
 		
 		return $profileList;
 	}
-		
+	
+	/**
+	 * Get profile for given id
+	 * 
+	 * @param type $id profile id
+	 * @return \Access
+	 */
+	public function getProfile($id) {
+		Query("BEGIN");
+		$profile = new Access($id);
+		Query("COMMIT");
+		return $profile;
+		//$res = $this->apiClient->get(self::API_PROFILES . "/{$id}");
+		//return($res['code'] == 200 ? json_decode($res['body']) : false);
+	}
+
+	/**
+	 *  update/create profile
+	 * @@param string $id profile id 
+	 * @param string $name profile name
+	 * @param string $description profile description
+	 * @param string $type profile type (cs, guardian)
+	 * @param string $permissions array of permissions
+	 * @return boolean true if success else false
+	 */
+	public function setProfile($id, $name, $description, $type, $permissions) {
+		global $USER;
+		$profile = new Access($id);
+		Query("BEGIN");
+
+		$profile->name = $name;
+		$profile->description = $description;
+		$profile->type = $type;
+		$profile->update();
+
+		foreach ($permissions as $perm) {
+			$profile->setPermission($perm['name'], $perm['value']);
+		}
+
+
+		Query("COMMIT");
+		return true;
+	}
+
 	// ---------------------------------------------------------------------
 	// PDF Bursting
 	// ---------------------------------------------------------------------

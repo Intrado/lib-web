@@ -116,7 +116,7 @@ $titles = array(	"name" => _L("Name"),
 startWindow(_L('Guardian Profile List'), 'padding: 3px;');
 
 ?>
-	<div class="feed_btn_wrap cf"><?= icon_button(_L('Add New Guardian Profile'),"add",null,"guardianprofile.php?id=new") ?></div>
+	<div class="feed_btn_wrap cf"><?= icon_button(_L('Add New Guardian Profile'),"add",null,"guardianprofile.php") ?></div>
 <?
 
 showObjects($accessGuardianList, $titles, array("Actions" => "fmt_guardian_actions" /*, "moduserid" => "fmt_creator"*/), count($data) > 10);
