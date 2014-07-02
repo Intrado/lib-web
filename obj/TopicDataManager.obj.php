@@ -24,6 +24,7 @@ SELECT SQL_CALC_FOUND_ROWS tai_topic.id, tai_topic.name FROM tai_topic
 JOIN tai_organizationtopic
 ON tai_organizationtopic.topicid = tai_topic.id
 WHERE tai_organizationtopic.organizationid = ?
+order by tai_topic.name
 LIMIT $start, $limit", true, false, array($this->rootOrganizationId()));
 
 		$total = QuickQuery("select FOUND_ROWS()");
