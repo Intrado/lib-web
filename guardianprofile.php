@@ -67,25 +67,21 @@ class GuardianProfilePage extends PageForm {
 		if (!is_null($this->profileId)) {
 			$this->profile = $this->csApi->getProfile($this->profileId);
 		} else {
-			$this->profile = (object) null;
+			$this->profile = new stdClass;
 			$this->profile->name = '';
 			$this->profile->description = '';
 			$this->profile->type = '';
 		}
 
-		if (!is_null($this->profileId)) {
-			// If we have been flagged as having reloaded on account of data having changed...
-			if (isset($session['profilereload'])) {
-				unset($session['profilereload']);
-				$this->error = _L("This record was changed in another window or session during the time you've had it open. Please review the current data. You may need to redo your changes and resubmit.");
-			}
+		if (!is_null($this->profileId) && isset($session['profilereload'])) {
+			unset($session['profilereload']);
+			$this->error = _L("This record was changed in another window or session during the time you've had it open. Please review the current data. You may need to redo your changes and resubmit.");
 		}
 		// Make the edit FORM
 		$this->form = $this->factoryProfileForm();
 	}
 
 	public function afterLoad() {
-
 		// Normal form handling makes form->getData() work...
 		$this->form->handleRequest();
 		// If the form was submitted...
@@ -112,8 +108,6 @@ class GuardianProfilePage extends PageForm {
 					redirect('profiles.php');
 				}
 			}
-
-			// For errors, we fall through to render() and let this error message be shown:
 			$this->error = _L("The profile could not be {$action}. Please try again later.");
 		}
 	}
@@ -121,18 +115,13 @@ class GuardianProfilePage extends PageForm {
 	public function render() {
 		// define main:subnav tab settings
 		$this->options["page"] = 'admin:profiles';
-
-		//Note: This is the title of the page. It should not also be the header of the form "window".
-		// This 'title' is set to global $TITLE in the base class.
 		$this->options['title'] = _L('Profile Editor');
-
 		//profile not created or updated.?
 		if (!(is_null($this->profileId) || is_object($this->profile))) {
 			$html = _L('The profile you have requested could not be found. It may not exist or your account does not have permission to view it.') . "<br/>\n";
 		} else {
 			$html = $this->form->render();
 		}
-
 		return($html);
 	}
 
@@ -169,7 +158,7 @@ class GuardianProfilePage extends PageForm {
 			"infocenter" => array(
 				"label" => _L('InfoCenter'),
 				"fieldhelp" => _L('Allows guardians to access InfoCenter'),
-				"value" => "infocenter",
+				"value" => (is_null($this->profileId) ? "infocenter" : $this->profile->getValue("infocenter")),
 				"validators" => array(),
 				"control" => array("CheckBox"),
 				"helpstep" => 3
@@ -178,7 +167,7 @@ class GuardianProfilePage extends PageForm {
 
 		$helpsteps = array(
 			_L('Enter a name and optional description for this Access Profile.'),
-			_L('Choose how you want users with this profile to be able to access the system. Then select whether they should be able to edit their own account information or not.'),
+			_L('Choose how you want users with this profile to be able to access the system.'),
 		);
 
 		$buttons = array(
