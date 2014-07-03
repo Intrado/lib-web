@@ -125,6 +125,24 @@ class GuardianProfilePageTest extends PHPUnit_Framework_TestCase {
 		unset($this->profileEditPage);
 	}
 
+	public function test_hasPermission() {
+		$profile = new stdClass();
+		$profile->id = 1;
+		$profile->name = "existing name";
+		$profile->description = "existing name description";
+		$profile->type = "guardian";
+		$permission1 = new stdClass;
+		$permission1->name = "infocenter";
+		$permission1->value = 1;
+		$permission2 = new stdClass;
+		$permission2->name = "cs";
+		$permission2->value = 0;
+		$profile->permissions = array($permission1, $permission2);
+		$this->assertTrue(1 === $this->profileEditPage->hasPermission($profile, "infocenter"), 'The profile does not have infocenter permission');
+		$this->assertTrue(0 === $this->profileEditPage->hasPermission($profile, "cs"), 'The profile should not have cs permission');
+		$this->assertTrue(0 === $this->profileEditPage->hasPermission($profile, "test", 0), 'The profile should not have test permission');
+	}
+
 	public function test_isAuthorized() {
 		$this->assertTrue($this->profileEditPage->isAuthorized(), 'The user should be authorized to access this page');
 	}
@@ -179,6 +197,10 @@ class GuardianProfilePageTest extends PHPUnit_Framework_TestCase {
 		$profile->name = "existing name";
 		$profile->description = "existing name description";
 		$profile->type = "guardian";
+		$permission = new stdClass;
+		$permission->name = "infocenter";
+		$permission->value = 1;
+		$profile->permissions = array($permission);
 
 
 		//validator for unique names
@@ -221,6 +243,66 @@ class GuardianProfilePageTest extends PHPUnit_Framework_TestCase {
 
 		//checkbox
 		$this->assertTrue(false !== strpos($formhtml, 'type="checkbox" value="true" checked'), 'InfoCenter checkbox did not have the right default option pre-selected');
+	}
+
+	// it prepopulates the form fields with values from an existing record if specified (converts the file input into a read-only string)
+	public function test_editExistingFormInfoCenterNotSelected() {
+		global $queryRules;
+
+		$_SESSION['profileid'] = 1;
+		$empty = array();
+
+		$profile = new stdClass();
+		$profile->id = 1;
+		$profile->name = "existing name";
+		$profile->description = "existing name description";
+		$profile->type = "guardian";
+		$permission = new stdClass;
+		$permission->name = "infocenter";
+		$permission->value = 0;
+		$profile->permissions = array($permission);
+
+
+		//validator for unique names
+		$queryRules->add("/from access where type/", array($profile->name, $profile->id), array(array(true)));
+		$queryRules->add('/from access where id/', array($profile->id), array(
+			array(
+				$profile->name,
+				$profile->description,
+				'guardian'
+			))
+		);
+		$apiClient = new ApiStub('http://localhost/api');
+
+		$mockApi = $this->getMockBuilder('CommsuiteApiClient')
+				->setConstructorArgs(array($apiClient))
+				->setMethods(array())
+				->getMock();
+
+
+
+		$mockApi->expects($this->any())
+				->method('getProfile')
+				->will($this->returnValue($profile));
+
+
+		$page = new GuardianProfilePage($mockApi);
+
+
+		$page->beforeLoad($empty, $empty, $empty, $_SESSION);
+		$page->load();
+		$page->afterLoad();
+		$formhtml = $page->render();
+
+
+		// The profile name input field should be present
+		$this->assertTrue(false !== strpos($formhtml, "{$this->formName}_name"), 'Missing name input field');
+
+		// Make sure the name input field has the right value from the profile record
+		$this->assertTrue(false !== strpos($formhtml, 'type="text" value="existing name"'), 'Name input field did not have the correct default value');
+
+		//checkbox
+		$this->assertFalse(false !== strpos($formhtml, 'type="checkbox" value="true" checked'), 'InfoCenter checkbox should not be selected');
 	}
 
 	// it handles form submission success by redirecting the client to profiles.php with a notice() message

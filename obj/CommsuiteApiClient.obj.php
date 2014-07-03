@@ -47,6 +47,7 @@ class CommsuiteApiClient {
 	public function getProfile($id) {
 		Query("BEGIN");
 		$profile = new Access($id);
+		$profile->loadPermissions();
 		Query("COMMIT");
 		return $profile;
 		//$res = $this->apiClient->get(self::API_PROFILES . "/{$id}");

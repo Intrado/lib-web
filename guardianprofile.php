@@ -70,7 +70,11 @@ class GuardianProfilePage extends PageForm {
 			$this->profile = new stdClass;
 			$this->profile->name = '';
 			$this->profile->description = '';
-			$this->profile->type = '';
+			$this->profile->type = 'guardian';
+			$permission = new stdClass;
+			$permission->name = "infocenter";
+			$permission->value = 1;
+			$this->profile->permissions = array($permission);
 		}
 
 		if (!is_null($this->profileId) && isset($session['profilereload'])) {
@@ -126,12 +130,41 @@ class GuardianProfilePage extends PageForm {
 	}
 
 	/**
+	 *  Check to see if given profile has a specific permission
+	 * @param Access $profile access profile
+	 * @param string $permission permission
+	 * @param boolean $default default value
+	 * @return boolean 
+	 */
+	public function hasPermission($profile, $permission, $default = false) {
+		$permission = $this->getPermissionFromProfile($profile, $permission);
+		return $permission ? $permission->value : $default;
+	}
+
+	/**
+	 *  Return permission from access profile
+	 * @param Access $profile access profile
+	 * @param string $permission permission
+	 * @return permission
+	 */
+	public function getPermissionFromProfile($profile, $permission) {
+		if (is_null($profile) || !isset($profile->permissions)) {
+			return false;
+		}
+		foreach ($profile->permissions as $p) {
+			if ($p->name == $permission) {
+				return $p;
+			}
+		}
+	}
+
+	/**
 	 * Method to create form object content for this page, including guide and mouseover help.
 	 *
 	 * @return object Form
 	 */
 	public function factoryProfileForm() {
-		
+		$infocenter = $this->hasPermission($this->profile, "infocenter");
 		$formdata = array(
 			"name" => array(
 				"label" => _L('Name'),
@@ -158,9 +191,8 @@ class GuardianProfilePage extends PageForm {
 			_L('Access Options'), //access options
 			"infocenter" => array(
 				"label" => _L('InfoCenter'),
-				"fieldhelp" => _L('Allows guardians to access InfoCenter'),
-				//TODO: fix this when API is in place
-				"value" => "infocenter",
+				"fieldhelp" => _L('Allows access to dependents information in InfoCenter'),
+				"value" => (!$infocenter) ? "" : "infocenter",
 				"validators" => array(),
 				"control" => array("CheckBox"),
 				"helpstep" => 3
@@ -169,7 +201,7 @@ class GuardianProfilePage extends PageForm {
 
 		$helpsteps = array(
 			_L('Enter a name and optional description for this Access Profile.'),
-			_L('Choose how you want users with this profile to be able to access the system.'),
+			_L('Choose how you want guardians with this profile to be able to access the system.'),
 		);
 
 		$buttons = array(
