@@ -131,6 +131,7 @@ class GuardianProfilePage extends PageForm {
 	 * @return object Form
 	 */
 	public function factoryProfileForm() {
+		
 		$formdata = array(
 			"name" => array(
 				"label" => _L('Name'),
@@ -158,7 +159,8 @@ class GuardianProfilePage extends PageForm {
 			"infocenter" => array(
 				"label" => _L('InfoCenter'),
 				"fieldhelp" => _L('Allows guardians to access InfoCenter'),
-				"value" => (is_null($this->profileId) ? "infocenter" : $this->profile->getValue("infocenter")),
+				//TODO: fix this when API is in place
+				"value" => "infocenter",
 				"validators" => array(),
 				"control" => array("CheckBox"),
 				"helpstep" => 3
