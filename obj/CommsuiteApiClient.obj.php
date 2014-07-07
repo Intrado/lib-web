@@ -30,13 +30,8 @@ class CommsuiteApiClient {
 	 * @return \Access
 	 */
 	public function getProfile($id) {
-		Query("BEGIN");
-		$profile = new Access($id);
-		$profile->loadPermissions();
-		Query("COMMIT");
-		return $profile;
-		//$res = $this->apiClient->get(self::API_PROFILES . "/{$id}");
-		//return($res['code'] == 200 ? json_decode($res['body']) : false);
+		$res = $this->apiClient->get(self::API_PROFILES . "/{$id}");
+		return($res['code'] == 200 ? json_decode($res['body']) : false);
 	}
 
 	/**
@@ -49,24 +44,20 @@ class CommsuiteApiClient {
 	 * @return boolean true if success else false
 	 */
 	public function setProfile($id, $name, $description, $type, $permissions) {
-		global $USER;
-		$profile = new Access($id);
-		Query("BEGIN");
-
+		$profile =(object) null;
 		$profile->name = $name;
 		$profile->description = $description;
 		$profile->type = $type;
-		$profile->update();
-
-		foreach ($permissions as $perm) {
-			$profile->setPermission($perm['name'], $perm['value']);
+		$profile->permissions = $permissions;
+		if (is_null($id)) {
+			$res = $this->apiClient->post(self::API_PROFILES."/", $profile);
+		} else {
+			$profile->id = $id;
+			$res = $this->apiClient->put(self::API_PROFILES."/".$id, $profile);
 		}
-
-
-		Query("COMMIT");
-		return true;
+		return ($res['code'] == 200 ? json_decode($res['body']) : false);
 	}
-	
+
 	public function deleteProfile($id) {
 		$res = $this->apiClient->delete(self::API_PROFILES . "/{$id}");
 		return($res['code'] == 200 ? true : false);
