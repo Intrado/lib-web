@@ -23,20 +23,21 @@ if (!$USER->authorize('manageprofile')) {
 ////////////////////////////////////////////////////////////////////////////////
 
 if (isset($_GET['delete'])) {
-	//TODO use csAPI
 	$deleteid = DBSafe($_GET['delete']);
 	if (isset($_SESSION['accessid']) && $_SESSION['accessid'] == $deleteid)
 		$_SESSION['accessid'] = NULL;
-	$count = QuickQuery("select count(*) from user where accessid='$deleteid' and deleted=0");
-	if ($count == 0) {
-		$access = new Access($deleteid);
-		Query("BEGIN");
-			QuickUpdate("delete from access where id='$deleteid'");
-			QuickUpdate("delete from permission where accessid='$deleteid'");
-		Query("COMMIT");
-		notice(_L("The access profile, %s, is now deleted.", escapehtml($access->name)));
+
+	// we need the access object to get the name for display after deletion
+	$access = new Access($deleteid); // TODO get from API
+	if (!$access)
+		$accessName = "";
+	else
+		$accessName = $access->name;
+	
+	if ($csApi->deleteProfile($deleteid)) {
+		notice(_L("The access profile, %s, is now deleted.", escapehtml($accessName)));
 	} else {
-		error("This access profile is being used by $count user account(s). Please reassign users to a different profile and try again");
+		error(_L("This access profile is being used. Please un-associate this profile and try again."));
 	}
 }
 

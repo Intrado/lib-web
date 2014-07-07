@@ -119,7 +119,7 @@ function setupCommsuiteApi() {
 	global $USER;
 
 	$apiClient = new ApiClient(
-		"https://{$_SERVER['SERVER_NAME']}/" . customerUrlComponent() ."/api/2/users/{$USER->id}",
+		"https://{$_SERVER['SERVER_NAME']}/" . customerUrlComponent() ."/api/2",
 		array(
 			"X-Auth-SessionId: {$_COOKIE[strtolower(customerUrlComponent()) . '_session']}"
 		)

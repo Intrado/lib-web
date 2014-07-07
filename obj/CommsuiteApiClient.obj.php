@@ -6,36 +6,21 @@ class CommsuiteApiClient {
 	const API_PROFILES = '/profiles';
 	
 	private $apiClient = null;
+	private $burstsBaseUrl = null;
 
 	public function __construct($apiClient) {
+		global $USER;
 		$this->apiClient = $apiClient;
+		$this->burstsBaseUrl = "/users/{$USER->id}" . self::API_BURSTS;
 	}
 	
 	// ---------------------------------------------------------------------
 	// Access Profiles
 	// ---------------------------------------------------------------------
 	
-	public function getProfileApiUrl() {
-		return($this->apiClient->getApiUrl() . API_PROFILES);
-	}
-	
 	public function getProfileList() {
-		//TODO call the API
-		//$res = $this->apiClient->get(self::API_PROFILES);
-		//return($res['code'] == 200 ? json_decode($res['body']) : false);
-		
-		$profileList = array();
-		$accessList = DBFindMany("Access","from access where name != 'SchoolMessenger Admin'");
-		foreach ($accessList as $a) {
-			$access = new stdClass();
-			$access->id = $a->id;
-			$access->name = $a->name;
-			$access->description = $a->description;
-			$access->type = $a->type;
-			$profileList[] = $access;
-		}
-		
-		return $profileList;
+		$res = $this->apiClient->get(self::API_PROFILES);
+		return($res['code'] == 200 ? json_decode($res['body']) : false);
 	}
 	
 	/**
@@ -81,13 +66,18 @@ class CommsuiteApiClient {
 		Query("COMMIT");
 		return true;
 	}
+	
+	public function deleteProfile($id) {
+		$res = $this->apiClient->delete(self::API_PROFILES . "/{$id}");
+		return($res['code'] == 200 ? true : false);
+	}
 
 	// ---------------------------------------------------------------------
 	// PDF Bursting
 	// ---------------------------------------------------------------------
 
 	public function getBurstApiUrl() {
-		return($this->apiClient->getApiUrl() . API_BURSTS);
+		return($this->apiClient->getApiUrl() . $this->burstsBaseUrl);
 	}
 
 	public function getBurstList($start = null, $limit = null) {
@@ -95,12 +85,12 @@ class CommsuiteApiClient {
 		if ($start) $querystring .= '&start=' . intval($start);
 		if ($limit) $querystring .= '&limit=' . intval($limit);
 
-		$res = $this->apiClient->get(self::API_BURSTS . "/{$querystring}");
+		$res = $this->apiClient->get($this->burstsBaseUrl . "/{$querystring}");
 		return($res['code'] == 200 ? json_decode($res['body']) : false);
 	}
 
 	public function getBurstData($id) {
-		$res = $this->apiClient->get(self::API_BURSTS . "/{$id}");
+		$res = $this->apiClient->get($this->burstsBaseUrl . "/{$id}");
 		return($res['code'] == 200 ? json_decode($res['body']) : false);
 	}
 
@@ -128,7 +118,7 @@ class CommsuiteApiClient {
 			if (is_numeric($template) && (intval($template) != 0)) {
 				$data['burstTemplateId'] = intval($template);
 			}
-			$res = $this->apiClient->post(self::API_BURSTS . '/upload', $data);
+			$res = $this->apiClient->post($this->burstsBaseUrl . '/upload', $data);
 			return($res['code'] == 201 ? true : false);
 		}
 
@@ -139,13 +129,13 @@ class CommsuiteApiClient {
 			$data->name = $name;
 			$data->burstTemplateId = $template;
 
-			$res = $this->apiClient->put(self::API_BURSTS . "/{$id}", $data);
+			$res = $this->apiClient->put($this->burstsBaseUrl . "/{$id}", $data);
 			return($res['code'] == 200 ? true : false);
 		}
 	}
 
 	public function deleteBurst($id) {
-		$res = $this->apiClient->delete(self::API_BURSTS . "/{$id}");
+		$res = $this->apiClient->delete($this->burstsBaseUrl . "/{$id}");
 		return($res['code'] == 200 ? true : false);
 	}
 
@@ -159,7 +149,7 @@ class CommsuiteApiClient {
 	 * @return object which contains the list of portions available
 	 */
 	public function getBurstPortionList($burstId) {
-		$res = $this->apiClient->get(self::API_BURSTS . "/{$burstId}/portions");
+		$res = $this->apiClient->get($this->burstsBaseUrl . "/{$burstId}/portions");
 		return($res['code'] == 200 ? json_decode($res['body']) : false);
 	}
 }

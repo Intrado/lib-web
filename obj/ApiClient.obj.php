@@ -55,7 +55,7 @@ class ApiClient {
 	 * supplies the numeric REST server response.
 	 */
 	public function sendRequest($method, $node, $data = null) {
-
+		//error_log("sendRequest " . $method . $this->ApiUrl . $node);
 		// Make a new curl request object with some default options
 		$creq = curl_init($this->ApiUrl . $node);
 		curl_setopt($creq, CURLOPT_RETURNTRANSFER, 1);
