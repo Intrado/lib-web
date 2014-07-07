@@ -104,7 +104,7 @@ class GuardianProfilePage extends PageForm {
 				$type = "guardian";
 				$permissions = array();
 				$infocenter = (bool) $postdata['infocenter'];
-				$permissions[] = array("name" => "infocenter", "value" => $infocenter);
+				$permissions[] = array("name" => "infocenter", "value" => $infocenter ? "1" : "0");
 				$result = $this->csApi->setProfile($this->profileId, $name, $description, $type, $permissions);
 				if ($result) {
 					unset($_SESSION['profileid']);
