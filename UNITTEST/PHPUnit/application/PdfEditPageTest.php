@@ -124,7 +124,7 @@ class PdfEditPageTest extends PHPUnit_Framework_TestCase {
 		);
 
 		// 6) API response: retrieve a single burst record (with id=1)
-		$queryRules->add('|"method":"GET","node":"\\\/bursts\\\/1","data":null|',
+		$queryRules->add('|"method":"GET","node":"\\\/users\\\/" . self::USER_ID . "\\\/bursts\\\/1","data":null|',
 			array(
 				array(
 					'headers' => 'Content-type: application/json',
@@ -135,7 +135,7 @@ class PdfEditPageTest extends PHPUnit_Framework_TestCase {
 		);
 
 		// 7) API response: update a single burst record (with id=1)
-		$queryRules->add('|"method":"PUT","node":"\\\/bursts\\\/1","data":{"name":"newname!","burstTemplateId":1}|',
+		$queryRules->add('|"method":"PUT","node":"\\\/users\\\/" . self::USER_ID . "\\\/bursts\\\/1","data":{"name":"newname!","burstTemplateId":1}|',
 			array(
 				array(
 					'headers' => 'Content-type: application/json',
@@ -146,7 +146,7 @@ class PdfEditPageTest extends PHPUnit_Framework_TestCase {
 		);
 
 		// 8) API response: update a single burst record (with id=3, but invalid template id=3)
-		$queryRules->add('|"method":"PUT","node":"\\\/bursts\\\/1","data":{"name":"this one has an invalid template id!","burstTemplateId":3}|',
+		$queryRules->add('|"method":"PUT","node":"\\\/users\\\/" . self::USER_ID . "\\\/bursts\\\/1","data":{"name":"this one has an invalid template id!","burstTemplateId":3}|',
 			array(
 				array(
 					'headers' => 'Content-type: text/plain',
