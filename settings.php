@@ -41,6 +41,7 @@ if ($USER->authorize('managesystem') || $USER->authorize('metadata')) {
 			$systemLinks[] = "<a href='scheduledatamanager.php'>Section Field Definitions</a>";
 		}
 		$systemLinks[] = "<a href='organizationdatamanager.php'>Organization Manager</a>";
+		$systemLinks[] = "<a href='guardiancategorymanager.php'>Guardian Category Manager</a>";
 	}
 	if ($USER->authorize('managesystem')) {
 		$systemLinks[] = "<a href='securitysettings.php'>Security</a>";
