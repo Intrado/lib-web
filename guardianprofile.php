@@ -38,13 +38,7 @@ class GuardianProfilePage extends PageForm {
 
 	public function isAuthorized(&$get = array(), &$post = array(), &$request = array(), &$session = array()) {
 		global $USER;
-		$adminProfile = false;
-		if (isset($request['id'])) {
-			if (QuickQuery("select count(*) from access where name = 'SchoolMessenger Admin' and id = ?", false, array($request['id']))) {
-				$adminProfile = true;
-			}
-		}
-		return $USER->authorize('manageprofile') && !$adminProfile;
+		return $USER->authorize('manageprofile');
 	}
 
 	public function beforeLoad(&$get = array(), &$post = array(), &$request = array(), &$session = array()) {
@@ -58,7 +52,7 @@ class GuardianProfilePage extends PageForm {
 			$this->profileId = null;
 		}
 
-		$this->options['windowTitle'] = ($this->profileId) ? _L('Edit Existing Guardian Profile') : _L('Create New Guardian Profile');
+		$this->options['windowTitle'] = ($this->profileId) ? _L('Edit Guardian Profile') : _L('New Guardian Profile');
 	}
 
 	public function load(&$get = array(), &$post = array(), &$request = array(), &$session = array()) {
@@ -230,7 +224,7 @@ class ValDupeProfileName extends Validator {
 		$query = "select count(*) from access where type = 'guardian' and name = ? and id != ?";
 		$res = QuickQuery($query, false, array($value, $args['accessid'] + 0));
 		if ($res)
-			return _L('An access profile with that name already exists. Please choose another');
+			return _L('An access profile with that name already exists. Please choose another.');
 
 		return true;
 	}
