@@ -51,11 +51,13 @@ class CommsuiteApiClient {
 		$profile->permissions = $permissions;
 		if (is_null($id)) {
 			$res = $this->apiClient->post(self::API_PROFILES."/", $profile);
+			return ($res['code'] == 201 ? json_decode($res['body']) : false);
 		} else {
 			$profile->id = $id;
 			$res = $this->apiClient->put(self::API_PROFILES."/".$id, $profile);
+			return ($res['code'] == 200 ? json_decode($res['body']) : false);
 		}
-		return ($res['code'] == 200 ? json_decode($res['body']) : false);
+
 	}
 
 	public function deleteProfile($id) {

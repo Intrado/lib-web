@@ -73,7 +73,7 @@ class GuardianProfilePage extends PageForm {
 			$this->profile->type = 'guardian';
 			$permission = new stdClass;
 			$permission->name = "infocenter";
-			$permission->value = 1;
+			$permission->value = 0;
 			$this->profile->permissions = array($permission);
 		}
 
