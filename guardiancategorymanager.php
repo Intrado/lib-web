@@ -18,11 +18,16 @@ if (!$USER->authorize('metadata')) {
 // Request processing:
 ///////////////////////////////////////////////////////////////////////////////
 
-$deleteorgids = array();
 if (isset($_GET["delete"]) && isset($_GET["id"])) {
 	// get the requested orgid for deletion
-	$deleteorgid = $_GET["id"] + 0;
-	// TODO call delete api
+	$deleteid = $_GET["id"] + 0;
+
+	if ($csApi->deleteGuardianCategory($deleteid)) {
+		notice(_L("The guardian category is now deleted."));
+	} else {
+		error(_L("This guardian category is being used. Please un-associate and try again."));
+	}
+	
 	redirect();
 }
 
@@ -35,37 +40,22 @@ if (isset($_GET['deleteunassociated'])) {
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-function fmt_actions ($row, $index) {
-	global $start;
+function fmt_actions ($obj, $name) {
 	return action_links(
-		action_link("Edit", "pencil", "guardiancategoryedit.php?orgid=". $row[$index]),
-		action_link("Delete", "cross", "guardiancategorymanager.php?id=". $row[$index] ."&delete&pagestart=$start","return confirm('". addslashes(_L('Are you sure you want to delete this guardian category?')) ."');")
+		action_link("Edit", "pencil", "guardiancategoryedit.php?id=". $obj->id),
+		action_link("Delete", "cross", "guardiancategorymanager.php?id=". $obj->id ."&delete","return confirm('". addslashes(_L('Are you sure you want to delete this guardian category?')) ."');")
 			);
 }
 
 $titles = array(
-	"orgkey" => _L("Guardian Category"),
-	"id" => 'Action');
+	"name" => _L("Guardian Category"),
+	"Actions" => _L('Actions'));
+
 $formatters = array(
 	"id" => "fmt_actions");
 
-$start = 0 + (isset($_GET['pagestart']) ? $_GET['pagestart'] : 0);
-$limit = 100;
-
-$data = QuickQueryMultiRow("select SQL_CALC_FOUND_ROWS id, orgkey from organization where not deleted order by orgkey, id limit $start, $limit", true);
-
-$total = QuickQuery("select FOUND_ROWS()");
-
-// TAI has a single root organization we want to display as the special case
-$rootOrgId = QuickQuery("select id from organization where (select 1 from setting where name like '_dbtaiversion') and parentorganizationid is null and not deleted");
-if ($rootOrgId) {
-	for ($i = 0; $i < count($data); $i++) {
-		if ($data[$i]['id'] == $rootOrgId) {
-			$data[$i]['orgkey'] = $data[$i]['orgkey'] . " (Root)";
-			break;
-		}
-	}
-}
+$data = $csApi->getGuardianCategoryList();
+// TODO sort by name
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
@@ -78,16 +68,11 @@ include_once("nav.inc.php");
 buttons(icon_button(_L("Done"), "fugue/tick", "document.location='settings.php';"));	
 startWindow(_L("Guardian Category Manager"));
 ?>
-	<div class="feed_btn_wrap cf"><?= icon_button(_L('Add New Guardian Category'), "add", null, "guardiancategoryedit.php?id=new") . icon_button(_L('Delete Un-associated'),"cross","if(confirm('". addslashes(_L('Are you sure you want to delete all un-associated organizations?')) ."')) document.location='organizationdatamanager.php?&deleteunassociated'") ?></div>
+	<div class="feed_btn_wrap cf"><?= icon_button(_L('Add New Guardian Category'), "add", null, "guardiancategoryedit.php?id=new") . icon_button(_L('Delete Un-associated'),"cross","if(confirm('". addslashes(_L('Are you sure you want to delete all un-associated categories?')) ."')) document.location='guardiancategorymanager.php?&deleteunassociated'") ?></div>
 <?
 
-// if there are any organizations
 if (count($data)) {
-	showPageMenu($total, $start, $limit);
-	?><table width="100%" cellpadding="3" cellspacing="1" class="list"><?
-	showTable($data, $titles, $formatters);
-	?></table><?
-	showPageMenu($total, $start, $limit);
+	showObjects($data, $titles, array("Actions" => "fmt_actions"), count($data) > 10);
 } else {
 	?><div><img src='img/largeicons/information.jpg' /><?=escapehtml(_L("No guardian categories defined"))?></div><?
 }

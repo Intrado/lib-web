@@ -4,6 +4,7 @@ class CommsuiteApiClient {
 
 	const API_BURSTS = '/bursts';
 	const API_PROFILES = '/profiles';
+	const API_GUARDIAN_CATEGORIES = '/settings/guardiancategories';
 	
 	private $apiClient = null;
 	private $burstsBaseUrl = null;
@@ -65,6 +66,62 @@ class CommsuiteApiClient {
 		return($res['code'] == 200 ? true : false);
 	}
 
+	// ---------------------------------------------------------------------
+	// Guardian Categories
+	// ---------------------------------------------------------------------
+	
+	/**
+	 * get full list of guardian categories in the system
+	 * @return boolean
+	 */
+	public function getGuardianCategoryList() {
+		$res = $this->apiClient->get(self::API_GUARDIAN_CATEGORIES);
+		return($res['code'] == 200 ? json_decode($res['body']) : false);
+	}
+	
+	/**
+	 * Get guardian category for given id
+	 *
+	 * @param type $id category id
+	 * @return \GuardianCategory
+	 */
+	public function getGuardianCategory($id) {
+		$res = $this->apiClient->get(self::API_GUARDIAN_CATEGORIES . "/{$id}");
+		return($res['code'] == 200 ? json_decode($res['body']) : false);
+	}
+	
+	/**
+	 *  update/create guardian category
+	 * @@param string $id category id
+	 * @param string $name category name
+	 * @param int $accessid guardian profile id
+	 * @return boolean true if success else false
+	 */
+	public function setGuardianCategory($id, $name, $accessid) {
+		$profile =(object) null;
+		$profile->name = $name;
+		$profile->accessId = $accessid;
+		if (is_null($id)) {
+			$res = $this->apiClient->post(self::API_GUARDIAN_CATEGORIES."/", $profile);
+			return ($res['code'] == 201 ? json_decode($res['body']) : false);
+		} else {
+			$profile->id = $id;
+			$res = $this->apiClient->put(self::API_GUARDIAN_CATEGORIES."/".$id, $profile);
+			return ($res['code'] == 200 ? json_decode($res['body']) : false);
+		}
+	
+	}
+	
+	/**
+	 * delete the specified guardian category
+	 * @param int $id
+	 * @return boolean
+	 */
+	public function deleteGuardianCategory($id) {
+		$res = $this->apiClient->delete(self::API_GUARDIAN_CATEGORIES . "/{$id}");
+		return($res['code'] == 200 ? true : false);
+	}
+	
 	// ---------------------------------------------------------------------
 	// PDF Bursting
 	// ---------------------------------------------------------------------
