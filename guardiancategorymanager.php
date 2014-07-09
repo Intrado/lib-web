@@ -68,7 +68,7 @@ include_once("nav.inc.php");
 buttons(icon_button(_L("Done"), "fugue/tick", "document.location='settings.php';"));	
 startWindow(_L("Guardian Category Manager"));
 ?>
-	<div class="feed_btn_wrap cf"><?= icon_button(_L('Add New Guardian Category'), "add", null, "guardiancategoryedit.php?id=new") . icon_button(_L('Delete Un-associated'),"cross","if(confirm('". addslashes(_L('Are you sure you want to delete all un-associated categories?')) ."')) document.location='guardiancategorymanager.php?&deleteunassociated'") ?></div>
+	<div class="feed_btn_wrap cf"><?= icon_button(_L('Add New Guardian Category'), "add", null, "guardiancategoryedit.php") . icon_button(_L('Delete Un-associated'),"cross","if(confirm('". addslashes(_L('Are you sure you want to delete all un-associated categories?')) ."')) document.location='guardiancategorymanager.php?&deleteunassociated'") ?></div>
 <?
 
 if (count($data)) {
