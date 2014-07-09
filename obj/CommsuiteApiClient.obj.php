@@ -100,7 +100,7 @@ class CommsuiteApiClient {
 	public function setGuardianCategory($id, $name, $accessid) {
 		$profile =(object) null;
 		$profile->name = $name;
-		$profile->accessId = $accessid;
+		$profile->profileId = $accessid;
 		if (is_null($id)) {
 			$res = $this->apiClient->post(self::API_GUARDIAN_CATEGORIES."/", $profile);
 			return ($res['code'] == 201 ? json_decode($res['body']) : false);
