@@ -104,6 +104,9 @@ class GuardianProfilePage extends PageForm {
 					unset($_SESSION['profileid']);
 					notice(_L("The profile was successfully {$action}."));
 					redirect('profiles.php');
+				} else {
+					//NOTE:error is set outside the if condition
+					unset($_SESSION['profileid']);
 				}
 			}
 			$this->error = _L("The profile could not be {$action}. Please try again later.");
@@ -114,8 +117,10 @@ class GuardianProfilePage extends PageForm {
 		// define main:subnav tab settings
 		$this->options["page"] = 'admin:profiles';
 		$this->options['title'] = _L('Profile Editor');
-		//profile not created or updated.?
-		if (!(is_null($this->profileId) || is_object($this->profile))) {
+		if (strlen($this->error)) {
+			$html = $this->error;
+		} else if (!(is_null($this->profileId) || is_object($this->profile))) {
+			unset($_SESSION['profileid']);
 			$html = _L('The profile you have requested could not be found. It may not exist or your account does not have permission to view it.') . "<br/>\n";
 		} else {
 			$html = $this->form->render();
