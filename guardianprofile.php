@@ -42,7 +42,11 @@ class GuardianProfilePage extends PageForm {
 	}
 
 	public function beforeLoad(&$get = array(), &$post = array(), &$request = array(), &$session = array()) {
-		if (isset($request['id']) && intval($request['id'])) {
+		if (isset($request['id']) && $request['id'] == "new") {
+			//reset previous id.
+			unset($session['profileid']);
+			redirect();
+		} else if (isset($request['id']) && intval($request['id'])) {
 			$session['profileid'] = intval($request['id']);
 			// .. then redirect back to ourselves to clean up the URL
 			redirect();

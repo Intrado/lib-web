@@ -44,7 +44,11 @@ class GuardianCategoryEditPage extends PageForm {
 	}
 
 	public function beforeLoad(&$get = array(), &$post = array(), &$request = array(), &$session = array()) {
-		if (isset($request['id']) && intval($request['id'])) {
+		if (isset($request['id']) && $request['id'] == "new") {
+			//reset previous id.
+			unset($session['categoryid']);
+			redirect();
+		} else if (isset($request['id']) && intval($request['id'])) {
 			$session['categoryid'] = intval($request['id']);
 			// .. then redirect back to ourselves to clean up the URL
 			redirect();
@@ -146,7 +150,6 @@ class GuardianCategoryEditPage extends PageForm {
 				"validators" => array(
 					array("ValRequired"),
 					array("ValLength", "max" => 50),
-					//TODO:
 					array("ValDupeCategoryName", "categoryid" => $this->categoryId)
 				),
 				"control" => array("TextField", "size" => "20", "maxsize" => 50),
