@@ -66,7 +66,7 @@ class GuardianCategoryEditPage extends PageForm {
 			$this->guardianCategory = new stdClass;
 			$this->guardianCategory->name = '';
 			$this->guardianCategory->sequence = 0;
-			$this->guardianCategory->accessId = 0;
+			$this->guardianCategory->profileId = 0;
 		}
 
 		if (!is_null($this->categoryId) && isset($session['categoryreload'])) {
@@ -92,8 +92,8 @@ class GuardianCategoryEditPage extends PageForm {
 				//get data
 				$postdata = $this->form->getData();
 				$name = $postdata['name'];
-				$profile = $postdata['profile'];
-				$result = $this->csApi->setGuardianCategory($this->categoryId, $name, $profile === '0' ? null : $profile);
+				$profileId = $postdata['profile'];
+				$result = $this->csApi->setGuardianCategory($this->categoryId, $name, $profileId === '0' ? null : $profileId);
 				if ($result) {
 					unset($_SESSION['categoryid']);
 					notice(_L("The Guardian Category was successfully {$action}."));
@@ -155,7 +155,7 @@ class GuardianCategoryEditPage extends PageForm {
 			"profile" => array(
 				"label" => _L('Guardian Profile'),
 				"fieldhelp" => _L('The the profile for this category.'),
-				"value" => $this->guardianCategory->name,
+				"value" => $this->guardianCategory->profileId,
 				"validators" => array(),
 				"control" => array("SelectMenu", "values" => $profileNames),
 				"helpstep" => 2

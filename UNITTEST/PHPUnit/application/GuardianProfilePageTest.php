@@ -110,7 +110,6 @@ class GuardianProfilePageTest extends PHPUnit_Framework_TestCase {
 		$apiClient = new ApiStub('http://localhost/api');
 		$this->csApi = new CommsuiteApiClient($apiClient);
 
-		// Then go for launch!
 		$this->profileEditPage = new GuardianProfilePage($this->csApi);
 
 		// Grab the formName; we're going to need it!
@@ -149,7 +148,7 @@ class GuardianProfilePageTest extends PHPUnit_Framework_TestCase {
 
 	// it shows an edit form with some properties of a Guardian Profile
 	public function test_newGuardianForm() {
-		// Load up the edit form with no burst id specified
+		// Load up the edit form with no guardian id specified
 		$this->profileEditPage->beforeLoad();
 		$this->profileEditPage->load();
 		$this->profileEditPage->afterLoad();
@@ -162,7 +161,7 @@ class GuardianProfilePageTest extends PHPUnit_Framework_TestCase {
 		global $HEADERS;
 
 
-		// Load up the edit form with burst id = 1
+		// Load up the edit form with profile id = 1
 		$data = array('id' => 1);
 
 		// Any call to exit/die will end up in this anonymous function now:
@@ -174,7 +173,6 @@ class GuardianProfilePageTest extends PHPUnit_Framework_TestCase {
 
 		unset_exit_overload();
 
-		// Strange, but self-referential redirect in CLI actually goes to PHPUNIT binary - hah!
 		$location = '';
 		foreach ($HEADERS as $header) {
 			if (strpos($header, 'Location:') == 0) {
@@ -182,7 +180,7 @@ class GuardianProfilePageTest extends PHPUnit_Framework_TestCase {
 				break;
 			}
 		}
-		$this->assertTrue((strpos($location, '/phpunit') !== FALSE), 'Expected a successful redirect to pdfedit.php');
+		$this->assertTrue((strpos($location, '/phpunit') !== FALSE), 'Expected a successful redirect to profiles.php');
 	}
 
 	// it prepopulates the form fields with values from an existing record if specified (converts the file input into a read-only string)
