@@ -32,7 +32,13 @@ if (isset($_GET["delete"]) && isset($_GET["id"])) {
 }
 
 if (isset($_GET['deleteunassociated'])) {
-	// TODO call api
+	$datalist = $csApi->getGuardianCategoryList();
+	foreach ($datalist as $d) {
+		// if no associations, it's safe to delete
+		if (!$d->hasAssociations) {
+			$csApi->deleteGuardianCategory($d->id);
+		}
+	}
 	redirect();
 }
 
@@ -54,8 +60,13 @@ $titles = array(
 $formatters = array(
 	"id" => "fmt_actions");
 
-$data = $csApi->getGuardianCategoryList();
-// TODO sort by name
+// get data from api, then map with keys by name for sorting
+$datalist = $csApi->getGuardianCategoryList();
+$data = array();
+foreach ($datalist as $d) {
+	$data[$d->name] = $d;
+}
+ksort($data);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
