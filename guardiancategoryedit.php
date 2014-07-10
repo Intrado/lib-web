@@ -18,6 +18,7 @@ require_once('obj/PageForm.obj.php');
  */
 class GuardianCategoryEditPage extends PageForm {
 
+	public static $NO_ACCESS = "-- Select a Profile --";
 	protected $guardianCategory = null; //current guardian category 
 	protected $categoryId = null; //category id
 	protected $error = '';
@@ -57,8 +58,6 @@ class GuardianCategoryEditPage extends PageForm {
 		} else {
 			$this->categoryId = null;
 		}
-
-		$this->options['windowTitle'] = ($this->categoryId) ? _L('Edit Guardian Category') : _L('New Guardian Category');
 	}
 
 	public function load(&$get = array(), &$post = array(), &$request = array(), &$session = array()) {
@@ -114,7 +113,9 @@ class GuardianCategoryEditPage extends PageForm {
 	public function render() {
 		// define main:subnav tab settings
 		$this->options["page"] = 'admin:settings';
-		$this->options['title'] = _L('Guardian Category Editor');
+		$this->options['windowTitle'] = _L('Guardian Category');
+		$this->options['title'] = _L('Edit Guardian Category: %1$s ', escapehtml(($this->categoryId && is_object($this->guardianCategory)) ? $this->guardianCategory->name : "New Guardian Category"));
+
 		if (strlen($this->error)) {
 			//TODO:should we create modal display? 
 			$html = $this->error;
@@ -136,10 +137,12 @@ class GuardianCategoryEditPage extends PageForm {
 	 * @return object Form
 	 */
 	public function pageForm() {
-		$profileNames = array("0" => "No Access");
+		$profileNames = array("0" => GuardianCategoryEditPage::$NO_ACCESS);
+		$validSelections = array();
 		foreach ($this->profiles as $p) {
 			if ($p->type === "guardian") {
 				$profileNames[$p->id] = $p->name;
+				$validSelections[] = $p->id;
 			}
 		}
 		$formdata = array(
@@ -159,7 +162,7 @@ class GuardianCategoryEditPage extends PageForm {
 				"label" => _L('Guardian Profile'),
 				"fieldhelp" => _L('The the profile for this category.'),
 				"value" => isset($this->guardianCategory->profileId) ? $this->guardianCategory->profileId : "0",
-				"validators" => array(),
+				"validators" => array(array("ValInArray", "values" => $validSelections),),
 				"control" => array("SelectMenu", "values" => $profileNames),
 				"helpstep" => 2
 			)
@@ -167,7 +170,7 @@ class GuardianCategoryEditPage extends PageForm {
 
 		$helpsteps = array(
 			_L('Enter a name for Guardian Category.'),
-			_L('Select a Guardian Profile for this category.')
+			_L('Select a Guardian Profile for this category. In order to create a Guardian profile, navigate to Admin>Profiles and click on "Add New Guardian Profile" button.')
 		);
 
 		$buttons = array(

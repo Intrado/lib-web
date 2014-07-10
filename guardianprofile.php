@@ -55,8 +55,6 @@ class GuardianProfilePage extends PageForm {
 		} else {
 			$this->profileId = null;
 		}
-
-		$this->options['windowTitle'] = ($this->profileId) ? _L('Edit Guardian Profile') : _L('New Guardian Profile');
 	}
 
 	public function load(&$get = array(), &$post = array(), &$request = array(), &$session = array()) {
@@ -120,7 +118,9 @@ class GuardianProfilePage extends PageForm {
 	public function render() {
 		// define main:subnav tab settings
 		$this->options["page"] = 'admin:profiles';
-		$this->options['title'] = _L('Profile Editor');
+		$this->options['windowTitle'] = _L('Guardian Profile');
+		$this->options['title'] = _L('Edit Guardian Profile: %1$s ', escapehtml(($this->profileId && is_object($this->profile)) ? $this->profile->name : "New Guardian Profile"));
+
 		if (strlen($this->error)) {
 			$html = $this->error;
 		} else if (!(is_null($this->profileId) || is_object($this->profile))) {
@@ -198,7 +198,7 @@ class GuardianProfilePage extends PageForm {
 				"value" => (!$infocenter) ? "" : "infocenter",
 				"validators" => array(),
 				"control" => array("CheckBox"),
-				"helpstep" => 3
+				"helpstep" => 2
 			)
 		);
 
