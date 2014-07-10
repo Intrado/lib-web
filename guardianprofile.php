@@ -118,8 +118,8 @@ class GuardianProfilePage extends PageForm {
 	public function render() {
 		// define main:subnav tab settings
 		$this->options["page"] = 'admin:profiles';
-		$this->options['windowTitle'] = _L('Guardian Profile');
-		$this->options['title'] = _L('Edit Guardian Profile: %1$s ', escapehtml(($this->profileId && is_object($this->profile)) ? $this->profile->name : "New Guardian Profile"));
+		$this->options['windowTitle'] = _L('Profile Access Controls');
+		$this->options['title'] = _L('Guardian Profile Editor: %1$s ', escapehtml(($this->profileId && is_object($this->profile)) ? $this->profile->name : "New Guardian Profile"));
 
 		if (strlen($this->error)) {
 			$html = $this->error;
