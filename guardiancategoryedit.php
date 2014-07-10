@@ -57,8 +57,6 @@ class GuardianCategoryEditPage extends PageForm {
 		} else {
 			$this->categoryId = null;
 		}
-
-		$this->options['windowTitle'] = ($this->categoryId) ? _L('Edit Guardian Category') : _L('New Guardian Category');
 	}
 
 	public function load(&$get = array(), &$post = array(), &$request = array(), &$session = array()) {
@@ -114,7 +112,9 @@ class GuardianCategoryEditPage extends PageForm {
 	public function render() {
 		// define main:subnav tab settings
 		$this->options["page"] = 'admin:settings';
-		$this->options['title'] = _L('Guardian Category Editor');
+		$this->options['windowTitle'] = _L('Guardian Category');
+		$this->options['title'] = _L('Edit Guardian Category: %1$s ', escapehtml(($this->categoryId && is_object($this->guardianCategory)) ? $this->guardianCategory->name : "New Guardian Category"));
+
 		if (strlen($this->error)) {
 			//TODO:should we create modal display? 
 			$html = $this->error;
