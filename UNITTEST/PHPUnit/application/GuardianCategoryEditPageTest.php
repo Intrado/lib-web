@@ -160,7 +160,7 @@ class GuardianCategoryEditPageTest extends PHPUnit_Framework_TestCase {
 		$formName = $page->formName;
 		$this->assertTrue(false !== strpos($formhtml, "{$formName}_name"), 'Missing name input field');
 		$this->assertTrue(false !== strpos($formhtml, "{$formName}_profile"), 'Missing profile selection field');
-		$this->assertTrue(false !== strpos($formhtml, '<option value="0" selected >No Access</option>'), 'Default Access profile is not selected');
+		$this->assertTrue(false !== strpos($formhtml, '<option value="0" selected >' . GuardianCategoryEditPage::$NO_ACCESS . '</option>'), 'Default Access profile is not selected');
 	}
 
 	// it redirects the request to edit a specific records after stashing the ID into the session

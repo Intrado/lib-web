@@ -18,6 +18,7 @@ require_once('obj/PageForm.obj.php');
  */
 class GuardianCategoryEditPage extends PageForm {
 
+	public static $NO_ACCESS = "-- Select a Profile --";
 	protected $guardianCategory = null; //current guardian category 
 	protected $categoryId = null; //category id
 	protected $error = '';
@@ -136,10 +137,12 @@ class GuardianCategoryEditPage extends PageForm {
 	 * @return object Form
 	 */
 	public function pageForm() {
-		$profileNames = array("0" => "No Access");
+		$profileNames = array("0" => GuardianCategoryEditPage::$NO_ACCESS);
+		$validSelections = array();
 		foreach ($this->profiles as $p) {
 			if ($p->type === "guardian") {
 				$profileNames[$p->id] = $p->name;
+				$validSelections[] = $p->id;
 			}
 		}
 		$formdata = array(
@@ -159,7 +162,7 @@ class GuardianCategoryEditPage extends PageForm {
 				"label" => _L('Guardian Profile'),
 				"fieldhelp" => _L('The the profile for this category.'),
 				"value" => isset($this->guardianCategory->profileId) ? $this->guardianCategory->profileId : "0",
-				"validators" => array(),
+				"validators" => array(array("ValInArray", "values" => $validSelections),),
 				"control" => array("SelectMenu", "values" => $profileNames),
 				"helpstep" => 2
 			)
@@ -167,7 +170,7 @@ class GuardianCategoryEditPage extends PageForm {
 
 		$helpsteps = array(
 			_L('Enter a name for Guardian Category.'),
-			_L('Select a Guardian Profile for this category.')
+			_L('Select a Guardian Profile for this category. In order to create a Guardian profile, navigate to Admin>Profiles and click on "Add New Guardian Profile" button.')
 		);
 
 		$buttons = array(
