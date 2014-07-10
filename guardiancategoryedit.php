@@ -170,7 +170,7 @@ class GuardianCategoryEditPage extends PageForm {
 
 		$helpsteps = array(
 			_L('Enter a name for Guardian Category.'),
-			_L('Select a Guardian Profile for this category. In order to create a Guardian profile, navigate to Admin>Profiles and click on "Add New Guardian Profile" button.')
+			_L('Select a Guardian Profile for this category. In order to create a Guardian Profile, navigate to Admin -> Profiles and click on the "Add New Guardian Profile" button.')
 		);
 
 		$buttons = array(
