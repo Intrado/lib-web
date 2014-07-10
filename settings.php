@@ -41,7 +41,12 @@ if ($USER->authorize('managesystem') || $USER->authorize('metadata')) {
 			$systemLinks[] = "<a href='scheduledatamanager.php'>Section Field Definitions</a>";
 		}
 		$systemLinks[] = "<a href='organizationdatamanager.php'>Organization Manager</a>";
-		$systemLinks[] = "<a href='guardiancategorymanager.php'>Guardian Category Manager</a>";
+		
+		// find if customer has guardian model, do not display section for guardian categories if not
+		$maxguardians = getSystemSetting("maxguardians", 0);
+		if ($maxguardians) {
+			$systemLinks[] = "<a href='guardiancategorymanager.php'>Guardian Category Manager</a>";
+		}
 	}
 	if ($USER->authorize('managesystem')) {
 		$systemLinks[] = "<a href='securitysettings.php'>Security</a>";
