@@ -83,6 +83,9 @@ ksort($accessGuardianList);
 //ksort($accessCsList, SORT_NATURAL | SORT_FLAG_CASE);
 //ksort($accessGuardianList, SORT_NATURAL | SORT_FLAG_CASE);
 
+// find if customer has guardian model, do not display section for guardian profiles if not
+$maxguardians = getSystemSetting("maxguardians", 0);
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
@@ -99,16 +102,17 @@ $titles = array(	"name" => _L("Name"),
 		"Actions" => _L("Actions")
 );
 
-startWindow(_L('Profile List'), 'padding: 3px;');
+startWindow(_L('User Profile List'), 'padding: 3px;');
 
 ?>
-	<div class="feed_btn_wrap cf"><?= icon_button(_L('Add New Access Profile'),"add",null,"profile.php?id=new") ?></div>
+	<div class="feed_btn_wrap cf"><?= icon_button(_L('Add New User Profile'),"add",null,"profile.php?id=new") ?></div>
 <?
 
 showObjects($accessCsList, $titles, array("Actions" => "fmt_actions" /*, "moduserid" => "fmt_creator"*/), count($data) > 10);
 endWindow();
 
 ///////////// Guardian Profiles
+if ($maxguardians) {
 $titles = array(	"name" => _L("Name"),
 		"description" => _L("Description"),
 		"Actions" => _L("Actions")
@@ -122,6 +126,7 @@ startWindow(_L('Guardian Profile List'), 'padding: 3px;');
 
 showObjects($accessGuardianList, $titles, array("Actions" => "fmt_guardian_actions" /*, "moduserid" => "fmt_creator"*/), count($data) > 10);
 endWindow();
+} // end if guardian model
 
 include_once("navbottom.inc.php");
 ?>
