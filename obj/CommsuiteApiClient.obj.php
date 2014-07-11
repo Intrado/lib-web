@@ -97,16 +97,17 @@ class CommsuiteApiClient {
 	 * @param int $accessid guardian profile id
 	 * @return boolean true if success else false
 	 */
-	public function setGuardianCategory($id, $name, $accessid) {
-		$profile =(object) null;
-		$profile->name = $name;
-		$profile->profileId = $accessid;
+	public function setGuardianCategory($id, $name, $accessid, $sequence) {
+		$category =(object) null;
+		$category->name = $name;
+		$category->profileId = $accessid;
+		$category->sequence = $sequence;
 		if (is_null($id)) {
-			$res = $this->apiClient->post(self::API_GUARDIAN_CATEGORIES."/", $profile);
+			$res = $this->apiClient->post(self::API_GUARDIAN_CATEGORIES."/", $category);
 			return ($res['code'] == 201 ? json_decode($res['body']) : false);
 		} else {
-			$profile->id = $id;
-			$res = $this->apiClient->put(self::API_GUARDIAN_CATEGORIES."/".$id, $profile);
+			$category->id = $id;
+			$res = $this->apiClient->put(self::API_GUARDIAN_CATEGORIES."/".$id, $category);
 			return ($res['code'] == 200 ? json_decode($res['body']) : false);
 		}
 	

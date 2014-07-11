@@ -96,7 +96,7 @@ class GuardianCategoryEditPage extends PageForm {
 				$postdata = $this->form->getData();
 				$name = $postdata['name'];
 				$profileId = $postdata['profile'];
-				$result = $this->csApi->setGuardianCategory($this->categoryId, $name, $profileId == "0" ? null : $profileId);
+				$result = $this->csApi->setGuardianCategory($this->categoryId, $name, $profileId == "0" ? null : $profileId, $this->guardianCategory->sequence);
 				if ($result) {
 					unset($_SESSION['categoryid']);
 					notice(_L("The Guardian Category was successfully {$action}."));
