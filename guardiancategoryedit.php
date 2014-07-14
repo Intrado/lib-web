@@ -116,18 +116,16 @@ class GuardianCategoryEditPage extends PageForm {
 		$this->options['windowTitle'] = _L('Guardian Category');
 		$this->options['title'] = _L('Edit Guardian Category: %1$s ', escapehtml(($this->categoryId && is_object($this->guardianCategory)) ? $this->guardianCategory->name : "New Guardian Category"));
 
-		if (strlen($this->error)) {
-			//TODO:should we create modal display? 
-			$html = $this->error;
-		}
 		//category not created or updated.?
-		else if (!(is_null($this->categoryId) || is_object($this->guardianCategory))) {
+		if (!(is_null($this->categoryId) || is_object($this->guardianCategory))) {
 			unset($_SESSION['categoryid']);
 			$html = _L('The Guardian Category you have requested could not be found. It may not exist or your account does not have permission to view it.') . "<br/>\n";
 		} else {
 			$html = $this->form->render();
 		}
-
+		if (strlen($this->error)) {
+			$html .= modalErrorDialog($this->error);
+		}
 		return($html);
 	}
 

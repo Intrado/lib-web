@@ -121,13 +121,14 @@ class GuardianProfilePage extends PageForm {
 		$this->options['windowTitle'] = _L('Profile Access Controls');
 		$this->options['title'] = _L('Guardian Profile Editor: %1$s ', escapehtml(($this->profileId && is_object($this->profile)) ? $this->profile->name : "New Guardian Profile"));
 
-		if (strlen($this->error)) {
-			$html = $this->error;
-		} else if (!(is_null($this->profileId) || is_object($this->profile))) {
+		if (!(is_null($this->profileId) || is_object($this->profile))) {
 			unset($_SESSION['profileid']);
 			$html = _L('The profile you have requested could not be found. It may not exist or your account does not have permission to view it.') . "<br/>\n";
 		} else {
 			$html = $this->form->render();
+		}
+		if (strlen($this->error)) {
+			$html .= modalErrorDialog($this->error);
 		}
 		return($html);
 	}

@@ -711,4 +711,30 @@ function convertWavToMp3($filename) {
 	return $data;
 }
 
+/**
+ * Creates a simple modal dialog. NOTE: modal elements are defined in nav.inc.php. Thus, it requires nav.inc.php.
+ * @param string $content content to display
+ * @param string $heading header 
+ * @return String script
+ */
+function modalErrorDialog($content, $heading = 'Error', $width='600px') {
+	$html = <<<END
+		<script language="JavaScript">
+			(function($) {
+				var modal = $('#defaultmodal');
+				var header = modal.find(".modal-header h3");
+				var body = modal.find(".modal-body");
+				modal.modal();
+				modal.height("auto");
+				modal.width("$width");
+				header.html("$heading");
+				body.html("$content");
+			}) (jQuery);
+		</script>
+END;
+
+	return($html);
+}
+
+
 ?>
