@@ -626,7 +626,6 @@
 				callback(cleanedContent);
 			}
 
-	
 			return(true);
 		};
 	
@@ -799,33 +798,93 @@
 		 * @return string The cleaned up HTML
 		 */
 		this.cleanFieldInserts = function (html) {
-			var regex = /&lt;(<.*?>)*?&lt;(.+?)&gt;(<.*?>)*?&gt;/g;
-			var matches = html.match(regex);
-	
-			if (!matches) {
-				return html;
-			}
-	
-			for (var i = 0, count = matches.length; i < count; i++) {
-				var cleaner = matches[i].replace(regex, '$1&lt;&lt;$2&gt;&gt;$3');
-				var beforeinsert = cleaner.match(/^(.*)?&lt;&lt;/)[1] || '';
-				var afterinsert = cleaner.match(/&gt;&gt;(.*)?$/)[1] || '';
-	
-				var field = cleaner.match(/&lt;&lt;(.+)?&gt;&gt;/)[1] || '';
-	
-				var opentags = field.match(/<[^\/]*?>/g);
-				if (opentags) {
-					beforeinsert += opentags.join('');
+
+			// Some HTML tag getting inserted into our marker?
+			// FIXME: This function does not appear... to function... as intended.
+			var possibilities = [];
+
+			// A normal FI with a possible disruption at beginning and/or end
+			//possibilities.push('/&lt;(<.*?>)*?(&lt;)(.+?)(&gt;)(<.*?>)*?&gt;/g');
+			possibilities.push({
+				'opener': '&lt;&lt;',
+				'opener_pattern': '&lt;(<.*?>)*?&lt;',
+				'closer': '&gt;&gt;',
+				'closer_pattern': '&gt;(<.*?>)*?&gt;'
+			});
+
+			// An SDD FI with a possible disruption at beginning and/or end
+			//possibilities.push('/&lt;(<.*?>)*?(\{)(.+?)(\})(<.*?>)*?&gt;/g');
+			possibilities.push({
+				'opener': '&lt;{',
+				'opener_pattern': '&lt;(<.*?>)*?\{',
+				'closer': '}&gt;',
+				'closer_pattern': '\}(<.*?>)*?&gt;'
+			});
+
+			// For each of the possibilities properties...
+			for (var num in possibilities) {
+
+				// ref: http://stackoverflow.com/questions/9329446/how-to-do-for-each-over-an-array-in-javascript
+				if  (! (possibilities.hasOwnProperty(num) &&	// Unless possibilities has this property (not inherited)
+					/^0$|^[1-9]\d*$/.test(num) &&		// and it's an integer number
+					num <= 4294967294)) {			// and it's within integer range for an array index
+					continue;				// move on to the next object property to iterate
 				}
-	
-				var closedtags = field.match(/<\/.*?>/g);
-				if (closedtags) {
-					afterinsert = closedtags.join('') + afterinsert;
+
+				var possibility = possibilities[num];
+
+				// Find any FI's that start with this possible opener's pattern and have the matching closer
+				//var regex = '/' + possibility.opener_pattern + '(.+?)' + possibility.closer_pattern + '/g';
+				var regex = new RegExp(possibility.opener_pattern + '(.+?)' + possibility.closer_pattern, 'g');
+
+				// And if we find any like this...
+				var matches = html.match(regex);
+				if (matches) {
+
+					// Replace them with a version that shoves text inserted in the middle of the markers to the outside
+					var replacewith = '$1' + possibility.opener + '$2' + possibility.closer + '$3';
+
+					// For each one found...
+					for (var i = 0, count = matches.length; i < count; i++) {
+
+						// Do the replacement
+						var cleaner = matches[i].replace(regex, replacewith);
+
+						// Capture the text to the left and right of the FI...
+						var beforeinsert = cleaner.match(new RegExp('^(.*)?' + possibility.opener))[1] || '';
+						var afterinsert = cleaner.match(new RegExp(possibility.closer + '(.*)?$'))[1] || '';
+
+						// Capture just the text *within* the FI itself
+						var field = cleaner.match(new RegExp(possibility.opener + '(.+)?' + possibility.closer))[1] || '';
+			
+						// For any tags opening within the FI...
+						var opentags = field.match(/<[^\/]*?>/g);
+						if (opentags) {
+
+							// ... move them to before the FI begins
+							beforeinsert += opentags.join('');
+						}
+			
+						// For any tags closing within the FI...
+						var closedtags = field.match(/<\/.*?>/g);
+						if (closedtags) {
+
+							// ... move them to after the FI ends
+							afterinsert = closedtags.join('') + afterinsert;
+						}
+
+						// TODO - scrub any tags beginning or ending within the FI and trim it...
+						field = this.trim(field.replace(/<.+?>/g, ''));
+
+						// And finally replace the originally matched FI with one reconstituted
+						// with leading and trailing formatting information
+						var replacement = beforeinsert + possibility.opener + field + possibility.closer + afterinsert;
+
+						html = html.replace(matches[i], replacement);
+					}
 				}
-	
-				field = this.trim(field);
-				html = html.replace(matches[i], beforeinsert + '&lt;&lt;' + field + '&gt;&gt;' + afterinsert);
 			}
+
 			return html;
 		};
 	
