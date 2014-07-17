@@ -111,7 +111,6 @@ window.RCIEditorInline = function () {
 			});
 
 			editor.on('key', function (event) {
-
 				// The following keys we want to captureChanges() on because they just represent changes to the content;
 				// any other keys are for cursor movement, etc. which don't affect the content.
 				// ref: http://www.webonweboff.com/tips/js/event_key_codes.aspx
@@ -125,9 +124,6 @@ window.RCIEditorInline = function () {
 			});
 			editor.on('blur', function () {
 				that.activeEditorId = null;
-				that.captureChanges();
-			});
-			editor.on('saveSnapshot', function () {
 				that.captureChanges();
 			});
 			editor.on('afterCommandExec', function () {
