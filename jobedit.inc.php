@@ -645,7 +645,8 @@ $helpsteps[] = _L("Select an existing message to use. If you do not see the mess
 if ($submittedmode || $completedmode) {
 	$formdata[] = _L('List(s)');
 	$query = "select name from list where id in (" . repeatWithSeparator("?", ",", count($selectedlists)) . ")";
-	$listhtml = implode("<br/>",QuickQueryList($query,false,false,$selectedlists));
+	$listnames = QuickQueryList($query, false, false, $selectedlists);
+	$listhtml = implode("<br/>", array_unique($listnames));
 	$formdata["lists"] = array(
 		"label" => _L('List(s)'),
 		"fieldhelp" => _L('Select a list from your existing lists.'),
