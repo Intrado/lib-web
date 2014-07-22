@@ -771,3 +771,6 @@ ALTER TABLE `customerproduct` CHANGE `product` `product` ENUM( 'cs', 'tai', 'cm'
 
 -- Add an index to the type and username to avoid table scans when executing logins and lookups
 ALTER TABLE `portaluseridentification` ADD INDEX `type_username` ( `type` , `username` );
+
+-- Add an index to the portalactivation portaluserid for lookups which need to find existing activation codes
+ALTER TABLE portalactivation ADD INDEX ( portaluserid );
