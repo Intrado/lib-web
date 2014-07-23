@@ -66,7 +66,7 @@ function summarizeListName($listid) {
 	if (count($summary) > 0) {
 		$list->name = SmartTruncate(implode('; ', $summary),50);
 	} else {
-		$list->name = _L('Quick Pick');
+		$list->name = _L('Please Add Rules to This List');
 	}
 	
 	$list->update();
@@ -119,7 +119,7 @@ function handleRequest() {
 			$list->modifydate = date("Y-m-d H:i:s");
 			$list->description = 'Created in MessageSender';
 			$list->userid = $USER->id;
-			$list->name = _L('Quick Pick');
+			$list->name = _L('Please Add Rules to This List');
 			$list->deleted = 1;
 			$list->type = isset($_POST['sectionids']) ? 'section' : 'person';
 			$list->update();
