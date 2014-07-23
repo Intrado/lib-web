@@ -113,13 +113,16 @@ function handleRequest() {
 				if ($errormessage !== true)
 					return array('error' => $errormessage);
 			}
+
+			// Accept a default name for this list via request parameter
+			$listName = (isset($_REQUEST['name'])? substr($_REQUEST['name'],0,50) : _L('Please Add Rules to This List'));
 			
 			// CREATE list
 			$list = new PeopleList(null);
 			$list->modifydate = date("Y-m-d H:i:s");
 			$list->description = 'Created in MessageSender';
 			$list->userid = $USER->id;
-			$list->name = _L('Please Add Rules to This List');
+			$list->name = $listName;
 			$list->deleted = 1;
 			$list->type = isset($_POST['sectionids']) ? 'section' : 'person';
 			$list->update();
