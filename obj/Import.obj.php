@@ -47,6 +47,45 @@ class Import extends DBMappedObject {
 		return QuickQuery("select data from import where id=?", false, array($this->id));
 	}
 
+	/** Returns the import CSV filedata, or extracts the largest non-hidden candidate from a zip file. Returns false if it was a zip file and no suitable entry was found. */
+	function downloadCsvData () {
+		$data =  $this->download();
+		//see if this is a zip file using PK zip header magic numbers see http://www.garykessler.net/library/file_sigs.html
+		if (strlen($data) > 4 && $data[0] == "P" && $data[1] == "K" && $data[2] == "\x03" && $data[3] == "\x04") {
+			//we need to use the zip functions to read the csv file out. zip utils only work with files. A data wrapper seems simplier than a temp file but may have memory implications
+			$datafile = "data://image/jpeg;base64," . base64_encode($data);
+			unset $data; //maybe reclaim memory
+			if (!$zip = resource zip_open($datafile) )
+				return false;
+
+			unset $datafile; //maybe reclaim memory
+
+			//find the largest non-hidden file
+			$largestEntry = false;
+			$largestSize = 0;
+			while ($entry = zip_read($zip)) {
+				if (strpos(zip_entry_name($entry), ".") === 0)
+					continue;
+				$size = zip_entry_filesize($entry);
+				if ($size > $largestSize) {
+					$largestSize = $size;
+					$largestEntry = $entry;
+				}
+			}
+
+			if ($largestEntry !== false) {
+				$result = zip_entry_read($largestEntry);
+			} else {
+				$result = false;
+			}
+			zip_close($zip);
+			return $result;
+		} else {
+			//plain csv
+			return $data;
+		}
+	}
+
 	// Always remove links to userAssociations, but don't actually remove them. We want the user to retain their privileges
 	function unlinkUserAssociations() {
 		return QuickUpdate("update userassociation set importid = null where importid = ?", false, array($this->id));

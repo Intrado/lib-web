@@ -29,8 +29,26 @@ require_once("obj/User.obj.php");
 require_once("obj/Import.obj.php");
 
 
-
-
+if (isset($_GET['download']) && isset($_GET['key'])) {
+	$identity = $_GET['key'];
+	if ($importid = authorizeUploadImport($identity, $CUSTOMERURL)) {
+		doStartSession();
+		$import = new Import($importid);
+		
+		if ($data = $import->downloadCsvData()) {
+			header("Pragma: private");
+			header("Cache-Control: private");
+			header("Content-disposition: attachment; filename=data.csv");
+			header("Content-type: application/vnd.ms-excel");
+			echo $data;
+		} else {
+			header("HTTP/1.0 500 Internal Server Error");
+		}
+	} else {
+		header("HTTP/1.0 404 Not Found");
+	}
+	exit();
+}
 
 //call 	doStartSession(); manually
 
