@@ -269,7 +269,7 @@ if ($datatype == "person") {
 	$maptofields["skey"] = "Section";
 	$maptofields["okey"] = getSystemSetting("organizationfieldname","Organization");
 	$maptofields[":enrollment:grade:letter"] = "Letter Grade";
-	$maptofields[":enrollment:grade:percent"] = "Percent Grade";
+	//$maptofields[":enrollment:grade:percent"] = "Percent Grade";
 	
 } else if ($datatype == "section") {
 	
