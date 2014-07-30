@@ -29,8 +29,29 @@ require_once("obj/User.obj.php");
 require_once("obj/Import.obj.php");
 
 
-
-
+//allow downloading of the import csv file. NOTE: this may be different if a zip was uploaded, only the csv file inside is sent.
+if (isset($_GET['download']) && isset($_GET['key'])) {
+	$identity = $_GET['key'];
+	if ($importid = authorizeUploadImport($identity, $CUSTOMERURL)) {
+		doStartSession();
+		$import = new Import($importid);
+		
+		if ($fp = $import->openCsvFile()) {
+			header("Pragma: private");
+			header("Cache-Control: private");
+			header("Content-disposition: attachment; filename=data.csv");
+			header("Content-type: application/vnd.ms-excel");
+			echo fpassthru($fp);
+			fclose($fp);
+		} else {
+			error_log_helper("Trying to download an import ($importid), but couldn't open csv file");
+			header("HTTP/1.0 500 Internal Server Error");
+		}
+	} else {
+		header("HTTP/1.0 404 Not Found");
+	}
+	exit();
+}
 
 //call 	doStartSession(); manually
 
