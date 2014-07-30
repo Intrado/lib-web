@@ -47,43 +47,81 @@ class Import extends DBMappedObject {
 		return QuickQuery("select data from import where id=?", false, array($this->id));
 	}
 
-	/** Returns the import CSV filedata, or extracts the largest non-hidden candidate from a zip file. Returns false if it was a zip file and no suitable entry was found. */
-	function downloadCsvData () {
-		$data =  $this->download();
-		//see if this is a zip file using PK zip header magic numbers see http://www.garykessler.net/library/file_sigs.html
-		if (strlen($data) > 4 && $data[0] == "P" && $data[1] == "K" && $data[2] == "\x03" && $data[3] == "\x04") {
-			//we need to use the zip functions to read the csv file out. zip utils only work with files. A data wrapper seems simplier than a temp file but may have memory implications
-			$datafile = "data://image/jpeg;base64," . base64_encode($data);
-			unset $data; //maybe reclaim memory
-			if (!$zip = resource zip_open($datafile) )
-				return false;
+	/** downloads, unzips if neccessary, and returns a file pointer to the csv file contained in this import. Please close it when you're done.
+	  * Returns false if unable to extract a csv file from the zip.
+	  * NOTE: creates tempfiles, but should unlink them while the file is still open to avoid making the caller's life complicated.
+	  * While this will leave the ZipArchive open, php will close the file when this page terminates, allowing the os to reclaim 
+	  * the unlinked files space.
+	  */
+	function openCsvFile () {
+		//scan the file
+		$importfile = secure_tmpname("importfiledownload",".dat");
+		file_put_contents($importfile,$this->download());
 
-			unset $datafile; //maybe reclaim memory
+		//see if this will open with zip
+		$fp = false;
+		$zip = new ZipArchive();
+		$res = $zip->open($importfile);
 
-			//find the largest non-hidden file
-			$largestEntry = false;
-			$largestSize = 0;
-			while ($entry = zip_read($zip)) {
-				if (strpos(zip_entry_name($entry), ".") === 0)
-					continue;
-				$size = zip_entry_filesize($entry);
-				if ($size > $largestSize) {
-					$largestSize = $size;
-					$largestEntry = $entry;
-				}
-			}
-
-			if ($largestEntry !== false) {
-				$result = zip_entry_read($largestEntry);
-			} else {
-				$result = false;
-			}
-			zip_close($zip);
-			return $result;
+		if ($res === true) {
+			//try to find best file match
+			$entry = $this->scan_zip($zip,"extension");
+			if ($entry === false)
+				$entry = $this->scan_zip($zip,"largest");
+			//see if we found a file, and open a stream for it
+			if ($entry !== false)
+				$fp = $zip->getStream($entry["name"]);
 		} else {
-			//plain csv
-			return $data;
+			$fp = @fopen($importfile , "r");
 		}
+
+		unlink($importfile); //should remain readable as long as it's still open
+
+		return $fp;
+	}
+
+	//helper function to scan a zip file for likely import files
+	private function scan_zip($zip,$mode) {
+		$max = 0;
+		$foundentry = false;
+		for ($x = 0; $x < $zip->numFiles; $x++) {
+			$entry = $zip->statIndex($x);
+			$name = $entry["name"];
+			$basename = basename($entry["name"]);
+			
+			//skip all hidden files that start with '.'
+			if (strpos($basename,".") === 0)
+				continue;	
+			//skip maxosx stuff
+			if (strpos($name,"__MACOSX") !== false)
+				continue;
+			//skip directories
+			if ($name[strlen($name)-1] == "/")
+				continue;
+			//skip empty files
+			if ($entry['size'] == 0)
+				continue;
+			
+			switch ($mode) {
+				case "largest":
+					if ($entry['size'] > $max) {
+						$max = $entry['size'];
+						$foundentry = $entry;
+					}
+					break;
+				case "extension":
+					$bits = explode(".",$basename);				
+					if (($count = count($bits)) > 1) {
+						$ext = strtolower($bits[$count-1]);
+						if ($ext == "csv" || $ext == "txt") {
+							$foundentry = $entry;
+						}
+					}
+					break;
+			}
+		}
+		
+		return $foundentry;
 	}
 
 	// Always remove links to userAssociations, but don't actually remove them. We want the user to retain their privileges
