@@ -52,6 +52,7 @@ class TopicDataManagerTest extends PHPUnit_Framework_TestCase {
 		$this->tdm = $this->getMock('TopicDataManager', array('rootOrganizationId'));
 	}
 
+	/*
 	public function test_rootOrganizationId() {
 		// needs database access to test
 		$this->markTestIncomplete();
@@ -66,7 +67,7 @@ class TopicDataManagerTest extends PHPUnit_Framework_TestCase {
 		// needs database access to test
 		$this->markTestIncomplete();
 	}
-
+	*/
 
 	public function test_updateTopicName() {
 		$fakeTopic = new FakeTopic();
