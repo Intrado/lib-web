@@ -83,7 +83,7 @@ class GuardianCategoryAssociation extends PageBase {
 
 	// @override
 	public function sendPageOutput() {
-		$titles = array("pkey" => "Unique ID", "firstname" => 'First Name', "lastname" => 'LastName', "guardian" => 'Guardian');
+		$titles = array("gkey" => "Unique ID", "firstname" => 'First Name', "lastname" => 'LastName');
 		buttons(icon_button(_L("Back"), "fugue/arrow_180", "document.location='guardiancategorymanager.php';"));
 
 		startWindow("Associations");
@@ -92,7 +92,7 @@ class GuardianCategoryAssociation extends PageBase {
 			showPageMenu($this->total, $this->displayStart, $this->pagingLimit);
 			?></div><div style="clear:both"></div>
 			<table width="100%" cellpadding="3" cellspacing="1" class="list"><?
-				showTable($this->guardianAssocations, $titles, array("pkey" => "fmt_persontip"));
+				showTable($this->guardianAssocations, $titles, array("gkey" => "fmt_persontip"));
 				?></table><?
 			showPageMenu($this->total, $this->displayStart, $this->pagingLimit);
 		} else {
@@ -104,7 +104,7 @@ class GuardianCategoryAssociation extends PageBase {
 	}
 
 	public function getAssociation($person) {
-		$arrItem = array("personid" => $person->personId, "pkey" => $person->pkey, "firstname" => $person->firstName, "lastname" => $person->lastName, "guardian" => $person->guardianName);
+		$arrItem = array("personid" => $person->personId, "gkey" => $person->gkey, "firstname" => $person->firstName, "lastname" => $person->lastName);
 		return $arrItem;
 	}
 

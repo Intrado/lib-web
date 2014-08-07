@@ -147,11 +147,9 @@ class GuardianCategoryAssociationTest extends PHPUnit_Framework_TestCase {
 		for ($i = 0; $i < 100; $i++) {
 			$a = new stdClass();
 			$a->personId = $i;
-			$a->pkey = "P-" . $i;
 			$a->gkey = "G-" . $i;
 			$a->firstName = "First Name-" . $i;
 			$a->lastName = "Last Name-" . $i;
-			$a->guardianName = "Guardian Name-" . $i;
 			$associations->associations[] = $a;
 		}
 
