@@ -46,11 +46,12 @@ if (isset($_GET['deleteunassociated'])) {
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-function fmt_actions ($obj, $name) {
+function fmt_actions($obj, $name) {
 	return action_links(
-		action_link("Edit", "pencil", "guardiancategoryedit.php?id=". $obj->id),
-		action_link("Delete", "cross", "guardiancategorymanager.php?id=". $obj->id ."&delete","return confirm('". addslashes(_L('Are you sure you want to delete this guardian category?')) ."');")
-			);
+			action_link("Edit", "pencil", "guardiancategoryedit.php?id=" . $obj->id),
+			action_link("Delete", "cross", "guardiancategorymanager.php?id=" . $obj->id . "&delete", "return confirm('" . addslashes(_L('Are you sure you want to delete this guardian category?')) . "');"),
+			action_link("Associations", "fugue/clear_folders__arrow", "guardiancategoryassociation.php?categoryid=" . $obj->id)
+	);
 }
 
 $titles = array(

@@ -89,7 +89,25 @@ class CommsuiteApiClient {
 		$res = $this->apiClient->get(self::API_GUARDIAN_CATEGORIES . "/{$id}");
 		return($res['code'] == 200 ? json_decode($res['body']) : false);
 	}
-	
+
+	/**
+	 * Get guardian category associations for given id
+	 *
+	 * @param type $id category id
+	 * @return \GuardianCategory
+	 */
+	public function getGuardianCategoryAssoications($id, $start = null, $limit = null) {
+		$queryParms = '?';
+		if ($start != null) //TODO
+			$queryParms .= '&start=' . intval($start);
+		if ($limit)
+			$queryParms .= '&limit=' . intval($limit);
+		$url = self::API_GUARDIAN_CATEGORIES . "/{$id}/associations/{$queryParms}";
+		$res = $this->apiClient->get($url);
+		$associations = ($res['code'] == 200) ? json_decode($res['body']) : false;
+		return $associations;
+	}
+
 	/**
 	 *  update/create guardian category
 	 * @@param string $id category id

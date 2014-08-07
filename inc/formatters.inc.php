@@ -168,10 +168,10 @@ function fmt_idmagnify ($row,$index) {
 
 function fmt_persontip ($row, $index) {
 	global $USER;
-
-	$pkey = escapehtml($row[1]);
-	$personid = $row[0];
 	
+	$pkey = isset($row[1]) ? escapehtml($row[1]) : escapehtml($row[$index]);
+	$personid = isset($row[0]) ? $row[0] : $row['personid'];
+
 	if ($personid == '')
 		return "";
 	else
