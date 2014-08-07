@@ -72,6 +72,9 @@ class VoiceProviderManager {
 	protected function enableVoices($voiceIds) {
 		QuickUpdate('update ttsvoice set enabled = 1 where id in (' . repeatWithSeparator('?', ',', count($voiceIds)) . ')',
 			$this->customerDbConnection, $voiceIds);
+		QuickUpdate('update messagepart mp inner join ttsvoice t2 on (t2.id = mp.voiceid)
+			set mp.voiceid = (select id from ttsvoice t where t.languagecode = t2.languagecode and t.gender = t2.gender and t.enabled = 1)',
+			$this->customerDbConnection);
 	}
 
 	/**
