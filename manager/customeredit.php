@@ -35,7 +35,7 @@ require_once("../obj/Person.obj.php");
 require_once("../obj/User.obj.php");
 require_once("../obj/Organization.obj.php");
 require_once("../obj/Voice.obj.php");
-require_once("../obj/VoiceProviderManager.obj.php");
+require_once("obj/VoiceProviderManager.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -934,7 +934,19 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$originalDMMethod = $settings['_dmmethod'];
 		//check either DM method is changed or provider is changed.
 		if ($originalProvider != $postdata["ttsprovider"] || $originalDMMethod != $postdata["dmmethod"]) {
-			switchTTSProviderTo($postdata["ttsprovider"], $postdata["dmmethod"], $custdb);
+			$provider = $postdata["ttsprovider"];
+			$allowOtherProviders = true;
+
+			// If this customer is a SmartCall customer or has an enabled SmartCall device, we MUST switch them to Loquendo
+			// and disallow all other tts voice providers
+			$hasSmartCallDevice = QuickQuery("select 1 from custdm where enablestate != 'disabled' limit 1", $custdb, false);
+			if ($hasSmartCallDevice || in_array($postdata['dmmethod'], array('cs', 'hybrid'))) {
+				$provider = 'loquendo';
+				$allowOtherProviders = false;
+			}
+
+			$voiceManager = new VoiceProviderManager($custdb);
+			$voiceManager->switchTo($provider, $allowOtherProviders);
 		}
 
 		$phonetargetedmessage = false;
