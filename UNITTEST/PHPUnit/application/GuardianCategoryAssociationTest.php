@@ -170,7 +170,10 @@ class GuardianCategoryAssociationTest extends PHPUnit_Framework_TestCase {
 
 		$page = new GuardianCategoryAssociation($mockApi);
 
-		$page->beforeLoad();
+		$_SESSION['categoryid'] = $category->id;
+		$empty = array();
+		$page->beforeLoad($empty, $empty, $empty, $_SESSION);
+
 		$page->load();
 		$page->afterLoad();
 
@@ -222,7 +225,10 @@ class GuardianCategoryAssociationTest extends PHPUnit_Framework_TestCase {
 
 		$page = new GuardianCategoryAssociation($mockApi);
 
-		$page->beforeLoad();
+		$_SESSION['categoryid'] = $category->id;
+		$empty = array();
+		$page->beforeLoad($empty, $empty, $empty, $_SESSION);
+
 		$page->load();
 		$page->afterLoad();
 
