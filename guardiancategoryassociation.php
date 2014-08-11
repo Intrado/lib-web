@@ -83,7 +83,7 @@ class GuardianCategoryAssociation extends PageBase {
 
 	// @override
 	public function sendPageOutput() {
-		$titles = array("gkey" => "Unique ID", "firstname" => 'First Name', "lastname" => 'LastName');
+		$titles = array("gkey" => "Unique ID", "firstname" => 'First Name', "lastname" => 'Last Name');
 		buttons(icon_button(_L("Back"), "fugue/arrow_180", "document.location='guardiancategorymanager.php';"));
 
 		startWindow("Associations");
