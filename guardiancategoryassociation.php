@@ -47,6 +47,7 @@ class GuardianCategoryAssociation extends PageBase {
 
 	// @override
 	public function beforeLoad(&$get = array(), &$post = array(), &$request = array(), &$session = array()) {
+		unset($session['guardian_of_personid']);//this is a check to clear up session so that back button in contact edit page works properly
 		$this->setPagingStart((isset($get['pagestart'])) ? $get['pagestart'] : 0);
 
 		if (isset($request['categoryid']) && intval($request['categoryid'])) {

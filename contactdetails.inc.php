@@ -171,7 +171,7 @@ if (isset($personid)) {
 		$_SESSION['guardian_of_personid'] = $personid;
 	}
 	// set page to redirect back to
-	if ($isGuardian) {
+	if ($isGuardian && isset($_SESSION['guardian_of_personid'])) {
 		// return to last viewed student, assume that is how we got to viewing this guardian
 		$backTo = "viewcontact.php?id=" . $_SESSION['guardian_of_personid'];
 	} else {
