@@ -93,12 +93,12 @@ class CommsuiteApiClient {
 	/**
 	 * Get guardian category associations for given id
 	 *
-	 * @param type $id category id
-	 * @return \GuardianCategory
+	 * @param int $id category id
+	 * @return array of association data
 	 */
 	public function getGuardianCategoryAssoications($id, $start = null, $limit = null) {
 		$queryParms = '?';
-		if ($start != null) //TODO
+		if ($start != null)
 			$queryParms .= '&start=' . intval($start);
 		if ($limit)
 			$queryParms .= '&limit=' . intval($limit);

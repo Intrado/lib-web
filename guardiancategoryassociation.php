@@ -37,7 +37,7 @@ class GuardianCategoryAssociation extends PageBase {
 	// @override
 	function isAuthorized($get = array(), $post = array()) {
 		global $USER;
-		return $USER->authorize('viewcontacts');
+		return $USER->authorize('metadata');
 	}
 
 	// @override

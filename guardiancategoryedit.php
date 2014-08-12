@@ -41,7 +41,7 @@ class GuardianCategoryEditPage extends PageForm {
 
 	public function isAuthorized(&$get = array(), &$post = array(), &$request = array(), &$session = array()) {
 		global $USER;
-		return $USER->authorize('manageprofile');
+		return $USER->authorize('metadata');
 	}
 
 	public function beforeLoad(&$get = array(), &$post = array(), &$request = array(), &$session = array()) {
