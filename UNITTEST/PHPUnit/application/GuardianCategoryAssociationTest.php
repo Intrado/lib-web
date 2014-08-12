@@ -90,7 +90,7 @@ class GuardianCategoryAssociationTest extends PHPUnit_Framework_TestCase {
 			), array(
 				3,
 				self::ACCESS_ID,
-				'viewcontacts',
+				'metadata',
 				1
 			)
 				)

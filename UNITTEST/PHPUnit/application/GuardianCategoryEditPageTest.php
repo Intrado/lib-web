@@ -87,6 +87,11 @@ class GuardianCategoryEditPageTest extends PHPUnit_Framework_TestCase {
 				self::ACCESS_ID,
 				'manageprofile',
 				1
+			), array(
+				3,
+				self::ACCESS_ID,
+				'metadata',
+				1
 			)
 				)
 		);
