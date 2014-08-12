@@ -215,7 +215,7 @@ class CommsuiteApiClient {
 	 * 
 	 * @param int $burstId the id which identifies the burst
 	 * 
-	 * @return object which contains the list of portions available
+	 * @return mixed object which contains the list of portions available on success or boolean false
 	 */
 	public function getBurstPortionList($burstId) {
 		$res = $this->apiClient->get($this->burstsBaseUrl . "/{$burstId}/portions");
