@@ -17,7 +17,7 @@ include_once("obj/Email.obj.php");
 include_once("obj/Language.obj.php");
 include_once("obj/JobType.obj.php");
 include_once("obj/Sms.obj.php");
-
+include_once("obj/LinkedAccountManager.obj.php");
 
 $FORMDISABLE = " DISABLED ";
 if(isset($method)){
@@ -77,10 +77,17 @@ if(getSystemSetting("_hasportal", false) && $USER->authorize("portalaccess")){
 			error("There was an error revoking this person's token");
 		}
 	}
+}
 
+if((getSystemSetting("_hasportal", false) || getSystemSetting("_hasinfocenter", false)) && $USER->authorize("portalaccess")){
 	if(isset($_GET['disassociate'])){
 		$portaluserid = $_GET['disassociate'] + 0;
-		$count = QuickUpdate("delete from portalperson where personid = '" . $personid . "' and portaluserid = '" . $portaluserid . "'");
+		if (isset($_GET['type']) && ($_GET['type'] == 'ic')) {
+			$linkedAccountManager = new LinkedAccountManager();
+			$count = $linkedAccountManager->disassociateAccount($personid, $portaluserid);
+		} else {
+			$count = QuickUpdate("delete from portalperson where personid = '" . $personid . "' and portaluserid = '" . $portaluserid . "'");
+		}
 		if($count){
 			$portaluser = getPortalUsers(array($portaluserid));
 			$portalusername = $portaluser[$portaluserid]['portaluser.username'];
@@ -665,6 +672,46 @@ foreach ($fieldmaps as $map) {
 	</tr>	
 <?		
 	} // end guardians
+
+	//***************************************************************************************************************************
+	// Associated Accounts settings
+	//***************************************************************************************************************************
+
+if (getSystemSetting("_hasinfocenter", false) && $USER->authorize("portalaccess")) {
+	$linkedAccountManager = new LinkedAccountManager();
+	$guardianAssociations = $linkedAccountManager->getAssociatedAccounts($personid);
+	?>
+		<tr class="listheader"><th align="left" colspan="2"><b style="font-size: 16px"><?= _L("Associated Accounts") ?></b></th></tr>
+			<tr>
+			<th align="right" class="windowRowHeader bottomBorder">Associations:</th>
+			<td class="bottomBorder">
+				<table  cellpadding="2" cellspacing="1" >
+					<tr class="listheader">
+						<th align="left"><b>User Name<b></th>
+						<th align="left"><b>Last Login<b></th>
+						<th align="left"><b>Actions<b></th>
+					</tr>
+	<?
+	foreach ($guardianAssociations as $portaluserid => $associate) {
+		if ($associate['portaluser.lastlogin']) {
+			$lastlogin = date("M j, Y g:i a", $associate['portaluser.lastlogin'] / 1000);
+		} else {
+			$lastlogin = "Never";
+		}
+	?>
+							<tr>
+								<td style="padding-right:5px;"><?= escapehtml($associate['portaluser.username']) ?></td>
+								<td style="padding-right:5px;"><?= escapehtml($lastlogin) ?></td>
+								<td><a href="#" onclick="if(confirmDisassociate()) window.location='?type=ic&disassociate=<?= $portaluserid . $iFrameAppend ?> '" />Disassociate</a></td>
+							</tr>
+		<?
+	}
+		?>
+				</table>
+			</td>
+		</tr>
+	<?
+}
 
 	//***************************************************************************************************************************
 	// Contact Manager settings
