@@ -265,6 +265,20 @@ function QuickQueryMultiRow($query, $assoc = false, $dbconnect = false, $args = 
 	return($list);
 }
 
+
+function QuickQueryList($query, $pair = false, $dbconnect = false, $args = false) {
+	global $queryRules;
+	$queryResult = new QueryResult($queryRules->apply($query, $args));
+	$list = array();
+	while ($row = $queryResult->fetch(PDO::FETCH_NUM)) {
+		if ($pair)
+			$list[$row[0]] = $row[1];
+		else
+			$list[] = $row[0];
+	}
+	return($list);
+}
+
 // functions lifted verbatim from db.inc.php
 
 function DBGetRow ($result, $assoc = false) {

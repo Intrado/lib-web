@@ -27,11 +27,11 @@ class LinkedAccountManager {
 
 	/**
 	 *  Get account details for given ids
-	 * @param array $accounts array of account ids
+	 * @param array $accountIds array of account ids
 	 * @return array list of accounts mapped by account id
 	 */
-	private function getAccountDetails($accounts) {
-		$associates = getPortalUsers($accounts);
+	function getAccountDetails($accountIds) {
+		$associates = getPortalUsers($accountIds);
 		return $associates;
 	}
 

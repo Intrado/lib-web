@@ -187,7 +187,7 @@ class GuardianCategoryAssociationTest extends PHPUnit_Framework_TestCase {
 		$assocs = $page->guardianAssocations;
 
 		$this->assertEquals($paging->limit, count($assocs), " number of associations do not match");
-		for ($i = 0; $i < count(count($assocs)); $i++) {
+		for ($i = 0; $i < count($assocs); $i++) {
 			$expected = "First Name-" . $i;
 			$returned = $assocs[$i]['firstname'];
 			$this->assertEquals($expected, $returned, "Expected \"First Name-" . $i . "\" but got \"" . $assocs[$i]['firstname'] . "\"");
