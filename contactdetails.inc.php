@@ -683,7 +683,7 @@ if (getSystemSetting("_hasinfocenter", false) && $USER->authorize("portalaccess"
 	?>
 		<tr class="listheader"><th align="left" colspan="2"><b style="font-size: 16px"><?= _L("Associated Accounts") ?></b></th></tr>
 			<tr>
-			<th align="right" class="windowRowHeader bottomBorder">Associations:</th>
+			<th align="right" class="windowRowHeader bottomBorder"></th>
 			<td class="bottomBorder">
 				<table  cellpadding="2" cellspacing="1" >
 					<tr class="listheader">
