@@ -82,7 +82,8 @@ if(getSystemSetting("_hasportal", false) && $USER->authorize("portalaccess")){
 if((getSystemSetting("_hasportal", false) || getSystemSetting("_hasinfocenter", false)) && $USER->authorize("portalaccess")){
 	if(isset($_GET['disassociate'])){
 		$portaluserid = $_GET['disassociate'] + 0;
-		if (isset($_GET['type']) && ($_GET['type'] == 'ic')) {
+		$infoCenter = getSystemSetting("_hasinfocenter", false);
+		if ($infoCenter) {
 			$linkedAccountManager = new LinkedAccountManager();
 			$count = $linkedAccountManager->disassociateAccount($personid, $portaluserid);
 		} else {
