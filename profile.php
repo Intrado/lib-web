@@ -918,9 +918,12 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$obj->setPermission("createstationery", (bool)(isset($postdata['createstationery'])?$postdata['createstationery']:false));
 			$obj->setPermission("forcestationery", (bool)(isset($postdata['forcestationery'])?$postdata['forcestationery']:false));
 			
+			if (getSystemSetting("_hasportal", false)) {
+				$obj->setPermission("generatebulktokens", (bool)$postdata['generatebulktokens']);
+			}
+
 			if (getSystemSetting("_hasportal", false) || getSystemSetting("_hasinfocenter", false)) {
 				$obj->setPermission("portalaccess", (bool)$postdata['portalaccess']);
-				$obj->setPermission("generatebulktokens", (bool)$postdata['generatebulktokens']);
 			}
 
 			if (getSystemSetting("_hassurvey", true)) {

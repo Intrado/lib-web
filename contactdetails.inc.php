@@ -827,7 +827,7 @@ if (getSystemSetting("_hasinfocenter", false) && $USER->authorize("portalaccess"
 </table>
 <script type="text/javascript">
 	function confirmDisassociate(){
-		return confirm('Are you sure you want to disassociate this Contact Manager User?');
+		return confirm('Are you sure you want to disassociate this Associated Account?');
 	}
 	function confirmRevoke(){
 		return confirm('Are you sure you want to revoke this contact\'s activation code?');
