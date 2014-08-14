@@ -703,7 +703,7 @@ if (getSystemSetting("_hasinfocenter", false) && $USER->authorize("portalaccess"
 							<tr>
 								<td style="padding-right:5px;"><?= escapehtml($associate['portaluser.username']) ?></td>
 								<td style="padding-right:5px;"><?= escapehtml($lastlogin) ?></td>
-								<td><a href="#" onclick="if(confirmDisassociate()) window.location='?type=ic&disassociate=<?= $portaluserid . $iFrameAppend ?> '" />Disassociate</a></td>
+								<td><a href="#" onclick="if(confirmDisassociate()) window.location='?disassociate=<?= $portaluserid . $iFrameAppend ?> '" />Disassociate</a></td>
 							</tr>
 		<?
 	}
