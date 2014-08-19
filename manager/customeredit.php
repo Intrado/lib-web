@@ -939,8 +939,12 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
 			// If this customer is a SmartCall customer or has an enabled SmartCall device, we MUST switch them to Loquendo
 			// and disallow all other tts voice providers
-			$hasSmartCallDevice = QuickQuery("select 1 from custdm where enablestate != 'disabled' limit 1", $custdb, false);
-			if ($hasSmartCallDevice || in_array($postdata['dmmethod'], array('cs', 'hybrid'))) {
+			$dmid = QuickQuery("select id from dm where customerid = ?", false, array($customerid));
+			if ($dmid)
+				$hasEnabledSmartCallDevice = QuickQuery("select value from dmsetting where dmid = ? and name = 'dm_enabled'");
+			else
+				$hasEnabledSmartCallDevice = false;
+			if ($hasEnabledSmartCallDevice || in_array($postdata['dmmethod'], array('cs', 'hybrid'))) {
 				$provider = 'loquendo';
 				$allowOtherProviders = false;
 			}
