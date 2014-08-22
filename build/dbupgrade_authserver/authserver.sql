@@ -796,7 +796,7 @@ CREATE TABLE `dbupgradehost` (
  `dbusername` varchar(50) NOT NULL,
  `dbpassword` varchar(50) NOT NULL,
  PRIMARY KEY (`id`),
- KEY `name` (`name`)
+ KEY `dbname` (`dbname`)
 ) ENGINE=InnoDB;
 
 -- ------------------------------------------------------
