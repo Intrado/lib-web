@@ -65,7 +65,7 @@ class GuardianCategoryAssociation extends PageBase {
 	public function load() {
 		if ($this->isAjaxRequest && $this->categoryid) {
 			$this->category = $this->csApi->getGuardianCategory($this->categoryid);
-			$this->options["title"] = $this->category->name;
+			$this->options["title"] = escapehtml($this->category->name);
 			$this->responseData = $this->csApi->getGuardianCategoryAssoications($this->categoryid, $this->pagingStart, $this->pagingLimit);
 			if ($this->responseData) {
 				foreach ($this->responseData->associations as $association) {
