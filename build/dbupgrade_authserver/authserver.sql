@@ -774,3 +774,30 @@ ALTER TABLE `portaluseridentification` ADD INDEX `type_username` ( `type` , `use
 
 -- Add an index to the portalactivation portaluserid for lookups which need to find existing activation codes
 ALTER TABLE portalactivation ADD INDEX ( portaluserid );
+
+-- ------------------------------------------------------
+-- add table for database versioning used by upgrade_databases.php
+
+CREATE TABLE `dbupgrade` (
+ `id` varchar(20) NOT NULL,
+ `version` varchar(20) NOT NULL,
+ `lastUpdateMs` bigint(20) NOT NULL,
+ `status` varchar(20) NOT NULL,
+ PRIMARY KEY (`id`)
+) ENGINE=InnoDB;
+
+INSERT INTO `dbupgrade` 
+  VALUES ('authserver', '11.0/1', (UNIX_TIMESTAMP() * 1000), 'none');
+
+CREATE TABLE `dbupgradehost` (
+ `id` int(11) NOT NULL AUTO_INCREMENT,
+ `dbname` varchar(50) NOT NULL,
+ `dbhost` varchar(255) NOT NULL,
+ `dbusername` varchar(50) NOT NULL,
+ `dbpassword` varchar(50) NOT NULL,
+ PRIMARY KEY (`id`),
+ KEY `name` (`name`)
+) ENGINE=InnoDB;
+
+-- ------------------------------------------------------
+-- NO MORE BELOW HERE!!! use upgrade_databases

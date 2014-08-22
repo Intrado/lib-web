@@ -21,3 +21,19 @@ ALTER TABLE  `agent` ADD  `options` TEXT NULL;
 update agent set options = '{"usernameAttributeName":"userPrincipalName","accountAttributeName":"userAccountControl","useFQDN":true,"enabledOperation":"bitcompare","ou":null}';
 
 
+-- ------------------------------------------------------
+-- add table for database versioning used by upgrade_databases.php
+
+CREATE TABLE `dbupgrade` (
+ `id` varchar(20) NOT NULL,
+ `version` varchar(20) NOT NULL,
+ `lastUpdateMs` bigint(20) NOT NULL,
+ `status` varchar(20) NOT NULL,
+ PRIMARY KEY (`id`)
+) ENGINE=InnoDB;
+
+INSERT INTO `dbupgrade` 
+  VALUES ('disk', '11.0/1', (UNIX_TIMESTAMP() * 1000), 'none');
+
+-- ------------------------------------------------------
+-- NO MORE BELOW HERE!!! use upgrade_databases
