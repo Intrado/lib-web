@@ -112,7 +112,7 @@ php upgrade_databases.php -a
 php upgrade_databases.php -c <customerid> [<customerid> ...] 
 php upgrade_databases.php -s <shardid> [<shardid> ...] 
 php upgrade_databases.php -e 
-php upgrade_databases.php -d <databasename> [<databasename> ...] 
+php upgrade_databases.php -d [all] <databasename> [<databasename> ...] 
 Optional: [-h hostname] [-u username] [-p password]
 
 -h : hostname of authserver
@@ -122,7 +122,7 @@ Optional: [-h hostname] [-u username] [-p password]
 -c : customer mode, specific customers only
 -s : shard mode, specific shards customers only
 -e : everything mode, all databases and all customers
--d : database mode, specific databases (may have multiple hosts per database, example: aspshard)
+-d : database mode, specific databases (may have multiple hosts per database, example: aspshard). Special case 'all' to skip upgrading customers and only upgrade all other databases.
 ";
 
 
@@ -217,6 +217,9 @@ echo "Updater id: $updater\n";
 echo "connecting to authserver db\n";
 $authdb = DBConnect($authhost,$authuser,$authpass,"authserver");
 
+if ($mode == "database" && $ids[0] == "all") {
+	// skip customers
+} else { // upgrade customers
 $res = Query("select id,dbhost,dbusername,dbpassword from shard", $authdb)
 	or exit(mysql_error());
 $shards = array();
@@ -263,11 +266,12 @@ foreach ($customers as  $customerid => $customer) {
 				break;
 		}
 	}
-}
+} // end loop customers
+} // end if upgrade customers
 
 // for each other database to upgrade
 if ($mode == "everything" || $mode == "database") {
-	if ($mode == "database")
+	if ($mode == "database" && $ids[0] != "all")
 		$optsql = "and dbname in ('" . implode("','",$ids) . "')";
 	else
 		$optsql = "";
