@@ -5,6 +5,7 @@ class CommsuiteApiClient {
 	const API_BURSTS = '/bursts';
 	const API_PROFILES = '/profiles';
 	const API_GUARDIAN_CATEGORIES = '/settings/guardiancategories';
+	const API_PEOPLE = '/people';
 	
 	private $apiClient = null;
 	private $burstsBaseUrl = null;
@@ -141,6 +142,71 @@ class CommsuiteApiClient {
 		return($res['code'] == 200 ? true : false);
 	}
 	
+	
+	//Person
+	/**
+	 * Get person and associations
+	 *
+	 * @param int $id person id
+	 * @param string $expansions expansions: dependents | guardians | dependents/guardians  
+	 * @return  association data
+	 */
+	public function getPerson($id, $expansions) {
+		$queryParms = '?';
+		if ($expansions != null) {
+			$queryParms .= 'expansions=' . $expansions;
+		}
+		$url = self::API_PEOPLE . "/{$id}/{$queryParms}";
+
+		//TODO: remove this
+		error_log("API URL=" . $url);
+
+		$res = $this->apiClient->get($url);
+		$person = ($res['code'] == 200) ? json_decode($res['body']) : false;
+
+		//TODO: once API is working remove this.
+		if ($person) {
+			error_log("person=" . print_r($person, true));
+
+			$p1 = (object) null;
+			$p1->id = 34;
+			$p1->pkey = "P123";
+			$p1->firstName = "Person 1";
+			$p1->lastName = "Doe";
+			$p1->canView = true;
+
+			$p2 = (object) null;
+			$p2->id = 35;
+			$p2->pkey = "P124";
+			$p2->firstName = "Person 2";
+			$p2->lastName = "Doe";
+			$p2->canView = false;
+
+
+			$assoc1 = (object) null;
+			$assoc1->guardianCategory = "primary";
+			$assoc1->canView = true;
+			$assoc1->person = $p1;
+
+
+			$assoc2 = (object) null;
+			$assoc2->guardianCategory = "primary";
+			$assoc2->person = $p2;
+
+			$dependents = array($assoc1, $assoc2);
+			$guardians = array($assoc1, $assoc2);
+			if (!isset($person->dependents)) {
+				$person->dependents = $dependents;
+			}
+			if (!isset($person->guardians)) {
+				$person->guardians = $guardians;
+			}
+
+			error_log(json_encode($person));
+		}
+		return $person;
+	}
+
 	// ---------------------------------------------------------------------
 	// PDF Bursting
 	// ---------------------------------------------------------------------
