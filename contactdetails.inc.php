@@ -58,7 +58,7 @@ if (isset($_GET['id'])) {
 	redirect('unauthorized.php');
 }
 
-$person = $csApi->getPerson($personid, "dependents/guardians");
+$person = $csApi->getPerson($personid, "dependents,guardians");
 
 if(getSystemSetting("_hasportal", false) && $USER->authorize("portalaccess")){
 	if(isset($_GET['create']) && $_GET['create']){
