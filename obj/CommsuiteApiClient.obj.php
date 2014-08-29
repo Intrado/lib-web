@@ -157,51 +157,8 @@ class CommsuiteApiClient {
 			$queryParms .= 'expansions=' . $expansions;
 		}
 		$url = self::API_PEOPLE . "/{$id}/{$queryParms}";
-
-		//TODO: remove this
-		error_log("API URL=" . $url);
-
 		$res = $this->apiClient->get($url);
 		$person = ($res['code'] == 200) ? json_decode($res['body']) : false;
-
-		//TODO: once API is working remove this.
-		if ($person) {
-			error_log("person=" . print_r($person, true));
-
-			$p1 = (object) null;
-			$p1->id = 34;
-			$p1->pkey = "P123";
-			$p1->firstName = "Person 1";
-			$p1->lastName = "Doe";
-
-			$p2 = (object) null;
-			$p2->id = 35;
-			$p2->pkey = "P124";
-			$p2->firstName = "Person 2";
-			$p2->lastName = "Doe";
-
-			$assoc1 = (object) null;
-			$assoc1->guardianCategory = "primary";
-			$assoc1->canView = true;
-			$assoc1->person = $p1;
-
-
-			$assoc2 = (object) null;
-			$assoc2->guardianCategory = "primary";
-			$assoc2->canView = false;
-			$assoc2->person = $p2;
-
-			$dependents = array($assoc1, $assoc2);
-			$guardians = array($assoc1, $assoc2);
-			if (!isset($person->dependents)) {
-				$person->dependents = $dependents;
-			}
-			if (!isset($person->guardians)) {
-				$person->guardians = $guardians;
-			}
-
-			error_log(json_encode($person));
-		}
 		return $person;
 	}
 

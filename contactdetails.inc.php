@@ -207,23 +207,6 @@ if (isset($personid)) {
 							"expirationdate" => "");
 	}
 	
-	//TODO: Remove
-	// if associates, assume guardiancm, else guardianauto
-/*	if (count($associates) > 0) {
-		// need to be sure guardiancm trumps guardianauto
-		$guardiandata = QuickQueryMultiRow("select pg.guardianpersonid, p." . FieldMap::GetFirstNameField() . ", p." . FieldMap::GetLastNameField() . ", gc.name
-				from personguardian pg 
-				left join person p on (p.id = pg.guardianpersonid) 
-				left join guardiancategory gc on (gc.id = pg.guardiancategoryid) 
-				where p.type = 'guardiancm' and not p.deleted and pg.personid = ? order by gc.sequence, p." . FieldMap::GetLastNameField(), true, false, array($personid));
-	} else {
-		$guardiandata = QuickQueryMultiRow("select pg.guardianpersonid, p." . FieldMap::GetFirstNameField() . ", p." . FieldMap::GetLastNameField() . ", gc.name
-				from personguardian pg
-				left join person p on (p.id = pg.guardianpersonid)
-				left join guardiancategory gc on (gc.id = pg.guardiancategoryid)
-				where p.type = 'guardianauto' and not p.deleted and pg.personid = ? order by gc.sequence, p." . FieldMap::GetLastNameField(), true, false, array($personid));
-	}
-	*/
 	if (getSystemSetting('_hassurvey', true))
 		$jobtypes = DBFindMany("JobType", "from jobtype where not deleted order by systempriority, issurvey, name");
 	else
@@ -649,7 +632,7 @@ foreach ($fieldmaps as $map) {
 ?>
 
 	
-	<!--TODO: create a function -->
+<!--TODO: should we create a function for these? -->
 <?
 	if (getSystemSetting("maxguardians", 0) && $person && count($person->guardians) > 0) {
 ?>
