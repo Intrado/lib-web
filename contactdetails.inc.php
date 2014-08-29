@@ -651,7 +651,7 @@ foreach ($fieldmaps as $map) {
 	
 	<!--TODO: create a function -->
 <?
-	if (getSystemSetting("maxguardians", 0) && count($person->guardians) > 0) {
+	if (getSystemSetting("maxguardians", 0) && $person && count($person->guardians) > 0) {
 ?>
 	<tr>
 		<th align="right" class="windowRowHeader bottomBorder">Guardians:</th>
@@ -672,7 +672,7 @@ foreach ($fieldmaps as $map) {
 					<td class="bottomBorder"><?= escapehtml($p->lastName) ?></td>
 					<td class="bottomBorder"><?= escapehtml($association->guardianCategory) ?></td>
 					<td class="bottomBorder">
-					<? if ($p->canView) { ?>
+					<? if ($association->canView) { ?>
 						<a href="viewcontact.php?id=<?= $p->id . $iFrameAppend ?>$iFrameAppend" />View</a>
 					<? } ?>
 					</td>
@@ -706,7 +706,7 @@ foreach ($fieldmaps as $map) {
 					<td class="bottomBorder"><?= escapehtml($p->lastName) ?></td>
 					<td class="bottomBorder"><?= escapehtml($association->guardianCategory) ?></td>
 					<td class="bottomBorder">
-					<? if ($p->canView) { ?>
+					<? if ($association->canView) { ?>
 						<a href="viewcontact.php?id=<?= $p->id . $iFrameAppend ?>$iFrameAppend" />View</a>
 					<? } ?>
 					</td>

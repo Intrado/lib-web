@@ -173,15 +173,12 @@ class CommsuiteApiClient {
 			$p1->pkey = "P123";
 			$p1->firstName = "Person 1";
 			$p1->lastName = "Doe";
-			$p1->canView = true;
 
 			$p2 = (object) null;
 			$p2->id = 35;
 			$p2->pkey = "P124";
 			$p2->firstName = "Person 2";
 			$p2->lastName = "Doe";
-			$p2->canView = false;
-
 
 			$assoc1 = (object) null;
 			$assoc1->guardianCategory = "primary";
@@ -191,6 +188,7 @@ class CommsuiteApiClient {
 
 			$assoc2 = (object) null;
 			$assoc2->guardianCategory = "primary";
+			$assoc2->canView = false;
 			$assoc2->person = $p2;
 
 			$dependents = array($assoc1, $assoc2);
