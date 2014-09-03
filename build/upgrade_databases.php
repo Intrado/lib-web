@@ -1,9 +1,9 @@
 <?
 
 // SET THESE to your authserver host and database. may optionally pass as CLI arguments.
-$authhost = "";
-$authuser = "";
-$authpass = "";
+$authhost = "localhost";
+$authuser = "root";
+$authpass = "asp123";
 
 /*
  * Starting in 11.1, we will use a database table 'dbupgrade' to indicate what version the DB is running.
@@ -76,7 +76,7 @@ $versions = array (
 $dbReleaseVersion = "11.0"; // version to update databases to if no revision changes for individual db, implies revision value of 1
 $dbversions = array (
 	"authserver" => array (
-		"11.0/1"
+		"11.0/2"
 	),
 	
 	"aspshard" => array (
