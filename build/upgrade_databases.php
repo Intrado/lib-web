@@ -1,9 +1,9 @@
 <?
 
 // SET THESE to your authserver host and database. may optionally pass as CLI arguments.
-$authhost = "localhost";
-$authuser = "root";
-$authpass = "asp123";
+$authhost = "";
+$authuser = "";
+$authpass = "";
 
 /*
  * Starting in 11.1, we will use a database table 'dbupgrade' to indicate what version the DB is running.
