@@ -697,7 +697,7 @@ $formdata ["haspdfburst"] = array (
 );
 
 $formdata ["hasicra"] = array (
-	"label" => _L('Has ICRA'),
+	"label" => _L('Has Recipient App'),
 	"value" => $settings ['_hasicra'],
 	"validators" => array(),
 	"control" => array("CheckBox"),
