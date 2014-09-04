@@ -19,7 +19,7 @@ function upgrade_11_0($rev, $shardid, $customerid, $db) {
 			apply_sql("upgrades/db_11-0_pre.sql", $customerid, $db, 4);
 		case 4:
 			echo "|";
-			apply_sql("upgrades/db_11-0_pre.sql", $customerid, $db, 4);
+			apply_sql("upgrades/db_11-0_pre.sql", $customerid, $db, 5);
 
 			  //enable ICRA for all existing customers
 			Query("BEGIN", $db);
