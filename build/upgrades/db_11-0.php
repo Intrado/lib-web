@@ -21,7 +21,7 @@ function upgrade_11_0($rev, $shardid, $customerid, $db) {
 			echo "|";
 			apply_sql("upgrades/db_11-0_pre.sql", $customerid, $db, 5);
 
-			  //enable ICRA for all existing customers
+			//enable ICRA for all existing customers
 			Query("BEGIN", $db);
 			if (!QuickQuery("select count(*) from setting where name = ?", $db, array("_hasicra"))) {
 				$portal = QuickQuery("select value from setting where name = ?", $db, array("_hasportal"));

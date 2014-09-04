@@ -2769,3 +2769,9 @@ update setting set value='11.0/4' where name='_dbversion'
 $$$
 
 -- END 11.0/4
+
+-- rev 5 no-op insert '_hasicra' setting
+update setting set value='11.0/5' where name='_dbversion'
+$$$
+
+-- END 11.0/5
