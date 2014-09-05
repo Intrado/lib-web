@@ -77,7 +77,7 @@ $USER = new User($userid);
 
 $canSeePerson = $USER->canSeePerson($personid);
 
-echo json_encode(array("canSee" => $canSeePerson));
+echo json_encode(array("canSee" => ($canSeePerson) ? "1" : "0"));
 
 exit(0); // success
 ?>
