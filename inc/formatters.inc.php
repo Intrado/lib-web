@@ -179,6 +179,14 @@ function fmt_persontip ($row, $index) {
 				. "<img src=\"img/icons/diagona/16/049.gif\" /> $pkey</a>";
 }
 
+function fmt_person_view_actions($row, $index) {
+	$personid = isset($row[0]) ? $row[0] : $row['personid'];
+	$canView = isset($row[4]) ? $row[4] : $row['canview'];
+	if ($personid == '' || !$canView)
+		return "";
+	else
+		return action_link(_L("View"), "magnifier", "viewcontact.php?id=$personid");
+}
 
 function fmt_jobs_actions ($obj, $name) {
 	return action_links(jobs_actionlinks ($obj));

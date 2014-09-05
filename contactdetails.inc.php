@@ -7,6 +7,7 @@ include_once("inc/common.inc.php");
 include_once("inc/utils.inc.php");
 include_once("inc/securityhelper.inc.php");
 include_once("inc/form.inc.php");
+require_once("inc/formatters.inc.php");
 include_once("inc/html.inc.php");
 include_once("inc/table.inc.php");
 include_once("obj/FieldMap.obj.php");
@@ -668,41 +669,61 @@ foreach ($fieldmaps as $map) {
 	} // end guardians
 	
 	
-	// TODO consider showTable()
-	if ($person && count($person->dependents) > 0) {
-	?>
-	<tr>
-		<th align="right" class="windowRowHeader bottomBorder">Dependents:</th>
+	if (getSystemSetting("maxguardians", 0) && $person && count($person->guardians) > 0) {
+?>
+		<tr>
+		<th align="right" class="windowRowHeader bottomBorder">Guardians:</th>
 		<td class="bottomBorder">
-			<table  cellpadding="2" cellspacing="1" >
-				<tr class="listheader">
-					<th align="left"><b>First Name<b></th>
-					<th align="left"><b>Last Name<b></th>
-					<th align="left"><b>Category<b></th>
-					<th align="left"><b>Actions<b></th>
-				</tr>
+			<table width="100%" cellpadding="3" cellspacing="1" class="list">
 				<?
-				foreach ($person->dependents as $association) {
-					$p = $association->person;
-					?>
-				<tr>
-					<td class="bottomBorder"><?= escapehtml($p->firstName) ?></td>
-					<td class="bottomBorder"><?= escapehtml($p->lastName) ?></td>
-					<td class="bottomBorder"><?= escapehtml($association->guardianCategory) ?></td>
-					<td class="bottomBorder">
-					<? if ($association->canView) { ?>
-						<a href="viewcontact.php?id=<?= $p->id . $iFrameAppend ?>$iFrameAppend" />View</a>
-					<? } ?>
-					</td>
-				</tr>
-<? } ?>
+				$associations = associationData($person->guardians);
+				$titles = array("firstname" => "First Name", "lastname" => 'Last Name', "category" => 'Category', "actions" => 'Actions');
+				showTable($associations, $titles, array("actions" => "fmt_person_view_actions"));
+				?>
 			</table>
 		</td>
 	</tr>
+<?
+	} // end guardians
+
+
+	if ($person && count($person->dependents) > 0) {
+	?>
+	<tr>
+			<th align="right" class="windowRowHeader bottomBorder">Dependents:</th>
+			<td class="bottomBorder">
+				<table width="100%" cellpadding="3" cellspacing="1" class="list">
+					<?
+					$associations = associationData($person->dependents);
+					$titles = array("firstname" => "First Name", "lastname" => 'Last Name', "category" => 'Category', "actions" => 'Actions');
+					showTable($associations, $titles, array("actions" => "fmt_person_view_actions"));
+					?>
+				</table>
+			</td>
+		</tr>
 	<?
 } // end dependents
 
-
+/**
+ *
+ * @param array $associations list of associations
+ * @return array rows of associations
+ */
+function associationData($associations) {
+	$rows = array();
+	foreach ($associations as $association) {
+		$p = $association->person;
+		$row = array(
+			"personid" => $p->id,
+			"firstname" => $p->firstName,
+			"lastname" => $p->lastName,
+			"category" => $association->guardianCategory,
+			"canview" => $association->canView
+		);
+		$rows[] = $row;
+	}
+	return $rows;
+}
 
 //***************************************************************************************************************************
 	// Associated Accounts settings
