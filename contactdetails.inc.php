@@ -668,6 +668,7 @@ foreach ($fieldmaps as $map) {
 	} // end guardians
 	
 	
+	// TODO consider showTable()
 	if ($person && count($person->dependents) > 0) {
 	?>
 	<tr>

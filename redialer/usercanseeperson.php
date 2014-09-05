@@ -1,6 +1,6 @@
 <?
 // Call PHP User.canSeePerson(personId) from Java for CS API
-// returns {"canSee":"1"} 1 is true, 0 is false
+// returns {"canSee":true}
 
 setlocale(LC_ALL, 'en_US.UTF-8');
 mb_internal_encoding('UTF-8');
@@ -77,7 +77,7 @@ $USER = new User($userid);
 
 $canSeePerson = $USER->canSeePerson($personid);
 
-echo json_encode(array("canSee" => ($canSeePerson) ? "1" : "0"));
+echo json_encode(array("canSee" => ($canSeePerson) ? true : false));
 
 exit(0); // success
 ?>

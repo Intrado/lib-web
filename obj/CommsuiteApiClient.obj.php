@@ -148,7 +148,7 @@ class CommsuiteApiClient {
 	 * Get person and associations
 	 *
 	 * @param int $id person id
-	 * @param string $expansions expansions: dependents | guardians | dependents/guardians  
+	 * @param string $expansions (csv of values)expansions: dependents | guardians
 	 * @return  association data
 	 */
 	public function getPerson($id, $expansions) {
