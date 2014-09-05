@@ -57,6 +57,9 @@ if (isset($_GET['id'])) {
 } else {
 	redirect('unauthorized.php');
 }
+
+$person = $csApi->getPerson($personid, "dependents,guardians");
+
 if(getSystemSetting("_hasportal", false) && $USER->authorize("portalaccess")){
 	if(isset($_GET['create']) && $_GET['create']){
 		if(generatePersonTokens(array($personid))){
@@ -202,21 +205,6 @@ if (isset($personid)) {
 		$tokendata = array("token" => "",
 							"creationusername" => "",
 							"expirationdate" => "");
-	}
-	// if associates, assume guardiancm, else guardianauto
-	if (count($associates) > 0) {
-		// need to be sure guardiancm trumps guardianauto
-		$guardiandata = QuickQueryMultiRow("select pg.guardianpersonid, p." . FieldMap::GetFirstNameField() . ", p." . FieldMap::GetLastNameField() . ", gc.name
-				from personguardian pg 
-				left join person p on (p.id = pg.guardianpersonid) 
-				left join guardiancategory gc on (gc.id = pg.guardiancategoryid) 
-				where p.type = 'guardiancm' and not p.deleted and pg.personid = ? order by gc.sequence, p." . FieldMap::GetLastNameField(), true, false, array($personid));
-	} else {
-		$guardiandata = QuickQueryMultiRow("select pg.guardianpersonid, p." . FieldMap::GetFirstNameField() . ", p." . FieldMap::GetLastNameField() . ", gc.name
-				from personguardian pg
-				left join person p on (p.id = pg.guardianpersonid)
-				left join guardiancategory gc on (gc.id = pg.guardiancategoryid)
-				where p.type = 'guardianauto' and not p.deleted and pg.personid = ? order by gc.sequence, p." . FieldMap::GetLastNameField(), true, false, array($personid));
 	}
 	
 	if (getSystemSetting('_hassurvey', true))
@@ -643,8 +631,10 @@ foreach ($fieldmaps as $map) {
 	} // end _hasenrollment
 ?>
 
+	
+<!--TODO: should we create a function for these? -->
 <?
-	if (getSystemSetting("maxguardians", 0) && count($guardiandata)) {
+	if (getSystemSetting("maxguardians", 0) && $person && count($person->guardians) > 0) {
 ?>
 	<tr>
 		<th align="right" class="windowRowHeader bottomBorder">Guardians:</th>
@@ -656,25 +646,65 @@ foreach ($fieldmaps as $map) {
 				<th align="left"><b>Category<b></th>
 				<th align="left"><b>Actions<b></th>
 			</tr>
-<?
-			foreach ($guardiandata as $guardian) {
-?>
-			<tr>
-				<td class="bottomBorder"><?=escapehtml($guardian['f01'])?></td>
-				<td class="bottomBorder"><?=escapehtml($guardian['f02'])?></td>
-				<td class="bottomBorder"><?=escapehtml($guardian['name'])?></td>
-				<td class="bottomBorder"><a href="viewcontact.php?id=<?=$guardian['guardianpersonid'] . $iFrameAppend?>$iFrameAppend" />View</a></td>
-			</tr>
-<?
-			}
-?>
+			<?
+				foreach ($person->guardians as $association) {
+					$p = $association->person;
+					?>
+				<tr>
+					<td class="bottomBorder"><?= escapehtml($p->firstName) ?></td>
+					<td class="bottomBorder"><?= escapehtml($p->lastName) ?></td>
+					<td class="bottomBorder"><?= escapehtml($association->guardianCategory) ?></td>
+					<td class="bottomBorder">
+					<? if ($association->canView) { ?>
+						<a href="viewcontact.php?id=<?= $p->id . $iFrameAppend ?>$iFrameAppend" />View</a>
+					<? } ?>
+					</td>
+				</tr>
+<? } ?>
 			</table>
 		</td>
 	</tr>	
 <?		
 	} // end guardians
+	
+	
+	// TODO consider showTable()
+	if ($person && count($person->dependents) > 0) {
+	?>
+	<tr>
+		<th align="right" class="windowRowHeader bottomBorder">Dependents:</th>
+		<td class="bottomBorder">
+			<table  cellpadding="2" cellspacing="1" >
+				<tr class="listheader">
+					<th align="left"><b>First Name<b></th>
+					<th align="left"><b>Last Name<b></th>
+					<th align="left"><b>Category<b></th>
+					<th align="left"><b>Actions<b></th>
+				</tr>
+				<?
+				foreach ($person->dependents as $association) {
+					$p = $association->person;
+					?>
+				<tr>
+					<td class="bottomBorder"><?= escapehtml($p->firstName) ?></td>
+					<td class="bottomBorder"><?= escapehtml($p->lastName) ?></td>
+					<td class="bottomBorder"><?= escapehtml($association->guardianCategory) ?></td>
+					<td class="bottomBorder">
+					<? if ($association->canView) { ?>
+						<a href="viewcontact.php?id=<?= $p->id . $iFrameAppend ?>$iFrameAppend" />View</a>
+					<? } ?>
+					</td>
+				</tr>
+<? } ?>
+			</table>
+		</td>
+	</tr>
+	<?
+} // end dependents
 
-	//***************************************************************************************************************************
+
+
+//***************************************************************************************************************************
 	// Associated Accounts settings
 	//***************************************************************************************************************************
 

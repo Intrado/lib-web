@@ -5,6 +5,7 @@ class CommsuiteApiClient {
 	const API_BURSTS = '/bursts';
 	const API_PROFILES = '/profiles';
 	const API_GUARDIAN_CATEGORIES = '/settings/guardiancategories';
+	const API_PEOPLE = '/people';
 	
 	private $apiClient = null;
 	private $burstsBaseUrl = null;
@@ -141,6 +142,26 @@ class CommsuiteApiClient {
 		return($res['code'] == 200 ? true : false);
 	}
 	
+	
+	//Person
+	/**
+	 * Get person and associations
+	 *
+	 * @param int $id person id
+	 * @param string $expansions (csv of values)expansions: dependents | guardians
+	 * @return  association data
+	 */
+	public function getPerson($id, $expansions) {
+		$queryParms = '?';
+		if ($expansions != null) {
+			$queryParms .= 'expansions=' . $expansions;
+		}
+		$url = self::API_PEOPLE . "/{$id}/{$queryParms}";
+		$res = $this->apiClient->get($url);
+		$person = ($res['code'] == 200) ? json_decode($res['body']) : false;
+		return $person;
+	}
+
 	// ---------------------------------------------------------------------
 	// PDF Bursting
 	// ---------------------------------------------------------------------
