@@ -631,44 +631,8 @@ foreach ($fieldmaps as $map) {
 <?
 	} // end _hasenrollment
 ?>
-
 	
-<!--TODO: should we create a function for these? -->
 <?
-	if (getSystemSetting("maxguardians", 0) && $person && count($person->guardians) > 0) {
-?>
-	<tr>
-		<th align="right" class="windowRowHeader bottomBorder">Guardians:</th>
-		<td class="bottomBorder">
-			<table  cellpadding="2" cellspacing="1" >
-			<tr class="listheader">
-				<th align="left"><b>First Name<b></th>
-				<th align="left"><b>Last Name<b></th>
-				<th align="left"><b>Category<b></th>
-				<th align="left"><b>Actions<b></th>
-			</tr>
-			<?
-				foreach ($person->guardians as $association) {
-					$p = $association->person;
-					?>
-				<tr>
-					<td class="bottomBorder"><?= escapehtml($p->firstName) ?></td>
-					<td class="bottomBorder"><?= escapehtml($p->lastName) ?></td>
-					<td class="bottomBorder"><?= escapehtml($association->guardianCategory) ?></td>
-					<td class="bottomBorder">
-					<? if ($association->canView) { ?>
-						<a href="viewcontact.php?id=<?= $p->id . $iFrameAppend ?>$iFrameAppend" />View</a>
-					<? } ?>
-					</td>
-				</tr>
-<? } ?>
-			</table>
-		</td>
-	</tr>	
-<?		
-	} // end guardians
-	
-	
 	if (getSystemSetting("maxguardians", 0) && $person && count($person->guardians) > 0) {
 ?>
 		<tr>
