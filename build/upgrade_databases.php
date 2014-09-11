@@ -76,7 +76,7 @@ $versions = array (
 $dbReleaseVersion = "11.0"; // version to update databases to if no revision changes for individual db, implies revision value of 1
 $dbversions = array (
 	"authserver" => array (
-		"11.0/1"
+		"11.0/2"
 	),
 	
 	"aspshard" => array (
