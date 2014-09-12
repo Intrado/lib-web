@@ -334,10 +334,7 @@ function getPooledCustomerConnection ($cid,$readonly=false) {
 	//see if we need to connect
 	if (!isset($SHARDINFO[$sid][$dbtype])) {
 		$host = $readonly ? $SETTINGS["db"]["readonly"][$sid-1] : $SHARDINFO[$sid]["dbhost"];
-		$dsn = "mysql:dbname=c_$cid;host=$host";
-		//error_log("New PDO connection to $dsn");
-		$SHARDINFO[$sid][$dbtype] = new PDO($dsn, $SHARDINFO[$sid]["dbusername"], $SHARDINFO[$sid]["dbpassword"]);
-		$SHARDINFO[$sid][$dbtype]->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
+		$SHARDINFO[$sid][$dbtype] = DBConnect($host, $SHARDINFO[$sid]["dbusername"], $SHARDINFO[$sid]["dbpassword"], 'aspshard');
 	}
 	//select this customer's db
 	$SHARDINFO[$sid][$dbtype]->query("use c_$cid");
@@ -362,10 +359,7 @@ function getSingleCustomerConnection ($cid,$readonly=false) {
 	}
 
 	$host = $readonly ? $SETTINGS["db"]["readonly"][$connectinfo["id"]-1] : $connectinfo["dbhost"];
-	
-	$dsn = "mysql:dbname=c_$cid;host=$host";
-	$db = new PDO($dsn, $connectinfo["dbusername"], $connectinfo["dbpassword"]);
-	$db->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
+	$db = DBConnect($host, $connectinfo["dbusername"], $connectinfo["dbpassword"], 'c_'.$cid);
 	return $db;
 }
 

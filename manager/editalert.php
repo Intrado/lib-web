@@ -49,11 +49,8 @@ $importalertruleid = $alertinfo['importalertruleid'];
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
 list($shardid,$dbhost,$dbusername,$dbpassword) = QuickQueryRow("select s.id, s.dbhost, s.dbusername, s.dbpassword from customer c inner join shard s on (c.shardid = s.id) where c.id=?",false,false,array($customerid));
-$dsn = 'mysql:dbname=aspshard;host='.$dbhost;
-$sharddb = new PDO($dsn, $dbusername, $dbpassword);
-$sharddb->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
 
-Query("use aspshard", $sharddb);
+$sharddb = DBConnect($dbhost, $dbusername, $dbpassword, 'aspshard');
 
 $query = "select importname,name,operation,testvalue,actualvalue,notes from importalert where customerid=? and importalertruleid=?";
 

@@ -144,9 +144,7 @@ $custdb; // customer database, using shard connection
 $data = array();
 foreach ($customers as $cust) {
 	if ($currhost != $cust["shardid"]) {
-		$dsn = 'mysql:dbname=c_'.$cust["id"].';host='.$shardinfo[$cust["shardid"]]["dbhost"];
-		$custdb = new PDO($dsn, $shardinfo[$cust["shardid"]]["dbusername"], $shardinfo[$cust["shardid"]]["dbpassword"]);
-		$custdb->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
+		$custdb = DBConnect($shardinfo[$cust["shardid"]]["dbhost"], $shardinfo[$cust["shardid"]]["dbusername"], $shardinfo[$cust["shardid"]]["dbpassword"], 'c_'.$cust["id"]);
 		$currhost = $cust["shardid"];
 	}
 	

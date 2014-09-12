@@ -42,15 +42,7 @@ if (strpos($hostname, "."))
 $SETTINGS = parse_ini_file("managersettings.ini.php",true);
 
 global $_dbcon;
-try {
-	$dsn = 'mysql:dbname='.$SETTINGS['db']['db'].';host='.$SETTINGS['db']['host'];
-	$_dbcon = new PDO($dsn, $SETTINGS['db']['user'], $SETTINGS['db']['pass']);
-	$_dbcon->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
-	$setcharset = "SET character_set_results = 'utf8', character_set_client = 'utf8', character_set_connection = 'utf8', character_set_database = 'utf8', character_set_server = 'utf8'";
-	$_dbcon->query($setcharset);
-} catch (PDOException $e) {
-	error_log("PDO Exception : ".$e->getMessage());
-}
+$_dbcon = DBConnect($SETTINGS['db']['host'], $SETTINGS['db']['user'], $SETTINGS['db']['pass'], $SETTINGS['db']['db']);
 
 // get the current runmode and the service definintion for it
 $serverid = QuickQuery("select id from server where hostname = ?", false, array($hostname));
