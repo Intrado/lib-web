@@ -187,7 +187,7 @@ function backupTable($db, $tablename, $tablebackup) {
 function dropTable($db, $tablename) {
 	echo "Droping table {$tablename}...\n";
 	if (QuickUpdate("drop table if exists {$tablename}", $db) === false) {
-		throw new DBException("Failed to drop table $tablename");
+		throw new DBException("Failed to drop table {$tablename}. SQL: drop table if exists {$tablename}");
 	}
 }
 
@@ -201,7 +201,7 @@ function dropTable($db, $tablename) {
 function createTable($db, $tablename, $destination) {
 	echo "Creating table $destination from $tablename\n";
 	if (QuickUpdate("create table {$destination} select * from {$tablename}", $db) === false) {
-		throw new DBException("Failed to create table $destination from $tablename");
+		throw new DBException("Failed to create table. SQL: create table {$destination} select * from {$tablename}");
 	}
 }
 
@@ -214,7 +214,7 @@ function createTable($db, $tablename, $destination) {
 function truncateTable($db, $tablename) {
 	echo "Truncating table  $tablename \n";
 	if (QuickUpdate("truncate $tablename", $db) === false) {
-		throw new DBException("Failed to truncate table $tablename");
+		throw new DBException("Failed to truncate table $tablename. SQL:truncate $tablename");
 	}
 }
 
@@ -234,7 +234,7 @@ function insertData($db, $tablename, $columns, $rows) {
 	//echo "Query=$query\n";
 	foreach ($rows as $row) {
 		if (QuickUpdate($query, $db, $row) === false) {
-			throw new DBException("Failed to insert data into table $tablename");
+			throw new DBException("Failed to insert data into table $tablename. SQL:$query");
 		}
 	}
 }
