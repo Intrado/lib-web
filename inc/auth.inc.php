@@ -320,24 +320,15 @@ function doDBConnect($authresult = false) {
 	if (!isset($_DBHOST))
 		return false;
 
-	try {
-		$dsn = 'mysql:dbname='.$_DBNAME.';host='.$_DBHOST;
-		$_dbcon = new PDO($dsn, $_DBUSER, $_DBPASS);
-		$_dbcon->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
-		
-		// TODO set charset
-		$setcharset = "SET character_set_results = 'utf8', character_set_client = 'utf8', character_set_connection = 'utf8', character_set_database = 'utf8', character_set_server = 'utf8'";
-		$_dbcon->query($setcharset);
-		
+	$_dbcon = DBConnect($_DBHOST, $_DBUSER, $_DBPASS, $_DBNAME);
+	if ($_dbcon) {
 		$temp = $_dbcon->query("select connection_id()");
 		$cid = $temp->fetchColumn();
 		$_SESSION['_dbcid'] = $cid;
-		
 		return true;
-	} catch (PDOException $e) {
-		error_log("Problem connecting to MySQL server at " . $_DBHOST . " error:" . $e->getMessage());
+	} else {
+		return false;
 	}
-	return false;
 }
 
 function asptokenLogin($asptoken, $url) {
@@ -486,20 +477,14 @@ function readonlyDBConnect() {
 	$result = readonlyDBInfo();
 	if ($result !== false && $result['result'] == '') {
 		// success, now try to connect
-		try {
-			$dsn = 'mysql:dbname='.$result['dbname'].';host='.$result['dbhost'];
-			$_readonlyDB = new PDO($dsn, $result['dbuser'], $result['dbpass']);
-			$_readonlyDB->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
-		
-			$setcharset = "SET character_set_results = 'utf8', character_set_client = 'utf8', character_set_connection = 'utf8', character_set_database = 'utf8', character_set_server = 'utf8'";
-			$_readonlyDB->query($setcharset);
-			
+		$_readonlyDB = DBConnect($result['dbhost'], $result['dbuser'], $result['dbpass'], $result['dbname']);
+		if ($_readonlyDB) {
 			if (isset($_SESSION['timezone'])) {
 				$_readonlyDB->query("set time_zone='" . $_SESSION['timezone'] . "'");
 			}
 			return $_readonlyDB;
-		} catch (PDOException $e) {
-			error_log("Problem connecting with readonly to MySQL server at " . $result['dbhost'] . " error:" . $e->getMessage() . " now retry primary db");
+		} else {
+			error_log("Problem connecting with readonly to MySQL server at " . $result['dbhost'] . " now retry primary db");
 			global $_dbcon;
 			return $_dbcon;
 		}

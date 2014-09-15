@@ -28,9 +28,7 @@ $customers = QuickQueryList("select id, urlcomponent from customer",true);
 $res = Query("select id, dbhost, dbusername, dbpassword from shard order by id");
 $shards = array();
 while($row = DBGetRow($res)){
-	$dsn = 'mysql:dbname=aspshard;host='.$row[1];
-	$db = new PDO($dsn, $row[2], $row[3]);
-	$db->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
+	$db = DBConnect($row[1], $row[2], $row[3], 'aspshard');
 	$shards[$row[0]] = $db;
 }
 

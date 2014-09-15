@@ -247,14 +247,7 @@ if ($data) {
 	$custdb;
 	foreach($data as $dmid => $cust) {
 		if ($cust[1] + 0 > 0) {
-			try {
-				$dsn = 'mysql:dbname=c_'.$cust[1].';host='.$shardinfo[$cust[15]][0];
-				$custdb = new PDO($dsn, $shardinfo[$cust[15]][1], $shardinfo[$cust[15]][2]);
-				$custdb->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
-			} catch (PDOException $e) {
-				die("Could not connect to customer database: ".$e->getMessage());
-			}
-			Query("use c_" . $cust[1], $custdb);
+			$custdb = DBConnect($shardinfo[$cust[15]][0], $shardinfo[$cust[15]][1], $shardinfo[$cust[15]][2], 'c_'.$cust[1]);
 			if ($custdb) {
 				$query = "select value from setting where name = '_dmmethod' limit 1";
 				$data[$dmid]['dmmethod'] = QuickQuery($query, $custdb);
