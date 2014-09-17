@@ -9,9 +9,10 @@ $$$
 CREATE TABLE `authserver`.`portalsetting` (
 	`name` VARCHAR(50) NOT NULL PRIMARY KEY,
 	`value` VARCHAR(1024) NOT NULL
-);
+)
+$$$
  
 -- A place to optionally link a redirectUrl for this token (nullable!)
 ALTER TABLE `authserver`.`portalactivation` ADD COLUMN `redirecturl` varchar(255);
-
 $$$
+
