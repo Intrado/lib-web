@@ -137,21 +137,11 @@ class QuickTipManager extends PageForm {
 	}
 
 	function load(&$get=array(), &$post=array(), &$request=array(), &$session=array()) {
-		// Get organization list from the API (/organizations/root)
+		// Get organization and feature list from the API (/organizations/root)
 		// Looks like { id: <id>, name: <name>, subOrganizations: [ <another org object>, ... ] }
 		$rootOrg = $this->csApi->getOrganization('root');
+		// Looks like [ { organizationId: <id>, isEnabled: <bool> }, ... ]
 		$orgQtFeatureList = $this->csApi->getFeature('quicktip');
-		error_log(print_r($orgQtFeatureList, true));
-
-//		$orgQtFeatureList = json_decode('[{
-//				"organizationId": 123,
-//				"isEnabled": true
-//			},
-//			{
-//				"organizationId": 125,
-//				"isEnabled": false
-//		}]');
-
 		$this->form = $this->formFactory($rootOrg, $orgQtFeatureList);
 	}
 
@@ -160,33 +150,24 @@ class QuickTipManager extends PageForm {
 
 		// If the form was submitted...
 		if ($this->form->getSubmit()) {
-			$redirectLocation = 'settings.php';
-
-			// Check if the data has changed and display a notification if so...
-			if ($this->form->checkForDataChange()) {
-				notice(_L("This form's data has been modified elsewhere. Please try again."));
-				$redirectLocation = '';
+			$postdata = $this->form->getData();
+			$featureSettings = array();
+			foreach ($postdata as $field => $value) {
+				$fieldParts = preg_split('/#/', $field);
+				$orgId = $fieldParts[1];
+				if ($value != 'inherited') {
+					$isEnabled = ($value === 'enabled');
+					$featureSettings[] = array( 'organizationId' => $orgId, 'isEnabled' => $isEnabled);
+				}
 			}
+			$success = $this->csApi->setFeature('quicktip', $featureSettings);
 
-			// Check for validation errors
-			if (($errors = $this->form->validate()) === false) {
-				$postdata = $this->form->getData();
-				$featureSettings = array();
-				foreach ($postdata as $field => $value) {
-					$fieldParts = preg_split('/#/', $field);
-					$orgId = $fieldParts[1];
-					if ($value != 'inherited') {
-						$isEnabled = ($value === 'enabled');
-						$featureSettings[] = array( 'organizationId' => $orgId, 'isEnabled' => $isEnabled);
-					}
-				}
-				$success = $this->csApi->setFeature('quicktip', $featureSettings);
-
-				if ($success) {
-					$this->form->sendTo($redirectLocation);
-				} else {
-					$this->form->fireEvent(_L('Setting new values failed, please try your request again'));
-				}
+			if ($success) {
+				$this->form->sendTo('settings.php');
+			} else {
+				$this->form->sendTo('', array(
+					'status' => 'fail'
+				));
 			}
 		}
 	}
@@ -194,15 +175,6 @@ class QuickTipManager extends PageForm {
 	function render() {
 		$this->options['title'] = _L('QuickTip Feature Management');
 		$this->options['windowTitle'] = _L('Show/Hide QuickTip Organizations');
-		$script =
-			"<script>
-				// watch for submit events and display them in an alert
-				(function($) {
-					$('#{$this->form->name}').on('Form:Submitted', function (event, data) {
-						alert(data);
-					});
-				})(jQuery);
-			</script>";
 		$styleOverride =
 			'<style>
 				.newform .formtitle {
@@ -212,7 +184,7 @@ class QuickTipManager extends PageForm {
 					margin: 0 0 0 26%;
 				}
 			</style>';
-		return $script . $styleOverride . parent::render();
+		return $styleOverride . parent::render();
 	}
 
 	function formFactory($rootOrganization, $orgQtFeatureList) {
