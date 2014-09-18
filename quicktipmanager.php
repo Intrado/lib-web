@@ -130,7 +130,7 @@ class QuickTipManager extends PageForm {
 
 	function isAuthorized(&$get=array(), &$post=array(), &$request=array(), &$session=array()) {
 		global $USER;
-		return($USER->authorize('managesystem')); // open to the world, unconditionally!
+		return($USER->authorize('managesystem'));
 	}
 
 	function beforeLoad(&$get=array(), &$post=array(), &$request=array(), &$session=array()) {
