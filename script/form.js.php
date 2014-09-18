@@ -639,11 +639,11 @@ function form_handle_submit(form,event) {
 					} else {
 						alert("There are some errors on this form.\nPlease correct them before trying again.");
 					}
-				}
-
-				if (res.datachange) {
+				} else if (res.datachange) {
 					alert("The data on this form has changed.\nYour changes cannot be saved.");
 					window.location=formvars.scriptname;
+				} else {
+					alert("The submit request has failed, please try your request again.");
 				}
 			} else if ("success" == res.status && res.nexturl) {
 					window.location=res.nexturl;
