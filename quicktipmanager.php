@@ -24,11 +24,24 @@ require_once('obj/PageForm.obj.php');
 // -----------------------------------------------------------------------------
 // CUSTOM FORM ITEMS
 // -----------------------------------------------------------------------------
+/**
+ * Class OrganizationFeature
+ *
+ * Used to display state of an system 'feature' for an individual organization, including inheritance from a parent organization.
+ */
 class OrganizationFeature extends FormItem {
 	var $organization;
 	var $parentValue;
 	var $inputName;
 
+	/**
+	 * Constructs a new instance of this form item
+	 *
+	 * @param Form $form the form this item is injected into
+	 * @param string $name a unique name for this instance of the form item
+	 * @param array $args required and optional arguments. Requires that an 'organization' object be passed. Optionally accepts 'parentValue'
+	 * as the enabled state of this organization's parent
+	 */
 	function __construct($form, $name, $args) {
 		parent::FormItem($form, $name, $args);
 		$this->organization = $args['organization'];
@@ -44,12 +57,24 @@ class OrganizationFeature extends FormItem {
 				</div>";
 	}
 
+	/**
+	 * Creates a jQuery module attaching functions for managing the state and getting the value of this form item
+	 * @return string as the <script> object containing the required javascript library to render this form item
+	 */
 	function renderJavascriptLibraries() {
 		return "<script>
 					(function($) {
 						$.fn.getOrgFeatureValue = function() {
 							return this.data('userValue');
 						};
+						/**
+						* Attaches a listener which detects changes and emits a new event which other instances can listen to
+						* Also listens for changes emitted by it's parent organization to update the display state
+						*
+						* @param {object} organization this organization object, containing the id and it's parent organization id
+						* @param {string} initialParentValue optionally sets this organization's parent's value
+						* @returns {object} this, after having attached org feature functionality
+						*/
 						$.fn.asOrgFeature = function(organization, initialParentValue) {
 							var org = organization;
 							var parentValue = initialParentValue;
@@ -58,6 +83,11 @@ class OrganizationFeature extends FormItem {
 							var changeEventPrefix = 'orgFeatureChange-';
 
 							var radios = this;
+							/**
+							* Changes the radio display based on the value of this organization's parent.
+							* If the value is NOT inherited from it's parent, it displays normally. Otherwise, the enabled state follows
+							* the parent and is displayed as 'disabled' to indicate this state
+							*/
 							var updateRadioDisplay = function() {
 								radios.prop('disabled', false);
 								var inheritedRadio = radios.filter('[value=' + parentValue + ']');
@@ -76,6 +106,7 @@ class OrganizationFeature extends FormItem {
 									userValue = 'inherited';
 								}
 								updateRadioDisplay();
+								// trigger a custom event to tell listeners that this organization's value has changed
 								$.event.trigger({
 									type: changeEventPrefix + org.id,
 									message: { value: userValue }
@@ -98,12 +129,19 @@ class OrganizationFeature extends FormItem {
 				</script>";
 	}
 
-	function renderJavascript($value) {
+	/**
+	 * Attaches the jQuery module to this form item
+	 * @return string the javascript to execute which sets up this form item
+	 */
+	function renderJavascript() {
 		$orgJson = json_encode($this->organization);
 		$parentValue = addslashes($this->parentValue);
 		return "jQuery('input[name=\"{$this->inputName}\"]').asOrgFeature($orgJson, '$parentValue');";
 	}
 
+	/**
+	 * @return string which is a javascript function to be executed, which will return the enabled state of the 'feature' for this organization
+	 */
 	function jsGetValue () {
 		return "function func() { return jQuery('input[name=\"{$this->inputName}\"]').getOrgFeatureValue() }; func";
 	}
@@ -124,19 +162,20 @@ class QuickTipManager extends PageForm {
 	 */
 	public function __construct($options, $csApi) {
 		$this->csApi = $csApi;
-		$this->options['validators'] = array('ValDupeCategoryName');
 		parent::__construct($options);
 	}
 
-	function isAuthorized(&$get=array(), &$post=array(), &$request=array(), &$session=array()) {
+	/**
+	 * Requires the user have the profile setting 'managesystem'
+	 *
+	 * @return bool true if the currently authenticated user has access to this page
+	 */
+	function isAuthorized() {
 		global $USER;
 		return($USER->authorize('managesystem'));
 	}
 
-	function beforeLoad(&$get=array(), &$post=array(), &$request=array(), &$session=array()) {
-	}
-
-	function load(&$get=array(), &$post=array(), &$request=array(), &$session=array()) {
+	function load() {
 		// Get organization and feature list from the API (/organizations/root)
 		// Looks like { id: <id>, name: <name>, subOrganizations: [ <another org object>, ... ] }
 		$rootOrg = $this->csApi->getOrganization('root');
@@ -150,9 +189,9 @@ class QuickTipManager extends PageForm {
 
 		// If the form was submitted...
 		if ($this->form->getSubmit()) {
-			$postdata = $this->form->getData();
+			$postData = $this->form->getData();
 			$featureSettings = array();
-			foreach ($postdata as $field => $value) {
+			foreach ($postData as $field => $value) {
 				$fieldParts = preg_split('/#/', $field);
 				$orgId = $fieldParts[1];
 				if ($value != 'inherited') {
@@ -187,6 +226,11 @@ class QuickTipManager extends PageForm {
 		return $styleOverride . parent::render();
 	}
 
+	/**
+	 * @param object $rootOrganization object which represents the root organization and contains it's sub organizations
+	 * @param object $orgQtFeatureList list of objects which indicate organization id and feature enabled state
+	 * @return Form the constructed form object
+	 */
 	function formFactory($rootOrganization, $orgQtFeatureList) {
 		$hasQt = array();
 		foreach($orgQtFeatureList as $orgQtFeature) {
