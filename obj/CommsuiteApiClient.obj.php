@@ -284,7 +284,7 @@ class CommsuiteApiClient {
 
 	public function setFeature($featureName, $newStateData) {
 		$res = $this->apiClient->put("/settings/features/$featureName", $newStateData);
-		return($res['code'] == 201 ? true : false);
+		return($res['code'] == 200 ? true : false);
 	}
 }
 
