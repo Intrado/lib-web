@@ -193,6 +193,13 @@ function QuickQueryMultiRow ($query, $assoc = false, $dbconnect = false, $args =
 	return $list;
 }
 
+/**
+ * @param string $query
+ * @param bool $pair
+ * @param bool|object $dbconnect
+ * @param bool|array $args
+ * @return array
+ */
 function QuickQueryList ($query, $pair = false, $dbconnect = false, $args = false) {
 	global $_dbcon;
 	$list = array();
