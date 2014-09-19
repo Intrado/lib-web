@@ -261,7 +261,9 @@ class QuickTipManager extends PageForm {
 			"org#{$org->id}" => array(
 				'label' => escapeHtml($org->name),
 				'value' => $rootOrgValue,
-				'validators' => array(array('ValInArray', 'values' => $validValues)),
+				'validators' => array(
+					array('ValRequired'),
+					array('ValInArray', 'values' => $validValues)),
 				'control' => array('OrganizationFeature', 'organization' => $org)
 			)
 		);
@@ -271,7 +273,9 @@ class QuickTipManager extends PageForm {
 				$formData["org#{$org->id}"] = array(
 					'label' => escapeHtml($org->name),
 					'value' => $orgFeatureValue($org->id),
-					'validators' => array(array('ValInArray', 'values' => $validValues)),
+					'validators' => array(
+						array('ValRequired'),
+						array('ValInArray', 'values' => $validValues)),
 					"control" => array("OrganizationFeature", "organization" => $org, "parentValue" => $rootOrgValue)
 				);
 			}
