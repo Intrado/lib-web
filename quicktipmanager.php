@@ -192,11 +192,13 @@ class QuickTipManager extends PageForm {
 			$postData = $this->form->getData();
 			$featureSettings = array();
 			foreach ($postData as $field => $value) {
-				$fieldParts = preg_split('/#/', $field);
-				$orgId = $fieldParts[1];
-				if ($value != 'inherited') {
-					$isEnabled = ($value === 'enabled');
-					$featureSettings[] = array( 'organizationId' => $orgId, 'isEnabled' => $isEnabled);
+				if (strpos($field, 'org#') === 0) {
+					$fieldParts = preg_split('/#/', $field);
+					$orgId = $fieldParts[1];
+					if ($value != 'inherited') {
+						$isEnabled = ($value === 'enabled');
+						$featureSettings[] = array('organizationId' => $orgId, 'isEnabled' => $isEnabled);
+					}
 				}
 			}
 			$success = $this->csApi->setFeature('quicktip', $featureSettings);
@@ -295,7 +297,6 @@ class QuickTipManager extends PageForm {
 // -----------------------------------------------------------------------------
 // PAGE INSTANTIATION AND DISPLAY
 // -----------------------------------------------------------------------------
-$page = new QuickTipManager(array('page' => 'admin:settings'), $csApi);
-executePage($page);
+executePage(new QuickTipManager(array('page' => 'admin:settings'), $csApi));
 
 ?>
