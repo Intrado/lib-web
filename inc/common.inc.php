@@ -9,7 +9,7 @@ $thriftdir = "{$basedir}/Thrift";
 
 // In case the mechanism for checking if we're running under PHPUnit needs to change,
 // we check it here and set our own global constant PHPUNIT that we can use everywhere
-if (defined('PHPUnit_MAIN_METHOD')) define('PHPUNIT', true);
+if (defined('PHPUNIT_CONTEXT')) define('PHPUNIT', true);
 
 setlocale(LC_ALL, 'en_US.UTF-8');
 mb_internal_encoding('UTF-8');
