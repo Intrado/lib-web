@@ -10,6 +10,9 @@
  */
 abstract class PageForm extends PageBase {
 
+	/**
+	 * @var Form
+	 */
 	public $form = null; // This is where the Form.obj will be instantiated
 	public $formName = 'theform'; // This needs to be overridden if a given page has more than one form
 

@@ -114,6 +114,10 @@ if ((getSystemSetting('_hasportal', false) && $USER->authorize('portalaccess') &
 		$featureLinks[] = "<a href='topicdatamanager.php'>Topic Manager</a>";
 	}
 
+	if (getSystemSetting('_hasquicktip', false) && $USER->authorize('managesystem')) {
+		$featureLinks[] = "<a href='quicktipmanager.php'>QuickTip Feature Manager</a>";
+	}
+
 	$linkLists[] = $featureLinks;
 }
 

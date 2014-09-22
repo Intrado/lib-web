@@ -10,6 +10,7 @@
  * @version 1.0
  */
 
+define('PHPUNIT_CONTEXT', true);
 $GLOBALS['konadir'] = $konadir = dirname(dirname(dirname(__FILE__)));
 
 // ...because this is missing from our php.ini

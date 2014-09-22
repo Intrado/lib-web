@@ -15,6 +15,15 @@ class CommsuiteApiClient {
 		$this->apiClient = $apiClient;
 		$this->burstsBaseUrl = "/users/{$USER->id}" . self::API_BURSTS;
 	}
+
+	/**
+	 * @param string $resourceUriFragment the fragment which identifies this resource. Example: "/organizations/1"
+	 * @return bool|mixed the object or false if the request failed
+	 */
+	public function getObject($resourceUriFragment) {
+		$res = $this->apiClient->get($resourceUriFragment);
+		return($res['code'] == 200 ? json_decode($res['body']) : false);
+	}
 	
 	// ---------------------------------------------------------------------
 	// Access Profiles
@@ -241,6 +250,41 @@ class CommsuiteApiClient {
 	public function getBurstPortionList($burstId) {
 		$res = $this->apiClient->get($this->burstsBaseUrl . "/{$burstId}/portions");
 		return($res['code'] == 200 ? json_decode($res['body']) : false);
+	}
+
+	// ---------------------------------------------------------------------
+	// Organizations
+	// ---------------------------------------------------------------------
+	/**
+	 * Get the organization
+	 *
+	 * GET /2/organizations/{orgId}
+	 *
+	 * @param string $orgId id of the organization to request data for
+	 * @return mixed object which contains the organization and also contains a list of it's child organizations
+	 */
+	public function getOrganization($orgId) {
+		return $this->getObject("/organizations/$orgId");
+	}
+
+	// ---------------------------------------------------------------------
+	// Settings
+	// ---------------------------------------------------------------------
+	/**
+	 * Get the specified feature setting (returns enable state of feature for organizations)
+	 *
+	 * GET /2/settings/features/{featureName}
+	 *
+	 * @param string $featureName name of the feature to request data for
+	 * @return mixed object which contains the list of feature settings per organization for the requested feature
+	 */
+	public function getFeature($featureName) {
+		return $this->getObject("/settings/features/$featureName");
+	}
+
+	public function setFeature($featureName, $newStateData) {
+		$res = $this->apiClient->put("/settings/features/$featureName", $newStateData);
+		return($res['code'] == 200 ? true : false);
 	}
 }
 
