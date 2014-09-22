@@ -172,7 +172,7 @@ class QuickTipManager extends PageForm {
 	 */
 	function isAuthorized() {
 		global $USER;
-		return($USER->authorize('managesystem'));
+		return (getSystemSetting('_hasquicktip', false) && $USER->authorize('managesystem'));
 	}
 
 	function load() {
@@ -285,7 +285,7 @@ class QuickTipManager extends PageForm {
 
 		$buttons = array(
 			submit_button(_L('Save'), 'submit', 'tick'),
-			icon_button(_L('Cancel'), 'cross', null, 'start.php')
+			icon_button(_L('Cancel'), 'cross', null, 'settings.php')
 		);
 
 		$form = new Form($this->formName, $formData, null, $buttons);

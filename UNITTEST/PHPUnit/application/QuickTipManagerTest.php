@@ -31,6 +31,12 @@ class QuickTipManagerTest extends PHPUnit_Framework_TestCase {
 	public function setUp() {
 		global $USER;
 
+		function getSystemSetting_stub() {
+			return true;
+		}
+		runkit_function_rename('getSystemSetting', 'orig_getSystemSetting');
+		runkit_function_rename('getSystemSetting_stub', 'getSystemSetting');
+
 		$USER = $this->getMockBuilder('User')
 			->disableOriginalConstructor()
 			->getMock();
