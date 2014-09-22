@@ -12,6 +12,12 @@ require_once(realpath(dirname(dirname(__FILE__)) .'/ApiStub.php'));
 
 require_once("{$konadir}/quicktipmanager.php");
 
+function getSystemSetting_stub() {
+	return true;
+}
+runkit_function_rename('getSystemSetting', 'orig_getSystemSetting');
+runkit_function_rename('getSystemSetting_stub', 'getSystemSetting');
+
 class QuickTipManagerTest extends PHPUnit_Framework_TestCase {
 	/**
 	 * @var QuickTipManager
@@ -30,12 +36,6 @@ class QuickTipManagerTest extends PHPUnit_Framework_TestCase {
 	// before each test
 	public function setUp() {
 		global $USER;
-
-		function getSystemSetting_stub() {
-			return true;
-		}
-		runkit_function_rename('getSystemSetting', 'orig_getSystemSetting');
-		runkit_function_rename('getSystemSetting_stub', 'getSystemSetting');
 
 		$USER = $this->getMockBuilder('User')
 			->disableOriginalConstructor()
