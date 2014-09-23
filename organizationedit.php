@@ -170,6 +170,10 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					QuickUpdate("delete from persondatavalues where id = ?", false, array($originalorgpdvid));
 					QuickUpdate("insert into persondatavalues values (null, 'oid', ?, 0, 1)", false, array($org->id));
 				}
+				// copy all organization settings
+				QuickUpdate("delete from setting where organizationid = ?", array($org->id));
+				QuickUpdate("insert into setting (name, value, organizationid) select name, value, " . $org->id . " from setting where organizationid = ?", array($originalorg->id));
+				
 				notice(_L('Organization %1$s has been updated', $orgkey));
 			} else {
 				notice(_L('%1$s has been created.', $orgkey));
