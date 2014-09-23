@@ -1019,16 +1019,10 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			// check if quicktip for organizations
 			$hasQtOrgSetting = QuickQuery('select 1 from setting where name = ? and organizationid is not null', $custdb, array($quickTipSettingName));
 			if (!$hasQtOrgSetting) {
-				// get all organizations and create a setting for each
-				$organizations = DBFindMany("organization", "from organization where not deleted");
-				foreach ($organizations as $id => $org) {
-					// root org default to disable, all other orgs enabled
-					if ($org->parentorganizationid)
-						$v = "1";
-					else
-						$v = "0";
-					setOrganizationSetting($quickTipSettingName, $v, $id);
-				}
+				// insert setting for root org, disabled
+				QuickUpdate("insert into setting (name, value, organizationid)  select '_hasquicktip', '0', id from organization where parentorganizationid is null and not deleted", $custdb);
+				// insert setting for each org, enabled
+				QuickUpdate("insert into setting (name, value, organizationid)  select '_hasquicktip', '1', id from organization where parentorganizationid is not null and not deleted", $custdb);
 			}
 
 			$_dbcon = $savedbcon;

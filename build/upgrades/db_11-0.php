@@ -39,16 +39,10 @@ function upgrade_11_0($rev, $shardid, $customerid, $db) {
 				// check if quicktip for organizations
 				$hasQtOrgSetting = QuickQuery('select 1 from setting where name = ? and organizationid is not null', $db, array($quickTipSettingName));
 				if (!$hasQtOrgSetting) {
-					// get all organizations and create a setting for each
-					$organizations = QuickQueryList("select id, parentorganizationid from organization where not deleted", true, $db);
-					foreach ($organizations as $id => $parentorganizationid) {
-						// root org default to disable, all other orgs enabled
-						if ($parentorganizationid)
-							$v = "1";
-						else
-							$v = "0";
-						QuickUpdate("insert into setting (name, value, organizationid) values (?, ?, ?)", $db, array($quickTipSettingName, $v, $id));
-					}
+					// insert setting for root org, disabled
+					QuickUpdate("insert into setting (name, value, organizationid)  select '_hasquicktip', '0', id from organization where parentorganizationid is null and not deleted", $db);
+					// insert setting for each org, enabled
+					QuickUpdate("insert into setting (name, value, organizationid)  select '_hasquicktip', '1', id from organization where parentorganizationid is not null and not deleted", $db);
 				}
 			}
 			Query("COMMIT", $db);
