@@ -194,7 +194,6 @@ class QuickTipManager extends PageForm {
 					}
 				}
 			}
-			error_log(json_encode($featureSettings));
 			$success = $this->csApi->setFeature('quicktip', $featureSettings);
 
 			if ($success) {
@@ -247,7 +246,7 @@ class QuickTipManager extends PageForm {
 		$org = new stdClass();
 		$org->id = $rootOrganization->id;
 		$org->name = $rootOrganization->name;
-		$rootOrgValue = ($orgFeatureValue($org->id) === 'inherited')? 'enabled' : 'disabled';
+		$rootOrgValue = ($orgFeatureValue($org->id) === 'inherited')? 'enabled' : $orgFeatureValue($org->id);
 		$formData = array(
 			_L('Root Organization'),
 			'tip' => array(
