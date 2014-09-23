@@ -126,6 +126,9 @@ window.RCIEditorInline = function () {
 				that.activeEditorId = null;
 				that.captureChanges();
 			});
+			editor.on('saveSnapshot', function () {
+				that.captureChanges();
+			});
 			editor.on('afterCommandExec', function () {
 				that.captureChanges();
 			});
@@ -135,7 +138,6 @@ window.RCIEditorInline = function () {
 			editor.on('insertElement', function () {
 				that.captureChanges();
 			});
-
 		});
 
 		this.constructed = true;
