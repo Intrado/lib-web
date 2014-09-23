@@ -754,5 +754,57 @@ END;
 	return($html);
 }
 
+/**
+ * Execute a command in another process and kill it if it runs for longer than expected.
+ *
+ * Pieced together from multiple sources:
+ * http://php.net/manual/en/function.proc-open.php
+ * http://stackoverflow.com/questions/5309900/php-process-execution-timeout
+ * http://stackoverflow.com/questions/9419122/exec-with-timeout
+ *
+ * @param string $command the command and it's arguments. Be sure to quote filenames if they have spaces.
+ * @param int $timeoutMs the maximum number of milliseconds this command can execute for before it is killed
+ * @param int $expectedExitValue the expected exit value from the command. Defaults to zero
+ * @return string the output from stdOut. if you want stdError as well, pipe it with your command
+ * @throws Exception if the process cannot be started, or if an unexpected exit value is returned
+ */
+function executeWithTimeout($command, $timeoutMs, $expectedExitValue = 0) {
+	// Start the process.
+	$process = proc_open('exec ' . $command,
+		array(
+			0 => array('pipe', 'r'),  // stdIn
+			1 => array('pipe', 'w'),  // stdOut
+			2 => array('pipe', 'w')   // stdError
+		), $pipes);
+
+	if (!is_resource($process)) {
+		throw new Exception("Unable to open process for command: '$command'");
+	}
+
+	// set stdOut and stdError to non-blocking
+	stream_set_timeout($pipes[1], 0);
+	stream_set_timeout($pipes[2], 0);
+
+	// time to stop, in ms
+	$stopTime = round(microtime(true) * 1000) + $timeoutMs;
+
+	$stdOut = '';
+	// attempt to read from stdOut till the stream returns false, or the timeout is reached
+	while (($data = fread($pipes[1], 4096)) && ($stopTime > round(microtime(true) * 1000))) {
+		$meta = stream_get_meta_data($pipes[1]);
+		if (!$meta['timed_out'])
+			$stdOut .= $data;
+	}
+
+	$stdOut .= stream_get_contents($pipes[1]);
+	$stdError = stream_get_contents($pipes[2]);
+	$exitValue = proc_close($process);
+
+	if ($exitValue != $expectedExitValue) {
+		throw new Exception("Unexpected exit value: $exitValue, stdError: '$stdError'");
+	}
+
+	return $stdOut;
+}
 
 ?>
