@@ -318,8 +318,8 @@ if (isset($_SESSION['customerid'])) {
 		exit("Connection failed for customer: {$custinfo["dbhost"]}, db: c_$customerid, as shard user");
 	}
 
-	$query = "select name,value from setting";
-	$settings = array_merge($settings, QuickQueryList($query,true,$custdb));
+	$query = "select name, value from setting where organizationid is null";
+	$settings = array_merge($settings, QuickQueryList($query, true, $custdb));
 }
 
 
@@ -1002,7 +1002,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
 		// ... and if it was disabled and is now enabled, add the TAI tables to this customer which QuickTip uses
 		// and add the quicktip alert email template
-		if ($postdata["hasquicktip"] && (! $settings['_hasquicktip'])) {
+		// add quick tip organization settings
+		$quickTipSettingName = "_hasquicktip";
+		if ($postdata["hasquicktip"] && (! $settings[$quickTipSettingName])) {
 			$savedbcon = $_dbcon;
 			$_dbcon = $custdb;
 			tai_setup($customerid);
@@ -1012,6 +1014,21 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			if (!$hasQtAlertTemplate) {
 				$messageGroupId = createEmailTemplateMessageGroup($templateName, $templates[$templateName]);
 				QuickQuery('insert into template (type, messagegroupid) values (?,?)', $custdb, array($templateName, $messageGroupId));
+			}
+			
+			// check if quicktip for organizations
+			$hasQtOrgSetting = QuickQuery('select 1 from setting where name = ? and organizationid is not null', $custdb, array($quickTipSettingName));
+			if (!$hasQtOrgSetting) {
+				// get all organizations and create a setting for each
+				$organizations = DBFindMany("organization", "from organization where not deleted");
+				foreach ($organizations as $id => $org) {
+					// root org default to disable, all other orgs enabled
+					if ($org->parentorganizationid)
+						$v = "1";
+					else
+						$v = "0";
+					setOrganizationSetting($quickTipSettingName, $v, $id);
+				}
 			}
 
 			$_dbcon = $savedbcon;

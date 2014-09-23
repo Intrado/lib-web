@@ -96,13 +96,14 @@ function getNextAvailableAccessCode($currentCode, $userid) {
 	return $nextCode;
 }
 
+// a customer system setting is one where organizationid is null
 function getCustomerSystemSetting($name, $defaultvalue=false, $refresh=false, $custdb = false) {
 	static $settings = array();
 
 	if (isset($settings[$name]) && !$refresh)
 		return $settings[$name];
 
-	$value = QuickQuery("select value from setting where name = ?", $custdb, array($name));
+	$value = QuickQuery("select value from setting where name = ? and organizationid is null", $custdb, array($name));
 
 	if($value === false) {
 		$value = $defaultvalue;
@@ -115,20 +116,37 @@ function getSystemSetting($name, $defaultvalue=false) {
 }
 
 
+// a customer system setting is one where organizationid is null
 function setCustomerSystemSetting($name, $value, $custdb = false) {
 	$old = getCustomerSystemSetting($name, false, true, $custdb);
 	if($old === false && $value !== '' && $value !==NULL) {
 		QuickUpdate("insert into setting (name, value) values (?, ?)", $custdb, array($name, $value));
 	} else {
 		if($value === '' || $value === NULL)
-			QuickUpdate("delete from setting where name = ?", $custdb, array($name));
+			QuickUpdate("delete from setting where name = ? and organizationid is null", $custdb, array($name));
 		elseif($value != $old)
-			QuickUpdate("update setting set value = ? where name = ?", $custdb, array($value, $name));
+			QuickUpdate("update setting set value = ? where name = ? and organizationid is null", $custdb, array($value, $name));
 	}
 }
 
 function setSystemSetting($name, $value) {
 	setCustomerSystemSetting($name, $value);
+}
+
+function setOrganizationSetting($name, $value, $organizationId, $custdb = false) {
+//TODO refactor with setCustomerSystemSetting to share code, unclear what if sql param is null for orgId
+
+	// get existing setting value (if any)
+	$old = QuickQuery("select value from setting where name = ? and organizationid = ?", $custdb, array($name, $organizationId));
+	//
+	if ($old === false && $value !== '' && $value !==NULL) {
+		QuickUpdate("insert into setting (name, value, organizationid) values (?, ?, ?)", $custdb, array($name, $value, $organizationId));
+	} else {
+		if($value === '' || $value === NULL)
+			QuickUpdate("delete from setting where name = ? and organizationid = ?", $custdb, array($name, $organizationId));
+		elseif($value != $old)
+			QuickUpdate("update setting set value = ? where name = ? and organizationid = ?", $custdb, array($value, $name, $organizationId));
+	}
 }
 
 // get the default callerid based on user prefs, privs, customer settings, etc.

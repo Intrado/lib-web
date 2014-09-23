@@ -155,7 +155,7 @@ if (isset($_SESSION['customerid'])) {
 		exit("Connection failed for customer: {$custinfo["dbhost"]}, db: c_$customerid, as shard user");
 	}
 
-	$query = "select name,value from setting";
+	$query = "select name, value from setting where organizationid is null";
 	$settings = array_merge($settings, QuickQueryList($query,true,$custdb));
 	
 	$query = "select product, enabled from customerproduct where customerid=?";
