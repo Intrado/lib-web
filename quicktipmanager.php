@@ -47,13 +47,15 @@ class OrganizationFeature extends FormItem {
 		$this->organization = $args['organization'];
 		$this->parentValue = isset($args['parentValue']) ? $args['parentValue'] : null;
 		$this->inputName = escapeHtml("{$this->form->name}_{$this->name}");
+		$this->radioName = $this->inputName . "-radio";
 	}
 
 	function render ($value) {
-		return "<div id='{$this->inputName}' class='radiobox'>
-					<label>Show&nbsp;<input type='radio' name='{$this->inputName}' value='enabled' ". (($value == 'enabled')? 'checked': '') ."></label>
-					<label>Hide&nbsp;<input type='radio' name='{$this->inputName}' value='disabled' ". (($value == 'disabled')? 'checked': '') ."></label>
-					<input type='radio' name='{$this->inputName}' value='inherited' style='display:none;' ". (($value == 'inherited')? 'checked': '') .">
+		return "<div>
+					<input id='{$this->inputName}' name='{$this->inputName}' type='hidden' value='$value' />
+					<label>Show&nbsp;<input type='radio' name='{$this->radioName}' value='enabled' ". (($value == 'enabled')? 'checked': '') ."></label>
+					<label>Hide&nbsp;<input type='radio' name='{$this->radioName}' value='disabled' ". (($value == 'disabled')? 'checked': '') ."></label>
+					<input type='radio' name='{$this->radioName}' value='inherited' style='display:none;' ". (($value == 'inherited')? 'checked': '') .">
 				</div>";
 	}
 
@@ -64,22 +66,19 @@ class OrganizationFeature extends FormItem {
 	function renderJavascriptLibraries() {
 		return "<script>
 					(function($) {
-						$.fn.getOrgFeatureValue = function() {
-							return this.data('userValue');
-						};
 						/**
 						* Attaches a listener which detects changes and emits a new event which other instances can listen to
 						* Also listens for changes emitted by it's parent organization to update the display state
 						*
 						* @param {object} organization this organization object, containing the id and it's parent organization id
 						* @param {string} initialParentValue optionally sets this organization's parent's value
+						* @param {object} hiddenInput jQuery extended input to store the value in
 						* @returns {object} this, after having attached org feature functionality
 						*/
-						$.fn.asOrgFeature = function(organization, initialParentValue) {
+						$.fn.asOrgFeature = function(organization, initialParentValue, hiddenInput) {
 							var org = organization;
 							var parentValue = initialParentValue;
 							var userValue = this.filter(':checked').val();
-							this.data('userValue', userValue);
 							var changeEventPrefix = 'orgFeatureChange-';
 
 							var radios = this;
@@ -111,7 +110,8 @@ class OrganizationFeature extends FormItem {
 									type: changeEventPrefix + org.id,
 									message: { value: userValue }
 								});
-								radios.data('userValue', userValue);
+								hiddenInput.val(userValue);
+								form_do_validation(hiddenInput.parents('form')[0], hiddenInput[0]);
 							});
 
 							// listen to change event's for this organization's parent org
@@ -130,20 +130,13 @@ class OrganizationFeature extends FormItem {
 	}
 
 	/**
-	 * Attaches the jQuery module to this form item
+	 * Attaches the jQuery module to the radio buttons in this form item
 	 * @return string the javascript to execute which sets up this form item
 	 */
 	function renderJavascript() {
 		$orgJson = json_encode($this->organization);
 		$parentValue = addslashes($this->parentValue);
-		return "jQuery('input[name=\"{$this->inputName}\"]').asOrgFeature($orgJson, '$parentValue');";
-	}
-
-	/**
-	 * @return string which is a javascript function to be executed, which will return the enabled state of the 'feature' for this organization
-	 */
-	function jsGetValue () {
-		return "function func() { return jQuery('input[name=\"{$this->inputName}\"]').getOrgFeatureValue() }; func";
+		return "jQuery('input[name=\"{$this->radioName}\"]').asOrgFeature($orgJson, '$parentValue', jQuery('input[name=\"{$this->inputName}\"]'));";
 	}
 }
 
@@ -201,6 +194,7 @@ class QuickTipManager extends PageForm {
 					}
 				}
 			}
+			error_log(json_encode($featureSettings));
 			$success = $this->csApi->setFeature('quicktip', $featureSettings);
 
 			if ($success) {
