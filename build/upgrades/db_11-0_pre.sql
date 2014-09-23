@@ -37,3 +37,6 @@ $$$
 
 -- $rev 5
 -- dummy rev to insert new customer setting '_hasicra'
+
+-- $rev 6
+-- dummy rev to insert organization settings '_hasquicktip'
