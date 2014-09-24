@@ -25,7 +25,6 @@ require_once("../inc/securityhelper.inc.php");
 require_once("../obj/PeopleList.obj.php");
 require_once("../obj/RenderedList.obj.php");
 require_once("../inc/date.inc.php");
-include_once("../obj/AudioConverter.obj.php");
 
 /**
  * Similar to showTable

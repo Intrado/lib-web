@@ -2402,6 +2402,7 @@ require_once("../obj/Permission.obj.php");
 require_once("../obj/Rule.obj.php"); //for search and sec profile rules
 require_once("../inc/date.inc.php");
 require_once("../inc/securityhelper.inc.php");
+include_once("../obj/AudioConverter.obj.php");
 
 // OBJECTS
 require_once("../obj/Section.obj.php");
