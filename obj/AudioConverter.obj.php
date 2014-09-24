@@ -18,7 +18,7 @@ class AudioConverter {
 	 */
 	public function getSupportedFormats() {
 		if (!$this->supportedFormats) {
-			$formats = array('wav','aiff','au','aif','mp3');
+			$formats = array('wav','aiff','au','aif','mp3', '3gp');
 			switch ($this->getSoxVersion()) {
 				case AudioConverter::$MODERN_SOX:
 					$formats[] = 'm4a';
@@ -85,7 +85,7 @@ class AudioConverter {
 
 		// use ffmpeg for these specific mime-types
 		if ($mimeType == 'audio/x-caf' || $mimeType == 'audio/3gpp' || $mimeType == 'audio/3gpp2') {
-			$cmd = "ffmpeg -i \"$sourceFile\" -ar 8000 -ac 1 \"$outputFile\" 2>/dev/null";
+			$cmd = "ffmpeg -y -i \"$sourceFile\" -ar 8000 -ac 1 \"$outputFile\"";
 		} else {
 			// Use sox to convert all other file types, or when the mime-type is not known
 			if ($this->getSoxVersion() == AudioConverter::$MODERN_SOX['name']) {
