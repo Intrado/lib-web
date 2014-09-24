@@ -125,7 +125,7 @@ class AudioConverter {
 			}
 		}
 
-		$tempFile = secure_tmpname(basename($filename). 'orig','.wav');
+		$tempFile = secure_tmpname(basename($filename). 'orig', ".$ext");
 		if(!copy($filename, $tempFile)) {
 			throw new Exception("Unable to copy to temporary file");
 		}
