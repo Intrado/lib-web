@@ -461,51 +461,35 @@ class SMAPI {
 			$fileext = isset($supportedmimetypes[$mimetype])?$supportedmimetypes[$mimetype]:".wav";
 			
 			//generate 2 temp files
-			//write audio data to first file then run through sox to clean audio and output to second file
+			//write audio data to first file, which will be converted into second
 			//read second file and base64 encode it for the DB
 			if (!$origtempfile = secure_tmpname($name . "origtempapiaudio", $fileext)) {
 				$result["resultdescription"] = "Failed to generate audio file";
 				return $result;
 			}
-			if (!$cleanedtempfile = secure_tmpname("cleanedtempapiaudio", ".wav")) {
-				$result["resultdescription"] = "Failed to generate audio file";
-				return $result;
-			}
-
-			//delete temp file that secure_tmpname generated so we can check if sox generated a file later
-			unlink($cleanedtempfile);
 
 			if (!file_put_contents($origtempfile, base64_decode($audio))) {
 				$result['resultdescription'] = "Failed to generate audio file";
 				return $result;
 			}
-			
-			if ($mimetype == 'audio/x-caf' || $mimetype == 'audio/3gpp' || $mimetype == 'audio/3gpp2') {
-				$cmd = "ffmpeg -i \"$origtempfile\" -ar 8000 -ac 1 \"$cleanedtempfile\" 2>/dev/null"; //  the 2>/dev/null is to make ffmpeg silent, there Is no other way of making it silent with a flag. 
-				$ffmpegresult = exec($cmd, $res1,$res2);
-			} else {
-				$cmd = "sox \"$origtempfile\" -r 8000 -c 1 -s -w \"$cleanedtempfile\" ";
-				//error_log($cmd);
-				$soxresult = exec($cmd, $res1,$res2);
-				//error_log("output " . $res1[0]);
-			}
-			
-			$contentid = false;
-			if ($res2 || !file_exists($cleanedtempfile)) {
+
+			$converter = new AudioConverter();
+			$cleanedtempfile = false;
+			try {
+				$cleanedtempfile = $converter->getMono8kPcm($origtempfile, $mimetype);
+			} catch (Exception $e) {
 				$result["resultdescription"]= "There was an error reading your audio file. Please try another file, or ensure the mimetype is correct. Supported mimetypes include: 'audio/wav' for .wav, 'audio/mpeg' for .mp3, and 'audio/x-caf' for .caf files.";
-				unlink($origtempfile);
-				unlink($cleanedtempfile);
+				@unlink($origtempfile);
+				@unlink($cleanedtempfile);
 				return $result;
-			} else {
-				
-				// even if they upload .mp3 or .caf we store it as .wav
-				$contentid = contentPut($cleanedtempfile, "audio/wav");
-
-				unlink($origtempfile);
-				unlink($cleanedtempfile);
 			}
-			if (!$contentid) {
 
+			// even if they upload .mp3 or .caf, the file is converted (above) and stored as .wav
+			$contentid = contentPut($cleanedtempfile, "audio/wav");
+			@unlink($origtempfile);
+			@unlink($cleanedtempfile);
+
+			if (!$contentid) {
 				$result["resultdescription"] = "Failed to create audio file record";
 				return $result;
 			}

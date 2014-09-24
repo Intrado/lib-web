@@ -11,6 +11,7 @@ include_once("../obj/MessagePart.obj.php");
 include_once("../obj/AudioFile.obj.php");
 include_once("../obj/Voice.obj.php");
 include_once("../obj/FieldMap.obj.php");
+require_once("../obj/AudioConverter.obj.php");
 
 // load the thrift api requirements.
 $thriftdir = '../Thrift';
@@ -68,31 +69,26 @@ if (isset($_GET['id']) && isset($_GET['customerid'])) {
 			$wavfiles[] = writeWav($data);
 		}
 	}
-	
-	//finally, merge the wav files
-	$outname = secure_tmpname("preview",".wav");
-	
-	$messageparts = empty($wavfiles)?'':'"' . implode('" "',$wavfiles) . '" ';
-			$cmd = 'sox ' . $messageparts . ' "' . $outname . '"';
-			$result = exec($cmd, $res1, $res2);
-	
-	foreach ($wavfiles as $file)
-	@unlink($file);
-	
-	if (!$res2 && file_exists($outname)) {
-		$data = file_get_contents ($outname); // readfile seems to cause problems
+	$converter = new AudioConverter();
+	$outputFile = false;
+	try {
+		// merge the audio files
+		$outputFile = $converter->combineFiles($wavfiles);
+
 		header("HTTP/1.0 200 OK");
 		header("Content-Type: audio/wav");
 		if (isset($_GET['download']))
 			header("Content-disposition: attachment; filename=message.wav");
 		header('Pragma: private');
 		header('Cache-control: private, must-revalidate');
-		header("Content-Length: " . strlen($data));
+		header("Content-Length: " . filesize($outputFile));
 		header("Connection: close");
-		echo $data;
-	} else {
+		readfile($outputFile);
+	} catch (Exception $e) {
 		echo _L("An error occurred trying to generate the preview file. Please try again.");
 	}
-	@unlink($outname);
+	foreach ($wavfiles as $file)
+		@unlink($file);
+	@unlink($outputFile);
 }
 ?>
