@@ -85,7 +85,6 @@ class AudioConverter {
 
 		// use ffmpeg for these specific mime-types
 		if ($mimeType == 'audio/x-caf' || $mimeType == 'audio/3gpp' || $mimeType == 'audio/3gpp2') {
-			// the 2>/dev/null is to make ffmpeg silent, there Is no other way of making it silent with a flag.
 			$cmd = "ffmpeg -i \"$sourceFile\" -ar 8000 -ac 1 \"$outputFile\" 2>/dev/null";
 		} else {
 			// Use sox to convert all other file types, or when the mime-type is not known
