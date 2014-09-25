@@ -19,22 +19,19 @@ $GLOBALS['commandControl'] = array();
  * @return mixed
  * @throws Exception
  */
-function executeWithTimeout($cmd) {
+function executeWithTimeout_stub($cmd) {
 	$GLOBALS['commandControl']['lastCommand'] = $cmd;
 	if ($GLOBALS['commandControl']['executeThrow']) {
 		throw new Exception();
 	}
 	return $GLOBALS['commandControl']['executeReturnValue'];
 }
-function secure_tmpname($prefix, $postfix) {
+function secure_tmpname_stub($prefix, $postfix) {
 	return "$prefix.$postfix";
 }
-
 function copy_stub() {
 	return $GLOBALS['commandControl']['copyReturnValue'];
 }
-runkit_function_rename('copy', 'orig_copy');
-runkit_function_rename('copy_stub', 'copy');
 
 class AudioConverterTest extends PHPUnit_Framework_TestCase {
 	const LEGACY_SOX_VERSION = "sox: Version 12.17.7\n";
@@ -43,6 +40,24 @@ class AudioConverterTest extends PHPUnit_Framework_TestCase {
 	 * @var AudioConverter
 	 */
 	var $converter;
+
+	public static function setUpBeforeClass() {
+		runkit_function_rename('executeWithTimeout', 'orig_executeWithTimeout');
+		runkit_function_rename('executeWithTimeout_stub', 'executeWithTimeout');
+		runkit_function_rename('secure_tmpname', 'orig_secure_tmpname');
+		runkit_function_rename('secure_tmpname_stub', 'secure_tmpname');
+		runkit_function_rename('copy', 'orig_copy');
+		runkit_function_rename('copy_stub', 'copy');
+	}
+
+	public static function tearDownAfterClass() {
+		runkit_function_rename('executeWithTimeout', 'executeWithTimeout_AudioConverterTest');
+		runkit_function_rename('orig_executeWithTimeout', 'executeWithTimeout');
+		runkit_function_rename('secure_tmpname', 'secure_tmpname_AudioConverterTest');
+		runkit_function_rename('orig_secure_tmpname', 'secure_tmpname');
+		runkit_function_rename('copy', 'copy_AudioConverterTest');
+		runkit_function_rename('orig_copy', 'copy');
+	}
 
 	// before each test
 	public function setUp() {
