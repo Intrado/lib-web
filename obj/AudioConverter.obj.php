@@ -1,4 +1,4 @@
-<?php
+<?
 /**
  * Convert audio files between different formats
  *
@@ -67,7 +67,7 @@ class AudioConverter {
 	public function combineFiles($files) {
 		$quotedFilesList = '"'. implode('" "',$files). '"';
 		$outputFile = secure_tmpname('combine','.wav');
-		$cmd = "sox $quotedFilesList -r 8000 -c 1 -s -w \"$outputFile\" ";
+		$cmd = "sox $quotedFilesList \"$outputFile\" ";
 		executeWithTimeout($cmd, 10 * 1000);
 		return $outputFile;
 	}
