@@ -782,23 +782,36 @@ function executeWithTimeout($command, $timeoutMs, $expectedExitValue = 0) {
 	}
 
 	// set stdOut and stdError to non-blocking
-	stream_set_timeout($pipes[1], 0);
-	stream_set_timeout($pipes[2], 0);
+	stream_set_blocking($pipes[1], 0);
+	stream_set_blocking($pipes[2], 0);
 
 	// time to stop, in ms
 	$stopTime = round(microtime(true) * 1000) + $timeoutMs;
 
 	$stdOut = '';
-	// attempt to read from stdOut till the stream returns false, or the timeout is reached
-	while (($data = fread($pipes[1], 4096)) && ($stopTime > round(microtime(true) * 1000))) {
-		$meta = stream_get_meta_data($pipes[1]);
-		if (!$meta['timed_out'])
-			$stdOut .= $data;
-	}
+	$stdError = '';
+	// read metadata, stdout and stderror till the process completes of times out.
+	do {
+		$stdOutMetaData = stream_get_meta_data($pipes[1]);
+		$stdErrMetaData = stream_get_meta_data($pipes[1]);
+		$stdOut .= fread($pipes[1], 4096);
+		$stdError .= fread($pipes[2], 4096);
+	} while (!($stdOutMetaData['eof'] && $stdErrMetaData['eof']) &&
+		($stopTime > round(microtime(true) * 1000)));
 
+	fclose($pipes[0]);
 	$stdOut .= stream_get_contents($pipes[1]);
+	fclose($pipes[1]);
 	$stdError = stream_get_contents($pipes[2]);
-	$exitValue = proc_close($process);
+	fclose($pipes[2]);
+
+	$status = proc_get_status($process);
+	if ($status['running']) {
+		proc_terminate($process);
+		$exitValue = -1;
+	} else {
+		$exitValue = $status['exitcode'];
+	}
 
 	if ($exitValue != $expectedExitValue) {
 		throw new Exception("Unexpected exit value: $exitValue, stdError: '$stdError'");
