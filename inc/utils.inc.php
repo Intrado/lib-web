@@ -814,7 +814,7 @@ function executeWithTimeout($command, $timeoutMs, $expectedExitValue = 0) {
 	}
 
 	if ($exitValue != $expectedExitValue) {
-		throw new Exception("Unexpected exit value: $exitValue, stdError: '$stdError'");
+		throw new Exception("Unexpected exit value for command: '$command' exit value: $exitValue, stdError: '$stdError'");
 	}
 
 	return $stdOut;

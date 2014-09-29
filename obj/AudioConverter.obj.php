@@ -118,10 +118,15 @@ class AudioConverter {
 		$ext = isset($path_parts['extension']) ? $path_parts['extension'] : "";
 		if (strlen($ext) < 1 || !in_array(strtolower($ext), $this->getSupportedFormats())) {
 			// if uncertain, let's try the mime type
-			if ($mimeType && $mimeType == 'audio/mpeg') {
-				$ext = "mp3";
-			} else {
-				$ext = "wav"; // default
+			switch ($mimeType) {
+				case 'audio/mpeg':
+					$ext = 'mp3';
+					break;
+				case 'audio/mp4':
+					$ext = 'm4a';
+					break;
+				default:
+					$ext = 'wav';
 			}
 		}
 
