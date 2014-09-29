@@ -123,6 +123,8 @@ class AudioConverter {
 					$ext = 'mp3';
 					break;
 				case 'audio/mp4':
+					// fall through, same as below
+				case 'audio/x-m4a':
 					$ext = 'm4a';
 					break;
 				default:
