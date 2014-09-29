@@ -20,7 +20,7 @@ class AudioConverter {
 		if (!$this->supportedFormats) {
 			$formats = array('wav','aiff','au','aif','mp3', '3gp');
 			switch ($this->getSoxVersion()) {
-				case AudioConverter::$MODERN_SOX:
+				case AudioConverter::$MODERN_SOX['name']:
 					$formats[] = 'm4a';
 					break;
 			}
