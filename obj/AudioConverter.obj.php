@@ -83,16 +83,26 @@ class AudioConverter {
 		$sourceFile = $this->createTempFile($filename, $mimeType);
 		$outputFile = secure_tmpname(basename($filename),'.wav');
 
-		// use ffmpeg for these specific mime-types
-		if ($mimeType == 'audio/x-caf' || $mimeType == 'audio/3gpp' || $mimeType == 'audio/3gpp2') {
-			$cmd = "ffmpeg -y -i \"$sourceFile\" -ar 8000 -ac 1 \"$outputFile\"";
-		} else {
-			// Use sox to convert all other file types, or when the mime-type is not known
-			if ($this->getSoxVersion() == AudioConverter::$MODERN_SOX['name']) {
-				$cmd = "sox \"$sourceFile\" -b 16 -e signed-integer \"$outputFile\" channels 1 rate 8k";
-			} else {
-				$cmd = "sox \"$sourceFile\" -r 8000 -c 1 -s -w \"$outputFile\" ";
-			}
+		// Select the appropriate utility to convert each type of audio
+		switch ($mimeType) {
+			case 'audio/x-caf':
+				// fall through. use ffmpeg, same as below
+			case 'audio/3gpp':
+				// fall through. use ffmpeg, same as below
+			case 'audio/3gpp2':
+				// fall through. use ffmpeg, same as below
+			case 'audio/mp4':
+				// fall through. use ffmpeg, same as below
+			case 'audio/x-m4a':
+				$cmd = "ffmpeg -y -i \"$sourceFile\" -ar 8000 -ac 1 \"$outputFile\"";
+				break;
+			default:
+				// Use sox to convert all other file types, or when the mime-type is not known
+				if ($this->getSoxVersion() == AudioConverter::$MODERN_SOX['name']) {
+					$cmd = "sox \"$sourceFile\" -b 16 -e signed-integer \"$outputFile\" channels 1 rate 8k";
+				} else {
+					$cmd = "sox \"$sourceFile\" -r 8000 -c 1 -s -w \"$outputFile\" ";
+				}
 		}
 
 		try {
