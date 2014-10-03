@@ -34,3 +34,9 @@ $$$
 -- copy enrollment data from personassociation.sectionid
 insert into enrollment (personid, sectionid, importid, importstatus) select personid, sectionid, importid, 'new' from personassociation where sectionid is not null
 $$$
+
+-- $rev 5
+-- dummy rev to insert new customer setting '_hasicra'
+
+-- $rev 6
+-- dummy rev to insert organization settings '_hasquicktip'

@@ -7,6 +7,7 @@ include_once("inc/common.inc.php");
 include_once("inc/utils.inc.php");
 include_once("inc/securityhelper.inc.php");
 include_once("inc/form.inc.php");
+require_once("inc/formatters.inc.php");
 include_once("inc/html.inc.php");
 include_once("inc/table.inc.php");
 include_once("obj/FieldMap.obj.php");
@@ -17,7 +18,7 @@ include_once("obj/Email.obj.php");
 include_once("obj/Language.obj.php");
 include_once("obj/JobType.obj.php");
 include_once("obj/Sms.obj.php");
-
+include_once("obj/LinkedAccountManager.obj.php");
 
 $FORMDISABLE = " DISABLED ";
 if(isset($method)){
@@ -57,6 +58,9 @@ if (isset($_GET['id'])) {
 } else {
 	redirect('unauthorized.php');
 }
+
+$person = $csApi->getPerson($personid, "dependents,guardians");
+
 if(getSystemSetting("_hasportal", false) && $USER->authorize("portalaccess")){
 	if(isset($_GET['create']) && $_GET['create']){
 		if(generatePersonTokens(array($personid))){
@@ -77,10 +81,18 @@ if(getSystemSetting("_hasportal", false) && $USER->authorize("portalaccess")){
 			error("There was an error revoking this person's token");
 		}
 	}
+}
 
+if((getSystemSetting("_hasportal", false) || getSystemSetting("_hasinfocenter", false)) && $USER->authorize("portalaccess")){
 	if(isset($_GET['disassociate'])){
 		$portaluserid = $_GET['disassociate'] + 0;
-		$count = QuickUpdate("delete from portalperson where personid = '" . $personid . "' and portaluserid = '" . $portaluserid . "'");
+		$infoCenter = getSystemSetting("_hasinfocenter", false);
+		if ($infoCenter) {
+			$linkedAccountManager = new LinkedAccountManager();
+			$count = $linkedAccountManager->disassociateAccount($personid, $portaluserid);
+		} else {
+			$count = QuickUpdate("delete from portalperson where personid = '" . $personid . "' and portaluserid = '" . $portaluserid . "'");
+		}
 		if($count){
 			$portaluser = getPortalUsers(array($portaluserid));
 			$portalusername = $portaluser[$portaluserid]['portaluser.username'];
@@ -171,7 +183,7 @@ if (isset($personid)) {
 		$_SESSION['guardian_of_personid'] = $personid;
 	}
 	// set page to redirect back to
-	if ($isGuardian) {
+	if ($isGuardian && isset($_SESSION['guardian_of_personid'])) {
 		// return to last viewed student, assume that is how we got to viewing this guardian
 		$backTo = "viewcontact.php?id=" . $_SESSION['guardian_of_personid'];
 	} else {
@@ -194,21 +206,6 @@ if (isset($personid)) {
 		$tokendata = array("token" => "",
 							"creationusername" => "",
 							"expirationdate" => "");
-	}
-	// if associates, assume guardiancm, else guardianauto
-	if (count($associates) > 0) {
-		// need to be sure guardiancm trumps guardianauto
-		$guardiandata = QuickQueryMultiRow("select pg.guardianpersonid, p." . FieldMap::GetFirstNameField() . ", p." . FieldMap::GetLastNameField() . ", gc.name
-				from personguardian pg 
-				left join person p on (p.id = pg.guardianpersonid) 
-				left join guardiancategory gc on (gc.id = pg.guardiancategoryid) 
-				where p.type = 'guardiancm' and not p.deleted and pg.personid = ? order by gc.sequence, p." . FieldMap::GetLastNameField(), true, false, array($personid));
-	} else {
-		$guardiandata = QuickQueryMultiRow("select pg.guardianpersonid, p." . FieldMap::GetFirstNameField() . ", p." . FieldMap::GetLastNameField() . ", gc.name
-				from personguardian pg
-				left join person p on (p.id = pg.guardianpersonid)
-				left join guardiancategory gc on (gc.id = pg.guardiancategoryid)
-				where p.type = 'guardianauto' and not p.deleted and pg.personid = ? order by gc.sequence, p." . FieldMap::GetLastNameField(), true, false, array($personid));
 	}
 	
 	if (getSystemSetting('_hassurvey', true))
@@ -634,37 +631,103 @@ foreach ($fieldmaps as $map) {
 <?
 	} // end _hasenrollment
 ?>
-
+	
 <?
-	if (getSystemSetting("maxguardians", 0) && count($guardiandata)) {
+	if (getSystemSetting("maxguardians", 0) && $person && count($person->guardians) > 0) {
 ?>
-	<tr>
+		<tr>
 		<th align="right" class="windowRowHeader bottomBorder">Guardians:</th>
 		<td class="bottomBorder">
-			<table  cellpadding="2" cellspacing="1" >
-			<tr class="listheader">
-				<th align="left"><b>First Name<b></th>
-				<th align="left"><b>Last Name<b></th>
-				<th align="left"><b>Category<b></th>
-				<th align="left"><b>Actions<b></th>
-			</tr>
-<?
-			foreach ($guardiandata as $guardian) {
-?>
-			<tr>
-				<td class="bottomBorder"><?=escapehtml($guardian['f01'])?></td>
-				<td class="bottomBorder"><?=escapehtml($guardian['f02'])?></td>
-				<td class="bottomBorder"><?=escapehtml($guardian['name'])?></td>
-				<td class="bottomBorder"><a href="viewcontact.php?id=<?=$guardian['guardianpersonid'] . $iFrameAppend?>$iFrameAppend" />View</a></td>
-			</tr>
-<?
-			}
-?>
+			<table width="100%" cellpadding="3" cellspacing="1" class="list">
+				<?
+				$associations = associationData($person->guardians);
+				$titles = array("firstname" => "First Name", "lastname" => 'Last Name', "category" => 'Category', "actions" => 'Actions');
+				showTable($associations, $titles, array("actions" => "fmt_person_view_actions"));
+				?>
 			</table>
 		</td>
-	</tr>	
-<?		
+	</tr>
+<?
 	} // end guardians
+
+
+	if ($person && count($person->dependents) > 0) {
+	?>
+	<tr>
+			<th align="right" class="windowRowHeader bottomBorder">Dependents:</th>
+			<td class="bottomBorder">
+				<table width="100%" cellpadding="3" cellspacing="1" class="list">
+					<?
+					$associations = associationData($person->dependents);
+					$titles = array("firstname" => "First Name", "lastname" => 'Last Name', "category" => 'Category', "actions" => 'Actions');
+					showTable($associations, $titles, array("actions" => "fmt_person_view_actions"));
+					?>
+				</table>
+			</td>
+		</tr>
+	<?
+} // end dependents
+
+/**
+ *
+ * @param array $associations list of associations
+ * @return array rows of associations
+ */
+function associationData($associations) {
+	$rows = array();
+	foreach ($associations as $association) {
+		$p = $association->person;
+		$row = array(
+			"personid" => $p->id,
+			"firstname" => $p->firstName,
+			"lastname" => $p->lastName,
+			"category" => $association->guardianCategory,
+			"canview" => $association->canView
+		);
+		$rows[] = $row;
+	}
+	return $rows;
+}
+
+//***************************************************************************************************************************
+	// Associated Accounts settings
+	//***************************************************************************************************************************
+
+if (getSystemSetting("_hasinfocenter", false) && $USER->authorize("portalaccess")) {
+	$linkedAccountManager = new LinkedAccountManager();
+	$guardianAssociations = $linkedAccountManager->getAssociatedAccounts($personid);
+	?>
+		<tr class="listheader"><th align="left" colspan="2"><b style="font-size: 16px"><?= _L("Associated Accounts") ?></b></th></tr>
+			<tr>
+			<th align="right" class="windowRowHeader bottomBorder"></th>
+			<td class="bottomBorder">
+				<table  cellpadding="2" cellspacing="1" >
+					<tr class="listheader">
+						<th align="left"><b>User Name<b></th>
+						<th align="left"><b>Last Login<b></th>
+						<th align="left"><b>Actions<b></th>
+					</tr>
+	<?
+	foreach ($guardianAssociations as $portaluserid => $associate) {
+		if ($associate['portaluser.lastlogin']) {
+			$lastlogin = date("M j, Y g:i a", $associate['portaluser.lastlogin'] / 1000);
+		} else {
+			$lastlogin = "Never";
+		}
+	?>
+							<tr>
+								<td style="padding-right:5px;"><?= escapehtml($associate['portaluser.username']) ?></td>
+								<td style="padding-right:5px;"><?= escapehtml($lastlogin) ?></td>
+								<td><a href="#" onclick="if(confirmDisassociate()) window.location='?disassociate=<?= $portaluserid . $iFrameAppend ?> '" />Disassociate</a></td>
+							</tr>
+		<?
+	}
+		?>
+				</table>
+			</td>
+		</tr>
+	<?
+}
 
 	//***************************************************************************************************************************
 	// Contact Manager settings
@@ -779,7 +842,7 @@ foreach ($fieldmaps as $map) {
 </table>
 <script type="text/javascript">
 	function confirmDisassociate(){
-		return confirm('Are you sure you want to disassociate this Contact Manager User?');
+		return confirm('Are you sure you want to disassociate this Associated Account?');
 	}
 	function confirmRevoke(){
 		return confirm('Are you sure you want to revoke this contact\'s activation code?');

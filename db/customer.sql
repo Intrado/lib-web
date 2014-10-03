@@ -2769,3 +2769,15 @@ update setting set value='11.0/4' where name='_dbversion'
 $$$
 
 -- END 11.0/4
+
+-- rev 5 no-op insert '_hasicra' setting
+update setting set value='11.0/5' where name='_dbversion'
+$$$
+
+-- END 11.0/5
+
+-- rev 6 no-op insert '_hasquicktip' setting for organizations
+update setting set value='11.0/6' where name='_dbversion'
+$$$
+
+-- END 11.0/6

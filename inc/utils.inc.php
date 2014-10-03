@@ -96,13 +96,14 @@ function getNextAvailableAccessCode($currentCode, $userid) {
 	return $nextCode;
 }
 
+// a customer system setting is one where organizationid is null
 function getCustomerSystemSetting($name, $defaultvalue=false, $refresh=false, $custdb = false) {
 	static $settings = array();
 
 	if (isset($settings[$name]) && !$refresh)
 		return $settings[$name];
 
-	$value = QuickQuery("select value from setting where name = ?", $custdb, array($name));
+	$value = QuickQuery("select value from setting where name = ? and organizationid is null", $custdb, array($name));
 
 	if($value === false) {
 		$value = $defaultvalue;
@@ -115,20 +116,37 @@ function getSystemSetting($name, $defaultvalue=false) {
 }
 
 
+// a customer system setting is one where organizationid is null
 function setCustomerSystemSetting($name, $value, $custdb = false) {
 	$old = getCustomerSystemSetting($name, false, true, $custdb);
 	if($old === false && $value !== '' && $value !==NULL) {
 		QuickUpdate("insert into setting (name, value) values (?, ?)", $custdb, array($name, $value));
 	} else {
 		if($value === '' || $value === NULL)
-			QuickUpdate("delete from setting where name = ?", $custdb, array($name));
+			QuickUpdate("delete from setting where name = ? and organizationid is null", $custdb, array($name));
 		elseif($value != $old)
-			QuickUpdate("update setting set value = ? where name = ?", $custdb, array($value, $name));
+			QuickUpdate("update setting set value = ? where name = ? and organizationid is null", $custdb, array($value, $name));
 	}
 }
 
 function setSystemSetting($name, $value) {
 	setCustomerSystemSetting($name, $value);
+}
+
+function setOrganizationSetting($name, $value, $organizationId, $custdb = false) {
+//TODO refactor with setCustomerSystemSetting to share code, unclear what if sql param is null for orgId
+
+	// get existing setting value (if any)
+	$old = QuickQuery("select value from setting where name = ? and organizationid = ?", $custdb, array($name, $organizationId));
+	//
+	if ($old === false && $value !== '' && $value !==NULL) {
+		QuickUpdate("insert into setting (name, value, organizationid) values (?, ?, ?)", $custdb, array($name, $value, $organizationId));
+	} else {
+		if($value === '' || $value === NULL)
+			QuickUpdate("delete from setting where name = ? and organizationid = ?", $custdb, array($name, $organizationId));
+		elseif($value != $old)
+			QuickUpdate("update setting set value = ? where name = ? and organizationid = ?", $custdb, array($value, $name, $organizationId));
+	}
 }
 
 // get the default callerid based on user prefs, privs, customer settings, etc.
@@ -736,5 +754,70 @@ END;
 	return($html);
 }
 
+/**
+ * Execute a command in another process and kill it if it runs for longer than expected.
+ *
+ * Pieced together from multiple sources:
+ * http://php.net/manual/en/function.proc-open.php
+ * http://stackoverflow.com/questions/5309900/php-process-execution-timeout
+ * http://stackoverflow.com/questions/9419122/exec-with-timeout
+ *
+ * @param string $command the command and it's arguments. Be sure to quote filenames if they have spaces.
+ * @param int $timeoutMs the maximum number of milliseconds this command can execute for before it is killed
+ * @param int $expectedExitValue the expected exit value from the command. Defaults to zero
+ * @return string the output from stdOut. if you want stdError as well, pipe it with your command
+ * @throws Exception if the process cannot be started, or if an unexpected exit value is returned
+ */
+function executeWithTimeout($command, $timeoutMs, $expectedExitValue = 0) {
+	// Start the process.
+	$process = proc_open('exec ' . $command,
+		array(
+			0 => array('pipe', 'r'),  // stdIn
+			1 => array('pipe', 'w'),  // stdOut
+			2 => array('pipe', 'w')   // stdError
+		), $pipes);
+
+	if (!is_resource($process)) {
+		throw new Exception("Unable to open process for command: '$command'");
+	}
+
+	// set stdOut and stdError to non-blocking
+	stream_set_blocking($pipes[1], 0);
+	stream_set_blocking($pipes[2], 0);
+
+	// time to stop, in ms
+	$stopTime = round(microtime(true) * 1000) + $timeoutMs;
+
+	$stdOut = '';
+	$stdError = '';
+	// read metadata, stdout and stderror till the process completes of times out.
+	do {
+		$stdOutMetaData = stream_get_meta_data($pipes[1]);
+		$stdErrMetaData = stream_get_meta_data($pipes[1]);
+		$stdOut .= fread($pipes[1], 4096);
+		$stdError .= fread($pipes[2], 4096);
+	} while (!($stdOutMetaData['eof'] && $stdErrMetaData['eof']) &&
+		($stopTime > round(microtime(true) * 1000)));
+
+	fclose($pipes[0]);
+	$stdOut .= stream_get_contents($pipes[1]);
+	fclose($pipes[1]);
+	$stdError = stream_get_contents($pipes[2]);
+	fclose($pipes[2]);
+
+	$status = proc_get_status($process);
+	if ($status['running']) {
+		proc_terminate($process);
+		$exitValue = -1;
+	} else {
+		$exitValue = $status['exitcode'];
+	}
+
+	if ($exitValue != $expectedExitValue) {
+		throw new Exception("Unexpected exit value for command: '$command' exit value: $exitValue, stdError: '$stdError'");
+	}
+
+	return $stdOut;
+}
 
 ?>

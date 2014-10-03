@@ -9,18 +9,6 @@ date_default_timezone_set("US/Pacific"); //to keep php from complaining. TODO mo
 apache_note("CS_APP","manager"); //for logging
 apache_note("CS_CUST","_Manager_"); //for logging
 
-$dsn = 'mysql:dbname='.$SETTINGS['db']['db'].';host='.$SETTINGS['db']['host'];
-
-global $_dbcon;
-try {
-	$_dbcon = new PDO($dsn, $SETTINGS['db']['user'], $SETTINGS['db']['pass']);
-	$_dbcon->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
-	$setcharset = "SET character_set_results = 'utf8', character_set_client = 'utf8', character_set_connection = 'utf8', character_set_database = 'utf8', character_set_server = 'utf8'";
-	$_dbcon->query($setcharset);
-} catch (PDOException $e) {
-	error_log("PDO Exception : ".$e->getMessage());
-}
-
 require_once("../inc/db.inc.php");
 require_once("../inc/utils.inc.php");
 require_once("../inc/memcache.inc.php");
@@ -30,6 +18,9 @@ require_once("../inc/DBRelationMap.php");
 require_once("managerutils.inc.php");
 require_once("dbmo/authserver/AspAdminUser.obj.php");
 require_once("../inc/locale.inc.php");
+
+global $_dbcon;
+$_dbcon = DBConnect($SETTINGS['db']['host'], $SETTINGS['db']['user'], $SETTINGS['db']['pass'], $SETTINGS['db']['db']);
 
 session_start();
 if(!isset($isasplogin)){

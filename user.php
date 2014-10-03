@@ -625,7 +625,7 @@ $formdata["datarules"] = array(
 	"helpstep" => 1
 );
 
-$linkusers = QuickQueryList("select id, concat(firstname,' ', lastname) from user where id!=? and enabled=1 and login!='schoolmessenger' order by firstname,lastname",true,false,array($edituser->id));
+$linkusers = QuickQueryList("select id, concat(firstname,' ', lastname) from user where id!=? and enabled=1 and login!='schoolmessenger' and accessid is not null order by firstname,lastname",true,false,array($edituser->id));
 $userlinks = QuickQueryList("select subordinateuserid from userlink where userid=?",false,false,array($edituser->id));
 if (count($linkusers) > 0) {
 	$multicheckbox = array("MultiCheckBox","values" => $linkusers);

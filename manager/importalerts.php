@@ -23,12 +23,7 @@ if(isset($_REQUEST["acknowledge"])) {
 	
 	if (isset($_REQUEST["customerid"]) && isset($_REQUEST["importalertruleid"])) {
 		list($shardid,$dbhost,$dbusername,$dbpassword) = QuickQueryRow("select s.id, s.dbhost, s.dbusername, s.dbpassword from customer c inner join shard s on (c.shardid = s.id) where c.id=?",false,false,array($_REQUEST["customerid"]));
-		$dsn = 'mysql:dbname=aspshard;host='.$dbhost;
-		$sharddb = new PDO($dsn, $dbusername, $dbpassword);
-		$sharddb->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
-
-		Query("use aspshard", $sharddb);
-		
+		$sharddb = DBConnect($dbhost, $dbusername, $dbpassword, 'aspshard');
 		QuickUpdate("update importalert set acknowledged=? where customerid=? and importalertruleid=?",$sharddb,array(($_REQUEST["acknowledge"]=="true"?1:0),$_REQUEST["customerid"],$_REQUEST["importalertruleid"]));
 
 		echo "true";
@@ -58,11 +53,8 @@ $shardresult = Query("select id, dbhost, dbusername, dbpassword from shard order
 $data = array();
 while ($shardinfo = DBGetRow($shardresult)) {
 	list($shardid,$dbhost,$dbusername,$dbpassword) = $shardinfo;
-	$dsn = 'mysql:dbname=aspshard;host='.$dbhost;
-	$sharddb = new PDO($dsn, $dbusername, $dbpassword);
-	$sharddb->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
+	$sharddb = DBConnect($dbhost, $dbusername, $dbpassword, 'aspshard');
 	
-	Query("use aspshard", $sharddb);
 	$query = "select customerid,importalertruleid,importname,name,operation,testvalue,actualvalue,alerttime,notified,notes,acknowledged from importalert where type='manager' and acknowledged=?";
 	
 	if ($displaysetting == "unconfigured" || $displaysetting == "dismissed")

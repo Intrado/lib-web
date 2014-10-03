@@ -24,6 +24,7 @@ class TopicDataFormatterTest extends PHPUnit_Framework_TestCase {
 		$this->assertFalse($tdf->anyTopics());
 	}
 
+	/*
 	public function test_showMenu() {
 		// untestable while showPageMenu only writes to stdout instead of returning a string
 		$this->markTestIncomplete();
@@ -33,7 +34,7 @@ class TopicDataFormatterTest extends PHPUnit_Framework_TestCase {
 		// untestable while showTable only writes to stdout instead of returning a string
 		$this->markTestIncomplete();
 	}
-
+	*/
 }
 
 ?>

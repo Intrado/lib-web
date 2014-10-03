@@ -698,15 +698,15 @@ class Message extends DBMappedObject {
 		$mp3Audio = null;
 
 		// Convert it to a wav
-		$wavName = secure_tmpname("preview_parts",".wav");
-		$cmd = 'sox "' . $mp3Name . '" -r 8000 -c 1 -s -w "' . $wavName . '"';
-		$result = exec($cmd, $res1, $res2);
-		@unlink($mp3Name);
-
-		// Read the size, in bytes, of the rendered audio
-		if (!$res2 && file_exists($wavName)) {
+		$converter = new AudioConverter();
+		$wavName = false;
+		try {
+			$wavName = $converter->getMono8kPcm($mp3Name);
 			$size = filesize($wavName);
+		} catch (Exception $e) {
+			// There was a problem converting the audio file
 		}
+		@unlink($mp3Name);
 		@unlink($wavName);
 
 		return $size;

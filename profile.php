@@ -428,8 +428,8 @@ _L('Contact & Field Options'),
 		"helpstep" => 8
 	),
 	"portalaccess" => array(
-		"label" => _L('Contact Manager Administration'),
-		"fieldhelp" => _L('Allows users to to change settings and options related to the Contact Manager.'),
+		"label" => getSystemSetting("_hasportal", false) ? _L('Contact Manager Administration') : _L('Associated Accounts Administration'),
+		"fieldhelp" => getSystemSetting("_hasportal", false) ? _L('Allows users to to change settings and options related to the Contact Manager.') : _L('Allows users to to change settings and options related to the Associated Accounts.'),
 		"value" => $obj->getValue("portalaccess"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
@@ -786,9 +786,11 @@ $helpsteps = array_merge($helpsteps, $admin_helpsteps);
 
 //remove any formdata for features that are not enabled
 
-if(!getSystemSetting("_hasportal", false)) {
-	unset($formdata['portalaccess']);
+if (!getSystemSetting("_hasportal", false)) {
 	unset($formdata['generatebulktokens']);
+}
+if (!(getSystemSetting("_hasportal", false) || getSystemSetting("_hasinfocenter", false))) {
+	unset($formdata['portalaccess']);
 }
 
 if (!getSystemSetting("_hassurvey", true)) {
@@ -917,8 +919,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$obj->setPermission("forcestationery", (bool)(isset($postdata['forcestationery'])?$postdata['forcestationery']:false));
 			
 			if (getSystemSetting("_hasportal", false)) {
-				$obj->setPermission("portalaccess", (bool)$postdata['portalaccess']);
 				$obj->setPermission("generatebulktokens", (bool)$postdata['generatebulktokens']);
+			}
+
+			if (getSystemSetting("_hasportal", false) || getSystemSetting("_hasinfocenter", false)) {
+				$obj->setPermission("portalaccess", (bool)$postdata['portalaccess']);
 			}
 
 			if (getSystemSetting("_hassurvey", true)) {

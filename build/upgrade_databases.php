@@ -1,14 +1,14 @@
 <?
 
-// NOTE in 'csimport' mode these must be set to the host info with the 'csimport' database
+// SET THESE to your authserver host and database. may optionally pass as CLI arguments.
 $authhost = "";
 $authuser = "";
 $authpass = "";
 
-if (!$authhost || !$authuser || !$authpass)
-	exit("ERROR: This script is not properly configured, please add connection info\n");
-
 /*
+ * Starting in 11.1, we will use a database table 'dbupgrade' to indicate what version the DB is running.
+ * Support for all commsuite databases is provided.
+ * 
  * Starting in 7.5, we will use a customer setting "_dbversion" to indicate what version
  * that customer DB is running. This script will evolve to upgrade databases 
  * from 7.1.X to 7.5 and later versions.
@@ -34,7 +34,7 @@ if (!$authhost || !$authuser || !$authpass)
 //list supported versons here in order of upgrade
 //format is major.minor.point/revision
 //rev is mainly for internal dev where we may have already deployed that version, but made some changes (rev starts at 1)
-
+// CUSTOMER databases
 $versions = array (
 	"cs" => array (
 		"7.1.5/0",	//this is the assumed version when no _dbversion exists. it is special
@@ -57,7 +57,7 @@ $versions = array (
 		"10.1/14",
 		"10.2/4",
 		"10.3/10",
-		"11.0/4"
+		"11.0/6"
 		//etc
 	),
 	
@@ -72,24 +72,67 @@ $versions = array (
 	
 );
 
+// non-Customer databases
+$dbReleaseVersion = "11.0"; // version to update databases to if no revision changes for individual db, implies revision value of 1
+$dbversions = array (
+	"authserver" => array (
+		"11.0/2"
+	),
+	
+	"aspshard" => array (
+		"11.0/1"
+	),
+	
+	"disk" => array (
+		"11.0/1"
+	),
+	
+	"infocenter" => array (
+		"11.0/1"
+	),
+	
+	"lcrrates" => array (
+		"11.0/1",
+		"11.0/2"
+	),
+	
+	"pagelink" => array (
+		"11.0/1"
+	),
+	
+	"portalauth" => array (
+		"11.0/1"
+	)
+);
+
 $usage = "
 Description:
-This script will upgrade customers or entire shards databases
+This script will upgrade customers or entire shards databases, or all/any databases found in authserver.dbupgradehost table.
 Usage:
-php upgrade_database.php -a 
-php upgrade_database.php -c <customerid> [<customerid> ...] 
-php upgrade_database.php -s <shardid> [<shardid> ...] 
-php upgrade_database.php -i
+php upgrade_databases.php -a 
+php upgrade_databases.php -c <customerid> [<customerid> ...] 
+php upgrade_databases.php -s <shardid> [<shardid> ...] 
+php upgrade_databases.php -e 
+php upgrade_databases.php -d [all] <databasename> [<databasename> ...] 
+Optional: [-h hostname] [-u username] [-p password]
 
--a : run on everything
--s : shard mode, specific shards
--c : customer mode, specific customers
+-h : hostname of authserver
+-u : username of authserver
+-p : password of authserver
+-a : all customers
+-c : customer mode, specific customers only
+-s : shard mode, specific shards customers only
+-e : everything mode, all databases and all customers
+-d : database mode, specific databases (may have multiple hosts per database, example: aspshard). Special case 'all' to skip upgrading customers and only upgrade all other databases.
 ";
+
 
 $opts = array();
 $mode = false;
 $ids = array();
 array_shift($argv); //ignore this script
+$argi = 0;
+$skiparg = false;
 foreach ($argv as $arg) {
 	if ($arg[0] == "-") {
 		for ($x = 1; $x < strlen($arg); $x++) {
@@ -103,25 +146,62 @@ foreach ($argv as $arg) {
 				case "c":
 					$mode = "customer";
 					break;
+				case "e":
+					$mode = "everything";
+					break;
+				case "d":
+					$mode = "database";
+					break;
+				case "h":
+					$authhost = $argv[$argi + 1];
+					$skiparg = true;
+					break;
+				case "u":
+					$authuser = $argv[$argi + 1];
+					$skiparg = true;
+					break;
+				case "p":
+					$authpass = $argv[$argi + 1];
+					$skiparg = true;
+					break;
 				default:
 					echo "Unknown option " . $arg[$x] . "\n";
 					exit($usage);
 			}
 		}
+	} else if ($skiparg) {
+		// skip this arg, already read by the -X arg that used it
+		$skiparg = false;
 	} else {
-		$ids[] = $arg + 0;
+		if ($mode == "database") {
+			$ids[] = $arg; // string ids
+		} else {
+			$ids[] = $arg + 0; // int ids
+		}
 	}
+	$argi++;
 }
 
 if (!$mode)
 	exit("No mode specified\n$usage");
-if ($mode != "csimport" && $mode != "all" && count($ids) == 0)
+if ($mode != "all" && $mode != "everything" && count($ids) == 0)
 	exit("No IDs specified\n$usage");
+
+if (!$authhost || !$authuser || !$authpass)
+	exit("ERROR: This script is not properly configured, please add connection info\n$usage");
 
 
 $SETTINGS = parse_ini_file("../inc/settings.ini.php",true);
 
 date_default_timezone_set("US/Pacific"); //to keep php from complaining. TODO move to manager settings.
+
+require_once("dbupgrade_authserver/dbupgrade_authserver.php");
+require_once("dbupgrade_aspshard/dbupgrade_aspshard.php");
+require_once("dbupgrade_disk/dbupgrade_disk.php");
+require_once("dbupgrade_infocenter/dbupgrade_infocenter.php");
+require_once("dbupgrade_lcrrates/dbupgrade_lcrrates.php");
+require_once("dbupgrade_pagelink/dbupgrade_pagelink.php");
+require_once("dbupgrade_portalauth/dbupgrade_portalauth.php");
 
 require_once("../inc/db.inc.php");
 require_once("../inc/utils.inc.php");
@@ -138,6 +218,9 @@ echo "Updater id: $updater\n";
 echo "connecting to authserver db\n";
 $authdb = DBConnect($authhost,$authuser,$authpass,"authserver");
 
+if ($mode == "database" && $ids[0] == "all") {
+	// skip customers
+} else { // upgrade customers
 $res = Query("select id,dbhost,dbusername,dbpassword from shard", $authdb)
 	or exit(mysql_error());
 $shards = array();
@@ -147,6 +230,8 @@ while ($row = DBGetRow($res, true))
 
 switch ($mode) {
 	case "all": $optsql = ""; break;
+	case "everything": $optsql = ""; break;
+	case "database": $optsql = "and 0"; break;
 	case "customer": $optsql = "and id in (" . implode(",",$ids) . ")"; break;
 	case "shard": $optsql = "and shardid in (" . implode(",",$ids) . ")"; break;
 }
@@ -158,6 +243,7 @@ while ($row = DBGetRow($res, true))
 	$customers[$row['id']] = $row;
 
 
+// for each customer database to upgrade
 foreach ($customers as  $customerid => $customer) {
 	echo "doing $customerid \n";
 	$_dbcon = $db = $shards[$customer['shardid']];
@@ -181,6 +267,164 @@ foreach ($customers as  $customerid => $customer) {
 				break;
 		}
 	}
+} // end loop customers
+} // end if upgrade customers
+
+// for each other database to upgrade
+if ($mode == "everything" || $mode == "database") {
+	if ($mode == "database" && $ids[0] != "all")
+		$optsql = "and dbname in ('" . implode("','",$ids) . "')";
+	else
+		$optsql = "";
+	// lookup all hosts and databases to be upgraded
+	$res = Query("select dbname, dbhost, dbusername, dbpassword from dbupgradehost where 1 $optsql order by id", $authdb)
+		or exit(mysql_error());
+	$dbupgradehosts = array();
+	while ($row = DBGetRow($res, true)) {
+		$dbupgradehosts[] = $row;
+	}
+	
+	foreach ($dbupgradehosts as $dbupgradehost) {
+		$dbname = $dbupgradehost['dbname'];
+		echo "\ndoing $dbname\n";
+		$_dbcon = $db = DBConnect($dbupgradehost['dbhost'], $dbupgradehost['dbusername'], $dbupgradehost['dbpassword'], $dbupgradehost['dbname']);
+		update_namedDb($db, $dbname);
+	}
+}
+
+function update_namedDb($db, $dbname) {
+	global $dbversions;
+	global $dbReleaseVersion;
+	global $updater;
+	
+	Query("begin", $db);
+	
+	// find current version
+	$version = QuickQuery("select version from dbupgrade where id = ?", $db, array($dbname));
+	if ($version == null) {
+		Query("commit", $db);
+		echo "MISSING DBUPGRADE TABLE! unable to upgrade $dbname\n";
+		return;
+	}
+	list($currentversion, $currentrev) = explode("/", $version);
+	echo("current version $version\n");
+	// find if needs update
+	// find latest ver/rev for specific database, compare with dbReleaseVersion
+	list($targetversion, $targetrev) = explode("/", $dbversions[$dbname][count($dbversions[$dbname]) -1]);
+
+	// if current version is up to date
+	if (($targetversion < $dbReleaseVersion && $currentversion == $dbReleaseVersion) ||
+		($targetversion == $dbReleaseVersion && $targetrev == $currentrev && $currentversion == $dbReleaseVersion)) {
+		// no changes to apply
+		Query("commit", $db);
+		echo "already up to date, skipping upgrade $dbname\n";
+		return;
+	}
+	// check in progress status
+	$inprogress = QuickQuery("select status from dbupgrade where id = ?", $db, array($dbname));
+	if ($inprogress == "none") {
+		// ok to continue
+		QuickUpdate("update dbupgrade set status = ? where id = ?", $db, array($updater, $dbname));
+		Query("commit", $db);
+		Query("begin", $db);
+	} else {
+		// another process is running, skip this database
+		Query("rollback", $db);
+		echo "an upgrade is already in progress, skipping\n";
+		return;
+	}
+	
+	// if no updates for db, be sure to update to latest release
+	if ($targetversion < $dbReleaseVersion && $currentversion == $targetversion && $currentrev == $targetrev) {
+		QuickUpdate("update dbupgrade set version = ?, lastUpdateMs = (UNIX_TIMESTAMP() * 1000), status = 'none' where id = ?", $db, array("$dbReleaseVersion/1", $dbname));
+		Query("commit", $db);
+		echo ("update to release version $dbReleaseVersion/1 \n");
+		return;
+	}
+	
+	// apply revision changes
+	apply_rev($db, $dbname, $currentversion, $currentrev);
+	
+	// after all revisions are applied, check again if the release version is greater than the target
+	if ($targetversion < $dbReleaseVersion) {
+		QuickUpdate("update dbupgrade set version = ?, lastUpdateMs = (UNIX_TIMESTAMP() * 1000) where id = ?", $db, array("$dbReleaseVersion/1", $dbname));
+	}
+	
+	QuickUpdate("update dbupgrade set status = 'none' where id = ?", $db, array($dbname));
+	Query("commit", $db);
+}
+
+// $db database connection
+// $dbname name of database
+// $version current version of db
+// $rev current rev of db
+function apply_rev($db, $dbname, $version, $rev) {
+	global $dbversions;
+	
+	// for each version, upgrade to the next
+	$foundstartingversion = false;
+	foreach ($dbversions[$dbname] as $vr) {
+		list($targetversion, $targetrev) = explode("/",$vr); //WARNING: $targetversion and $targetrev are used outside of for loop
+		// skip past versions, find our current version to start the upgrade
+		if (!$foundstartingversion && $version > $targetversion) {
+			continue;
+		}
+
+		if ($version == $targetversion)
+			$foundstartingversion = true;
+	
+		//check to see that we are already on the latest rev, then skip upgrading current version, go to next version
+		if ($version == $targetversion && $rev == $targetrev) {
+			continue;
+		}
+	
+		echo "upgrading $dbname from $version/$rev to $targetversion/$targetrev\n";
+	
+	
+		/* if we are looking at same major version, check for revs
+		 * otherwise skip to next target version and start at rev zero (since we obviously moved major versions)
+		* in either case we run the targetversion upgrade script, difference is same version we use current rev,
+		* different version we set rev to zero (to indicate that upgrade should take it to rev1)
+		*/
+	
+		if ($version != $targetversion) {
+			$rev = 0;
+		}
+		
+		switch ($dbname) {
+			case "authserver":
+				apply_authserver($targetversion, $rev, $db);
+				break;
+			case "aspshard":
+				apply_aspshard($targetversion, $rev, $db);
+				break;
+			case "lcrrates":
+				apply_lcrrates($targetversion, $rev, $db);
+				break;
+			case "disk":
+				apply_disk($targetversion, $rev, $db);
+				break;
+			case "infocenter":
+				apply_infocenter($targetversion, $rev, $db);
+				break;
+			case "portalauth":
+				apply_portalauth($targetversion, $rev, $db);
+				break;
+			case "pagelink":
+				apply_pagelink($targetversion, $rev, $db);
+				break;
+			default:
+				echo("Unsupported database named: $dbname , skipping\n");
+		}
+		
+		$version = $targetversion;
+		$rev = $targetrev;
+	} // end for each version
+	
+	if ($foundstartingversion !== false) {
+		// upgrade success
+		QuickUpdate("update dbupgrade set version = ?, lastUpdateMs = (UNIX_TIMESTAMP() * 1000) where id = ?", $db, array("$targetversion/$targetrev", $dbname));
+	} // else nothing to apply
 }
 
 
@@ -223,7 +467,8 @@ function update_customer($db, $customerid, $shardid) {
 		return;
 	}
 	
-	// require the necessary version upgrade scripts	
+	// require the necessary version upgrade scripts
+	//TODO nice to rename "upgrades" folder to "dbupgrade_customer" for consistency with "dbupgrade_*" folders
 	require_once("upgrades/db_7-5.php");
 	require_once("upgrades/db_7-6.php");
 	require_once("upgrades/db_7-7.php");
@@ -261,7 +506,7 @@ function update_customer($db, $customerid, $shardid) {
 		if ($version == $targetversion && $rev == $targetrev)
 			continue;
 
-		echo "upgrading commsuite from $version/$rev to $targetversion/$targetrev\n";
+		echo "upgrading commsuite customer from $version/$rev to $targetversion/$targetrev\n";
 		
 		
 		/* if we are looking at same major version, check for revs
@@ -523,6 +768,7 @@ function update_taicustomer($db, $customerid, $shardid) {
 	echo "\n";
 }
 
+// apply to customer db
 function apply_sql ($filename, $customerid, $custdb, $specificrev = false) {
 	
 	$allsql = file_get_contents($filename);
@@ -559,6 +805,44 @@ function apply_sql ($filename, $customerid, $custdb, $specificrev = false) {
 		
 	Query("commit",$custdb);	
 	Query("begin",$custdb);	
+}
+
+// apply to non-customer db
+function apply_sql_db ($filename, $db, $specificrev = false) {
+
+	$allsql = file_get_contents($filename);
+
+	//check revisions
+	$revs = preg_split("/-- \\\$rev ([0-9]+)/",$allsql,-1, PREG_SPLIT_DELIM_CAPTURE);
+
+	$currev = 1;
+	foreach ($revs as $revsql) {
+
+		//if we got just numbers, must be revision version
+		if (preg_match("/^[0-9]+\$/",$revsql)) {
+			$currev = $revsql + 0;
+			continue;
+		}
+
+		//skip blanks, older revs
+		if (trim($revsql) == "" || $specificrev && $currev != $specificrev) {
+			continue;
+		}
+
+		$sqlqueries = explode("$$$",$revsql);
+		foreach ($sqlqueries as $sqlquery) {
+			if (trim($sqlquery)){
+				echo ".";
+				$res = Query($sqlquery,$db);
+				if (!$res) {
+					exit("Error running query, check dberrors.txt for info");
+				}
+			}
+		}
+	}
+
+	Query("commit",$db);
+	Query("begin",$db);
 }
 
 ?>

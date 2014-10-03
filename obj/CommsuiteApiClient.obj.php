@@ -5,6 +5,7 @@ class CommsuiteApiClient {
 	const API_BURSTS = '/bursts';
 	const API_PROFILES = '/profiles';
 	const API_GUARDIAN_CATEGORIES = '/settings/guardiancategories';
+	const API_PEOPLE = '/people';
 	
 	private $apiClient = null;
 	private $burstsBaseUrl = null;
@@ -13,6 +14,15 @@ class CommsuiteApiClient {
 		global $USER;
 		$this->apiClient = $apiClient;
 		$this->burstsBaseUrl = "/users/{$USER->id}" . self::API_BURSTS;
+	}
+
+	/**
+	 * @param string $resourceUriFragment the fragment which identifies this resource. Example: "/organizations/1"
+	 * @return bool|mixed the object or false if the request failed
+	 */
+	public function getObject($resourceUriFragment) {
+		$res = $this->apiClient->get($resourceUriFragment);
+		return($res['code'] == 200 ? json_decode($res['body']) : false);
 	}
 	
 	// ---------------------------------------------------------------------
@@ -89,7 +99,25 @@ class CommsuiteApiClient {
 		$res = $this->apiClient->get(self::API_GUARDIAN_CATEGORIES . "/{$id}");
 		return($res['code'] == 200 ? json_decode($res['body']) : false);
 	}
-	
+
+	/**
+	 * Get guardian category associations for given id
+	 *
+	 * @param int $id category id
+	 * @return array of association data
+	 */
+	public function getGuardianCategoryAssoications($id, $start = null, $limit = null) {
+		$queryParms = '?';
+		if ($start != null)
+			$queryParms .= '&start=' . intval($start);
+		if ($limit)
+			$queryParms .= '&limit=' . intval($limit);
+		$url = self::API_GUARDIAN_CATEGORIES . "/{$id}/associations/{$queryParms}";
+		$res = $this->apiClient->get($url);
+		$associations = ($res['code'] == 200) ? json_decode($res['body']) : false;
+		return $associations;
+	}
+
 	/**
 	 *  update/create guardian category
 	 * @@param string $id category id
@@ -123,6 +151,26 @@ class CommsuiteApiClient {
 		return($res['code'] == 200 ? true : false);
 	}
 	
+	
+	//Person
+	/**
+	 * Get person and associations
+	 *
+	 * @param int $id person id
+	 * @param string $expansions (csv of values)expansions: dependents | guardians
+	 * @return  association data
+	 */
+	public function getPerson($id, $expansions) {
+		$queryParms = '?';
+		if ($expansions != null) {
+			$queryParms .= 'expansions=' . $expansions;
+		}
+		$url = self::API_PEOPLE . "/{$id}/{$queryParms}";
+		$res = $this->apiClient->get($url);
+		$person = ($res['code'] == 200) ? json_decode($res['body']) : false;
+		return $person;
+	}
+
 	// ---------------------------------------------------------------------
 	// PDF Bursting
 	// ---------------------------------------------------------------------
@@ -197,11 +245,46 @@ class CommsuiteApiClient {
 	 * 
 	 * @param int $burstId the id which identifies the burst
 	 * 
-	 * @return object which contains the list of portions available
+	 * @return mixed object which contains the list of portions available on success or boolean false
 	 */
 	public function getBurstPortionList($burstId) {
 		$res = $this->apiClient->get($this->burstsBaseUrl . "/{$burstId}/portions");
 		return($res['code'] == 200 ? json_decode($res['body']) : false);
+	}
+
+	// ---------------------------------------------------------------------
+	// Organizations
+	// ---------------------------------------------------------------------
+	/**
+	 * Get the organization
+	 *
+	 * GET /2/organizations/{orgId}
+	 *
+	 * @param string $orgId id of the organization to request data for
+	 * @return mixed object which contains the organization and also contains a list of it's child organizations
+	 */
+	public function getOrganization($orgId) {
+		return $this->getObject("/organizations/$orgId");
+	}
+
+	// ---------------------------------------------------------------------
+	// Settings
+	// ---------------------------------------------------------------------
+	/**
+	 * Get the specified feature setting (returns enable state of feature for organizations)
+	 *
+	 * GET /2/settings/features/{featureName}
+	 *
+	 * @param string $featureName name of the feature to request data for
+	 * @return mixed object which contains the list of feature settings per organization for the requested feature
+	 */
+	public function getFeature($featureName) {
+		return $this->getObject("/settings/features/$featureName");
+	}
+
+	public function setFeature($featureName, $newStateData) {
+		$res = $this->apiClient->put("/settings/features/$featureName", $newStateData);
+		return($res['code'] == 200 ? true : false);
 	}
 }
 

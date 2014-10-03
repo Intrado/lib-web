@@ -1,29 +1,10 @@
 <?
-
 require_once(realpath(dirname(dirname(__FILE__)) . '/konaenv.php'));
-require_once(realpath(dirname(dirname(__FILE__)) . '/DBStub.php'));
 
 
 require_once("{$konadir}/inc/common.inc.php");
 require_once("{$konadir}/obj/Voice.obj.php");
-require_once("{$konadir}/obj/VoiceProviderManager.obj.php");
-
-class PDOMock extends PDO {
-
-	public function __construct() {
-		
-	}
-
-}
-
-function QuickUpdate($query, $db, $args) {
-	
-}
-
-//
-//function setCustomerSystemSetting($name, $value, $db) {
-//	
-//}
+require_once("{$konadir}/manager/obj/VoiceProviderManager.php");
 
 /**
  * @backupGlobals disabled
@@ -35,223 +16,176 @@ class VoiceProviderManagerTest extends PHPUnit_Framework_TestCase {
 	var $db; //mock db connection
 
 	public function setup() {
-		global $queryRules;
-		// 1) Hit the reset switch!
-		$queryRules->reset();
-		$this->mockVoices();
+		$mockVoiceManager = $this->getMockBuilder('VoiceProviderManager')
+			->setConstructorArgs(array(null))
+			->setMethods(array('getAllVoices', 'disableAllVoices', 'enableVoices', 'setDefaultProvider'))
+			->getMock();
 
-		$queryRules->add("/BEGIN/", null);
-		$queryRules->add("/COMMIT/", null);
+		$mockVoiceManager->expects($this->any())
+			->method('getAllVoices')
+			->will($this->returnValue($this->getMockVoices()));
 
-		$this->db = $this->getMockBuilder('PDOMock')
-				->getMock();
-		$this->voiceManager = new VoiceProviderManager($this->db);
+		$this->voiceManager = $mockVoiceManager;
 	}
 
-	private function mockVoices() {
-		global $queryRules;
+	/**
+	 * Create a list of Voice objects similar to what would be returned by DBFindMany('Voice', ... )
+	 * @return array
+	 */
+	private function getMockVoices() {
+		$voices = array();
 
-		$results = array(
-			array(
-				'id' => '1',
-				'language' => 'english',
-				'languagecode' => 'en',
-				'gender' => 'male',
-				'name' => 'Dave',
-				'enabled' => '1',
-				'provider' => 'loquendo'
-			),
-			array(
-				'id' => '2',
-				'language' => 'english',
-				'languagecode' => 'en',
-				'gender' => 'female',
-				'name' => 'Susan',
-				'enabled' => '0',
-				'provider' => 'loquendo'
-			),
-			array(
-				'id' => '3',
-				'language' => 'english',
-				'languagecode' => 'en',
-				'gender' => 'male',
-				'name' => 'James',
-				'enabled' => '0',
-				'provider' => 'neospeech'
-			),
-			array(
-				'id' => '4',
-				'language' => 'english',
-				'languagecode' => 'en',
-				'gender' => 'female',
-				'name' => 'Julie',
-				'enabled' => '0',
-				'provider' => 'neospeech'
-			),
-			array(
-				'id' => '5',
-				'language' => 'spanish',
-				'languagecode' => 'es',
-				'gender' => 'male',
-				'name' => 'Carlos',
-				'enabled' => '1',
-				'provider' => 'loquendo'
-			)
-		);
+		$voice = new Voice();
+		$voice->id = 1;
+		$voice->language = 'english';
+		$voice->languagecode = 'en';
+		$voice->gender = 'male';
+		$voice->name = 'Dave';
+		$voice->enabled = '1';
+		$voice->provider = 'loquendo';
+		$voices[$voice->id] = $voice;
 
-		// 1) SQL response: get voices
-		$queryRules->add("/from ttsvoice/", $results);
-		return $results;
+		$voice = new Voice();
+		$voice->id = 2;
+		$voice->language = 'english';
+		$voice->languagecode = 'en';
+		$voice->gender = 'female';
+		$voice->name = 'Susan';
+		$voice->enabled = '0';
+		$voice->provider = 'loquendo';
+		$voices[$voice->id] = $voice;
+
+		$voice = new Voice();
+		$voice->id = 3;
+		$voice->language = 'english';
+		$voice->languagecode = 'en';
+		$voice->gender = 'male';
+		$voice->name = 'James';
+		$voice->enabled = '0';
+		$voice->provider = 'neospeech';
+		$voices[$voice->id] = $voice;
+
+		$voice = new Voice();
+		$voice->id = 4;
+		$voice->language = 'english';
+		$voice->languagecode = 'en';
+		$voice->gender = 'female';
+		$voice->name = 'Julie';
+		$voice->enabled = '0';
+		$voice->provider = 'neospeech';
+		$voices[$voice->id] = $voice;
+
+		$voice = new Voice();
+		$voice->id = 5;
+		$voice->language = 'spanish';
+		$voice->languagecode = 'es';
+		$voice->gender = 'female';
+		$voice->name = 'Esperanza';
+		$voice->enabled = '1';
+		$voice->provider = 'loquendo';
+		$voices[$voice->id] = $voice;
+
+		$voice = new Voice();
+		$voice->id = 6;
+		$voice->language = 'spanish';
+		$voice->languagecode = 'es';
+		$voice->gender = 'male';
+		$voice->name = 'Carlos';
+		$voice->enabled = '1';
+		$voice->provider = 'neospeech';
+		$voices[$voice->id] = $voice;
+
+		return $voices;
 	}
 
 	public function tearDown() {
 		unset($this->voiceManager);
 	}
 
-	public function test_loadVoices() {
-		$loquendoVoices = $this->voiceManager->providerVoices["loquendo"];
-		$neoSpeechVoices = $this->voiceManager->providerVoices["neospeech"];
-		$this->assertTrue((count($loquendoVoices) == 3), "3 overlapping Loquendo voices expected but found: " . count($loquendoVoices));
-		$this->assertTrue((count($neoSpeechVoices) == 2), "2 overlapping NeoSpeech voices expected but found: " . count($neoSpeechVoices));
-	}
-
+	/**
+	 * Assert that switching to loquendo and allowing other providers correctly enables all loquendo voices and those only provided
+	 * by another provider
+	 */
 	public function test_switchToLoquendo() {
-		global $queryRules;
-		$queryRules->add("/from setting where name/", array('_defaultttsprovider'), array(array("_defaultttsprovider" => "neospeech")));
-		$queryRules->add("/select 1 from custdm where enablestate != 'disabled' limit 1/", false, array(array(0)));
+		$this->voiceManager->expects($this->once())
+			->method('disableAllVoices');
 
+		$this->voiceManager->expects($this->once())
+			->method('enableVoices')
+			->with($this->callback(function($voiceIds) {
+				sort($voiceIds);
+				return ($voiceIds == array(1,2,5,6));
+			}));
 
-		$mockManager = $this->getMockBuilder('VoiceProviderManager')
-				->setConstructorArgs(array($this->db))
-				->setMethods(array('switchVoices'))
-				->getMock();
+		$this->voiceManager->expects($this->once())
+			->method('setDefaultProvider')
+			->with($this->equalTo('loquendo'));
 
-		$loquendoVoices = $this->voiceManager->providerVoices["loquendo"];
-		$neoSpeechVoices = $mockManager->getOverlappingVoicesForProvider("loquendo");
-		$this->assertTrue((count($neoSpeechVoices) == 2), "2 overlapping NeoSpeech voices expected but found: " . count($neoSpeechVoices));
-
-		$fromMale = clone $neoSpeechVoices["en:male"][0];
-		$toMale = clone $loquendoVoices["en:male"];
-
-		$mockManager->expects($this->at(0))
-				->method('switchVoices')
-				->with($fromMale, $toMale);
-
-		$fromFemale = clone $neoSpeechVoices["en:female"][0];
-		$toFemale = clone $loquendoVoices["en:female"];
-
-		$mockManager->expects($this->at(1))
-				->method('switchVoices')
-				->with($fromFemale, $toFemale);
-
-		$mockManager->switchProviderTo("loquendo", "asp");
+		$this->voiceManager->switchTo('loquendo');
 	}
 
-	public function test_switchToNeoSpeech() {
-		global $queryRules;
-		$queryRules->add("/from setting where name/", array('_defaultttsprovider'), array(array("_defaultttsprovider" => "loquendo")));
-		$queryRules->add("/select 1 from custdm where enablestate != 'disabled' limit 1/", false, array(array(0)));
+	/**
+	 * Assert that switching to neospeech and allowing other providers correctly enables all neospeech voices and those only provided
+	 * by another provider
+	 */
+	public function test_switchToNeospeech() {
+		$this->voiceManager->expects($this->once())
+			->method('disableAllVoices');
 
-		$mockManager = $this->getMockBuilder('VoiceProviderManager')
-				->setConstructorArgs(array($this->db))
-				->setMethods(array('switchVoices'))
-				->getMock();
+		$this->voiceManager->expects($this->once())
+			->method('enableVoices')
+			->with($this->callback(function($voiceIds) {
+				sort($voiceIds);
+				return ($voiceIds == array(3,4,5,6));
+			}));
 
-		$neoSpeechVoices = $this->voiceManager->providerVoices["neospeech"];
-		$loquendoVoices = $mockManager->getOverlappingVoicesForProvider("neospeech");
-		$this->assertTrue((count($loquendoVoices) == 2), "2 overlapping Loquendo voices expected but found: " . count($loquendoVoices));
+		$this->voiceManager->expects($this->once())
+			->method('setDefaultProvider')
+			->with($this->equalTo('neospeech'));
 
-		$toMale = clone $neoSpeechVoices["en:male"];
-		$fromMale = clone $loquendoVoices["en:male"][0];
-
-		$mockManager->expects($this->at(0))
-				->method('switchVoices')
-				->with($fromMale, $toMale);
-
-		$toFemale = clone $neoSpeechVoices["en:female"];
-		$fromFemale = clone $loquendoVoices["en:female"][0];
-
-		$mockManager->expects($this->at(1))
-				->method('switchVoices')
-				->with($fromFemale, $toFemale);
-
-		$mockManager->switchProviderTo("neospeech", "asp");
+		$this->voiceManager->switchTo('neospeech');
 	}
 
-	public function test_switchToLoquendoWhenSmartCallEnabled() {
-		global $queryRules;
-		$queryRules->add("/from setting where name/", array('_defaultttsprovider'), array(array("_defaultttsprovider" => "neospeech")));
-		$queryRules->add("/select 1 from custdm where enablestate != 'disabled' limit 1/", false, array(array(1)));
+	/**
+	 * Assert that switching to loquendo and disallowing other providers correctly enables all loquendo voices only
+	 */
+	public function test_switchToLoquendoOnly() {
+		$this->voiceManager->expects($this->once())
+			->method('disableAllVoices');
 
+		$this->voiceManager->expects($this->once())
+			->method('enableVoices')
+			->with($this->callback(function($voiceIds) {
+				sort($voiceIds);
+				return ($voiceIds == array(1,2,5));
+			}));
 
-		$mockManager = $this->getMockBuilder('VoiceProviderManager')
-				->setConstructorArgs(array($this->db))
-				->setMethods(array('enableSmartCall'))
-				->getMock();
+		$this->voiceManager->expects($this->once())
+			->method('setDefaultProvider')
+			->with($this->equalTo('loquendo'));
 
-
-		$mockManager->expects($this->once())
-				->method('enableSmartCall')
-				->with("loquendo");
-
-		$mockManager->switchProviderTo("loquendo", "asp");
-	}
-	
-	public function test_switchToLoquendoWhenSmartCallSelected() {
-		global $queryRules;
-		$queryRules->add("/from setting where name/", array('_defaultttsprovider'), array(array("_defaultttsprovider" => "neospeech")));
-		$queryRules->add("/select 1 from custdm where enablestate != 'disabled' limit 1/", false, array(array(0)));
-
-
-		$mockManager = $this->getMockBuilder('VoiceProviderManager')
-				->setConstructorArgs(array($this->db))
-				->setMethods(array('enableSmartCall'))
-				->getMock();
-
-
-		$mockManager->expects($this->once())
-				->method('enableSmartCall')
-				->with("loquendo");
-
-		$mockManager->switchProviderTo("loquendo", "hybrid");
+		$this->voiceManager->switchTo('loquendo', false);
 	}
 
-	public function test_switchToNeoSpeechWhenSmartCallEnabled() {
-		global $queryRules;
-		$queryRules->add("/from setting where name/", array('_defaultttsprovider'), array(array("_defaultttsprovider" => "neospeech")));
-		$queryRules->add("/select 1 from custdm where enablestate != 'disabled' limit 1/", false, array(array(1)));
+	/**
+	 * Assert that switching to neospeech and disallowing other providers correctly enables all neospeech voices only
+	 */
+	public function test_switchToNeospeechOnly() {
+		$this->voiceManager->expects($this->once())
+			->method('disableAllVoices');
 
+		$this->voiceManager->expects($this->once())
+			->method('enableVoices')
+			->with($this->callback(function($voiceIds) {
+				sort($voiceIds);
+				return ($voiceIds == array(3,4,6));
+			}));
 
-		$mockManager = $this->getMockBuilder('VoiceProviderManager')
-				->setConstructorArgs(array($this->db))
-				->setMethods(array('enableSmartCall'))
-				->getMock();
+		$this->voiceManager->expects($this->once())
+			->method('setDefaultProvider')
+			->with($this->equalTo('neospeech'));
 
-
-		$mockManager->expects($this->once())
-				->method('enableSmartCall')
-				->with("loquendo");
-
-		$mockManager->switchProviderTo("neospeech", "hybrid");
-	}
-
-	public function test_switchToNeoSpeechWhenSmartCallSelected() {
-		global $queryRules;
-		$queryRules->add("/from setting where name/", array('_defaultttsprovider'), array(array("_defaultttsprovider" => "neospeech")));
-		$queryRules->add("/select 1 from custdm where enablestate != 'disabled' limit 1/", false, array(array(0)));
-
-
-		$mockManager = $this->getMockBuilder('VoiceProviderManager')
-				->setConstructorArgs(array($this->db))
-				->setMethods(array('enableSmartCall'))
-				->getMock();
-
-
-		$mockManager->expects($this->once())
-				->method('enableSmartCall')
-				->with("loquendo");
-
-		$mockManager->switchProviderTo("neospeech", "hybrid");
+		$this->voiceManager->switchTo('neospeech', false);
 	}
 
 }

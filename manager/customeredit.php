@@ -35,7 +35,7 @@ require_once("../obj/Person.obj.php");
 require_once("../obj/User.obj.php");
 require_once("../obj/Organization.obj.php");
 require_once("../obj/Voice.obj.php");
-require_once("../obj/VoiceProviderManager.obj.php");
+require_once("obj/VoiceProviderManager.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -318,8 +318,8 @@ if (isset($_SESSION['customerid'])) {
 		exit("Connection failed for customer: {$custinfo["dbhost"]}, db: c_$customerid, as shard user");
 	}
 
-	$query = "select name,value from setting";
-	$settings = array_merge($settings, QuickQueryList($query,true,$custdb));
+	$query = "select name, value from setting where organizationid is null";
+	$settings = array_merge($settings, QuickQueryList($query, true, $custdb));
 }
 
 
@@ -934,7 +934,23 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$originalDMMethod = $settings['_dmmethod'];
 		//check either DM method is changed or provider is changed.
 		if ($originalProvider != $postdata["ttsprovider"] || $originalDMMethod != $postdata["dmmethod"]) {
-			switchTTSProviderTo($postdata["ttsprovider"], $postdata["dmmethod"], $custdb);
+			$provider = $postdata["ttsprovider"];
+			$allowOtherProviders = true;
+
+			// If this customer is a SmartCall customer or has an enabled SmartCall device, we MUST switch them to Loquendo
+			// and disallow all other tts voice providers
+			$dmid = QuickQuery("select id from dm where customerid = ?", false, array($customerid));
+			if ($dmid)
+				$hasEnabledSmartCallDevice = QuickQuery("select value from dmsetting where dmid = ? and name = 'dm_enabled'");
+			else
+				$hasEnabledSmartCallDevice = false;
+			if ($hasEnabledSmartCallDevice || in_array($postdata['dmmethod'], array('cs', 'hybrid'))) {
+				$provider = 'loquendo';
+				$allowOtherProviders = false;
+			}
+
+			$voiceManager = new VoiceProviderManager($custdb);
+			$voiceManager->switchTo($provider, $allowOtherProviders);
 		}
 
 		$phonetargetedmessage = false;
@@ -986,7 +1002,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
 		// ... and if it was disabled and is now enabled, add the TAI tables to this customer which QuickTip uses
 		// and add the quicktip alert email template
-		if ($postdata["hasquicktip"] && (! $settings['_hasquicktip'])) {
+		// add quick tip organization settings
+		$quickTipSettingName = "_hasquicktip";
+		if ($postdata["hasquicktip"] && (! $settings[$quickTipSettingName])) {
 			$savedbcon = $_dbcon;
 			$_dbcon = $custdb;
 			tai_setup($customerid);
@@ -996,6 +1014,15 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			if (!$hasQtAlertTemplate) {
 				$messageGroupId = createEmailTemplateMessageGroup($templateName, $templates[$templateName]);
 				QuickQuery('insert into template (type, messagegroupid) values (?,?)', $custdb, array($templateName, $messageGroupId));
+			}
+			
+			// check if quicktip for organizations
+			$hasQtOrgSetting = QuickQuery('select 1 from setting where name = ? and organizationid is not null', $custdb, array($quickTipSettingName));
+			if (!$hasQtOrgSetting) {
+				// insert setting for root org, disabled
+				QuickUpdate("insert into setting (name, value, organizationid)  select '_hasquicktip', '0', id from organization where parentorganizationid is null and not deleted", $custdb);
+				// insert setting for each org, enabled
+				QuickUpdate("insert into setting (name, value, organizationid)  select '_hasquicktip', '1', id from organization where parentorganizationid is not null and not deleted", $custdb);
 			}
 
 			$_dbcon = $savedbcon;
