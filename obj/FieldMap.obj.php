@@ -11,7 +11,7 @@ class FieldMap extends DBMappedObject {
 	var $label = "";
 
 
-	//Special field default mappings. NOTE: it is initialized after the class definition
+	/** @var $specialFields FieldMap[] Special field default mappings. NOTE: it is initialized after the class definition*/
 	static $specialFields;
 
 	function FieldMap ($id = NULL) {
@@ -75,11 +75,10 @@ class FieldMap extends DBMappedObject {
 	}
 
 
-
 	/**
 	 * Return special field numbers
-	 * @param $requireDefault if set, it will return special fields with default field numbers. 
-	 *	Otherwise,it returns all fields defined by the customer
+	 * @param bool $requireDefault if set, it will return special fields with default field numbers.
+	 *    Otherwise,it returns all fields defined by the customer
 	 * @return array of field number strings
 	 */
 	static function getSpecialFieldNumbers($requireDefault=false) {
