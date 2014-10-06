@@ -132,9 +132,10 @@ NewFormItem($f, $s, "ffield", "selectend");
 <? 
 NewFormItem($f, $s, "gfield", "selectstart", null, null, "");
 NewFormItem($f, $s, "gfield", "selectoption", "Select g-field", "");
-for($i = 1; $i < 10; $i++){
-	if(!isset($gfields["g0$i"]))
-		NewFormItem($f, $s, "gfield", "selectoption", "g0$i", "g0$i");
+for($i = 1; $i <= 10; $i++){
+	$field = sprintf('g%02d',$i);
+	if(!isset($gfields[$field]))
+		NewFormItem($f, $s, "gfield", "selectoption", $field, $field);
 }
 NewFormItem($f, $s, "gfield", "selectend");
 ?>
