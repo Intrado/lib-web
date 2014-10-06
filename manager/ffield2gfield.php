@@ -25,18 +25,13 @@ $gfields = QuickQueryList("select fieldnum, name from fieldmap where fieldnum li
 $f = "advancedactions";
 $s = "main";
 $reloadform = 0;
-$refreshdm = false;
 
-if(CheckFormSubmit($f,$s))
-{
+if(CheckFormSubmit($f,$s)) {
 	//check to see if formdata is valid
-	if(CheckFormInvalid($f))
-	{
+	if(CheckFormInvalid($f)) {
 		error('Form was edited in another window, reloading data');
 		$reloadform = 1;
-	}
-	else
-	{
+	} else {
 		MergeSectionFormData($f, $s);
 
 		//do check
@@ -46,7 +41,7 @@ if(CheckFormSubmit($f,$s))
 			
 			$ffield = GetFormData($f,$s,"ffield");
 			$gfield = GetFormData($f,$s,"gfield");
-			$gfieldnum = substr($gfield,1) + 0;
+			$gfieldnum = intval(substr($gfield,1));
 			
 			// verify data
 			echo "<pre>Verifying existing data is ok to move\n";
@@ -97,7 +92,7 @@ if(CheckFormSubmit($f,$s))
 			}
 
 			echo "SUCCESS\n</pre>";
-			echo '<hr></hr><a href="customers.php">Back to Customer list</a>';
+			echo '<hr /><a href="customers.php">Back to Customer list</a>';
 			
 			exit();
 			
@@ -107,8 +102,7 @@ if(CheckFormSubmit($f,$s))
 	$reloadform = 1;
 }
 
-if( $reloadform )
-{
+if( $reloadform ) {
 	ClearFormData($f);
 
 	PutFormData($f, $s, "ffield",0, "text", "nomin", "nomax", true);
