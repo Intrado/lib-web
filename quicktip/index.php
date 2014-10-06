@@ -122,15 +122,15 @@ class TipSubmissionHandler {
 		return $name;
  	}
 
- 	/**
- 	 * Returns a string containing all the <option> elements for a given array
- 	 * of objects, ex Org or Topics.
- 	 * @param array arrayOfObjects array of objects from either organizations or topics 
- 	 * return string a string containing all the <option> elements for a given array of objects
- 	 */
- 	public function setSelectOptions($arrayOfObjects) {
+	/**
+	 * Returns a string containing all the <option> elements for a given array
+	 * of objects, ex Org or Topics.
+	 * @param array $arrayOfObjects array of objects from either organizations or topics
+	 * @return string all the <option> elements for a given array of objects
+	 */
+ 	public function getSelectOptionsHtml($arrayOfObjects) {
 		$html = '';
-		foreach ($arrayOfObjects as $k => $obj) {
+		foreach ($arrayOfObjects as $obj) {
 			$html .= '<option value="'.$obj->id.'">'.escapeHtml($obj->name).'</option>';
 		}
 		return $html;
@@ -152,13 +152,13 @@ class TipSubmissionHandler {
 					<label for="orgId">'.$this->orgFieldName.' <span class="sup" title="Required field">*</span></label>
 					<select id="orgId" name="orgId" tabindex="1">';
 			
-			$html .= $this->setSelectOptions($this->organizations);
+			$html .= $this->getSelectOptionsHtml($this->organizations);
 			
 			$html .= '</select>
 					<label for="topicId">Topic <span class="sup" title="Required field">*</span></label>
 					<select id="topicId" name="topicId" tabindex="2">';
 			
-			$html .= $this->setSelectOptions($this->topics);
+			$html .= $this->getSelectOptionsHtml($this->topics);
 			
 			$html .= '</select>
 					<div id="tip-message-control-group" class="form-group">
@@ -218,7 +218,7 @@ class TipSubmissionHandler {
 			<div class="summary-info">
 				<div class="summary-heading">Summary of the tip information you submitted:</div>
 				<div><span class="summary-label">'.$this->orgFieldName.':</span> &nbsp;<div class="summary-value">'. $this->orgName. '</div></div>
-				<div><span class="summary-label">Topic:</span> &nbsp;<div class="summary-value">'. escapeHtml($this->topicName).'</div></div>
+				<div><span class="summary-label">Topic:</span> &nbsp;<div class="summary-value">'. $this->topicName.'</div></div>
 				<div><span class="summary-label">Message:</span> &nbsp;<div class="summary-value message-text">'.escapeHtml($this->message).'</div></div>';
 		if ($this->file) {
 			$html .= '<div id="summary-attachment-container"><span class="summary-label">Attachment:</span> &nbsp;<div class="summary-value">'.escapeHtml($this->file).'</div></div>';

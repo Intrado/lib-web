@@ -232,7 +232,7 @@ class TipSubmissionViewer extends PageForm {
 	function factoryFormTipSubmissions() {
 		$orgArray[0] = 'All ' . $this->orgFieldName . 's';
 		foreach ($this->authOrgList as $id => $value) {
-			$orgArray[$id] = escapehtml($value);
+			$orgArray[$id] = $value;
 		}
 
 		$catArray[0] = "All Topics";
@@ -242,7 +242,7 @@ class TipSubmissionViewer extends PageForm {
 			WHERE tot.organizationid = (SELECT id FROM organization WHERE parentorganizationid IS NULL)
 			ORDER BY tt.name ASC", true);
 		foreach ($catList as $id => $value) {
-			$catArray[$id] = escapehtml($value);
+			$catArray[$id] = $value;
 		}
 
 		$dateObj = json_decode($this->date, true);
