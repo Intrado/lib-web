@@ -73,25 +73,25 @@ if (isset($_GET['clear'])) {
 
 
 switch ($DATATYPE) {
-case "person" :
+	case "person" :
 		$VALID_TYPES = array('text', 'reldate', 'multisearch', 'numeric');
 		foreach (FieldMap::$specialFields as $name => $field) {
 			$VALID_TYPES[] = $name;
 			$VALID_TYPES[] = $field->options;
 		}
 		$numfields = 20;
-	$dt = "f%";
-break;
-case "group" :
-	$VALID_TYPES = array('multisearch');
-	$numfields = 10;
-	$dt = "g%";
-break;
-case "schedule" :
-	$VALID_TYPES = array('multisearch', 'numeric');
-	$numfields = 10;
-	$dt = "c%";
-break;
+		$dt = "f%";
+		break;
+	case "group" :
+		$VALID_TYPES = array('multisearch');
+		$numfields = 10;
+		$dt = "g%";
+		break;
+	case "schedule" :
+		$VALID_TYPES = array('multisearch', 'numeric');
+		$numfields = 10;
+		$dt = "c%";
+		break;
 }
 
 $FIELDMAPS = DBFindMany("FieldMap", "from fieldmap where fieldnum like '".$dt."' order by fieldnum");
@@ -253,18 +253,18 @@ if( $reloadform )
 $PAGE = "admin:settings";
 
 switch ($DATATYPE) {
-case "person" :
-$TITLE = _L("Field Definitions");
-$hover = "DataManager_Fields";
-break;
-case "group" :
-$TITLE = _L("Group Field Definitions");
-$hover = "DataManager_GFields";
-break;
-case "schedule" :
-$TITLE = _L("Section Field Definitions");
-$hover = "DataManager_CFields";
-break;
+	case "person" :
+		$TITLE = _L("Field Definitions");
+		$hover = "DataManager_Fields";
+		break;
+	case "group" :
+		$TITLE = _L("Group Field Definitions");
+		$hover = "DataManager_GFields";
+		break;
+	case "schedule" :
+		$TITLE = _L("Section Field Definitions");
+		$hover = "DataManager_CFields";
+		break;
 }
 
 include_once("nav.inc.php");
@@ -289,12 +289,12 @@ startWindow('Fields ' . help($hover), 'padding: 3px;');
 
 
 switch ($DATATYPE) {
-case "person" :
-	$types = array(
-			"Text" => 'text',
-			"Date" => 'reldate',
-			"List" => 'multisearch',
-			"Numeric" => 'numeric');
+	case "person" :
+		$types = array(
+				"Text" => 'text',
+				"Date" => 'reldate',
+				"List" => 'multisearch',
+				"Numeric" => 'numeric');
 
 		//if any of the special fields is not defined add its type.
 		foreach (FieldMap::$specialFields as $name => $field) {
@@ -302,168 +302,165 @@ case "person" :
 				$types[$field->label] = $field->options;
 			}
 		}
-
-break;
-case "group" :
+		break;
+	case "group" :
+		// Fall through, same as 'schedule'
+	case "schedule" :
 		$types = array("List" => 'multisearch');
-break;
-case "schedule" :
-		$types = array("List" => 'multisearch');
-break;
+		break;
 }
 
-	if (count($FIELDMAPS) > 0) {
-
-		foreach ($FIELDMAPS as $field) {
-			echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
-?>
-			<td>
-<?
-				$fieldnum = $field->fieldnum;
-				$num = substr($fieldnum, 1) + 0;
-				echo $num;
-?>
-			</td>
-<?
-
-switch ($DATATYPE) {
-case "person" :
-	$datapage = "persondatamanager.php";
-break;
-case "group" :
-	$datapage = "groupdatamanager.php";
-break;
-case "schedule" :
-	$datapage = "scheduledatamanager.php";
-break;
-}
-
-			// These items are special cases
-			if (! in_array($fieldnum, FieldMap::getSpecialFieldNumbers())) {
-?>
-				<td><? NewFormItem($form, $section, "name_$fieldnum", 'text', '20'); ?></td>
-				<td>
-<?
-					NewFormItem($form, $section, 'type_' . $fieldnum, 'selectstart', '', 'id=type_'.$fieldnum);
-					foreach($types as $text => $type)
-						NewFormItem($form, $section, 'type_' . $fieldnum, 'selectoption', $text, $type);
-					NewFormItem($form, $section, 'type_' . $fieldnum, 'selectend');
-?>
-				</td>
-<?				switch ($DATATYPE) {
-				case "person" :
-?>
-					<td>
-					<?NewFormItem($form, $section, 'searchable_' . $fieldnum, 'checkbox');?>
-					</td>
-					<td><?= action_links(
-							action_link(_L("Delete"),"cross","$datapage?delete=$field->id","return confirmDelete();"),
-							action_link(_L("Clear Data"),"lightning","$datapage?clear=$fieldnum","return confirm('Are you sure you want to clear (erase) all data for this field?');")
-							) ?></td>
-<?
-				break;
-				case "group" :
-?>
-					<td><?= action_links(
-							action_link(_L("Delete"),"cross","$datapage?delete=$field->id","return confirmDelete();"),
-							action_link(_L("Clear Data"),"lightning","$datapage?clear=$fieldnum","return confirm('Are you sure you want to clear (erase) all data for this field?');")
-							) ?></td>
-<?
-				break;
-				case "schedule" :
-?>
-					<td><?= action_links(
-							action_link(_L("Delete"),"cross","$datapage?delete=$field->id","return confirmDelete();"),
-							action_link(_L("Clear Data"),"lightning","$datapage?clear=$fieldnum","return confirm('Are you sure you want to clear (erase) all data for this field?');")
-							) ?></td>
-<?
-				break;
-				}
-			} else {
-?>
-				<td><? NewFormItem($form, $section, "name_$fieldnum", 'text', '20');?></td>
-				<td><?=ucfirst(GetFormData($form, $section, "type_$fieldnum")); ?></td>
-
-<?				switch ($DATATYPE) {
-				case "person" :
-?>
-					<td>
-<?
-					$issearch = 'DISABLED';
-					// firstname, lastname, language are always searchable, so checkbox disabled
-					if (! in_array($fieldnum, FieldMap::getSpecialFieldNumbers(true))) {
-						$issearch = '';
-					}
-					NewFormItem($form, $section, 'searchable_' . $fieldnum, 'checkbox', null, null, $issearch);
-?>
-					</td>
-					<td>
-<?
-					// firstname, lastname, language are unremovable
-					if (! in_array($fieldnum, FieldMap::getSpecialFieldNumbers(true))) {
-?>
-					<?= action_links(
-							action_link(_L("Delete"),"cross","$datapage?delete=$field->id","return confirmDelete();"),
-							action_link(_L("Clear Data"),"lightning","$datapage?clear=$fieldnum","return confirm('Are you sure you want to clear (erase) all data for this field?');")
-							) ?>
-<?
-					}
-					?></td><?
-				break;
-				case "group" :
-?>
-					<td><?= action_links(
-							action_link(_L("Delete"),"cross","$datapage?delete=$field->id","return confirmDelete();"),
-							action_link(_L("Clear Data"),"lightning","$datapage?clear=$fieldnum","return confirm('Are you sure you want to clear (erase) all data for this field?');")
-							) ?></td>
-<?
-				break;
-				case "schedule" :
-					// no special cases
-				break;
-				}
-			}
-?>
-		</tr>
-<?
-		}
-	}
-
-	// Print extra row for adding new items
-	// only if they have more fields to use
-	if(count($FIELDMAPS) < $numfields){
+if (count($FIELDMAPS) > 0) {
+	foreach ($FIELDMAPS as $field) {
 		echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
 ?>
 		<td>
 <?
-		NewFormItem($form, $section, 'newfield_fieldnum', 'selectstart');
-		foreach ($availablefields as $field)
-			NewFormItem($form, $section, 'newfield_fieldnum', 'selectoption', $field , $field);
-		NewFormItem($form, $section, 'newfield_fieldnum', 'selectend');
+		$fieldnum = $field->fieldnum;
+		$num = substr($fieldnum, 1) + 0;
+		echo $num;
+?>
+		</td>
+<?
+
+	switch ($DATATYPE) {
+		case "person" :
+			$datapage = "persondatamanager.php";
+			break;
+		case "group" :
+			$datapage = "groupdatamanager.php";
+			break;
+		case "schedule" :
+			$datapage = "scheduledatamanager.php";
+			break;
+	}
+
+	// These items are special cases
+	if (! in_array($fieldnum, FieldMap::getSpecialFieldNumbers())) {
+?>
+		<td><? NewFormItem($form, $section, "name_$fieldnum", 'text', '20'); ?></td>
+		<td>
+<?
+			NewFormItem($form, $section, 'type_' . $fieldnum, 'selectstart', '', 'id=type_'.$fieldnum);
+			foreach($types as $text => $type)
+				NewFormItem($form, $section, 'type_' . $fieldnum, 'selectoption', $text, $type);
+			NewFormItem($form, $section, 'type_' . $fieldnum, 'selectend');
+?>
+		</td>
+<?				switch ($DATATYPE) {
+		case "person" :
+?>
+			<td>
+			<?NewFormItem($form, $section, 'searchable_' . $fieldnum, 'checkbox');?>
+			</td>
+			<td><?= action_links(
+					action_link(_L("Delete"),"cross","$datapage?delete=$field->id","return confirmDelete();"),
+					action_link(_L("Clear Data"),"lightning","$datapage?clear=$fieldnum","return confirm('Are you sure you want to clear (erase) all data for this field?');")
+					) ?></td>
+<?
+		break;
+		case "group" :
+?>
+			<td><?= action_links(
+					action_link(_L("Delete"),"cross","$datapage?delete=$field->id","return confirmDelete();"),
+					action_link(_L("Clear Data"),"lightning","$datapage?clear=$fieldnum","return confirm('Are you sure you want to clear (erase) all data for this field?');")
+					) ?></td>
+<?
+		break;
+		case "schedule" :
+?>
+			<td><?= action_links(
+					action_link(_L("Delete"),"cross","$datapage?delete=$field->id","return confirmDelete();"),
+					action_link(_L("Clear Data"),"lightning","$datapage?clear=$fieldnum","return confirm('Are you sure you want to clear (erase) all data for this field?');")
+					) ?></td>
+<?
+		break;
+		}
+	} else {
+?>
+		<td><? NewFormItem($form, $section, "name_$fieldnum", 'text', '20');?></td>
+		<td><?=ucfirst(GetFormData($form, $section, "type_$fieldnum")); ?></td>
+
+<?		switch ($DATATYPE) {
+			case "person" :
+?>
+			<td>
+<?
+			$issearch = 'DISABLED';
+			// firstname, lastname, language are always searchable, so checkbox disabled
+			if (! in_array($fieldnum, FieldMap::getSpecialFieldNumbers(true))) {
+				$issearch = '';
+			}
+			NewFormItem($form, $section, 'searchable_' . $fieldnum, 'checkbox', null, null, $issearch);
+?>
+			</td>
+			<td>
+<?
+			// firstname, lastname, language are unremovable
+			if (! in_array($fieldnum, FieldMap::getSpecialFieldNumbers(true))) {
+?>
+			<?= action_links(
+					action_link(_L("Delete"),"cross","$datapage?delete=$field->id","return confirmDelete();"),
+					action_link(_L("Clear Data"),"lightning","$datapage?clear=$fieldnum","return confirm('Are you sure you want to clear (erase) all data for this field?');")
+					) ?>
+<?
+			}
+			?></td><?
+			break;
+		case "group" :
+?>
+			<td><?= action_links(
+					action_link(_L("Delete"),"cross","$datapage?delete=$field->id","return confirmDelete();"),
+					action_link(_L("Clear Data"),"lightning","$datapage?clear=$fieldnum","return confirm('Are you sure you want to clear (erase) all data for this field?');")
+					) ?></td>
+<?
+			break;
+		case "schedule" :
+			// no special cases
+			break;
+		}
+	}
+?>
+	</tr>
+<?
+	}
+}
+
+// Print extra row for adding new items
+// only if they have more fields to use
+if(count($FIELDMAPS) < $numfields){
+	echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
+?>
+		<td>
+<?
+	NewFormItem($form, $section, 'newfield_fieldnum', 'selectstart');
+	foreach ($availablefields as $field)
+		NewFormItem($form, $section, 'newfield_fieldnum', 'selectoption', $field , $field);
+	NewFormItem($form, $section, 'newfield_fieldnum', 'selectend');
 ?>
 		</td>
 		<td>
 <?
-		NewFormItem($form, $section, 'newfield_name', 'text',20, '', 'id=newfield');
+	NewFormItem($form, $section, 'newfield_name', 'text',20, '', 'id=newfield');
 ?>
 		</td>
 		<td>
 <?
-		NewFormItem($form, $section, 'newfield_type', 'selectstart', '', '', 'id=newfield_type');
-		foreach($types as $text => $type)
-			NewFormItem($form, $section, 'newfield_type', 'selectoption', $text, $type);
-		NewFormItem($form, $section, 'newfield_type', 'selectend');
+	NewFormItem($form, $section, 'newfield_type', 'selectstart', '', '', 'id=newfield_type');
+	foreach($types as $text => $type)
+		NewFormItem($form, $section, 'newfield_type', 'selectoption', $text, $type);
+	NewFormItem($form, $section, 'newfield_type', 'selectend');
 ?>
 		</td>
-<?		if ($DATATYPE == "person") {
+<?	if ($DATATYPE == "person") {
 ?>
 		<td><? NewFormItem($form, $section, 'newfield_searchable', 'checkbox', '', '', 'id=newfield_searchable'); ?> </td>
-<?		}
+<?	}
 ?>
 		<td><? echo submit($form, 'add', 'Add'); ?></td>
 	</tr>
 <?
-	}
+}
 ?>
 </table>
 <?
