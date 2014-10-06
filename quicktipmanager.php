@@ -151,7 +151,7 @@ class QuickTipManager extends PageForm {
 	 * Create a new instance of this page object
 	 *
 	 * @param array $options which contain information necessary for display of the page with relation to the rest of the application
-	 * @param object $csApi An instance of CommsuiteApiClient
+	 * @param CommsuiteApiClient $csApi An instance of CommsuiteApiClient
 	 */
 	public function __construct($options, $csApi) {
 		$this->csApi = $csApi;

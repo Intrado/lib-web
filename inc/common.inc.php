@@ -114,10 +114,10 @@ require_once("{$thriftdir}/StringFunc/Core.php");
 require_once("{$thriftdir}/packages/commsuite/Types.php");
 require_once("{$thriftdir}/packages/commsuite/CommSuite.php");
 
-
+/**
+ * @return CommsuiteApiClient
+ */
 function setupCommsuiteApi() {
-	global $USER;
-
 	$apiClient = new ApiClient(
 		"https://{$_SERVER['SERVER_NAME']}/" . customerUrlComponent() ."/api/2",
 		array(

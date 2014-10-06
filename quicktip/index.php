@@ -38,8 +38,8 @@ class TipSubmissionHandler {
 	private $orgFieldName;
 	private $topicName;
 	private $message;
-	private $firstName;
-	private $lastName;
+	private $firstname;
+	private $lastname;
 	private $email;
 	private $phone;
 	private $file;
@@ -108,13 +108,13 @@ class TipSubmissionHandler {
 
  	/**
  	 * Gets the name of an organization or category/topic for a given org/topicid and org/topic array
- 	 * @param int id - id of an Org or Topic
- 	 * @param array arr - array of either Org or Topic objects
-     * @return the name of an org or topic for the given id; from the respective array (Org/Topic)
+ 	 * @param int $id - id of an Org or Topic
+ 	 * @param array $arr - array of either Org or Topic objects
+     * @return string the name of an org or topic for the given id; from the respective array (Org/Topic)
  	 */
  	public function getName($id, $arr) {
 		$name = '';
-		foreach ($arr as $k => $obj) {
+		foreach ($arr as $obj) {
 			if ($obj->id == $id) {
 				return escapeHtml($obj->name);
 			}

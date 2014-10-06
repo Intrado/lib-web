@@ -8,13 +8,10 @@ class ApiClient {
 	/**
 	 * Constructor
 	 *
-	 * @param string The hostname for REST Api access that we can reach server-side (localhost?)
-	 * @param string The "Url Component" for the customer which identifies them uniquely in the Url
-	 * @param integer The ID for the logged in user making the request
-	 * @param string The contents of the session auth cookie for this logged in customer/user 
+	 * @param string $ApiUrl hostname for REST Api access that we can reach server-side (localhost?)
+	 * @param array $staticHeaders
 	 */
 	public function __construct($ApiUrl, $staticHeaders = array()) {
-
 		$this->ApiUrl = $ApiUrl;
 		$this->staticHeaders = $staticHeaders;
 	}

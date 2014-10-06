@@ -6,10 +6,14 @@ class CommsuiteApiClient {
 	const API_PROFILES = '/profiles';
 	const API_GUARDIAN_CATEGORIES = '/settings/guardiancategories';
 	const API_PEOPLE = '/people';
-	
-	private $apiClient = null;
-	private $burstsBaseUrl = null;
 
+	/** @var $apiClient ApiClient */
+	private $apiClient;
+	private $burstsBaseUrl;
+
+	/**
+	 * @param ApiClient $apiClient
+	 */
 	public function __construct($apiClient) {
 		global $USER;
 		$this->apiClient = $apiClient;
@@ -37,7 +41,7 @@ class CommsuiteApiClient {
 	/**
 	 * Get profile for given id
 	 * 
-	 * @param type $id profile id
+	 * @param int $id profile id
 	 * @return \Access
 	 */
 	public function getProfile($id) {
@@ -92,8 +96,8 @@ class CommsuiteApiClient {
 	/**
 	 * Get guardian category for given id
 	 *
-	 * @param type $id category id
-	 * @return \GuardianCategory
+	 * @param int $id category id
+	 * @return object GuardianCategory
 	 */
 	public function getGuardianCategory($id) {
 		$res = $this->apiClient->get(self::API_GUARDIAN_CATEGORIES . "/{$id}");
@@ -104,6 +108,8 @@ class CommsuiteApiClient {
 	 * Get guardian category associations for given id
 	 *
 	 * @param int $id category id
+	 * @param int $start
+	 * @param int $limit
 	 * @return array of association data
 	 */
 	public function getGuardianCategoryAssoications($id, $start = null, $limit = null) {
@@ -119,10 +125,12 @@ class CommsuiteApiClient {
 	}
 
 	/**
-	 *  update/create guardian category
-	 * @@param string $id category id
+	 * update/create guardian category
+	 *
+	 * @param string $id category id
 	 * @param string $name category name
 	 * @param int $accessid guardian profile id
+	 * @param $sequence
 	 * @return boolean true if success else false
 	 */
 	public function setGuardianCategory($id, $name, $accessid, $sequence) {
@@ -158,7 +166,7 @@ class CommsuiteApiClient {
 	 *
 	 * @param int $id person id
 	 * @param string $expansions (csv of values)expansions: dependents | guardians
-	 * @return  association data
+	 * @return object association data
 	 */
 	public function getPerson($id, $expansions) {
 		$queryParms = '?';
