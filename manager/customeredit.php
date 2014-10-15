@@ -278,6 +278,7 @@ $settings = array(
 	'_hasfeed' => '0',
 	'_hasquicktip' => '0',
 	'_haspdfburst' => '0',
+	'_hasicra' => '1',
 	'_cmaappid' => '',
 	'autoreport_replyname' => 'SchoolMessenger',
 	'autoreport_replyemail' => 'autoreport@system.schoolmessenger.com',
@@ -695,6 +696,14 @@ $formdata ["haspdfburst"] = array (
 	"helpstep" => $helpstepnum 
 );
 
+$formdata ["hasicra"] = array (
+	"label" => _L('Has Recipient App'),
+	"value" => $settings ['_hasicra'],
+	"validators" => array(),
+	"control" => array("CheckBox"),
+	"helpstep" => $helpstepnum
+);
+
 $formdata["cmaappid"] = array(
 	"label" => _L('CMA App. ID'),
 	"value" => ($settings['_cmaappid'] ? $settings['_cmaappid'] : ''),
@@ -997,6 +1006,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		// SSD feature...
 		setCustomerSystemSetting('_haspdfburst', $postdata["haspdfburst"] ? '1' : '0', $custdb);
 		
+		//ICRA feature
+		setCustomerSystemSetting('_hasicra', ($postdata["hasicra"] && ($postdata["portal"] !== 'contactmanager'))  ? '1' : '0', $custdb);
+
 		// QuickTip requires that we add the [dis|en]able the feature...
 		setCustomerSystemSetting('_hasquicktip', $postdata["hasquicktip"] ? '1' : '0', $custdb);
 
