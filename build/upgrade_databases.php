@@ -57,7 +57,8 @@ $versions = array (
 		"10.1/14",
 		"10.2/4",
 		"10.3/10",
-		"11.0/6"
+		"11.0/6",
+		"11.1/1"
 		//etc
 	),
 	
@@ -73,7 +74,7 @@ $versions = array (
 );
 
 // non-Customer databases
-$dbReleaseVersion = "11.0"; // version to update databases to if no revision changes for individual db, implies revision value of 1
+$dbReleaseVersion = "11.1"; // version to update databases to if no revision changes for individual db, implies revision value of 1
 $dbversions = array (
 	"authserver" => array (
 		"11.0/2"
@@ -83,12 +84,17 @@ $dbversions = array (
 		"11.0/1"
 	),
 	
+	"deviceservice" => array (
+		"11.1/1"
+	),
+	
 	"disk" => array (
 		"11.0/1"
 	),
 	
 	"infocenter" => array (
-		"11.0/1"
+		"11.0/1",
+		"11.1/1"
 	),
 	
 	"lcrrates" => array (
@@ -197,6 +203,7 @@ date_default_timezone_set("US/Pacific"); //to keep php from complaining. TODO mo
 
 require_once("dbupgrade_authserver/dbupgrade_authserver.php");
 require_once("dbupgrade_aspshard/dbupgrade_aspshard.php");
+require_once("dbupgrade_deviceservice/dbupgrade_deviceservice.php");
 require_once("dbupgrade_disk/dbupgrade_disk.php");
 require_once("dbupgrade_infocenter/dbupgrade_infocenter.php");
 require_once("dbupgrade_lcrrates/dbupgrade_lcrrates.php");
@@ -401,6 +408,9 @@ function apply_rev($db, $dbname, $version, $rev) {
 			case "lcrrates":
 				apply_lcrrates($targetversion, $rev, $db);
 				break;
+			case "deviceservice":
+				apply_deviceservice($targetversion, $rev, $db);
+				break;
 			case "disk":
 				apply_disk($targetversion, $rev, $db);
 				break;
@@ -489,6 +499,7 @@ function update_customer($db, $customerid, $shardid) {
 	require_once("upgrades/db_10-2.php");
 	require_once("upgrades/db_10-3.php");
 	require_once("upgrades/db_11-0.php");
+	require_once("upgrades/db_11-1.php");
 
 
 	// for each version, upgrade to the next
@@ -616,6 +627,11 @@ function update_customer($db, $customerid, $shardid) {
 				break;
 			case "11.0":
 				if (!upgrade_11_0($rev, $shardid, $customerid, $db)) {
+					exit("Error upgrading DB");
+				}
+				break;
+			case "11.1":
+				if (!upgrade_11_1($rev, $shardid, $customerid, $db)) {
 					exit("Error upgrading DB");
 				}
 				break;
@@ -797,7 +813,7 @@ function apply_sql ($filename, $customerid, $custdb, $specificrev = false) {
 				$sqlquery = str_replace('_$CUSTOMERID_', $customerid, $sqlquery);
 				$res = Query($sqlquery,$custdb);
 				if (!$res) {
-					exit("Error running query, check dberrors.txt for info");
+					exit("Error running query, check dberrors.txt for info\n");
 				}
 			}
 		}
@@ -835,7 +851,7 @@ function apply_sql_db ($filename, $db, $specificrev = false) {
 				echo ".";
 				$res = Query($sqlquery,$db);
 				if (!$res) {
-					exit("Error running query, check dberrors.txt for info");
+					exit("Error running query, check dberrors.txt for info\n");
 				}
 			}
 		}
