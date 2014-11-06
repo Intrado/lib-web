@@ -129,6 +129,8 @@ class AudioConverter {
 		if (strlen($ext) < 1 || !in_array(strtolower($ext), $this->getSupportedFormats())) {
 			// if uncertain, let's try the mime type
 			switch ($mimeType) {
+				case 'audio/mp3':
+					// fall through to audio/mpeg
 				case 'audio/mpeg':
 					$ext = 'mp3';
 					break;
