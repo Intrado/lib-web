@@ -2,6 +2,7 @@
 
 /**
  * appends user@customer and stack trace to the error message before calling error_log
+ * and instrumentation_notice_error
  * @param string $msg
  */
 function error_log_helper ($msg) {
@@ -24,7 +25,20 @@ function error_log_helper ($msg) {
 
 	$debug .= "]";
 	
+	instrumentation_notice_error($msg);
 	error_log($msg . $debug);
+}
+
+funciton instrumentation_add_custom_parameter ($key, $value) {
+	if (extension_loaded ('newrelic')) {
+		newrelic_add_custom_parameter($key, $value)
+	}
+}
+
+funciton instrumentation_notice_error ($message, $exception) {
+	if (extension_loaded ('newrelic')) {
+		newrelic_notice_error($message, $exception);
+	}
 }
 
 //quick utf8 aware replacement for htmlentities
