@@ -85,7 +85,7 @@ $dbversions = array (
 	),
 	
 	"deviceservice" => array (
-		"11.1/1"
+		"11.1/2"
 	),
 	
 	"disk" => array (
@@ -98,7 +98,6 @@ $dbversions = array (
 	),
 	
 	"lcrrates" => array (
-		"11.0/1",
 		"11.0/2"
 	),
 	

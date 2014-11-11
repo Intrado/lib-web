@@ -43,5 +43,9 @@ CREATE TABLE `registrationlog` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
 
+-- $rev 2
 
+ALTER TABLE `appinstance`
+  ADD UNIQUE KEY `appInstance` (`name`,`version`,`cmaAppId`)
+$$$
 
