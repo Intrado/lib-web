@@ -8,7 +8,7 @@
 -- PHP Version: 5.3.8
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO"
-$$$
+;
 
 --
 -- Database: 'portalauth'
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS oauth_access_token (
   authentication blob,
   refresh_token varchar(256) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1
-$$$
+;
 
 -- --------------------------------------------------------
 
@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS oauth_client_details (
   autoapprove varchar(256) DEFAULT NULL,
   PRIMARY KEY (client_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1
-$$$
+;
 
 -- --------------------------------------------------------
 
@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS oauth_client_token (
   user_name varchar(256) DEFAULT NULL,
   client_id varchar(256) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1
-$$$
+;
 
 -- --------------------------------------------------------
 
@@ -78,7 +78,7 @@ CREATE TABLE IF NOT EXISTS oauth_code (
   `code` varchar(256) DEFAULT NULL,
   authentication blob
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1
-$$$
+;
 
 -- --------------------------------------------------------
 
@@ -91,16 +91,16 @@ CREATE TABLE IF NOT EXISTS oauth_refresh_token (
   token blob,
   authentication blob
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1
-$$$
+;
 
 ALTER TABLE oauth_access_token ADD INDEX ( client_id , user_name )
-$$$
+;
 
 ALTER TABLE oauth_access_token ADD INDEX ( authentication_id )
-$$$
+;
 
 ALTER TABLE oauth_access_token ADD INDEX ( token_id )
-$$$
+;
 
 -- ------------------------------------------------------
 -- add table for database versioning used by upgrade_databases.php

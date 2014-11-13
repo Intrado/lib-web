@@ -2,17 +2,17 @@ CREATE TABLE `user` (
   `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
   `portalUserId` INT NOT NULL
 ) ENGINE = InnoDB
-$$$
+;
  
 CREATE TABLE `usercustomer` (
   `userId` int(11) NOT NULL,
   `customerId` int(11) NOT NULL,
   PRIMARY KEY (`userId`,`customerId`)
 ) ENGINE=InnoDB
-$$$
+;
 
 ALTER TABLE `user` ADD INDEX ( `portalUserId` )
-$$$
+;
 
 -- ------------------------------------------------------
 -- add table for database versioning used by upgrade_databases.php
