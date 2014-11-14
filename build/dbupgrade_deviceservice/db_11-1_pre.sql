@@ -46,6 +46,6 @@ $$$
 -- $rev 2
 
 ALTER TABLE `appinstance`
-  ADD UNIQUE KEY `appInstance` (`name`,`version`,`cmaAppId`)
+  ADD INDEX `appInstance` (`name`,`version`,`cmaAppId`)
 $$$
 
