@@ -272,13 +272,13 @@ $settings = array(
 	'_hasphonetargetedmessage' => '0',
 	'_hasselfsignup' => '',
 	'_hasportal' => '',
-	'_hasinfocenter' => '',
+	'_hasinfocenter' => '1',
 	'_hasfacebook' => '0',
 	'_hastwitter' => '0',
 	'_hasfeed' => '0',
 	'_hasquicktip' => '0',
 	'_haspdfburst' => '0',
-	'_hasicra' => '1',
+	'_hasicplus' => '0',
 	'_cmaappid' => '',
 	'autoreport_replyname' => 'SchoolMessenger',
 	'autoreport_replyemail' => 'autoreport@system.schoolmessenger.com',
@@ -622,6 +622,14 @@ $formdata["portal"] = array(
 	"helpstep" => $helpstepnum
 );
 
+$formdata ["hasicplus"] = array (
+	"label" => _L('Has InfoCenter Plus'),
+	"value" => $settings ['_hasicplus'],
+	"validators" => array(),
+	"control" => array("CheckBox"),
+	"helpstep" => $helpstepnum
+);
+
 $formdata["hassurvey"] = array(
 	"label" => _L('Has Survey'),
 	"value" => $settings['_hassurvey'],
@@ -694,14 +702,6 @@ $formdata ["haspdfburst"] = array (
 	"validators" => array(),
 	"control" => array("CheckBox"),
 	"helpstep" => $helpstepnum 
-);
-
-$formdata ["hasicra"] = array (
-	"label" => _L('Has Recipient App'),
-	"value" => $settings ['_hasicra'],
-	"validators" => array(),
-	"control" => array("CheckBox"),
-	"helpstep" => $helpstepnum
 );
 
 $formdata["cmaappid"] = array(
@@ -935,6 +935,10 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		updateCustomerProduct($customerid, 'cm', $postdata["portal"] === 'contactmanager');
 		updateCustomerProduct($customerid, 'ic', $postdata["portal"] === 'infocenter');
 
+		//InfoCenter Plus feature (CMA view attendance and enrollment)
+		setCustomerSystemSetting('_hasicplus', ($postdata["hasicplus"] && ($postdata["portal"] === 'infocenter'))  ? '1' : '0', $custdb);
+
+		// more features
 		setCustomerSystemSetting('_hassurvey', $postdata["hassurvey"]?'1':'0', $custdb);
 		setCustomerSystemSetting('_hasldap', $postdata["hasldap"]?'1':'0', $custdb);
 		setCustomerSystemSetting('_hasenrollment', $postdata["hasenrollment"]?'1':'0', $custdb);
@@ -1006,9 +1010,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		// SSD feature...
 		setCustomerSystemSetting('_haspdfburst', $postdata["haspdfburst"] ? '1' : '0', $custdb);
 		
-		//ICRA feature
-		setCustomerSystemSetting('_hasicra', ($postdata["hasicra"] && ($postdata["portal"] !== 'contactmanager'))  ? '1' : '0', $custdb);
-
 		// QuickTip requires that we add the [dis|en]able the feature...
 		setCustomerSystemSetting('_hasquicktip', $postdata["hasquicktip"] ? '1' : '0', $custdb);
 
