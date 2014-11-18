@@ -11,3 +11,6 @@ $$$
 ALTER TABLE `contactpref` CHANGE `type` `type` ENUM('phone','email','print','sms','device') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL
 $$$
 
+-- $rev 2
+
+-- no schema just update _hasinfocenter settings

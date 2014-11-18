@@ -2797,3 +2797,10 @@ update setting set value='11.1/1' where name='_dbversion'
 $$$
 
 -- END 11.1/1
+
+-- no schema just update _hasinfocenter settings
+
+update setting set value='11.1/2' where name='_dbversion'
+$$$
+
+-- END 11.1/2
