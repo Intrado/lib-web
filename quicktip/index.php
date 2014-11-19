@@ -122,14 +122,15 @@ class TipSubmissionHandler {
 		return $name;
  	}
 
- 	/**
- 	 * Returns a string containing all the <option> elements for a given array
- 	 * of objects, ex Org or Topics.
- 	 * @param array arrayOfObjects array of objects from either organizations or topics 
- 	 * return string a string containing all the <option> elements for a given array of objects
- 	 */
+	/**
+	 * Returns a string containing all the <option> elements for a given array
+	 * of objects, ex Org or Topics.
+	 * @param array arrayOfObjects array of objects from either organizations or topics
+	 * return string a string containing all the <option> elements for a given array of objects
+	 * @return string
+	 */
  	public function setSelectOptions($arrayOfObjects) {
-		$html = '';
+		$html = '<option value="0">'.escapeHtml('-- Please select one of the following --').'</option>';
 		foreach ($arrayOfObjects as $k => $obj) {
 			$html .= '<option value="'.$obj->id.'">'.escapeHtml($obj->name).'</option>';
 		}
