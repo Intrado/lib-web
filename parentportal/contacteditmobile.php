@@ -109,7 +109,7 @@ if($PERSONID){
 				$type = "sms";
 ?>
 				<tr class="windowRowHeader" >
-					<th align="left" colspan="2"><?=format_delivery_type($type); ?></th>
+					<th align="left" colspan="2">Text (Mobile)</th>
 				</tr>
 <?
 				foreach($smses as $sms){
@@ -159,7 +159,7 @@ if($PERSONID){
 		});
 
 		$$('input.smspreference').each(function(item) {
-			initiateDestination('<?=_L("SMS")?>',item);			
+			initiateDestination('<?=_L("Text")?>',item);			
 		});
 	});
 	
