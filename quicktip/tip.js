@@ -32,19 +32,35 @@ function QuickTip() {
 
 	this.valEmail = function() {
 		return this.validation.email.isValid = (typeof(this.emailTF.checkValidity) === 'function') ? this.emailTF.checkValidity() : true;
-	}
+	};
 
 	this.valPhone = function() {
 		return this.validation.phone.isValid = (typeof(this.phoneTF.checkValidity) === 'function') ? this.phoneTF.checkValidity() : true;
-	}
+	};
+
+	this.valSchool = function() {
+		return this.validation.school.isValid = (this.orgListCoB.value > 0);
+	};
+
+	this.valTopic = function() {
+		return this.validation.topic.isValid = (this.topicCoB.value > 0);
+	};
 
 	this.validate = function() {
-		return this.isValid = (this.valMessage() && this.valEmail() && this.valPhone());
+		return this.isValid = (this.valSchool() && this.valTopic() && this.valMessage() && this.valEmail() && this.valPhone());
 	};
 
 	this.validation = {
+		school: {
+			isValid: true,
+			msg: 'Please select a School.'
+		},
+		topic: {
+			isValid: true,
+			msg: 'Please select a Topic.'
+		},
 		message: {
-			isValid: false,
+			isValid: true,
 			msg: 'Please enter a Tip Message.'
 		},
 		email: {
@@ -64,6 +80,18 @@ function QuickTip() {
 			this.addClass(this.errorMsgCont, 'hide');
 			this.removeClass(this.messageTACont, 'has-error');
 		} else {
+			if (!this.validation.school.isValid) {
+				this.addClass(this.orgListCoB, 'has-error');
+				this.setErrorMessage(this.validation.school.msg);
+			} else  {
+				this.removeClass(this.orgListCoB, 'has-error');
+			}
+			if (!this.validation.topic.isValid) {
+				this.addClass(this.topicCoB, 'has-error');
+				this.setErrorMessage(this.validation.topic.msg);
+			} else  {
+				this.removeClass(this.topicCoB, 'has-error');
+			}
 			if (!this.validation.message.isValid) {
 				this.addClass(this.messageTACont, 'has-error');
 				this.setErrorMessage(this.validation.message.msg);
@@ -91,16 +119,8 @@ function QuickTip() {
 
 	this.setFormActionURL = function() {
 		this.baseCustomerURL = this.tipForm.getAttribute('data-base-url');
-		this.formActionUrl = "/api/2/organizations/" + this.orgId + "/topics/" + this.topicId + "/quicktip";
+		this.formActionUrl = "/api/2/organizations/" + this.orgListCoB.value + "/topics/" + this.topicCoB.value + "/quicktip";
 		this.tipForm.setAttribute('action', this.baseCustomerURL + this.formActionUrl);
-	};
-
-	this.setSelectedOrgId = function() {
-		this.orgId = (this.orgListCoB.selectedIndex > -1) ? this.orgListCoB.options[this.orgListCoB.selectedIndex].value : -1;
-	};
-
-	this.setSelectedTopicId = function() {
-		this.topicId = (this.topicCoB.selectedIndex > -1) ? this.topicCoB.options[this.topicCoB.selectedIndex].value : -1;
 	};
 
 	this.hasClass = function(elem, className) {
@@ -152,9 +172,6 @@ function QuickTip() {
 	this.submitHandler = this.bind(function(event) {
 		event.preventDefault ? event.preventDefault() : event.returnValue = false;
 
-		this.setSelectedOrgId();
-		this.setSelectedTopicId();
-
 		if (!this.validate()) {
 			this.renderValidation();
 		} else {
@@ -175,6 +192,14 @@ function QuickTip() {
 		}
 	};
 
+	this.schoolHandler = this.bind(function() {
+		this.valHandler(this.valSchool);
+	});
+
+	this.topicHandler = this.bind(function() {
+		this.valHandler(this.valTopic);
+	});
+
 	this.messageHandler = this.bind(function() {
 		this.valHandler(this.valMessage);
 	});
@@ -188,11 +213,9 @@ function QuickTip() {
 	});
 
 	this.addEvent(this.submitB,   'click', this.submitHandler);
+	this.addEvent(this.orgListCoB, 'change', this.schoolHandler);
+	this.addEvent(this.topicCoB,  'change', this.topicHandler);
 	this.addEvent(this.messageTA, 'keyup', this.messageHandler);
 	this.addEvent(this.emailTF,   'keyup', this.emailHandler);
 	this.addEvent(this.phoneTF,   'keyup', this.phoneHandler);
-
-	this.setSelectedOrgId();
-	this.setSelectedTopicId();
-
-};
+}
