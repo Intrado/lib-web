@@ -128,7 +128,7 @@ function message_action($row, $index){
 		$actionlinks[] = action_link($title, $icon,null,$onclick);
 	}
 	if ($messagegroup->hasMessage("sms")) {
-		$title = _L("Read SMS");
+		$title = _L("Read Text");
 		$icon = "comment";
 		$onclick = "popup('previewmessage.php?jobid=" . $row[1] . "&personid=" . $row[7] . "&type=sms', 400, 500,'preview');";
 		
