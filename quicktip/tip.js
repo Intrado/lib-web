@@ -1,10 +1,8 @@
 function QuickTip() {
 
-	this.doc 			 = window.document,
-	this.orgId			 = null,
-	this.topicId		 = null,
-	this.baseCustomerURL = "",
-	this.formActionUrl	 = "",
+	this.doc 			 = window.document;
+	this.baseCustomerURL = "";
+	this.formActionUrl	 = "";
 	this.isValid 		 = false;
 
 	this.ui = {
@@ -76,40 +74,36 @@ function QuickTip() {
 	this.renderValidation = function() {
 		this.errorMsgCont.innerHTML = '';
 
-		if (this.isValid) {
-			this.addClass(this.errorMsgCont, 'hide');
-			this.removeClass(this.messageTACont, 'has-error');
-		} else {
-			if (!this.validation.school.isValid) {
-				this.addClass(this.orgListCoB, 'has-error');
-				this.setErrorMessage(this.validation.school.msg);
-			} else  {
-				this.removeClass(this.orgListCoB, 'has-error');
-			}
-			if (!this.validation.topic.isValid) {
-				this.addClass(this.topicCoB, 'has-error');
-				this.setErrorMessage(this.validation.topic.msg);
-			} else  {
-				this.removeClass(this.topicCoB, 'has-error');
-			}
-			if (!this.validation.message.isValid) {
-				this.addClass(this.messageTACont, 'has-error');
-				this.setErrorMessage(this.validation.message.msg);
-			} else  {
-				this.removeClass(this.messageTACont, 'has-error');
-			}
-			if (!this.validation.email.isValid) {
-				this.setErrorMessage(this.validation.email.msg);
-			}
-			if (!this.validation.phone.isValid) {
-				this.setErrorMessage(this.validation.phone.msg);
-			}
+		this.addClass(this.errorMsgCont, 'hide');
+		this.removeClass(this.messageTACont, 'has-error');
+		this.removeClass(this.topicCoB, 'has-error');
+		this.removeClass(this.orgListCoB, 'has-error');
+
+		if (!this.validation.school.isValid) {
+			this.addClass(this.orgListCoB, 'has-error');
+			this.setErrorMessage(this.validation.school.msg);
+		}
+		if (!this.validation.topic.isValid) {
+			this.addClass(this.topicCoB, 'has-error');
+			this.setErrorMessage(this.validation.topic.msg);
+		}
+		if (!this.validation.message.isValid) {
+			this.addClass(this.messageTACont, 'has-error');
+			this.setErrorMessage(this.validation.message.msg);
+		}
+		if (!this.validation.email.isValid) {
+			this.setErrorMessage(this.validation.email.msg);
+		}
+		if (!this.validation.phone.isValid) {
+			this.setErrorMessage(this.validation.phone.msg);
+		}
+		if (!this.isValid) {
 			this.removeClass(this.errorMsgCont, 'hide');
 		}
 	};
 
 	this.isSelectedIdValid = function(id) {
-		return (typeof(id) !== 'undefined' && id > -1) ? true : false;
+		return (typeof(id) !== 'undefined' && id > 0) ? true : false;
 	};
 
 	this.setErrorMessage = function(errorMsg) {
