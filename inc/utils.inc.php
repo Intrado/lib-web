@@ -29,13 +29,13 @@ function error_log_helper ($msg) {
 	error_log($msg . $debug);
 }
 
-funciton instrumentation_add_custom_parameter ($key, $value) {
+function instrumentation_add_custom_parameter ($key, $value) {
 	if (extension_loaded ('newrelic')) {
-		newrelic_add_custom_parameter($key, $value)
+		newrelic_add_custom_parameter($key, $value);
 	}
 }
 
-funciton instrumentation_notice_error ($message, $exception) {
+function instrumentation_notice_error ($message, $exception=null) {
 	if (extension_loaded ('newrelic')) {
 		newrelic_notice_error($message, $exception);
 	}
@@ -389,6 +389,7 @@ function validateDomainList($emaildomain) {
 		$domainregexp = getDomainRegExp();
 
 		$domains = explode(";", $emaildomain);
+		$errmsg = "";
 		foreach ($domains as $domain) {
 			if (!preg_match("!^$domainregexp$!", $domain))
 				$errmsg .= $domain . ";";
