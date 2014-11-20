@@ -389,7 +389,6 @@ function validateDomainList($emaildomain) {
 		$domainregexp = getDomainRegExp();
 
 		$domains = explode(";", $emaildomain);
-		$errmsg = "";
 		foreach ($domains as $domain) {
 			if (!preg_match("!^$domainregexp$!", $domain))
 				$errmsg .= $domain . ";";
