@@ -39,6 +39,7 @@ if(!isset($ppNotLoggedIn)){
     	if($result['result'] == ""){
 	    	$_SESSION['portaluser'] = $result['portaluser'];
 			apache_note("CS_USER",urlencode($_SESSION['portaluser']['portaluser.username'])); //for logging
+			instrumentation_add_custom_parameter("portalUsername", $_SESSION['portaluser']['portaluser.username']);
     	} else {
     		redirect("./".$logout);
     	}
@@ -46,6 +47,7 @@ if(!isset($ppNotLoggedIn)){
 
 	if (isset($_SESSION['customerid'])) {		
 		apache_note("CS_CUST",urlencode($_SESSION['customerid'])); //for logging
+		instrumentation_add_custom_parameter("customerId", $_SESSION['customerid']);
 
 		// store the customer's toll free inbound number
 		$n = QuickQuery("select value from setting where name='inboundnumber'");

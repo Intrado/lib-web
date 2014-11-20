@@ -36,6 +36,8 @@ if (! defined('PHPUNIT')) {
 	apache_note("CS_APP","cs"); //for logging
 	apache_note("CS_CUST",urlencode($CUSTOMERURL)); //for logging
 
+	instrumentation_add_custom_parameter("customerShortName", $CUSTOMERURL);
+
 	// Start up the memcache interface
 	init_memcache();
 }
@@ -74,6 +76,8 @@ if ((! defined('PHPUNIT')) && (!isset($isindexpage) || !$isindexpage)) {
 		$USER->optionsarray = false; /* will be reconstructed if needed */
 		
 		apache_note("CS_USER",urlencode($USER->login)); //for logging
+		instrumentation_add_custom_parameter("userLogin", $USER->login);
+		instrumentation_add_custom_parameter("customerUser", $CUSTOMERURL . ":" . $USER->login);
 
 		$ACCESS = &$_SESSION['access'];
 		$ACCESS->loadPermissions(true);
