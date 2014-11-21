@@ -41,7 +41,7 @@ function instrumentation_notice_error ($message, $exception=null) {
 	}
 }
 
-funciton instrumentation_name_transaction ($name) {
+function instrumentation_name_transaction ($name) {
 	if (extension_loaded ('newrelic')) {
 		newrelic_name_transaction($name);
 	}
