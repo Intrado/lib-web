@@ -30,4 +30,6 @@ tts="10.25.25.66,8080,/tts/ttsserver"
 
 externalcontent=false
 
+[newrelic]
+appname=sandbox/kona/cm
 ;*/?>

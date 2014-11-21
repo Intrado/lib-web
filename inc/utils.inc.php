@@ -41,6 +41,12 @@ function instrumentation_notice_error ($message, $exception=null) {
 	}
 }
 
+function instrumentation_name_transaction ($name) {
+	if (extension_loaded ('newrelic')) {
+		newrelic_name_transaction($name);
+	}
+}
+
 //quick utf8 aware replacement for htmlentities
 function escapehtml($var) {
 	return htmlentities($var, ENT_COMPAT, 'UTF-8') ;
