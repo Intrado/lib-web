@@ -4,6 +4,10 @@ $SETTINGS = parse_ini_file("parentportalsettings.ini.php",true);
 $INBOUND_ACTIVATION = false; // set only when customer allows phone activation (bypass activation codes for contact associations)
 $INBOUND_MSGCALLBACK = false; // set only when customer has callback feature
 
+if (extension_loaded ('newrelic') && isset($SETTINGS['newrelic']['appname']) {
+	newrelic_set_appname($SETTINGS['newrelic']['appname']);
+}
+
 require_once("XML/RPC.php");
 require_once("authportal.inc.php");
 require_once("portalsessionhandler.inc.php");

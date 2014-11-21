@@ -36,7 +36,7 @@ if (! defined('PHPUNIT')) {
 	apache_note("CS_APP","cs"); //for logging
 	apache_note("CS_CUST",urlencode($CUSTOMERURL)); //for logging
 
-	instrumentation_add_custom_parameter("customerShortName", $CUSTOMERURL);
+	instrumentation_add_custom_parameter("customerUrlComponent", $CUSTOMERURL);
 
 	// Start up the memcache interface
 	init_memcache();
