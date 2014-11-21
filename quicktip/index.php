@@ -129,7 +129,7 @@ class TipSubmissionHandler {
 	 * return string a string containing all the <option> elements for a given array of objects
 	 * @return string
 	 */
- 	public function getSelectOptions($arrayOfObjects) {
+ 	public function getSelectOptionsHtml($arrayOfObjects) {
 		$html = '<option value="0">'.escapeHtml('-- Please select one of the following --').'</option>';
 		foreach ($arrayOfObjects as $obj) {
 			$html .= '<option value="'.$obj->id.'">'.escapeHtml($obj->name).'</option>';
