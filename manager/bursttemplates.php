@@ -27,8 +27,8 @@ if (isset($_GET['deleteid'])) {
 // index 1 is burst_template.id
 function fmt_actions($row, $index) {
 	global $currentid;
-	$src =  '<a href="bursttemplateedit.php?cid=' . $currentid . '&id=' . $row[1] . '" title="Edit"><img src="mimg/s-edit.png" border=0></a>&nbsp;' ;
-	$src .=  '<a href="?cid=' . $currentid . '&deleteid=' . $row[1] . '" title="Delete"><img src="mimg/cross.png" border=0></a>&nbsp;' ;
+	$src =  '<a href="bursttemplateedit.php?cid=' . $currentid . '&id=' . $row[4] . '" title="Edit"><img src="mimg/s-edit.png" border=0></a>&nbsp;' ;
+	$src .=  '<a href="?cid=' . $currentid . '&deleteid=' . $row[4] . '" title="Delete"><img src="mimg/cross.png" border=0></a>&nbsp;' ;
 	return $src;
 }
 
@@ -45,13 +45,13 @@ echo "<div style='padding:10px'>" . icon_button("Add PDF Template", "add",false,
 <table class="list sortable" id="customer_templates_table">
 <?
 	$templates = array();
-	$result = Query("select name, id from bursttemplate where not deleted order by name", $custdb);
+	$result = Query("select name, x, y, identifiertextpattern, id from bursttemplate where not deleted order by name", $custdb);
 	if (is_object($result)) {
 		while ($row = DBGetRow($result)) {
 			$templates[] = $row;
 		}
 	}
-	$titles = array('PDF Template', 'actions' => 'Actions');
+	$titles = array('PDF Template', 'X', 'Y', 'Pattern', 'actions' => 'Actions');
 	$formatters = array("actions" => "fmt_actions");
 
 	showTable($templates, $titles, $formatters);
