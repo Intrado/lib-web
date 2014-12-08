@@ -14,6 +14,7 @@ $error = 0;
 $notifyemailCheckbox = 0;
 $notifysmsCheckbox = 0;
 
+instrumentation_add_custom_parameter("action", "error");
 if(CheckFormSubmit($f,$s))
 {
 	//check to see if formdata is valid
@@ -52,13 +53,15 @@ if(CheckFormSubmit($f,$s))
 
 			$preferences = $_SESSION['portaluser']['portaluser.preferences'];
 			portalUpdateUserPreferences($notifyemail, $notifysms, $preferences);
-			
+			instrumentation_add_custom_parameter("action", "save");
+
 			if (!$error) {
 				redirect("start.php");
 			}
 		}
 	}
 } else {
+	instrumentation_add_custom_parameter("action", "load");
 	$reloadform = 1;
 }
 

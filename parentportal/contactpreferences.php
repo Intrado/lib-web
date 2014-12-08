@@ -107,7 +107,7 @@ if($PERSONID){
 		$s = "main";
 		$reloadform = 0;
 
-
+		instrumentation_add_custom_parameter("action", "error");
 		if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "all"))
 		{
 			//check to see if formdata is valid
@@ -127,9 +127,11 @@ if($PERSONID){
 					if ($error = checkPriorityPhone($f, $s, $phones)) {
 						error(_L("You must have at least one phone number that can receive calls for these job types: ") . implode(", ", $error));
 					} else {
+						instrumentation_add_custom_parameter("action", "save");
 						getsetContactFormData($f, $s, $PERSONID, $phones, $emails, $smses, $jobtypes, $locked);
 
 						if(GetFormData($f, $s, "savetoall")){
+							instrumentation_add_custom_parameter("action", "savetoall");
 							//Fetch all person id's associated with this user on this customer
 							//then remove the current person id from the list
 							$otherContacts = getContactIDs($_SESSION['portaluserid']);
@@ -141,6 +143,7 @@ if($PERSONID){
 				}
 			}
 		} else {
+			instrumentation_add_custom_parameter("action", "load");
 			$reloadform = 1;
 		}
 

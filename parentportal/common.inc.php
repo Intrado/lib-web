@@ -44,6 +44,8 @@ if(!isset($ppNotLoggedIn)){
 	    	$_SESSION['portaluser'] = $result['portaluser'];
 			apache_note("CS_USER",urlencode($_SESSION['portaluser']['portaluser.username'])); //for logging
 			instrumentation_add_custom_parameter("portalUsername", $_SESSION['portaluser']['portaluser.username']);
+			instrumentation_add_custom_parameter("portalUserId", $_SESSION['portaluserid']);
+			instrumentation_add_custom_parameter("userSession", hash("sha256", session_id() . $_SESSION['portaluserid']));
     	} else {
     		redirect("./".$logout);
     	}
@@ -66,6 +68,8 @@ if(!isset($ppNotLoggedIn)){
  	    	if ($n != false && $n != "")
     			$INBOUND_MSGCALLBACK = $n;
 	    }
+	    instrumentation_add_custom_parameter("inboundActivation", $INBOUND_ACTIVATION ? "yes":"no");
+	    instrumentation_add_custom_parameter("inboundMsgCallback", $INBOUND_MSGCALLBACK ? "yes":"no");
     }
 } else {
 	// we are not logged in
@@ -73,6 +77,7 @@ if(!isset($ppNotLoggedIn)){
 
 // load customer/user locale 
 require_once("../inc/locale.inc.php");
+instrumentation_add_custom_parameter("locale", $LOCALE);
 
 /*
  * return string to append on url redirects, may contain the customerurl option

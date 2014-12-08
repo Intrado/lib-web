@@ -5,16 +5,17 @@ require_once("../inc/form.inc.php");
 require_once("../inc/table.inc.php");
 
 // if not authorized, redirect
-if (!$INBOUND_ACTIVATION)
+if (!$INBOUND_ACTIVATION) {
+	instrumentation_add_custom_parameter("action", "noChoiceCode");
 	redirect("addcontact1.php");
-
+}
 $_SESSION['phoneactivationpkeylist'] = array(); // clear out any previous pkeys
 
 $f="addstudent";
 $s="main";
 $reloadform = 0;
 
-
+instrumentation_add_custom_parameter("action", "error");
 if(CheckFormSubmit($f,$s))
 {
 	//check to see if formdata is valid
@@ -36,14 +37,17 @@ if(CheckFormSubmit($f,$s))
 
 			// by phone
 			if (GetFormData($f, $s, "radioselect") == "byphone") {
+				instrumentation_add_custom_parameter("action", "chosePhone");
 				redirect("phoneactivation1.php");
 			} else {
 				// by code
+				instrumentation_add_custom_parameter("action", "choseCode");
 				redirect("addcontact1.php");
 			}
 		}
 	}
 } else {
+	instrumentation_add_custom_parameter("action", "load");
 	$reloadform = 1;
 }
 
