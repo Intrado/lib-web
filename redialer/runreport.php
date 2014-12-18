@@ -48,6 +48,7 @@ require_once("../obj/JobSummaryReport.obj.php");
 require_once("../obj/JobDetailReport.obj.php");
 require_once("../obj/CallsReport.obj.php");
 require_once("../obj/ContactChangeReport.obj.php");
+require_once("../obj/SmsOptinReport.obj.php");
 require_once("../obj/Person.obj.php");
 require_once("../obj/Phone.obj.php");
 require_once("../obj/Email.obj.php");
@@ -87,6 +88,9 @@ if($type == "subscription"){
 
 		case 'contactchangereport':
 			$generator = new ContactChangeReport();
+			break;
+		case 'smsoptin':
+			$generator = new SmsOptinReport();
 			break;
 		case 'contacthistory':
 			$generator = new CallsReport();

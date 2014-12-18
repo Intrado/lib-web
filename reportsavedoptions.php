@@ -47,6 +47,8 @@ function runReport($subscription){
 			redirect("reportcallsperson.php?reportid=$subscription->id");
 		case "contactchangereport":
 			redirect("reportcontactchangesummary.php?reportid=$subscription->id");
+		case "smsoptin":
+			redirect("reportsmsoptin.php?reportid=$subscription->id");
 	}
 }
 
@@ -68,7 +70,8 @@ function editReport($subscription){
 			redirect("reportcallssearch.php?reportid=$subscription->id");
 		case "contactchangereport":
 			redirect("reportcontactchange.php?reportid=$subscription->id");
-
+		case "smsoptin":
+			redirect("reportsmsoptin.php?reportid=$subscription->id");
 	}
 }
 
