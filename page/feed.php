@@ -49,7 +49,10 @@ apache_note("CS_CUST",urlencode($customer)); //for logging
 
 // call appserver
 // echo the xml doc, http error codes handled within method
-header ("Content-Type:text/xml");
+header("Content-Type:text/xml");
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Max-Age: 86400");
+
 echo generateFeed($customer, $categories, $maxPost, $maxDays);
 
 
