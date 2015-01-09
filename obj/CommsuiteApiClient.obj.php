@@ -2,6 +2,7 @@
 
 class CommsuiteApiClient {
 
+	const API_SMSSTATUS = '/smsstatus';
 	const API_BURSTS = '/bursts';
 	const API_PROFILES = '/profiles';
 	const API_GUARDIAN_CATEGORIES = '/settings/guardiancategories';
@@ -294,6 +295,20 @@ class CommsuiteApiClient {
 		$res = $this->apiClient->put("/settings/features/$featureName", $newStateData);
 		return($res['code'] == 200 ? true : false);
 	}
+	
+	// ---------------------------------------------------------------------
+	// Reports
+	// ---------------------------------------------------------------------
+	
+	public function getSmsStatusReport($start = null, $limit = null) {
+		$querystring = '?';
+		if ($start) $querystring .= '&start=' . intval($start);
+		if ($limit) $querystring .= '&limit=' . intval($limit);
+
+		$res = $this->apiClient->get(self::API_SMSSTATUS . "/{$querystring}");
+		return($res['code'] == 200 ? json_decode($res['body']) : false);
+	}
+
 }
 
 ?>
