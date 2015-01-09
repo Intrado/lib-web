@@ -13,39 +13,39 @@ class SmsOptinReport extends ReportGenerator {
 	}
 
 	function runHtml(){
+		global $csApi;
 		$max = 100;
-		$query = $this->query;
-
-		$pagestart = isset($this->params['pagestart']) ? $this->params['pagestart'] : 0;
-		$query .= "limit $pagestart, $max";
-
-		$result = Query($query, $this->_readonlyDB);
-		$total = QuickQuery("select found_rows()", $this->_readonlyDB);
+		$apiResponse = $csApi->getSmsStatusReport($pagestart, $max);
+		$total = $apiResponse->paging->total;
 		
 		// fill data array from query
 		$data = array(); // array of rows with these columns
 			// 0 = sms
 			// 1 = status
-			// 2 = date
-			// 3 = notes
-		$data[] = array("8005551212", "pending", "date", "notes hello");
+			// 2 = scope local vs global
+			// 3 = date
+			// 4 = notes
+		foreach ($apiResponse->smsStatus as $row) {
+			$data[] = array($row->sms, $row->status, $row->scope, $row->lastUpdateMs, $row->notes);
+		}
 
 		//Display Formatter
-		// index 2 should be the lastupdate date
+		// index 3 should be the lastupdate date
 		function fmt_lastupdate_date($row, $index) {
-			return $row[2];
+			return $row[3];
 		}
 		
 		//TODO formatters
 		
 		$titles = array("0" => "SMS",
 						"1" => "Status",
-						"2" => "Last Update",
-						"3" => "Notes"
+						"2" => "Scope",
+						"3" => "Last Update",
+						"4" => "Notes"
 					);
 
 		$formatters = array("0" => "fmt_phone",
-							"2" => "fmt_lastupdate_date"
+							"3" => "fmt_lastupdate_date"
 					);
 		
 		///////////////
@@ -55,7 +55,7 @@ class SmsOptinReport extends ReportGenerator {
 		?>
 			<table width="100%" cellpadding="3" cellspacing="1" class="list" id="searchresults">
 		<?
-			showTable($data, $titles, $formatters, array("5", "6", "9"), 0);
+			showTable($data, $titles, $formatters);
 		?>
 			</table>
 			<script type="text/javascript">
