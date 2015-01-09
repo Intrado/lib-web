@@ -6,8 +6,7 @@ class SmsOptinReport extends ReportGenerator {
 		$hassms = getSystemSetting("_hassms", false);
 
 		$this->params = $this->reportinstance->getParameters();
-		$this->reporttype = $this->params['reporttype'];
-
+		//$this->reporttype = $this->params['reporttype'];
 		
 		$this->query = "select 1"; // TODO call API
 	}
@@ -15,6 +14,8 @@ class SmsOptinReport extends ReportGenerator {
 	function runHtml(){
 		global $csApi;
 		$max = 100;
+		$pagestart = $this->params['pagestart'];
+		
 		$apiResponse = $csApi->getSmsStatusReport($pagestart, $max);
 		$total = $apiResponse->paging->total;
 		
@@ -32,7 +33,7 @@ class SmsOptinReport extends ReportGenerator {
 		//Display Formatter
 		// index 3 should be the lastupdate date
 		function fmt_lastupdate_date($row, $index) {
-			return $row[3];
+			return date("M j, Y g:i a",$row[$index]/1000);
 		}
 		
 		//TODO formatters
