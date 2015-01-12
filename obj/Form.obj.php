@@ -38,10 +38,17 @@ class Form {
 	}
 
 	function handleRequest($dontexit = false) {
-		if (!isset($_REQUEST['form']) || $_REQUEST['form'] != $this->name)
-			return false; //nothing to do
-
 		$isAjax = isset($_REQUEST['ajax']);
+
+		if ($isApi = isset($_REQUEST['api'])) {
+			// Make form API request "look" like our web form request to leverage downstream functionality...
+			//
+			$_REQUEST['form'] = $this->name;
+		}
+
+		if (!isset($_REQUEST['form']) || $_REQUEST['form'] != $this->name) {
+			return false; //nothing to do
+		}
 
 		//single item ajax validation call
 		if (isset($_REQUEST['ajaxvalidator'])) {
@@ -73,10 +80,71 @@ class Form {
 			}
 		}
 
+		if ($isApi) {
+			// We only support GET/POST actions on API requests...
+			//
+			switch ($_SERVER['REQUEST_METHOD']) {
+				case "POST":
+					// Form POST API call...translate input json to form post variables.
+					//
+					$_POST['submit'] = "submit";
+
+					$payload = json_decode(file_get_contents("php://input"), true);
+
+					foreach ($payload['formData'] as $name => $value) {
+						if ($name == "formsnum") {
+							$_POST[$this->name . "-$name"] = $value;
+						} else {
+							$_POST[$this->name . "_$name"] = $value;
+						}
+					}
+
+					// Hack Alert:
+					//
+					// Forcing the API form request to "look" like ajax.
+					// Need to do this because downstream form scripts (that call us)
+					// will only generate json response for ajax requests.
+					// Yes -- we can certainly update our form scripts to handle API requests properly, but
+					// that would require us to modify 100's of scripts...
+					//
+					$_GET['ajax'] = true;
+
+					break;
+
+				case "GET":
+					// Form GET API call...respond with form data
+					//
+					$result = $this->getFormdata();
+
+					if ($dontexit) {
+						return $result;
+					} else {
+						header("Content-Type: application/json");
+						echo json_encode($result);
+
+						exit();
+					}
+
+					break;
+
+				default:
+					$result = array("status" => "fail", "unsupportedaction" => $_SERVER['REQUEST_METHOD']);
+
+					if ($dontexit) {
+						return $result;
+					} else {
+						header("Content-Type: application/json");
+						echo json_encode($result);
+
+						exit();
+					}
+			}
+		}
+
 		//ajax post form - merge in data, check validation, etc
 		if (isset($_POST['submit'])) {
 			//check the form snum vs loaded formdata
-			if ($isAjax && $this->checkForDataChange()) {
+			if (($isAjax || $isApi) && $this->checkForDataChange()) {
 				$result = array("status" => "fail", "datachange" => true);
 				if ($dontexit) {
 					return $result;
@@ -129,7 +197,7 @@ class Form {
 			$errors = $this->validate();
 
 			//if this is an ajax request, validate now and return json results for the form
-			if ($isAjax && ($errors !== false)) {
+			if (($isAjax || $isApi) && ($errors !== false)) {
 				$result = array("status" => "fail", "validationerrors" => $errors);
 				if ($dontexit) {
 					return $result;
