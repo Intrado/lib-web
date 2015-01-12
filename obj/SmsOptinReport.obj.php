@@ -2,6 +2,9 @@
 
 class SmsOptinReport extends ReportGenerator {
 
+	var $total = 0;
+	var $data = array();
+	
 	function generateQuery($hackPDF = false){
 		$hassms = getSystemSetting("_hassms", false);
 
@@ -10,25 +13,41 @@ class SmsOptinReport extends ReportGenerator {
 		
 		$this->query = "select 1"; // TODO call API
 	}
-
-	function runHtml(){
+	
+	function fetchPage($pagestart, $max) {
 		global $csApi;
-		$max = 100;
-		$pagestart = $this->params['pagestart'];
+		global $total;
+		global $data;
 		
 		$apiResponse = $csApi->getSmsStatusReport($pagestart, $max);
 		$total = $apiResponse->paging->total;
 		
 		// fill data array from query
 		$data = array(); // array of rows with these columns
-			// 0 = sms
-			// 1 = status
-			// 2 = scope local vs global
-			// 3 = date
-			// 4 = notes
+		// 0 = sms
+		// 1 = status
+		// 2 = scope local vs global
+		// 3 = date
+		// 4 = notes
 		foreach ($apiResponse->smsStatus as $row) {
 			$data[] = array($row->sms, $row->status, $row->scope, $row->lastUpdateMs, $row->notes);
 		}
+	}
+	
+	function runHtml() {
+		global $total;
+		global $data;
+		
+		$max = 100;
+		$pagestart = $this->params['pagestart'];
+		$this->fetchPage($pagestart, $max);
+
+		$titles = array("0" => "SMS",
+				"1" => "Status",
+				"2" => "Scope",
+				"3" => "Last Update",
+				"4" => "Notes"
+		);
 
 		//Display Formatter
 		// index 3 should be the lastupdate date
@@ -36,15 +55,6 @@ class SmsOptinReport extends ReportGenerator {
 			return date("M j, Y g:i a",$row[$index]/1000);
 		}
 		
-		//TODO formatters
-		
-		$titles = array("0" => "SMS",
-						"1" => "Status",
-						"2" => "Scope",
-						"3" => "Last Update",
-						"4" => "Notes"
-					);
-
 		$formatters = array("0" => "fmt_phone",
 							"3" => "fmt_lastupdate_date"
 					);
@@ -69,8 +79,6 @@ class SmsOptinReport extends ReportGenerator {
 	}
 
 	function runCSV($options = false){
-		// TODO call API, will it return file or data?
-		
 		if ($options) {
 			$fp = fopen($options['filename'], "w");
 			if (!$fp)
@@ -83,8 +91,7 @@ class SmsOptinReport extends ReportGenerator {
 		}
 		
 		//generate the CSV header
-		$header = '"SMS","Status","Last Update","Notes"';
-
+		$header = '"SMS","Status","Scope","Last Update","Notes"';
 		
 		if ($options) {
 			$ok = fwrite($fp, $header . "\r\n");
@@ -95,13 +102,35 @@ class SmsOptinReport extends ReportGenerator {
 			echo $header;
 			echo "\r\n";
 		}
-
-
-		// batch query by 100 persons, cannot load all 100k into memory
-		$batchsize = 100;
-		$pagestart = 0;
-		$total = 1;
 		
+		//Display Formatter
+		// index 3 should be the lastupdate date
+		function fmt_lastupdate_date($row, $index) {
+			return date("M j, Y g:i a",$row[$index]/1000);
+		}
+
+		// batch api request by 100 smsnumber, cannot load all 100k into memory
+		global $total;
+		global $data;
+		
+		$max = 100;
+		$pagestart = $this->params['pagestart'];
+		do {
+			$this->fetchPage($pagestart, $max);
+			foreach ($data as $row) {
+				$row[0] = fmt_phone($row, 0);
+				$row[3] = fmt_lastupdate_date($row, 3);
+				if ($options) {
+					$ok = fwrite($fp, '"' . implode('","', $row) . '"' . "\r\n");
+					if (!$ok)
+						return false;
+				} else {
+					echo '"' . implode('","', $row) . '"' . "\r\n";
+				}
+			}
+			$pagestart += $max;
+		} while ($pagestart < $total);
+
 		if ($options) {
 			return fclose($fp);
 		}
