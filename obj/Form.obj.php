@@ -38,17 +38,12 @@ class Form {
 	}
 
 	function handleRequest($dontexit = false) {
-		$isAjax = isset($_REQUEST['ajax']);
-
-		if ($isApi = isset($_REQUEST['api'])) {
-			// Make form API request "look" like our web form request to leverage downstream functionality...
-			//
-			$_REQUEST['form'] = $this->name;
-		}
-
 		if (!isset($_REQUEST['form']) || $_REQUEST['form'] != $this->name) {
 			return false; //nothing to do
 		}
+
+		$isAjax = isset($_REQUEST['ajax']);
+		$isApi = isset($_REQUEST['api']);
 
 		//single item ajax validation call
 		if (isset($_REQUEST['ajaxvalidator'])) {
@@ -87,8 +82,6 @@ class Form {
 				case "POST":
 					// Form POST API call...translate input json to form post variables.
 					//
-					$_POST['submit'] = "submit";
-
 					$payload = json_decode(file_get_contents("php://input"), true);
 
 					foreach ($payload['formData'] as $name => $value) {
@@ -101,12 +94,13 @@ class Form {
 
 					// Hack Alert:
 					//
-					// Forcing the API form request to "look" like ajax.
+					// Forcing request to "look" like ajax submit.
 					// Need to do this because downstream form scripts (that call us)
 					// will only generate json response for ajax requests.
 					// Yes -- we can certainly update our form scripts to handle API requests properly, but
 					// that would require us to modify 100's of scripts...
 					//
+					$_POST['submit'] = (isset($_GET['submit']) ? $_GET['submit'] : "submit");
 					$_GET['ajax'] = true;
 
 					break;
@@ -114,30 +108,30 @@ class Form {
 				case "GET":
 					// Form GET API call...respond with form data
 					//
-					$result = $this->getFormdata();
+					$formData = array();
 
-					if ($dontexit) {
-						return $result;
-					} else {
-						header("Content-Type: application/json");
-						echo json_encode($result);
+					foreach ($this->getFormdata() as $key => $value) {
+						if (is_array($value)) {
+							$formData[$key] = array();
 
-						exit();
+							$formData[$key]['value'] = $value['value'];
+							$formData[$key]['label'] = $value['label'];
+							$formData[$key]['validators'] = $value['validators'];
+						}
 					}
 
-					break;
+					header("Content-Type: application/json");
+					echo json_encode(array("formData" => $formData));
+
+					exit();
 
 				default:
 					$result = array("status" => "fail", "unsupportedaction" => $_SERVER['REQUEST_METHOD']);
 
-					if ($dontexit) {
-						return $result;
-					} else {
-						header("Content-Type: application/json");
-						echo json_encode($result);
+					header("Content-Type: application/json");
+					echo json_encode($result);
 
-						exit();
-					}
+					exit();
 			}
 		}
 
