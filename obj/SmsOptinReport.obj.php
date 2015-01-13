@@ -42,20 +42,40 @@ class SmsOptinReport extends ReportGenerator {
 		$pagestart = $this->params['pagestart'];
 		$this->fetchPage($pagestart, $max);
 
-		$titles = array("0" => "SMS",
+		$titles = array("0" => "Phone Number",
 				"1" => "Status",
-				"2" => "Scope",
-				"3" => "Last Update",
+				"2" => "Modified By",
+				"3" => "Modified Date",
 				"4" => "Notes"
 		);
 
-		//Display Formatter
-		// index 3 should be the lastupdate date
+		//Display Formatters
 		function fmt_lastupdate_date($row, $index) {
-			return date("M j, Y g:i a",$row[$index]/1000);
+			return date("M j, Y g:i a", $row[$index]/1000);
+		}
+		
+		function fmt_modifiedby($row, $index) {
+			if ($row[$index] === "global")
+				return "System";
+			else
+				return $row[$index];
+		}
+		
+		function fmt_smsstatus($row, $index) {
+			switch ($row[$index]) {
+				case "new":
+				case "pendingoptin":
+					return "Pending Opt-In";
+				case "block":
+					return "Blocked";
+				case "optin":
+					return "Opted In";
+			}
 		}
 		
 		$formatters = array("0" => "fmt_phone",
+							"1" => "fmt_smsstatus",
+							"2" => "fmt_modifiedby",
 							"3" => "fmt_lastupdate_date"
 					);
 		
@@ -91,7 +111,7 @@ class SmsOptinReport extends ReportGenerator {
 		}
 		
 		//generate the CSV header
-		$header = '"SMS","Status","Scope","Last Update","Notes"';
+		$header = '"Phone Number","Status","Modified By","Modified Date","Notes"';
 		
 		if ($options) {
 			$ok = fwrite($fp, $header . "\r\n");
@@ -104,9 +124,27 @@ class SmsOptinReport extends ReportGenerator {
 		}
 		
 		//Display Formatter
-		// index 3 should be the lastupdate date
 		function fmt_lastupdate_date($row, $index) {
-			return date("M j, Y g:i a",$row[$index]/1000);
+			return date("M j, Y g:i a", $row[$index]/1000);
+		}
+		
+		function fmt_modifiedby($row, $index) {
+			if ($row[$index] === "global")
+				return "System";
+			else
+				return $row[$index];
+		}
+		
+		function fmt_smsstatus($row, $index) {
+			switch ($row[$index]) {
+				case "new":
+				case "pendingoptin":
+					return "Pending Opt-In";
+				case "block":
+					return "Blocked";
+				case "optin":
+					return "Opted In";
+			}
 		}
 
 		// batch api request by 100 smsnumber, cannot load all 100k into memory
@@ -119,7 +157,9 @@ class SmsOptinReport extends ReportGenerator {
 			$this->fetchPage($pagestart, $max);
 			foreach ($data as $row) {
 				$row[0] = fmt_phone($row, 0);
-				$row[3] = fmt_lastupdate_date($row, 3);
+				$row[1] = fmt_smsstatus($row, 1);
+				$row[2] = fmt_modifiedby($row, 2);
+ 				$row[3] = fmt_lastupdate_date($row, 3);
 				if ($options) {
 					$ok = fwrite($fp, '"' . implode('","', $row) . '"' . "\r\n");
 					if (!$ok)
