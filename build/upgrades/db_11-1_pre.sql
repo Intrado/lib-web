@@ -14,3 +14,9 @@ $$$
 -- $rev 2
 
 -- no schema just update _hasinfocenter settings
+
+-- $rev 3
+
+-- no schema, disable all _hasinfocenter (keeping _hasicplus)
+-- manual process by support to enable infocenter and guardian data for our customers
+
