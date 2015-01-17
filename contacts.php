@@ -105,6 +105,11 @@ include_once("nav.inc.php");
 			$('listsearch_ruledata').value = Object.toJSON(event.memo.ruledata);
 			form_submit(event, 'addrule');
 		}
+		
+		function rulewidget_update_rule(event) {
+			$('listsearch_ruledata').value = Object.toJSON(event.memo.ruledata);
+			form_submit(event, 'updaterule');
+		}
 
 		function rulewidget_delete_rule(event) {
 			$('listsearch_ruledata').value = event.memo.fieldnum;
@@ -115,6 +120,7 @@ include_once("nav.inc.php");
 			if (window.ruleWidget) {
 				ruleWidget.delayActions = true;
 				ruleWidget.container.observe('RuleWidget:AddRule', rulewidget_add_rule);
+				ruleWidget.container.observe('RuleWidget:UpdateRule', rulewidget_update_rule);
 				ruleWidget.container.observe('RuleWidget:DeleteRule', rulewidget_delete_rule);
 			}
 		});

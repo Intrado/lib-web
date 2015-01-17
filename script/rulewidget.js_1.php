@@ -14,7 +14,6 @@ header("Cache-Control: private");
 //ruleWidget.container.observe('RuleWidget:Ready',..);
 //ruleWidget.container.observe('RuleWidget:DeleteRule',..);
 //ruleWidget.container.observe('RuleWidget:AddRule',..);
-//ruleWidget.container.observe('RuleWidget:UpdateRule',..); //currently behaves as AddRule
 //ruleWidget.container.observe('RuleWidget:InColumn',..);
 //ruleWidget.container.observe('RuleWidget:ChangeField',..);
 //ruleWidget.container.observe('RuleWidget:RemoveAllRules',..);
@@ -409,12 +408,6 @@ var RuleWidget = Class.create({
 
 	// @param data, {fieldnum, type, logical, op, val}
 	insert_rule: function(data, suppressFire) {
-		var labels = {
-			'delete':"<?=addslashes(icon_button(_L('Delete'), 'diagona/10/101'))?>",
-			'edit':"<?=addslashes(icon_button(_L('Edit'), 'diagona/10/018'))?>",
-			'update':"<?=addslashes(icon_button(_L('Update'), 'diagona/10/102'))?>",
-			'cancel':"<?=addslashes(icon_button(_L('Cancel'), 'diagona/10/101'))?>"
-		};
 		var needWarning = false;
 		if (!data)
 			needWarning = true;
@@ -442,8 +435,10 @@ var RuleWidget = Class.create({
 		if (!this.delayActions || suppressFire) {
 			// Actions
 			if (this.ruleEditor) {
-				var actionTD = new Element('td').update('<div>' + labels['delete']);
-				var actionEditTD = this.create_edit_action(data, tr, labels);
+				var actionTD = new Element('td').update(
+					'<div><?=addslashes(icon_button(_L('Remove'), 'diagona/10/101'))?>'
+				);
+				
 				// Observe clicks on the "Remove" button.
 				actionTD.down('button').observe('click', function(event, tr, fieldnum) {
 					event.stop();
@@ -455,18 +450,29 @@ var RuleWidget = Class.create({
 						if (this.ruleEditor)
 							this.ruleEditor.reset();
 					}
-
+					
 					this.refresh_guide(true);
 					
 					this.container.fire('RuleWidget:DeleteRule', {'fieldnum':fieldnum});
 				}.bindAsEventListener(this, tr, data.fieldnum));
-
-				tr.insert(actionEditTD);
+				
 				tr.insert(actionTD);
 			}
 			
 			this.rulesTableBody.insert(tr);
-			this.convert_values(data);
+			
+			// If this is an association, we want to convert data.val into an array of IDs if it is currently an object of value:title pairs.
+			// This is so the validator does not need to worry about whether data.val is an array or an object of value:title pairs.
+			if (data.type == 'association' && typeof(data.val.join) == "undefined") {
+				var ids = [];
+				
+				for (var id in data.val) {
+					ids.push(id);
+				}
+				
+				data.val = ids;
+			}
+			
 			this.appliedRules[data.fieldnum] = data;
 			
 			this.refresh_rules_table();
@@ -483,65 +489,7 @@ var RuleWidget = Class.create({
 		
 		return true;
 	},
-	create_edit_action: function (data, tr, labels) {
-		var ruleTable = this.rulesTableBody;
-		function disableEdit(disable){
-			ruleTable.select('.edit-button button').each(function(b){
-				if(disable)
-					b.disable();
-				else
-					b.enable();
-			});
-		}
-		var actionEditTD = new Element('td').update('<div class="edit-button">' + labels['edit']);
-		// Observe clicks on the "Remove" button.
-		actionEditTD.down('button').observe('click', function (event, tr, fieldnum, type) {
-			event.stop();
-			var rowElements = tr.childElements();
-			var selectedOptions = (type == 'multisearch' && !Array.isArray(data.val)) ? data.val.split('|') : data.val;
-			var container = this.ruleEditor.create_rule_section(fieldnum, type, data.op, selectedOptions);
-			var readableValues = rowElements[3].clone(true);
-			rowElements[3].replace(container);
-			var updateTD = new Element('td').update('<div class="update-button">' + labels['update']);
-			var cancelTD = new Element('td').update('<div class="cancel-button">' + labels['cancel']);
 
-			rowElements[4].replace(updateTD);
-			tr.insert(cancelTD);
-			disableEdit(true);
-			updateTD.down('button').observe('click', function (event) {
-				event.stop();
-				var vals = this.ruleEditor.get_values(type, container);
-				data.val = vals;
-				this.convert_values(data);
-				container.fire('RuleWidget:UpdateRule', {
-					'ruledata': $H(data)
-				});
-			}.bindAsEventListener(this));
-
-			cancelTD.down('button').observe('click', function (event) {
-				event.stop();
-				var rowElements = tr.childElements();
-				rowElements[4].replace(actionEditTD);
-				rowElements[3].replace(readableValues);
-				cancelTD.remove();
-				disableEdit(false);
-			}.bindAsEventListener(this));
-
-		}.bindAsEventListener(this, tr, data.fieldnum, data.type));
-
-		return actionEditTD;
-	},
-	convert_values: function (data) {
-		// If this is an association, we want to convert data.val into an array of IDs if it is currently an object of value:title pairs.
-		// This is so the validator does not need to worry about whether data.val is an array or an object of value:title pairs.
-		if (data.type == 'association' && typeof(data.val.join) == "undefined") {
-			var ids = [];
-			for (var id in data.val) {
-				ids.push(id);
-			}
-			data.val = ids;
-		}
-	},
 	// Returns json-encoded array of rules.
 	// Example: [{fieldnum:"f01", type:"text", logical:"and", op:"eq", val:"Kee-Yip"}]
 	toJSON: function(data) {
@@ -551,11 +499,6 @@ var RuleWidget = Class.create({
 });
 
 var RuleEditor = Class.create({
-
-	labels: {
-		'and':'<?=addslashes(_L("and"))?>',
-		'notfound':'<?=addslashes(_L("No data found"))?>'
-	},
 	//----------------------------- PUBLIC FUNCTIONS --------------------------
 
 	// @param ruleWidget, the parent RuleWidget.
@@ -644,44 +587,35 @@ var RuleEditor = Class.create({
 		} else { // association
 			var op = 'in';
 		}
-		var val = this.get_values(fieldmap.type, this.valueTD);
-		return {'fieldnum':fieldmap.fieldnum,
-			'type':fieldmap.type,
-			'logical':logical,
-			'op':op,
-			'val':val
-		};
-	},
-	get_values: function (type, valueTD) {
+		
 		var val = [];
-
 		// MULTISEARCH or association
-		if (type == 'multisearch' || type == 'association') {
+		if (fieldmap.type == 'multisearch' || fieldmap.type == 'association') {
 			var multisearchValues = [];
-			if (valueTD.down('input')) {
-				var checkboxes = valueTD.select('input:checked');
+			if (this.valueTD.down('input')) {
+				var checkboxes = this.valueTD.select('input:checked');
 				var count = checkboxes.length;
 				for (var i = 0; i < count; ++i) {
 					var checkbox = checkboxes[i];
 					multisearchValues.push(checkbox.value);
 				}
 			} else {
-				var select = valueTD.down('select');
+				var select = this.valueTD.down('select');
 				if (select)
 					multisearchValues.push(select.getValue());
 			}
 			val = multisearchValues;
 		} else {
 			// RELDATE_RELDATE
-			if (valueTD.down('input[type="radio"]')) {
-				var radio = valueTD.down('input:checked');
+			if (this.valueTD.down('input[type="radio"]')) {
+				var radio = this.valueTD.down('input:checked');
 				if (radio)
 					val = radio.getValue();
 				else
 					val = '';
 			} else {
 				// TEXT, NUMERIC, RELDATE_*
-				var inputs = valueTD.select('input');
+				var inputs = this.valueTD.select('input');
 				if (inputs.length == 1) {
 					val = inputs[0].getValue().strip();
 				} else if (inputs.length > 1) {
@@ -690,7 +624,13 @@ var RuleEditor = Class.create({
 				}
 			}
 		}
-		return val;
+
+		return {'fieldnum':fieldmap.fieldnum,
+			'type':fieldmap.type,
+			'logical':logical,
+			'op':op,
+			'val':val
+		};
 	},
 
 	//----------------------------- PRIVATE FUNCTIONS --------------------------
@@ -770,91 +710,81 @@ var RuleEditor = Class.create({
 		}
 
 		this.ruleWidget.container.style.width = 'auto';
-		var container = this.create_rule_section(fieldnum, type, op, null);
-		this.show_action_column()
-		section.update(container);
-
-		this.valueTD.down('span').show().observe('click', this.trigger_event_in_column.bindAsEventListener(this, this.valueTD));
-	},
-	create_rule_section: function (fieldnum, type, op, selectedOptions) {
-		var container = new Element('div'),
-			selectedValue = selectedOptions === null ? '' : selectedOptions, //current selected value
-			vals = selectedValue.indexOf('|') > -1 ? selectedValue.split("|") : ['', '']; //for range values
-
-		switch (type) {
+		var container = new Element('div');
+		switch(type) {
 			case 'association':
-			// fall through, shares cache and ajax call with multisearch
+				// fall through, shares cache and ajax call with multisearch
 			case 'multisearch':
-				container.setStyle({'border': 'solid 1px gray', 'background': 'white', 'padding': '2px'});
+				container.setStyle({'border': 'solid 1px gray', 'background': 'white', 'padding':'2px'});
 				container.update('<img src="img/ajax-loader.gif"/>');
 				if (this.ruleWidget.multisearchDomCache[fieldnum]) {
 					container.update(this.ruleWidget.multisearchDomCache[fieldnum]);
 					this.add_multicheckbox_toolbar(container);
+					this.show_action_column();
 				} else {
-					var data = this.fetch_field_data(fieldnum, null);
-					if (!data) {
-						container.insert('<div>' + this.labels['notfound'] + '</div>');
-						return;
-					}
+					new Ajax.Request('ajax.php?type=getdatavalues&fieldnum=' + fieldnum, {
+						onSuccess: function(transport, fieldnum, type) {
+							var section = this.valueTD.down('fieldset').down('div');
+							var data = transport.responseJSON;
+							if (!data) {
+								container.update('<?=addslashes(_L("No data found"))?>');
+								return;
+							}
+							
+							if (type == 'association')
+								this.ruleWidget.associationTitles[fieldnum] = data;
+							
+							var multicheckboxDom = this.make_multicheckbox(data);
+							container.update(multicheckboxDom);
+							this.ruleWidget.multisearchDomCache[fieldnum] = container.innerHTML;
+							var tempdiv = new Element('div').insert(this.add_multicheckbox_toolbar(container));
+							section.update(container);
+							this.show_action_column();
 
-					if (type == 'association')
-						this.ruleWidget.associationTitles[fieldnum] = data;
-
-					var multicheckboxDom = this.make_multicheckbox(data, selectedOptions);
-					container.update(multicheckboxDom);
-					this.ruleWidget.multisearchDomCache[fieldnum] = container.innerHTML;
-					this.add_multicheckbox_toolbar(container);
+						}.bindAsEventListener(this, fieldnum, type)
+					});
 				}
+
 				break;
+
 			case 'numeric':
+				container.update(this.make_textbox('',true));
 				if (op == 'num_range') {
-					container.update(this.make_textbox(vals[0], true));
-					container.insert('<div>' + this.labels['and'] + '</div>');
-					container.insert(this.make_textbox(vals[1], true));
-				} else {
-					container.update(this.make_textbox(selectedValue, true));
+					container.insert('<div><?=addslashes(_L('and'))?></div>');
+					container.insert(this.make_textbox('',true));
 				}
+				this.show_action_column();
 				break;
+
 			case 'reldate':
 				if (op == 'reldate') {
-					var selectbox = this.make_radioboxes(this.ruleWidget.reldateOptions, false, selectedValue);
+					var selectbox = this.make_radioboxes(this.ruleWidget.reldateOptions);
 					container.update(selectbox);
 				} else if (op == 'eq' || op == 'date_range') {
+					container.update(this.make_datebox(''));
 					if (op == 'date_range') {
-						container.update(this.make_datebox(vals[0]));
-						container.insert('<div>' + this.labels['and'] + '</div>');
-						container.insert(this.make_datebox(vals[1]));
-					} else {
-						container.update(this.make_datebox(selectedValue));
+						container.insert('<div><?=addslashes(_L('and'))?></div>');
+						container.insert(this.make_datebox(''));
 					}
 				} else if (op == 'date_offset' || op == 'reldate_range') {
+					container.update(this.make_textbox('',true));
 					if (op == 'reldate_range') {
-						container.update(this.make_textbox(vals[0], true));
-						container.insert('<div>' + this.labels['and'] + '</div>');
-						container.insert(this.make_textbox(vals[1], true));
-					} else {
-						container.update(this.make_textbox(selectedValue, true));
+						container.insert('<div><?=addslashes(_L('and'))?></div>');
+						container.insert(this.make_textbox('',true));
 					}
 				}
+				this.show_action_column();
 				break;
+
 			case 'text':
-				container.update(this.make_textbox(selectedValue));
+				container.update(this.make_textbox(''));
+				this.show_action_column();
 				break;
 		}
-		return container;
-	},
-	fetch_field_data: function (fieldnum, callback) {
-		var results = {};
-		var url = 'ajax.php?type=getdatavalues&fieldnum=' + fieldnum;
-		new Ajax.Request(url, {
-			asynchronous: (callback !== null),
-			onSuccess: function (transport) {
-				results = transport.responseJSON;
-				if (callback)
-					callback(results);
-			}
-		});
-		return results;
+
+		section.update(container);
+
+		this.valueTD.down('span').show().observe('click', this.trigger_event_in_column.bindAsEventListener(this, this.valueTD));
 	},
 
 	show_action_column: function(clear) {
@@ -987,7 +917,7 @@ var RuleEditor = Class.create({
 
 	// NOTE: If you want add a toolbar, do add_multicheckbox_toolbar(new Element('div').update(make_multicheckbox()));
 	// Returns a div element containing the values as checkboxes, or returns a select element with a single option if there's just one value.
-	make_multicheckbox: function(values, selected) {
+	make_multicheckbox: function(values) {
 		var multicheckbox = new Element('ul', {
 			//'style': 'overflow:auto; padding-right: 2em; padding-bottom: 1em',
 			'class': 'MultiCheckbox'
@@ -996,13 +926,7 @@ var RuleEditor = Class.create({
 		//var labelstyle = 'margin:0;padding:1px; font-size:90%;';
 		//var checkboxstyle = 'font-size:90%;';
 		//var divstyle = 'white-space:nowrap;';
-		var selectedValues = {};
-		if(selected){
-			//var vals = selected.split(',');
-			for (var i = 0; i < selected.length; i++) {
-				selectedValues[selected[i]] = true;
-			}
-		}
+		
 		// Determine if values is an array, only support array with object of {value:___,name:___} objcets
 		if (typeof(values.join) != 'undefined') { // values is an array.
 			var max = values.length;
@@ -1014,12 +938,10 @@ var RuleEditor = Class.create({
 						new Element('option', {'value': (typeof(value.value) != 'undefined'?value.value:value)}).update(typeof(value.name) != 'undefined'?value.name:value.escapeHTML())
 					);
 				}
-				var checkboxValue = typeof(value.value) != 'undefined' ? value.value : value;
-				var checked = selectedValues[checkboxValue] === true;
+				
 				var checkbox = new Element('input', {
 					'type': 'checkbox',
-					'checked':checked,
-					'value': checkboxValue
+					'value': typeof(value.value) != 'undefined'?value.value:value
 				});
 				
 				var label = new Element('label', {
@@ -1045,7 +967,7 @@ var RuleEditor = Class.create({
 		return selectbox;
 	},
 
-	make_radioboxes: function(values, hidden, checked) {
+	make_radioboxes: function(values, hidden) {
 		var radioboxDIV = new Element('div');
 		// get the number of possible values
 		var numvals = $H(values).size();
@@ -1055,10 +977,10 @@ var RuleEditor = Class.create({
 			// don't insert a control if there is only one possible value
 			if (numvals > 1) {
 				// create the control with a label
-				var check = checked === i;
-				var radio = new Element('input', {'type':'radio','checked':check, 'name':radioboxDIV.identify(), 'value':i.escapeHTML()});
+				var radio = new Element('input', {'type':'radio', 'name':radioboxDIV.identify(), 'value':i.escapeHTML()});
 				var label = new Element('label', {'style':'font-size:90%', 'for':radio.identify()}).update(values[i].escapeHTML());
-				radioboxDIV.insert(new Element('div', {'style':'white-space:nowrap'}).insert(radio).insert(label));
+				radioboxDIV.insert(
+					new Element('div', {'style':'white-space:nowrap'}).insert(radio).insert(label));
 			// otherwise, just stick the text into the div
 			} else {
 				radioboxDIV.update(values[i].escapeHTML());

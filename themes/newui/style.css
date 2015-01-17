@@ -567,7 +567,7 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
 		 -moz-box-shadow: inset 0px 2px 3px 0px rgba(0,0,0,0.25); 
 	        box-shadow: inset 0px 2px 3px 0px rgba(0,0,0,0.25);  }
 
-.window_panel button[disabled], .window_panel button[disabled]:hover, #send_now_broadcast[disabled], #send_now_broadcast[disbaled]:hover {
+.window_panel button[disabled], .window_panel button[disabled]:hover, #send_now_broadcast[disabled], #send_now_broadcast[disbaled]:hover, .btn:disabled {
   background-color: rgb(100,100,100);
   background-image: -webkit-gradient(linear, left top, left bottom, from(#999), to(#AAA)); 
   background-image: -webkit-linear-gradient(top, #999, #AAA); 

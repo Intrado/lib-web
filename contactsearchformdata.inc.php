@@ -208,7 +208,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		if ($ajax) {
 			switch ($button) {
 				case 'addrule':
-					
+				case 'updaterule':
 					if (!isset($_SESSION['listsearch']['rules']))
 						$_SESSION['listsearch'] = array ('rules' => array());
 					

@@ -387,6 +387,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			if ($ajax) {
 				switch ($button) {
 					case 'addrule':
+					case 'updaterule':
+						$noticemsg = ($button === 'updaterule') ? 'The rule for %s is now updated.' : 'The rule for %s is now added.';
 						if ($method === 'rules') {
 							$ruledata = json_decode($postdata['newrule']);
 							$data = $ruledata[0];
@@ -396,7 +398,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 								$form->sendTo($methodlink);
 								break;
 							}
-						
+
 							if ($data->fieldnum == 'organization') {
 								QuickUpdate('BEGIN');
 									QuickUpdate("DELETE FROM listentry WHERE listid=? AND type='organization'", false, array($list->id));
@@ -410,19 +412,21 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 									}
 								
 								QuickUpdate('COMMIT');
-							
-								notice(_L('The rule for %s is now added.',getSystemSetting("organizationfieldname","Organization")));
+
+								notice(_L($noticemsg, getSystemSetting("organizationfieldname","Organization")));
 							} else {
 								if (!$type = Rule::getType($data->fieldnum)) {
 									notice(_L('There is a problem adding the rule for %s.', escapehtml(FieldMap::getName($data->fieldnum))));
 									$form->sendTo($methodlink);
 									break;
 								}
-							
+
+								//first delete the rule
+								QuickUpdate("DELETE le.*, r.* FROM listentry le, rule r WHERE le.ruleid=r.id AND le.listid=? AND r.fieldnum=?", false, array($list->id, $data->fieldnum));
 								$data->val = prepareRuleVal($type, $data->op, $data->val);
 							
 								if (!$rule = Rule::initFrom($data->fieldnum, $data->logical, $data->op, $data->val)) {
-									notice(_L('There is a problem adding the rule for %s.', escapehtml(FieldMap::getName($data->fieldnum))));
+									notice(_L('There is a problem adding or updating the rule for %s.', escapehtml(FieldMap::getName($data->fieldnum))));
 									$form->sendTo($methodlink);
 									break;
 								}
@@ -435,8 +439,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 									$le->ruleid = $rule->id;
 									$le->create();
 								QuickUpdate('COMMIT');
-							
-								notice(_L('The rule for %s is now added.', escapehtml(FieldMap::getName($data->fieldnum))));
+								notice(_L($noticemsg, escapehtml(FieldMap::getName($data->fieldnum))));
 							}
 						}
 						
@@ -543,6 +546,10 @@ endWindow();
 				$('list_newrule').value = Object.toJSON([event.memo.ruledata]);
 				form_submit(event, 'addrule');
 			}
+			function list_update_rule(event) {
+				$('list_newrule').value = Object.toJSON([event.memo.ruledata]);
+				form_submit(event, 'updaterule');
+			}
 			function list_delete_rule(event) {
 				$('list_ruledelete').value = event.memo.fieldnum;
 				form_submit(event, 'deleterule');
@@ -551,6 +558,7 @@ endWindow();
 				form_submit(event, 'clearrules');
 			}
 			ruleWidget.container.observe('RuleWidget:AddRule', list_add_rule);
+			ruleWidget.container.observe('RuleWidget:UpdateRule', list_update_rule);
 			ruleWidget.container.observe('RuleWidget:DeleteRule', list_delete_rule);
 			ruleWidget.container.observe('RuleWidget:RemoveAllRules', list_clear_rules);
 		}

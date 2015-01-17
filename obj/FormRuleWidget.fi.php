@@ -41,6 +41,7 @@ class FormRuleWidget extends FormItem {
 			
 			ruleWidget.container.observe('RuleWidget:Ready', rulewidget_update_value.bindAsEventListener(ruleWidget));
 			ruleWidget.container.observe('RuleWidget:AddRule', rulewidget_update_value.bindAsEventListener(ruleWidget));
+			ruleWidget.container.observe('RuleWidget:UpdateRule', rulewidget_update_value.bindAsEventListener(ruleWidget));
 			ruleWidget.container.observe('RuleWidget:DeleteRule', rulewidget_update_value.bindAsEventListener(ruleWidget));
 			ruleWidget.container.observe('RuleWidget:RemoveAllRules', function() {
 				this.clear_rules();

@@ -393,7 +393,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 
 		if ($ajax) {
-			if (in_array($button,array('addrule','deleterule','view', 'save'))) {
+			if (in_array($button,array('addrule','updaterule', 'deleterule','view', 'save'))) {
 				// Clear report options except for rules and organizations.
 				if (isset($_SESSION['report']['options']['rules']))
 					$rules = $_SESSION['report']['options']['rules'];
@@ -606,6 +606,7 @@ endWindow();
 			
 			ruleWidget.delayActions = true;
 			ruleWidget.container.observe('RuleWidget:AddRule', rulewidget_add_rule);
+			ruleWidget.container.observe('RuleWidget:UpdateRule', rulewidget_update);
 			ruleWidget.container.observe('RuleWidget:DeleteRule', rulewidget_delete_rule);
 
 			radioselectelem.select('input').invoke('observe', 'click', function(event) {
@@ -670,6 +671,11 @@ endWindow();
 		});
 
 		function rulewidget_add_rule(event) {
+			$('<?=$form->name?>_ruledata').value = Object.toJSON(event.memo.ruledata); 
+			form_submit(event, 'addrule');
+		}
+
+		function rulewidget_update(event) {
 			$('<?=$form->name?>_ruledata').value = Object.toJSON(event.memo.ruledata); 
 			form_submit(event, 'addrule');
 		}
