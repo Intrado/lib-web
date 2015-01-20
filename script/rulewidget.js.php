@@ -413,7 +413,7 @@ var RuleWidget = Class.create({
 			'delete':"<?=addslashes(icon_button(_L('Delete'), 'diagona/10/101'))?>",
 			'edit':"<?=addslashes(icon_button(_L('Edit'), 'diagona/10/018'))?>",
 			'update':"<?=addslashes(icon_button(_L('Update'), 'diagona/10/102'))?>",
-			'cancel':"<?=addslashes(icon_button(_L('Cancel'), 'diagona/10/101'))?>"
+			'cancel':"<?=addslashes(icon_button(_L('Cancel'), 'fugue/slash'))?>"
 		};
 		var needWarning = false;
 		if (!data)
