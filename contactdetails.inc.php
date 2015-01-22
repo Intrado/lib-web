@@ -15,6 +15,7 @@ include_once("obj/Person.obj.php");
 include_once("obj/Address.obj.php");
 include_once("obj/Phone.obj.php");
 include_once("obj/Email.obj.php");
+include_once("obj/Device.obj.php");
 include_once("obj/Language.obj.php");
 include_once("obj/JobType.obj.php");
 include_once("obj/Sms.obj.php");
@@ -170,9 +171,22 @@ if (isset($personid)) {
 		}
 		$types["sms"] = $smses;
 	}
+	
+	if (getSystemSetting("_hasinfocenter", false)) {
+		$devices = array();
+		$devices[0] = new Device();
+		$devices[0]->sequence = 0;
+		$devices[0]->personid = $personid;
+		$devices[0]->uuid = "foobar";
+		$devices[0]->name = "Gretel iPad";
+		$types["device"] = $devices;
+	}
+	
 	$contacttypes = array("phone", "email");
-	if(getSystemSetting("_hassms", false))
+	if (getSystemSetting("_hassms", false))
 		$contacttypes[] = "sms";
+	if (getSystemSetting("_hasinfocenter", false))
+		$contacttypes[] = "device";
 	
 	// check if viewing a guardian
 	if ($data->type == "guardianauto" || $data->type == "guardiancm") {
@@ -266,7 +280,8 @@ if(CheckFormSubmit($f,$s))
 				if ($error) continue;
 				if (!isset($types[$type])) continue;
 				foreach($types[$type] as $item){
-					if(GetFormData($f, $s, "editlock_" . $type . $item->sequence) || $item->editlock != GetFormData($f, $s, "editlock_" . $type . $item->sequence)){
+					// device type does not have editlock
+					if($type != "device" && GetFormData($f, $s, "editlock_" . $type . $item->sequence) || $item->editlock != GetFormData($f, $s, "editlock_" . $type . $item->sequence)){
 						$item->editlock = GetFormData($f, $s, "editlock_" . $type . $item->sequence);
 						if($item->editlock){
 							if($type == "email")
@@ -327,7 +342,8 @@ if( $reloadform )
 				PutFormData($f, $s, $type . $item->sequence, $item->$type, "email");
 			else
 				PutFormData($f, $s, $type . $item->sequence, Phone::format($item->$type), "phone");
-			PutFormData($f, $s, "editlock_" . $type . $item->sequence, $item->editlock, "bool", 0, 1);
+			if ($type != "device")
+				PutFormData($f, $s, "editlock_" . $type . $item->sequence, $item->editlock, "bool", 0, 1);
 			foreach($jobtypes as $jobtype){
 				$contactpref = 0;
 				if(isset($contactprefs[$type][$item->sequence][$jobtype->id]))
@@ -497,14 +513,24 @@ foreach ($fieldmaps as $map) {
 		</tr>
 		<tr class="windowRowHeader">
 			<th align="left">Contact&nbsp;Type</th>
+<?
+			if ($type == 'device') {
+?>
+			<th>&nbsp;&nbsp;</th>
+<?
+			} else {
+?>
 			<th>Override</th>
+<?
+			}
+?>
 			<th align="left">Destination</th>
 <?
 			foreach($jobtypes as $jobtype){
 ?>
 				<th>
 <?
-					if($type=='sms' && $jobtype->issurvey)
+					if(($type=='sms' || $type == 'device') && $jobtype->issurvey)
 						echo "&nbsp;";
 					else
 						echo jobtype_info($jobtype);
@@ -520,8 +546,16 @@ foreach ($fieldmaps as $map) {
 ?>
 			<tr>
 				<td class="bottomBorder"><?= $header ?></td>
-				<td align="center"  class="bottomBorder"><? NewFormItem($f, $s, "editlock_" . $type . $item->sequence, "checkbox", 0, 1, $FORMDISABLE . 'id="editlock_' . $type . $item->sequence . '" onclick="new getObj(\'' . $type . $item->sequence . '\').obj.disabled = !this.checked"'); ?></td>
+<?				// Override checkbox
+				if ($type == "device") {
+?>
+					<td align="center"  class="bottomBorder">&nbsp;</td>
 <?
+				} else {
+?>
+					<td align="center"  class="bottomBorder"><? NewFormItem($f, $s, "editlock_" . $type . $item->sequence, "checkbox", 0, 1, $FORMDISABLE . 'id="editlock_' . $type . $item->sequence . '" onclick="new getObj(\'' . $type . $item->sequence . '\').obj.disabled = !this.checked"'); ?></td>
+<?				}
+				// Destination field
 				$disabled = "";
 				if(!$item->editlock)
 					$disabled = " Disabled ";
@@ -532,20 +566,23 @@ foreach ($fieldmaps as $map) {
 						} else {
 							NewFormItem($f, $s, $type . $item->sequence, "text", 30, 100, "id='" . $type . $item->sequence . "'". $disabled);
 						}
+				} else if ($type == "device") {
+						echo $item->name . "&nbsp;";
 				} else {
 						if($FORMDISABLE){
 							echo Phone::format($item->$type) . "&nbsp;";
 						} else {
 							NewFormItem($f, $s, $type . $item->sequence, "text", 14, null, "id='" . $type . $item->sequence . "'". $disabled);
 						}
-
 				}
 				?></td><?
+				// for each jobtype checkbox
 				foreach($jobtypes as $jobtype){
 ?>
 					<td align="center"  class="bottomBorder">
 <?
-						if($type == "sms" && $jobtype->issurvey){
+						if(($type == "sms" || ($type == "device"))
+							 && $jobtype->issurvey){
 							echo "&nbsp;";
 						} else {
 							echo NewFormItem($f, $s, $type . $item->sequence . "jobtype" . $jobtype->id, "checkbox", 0, 1, $FORMDISABLE);
