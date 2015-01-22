@@ -74,19 +74,23 @@ if ($USER->authorize('managesystem')) {
 	$linkLists[] = $jobLinks;
 	$linkLists[] = $labelLinks;
 }
-// features - if contact manager, or subscriber(self-signup), or smartcall appliance, or classroom
+// features - if contact manager, or subscriber(self-signup), or smartcall appliance, or classroom, or infocenter
 if ((getSystemSetting('_hasportal', false) && $USER->authorize('portalaccess') && $USER->authorize('managesystem')) ||
 	(getSystemSetting('_hasselfsignup', false) && ($USER->authorize('metadata') || $USER->authorize('managesystem'))) ||
 	($USER->authorize('managesystem') && getSystemSetting('_dmmethod', "")!='asp') ||
 	($USER->authorize('manageclassroommessaging') && getSystemSetting('_hastargetedmessage')) ||
 	($USER->authorize('managesystem') && getSystemSetting("_hasfacebook")) ||
 	($USER->authorize('managesystem') && getSystemSetting("_hasfeed")) ||
+	($USER->authorize('managesystem') && getSystemSetting("_hasinfocenter")) ||
 	($USER->authorize('managesystem') && getSystemSetting('_hasquicktip', false) && $USER->authorize("tai_canmanagetopics"))) {
 
 	$headers[] = _L("Features");
 	
 	if (getSystemSetting('_hasportal', false) && $USER->authorize('portalaccess') && $USER->authorize('managesystem')) {
 		$featureLinks[] = "<a href='contactmanagersettings.php'>Contact Manager Settings</a>";
+	}
+	if (getSystemSetting('_hasinfocenter', false) && $USER->authorize('managesystem')) {
+		$featureLinks[] = "<a href='infocentersettings.php'>InfoCenter Settings</a>";
 	}
 	if (getSystemSetting('_hasselfsignup', false)) {
 		if ($USER->authorize('managesystem')) {
