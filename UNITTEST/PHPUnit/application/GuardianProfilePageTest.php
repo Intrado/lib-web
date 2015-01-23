@@ -131,13 +131,13 @@ class GuardianProfilePageTest extends PHPUnit_Framework_TestCase {
 		$profile->description = "existing name description";
 		$profile->type = "guardian";
 		$permission1 = new stdClass;
-		$permission1->name = "infocenter";
+		$permission1->name = "icplus";
 		$permission1->value = 1;
 		$permission2 = new stdClass;
 		$permission2->name = "cs";
 		$permission2->value = 0;
 		$profile->permissions = array($permission1, $permission2);
-		$this->assertTrue(1 === $this->profileEditPage->hasPermission($profile, "infocenter"), 'The profile does not have infocenter permission');
+		$this->assertTrue(1 === $this->profileEditPage->hasPermission($profile, "icplus"), 'The profile does not have icplus permission');
 		$this->assertTrue(0 === $this->profileEditPage->hasPermission($profile, "cs"), 'The profile should not have cs permission');
 		$this->assertTrue(0 === $this->profileEditPage->hasPermission($profile, "test", 0), 'The profile should not have test permission');
 	}
@@ -196,7 +196,7 @@ class GuardianProfilePageTest extends PHPUnit_Framework_TestCase {
 		$profile->description = "existing name description";
 		$profile->type = "guardian";
 		$permission = new stdClass;
-		$permission->name = "infocenter";
+		$permission->name = "icplus";
 		$permission->value = 1;
 		$profile->permissions = array($permission);
 
@@ -256,7 +256,7 @@ class GuardianProfilePageTest extends PHPUnit_Framework_TestCase {
 		$profile->description = "existing name description";
 		$profile->type = "guardian";
 		$permission = new stdClass;
-		$permission->name = "infocenter";
+		$permission->name = "icplus";
 		$permission->value = 0;
 		$profile->permissions = array($permission);
 

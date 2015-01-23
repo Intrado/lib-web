@@ -141,7 +141,7 @@ class GuardianCategoryEditPageTest extends PHPUnit_Framework_TestCase {
 		$profile->description = "existing name description";
 		$profile->type = "guardian";
 		$permission = new stdClass;
-		$permission->name = "infocenter";
+		$permission->name = "icplus";
 		$permission->value = 0;
 		$profile->permissions = array($permission);
 		$profiles[] = $profile;
@@ -242,7 +242,7 @@ class GuardianCategoryEditPageTest extends PHPUnit_Framework_TestCase {
 		$profile->description = "existing name description";
 		$profile->type = "guardian";
 		$permission = new stdClass;
-		$permission->name = "infocenter";
+		$permission->name = "icplus";
 		$permission->value = 0;
 		$profile->permissions = array($permission);
 		$profiles[] = $profile;
@@ -332,7 +332,7 @@ class GuardianCategoryEditPageTest extends PHPUnit_Framework_TestCase {
 		$profile->description = "existing name description";
 		$profile->type = "guardian";
 		$permission = new stdClass;
-		$permission->name = "infocenter";
+		$permission->name = "icplus";
 		$permission->value = 0;
 		$profile->permissions = array($permission);
 		$profiles[] = $profile;
