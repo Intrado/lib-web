@@ -68,7 +68,7 @@ class GuardianProfilePage extends PageForm {
 			$this->profile->description = '';
 			$this->profile->type = 'guardian';
 			$permission = new stdClass;
-			$permission->name = "infocenter";
+			$permission->name = "icplus";
 			$permission->value = 0;
 			$this->profile->permissions = array($permission);
 		}
@@ -99,8 +99,8 @@ class GuardianProfilePage extends PageForm {
 				$description = $postdata['description'];
 				$type = "guardian";
 				$permissions = array();
-				$infocenter = (bool) $postdata['infocenter'];
-				$permissions[] = array("name" => "infocenter", "value" => $infocenter ? "1" : "0");
+				$icplus = (bool) $postdata['icplus'];
+				$permissions[] = array("name" => "icplus", "value" => $icplus ? "1" : "0");
 				$result = $this->csApi->setProfile($this->profileId, $name, $description, $type, $permissions);
 				if ($result) {
 					unset($_SESSION['profileid']);
@@ -168,7 +168,7 @@ class GuardianProfilePage extends PageForm {
 	 * @return object Form
 	 */
 	public function factoryProfileForm() {
-		$infocenter = $this->hasPermission($this->profile, "infocenter");
+		$icplus = $this->hasPermission($this->profile, "icplus");
 		$formdata = array(
 			"name" => array(
 				"label" => _L('Name'),
@@ -193,10 +193,10 @@ class GuardianProfilePage extends PageForm {
 				"helpstep" => 1
 			),
 			_L('Access Options'), //access options
-			"infocenter" => array(
-				"label" => _L('InfoCenter'),
-				"fieldhelp" => _L('Allows access to dependents information in InfoCenter'),
-				"value" => (!$infocenter) ? "" : "infocenter",
+			"icplus" => array(
+				"label" => _L('InfoCenter Plus'),
+				"fieldhelp" => _L('Allows access to dependents information in InfoCenter Plus'),
+				"value" => (!$icplus) ? "" : "icplus",
 				"validators" => array(),
 				"control" => array("CheckBox"),
 				"helpstep" => 2

@@ -2811,3 +2811,10 @@ update setting set value='11.1/3' where name='_dbversion'
 $$$
 
 -- END 11.1/3
+
+-- no schema just rename guardian profile permission
+
+update setting set value='11.1/4' where name='_dbversion'
+$$$
+
+-- END 11.1/4

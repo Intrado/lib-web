@@ -20,3 +20,8 @@ $$$
 -- no schema, disable all _hasinfocenter (keeping _hasicplus)
 -- manual process by support to enable infocenter and guardian data for our customers
 
+-- $rev 4
+
+-- rename guardian profile permission
+update permission set name = 'icplus' where name = 'infocenter'
+$$$
