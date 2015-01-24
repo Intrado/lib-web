@@ -151,7 +151,7 @@ class SmsOptinReport extends ReportGenerator {
 		global $total;
 		global $data;
 		
-		$max = 100;
+		$max = 10000;
 		$pagestart = $this->params['pagestart'];
 		do {
 			$this->fetchPage($pagestart, $max);
