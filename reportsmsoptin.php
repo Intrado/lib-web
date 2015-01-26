@@ -171,16 +171,11 @@ if($error || $reportgenerator->format == "html"){
 	$PAGE = "reports:reports";
 	$TITLE = _L("SMS Opt-In Status");
 	
-	if(isset($_SESSION['reportid'])){
-		$subscription = new ReportSubscription($_SESSION['reportid']);
-		$TITLE .= " - " . escapehtml($subscription->name);
-	}
-
 	include_once("nav.inc.php");
 	NewForm($f);
 
 	$back = icon_button("Back", "fugue/arrow_180", "location.href='reports.php'");
-	buttons($back, submit($f, $s, "Refresh", null, "arrow_refresh"), submit($f, "save", "Save/Schedule"));
+	buttons($back, submit($f, $s, "Refresh", null, "arrow_refresh"));
 	startWindow("Display Options", "padding: 3px;", "true");
 	
 	?>
