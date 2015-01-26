@@ -62,7 +62,14 @@ if (!isset($_POST['s']) || !isset($_POST['mal'])) {
 
 $response = array();
 
-list($protocol, $transport) = initMessageLinkApp();
+// if SDD portionList is not in cache, then it may take some time to fetch a portion attachment
+if (isset($SETTINGS['appserver']['requestAttachmentTimeout'])) {
+	$timeout = $SETTINGS['appserver']['requestAttachmentTimeout'];
+} else {
+	$timeout = 55000; // about 55seconds
+}
+
+list($protocol, $transport) = initMessageLinkApp($timeout);
 
 if($protocol == null || $transport == null) {
 	error_log("Cannot use AppServer; MessageLinkClient failed to be initialized");
