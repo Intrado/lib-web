@@ -24,10 +24,24 @@ use commsuite\NotAvailableException;
 /////////////////////////////////////
 // AppServer MessageLink service
 
-function initMessageLinkApp() {
+/**
+ * 
+ * @param string $timeout optional timeout to override $SETTINGS['appserver']['timeout']
+ * @return multitype:Ambigous <NULL, \Thrift\Protocol\TBinaryProtocolAccelerated> Ambigous <NULL, \Thrift\Transport\TFramedTransport>
+ */
+function initMessageLinkApp($timeout = null) {
 	global $SETTINGS;
 	$appservertransport = null;
 	$appserverprotocol = null;
+	
+	// optional timeout override, else get from properties, else set to default
+	if ($timeout == null) {
+		if (isset($SETTINGS['appserver']['timeout'])) {
+			$timeout = $SETTINGS['appserver']['timeout'];
+		} else {
+			$timeout = 5500; // about 5seconds
+		}
+	}
 
 	try {
 		if (isset($SETTINGS['appserver']) && isset($SETTINGS['appserver']['host'])) {
@@ -37,11 +51,7 @@ function initMessageLinkApp() {
 
 				$appserversocket = new TSocket($appserverhost[0], $appserverhost[1]);
 				//$appserversocket->setDebug(true);
-				if (isset($SETTINGS['appserver']['timeout'])) {
-					$appserversocket->setRecvTimeout($SETTINGS['appserver']['timeout']);
-				} else {
-					$appserversocket->setRecvTimeout(5500);
-				}
+				$appserversocket->setRecvTimeout($timeout);
 				$appservertransport = new TFramedTransport($appserversocket);
 				//$appserverprotocol = new TBinaryProtocol($appservertransport);
 
