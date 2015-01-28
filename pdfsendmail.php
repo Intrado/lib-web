@@ -385,6 +385,16 @@ class PdfSendMail extends PageForm {
 				),
 				"control" => array('HtmlTextArea', 'subtype' => 'html', 'rows' => 20, 'editor_mode' => 'inline'),
 				"helpstep" => 7
+			),
+			_L("Information"),
+			"infohelp" => array(
+				'label' => '',
+				'control' => array(
+					"FormHtml",
+					'html' => '<div class="password-protect-wrapper"><span class="secure-lock"></span>' .
+					_L('Note: Larger files may take up to a minute to process. Thank you for your patience.') . '</div>'
+				),
+				'helpstep' => 7
 			)
 		);
 
