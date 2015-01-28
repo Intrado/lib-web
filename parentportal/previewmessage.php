@@ -65,6 +65,8 @@ if(isset($_GET['type'])){
 	$_SESSION['type'] = $_GET['type'];
 }
 
+instrumentation_add_custom_parameter("action", $_SESSION['type']);
+
 if(isset($_GET['jobid']) && isset($_GET['personid'])){
 	$_SESSION['previewmessage_jobid'] = $_GET['jobid']+0;
 	$_SESSION['previewmessage_personid'] = $_GET['personid']+0;
@@ -122,6 +124,8 @@ if (CheckFormSubmit($f,$s)) {
 if ($reloadform) {
 	PutFormData($f, $s, "language", $_SESSION['previewmessage_langcode'], "text", "nomin", "nomax");
 }
+
+instrumentation_add_custom_parameter("languageCode", $_SESSION['previewmessage_langcode']);
 
 
 // if historic data should be used, fetch it now

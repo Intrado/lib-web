@@ -57,6 +57,7 @@ if (isset($_POST['frm'])) {
 	MergeSectionFormData($f, $s);
 	TrimFormData($f, $s, "pkeyadd");
 }
+instrumentation_add_custom_parameter("action", "error");
 if (CheckFormSubmit($f,$s) || CheckFormSubmit($f,'add') || GetFormData($f, $s, "pkeyadd")) {
 	//check to see if formdata is valid
 	if (CheckFormInvalid($f)) {
@@ -70,7 +71,6 @@ if (CheckFormSubmit($f,$s) || CheckFormSubmit($f,'add') || GetFormData($f, $s, "
 			error(_L('Please enter a Contact Identification Number'));
 		} else {
 			$_SESSION['phoneactivationpkeylist'] = array(); // clear out any previous pkeys
-
 			// save any changed pkeys
 			$i = 0;
 			while ($i < $maxcontacts) {
@@ -85,17 +85,21 @@ if (CheckFormSubmit($f,$s) || CheckFormSubmit($f,'add') || GetFormData($f, $s, "
 
 			// add another
 			if (CheckFormSubmit($f, 'add')) {
+				instrumentation_add_custom_parameter("action", "add");
 				//$_SESSION['phoneactivationpkeylist'][""] = "Unknown";
 			} else if (CheckFormSubmit($f, $s)) {
 				// Next button, must verify all pkey status ok to continue
 				checkIDStatus();
-				if ($oktogo)
+				if ($oktogo) {
+					instrumentation_add_custom_parameter("action", "save");
 					redirect("phoneactivationcode.php");
+				}
 			}
 			$reloadform = 1;
 		}
 	}
 } else {
+	instrumentation_add_custom_parameter("action", "load");
 	$reloadform = 1;
 }
 
