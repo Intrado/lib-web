@@ -147,7 +147,7 @@ class SmsOptinReport extends ReportGenerator {
 			}
 		}
 
-		// batch api request by 100 smsnumber, cannot load all 100k into memory
+		// batch api request by 10000 smsnumber, cannot load all 100k into memory
 		global $total;
 		global $data;
 		

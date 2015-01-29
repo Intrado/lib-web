@@ -21,6 +21,8 @@ if(isset($_SESSION['customerid']) && $_SESSION['customerid']){
 	$lastnameField = FieldMap::getLastNameField();
 	$contactList = getContactIDs($_SESSION['portaluserid']);
 
+	instrumentation_add_custom_parameter("numContacts", count($contactList));
+
 	$contactListString = implode("','", $contactList);
 	$contactCount=array();
 	$allData = array();
@@ -57,8 +59,10 @@ if(isset($_SESSION['customerid']) && $_SESSION['customerid']){
 				j.id in ('" . $jobListString . "')
 				order by j.startdate desc, j.starttime, j.id desc";
 	$result = Query($query);
+	$count = 0;
 	while ($row = DBGetRow($result)) {
 		foreach ($jobids[$row[0]] as $personid) {
+			$count++;
 			// create new array for personrow, otherwise adds elements to $row for all persons
 			$personrow = array();
 			// start with an incremental id
@@ -75,7 +79,8 @@ if(isset($_SESSION['customerid']) && $_SESSION['customerid']){
 			$contactCount[$personid]++;
 		}
 	}
-	
+
+	instrumentation_add_custom_parameter("numMessages", $count);
 	
 	$titles = array(
 					"2" => _L("Date"),

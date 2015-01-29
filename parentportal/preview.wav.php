@@ -88,8 +88,10 @@ if ($data === false) {
 	header("HTTP/1.0 200 OK");
 	header('Pragma: private');
 	header('Cache-control: private, must-revalidate');
-	if (isset($_GET['download']))
+	if (isset($_GET['download'])) {
+		instrumentation_add_custom_parameter("action", "download");
 		header("Content-disposition: attachment; filename=message.mp3");
+	}
 	header("Content-Type: audio/mpeg");
 	header("Content-Length: " . strlen($data));
 	header("Connection: close");

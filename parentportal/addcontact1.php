@@ -9,7 +9,7 @@ $f="addstudent";
 $s="main";
 $reloadform = 0;
 
-
+instrumentation_add_custom_parameter("action", "error");
 if(CheckFormSubmit($f,$s))
 {
 	//check to see if formdata is valid
@@ -53,13 +53,16 @@ if(CheckFormSubmit($f,$s))
 				$_SESSION['pidlist'][$result['customerid']][] = $result['personid'];
 				$_SESSION['currentpid'] = $result['personid'];
 				$_SESSION['currentcid'] = $result['customerid'];
+				instrumentation_add_custom_parameter("action", "save");
 				redirect("addcontact2.php");
 			} else {
+				instrumentation_add_custom_parameter("action", "invalid");
 				error(_L("That is not a valid Activation Code and Person ID combination"));
 			}
 		}
 	}
 } else {
+	instrumentation_add_custom_parameter("action", "load");
 	$reloadform = 1;
 }
 
