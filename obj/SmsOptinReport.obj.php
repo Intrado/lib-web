@@ -147,11 +147,11 @@ class SmsOptinReport extends ReportGenerator {
 			}
 		}
 
-		// batch api request by 100 smsnumber, cannot load all 100k into memory
+		// batch api request by 10000 smsnumber, cannot load all 100k into memory
 		global $total;
 		global $data;
 		
-		$max = 100;
+		$max = 10000;
 		$pagestart = $this->params['pagestart'];
 		do {
 			$this->fetchPage($pagestart, $max);
