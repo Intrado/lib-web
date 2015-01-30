@@ -11,12 +11,14 @@ class PeopleList extends DBMappedObject {
 
 	var $rules = false; // Local cache.
 	var $organizations = false; // Local cache.
+	var $recipientmode;
 	var $sections = false; // Local cache.
-	
+	public static $RECIPIENTMODE_MAP = array(1 => 'self', 2 => 'guardian', 3 => 'selfAndGuardian');
+
 	function PeopleList ($id = NULL) {
 		$this->_allownulls = true;
 		$this->_tablename = "list";
-		$this->_fieldlist = array("userid", "type", "name", "description","modifydate","lastused", "deleted");
+		$this->_fieldlist = array("userid", "type", "name","recipientmode", "description","modifydate","lastused", "deleted");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}

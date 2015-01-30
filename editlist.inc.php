@@ -34,7 +34,7 @@ require_once("inc/formatters.inc.php");
 require_once("obj/JobType.obj.php");
 require_once("inc/list.inc.php");
 require_once("obj/RestrictedValues.fi.php");
-
+require_once("obj/ListGuardianCategory.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -140,7 +140,18 @@ $total = isset($renderedlist) ? $renderedlist->getTotal() : 0;
 $showAdditions = $list->countAdded() > 0;
 $showSkips = $list->countRemoved() > 0;
 
-$categories = array(1 => 'Father', 2 => 'Mother', 3 => "Neighbor");
+//get guardian categories
+$categoryList = $csApi->getGuardianCategoryList();
+$categories = array();
+foreach ($categoryList as $c) {
+	$categories[$c->id] = $c->name;
+}
+
+$selectedCategories = array();
+if($list->id){
+	$selectedCategories = ListGuardianCategory::getGuardiansForList($list->id);
+}
+
 $formdata = array(
 	// A hidden submit button is needed because otherwise pressing ENTER would take you to the Preview page.
 	"hiddendone" => array(
@@ -162,18 +173,22 @@ $formdata = array(
 		"helpstep" => 1
 	),
 	"contacttypelabel" => array(
+		"label" => "",
+		"helpstep" => 4,
 		"control" => array("FormHtml", "html" => _L('Select the recipients that will be contacted on behalf of this list')),
-	), 
-	"recipientmode" => array(
+	),
+	"selfmode" => array(
+		"label" => "",
 		"fieldhelp" => _L('contacts only (self), guardian  or both'),
-		"value" => null,
+		"value" => $list->recipientmode === 'self' || $list->recipientmode === 'selfAndGuardian',
 		"validators" => array(),
 		"control" => array("CheckBox", "label" => _L('Self - The people named on this list will be contacted directly')),
 		"helpstep" => 4
 	),
 	"category" => array(
+		"label" => "",
 		"fieldhelp" => _L('Categories to filter by'),
-		"value" => null,
+		"value" => $selectedCategories,
 		"validators" => array(
 			array("ValInArray", "values" => array_keys($categories))
 		),
@@ -381,10 +396,16 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 
+		//1=> self, 2=>guardian 3=> selfAndGuardian
+		$mode = $postdata['selfmode'] == true ? 1 : 0;
+		$categories = $postdata['category'];
+		if (count($categories) > 0) {
+			$mode |= 2;
+		}
 		$list->name = removeIllegalXmlChars($postdata['name']);
 		$list->description = $postdata['description'];
-		$list->recipientmode = $postdata['recipientmode'];
-		$list->category = $postdata['category'];
+		//if no option selected we use selfAndGuardian mode
+		$list->recipientmode = $mode === 0 ? null : PeopleList::$RECIPIENTMODE_MAP[$mode];
 		$list->modifydate = QuickQuery("select now()");
 		$list->userid = $USER->id;
 		$list->deleted = 0;
@@ -402,7 +423,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			
 			QuickUpdate('COMMIT');
 		}
-
+		if (count($categories) > 0) {
+			ListGuardianCategory::upsertListGuardianCategories($list->id, $categories);
+		}
 		$_SESSION['listid'] = $list->id;
 
 		// Save
