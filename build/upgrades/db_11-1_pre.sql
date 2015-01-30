@@ -25,3 +25,24 @@ $$$
 -- rename guardian profile permission
 update permission set name = 'icplus' where name = 'infocenter'
 $$$
+
+-- $rev 5
+
+-- add support for guardian rule item
+ALTER TABLE `listentry`
+  CHANGE `type` `type` ENUM('rule','add','negate','organization','section','sublist') NOT NULL DEFAULT 'add',
+  ADD `sublistid` INT DEFAULT NULL ;
+
+$$$
+
+ALTER TABLE `list` ADD `recipientmode` enum ('self','guardian','selfAndGuardian');
+ $$$
+
+-- restrict targeted recipients based on guardiancategory relation to list people. if no entries, include all categories.
+CREATE TABLE `listguardiancategory` (
+  `listId` int(11) NOT NULL,
+  `guardianCategoryId` int(11) NOT NULL,
+  PRIMARY KEY (`listId`,`guardianCategoryId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+ 
+$$$

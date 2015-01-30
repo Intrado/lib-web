@@ -33,6 +33,7 @@ require_once("obj/SectionWidget.fi.php");
 require_once("inc/formatters.inc.php");
 require_once("obj/JobType.obj.php");
 require_once("inc/list.inc.php");
+require_once("obj/RestrictedValues.fi.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -139,6 +140,7 @@ $total = isset($renderedlist) ? $renderedlist->getTotal() : 0;
 $showAdditions = $list->countAdded() > 0;
 $showSkips = $list->countRemoved() > 0;
 
+$categories = array(1 => 'Father', 2 => 'Mother', 3 => "Neighbor");
 $formdata = array(
 	// A hidden submit button is needed because otherwise pressing ENTER would take you to the Preview page.
 	"hiddendone" => array(
@@ -158,6 +160,25 @@ $formdata = array(
 		),
 		"control" => array("TextField","size" => 30, "maxlength" => 50),
 		"helpstep" => 1
+	),
+	"contacttypelabel" => array(
+		"control" => array("FormHtml", "html" => _L('Select the recipients that will be contacted on behalf of this list')),
+	), 
+	"recipientmode" => array(
+		"fieldhelp" => _L('contacts only (self), guardian  or both'),
+		"value" => null,
+		"validators" => array(),
+		"control" => array("CheckBox", "label" => _L('Self - The people named on this list will be contacted directly')),
+		"helpstep" => 4
+	),
+	"category" => array(
+		"fieldhelp" => _L('Categories to filter by'),
+		"value" => null,
+		"validators" => array(
+			array("ValInArray", "values" => array_keys($categories))
+		),
+		"control" => array("RestrictedValues", "height" => "150px", "values" => $categories, "label" => _L("Guardian - Parent/guardians of people on this list will be contacted")),
+		"helpstep" => 4
 	),
 	"description" => array(
 		"label" => _L('Description'),
@@ -362,6 +383,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
 		$list->name = removeIllegalXmlChars($postdata['name']);
 		$list->description = $postdata['description'];
+		$list->recipientmode = $postdata['recipientmode'];
+		$list->category = $postdata['category'];
 		$list->modifydate = QuickQuery("select now()");
 		$list->userid = $USER->id;
 		$list->deleted = 0;
