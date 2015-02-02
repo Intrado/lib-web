@@ -405,7 +405,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$list->name = removeIllegalXmlChars($postdata['name']);
 		$list->description = $postdata['description'];
 		//if no option selected we use selfAndGuardian mode
-		$list->recipientmode = $mode === 0 ? null : PeopleList::$RECIPIENTMODE_MAP[$mode];
+		$list->recipientmode = PeopleList::$RECIPIENTMODE_MAP[$mode == 0 ? 3 : $mode];
 		$list->modifydate = QuickQuery("select now()");
 		$list->userid = $USER->id;
 		$list->deleted = 0;

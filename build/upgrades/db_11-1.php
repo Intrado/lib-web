@@ -48,7 +48,10 @@ function upgrade_11_1($rev, $shardid, $customerid, $db) {
 			case 4:
 				echo "|";
 				apply_sql("upgrades/db_11-1_pre.sql", $customerid, $db, 5);
-					
+				Query("BEGIN", $db);
+				QuickUpdate("update list set recipientmode = 'self'", $db);
+				Query("COMMIT", $db);
+
 	}
 	//This statement should appear in each upgrade script, when relevent.
 	apply_sql("../db/update_SMAdmin_access.sql", $customerid, $db);

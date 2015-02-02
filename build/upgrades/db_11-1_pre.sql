@@ -35,7 +35,7 @@ ALTER TABLE `listentry`
 
 $$$
 
-ALTER TABLE `list` ADD `recipientmode` enum ('self','guardian','selfAndGuardian');
+ALTER TABLE `list` ADD `recipientmode` enum ('self','guardian','selfAndGuardian') NOT NULL DEFAULT 'selfAndGuardian';
  $$$
 
 -- restrict targeted recipients based on guardiancategory relation to list people. if no entries, include all categories.
