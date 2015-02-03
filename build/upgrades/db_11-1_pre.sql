@@ -29,26 +29,19 @@ $$$
 -- $rev 5
 
 -- add support for guardian rule item
-ALTER TABLE `listentry`
-  CHANGE `type` `type` ENUM('rule','add','negate','organization','section','sublist') NOT NULL DEFAULT 'add',
-  ADD `sublistid` INT DEFAULT NULL ;
-
+-- indicate if list should include the people themselves
+ALTER TABLE `list` ADD `recipientmode` enum ('self','guardian','selfAndGuardian') NOT NULL DEFAULT 'selfAndGuardian'
 $$$
-
-ALTER TABLE `list` ADD `recipientmode` enum ('self','guardian','selfAndGuardian') NOT NULL DEFAULT 'selfAndGuardian';
- $$$
 
 -- restrict targeted recipients based on guardiancategory relation to list people. if no entries, include all categories.
 CREATE TABLE `listguardiancategory` (
   `listId` int(11) NOT NULL,
   `guardianCategoryId` int(11) NOT NULL,
   PRIMARY KEY (`listId`,`guardianCategoryId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
- 
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
 
 -- store the recipient for lookup to display name on reports (instead of sequence12)
 -- lookup the recipientperson name from the person table (no need to keep history of recipient name)
-ALTER TABLE `reportcontact`  ADD `recipientpersonid` INT NOT NULL  AFTER `sequence`;
-
+ALTER TABLE `reportcontact` ADD `recipientpersonid` INT NOT NULL  AFTER `sequence`
 $$$

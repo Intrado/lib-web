@@ -49,7 +49,7 @@ function upgrade_11_1($rev, $shardid, $customerid, $db) {
 				echo "|";
 				apply_sql("upgrades/db_11-1_pre.sql", $customerid, $db, 5);
 				Query("BEGIN", $db);
-				QuickUpdate("update list set recipientmode = 'self'", $db);
+				QuickUpdate("update list set recipientmode = 'selfAndGuardian'", $db);
 				Query("COMMIT", $db);
 
 	}
