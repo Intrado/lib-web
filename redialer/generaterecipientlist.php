@@ -38,8 +38,7 @@ if ($listid == 0) {
 	exit(-1);
 }
 
-//TODO comment out echo
-echo "generaterecipientlist for customerid=".$custid." listid=".$listid."\n";
+//echo "generaterecipientlist for customerid=".$custid." listid=".$listid."\n";
 
 // gather database connection info
 $db['host'] = $argv[3];
