@@ -155,7 +155,9 @@ class JobDetailReport extends ReportGenerator{
 							where js.jobid = rp.jobid and name = concat('max', rp.type, if((rp.type = 'email' || rp.type = 'phone'), 's', '') )
 						)
 					)
-				) as label
+				) as label,
+				rc.recipientpersonid,
+				(select CONCAT(' ', f01, ' ', f02) from person where rc.recipientpersonid=id) as recipientpersonname
 			from
 				reportperson rp
 				inner join job j on (rp.jobid = j.id)
@@ -330,6 +332,7 @@ class JobDetailReport extends ReportGenerator{
 						3 => _L("First Name"),
 						4 => _L("Last Name"),
 						17 => _L("Sequence"),
+						51 => _L("Recipient Guardian"),
 						7 => _L("Destination"),
 						13 => _L("Attempts"),
 						8 => _L("Last Attempt"),

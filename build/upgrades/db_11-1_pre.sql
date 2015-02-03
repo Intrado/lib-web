@@ -46,3 +46,9 @@ CREATE TABLE `listguardiancategory` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
  
 $$$
+
+-- store the recipient for lookup to display name on reports (instead of sequence12)
+-- lookup the recipientperson name from the person table (no need to keep history of recipient name)
+ALTER TABLE `reportcontact`  ADD `recipientpersonid` INT NOT NULL  AFTER `sequence`;
+
+$$$
