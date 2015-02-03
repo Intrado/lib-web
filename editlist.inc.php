@@ -140,16 +140,18 @@ $total = isset($renderedlist) ? $renderedlist->getTotal() : 0;
 $showAdditions = $list->countAdded() > 0;
 $showSkips = $list->countRemoved() > 0;
 
+$maxguardians = getSystemSetting("maxguardians", 0);
+if ($maxguardians) {
 //get guardian categories
-$categoryList = $csApi->getGuardianCategoryList();
-$categories = array();
-foreach ($categoryList as $c) {
-	$categories[$c->id] = $c->name;
-}
-
-$selectedCategories = array();
-if($list->id){
-	$selectedCategories = ListGuardianCategory::getGuardiansForList($list->id);
+	$categoryList = $csApi->getGuardianCategoryList();
+	$categories = array();
+	foreach ($categoryList as $c) {
+		$categories[$c->id] = $c->name;
+	}
+	$selectedCategories = array();
+	if ($list->id) {
+		$selectedCategories = ListGuardianCategory::getGuardiansForList($list->id);
+	}
 }
 
 $formdata = array(
@@ -171,21 +173,24 @@ $formdata = array(
 		),
 		"control" => array("TextField","size" => 30, "maxlength" => 50),
 		"helpstep" => 1
-	),
-	"contacttypelabel" => array(
+	)
+);
+
+if ($maxguardians) {
+	$formdata["contacttypelabel"] = array(
 		"label" => "",
 		"helpstep" => 4,
 		"control" => array("FormHtml", "html" => _L('Select the recipients that will be contacted on behalf of this list')),
-	),
-	"selfmode" => array(
+	);
+	$formdata["selfmode"] = array(
 		"label" => "",
 		"fieldhelp" => _L('contacts only (self), guardian  or both'),
 		"value" => $list->recipientmode === 'self' || $list->recipientmode === 'selfAndGuardian',
 		"validators" => array(),
 		"control" => array("CheckBox", "label" => _L('Self - The people named on this list will be contacted directly')),
 		"helpstep" => 4
-	),
-	"category" => array(
+	);
+	$formdata["category"] = array(
 		"label" => "",
 		"fieldhelp" => _L('Categories to filter by'),
 		"value" => $selectedCategories,
@@ -194,23 +199,24 @@ $formdata = array(
 		),
 		"control" => array("RestrictedValues", "height" => "150px", "values" => $categories, "label" => _L("Guardian - Parent/guardians of people on this list will be contacted")),
 		"helpstep" => 4
+	);
+}
+
+$formdata["description"] = array(
+	"label" => _L('Description'),
+	"fieldhelp" => _L('This field is for an optional description of your list, viewable in the List Builder screen.'),
+	"value" => $list->description,
+	"validators" => array(
+		array("ValLength", "max" => 50)
 	),
-	"description" => array(
-		"label" => _L('Description'),
-		"fieldhelp" => _L('This field is for an optional description of your list, viewable in the List Builder screen.'),
-		"value" => $list->description,
-		"validators" => array(
-			array("ValLength","max" => 50)
-		),
-		"control" => array("TextField","size" => 30, "maxlength" => 50),
-		"helpstep" => 1
-	),
-	"preview" => array(
-		"label" => 'Total',
-		"fieldhelp" => _L('This number indicates how many people are currently in your list. Click the preview button to view contact information.'),
-		"control" => array("FormHtml", 'html' => '<div id="listTotal" style="float:left; padding:5px; margin-right: 10px;">'.$total.'</div>' . submit_button(_L('Preview'), 'preview', 'diagona/16/049')),
-		"helpstep" => 1
-	)
+	"control" => array("TextField", "size" => 30, "maxlength" => 50),
+	"helpstep" => 1
+);
+$formdata["preview"] = array(
+	"label" => 'Total',
+	"fieldhelp" => _L('This number indicates how many people are currently in your list. Click the preview button to view contact information.'),
+	"control" => array("FormHtml", 'html' => '<div id="listTotal" style="float:left; padding:5px; margin-right: 10px;">' . $total . '</div>' . submit_button(_L('Preview'), 'preview', 'diagona/16/049')),
+	"helpstep" => 1
 );
 
 $formdata[] = _L('List Content');
@@ -396,11 +402,15 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 
-		//1=> self, 2=>guardian 3=> selfAndGuardian
-		$mode = $postdata['selfmode'] == true ? 1 : 0;
-		$categories = $postdata['category'];
-		if (count($categories) > 0) {
-			$mode |= 2;
+		if ($maxguardians) {
+			//1=> self, 2=>guardian 3=> selfAndGuardian
+			$mode = $postdata['selfmode'] == true ? 1 : 0;
+			$categories = $postdata['category'];
+			if (count($categories) > 0) {
+				$mode |= 2;
+			}
+		} else {
+			$mode = 1; //self
 		}
 		$list->name = removeIllegalXmlChars($postdata['name']);
 		$list->description = $postdata['description'];
@@ -412,6 +422,10 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$list->type = ($method === 'sections') ? 'section' : 'person';
 		$list->update();
 		
+		if ($maxguardians && count($categories) > 0) {
+			ListGuardianCategory::upsertListGuardianCategories($list->id, $categories);
+		}
+
 		if ($method == 'sections') {
 			QuickUpdate('BEGIN');
 			
@@ -423,9 +437,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			
 			QuickUpdate('COMMIT');
 		}
-		if (count($categories) > 0) {
-			ListGuardianCategory::upsertListGuardianCategories($list->id, $categories);
-		}
+
 		$_SESSION['listid'] = $list->id;
 
 		// Save
