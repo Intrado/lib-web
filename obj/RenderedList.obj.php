@@ -578,6 +578,20 @@ class RenderedList2 {
 		return $this->pageinlistmap[$list->id] = QuickQueryList($query,true);
 	}
 	
+	
+	function getRecipientList() {
+		
+		$personSql = $this->getPersonSql();
+		echo $personSql . "\n";
+		$targetedPersonList = DBFindMany('PeopleList', $personSql);
+		
+		$recipientList = array();
+		foreach ($targetedPersonList as $targetedPerson) {
+			$recipientList[] = new RenderedRecipient($targetedPerson, $targetedPerson);
+		}
+		return $recipientList;
+	}
+	
 }
 
 ?>
