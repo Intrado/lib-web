@@ -161,63 +161,36 @@ $formdata = array(
 		"control" => array("FormHtml", "html" => hidden_submit_button('done')),
 		"helpstep" => 1
 	),
-
 	"name" => array(
 		"label" => _L('List Name'),
 		"fieldhelp" => _L('This is the name of your list. The best names describe the list contents.'),
 		"value" => $list->name,
 		"validators" => array(
 			array("ValRequired"),
-			array("ValLength","max" => 50),
+			array("ValLength", "max" => 50),
 			array("ValListName")
 		),
-		"control" => array("TextField","size" => 30, "maxlength" => 50),
+		"control" => array("TextField", "size" => 30, "maxlength" => 50),
+		"helpstep" => 1
+	),
+	"description" => array(
+		"label" => _L('Description'),
+		"fieldhelp" => _L('This field is for an optional description of your list, viewable in the List Builder screen.'),
+		"value" => $list->description,
+		"validators" => array(
+			array("ValLength", "max" => 50)
+		),
+		"control" => array("TextField", "size" => 30, "maxlength" => 50),
+		"helpstep" => 1
+	),
+	"preview" => array(
+		"label" => 'Total',
+		"fieldhelp" => _L('This number indicates how many people are currently in your list. Click the preview button to view contact information.'),
+		"control" => array("FormHtml", 'html' => '<div id="listTotal" style="float:left; padding:5px; margin-right: 10px;">' . $total . '</div>' . submit_button(_L('Preview'), 'preview', 'diagona/16/049')),
 		"helpstep" => 1
 	)
 );
 
-if ($maxguardians) {
-	$formdata["contacttypelabel"] = array(
-		"label" => "",
-		"helpstep" => 4,
-		"control" => array("FormHtml", "html" => _L('Select the recipients that will be contacted on behalf of this list')),
-	);
-	$formdata["selfmode"] = array(
-		"label" => "",
-		"fieldhelp" => _L('contacts only (self), guardian  or both'),
-		"value" => $list->recipientmode === 'self' || $list->recipientmode === 'selfAndGuardian',
-		"validators" => array(),
-		"control" => array("CheckBox", "label" => _L('Self - The people named on this list will be contacted directly')),
-		"helpstep" => 4
-	);
-	$formdata["category"] = array(
-		"label" => "",
-		"fieldhelp" => _L('Categories to filter by'),
-		"value" => $selectedCategories,
-		"validators" => array(
-			array("ValInArray", "values" => array_keys($categories))
-		),
-		"control" => array("RestrictedValues", "height" => "150px", "values" => $categories, "label" => _L("Guardian - Parent/guardians of people on this list will be contacted")),
-		"helpstep" => 4
-	);
-}
-
-$formdata["description"] = array(
-	"label" => _L('Description'),
-	"fieldhelp" => _L('This field is for an optional description of your list, viewable in the List Builder screen.'),
-	"value" => $list->description,
-	"validators" => array(
-		array("ValLength", "max" => 50)
-	),
-	"control" => array("TextField", "size" => 30, "maxlength" => 50),
-	"helpstep" => 1
-);
-$formdata["preview"] = array(
-	"label" => 'Total',
-	"fieldhelp" => _L('This number indicates how many people are currently in your list. Click the preview button to view contact information.'),
-	"control" => array("FormHtml", 'html' => '<div id="listTotal" style="float:left; padding:5px; margin-right: 10px;">' . $total . '</div>' . submit_button(_L('Preview'), 'preview', 'diagona/16/049')),
-	"helpstep" => 1
-);
 
 $formdata[] = _L('List Content');
 
@@ -251,6 +224,31 @@ if ($method === 'sections') {
 			"sectionids" => QuickQueryList("select sectionid from listentry where listid=? and type='section'", false, false, array($list->id))
 		),
 		"helpstep" => 2
+	);
+}
+
+
+if ($maxguardians) {
+	$formdata[] = _L('Recipient Mode');
+	$formdata["recipientmode"] = array(
+		"label" => _L("Recipient Mode"),
+		"fieldhelp" => _L('Select the recipients that will be contacted on behalf of this list'),
+		"value" => $list->recipientmode,
+		"validators" => array(), "control" => array("RadioButton", "values" => array(
+				PeopleList::$RECIPIENTMODE_MAP[1] => _L("Self"),
+				PeopleList::$RECIPIENTMODE_MAP[2] => _L("Guardian"),
+				PeopleList::$RECIPIENTMODE_MAP[3] => _L("Self and Guardian"))),
+		"helpstep" => 4
+	);
+	$formdata["category"] = array(
+		"label" => _L("Category Restriction"),
+		"fieldhelp" => _L('Categories to filter by'),
+		"value" => $selectedCategories,
+		"validators" => array(
+			array("ValInArray", "values" => array_keys($categories))
+		),
+		"control" => array("RestrictedValues", "values" => $categories, "label" => _L("Guardian - Parent/guardians of people on this list will be contacted")),
+		"helpstep" => 4
 	);
 }
 
@@ -401,28 +399,26 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$datachange = true;
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
-
+		$mode = PeopleList::$RECIPIENTMODE_MAP[1]; //self
 		if ($maxguardians) {
 			//1=> self, 2=>guardian 3=> selfAndGuardian
-			$mode = $postdata['selfmode'] == true ? 1 : 0;
-			$categories = $postdata['category'];
-			if (count($categories) > 0) {
-				$mode |= 2;
+			if ($postdata['recipientmode']) {
+				$mode = $postdata['recipientmode'];
 			}
-		} else {
-			$mode = 1; //self
+			$categories = $postdata['category'];
 		}
+
 		$list->name = removeIllegalXmlChars($postdata['name']);
 		$list->description = $postdata['description'];
 		//if no option selected we use selfAndGuardian mode
-		$list->recipientmode = PeopleList::$RECIPIENTMODE_MAP[$mode == 0 ? 3 : $mode];
+		$list->recipientmode = $mode;
 		$list->modifydate = QuickQuery("select now()");
 		$list->userid = $USER->id;
 		$list->deleted = 0;
 		$list->type = ($method === 'sections') ? 'section' : 'person';
 		$list->update();
 		
-		if ($maxguardians && count($categories) > 0) {
+		if ($maxguardians) {
 			ListGuardianCategory::upsertListGuardianCategories($list->id, $categories);
 		}
 
