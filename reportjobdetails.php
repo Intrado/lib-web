@@ -39,8 +39,12 @@ if (!$USER->authorize('createreport') && !$USER->authorize('viewsystemreports'))
 ////////////////////////////////////////////////////////////////////////////////
 //index 5 is type
 function fmt_dst_src($row, $index){
-	if($row[$index] != null)
-		return escapehtml(destination_label($row[5], $row[$index]));
+	if($row[$index] != null){
+		$type = $row[5];
+		$maxtypes = fetch_max_types();
+		$actualsequence = ($row[$index] % $maxtypes[$type]);
+		return escapehtml(destination_label($row[5], $actualsequence));
+	}
 	else
 		return "";
 }

@@ -43,5 +43,7 @@ $$$
 
 -- store the recipient for lookup to display name on reports (instead of sequence12)
 -- lookup the recipientperson name from the person table (no need to keep history of recipient name)
-ALTER TABLE `reportcontact` ADD `recipientpersonid` INT NOT NULL  AFTER `sequence`
+ALTER TABLE `reportcontact`  
+  ADD `recipientpersonid` INT NOT NULL default 0 AFTER `sequence`,
+  ADD INDEX (`recipientpersonid`);
 $$$
