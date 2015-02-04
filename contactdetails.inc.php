@@ -16,6 +16,7 @@ include_once("obj/Address.obj.php");
 include_once("obj/Phone.obj.php");
 include_once("obj/Email.obj.php");
 include_once("obj/Device.obj.php");
+include_once("obj/DeviceDto.obj.php");
 include_once("obj/Language.obj.php");
 include_once("obj/JobType.obj.php");
 include_once("obj/Sms.obj.php");
@@ -173,12 +174,17 @@ if (isset($personid)) {
 	}
 	
 	if (getSystemSetting("_hasinfocenter", false)) {
+		$deviceDbmos = DBFindMany("Device", "from device where personId = ? order by sequence", false, array($personid));
 		$devices = array();
-		$devices[0] = new Device();
-		$devices[0]->sequence = 0;
-		$devices[0]->personid = $personid;
-		$devices[0]->uuid = "foobar";
-		$devices[0]->name = "Gretel iPad";
+		foreach ($deviceDbmos as $d) {
+			//FIXME call device service API to get device display name
+			$dto = new DeviceDto();
+			$dto->sequence = $d->sequence;
+			$dto->personId = $d->personId;
+			$dto->uuid = $d->deviceUuid;
+			$dto->name = "todoGretel iPad";
+			$devices[] = $dto;
+		}
 		$types["device"] = $devices;
 	}
 	

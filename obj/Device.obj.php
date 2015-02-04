@@ -1,12 +1,17 @@
 <?
 
-class Device {
+class Device extends DBMappedObject {
 
-	var $personid;
+	var $personId;
+	var $deviceUuid;
 	var $sequence;
-	var $uuid;
-	var $name;
 
+	function Device ($id = NULL) {
+		$this->_tablename = "device";
+		$this->_fieldlist = array("personId", "deviceUuid", "sequence");
+		//call super's constructor
+		DBMappedObject::DBMappedObject($id);
+	}
 }
 
 ?>
