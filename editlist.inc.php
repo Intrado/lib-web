@@ -241,13 +241,13 @@ if ($maxguardians) {
 		"helpstep" => 4
 	);
 	$formdata["category"] = array(
-		"label" => _L("Category Restriction"),
+		"label" => _L("Guardian Category Restriction"),
 		"fieldhelp" => _L('Categories to filter by'),
 		"value" => $selectedCategories,
 		"validators" => array(
 			array("ValInArray", "values" => array_keys($categories))
 		),
-		"control" => array("RestrictedValues", "values" => $categories, "label" => _L("Guardian - Parent/guardians of people on this list will be contacted")),
+		"control" => array("RestrictedValues", "values" => $categories, "label" => _L("Restrict to these categories:")),
 		"helpstep" => 4
 	);
 }
