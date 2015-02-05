@@ -242,7 +242,7 @@ if ($maxguardians) {
 	);
 	$formdata["category"] = array(
 		"label" => _L("Guardian Category Restriction"),
-		"fieldhelp" => _L('Categories to filter by'),
+		"fieldhelp" => _L('Select categories to restrict by'),
 		"value" => $selectedCategories,
 		"validators" => array(
 			array("ValInArray", "values" => array_keys($categories))
@@ -365,6 +365,7 @@ if ($method == 'rules'){
 	_L('Enter a name for your list. The best names describe the list\'s content, making the list easy to reuse.'), // 1
 	_L('Rules are used to select groups of contacts from the data available to your account. For example, if you wanted to make a list of 6th graders from Springfield Elementary, you would create two rules: "Grade equals 6" and "School equals Springfield Elementary".'), // 2
 	_L('This section contains tools to add specific individuals and add contacts that are not part of your regular database of contacts. '), // 3
+	_L('Select the recipients that will be contacted on behalf of this list and select categories to restrict by') // 4
 	);
 
 } else {
@@ -372,6 +373,7 @@ if ($method == 'rules'){
 	_L('Enter a name for your list. The best names describe the list\'s content, making the list easy to reuse.'), // 1
 	_L('Select a school then select the sections you wish to include in the list.'), // 2
 	_L('This section contains tools to add specific individuals and add contacts that are not part of your regular database of contacts. '), // 3
+	_L('Select the recipients that will be contacted on behalf of this list and select categories to restrict by') // 4
 	);
 }
 
