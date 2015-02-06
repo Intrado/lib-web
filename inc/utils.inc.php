@@ -607,7 +607,7 @@ function fetch_labels($type, $sequence, $refresh=false){
 		}
 	}
 	// prevent division by zero, where the max is zero or unset
-	if (!$maxtypes[$type])
+	if (!array_key_exists($type, $maxtypes))
 		return "";
 
 	// mod the sequence against the max value for this type (might be an appended person's contact data)

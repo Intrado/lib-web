@@ -21,6 +21,7 @@ include_once("obj/Language.obj.php");
 include_once("obj/JobType.obj.php");
 include_once("obj/Sms.obj.php");
 include_once("obj/LinkedAccountManager.obj.php");
+include_once("obj/DeviceServiceApiClient.obj.php");
 
 $FORMDISABLE = " DISABLED ";
 if(isset($method)){
@@ -174,15 +175,18 @@ if (isset($personid)) {
 	}
 	
 	if (getSystemSetting("_hasinfocenter", false)) {
+		$deviceService = DeviceServiceApiClient::instance($SETTINGS);
 		$deviceDbmos = DBFindMany("Device", "from device where personId = ? order by sequence", false, array($personid));
 		$devices = array();
 		foreach ($deviceDbmos as $d) {
-			//FIXME call device service API to get device display name
+			$response = $deviceService->getDevice($d->deviceUuid);
 			$dto = new DeviceDto();
 			$dto->sequence = $d->sequence;
 			$dto->personId = $d->personId;
 			$dto->uuid = $d->deviceUuid;
-			$dto->name = "todoGretel iPad";
+			if ($response) {
+				$dto->name = $response->name;
+			}
 			$devices[] = $dto;
 		}
 		$types["device"] = $devices;
@@ -344,7 +348,9 @@ if( $reloadform )
 	foreach($contacttypes as $type){
 		if(!isset($types[$type])) continue;
 		foreach($types[$type] as $item){
-			if($type == "email")
+			if($type == "device")
+				PutFormData($f, $s, $type . $item->sequence, $type, "device");
+			else if($type == "email")
 				PutFormData($f, $s, $type . $item->sequence, $item->$type, "email");
 			else
 				PutFormData($f, $s, $type . $item->sequence, Phone::format($item->$type), "phone");
@@ -563,7 +569,7 @@ foreach ($fieldmaps as $map) {
 <?				}
 				// Destination field
 				$disabled = "";
-				if(!$item->editlock)
+				if($type != "device" && !$item->editlock)
 					$disabled = " Disabled ";
 				?><td class="bottomBorder"><?
 				if($type == "email"){
