@@ -25,3 +25,18 @@ $$$
 -- rename guardian profile permission
 update permission set name = 'icplus' where name = 'infocenter'
 $$$
+
+-- $rev 5
+
+-- rename persondevice table to device
+drop table if exists `persondevice`
+$$$
+CREATE TABLE `device` (
+ `id` int(11) NOT NULL AUTO_INCREMENT,
+ `personId` int(11) NOT NULL,
+ `deviceUuid` varchar(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ `sequence` tinyint(4) NOT NULL,
+ PRIMARY KEY (`id`),
+ KEY `personId` (`personId`,`sequence`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;$
+

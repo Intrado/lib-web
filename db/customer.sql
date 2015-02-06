@@ -2782,14 +2782,16 @@ $$$
 
 -- END 11.0/6
 
-CREATE TABLE `persondevice` (
-  `personid` int(11) NOT NULL,
-  `deviceUuid` varchar(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
-  `sequence` tinyint(4) NOT NULL,
-  PRIMARY KEY (`personid`,`deviceUuid`,`sequence`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8
+CREATE TABLE `device` (
+ `id` int(11) NOT NULL AUTO_INCREMENT,
+ `personId` int(11) NOT NULL,
+ `deviceUuid` varchar(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ `sequence` tinyint(4) NOT NULL,
+ PRIMARY KEY (`id`),
+ KEY `personId` (`personId`,`sequence`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 $$$
- 
+
 ALTER TABLE `contactpref` CHANGE `type` `type` ENUM('phone','email','print','sms','device') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL
 $$$
 
@@ -2818,3 +2820,8 @@ update setting set value='11.1/4' where name='_dbversion'
 $$$
 
 -- END 11.1/4
+
+update setting set value='11.1/5' where name='_dbversion'
+$$$
+
+-- END 11.1/5
