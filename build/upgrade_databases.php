@@ -81,7 +81,8 @@ $dbversions = array (
 	),
 	
 	"aspshard" => array (
-		"11.0/1"
+		"11.0/1",
+		"11.1/2"
 	),
 	
 	"deviceservice" => array (
