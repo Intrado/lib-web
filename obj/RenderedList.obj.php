@@ -4,6 +4,8 @@ class RenderedList2 {
 	
 	var $mode = false; //list,search,individual,quickaddsearch
 	var $owneruser;
+	var $recipientMode; //self,guardian,selfAndGuardian
+	var $restrictedGuardianCategoryIds = array();
 	
 	//vars to hold search criteria (or list search contents)
 	var $rules = array();
@@ -68,6 +70,9 @@ class RenderedList2 {
 	function initWithList ($list) {
 		global $USER;
 		$this->mode = "list";
+		$this->recipientMode = $list->recipientmode;
+		$this->restrictedGuardianCategoryIds = $list->getRestrictedGuardianCategoryIds();
+		
 		//load the list rules, orgs, sections, etc
 		$this->listid = $list->id;
 		//TODO load list userid as owner so we can check user restrictions on them instead of logged in global (ie for list sharing)
@@ -576,6 +581,33 @@ class RenderedList2 {
 		}
 		
 		return $this->pageinlistmap[$list->id] = QuickQueryList($query,true);
+	}
+	
+	
+	/**
+	 * Get the recipient list. Includes the relationship of the target person to each recipient
+	 * @return multitype:RenderedRecipient array of target-recipient pairs
+	 */
+	function getRecipientList() {
+		
+		$personSql = $this->getPersonSql(false, false);
+		//echo $personSql . "\n";
+		$personIds = QuickQueryList($personSql);
+		
+		$recipientList = array();
+		
+		// if self targeted
+		if ($this->recipientMode == "self" || $this->recipientMode == "selfAndGuardian") {
+			foreach ($personIds as $personId) {
+				$recipientList[] = new RenderedRecipient($personId, $personId);
+			}
+		}
+		// if guardian recipients
+		if ($this->recipientMode == "guardian" || $this->recipientMode == "selfAndGuardian") {
+			// TODO $restrictedGuardianCategoryIds
+		}
+		
+		return $recipientList;
 	}
 	
 }

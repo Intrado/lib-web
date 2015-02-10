@@ -155,7 +155,9 @@ class JobDetailReport extends ReportGenerator{
 							where js.jobid = rp.jobid and name = concat('max', rp.type, if((rp.type = 'email' || rp.type = 'phone'), 's', '') )
 						)
 					)
-				) as label
+				) as label,
+				rc.recipientpersonid,
+				(select CONCAT(' ', f01, ' ', f02) from person where rc.recipientpersonid=id) as recipientpersonname
 			from
 				reportperson rp
 				inner join job j on (rp.jobid = j.id)
@@ -330,6 +332,7 @@ class JobDetailReport extends ReportGenerator{
 						3 => _L("First Name"),
 						4 => _L("Last Name"),
 						17 => _L("Sequence"),
+						51 => _L("Recipient Guardian"),
 						7 => _L("Destination"),
 						13 => _L("Attempts"),
 						8 => _L("Last Attempt"),
@@ -409,7 +412,7 @@ class JobDetailReport extends ReportGenerator{
 		$fieldindex = getFieldIndexList("p");
 		$activefields = array_flip($activefields);
 		//generate the CSV header
-		$header = array(_L("%s Name",getJobTitle()),_L("Submitted by"),_L("ID"),_L("First Name"),_L("Last Name"),_L("Dst. Src."),_L("Destination"),_L("Attempts"),_L("Last Attempt"),_L("Delivery Results"),_L("Response"),_L(getSystemSetting("organizationfieldname","Organization")));
+		$header = array(_L("%s Name",getJobTitle()),_L("Submitted by"),_L("ID"),_L("First Name"),_L("Last Name"),_L("Dst. Src."),_L("Destination"),_L("Recipient Guardian"),_L("Attempts"),_L("Last Attempt"),_L("Delivery Results"),_L("Response"),_L(getSystemSetting("organizationfieldname","Organization")));
 		foreach($fieldlist as $fieldnum => $fieldname){
 			if(isset($activefields[$fieldnum])){
 				$header[] = $fieldname;
@@ -442,7 +445,7 @@ class JobDetailReport extends ReportGenerator{
 			}
 			$row[9] = html_entity_decode(fmt_jobdetail_result($row,9));
 
-			$reportarray = array($row[0], $row[1], $row[2],$row[3],$row[4],fmt_dst_src($row, 17),$row[7],$row[13],$row[8],$row[9],fmt_confirmation($row, 16), $row[20]);
+			$reportarray = array($row[0], $row[1], $row[2],$row[3],$row[4],fmt_dst_src($row, 17), $row[51], $row[7],$row[13],$row[8],$row[9],fmt_confirmation($row, 16), $row[20]);
 			//index 18 is the last position of a non-ffield
 			foreach($fieldlist as $fieldnum => $fieldname){
 				if(isset($activefields[$fieldnum])){

@@ -12,11 +12,15 @@ class PeopleList extends DBMappedObject {
 	var $rules = false; // Local cache.
 	var $organizations = false; // Local cache.
 	var $sections = false; // Local cache.
+	var $restrictedGuardianCategoryIds = false; // local cache, array of guardian category ids
 	
+	var $recipientmode;
+	public static $RECIPIENTMODE_MAP = array(1 => 'self', 2 => 'guardian', 3 => 'selfAndGuardian');
+
 	function PeopleList ($id = NULL) {
 		$this->_allownulls = true;
 		$this->_tablename = "list";
-		$this->_fieldlist = array("userid", "type", "name", "description","modifydate","lastused", "deleted");
+		$this->_fieldlist = array("userid", "type", "name", "recipientmode", "description","modifydate","lastused", "deleted");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}
@@ -30,6 +34,13 @@ class PeopleList extends DBMappedObject {
 		}
 		
 		return $this->rules;
+	}
+	
+	function getRestrictedGuardianCategoryIds() {
+		if ($this->restrictedGuardianCategoryIds === false) {
+			$this->restrictedGuardianCategoryIds = QuickQueryList("select guardiancategoryid from listguardiancategory where listid = ?", false, false, array($this->id));
+		}
+		return $this->restrictedGuardianCategoryIds;
 	}
 	
 	function getOrganizations() {

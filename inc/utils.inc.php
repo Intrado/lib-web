@@ -585,9 +585,12 @@ function resequence($objectarray, $field){
 	return $temparray;
 }
 
-//fetch destination labels and store them into a static array
-function fetch_labels($type, $sequence, $refresh=false){
-	static $labels = array();
+/**
+ * Fetch max types
+ * @staticvar type $maxtypes
+ * @return type
+ */
+function fetch_max_types(){
 	static $maxtypes = null;
 	if ($maxtypes == null) {
 		$maxtypes = array();
@@ -606,6 +609,12 @@ function fetch_labels($type, $sequence, $refresh=false){
 			}
 		}
 	}
+	return $maxtypes;
+}
+//fetch destination labels and store them into a static array
+function fetch_labels($type, $sequence, $refresh=false){
+	static $labels = array();
+	$maxtypes = fetch_max_types();
 	// prevent division by zero, where the max is zero or unset
 	if (!array_key_exists($type, $maxtypes))
 		return "";

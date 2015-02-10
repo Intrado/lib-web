@@ -42,12 +42,29 @@ function upgrade_11_1($rev, $shardid, $customerid, $db) {
 				QuickUpdate("update setting set value = '0' where name = '_hasinfocenter'", $db);
 			}
 			Query("COMMIT", $db);
+<<<<<<< HEAD
 		case 3:
 			echo "|";
 			apply_sql("upgrades/db_11-1_pre.sql", $customerid, $db, 4);
 		case 4:
 			echo "|";
 			apply_sql("upgrades/db_11-1_pre.sql", $customerid, $db, 5);
+=======
+			case 3:
+				echo "|";
+				apply_sql("upgrades/db_11-1_pre.sql", $customerid, $db, 4);
+			case 4:
+				echo "|";
+				apply_sql("upgrades/db_11-1_pre.sql", $customerid, $db, 5);
+				Query("BEGIN", $db);
+				$maxguardians = QuickQuery("select value from setting where name = 'maxguardians'", $db);
+				if($maxguardians > 0){
+					QuickUpdate("update list set recipientmode = 'selfAndGuardian'", $db);
+				}else {
+					QuickUpdate("update list set recipientmode = 'self'", $db);
+				}
+				Query("COMMIT", $db);
+>>>>>>> topic/CS-7171
 
 	}
 	//This statement should appear in each upgrade script, when relevent.
