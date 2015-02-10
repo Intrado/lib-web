@@ -104,7 +104,7 @@ $graph = new Graph(1200, 650,"auto");
 if ($dm)
 	$graph->SetScale("textlin");
 else
-	$graph->SetScale("textlin",0,30000);
+	$graph->SetScale("textlin",0,35000);
 $graph->SetFrame(false);
 
 //$graph->SetShadow();
