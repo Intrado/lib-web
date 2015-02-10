@@ -2782,6 +2782,17 @@ $$$
 
 -- END 11.0/6
 
+ALTER TABLE `reportcontact`  
+  ADD `recipientpersonid` INT NOT NULL default 0 AFTER `sequence`,
+  ADD INDEX (`recipientpersonid`)
+$$$
+
+update setting set value='11.0/7' where name='_dbversion'
+$$$
+
+-- END 11.0/7
+
+
 CREATE TABLE `device` (
  `id` int(11) NOT NULL AUTO_INCREMENT,
  `personId` int(11) NOT NULL,
