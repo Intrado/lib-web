@@ -40,3 +40,11 @@ $$$
 
 -- $rev 6
 -- dummy rev to insert organization settings '_hasquicktip'
+
+-- $rev 7
+-- rolling upgrade customers for reportcontact changes needed in upcoming 11.1 release
+ALTER TABLE `reportcontact`  
+  ADD `recipientpersonid` INT NOT NULL default 0 AFTER `sequence`,
+  ADD INDEX (`recipientpersonid`)
+$$$
+
