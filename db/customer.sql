@@ -2825,3 +2825,20 @@ update setting set value='11.1/5' where name='_dbversion'
 $$$
 
 -- END 11.1/5
+
+-- indicate if list should include the people themselves
+ALTER TABLE `list` ADD `recipientmode` enum ('self','guardian','selfAndGuardian') NOT NULL DEFAULT 'selfAndGuardian'
+$$$
+
+-- restrict targeted recipients based on guardiancategory relation to list people. if no entries, include all categories.
+CREATE TABLE `listguardiancategory` (
+  `listId` int(11) NOT NULL,
+  `guardianCategoryId` int(11) NOT NULL,
+  PRIMARY KEY (`listId`,`guardianCategoryId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
+
+update setting set value='11.1/6' where name='_dbversion'
+$$$
+
+-- END 11.1/6

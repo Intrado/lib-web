@@ -42,30 +42,35 @@ function upgrade_11_1($rev, $shardid, $customerid, $db) {
 				QuickUpdate("update setting set value = '0' where name = '_hasinfocenter'", $db);
 			}
 			Query("COMMIT", $db);
-<<<<<<< HEAD
 		case 3:
 			echo "|";
 			apply_sql("upgrades/db_11-1_pre.sql", $customerid, $db, 4);
 		case 4:
 			echo "|";
 			apply_sql("upgrades/db_11-1_pre.sql", $customerid, $db, 5);
-=======
-			case 3:
-				echo "|";
-				apply_sql("upgrades/db_11-1_pre.sql", $customerid, $db, 4);
-			case 4:
-				echo "|";
-				apply_sql("upgrades/db_11-1_pre.sql", $customerid, $db, 5);
-				Query("BEGIN", $db);
-				$maxguardians = QuickQuery("select value from setting where name = 'maxguardians'", $db);
-				if($maxguardians > 0){
-					QuickUpdate("update list set recipientmode = 'selfAndGuardian'", $db);
-				}else {
-					QuickUpdate("update list set recipientmode = 'self'", $db);
-				}
-				Query("COMMIT", $db);
->>>>>>> topic/CS-7171
+		case 5:
+			echo "|";
+			apply_sql("upgrades/db_11-1_pre.sql", $customerid, $db, 6);
+			Query("BEGIN", $db);
+			$maxguardians = QuickQuery("select value from setting where name = 'maxguardians'", $db);
+			if($maxguardians > 0) {
+				QuickUpdate("update list set recipientmode = 'selfAndGuardian'", $db);
+			}else {
+				QuickUpdate("update list set recipientmode = 'self'", $db);
+			}
+			Query("COMMIT", $db);
 
+			// reportcontact change in 11.0/7 some test servers may have missed so be nice and apply now
+			$hasChange = QuickQuery("select column_name from information_schema.columns where table_name = 'reportcontact' and column_name = 'recipientpersonid'", $db);
+			if (!$hasChange) {
+				echo "alter reportcontact for test servers do not expect this on production";
+				QuickUpdate("ALTER TABLE `reportcontact` ADD `recipientpersonid` INT NOT NULL default 0 AFTER `sequence`, ADD INDEX (`recipientpersonid`)", $db);
+			}
+			// batch update reportcontact recipientpersonid, loop over small batches
+			while (reportcontact_recipientpersonid_11_0($db)) {
+				// keep running until no more changes
+				echo ".";
+			}
 	}
 	//This statement should appear in each upgrade script, when relevent.
 	apply_sql("../db/update_SMAdmin_access.sql", $customerid, $db);
