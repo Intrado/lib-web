@@ -332,7 +332,7 @@ class JobDetailReport extends ReportGenerator{
 						3 => _L("First Name"),
 						4 => _L("Last Name"),
 						17 => _L("Sequence"),
-						51 => _L("Recipient Guardian"),
+						51 => _L("Recipient"),
 						7 => _L("Destination"),
 						13 => _L("Attempts"),
 						8 => _L("Last Attempt"),
@@ -412,7 +412,7 @@ class JobDetailReport extends ReportGenerator{
 		$fieldindex = getFieldIndexList("p");
 		$activefields = array_flip($activefields);
 		//generate the CSV header
-		$header = array(_L("%s Name",getJobTitle()),_L("Submitted by"),_L("ID"),_L("First Name"),_L("Last Name"),_L("Dst. Src."),_L("Destination"),_L("Recipient Guardian"),_L("Attempts"),_L("Last Attempt"),_L("Delivery Results"),_L("Response"),_L(getSystemSetting("organizationfieldname","Organization")));
+		$header = array(_L("%s Name",getJobTitle()),_L("Submitted by"),_L("ID"),_L("First Name"),_L("Last Name"),_L("Dst. Src."),_L("Recipient"),_L("Destination"),_L("Attempts"),_L("Last Attempt"),_L("Delivery Results"),_L("Response"),_L(getSystemSetting("organizationfieldname","Organization")));
 		foreach($fieldlist as $fieldnum => $fieldname){
 			if(isset($activefields[$fieldnum])){
 				$header[] = $fieldname;

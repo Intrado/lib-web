@@ -73,7 +73,9 @@ class JobAutoReport extends ReportGenerator{
 						where js.jobid = rp.jobid and name = concat('max', rp.type, if((rp.type = 'email' || rp.type = 'phone'), 's', '') )
 					)
 				)
-			) as label
+			) as label,
+			rc.recipientpersonid,
+			(select CONCAT(' ', f01, ' ', f02) from person where rc.recipientpersonid=id) as recipientpersonname
 			from reportperson rp
 			inner join job j on (rp.jobid = j.id)
 			inner join user u on (u.id = j.userid)
