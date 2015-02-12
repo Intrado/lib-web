@@ -1,13 +1,5 @@
 <?
 
-function reportcontact_recipientpersonid_11_0($db) {
-	$hasChanges = false;
-	Query("BEGIN", $db);
-	$hasChanges = QuickUpdate("update reportcontact set recipientpersonid = personid where recipientpersonid = 0 limit 1000", $db);
-	Query("COMMIT", $db);
-	return $hasChanges;
-}
-
 function upgrade_11_0($rev, $shardid, $customerid, $db) {
 	global $authdb;
 
@@ -58,12 +50,6 @@ function upgrade_11_0($rev, $shardid, $customerid, $db) {
 		case 6:
 			echo "|";
 			apply_sql("upgrades/db_11-0_pre.sql", $customerid, $db, 7);
-			
-			// batch update reportcontact recipientpersonid, loop over small batches
-			while (reportcontact_recipientpersonid_11_0($db)) {
-				// keep running until no more changes
-				echo ".";
-			}
 	}
 	//This statement should appear in each upgrade script, when relevent.
 	apply_sql("../db/update_SMAdmin_access.sql", $customerid, $db);

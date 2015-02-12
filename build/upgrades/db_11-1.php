@@ -1,4 +1,12 @@
 <?
+function reportcontact_recipientpersonid_11_0($db) {
+	$hasChanges = false;
+	Query("BEGIN", $db);
+	$hasChanges = QuickUpdate("update reportcontact set recipientpersonid = personid where recipientpersonid = 0 limit 10000", $db);
+	Query("COMMIT", $db);
+	return $hasChanges;
+}
+
 function upgrade_11_1($rev, $shardid, $customerid, $db) {
 	global $authdb;
 
