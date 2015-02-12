@@ -14,7 +14,7 @@ class PeopleList extends DBMappedObject {
 	var $sections = false; // Local cache.
 	var $restrictedGuardianCategoryIds = false; // local cache, array of guardian category ids
 	
-	var $recipientmode;
+	var $recipientmode = 'selfAndGuardian';
 	public static $RECIPIENTMODE_MAP = array(1 => 'self', 2 => 'guardian', 3 => 'selfAndGuardian');
 
 	function PeopleList ($id = NULL) {
