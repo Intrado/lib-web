@@ -180,16 +180,20 @@ if (isset($personid)) {
 		$devices = array();
 		foreach ($deviceDbmos as $d) {
 			$response = $deviceService->getDevice($d->deviceUuid);
-			$dto = new DeviceDto();
-			$dto->sequence = $d->sequence;
-			$dto->personId = $d->personId;
-			$dto->uuid = $d->deviceUuid;
+			//only add a device when device service returns device details
 			if ($response) {
-				$dto->name = $response->name;
+				$dto = new DeviceDto();
+				$dto->sequence = $d->sequence;
+				$dto->personId = $d->personId;
+				$dto->uuid = $d->deviceUuid;
+				if ($response) {
+					$dto->name = $response->name;
+				}
+				$devices[] = $dto;
 			}
-			$devices[] = $dto;
 		}
-		$types["device"] = $devices;
+		if(count($devices) > 0)
+			$types["device"] = $devices;
 	}
 	
 	$contacttypes = array("phone", "email");
