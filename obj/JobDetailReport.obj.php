@@ -136,7 +136,7 @@ class JobDetailReport extends ReportGenerator{
 					) as destination,
 				from_unixtime(rc.starttime/1000) as lastattempt,
 				coalesce(if(rc.result='X' and rc.numattempts<3,'F',rc.result), rp.status) as result,
-				(SELECT statuscode FROM reportemaildelivery WHERE jobid=rc.jobid AND personid = rc.personid AND sequence = rc.sequence ORDER BY timestamp DESC LIMIT 1) as emailstatuscode,
+				(select statuscode from reportemaildelivery use index (jobperson) where jobid=rc.jobid AND personid = rc.personid and sequence = rc.sequence order by timestamp desc limit 1) as emailstatuscode,
 				ret.requestduration as emailreadduration,
 				rp.status,
 				rc.numattempts as numattempts,
