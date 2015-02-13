@@ -25,7 +25,7 @@ if (isset($_GET["delete"]) && isset($_GET["id"])) {
 	if ($csApi->deleteGuardianCategory($deleteid)) {
 		notice(_L("The guardian category is now deleted."));
 	} else {
-		notice(_L("This guardian category is being used. Please un-associate and try again."));
+		notice(_L("This guardian category is being used by a list or guardian. Please un-associate and try again."));
 	}
 	
 	redirect();
