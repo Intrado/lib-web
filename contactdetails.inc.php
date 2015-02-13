@@ -183,16 +183,14 @@ if (isset($personid)) {
 			//only add a device when device service returns device details
 			if ($response) {
 				$dto = new DeviceDto();
+				$dto->name = $response->name;
 				$dto->sequence = $d->sequence;
 				$dto->personId = $d->personId;
 				$dto->uuid = $d->deviceUuid;
-				if ($response) {
-					$dto->name = $response->name;
-				}
 				$devices[] = $dto;
 			}
 		}
-		if(count($devices) > 0)
+		if (count($devices) > 0)
 			$types["device"] = $devices;
 	}
 	
@@ -295,7 +293,8 @@ if(CheckFormSubmit($f,$s))
 				if (!isset($types[$type])) continue;
 				foreach($types[$type] as $item){
 					// device type does not have editlock
-					if($type != "device" && GetFormData($f, $s, "editlock_" . $type . $item->sequence) || $item->editlock != GetFormData($f, $s, "editlock_" . $type . $item->sequence)){
+					if ($type != "device" && 
+						(GetFormData($f, $s, "editlock_" . $type . $item->sequence) || $item->editlock != GetFormData($f, $s, "editlock_" . $type . $item->sequence))) {
 						$item->editlock = GetFormData($f, $s, "editlock_" . $type . $item->sequence);
 						if($item->editlock){
 							if($type == "email")
