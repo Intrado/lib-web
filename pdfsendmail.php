@@ -210,12 +210,19 @@ class PdfSendMail extends PageForm {
 				$messagePart->create();
 			}
 
+			// build the list of people for this job
 			$list = new PeopleList();
 			$list->userid = $USER->id;
 			$list->name = $job->name;
 			$list->description = $job->description;
 			$list->modifydate = $job->modifydate;
 			$list->deleted = 1;
+			// is customer guardian data or flat, used to determine list recipient mode
+			if (getSystemSetting("maxguardians", 0)) {
+				$list->recipientmode = 'guardian';
+			} else {
+				$list->recipientmode = 'self';
+			}
 			$list->create();
 			$this->fillListFromBurst($list, $this->burst->id);
 
@@ -258,8 +265,9 @@ class PdfSendMail extends PageForm {
 		$pkeys = array();
 		$portionList = $this->csApi->getBurstPortionList($burstId);
 		if ($portionList) {
-			foreach ($portionList->portions as $portion)
+			foreach ($portionList->portions as $portion) {
 				$pkeys[] = $portion->identifierText;
+			}
 		}
 		$list->updateManualAddByPkeys($pkeys);
 	}
