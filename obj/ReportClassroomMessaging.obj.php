@@ -90,10 +90,10 @@ class ReportClassroomMessaging extends ReportGenerator {
 				tg.messagekey,
 				e.notes,
 				e.occurence AS occurrence,
-				from_unixtime(if(rc.type = 'email', (select timestamp from reportemaildelivery where jobid = rc.jobid and personid = rc.personid and sequence = rc.sequence order by timestamp limit 1), rc.starttime/1000)) as lastattempt,
+				from_unixtime(if(rc.type = 'email', (select timestamp from reportemaildelivery use index (jobperson) where jobid = rc.jobid and personid = rc.personid and sequence = rc.sequence order by timestamp limit 1), rc.starttime/1000)) as lastattempt,
 				rc.type,
 				if(rc.type = 'email', rc.email, rc.phone) as destination,
-				if(rc.type = 'email', (select statuscode from reportemaildelivery where jobid = rc.jobid and personid = rc.personid and sequence = rc.sequence order by timestamp limit 1), rc.result) as result
+				if(rc.type = 'email', (select statuscode from reportemaildelivery use index (jobperson) where jobid = rc.jobid and personid = rc.personid and sequence = rc.sequence order by timestamp limit 1), rc.result) as result
 			from
 				alert a
 				inner join event e on (e.id = a.eventid)
