@@ -68,6 +68,10 @@ function upgrade_11_1($rev, $shardid, $customerid, $db) {
 			}
 			Query("COMMIT", $db);
 
+		case 6:
+			echo "|";
+			apply_sql("upgrades/db_11-1_pre.sql", $customerid, $db, 7);
+					
 			// reportcontact change in 11.0/7 some test servers may have missed so be nice and apply now
 			$hasChange = QuickQuery("select column_name from information_schema.columns where table_name = 'reportcontact' and column_name = 'recipientpersonid'", $db);
 			if (!$hasChange) {

@@ -56,3 +56,6 @@ CREATE TABLE `listguardiancategory` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
 
+-- $rev 7
+-- optional upgrade on test servers (should have been applied to production in 11.0/7) for reportcontact.recipientpersonid
+

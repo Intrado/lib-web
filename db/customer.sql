@@ -2853,3 +2853,8 @@ update setting set value='11.1/6' where name='_dbversion'
 $$$
 
 -- END 11.1/6
+
+update setting set value='11.1/7' where name='_dbversion'
+$$$
+
+-- END 11.1/7
