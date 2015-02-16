@@ -407,7 +407,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			if ($postdata['recipientmode']) {
 				$mode = $postdata['recipientmode'];
 			}
-			$categories = $postdata['category'];
+			$categories = $mode === 'self' ? array() : $postdata['category'];
 		}
 
 		$list->name = removeIllegalXmlChars($postdata['name']);
@@ -587,6 +587,22 @@ include_once("nav.inc.php");
 ?>
 <script type="text/javascript">
 	<? Validator::load_validators(array("ValRules", "ValListName", "ValSections")); ?>
+
+	function toggleCategory(){
+		if($('list_recipientmode-1').checked)
+			$('list_category_fieldarea').hide();
+		else
+			$('list_category_fieldarea').show();
+	}
+	document.observe('dom:loaded', function () {
+		//first check the initial value
+		toggleCategory();
+		$('list_recipientmode').observe('click', function(e) {
+			toggleCategory();
+		});
+	});
+
+
 </script>
 <?
 startWindow(_L('List Editor'));
