@@ -73,7 +73,7 @@ function upgrade_11_1($rev, $shardid, $customerid, $db) {
 			apply_sql("upgrades/db_11-1_pre.sql", $customerid, $db, 7);
 					
 			// reportcontact change in 11.0/7 some test servers may have missed so be nice and apply now
-			$hasChange = QuickQuery("select column_name from information_schema.columns where table_name = 'reportcontact' and column_name = 'recipientpersonid'", $db);
+			$hasChange = QuickQuery("select column_name from information_schema.columns where table_schema = ? and table_name = 'reportcontact' and column_name = 'recipientpersonid'", $db, array("c_".$customerid));
 			if (!$hasChange) {
 				echo "alter reportcontact for test servers do not expect this on production";
 				QuickUpdate("ALTER TABLE `reportcontact` ADD `recipientpersonid` INT NOT NULL default 0 AFTER `sequence`, ADD INDEX (`recipientpersonid`)", $db);
