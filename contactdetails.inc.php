@@ -190,8 +190,7 @@ if (isset($personid)) {
 				$devices[] = $dto;
 			}
 		}
-		if (count($devices) > 0)
-			$types["device"] = $devices;
+		$types["device"] = $devices;
 	}
 	
 	$contacttypes = array("phone", "email");
@@ -556,6 +555,14 @@ foreach ($fieldmaps as $map) {
 ?>
 		</tr>
 <?
+
+		//For contact types without entry display None
+		if (count($types[$type]) == 0) {
+			?>
+			<td align="center"><?= _L("None") ?></td>
+			<?
+		}
+
 		foreach($types[$type] as $item){
 			$header = escapehtml(destination_label($type, $item->sequence));
 ?>
