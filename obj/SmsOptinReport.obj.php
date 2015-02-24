@@ -2,45 +2,57 @@
 
 class SmsOptinReport extends ReportGenerator {
 
-	var $total = 0;
-	var $data = array();
-	
 	function generateQuery($hackPDF = false){
 		$hassms = getSystemSetting("_hassms", false);
 
 		$this->params = $this->reportinstance->getParameters();
 		//$this->reporttype = $this->params['reporttype'];
 		
-		$this->query = "select 1"; // TODO call API
+		// TODO: this query is known to be expensive, because the UNION causes a big temp table.
+		$this->query = "select sql_calc_found_rows * from (
+    (
+	select asb.sms, asb.status, 'global' as modifiedby, unix_timestamp(asb.lastupdate)*1000 as modifieddate, asb.notes
+	from aspsmsblock as asb 
+	join person as p on (p.id = asb.personid)
+	where (p.type in ('system', 'guardianauto') and asb.editlock = 0 and not p.deleted)
+    )
+    union
+    (
+	select s.sms, 'block', bu.login, unix_timestamp(b.createdate)*1000, b.description
+	from sms as s
+	inner join blockeddestination as b
+	  on (b.type = 'sms' and b.destination = s.sms)
+	inner join user as bu
+	  on (b.userid = bu.id)
+	inner join person as p
+	  on (s.personid = p.id)
+	where not p.deleted
+    )) t
+    order by sms "; // expect a limit clause when displaying by paging
 	}
-	
-	function fetchPage($pagestart, $max) {
-		global $csApi;
-		global $total;
-		global $data;
-		
-		$apiResponse = $csApi->getSmsStatusReport($pagestart, $max);
-		$total = $apiResponse->paging->total;
-		
-		// fill data array from query
-		$data = array(); // array of rows with these columns
-		// 0 = sms
-		// 1 = status
-		// 2 = scope local vs global
-		// 3 = date
-		// 4 = notes
-		foreach ($apiResponse->smsStatus as $row) {
-			$data[] = array($row->sms, $row->status, $row->scope, $row->lastUpdateMs, $row->notes);
+
+	protected function fetchData($pageStart, $pageSize) {
+		QuickQuery("set session max_heap_table_size=1024*1024*1024");
+		QuickQuery("set session tmp_table_size=1024*1024*1024");
+
+		$pageStart = (int) $pageStart;
+		$pageSize = (int) $pageSize;
+		$limit = " limit $pageStart, $pageSize";
+		$result = Query($this->query . $limit, $this->_readonlyDB);
+		while ($row = DBGetRow($result)) {
+			$data[] = $row;
 		}
+
+		$query = "select found_rows()";
+		$total = QuickQuery($query, $this->_readonlyDB);
+		return(array($data, $total));
 	}
 	
 	function runHtml() {
-		global $total;
-		global $data;
-		
-		$max = 100;
-		$pagestart = $this->params['pagestart'];
-		$this->fetchPage($pagestart, $max);
+		$pageSize = 100;
+		$pageStart = isset($this->params["pagestart"]) ? (int) $this->params["pagestart"] : 0;
+
+		list($data, $total) = $this->fetchData($pageStart, $pageSize);
 
 		$titles = array("0" => "Phone Number",
 				"1" => "Status",
@@ -74,14 +86,14 @@ class SmsOptinReport extends ReportGenerator {
 		}
 		
 		$formatters = array("0" => "fmt_phone",
-							"1" => "fmt_smsstatus",
-							"2" => "fmt_modifiedby",
-							"3" => "fmt_lastupdate_date"
-					);
+				    "1" => "fmt_smsstatus",
+				    "2" => "fmt_modifiedby",
+				    "3" => "fmt_lastupdate_date"
+		);
 		
 		///////////////
 		startWindow(_L("Search Results"), "padding: 3px;");
-		showPageMenu($total, $pagestart, $max);
+		showPageMenu($total, $pageStart, $pageSize);
 
 		?>
 			<table width="100%" cellpadding="3" cellspacing="1" class="list" id="searchresults">
@@ -94,34 +106,33 @@ class SmsOptinReport extends ReportGenerator {
 			</script>
 		<?
 
-		showPageMenu($total, $pagestart, $max);
+		showPageMenu($total, $pageStart, $pageSize);
 		endWindow();
 	}
 
 	function runCSV($options = false){
 		if ($options) {
-			$fp = fopen($options['filename'], "w");
-			if (!$fp)
+			if (!$options["filename"])
 				return false;
+			$outputfile = $options["filename"];
 		} else {
+			$outputfile = "php://output";
 			header("Pragma: private");
 			header("Cache-Control: private");
 			header("Content-disposition: attachment; filename=report.csv");
 			header("Content-type: application/vnd.ms-excel");
 		}
+		$fp = fopen($outputfile, "w");
+		if (!$fp)
+			return false;
 		
 		//generate the CSV header
-		$header = '"Phone Number","Status","Modified By","Modified Date","Notes"';
+		$headerfields = array("Phone Number","Status","Modified By","Modified Date","Notes");
+		$header = '"' . implode('","', $headerfields) . '"';
 		
-		if ($options) {
-			$ok = fwrite($fp, $header . "\r\n");
-			if (!$ok)
-				return false;
-				
-		} else {
-			echo $header;
-			echo "\r\n";
-		}
+		$ok = fwrite($fp, $header . "\r\n");
+		if (!$ok)
+			return false;
 		
 		//Display Formatter
 		function fmt_lastupdate_date($row, $index) {
@@ -147,29 +158,25 @@ class SmsOptinReport extends ReportGenerator {
 			}
 		}
 
+		session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
+
 		// batch api request by 10000 smsnumber, cannot load all 100k into memory
-		global $total;
-		global $data;
 		
-		$max = 10000;
-		$pagestart = $this->params['pagestart'];
+		$pageSize = 10000;
+		$pageStart = array_key_exists('pagestart', $this->params) ? $this->params['pagestart'] : 0;
 		do {
-			$this->fetchPage($pagestart, $max);
+			list($data, $total) = $this->fetchData($pageStart, $pageSize);
 			foreach ($data as $row) {
 				$row[0] = fmt_phone($row, 0);
 				$row[1] = fmt_smsstatus($row, 1);
 				$row[2] = fmt_modifiedby($row, 2);
  				$row[3] = fmt_lastupdate_date($row, 3);
-				if ($options) {
-					$ok = fwrite($fp, '"' . implode('","', $row) . '"' . "\r\n");
-					if (!$ok)
-						return false;
-				} else {
-					echo '"' . implode('","', $row) . '"' . "\r\n";
-				}
+				$ok = fwrite($fp, '"' . implode('","', $row) . '"' . "\r\n");
+				if (!$ok)
+					return false;
 			}
-			$pagestart += $max;
-		} while ($pagestart < $total);
+			$pageStart += $pageSize;
+		} while ($pageStart < $total);
 
 		if ($options) {
 			return fclose($fp);

@@ -175,7 +175,7 @@ if($error || $reportgenerator->format == "html"){
 	NewForm($f);
 
 	$back = icon_button("Back", "fugue/arrow_180", "location.href='reports.php'");
-	buttons($back, submit($f, $s, "Refresh", null, "arrow_refresh"));
+	buttons($back, submit($f, $s, "Refresh", null, "arrow_refresh"), submit($f, "save", "Save/Schedule"));
 	startWindow("Display Options", "padding: 3px;", "true");
 	
 	?>
