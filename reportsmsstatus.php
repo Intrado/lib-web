@@ -20,7 +20,7 @@ require_once("obj/ReportInstance.obj.php");
 require_once("obj/ReportGenerator.obj.php");
 require_once("obj/ReportSubscription.obj.php");
 require_once("obj/UserSetting.obj.php");
-require_once("obj/SmsOptinReport.obj.php");
+require_once("obj/SmsStatusReport.obj.php");
 require_once("obj/Person.obj.php");
 require_once("obj/Phone.obj.php");
 require_once("obj/Email.obj.php");
@@ -64,20 +64,15 @@ if(isset($_GET['reportid'])){
 	redirect();
 }
 
-$pagestartflag=0;
-$pagestart=0;
-if(isset($_GET['pagestart'])){
-	$pagestart = $_GET['pagestart']+0;
-	$pagestartflag=1;
+if (isset($_SESSION['report']) && isset($_SESSION['report']['options'])) {
+	$options = $_SESSION['report']['options'];
+} else {
+	$options = array();
 }
-
-$options = $_SESSION['report']['options'];
-$options["pagestart"] = $pagestart;
 
 if(!isset($_SESSION['reportid']))
 	$_SESSION['saved_report'] = false;
 
-$options['format'] = 'csv'; // (most reports use PDF by default), this one does not support it, only CSV
 $instance = new ReportInstance();
 
 if(isset($_SESSION['reportid'])){
@@ -88,24 +83,33 @@ if(isset($_SESSION['reportid'])){
 
 $_SESSION['report']['options'] = $options;
 
-$options['pagestart'] = $pagestart;
+if(isset($_GET["csv"]) && $_GET["csv"]){
+	$options["reporttype"] = "csv";
+} elseif (isset($_GET["summary"]) && $_GET["summary"]) {
+	$options["reporttype"] = "summary";
+} elseif (isset($_GET["sms"]) && $_GET["sms"]) {
+	$options["reporttype"] = "view";
+	$options["sms"] = (string) $_GET["sms"];
+} elseif (array_key_exists("pagestart", $_GET)) {
+	$options["reporttype"] = "paged";
+	$options["pagestart"] = (int) $_GET["pagestart"];
+} else {
+	$options["reporttype"] = "html";
+}
 
 $instance->setParameters($options);
-$reportgenerator = new SmsOptinReport();
+$reportgenerator = new SmsStatusReport();
 $reportgenerator->reportinstance = $instance;
 $reportgenerator->userid = $USER->id;
 
-if(isset($_GET['csv']) && $_GET['csv']){
-	$reportgenerator->format = "csv";
-} else if(isset($_GET['pdf']) && $_GET['pdf']){
-	$reportgenerator->format = "pdf";
+if(isset($_GET["csv"]) && $_GET["csv"]){
+	$reportgenerator->set_format("csv");
 } else {
-	$reportgenerator->format = "html";
+	$reportgenerator->set_format("html");
 }
 
-
 $f="reports";
-$s="smsoptin";
+$s="smsstatus";
 $reload = 0;
 $submit=0;
 
@@ -128,7 +132,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "save"))
 
 			if(CheckFormSubmit($f, "save")){
 				$options = $instance->getParameters();
-				$options["reporttype"] = "smsoptin";
+				$options["reporttype"] = "smsstatus";
 				$_SESSION['report']['options']= $options;
 				$_SESSION['report']['edit'] = 1;
 				ClearFormData($f);
@@ -180,8 +184,35 @@ if($error || $reportgenerator->format == "html"){
 	
 	?>
 	<table border="0" cellpadding="3" cellspacing="0" width="100%">
-		<tr><th align="right" class="windowRowHeader bottomBorder">Output Format:</th>
-			<td class="bottomBorder"><a href="reportsmsoptin.php/report.csv?csv=true">CSV</a></td>
+		<tr>
+			<th align="right" class="windowRowHeader"><p>Output Format:</p></th>
+			<td>
+				Search for a specific SMS number:
+				<?
+				NewForm($f);
+				NewFormItem($f, $s, "sms", "tel");
+				NewFormItem($f, "view", null, "submit");
+				EndForm();
+				?>
+			</td>
+		</tr>
+		<tr>
+			<th align="right" class="windowRowHeader"><p>&nbsp;</p></th>
+			<td>
+				<a href="reportsmsstatus.php?summary=true">Summarize counts</a> of SMS numbers per status
+			</td>
+		</tr>
+		<tr>
+			<th align="right" class="windowRowHeader"><p>&nbsp;</p></th>
+			<td>
+				<a href="reportsmsstatus.php/report.csv?csv=true">CSV download</a> of all SMS status data
+			</td>
+		</tr>
+		<tr>
+			<th align="right" class="windowRowHeader bottomBorder"><p>&nbsp;</p></th>
+			<td class="bottomBorder">
+				<a href="reportsmsstatus.php?pagestart=0">View paged table</a> of all SMS status data
+			</td>
 		</tr>
 	</table>
 	<?
