@@ -59,3 +59,30 @@ $$$
 -- $rev 7
 -- optional upgrade on test servers (should have been applied to production in 11.0/7) for reportcontact.recipientpersonid
 
+-- $rev 8
+
+-- for device types, reportdevice is used instead of reportcontact
+CREATE TABLE `reportdevice` (
+  `jobId` int(11) NOT NULL,
+  `personId` int(11) NOT NULL,
+  `sequence` tinyint(4) NOT NULL,
+  `deviceUuid` varchar(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  `numAttempts` tinyint(4) NOT NULL,
+  `startTimeMs` bigint(20) DEFAULT NULL,
+  `result` enum('sent','unsent') NOT NULL,
+  PRIMARY KEY (`jobId`,`personId`,`sequence`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
+
+-- record each attempt, rather than cramming into reportcontact.attemptdata
+CREATE TABLE `reportdeviceattempt` (
+  `jobId` int(11) NOT NULL,
+  `personId` int(11) NOT NULL,
+  `sequence` tinyint(4) NOT NULL,
+  `attempt` tinyint(4) NOT NULL,
+  `startTimeMs` bigint(20) NOT NULL,
+  `result` enum('sent','unsent') NOT NULL,
+  `notificationReceiptId` bigint(20) NOT NULL,
+  PRIMARY KEY (`jobId`,`personId`,`sequence`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$

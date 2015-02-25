@@ -2782,11 +2782,13 @@ $$$
 
 -- END 11.0/6
 
+-- TODO view of sms status report
+
 ALTER TABLE `reportcontact`  
   ADD `recipientpersonid` INT NOT NULL default 0 AFTER `sequence`,
   ADD INDEX (`recipientpersonid`)
 $$$
-
+ -- TODO reportperson type device
 update setting set value='11.0/7' where name='_dbversion'
 $$$
 
@@ -2858,3 +2860,35 @@ update setting set value='11.1/7' where name='_dbversion'
 $$$
 
 -- END 11.1/7
+
+-- for device types, reportdevice is used instead of reportcontact
+CREATE TABLE `reportdevice` (
+  `jobId` int(11) NOT NULL,
+  `personId` int(11) NOT NULL,
+  `sequence` tinyint(4) NOT NULL,
+  `deviceUuid` varchar(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  `numAttempts` tinyint(4) NOT NULL,
+  `startTimeMs` bigint(20) DEFAULT NULL,
+  `result` enum('sent','unsent') NOT NULL,
+  PRIMARY KEY (`jobId`,`personId`,`sequence`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
+
+-- record each attempt, rather than cramming into reportcontact.attemptdata
+CREATE TABLE `reportdeviceattempt` (
+  `jobId` int(11) NOT NULL,
+  `personId` int(11) NOT NULL,
+  `sequence` tinyint(4) NOT NULL,
+  `attempt` tinyint(4) NOT NULL,
+  `startTimeMs` bigint(20) NOT NULL,
+  `result` enum('sent','unsent') NOT NULL,
+  `notificationReceiptId` bigint(20) NOT NULL,
+  PRIMARY KEY (`jobId`,`personId`,`sequence`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
+
+update setting set value='11.1/8' where name='_dbversion'
+$$$
+
+-- END 11.1/8
+
