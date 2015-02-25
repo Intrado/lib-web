@@ -206,12 +206,12 @@ $groupBy $orderBy ";
 		$fp = fopen($outputfile, "w");
 		if (!$fp)
 			return false;
-		
+
 		//generate the CSV header
 		$headerfields = array("Phone Number","Person Pkey","Status","Modified By","Modified Date","Notes");
 		$headerfields = array_map(function ($value) { return '"'.$value.'"'; }, $headerfields);
 		$header = implode(",", $headerfields);
-		
+
 		$ok = fwrite($fp, $header . "\r\n");
 		if (!$ok)
 			return false;
@@ -234,7 +234,7 @@ $groupBy $orderBy ";
 				// $row[1] is Person Pkey
 				$row[2] = fmt_smsstatus($row, 2);
 				$row[3] = fmt_modifiedby($row, 3);
- 				$row[4] = fmt_lastupdate_date($row, 4);
+				$row[4] = fmt_lastupdate_date($row, 4);
 				$row = array_map(function ($value) { return '"'.$value.'"'; }, $row);
 				$ok = fwrite($fp, implode(",", $row) . "\r\n");
 				if (!$ok)
