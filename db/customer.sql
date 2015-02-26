@@ -2781,3 +2781,12 @@ update setting set value='11.0/6' where name='_dbversion'
 $$$
 
 -- END 11.0/6
+
+-- rev 7 add view to join c_X.sms to aspshard.smsblock
+CREATE OR REPLACE SQL SECURITY DEFINER VIEW `aspsmsblock` AS select `s`.`sms` AS `sms`,`sb`.`status` AS `status`,`s`.`personid` AS `personid`,`sb`.`lastupdate` AS `lastupdate`,`sb`.`notes` AS `notes`, `s`.`editlock` AS `editlock` from (`sms` `s` join `aspshard`.`smsblock` `sb` on((`sb`.`sms` = convert(`s`.`sms` using latin1))))
+$$$
+
+update setting set value='11.0/7' where name='_dbversion'
+$$$
+
+-- END 11.0/7

@@ -29,13 +29,13 @@ class SmsStatusReport extends ReportGenerator {
 			$groupBy = "group by status";
 			$orderBy = "";
 			break;
-		case "view":
+		case "smsview":
 			$whereSms = "and sms = ?";
 			// need two parameters to fill two placeholders
 			$this->queryArgs[] = $this->params["sms"];
 			$this->queryArgs[] = $this->params["sms"];
 			break;
-		case "paged":
+		case "view":
 			$selectList0 = "sql_calc_found_rows *";
 			$orderBy = "order by sms";
 			break;
@@ -60,10 +60,9 @@ union
     inner join user as bu on (b.userid = bu.id)
     inner join person as p on (s.personid = p.id)
     where not p.deleted $whereSms
-    $groupBy
 )) t
 $groupBy $orderBy ";
-    }
+	}
 
 	function runHtml() {
 
@@ -76,30 +75,7 @@ $groupBy $orderBy ";
 		$pageSize = null;
 		$pageStart = null;
 
-		function fmt_lastupdate_date($row, $index) {
-			return date("M j, Y g:i a", $row[$index]/1000);
-		}
-		
-		function fmt_modifiedby($row, $index) {
-			if ($row[$index] === "global")
-				return "System";
-			else
-				return $row[$index];
-		}
-		
-		function fmt_smsstatus($row, $index) {
-			switch ($row[$index]) {
-				case "new":
-				case "pendingoptin":
-					return "Pending Opt-In";
-				case "block":
-					return "Blocked";
-				case "optin":
-					return "Opted In";
-			}
-		}
-
-		if ($this->reportType == "paged") {
+		if ($this->reportType == "view") {
 			$pageSize = 100;
 			$pageStart = isset($this->params["pagestart"]) ? (int) $this->params["pagestart"] : 0;
 			$limit = "limit $pageStart, $pageSize";
@@ -112,7 +88,7 @@ $groupBy $orderBy ";
 			$data[] = $row;
 		}
 
-		if ($this->reportType == "paged") {
+		if ($this->reportType == "view") {
 			$total = QuickQuery("select found_rows()", $this->_readonlyDB);
 		}
 
@@ -122,9 +98,27 @@ $groupBy $orderBy ";
 					"1" => "Count"
 			);
 			$formatters = array("0" => "fmt_smsstatus");
+			$newdata = array(
+				"Pending Opt-In" => array(
+					"0" => "pendingoptin", // also used for 'new'
+					"1" => "0"
+				),
+				"Opted In" => array(
+					"0" => "optin",
+					"1" => "0"
+				),
+				"Blocked" => array(
+					"0" => "block",
+					"1" => "0"
+				)
+			);
+			foreach ($data as $row) {
+				$newdata[fmt_smsstatus($row, 0)][1] += $row[1];
+			}
+			$data = array_values($newdata);
 			break;
+		case "smsview":
 		case "view":
-		case "paged":
 			$titles = array("0" => "Phone Number",
 					"1" => "Person Key",
 					"2" => "Status",
@@ -142,16 +136,19 @@ $groupBy $orderBy ";
 
 		switch ($this->reportType) {
 		case "summary":
-			startWindow(_L("Summary SMS Status Results"), "padding: 3px;");
+			startWindow(_L("Summary of Count per Status"), "padding: 3px;");
+			break;
+		case "smsview":
+			startWindow(_L("SMS Search for '" . fmt_phone(array($this->params["sms"]), 0) . "'"), "padding: 3px;");
 			break;
 		case "view":
-			startWindow(_L("SMS Search Results"), "padding: 3px;");
-			break;
-		case "paged":
-			startWindow(_L("Full SMS Status Results"), "padding: 3px;");
-			showPageMenu($total, $pageStart, $pageSize);
+			startWindow(_L("View SMS Status Results"), "padding: 3px;");
 			break;
 		}
+		if ($data) {
+		    if ($this->reportType == "view") {
+			    showPageMenu($total, $pageStart, $pageSize);
+		    }
 		?>
 			<table width="100%" cellpadding="3" cellspacing="1" class="list" id="searchresults">
 		<?
@@ -162,36 +159,18 @@ $groupBy $orderBy ";
 			var searchresultstable = new getObj("searchresults").obj;
 			</script>
 		<?
-		if ($this->reportType == "paged") {
-			showPageMenu($total, $pageStart, $pageSize);
+		    if ($this->reportType == "view") {
+			    showPageMenu($total, $pageStart, $pageSize);
+		    }
+		} else {
+		?>
+			<em>No results found.</em>
+		<?
 		}
 		endWindow();
 	}
 
 	function runCSV($options = false){
-		function fmt_lastupdate_date($row, $index) {
-			return date("M j, Y g:i a", $row[$index]/1000);
-		}
-		
-		function fmt_modifiedby($row, $index) {
-			if ($row[$index] === "global")
-				return "System";
-			else
-				return $row[$index];
-		}
-		
-		function fmt_smsstatus($row, $index) {
-			switch ($row[$index]) {
-				case "new":
-				case "pendingoptin":
-					return "Pending Opt-In";
-				case "block":
-					return "Blocked";
-				case "optin":
-					return "Opted In";
-			}
-		}
-
 		if ($options) {
 			if (!$options["filename"])
 				return false;
@@ -218,30 +197,22 @@ $groupBy $orderBy ";
 
 		session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 
-		// batch api request by 10000 smsnumber, cannot load all 100k into memory
 		
-		$pageSize = 10000;
-		$pageStart = 0;
-		$n = 0;
-		do {
-
-			$limit = "limit $pageStart, $pageSize";
-			$result = Query($this->query . $limit, $this->_readonlyDB, $this->queryArgs);
-			$n = 0;
-			while ($row = DBGetRow($result)) {
-				$n++;
-				$row[0] = fmt_phone($row, 0);
-				// $row[1] is Person Pkey
-				$row[2] = fmt_smsstatus($row, 2);
-				$row[3] = fmt_modifiedby($row, 3);
-				$row[4] = fmt_lastupdate_date($row, 4);
-				$row = array_map(function ($value) { return '"'.$value.'"'; }, $row);
-				$ok = fwrite($fp, implode(",", $row) . "\r\n");
-				if (!$ok)
-					return false;
-			}
-			$pageStart += $pageSize;
-		} while ($n == $pageSize);
+		// we don't need to worry about blowing out PHP memory if we fetch rows unbuffered
+		$this->_readonlyDB->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);
+		$result = Query($this->query, $this->_readonlyDB, $this->queryArgs);
+		$numFetched = 0;
+		while ($row = DBGetRow($result)) {
+			$row[0] = fmt_phone($row, 0);
+			// $row[1] is Person Pkey
+			$row[2] = fmt_smsstatus($row, 2);
+			$row[3] = fmt_modifiedby($row, 3);
+			$row[4] = fmt_lastupdate_date($row, 4);
+			$row = array_map(function ($value) { return '"'.$value.'"'; }, $row);
+			$ok = fwrite($fp, implode(",", $row) . "\r\n");
+			if (!$ok)
+				return false;
+		}
 
 		if ($options) {
 			return fclose($fp);

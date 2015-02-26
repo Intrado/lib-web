@@ -5,227 +5,199 @@
 ////////////////////////////////////////////////////////////////////////////////
 require_once("inc/common.inc.php");
 include_once("inc/securityhelper.inc.php");
-require_once("inc/html.inc.php");
 require_once("inc/table.inc.php");
-require_once("inc/form.inc.php");
+require_once("inc/html.inc.php");
 require_once("inc/utils.inc.php");
-require_once("inc/reportutils.inc.php");
+require_once("obj/Validator.obj.php");
+require_once("obj/Form.obj.php");
+require_once("obj/FormItem.obj.php");
+require_once("ifc/Page.ifc.php");
+require_once("obj/PageBase.obj.php");
+require_once("obj/PageForm.obj.php");
 require_once("inc/formatters.inc.php");
-require_once("inc/rulesutils.inc.php");
-require_once("inc/date.inc.php");
-require_once("inc/reportgeneratorutils.inc.php");
-
-require_once("obj/FieldMap.obj.php");
 require_once("obj/ReportInstance.obj.php");
 require_once("obj/ReportGenerator.obj.php");
-require_once("obj/ReportSubscription.obj.php");
-require_once("obj/UserSetting.obj.php");
-require_once("obj/SmsStatusReport.obj.php");
-require_once("obj/Person.obj.php");
 require_once("obj/Phone.obj.php");
-require_once("obj/Email.obj.php");
-require_once("obj/Sms.obj.php");
-require_once("obj/Language.obj.php");
 
+require_once("obj/SmsStatusReport.obj.php");
 
-////////////////////////////////////////////////////////////////////////////////
-// Authorization
-////////////////////////////////////////////////////////////////////////////////
-if (!($USER->authorize('viewsystemreports'))) {
-	redirect('unauthorized.php');
+// -----------------------------------------------------------------------------
+// CUSTOM VALIDATORS
+// -----------------------------------------------------------------------------
+
+// No custom Validators are used in this form.
+
+// -----------------------------------------------------------------------------
+// CUSTOM FORM ITEMS
+// -----------------------------------------------------------------------------
+
+// No custom FormItems are used in this form.
+
+// -----------------------------------------------------------------------------
+// CUSTOM FORMATTERS
+// -----------------------------------------------------------------------------
+
+function fmt_lastupdate_date($row, $index) {
+	return date("M j, Y g:i a", $row[$index]/1000);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Functions
-////////////////////////////////////////////////////////////////////////////////
-//index 5 is type
-function fmt_dst_src($row, $index){
-	if($row[$index] != null)
-		return escapehtml(destination_label($row[5], $row[$index]));
+function fmt_modifiedby($row, $index) {
+	if ($row[$index] === "global")
+		return "System";
 	else
-		return "";
+		return $row[$index];
 }
 
-
-////////////////////////////////////////////////////////////////////////////////
-// Data Handling
-////////////////////////////////////////////////////////////////////////////////
-
-unset($_SESSION['report']['edit']);
-if(isset($_GET['reportid'])){
-	$_SESSION['reportid'] = $_GET['reportid']+0;
-	if(!userOwns("reportsubscription", $_SESSION['reportid'])){
-		redirect("unauthorized.php");
+function fmt_smsstatus($row, $index) {
+	switch ($row[$index]) {
+		case "new":
+		case "pendingoptin":
+			return "Pending Opt-In";
+		case "block":
+			return "Blocked";
+		case "optin":
+			return "Opted In";
 	}
-	$subscription = new ReportSubscription($_SESSION['reportid']);
-	$instance = new ReportInstance($subscription->reportinstanceid);
-	$options = $instance->getParameters();
-	$_SESSION['report']['options'] = $options;
-	redirect();
 }
 
-if (isset($_SESSION['report']) && isset($_SESSION['report']['options'])) {
-	$options = $_SESSION['report']['options'];
-} else {
-	$options = array();
-}
+// -----------------------------------------------------------------------------
+// CUSTOM PAGE FUNCTIONALITY
+// -----------------------------------------------------------------------------
 
-if(!isset($_SESSION['reportid']))
-	$_SESSION['saved_report'] = false;
+class ReportSmsStatusPage extends PageForm {
 
-$instance = new ReportInstance();
+	public $formName = "smsstatus";
+	protected $reportGenerator = null;
+	protected $reportOutput = null;
 
-if(isset($_SESSION['reportid'])){
-	$_SESSION['saved_report'] = true;
-} else {
-	$_SESSION['saved_report'] = false;
-}
-
-$_SESSION['report']['options'] = $options;
-
-if(isset($_GET["csv"]) && $_GET["csv"]){
-	$options["reporttype"] = "csv";
-} elseif (isset($_GET["summary"]) && $_GET["summary"]) {
-	$options["reporttype"] = "summary";
-} elseif (isset($_GET["sms"]) && $_GET["sms"]) {
-	$options["reporttype"] = "view";
-	$options["sms"] = (string) $_GET["sms"];
-} elseif (array_key_exists("pagestart", $_GET)) {
-	$options["reporttype"] = "paged";
-	$options["pagestart"] = (int) $_GET["pagestart"];
-} else {
-	$options["reporttype"] = "html";
-}
-
-$instance->setParameters($options);
-$reportgenerator = new SmsStatusReport();
-$reportgenerator->reportinstance = $instance;
-$reportgenerator->userid = $USER->id;
-
-if(isset($_GET["csv"]) && $_GET["csv"]){
-	$reportgenerator->set_format("csv");
-} else {
-	$reportgenerator->set_format("html");
-}
-
-$f="reports";
-$s="smsstatus";
-$reload = 0;
-$submit=0;
-
-if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "save"))
-{
-	//check to see if formdata is valid
-	if(CheckFormInvalid($f))
-	{
-		error('Form was edited in another window, reloading data');
-		$reload = 1;
+	function isAuthorized(&$get=array(), &$post=array(), &$request=array(), &$session=array()) {
+		global $USER;
+		return $USER->authorize("viewsystemreports");
 	}
-	else
-	{
-		MergeSectionFormData($f, $s);
-		//do check
-		if( CheckFormSection($f, $s) ) {
-			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else {
-			$submit = 1;
 
-			if(CheckFormSubmit($f, "save")){
-				$options = $instance->getParameters();
-				$options["reporttype"] = "smsstatus";
-				$_SESSION['report']['options']= $options;
-				$_SESSION['report']['edit'] = 1;
-				ClearFormData($f);
-				redirect("reportedit.php");
-			}
+	function beforeLoad(&$get=array(), &$post=array(), &$request=array(), &$session=array()) {
+
+		if (isset($get["clear"])) {
+			unset($session["smsstatus"]);
 			redirect();
 		}
-	}
-} else {
-	$reload = 1;
-}
 
-if ($reload) {
-	ClearFormData($f);
-}
+		if (isset($session["smsstatus"]) && isset($session["smsstatus"]["mode"])) {
 
-////////////////////////////////////////////////////////////////////////////////
-// Display
-////////////////////////////////////////////////////////////////////////////////
+			$this->reportGenerator = new SmsStatusReport();
+			$instance = new ReportInstance();
+			$this->reportGenerator->reportinstance = $instance;
 
-$error = false;
-if($reportgenerator->format != "html"){
+			$this->options["reporttype"] = "html";
+			$this->reportGenerator->set_format("html");
 
-	// PDF not supported at this time, leave code in for later just in case
-	if($reportgenerator->format == "pdf"){
-		if($result = $reportgenerator->testSize()){
-			error($result);
-			$error = true;
-		} else {
-			$reportgenerator->generate();
+			switch ($session["smsstatus"]["mode"]) {
+			case "csv":
+				$this->reportGenerator->set_format("csv");
+				$this->options["reporttype"] = "csv";
+				break;
+			case "summary":
+				$this->options["reporttype"] = "summary";
+				break;
+			case "smsview":
+				$this->options["reporttype"] = "smsview";
+				$this->options["sms"] = $session["smsstatus"]["sms"];
+				break;
+			case "view":
+				$this->options["reporttype"] = "view";
+				$this->options["pagestart"] = isset($get["pagestart"]) ? $get["pagestart"] : 0;
+				break;
+			}
+
+			$instance->setParameters($this->options);
 		}
-	} else {
-		$reportgenerator->generate();
+	}
+
+	function load(&$get=array(), &$post=array(), &$request=array(), &$session=array()) {
+		$this->form = $this->factoryTemplatePageForm();
+	}
+
+	function afterLoad() {
+
+		// Normal form handling makes form->getData() work...
+		$this->form->handleRequest();
+
+		// If the form was submitted...
+		if ($button = $this->form->getSubmit()) {
+
+			// Check for validation errors
+			if (($errors = $this->form->validate()) === false) {
+				$postdata = $this->form->getData();
+				$_SESSION["smsstatus"] = array(
+					"mode" => $button,
+					"sms" => Phone::parse($postdata["sms"])
+				);
+				$this->form->sendTo("reportsmsstatus.php");
+			}
+		}
+	}
+
+	function beforeRender() {
+		if ($this->reportGenerator) {
+			if ($this->options["reporttype"] == "csv") {
+				$this->reportGenerator->generate();
+				exit();
+			}
+			ob_start();
+			$this->reportGenerator->generate();
+			$this->reportOutput = ob_get_clean();
+		}
+	}
+
+	function render() {
+		$this->options["page"] = "reports:reports";
+		$this->options["title"] = _L("SMS Status");
+		$this->options["windowTitle"] = _L("Display Options");
+
+		$html	= parent::render()
+			. $this->reportOutput;
+		return($html);
+	}
+
+	function factoryTemplatePageForm() {
+		$formdata = array(
+			"sms" => array(
+				"label" => _L("SMS number"),
+				"value" => fmt_phone(array($this->options["sms"]), 0),
+				"validators" => array(
+					array("ValPhone")
+				),
+				"control" => array("TextField","size" => 15, "maxlength" => 20),
+				// "helpstep" => 1
+			),
+		);
+
+		$helpsteps = array (
+			// _L("Templatehelpstep 1"),
+		);
+
+		$buttons = array(
+			submit_button(_L("Summarize Count per Status"), "summary", "tick"),
+			submit_button(_L("Search for Single SMS"), "smsview", "application_form_magnify"),
+			submit_button(_L("Download All Data in CSV"), "csv", "arrow_down"),
+			submit_button(_L("View All Data"), "view", "table_multiple")
+		);
+
+		$form = new Form($this->formName, $formdata, $helpsteps, $buttons, "vertical");
+		$form->ajaxsubmit = true; // Set to false if your form can't do AJAX submission
+
+		return($form);
 	}
 }
 
-if($error || $reportgenerator->format == "html"){
-	$reportgenerator->format = "html";
-	$reportgenerator->generateQuery();
-	$PAGE = "reports:reports";
-	$TITLE = _L("SMS Opt-In Status");
-	
-	include_once("nav.inc.php");
-	NewForm($f);
 
-	$back = icon_button("Back", "fugue/arrow_180", "location.href='reports.php'");
-	buttons($back, submit($f, $s, "Refresh", null, "arrow_refresh"), submit($f, "save", "Save/Schedule"));
-	startWindow("Display Options", "padding: 3px;", "true");
-	
-	?>
-	<table border="0" cellpadding="3" cellspacing="0" width="100%">
-		<tr>
-			<th align="right" class="windowRowHeader"><p>Output Format:</p></th>
-			<td>
-				Search for a specific SMS number:
-				<?
-				NewForm($f);
-				NewFormItem($f, $s, "sms", "tel");
-				NewFormItem($f, "view", null, "submit");
-				EndForm();
-				?>
-			</td>
-		</tr>
-		<tr>
-			<th align="right" class="windowRowHeader"><p>&nbsp;</p></th>
-			<td>
-				<a href="reportsmsstatus.php?summary=true">Summarize counts</a> of SMS numbers per status
-			</td>
-		</tr>
-		<tr>
-			<th align="right" class="windowRowHeader"><p>&nbsp;</p></th>
-			<td>
-				<a href="reportsmsstatus.php/report.csv?csv=true">CSV download</a> of all SMS status data
-			</td>
-		</tr>
-		<tr>
-			<th align="right" class="windowRowHeader bottomBorder"><p>&nbsp;</p></th>
-			<td class="bottomBorder">
-				<a href="reportsmsstatus.php?pagestart=0">View paged table</a> of all SMS status data
-			</td>
-		</tr>
-	</table>
-	<?
-	endWindow();
-	?>
-	<br>
-	<?
+// -----------------------------------------------------------------------------
+// PAGE INSTANTIATION AND DISPLAY
+// -----------------------------------------------------------------------------
 
-	if (isset($reportgenerator)) {
-		$reportgenerator->runHtml();
-	}
-	buttons();
-	endForm();
-	include_once("navbottom.inc.php");
-}
-?>
+$page = new ReportSmsStatusPage(array(
+	"formname" => "smsstatus"
+));
+
+executePage($page);
+
