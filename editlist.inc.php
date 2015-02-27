@@ -192,7 +192,7 @@ $formdata = array(
 );
 
 
-$formdata[] = _L('List Content');
+$formdata[] = _L('List Content - Use rules to select your contact records');
 
 if ($method === 'rules') {
 	$formdata["ruledelete"] = array(
@@ -227,22 +227,26 @@ if ($method === 'sections') {
 	);
 }
 
-
+$modetips = array(
+	PeopleList::$RECIPIENTMODE_MAP[1] => 'Typically students or staff records',
+	PeopleList::$RECIPIENTMODE_MAP[2] => 'Typically parents or guardians',
+	PeopleList::$RECIPIENTMODE_MAP[3] => 'Both contact records and/or their associated guardian records'
+);
 if ($maxguardians) {
-	$formdata[] = _L('Recipient Mode');
+	$formdata[] = _L('Target Recipients - You can select contact records and/or their associated guardian records');
 	$formdata["recipientmode"] = array(
-		"label" => _L("Recipient Mode"),
+		"label" => _L("Target Recipients"),
 		"fieldhelp" => _L('Select the recipients that will be contacted on behalf of this list'),
 		"value" => $list->recipientmode,
 		"validators" => array(), "control" => array("RadioButton", "values" => array(
-				PeopleList::$RECIPIENTMODE_MAP[1] => _L("Self"),
-				PeopleList::$RECIPIENTMODE_MAP[2] => _L("Guardian"),
-				PeopleList::$RECIPIENTMODE_MAP[3] => _L("Self and Guardian"))),
+				PeopleList::$RECIPIENTMODE_MAP[1] => _L("Contacts"),
+				PeopleList::$RECIPIENTMODE_MAP[2] => _L("Associated Guardians"),
+				PeopleList::$RECIPIENTMODE_MAP[3] => _L("Both")), "hover" => $modetips),
 		"helpstep" => 4
 	);
 	$formdata["category"] = array(
 		"label" => _L("Guardian Category Restriction"),
-		"fieldhelp" => _L('Select categories to restrict by'),
+		"fieldhelp" => _L('Select categories to restrict by. When no category is checked, it will be unrestricted'),
 		"value" => $selectedCategories,
 		"validators" => array(
 			array("ValInArray", "values" => array_keys($categories))
