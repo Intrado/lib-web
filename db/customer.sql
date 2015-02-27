@@ -2790,3 +2790,14 @@ update setting set value='11.0/7' where name='_dbversion'
 $$$
 
 -- END 11.0/7
+
+-- rolling upgrade customers for reportcontact changes needed in upcoming 11.1 release
+ALTER TABLE `reportcontact`  
+  ADD `recipientpersonid` INT NOT NULL default 0 AFTER `sequence`,
+  ADD INDEX (`recipientpersonid`)
+$$$
+
+update setting set value='11.0/8' where name='_dbversion'
+$$$
+
+-- END 11.0/8
