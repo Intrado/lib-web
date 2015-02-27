@@ -2782,17 +2782,24 @@ $$$
 
 -- END 11.0/6
 
--- TODO view of sms status report
+-- rev 7 add view to join c_X.sms to aspshard.smsblock
+CREATE OR REPLACE SQL SECURITY DEFINER VIEW `aspsmsblock` AS select `s`.`sms` AS `sms`,`sb`.`status` AS `status`,`s`.`personid` AS `personid`,`sb`.`lastupdate` AS `lastupdate`,`sb`.`notes` AS `notes`, `s`.`editlock` AS `editlock` from (`sms` `s` join `aspshard`.`smsblock` `sb` on((`sb`.`sms` = convert(`s`.`sms` using latin1))))
+$$$
+
+update setting set value='11.0/7' where name='_dbversion'
+$$$
+
+-- END 11.0/7
 
 ALTER TABLE `reportcontact`  
   ADD `recipientpersonid` INT NOT NULL default 0 AFTER `sequence`,
   ADD INDEX (`recipientpersonid`)
 $$$
- -- TODO reportperson type device
-update setting set value='11.0/7' where name='_dbversion'
+
+update setting set value='11.0/8' where name='_dbversion'
 $$$
 
--- END 11.0/7
+-- END 11.0/8
 
 
 CREATE TABLE `device` (
@@ -2885,6 +2892,9 @@ CREATE TABLE `reportdeviceattempt` (
   `notificationReceiptId` bigint(20) NOT NULL,
   PRIMARY KEY (`jobId`,`personId`,`sequence`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
+
+ALTER TABLE `reportperson` CHANGE `type` `type` ENUM('phone','email','print','sms','device') NOT NULL
 $$$
 
 update setting set value='11.1/8' where name='_dbversion'

@@ -57,7 +57,7 @@ CREATE TABLE `listguardiancategory` (
 $$$
 
 -- $rev 7
--- optional upgrade on test servers (should have been applied to production in 11.0/7) for reportcontact.recipientpersonid
+-- optional upgrade on test servers (should have been applied to production in 11.0/8) for reportcontact.recipientpersonid
 
 -- $rev 8
 
@@ -86,3 +86,8 @@ CREATE TABLE `reportdeviceattempt` (
   PRIMARY KEY (`jobId`,`personId`,`sequence`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
+
+ALTER TABLE `reportperson` CHANGE `type` `type` ENUM('phone','email','print','sms','device') NOT NULL
+$$$
+
+
