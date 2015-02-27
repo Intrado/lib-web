@@ -126,7 +126,8 @@ $groupBy $orderBy ";
 					"4" => "Modified Date",
 					"5" => "Notes"
 			);
-			$formatters = array("1" => "fmt_phone",
+			$formatters = array(// 0 is the Unique ID
+					    "1" => "fmt_phone",
 					    "2" => "fmt_smsstatus",
 					    "3" => "fmt_modifiedby",
 					    "4" => "fmt_lastupdate_date"
@@ -187,7 +188,7 @@ $groupBy $orderBy ";
 			return false;
 
 		//generate the CSV header
-		$headerfields = array("Phone Number","Person Pkey","Status","Modified By","Modified Date","Notes");
+		$headerfields = array("Unique ID","Phone Number","Status","Modified By","Modified Date","Notes");
 		$headerfields = array_map(function ($value) { return '"'.$value.'"'; }, $headerfields);
 		$header = implode(",", $headerfields);
 
@@ -203,8 +204,8 @@ $groupBy $orderBy ";
 		$result = Query($this->query, $this->_readonlyDB, $this->queryArgs);
 		$numFetched = 0;
 		while ($row = DBGetRow($result)) {
-			$row[0] = fmt_phone($row, 0);
-			// $row[1] is Person Pkey
+			// $row[0] is Unique ID
+			$row[1] = fmt_phone($row, 1);
 			$row[2] = fmt_smsstatus($row, 2);
 			$row[3] = fmt_modifiedby($row, 3);
 			$row[4] = fmt_lastupdate_date($row, 4);

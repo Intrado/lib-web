@@ -177,8 +177,8 @@ class ReportSmsStatusPage extends PageForm {
 		);
 
 		$buttons = array(
-			submit_button(_L("Summarize Count per Status"), "summary", "tick"),
 			submit_button(_L("Search for Single SMS"), "smsview", "application_form_magnify"),
+			submit_button(_L("Summarize Count per Status"), "summary", "tick"),
 			submit_button(_L("Download All Data in CSV"), "csv", "arrow_down"),
 			submit_button(_L("View All Data"), "view", "table_multiple")
 		);
