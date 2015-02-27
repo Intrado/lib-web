@@ -12,8 +12,8 @@ class SmsStatusReport extends ReportGenerator {
 		$this->reportType = $this->params["reporttype"];
 
 		$selectList0 = "*";
-		$selectList1 = "asb.sms, p.pkey, asb.status, 'global' as modifiedby, unix_timestamp(asb.lastupdate)*1000 as modifieddate, asb.notes";
-		$selectList2 = "s.sms, p.pkey, 'block', bu.login, unix_timestamp(b.createdate)*1000, b.description";
+		$selectList1 = "p.pkey, asb.sms, asb.status, 'global' as modifiedby, unix_timestamp(asb.lastupdate)*1000 as modifieddate, asb.notes";
+		$selectList2 = "p.pkey, s.sms, 'block', bu.login, unix_timestamp(b.createdate)*1000, b.description";
 		$whereSms = "";
 		$groupBy = "";
 		$orderBy = "";
@@ -52,7 +52,7 @@ class SmsStatusReport extends ReportGenerator {
     where (p.type in ('system', 'guardianauto') and asb.editlock = 0 and not p.deleted) $whereSms
     $groupBy
 )
-union
+union all
 (
     select $selectList2
     from sms as s
@@ -119,14 +119,14 @@ $groupBy $orderBy ";
 			break;
 		case "smsview":
 		case "view":
-			$titles = array("0" => "Phone Number",
-					"1" => "Person Key",
+			$titles = array("0" => "Unique ID",
+					"1" => "Phone Number",
 					"2" => "Status",
 					"3" => "Modified By",
 					"4" => "Modified Date",
 					"5" => "Notes"
 			);
-			$formatters = array("0" => "fmt_phone",
+			$formatters = array("1" => "fmt_phone",
 					    "2" => "fmt_smsstatus",
 					    "3" => "fmt_modifiedby",
 					    "4" => "fmt_lastupdate_date"

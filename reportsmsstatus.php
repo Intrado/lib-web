@@ -163,7 +163,7 @@ class ReportSmsStatusPage extends PageForm {
 		$formdata = array(
 			"sms" => array(
 				"label" => _L("SMS number"),
-				"value" => fmt_phone(array($this->options["sms"]), 0),
+				"value" => "",
 				"validators" => array(
 					array("ValPhone")
 				),
