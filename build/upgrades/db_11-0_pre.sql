@@ -42,7 +42,7 @@ $$$
 -- dummy rev to insert organization settings '_hasquicktip'
 
 -- $rev 7
-CREATE OR REPLACE SQL SECURITY DEFINER VIEW `aspsmsblock` AS select `s`.`sms` AS `sms`,`sb`.`status` AS `status`,`s`.`personid` AS `personid`,`sb`.`lastupdate` AS `lastupdate`,`sb`.`notes` AS `notes`, `s`.`editlock` AS `editlock` from (`c_1`.`sms` `s` join `aspshard`.`smsblock` `sb` on((`sb`.`sms` = convert(`s`.`sms` using latin1))))
+CREATE OR REPLACE SQL SECURITY DEFINER VIEW `aspsmsblock` AS select `s`.`sms` AS `sms`,`sb`.`status` AS `status`,`s`.`personid` AS `personid`,`sb`.`lastupdate` AS `lastupdate`,`sb`.`notes` AS `notes`, `s`.`editlock` AS `editlock` from (`sms` `s` join `aspshard`.`smsblock` `sb` on((`sb`.`sms` = convert(`s`.`sms` using latin1))))
 $$$
 
 -- $rev 8
