@@ -48,7 +48,7 @@ require_once("../obj/JobSummaryReport.obj.php");
 require_once("../obj/JobDetailReport.obj.php");
 require_once("../obj/CallsReport.obj.php");
 require_once("../obj/ContactChangeReport.obj.php");
-require_once("../obj/SmsOptinReport.obj.php");
+require_once("../obj/SmsStatusReport.obj.php");
 require_once("../obj/Person.obj.php");
 require_once("../obj/Phone.obj.php");
 require_once("../obj/Email.obj.php");
