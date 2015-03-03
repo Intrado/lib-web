@@ -2791,7 +2791,7 @@ $$$
 
 -- END 11.0/7
 
-ALTER TABLE `reportcontact`  
+ALTER TABLE `reportcontact`
   ADD `recipientpersonid` INT NOT NULL default 0 AFTER `sequence`,
   ADD INDEX (`recipientpersonid`)
 $$$

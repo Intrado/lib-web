@@ -50,6 +50,9 @@ function upgrade_11_0($rev, $shardid, $customerid, $db) {
 		case 6:
 			echo "|";
 			apply_sql("upgrades/db_11-0_pre.sql", $customerid, $db, 7);
+		case 7:
+			echo "|";
+			apply_sql("upgrades/db_11-0_pre.sql", $customerid, $db, 8);
 	}
 	//This statement should appear in each upgrade script, when relevent.
 	apply_sql("../db/update_SMAdmin_access.sql", $customerid, $db);
