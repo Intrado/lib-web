@@ -140,19 +140,6 @@ $total = isset($renderedlist) ? $renderedlist->getTotal() : 0;
 $showAdditions = $list->countAdded() > 0;
 $showSkips = $list->countRemoved() > 0;
 
-$maxguardians = getSystemSetting("maxguardians", 0);
-if ($maxguardians) {
-//get guardian categories
-	$categoryList = $csApi->getGuardianCategoryList();
-	$categories = array();
-	foreach ($categoryList as $c) {
-		$categories[$c->id] = $c->name;
-	}
-	$selectedCategories = array();
-	if ($list->id) {
-		$selectedCategories = ListGuardianCategory::getGuardiansForList($list->id);
-	}
-}
 
 $formdata = array(
 	// A hidden submit button is needed because otherwise pressing ENTER would take you to the Preview page.
@@ -227,12 +214,26 @@ if ($method === 'sections') {
 	);
 }
 
-$modetips = array(
-	PeopleList::$RECIPIENTMODE_MAP[1] => 'Typically students or staff records',
-	PeopleList::$RECIPIENTMODE_MAP[2] => 'Typically parents or guardians',
-	PeopleList::$RECIPIENTMODE_MAP[3] => 'Both contact records and/or their associated guardian records'
-);
-if ($maxguardians) {
+$maxguardians = getSystemSetting("maxguardians", 0);
+if ($maxguardians > 0) {
+
+	$modetips = array(
+		PeopleList::$RECIPIENTMODE_MAP[1] => 'Typically students or staff records',
+		PeopleList::$RECIPIENTMODE_MAP[2] => 'Typically parents or guardians',
+		PeopleList::$RECIPIENTMODE_MAP[3] => 'Both contact records and/or their associated guardian records'
+	);
+
+	//get guardian categories
+	$categoryList = $csApi->getGuardianCategoryList();
+	$categories = array();
+	foreach ($categoryList as $c) {
+		$categories[$c->id] = $c->name;
+	}
+	$selectedCategories = array();
+	if ($list->id) {
+		$selectedCategories = ListGuardianCategory::getGuardiansForList($list->id);
+	}
+
 	$formdata[] = _L('Target Recipients - You can select contact records and/or their associated guardian records');
 	$formdata["recipientmode"] = array(
 		"label" => _L("Target Recipients"),
@@ -410,7 +411,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 		$mode = PeopleList::$RECIPIENTMODE_MAP[1]; //self
-		if ($maxguardians) {
+		if ($maxguardians > 0) {
 			//1=> self, 2=>guardian 3=> selfAndGuardian
 			if ($postdata['recipientmode']) {
 				$mode = $postdata['recipientmode'];
@@ -428,7 +429,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$list->type = ($method === 'sections') ? 'section' : 'person';
 		$list->update();
 		
-		if ($maxguardians) {
+		if ($maxguardians > 0) {
 			ListGuardianCategory::resetListGuardianCategories($list->id, $categories);
 		}
 
