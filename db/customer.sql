@@ -2902,3 +2902,17 @@ $$$
 
 -- END 11.1/8
 
+ALTER TABLE `reportdeviceattempt` CHANGE `notificationReceiptId` `notificationId` BIGINT(20) NULL DEFAULT NULL
+$$$
+
+ALTER TABLE `reportdevice` ADD `recipientPersonId` INT NULL DEFAULT NULL AFTER `sequence`
+$$$
+
+-- default null for insert stmt used with insert update on duplicate key
+ALTER TABLE `reportdevice` CHANGE `deviceUuid` `deviceUuid` VARCHAR(36) CHARACTER SET ascii COLLATE ascii_bin NULL DEFAULT NULL
+$$$
+
+update setting set value='11.1/9' where name='_dbversion'
+$$$
+
+-- END 11.1/9

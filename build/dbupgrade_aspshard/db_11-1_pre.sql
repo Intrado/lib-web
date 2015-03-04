@@ -54,3 +54,9 @@ CREATE TABLE `devicerenderedmessage` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
 
+-- $rev 4
+
+ALTER TABLE `devicejobtask` CHANGE `notificationReceiptId` `notificationId` BIGINT(20) NULL DEFAULT NULL
+$$$
+
+

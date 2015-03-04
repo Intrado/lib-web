@@ -49,3 +49,21 @@ ALTER TABLE `appinstance`
   ADD INDEX `appInstance` (`name`,`version`,`cmaAppId`)
 $$$
 
+-- $rev 3
+
+CREATE TABLE `notification` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `deviceId` int(11) NOT NULL,
+  `message` varchar(4096),
+  `owner` varchar(50),
+  `requestData` mediumtext NOT NULL,
+  `responseData` mediumtext NOT NULL,
+  `createdTimestampMs` bigint,
+  `updatedTimestampMs` bigint,
+  `responseReceivedTimestampMs` bigint,
+  `status` ENUM('ACCEPTED','SENDING','CONGESTION','EXPIRED_TOKEN','EXPIRED_AUTH', 'TEMPORARY_ERROR', 'INTERNAL_ERROR', 'REJECTED', 'SENT', 'RECEIVED', 'UNSENT') CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `attempts` tinyint,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
+
