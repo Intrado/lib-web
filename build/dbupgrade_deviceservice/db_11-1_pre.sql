@@ -67,3 +67,11 @@ CREATE TABLE `notification` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
 
+
+-- $rev 4
+-- add apple and google key columns
+ALTER TABLE `appinstance` 
+	ADD COLUMN `appleCert` BLOB NOT NULL,
+	ADD COLUMN `applePassPhrase` varchar(100) NOT NULL,
+	ADD COLUMN `googleApiKey` varchar(100) NOT NULL
+$$$
