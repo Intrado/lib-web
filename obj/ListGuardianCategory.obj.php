@@ -13,7 +13,7 @@ class ListGuardianCategory extends DBMappedObject {
 		$this->_fieldlist = array("listId", "guardianCategoryId");
 	}
 
-	static function upsertListGuardianCategories($listId, $categories) {
+	static function resetListGuardianCategories($listId, $categories) {
 		ListGuardianCategory::deleteListGuardianCategories($listId);
 		ListGuardianCategory::insertListGuardianCategories($listId, $categories);
 	}

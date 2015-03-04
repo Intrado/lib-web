@@ -543,8 +543,8 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 .newform .formcontrol .datafields input { width: 175px; }
 .newform .formcontrol .audiocontainer input { width: 270px; margin: 0 8px 0 0; }
 
-#list_helpsection_3 .formtitle { width: 100%; text-align: left; }
-#list_helpsection_3 .formcontrol { width: 600px; margin: 0; }
+#list_helpsection_4 .formtitle { width: 100%; text-align: left; }
+#list_helpsection_4 .formcontrol { width: 600px; margin: 0; }
 
 #ruleWidgetContainer table { border-spacing: 2px; }
 #ruleWidgetContainer td.list,

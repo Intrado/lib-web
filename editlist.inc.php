@@ -242,7 +242,7 @@ if ($maxguardians) {
 				PeopleList::$RECIPIENTMODE_MAP[1] => _L("Contacts"),
 				PeopleList::$RECIPIENTMODE_MAP[2] => _L("Associated Guardians"),
 				PeopleList::$RECIPIENTMODE_MAP[3] => _L("Both")), "hover" => $modetips),
-		"helpstep" => 4
+		"helpstep" => 3
 	);
 	$formdata["category"] = array(
 		"label" => _L("Guardian Category Restriction"),
@@ -252,8 +252,12 @@ if ($maxguardians) {
 			array("ValInArray", "values" => array_keys($categories))
 		),
 		"control" => array("RestrictedValues", "values" => $categories, "label" => _L("Restrict to these categories:")),
-		"helpstep" => 4
+		"helpstep" => 3
 	);
+}
+
+if ($showAdditions || $showSkips){
+	$formdata[] = _L('List Add/Skip');
 }
 
 if ($showAdditions) {
@@ -361,23 +365,23 @@ $formdata[] = _L('Additional List Tools');
 $formdata["advancedtools"] = array(
 	"label" => '',
 	"control" => array("FormHtml", 'html' => "<table  class='list' cellspacing='1' cellpadding='3' style='margin-bottom:10px;'>$advancedtools</table>"),
-	"helpstep" => 3
+	"helpstep" => 4
 );
 
 if ($method == 'rules'){
 	$helpsteps = array (
 	_L('Enter a name for your list. The best names describe the list\'s content, making the list easy to reuse.'), // 1
 	_L('Rules are used to select groups of contacts from the data available to your account. For example, if you wanted to make a list of 6th graders from Springfield Elementary, you would create two rules: "Grade equals 6" and "School equals Springfield Elementary".'), // 2
-	_L('This section contains tools to add specific individuals and add contacts that are not part of your regular database of contacts. '), // 3
-	_L('Select the recipients that will be contacted on behalf of this list and select categories to restrict by') // 4
+	_L('Select the recipients that will be contacted on behalf of this list and select categories to restrict by'), // 3
+	_L('This section contains tools to add specific individuals and add contacts that are not part of your regular database of contacts. ') //4
 	);
 
 } else {
 	$helpsteps = array (
 	_L('Enter a name for your list. The best names describe the list\'s content, making the list easy to reuse.'), // 1
 	_L('Select a school then select the sections you wish to include in the list.'), // 2
-	_L('This section contains tools to add specific individuals and add contacts that are not part of your regular database of contacts. '), // 3
-	_L('Select the recipients that will be contacted on behalf of this list and select categories to restrict by') // 4
+	_L('Select the recipients that will be contacted on behalf of this list and select categories to restrict by'), // 3
+	_L('This section contains tools to add specific individuals and add contacts that are not part of your regular database of contacts. '), // 4
 	);
 }
 
@@ -425,7 +429,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$list->update();
 		
 		if ($maxguardians) {
-			ListGuardianCategory::upsertListGuardianCategories($list->id, $categories);
+			ListGuardianCategory::resetListGuardianCategories($list->id, $categories);
 		}
 
 		if ($method == 'sections') {
