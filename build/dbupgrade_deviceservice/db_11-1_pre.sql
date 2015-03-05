@@ -75,3 +75,9 @@ ALTER TABLE `appinstance`
 	ADD COLUMN `applePassPhrase` varchar(100) NOT NULL,
 	ADD COLUMN `googleApiKey` varchar(100) NOT NULL
 $$$
+
+-- $rev 5
+
+ALTER TABLE `notification` ADD `responseHeaders` TEXT NULL DEFAULT NULL AFTER `responseData`
+$$$
+

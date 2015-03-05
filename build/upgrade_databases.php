@@ -86,7 +86,7 @@ $dbversions = array (
 	),
 	
 	"deviceservice" => array (
-		"11.1/4"
+		"11.1/5"
 	),
 	
 	"disk" => array (
