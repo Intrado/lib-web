@@ -157,7 +157,7 @@ class JobDetailReport extends ReportGenerator{
 					)
 				) as label,
 				rc.recipientpersonid,
-				(select CONCAT(' ', f01, ' ', f02) from person where rc.recipientpersonid=id) as recipientpersonname
+				concat(' ', rcp.f01, ' ', rcp.f02) as recipientpersonname
 			from
 				reportperson rp
 				inner join job j on (rp.jobid = j.id)
@@ -169,6 +169,7 @@ class JobDetailReport extends ReportGenerator{
 				left join voicereply vr on (vr.jobid = rp.jobid and vr.personid = rp.personid and vr.sequence = rc.sequence and vr.userid = " . $USER->id . " and rc.type='phone')
 				left join language l on (l.code = rp." . FieldMap::GetLanguageField() . ")
 				left join reportemailtracking ret on (rc.jobid = ret.jobid and rc.personid = ret.personid and rc.sequence = ret.sequence)
+				left outer join person rcp on (rc.recipientpersonid = rcp.id)
 			where
 				1
 			$searchquery
