@@ -894,6 +894,11 @@ if (isset($_GET['jsonformdata'])) {
 	exit();
 }
 
+// SUPPORTING/BOOTSTRAP DATA
+
+// Get guardian categories
+$categoryList = $csApi->getGuardianCategoryList();
+
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
@@ -957,11 +962,12 @@ include("nav.inc.php");
 
 			user.done(function (userResponse) {
 				var roles = userResponse.roles[0];
+				// Changes to org will change userResponse.roles[0].organization
 				var org = roles.organization;
 				orgID = org.id;
 
-                // Remove 'Survey' job type(s); to prevent from displaying in Message Type drop-down.
-                roles.jobTypes = _.filter(roles.jobTypes, function(type) {return type && type.isSurvey === false;});
+				// Remove 'Survey' job type(s); to prevent from displaying in Message Type drop-down.
+				roles.jobTypes = _.filter(roles.jobTypes, function(type) {return type && type.isSurvey === false;});
 
 				languages = fetch('/languages');
 				features = fetch('/settings/features');
@@ -971,42 +977,44 @@ include("nav.inc.php");
 				formData = $.getJSON("message_sender.php?jsonformdata=true");
 
 				$.when(languages, features, options, facebookPages, fieldmaps, formData)
-					.done(function (languagesRes, featuresRes, optionsRes, facebookPagesRes, fieldmaps, formData) {
-                        org.languages = _.sortBy(languagesRes[0].languages, function(language) {return language.name;});
-						org.settings = {
-							features:featuresRes[0].features,
-							options:optionsRes[0].options,
-							facebookpages:facebookPagesRes[0].facebookPages,
-							facebookAppID:  <?= $SETTINGS['facebook']['appid'] ?>
-						};
-						roles.accessProfile['fieldmaps'] = fieldmaps[0];
-                        userResponse.preferences.push({name:'hidetoolbar', value: <?= ($USER->getSetting('hideemailtools', false) ? 'true' : 'false'); ?>});
-						window.BOOTSTRAP_DATA.user = userResponse;
+				.done(function (languagesRes, featuresRes, optionsRes, facebookPagesRes, fieldmaps, formData) {
+					org.languages = _.sortBy(languagesRes[0].languages, function(language) {return language.name;});
+					org.settings = {
+						features:featuresRes[0].features,
+						options:optionsRes[0].options,
+						facebookpages:facebookPagesRes[0].facebookPages,
+						facebookAppID:  <?= $SETTINGS['facebook']['appid'] ?>
+					};
+					roles.accessProfile['fieldmaps'] = fieldmaps[0];
+					userResponse.preferences.push({name:'hidetoolbar', value: <?= ($USER->getSetting('hideemailtools', false) ? 'true' : 'false'); ?>});
+					window.BOOTSTRAP_DATA.user = userResponse;
+					window.BOOTSTRAP_DATA.customer = {
+						"guardianCategories": <?echo json_encode($categoryList); ?>
+					};
+					window.BOOTSTRAP_DATA.form = {
+						template: {
+							// get template settings (if loading from template, they will be set in session data)
+							subject: <?echo (isset($_SESSION['message_sender']['template']['subject'])?("'". str_replace("'", "\'", $_SESSION['message_sender']['template']['subject']). "'"):"''")?>,
+							lists: <?echo (isset($_SESSION['message_sender']['template']['lists'])?$_SESSION['message_sender']['template']['lists']:'[]')?>,
+							jtid: <?echo (isset($_SESSION['message_sender']['template']['jobtypeid'])?$_SESSION['message_sender']['template']['jobtypeid']:0)?>,
+							mgid: <?echo (isset($_SESSION['message_sender']['template']['messagegroupid'])?$_SESSION['message_sender']['template']['messagegroupid']:0)?>
 
-						window.BOOTSTRAP_DATA.form = {
-							template: {
-								// get template settings (if loading from template, they will be set in session data)
-								subject: <?echo (isset($_SESSION['message_sender']['template']['subject'])?("'". str_replace("'", "\'", $_SESSION['message_sender']['template']['subject']). "'"):"''")?>,
-								lists: <?echo (isset($_SESSION['message_sender']['template']['lists'])?$_SESSION['message_sender']['template']['lists']:'[]')?>,
-								jtid: <?echo (isset($_SESSION['message_sender']['template']['jobtypeid'])?$_SESSION['message_sender']['template']['jobtypeid']:0)?>,
-								mgid: <?echo (isset($_SESSION['message_sender']['template']['messagegroupid'])?$_SESSION['message_sender']['template']['messagegroupid']:0)?>
+						},
+						snum:formData[0].snum,
+						schema:formData[0].formdata,
+						name:"msgsndr",
+						url:window.location.protocol + "//" + window.location.host + "/" + window.location.pathname.split('/')[1] + "/message_sender.php",
+						validators:document.validators,
+						twitterMaxChars: <? print_r(140 - mb_strlen(" http://". getSystemSetting("tinydomain"). "/") - 6); ?>
+					};
 
-							},
-							snum:formData[0].snum,
-							schema:formData[0].formdata,
-							name:"msgsndr",
-							url:window.location.protocol + "//" + window.location.host + "/" + window.location.pathname.split('/')[1] + "/message_sender.php",
-							validators:document.validators,
-							twitterMaxChars: <? print_r(140 - mb_strlen(" http://". getSystemSetting("tinydomain"). "/") - 6); ?>
-						};
+					window.globals.require('initialize');
 
-						window.globals.require('initialize');
-
-                        // display a warning message to users if they navigate away from MS
-                        window.onbeforeunload = function () {
-                            return 'WARNING: Leaving this page will result in a loss of any data you may have entered.';
-                        };
-					});
+					// display a warning message to users if they navigate away from MS
+					window.onbeforeunload = function () {
+					    return 'WARNING: Leaving this page will result in a loss of any data you may have entered.';
+					};
+				});
 			});
 
 			user.fail(function (userResponse) {
