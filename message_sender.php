@@ -894,11 +894,6 @@ if (isset($_GET['jsonformdata'])) {
 	exit();
 }
 
-// SUPPORTING/BOOTSTRAP DATA
-
-// Get guardian categories
-$categoryList = $csApi->getGuardianCategoryList();
-
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
@@ -942,42 +937,37 @@ include("nav.inc.php");
 		$(function () {
 
 			window.BOOTSTRAP_DATA = {};
-			var orgID = -1;
-			var userBaseUrl = 'api/2/users/' + <?= $USER->id ?>;
-			var languages, features, options, facebookPages, initUserResponse;
+			var csApiBaseUri = 'api/2/';
+			var csApiUserUri = csApiBaseUri + 'users/' + <?= $USER->id ?>;
 
-			var fetch = function (url) {
-				return $.ajax({
-					url:'api/2/organizations/' + orgID + url,
-					type:'GET',
-					dataType:'json'
-				});
-			};
+			<?/* We'll set these once we discover orgId from the user request */?>
+			var orgId = -1;
+			var csApiOrgUri = '';
 
-			var user = $.ajax({
-				url: userBaseUrl +'?expansions=roles/jobtypes,roles/feedcategories,roles/callerids,preferences,tokens',
-				type:'GET',
-				dataType:'json'
-			});
+			var user = $.getJSON(csApiUserUri +'?expansions=roles/jobtypes,roles/feedcategories,roles/callerids,preferences,tokens')
+			.done(function (userResponse) {
 
-			user.done(function (userResponse) {
+				<?/* Changes to org will change userResponse.roles[0].organization */?>
 				var roles = userResponse.roles[0];
-				// Changes to org will change userResponse.roles[0].organization
 				var org = roles.organization;
-				orgID = org.id;
 
-				// Remove 'Survey' job type(s); to prevent from displaying in Message Type drop-down.
+				<?/* Set up org request uri */?>
+				orgId = org.id;
+				csApiOrgUri = 'api/2/organizations/' + orgId;
+
+				<?/* Remove 'Survey' job type(s); to prevent from displaying in Message Type drop-down. */?>
 				roles.jobTypes = _.filter(roles.jobTypes, function(type) {return type && type.isSurvey === false;});
 
-				languages = fetch('/languages');
-				features = fetch('/settings/features');
-				options = fetch('/settings/options');
-				facebookPages = fetch('/settings/facebookpages');
-				fieldmaps = $.getJSON(userBaseUrl + '/roles/' + orgID + '/accessprofile/fieldmaps');
-				formData = $.getJSON("message_sender.php?jsonformdata=true");
+				var languages = $.getJSON(csApiOrgUri + '/languages');
+				var features = $.getJSON(csApiOrgUri + '/settings/features');
+				var options = $.getJSON(csApiOrgUri + '/settings/options');
+				var facebookPages = $.getJSON(csApiOrgUri + '/settings/facebookpages');
+				var fieldmaps = $.getJSON(csApiUserUri + '/roles/' + orgId + '/accessprofile/fieldmaps');
+				var formData = $.getJSON("message_sender.php?jsonformdata=true");
+				var categories = $.getJSON(csApiBaseUri + 'settings/guardiancategories');
 
-				$.when(languages, features, options, facebookPages, fieldmaps, formData)
-				.done(function (languagesRes, featuresRes, optionsRes, facebookPagesRes, fieldmaps, formData) {
+				$.when(languages, features, options, facebookPages, fieldmaps, formData, categories)
+				.done(function (languagesRes, featuresRes, optionsRes, facebookPagesRes, fieldmaps, formData, categoriesRes) {
 					org.languages = _.sortBy(languagesRes[0].languages, function(language) {return language.name;});
 					org.settings = {
 						features:featuresRes[0].features,
@@ -989,11 +979,11 @@ include("nav.inc.php");
 					userResponse.preferences.push({name:'hidetoolbar', value: <?= ($USER->getSetting('hideemailtools', false) ? 'true' : 'false'); ?>});
 					window.BOOTSTRAP_DATA.user = userResponse;
 					window.BOOTSTRAP_DATA.customer = {
-						"guardianCategories": <?echo json_encode($categoryList); ?>
+						"guardianCategories": categoriesRes[0]
 					};
 					window.BOOTSTRAP_DATA.form = {
 						template: {
-							// get template settings (if loading from template, they will be set in session data)
+							<?/* get template settings (if loading from template, they will be set in session data) */?>
 							subject: <?echo (isset($_SESSION['message_sender']['template']['subject'])?("'". str_replace("'", "\'", $_SESSION['message_sender']['template']['subject']). "'"):"''")?>,
 							lists: <?echo (isset($_SESSION['message_sender']['template']['lists'])?$_SESSION['message_sender']['template']['lists']:'[]')?>,
 							jtid: <?echo (isset($_SESSION['message_sender']['template']['jobtypeid'])?$_SESSION['message_sender']['template']['jobtypeid']:0)?>,
@@ -1010,7 +1000,7 @@ include("nav.inc.php");
 
 					window.globals.require('initialize');
 
-					// display a warning message to users if they navigate away from MS
+					<?/* display a warning message to users if they navigate away from MS */?>
 					window.onbeforeunload = function () {
 					    return 'WARNING: Leaving this page will result in a loss of any data you may have entered.';
 					};
@@ -1021,14 +1011,14 @@ include("nav.inc.php");
 				console.log('error creating bootstrap data:', userResponse);
 			});
 
-			// load required validators into document.validators
+			<?/* load required validators into document.validators */?>
 			<? Validator::load_validators(array("ValCallerID", "ValConditionalOnValue", "ValConditionallyRequired", "ValDate", "ValDomain", "ValDomainList", "ValDuplicateNameCheck", "ValEasycall", "ValEmail", "ValEmailAttach", "ValEmailList", "ValFacebookPage", "ValFieldConfirmation", "ValHasMessage", "ValInArray", "ValLength", "ValLists", "ValMessageBody", "ValMessageGroup", "ValMessageTypeSelect", "ValNumber", "ValNumeric", "ValPhone", "ValRequired", "ValSmsText", "ValTextAreaAndSubjectWithCheckbox", "ValTimeCheck", "ValTimePassed", "ValTimeWindowCallEarly", "ValTimeWindowCallLate", "ValTranslation", "ValTranslationCharacterLimit", "ValTtsText", "valPhone")); ?>
 		});
 		
-		// monitor the main content div for resize and send a message with this information
+		<?/* monitor the main content div for resize and send a message with this information */?>
 		var lastHeight;
 		setInterval(function() {
-			// #main-content has 8px of margins so adding a little extra to compensate...
+			<?/* #main-content has 8px of margins so adding a little extra to compensate... */?>
 			var newHeight = $('#messagesender-shell').height() + 18;
 			if (newHeight != lastHeight) {
 				var msg = {};
