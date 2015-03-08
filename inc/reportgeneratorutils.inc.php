@@ -78,7 +78,8 @@ function getJobSummary($joblist, $readonlyDB = false){
 							count(distinct rp.personid) as pcount,
 							coalesce(sum(rc.type='phone'), 0),
 							coalesce(sum(rc.type='email'), 0),
-							coalesce(sum(rc.type='sms'), 0)
+							coalesce(sum(rc.type='sms'), 0),
+							coalesce(sum(rc.type='device'), 0)
 							from job j
 							left join reportperson rp on (j.id = rp.jobid)
 							left join reportcontact rc on (rp.personid = rc.personid and rp.jobid = rc.jobid and rp.type = rc.type)
@@ -133,6 +134,7 @@ function displayJobSummary($joblist, $readonlyDB = false){
 <? if($hassms) { ?>
 								<th><?= _L("# of SMS") ?></th>
 <? } ?>
+                                <th><?= _L("# of Devices") ?></th>
 							</tr>
 <?
 							$alt=0;
@@ -153,6 +155,7 @@ function displayJobSummary($joblist, $readonlyDB = false){
 <? if($hassms) { ?>
 									<td><?=$job[13]?></td>
 <? } ?>
+									<td><?=$job[14]?></td>
 								</tr>
 <?
 							}

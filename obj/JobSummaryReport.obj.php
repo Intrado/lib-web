@@ -14,6 +14,7 @@ class JobSummaryReport extends ReportGenerator{
 		if(isset($this->params['survey']) && $this->params['survey']=="true"){
 			$surveyonly = "true";
 		}
+		error_log("*** in generateQuery, jobid = '{$this->params['jobid']}'");
 		if(isset($this->params['jobid'])){
 			$url = "jobid=";
 			$joblist = "";
@@ -28,6 +29,7 @@ class JobSummaryReport extends ReportGenerator{
 				$reldate = $this->params['reldate'];
 			list($startdate, $enddate) = getStartEndDate($reldate, $this->params);
 			$joblist = implode("','", getJobList($startdate, $enddate, $jobtypes, $surveyonly));
+			error_log("*** joblist = $joblist");
 		}
 
 		if($joblist){
@@ -61,15 +63,15 @@ class JobSummaryReport extends ReportGenerator{
 									sum(rc.result = 'blocked') as blocked,
 									sum(rc.result = 'duplicate') as duplicate,
 									sum(rp.status = 'nocontacts' and rc.result is null) as nocontacts,
-									sum(rc.numattempts) as totalattempts,
 									sum(rp.status = 'declined' and rc.result is null) as declined,
+									sum(rc.numattempts) as totalattempts,
 									100 * sum(rp.numcontacts and rp.status='success') / (sum(rp.numcontacts and rp.status != 'duplicate')) as success_rate
 									from reportperson rp
 									left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
 									inner join job j on (j.id = rp.jobid)
 									where rp.jobid in ('$joblist')
 									and rp.type='phone'";
-		return QuickQueryRow($phonenumberquery, false, $readonlyconn);
+		return QuickQueryRow($phonenumberquery, true, $readonlyconn);
 	}
 
 	// @param $joblist, a comma-separated string of job ids, assumed to be SQL-injection-safe
@@ -77,6 +79,7 @@ class JobSummaryReport extends ReportGenerator{
 		$emailquery = "select sum(rc.type = 'email') as total,
 									sum(rp.status in ('success', 'duplicate', 'fail')) as done,
 									sum(rp.status not in ('success', 'fail', 'duplicate', 'nocontacts', 'declined') and rc.result not in ('sent', 'duplicate', 'blocked')) as remaining,
+									null as blocked,
 									sum(rc.result = 'duplicate') as duplicate,
 									sum(rp.status = 'nocontacts' and rc.result is null) as nocontacts,
 									sum(rp.status = 'declined' and rc.result is null) as declined,
@@ -85,7 +88,7 @@ class JobSummaryReport extends ReportGenerator{
 									left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
 									where rp.jobid in ('$joblist')
 									and rp.type='email'";
-		return QuickQueryRow($emailquery, false, $readonlyconn);
+		return QuickQueryRow($emailquery, true, $readonlyconn);
 	}
 
 	static function getSmsInfo($joblist, $readonlyconn) {
@@ -101,7 +104,26 @@ class JobSummaryReport extends ReportGenerator{
 									left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
 									where rp.jobid in ('$joblist')
 									and rp.type='sms'";
-		return QuickQueryRow($smsquery, false, $readonlyconn);
+		return QuickQueryRow($smsquery, true, $readonlyconn);
+	}
+
+	// @BillKarwin
+	static function getDeviceInfo($joblist, $readonlyconn) {
+		$devicequery = "select count(rd.jobid) as total,
+									sum(rp.status in ('success', 'duplicate', 'fail')) as done,
+									sum(rp.status not in ('success', 'fail', 'duplicate', 'blocked', 'nocontacts', 'declined') and rd.result not in ('sent', 'duplicate', 'blocked')) as remaining,
+									sum(rc.result = 'blocked') as blocked,
+									sum(rc.result = 'duplicate') as duplicate,
+									sum(rp.status = 'nocontacts' and rd.result is null) as nocontacts,
+									sum(rp.status = 'declined' and rd.result is null) as declined,
+									sum(rd.result = 'sent') as sent,
+									sum(rd.result = 'unsent') as unsent,
+									100 * sum(rp.numcontacts and rp.status='success') / (sum(rp.numcontacts and rp.status != 'duplicate')) as success_rate
+									from reportperson rp
+									left join reportdevice rd on (rp.jobid = rd.jobid and rp.personid = rd.personid)
+									where rp.jobid in ('$joblist')
+									and rp.type='device'";
+		return QuickQueryRow($devicequery, true, $readonlyconn);
 	}
 
 	function runHtml(){
@@ -140,7 +162,8 @@ class JobSummaryReport extends ReportGenerator{
 		$phonenumberinfo = JobSummaryReport::getPhoneInfo($this->params['joblist'], $this->_readonlyDB);
 		$emailinfo = JobSummaryReport::getEmailInfo($this->params['joblist'], $this->_readonlyDB);
 		$smsinfo = JobSummaryReport::getSmsInfo($this->params['joblist'], $this->_readonlyDB);
-
+		// @BillKarwin
+		$deviceinfo = JobSummaryReport::getDeviceInfo($this->params['joblist'], $this->_readonlyDB);
 
 		if($hasconfirmation){
 			$confirmedquery = "select sum(rc.response=1),
@@ -232,7 +255,8 @@ class JobSummaryReport extends ReportGenerator{
 ?>
 			<table border="0" cellpadding="3" cellspacing="0" width="100%">
 <?
-				if(array_sum($emailinfo) > 0){
+				// @BillKarwin
+				if(true || array_sum($emailinfo) > 0){
 ?>
 				<tr>
 					<th align="right" class="windowRowHeader bottomBorder"><a href="reportjobdetails.php?type=email"><?= _L("Email:") ?></a></th>
@@ -242,22 +266,26 @@ class JobSummaryReport extends ReportGenerator{
 								<td>
 									<table  border="0" cellpadding="2" cellspacing="1" class="list" width="100%">
 										<tr class="listHeader" align="left" valign="bottom">
-											<th><?= _L("# of Emails") ?></th>
-											<th><?= _L("Completed") ?></th>
-											<th><?= _L("Remaining") ?></th>
-											<th><?= _L("Duplicates Removed") ?></th>
-											<th><?= _L("No Email") ?></th>
-											<th><?= _L("No Email Selected") ?></th>
-											<th><?= _L("% Contacted") ?></th>
+											<th style="min-width: 100px"><?= _L("# of Emails") ?></th>
+											<th style="min-width: 100px"><?= _L("Completed") ?></th>
+											<th style="min-width: 100px"><?= _L("Remaining") ?></th>
+											<th style="min-width: 100px">&nbsp;</th>
+											<th style="min-width: 100px"><?= _L("Duplicates Removed") ?></th>
+											<th style="min-width: 100px"><?= _L("No Email") ?></th>
+											<th style="min-width: 100px"><?= _L("No Email Selected") ?></th>
+											<th style="width: 99%">&nbsp;</td>
+											<th style="min-width: 100px"><?= _L("% Contacted") ?></th>
 										</tr>
 										<tr>
-											<td><?=$emailinfo[0]+0?></td>
-											<td><?=$emailinfo[1]+0?></td>
-											<td><?=$emailinfo[2]+0?></td>
-											<td><?=$emailinfo[3]+0?></td>
-											<td><?=$emailinfo[4]+0?></td>
-											<td><?=$emailinfo[5]+0?></td>
-											<td><?=sprintf("%0.2f", isset($emailinfo[6]) ? $emailinfo[6] : "") . "%" ?></td>
+											<td><?=(int)$emailinfo['total']?></td>
+											<td><?=(int)$emailinfo['done']?></td>
+											<td><?=(int)$emailinfo['remaining']?></td>
+											<td>&nbsp;</td>
+											<td><?=(int)$emailinfo['duplicates']?></td>
+											<td><?=(int)$emailinfo['nocontacts']?></td>
+											<td><?=(int)$emailinfo['declined']?></td>
+											<td>&nbsp;</td>
+											<td><?=sprintf("%0.2f", isset($emailinfo['success_rate']) ? $emailinfo['success_rate'] : "") . "%" ?></td>
 										</tr>
 									</table>
 								</td>
@@ -266,8 +294,10 @@ class JobSummaryReport extends ReportGenerator{
 					</td>
 				</tr>
 <?
-				}
-				if(array_sum($smsinfo) > 0){
+				} // end email summary
+
+				// @BillKarwin
+				if(true || array_sum($smsinfo) > 0){
 ?>
 				<tr>
 					<th align="right" class="windowRowHeader bottomBorder"><a href="reportjobdetails.php?type=sms">SMS:</a></th>
@@ -277,24 +307,26 @@ class JobSummaryReport extends ReportGenerator{
 								<td>
 									<table  border="0" cellpadding="2" cellspacing="1" class="list" width="100%">
 										<tr class="listHeader" align="left" valign="bottom">
-											<th><?= _L("# of SMS") ?></th>
-											<th><?= _L("Completed") ?></th>
-											<th><?= _L("Remaining") ?></th>
-											<th><?= _L("Blocked") ?></th>
-											<th><?= _L("Duplicates Removed") ?></th>
-											<th><?= _L("No SMS") ?></th>
-											<th><?= _L("No SMS Selected") ?></th>
-											<th><?= _L("% Contacted") ?></th>
+											<th style="min-width: 100px"><?= _L("# of SMS") ?></th>
+											<th style="min-width: 100px"><?= _L("Completed") ?></th>
+											<th style="min-width: 100px"><?= _L("Remaining") ?></th>
+											<th style="min-width: 100px"><?= _L("Blocked") ?></th>
+											<th style="min-width: 100px"><?= _L("Duplicates Removed") ?></th>
+											<th style="min-width: 100px"><?= _L("No SMS") ?></th>
+											<th style="min-width: 100px"><?= _L("No SMS Selected") ?></th>
+											<th style="width: 99%">&nbsp;</td>
+											<th style="min-width: 100px"><?= _L("% Contacted") ?></th>
 										</tr>
 										<tr>
-											<td><?=$smsinfo[0]+0?></td>
-											<td><?=$smsinfo[1]+0?></td>
-											<td><?=$smsinfo[2]+0?></td>
-											<td><?=$smsinfo[3]+0?></td>
-											<td><?=$smsinfo[4]+0?></td>
-											<td><?=$smsinfo[5]+0?></td>
-											<td><?=$smsinfo[6]+0?></td>
-											<td><?=sprintf("%0.2f", isset($smsinfo[7]) ? $smsinfo[7] : "") . "%" ?></td>
+											<td><?=(int)$smsinfo['total']?></td>
+											<td><?=(int)$smsinfo['done']?></td>
+											<td><?=(int)$smsinfo['remaining']?></td>
+											<td><?=(int)$smsinfo['blocked']?></td>
+											<td><?=(int)$smsinfo['duplicates']?></td>
+											<td><?=(int)$smsinfo['nocontacts']?></td>
+											<td><?=(int)$smsinfo['declined']?></td>
+											<td>&nbsp;</td>
+											<td><?=sprintf("%0.2f", isset($smsinfo['success_rate']) ? $smsinfo['success_rate'] : "") . "%" ?></td>
 										</tr>
 									</table>
 								</td>
@@ -303,8 +335,55 @@ class JobSummaryReport extends ReportGenerator{
 					</td>
 				</tr>
 <?
-				}
-				if(array_sum($phonenumberinfo) > 0){
+				} // end sms summary
+
+				// @BillKarwin
+				if (true || array_sum($deviceinfo) > 0) {
+?>
+				<tr>
+					<th align="right" class="windowRowHeader bottomBorder"><a href="reportjobdetails.php?type=device">Device:</a></th>
+					<td class ="bottomBorder">
+						<table width="100%">
+							<tr>
+								<td>
+
+	<table  border="0" cellpadding="2" cellspacing="1" class="list" width="100%">
+										<tr class="listHeader" align="left" valign="bottom">
+											<th style="min-width: 100px"><?= _L("# of Devices") ?></th>
+											<th style="min-width: 100px"><?= _L("Completed") ?></th>
+											<th style="min-width: 100px"><?= _L("Remaining") ?></th>
+											<th style="min-width: 100px">&nbsp;</th>
+											<th style="min-width: 100px">&nbsp;</th>
+											<th style="min-width: 100px">&nbsp;</th>
+											<th style="min-width: 100px">&nbsp;</th>
+											<th style="min-width: 100px"><?= _L("Sent") ?></th>
+											<th style="min-width: 100px"><?= _L("Unsent") ?></th>
+											<th style="width: 99%">&nbsp;</th>
+											<th style="min-width: 100px"><?= _L("% Contacted") ?></th>
+										</tr>
+										<tr>
+											<td><?=(int)$phonenumberinfo['total']?></td>
+											<td><?=(int)$phonenumberinfo['done']?></td>
+											<td><?=(int)$phonenumberinfo['remaining']?></td>
+											<td>&nbsp;</td>
+											<td>&nbsp;</td>
+											<td>&nbsp;</td>
+											<td>&nbsp;</td>
+											<td><?=(int)$phonenumberinfo['sent']?></td>
+											<td><?=(int)$phonenumberinfo['unsent']?></td>
+											<td>&nbsp;</td>
+											<td><?=sprintf("%0.2f", isset($smsinfo['success_rate']) ? $smsinfo['success_rate'] : "") . "%" ?></td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+<?
+				} // end device summary
+
+				if(true || array_sum($phonenumberinfo) > 0){
 ?>
 				<tr>
 					<th align="right" class="windowRowHeader bottomBorder"><a href="reportjobdetails.php?type=phone">Phone:</a></th>
@@ -314,26 +393,28 @@ class JobSummaryReport extends ReportGenerator{
 								<td>
 									<table  border="0" cellpadding="2" cellspacing="1" class="list" width="100%">
 										<tr class="listHeader" align="left" valign="bottom">
-											<th><?= _L("# of Phones") ?></th>
-											<th><?= _L("Completed") ?></th>
-											<th><?= _L("Remaining") ?></th>
-											<th><?= _L("Blocked") ?></th>
-											<th><?= _L("Duplicates Removed") ?></th>
-											<th><?= _L("No Phone #") ?></th>
-											<th><?= _L("No Phone Selected") ?></th>
-											<th><?= _L("Total Attempts") ?></th>
-											<th><?= _L("% Contacted") ?></th>
+											<th style="min-width: 100px"><?= _L("# of Phones") ?></th>
+											<th style="min-width: 100px"><?= _L("Completed") ?></th>
+											<th style="min-width: 100px"><?= _L("Remaining") ?></th>
+											<th style="min-width: 100px"><?= _L("Blocked") ?></th>
+											<th style="min-width: 100px"><?= _L("Duplicates Removed") ?></th>
+											<th style="min-width: 100px"><?= _L("No Phone #") ?></th>
+											<th style="min-width: 100px"><?= _L("No Phone Selected") ?></th>
+											<th style="min-width: 100px"><?= _L("Total Attempts") ?></th>
+											<th style="width: 99%">&nbsp;</th>
+											<th style="min-width: 100px"><?= _L("% Contacted") ?></th>
 										</tr>
 										<tr>
-											<td><?=$phonenumberinfo[0]+0?></td>
-											<td><?=$phonenumberinfo[1]+0?></td>
-											<td><?=$phonenumberinfo[2]+0?></td>
-											<td><?=$phonenumberinfo[3]+0?></td>
-											<td><?=$phonenumberinfo[4]+0?></td>
-											<td><?=$phonenumberinfo[5]+0?></td>
-											<td><?=$phonenumberinfo[7]+0?></td>
-											<td><?=$phonenumberinfo[6]+0?></td>
-											<td><?=sprintf("%0.2f", isset($phonenumberinfo[8]) ? $phonenumberinfo[8] : "") . "%" ?></td>
+											<td><?=(int)$phonenumberinfo['total']?></td>
+											<td><?=(int)$phonenumberinfo['done']?></td>
+											<td><?=(int)$phonenumberinfo['remaining']?></td>
+											<td><?=(int)$phonenumberinfo['blocked']?></td>
+											<td><?=(int)$phonenumberinfo['duplicates']?></td>
+											<td><?=(int)$phonenumberinfo['nocontacts']?></td>
+											<td><?=(int)$phonenumberinfo['declined']?></td>
+											<td><?=(int)$phonenumberinfo['totalattempts']?></td>
+											<td>&nbsp;</th>
+											<td><?=sprintf("%0.2f", isset($phonenumberinfo['success_rate']) ? $phonenumberinfo['success_rate'] : "") . "%" ?></td>
 										</tr>
 									</table>
 								</td>
@@ -381,7 +462,7 @@ class JobSummaryReport extends ReportGenerator{
 					</td>
 				</tr>
 <?
-				}
+				} // end phone summary
 				if($hasconfirmation){
 ?>
 				<tr>
