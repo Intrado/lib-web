@@ -75,7 +75,7 @@ class JobAutoReport extends ReportGenerator{
 				)
 			) as label,
 			rc.recipientpersonid,
-			(select CONCAT(' ', f01, ' ', f02) from person where rc.recipientpersonid=id) as recipientpersonname
+			concat(' ', rcp.f01, ' ', rcp.f02) as recipientpersonname
 			from reportperson rp
 			inner join job j on (rp.jobid = j.id)
 			inner join user u on (u.id = j.userid)
@@ -85,6 +85,7 @@ class JobAutoReport extends ReportGenerator{
 			left join surveyquestionnaire sq on (sq.id = j.questionnaireid)
 			left join surveyweb sw on (sw.personid = rp.personid and sw.jobid = rp.jobid)
 			left join voicereply vr on (vr.jobid = rp.jobid and vr.personid = rp.personid and vr.sequence = rc.sequence and vr.userid = " . $USER->id . " and rc.type='phone')
+			left outer join person rcp on (rc.recipientpersonid = rcp.id)
 			where 1 "
 			. $searchquery
 			. $rulesql
