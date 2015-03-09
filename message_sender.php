@@ -979,7 +979,10 @@ include("nav.inc.php");
 					userResponse.preferences.push({name:'hidetoolbar', value: <?= ($USER->getSetting('hideemailtools', false) ? 'true' : 'false'); ?>});
 					window.BOOTSTRAP_DATA.user = userResponse;
 					window.BOOTSTRAP_DATA.customer = {
-						"guardianCategories": categoriesRes[0]
+						"guardianData": {
+							"hasGDM": <? echo ((getSystemSetting('maxguardians', 0) > 0) ? 'true' : 'false'); ?>,
+							"categories": categoriesRes[0]
+						}
 					};
 					window.BOOTSTRAP_DATA.form = {
 						template: {
