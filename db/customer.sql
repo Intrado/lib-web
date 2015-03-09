@@ -2916,3 +2916,18 @@ update setting set value='11.1/9' where name='_dbversion'
 $$$
 
 -- END 11.1/9
+
+ALTER TABLE `reportdeviceattempt`
+  DROP PRIMARY KEY,
+   ADD PRIMARY KEY(
+     `jobId`,
+     `personId`,
+     `sequence`,
+     `attempt`)
+$$$
+
+update setting set value='11.1/10' where name='_dbversion'
+$$$
+
+-- END 11.1/10
+

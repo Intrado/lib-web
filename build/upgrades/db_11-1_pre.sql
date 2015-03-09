@@ -102,5 +102,16 @@ $$$
 ALTER TABLE `reportdevice` CHANGE `deviceUuid` `deviceUuid` VARCHAR(36) CHARACTER SET ascii COLLATE ascii_bin NULL DEFAULT NULL
 $$$
 
+-- $rev 10
+
+ALTER TABLE `reportdeviceattempt`
+  DROP PRIMARY KEY,
+   ADD PRIMARY KEY(
+     `jobId`,
+     `personId`,
+     `sequence`,
+     `attempt`)
+$$$
+
 
 
