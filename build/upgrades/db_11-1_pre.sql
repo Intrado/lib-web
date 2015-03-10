@@ -113,5 +113,8 @@ ALTER TABLE `reportdeviceattempt`
      `attempt`)
 $$$
 
+-- $rev 11
 
+INSERT IGNORE INTO `setting` SET `name` = '_customerid', `value` = '_$CUSTOMERID_'+0
+$$$
 

@@ -912,7 +912,10 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				QuickUpdate("insert into persondatavalues (fieldnum, value, refcount, editlock) values ('f03','es',0,1)", $custdb);
 			}
 		}
-		
+
+
+        setCustomerSystemSetting('_customerid', $customerid, $custdb);
+
 		setCustomerSystemSetting('_hassms', $postdata["hassms"]?'1':'0', $custdb);
 		
 		update_jobtypeprefs(1, $postdata["maxsms"], "sms", $custdb);
