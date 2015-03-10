@@ -914,7 +914,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		}
 
 
-        setCustomerSystemSetting('_customerid', $customerid, $custdb);
+		setCustomerSystemSetting('_customerid', $customerid, $custdb);
 
 		setCustomerSystemSetting('_hassms', $postdata["hassms"]?'1':'0', $custdb);
 		
