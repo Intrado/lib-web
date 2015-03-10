@@ -110,14 +110,12 @@ class JobSummaryReport extends ReportGenerator{
 	// @BillKarwin
 	static function getDeviceInfo($joblist, $readonlyconn) {
 		$devicequery = "select count(rd.jobid) as total,
-									sum(rp.status in ('success', 'duplicate', 'fail')) as done,
-									sum(rp.status not in ('success', 'fail', 'duplicate', 'blocked', 'nocontacts', 'declined') and rd.result not in ('sent', 'duplicate', 'blocked')) as remaining,
-									sum(rc.result = 'blocked') as blocked,
-									sum(rc.result = 'duplicate') as duplicate,
-									sum(rp.status = 'nocontacts' and rd.result is null) as nocontacts,
-									sum(rp.status = 'declined' and rd.result is null) as declined,
-									sum(rd.result = 'sent') as sent,
-									sum(rd.result = 'unsent') as unsent,
+									sum(rp.status in ('success', 'duplicate', 'fail')) as done, -- what status is possible for device?
+									sum(rp.status not in ('success', 'fail', 'duplicate', 'blocked', 'nocontacts', 'declined') and rd.result not in ('sent')) as remaining, -- what status is possible for device?
+									sum(rp.status = 'nocontacts' and rd.result is null) as nocontacts, -- is this possible for device?
+									sum(rp.status = 'declined' and rd.result is null) as declined, -- is this possible for device?
+									sum(rd.result = 'sent') as sent, -- should this just be 'done'?
+									sum(rd.result = 'unsent') as unsent, -- should this just be 'remaining'?
 									100 * sum(rp.numcontacts and rp.status='success') / (sum(rp.numcontacts and rp.status != 'duplicate')) as success_rate
 									from reportperson rp
 									left join reportdevice rd on (rp.jobid = rd.jobid and rp.personid = rd.personid)
@@ -281,7 +279,7 @@ class JobSummaryReport extends ReportGenerator{
 											<td><?=(int)$emailinfo['done']?></td>
 											<td><?=(int)$emailinfo['remaining']?></td>
 											<td>&nbsp;</td>
-											<td><?=(int)$emailinfo['duplicates']?></td>
+											<td><?=(int)$emailinfo['duplicate']?></td>
 											<td><?=(int)$emailinfo['nocontacts']?></td>
 											<td><?=(int)$emailinfo['declined']?></td>
 											<td>&nbsp;</td>
@@ -322,7 +320,7 @@ class JobSummaryReport extends ReportGenerator{
 											<td><?=(int)$smsinfo['done']?></td>
 											<td><?=(int)$smsinfo['remaining']?></td>
 											<td><?=(int)$smsinfo['blocked']?></td>
-											<td><?=(int)$smsinfo['duplicates']?></td>
+											<td><?=(int)$smsinfo['duplicate']?></td>
 											<td><?=(int)$smsinfo['nocontacts']?></td>
 											<td><?=(int)$smsinfo['declined']?></td>
 											<td>&nbsp;</td>
@@ -347,32 +345,32 @@ class JobSummaryReport extends ReportGenerator{
 							<tr>
 								<td>
 
-	<table  border="0" cellpadding="2" cellspacing="1" class="list" width="100%">
+                                    <table  border="0" cellpadding="2" cellspacing="1" class="list" width="100%">
 										<tr class="listHeader" align="left" valign="bottom">
 											<th style="min-width: 100px"><?= _L("# of Devices") ?></th>
 											<th style="min-width: 100px"><?= _L("Completed") ?></th>
 											<th style="min-width: 100px"><?= _L("Remaining") ?></th>
-											<th style="min-width: 100px">&nbsp;</th>
-											<th style="min-width: 100px">&nbsp;</th>
-											<th style="min-width: 100px">&nbsp;</th>
-											<th style="min-width: 100px">&nbsp;</th>
+                                            <th style="min-width: 100px"><?= _L("Blocked") ?></th>
+                                            <th style="min-width: 100px"><?= _L("Duplicates Removed") ?></th>
+											<th style="min-width: 100px"><?= _L("No Device") ?></th>
+											<th style="min-width: 100px"><?= _L("No Device Selected") ?></th>
 											<th style="min-width: 100px"><?= _L("Sent") ?></th>
 											<th style="min-width: 100px"><?= _L("Unsent") ?></th>
 											<th style="width: 99%">&nbsp;</th>
 											<th style="min-width: 100px"><?= _L("% Contacted") ?></th>
 										</tr>
 										<tr>
-											<td><?=(int)$phonenumberinfo['total']?></td>
-											<td><?=(int)$phonenumberinfo['done']?></td>
-											<td><?=(int)$phonenumberinfo['remaining']?></td>
+											<td><?=(int)$deviceinfo['total']?></td>
+											<td><?=(int)$deviceinfo['done']?></td>
+											<td><?=(int)$deviceinfo['remaining']?></td>
+                                            <td><?=(int)$deviceinfo['blocked']?></td>
+                                            <td><?=(int)$deviceinfo['duplicate']?></td>
+                                            <td><?=(int)$deviceinfo['nocontacts']?></td>
+                                            <td><?=(int)$deviceinfo['declined']?></td>
+											<td><?=(int)$deviceinfo['sent']?></td>
+											<td><?=(int)$deviceinfo['unsent']?></td>
 											<td>&nbsp;</td>
-											<td>&nbsp;</td>
-											<td>&nbsp;</td>
-											<td>&nbsp;</td>
-											<td><?=(int)$phonenumberinfo['sent']?></td>
-											<td><?=(int)$phonenumberinfo['unsent']?></td>
-											<td>&nbsp;</td>
-											<td><?=sprintf("%0.2f", isset($smsinfo['success_rate']) ? $smsinfo['success_rate'] : "") . "%" ?></td>
+											<td><?=sprintf("%0.2f", isset($deviceinfo['success_rate']) ? $deviceinfo['success_rate'] : "") . "%" ?></td>
 										</tr>
 									</table>
 								</td>
@@ -409,7 +407,7 @@ class JobSummaryReport extends ReportGenerator{
 											<td><?=(int)$phonenumberinfo['done']?></td>
 											<td><?=(int)$phonenumberinfo['remaining']?></td>
 											<td><?=(int)$phonenumberinfo['blocked']?></td>
-											<td><?=(int)$phonenumberinfo['duplicates']?></td>
+											<td><?=(int)$phonenumberinfo['duplicate']?></td>
 											<td><?=(int)$phonenumberinfo['nocontacts']?></td>
 											<td><?=(int)$phonenumberinfo['declined']?></td>
 											<td><?=(int)$phonenumberinfo['totalattempts']?></td>
