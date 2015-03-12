@@ -175,7 +175,8 @@ function getJobList($startdate, $enddate, $jobtypes = "", $surveyonly = "", $del
 		$deliveryquery = " and (exists (select * from message m where m.messagegroupid = j.messagegroupid and m.type='sms')) ";
     // @BillKarwin
 	} else if("device" == $deliverymethod) {
-        $deliveryquery = " and (exists (select * from message m where m.messagegroupid = j.messagegroupid and m.type='device')) ";
+        // there are no `message` rows associated with 'device' deliveries, so don't query that table
+        $deliveryquery = " ";
     }
 	$surveyfilter = "";
 	if($surveyonly == "true"){
