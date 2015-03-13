@@ -16,45 +16,24 @@ class JobDetailReport extends ReportGenerator{
 		}
 
 		$typequery = "";
-
-        // a few tables and columns must be variable because we join either to `reportcontact` or `reportdevice`.
-        // those two tables have different columns, and the query would break if we reference columns that don't exist.
-        $reportcontact_destination_field = "coalesce(rc.phone, rc.email, rc.sms, concat_ws(' ', rc.addr1, rc.addr2, rc.city, rc.state, rc.zip))";
-        $reportcontact_lastattempt_field = "from_unixtime(rc.starttime/1000)";
-        $reportcontact_resultdata_field = "rc.resultdata";
-        $reportcontact_confirmed_field = "rc.response";
-		$reportcontact_join = "left outer join reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid)";
-
-        $reportcontact_voicereplyid_field = "null";
-        $voicereply_vrid_field = "null";
-        $voicereply_join = ""; // don't join to this table at all unless the report type is 'phone'
-
-        switch ($this->params['reporttype']) {
-            case 'phonedetail':
-                $typequery = " and rp.type = 'phone'";
-                $this->params['type'] = 'phone';
-                $reportcontact_voicereplyid_field = "rc.voicereplyid";
-                $voicereply_vrid_field = "vr.id";
-                $voicereply_join = "left outer join voicereply vr on (vr.jobid = rp.jobid and vr.personid = rp.personid and vr.sequence = rc.sequence and vr.userid = {$USER->id} and rc.type='phone')";
-                break;
-            case 'emaildetail':
-                $typequery = " and rp.type = 'email'";
-                $this->params['type'] = 'email';
-                break;
-            case 'smsdetail':
-                $typequery = " and rp.type = 'sms'";
-                $this->params['type'] = 'sms';
-                break;
-            case 'devicedetail':
-                $typequery = " and rp.type = 'device'";
-                $this->params['type'] = 'device';
-                $reportcontact_destination_field = "rc.deviceUuid";
-                $reportcontact_lastattempt_field = "from_unixtime(rc.startTimeMs/1000)";
-                $reportcontact_resultdata_field = "null";
-                $reportcontact_confirmed_field = "null";
-                $reportcontact_join = 'left outer join reportdevice rc on (rc.jobid = rp.jobid and rc.personid = rp.personid)';
-                break;
-        }
+		switch ($this->params['reporttype']) {
+		case 'phonedetail':
+			$typequery = " and rp.type = 'phone'";
+			$this->params['type'] = 'phone';
+			break;
+		case 'emaildetail':
+			$typequery = " and rp.type = 'email'";
+			$this->params['type'] = 'email';
+			break;
+		case 'smsdetail':
+			$typequery = " and rp.type = 'sms'";
+			$this->params['type'] = 'sms';
+			break;
+		case 'devicedetail':
+			$typequery = " and rp.type = 'device'";
+			$this->params['type'] = 'device';
+			break;
+		}
 
 		if(isset($this->params['jobid'])){
 			$joblist = "";
@@ -88,27 +67,27 @@ class JobDetailReport extends ReportGenerator{
 			} else if($this->params['result'] == "nocontacts"){
 				$resultquery .= " and rp.status = 'nocontacts' ";
 			} else {
-                $resultarray = array_flip(explode("','", $this->params['result']));
-                $resultqueryarray = array();
+				$resultarray = array_flip(explode("','", $this->params['result']));
+				$resultqueryarray = array();
 
-                //check for specific results that aren't just reportcontact results, and make exceptions for them
-                //remove them from the array so we can do a big rc.result in (...)
+				//check for specific results that aren't just reportcontact results, and make exceptions for them
+				//remove them from the array so we can do a big rc.result in (...)
 
-                // special case for 'device' because `reportdevice`.`response` doesn't exist
-                if ($this->params['type'] != 'device') {
-                    if (isset($resultarray["confirmed"])) {
-                        $resultqueryarray[] = " rc.response = 1 ";
-                        unset($resultarray["confirmed"]);
-                    }
-                    if (isset($resultarray["notconfirmed"])) {
-                        $resultqueryarray[] = " rc.response = 2 ";
-                        unset($resultarray["notconfirmed"]);
-                    }
-                    if (isset($resultarray["noconfirmation"])) {
-                        $resultqueryarray[] = " rc.response is null ";
-                        unset($resultarray["noconfirmation"]);
-                    }
-                }
+				// special case for 'device' because `reportdevice`.`response` doesn't exist
+				if ($this->params['type'] != 'device') {
+					if (isset($resultarray["confirmed"])) {
+						$resultqueryarray[] = " rc.response = 1 ";
+						unset($resultarray["confirmed"]);
+					}
+					if (isset($resultarray["notconfirmed"])) {
+						$resultqueryarray[] = " rc.response = 2 ";
+						unset($resultarray["notconfirmed"]);
+					}
+					if (isset($resultarray["noconfirmation"])) {
+						$resultqueryarray[] = " rc.response is null ";
+						unset($resultarray["noconfirmation"]);
+					}
+				}
 				if(isset($resultarray["declined"])){
 					$resultqueryarray[] = " rp.status='declined' ";
 					unset($resultarray["declined"]);
@@ -145,8 +124,6 @@ class JobDetailReport extends ReportGenerator{
 		$fieldquery = generateFields("rp");
 		$gfieldquery = generateGFieldQuery("rp.personid", true, $hackPDF);
 
-		// NOTE: the sub-selelect on reportemaildelivery prevents the possibly
-		// multiple-rows per contact from multiplying rp rows as a result of a join
 		$this->query =
 			"select SQL_CALC_FOUND_ROWS
 				j.name as jobname,
@@ -156,19 +133,19 @@ class JobDetailReport extends ReportGenerator{
 				rp." . FieldMap::GetLastNameField() . " as lastname,
 				rp.type as type,
 				coalesce(mg.name, sq.name) as messagename,
-				$reportcontact_destination_field as destination,
-				$reportcontact_lastattempt_field as lastattempt,
-				coalesce(if(rc.result='X' and rc.numattempts<3,'F',rc.result), rp.status) as result,
+				case rp.type when 'device' then concat(left(rd.deviceUuid,8), '...') when 'phone' then rc.phone when 'email' then rc.email when 'sms' then rc.sms else concat_ws(' ', rc.addr1, rc.addr2, rc.city, rc.state, rc.zip) end as destination,
+				case rp.type when 'device' then from_unixtime(rd.startTimeMs/1000) else from_unixtime(rc.starttime/1000) end as lastattempt,
+				coalesce(if(rc.result='X' and rc.numattempts<3,'F',rc.result), rd.result, rp.status) as result,
 				(select statuscode from reportemaildelivery use index (jobperson) where jobid=rc.jobid AND personid = rc.personid and sequence = rc.sequence order by timestamp desc limit 1) as emailstatuscode,
 				ret.requestduration as emailreadduration,
 				rp.status,
-				rc.numattempts as numattempts,
-				$reportcontact_resultdata_field as resultdata,
+				case rp.type when 'device' then rd.numAttempts else rc.numattempts end as numattempts,
+				rc.resultdata,
 				sw.resultdata,
-				$reportcontact_confirmed_field as confirmed,
-				rc.sequence as sequence,
-                $reportcontact_voicereplyid_field as voicereplyid,
-                $voicereply_vrid_field as vrid
+				rc.response as confirmed,
+				case rp.type when 'device' then rd.sequence else rc.sequence end as sequence,
+				rc.voicereplyid as voicereplyid,
+				vr.id as vrid
 				$orgfieldquery
 				$fieldquery
 				$gfieldquery
@@ -180,19 +157,21 @@ class JobDetailReport extends ReportGenerator{
 					)
 				) as label,
 				rc.recipientpersonid,
-				concat(' ', rcp.f01, ' ', rcp.f02) as recipientpersonname
+				case rp.type when 'device' then concat(' ', rdp.f01, ' ', rdp.f02) else concat(' ', rcp.f01, ' ', rcp.f02) end as recipientpersonname
 			from
 				reportperson rp
 				inner join job j on (rp.jobid = j.id)
 				inner join user u on (u.id = j.userid)
-				$reportcontact_join
+				left outer join reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid and rc.result not in ('nocontacts', 'declined'))
+				left outer join reportdevice rd on (rd.jobid = rp.jobid and rd.personid = rp.personid)
 				left outer join messagegroup mg on (mg.id = j.messagegroupid)
 				left outer join surveyquestionnaire sq on (sq.id = j.questionnaireid)
 				left outer join surveyweb sw on (sw.personid = rp.personid and sw.jobid = rp.jobid)
-				$voicereply_join
+				left outer join voicereply vr on (vr.jobid = rp.jobid and vr.personid = rp.personid and vr.sequence = rc.sequence and vr.userid = {$USER->id} and rc.type='phone')
 				left outer join language l on (l.code = rp." . FieldMap::GetLanguageField() . ")
 				left outer join reportemailtracking ret on (rc.jobid = ret.jobid and rc.personid = ret.personid and rc.sequence = ret.sequence)
 				left outer join person rcp on (rc.recipientpersonid = rcp.id)
+				left outer join person rdp on (rd.recipientpersonid = rdp.id)
 			where
 				1
 			$searchquery
@@ -201,28 +180,32 @@ class JobDetailReport extends ReportGenerator{
 			$orderquery
 			";
 
-		//query to test resulting dataset
+		// query to test resulting dataset, PDF generation uses this to estimate the number of pages.
+		// comment out tables in left outer join that can match only 0 or 1 row, since they can't affect the count.
+		// comment out ORDER BY because it can't affect the count either.
 		$this->testquery =
 			"select count(*)
 				from reportperson rp
 				inner join job j on (rp.jobid = j.id)
 				inner join user u on (u.id = j.userid)
-				$reportcontact_join
-				left join	messagegroup mg on
-							(mg.id = j.messagegroupid)
-				left join surveyquestionnaire sq on (sq.id = j.questionnaireid)
-				left join surveyweb sw on (sw.personid = rp.personid and sw.jobid = rp.jobid)
-				left join voicereply vr on (vr.jobid = rp.jobid and vr.personid = rp.personid and vr.sequence = rc.sequence and u.id = vr.userid)
+				left outer join reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid and rc.result not in ('nocontacts', 'declined'))
+				left outer join reportdevice rd on (rd.jobid = rp.jobid and rd.personid = rp.personid)
+				-- left outer join	messagegroup mg on (mg.id = j.messagegroupid)
+				-- left outer join surveyquestionnaire sq on (sq.id = j.questionnaireid)
+				-- left outer join surveyweb sw on (sw.personid = rp.personid and sw.jobid = rp.jobid)
+				left outer join voicereply vr on (vr.jobid = rp.jobid and vr.personid = rp.personid and vr.sequence = rc.sequence and u.id = vr.userid)
+				-- left outer join person rcp on (rc.recipientpersonid = rcp.id)
+				-- left outer join person rdp on (rd.recipientpersonid = rdp.id)
 				where 1
 				$searchquery
 				$rulesql
 				$orgsql
-				$orderquery
+				-- $orderquery
 				";
 
 	}
 
-	function runHtml(){
+	function runHtml() {
 		//index 18 is voicereply id
 		function fmt_detailedresponse($row, $index){
 			global $USER;
@@ -231,17 +214,17 @@ class JobDetailReport extends ReportGenerator{
 			if ($row[5] == 'email') {
 				$text = display_read_duration($row[11]);
 			} else {
-				if($row[18] != null){
-					if($row[19] != null){
-						$text .= ' <span class="voicereplyclickableicon"><img src="img/speaker.gif" onclick="popup(\'repliespreview.php?id=' . $row[18] . '&close=1\', 450, 600)"></span>';
-					} else {
-						$text .= ' <span class="voicereplyicon"><img src="img/speaker2.gif"></span>';
-					}
+				if ($row[18] != null) {
+					if ($row[19] != null) {
+					$text .= ' <span class="voicereplyclickableicon"><img src="img/speaker.gif" onclick="popup(\'repliespreview.php?id=' . $row[18] . '&close=1\', 450, 600)"></span>';
+				} else {
+					$text .= ' <span class="voicereplyicon"><img src="img/speaker2.gif"></span>';
+				}
 				}
 
-				if($row[$index] == "1"){
+				if ($row[$index] == "1") {
 					$text .= "Yes";
-				} else if($row[$index] == "2"){
+				} else if ($row[$index] == "2") {
 					$text .= "No";
 				}
 			}
@@ -249,23 +232,19 @@ class JobDetailReport extends ReportGenerator{
 		}
 
 		function fmt_person_status($status){
-			switch ($status){
-				case 'nocontacts':
-					return _L("No Contacts");
-				case 'declined':
-					return _L("Declined");
-				default;
-					return ucfirst($status);
+			switch ($status) {
+			case 'nocontacts':
+				return _L("No Contacts");
+			case 'declined':
+				return _L("Declined");
+			default;
+				return ucfirst($status);
 			}
 		}
 
 		function fmt_organization($row, $index) {
 			return $row[20];
 		}
-
-		$typequery = "";
-		if(isset($this->params['type']))
-			$typequery = " and rp.type = '" . $this->params['type'] . "'";
 
 		$activefields = explode(",", $this->params['activefields']);
 		$ffields = FieldMap::getOptionalAuthorizedFieldMapsLike('f');

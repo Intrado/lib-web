@@ -85,7 +85,7 @@ if(isset($_GET['reportid'])){
 if(isset($_GET['type'])){
 	$_SESSION['report']['jobdetail']=1;
 	$options = $_SESSION['report']['options'];
-    switch ($_GET['type']) {
+	switch ($_GET['type']) {
         case 'phone':
             $options['reporttype'] = 'phonedetail';
             break;
@@ -98,7 +98,7 @@ if(isset($_GET['type'])){
         case "device":
             $options['reporttype'] = 'devicedetail';
             break;
-    }
+	}
 	unset($options['result']);
 	unset($options['status']);
 	$options['order1'] = 'rp.pkey';

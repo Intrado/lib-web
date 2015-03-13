@@ -4,7 +4,7 @@ mb_internal_encoding('UTF-8');
 
 
 if ($argc < 7) {
-	echo "Usage: reportsubscriptionid | jobid, type 'subscription' | 'job', filename, dbhost, dbname, dbuser, dbpass";
+	echo "Usage: { <reportsubscriptionid> | <jobid> } { subscription | job } <filename> <dbhost> <dbname> <dbuser> <dbpassword>";
 	exit(-1);
 }
 
@@ -89,8 +89,8 @@ if($type == "subscription"){
 		case 'contactchangereport':
 			$generator = new ContactChangeReport();
 			break;
-		case 'smsoptin':
-			$generator = new SmsOptinReport();
+		case 'smsstatus':
+			$generator = new SmsStatusReport();
 			break;
 		case 'contacthistory':
 			$generator = new CallsReport();
@@ -104,6 +104,7 @@ if($type == "subscription"){
 		case 'emaildetail':
 		case 'phonedetail':
 		case 'smsdetail':
+		case 'devicedetail':
 		case 'notcontacted':
 			$generator = new JobDetailReport();
 			break;
