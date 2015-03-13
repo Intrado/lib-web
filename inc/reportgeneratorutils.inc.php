@@ -81,7 +81,7 @@ function getJobSummary($joblist, $readonlyDB = false){
 							coalesce(sum(rc.type='sms'), 0)
 							from job j
 							left join reportperson rp on (j.id = rp.jobid)
-							left join reportcontact rc on (rp.personid = rc.personid and rp.jobid = rc.jobid and rp.type = rc.type)
+							left join reportcontact rc on (rp.personid = rc.personid and rp.jobid = rc.jobid and rp.type = rc.type AND rc.result NOT IN('declined'))
 							inner join user u on (j.userid = u.id)
 							inner join jobtype jt on (jt.id = j.jobtypeid)
 							where j.id in ('" . $joblist . "')

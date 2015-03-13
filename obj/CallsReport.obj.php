@@ -79,7 +79,7 @@ class CallsReport extends ReportGenerator{
 					$fieldquery
 					$gfieldquery
 					from reportperson rp
-					left join reportcontact rc on (rp.jobid = rc.jobid and rp.personid = rc.personid and rp.type = rc.type)
+					left join reportcontact rc on (rp.jobid = rc.jobid and rp.personid = rc.personid and rp.type = rc.type AND rc.result NOT IN('declined'))
 					inner join job j on (rp.jobid= j.id)
 					inner join jobtype jt on (j.jobtypeid = jt.id)
 					left join messagegroup mg on (mg.id = j.messagegroupid)
@@ -332,7 +332,7 @@ class CallsReport extends ReportGenerator{
 					$fieldquery
 					,j.id
 					from reportperson rp
-					left join reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid)
+					left join reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid AND rc.result NOT IN('declined'))
 					inner join job j on (rp.jobid= j.id)
 					where rp.personid = '$info[3]'
 					$resultquery

@@ -92,7 +92,7 @@ if (!isset($_POST['startdate'])) {
 				(select count(*) from custdm) as hasflex
 				from job j
 				inner join reportperson rp on (j.id = rp.jobid and rp.type='phone')
-				inner join reportcontact rc on (rc.jobid = j.id and rc.type='phone' and rc.personid = rp.personid)
+				inner join reportcontact rc on (rc.jobid = j.id and rc.type='phone' and rc.personid = rp.personid) AND rc.result NOT IN('declined')
 				inner join jobtype jt on (jt.id = j.jobtypeid)
 				where j.finishdate between ? and ? + interval 1 day
 				and rc.result in ('A','M')";

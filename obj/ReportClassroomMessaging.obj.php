@@ -104,7 +104,7 @@ class ReportClassroomMessaging extends ReportGenerator {
 				inner join targetedmessage tg on (tg.id = e.targetedmessageid)
 				left join job j on (j.startdate = a.date and j.type = 'alert')
 				left join reportperson rp on (rp.jobid = j.id and rp.type in ('email', 'phone') and rp.personid = a.personid)
-				left join reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid)
+				left join reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid AND rc.result NOT IN('declined'))
 				{$emailjoins}
 			where
 				1

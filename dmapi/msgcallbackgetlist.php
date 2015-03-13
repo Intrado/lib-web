@@ -33,14 +33,10 @@ if ($REQUEST_TYPE == "new") {
 	if (isset($_SESSION['contactphone'])) {
 		$query = "select j.id, j.userid, j.messagegroupid, rc.personid, rc.sequence, rc.starttime
 			from job j
-			left join phone ph on 
-				(ph.phone=?)
-			left join jobsetting js on 
-				(js.jobid=j.id and js.name='translationexpire')
-			inner join reportcontact rc on 
-				(rc.jobid = j.id and rc.type='phone' and rc.personid = ph.personid and rc.phone=?)
-			inner join reportperson rp on 
-				(rp.jobid = j.id and rp.personid=rc.personid and rp.type='phone')
+			left join phone ph on (ph.phone=?)
+			left join jobsetting js on (js.jobid=j.id and js.name='translationexpire')
+			inner join reportcontact rc on (rc.jobid = j.id and rc.type='phone' and rc.personid = ph.personid and rc.phone=? AND rc.result NOT IN('declined'))
+			inner join reportperson rp on (rp.jobid = j.id and rp.personid=rc.personid and rp.type='phone')
 			where
 				j.startdate <= curdate() and j.startdate >= date_sub(curdate(),interval 30 day)
 				and j.status in ('active', 'complete')

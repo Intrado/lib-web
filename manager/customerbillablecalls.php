@@ -56,7 +56,7 @@ if (!isset($_POST['startdate'])) {
 	
 	$query = "select date(finishdate) as day,sum(rc.dispatchtype = 'system'), sum(rc.dispatchtype = 'customer'), ceil(sum(if(rc.dispatchtype = 'system',(ceil(duration/6000)*6),0))/60.0) as minutes from job j
 			inner join reportperson rp on (j.id = rp.jobid and rp.type='phone')
-			inner join reportcontact rc on (rc.jobid = j.id and rc.type='phone' and rc.personid = rp.personid)
+			inner join reportcontact rc on (rc.jobid = j.id and rc.type='phone' and rc.personid = rp.personid AND rc.result NOT IN('declined'))
 			where j.finishdate between ? and ? + interval 1 day
 			and rc.result in ('A','M')
 			group by day";

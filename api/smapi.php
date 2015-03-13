@@ -2330,8 +2330,7 @@ function getJobData($jobid=0){
 	sum(rc.result not in ('sent', 'duplicate', 'nocontacts', 'blocked') and rc.type='sms' and rc.numattempts < 1) as remaining_sms,
 	ADDTIME(j.startdate, j.starttime), j.status, j.deleted, j.type
 	from job j
-	left join reportcontact rc
-	on j.id = rc.jobid
+	left join reportcontact rc on (j.id = rc.jobid AND rc.result NOT IN('declined'))
 	left join jobsetting js on (js.jobid = j.id and js.name = 'maxcallattempts')
 	where 1 and j.deleted=0
 	and j.userid = $USER->id ";

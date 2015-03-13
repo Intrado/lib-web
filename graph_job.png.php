@@ -68,7 +68,7 @@ $query = "
 	select count(*) as cnt, coalesce($coalesceSQL) as callprogress2
 	from job j
 	inner join reportperson rp on (rp.jobid=j.id)
-	left join reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid)
+	left join reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid AND rc.result NOT IN('declined'))
 	inner join jobsetting js on (js.jobid = j.id and js.name = 'maxcallattempts')
 	where rp.type=?
 	and rp.jobid=?

@@ -47,7 +47,7 @@ class JobSummaryReport extends ReportGenerator{
 				coalesce(if(rc.result='X' and rc.numattempts<3,'F',rc.result), rp.status) as currentstatus,
 				sum(rc.result not in ('A','M', 'sent', 'blocked', 'duplicate') and rc.numattempts < js.value) as remaining
 				from reportperson rp
-				left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
+				left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid AND rc.result NOT IN('declined'))
 				left join jobsetting js on (js.jobid = rc.jobid and js.name = 'maxcallattempts')
 				where 1 $joblistquery $rptypequery
 				group by currentstatus";
@@ -65,7 +65,7 @@ class JobSummaryReport extends ReportGenerator{
 									sum(rp.status = 'declined' and rc.result is null) as declined,
 									100 * sum(rp.numcontacts and rp.status='success') / (sum(rp.numcontacts and rp.status != 'duplicate')) as success_rate
 									from reportperson rp
-									left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
+									left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid AND rc.result NOT IN('declined'))
 									inner join job j on (j.id = rp.jobid)
 									where rp.jobid in ('$joblist')
 									and rp.type='phone'";
@@ -82,7 +82,7 @@ class JobSummaryReport extends ReportGenerator{
 									sum(rp.status = 'declined' and rc.result is null) as declined,
 									100 * sum(rp.numcontacts and rp.status='success') / (sum(rp.numcontacts and rp.status != 'duplicate')) as success_rate
 									from reportperson rp
-									left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
+									left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid AND rc.result NOT IN('declined'))
 									where rp.jobid in ('$joblist')
 									and rp.type='email'";
 		return QuickQueryRow($emailquery, false, $readonlyconn);
@@ -98,7 +98,7 @@ class JobSummaryReport extends ReportGenerator{
 									sum(rp.status = 'declined' and rc.result is null) as declined,
 									100 * sum(rp.numcontacts and rp.status='success') / (sum(rp.numcontacts and rp.status != 'duplicate')) as success_rate
 									from reportperson rp
-									left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
+									left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid AND rc.result NOT IN('declined'))
 									where rp.jobid in ('$joblist')
 									and rp.type='sms'";
 		return QuickQueryRow($smsquery, false, $readonlyconn);
@@ -147,7 +147,7 @@ class JobSummaryReport extends ReportGenerator{
 										sum(rc.response=2),
 										sum(rc.response is null)
 											from reportperson rp
-											left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
+											left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid AND rc.result NOT IN('declined'))
 											inner join job j on (j.id = rp.jobid)
 											where rp.jobid in ('" . $this->params['joblist'] . "')
 										and rp.type='phone'";

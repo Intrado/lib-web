@@ -61,10 +61,8 @@ $result = Query(
             	sum(rc.result not in ('sent', 'duplicate', 'nocontacts', 'blocked') and rc.type='sms' and rc.numattempts < 1) as remaining_sms,
             ADDTIME(j.startdate, j.starttime), j.id, j.status, j.deleted, jobowner.login, jobowner.id, j.type, j.percentprocessed, j.cancelleduserid, j.jobtypeid
             from job j
-            left join reportcontact rc
-            	on j.id = rc.jobid
-            left join user jobowner
-            	on j.userid = jobowner.id
+            left join reportcontact rc on (j.id = rc.jobid AND rc.result NOT IN('declined'))
+            left join user jobowner on j.userid = jobowner.id
             left join jobsetting js on (js.jobid = j.id and js.name = 'maxcallattempts')
             where (j.status = 'active' or j.status='scheduled' or j.status='procactive' or j.status='processing' or j.status = 'new' or j.status = 'cancelling') and j.deleted=0
             group by j.id order by j.id desc limit $start, $limit");

@@ -101,7 +101,7 @@ $query = "select rp.pkey,
 			rp.personid,
 			max(rc.starttime)
 			from reportperson rp
-			left join reportcontact rc on (rc.personid = rp.personid and rc.type = rp.type and rc.jobid = rp.jobid)
+			left join reportcontact rc on (rc.personid = rp.personid and rc.type = rp.type and rc.jobid = rp.jobid AND rc.result NOT IN('declined'))
 			left join job j on (j.id = rp.jobid)
 			where 1
 			$userjoin

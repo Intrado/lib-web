@@ -210,7 +210,7 @@ $detailedquery = "select SQL_CALC_FOUND_ROWS
 			from voicereply vr
 			inner join job j on (vr.jobid = j.id)
 			inner join reportperson rp on(vr.personid = rp.personid and vr.jobid = rp.jobid and rp.type ='phone')
-			left join reportcontact rc on (rp.personid = rc.personid and rp.jobid = rc.jobid and rp.type = rc.type and rc.sequence = vr.sequence)
+			left join reportcontact rc on (rp.personid = rc.personid and rp.jobid = rc.jobid and rp.type = rc.type and rc.sequence = vr.sequence AND rc.result NOT IN('declined'))
 			left join messagegroup mg on (mg.id = j.messagegroupid)
 			left join surveyquestionnaire s on (s.id = j.questionnaireid)
 			where vr.userid = '$USER->id'
