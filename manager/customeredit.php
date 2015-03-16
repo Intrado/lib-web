@@ -957,7 +957,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			// and disallow all other tts voice providers
 			$dmid = QuickQuery("select id from dm where customerid = ?", false, array($customerid));
 			if ($dmid)
-				$hasEnabledSmartCallDevice = QuickQuery("select value from dmsetting where dmid = ? and name = 'dm_enabled'");
+				$hasEnabledSmartCallDevice = QuickQuery("select value from dmsetting where dmid = ? and name = 'dm_enabled'", false, array($dmid));
 			else
 				$hasEnabledSmartCallDevice = false;
 			if ($hasEnabledSmartCallDevice || in_array($postdata['dmmethod'], array('cs', 'hybrid'))) {
