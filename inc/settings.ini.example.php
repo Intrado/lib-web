@@ -100,8 +100,10 @@ user = ""
 pass = ""
 ; Netsuite integration user access role
 role = ""
-; Feedback URL to POST to WITH Authorization header
-urlFeedback = "https://rest.netsuite.com/app/site/hosting/restlet.nl?script=105&deploy=1"
+; NetSuite integration host URL
+url = "https://rest.netsuite.com/"
+; Feedback URI to POST to WITH Authorization header
+uriFeedback = "app/site/hosting/restlet.nl?script=105&deploy=1"
 
 ;*/?>
 
