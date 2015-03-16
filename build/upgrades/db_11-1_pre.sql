@@ -118,3 +118,14 @@ $$$
 INSERT IGNORE INTO `setting` SET `name` = '_customerid', `value` = '_$CUSTOMERID_'+0
 $$$
 
+-- $rev 12
+
+-- these tables are part of a new feature, so they should be empty.
+ALTER TABLE `reportdevice` MODIFY `result` ENUM('sent','unsent','notattempted','duplicate','blocked','nocontacts','declined') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL
+$$$
+
+-- this table may be large, but adding new enum values to the end of the list
+-- is only a metadata change, and does not take a long time regardless of the table size.
+ALTER TABLE `reportcontact` MODIFY `result` ENUM('C','A','M','N','B','X','F','sent','unsent','printed','notprinted','notattempted','duplicate','blocked','nocontacts','declined') NOT NULL DEFAULT 'notattempted';
+
+$$$
