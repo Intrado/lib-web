@@ -14,7 +14,6 @@ class JobSummaryReport extends ReportGenerator{
 		if(isset($this->params['survey']) && $this->params['survey']=="true"){
 			$surveyonly = "true";
 		}
-		error_log("*** in generateQuery, jobid = '{$this->params['jobid']}'");
 		if(isset($this->params['jobid'])){
 			$url = "jobid=";
 			$joblist = "";
@@ -29,7 +28,6 @@ class JobSummaryReport extends ReportGenerator{
 				$reldate = $this->params['reldate'];
 			list($startdate, $enddate) = getStartEndDate($reldate, $this->params);
 			$joblist = implode("','", getJobList($startdate, $enddate, $jobtypes, $surveyonly));
-			error_log("*** joblist = $joblist");
 		}
 
 		if($joblist){
@@ -258,7 +256,7 @@ class JobSummaryReport extends ReportGenerator{
 						<table width="100%">
 							<tr>
 								<td>
-									<table  border="0" cellpadding="2" cellspacing="1" class="list" width="100%">
+									<table border="0" cellpadding="2" cellspacing="1" class="list" width="100%">
 										<tr class="listHeader" align="left" valign="bottom">
 											<th style="min-width: 100px"><?= _L("# of Emails") ?></th>
 											<th style="min-width: 100px"><?= _L("Completed") ?></th>
@@ -298,7 +296,7 @@ class JobSummaryReport extends ReportGenerator{
 						<table width="100%">
 							<tr>
 								<td>
-									<table  border="0" cellpadding="2" cellspacing="1" class="list" width="100%">
+									<table border="0" cellpadding="2" cellspacing="1" class="list" width="100%">
 										<tr class="listHeader" align="left" valign="bottom">
 											<th style="min-width: 100px"><?= _L("# of SMS") ?></th>
 											<th style="min-width: 100px"><?= _L("Completed") ?></th>
@@ -339,7 +337,7 @@ class JobSummaryReport extends ReportGenerator{
 							<tr>
 								<td>
 
-									<table  border="0" cellpadding="2" cellspacing="1" class="list" width="100%">
+									<table border="0" cellpadding="2" cellspacing="1" class="list" width="100%">
 										<tr class="listHeader" align="left" valign="bottom">
 											<th style="min-width: 100px"><?= _L("# of Devices") ?></th>
 											<th style="min-width: 100px"><?= _L("Completed") ?></th>
@@ -379,7 +377,7 @@ class JobSummaryReport extends ReportGenerator{
 						<table width="100%">
 							<tr>
 								<td>
-									<table  border="0" cellpadding="2" cellspacing="1" class="list" width="100%">
+									<table border="0" cellpadding="2" cellspacing="1" class="list" width="100%">
 										<tr class="listHeader" align="left" valign="bottom">
 											<th style="min-width: 100px"><?= _L("# of Phones") ?></th>
 											<th style="min-width: 100px"><?= _L("Completed") ?></th>

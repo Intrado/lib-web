@@ -369,7 +369,7 @@ class JobDetailReport extends ReportGenerator{
 		function fmt_confirmation($row, $index){
 			if ($row[5] == 'email') {
 				$text = display_read_duration($row[11]);
-			} else  {
+			} else {
 				if($row[$index] == "1"){
 					$text = "Yes";
 				} else if($row[$index] == "2"){

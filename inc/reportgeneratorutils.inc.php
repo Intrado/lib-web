@@ -112,6 +112,7 @@ function displayJobSummary($joblist, $readonlyDB = false){
 
 		//Check for any sms messages
 		$hassms = QuickQuery("select exists (select * from message m where m.type='sms' and m.messagegroupid = j.messagegroupid) from job j where id in ('" . $joblist . "')", $readonlyDB);
+        $hasinfocenter = getSystemSetting("_hasinfocenter", false);
 
 		startWindow(_L("Summary "). help("ReportGeneratorUtils_Summary"), 'padding: 3px;');
 		?>
@@ -134,7 +135,9 @@ function displayJobSummary($joblist, $readonlyDB = false){
 <? if($hassms) { ?>
 								<th><?= _L("# of SMS") ?></th>
 <? } ?>
+<? if($hasinfocenter) { ?>
                                 <th><?= _L("# of Devices") ?></th>
+<? } ?>
 							</tr>
 <?
 							$alt=0;
@@ -155,7 +158,9 @@ function displayJobSummary($joblist, $readonlyDB = false){
 <? if($hassms) { ?>
 									<td><?=$job[13]?></td>
 <? } ?>
+<? if ($hasinfocenter) { ?>
 									<td><?=$job[14]?></td>
+<? } ?>
 								</tr>
 <?
 							}

@@ -86,18 +86,18 @@ if(isset($_GET['type'])){
 	$_SESSION['report']['jobdetail']=1;
 	$options = $_SESSION['report']['options'];
 	switch ($_GET['type']) {
-        case 'phone':
-            $options['reporttype'] = 'phonedetail';
-            break;
-        case "email":
-            $options['reporttype'] = 'emaildetail';
-            break;
-        case "sms":
-            $options['reporttype'] = 'smsdetail';
-            break;
-        case "device":
-            $options['reporttype'] = 'devicedetail';
-            break;
+	case 'phone':
+		$options['reporttype'] = 'phonedetail';
+		break;
+	case "email":
+		$options['reporttype'] = 'emaildetail';
+		break;
+	case "sms":
+		$options['reporttype'] = 'smsdetail';
+		break;
+	case "device":
+		$options['reporttype'] = 'devicedetail';
+		break;
 	}
 	unset($options['result']);
 	unset($options['status']);
@@ -305,23 +305,23 @@ if($error || $reportgenerator->format == "html"){
 	$PAGE = "reports:reports";
 	$TITLE = "Phone Log";
 	if(isset($_SESSION['report']['options']['reporttype'])) {
-        switch ($_SESSION['report']['options']['reporttype']) {
-            case 'phonedetail':
-                $TITLE = 'Phone Log';
-                break;
-            case 'emaildetail':
-                $TITLE = 'Email Log';
-                break;
-            case 'smsdetail':
-                $TITLE = 'SMS Log';
-                break;
-            case 'devicedetail':
-                $TITLE = 'Device Log';
-                break;
-            case 'notcontacted':
-                $TITLE = "Recipients Not Contacted - " . escapehtml($reportgenerator->params['undeliveredcount']) . " Recipients";
-                break;
-        }
+	switch ($_SESSION['report']['options']['reporttype']) {
+	case 'phonedetail':
+		$TITLE = 'Phone Log';
+		break;
+	case 'emaildetail':
+		$TITLE = 'Email Log';
+		break;
+	case 'smsdetail':
+		$TITLE = 'SMS Log';
+		break;
+	case 'devicedetail':
+		$TITLE = 'Device Log';
+		break;
+	case 'notcontacted':
+		$TITLE = "Recipients Not Contacted - " . escapehtml($reportgenerator->params['undeliveredcount']) . " Recipients";
+		break;
+	}
 	}
 	if(isset($_SESSION['reportid'])){
 		$subscription = new ReportSubscription($_SESSION['reportid']);
@@ -344,7 +344,7 @@ if($error || $reportgenerator->format == "html"){
 	$csvbutton = icon_button("Download CSV", "page_white_excel", null, "reportjobdetails.php/report.csv?csv=true");
 	$pdfbutton = icon_button("Download PDF", "page_white_acrobat", null, "reportjobdetails.php/report.pdf?pdf=true");
 	
-	//check to see if referer came from summary page.  if so, go to history instead of referer
+	//check to see if referer came from summary page. if so, go to history instead of referer
 	if(isset($_SESSION['report']['jobdetail']) || $error || $submit || $pagestartflag)
 		$back = icon_button(_L("Back"), "fugue/arrow_180", "window.history.go(-1)");
 	else {
@@ -364,7 +364,7 @@ if($error || $reportgenerator->format == "html"){
 		</tr>
 		
 		<tr><th align="right" class="windowRowHeader bottomBorder">Output Format:</th>
-			<td class="bottomBorder">  <? echo $csvbutton ?> <? echo $pdfbutton ?>  </td>
+			<td class="bottomBorder"> <? echo $csvbutton ?> <? echo $pdfbutton ?> </td>
 		</tr>
 <?
 		if(isset($_SESSION['report']['options']['reporttype']) && $_SESSION['report']['options']['reporttype'] == "notcontacted"){

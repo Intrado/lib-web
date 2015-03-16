@@ -93,7 +93,6 @@ class JobAutoReport extends ReportGenerator{
 
 	}
 
-  
 	function setReportFile(){
 		$this->reportfile = "jobautoreport.jasper";
 	}
