@@ -819,7 +819,7 @@ CREATE TABLE `reportcontact` (
   `numattempts` tinyint(4) NOT NULL default '0',
   `userid` int(11) NOT NULL default '0',
   `starttime` bigint(20) default NULL,
-  `result` enum('C','A','M','N','B','X','F','sent','unsent','printed','notprinted','notattempted','duplicate','blocked') NOT NULL default 'notattempted',
+  `result` enum('C','A','M','N','B','X','F','sent','unsent','printed','notprinted','notattempted','duplicate','blocked','nocontacts','declined') NOT NULL default 'notattempted',
   `participated` tinyint(4) NOT NULL default '0',
   `duration` float default NULL,
   `resultdata` varchar(255) default NULL,
@@ -2876,12 +2876,12 @@ CREATE TABLE `reportdevice` (
   `deviceUuid` varchar(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
   `numAttempts` tinyint(4) NOT NULL,
   `startTimeMs` bigint(20) DEFAULT NULL,
-  `result` enum('sent','unsent') NOT NULL,
+  `result` enum('sent','unsent','notattempted','duplicate','blocked','nocontacts','declined'),
   PRIMARY KEY (`jobId`,`personId`,`sequence`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
 
--- record each attempt, rather than cramming into reportcontact.attemptdata
+-- record each attempt, rather than cramming into reportdevice.attemptdata
 CREATE TABLE `reportdeviceattempt` (
   `jobId` int(11) NOT NULL,
   `personId` int(11) NOT NULL,

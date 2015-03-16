@@ -126,6 +126,5 @@ $$$
 
 -- this table may be large, but adding new enum values to the end of the list
 -- is only a metadata change, and does not take a long time regardless of the table size.
-ALTER TABLE `reportcontact` MODIFY `result` ENUM('C','A','M','N','B','X','F','sent','unsent','printed','notprinted','notattempted','duplicate','blocked','nocontacts','declined') NOT NULL DEFAULT 'notattempted';
-
+ALTER TABLE `reportcontact` MODIFY `result` ENUM('C','A','M','N','B','X','F','sent','unsent','printed','notprinted','notattempted','duplicate','blocked','nocontacts','declined') NOT NULL DEFAULT 'notattempted'
 $$$
