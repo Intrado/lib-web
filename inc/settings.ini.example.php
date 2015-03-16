@@ -91,5 +91,17 @@ memcache_session_lock_retry_us=50000
 ; if no urls are defined, memache support is disabled
 memcached_url[]="tcp://127.0.0.1:11211?persistent=1&timeoutms=1000"
 
+[netsuite]
+; Netsuite account number for Incase
+account = ""
+; Netsuite integration user login
+user = ""
+; Netsuite integration user password
+pass = ""
+; Netsuite integration user access role
+role = ""
+; Feedback URL to POST to WITH Authorization header
+urlFeedback = "https://rest.netsuite.com/app/site/hosting/restlet.nl?script=105&deploy=1"
 
 ;*/?>
+
