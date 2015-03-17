@@ -5,6 +5,7 @@ require_once('inc/securityhelper.inc.php');
 require_once('inc/table.inc.php');
 require_once('inc/html.inc.php');
 require_once('inc/utils.inc.php');
+require_once('obj/Phone.obj.php');
 require_once('obj/Validator.obj.php');
 require_once('obj/Form.obj.php');
 require_once('obj/FormItem.obj.php');
@@ -92,6 +93,8 @@ class FeedbackPage extends PageForm {
 
 	private $firstName;
 	private $lastName;
+	private $email;
+	private $phone;
 	private $data3;
 
 	public $formName = 'ourcustomformname';
@@ -139,8 +142,12 @@ class FeedbackPage extends PageForm {
 			list($this->firstName, $this->lastName, $this->data3) = array(1,2,3);
 		}
 		else {
-			$this->firstName = "first name"; // TODO get this from the user data
+			// TODO initialize these from user data
+			$this->firstName = "first name";
 			$this->lastName = "last name";
+			$this->email = "email@email.email";
+			$this->phone = '8888888888';
+
 			$this->data3 = 1;
 		}
 
@@ -216,55 +223,119 @@ class FeedbackPage extends PageForm {
 		$this->options['title'] = ''; //_L('Feedback');
 		$this->options['windowTitle'] = _L('Feedback') . $this->id;
 
-		$html = sprintf(_L("Today's date is %s"), $this->date) . "<br/><br/>\n";
+		$html = ''; //sprintf(_L("Today's date is %s"), $this->date) . "<br/><br/>\n";
 		$html .= parent::render();
 		return($html);
+	}
+
+	function getFeedbackCategories() {
+		// FIXME: final category labels/values are needed
+		return array(
+			1 => 'Example Category 1',
+			2 => 'Example Category 2',
+		);
+	}
+
+	function getFeedbackTypes() {
+		// FIXME: final type labels/values are needed
+		return array(
+			1 => 'Example Type 1',
+			2 => 'Example Type 2',
+		);
 	}
 
 	function factoryFeedbackPageForm() {
 		$formdata = array(
 			_L('Reported by'),
-			"firstName" => array(
-				"label" => _L('First Name'),
-				"value" => $this->firstName,
-				"validators" => array(
-					array("ValLength","min" => 3,"max" => 50)
+
+			'firstName' => array(
+				'label' => _L('First Name'),
+				'value' => $this->firstName,
+				'validators' => array(
+					array('ValLength', 'min' => 3, 'max' => 50)
 				),
-				"control" => array("TextField","size" => 30, "maxlength" => 51, "autocomplete" => "test"),
-				"helpstep" => 1
+				'control' => array('TextField', 'size' => 30, 'maxlength' => 51, 'autocomplete' => 'test'),
+				'helpstep' => 1
 			),
-			"lastName" => array(
-				"label" => _L('Last Name'),
-				"value" => $this->lastName,
-				"validators" => array(
-					array("ValLength","min" => 3,"max" => 50)
+
+			'lastName' => array(
+				'label' => _L('Last Name'),
+				'value' => $this->lastName,
+				'validators' => array(
+					array('ValLength', 'min' => 2, 'max' => 50)
 				),
-				"control" => array("TextField","size" => 30, "maxlength" => 51, "autocomplete" => "test"),
-				"helpstep" => 1
+				'control' => array('TextField', 'size' => 30, 'maxlength' => 51, 'autocomplete' => 'test'),
+				'helpstep' => 2
 			),
-			_L('Feedback Section 2'), // Optional
-			"templatecheckbox" => array(
-				"label" => _L('Checkbox'),
-				"value" => $bogusData,
-				"validators" => array(
-					array("ValRequired")
+
+			'email' => array(
+				'label' => _L('Email'),
+				'value' => $this->email,
+				'validators' => array(
+					array('ValLength', 'min' => 9, 'max' => 50),
+					array('ValEmail')
 				),
-				"control" => array("CheckBox"),
-				"helpstep" => 2
+				'control' => array('TextField', 'size' => 30, 'maxlength' => 51, 'autocomplete' => 'test'),
+				'helpstep' => 3
 			),
-			"templateitem" => array(
-				"label" => _L('FeedbackItem'),
-				"value" => $this->data3,
-				"validators" => array(array("ValRequired"),array("ValFeedbackItem")),
-				"control" => array("FeedbackItem"),
-				"helpstep" => 3
+
+			'phone' => array(
+				'label' => _L('Phone'),
+				'value' => $this->phone,
+				'validators' => array(
+					array('ValLength', 'min' => 10, 'max' => 50),
+					array('ValPhone')
+				),
+				'control' => array('TextField', 'size' => 30, 'maxlength' => 51, 'autocomplete' => 'test'),
+				'helpstep' => 4
+			),
+
+			_L('Feedback'),
+
+			'feedbackCategory' => array(
+				'label' => _L('Feedback Category'),
+				'fieldhelp' => _L('Select the category that best describes your feedback'),
+				'value' => 1,
+				'validators' => array(
+					array('ValInArray', 'values' => array_keys($this->getFeedbackCategories()))
+				),
+				'control' => array('SelectMenu', 'values' => $this->getFeedbackCategories()),
+				'helpstep' => 5
+			),
+
+			'feedbackType' => array(
+				'label' => _L('Feedback Type'),
+				'fieldhelp' => _L('Select the type that best describes your feedback'),
+				'value' => 1,
+				'validators' => array(
+					array('ValInArray', 'values' => array_keys($this->getFeedbackTypes()))
+				),
+				'control' => array('SelectMenu', 'values' => $this->getFeedbackTypes()),
+				'helpstep' => 6
+			),
+
+			'feedbackText' => array(
+				'label' => _L('Message'),
+				'fieldhelp' => _L('Fill in the details of your feedback'),
+				'value' => '',
+				'validators' => array(
+					// TODO: find out if netsuite has a max value on this or if we should increase it...
+					array('ValLength', 'min' => 10, 'max' => 5000)
+				),
+				'control' => array('TextArea', 'size' => 30, 'cols' => 34),
+				'helpstep' => 7
 			)
 		);
 
+		// FIXME: Fill in appropriate feedback help steps... or eliminate the guide altogether
 		$helpsteps = array (
 			_L('Feedbackhelpstep 1'),
 			_L('Feedbackhelpstep 2'),
-			_L('Feedbackhelpstep 3')
+			_L('Feedbackhelpstep 3'),
+			_L('Feedbackhelpstep 4'),
+			_L('Feedbackhelpstep 5'),
+			_L('Feedbackhelpstep 6'),
+			_L('Feedbackhelpstep 7')
 		);
 
 		$buttons = array(
