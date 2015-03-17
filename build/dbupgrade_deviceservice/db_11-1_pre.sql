@@ -81,3 +81,7 @@ $$$
 ALTER TABLE `notification` ADD `responseHeaders` TEXT NULL DEFAULT NULL AFTER `responseData`
 $$$
 
+-- $rev 6
+
+ALTER TABLE `device` CHANGE `token` `token` VARCHAR(204) CHARACTER SET ascii COLLATE ascii_bin NULL DEFAULT NULL
+$$$
