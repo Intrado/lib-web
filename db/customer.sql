@@ -2938,10 +2938,10 @@ $$$
 
 -- END 11.1/11
 
-ALTER TABLE `reportdevice` MODIFY `result` ENUM('sent','unsent','notattempted','duplicate','blocked','nocontacts','declined') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL
+ALTER TABLE `reportdevice` MODIFY `result` ENUM('sent','unsent','notattempted','duplicate','blocked','declined') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL
 $$$
 
-ALTER TABLE `reportcontact` MODIFY `result` ENUM('C','A','M','N','B','X','F','sent','unsent','printed','notprinted','notattempted','duplicate','blocked','nocontacts','declined') NOT NULL DEFAULT 'notattempted'
+ALTER TABLE `reportcontact` MODIFY `result` ENUM('C','A','M','N','B','X','F','sent','unsent','printed','notprinted','notattempted','duplicate','blocked','declined') NOT NULL DEFAULT 'notattempted'
 $$$
 
 update setting set value='11.1/12' where name='_dbversion'
