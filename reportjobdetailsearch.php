@@ -80,6 +80,8 @@ if (isset($_GET['reportid'])) {
 			$_SESSION['report']['type']="notcontacted";
 		else if($options['reporttype'] == "smsdetail")
 			$_SESSION['report']['type']="sms";
+		else if($options['reporttype'] == "devicedetail")
+			$_SESSION['report']['type']="device";
 	}
 	$activefields = array();
 	if(isset($options['activefields'])){
@@ -133,8 +135,6 @@ foreach($jobtypeobjs as $jobtype){
 	$jobtypenames[$jobtype->id] = $jobtype->name;
 }
 
-
-
 switch($_SESSION['report']['type']){
 	case "phone":
 		$possibleresults = array("A" => "Answered",
@@ -178,6 +178,14 @@ switch($_SESSION['report']['type']){
 			"duplicate" => "Duplicate",
 			"blocked" => "Blocked",
 			"declined" => "No SMS Selected");
+		break;
+
+	case "device":
+		$possibleresults = array("sent" => "Sent",
+			"unsent" => "Unsent",
+			"duplicate" => "Duplicate",
+			"blocked" => "Blocked",
+			"declined" => "No Device Selected");
 		break;
 
 	default:
@@ -517,6 +525,8 @@ function set_session_options_reporttype() {
 			$_SESSION['report']['options']['reporttype'] = "emaildetail";
 		} else if ($_SESSION['report']['type'] == "sms"){
 			$_SESSION['report']['options']['reporttype'] = "smsdetail";
+		} else if ($_SESSION['report']['type'] == "device"){
+			$_SESSION['report']['options']['reporttype'] = "devicedetail";
 		} else if ($_SESSION['report']['type'] == "notcontacted"){
 			$_SESSION['report']['options']['reporttype'] = "notcontacted";
 		}
@@ -556,6 +566,8 @@ if(isset($_SESSION['report']['type'])){
 		$TITLE = "Phone Log";
 	} else if($_SESSION['report']['type'] == 'sms'){
 		$TITLE = "SMS Log";
+	} else if($_SESSION['report']['type'] == 'device'){
+		$TITLE = "Device Log";
 	} else if($_SESSION['report']['type'] == 'notcontacted'){
 		$TITLE = "Recipients Not Contacted";
 	}
