@@ -88,5 +88,13 @@ $$$
 
 -- $rev 7
 
-ALTER TABLE `notification` ADD KEY (deviceId, createdTimestampMs), ADD KEY (createdTimestampMs)
+ALTER TABLE `notification` ADD INDEX (deviceId, createdTimestampMs), ADD INDEX (createdTimestampMs)
+$$$
+
+-- $rev 8
+
+ALTER TABLE `device` ADD COLUMN `pushyToken` VARBINARY(204) NULL AFTER token, ADD INDEX (pushyToken), ADD INDEX (token)
+$$$
+
+ALTER TABLE `notification` ADD INDEX (status)
 $$$
