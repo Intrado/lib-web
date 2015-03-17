@@ -85,3 +85,8 @@ $$$
 
 ALTER TABLE `device` CHANGE `token` `token` VARCHAR(204) CHARACTER SET ascii COLLATE ascii_bin NULL DEFAULT NULL
 $$$
+
+-- $rev 7
+
+ALTER TABLE `notification` ADD KEY (deviceId, createdTimestampMs), ADD KEY (createdTimestampMs)
+$$$
