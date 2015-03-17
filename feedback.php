@@ -95,7 +95,6 @@ class FeedbackPage extends PageForm {
 	private $lastName;
 	private $email;
 	private $phone;
-	private $data3;
 
 	public $formName = 'ourcustomformname';
 
@@ -134,22 +133,13 @@ class FeedbackPage extends PageForm {
 	}
 
 	function load(&$get=array(), &$post=array(), &$request=array(), &$session=array()) {
+		global $USER;
 
-                // If we're editing an existing one, get its data
-		if (! is_null($this->id)) {
-
-			// Pull in current data for this TEMPLATE record
-			list($this->firstName, $this->lastName, $this->data3) = array(1,2,3);
-		}
-		else {
-			// TODO initialize these from user data
-			$this->firstName = "first name";
-			$this->lastName = "last name";
-			$this->email = "email@email.email";
-			$this->phone = '8888888888';
-
-			$this->data3 = 1;
-		}
+		// Initialize these from user data
+		$this->firstName = $USER->firstname;
+		$this->lastName = $USER->lastname;
+		$this->email = $USER->email;
+		$this->phone = $USER->phone;
 
 /*
 		// If there was a data reload issue
