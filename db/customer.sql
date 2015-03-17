@@ -819,7 +819,7 @@ CREATE TABLE `reportcontact` (
   `numattempts` tinyint(4) NOT NULL default '0',
   `userid` int(11) NOT NULL default '0',
   `starttime` bigint(20) default NULL,
-  `result` enum('C','A','M','N','B','X','F','sent','unsent','printed','notprinted','notattempted','duplicate','blocked','nocontacts','declined') NOT NULL default 'notattempted',
+  `result` enum('C','A','M','N','B','X','F','sent','unsent','printed','notprinted','notattempted','duplicate','blocked') NOT NULL default 'notattempted',
   `participated` tinyint(4) NOT NULL default '0',
   `duration` float default NULL,
   `resultdata` varchar(255) default NULL,
@@ -2876,7 +2876,7 @@ CREATE TABLE `reportdevice` (
   `deviceUuid` varchar(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
   `numAttempts` tinyint(4) NOT NULL,
   `startTimeMs` bigint(20) DEFAULT NULL,
-  `result` enum('sent','unsent','notattempted','duplicate','blocked','nocontacts','declined'),
+  `result` enum('sent','unsent'),
   PRIMARY KEY (`jobId`,`personId`,`sequence`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
@@ -2931,3 +2931,20 @@ $$$
 
 -- END 11.1/10
 
+-- no schema just add _customerid to setting table
+
+update setting set value='11.1/11' where name='_dbversion'
+$$$
+
+-- END 11.1/11
+
+ALTER TABLE `reportdevice` MODIFY `result` ENUM('sent','unsent','notattempted','duplicate','blocked','declined') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL
+$$$
+
+ALTER TABLE `reportcontact` MODIFY `result` ENUM('C','A','M','N','B','X','F','sent','unsent','printed','notprinted','notattempted','duplicate','blocked','declined') NOT NULL DEFAULT 'notattempted'
+$$$
+
+update setting set value='11.1/12' where name='_dbversion'
+$$$
+
+-- END 11.1/12
