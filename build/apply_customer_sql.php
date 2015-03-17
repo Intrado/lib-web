@@ -29,8 +29,9 @@
 // rows eventually.
 // UPDATE mytable SET field = 123 WHERE field != 123 _$CHUNKIFY_;
 
-function help() {
-echo <<<HELP
+function help()
+{
+	echo <<<HELP
 Usage: php apply_customer_sql.php [ options... ] [ <sqlfile> ] { all | <cid1> ... <cidN> }
 
 -c|--chunk-size <n>		apply change in chunks of n rows (default: all rows in one chunk)
@@ -68,7 +69,8 @@ $options = array(
 $sqlQueries = array();
 $chunkDelayMsTotal = 0;
 
-function runSqlAgainstCustomer(array $customer, array $sqlQueries, array $options) {
+function runSqlAgainstCustomer(array $customer, array $sqlQueries, array $options)
+{
 	global $chunkDelayMsTotal;
 
 	printf("Executing against customer % 5d: ", $customer["id"]);
@@ -111,7 +113,7 @@ function runSqlAgainstCustomer(array $customer, array $sqlQueries, array $option
 				} else {
 					echo ".";
 				}
-				usleep($options["chunkDelayMs"]*1000);
+				usleep($options["chunkDelayMs"] * 1000);
 				$chunkDelayMsTotal += $options["chunkDelayMs"];
 			}
 			// stop processing chunks after a number of chunks.
@@ -119,7 +121,7 @@ function runSqlAgainstCustomer(array $customer, array $sqlQueries, array $option
 				break;
 			}
 			// stop processing chunks if we run out of runTime.
-			if ($options["runTime"] && time()-$options["startTime"] > $options["runTime"]) {
+			if ($options["runTime"] && time() - $options["startTime"] > $options["runTime"]) {
 				if ($options["verbose"]) {
 					echo "Stopping because runtime exceeded.\n";
 				}
@@ -135,7 +137,8 @@ function runSqlAgainstCustomer(array $customer, array $sqlQueries, array $option
 
 		// optionally fetch and display output
 		switch ($options["output"]) {
-		case "csv": case "CSV":
+		case "csv":
+		case "CSV":
 			echo "\n";
 			do {
 				while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -152,18 +155,19 @@ function runSqlAgainstCustomer(array $customer, array $sqlQueries, array $option
 	$custDb = NULL;
 }
 
-function databaseConnection(array $dbParams) {
+function databaseConnection(array $dbParams)
+{
 	try {
 		$dsn = "mysql:";
-		if (isset($dbParams["dbhost"]) ) {
+		if (isset($dbParams["dbhost"])) {
 			$dsn .= "host={$dbParams['dbhost']}";
 		} else {
 			$dsn .= "host=localhost";
 		}
-		if (isset($dbParams["dbport"]) ) {
+		if (isset($dbParams["dbport"])) {
 			$dsn .= ";port={$dbParams['dbport']}";
 		}
-		if (isset($dbParams["dbname"]) ) {
+		if (isset($dbParams["dbname"])) {
 			$dsn .= ";dbname={$dbParams['dbname']}";
 		}
 		$db = new PDO($dsn, $dbParams["dbusername"], $dbParams["dbpassword"],
@@ -174,9 +178,9 @@ function databaseConnection(array $dbParams) {
 		);
 	} catch (PDOException $e) {
 		error_log("Connection failed for $dsn");
-		die($e->getMessage(). "\n");
+		die($e->getMessage() . "\n");
 	}
-	return($db);
+	return ($db);
 }
 
 // parse command line options and arguments
@@ -203,74 +207,87 @@ $progname = array_shift($remainingArgv); // remove $0
 
 foreach ($getopts as $flag => $value) {
 	switch ($flag) {
-	case "c": case "chunk-size":
-		$options["chunkSize"] = (int) $value;
+	case "c":
+	case "chunk-size":
+		$options["chunkSize"] = (int)$value;
 		array_shift($remainingArgv);
 		array_shift($remainingArgv);
 		break;
 	case "chunk-limit":
-		$options["chunkLimit"] = (int) $value;
+		$options["chunkLimit"] = (int)$value;
 		array_shift($remainingArgv);
 		array_shift($remainingArgv);
 		break;
 	case "chunk-delay-ms":
-		$options["chunkDelayMs"] = (int) $value;
+		$options["chunkDelayMs"] = (int)$value;
 		array_shift($remainingArgv);
 		array_shift($remainingArgv);
 		break;
-	case "d": case "database":
+	case "d":
+	case "database":
 		$authDbParams["dbname"] = $value;
 		array_shift($remainingArgv);
 		array_shift($remainingArgv);
 		break;
-	case "e": case "execute":
+	case "e":
+	case "execute":
 		$sqlQueries[] = $value;
 		array_shift($remainingArgv);
 		array_shift($remainingArgv);
 		break;
-	case "h": case "host":
+	case "h":
+	case "host":
 		$authDbParams["dbhost"] = $value;
 		array_shift($remainingArgv);
 		array_shift($remainingArgv);
 		break;
-	case "o": case "output":
+	case "o":
+	case "output":
 		$options["output"] = $value;
 		array_shift($remainingArgv);
 		array_shift($remainingArgv);
 		break;
-	case "p": case "password":
+	case "p":
+	case "password":
 		$authDbParams["dbpassword"] = $value;
 		array_shift($remainingArgv);
 		array_shift($remainingArgv);
 		break;
-	case "P": case "port":
-		$authDbParams["dbport"] = (int) $value;
+	case "P":
+	case "port":
+		$authDbParams["dbport"] = (int)$value;
 		array_shift($remainingArgv);
 		array_shift($remainingArgv);
 		break;
-	case "r": case "runtime":
+	case "r":
+	case "runtime":
 		$options["runTime"] = $value;
 		array_shift($remainingArgv);
 		array_shift($remainingArgv);
 		break;
-	case "u": case "user":
+	case "u":
+	case "user":
 		$authDbParams["dbusername"] = $value;
 		array_shift($remainingArgv);
 		array_shift($remainingArgv);
 		break;
-	case "v": case "verbose":
+	case "v":
+	case "verbose":
 		$options["verbose"]++;
 		array_shift($remainingArgv);
 		break;
-	case "?": case "help":
+	case "?":
+	case "help":
 		help();
 		array_shift($remainingArgv);
 		exit(0);
 	}
 }
 
-if ($remainingArgv[0][0] == '-') {
-	die("Unknown flag '{$remainingArgv[0]}'. Run $progname --help.\n");
+if ($remainingArgv) {
+	if ($remainingArgv[0][0] == '-') {
+		die("Unknown flag '{$remainingArgv[0]}'. Run $progname --help.\n");
+	}
 }
 
 if (empty($sqlQueries)) {
@@ -292,7 +309,9 @@ if (empty($remainingArgv) || array_search("all", $remainingArgv) !== false) {
 		from shard s inner join customer c on (c.shardid = s.id)";
 } else {
 	$cidArray = array_filter(array_map("intval", $remainingArgv),
-		function ($cid) { return $cid >= 1; });
+		function ($cid) {
+			return $cid >= 1;
+		});
 	$query = "select c.id, s.dbhost, concat('c_', c.id) as dbname, s.dbusername, s.dbpassword
 		from shard s inner join customer c on (c.shardid = s.id)
 		where c.id in (" . implode(", ", array_fill(1, count($cidArray), "?")) . ")";
@@ -307,7 +326,7 @@ $authDb = NULL;
 
 while ($customer = $stmt->fetch(PDO::FETCH_ASSOC)) {
 	runSqlAgainstCustomer($customer, $sqlQueries, $options);
-	if ($options["runTime"] && time()-$options["startTime"] > $options["runTime"]) {
+	if ($options["runTime"] && time() - $options["startTime"] > $options["runTime"]) {
 		if ($options["verbose"]) {
 			echo "Finishing because runtime exceeded.\n\n";
 		}
@@ -317,7 +336,7 @@ while ($customer = $stmt->fetch(PDO::FETCH_ASSOC)) {
 
 $elapsedSeconds = time() - $options["startTime"];
 echo "Completion time: " . gmdate("H:i:s", $elapsedSeconds) . "\n";
-$delaySeconds = (int) ($chunkDelayMsTotal/1000);
+$delaySeconds = (int)($chunkDelayMsTotal / 1000);
 if ($chunkDelayMsTotal) {
 	echo "Delay time:      " . gmdate("H:i:s", $delaySeconds) . "\n";
 }
