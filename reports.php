@@ -76,6 +76,9 @@ if ($USER->authorize('viewsystemreports') || $USER->authorize("sendemail")) {
 if (getSystemSetting('_hassms', false) && ($USER->authorize('viewsystemreports') || $USER->authorize("sendsms"))) {
 	$jobLinks[] = "<a href='reportjobdetailsearch.php?clear=1&type=sms' >SMS Log</a>";
 }
+if (getSystemSetting("_hasinfocenter", false) && $USER->authorize('viewsystemreports')) {
+	$jobLinks[] = "<a href='reportjobdetailsearch.php?clear=1&type=device' >Device Log</a>";
+}
 if ((getSystemSetting('_hasfacebook', false) || getSystemSetting('_hastwitter', false) && ($USER->authorize('viewsystemreports') || $USER->authorize("facebookpost") || $USER->authorize("twitterpost")))) {
 	$jobLinks[] = "<a href='reportsocialmediasearch.php?clear=1' >Social Media Log</a>";
 }
@@ -119,7 +122,7 @@ $TITLE= "Report Builder";
 
 include("nav.inc.php");
 
-startWindow("Select a Template"  . help('Reports_SelectATemplate'), 'padding: 3px;');
+startWindow("Select a Template" . help('Reports_SelectATemplate'), 'padding: 3px;');
 drawTableOfLists($headers, $linkLists);
 endWindow();
 

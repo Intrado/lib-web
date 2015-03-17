@@ -78,7 +78,8 @@ function getJobSummary($joblist, $readonlyDB = false){
 							count(distinct rp.personid) as pcount,
 							coalesce(sum(rc.type='phone'), 0),
 							coalesce(sum(rc.type='email'), 0),
-							coalesce(sum(rc.type='sms'), 0)
+							coalesce(sum(rc.type='sms'), 0),
+							coalesce(sum(rc.type='device'), 0)
 							from job j
 							left join reportperson rp on (j.id = rp.jobid)
 							left join reportcontact rc on (rp.personid = rc.personid and rp.jobid = rc.jobid and rp.type = rc.type AND rc.result NOT IN('declined'))
@@ -111,6 +112,7 @@ function displayJobSummary($joblist, $readonlyDB = false){
 
 		//Check for any sms messages
 		$hassms = QuickQuery("select exists (select * from message m where m.type='sms' and m.messagegroupid = j.messagegroupid) from job j where id in ('" . $joblist . "')", $readonlyDB);
+        $hasinfocenter = getSystemSetting("_hasinfocenter", false);
 
 		startWindow(_L("Summary "). help("ReportGeneratorUtils_Summary"), 'padding: 3px;');
 		?>
@@ -133,6 +135,9 @@ function displayJobSummary($joblist, $readonlyDB = false){
 <? if($hassms) { ?>
 								<th><?= _L("# of SMS") ?></th>
 <? } ?>
+<? if($hasinfocenter) { ?>
+                                <th><?= _L("# of Devices") ?></th>
+<? } ?>
 							</tr>
 <?
 							$alt=0;
@@ -152,6 +157,9 @@ function displayJobSummary($joblist, $readonlyDB = false){
 									<td><?=$job[12]?></td>
 <? if($hassms) { ?>
 									<td><?=$job[13]?></td>
+<? } ?>
+<? if ($hasinfocenter) { ?>
+									<td><?=$job[14]?></td>
 <? } ?>
 								</tr>
 <?

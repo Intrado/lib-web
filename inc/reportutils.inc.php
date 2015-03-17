@@ -173,7 +173,11 @@ function getJobList($startdate, $enddate, $jobtypes = "", $surveyonly = "", $del
 		$deliveryquery = " and (exists (select * from message m where m.messagegroupid = j.messagegroupid and m.type='email') OR exists (select * from surveyquestionnaire sq where sq.id = j.questionnaireid and sq.hasweb != '0')) ";
 	} else if("sms" == $deliverymethod) {
 		$deliveryquery = " and (exists (select * from message m where m.messagegroupid = j.messagegroupid and m.type='sms')) ";
-	}
+    // @BillKarwin
+	} else if("device" == $deliverymethod) {
+        // there are no `message` rows associated with 'device' deliveries, so don't query that table
+        $deliveryquery = " ";
+    }
 	$surveyfilter = "";
 	if($surveyonly == "true"){
 		$surveyfilter = " and j.questionnaireid is not null ";
