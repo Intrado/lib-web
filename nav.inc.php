@@ -234,14 +234,15 @@ header('Content-type: text/html; charset=UTF-8') ;
 	<div class="modal-body"></div>
 </div>
 
-<div class="modal hide fade" id="feedbackModal">
+<div class="modal hide fade" id="feedbackModal" style="width: 90%; max-height: none; margin: 5%; position: absolue; left: 0px; top: 0px;"-->
 	<div class="modal-header">
 		<button class="close" aria-hidden="true" data-dismiss="modal" type="button">x</button>
-		<h3></h3>
+		<h3>Provide Feedback</h3>
 	</div>
-	<div class="modal-body">
-		<iframe style="width: 100%; height: 1000px; border: none;" scrolling="no" src="feedback.php?iframe=1"></iframe>
-	</div>
+	<!--div class="modal-body"-->
+		<iframe style="width: 100%; height: 500px; border: none;" src="feedback.php?iframe=1"></iframe>
+	<!--/div-->
+	<br clear="all"/>
 </div>
 
 <div id="top_banner" class="banner">
