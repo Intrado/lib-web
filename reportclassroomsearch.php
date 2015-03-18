@@ -176,7 +176,7 @@ if ($options['classroomreporttype'] == 'organization') {
 	$formdata["organizationid"] = array(
 		"label" => _L(getSystemSetting("organizationfieldname","Organization")),
 		"fieldhelp" => _L("Select the organization that the report should cover."),
-		"value" =>  $orgSelect[0],
+		"value" =>  null, // none selected initially
 		"validators" => array(),
 		"control" => array("RestrictedValues", "values" => $orgSelect, 'height' => '150px', 'type' => getSystemSetting('organizationfieldname', 'Organization') . 's'),
 		"helpstep" => $helpstepscount
