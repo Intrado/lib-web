@@ -14,74 +14,6 @@ require_once('ifc/Page.ifc.php');
 require_once('obj/PageBase.obj.php');
 require_once('obj/PageForm.obj.php');
 
-
-// -----------------------------------------------------------------------------
-// CUSTOM VALIDATORS
-// -----------------------------------------------------------------------------
-
-// Example of a custom form Validator
-class ValFeedbackItem extends Validator {
-	function validate ($value, $args) {
-		if(!is_array($value)) {
-			$value = json_decode($value,true);
-		}
-		if (!($value["left"] == "true" || $value["right"] == "true"))
-			return "One item is required for " . $this->label;
-		else
-			return true;
-
-	}
-	function getJSValidator () {
-		return
-			'function (name, label, value, args) {
-				checkval = value.evalJSON();
-				if (!(checkval.left == "true" || checkval.right == "true"))
-					return "One item is required for " + label;
-				return true;
-			}';
-	}
-}
-
-
-// -----------------------------------------------------------------------------
-// CUSTOM FORM ITEMS
-// -----------------------------------------------------------------------------
-
-// TODO - move this guy's javascript component to its own method where it belongs
-// also this->form->name is entirely invalid...
-class FeedbackItem extends FormItem {
-	function render ($value) {
-		$n = $this->form->name."_".$this->name;
-		if($value == null || $value == "") // Handle empty value to combind this validator with ValRequired
-			$value = array("left" => "false","right" => "false");
-		// edit input type from "hidden" to "text" to debug the form value
-		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml(json_encode($value)).'"/>';
-		$str .= '<input id="'.$n.'left" name="'.$n.'left" type="checkbox" onchange="setValue_'.$n.'()" value="" '. ($value["left"] == "true" ? 'checked' : '').' />';
-		$str .= '<input id="'.$n.'right" name="'.$n.'right" type="checkbox" onchange="setValue_'.$n.'()" value="" '. ($value["right"] == "true" ? 'checked' : '').' />';
-		$str .= '<script>
-				function setValue_'.$n.'(){
-					$("'.$n.'").value = Object.toJSON({
-						"left": $("'.$n.'left").checked.toString(),
-						"right": $("'.$n.'right").checked.toString()
-					});
-					form_do_validation($("' . $this->form->name . '"), $("' . $n . '"));
-				 }
-			</script>';
-		return $str;
-	}
-}
-
-
-// -----------------------------------------------------------------------------
-// CUSTOM FORMATTERS
-// -----------------------------------------------------------------------------
-
-// TODO: Make better examples of working formatters (extend Formatters.obj.php?)
-function fmt_template ($obj, $field) {
-	return $obj->$field;
-}
-
-
 // -----------------------------------------------------------------------------
 // CUSTOM PAGE FUNCTIONALITY
 // -----------------------------------------------------------------------------
@@ -140,25 +72,6 @@ class FeedbackPage extends PageForm {
 		$this->lastName = $USER->lastname;
 		$this->email = $USER->email;
 		$this->phone = $USER->phone;
-
-/*
-		// If there was a data reload issue
-		if (! is_null($this->id)) {
-
-			// If we have been flagged as having reloaded on account of data having changed...
-			if (isset($session['TEMPLATEreload'])) {
-
-				// Clear the flag and set the error message; this will allow the message to display, but
-				// upon dismissal show the form repopulated with the freshly loaded burst data from above
-				unset($session['TEMPLATEreload']);
-
-				// Add this error message to the page output, but still
-				// allow the form to be displayed to take edits and resubmit
-				$this->error = _L("This TEMPLATE was changed in another window or session during the time you've had it open. Please review the current data. You may need to redo your changes and resubmit.");
-			}
-		}
-*/
-
 		$this->form = $this->factoryFeedbackPageForm();
 	}
 
@@ -181,15 +94,10 @@ class FeedbackPage extends PageForm {
 */
 
 			// Check for validation errors
-			$action = (is_null($this->burstId)) ? 'created' : 'updated';
 			if (($errors = $this->form->validate()) === false) {
 
 				// TODO store a new record if id is null, otherwise update an existing record
 				if (true) {
-/*
-					// For success, we redirect back to some list page with this notice to be shown on that page:
-					unset($_SESSION['TEMPLATEid']);
- */
 					notice(_L('Thank you for your feedback!'));
 				}
 				else {
@@ -215,6 +123,7 @@ class FeedbackPage extends PageForm {
 
 		$html = ''; //sprintf(_L("Today's date is %s"), $this->date) . "<br/><br/>\n";
 		$html .= parent::render();
+
 		return($html);
 	}
 
@@ -312,7 +221,7 @@ class FeedbackPage extends PageForm {
 					// TODO: find out if netsuite has a max value on this or if we should increase it...
 					array('ValLength', 'min' => 10, 'max' => 5000)
 				),
-				'control' => array('TextArea', 'size' => 30, 'cols' => 34),
+				'control' => array('TextArea', 'size' => 30, 'rows' => 15, 'cols' => 34),
 				'helpstep' => 7
 			)
 		);
@@ -329,8 +238,8 @@ class FeedbackPage extends PageForm {
 		);
 
 		$buttons = array(
-			submit_button(_L('Save'), 'submit', 'tick'),
-			icon_button(_L('Cancel'), 'cross', null, 'start.php')
+			submit_button(_L('Send Feedback'), 'submit', 'tick'),
+			icon_button(_L('Cancel'), 'cross',  "window.parent.jQuery('#feedbackModal').find('button').click();", '#')
 		);
 
 		$form = new Form($this->formName, $formdata, $helpsteps, $buttons);
@@ -347,7 +256,7 @@ class FeedbackPage extends PageForm {
 
 $page = new FeedbackPage(Array(
 	'formname' => 'templateform',
-	'validators' => Array('ValFeedbackItem')
+	'validators' => Array()
 ));
 
 executePage($page);

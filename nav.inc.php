@@ -239,9 +239,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 		<button class="close" aria-hidden="true" data-dismiss="modal" type="button">x</button>
 		<h3>Provide Feedback</h3>
 	</div>
-	<!--div class="modal-body"-->
-		<iframe style="width: 100%; height: 500px; border: none;" src="feedback.php?iframe=1"></iframe>
-	<!--/div-->
+	<iframe style="width: 100%; height: 500px; border: none;" src="feedback.php?iframe=1"></iframe>
 	<br clear="all"/>
 </div>
 
