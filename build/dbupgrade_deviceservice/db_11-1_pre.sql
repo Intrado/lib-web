@@ -98,3 +98,8 @@ $$$
 
 ALTER TABLE `notification` ADD INDEX (status)
 $$$
+
+-- $rev 9
+
+ALTER TABLE `registrationlog` MODIFY COLUMN `token` varchar(204) CHARACTER SET ascii COLLATE ascii_bin NULL
+$$$
