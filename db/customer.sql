@@ -2948,3 +2948,12 @@ update setting set value='11.1/12' where name='_dbversion'
 $$$
 
 -- END 11.1/12
+
+ALTER TABLE `listguardiancategory` ADD INDEX (`guardianCategoryId`)
+$$$
+
+update setting set value='11.1/13' where name='_dbversion'
+$$$
+
+-- END 11.1/13
+

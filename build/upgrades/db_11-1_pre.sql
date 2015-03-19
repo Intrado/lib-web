@@ -128,3 +128,8 @@ $$$
 -- is only a metadata change, and does not take a long time regardless of the table size.
 ALTER TABLE `reportcontact` MODIFY `result` ENUM('C','A','M','N','B','X','F','sent','unsent','printed','notprinted','notattempted','duplicate','blocked','declined') NOT NULL DEFAULT 'notattempted'
 $$$
+
+-- $rev 13
+
+ALTER TABLE `listguardiancategory` ADD INDEX (`guardianCategoryId`)
+$$$
