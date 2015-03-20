@@ -218,8 +218,8 @@ class PdfSendMail extends PageForm {
 			$list->modifydate = $job->modifydate;
 			$list->deleted = 1;
 			// is customer guardian data or flat, used to determine list recipient mode
-			if (getSystemSetting("maxguardians", 0)) {
-				$list->recipientmode = 'guardian';
+			if (getSystemSetting("maxguardians", 0) > 0) {
+				$list->recipientmode = 'selfAndGuardian';
 			} else {
 				$list->recipientmode = 'self';
 			}
