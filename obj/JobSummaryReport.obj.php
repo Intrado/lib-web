@@ -61,6 +61,7 @@ class JobSummaryReport extends ReportGenerator{
 									sum(rc.result = 'blocked') as blocked,
 									sum(rc.result = 'duplicate') as duplicate,
 									sum(rp.status = 'nocontacts' and rc.result is null) as nocontacts,
+									sum(rc.numattempts) as totalattempts,
 									sum(rp.status = 'declined' and rc.result is null) as declined,
 									100 * sum(rp.numcontacts and rp.status='success') / (sum(rp.numcontacts and rp.status != 'duplicate')) as success_rate
 									from reportperson rp

@@ -144,34 +144,34 @@ if ($job->hasPhone()) {
 	foreach ($jobstats_objects as $obj) {
 		$JOB_STATS[$obj[0]][$obj[1]] = $obj[2];
 	}
-	
-		$phoneinfo = JobSummaryReport::getPhoneInfo($job->id, $readonlyconn);
-		$destinationresults['phone'] = array(
-			'recipients' => $phoneinfo[0]+0,
-			'completed' => $phoneinfo[1]+0,
-			'remaining' => $phoneinfo[2]+0,
-			'attempts' => $phoneinfo[6]+0,
-			'firstpass' => fmt_obj_job_first_pass($job, 'activedate'),
-			'percentcontacted' => sprintf("%0.2f", isset($phoneinfo[8]) ? $phoneinfo[8] : "") . '%'
-		);
+
+	$phoneinfo = JobSummaryReport::getPhoneInfo($job->id, $readonlyconn);
+	$destinationresults['phone'] = array(
+		'recipients' => (int)$phoneinfo['total'],
+		'completed' => (int)$phoneinfo['done'],
+		'remaining' => (int)$phoneinfo['remaining'],
+		'attempts' => (int)$phoneinfo['attempts'],
+		'firstpass' => fmt_obj_job_first_pass($job, 'activedate'),
+		'percentcontacted' => sprintf("%0.2f", isset($phoneinfo['successrate']) ? $phoneinfo['successrate'] : "") . '%'
+	);
 }
 if ($job->hasEmail()) {
-		$destinationresults['email'] = JobSummaryReport::getEmailInfo($job->id, $readonlyconn);
-		$destinationresults['email'] = array(
-			'recipients' => $destinationresults['email'][0]+0,
-			'completed' => $destinationresults['email'][1]+0,
-			'remaining' => $destinationresults['email'][2]+0,
-			'percentcontacted' => sprintf("%0.2f", isset($destinationresults['email'][6]) ? $destinationresults['email'][6] : "") . '%'
-		);
+	$destinationresults['email'] = JobSummaryReport::getEmailInfo($job->id, $readonlyconn);
+	$destinationresults['email'] = array(
+		'recipients' => (int)$destinationresults['email']['total'],
+		'completed' => (int)$destinationresults['email']['done'],
+		'remaining' => (int)$destinationresults['email']['remaining'],
+		'percentcontacted' => sprintf("%0.2f", isset($destinationresults['email']['successrate']) ? $destinationresults['email']['successrate'] : "") . '%'
+	);
 }
 if ($job->hasSMS()) {
-		$destinationresults['sms'] = JobSummaryReport::getSmsInfo($job->id, $readonlyconn);
-		$destinationresults['sms'] = array(
-			'recipients' => $destinationresults['sms'][0]+0,
-			'completed' => $destinationresults['sms'][1]+0,
-			'remaining' => $destinationresults['sms'][2]+0,
-			'percentcontacted' => sprintf("%0.2f", isset($destinationresults['sms'][7]) ? $destinationresults['sms'][7] : "") . '%'
-		);
+	$destinationresults['sms'] = JobSummaryReport::getSmsInfo($job->id, $readonlyconn);
+	$destinationresults['sms'] = array(
+		'recipients' => (int)$destinationresults['sms']['total'],
+		'completed' => (int)$destinationresults['sms']['done'],
+		'remaining' => (int)$destinationresults['sms']['remaining'],
+		'percentcontacted' => sprintf("%0.2f", isset($destinationresults['sms']['successrate']) ? $destinationresults['sms']['successrate'] : "") . '%'
+	);
 }
 $windowtitle = _L("Monitoring job, %1s, last updated %2s", escapehtml($job->name), date("g:i:s a",$jobstats['validstamp']));
 if (!in_array($job->status, array('complete', 'cancelled')))
