@@ -218,8 +218,8 @@ class PdfSendMail extends PageForm {
 			$list->modifydate = $job->modifydate;
 			$list->deleted = 1;
 			// is customer guardian data or flat, used to determine list recipient mode
-			if (getSystemSetting("maxguardians", 0)) {
-				$list->recipientmode = 'guardian';
+			if (getSystemSetting("maxguardians", 0) > 0) {
+				$list->recipientmode = 'selfAndGuardian';
 			} else {
 				$list->recipientmode = 'self';
 			}
@@ -262,18 +262,14 @@ class PdfSendMail extends PageForm {
 	 * @param int $burstId the id which identifies the burst
 	 */
 	public function fillListFromBurst($list, $burstId) {
-		error_log("GJB fillListFromBurst listid=$list->id burstid=$burstId");
 		$pkeys = array();
 		$portionList = $this->csApi->getBurstPortionList($burstId);
-		error_log("GJB portions found " . count($portionList->portions));
 		if ($portionList) {
 			foreach ($portionList->portions as $portion) {
 				$pkeys[] = $portion->identifierText;
 			}
 		}
-		error_log("GJB portions count " . count($pkeys));
-		$c = $list->updateManualAddByPkeys($pkeys);
-		error_log("GJB matching pkeys $c");
+		$list->updateManualAddByPkeys($pkeys);
 	}
 
 	public function getUserBroadcastTypes() {

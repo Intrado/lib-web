@@ -65,9 +65,9 @@ function getJobSummary($joblist, $readonlyDB = false){
 	global $USER;
 
 	$jobinfoquery = "Select
-							j.id,
+							j.id as jobid,
 							j.name,
-							jt.name,
+							jt.name as jobtype,
 							u.login,
 							j.startdate,
 							j.enddate,
@@ -75,26 +75,45 @@ function getJobSummary($joblist, $readonlyDB = false){
 							j.endtime,
 							j.activedate,
 							j.status,
-							count(distinct rp.personid) as pcount,
-							coalesce(sum(rc.type='phone'), 0),
-							coalesce(sum(rc.type='email'), 0),
-							coalesce(sum(rc.type='sms'), 0),
-							coalesce(sum(rc.type='device'), 0)
+							count(distinct rp.personid) as person_count,
+							coalesce(sum(rc.type='phone'), 0) as phone_count,
+							coalesce(sum(rc.type='email'), 0) as email_count,
+							coalesce(sum(rc.type='sms'), 0) as sms_count
 							from job j
-							left join reportperson rp on (j.id = rp.jobid)
-							left join reportcontact rc on (rp.personid = rc.personid and rp.jobid = rc.jobid and rp.type = rc.type AND rc.result NOT IN('declined'))
+							left outer join reportperson rp
+								on (j.id = rp.jobid)
+							left outer join reportcontact rc
+								on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid and rc.result not in('declined'))
 							inner join user u on (j.userid = u.id)
 							inner join jobtype jt on (jt.id = j.jobtypeid)
 							where j.id in ('" . $joblist . "')
 							group by j.id";
 	$jobinforesult = Query($jobinfoquery, $readonlyDB);
 	$jobinfo = array();
-	while($row = DBGetRow($jobinforesult)){
-		//combine start date and start time for formatter to output correctly
-		$row[5] = $row[5] . " " . $row[6];
-		$jobinfo[] = $row;
+	while($row = DBGetRow($jobinforesult, true)){
+		// the date and time formatters expect $row[$index] to be start and $row[$index+1] to be the end
+		$row[4] = $row["startdate"];
+		$row[5] = $row["enddate"];
+		$row[6] = $row["starttime"];
+		$row[7] = $row["endtime"];
+		$jobinfo[$row["jobid"]] = $row;
 	}
-	
+
+	// get the count of devices separately, and combine the results in PHP space.
+	$jobinfoquery = "Select
+							rp.jobid,
+							coalesce(count(rd.jobid), 0) as device_count
+							from reportperson rp
+							left outer join reportdevice rd
+								on (rp.jobid = rd.jobid and rp.personid = rd.personid and rd.result not in('declined'))
+							where rp.jobid in ('" . $joblist . "')
+								and rp.type = 'device'
+							group by rp.jobid";
+	$jobinforesult = Query($jobinfoquery, $readonlyDB);
+	while($row = DBGetRow($jobinforesult, true)){
+		$jobinfo[$row["jobid"]]["device_count"] = $row["device_count"];
+	}
+
 	global $JOB_STATS;
 	$JOB_STATS = array();
 	$query = "select jobid, name, value from jobstats where jobid in ('" . $joblist . "') and name = 'complete-seconds-phone-attempt-0-sequence-0'";
@@ -112,7 +131,7 @@ function displayJobSummary($joblist, $readonlyDB = false){
 
 		//Check for any sms messages
 		$hassms = QuickQuery("select exists (select * from message m where m.type='sms' and m.messagegroupid = j.messagegroupid) from job j where id in ('" . $joblist . "')", $readonlyDB);
-        $hasinfocenter = getSystemSetting("_hasinfocenter", false);
+		$hasinfocenter = getSystemSetting("_hasinfocenter", false);
 
 		startWindow(_L("Summary "). help("ReportGeneratorUtils_Summary"), 'padding: 3px;');
 		?>
@@ -136,7 +155,7 @@ function displayJobSummary($joblist, $readonlyDB = false){
 								<th><?= _L("# of SMS") ?></th>
 <? } ?>
 <? if($hasinfocenter) { ?>
-                                <th><?= _L("# of Devices") ?></th>
+								<th><?= _L("# of Devices") ?></th>
 <? } ?>
 							</tr>
 <?
@@ -144,22 +163,21 @@ function displayJobSummary($joblist, $readonlyDB = false){
 							foreach($jobinfo as $job){
 								echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
 ?>
-
-									<td><?=escapehtml($job[1])?></td>
-									<td><?=escapehtml($job[2])?></td>
-									<td><?=escapehtml($job[3])?></td>
+									<td><?=escapehtml($job["name"])?></td>
+									<td><?=escapehtml($job["jobtype"])?></td>
+									<td><?=escapehtml($job["login"])?></td>
 									<td><?=fmt_scheduled_date($job,4)?></td>
 									<td><?=fmt_scheduled_time($job,6)?></td>
-									<td><?=fmt_job_first_pass($job, 8)?></td>
-									<td><?=ucfirst($job[9])?></td>
-									<td><?=$job[10]?></td>
-									<td><?=$job[11]?></td>
-									<td><?=$job[12]?></td>
+									<td><?=fmt_job_first_pass($job, "activedate")?></td>
+									<td><?=escapehtml(ucfirst($job["status"]))?></td>
+									<td><?=(int)$job["person_count"]?></td>
+									<td><?=(int)$job["phone_count"]?></td>
+									<td><?=(int)$job["email_count"]?></td>
 <? if($hassms) { ?>
-									<td><?=$job[13]?></td>
+									<td><?=(int)$job["sms_count"]?></td>
 <? } ?>
 <? if ($hasinfocenter) { ?>
-									<td><?=$job[14]?></td>
+									<td><?=(int)$job["device_count"]?></td>
 <? } ?>
 								</tr>
 <?

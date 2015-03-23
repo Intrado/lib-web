@@ -85,3 +85,21 @@ $$$
 
 ALTER TABLE `device` CHANGE `token` `token` VARCHAR(204) CHARACTER SET ascii COLLATE ascii_bin NULL DEFAULT NULL
 $$$
+
+-- $rev 7
+
+ALTER TABLE `notification` ADD INDEX (deviceId, createdTimestampMs), ADD INDEX (createdTimestampMs)
+$$$
+
+-- $rev 8
+
+ALTER TABLE `device` ADD COLUMN `pushyToken` VARBINARY(204) NULL AFTER token, ADD INDEX (pushyToken), ADD INDEX (token)
+$$$
+
+ALTER TABLE `notification` ADD INDEX (status)
+$$$
+
+-- $rev 9
+
+ALTER TABLE `registrationlog` MODIFY COLUMN `token` varchar(204) CHARACTER SET ascii COLLATE ascii_bin NULL
+$$$
