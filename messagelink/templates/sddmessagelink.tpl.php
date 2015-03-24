@@ -70,7 +70,7 @@ function escapeHtml($string) {
 						<? endif; ?>
 							<div id="email-details">
 								<div class="form-group">
-									<label class="col-sm-2 control-label">To:</label>
+									<label class="col-sm-2 control-label">Re:</label>
 									<div class="col-sm-10">
 										<p class="form-control-static"><?= escapeHtml($this->recipient->firstName) ?></p>
 									</div>
