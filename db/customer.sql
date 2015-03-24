@@ -2957,3 +2957,12 @@ $$$
 
 -- END 11.1/13
 
+-- all lists, regardless of flat or guardian model
+update list set recipientmode = 'selfAndGuardian'
+$$$
+
+update setting set value='11.1/14' where name='_dbversion'
+$$$
+
+-- END 11.1/14
+

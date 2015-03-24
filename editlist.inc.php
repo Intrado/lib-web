@@ -410,7 +410,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$datachange = true;
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
-		$mode = PeopleList::$RECIPIENTMODE_MAP[1]; //self
+		// customer flat or guardian data, default to 'selfAndGuardian' for ease of use when/if migrate customer from flat to guardian
+		$mode = PeopleList::$RECIPIENTMODE_MAP[3]; //selfAndGuardian
 		if ($maxguardians > 0) {
 			//1=> self, 2=>guardian 3=> selfAndGuardian
 			if ($postdata['recipientmode']) {

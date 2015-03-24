@@ -133,3 +133,8 @@ $$$
 
 ALTER TABLE `listguardiancategory` ADD INDEX (`guardianCategoryId`)
 $$$
+
+-- $rev 14
+-- all lists, regardless of flat or guardian model
+update list set recipientmode = 'selfAndGuardian'
+$$$
