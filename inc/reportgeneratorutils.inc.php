@@ -91,7 +91,8 @@ function getJobSummary($joblist, $readonlyDB = false){
 	$jobinforesult = Query($jobinfoquery, $readonlyDB);
 	$jobinfo = array();
 	while($row = DBGetRow($jobinforesult, true)){
-		// the date and time formatters expect $row[$index] to be start and $row[$index+1] to be the end
+		// formatters expect arrays to be integer-indexed
+		$row[0] = $row["jobid"];
 		$row[4] = $row["startdate"];
 		$row[5] = $row["enddate"];
 		$row[6] = $row["starttime"];
