@@ -41,14 +41,16 @@ function runReport($subscription){
 		case "phonedetail":
 		case "emaildetail":
 		case "smsdetail":
+		case "devicedetail":
 		case "notcontacted":
 			redirect("reportjobdetails.php?reportid=$subscription->id");
 		case "contacthistory":
 			redirect("reportcallsperson.php?reportid=$subscription->id");
 		case "contactchangereport":
 			redirect("reportcontactchangesummary.php?reportid=$subscription->id");
-		case "smsoptin":
-			redirect("reportsmsoptin.php?reportid=$subscription->id");
+		// TODO: enable smsstatus when that report supports saving/scheduling
+		// case "smsstatus":
+		//	redirect("reportsmsstatus.php?reportid=$subscription->id");
 	}
 }
 
@@ -64,14 +66,16 @@ function editReport($subscription){
 		case "phonedetail":
 		case "emaildetail":
 		case "smsdetail":
+		case "devicedetail":
 		case "notcontacted":
 			redirect("reportjobdetailsearch.php?reportid=$subscription->id");
 		case "contacthistory":
 			redirect("reportcallssearch.php?reportid=$subscription->id");
 		case "contactchangereport":
 			redirect("reportcontactchange.php?reportid=$subscription->id");
-		case "smsoptin":
-			redirect("reportsmsoptin.php?reportid=$subscription->id");
+		// TODO: enable smsstatus when that report supports saving/scheduling
+		// case "smsstatus":
+		//  redirect("reportsmsstatus.php?reportid=$subscription->id");
 	}
 }
 
