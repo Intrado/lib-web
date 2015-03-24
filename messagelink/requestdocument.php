@@ -6,6 +6,11 @@ if (!isset($_POST['s']) || !isset($_POST['mal'])) {
 }
 
 require_once('apiGetDocument.php');
+
+// These "use" statements exist in apiGetDocument, but are limited in scope to THAT file only by default
+use messagelink\MessageLinkClient;
+use messagelink\MessageLinkCodeNotFoundException;
+
 apiGetDocument($_POST['s'], $_POST['mal'], ((isset($_POST['v']) && $_POST['v'] == true) ? $_POST['p'] : null));
 $response = array();
 
