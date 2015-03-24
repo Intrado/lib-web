@@ -5,8 +5,5 @@ $$$
 
 -- $rev 2
 
-ALTER TABLE oauth_access_token DROP INDEX authentication_id
-$$$
-
-ALTER TABLE oauth_access_token ADD UNIQUE(`authentication_id`)
+ALTER TABLE oauth_access_token DROP INDEX authentication_id, ADD UNIQUE KEY authentication_id (`authentication_id`)
 $$$
