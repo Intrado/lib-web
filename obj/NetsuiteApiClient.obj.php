@@ -16,26 +16,6 @@ class NetsuiteApiClient {
 	protected $apiClient;
 
 	/**
-	 * The NetSuite account ID for us to connect to
-	 */
-	protected $account;
-
-	/**
-	 * The NetSuite user under the account to authenticate as
-	 */
-	protected $user;
-
-	/**
-	 * The NetSuite user's password to authenticate with
-	 */
-	protected $pass;
-
-	/**
-	 * The NetSuite "role" to authorize operations for this authenticated session
-	 */
-	protected $role;
-
-	/**
 	 * The feedback POST URI relative to the ApiClient's base URL (settings.ini.php::netsuite)
 	 */
 	protected $feedbackUri;
@@ -46,20 +26,25 @@ class NetsuiteApiClient {
 	protected $feedbackData;
 
 	/**
+	 * The previous raw response
+	 */
+	protected $response;
+
+	/**
 	 * @param object $apiClient ApiClient class instance
-	 * @param string $account The NetSuite account ID for us to connect to
-	 * @param string $user The NetSuite user under the account to authenticate as
-	 * @param string $pass The NetSuite user's password to authenticate with
-	 * @param string $role The NetSuite "role" to authorize operations for this authenticated session
 	 * @param string $feedbackUri The NetSuite feedback URI that we will POST to
 	 */
-	public function __construct($apiClient, $account, $user, $pass, $role, $feedbackUri) {
+	public function __construct($apiClient, $feedbackUri) {
 		$this->apiClient = $apiClient;
-		$this->account = $account;
-		$this->user = $user;
-		$this->pass = $pass;
-		$this->role = $role;
 		$this->feedbackUri = $feedbackUri;
+		$this->feedbackReset();
+	}
+
+	/**
+	 * Getter for our response
+	 */
+	public function getResponse() {
+		return $this->response;
 	}
 
 	/**
@@ -105,7 +90,7 @@ class NetsuiteApiClient {
 				break;
 
 			default:
-				error_log("NetsuiteApiClient::feedbackSet() - Attempted to set feedback data for an unknown name: '{$name}'");
+				error_log("NetsuiteApiClient::feedbackSet() - Attempted to set feedback data for an unknown property: '{$name}'");
 				break;
 		}
 
@@ -117,10 +102,10 @@ class NetsuiteApiClient {
 	 *
 	 * @return bool|mixed the object or false if the request failed
 	 */
-	public function captureUserFeedback($data) {
-		$json = json_encode($data);
-		$res = $this->apiClient->post($this->feedbackUri, $json);
-		return($res['code'] == 200 ? json_decode($res['body']) : false);
+	public function captureUserFeedback() {
+		$json = json_encode($this->feedbackData);
+		$this->response = $this->apiClient->post($this->feedbackUri, $json);
+		return($response['code'] == 200 ? json_decode($response['body']) : false);
 	}
 }
 

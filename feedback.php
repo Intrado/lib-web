@@ -14,11 +14,13 @@ require_once('ifc/Page.ifc.php');
 require_once('obj/PageBase.obj.php');
 require_once('obj/PageForm.obj.php');
 
+require_once('obj/NetsuiteApiClient.obj.php');
+
+
 // -----------------------------------------------------------------------------
 // CUSTOM PAGE FUNCTIONALITY
 // -----------------------------------------------------------------------------
 
-// TODO - replace 'TEMPLATE' occurrences with your own fancy jargony name
 class FeedbackPage extends PageForm {
 
 	protected $id = null; // The ID of the TEMPLATE thing that our form is for
@@ -30,40 +32,17 @@ class FeedbackPage extends PageForm {
 	protected $email;
 	protected $phone;
 
-	public $formName = 'ourcustomformname';
+	// Output formatting controls
+	protected $showForm = true;
+	protected $message = '';
+
+	public $formName = 'feedbackform';
 
 	function isAuthorized(&$get=array(), &$post=array(), &$request=array(), &$session=array()) {
 		return(true); // open to the world, unconditionally!
 	}
 
 	function beforeLoad(&$get=array(), &$post=array(), &$request=array(), &$session=array()) {
-
-/*
-                if (isset($request['id']) && intval($request['id'])) {
-
-			// Peel the ID off the URL, stash it in the session...
-			$session['TEMPLATEid'] = intval($request['id']);
-
-			// .. then redirect back to ourselves to clean up the URL
-			redirect();
-
-		} else if (isset($session['TEMPLATEid'])) {
-
-			$this->id = $session['TEMPLATEid'];
-		} else {
-			$this->id = null;
-		}
-			
-		// Special case for handling deletions - WARNING: this is NOT the idempotent way...
-		if (isset($get['deleteid'])) {
-			// best practice: use transaction whenever modifying data
-			// (around whole section or logical atomic block)
-			//Query("BEGIN");
-			//FooDBMO::delete($get['deleteid']);
-			//Query("COMMIT");
-			redirect();
-		}
-*/
 	}
 
 	function load(&$get=array(), &$post=array(), &$request=array(), &$session=array()) {
@@ -81,54 +60,48 @@ class FeedbackPage extends PageForm {
 
 	function afterLoad() {
 
+		// TODO: prevent resubmission of the same form (browser:frame:thisframe:reload after submission)
+
 		// Normal form handling makes form->getData() work...
 		$this->form->handleRequest();
 
-		// If the form was submitted...
+		// If the form was submitted; (AJAX request requires JSON response...)
 		if ($this->form->getSubmit()) {
 
-/*
-			// Check if the data has changed and display a notification if so...
-			if (! is_null($this->id) && $this->form->checkForDataChange()) {
+			// The form's been submitted... we won't show it again.
+			$this->showForm = false;
 
-				// Flag the problem, then redirect back to ourselves to redisplay the form with now-current data
-				$_SESSION['TEMPLATEreload'] = true;
-				redirect("?id={$this->id}");
-			}
-*/
-
-			// Check for validation errors
+			// Check for validation errors (server-side; client-side have already passed)
 			if (($errors = $this->form->validate()) === false) {
 
-				if (true) {
-					notice(_L('Thank you for your feedback!'));
+				// No errors - take the feedback form data, add in
+				// extra attributes, and  send it all over to NetSuite
+				$postdata = $this->form->getData();
 
-					// No errors - take the feedback form data, add in
-					// extra attributes, and  send it all over to NetSuite
-					$postdata = $this->form->getData();
-					$feedbackData = array(
-						'ASP_Id' => $customerId, // FIXME: write something special to get the customer ID
-						'firstName' => $postdata['firstName'],
-						'lastName' => $postdata['lastName'],
-						'emailAddress' => $postdata['email'],
-						'phoneNum' => $postdata['phone'],
-						'feedbackCategory' => $postdata['feedbackCategory'],
-						'feedbackText' => $postdata['feedbackText'],
-						'userId' => $this->userId,
-						'feedbackType' => $postdata['feedbackType'],
-						'userPage' => $this->userPage,
-						'trackingId' => $trackingId // FIXME: use same tracking token generated for new relic
-					);
+				// Send the data to NetSuite
+				$netsuiteApi = setupNetsuiteApi();
+				$netsuiteApi->feedbackSet('ASP_Id', getSystemSetting('_customerid', 0));
+				$netsuiteApi->feedbackSet('firstName', $postdata['firstName']);
+				$netsuiteApi->feedbackSet('lastName', $postdata['lastName']);
+				$netsuiteApi->feedbackSet('emailAddress', $postdata['email']);
+				$netsuiteApi->feedbackSet('phoneNum', $postdata['phone']);
+				$netsuiteApi->feedbackSet('feedbackCategory', $postdata['feedbackCategory']);
+				$netsuiteApi->feedbackSet('feedbackText', $postdata['feedbackText']);
+				$netsuiteApi->feedbackSet('userId', $this->userId);
+				$netsuiteApi->feedbackSet('feedbackType', $postdata['feedbackType']);
+				$netsuiteApi->feedbackSet('userPage', $this->userPage);
+				$netsuiteApi->feedbackSet('trackingId', getUserSessionTrackingId());
+				$netsuiteApi->feedbackSet('sessionData', '');
+				if ($netsuiteApi->captureUserFeedback()) {
 
-					// TODO - send the data to NetSuite
-					// TODO - show a success result message
+					// Success message
+					$this->message = _L('Thank you for your feedback. Our support staff will follow up with you if applicable with the provided contact information.');
+					return;
 				}
-				else {
-					notice(_L("There was a problem recording your feedback - please try again later."));
-				}
-
-				//redirect('somepage.php');
 			}
+
+			$this->message = _L('There was a problem recording your feedback - please try again later.');
+			$this->message .= "response was:<br/>\n" . print_r($netsuiteApi->getResponse(), true);
 		}
 	}
 
@@ -140,10 +113,15 @@ class FeedbackPage extends PageForm {
 
 		// Note: This is the title of the page. It should not also be the header of the form "window".
 		// This 'title' is set to global $TITLE in the base class.
-		$this->options['title'] = ''; //_L('Feedback');
-		$this->options['windowTitle'] = _L('Feedback') . $this->id;
+		$this->options['title'] = '';
 
-		$html = parent::render();
+		if ($this->showForm) {
+			$this->options['windowTitle'] = _L('Provide Feedback...');
+			$html = parent::render();
+		}
+		else {
+			$html = "<h3>{$this->message}</h3>";
+		}
 
 		return($html);
 	}
@@ -264,7 +242,7 @@ class FeedbackPage extends PageForm {
 		);
 
 		$form = new Form($this->formName, $formdata, $helpsteps, $buttons);
-		$form->ajaxsubmit = true; // Set to false if your form can't be handled via AJAX submission
+		$form->ajaxsubmit = false; // AJAX submission is pointless complexity since we're in an iframe!
 
 		return($form);
 	}

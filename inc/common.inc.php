@@ -138,6 +138,25 @@ function setupCommsuiteApi() {
 	return(new CommsuiteApiClient($apiClient));
 }
 
+/**
+ * @return NetsuiteApiClient
+ */
+function setupNetsuiteApi() {
+	global $SETTINGS;
+	$apiClient = new ApiClient(
+		$SETTINGS['netsuite']['url'],
+		array(
+			"Accept: '*" . '/' . "*'",
+			"Authorization: NLAuth nlauth_account={$SETTINGS['netsuite']['account']}, nlauth_email={$SETTINGS['netsuite']['user']}, nlauth_signature={$SETTINGS['netsuite']['pass']}, nlauth_role={$SETTINGS['netsuite']['role']}"
+		)
+	);
+
+	return(new NetsuiteApiClient(
+		$apiClient,
+		$SETTINGS['netsuite']['uriFeedback']
+	));
+}
+
 function customerUrlComponent() {
 	$c = substr($_SERVER["SCRIPT_NAME"], 1);
 	$c = strtolower(substr($c, 0, strpos($c, '/')));
