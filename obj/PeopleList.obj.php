@@ -91,28 +91,29 @@ class PeopleList extends DBMappedObject {
 				$temppersonids[$p->id] = 1;
 			}
 		}
-		//flip associative array
-		$personids = array_keys($temppersonids);
-		
-		// sync up the ids
-		$oldids = QuickQueryList("select p.id from person p, listentry le where p.id=le.personid and le.type='add' and p.userid is null and le.listid=$this->id");
-		$addids = array_diff($personids, $oldids);
 
+		// sync up the ids
 		if ($removeExisting) {
+			$oldids = QuickQueryList("select p.id from person p, listentry le where p.id=le.personid and le.type='add' and p.userid is null and le.listid=$this->id");
+			$personids = array_keys($temppersonids);
+			$addids = array_diff($personids, $oldids);
 			$deleteids = array_diff($oldids, $personids);
 			if (count($deleteids) > 0) {
 				$query = "delete from listentry where personid in ('" . implode("','",$deleteids) . "') and listid = " . $this->id;
 				QuickUpdate($query);
 			}
 		}
+		else {
+			$addids = array_keys($temppersonids);
+		}
 
 		if (count($addids) > 0) {
 			$query = "insert into listentry (listid, type, personid) values ($this->id,'add','" . implode("'),($this->id,'add','",$addids) . "')";
 			QuickUpdate($query);
 		}
-		
+
 		// return number of system contacts manually added to list
-		return count($personids);
+		return count($temppersonids);
 	}
 	
 	function softDelete() {

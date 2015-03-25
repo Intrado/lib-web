@@ -269,7 +269,8 @@ class PdfSendMail extends PageForm {
 				$pkeys[] = $portion->identifierText;
 			}
 		}
-		$list->updateManualAddByPkeys($pkeys);
+
+		$res = $list->updateManualAddByPkeys($pkeys, false);
 	}
 
 	public function getUserBroadcastTypes() {
@@ -281,6 +282,7 @@ class PdfSendMail extends PageForm {
 	}
 
 	public function factoryPdfSendMailForm() {
+		global $USER;
 
 		// TODO: preselect a valid and applicable job type
 		$broadcastTypeNames = array();
@@ -304,13 +306,14 @@ class PdfSendMail extends PageForm {
 		// Replace the automagical customer name of it is present
 		$customerName = escapehtml($this->custname);
 		$messageBody = str_replace('#CUSTOMERNAMEPLACEHOLDER', $customerName, $messageBody);
-
+		reset($boradcastTypeNames);
+		$selectedBroadcastType = key($broadcastTypeNames);
 		$formdata = array(
 			_L("Broadcast Settings"),
 			"broadcastname" => array(
 				"label" => _L('Broadcast Name'),
 				"fieldhelp" => _L('Enter a name for your email.'),
-				"value" => '',
+				"value" => _L('Secure Document Delivery: ') . $this->burst->name,
 				"validators" => array(
 					array('ValRequired'),
 					array("ValLength","min" => 3,"max" => 50),
@@ -322,7 +325,7 @@ class PdfSendMail extends PageForm {
 			"broadcasttype" => array(
 				"label" => _L('Broadcast Type'),
 				"fieldhelp" => _L('Select the type for this Broadcast.'),
-				"value" => '',
+				"value" => $selectedBroadcastType,
 				"validators" => array(
 					array('ValRequired'),
 					array("ValInArray", "values" => array_keys($broadcastTypeNames))),
@@ -351,7 +354,7 @@ class PdfSendMail extends PageForm {
 			"fromname" => array(
 				"label" => _L('From Name'),
 				"fieldhelp" => _L('Enter the name of the Document sender.'),
-				"value" => '',
+				"value" => $USER->firstname . ' ' . $USER->lastname,
 				"validators" => array(
 					array('ValRequired'),
 					array("ValLength","max" => 50)
@@ -362,7 +365,7 @@ class PdfSendMail extends PageForm {
 			"fromemail" => array(
 				"label" => _L('From Email'),
 				"fieldhelp" => _L('Enter the email address this message should appear to come from.'),
-				"value" => '',
+				"value" => $USER->email,
 				"validators" => array(
 					array('ValRequired'),
 					array("ValLength","max" => 255),
@@ -374,7 +377,7 @@ class PdfSendMail extends PageForm {
 			"subject" => array(
 				"label" => _L('Subject'),
 				"fieldhelp" => _L('Enter a subject for this Delivery email.'),
-				"value" => '',
+				"value" => _L('Secure Document Delivery: ') . $this->burst->name,
 				"validators" => array(
 					array('ValRequired'),
 					array("ValLength","max" => 255)
