@@ -1,4 +1,6 @@
 <?
+//phpinfo();
+//exit;
 
 // calculate the session warning timeout popup
 $SESSION_WARNING_TIME = isset($SETTINGS['feature']['session_warning_time']) ?
@@ -56,7 +58,7 @@ $NAVTREE = array (
 		array("Monitors","monitors.php","monitorevent",$SUBTAB=="monitors")
 		)),
 	array("Admin",NULL,array('manageaccount', 'manageprofile', 'managesystem',
-							'metadata', 'managetasks', 'manageclassroommessaging'),$MAINTAB=="admin",array(
+						'metadata', 'managetasks', 'manageclassroommessaging'),$MAINTAB=="admin",array(
 		array("Users","users.php","manageaccount",$SUBTAB=="users"),
 		array("Profiles","profiles.php","manageprofile",$SUBTAB=="profiles"),
 		array("Settings","settings.php",array("managesystem","metadata","manageclassroommessaging"),$SUBTAB=="settings"),
@@ -239,7 +241,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 		<button class="close" aria-hidden="true" data-dismiss="modal" type="button">x</button>
 		<h3>Provide Feedback</h3>
 	</div>
-	<iframe style="width: 100%; height: 500px; border: none;" src="feedback.php?iframe=1"></iframe>
+	<iframe style="width: 100%; height: 500px; border: none;" src="feedback.php?iframe=1&from=<?=$_SERVER['REQUEST_URI']?>"></iframe>
 	<br clear="all"/>
 </div>
 

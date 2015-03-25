@@ -21,12 +21,14 @@ require_once('obj/PageForm.obj.php');
 // TODO - replace 'TEMPLATE' occurrences with your own fancy jargony name
 class FeedbackPage extends PageForm {
 
-	private $id = null; // The ID of the TEMPLATE thing that our form is for
+	protected $id = null; // The ID of the TEMPLATE thing that our form is for
 
-	private $firstName;
-	private $lastName;
-	private $email;
-	private $phone;
+	protected $userId;
+	protected $userPage;
+	protected $firstName;
+	protected $lastName;
+	protected $email;
+	protected $phone;
 
 	public $formName = 'ourcustomformname';
 
@@ -68,10 +70,12 @@ class FeedbackPage extends PageForm {
 		global $USER;
 
 		// Initialize these from user data
+		$this->userId = $USER->id;
 		$this->firstName = $USER->firstname;
 		$this->lastName = $USER->lastname;
 		$this->email = $USER->email;
 		$this->phone = $USER->phone;
+		$this->userPage = $request['from'];
 		$this->form = $this->factoryFeedbackPageForm();
 	}
 
@@ -96,22 +100,40 @@ class FeedbackPage extends PageForm {
 			// Check for validation errors
 			if (($errors = $this->form->validate()) === false) {
 
-				// TODO store a new record if id is null, otherwise update an existing record
 				if (true) {
 					notice(_L('Thank you for your feedback!'));
+
+					// No errors - take the feedback form data, add in
+					// extra attributes, and  send it all over to NetSuite
+					$postdata = $this->form->getData();
+					$feedbackData = array(
+						'ASP_Id' => $customerId, // FIXME: write something special to get the customer ID
+						'firstName' => $postdata['firstName'],
+						'lastName' => $postdata['lastName'],
+						'emailAddress' => $postdata['email'],
+						'phoneNum' => $postdata['phone'],
+						'feedbackCategory' => $postdata['feedbackCategory'],
+						'feedbackText' => $postdata['feedbackText'],
+						'userId' => $this->userId,
+						'feedbackType' => $postdata['feedbackType'],
+						'userPage' => $this->userPage,
+						'trackingId' => $trackingId // FIXME: use same tracking token generated for new relic
+					);
+
+					// TODO - send the data to NetSuite
+					// TODO - show a success result message
 				}
 				else {
 					notice(_L("There was a problem recording your feedback - please try again later."));
 				}
 
-				redirect('somepage.php');
+				//redirect('somepage.php');
 			}
 		}
 	}
 
 	function beforeRender() {
 		// Do any additional work needed to prepare for rendering a page
-		$this->date = date('Y-m-d');
 	}
 
 	function render() {
@@ -121,8 +143,7 @@ class FeedbackPage extends PageForm {
 		$this->options['title'] = ''; //_L('Feedback');
 		$this->options['windowTitle'] = _L('Feedback') . $this->id;
 
-		$html = ''; //sprintf(_L("Today's date is %s"), $this->date) . "<br/><br/>\n";
-		$html .= parent::render();
+		$html = parent::render();
 
 		return($html);
 	}
