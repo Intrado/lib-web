@@ -103,3 +103,8 @@ $$$
 
 ALTER TABLE `registrationlog` MODIFY COLUMN `token` varchar(204) CHARACTER SET ascii COLLATE ascii_bin NULL
 $$$
+
+-- $rev 10
+
+ALTER TABLE `appinstance` ADD COLUMN `isProduction` TINYINT NOT NULL DEFAULT 0 AFTER `version`
+$$$
