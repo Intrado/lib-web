@@ -62,7 +62,7 @@ require_once("{$objdir}/CommsuiteApiClient.obj.php");
 
 function getUserSessionTrackingId() {
 	global $USER:
-	return hash("sha256", session_id() . $USER->login)
+	return hash("sha256", session_id() . $USER->login);
 }
 
 if ((! defined('PHPUNIT')) && (!isset($isindexpage) || !$isindexpage)) {
