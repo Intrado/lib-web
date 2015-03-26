@@ -151,7 +151,12 @@ for ($x = 0; $x < 3; $x++) {
 		$ordering[$x] = array($_GET["sort$x"],isset($_GET["desc$x"]));
 	}
 }
-$_SESSION['showlistorder'] = $ordering = array_values($ordering); //remove gaps
+
+// remove gaps and duplicates
+foreach ($ordering as $o) {
+	$orderinguniq[$o[0]] = $o;
+}
+$_SESSION['showlistorder'] = $ordering = array_values($orderinguniq);
 
 $pagestart = (isset($_GET['pagestart']) ? $_GET['pagestart'] + 0 : 0);
 $renderedlist->setPageOffset($pagestart);

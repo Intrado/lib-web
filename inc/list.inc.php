@@ -9,28 +9,31 @@
  * @return unknown_type
  */
 function showRenderedListTable($renderedlist, $list = false, $showinlist = true) {
-	global $PAGEINLISTMAP,$USER;
+	global $PAGEINLISTMAP, $USER;
 	static $tableidcounter = 1;
-	
-	
+
 	$validsortfields = array("pkey" => "Unique ID");
 	foreach (FieldMap::getAuthorizedFieldMapsLike("f") as $fieldmap) {
 		$validsortfields[$fieldmap->fieldnum] = $fieldmap->name;
 	}
-	
-	$ordering = isset($_SESSION['showlistorder']) ? $_SESSION['showlistorder'] : array(array("f02", false),array("f01",false));
+
+	$ordering = isset($_SESSION['showlistorder']) ? $_SESSION['showlistorder'] : array(array("f02", false), array("f01", false));
 	for ($x = 0; $x < 3; $x++) {
 		if (!isset($_GET["sort$x"]))
 			continue;
 		if ($_GET["sort$x"] == "")
 			unset($ordering[$x]);
 		else if (isset($validsortfields[$_GET["sort$x"]])) {
-			$ordering[$x] = array($_GET["sort$x"],isset($_GET["desc$x"]));
+			$ordering[$x] = array($_GET["sort$x"], isset($_GET["desc$x"]));
 		}
 	}
-	$_SESSION['showlistorder'] = $ordering = array_values($ordering); //remove gaps
-	
-	
+
+	// remove gaps and duplicates
+	foreach ($ordering as $o) {
+		$orderinguniq[$o[0]] = $o;
+	}
+	$_SESSION['showlistorder'] = $ordering = array_values($orderinguniq);
+
 	$pagestart = (isset($_GET['pagestart']) ? $_GET['pagestart'] + 0 : 0);
 	$renderedlist->pageoffset = $pagestart;
 	$renderedlist->orderby = $ordering;
