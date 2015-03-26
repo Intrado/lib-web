@@ -51,7 +51,7 @@ function echoErrorResponse($errorMessage) {
 	exit();
 }
 
-function apiGetDocument($messageLinkCode, $malCode, $password = null) {
+function apiGetDocument($messageLinkCode, $malCode, $password, $verify) {
 	$response = array();
 
 	list($protocol, $transport) = initMessageLinkApp();
@@ -68,7 +68,7 @@ function apiGetDocument($messageLinkCode, $malCode, $password = null) {
 				$client = new MessageLinkClient($protocol);
 				$transport->open();
 				try {
-					if (! is_null($password)) {
+					if ($verify) {
 						// NOTE: getAttachmentInfo() currently used to verify user-entered password
 						// returning an AttachmentInfo object if successful, else an exception
 						$attachmentInfo = $client->getAttachmentInfo($messageLinkCode, $malCode, $password);
