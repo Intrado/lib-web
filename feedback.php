@@ -127,22 +127,27 @@ class FeedbackPage extends PageForm {
 	}
 
 	function getFeedbackCategories() {
-		// FIXME: final category labels/values are needed
-		return array(
-			1 => 'Example Category 1',
-			2 => 'Example Category 2',
-		);
+		global $SETTINGS;
+		$feedbackCategories = explode(',', $SETTINGS['netsuite']['feedbackCategories']);
+		array_unshift($feedbackCategories, 'Select a Category...');
+		for ($i = 0; $i < count($feedbackCategories); $i++) {
+			$feedbackCategories[$i] = _L(trim($feedbackCategories[$i]));
+		}
+		return $feedbackCategories;
 	}
 
 	function getFeedbackTypes() {
-		// FIXME: final type labels/values are needed
-		return array(
-			1 => 'Example Type 1',
-			2 => 'Example Type 2',
-		);
+		global $SETTINGS;
+		$feedbackTypes = explode(',', $SETTINGS['netsuite']['feedbackTypes']);
+		array_unshift($feedbackTypes, 'Select a Type...');
+		for ($i = 0; $i < count($feedbackTypes); $i++) {
+			$feedbackTypes[$i] = _L(trim($feedbackTypes[$i]));
+		}
+		return $feedbackTypes;
 	}
 
 	function factoryFeedbackPageForm() {
+
 		$formdata = array(
 			_L('Reported by'),
 
@@ -193,7 +198,7 @@ class FeedbackPage extends PageForm {
 			'feedbackCategory' => array(
 				'label' => _L('Feedback Category'),
 				'fieldhelp' => _L('Select the category that best describes your feedback'),
-				'value' => 1,
+				'value' => 0,
 				'validators' => array(
 					array('ValInArray', 'values' => array_keys($this->getFeedbackCategories()))
 				),
@@ -204,7 +209,7 @@ class FeedbackPage extends PageForm {
 			'feedbackType' => array(
 				'label' => _L('Feedback Type'),
 				'fieldhelp' => _L('Select the type that best describes your feedback'),
-				'value' => 1,
+				'value' => 0,
 				'validators' => array(
 					array('ValInArray', 'values' => array_keys($this->getFeedbackTypes()))
 				),
