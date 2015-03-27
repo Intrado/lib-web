@@ -501,7 +501,7 @@ var RuleWidget = Class.create({
 			var selectedOptions = (type == 'multisearch' && !Array.isArray(data.val)) ? data.val.split('|') : data.val;
 			var container = this.ruleEditor.create_rule_section(fieldnum, type, data.op, selectedOptions);
 			var readableValues = rowElements[3].clone(true);
-			rowElements[3].replace(container);
+			rowElements[3].update(container);
 			var updateTD = new Element('td').update('<div class="update-button">' + labels['update']);
 			var cancelTD = new Element('td').update('<div class="cancel-button">' + labels['cancel']);
 
