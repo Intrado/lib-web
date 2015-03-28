@@ -505,7 +505,7 @@ var RuleWidget = Class.create({
 		actionEditTD.down('button').observe('click', function (event, tr, fieldnum, type) {
 			event.stop();
 			var rowElements = tr.childElements();
-			var selectedOptions = (type == 'multisearch' && (typeof data.val.length == "undefined")) ? data.val.split('|') : data.val;
+			var selectedOptions = (type == 'multisearch' && !Array.isArray(data.val)) ? data.val.split('|') : data.val;
 			var container = this.ruleEditor.create_rule_section(fieldnum, type, data.op, selectedOptions);
 			var readableValues = rowElements[3].clone(true);
 			rowElements[3].update(container);
