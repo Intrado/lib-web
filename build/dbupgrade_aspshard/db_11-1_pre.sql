@@ -59,4 +59,17 @@ $$$
 ALTER TABLE `devicejobtask` CHANGE `notificationReceiptId` `notificationId` BIGINT(20) NULL DEFAULT NULL
 $$$
 
+-- $rev 5
+
+ALTER TABLE `qjobtask` CHANGE `contactsequence` `contactsequence` SMALLINT NOT NULL DEFAULT '0';
+$$$
+
+ALTER TABLE `emailjobtask` CHANGE `contactsequence` `contactsequence` SMALLINT NOT NULL DEFAULT '0';
+$$$
+
+ALTER TABLE `smsjobtask` CHANGE `contactsequence` `contactsequence` SMALLINT NOT NULL DEFAULT '0';
+$$$
+
+ALTER TABLE `devicejobtask` CHANGE `contactsequence` `contactsequence` SMALLINT NOT NULL DEFAULT '0';
+$$$
 
