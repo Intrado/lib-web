@@ -108,11 +108,9 @@ class ListRecipientMode {
 	 * @return int recipient mode
 	 */
 	function getRecipientModeFromPostData($postdata) {
-		if (!$this->enabled) return PeopleList::$RECIPIENTMODE_MAP[3];
-
 		$mode = PeopleList::$RECIPIENTMODE_MAP[3]; //self
 		//1=> self, 2=>guardian 3=> selfAndGuardian
-		if ($postdata[self::RECIPIENT_MODE_ELEMENT]) {
+		if (array_key_exists(self::RECIPIENT_MODE_ELEMENT, $postdata) && $postdata[self::RECIPIENT_MODE_ELEMENT]) {
 			$mode = $postdata[self::RECIPIENT_MODE_ELEMENT];
 		}
 		$this->recipientMode = $mode;
