@@ -49,7 +49,13 @@ if (isset($_GET['origin'])) {
 
 if (isset($_GET['id'])) {
 	setCurrentList($_GET['id']);
-	redirect();
+
+    // API clients don't support redirect/page-reload for caching session state.
+    // For these clients, just continue with execution and don't redirect!
+    //
+    if (!isset($_GET['api'])) {
+        redirect();
+    }
 }
 
 if (isset($_GET['removealladds'])) {
@@ -457,59 +463,62 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 						$noticemsg = ($button === 'updaterule') ? 'The rule for %s is now updated.' : 'The rule for %s is now added.';
 						if ($method === 'rules') {
 							$ruledata = json_decode($postdata['newrule']);
-							$data = $ruledata[0];
-							// CREATE rule.
-							if (!isset($data->fieldnum, $data->logical, $data->op, $data->val)) {
-								notice(_L('There is a problem adding the rule for %s.', escapehtml(FieldMap::getName($data->fieldnum))));
-								$form->sendTo($methodlink);
-								break;
-							}
 
-							if ($data->fieldnum == 'organization') {
-								QuickUpdate('BEGIN');
-									QuickUpdate("DELETE FROM listentry WHERE listid=? AND type='organization'", false, array($list->id));
-								
-									foreach ($data->val as $id) {
-										$le = new ListEntry();
-										$le->listid = $list->id;
-										$le->type = "organization";
-										$le->organizationid = $id + 0;
-										$le->create();
-									}
-								
-								QuickUpdate('COMMIT');
+                            foreach ($ruledata as $data) {
+                                //$data = $ruledata[0];
+                                // CREATE rule.
+                                if (!isset($data->fieldnum, $data->logical, $data->op, $data->val)) {
+                                    notice(_L('There is a problem adding the rule for %s.', escapehtml(FieldMap::getName($data->fieldnum))));
+                                    $form->sendTo($methodlink);
+                                    break;
+                                }
 
-								notice(_L($noticemsg, getSystemSetting("organizationfieldname","Organization")));
-							} else {
-								if (!$type = Rule::getType($data->fieldnum)) {
-									notice(_L('There is a problem adding the rule for %s.', escapehtml(FieldMap::getName($data->fieldnum))));
-									$form->sendTo($methodlink);
-									break;
-								}
+                                if ($data->fieldnum == 'organization') {
+                                    QuickUpdate('BEGIN');
+                                    QuickUpdate("DELETE FROM listentry WHERE listid=? AND type='organization'", false, array($list->id));
 
-								//first delete the rule
-								QuickUpdate("DELETE le.*, r.* FROM listentry le, rule r WHERE le.ruleid=r.id AND le.listid=? AND r.fieldnum=?", false, array($list->id, $data->fieldnum));
-								$data->val = prepareRuleVal($type, $data->op, $data->val);
-							
-								if (!$rule = Rule::initFrom($data->fieldnum, $data->logical, $data->op, $data->val)) {
-									notice(_L('There is a problem adding or updating the rule for %s.', escapehtml(FieldMap::getName($data->fieldnum))));
-									$form->sendTo($methodlink);
-									break;
-								}
-							
-								QuickUpdate('BEGIN');
-									$rule->create();
-									$le = new ListEntry();
-									$le->listid = $list->id;
-									$le->type = "rule";
-									$le->ruleid = $rule->id;
-									$le->create();
-								QuickUpdate('COMMIT');
-								notice(_L($noticemsg, escapehtml(FieldMap::getName($data->fieldnum))));
-							}
+                                    foreach ($data->val as $id) {
+                                        $le = new ListEntry();
+                                        $le->listid = $list->id;
+                                        $le->type = "organization";
+                                        $le->organizationid = $id + 0;
+                                        $le->create();
+                                    }
+
+                                    QuickUpdate('COMMIT');
+
+                                    notice(_L($noticemsg, getSystemSetting("organizationfieldname", "Organization")));
+                                } else {
+                                    if (!$type = Rule::getType($data->fieldnum)) {
+                                        notice(_L('There is a problem adding the rule for %s.', escapehtml(FieldMap::getName($data->fieldnum))));
+                                        $form->sendTo($methodlink);
+                                        break;
+                                    }
+
+                                    //first delete the rule
+                                    QuickUpdate("DELETE le.*, r.* FROM listentry le, rule r WHERE le.ruleid=r.id AND le.listid=? AND r.fieldnum=?", false, array($list->id, $data->fieldnum));
+                                    $data->val = prepareRuleVal($type, $data->op, $data->val);
+
+                                    if (!$rule = Rule::initFrom($data->fieldnum, $data->logical, $data->op, $data->val)) {
+                                        notice(_L('There is a problem adding or updating the rule for %s.', escapehtml(FieldMap::getName($data->fieldnum))));
+                                        $form->sendTo($methodlink);
+                                        break;
+                                    }
+
+                                    QuickUpdate('BEGIN');
+                                    $rule->create();
+                                    $le = new ListEntry();
+                                    $le->listid = $list->id;
+                                    $le->type = "rule";
+                                    $le->ruleid = $rule->id;
+                                    $le->create();
+                                    QuickUpdate('COMMIT');
+                                    notice(_L($noticemsg, escapehtml(FieldMap::getName($data->fieldnum))));
+                                }
+                            }
 						}
 						
-						$form->sendTo($methodlink);
+						$form->sendTo($methodlink, Array("list" => Array("id" => (int)$list->id)));
 						break;
 
 					case 'deleterule':
@@ -544,12 +553,13 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 						if (isset($_SESSION['origin']) && ($_SESSION['origin'] == 'start')) {
 							unset($_SESSION['origin']);
 							// TODO, Release 7.2, add notice()
-							$form->sendTo('start.php');
+							$form->sendTo('start.php', Array("list" => Array("id" => (int)$list->id)));
 						} else {
 							unset($_SESSION['origin']);
 							if ($button == 'refresh')
-								$form->sendTo($methodlink);
-							$form->sendTo('lists.php');
+								$form->sendTo($methodlink, Array("list" => Array("id" => (int)$list->id)));
+
+							$form->sendTo('lists.php', Array("list" => Array("id" => (int)$list->id)));
 						}
 						break;
 

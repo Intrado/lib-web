@@ -39,7 +39,7 @@ if (!$cansendphone && !$cansendemail && !$cansendsms) {
 
 if (isset($_GET['id'])) {
 	if ($_GET['id'] !== "new" && !userOwns("messagegroup",$_GET['id']))
-		redirect('unauthorized.php');
+        redirect('unauthorized.php');
 	setCurrentMessageGroup($_GET['id']);
 	
 	if (isset($_GET["redirect"])) {
@@ -97,7 +97,13 @@ if (isset($_GET['id'])) {
 				break;
 		}
 	}
-	redirect();
+
+    // API clients don't support redirect/page-reload for caching session state.
+    // For these clients, just continue with execution and don't redirect!
+    //
+    if (!isset($_GET['api'])) {
+        redirect();
+    }
 }
 
 $messagegroup = new MessageGroup(getCurrentMessageGroup());
@@ -306,8 +312,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$messagegroup->update();
 		Query("COMMIT");
 		$_SESSION['messagegroupid'] = $messagegroup->id;
+
 		if ($ajax)
-			$form->sendTo("mgeditor.php");
+			$form->sendTo("mgeditor.php", Array("messageGroup" => Array("id" => (int)$messagegroup->id)));
 		else
 			redirect("mgeditor.php");
 	}
