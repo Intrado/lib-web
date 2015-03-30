@@ -199,7 +199,7 @@ $formdata["owner"] = array(
 	"helpstep" => 5
 );
 
-
+$list = null;
 if ($job) {
 	$joblist = DBFind("JobList", "from joblist where jobid = ?", false, array($job->id));
 	if ($joblist) {
@@ -413,7 +413,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		else
 			$peoplelist->create();
 
-		$listRecipientMode->resetListCategories($postdata, $list->id);
+		$listRecipientMode->resetListCategories($postdata, $peoplelist->id);
 
 		$listentry->listid = $peoplelist->id;
 		$listentry->type = 'rule';
