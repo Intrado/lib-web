@@ -103,7 +103,7 @@ class ListRecipientModeTest extends PHPUnit_Framework_TestCase {
 		require_once("{$konadir}/obj/PeopleList.obj.php");
 		require_once("{$konadir}/obj/RestrictedValues.fi.php");
 		require_once("{$konadir}/obj/ListGuardianCategory.obj.php");
-		require_once("{$konadir}/obj/ListRecipientMode.php");
+		require_once("{$konadir}/obj/ListRecipientMode.obj.php");
 
 		// Mock up a USER session
 		$USER = new User(self::USER_ID);

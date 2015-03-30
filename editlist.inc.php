@@ -35,7 +35,7 @@ require_once("obj/JobType.obj.php");
 require_once("inc/list.inc.php");
 require_once("obj/RestrictedValues.fi.php");
 require_once("obj/ListGuardianCategory.obj.php");
-require_once("obj/ListRecipientMode.php");
+require_once("obj/ListRecipientMode.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
