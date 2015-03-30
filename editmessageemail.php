@@ -75,7 +75,7 @@ if ($message) {
 } else {
 	// not editing an existing message, check session data for new message bits
 	if (isset($_SESSION['editmessage']['messagegroupid']) && 
-        isset($_SESSION['editmessage']['languagecode'])) {
+			isset($_SESSION['editmessage']['languagecode'])) {
 		
 		$messagegroup = new MessageGroup($_SESSION['editmessage']['messagegroupid']);
 		$languagecode = $_SESSION['editmessage']['languagecode'];
@@ -374,7 +374,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$attachments = json_decode($postdata['attachments'], true);
 			if ($attachments == null)
 				$attachments = array();
-
+			
 			$message->replaceContentAttachments($attachments);
 			
 			// Sync with other message subtype if it exists
@@ -397,7 +397,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		unset($_SESSION['editmessage']);
 		
 		if ($ajax)
-			$form->sendTo(getEditMessageSendTo($messagegroup->id), Array('message' => Array('id' => (int)$message->id)));
+			$form->sendTo(getEditMessageSendTo($messagegroup->id));
 		else
 			redirect(getEditMessageSendTo($messagegroup->id));
 	}

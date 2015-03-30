@@ -1158,7 +1158,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			}
 		}
 		if ($ajax)
-            $form->sendTo($sendto, Array("job" => Array("id" => (int)$job->id)));
+			$form->sendTo($sendto);
 		else
 			redirect($sendto);
 	}

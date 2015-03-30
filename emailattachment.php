@@ -1,4 +1,4 @@
-<?
+<? 
 include_once("inc/common.inc.php");
 include_once("inc/securityhelper.inc.php");
 include_once("inc/content.inc.php");
@@ -48,26 +48,6 @@ $unsafeext = array(".ade",".adp",".asx",".bas",".bat",".chm",".cmd",".com",".cpl
 
 $result = handleFileUpload('emailattachment', $maxattachmentsize, $unsafeext, null, true);
 
-// If caller is api-client, respond with json
-//
-if (isset($_GET['api'])) {
-    if (is_array($result)) {
-        $response = Array(
-            "status" => "success",
-            "upload" => Array(
-                "id" => (int)$result['contentid'],
-                "name" => $result['filename'],
-                "size" => $result['sizebytes']));
-    }
-    else {
-        $response = Array("status" => "fail", "error" => $result);
-    }
-
-    header("Content-Type: application/json");
-    echo json_encode($response);
-
-    exit();
-}
 
 if (is_array($result)) {
 	permitContent($result['contentid']);

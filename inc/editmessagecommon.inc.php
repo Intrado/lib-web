@@ -7,13 +7,7 @@ function setEditMessageSession() {
 		$_SESSION['editmessagereferer'] = (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : NULL);
 		// this is an edit for an existing message
 		$_SESSION['editmessage'] = array("messageid" => $_GET['id']);
-
-        // API clients don't support redirect/page-reload for caching session state.
-        // For these clients, just continue with execution and don't redirect!
-        //
-        if (!isset($_GET['api'])) {
-            redirect();
-        }
+		redirect();
 	} else if (isset($_GET['mgid'])) {
 		$_SESSION['editmessagereferer'] = (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : NULL);
 		$_SESSION['editmessage'] = array("messagegroupid" => $_GET['mgid']);
@@ -30,13 +24,7 @@ function setEditMessageSession() {
 			$_SESSION['editmessage']['stationeryid'] = $_GET['stationeryid'];
 			$_SESSION['editmessagereferer'] = "mgeditor.php";
 		}
-
-        // API clients don't support redirect/page-reload for caching session state.
-        // For these clients, just continue with execution and don't redirect!
-        //
-        if (!isset($_GET['api'])) {
-            redirect();
-        }
+		redirect();
 	}
 }
 
