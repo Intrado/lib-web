@@ -14,10 +14,22 @@ class ValEmailAttach extends Validator {
 		if(count($value) > $max)
 			return "Max $max attachments allowed. Please remove one attachment.";
 		
-		// verify against message group, if possible
+		// Verify against message group, if possible
 		foreach ($value as $cid => $details) {
-			if (!contentAllowed($cid))
-				return "One or more attachments contains invalid data, or the data is no longer accessible.";
+            // API clients are stateless and hence no content will be in session scope.
+            // Manually check for existence of uploaded content before rejecting...
+            //
+			if (!contentAllowed($cid)) {
+                if (isset($_GET['api'])) {
+                    if (!contentGet($cid)) {
+                        return "One or more attachments contains invalid data, or the data is no longer accessible.";
+                    } else {
+                        permitContent($cid);
+                    }
+                } else {
+                    return "One or more attachments contains invalid data, or the data is no longer accessible.";
+                }
+            }
 		}
 		// TODO: check the database to see that all the content IDs are actually valid (who knows what junk the client sent?)
 		// TODO: We only allow attachments up to a certain size
