@@ -158,7 +158,7 @@ if (isset($_GET["clearfavorites"])) {
 // result - if this is not the desired behavior then the "Show" options really
 // should be converted into radio-style toggles.
 if (isset($_GET["showdisabled"])) {
-	//$sqltoggledisabled = "and not enabled";
+	$sqltoggledisabled = "";
 }
 else {
 	$sqltoggledisabled = "and c.enabled";
