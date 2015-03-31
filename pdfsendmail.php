@@ -35,6 +35,11 @@ require_once('ifc/Page.ifc.php');
 require_once('obj/PageBase.obj.php');
 require_once('obj/PageForm.obj.php');
 
+require_once("obj/PeopleList.obj.php");
+require_once("obj/RestrictedValues.fi.php");
+require_once("obj/ListGuardianCategory.obj.php");
+require_once("obj/ListRecipientMode.obj.php");
+
 /**
  * class PdfSendMail
  * 
@@ -52,6 +57,7 @@ class PdfSendMail extends PageForm {
 	private $burstId;
 	private $burst;
 	private $custname;
+	private $listRecipientMode;
 
 
 	/**
@@ -59,6 +65,9 @@ class PdfSendMail extends PageForm {
 	 */
 	public function __construct($csApi) {
 		$this->csApi = $csApi;
+		$maxguardians = getSystemSetting("maxguardians", 0);
+
+		$this->listRecipientMode = new ListRecipientMode ($csApi, 3, $maxguardians, null, null);
 		parent::__construct();
 	}
 
@@ -218,8 +227,10 @@ class PdfSendMail extends PageForm {
 			$list->modifydate = $job->modifydate;
 			$list->deleted = 1;
 			// customer flat or guardian data, default to 'selfAndGuardian' for ease of use when/if migrate customer from flat to guardian
-			$list->recipientmode = 'selfAndGuardian';
+			$list->recipientmode = $this->listRecipientMode->getRecipientModeFromPostData($postData);
 			$list->create();
+			$this->listRecipientMode->resetListCategories($postData, $list->id);
+
 			$this->fillListFromBurst($list, $this->burst->id);
 
 			$job->create();
@@ -249,6 +260,7 @@ class PdfSendMail extends PageForm {
 	public function render() {
 		$html = '<link rel="stylesheet" type="text/css" href="css/pdfmanager.css">';
 		$html .= parent::render();
+		$html .= '<script type="text/javascript">' . $this->listRecipientMode->addJavaScript("pdfsendmail") . '</script>';
 		return $html;
 	}
 
@@ -292,7 +304,9 @@ class PdfSendMail extends PageForm {
 			_L('Enter the email address this Delivery email should appear to come from. Keep in mind that recipients may reply to this address.'),
 			_L('Enter the subject for this Delivery email.'),
 			_L('Enter the message body for this Delivery email. The portion of the Document which should be delivered to each recipient will be attached to this email message.')
-		); 
+		);
+
+		$this->listRecipientMode->addHelpText($helpsteps);
 
 		// Pull the static message layout from disk
 		$messageBody = file_get_contents(dirname(__FILE__) . '/layouts/SDDBurstEmailLayout.html');
@@ -324,82 +338,86 @@ class PdfSendMail extends PageForm {
 					array("ValInArray", "values" => array_keys($broadcastTypeNames))),
 				"control" => array('RadioButton', 'values' => $broadcastTypeNames),
 				"helpstep" => 2
-			),
-			_L("Secure Documents"),
-			"passwordhelp" => array(
-				'label' => '',
-				'control' => array(
-					"FormHtml",
-					'html' => '<div class="password-protect-wrapper"><span class="secure-lock"></span>' .
-					_L('To require recipients to enter a password when viewing this Document, you must select Require Password.') . '</div>'
-				),
-				'helpstep' => 3
-			),
-			"dopasswordprotect" => array(
-				"label" => _L("Require Password"),
-				"fieldhelp" => _L('Select this option if recipients must enter a password to view this Document.'),
-				"value" => '',
-				"validators" => array(),
-				"control" => array("Checkbox"),
-				"helpstep" => 3
-			),
-			_L("Email Details"),
-			"fromname" => array(
-				"label" => _L('From Name'),
-				"fieldhelp" => _L('Enter the name of the Document sender.'),
-				"value" => '',
-				"validators" => array(
-					array('ValRequired'),
-					array("ValLength","max" => 50)
-				),
-				"control" => array("TextField", "size" => 30, "maxlength" => 50),
-				"helpstep" => 4
-			),
-			"fromemail" => array(
-				"label" => _L('From Email'),
-				"fieldhelp" => _L('Enter the email address this message should appear to come from.'),
-				"value" => '',
-				"validators" => array(
-					array('ValRequired'),
-					array("ValLength","max" => 255),
-					array("ValEmail", "domain" => $this->emailDomain)
-				),
-				"control" => array("TextField", "size" => 30, "maxlength" => 255),
-				"helpstep" => 5
-			),
-			"subject" => array(
-				"label" => _L('Subject'),
-				"fieldhelp" => _L('Enter a subject for this Delivery email.'),
-				"value" => '',
-				"validators" => array(
-					array('ValRequired'),
-					array("ValLength","max" => 255)
-				),
-				"control" => array("TextField", "size" => 30, "maxlength" => 255),
-				"helpstep" => 6
-			),
-			"messagebody" => array(
-				"label" => _L('Message'),
-				"fieldhelp" => _L('Enter an email message to accompany the Document.'),
-				"value" => $messageBody,
-				"validators" => array(
-					array("ValRequired"),
-					array("ValMessageBody"),
-					array("ValLength","max" => 256000)
-				),
-				"control" => array('HtmlTextArea', 'subtype' => 'html', 'rows' => 20, 'editor_mode' => 'inline'),
-				"helpstep" => 7
-			),
-			_L("Information"),
-			"infohelp" => array(
-				'label' => '',
-				'control' => array(
-					"FormHtml",
-					'html' => '<div class="password-protect-wrapper"><span class="secure-lock"></span>' .
-					_L('Note: Larger files may take up to a minute to process. Thank you for your patience.') . '</div>'
-				),
-				'helpstep' => 7
 			)
+		);
+
+		$this->listRecipientMode->addToForm($formdata);
+
+		$formdata[] = _L("Secure Documents");
+		$formdata["passwordhelp"] = array(
+			'label' => '',
+			'control' => array(
+				"FormHtml",
+				'html' => '<div class="password-protect-wrapper"><span class="secure-lock"></span>' .
+					_L('To require recipients to enter a password when viewing this Document, you must select Require Password.') . '</div>'
+			),
+			'helpstep' => 3 + $this->listRecipientMode->isEnabled()
+		);
+		$formdata["dopasswordprotect"] = array(
+			"label" => _L("Require Password"),
+			"fieldhelp" => _L('Select this option if recipients must enter a password to view this Document.'),
+			"value" => '',
+			"validators" => array(),
+			"control" => array("Checkbox"),
+			"helpstep" => 3 + $this->listRecipientMode->isEnabled()
+		);
+
+		$formdata[] = _L("Email Details");
+		$formdata["fromname"] = array(
+			"label" => _L('From Name'),
+			"fieldhelp" => _L('Enter the name of the Document sender.'),
+			"value" => '',
+			"validators" => array(
+				array('ValRequired'),
+				array("ValLength", "max" => 50)
+			),
+			"control" => array("TextField", "size" => 30, "maxlength" => 50),
+			"helpstep" => 4 + $this->listRecipientMode->isEnabled()
+		);
+		$formdata["fromemail"] = array(
+			"label" => _L('From Email'),
+			"fieldhelp" => _L('Enter the email address this message should appear to come from.'),
+			"value" => '',
+			"validators" => array(
+				array('ValRequired'),
+				array("ValLength", "max" => 255),
+				array("ValEmail", "domain" => $this->emailDomain)
+			),
+			"control" => array("TextField", "size" => 30, "maxlength" => 255),
+			"helpstep" => 5 + $this->listRecipientMode->isEnabled()
+		);
+		$formdata["subject"] = array(
+			"label" => _L('Subject'),
+			"fieldhelp" => _L('Enter a subject for this Delivery email.'),
+			"value" => '',
+			"validators" => array(
+				array('ValRequired'),
+				array("ValLength", "max" => 255)
+			),
+			"control" => array("TextField", "size" => 30, "maxlength" => 255),
+			"helpstep" => 6 + $this->listRecipientMode->isEnabled()
+		);
+		$formdata["messagebody"] = array(
+			"label" => _L('Message'),
+			"fieldhelp" => _L('Enter an email message to accompany the Document.'),
+			"value" => $messageBody,
+			"validators" => array(
+				array("ValRequired"),
+				array("ValMessageBody"),
+				array("ValLength", "max" => 256000)
+			),
+			"control" => array('HtmlTextArea', 'subtype' => 'html', 'rows' => 20, 'editor_mode' => 'inline'),
+			"helpstep" => 7 + $this->listRecipientMode->isEnabled()
+		);
+		$formdata[] = _L("Information");
+		$formdata["infohelp"] = array(
+			'label' => '',
+			'control' => array(
+				"FormHtml",
+				'html' => '<div class="password-protect-wrapper"><span class="secure-lock"></span>' .
+					_L('Note: Larger files may take up to a minute to process. Thank you for your patience.') . '</div>'
+			),
+			'helpstep' => 7 + $this->listRecipientMode->isEnabled()
 		);
 
 		$form = new Form("pdfsendmail", $formdata, $helpsteps, array( submit_button(_L(' Send Now'), 'send', 'tick')));
