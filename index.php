@@ -13,8 +13,9 @@ if(isset($_GET['f'])){
 if (isset($_GET['logout'])) {
 	doStartSession(); // start the session to get the id
 	
-	//FIXME fix session_destroy then we don't need to write empty string
-	putSessionData(session_id(), ""); // write empty data to flush the user
+	// if logging out and session is not already empty, try to overwrite our session data
+	if (!empty($_SESSION))
+		putSessionData(session_id(), ""); // write empty data to flush the user
 
 	@session_destroy();
 }

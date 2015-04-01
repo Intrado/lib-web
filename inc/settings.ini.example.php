@@ -33,6 +33,7 @@ timeout=5500
 
 [feature]
 has_ssl=true
+; tell browser to only send session cookie over secure connections
 force_ssl=true
 log_dir="/usr/commsuite/logs/"
 log_db_errors=true
