@@ -104,6 +104,10 @@ role = ""
 url = "https://rest.netsuite.com/"
 ; Feedback URI to POST to WITH Authorization header
 uriFeedback = "app/site/hosting/restlet.nl?script=105&deploy=1"
+; Feedback Categories for the UI drop-down selection (subject to translation)
+feedbackCategories = "Contact Management, Interface / Usability, Message Sending Process, Messages / Lists, Reports, System Administration, Other"
+; Feedback Types for the UI drop-down selection (subject to translation)
+feedbackTypes = "Compliment, Product Question, Product Request, Other"
 
 ;*/?>
 

@@ -60,8 +60,6 @@ class FeedbackPage extends PageForm {
 
 	function afterLoad() {
 
-		// TODO: prevent resubmission of the same form (browser:frame:thisframe:reload after submission)
-
 		// Normal form handling makes form->getData() work...
 		$this->form->handleRequest();
 
@@ -91,17 +89,16 @@ class FeedbackPage extends PageForm {
 				$netsuiteApi->feedbackSet('feedbackType', $postdata['feedbackType']);
 				$netsuiteApi->feedbackSet('userPage', $this->userPage);
 				$netsuiteApi->feedbackSet('trackingId', getUserSessionTrackingId());
-				$netsuiteApi->feedbackSet('sessionData', '');
+				$netsuiteApi->feedbackSet('sessionData', 'n/a');
 				if ($netsuiteApi->captureUserFeedback()) {
 
 					// Success message
-					$this->message = _L('Thank you for your feedback. Our support staff will follow up with you if applicable with the provided contact information.');
+					$this->message = _L('Thank you for your feedback! Our Product team will review your comments, and may contact you with questions. Should you need immediate assistance, please contact our Support team at (800) 920-3897.');
 					return;
 				}
 			}
 
 			$this->message = _L('There was a problem recording your feedback - please try again later.');
-			$this->message .= "response was:<br/>\n" . print_r($netsuiteApi->getResponse(), true);
 		}
 	}
 

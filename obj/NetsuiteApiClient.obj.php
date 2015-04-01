@@ -30,6 +30,7 @@ class NetsuiteApiClient {
 	 */
 	protected $response;
 
+
 	/**
 	 * @param object $apiClient ApiClient class instance
 	 * @param string $feedbackUri The NetSuite feedback URI that we will POST to
@@ -103,9 +104,8 @@ class NetsuiteApiClient {
 	 * @return bool|mixed the object or false if the request failed
 	 */
 	public function captureUserFeedback() {
-		$json = json_encode($this->feedbackData);
-		$this->response = $this->apiClient->post($this->feedbackUri, $json);
-		return($response['code'] == 200 ? json_decode($response['body']) : false);
+		$this->response = $this->apiClient->post($this->feedbackUri, $this->feedbackData);
+		return($this->response['code'] == 200 ? json_decode($this->response['body']) : false);
 	}
 }
 
