@@ -271,7 +271,13 @@ foreach ($customers as $cust) {
 			$customerfeatures[] = "Feed";
 		if (getCustomerSystemSetting('_hasinfocenter', false, true, $custdb))
 			$customerfeatures[] = "InfoCenter";
-
+		if (getCustomerSystemSetting('_hasicplus', false, true, $custdb))
+			$customerfeatures[] = "ICPlus";
+		if (getCustomerSystemSetting('_haspdfburst', false, true, $custdb))
+			$customerfeatures[] = "SDD";
+		if (getCustomerSystemSetting('_hasquicktip', false, true, $custdb))
+			$customerfeatures[] = "QuickTip";
+		
 		$row[10] = implode(", ", $customerfeatures);
 		$row[11] = getCustomerSystemSetting('_dmmethod', "", true, $custdb);
 		$row[12] = $cust[3];
