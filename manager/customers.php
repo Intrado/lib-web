@@ -269,6 +269,8 @@ foreach ($customers as $cust) {
 			$customerfeatures[] = "Twitter";
 		if (getCustomerSystemSetting('_hasfeed', false, true, $custdb))
 			$customerfeatures[] = "Feed";
+		if (getCustomerSystemSetting('maxguardians', 0, true, $custdb)) // if max > 0 then has guardian data model
+			$customerfeatures[] = "Guardian";
 		if (getCustomerSystemSetting('_hasinfocenter', false, true, $custdb))
 			$customerfeatures[] = "InfoCenter";
 		if (getCustomerSystemSetting('_hasicplus', false, true, $custdb))
