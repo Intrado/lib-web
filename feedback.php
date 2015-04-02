@@ -150,6 +150,7 @@ class FeedbackPage extends PageForm {
 
 			'firstName' => array(
 				'label' => _L('First Name'),
+				'fieldhelp' => _L('This is your first name.'),
 				'value' => $this->firstName,
 				'validators' => array(
 					array('ValLength', 'min' => 3, 'max' => 50)
@@ -160,6 +161,7 @@ class FeedbackPage extends PageForm {
 
 			'lastName' => array(
 				'label' => _L('Last Name'),
+				'fieldhelp' => _L('This is your last name.'),
 				'value' => $this->lastName,
 				'validators' => array(
 					array('ValLength', 'min' => 2, 'max' => 50)
@@ -170,6 +172,7 @@ class FeedbackPage extends PageForm {
 
 			'email' => array(
 				'label' => _L('Email'),
+				'fieldhelp' => _L('This is the email address associated with your account.'),
 				'value' => $this->email,
 				'validators' => array(
 					array('ValLength', 'min' => 9, 'max' => 50),
@@ -181,6 +184,7 @@ class FeedbackPage extends PageForm {
 
 			'phone' => array(
 				'label' => _L('Phone'),
+				'fieldhelp' => _L('This is your direct contact number.'),
 				'value' => $this->phone,
 				'validators' => array(
 					array('ValLength', 'min' => 10, 'max' => 50),
@@ -194,7 +198,7 @@ class FeedbackPage extends PageForm {
 
 			'feedbackCategory' => array(
 				'label' => _L('Feedback Category'),
-				'fieldhelp' => _L('Select the category that best describes your feedback'),
+				'fieldhelp' => _L('This is the category of feedback.'),
 				'value' => 0,
 				'validators' => array(
 					array('ValInArray', 'values' => array_keys($this->getFeedbackCategories()))
@@ -205,7 +209,7 @@ class FeedbackPage extends PageForm {
 
 			'feedbackType' => array(
 				'label' => _L('Feedback Type'),
-				'fieldhelp' => _L('Select the type that best describes your feedback'),
+				'fieldhelp' => _L('This is the type of feedback you.d like to leave.'),
 				'value' => 0,
 				'validators' => array(
 					array('ValInArray', 'values' => array_keys($this->getFeedbackTypes()))
@@ -216,10 +220,10 @@ class FeedbackPage extends PageForm {
 
 			'feedbackText' => array(
 				'label' => _L('Message'),
-				'fieldhelp' => _L('Fill in the details of your feedback'),
+				'fieldhelp' => _L('This text box is where you enter your feedback.'),
 				'value' => '',
 				'validators' => array(
-					// TODO: find out if netsuite has a max value on this or if we should increase it...
+					// Note: API host's max for this field is 100K
 					array('ValLength', 'min' => 10, 'max' => 5000)
 				),
 				'control' => array('TextArea', 'size' => 30, 'rows' => 15, 'cols' => 34),
@@ -227,15 +231,14 @@ class FeedbackPage extends PageForm {
 			)
 		);
 
-		// FIXME: Fill in appropriate feedback help steps... or eliminate the guide altogether
 		$helpsteps = array (
-			_L('Feedbackhelpstep 1'),
-			_L('Feedbackhelpstep 2'),
-			_L('Feedbackhelpstep 3'),
-			_L('Feedbackhelpstep 4'),
-			_L('Feedbackhelpstep 5'),
-			_L('Feedbackhelpstep 6'),
-			_L('Feedbackhelpstep 7')
+			_L('The first name listed in your SchoolMessenger account should be pre-populated here. If missing or incorrect, please update.'),
+			_L('The last name listed in your SchoolMessenger account should be pre-populated here. If missing or incorrect, please update.'),
+			_L('The email address listed in your SchoolMessenger account should be pre-populated here. If missing or incorrect, please update. We.ll use this to contact you to follow up on your feedback.'),
+			_L('The phone number listed in your SchoolMessenger account should be pre-populated here. If missing or incorrect, please update. We.ll use this to contact you to follow up on your feedback.'),
+			_L('Select a Feedback Category from the dropdown. This helps us categorize what part of SchoolMessenger your feedback references.'),
+			_L('Select a Feedback Type from the dropdown. This provides us with the context needed to evaluate your feedback.'),
+			_L('Please provide us with your feedback.')
 		);
 
 		$buttons = array(
