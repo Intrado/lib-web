@@ -92,5 +92,23 @@ memcache_session_lock_retry_us=50000
 ; if no urls are defined, memache support is disabled
 memcached_url[]="tcp://127.0.0.1:11211?persistent=1&timeoutms=1000"
 
+[netsuite]
+; Netsuite account number for Incase
+account = ""
+; Netsuite integration user login
+user = ""
+; Netsuite integration user password
+pass = ""
+; Netsuite integration user access role
+role = ""
+; NetSuite integration host URL
+url = "https://rest.netsuite.com/"
+; Feedback URI to POST to WITH Authorization header
+uriFeedback = "app/site/hosting/restlet.nl?script=105&deploy=1"
+; Feedback Categories for the UI drop-down selection (subject to translation)
+feedbackCategories = "Contact Management, Interface / Usability, Message Sending Process, Messages / Lists, Reports, System Administration, Other"
+; Feedback Types for the UI drop-down selection (subject to translation)
+feedbackTypes = "Compliment, Product Question, Product Request, Other"
 
 ;*/?>
+

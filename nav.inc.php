@@ -1,4 +1,6 @@
 <?
+//phpinfo();
+//exit;
 
 // calculate the session warning timeout popup
 $SESSION_WARNING_TIME = isset($SETTINGS['feature']['session_warning_time']) ?
@@ -56,7 +58,7 @@ $NAVTREE = array (
 		array("Monitors","monitors.php","monitorevent",$SUBTAB=="monitors")
 		)),
 	array("Admin",NULL,array('manageaccount', 'manageprofile', 'managesystem',
-							'metadata', 'managetasks', 'manageclassroommessaging'),$MAINTAB=="admin",array(
+						'metadata', 'managetasks', 'manageclassroommessaging'),$MAINTAB=="admin",array(
 		array("Users","users.php","manageaccount",$SUBTAB=="users"),
 		array("Profiles","profiles.php","manageprofile",$SUBTAB=="profiles"),
 		array("Settings","settings.php",array("managesystem","metadata","manageclassroommessaging"),$SUBTAB=="settings"),
@@ -225,6 +227,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 <!-- ********************************************************************* -->
 
 <div class="wrap"><!-- ends in navbottom.inc -->
+
 <div class="modal hide fade default-modal" id="defaultmodal">
 	<div class="modal-header">
 		<button class="close" aria-hidden="true" data-dismiss="modal" type="button">x</button>
@@ -232,6 +235,16 @@ header('Content-type: text/html; charset=UTF-8') ;
 	</div>
 	<div class="modal-body"></div>
 </div>
+
+<div class="modal hide fade" id="feedbackModal" style="width: 90%; max-height: none; margin: 5%; position: absolue; left: 0px; top: 0px;"-->
+	<div class="modal-header">
+		<button class="close" aria-hidden="true" data-dismiss="modal" type="button">x</button>
+		<h3>Feedback</h3>
+	</div>
+	<iframe style="width: 100%; height: 500px; border: none;" src="feedback.php?iframe=1&from=<?=$_SERVER['REQUEST_URI']?>"></iframe>
+	<br clear="all"/>
+</div>
+
 <div id="top_banner" class="banner">
 <div class="contain cf">
 
@@ -250,6 +263,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 			<li><a href="account.php">Account</a></li>
 <? } ?>
 			<li><a href="#" onclick="window.open('help/index.php', '_blank', 'width=950,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');">Help</a></li>
+			<li><a data-toggle="modal" href="#feedbackModal">Feedback</a></li>
 			<li class="bl_last"><a class="logout" href="index.php?logout=1">Logout</a></li>
 			<li class="bl_right"></li>
 		</ul>

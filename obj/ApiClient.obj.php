@@ -1,5 +1,10 @@
 <?
 
+/**
+ * A general purpose JSON/REST API client that abstracts curl operation away from business logic;
+ *
+ * Note that this only handles a single base URL to which all requests are relative
+ */
 class ApiClient {
 
 	public $ApiUrl;
