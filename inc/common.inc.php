@@ -60,6 +60,11 @@ require_once("{$objdir}/Section.obj.php"); //for search and sec profile rules
 require_once("{$objdir}/ApiClient.obj.php");
 require_once("{$objdir}/CommsuiteApiClient.obj.php");
 
+function getUserSessionTrackingId() {
+	global $USER;
+	return hash("sha256", session_id() . $USER->login);
+}
+
 if ((! defined('PHPUNIT')) && (!isset($isindexpage) || !$isindexpage)) {
 	doStartSession();
 	//force ssl?
@@ -78,6 +83,7 @@ if ((! defined('PHPUNIT')) && (!isset($isindexpage) || !$isindexpage)) {
 		apache_note("CS_USER",urlencode($USER->login)); //for logging
 		instrumentation_add_custom_parameter("userLogin", $USER->login);
 		instrumentation_add_custom_parameter("customerUser", $CUSTOMERURL . ":" . $USER->login);
+		instrumentation_add_custom_parameter("userSession", getUserSessionTrackingId());
 
 		$ACCESS = &$_SESSION['access'];
 		$ACCESS->loadPermissions(true);
@@ -130,6 +136,27 @@ function setupCommsuiteApi() {
 	);
 
 	return(new CommsuiteApiClient($apiClient));
+}
+
+/**
+ * @return NetsuiteApiClient
+ */
+function setupNetsuiteApi() {
+	global $SETTINGS;
+	$apiClient = new ApiClient(
+		$SETTINGS['netsuite']['url'],
+		array(
+			"Content-Type: application/json",
+			//"Accept: '*" . '/' . "*'",
+			"Accept: *" . '/' . "*",
+			"Authorization: NLAuth nlauth_account={$SETTINGS['netsuite']['account']}, nlauth_email={$SETTINGS['netsuite']['user']}, nlauth_signature={$SETTINGS['netsuite']['pass']}, nlauth_role={$SETTINGS['netsuite']['role']}"
+		)
+	);
+
+	return(new NetsuiteApiClient(
+		$apiClient,
+		$SETTINGS['netsuite']['uriFeedback']
+	));
 }
 
 function customerUrlComponent() {

@@ -248,6 +248,7 @@ function putSessionData($id, $sess_data) {
 
 //fires up the session, sets timezone, and connects to the db
 function doStartSession() {
+	global $SETTINGS;
 //	if (session_id() != "") return; // session was already started
 	global $CUSTOMERURL;
 	global $_DBHOST;
@@ -255,8 +256,23 @@ function doStartSession() {
 	global $_DBUSER;
 	global $_DBPASS;
 	
-	session_name($CUSTOMERURL . "_session");
-	session_start();
+	$sessionName = $CUSTOMERURL . "_session";
+	session_name($sessionName);
+	// only start the session if we have a session cookie or we have a session_id
+	// otherwise this will cause PHP to generate some junk session ID that authserver will barf on later
+	if (isset($_COOKIE[$sessionName]) || session_id() !== "")
+		session_start();
+
+	// conditionally set the secure flag on the session cookie
+	// this will tell browser to only send the session cookie over secure connections
+	$currentCookieParams = session_get_cookie_params();
+	session_set_cookie_params( 
+		$currentCookieParams["lifetime"], 
+		$currentCookieParams["path"], 
+		$currentCookieParams["domain"], 
+		$SETTINGS['feature']['force_ssl'], //secure flag
+		$currentCookieParams["httponly"] 
+	);
 
 	//this code is to work around the differences in memcache sessions and authserver sessions
 	//normal case for page loads, global is unset, but data is in session
@@ -268,7 +284,7 @@ function doStartSession() {
 		doDBConnect();
 	}
 	//for new logins, session data will be missing. getSessionDataReadOnly() has side-effect of settings globals
-	if (!isset($_SESSION['_DBHOST'])) {
+	if (!isset($_SESSION['_DBHOST']) && session_id() !== '') {
 		getSessionDataReadOnly(session_id()); //also calls doDBConnect()
 		$_SESSION['_DBHOST'] = $_DBHOST;
 		$_SESSION['_DBNAME'] = $_DBNAME;
