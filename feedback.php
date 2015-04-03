@@ -155,7 +155,7 @@ class FeedbackPage extends PageForm {
 				'validators' => array(
 					array('ValLength', 'min' => 3, 'max' => 50)
 				),
-				'control' => array('TextField', 'size' => 30, 'maxlength' => 51, 'autocomplete' => 'test'),
+				'control' => array('TextField', 'size' => 30, 'maxlength' => 51),
 				'helpstep' => 1
 			),
 
@@ -166,7 +166,7 @@ class FeedbackPage extends PageForm {
 				'validators' => array(
 					array('ValLength', 'min' => 2, 'max' => 50)
 				),
-				'control' => array('TextField', 'size' => 30, 'maxlength' => 51, 'autocomplete' => 'test'),
+				'control' => array('TextField', 'size' => 30, 'maxlength' => 51),
 				'helpstep' => 2
 			),
 
@@ -178,7 +178,7 @@ class FeedbackPage extends PageForm {
 					array('ValLength', 'min' => 9, 'max' => 50),
 					array('ValEmail')
 				),
-				'control' => array('TextField', 'size' => 30, 'maxlength' => 51, 'autocomplete' => 'test'),
+				'control' => array('TextField', 'size' => 30, 'maxlength' => 51),
 				'helpstep' => 3
 			),
 
@@ -190,7 +190,7 @@ class FeedbackPage extends PageForm {
 					array('ValLength', 'min' => 10, 'max' => 50),
 					array('ValPhone')
 				),
-				'control' => array('TextField', 'size' => 30, 'maxlength' => 51, 'autocomplete' => 'test'),
+				'control' => array('TextField', 'size' => 30, 'maxlength' => 51),
 				'helpstep' => 4
 			),
 
