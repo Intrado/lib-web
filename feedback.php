@@ -234,8 +234,8 @@ class FeedbackPage extends PageForm {
 		$helpsteps = array (
 			_L('The first name listed in your SchoolMessenger account should be pre-populated here. If missing or incorrect, please update.'),
 			_L('The last name listed in your SchoolMessenger account should be pre-populated here. If missing or incorrect, please update.'),
-			_L('The email address listed in your SchoolMessenger account should be pre-populated here. If missing or incorrect, please update. We.ll use this to contact you to follow up on your feedback.'),
-			_L('The phone number listed in your SchoolMessenger account should be pre-populated here. If missing or incorrect, please update. We.ll use this to contact you to follow up on your feedback.'),
+			_L('The email address listed in your SchoolMessenger account should be pre-populated here. If missing or incorrect, please update. We\'ll use this to contact you to follow up on your feedback.'),
+			_L('The phone number listed in your SchoolMessenger account should be pre-populated here. If missing or incorrect, please update. We\'ll use this to contact you to follow up on your feedback.'),
 			_L('Select a Feedback Category from the dropdown. This helps us categorize what part of SchoolMessenger your feedback references.'),
 			_L('Select a Feedback Type from the dropdown. This provides us with the context needed to evaluate your feedback.'),
 			_L('Please provide us with your feedback.')
