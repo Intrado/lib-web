@@ -23,6 +23,11 @@ require_once('obj/NetsuiteApiClient.obj.php');
 
 class FeedbackPage extends PageForm {
 
+	// We offer two views, one of the form, and one for the result of the form AJAX submission
+	const VIEW_FORM = 'form';
+	const VIEW_RESULT = 'result';
+	protected $view = self::VIEW_FORM;
+
 	protected $id = null; // The ID of the TEMPLATE thing that our form is for
 
 	protected $userId;
@@ -32,8 +37,10 @@ class FeedbackPage extends PageForm {
 	protected $email;
 	protected $phone;
 
+	protected $feedbackCategories;
+	protected $feedbackTypes;
+
 	// Output formatting controls
-	protected $showForm = true;
 	protected $message = '';
 
 	public $formName = 'feedbackform';
@@ -43,34 +50,67 @@ class FeedbackPage extends PageForm {
 	}
 
 	function beforeLoad(&$get=array(), &$post=array(), &$request=array(), &$session=array()) {
+
+		// If we are showing the result view...
+		if (isset($request['result'])) {
+			$this->view = self::VIEW_RESULT;
+			if ($request['result'] == 'pass') {
+
+				// Success message
+				$this->message = _L('Thank you for your feedback! Our Product team will review your comments, and may contact you with questions. Should you need immediate assistance, please contact our Support team at (800) 920-3897.');
+			}
+			else {
+				$this->message = _L('There was a problem recording your feedback - please try again later.');
+			}
+		}
 	}
 
 	function load(&$get=array(), &$post=array(), &$request=array(), &$session=array()) {
-		global $USER;
+		global $USER, $SETTINGS;
 
-		// Initialize these from user data
-		$this->userId = $USER->id;
-		$this->firstName = $USER->firstname;
-		$this->lastName = $USER->lastname;
-		$this->email = $USER->email;
-		$this->phone = $USER->phone;
-		$this->userPage = $request['from'];
-		$this->form = $this->factoryFeedbackPageForm();
+		if (self::VIEW_FORM == $this->view) {
+
+			// Feedback Types
+			$this->feedbackTypes = array( '' => 'Select a Type');
+			$i = 1;
+			foreach (explode(',', $SETTINGS['netsuite']['feedbackTypes']) as $feedbackType) {
+				$this->feedbackTypes[$i++] = _L(trim($feedbackType));
+			}
+
+			// Feedback Categories
+			$this->feedbackCategories = array( '' => 'Select a Category');
+			$i = 1;
+			foreach (explode(',', $SETTINGS['netsuite']['feedbackCategories']) as $feedbackCategory) {
+				$this->feedbackCategories[$i++] = _L(trim($feedbackCategory));
+			}
+
+			// Initialize these from user data
+			$this->userId = $USER->id;
+			$this->firstName = $USER->firstname;
+			$this->lastName = $USER->lastname;
+			$this->email = $USER->email;
+			$this->phone = $USER->phone;
+			$this->userPage = $request['from'];
+			$this->form = $this->factoryFeedbackPageForm();
+		}
 	}
 
 	function afterLoad() {
+		if (self::VIEW_FORM == $this->view) {
 
-		// Normal form handling makes form->getData() work...
-		$this->form->handleRequest();
+			// Normal form handling makes form->getData() work...
+			$this->form->handleRequest();
 
-		// If the form was submitted; (AJAX request requires JSON response...)
-		if ($this->form->getSubmit()) {
+			// If the form was submitted; (AJAX request requires JSON response...)
+			if ($this->form->getSubmit()) {
 
-			// The form's been submitted... we won't show it again.
-			$this->showForm = false;
+				// Check for validation errors (server-side; client-side have already passed)
+				if (false !== $this->form->validate()) {
 
-			// Check for validation errors (server-side; client-side have already passed)
-			if (($errors = $this->form->validate()) === false) {
+					// Should never get here unless our client and server side validators are misalignd (or haxx...?)
+					$this->form->sendTo('feedback.php?iframe=1&result=fail');
+					return;
+				}
 
 				// No errors - take the feedback form data, add in
 				// extra attributes, and  send it all over to NetSuite
@@ -90,15 +130,15 @@ class FeedbackPage extends PageForm {
 				$netsuiteApi->feedbackSet('userPage', $this->userPage);
 				$netsuiteApi->feedbackSet('trackingId', getUserSessionTrackingId());
 				$netsuiteApi->feedbackSet('sessionData', 'n/a');
-				if ($netsuiteApi->captureUserFeedback()) {
 
-					// Success message
-					$this->message = _L('Thank you for your feedback! Our Product team will review your comments, and may contact you with questions. Should you need immediate assistance, please contact our Support team at (800) 920-3897.');
-					return;
+				// Show a different result view depending on success/error response from API...
+				if ($netsuiteApi->captureUserFeedback()) {
+					$this->form->sendTo('feedback.php?iframe=1&result=pass');
+				}
+				else {
+					$this->form->sendTo('feedback.php?iframe=1&result=fail');
 				}
 			}
-
-			$this->message = _L('There was a problem recording your feedback - please try again later.');
 		}
 	}
 
@@ -112,35 +152,17 @@ class FeedbackPage extends PageForm {
 		// This 'title' is set to global $TITLE in the base class.
 		$this->options['title'] = '';
 
-		if ($this->showForm) {
-			$this->options['windowTitle'] = _L('Provide Feedback');
-			$html = parent::render();
-		}
-		else {
+		$html = '';
+		if (strlen($this->message)) {
 			$html = "<h3>{$this->message}</h3>";
 		}
 
+		if (self::VIEW_FORM == $this->view) {
+			$this->options['windowTitle'] = _L('Provide Feedback');
+			$html .= parent::render();
+		}
+
 		return($html);
-	}
-
-	function getFeedbackCategories() {
-		global $SETTINGS;
-		$feedbackCategories = explode(',', $SETTINGS['netsuite']['feedbackCategories']);
-		array_unshift($feedbackCategories, 'Select a Category');
-		for ($i = 0; $i < count($feedbackCategories); $i++) {
-			$feedbackCategories[$i] = _L(trim($feedbackCategories[$i]));
-		}
-		return $feedbackCategories;
-	}
-
-	function getFeedbackTypes() {
-		global $SETTINGS;
-		$feedbackTypes = explode(',', $SETTINGS['netsuite']['feedbackTypes']);
-		array_unshift($feedbackTypes, 'Select a Type');
-		for ($i = 0; $i < count($feedbackTypes); $i++) {
-			$feedbackTypes[$i] = _L(trim($feedbackTypes[$i]));
-		}
-		return $feedbackTypes;
 	}
 
 	function factoryFeedbackPageForm() {
@@ -175,6 +197,7 @@ class FeedbackPage extends PageForm {
 				'fieldhelp' => _L('This is the email address associated with your account.'),
 				'value' => $this->email,
 				'validators' => array(
+					array('ValRequired'),
 					array('ValLength', 'min' => 9, 'max' => 50),
 					array('ValEmail')
 				),
@@ -199,22 +222,24 @@ class FeedbackPage extends PageForm {
 			'feedbackCategory' => array(
 				'label' => _L('Feedback Category'),
 				'fieldhelp' => _L('This is the category of feedback.'),
-				'value' => 0,
+				'value' => '',
 				'validators' => array(
-					array('ValInArray', 'values' => array_keys($this->getFeedbackCategories()))
+					array('ValRequired'),
+					array('ValInArray', 'values' => array_keys($this->feedbackCategories))
 				),
-				'control' => array('SelectMenu', 'values' => $this->getFeedbackCategories()),
+				'control' => array('SelectMenu', 'values' => $this->feedbackCategories),
 				'helpstep' => 5
 			),
 
 			'feedbackType' => array(
 				'label' => _L('Feedback Type'),
 				'fieldhelp' => _L('This is the type of feedback you.d like to leave.'),
-				'value' => 0,
+				'value' => '',
 				'validators' => array(
-					array('ValInArray', 'values' => array_keys($this->getFeedbackTypes()))
+					array('ValRequired'),
+					array('ValInArray', 'values' => array_keys($this->feedbackTypes))
 				),
-				'control' => array('SelectMenu', 'values' => $this->getFeedbackTypes()),
+				'control' => array('SelectMenu', 'values' => $this->feedbackTypes),
 				'helpstep' => 6
 			),
 
@@ -223,6 +248,7 @@ class FeedbackPage extends PageForm {
 				'fieldhelp' => _L('This text box is where you enter your feedback.'),
 				'value' => '',
 				'validators' => array(
+					array('ValRequired'),
 					// Note: API host's max for this field is 100K
 					array('ValLength', 'min' => 10, 'max' => 5000)
 				),
@@ -247,7 +273,7 @@ class FeedbackPage extends PageForm {
 		);
 
 		$form = new Form($this->formName, $formdata, $helpsteps, $buttons);
-		$form->ajaxsubmit = false; // AJAX submission is pointless complexity since we're in an iframe!
+		$form->ajaxsubmit = true;
 
 		return($form);
 	}
@@ -258,10 +284,11 @@ class FeedbackPage extends PageForm {
 // PAGE INSTANTIATION AND DISPLAY
 // -----------------------------------------------------------------------------
 
-$page = new FeedbackPage(Array(
-	'formname' => 'templateform',
-	'validators' => Array()
-));
 
-executePage($page);
+executePage(
+	new FeedbackPage(Array(
+		'formname' => 'feedbackform',
+		'validators' => Array()
+	))
+);
 
