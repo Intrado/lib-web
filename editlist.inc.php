@@ -35,6 +35,7 @@ require_once("obj/JobType.obj.php");
 require_once("inc/list.inc.php");
 require_once("obj/RestrictedValues.fi.php");
 require_once("obj/ListGuardianCategory.obj.php");
+require_once("obj/ListRecipientMode.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -215,47 +216,9 @@ if ($method === 'sections') {
 }
 
 $maxguardians = getSystemSetting("maxguardians", 0);
-if ($maxguardians > 0) {
 
-	$modetips = array(
-		PeopleList::$RECIPIENTMODE_MAP[1] => 'Typically students or staff records',
-		PeopleList::$RECIPIENTMODE_MAP[2] => 'Typically parents or guardians',
-		PeopleList::$RECIPIENTMODE_MAP[3] => 'Both contact records and/or their associated guardian records'
-	);
-
-	//get guardian categories
-	$categoryList = $csApi->getGuardianCategoryList();
-	$categories = array();
-	foreach ($categoryList as $c) {
-		$categories[$c->id] = $c->name;
-	}
-	$selectedCategories = array();
-	if ($list->id) {
-		$selectedCategories = ListGuardianCategory::getGuardiansForList($list->id);
-	}
-
-	$formdata[] = _L('Target Recipients - You can select contact records and/or their associated guardian records');
-	$formdata["recipientmode"] = array(
-		"label" => _L("Target Recipients"),
-		"fieldhelp" => _L('Select the recipients that will be contacted on behalf of this list'),
-		"value" => $list->recipientmode,
-		"validators" => array(), "control" => array("RadioButton", "values" => array(
-				PeopleList::$RECIPIENTMODE_MAP[1] => _L("Contacts"),
-				PeopleList::$RECIPIENTMODE_MAP[2] => _L("Associated Guardians"),
-				PeopleList::$RECIPIENTMODE_MAP[3] => _L("Both")), "hover" => $modetips),
-		"helpstep" => 3
-	);
-	$formdata["category"] = array(
-		"label" => _L("Guardian Category Restriction"),
-		"fieldhelp" => _L('Select categories to restrict by. When no category is checked, it will be unrestricted'),
-		"value" => $selectedCategories,
-		"validators" => array(
-			array("ValInArray", "values" => array_keys($categories))
-		),
-		"control" => array("RestrictedValues", "values" => $categories, "label" => _L("Restrict to these categories:")),
-		"helpstep" => 3
-	);
-}
+$listRecipientMode = new ListRecipientMode ($csApi, 3, $maxguardians, $list->id, $list->recipientmode);
+$listRecipientMode->addToForm($formdata);
 
 if ($showAdditions || $showSkips){
 	$formdata[] = _L('List Add/Skip');
@@ -366,24 +329,23 @@ $formdata[] = _L('Additional List Tools');
 $formdata["advancedtools"] = array(
 	"label" => '',
 	"control" => array("FormHtml", 'html' => "<table  class='list' cellspacing='1' cellpadding='3' style='margin-bottom:10px;'>$advancedtools</table>"),
-	"helpstep" => 4
+	"helpstep" => 3 + $listRecipientMode->isEnabled()
 );
 
 if ($method == 'rules'){
 	$helpsteps = array (
 	_L('Enter a name for your list. The best names describe the list\'s content, making the list easy to reuse.'), // 1
 	_L('Rules are used to select groups of contacts from the data available to your account. For example, if you wanted to make a list of 6th graders from Springfield Elementary, you would create two rules: "Grade equals 6" and "School equals Springfield Elementary".'), // 2
-	_L('Select the recipients that will be contacted on behalf of this list and select categories to restrict by'), // 3
-	_L('This section contains tools to add specific individuals and add contacts that are not part of your regular database of contacts. ') //4
+	_L('This section contains tools to add specific individuals and add contacts that are not part of your regular database of contacts. ') //3:changes based on recipient mode
 	);
-
+	$listRecipientMode->addHelpText($helpsteps);
 } else {
 	$helpsteps = array (
 	_L('Enter a name for your list. The best names describe the list\'s content, making the list easy to reuse.'), // 1
 	_L('Select a school then select the sections you wish to include in the list.'), // 2
-	_L('Select the recipients that will be contacted on behalf of this list and select categories to restrict by'), // 3
-	_L('This section contains tools to add specific individuals and add contacts that are not part of your regular database of contacts. '), // 4
+	_L('This section contains tools to add specific individuals and add contacts that are not part of your regular database of contacts. '), // 3 : changes based on recipient mode
 	);
+	$listRecipientMode->addHelpText($helpsteps);
 }
 
 
@@ -410,29 +372,18 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$datachange = true;
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
-		// customer flat or guardian data, default to 'selfAndGuardian' for ease of use when/if migrate customer from flat to guardian
-		$mode = PeopleList::$RECIPIENTMODE_MAP[3]; //selfAndGuardian
-		if ($maxguardians > 0) {
-			//1=> self, 2=>guardian 3=> selfAndGuardian
-			if ($postdata['recipientmode']) {
-				$mode = $postdata['recipientmode'];
-			}
-			$categories = $mode === 'self' ? array() : $postdata['category'];
-		}
 
 		$list->name = removeIllegalXmlChars($postdata['name']);
 		$list->description = $postdata['description'];
 		//if no option selected we use selfAndGuardian mode
-		$list->recipientmode = $mode;
+		$list->recipientmode = $listRecipientMode->getRecipientModeFromPostData($postdata);
 		$list->modifydate = QuickQuery("select now()");
 		$list->userid = $USER->id;
 		$list->deleted = 0;
 		$list->type = ($method === 'sections') ? 'section' : 'person';
 		$list->update();
-		
-		if ($maxguardians > 0) {
-			ListGuardianCategory::resetListGuardianCategories($list->id, $categories);
-		}
+
+		$listRecipientMode->resetListCategories($postdata, $list->id);
 
 		if ($method == 'sections') {
 			QuickUpdate('BEGIN');
@@ -597,22 +548,7 @@ include_once("nav.inc.php");
 ?>
 <script type="text/javascript">
 	<? Validator::load_validators(array("ValRules", "ValListName", "ValSections")); ?>
-
-	function toggleCategory(){
-		if($('list_recipientmode-1').checked)
-			$('list_category_fieldarea').hide();
-		else
-			$('list_category_fieldarea').show();
-	}
-	document.observe('dom:loaded', function () {
-		//first check the initial value
-		toggleCategory();
-		$('list_recipientmode').observe('click', function(e) {
-			toggleCategory();
-		});
-	});
-
-
+	<? echo $listRecipientMode->addJavaScript("list"); ?>
 </script>
 <?
 startWindow(_L('List Editor'));

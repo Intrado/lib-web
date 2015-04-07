@@ -158,7 +158,7 @@ if (isset($_GET["clearfavorites"])) {
 // result - if this is not the desired behavior then the "Show" options really
 // should be converted into radio-style toggles.
 if (isset($_GET["showdisabled"])) {
-	//$sqltoggledisabled = "and not enabled";
+	$sqltoggledisabled = "";
 }
 else {
 	$sqltoggledisabled = "and c.enabled";
@@ -269,9 +269,17 @@ foreach ($customers as $cust) {
 			$customerfeatures[] = "Twitter";
 		if (getCustomerSystemSetting('_hasfeed', false, true, $custdb))
 			$customerfeatures[] = "Feed";
+		if (getCustomerSystemSetting('maxguardians', 0, true, $custdb)) // if max > 0 then has guardian data model
+			$customerfeatures[] = "Guardian";
 		if (getCustomerSystemSetting('_hasinfocenter', false, true, $custdb))
 			$customerfeatures[] = "InfoCenter";
-
+		if (getCustomerSystemSetting('_hasicplus', false, true, $custdb))
+			$customerfeatures[] = "ICPlus";
+		if (getCustomerSystemSetting('_haspdfburst', false, true, $custdb))
+			$customerfeatures[] = "SDD";
+		if (getCustomerSystemSetting('_hasquicktip', false, true, $custdb))
+			$customerfeatures[] = "QuickTip";
+		
 		$row[10] = implode(", ", $customerfeatures);
 		$row[11] = getCustomerSystemSetting('_dmmethod', "", true, $custdb);
 		$row[12] = $cust[3];

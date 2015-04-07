@@ -1,83 +1,66 @@
 <?
-// apply_customer_sql.php
-//
-// Description: execute the contents of an SQL script (delimited by $$$)
-// or individual SQL statements against one or many customer databases.
-// Automatically connects to authserver to find the respective shard
-// for each customer.
-//
-// You can include the integer for the current customer id in the query:
-// UPDATE mytable SET field = _$CUSTOMERID_;
-//
-// Supports optional output of query result sets.
-//
-// Supports optional "chunking" to apply large UPDATE or DELETE statements
-// incrementally. The purpose is to limit the scope of row locking and use
-// of the rollback segment during an update that affects many rows.
-// To use this feature, add the placeholder _$CHUNKIFY_ at the end of your
-// UPDATE or DELETE statement. This is not supported for INSERT statements.
-// Results are unpredictable when using joins or subqueries.
-//
-// Be careful when using chunking that your SQL fetches a different set of
-// rows on successive chunks, or else you will create an infinite loop.
-// For example, the below doesn't work because it will apply the same change
-// redundantly to the same chunk of rows every time, and will never progress.
-// UPDATE mytable SET field = 123 _$CHUNKIFY_;
-//
-// Whereas the below does work, because each successive chunk will match
-// only rows that haven't been updated yet. Therefore it will update all
-// rows eventually.
-// UPDATE mytable SET field = 123 WHERE field != 123 _$CHUNKIFY_;
+/*
+ * apply_customer_sql.php
+ *
+ * Description: execute the contents of an SQL script (delimited by $$$)
+ * or individual SQL statements against one or many customer databases.
+ * Automatically connects to authserver to find the respective shard
+ * for each customer.
+ *
+ * You can include the integer for the current customer id in the query:
+ * UPDATE mytable SET field = _$CUSTOMERID_;
+ *
+ * Supports optional output of query result sets.
+ *
+ * Supports optional "chunking" to apply large UPDATE or DELETE statements
+ * incrementally. The purpose is to limit the scope of row locking and use
+ * of the rollback segment during an update that affects many rows.
+ * To use this feature, add the placeholder _$CHUNKIFY_ at the end of your
+ * UPDATE or DELETE statement. This is not supported for INSERT statements.
+ * Results are unpredictable when using joins or subqueries.
+ *
+ * Be careful when using chunking that your SQL fetches a different set of
+ * rows on successive chunks, or else you will create an infinite loop.
+ * For example, the below doesn't work because it will apply the same change
+ * redundantly to the same chunk of rows every time, and will never progress.
+ * UPDATE mytable SET field = 123 _$CHUNKIFY_;
+ *
+ * Whereas the below does work, because each successive chunk will match
+ * only rows that haven't been updated yet. Therefore it will update all
+ * rows eventually.
+ * UPDATE mytable SET field = 123 WHERE field != 123 _$CHUNKIFY_;
+ */
 
-function help()
-{
+function help() {
 	echo <<<HELP
 Usage: php apply_customer_sql.php [ options... ] [ <sqlfile> ] { all | <cid1> ... <cidN> }
 
--c|--chunk-size <n>		apply change in chunks of n rows (default: all rows in one chunk)
-   --chunk-limit <n>		stop after executing n chunks (default: unlimited)
-   --chunk-delay-ms <ms>	sleep for milliseconds after each chunk (default: 0)
--d|--database <database>	authserver database (default: "authserver")
--e|--execute <sql>		literal SQL statement, in lieu of using an input file
--h|--host <host>		authserver host (default: "localhost")
--o|--output <format>		output results of queries e.g. in CSV format (default: no output)
--p|--password <password>	authserver password
--P|--port <port>		authserver port (default: 3306)
--r|--runtime <seconds>		stop after specified number of seconds (default: unlimited)
--u|--user <user>		authserver user (default: "root")
--?|--help			print this help
+-c|--chunk-size <n>            Apply change in chunks of n rows (default: all rows in one chunk)
+   --chunk-limit <n>           Stop after executing n chunks (default: unlimited)
+   --chunk-delay-ms <ms>       Sleep for milliseconds after each chunk (default: 0)
+-r|--runtime <seconds>         Stop after specified number of seconds (default: unlimited)
+-e|--execute <sql>             Literal SQL statement, in lieu of using an input file
+-f|--config <file>             MySQL config file for host, port user, password (default: "~/.my.cnf")
+-h|--host <host>               Authserver host (default: "localhost")
+-o|--output <format>           Output results of queries e.g. in CSV format (default: no output)
+-p|--password <password>       Authserver password
+-P|--port <port>               Authserver port (default: 3306)
+-u|--user <user>               Authserver user (default: "root")
+-?|--help                      Print this help
 
 HELP;
 }
 
-$authDbParams = array(
-	"dbhost" => "localhost",
-	"dbport" => "3306",
-	"dbname" => "authserver",
-	"dbusername" => "root",
-	"dbpassword" => "asp123"
-);
-$options = array(
-	"chunkSize" => 0,
-	"chunkLimit" => null,
-	"chunkDelayMs" => 100,
-	"output" => false,
-	"runTime" => null,
-	"startTime" => time(),
-	"verbose" => 0
-);
-$sqlQueries = array();
 $chunkDelayMsTotal = 0;
 
-function runSqlAgainstCustomer(array $customer, array $sqlQueries, array $options)
-{
+function runSqlAgainstCustomer(array $customer, array $options) {
 	global $chunkDelayMsTotal;
 
 	printf("Executing against customer % 5d: ", $customer["id"]);
 
 	$custDb = databaseConnection($customer);
 
-	foreach ($sqlQueries as $sqlQuery) {
+	foreach ($options["sqlQueries"] as $sqlQuery) {
 		if (!trim($sqlQuery)) {
 			continue;
 		}
@@ -155,8 +138,157 @@ function runSqlAgainstCustomer(array $customer, array $sqlQueries, array $option
 	$custDb = NULL;
 }
 
-function databaseConnection(array $dbParams)
-{
+function parse_options($argv) {
+	$options = array(
+		"chunkSize" => 0,
+		"chunkLimit" => null,
+		"chunkDelayMs" => 100,
+		"configfile" => getenv("HOME") . "/.my.cnf",
+		"output" => false,
+		"runTime" => null,
+		"startTime" => time(),
+		"verbose" => 0,
+		"sqlQueries" => array(),
+		"dbparams" => array(
+			"dbhost" => "localhost",
+			"dbport" => "3306",
+			"dbname" => "authserver",
+			"dbuser" => "root",
+			"dbpassword" => "asp123"
+		)
+	);
+
+	$shortopts = "c:e:f:h:o:p:P:r:u:v?";
+	$longopts = array(
+		"chunk-size:",
+		"chunk-limit:",
+		"chunk-delay-ms:",
+		"execute:",
+		"config:",
+		"host:",
+		"output:",
+		"password:",
+		"port:",
+		"runtime:",
+		"user:",
+		"verbose",
+		"help"
+	);
+	$getopts = getopt($shortopts, $longopts);
+
+	$remainingArgv = $argv;
+	array_shift($remainingArgv); // remove $0
+
+	$flag_dbparams = array();
+
+	foreach ($getopts as $flag => $value) {
+		switch ($flag) {
+		case "c":
+		case "chunk-size":
+			$options["chunkSize"] = (int)$value;
+			array_shift($remainingArgv);
+			array_shift($remainingArgv);
+			break;
+		case "chunk-limit":
+			$options["chunkLimit"] = (int)$value;
+			array_shift($remainingArgv);
+			array_shift($remainingArgv);
+			break;
+		case "chunk-delay-ms":
+			$options["chunkDelayMs"] = (int)$value;
+			array_shift($remainingArgv);
+			array_shift($remainingArgv);
+			break;
+		case "r":
+		case "runtime":
+			$options["runTime"] = $value;
+			array_shift($remainingArgv);
+			array_shift($remainingArgv);
+			break;
+		case "e":
+		case "execute":
+			$options["sqlQueries"][] = $value;
+			array_shift($remainingArgv);
+			array_shift($remainingArgv);
+			break;
+		case "f":
+		case "config":
+			$options["configfile"] = $value;
+			array_shift($remainingArgv);
+			array_shift($remainingArgv);
+			break;
+		case "o":
+		case "output":
+			$options["output"] = $value;
+			array_shift($remainingArgv);
+			array_shift($remainingArgv);
+			break;
+		case "h":
+		case "host":
+			$flag_dbparams["dbhost"] = $value;
+			array_shift($remainingArgv);
+			array_shift($remainingArgv);
+			break;
+		case "p":
+		case "password":
+			$flag_dbparams["dbpassword"] = $value;
+			array_shift($remainingArgv);
+			array_shift($remainingArgv);
+			break;
+		case "P":
+		case "port":
+			$flag_dbparams["dbport"] = (int)$value;
+			array_shift($remainingArgv);
+			array_shift($remainingArgv);
+			break;
+		case "u":
+		case "user":
+			$flag_dbparams["dbuser"] = $value;
+			array_shift($remainingArgv);
+			array_shift($remainingArgv);
+			break;
+		case "v":
+		case "verbose":
+			$options["verbose"]++;
+			array_shift($remainingArgv);
+			break;
+		case "?":
+		case "help":
+			help();
+			array_shift($remainingArgv);
+			exit(0);
+		}
+	}
+
+	if ($remainingArgv && $remainingArgv[0] && $remainingArgv[0][0] == '-') {
+		echo "Unknown flag '{$remainingArgv[0]}'.\n\n";
+		help();
+		exit(1);
+	}
+
+	if (isset($options["configfile"]) && file_exists($options["configfile"])) {
+		if ($config = parse_ini_file($options["configfile"], true)) {
+			foreach ($config["client"] as $key => $value) {
+				switch ($key) {
+				case "user":
+					$key = "username";
+				case "host":
+				case "port":
+				case "password":
+					$options["dbparams"]["db{$key}"] = $value;
+				}
+			}
+		} else {
+			die(__FUNCTION__ . ": Cannot read or parse config file \"{$options['configfile']}\"\n");
+		}
+	}
+	// options on the command-line override both defaults and config file, if any
+	$options["dbparams"] = array_merge($options["dbparams"], $flag_dbparams);
+
+	return array($options, $remainingArgv);
+}
+
+function databaseConnection(array $dbParams) {
 	try {
 		$dsn = "mysql:";
 		if (isset($dbParams["dbhost"])) {
@@ -183,123 +315,18 @@ function databaseConnection(array $dbParams)
 	return ($db);
 }
 
-// parse command line options and arguments
-$shortopts = "c:d:e:h:o:p:P:r:u:v?";
-$longopts = array(
-	"chunk-size:",
-	"chunk-limit:",
-	"chunk-delay-ms:",
-	"database:",
-	"execute:",
-	"host:",
-	"output:",
-	"password:",
-	"port:",
-	"runtime:",
-	"user:",
-	"verbose",
-	"help"
-);
-$getopts = getopt($shortopts, $longopts);
+list($options, $remainingArgv) = parse_options($argv);
 
-$remainingArgv = $argv;
-$progname = array_shift($remainingArgv); // remove $0
-
-foreach ($getopts as $flag => $value) {
-	switch ($flag) {
-	case "c":
-	case "chunk-size":
-		$options["chunkSize"] = (int)$value;
-		array_shift($remainingArgv);
-		array_shift($remainingArgv);
-		break;
-	case "chunk-limit":
-		$options["chunkLimit"] = (int)$value;
-		array_shift($remainingArgv);
-		array_shift($remainingArgv);
-		break;
-	case "chunk-delay-ms":
-		$options["chunkDelayMs"] = (int)$value;
-		array_shift($remainingArgv);
-		array_shift($remainingArgv);
-		break;
-	case "d":
-	case "database":
-		$authDbParams["dbname"] = $value;
-		array_shift($remainingArgv);
-		array_shift($remainingArgv);
-		break;
-	case "e":
-	case "execute":
-		$sqlQueries[] = $value;
-		array_shift($remainingArgv);
-		array_shift($remainingArgv);
-		break;
-	case "h":
-	case "host":
-		$authDbParams["dbhost"] = $value;
-		array_shift($remainingArgv);
-		array_shift($remainingArgv);
-		break;
-	case "o":
-	case "output":
-		$options["output"] = $value;
-		array_shift($remainingArgv);
-		array_shift($remainingArgv);
-		break;
-	case "p":
-	case "password":
-		$authDbParams["dbpassword"] = $value;
-		array_shift($remainingArgv);
-		array_shift($remainingArgv);
-		break;
-	case "P":
-	case "port":
-		$authDbParams["dbport"] = (int)$value;
-		array_shift($remainingArgv);
-		array_shift($remainingArgv);
-		break;
-	case "r":
-	case "runtime":
-		$options["runTime"] = $value;
-		array_shift($remainingArgv);
-		array_shift($remainingArgv);
-		break;
-	case "u":
-	case "user":
-		$authDbParams["dbusername"] = $value;
-		array_shift($remainingArgv);
-		array_shift($remainingArgv);
-		break;
-	case "v":
-	case "verbose":
-		$options["verbose"]++;
-		array_shift($remainingArgv);
-		break;
-	case "?":
-	case "help":
-		help();
-		array_shift($remainingArgv);
-		exit(0);
-	}
-}
-
-if ($remainingArgv) {
-	if ($remainingArgv[0][0] == '-') {
-		die("Unknown flag '{$remainingArgv[0]}'. Run $progname --help.\n");
-	}
-}
-
-if (empty($sqlQueries)) {
-	// Load SQL statements from file
+// Load SQL statements from file
+if (empty($options["sqlQueries"])) {
 	$sqlFile = array_shift($remainingArgv);
 	if (!$sqlFile) {
-		die("Please specify the file with sql you would like to apply or run: $progname --help\n");
+		die("Please specify the file with SQL you would like to execute, or use the --execute option.\n");
 	}
 	if (!file_exists($sqlFile)) {
 		die("Cannot find the specified file \"$sqlFile\".\n");
 	}
-	$sqlQueries = explode("$$$", file_get_contents($sqlFile));
+	$options["sqlQueries"] = explode("$$$", file_get_contents($sqlFile));
 }
 
 // Get SQL to query customer(s)
@@ -317,7 +344,7 @@ if (empty($remainingArgv) || array_search("all", $remainingArgv) !== false) {
 		where c.id in (" . implode(", ", array_fill(1, count($cidArray), "?")) . ")";
 }
 
-$authDb = databaseConnection($authDbParams);
+$authDb = databaseConnection($options["dbparams"]);
 
 $stmt = $authDb->prepare($query);
 $stmt->execute(array_values($cidArray));
@@ -325,7 +352,7 @@ $stmt->execute(array_values($cidArray));
 $authDb = NULL;
 
 while ($customer = $stmt->fetch(PDO::FETCH_ASSOC)) {
-	runSqlAgainstCustomer($customer, $sqlQueries, $options);
+	runSqlAgainstCustomer($customer, $options);
 	if ($options["runTime"] && time() - $options["startTime"] > $options["runTime"]) {
 		if ($options["verbose"]) {
 			echo "Finishing because runtime exceeded.\n\n";
@@ -341,4 +368,3 @@ if ($chunkDelayMsTotal) {
 	echo "Delay time:      " . gmdate("H:i:s", $delaySeconds) . "\n";
 }
 
-exit(0);

@@ -27,6 +27,10 @@ require_once("obj/PeopleList.obj.php");
 require_once("obj/Rule.obj.php");
 require_once("obj/JobList.obj.php");
 
+require_once("obj/PeopleList.obj.php");
+require_once("obj/RestrictedValues.fi.php");
+require_once("obj/ListGuardianCategory.obj.php");
+require_once("obj/ListRecipientMode.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -195,6 +199,17 @@ $formdata["owner"] = array(
 	"helpstep" => 5
 );
 
+$list = null;
+if ($job) {
+	$joblist = DBFind("JobList", "from joblist where jobid = ?", false, array($job->id));
+	if ($joblist) {
+		$list = DBFind("PeopleList", "from list where id = ?", false, array($joblist->listid));
+	}
+}
+$maxguardians = getSystemSetting("maxguardians", 0);
+
+$listRecipientMode = new ListRecipientMode ($csApi, 6, $maxguardians, ($list) ? $list->id : null, ($list) ? $list->recipientmode : PeopleList::$RECIPIENTMODE_MAP[3]);
+$listRecipientMode->addToForm($formdata);
 
 // get this jobs messagegroup and it's messages
 if ($job) {
@@ -242,7 +257,7 @@ $formdata["template"] = array(
 					$phonecomponent
 					</tr>
 				</table>"),
-		"helpstep" => 6
+		"helpstep" => 6 + $listRecipientMode->isEnabled()
 );
 
 
@@ -254,7 +269,7 @@ $helpsteps = array (
 	_L('Select the user account that Classroom Messaging %s should be sent from.',getJobsTitle()),
 	_L('Edit Template')
 );
-
+$listRecipientMode->addHelpText($helpsteps);
 $buttons = array(submit_button(_L('Save'),"submit","tick"),
 				icon_button(_L('Cancel'),"cross",null,"settings.php"));
 $form = new Form("templateform",$formdata,$helpsteps,$buttons);
@@ -387,6 +402,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		
 		$peoplelist->userid = $owner;
 		$peoplelist->type = 'alert';
+		$peoplelist->recipientmode =  $listRecipientMode->getRecipientModeFromPostData($postdata);
 		$peoplelist->name = removeIllegalXmlChars($postdata['name']);
 		$peoplelist->description = "Classroom Messaging Template";
 		$peoplelist->modifydate = date("Y-m-d H:i:s");
@@ -396,7 +412,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$peoplelist->update();
 		else
 			$peoplelist->create();
-		
+
+		$listRecipientMode->resetListCategories($postdata, $peoplelist->id);
+
 		$listentry->listid = $peoplelist->id;
 		$listentry->type = 'rule';
 		$listentry->ruleid = $rule->id;
@@ -468,6 +486,7 @@ include_once("nav.inc.php");
 <script type="text/javascript" src="script/listform.js.php"></script>
 <script type="text/javascript">
 <? Validator::load_validators(array("ValDuplicateNameCheck","ValWeekRepeatItem")); ?>
+<? echo $listRecipientMode->addJavaScript("templateform"); ?>
 </script>
 <?
 $TITLE = _L('Classroom Messaging Template');
