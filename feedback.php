@@ -126,7 +126,7 @@ class FeedbackPage extends PageForm {
 	function getFeedbackCategories() {
 		global $SETTINGS;
 		$feedbackCategories = explode(',', $SETTINGS['netsuite']['feedbackCategories']);
-		array_unshift($feedbackCategories, 'Select a Category...');
+		array_unshift($feedbackCategories, 'Select a Category');
 		for ($i = 0; $i < count($feedbackCategories); $i++) {
 			$feedbackCategories[$i] = _L(trim($feedbackCategories[$i]));
 		}
@@ -136,7 +136,7 @@ class FeedbackPage extends PageForm {
 	function getFeedbackTypes() {
 		global $SETTINGS;
 		$feedbackTypes = explode(',', $SETTINGS['netsuite']['feedbackTypes']);
-		array_unshift($feedbackTypes, 'Select a Type...');
+		array_unshift($feedbackTypes, 'Select a Type');
 		for ($i = 0; $i < count($feedbackTypes); $i++) {
 			$feedbackTypes[$i] = _L(trim($feedbackTypes[$i]));
 		}
