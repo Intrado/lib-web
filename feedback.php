@@ -113,7 +113,7 @@ class FeedbackPage extends PageForm {
 		$this->options['title'] = '';
 
 		if ($this->showForm) {
-			$this->options['windowTitle'] = _L('Provide Feedback...');
+			$this->options['windowTitle'] = _L('Provide Feedback');
 			$html = parent::render();
 		}
 		else {
