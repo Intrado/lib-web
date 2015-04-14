@@ -43,35 +43,35 @@ class PdfSendMailTest extends PHPUnit_Framework_TestCase {
 		);
 
 		$this->userBroadcastTypes = array(
-							1 => (object) array(
-									'name' => 'Emergency',
-									'systempriority' => 1,
-									'info' => 'Emergencies Only',
-									'issurvey' => 0,
-									'deleted' => 0,
-									'id' => 1
-								), 
-							2 => (object) array(
-									'name' => 'Attendance',
-									'systempriority' => 2,
-									'info' => 'Attendance',
-									'issurvey' => 0,
-									'deleted' => 0,
-									'id' => 2
-								),
-							3 => (object) array(
-									'name' => 'General',
-									'systempriority' => 3,
-									'info' => 'General',
-									'issurvey' => 0,
-									'deleted' => 0,
-									'id' => 3
-								)
-						);
+			1 => (object) array(
+				'name' => 'Emergency',
+				'systempriority' => 1,
+				'info' => 'Emergencies Only',
+				'issurvey' => 0,
+				'deleted' => 0,
+				'id' => 1
+			), 
+			2 => (object) array(
+				'name' => 'Attendance',
+				'systempriority' => 2,
+				'info' => 'Attendance',
+				'issurvey' => 0,
+				'deleted' => 0,
+				'id' => 2
+			),
+			3 => (object) array(
+				'name' => 'General',
+				'systempriority' => 3,
+				'info' => 'General',
+				'issurvey' => 0,
+				'deleted' => 0,
+				'id' => 3
+			)
+		);
 
 		$this->csApi = $this->getMockBuilder('CommsuiteApiClient')
 							->setConstructorArgs(array($this->apiClient))
-							->setMethods(array('getBurstData', 'getBurstPortionList'))
+							->setMethods(array('getBurstData', 'getBurstPortionList', 'getGuardianCategoryList'))
 							->getMock();
 
 		$burstObj = (object) null;
@@ -86,6 +86,28 @@ class PdfSendMailTest extends PHPUnit_Framework_TestCase {
 		$burstListObj = (object) null;
 		$burstListObj->portions = array($burstPortionObj);
 		$this->csApi->expects($this->any())->method('getBurstPortionList')->will($this->returnValue($burstListObj));
+
+
+		$this->guardianCategories = array(
+			1 => (object) array(
+				'id' => 123,
+				'name' => 'Primary',
+				'sequence' => 0,
+				'profileId' => 11,
+				'hasAssociations' => true
+			),
+			2 => (object) array(
+				'id' => 321,
+				'name' => 'Secondary',
+				'sequence' => 1,
+				'profileId' => 11,
+				'hasAssociations' => true
+			)
+		);
+		// csApi >getGuardianCategoryList
+		$this->csApi->expects($this->any())
+			->method('getGuardianCategoryList')
+			->will($this->returnValue($this->guardianCategories));
 
 		// define PdfSendMail mock object
 		$this->pdfSendMail = $this->getMockBuilder('PdfSendMail')
@@ -102,7 +124,6 @@ class PdfSendMailTest extends PHPUnit_Framework_TestCase {
 		$this->pdfSendMail->expects($this->any())
 			  		->method('getUserBroadcastTypes')
 			  		->will($this->returnValue($this->userBroadcastTypes));
-
 	}
 
 	public function teardown() {

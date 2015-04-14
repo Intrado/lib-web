@@ -316,7 +316,7 @@ class PdfSendMail extends PageForm {
 		// Replace the automagical customer name of it is present
 		$customerName = escapehtml($this->custname);
 		$messageBody = str_replace('#CUSTOMERNAMEPLACEHOLDER', $customerName, $messageBody);
-		reset($boradcastTypeNames);
+		reset($broadcastTypeNames);
 		$selectedBroadcastType = key($broadcastTypeNames);
 		$formdata = array(
 			_L("Broadcast Settings"),
