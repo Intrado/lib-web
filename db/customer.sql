@@ -2982,7 +2982,7 @@ $$$
 ALTER TABLE `burst` ADD `jobId` INT NULL DEFAULT NULL AFTER `bursttemplateid`
 $$$
 
-update setting set value='11.1/15' where name='_dbversion'
+update setting set value='11.2/1' where name='_dbversion'
 $$$
 
--- END 11.1/15
+-- END 11.2/1
