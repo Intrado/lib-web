@@ -2979,7 +2979,7 @@ CREATE TABLE reportsdddelivery (
 )
 $$$
 
-ALTER TABLE `burst` ADD `jobId` TEXT NULL DEFAULT NULL AFTER `bursttemplateid`
+ALTER TABLE `burst` ADD `jobId` INT NULL DEFAULT NULL AFTER `bursttemplateid`
 $$$
 
 update setting set value='11.1/15' where name='_dbversion'

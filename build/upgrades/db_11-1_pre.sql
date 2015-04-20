@@ -154,5 +154,15 @@ CREATE TABLE reportsdddelivery (
 )
 $$$
 
-ALTER TABLE `burst` ADD `jobId` TEXT NULL DEFAULT NULL AFTER `bursttemplateid`
+ALTER TABLE `burst` ADD `jobId` INT NULL DEFAULT NULL AFTER `bursttemplateid`
+$$$
+
+UPDATE messageattachment ma 
+JOIN burstattachment ba ON (ma.burstattachmentid = ba.id)
+JOIN burst b ON (b.id = ba.burstid)
+JOIN message m ON (ma.messageid = m.id)
+JOIN job j ON (m.messagegroupid = j.messagegroupid)
+JOIN messagegroup mg ON (m.messagegroupid = mg.id)
+SET b.jobId = j.id
+WHERE ma.type = 'burst'
 $$$
