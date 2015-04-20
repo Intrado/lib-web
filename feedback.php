@@ -71,14 +71,14 @@ class FeedbackPage extends PageForm {
 		if (self::VIEW_FORM == $this->view) {
 
 			// Feedback Types
-			$this->feedbackTypes = array( '' => 'Select a Type');
+			$this->feedbackTypes = array( '' => _L('-- Select a Type --'));
 			$i = 1;
 			foreach (explode(',', $SETTINGS['netsuite']['feedbackTypes']) as $feedbackType) {
 				$this->feedbackTypes[$i++] = _L(trim($feedbackType));
 			}
 
 			// Feedback Categories
-			$this->feedbackCategories = array( '' => 'Select a Category');
+			$this->feedbackCategories = array( '' => _L('-- Select a Category --'));
 			$i = 1;
 			foreach (explode(',', $SETTINGS['netsuite']['feedbackCategories']) as $feedbackCategory) {
 				$this->feedbackCategories[$i++] = _L(trim($feedbackCategory));
