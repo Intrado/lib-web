@@ -2966,3 +2966,23 @@ $$$
 
 -- END 11.1/14
 
+-- SDD delivery events
+CREATE TABLE reportsdddelivery (
+  customerId INT NOT NULL,
+  jobId INT NOT NULL,
+  personId INT NOT NULL,
+  messageAttachmentId INT NOT NULL,
+  action ENUM('SENT','BAD_PASSWORD','DOWNLOAD') CHARACTER SET utf8 COLLATE utf8_general_ci,
+  timestampMs BIGINT NOT NULL,
+  actionCount INT NOT NULL,
+  UNIQUE KEY `customerjobperson` (`customerId`,`jobId`,`personId`, `messageAttachmentId`, `action`)
+)
+$$$
+
+ALTER TABLE `burst` ADD `jobId` TEXT NULL DEFAULT NULL AFTER `bursttemplateid`
+$$$
+
+update setting set value='11.1/15' where name='_dbversion'
+$$$
+
+-- END 11.1/15
