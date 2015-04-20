@@ -2986,3 +2986,9 @@ update setting set value='11.2/1' where name='_dbversion'
 $$$
 
 -- END 11.2/1
+
+ALTER TABLE reportsdddelivery DEFAULT CHARSET=utf8,
+  MODIFY COLUMN action ENUM('SEND', 'CLICK', 'DOWNLOAD', 'BAD_PASSWORD') NOT NULL
+$$$
+
+-- END 11.2/2

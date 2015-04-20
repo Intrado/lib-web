@@ -25,3 +25,9 @@ JOIN messagegroup mg ON (m.messagegroupid = mg.id)
 SET b.jobId = j.id
 WHERE ma.type = 'burst'
 $$$
+
+-- $rev 2
+
+ALTER TABLE reportsdddelivery DEFAULT CHARSET=utf8,
+  MODIFY COLUMN action ENUM('SEND', 'CLICK', 'DOWNLOAD', 'BAD_PASSWORD') NOT NULL
+$$$
