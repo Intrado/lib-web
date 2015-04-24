@@ -72,16 +72,20 @@ class FeedbackPage extends PageForm {
 
 			// Feedback Types
 			$this->feedbackTypes = array( '' => _L('-- Select a Type --'));
-			$i = 1;
-			foreach (explode(',', $SETTINGS['netsuite']['feedbackTypes']) as $feedbackType) {
-				$this->feedbackTypes[$i++] = _L(trim($feedbackType));
+			if (isset($SETTINGS['netsuite']) && isset($SETTINGS['netsuite']['feedbackTypes'])) {
+				$i = 1;
+				foreach (explode(',', $SETTINGS['netsuite']['feedbackTypes']) as $feedbackType) {
+					$this->feedbackTypes[$i++] = _L(trim($feedbackType));
+				}
 			}
 
 			// Feedback Categories
 			$this->feedbackCategories = array( '' => _L('-- Select a Category --'));
-			$i = 1;
-			foreach (explode(',', $SETTINGS['netsuite']['feedbackCategories']) as $feedbackCategory) {
-				$this->feedbackCategories[$i++] = _L(trim($feedbackCategory));
+			if (isset($SETTINGS['netsuite']) && isset($SETTINGS['netsuite']['feedbackCategories'])) {
+				$i = 1;
+				foreach (explode(',', $SETTINGS['netsuite']['feedbackCategories']) as $feedbackCategory) {
+					$this->feedbackCategories[$i++] = _L(trim($feedbackCategory));
+				}
 			}
 
 			// Initialize these from user data
