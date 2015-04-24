@@ -1,8 +1,6 @@
 /********** PDF Manager styles *****************/
 
-.window_main {
-	margin: 0;
-}
+
 .window_main .content_row {
 	float: left;
 	height: auto;
@@ -43,4 +41,18 @@ span.secure-lock {
 	width: 16px;
 	height: 16px;
 	margin-right: 10px;
+}
+
+span.burst-status-new {
+	font-size: 16px;
+	color: #006400;
+	display: inline !important;
+	*display: inline; /* IE7 and below */
+}
+
+span.burst-status-sent {
+	font-size: 16px;
+	color: #ff8c00;
+	display: inline !important;
+	*display: inline; /* IE7 and below */
 }

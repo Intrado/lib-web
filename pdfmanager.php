@@ -37,6 +37,7 @@ class PdfManager extends PageBase {
 	var $burstsURL;
 	var $authOrgList;
 	var $csApi;
+	var $sortby = "status";
 
 	function __construct($csApi) {
 		$this->csApi = $csApi;
@@ -61,7 +62,8 @@ class PdfManager extends PageBase {
 		$this->customerURLComponent = customerUrlComponent();
 		$this->burstsURL = $this->csApi->getBurstApiUrl();
 
-		// if delete request, execute delete API call and exit, 
+		$this->sortby = isset($get['feed_sortby']) ? $get['feed_sortby'] : "status";
+		// if delete request, execute delete API call and exit,
 		// which upon a successful response (200) will reload pdfmanager.php page (via JS in pdfmanager.js)
 		if (isset($post['delete']) && $post['delete']) {
 			$this->deleteAjaxResponse($post['id']);
@@ -103,13 +105,20 @@ class PdfManager extends PageBase {
 	public function sendPageOutput() {
 		echo '<link rel="stylesheet" type="text/css" href="css/pdfmanager.css">';
 		echo '<script type="text/javascript" src="script/pdfmanager.js"></script>';
-		startWindow(_L("My Documents"), 'padding: 3px;', false, true);
+		startWindow(_L("My Documents"));
+
+		$sortoptions = array(
+			"name" => array("icon" => "img/largeicons/tiny20x20/pencil.jpg", "name" => "Name"),
+			"date" => array("icon" => "img/largeicons/tiny20x20/clock.jpg", "name" => "Date"),
+			"status" => array("icon" => "img/largeicons/tiny20x20/email.jpg", "name" => "Status")
+		);
+
 		$feedButtons = array(icon_button(_L(' Create New Document'), "pdficon_16", null, "pdfedit.php"));
-		feed($feedButtons, null);
+		feed($feedButtons, $sortoptions);
 		echo '<script type="text/javascript" src="script/feed.js.php"></script>
 		<script type="text/javascript">
 			document.observe("dom:loaded", function() {
-			feed_applyDefault("'. $_SERVER["REQUEST_URI"] .'","name","pdfmanager");
+			feed_applyDefault("'. $_SERVER["REQUEST_URI"] .'","status","pdfmanager");
 		});
 		</script>';
 		endWindow();
@@ -131,7 +140,8 @@ class PdfManager extends PageBase {
 				  "tools" => ""
 			  );
 		} else {
-			foreach ($this->feedData as $burstObj) {
+			usort( $this->feedData, $this->sorterOf($this->sortby));
+			foreach ( $this->feedData as $burstObj) {
 				$data->list[] = $this->getBurstListItem($burstObj);
 			}
 		}
@@ -150,7 +160,8 @@ class PdfManager extends PageBase {
 
 	public function getBurstListItem($burstObj) {
 		$id = $burstObj->id;
-		$defaultlink = 'pdfedit.php?id=' . $id;
+
+		$defaultlink = $burstObj->status == "sent" ? 'reportsdd.php?id=' . $id : 'pdfedit.php?id=' . $id;
 
 		$title = escapehtml($burstObj->name);
 		$fileName = escapehtml($burstObj->filename);
@@ -164,28 +175,42 @@ class PdfManager extends PageBase {
             $formattedFileSize = number_format(($fileSize / pow(2,20)), 2, '.', '') . 'MB';
         }
 
-		$tools = action_links (
-			action_link(_L(" Edit"), "pencil", 'pdfedit.php?id=' . $id),
-			action_link(_L(" Send Email"), "email_go", 'pdfsendmail.php?id=' . $id),
-			action_link(_L(" Download"), "pdficon_16", $this->burstsURL . '/' . $id. '/pdf'),
-			action_link(_L(" Delete"), "cross", '#', "deleteBurst(".$id.");")
-		);
+		$burstStatusTag = "burst-status-new";
+		$icon = 'img/largeicons/email.jpg';
+		if ($burstObj->status == "sent") {
+			$burstStatusTag = "burst-status-sent";
+			$icon = 'img/largeicons/checked.jpg';
+			$tools = action_links(
+				action_link(_L(" Report"), "layout", 'pdfstats.php?id=' . $id),
+				action_link(_L(" Edit"), "pencil", 'pdfedit.php?id=' . $id),
+				action_link(_L(" Download"), "pdficon_16", $this->burstsURL . '/' . $id . '/pdf'),
+				action_link(_L(" Delete"), "cross", '#', "deleteBurst(" . $id . ");")
+			);
+		} else {
+
+			$tools = action_links(
+				action_link(_L(" Edit"), "pencil", 'pdfedit.php?id=' . $id),
+				action_link(_L(" Send Email"), "email_go", 'pdfsendmail.php?id=' . $id),
+				action_link(_L(" Download"), "pdficon_16", $this->burstsURL . '/' . $id . '/pdf'),
+				action_link(_L(" Delete"), "cross", '#', "deleteBurst(" . $id . ");")
+			);
+		}
+
 
 		$content = '<span data-burst-id="'.$id.'">';
 		$content .= _L('File') . ': &nbsp;<a href="'.$this->burstsURL . '/' . $id. '/pdf" title="' . _L('Download File') . ': '.$fileName.'">' .$fileName. '</a><br>';
 		$content .= _L('Size') . ': &nbsp;<strong>' . $formattedFileSize . '</strong><br>';
 		$content .= _L('Upload Date') . ': &nbsp;<strong>' .$uploadDate.'</strong><br>';
-		$content .= _L('Status') . ': &nbsp;<strong>' .ucwords($status).'</strong></span>';
+		$content .= _L('Status') . ': &nbsp;<span class="' . $burstStatusTag . '">' . ucwords($status) . '</span></span>';
 
 		$arrItem = array(
 			"itemid" => $id,
 			"defaultlink" => $defaultlink,
-			"icon" => 'img/pdficon_32.png',
+			"icon" => $icon,
 			"title" => $title,
 			"content" => $content,
 			"tools" => $tools
 		);
-
 		return $arrItem;
 	}
 
@@ -213,6 +238,20 @@ class PdfManager extends PageBase {
 
 	public function getAuthOrgKeys() {
 		return Organization::getAuthorizedOrgKeys();
+	}
+
+
+	function sorterOf($key) {
+		return function ($a, $b) use ($key) {
+			switch ($key) {
+				case "status":
+					return strnatcmp($a->status, $b->status);
+				case "date":
+					return strnatcmp($a->uploadTimestampMs, $b->uploadTimestampMs);
+				case "name":
+					return strnatcmp($a->name, $b->name);
+			}
+		};
 	}
 
 }

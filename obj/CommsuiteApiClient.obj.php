@@ -202,6 +202,11 @@ class CommsuiteApiClient {
 		return($res['code'] == 200 ? json_decode($res['body']) : false);
 	}
 
+	public function updateBurstData($burst) {
+		$res = $this->apiClient->put($this->burstsBaseUrl . "/{$burst->id}", $burst);
+		return($res['code'] == 200 ? json_decode($res['body']) : false);
+	}
+
 	public function setBurstData($id, $name, $template) {
 
 		// If the burst ID is null then we're creating a new one

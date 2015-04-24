@@ -243,6 +243,11 @@ class PdfSendMail extends PageForm {
 			// run the job
 			$job->runNow();
 
+			//update burst to be "sent"
+			$this->burst->jobId = $job->id;
+			$this->burst->status = "sent";
+			$this->csApi->updateBurstData($this->burst);
+
 			Query("COMMIT");
 
 			unset($_SESSION['pdfsendmail_burstid']);
