@@ -150,27 +150,27 @@ if ($job->hasPhone()) {
 		'recipients' => (int)$phoneinfo['total'],
 		'completed' => (int)$phoneinfo['done'],
 		'remaining' => (int)$phoneinfo['remaining'],
-		'attempts' => (int)$phoneinfo['attempts'],
+		'attempts' => (int)$phoneinfo['totalattempts'],
 		'firstpass' => fmt_obj_job_first_pass($job, 'activedate'),
-		'percentcontacted' => sprintf("%0.2f", isset($phoneinfo['successrate']) ? $phoneinfo['successrate'] : "") . '%'
+		'percentcontacted' => isset($phoneinfo['success_rate']) ? sprintf("%0.2f%%", $phoneinfo['success_rate']) : "N/A"
 	);
 }
 if ($job->hasEmail()) {
-	$destinationresults['email'] = JobSummaryReport::getEmailInfo($job->id, $readonlyconn);
+	$emailinfo = JobSummaryReport::getEmailInfo($job->id, $readonlyconn);
 	$destinationresults['email'] = array(
-		'recipients' => (int)$destinationresults['email']['total'],
-		'completed' => (int)$destinationresults['email']['done'],
-		'remaining' => (int)$destinationresults['email']['remaining'],
-		'percentcontacted' => sprintf("%0.2f", isset($destinationresults['email']['successrate']) ? $destinationresults['email']['successrate'] : "") . '%'
+		'recipients' => (int)$emailinfo['total'],
+		'completed' => (int)$emailinfo['done'],
+		'remaining' => (int)$emailinfo['remaining'],
+		'percentcontacted' => isset($emailinfo['success_rate']) ? sprintf("%0.2f%%", $emailinfo['success_rate']) : "N/A"
 	);
 }
 if ($job->hasSMS()) {
-	$destinationresults['sms'] = JobSummaryReport::getSmsInfo($job->id, $readonlyconn);
+	$smsinfo = JobSummaryReport::getSmsInfo($job->id, $readonlyconn);
 	$destinationresults['sms'] = array(
-		'recipients' => (int)$destinationresults['sms']['total'],
-		'completed' => (int)$destinationresults['sms']['done'],
-		'remaining' => (int)$destinationresults['sms']['remaining'],
-		'percentcontacted' => sprintf("%0.2f", isset($destinationresults['sms']['successrate']) ? $destinationresults['sms']['successrate'] : "") . '%'
+		'recipients' => (int)$smsinfo['total'],
+		'completed' => (int)$smsinfo['done'],
+		'remaining' => (int)$smsinfo['remaining'],
+		'percentcontacted' => isset($smsinfo['success_rate']) ? sprintf("%0.2f%%", $smsinfo['success_rate']) : "N/A"
 	);
 }
 $windowtitle = _L("Monitoring job, %1s, last updated %2s", escapehtml($job->name), date("g:i:s a",$jobstats['validstamp']));
