@@ -110,7 +110,7 @@ function handleRequest() {
 				$extrasql = "and m.languagecode = ?";
 				$sqlargs[] = $_GET['languagecode'];
 			}
-			
+
 			$query = "select m.id,mg.name from message m inner join messagegroup mg on (m.messagegroupid = mg.id) where mg.deleted = 0 and m.autotranslate not in ('source','translated') and mg.userid=? and m.type=? $extrasql order by id";
 			return QuickQueryList($query, true, false,$sqlargs);
 
@@ -143,17 +143,59 @@ function handleRequest() {
 		case 'getaudiolibrary':
 			if (!isset($_GET['messagegroupid']) || !$_GET['messagegroupid'])
 				return false;
-			
+
 			$messagegroupid = $_GET['messagegroupid'] + 0;
-			
+
 			if (!userCanSee("messagegroup", $messagegroupid))
 				return false;
-			
+
 			$audiofileids = MessageGroup::getReferencedAudioFileIDs($messagegroupid);
 			if (count($audiofileids) > 0)
 				return QuickQueryMultiRow('select id, name, messagegroupid from audiofile where not deleted and id in ('.implode(',', $audiofileids).') order by recorddate desc', true, false);
 			else
-				return false;
+                return false;
+
+        case 'list':
+            if (!isset($_GET['listid']))
+                return false;
+            //$listids = json_decode($_GET['listids']);
+
+            //$listrules = array();
+
+            $fieldmaps = FieldMap::getAllAuthorizedFieldMaps();
+
+            $id = $_GET['listid'];
+
+            if (!userOwns('list', $id) && !isSubscribed('list', $id))
+                return false;
+
+            $list = new PeopleList($id+0);
+            $listrules = $list->getListRules();
+
+            error_log("hello");
+            error_log(print_r($listrules, true));
+
+            foreach ($listrules as $ruleid => $rule) {
+                if (!$USER->authorizeField($rule->fieldnum))
+                    unset($listrules[$ruleid]);
+            }
+
+            $organizations = $list->getOrganizations();
+
+            if (count($organizations) > 0) {
+                $orgkeys = array();
+
+                foreach ($organizations as $organization) {
+                    $orgkeys[$organization->id] = $organization->orgkey;
+                }
+
+                $listrules['organization'] = array(
+                    'fieldnum' => 'organization',
+                    'val' => $orgkeys
+                );
+            }
+
+            return array("list" => cleanObjects($list), "listrules" => cleanObjects($listrules));
 
 		case 'listrules':
 			// $_GET['listids'] should be json-encoded array.
@@ -173,16 +215,16 @@ function handleRequest() {
 					if (!$USER->authorizeField($rule->fieldnum))
 						unset($listrules[$id][$ruleid]);
 				}
-				
+
 				$organizations = $list->getOrganizations();
-				
+
 				if (count($organizations) > 0) {
 					$orgkeys = array();
-					
+
 					foreach ($organizations as $organization) {
 						$orgkeys[$organization->id] = $organization->orgkey;
 					}
-					
+
 					$listrules[$id]['organization'] = array(
 						'fieldnum' => 'organization',
 						'val' => $orgkeys

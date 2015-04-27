@@ -215,14 +215,18 @@ function handle_list_checkbox_ajax () {
 				//must be a skip, so delete the skip entry
 				QuickUpdate("delete from listentry where personid=? and listid=?",false,array($id, $_SESSION['listid']));
 			} else if ($existingtype == null) {
+                error_log("executing good sql!!");
 				//see if user can see this person
 				if ($USER->canSeePerson($id)) {
+                    error_log("can see person!!");
 					QuickUpdate("insert into listentry (listid, type, personid) values (?,'add',?)",false,array($_SESSION['listid'], $id));
 				}
 			} else {
 				header('Content-Type: application/json');
 				exit(json_encode(false));
 			}
+
+            error_log("succeeded!!");
 			header('Content-Type: application/json');
 			exit(json_encode(true));
 		}
