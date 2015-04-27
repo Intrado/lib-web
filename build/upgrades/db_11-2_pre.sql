@@ -31,3 +31,9 @@ $$$
 ALTER TABLE reportsdddelivery DEFAULT CHARSET=utf8,
   MODIFY COLUMN action ENUM('SEND', 'CLICK', 'DOWNLOAD', 'BAD_PASSWORD') NOT NULL
 $$$
+
+-- $rev 3
+
+UPDATE burst SET status = 'sent' WHERE jobid IS NOT NULL
+$$$
+
