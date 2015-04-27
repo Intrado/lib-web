@@ -3,6 +3,7 @@
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
 include_once("inc/common.inc.php");
+include_once("inc/content.inc.php");
 include_once("inc/securityhelper.inc.php");
 include_once("inc/utils.inc.php");
 include_once("inc/form.inc.php");
@@ -38,14 +39,14 @@ $_SESSION['messagegroupid'] = $payload['messageGroupId'];
 if (isset($_SESSION['messagegroupid']) && userOwns('messagegroup', $_SESSION['messagegroupid'])) {
     $audio->contentid = $payload['uploadId'];
 
-    /*if (!contentGet($payload['uploadId'])) {
+    if (!contentGet($payload['uploadId'])) {
         $result = Array('status' => 'fail', 'error' => 'Upload ' . $payload['uploadId'] . 'not found');
 
         header('Content-Type: application/json');
         echo json_encode($result);
 
         exit();
-    }*/
+    }
 
     $messagegroup = new MessageGroup($_SESSION['messagegroupid']);
 

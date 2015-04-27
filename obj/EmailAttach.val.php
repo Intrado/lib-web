@@ -1,5 +1,7 @@
 <?
 
+include_once("inc/content.inc.php");
+
 class ValEmailAttach extends Validator {
 	var $onlyserverside = true;
 	
