@@ -37,3 +37,17 @@ $$$
 UPDATE burst SET status = 'sent' WHERE jobid IS NOT NULL
 $$$
 
+-- $rev 4
+
+ALTER TABLE burstattachment
+  ADD KEY (burstid)
+$$$
+
+ALTER TABLE messageattachment
+  ADD KEY (burstattachmentid)
+$$$
+
+ALTER TABLE reportsdddelivery
+  ADD KEY rsdd_ma_ts (messageAttachmentId, timestampMs),
+  ADD KEY rsdd_ma_act_ts (messageAttachmentId, action, timestampMs)
+$$$

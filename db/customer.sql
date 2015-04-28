@@ -2995,3 +2995,27 @@ update setting set value='11.2/2' where name='_dbversion'
 $$$
 
 -- END 11.2/2
+
+-- no schema change, just update burst.status
+update setting set value='11.2/3' where name='_dbversion'
+$$$
+
+-- END 11.2/3
+
+ALTER TABLE burstattachment
+  ADD KEY (burstid)
+$$$
+
+ALTER TABLE messageattachment
+  ADD KEY (burstattachmentid)
+$$$
+
+ALTER TABLE reportsdddelivery
+  ADD KEY rsdd_ma_ts (messageAttachmentId, timestampMs),
+  ADD KEY rsdd_ma_act_ts (messageAttachmentId, action, timestampMs)
+$$$
+
+update setting set value='11.2/4' where name='_dbversion'
+$$$
+
+-- END 11.2/4
