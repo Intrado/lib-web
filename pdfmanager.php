@@ -181,7 +181,7 @@ class PdfManager extends PageBase {
 			$burstStatusTag = "burst-status-sent";
 			$icon = 'img/largeicons/checked.jpg';
 			$tools = action_links(
-				action_link(_L(" Report"), "layout", 'pdfstats.php?id=' . $id),
+				action_link(_L(" Report"), "layout", 'reportsdd.php?id=' . $id),
 				action_link(_L(" Edit"), "pencil", 'pdfedit.php?id=' . $id),
 				action_link(_L(" Download"), "pdficon_16", $this->burstsURL . '/' . $id . '/pdf'),
 				action_link(_L(" Delete"), "cross", '#', "deleteBurst(" . $id . ");")
