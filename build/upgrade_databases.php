@@ -647,112 +647,134 @@ function update_customer($db, $customerid, $shardid) {
 		switch ($targetversion) {
 		case "7.5":
 			if (!upgrade_7_5($rev, $shardid, $customerid, $db)) {
-				exit("Error upgrading DB");
+				echo("Error upgrading DB");
+				exit(1);
 			}
 			break;
 		case "7.6":
 			if (!upgrade_7_6($rev, $shardid, $customerid, $db)) {
-				exit("Error upgrading DB");
+				echo("Error upgrading DB");
+				exit(1);
 			}
 			break;
 		case "7.7":
 			if (!upgrade_7_7($rev, $shardid, $customerid, $db)) {
-				exit("Error upgrading DB");
+				echo("Error upgrading DB");
+				exit(1);
 			}
 			break;
 		case "7.8":
 			if (!upgrade_7_8($rev, $shardid, $customerid, $db)) {
-				exit("Error upgrading DB");
+				echo("Error upgrading DB");
+				exit(1);
 			}
 			break;
 		case "8.0":
 			if (!upgrade_8_0($rev, $shardid, $customerid, $db)) {
-				exit("Error upgrading DB");
+				echo("Error upgrading DB");
+				exit(1);
 			}
 			break;
 		case "8.1":
 			if (!upgrade_8_1($rev, $shardid, $customerid, $db)) {
-				exit("Error upgrading DB");
+				echo("Error upgrading DB");
+				exit(1);
 			}
 			break;
 		case "8.2":
 			if (!upgrade_8_2($rev, $shardid, $customerid, $db)) {
-				exit("Error upgrading DB");
+				echo("Error upgrading DB");
+				exit(1);
 			}
 			break;
 		case "8.3":
 			if (!upgrade_8_3($rev, $shardid, $customerid, $db)) {
-				exit("Error upgrading DB");
+				echo("Error upgrading DB");
+				exit(1);
 			}
 			break;
 		case "9.1":
 			if (!upgrade_9_1($rev, $shardid, $customerid, $db)) {
-				exit("Error upgrading DB");
+				echo("Error upgrading DB");
+				exit(1);
 			}
 			break;
 		case "9.2":
 			if (!upgrade_9_2($rev, $shardid, $customerid, $db)) {
-				exit("Error upgrading DB");
+				echo("Error upgrading DB");
+				exit(1);
 			}
 			break;
 		case "9.3":
 			if (!upgrade_9_3($rev, $shardid, $customerid, $db)) {
-				exit("Error upgrading DB");
+				echo("Error upgrading DB");
+				exit(1);
 			}
 			break;
 		case "9.4":
 			if (!upgrade_9_4($rev, $shardid, $customerid, $db)) {
-				exit("Error upgrading DB");
+				echo("Error upgrading DB");
+				exit(1);
 			}
 			break;
 		case "9.5":
 			if (!upgrade_9_5($rev, $shardid, $customerid, $db)) {
-				exit("Error upgrading DB");
+				echo("Error upgrading DB");
+				exit(1);
 			}
 			break;
 		case "9.6":
 			if (!upgrade_9_6($rev, $shardid, $customerid, $db)) {
-				exit("Error upgrading DB");
+				echo("Error upgrading DB");
+				exit(1);
 			}
 			break;
 		case "9.7":
 			if (!upgrade_9_7($rev, $shardid, $customerid, $db)) {
-				exit("Error upgrading DB");
+				echo("Error upgrading DB");
+				exit(1);
 			}
 			break;
 		case "10.0":
 			if (!upgrade_10_0($rev, $shardid, $customerid, $db)) {
-				exit("Error upgrading DB");
+				echo("Error upgrading DB");
+				exit(1);
 			}
 			break;
 		case "10.1":
 			if (!upgrade_10_1($rev, $shardid, $customerid, $db)) {
-				exit("Error upgrading DB");
+				echo("Error upgrading DB");
+				exit(1);
 			}
 			break;
 		case "10.2":
 			if (!upgrade_10_2($rev, $shardid, $customerid, $db)) {
-				exit("Error upgrading DB");
+				echo("Error upgrading DB");
+				exit(1);
 			}
 			break;
 		case "10.3":
 			if (!upgrade_10_3($rev, $shardid, $customerid, $db)) {
-				exit("Error upgrading DB");
+				echo("Error upgrading DB");
+				exit(1);
 			}
 			break;
 		case "11.0":
 			if (!upgrade_11_0($rev, $shardid, $customerid, $db)) {
-				exit("Error upgrading DB");
+				echo("Error upgrading DB");
+				exit(1);
 			}
 			break;
 		case "11.1":
 			if (!upgrade_11_1($rev, $shardid, $customerid, $db)) {
-				exit("Error upgrading DB");
+				echo("Error upgrading DB");
+				exit(1);
 			}
 			break;
 		case "11.2":
 			if (!upgrade_11_2($rev, $shardid, $customerid, $db)) {
-				exit("Error upgrading DB");
+				echo("Error upgrading DB");
+				exit(1);
 			}
 			break;
 		}
@@ -858,27 +880,32 @@ function update_taicustomer($db, $customerid, $shardid) {
 		switch ($targetversion) {
 		case "0.1":
 			if (!tai_upgrade_0_1($rev, $shardid, $customerid, $db)) {
-				exit("Error upgrading DB; Shard: $shardid, Customer: $customerid, Rev: " . $rev);
+				echo("Error upgrading DB; Shard: $shardid, Customer: $customerid, Rev: " . $rev);
+				exit(1);
 			}
 			break;
 		case "1.2":
 			if (!tai_upgrade_1_2($rev, $shardid, $customerid, $db)) {
-				exit("Error upgrading DB; Shard: $shardid, Customer: $customerid, Rev: " . $rev);
+				echo("Error upgrading DB; Shard: $shardid, Customer: $customerid, Rev: " . $rev);
+				exit(1);
 			}
 			break;
 		case "1.3":
 			if (!tai_upgrade_1_3($rev, $shardid, $customerid, $db)) {
-				exit("Error upgrading DB; Shard: $shardid, Customer: $customerid, Rev: " . $rev);
+				echo("Error upgrading DB; Shard: $shardid, Customer: $customerid, Rev: " . $rev);
+				exit(1);
 			}
 			break;
 		case "1.4":
 			if (!tai_upgrade_1_4($rev, $shardid, $customerid, $db)) {
-				exit("Error upgrading DB; Shard: $shardid, Customer: $customerid, Rev: " . $rev);
+				echo("Error upgrading DB; Shard: $shardid, Customer: $customerid, Rev: " . $rev);
+				exit(1);
 			}
 			break;
 		case "1.5":
 			if (!tai_upgrade_1_5($rev, $shardid, $customerid, $db)) {
-				exit("Error upgrading DB; Shard: $shardid, Customer: $customerid, Rev: " . $rev);
+				echo("Error upgrading DB; Shard: $shardid, Customer: $customerid, Rev: " . $rev);
+				exit(1);
 			}
 			break;
 		}
@@ -933,7 +960,8 @@ function apply_sql($filename, $customerid, $custdb, $specificrev = false) {
 				$sqlquery = str_replace('_$CUSTOMERID_', $customerid, $sqlquery);
 				$res = Query($sqlquery, $custdb);
 				if (!$res) {
-					exit("Error running query, check dberrors.txt for info\n");
+					echo("Error running query, check dberrors.txt for info\n");
+					exit(1);
 				}
 			}
 		}
@@ -971,7 +999,8 @@ function apply_sql_db($filename, $db, $specificrev = false) {
 				echo ".";
 				$res = Query($sqlquery, $db);
 				if (!$res) {
-					exit("Error running query, check dberrors.txt for info\n");
+					echo("Error running query, check dberrors.txt for info\n");
+					exit(1);
 				}
 			}
 		}
