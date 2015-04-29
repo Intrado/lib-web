@@ -115,15 +115,26 @@ function handleRequest() {
 			}
 
 			// Accept a default name for this list via request parameter
-			$listName = (isset($_REQUEST['name'])? substr($_REQUEST['name'],0,50) : _L('Please Add Rules to This List'));
-			
+			if (isset($_REQUEST['name'])) {
+				$listName = substr($_REQUEST['name'],0,50);
+				$explicitName = true;
+
+				if ($_POST['save']) {
+					if (QuickQuery('select id from list where deleted=0 and name=? and userid=?', false, array($listName, $USER->id))) {
+						return array('error' => _L('Recipient list ' . $listName . ' already exists'));
+					}
+				}
+			} else {
+				$listName = _L('Please Add Rules to This List');
+			}
+
 			// CREATE list
 			$list = new PeopleList(null);
 			$list->modifydate = date("Y-m-d H:i:s");
-			$list->description = 'Created in MessageSender';
+			$list->description = ($_POST['description'] ? $_POST['description'] : 'Created in MessageSender');
 			$list->userid = $USER->id;
 			$list->name = $listName;
-			$list->deleted = 1;
+			$list->deleted = ($_POST['save'] ? 0 : 1);
 			$list->type = isset($_POST['sectionids']) ? 'section' : 'person';
 			$list->update();
 			if (!$list->id)
@@ -133,10 +144,13 @@ function handleRequest() {
 				foreach ($_POST['sectionids'] as $sectionid) {
 					QuickUpdate('insert into listentry set type="section", listid=?, sectionid=?', false, array($list->id, $sectionid));
 				}
-				summarizeListName($list->id);
+
+				if (!$explicitName) {
+					summarizeListName($list->id);
+				}
 			}
 			$_SESSION['listid'] = $list->id;
-			
+
 			return $list->id;
 			
 		case 'addrule':
@@ -144,22 +158,28 @@ function handleRequest() {
 				return false;
 			
 			$listid = $_REQUEST['listid']+0;
-			
-			$data = json_decode($_POST['ruledata']);
-			if (empty($data) || !userOwns('list', $listid))
+
+			$rules = json_decode($_POST['ruledata']);
+			if (empty($rules) || !userOwns('list', $listid))
 				return false;
-			if (!isset($data->fieldnum, $data->logical, $data->op, $data->val))
-				return false;
-			
-			if ($data->fieldnum == 'organization') {
-				QuickUpdate('BEGIN');
+
+			if (!is_array($rules)) {
+				$rules = array($rules);
+			}
+
+			foreach($rules as $data) {
+				if (!isset($data->fieldnum, $data->logical, $data->op, $data->val))
+					return false;
+
+				if ($data->fieldnum == 'organization') {
+					QuickUpdate('BEGIN');
 					QuickUpdate("DELETE FROM listentry WHERE type='organization' AND listid=?", false, array($listid));
-					
+
 					$validorgkeys = Organization::getAuthorizedOrgKeys();
-					
+
 					foreach ($data->val as $id) {
 						$id = $id + 0;
-						
+
 						if (isset($validorgkeys[$id])) {
 							$le = new ListEntry();
 							$le->listid = $listid;
@@ -168,28 +188,36 @@ function handleRequest() {
 							$le->create();
 						}
 					}
-					
-					summarizeListName($listid);
-				QuickUpdate('COMMIT');
-			} else {
-				if (!$type = Rule::getType($data->fieldnum))
-					return false;
 
-				$data->val = prepareRuleVal($type, $data->op, $data->val);
+					if (!$_POST['nosummary']) {
+						summarizeListName($listid);
+					}
 
-				if (!$rule = Rule::initFrom($data->fieldnum, $data->logical, $data->op, $data->val))
-					return false;
-				
-				// CREATE rule.
-				QuickUpdate('BEGIN');
+					QuickUpdate('COMMIT');
+				} else {
+					if (!$type = Rule::getType($data->fieldnum))
+						return false;
+
+					$data->val = prepareRuleVal($type, $data->op, $data->val);
+
+					if (!$rule = Rule::initFrom($data->fieldnum, $data->logical, $data->op, $data->val))
+						return false;
+
+					// CREATE rule.
+					QuickUpdate('BEGIN');
 					$rule->create();
 					$le = new ListEntry();
 					$le->listid = $listid;
 					$le->type = "rule";
 					$le->ruleid = $rule->id;
 					$le->create();
-					summarizeListName($listid); //update list name, etc
-				QuickUpdate('COMMIT');
+
+					if (!$_POST['nosummary']) {
+						summarizeListName($listid); //update list name, etc
+					}
+
+					QuickUpdate('COMMIT');
+				}
 			}
 			
 			return true;
