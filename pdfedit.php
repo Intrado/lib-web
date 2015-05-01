@@ -76,6 +76,7 @@ class PdfEditPage extends PageForm {
 		else {
 			$this->burstData = (object) null;
 			$this->burstData->name = '';
+			$this->burstData->status = 'new';
 			$this->burstData->burstTemplateId = '';
 			$this->burstData->filename = '';
 		}
