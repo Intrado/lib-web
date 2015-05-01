@@ -2,6 +2,21 @@
 
 require_once('obj/ReportGenerator.obj.php');
 
+// TODO: this function is similar to the one of the same name in reportjobdetails.php
+// and there are also functions of the same name with different functionality in
+// reportcallsperson.php and reportcontactchangesummary.php. We should unify them
+// and move them to inc/formatters.inc.php.
+function fmt_dst_src($row, $index) {
+	if ($row[$index] != null) {
+		$type = $row[$index + 1];
+		$maxtypes = fetch_max_types();
+		$actualsequence = isset($maxtypes[$type]) ? ($row[$index] % $maxtypes[$type]) : $row[$index];
+		return escapehtml(destination_label($row[5], $actualsequence));
+	} else {
+		return "";
+	}
+}
+
 function fmt_sdd_action($row, $index) {
 	$map = array(
 		"NONE" => "N/A",
@@ -23,7 +38,8 @@ class SddReport extends ReportGenerator {
 		'0' => "Last Name",
 		'1' => "First Name",
 		'2' => "Sequence",
-		'3' => "Destination",
+		// '3' => "Type" but we don't need it in the output
+		'4' => "Destination",
 		'5' => "Attachment Filename",
 		'6' => "Result",
 		'7' => "Activity",
@@ -31,8 +47,8 @@ class SddReport extends ReportGenerator {
 		'9' => "Last Timestamp",
 	);
 	private $formatters = array(
-		'2' => "fmt_renderedlist_destination_sequence",
-		'3' => "fmt_email",
+		'2' => "fmt_dst_src",
+		'4' => "fmt_email",
 		'6' => "fmt_result",
 		'7' => "fmt_sdd_action",
 		'9' => "fmt_ms_timestamp"
@@ -49,8 +65,8 @@ class SddReport extends ReportGenerator {
 p.f02 as lastname,
 p.f01 as firstname,
 rc.sequence,
-rc.email as destination,
 rc.type,
+rc.email as destination,
 ba.filename,
 rc.result,
 coalesce(sdd_download.action, sdd_action.action, 'NONE') as action,
@@ -61,13 +77,13 @@ inner join burstattachment as ba on (ba.burstid = b.id)
 inner join messageattachment as ma on (ma.burstattachmentid = ba.id)
 inner join job as j on (j.id = b.jobid)
 inner join reportperson as rp on (rp.jobid = b.jobid and rp.type = 'email')
-inner join reportcontact as rc on (rc.jobid = b.jobid and rc.type = 'email' and rc.personid = rp.personid)
+inner join reportcontact as rc on (rc.jobid = b.jobid and rc.type = rp.type and rc.personid = rp.personid)
 left outer join reportsdddelivery as sdd_action on (sdd_action.messageAttachmentId = ma.id and sdd_action.personid = rp.personid)
 left outer join reportsdddelivery as sdd_action2 on (sdd_action2.messageAttachmentId = ma.id and sdd_action2.personid = sdd_action.personid and sdd_action2.timestampMs > sdd_action.timestampMs)
 left outer join reportsdddelivery as sdd_download on (sdd_download.messageAttachmentId = ma.id and sdd_download.personid = sdd_action.personid and sdd_download.action = 'DOWNLOAD')
 left outer join reportsdddelivery as sdd_download2 on (sdd_download2.messageAttachmentId = ma.id and sdd_download2.personid = sdd_action.personid and sdd_download2.action = 'DOWNLOAD' and sdd_download2.timestampMs > sdd_download.timestampMs)
-inner join person as p on (p.id = rc.recipientpersonid)
-where b.id = ? and sdd_action2.messageattachmentid is null and sdd_download2.messageattachmentid is null
+inner join person as p on (p.id = rc.personid)
+where b.id = ? and b.deleted = 0 and sdd_action2.messageattachmentid is null and sdd_download2.messageattachmentid is null
 order by lastname, firstname
 ";
 
@@ -78,7 +94,7 @@ order by lastname, firstname
 
 		$data = array();
 		$pageSize = self::DEFAULT_PAGE_SIZE;
-		$pageStart = isset($this->params['pagestart']) ? (int) $this->params["pagestart"] : 0;
+		$pageStart = isset($this->params['pagestart']) ? (int)$this->params["pagestart"] : 0;
 		$limit = "limit $pageStart, $pageSize";
 
 		$sql = $this->query . $limit;
@@ -94,21 +110,21 @@ order by lastname, firstname
 				showPageMenu($total, $pageStart, $pageSize);
 			}
 
-		?>
+			?>
 			<table width="100%" cellpadding="3" cellspacing="1" class="list" id="searchresults">
-		<?
-			showTable($data, $this->titles, $this->formatters);
-		?>
+				<?
+				showTable($data, $this->titles, $this->formatters);
+				?>
 			</table>
 			<script type="text/javascript">
-			var searchresultstable = new getObj("searchresults").obj;
+				var searchresultstable = new getObj("searchresults").obj;
 			</script>
-		<?
+			<?
 			if ($total > $pageSize) {
 				showPageMenu($total, $pageStart, $pageSize);
 			}
 		} else {
-		?>
+			?>
 			<em>No results found.</em>
 		<?
 		}
@@ -132,7 +148,7 @@ order by lastname, firstname
 			return false;
 		}
 
-		$headerfields = array_map(function ($value) { return '"'.$value.'"'; }, $this->titles);
+		$headerfields = array_map(function ($value) { return '"' . $value . '"'; }, $this->titles);
 		$header = implode(",", $headerfields);
 		$ok = fwrite($fp, $header . "\r\n");
 		if (!$ok) {
