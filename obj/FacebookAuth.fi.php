@@ -17,7 +17,7 @@ class FacebookAuth extends FormItem {
 		$validtoken = fb_hasValidAccessToken();
 		
 		// These are the required permissions for the app
-		$perms = "publish_stream,manage_pages";
+		$perms = "publish_actions,publish_pages,manage_pages";
 		
 		$str .= '<div id="'. $n. 'fbdetails">
 					<a NAME="facebookauth"></a>
