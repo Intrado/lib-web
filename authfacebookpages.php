@@ -33,7 +33,7 @@ class FacebookAuthPages extends FormItem {
 		$haspages = (count($pages) > 0);
 		
 		// auth a user to add more pages
-		$perms = "publish_stream,offline_access,manage_pages";
+		$perms = "publish_actions,publish_pages,manage_pages";
 		$str .= '
 			<style>
 				.fbpagelist {
