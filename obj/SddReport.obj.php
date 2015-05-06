@@ -11,7 +11,7 @@ function fmt_dst_src($row, $index) {
 		$type = $row[$index + 1];
 		$maxtypes = fetch_max_types();
 		$actualsequence = isset($maxtypes[$type]) ? ($row[$index] % $maxtypes[$type]) : $row[$index];
-		return escapehtml(destination_label($row[5], $actualsequence));
+		return escapehtml(destination_label($type, $actualsequence));
 	} else {
 		return "";
 	}
@@ -160,6 +160,7 @@ order by lastname, firstname
 		// we don't need to worry about blowing out PHP memory if we fetch rows unbuffered
 		$this->_readonlyDB->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);
 		$result = Query($this->query, $this->_readonlyDB, $this->queryArgs);
+		unset($this->formatters[4]); // no email formatting in CSV mode
 		while ($row = DBGetRow($result)) {
 			foreach ($this->formatters as $index => $formatter) {
 				$row[$index] = $formatter($row, $index);
