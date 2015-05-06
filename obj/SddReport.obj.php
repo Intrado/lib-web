@@ -35,40 +35,40 @@ class SddReport extends ReportGenerator {
 	public $queryArgs = false;
 
 	private $titles = array(
-		'0' => "Last Name",
-		'1' => "First Name",
-		'2' => "Sequence",
-		// '3' => "Type" but we don't need it in the output
-		'4' => "Destination",
-		'5' => "Attachment Filename",
-		'6' => "Result",
-		'7' => "Activity",
-		'8' => "Activity Count",
-		'9' => "Last Timestamp",
+		'0' => "Unique ID",
+		'1' => "Last Name",
+		'2' => "First Name",
+		'3' => "Attachment Filename",
+		'4' => "Status",
+		'5' => "Activity",
+		'6' => "Activity Count",
+		'7' => "Last Timestamp",
 	);
 	private $formatters = array(
-		'2' => "fmt_dst_src",
-		'4' => "fmt_email",
-		'6' => "fmt_result",
-		'7' => "fmt_sdd_action",
-		'9' => "fmt_ms_timestamp"
+		'4' => "fmt_result",
+		'5' => "fmt_sdd_action",
+		'7' => "fmt_ms_timestamp"
 	);
 
 	function generateQuery($hackPDF = false) {
 		$this->params = $this->reportinstance->getParameters();
 
-		// the query returns all recipients even if they have 0 SDD actions and 0 rows in reportsdddelivery.
+		// TODO: expand this to show activity per reportcontact (i.e. include a row for each recipient)
+		// This requires a data model change and an API change, to make the mal reference recipientPersonId
+		// instead of personId. Then the SQL below should join to reportcontact, and sdd_action should join
+		// using recipientPersonId, and include reportcontact.result instead of reportperson.status,
+		// and also sequence and destination.
+
+		// the query returns all recipients even if they have 0 SDD actions and 0 rows in reportsdddelivery
 		// - sdd_action is a reference to the most recent action of any type for a given attachment and given person.
 		// - sdd_download is a reference to the most recent DOWNLOAD action for a given attachment and given person.
 		$this->query =
 "select sql_calc_found_rows
+p.pkey,
 p.f02 as lastname,
 p.f01 as firstname,
-rc.sequence,
-rc.type,
-rc.email as destination,
 ba.filename,
-rc.result,
+rp.status,
 coalesce(sdd_download.action, sdd_action.action, 'NONE') as action,
 coalesce(sdd_download.actionCount, sdd_action.actionCount) as actionCount,
 coalesce(sdd_download.timestampMs, sdd_action.timestampMs) as actionTimestampMs
@@ -77,12 +77,11 @@ inner join burstattachment as ba on (ba.burstid = b.id)
 inner join messageattachment as ma on (ma.burstattachmentid = ba.id)
 inner join job as j on (j.id = b.jobid)
 inner join reportperson as rp on (rp.jobid = b.jobid and rp.type = 'email')
-inner join reportcontact as rc on (rc.jobid = b.jobid and rc.type = rp.type and rc.personid = rp.personid)
 left outer join reportsdddelivery as sdd_action on (sdd_action.messageAttachmentId = ma.id and sdd_action.personid = rp.personid)
 left outer join reportsdddelivery as sdd_action2 on (sdd_action2.messageAttachmentId = ma.id and sdd_action2.personid = sdd_action.personid and sdd_action2.timestampMs > sdd_action.timestampMs)
 left outer join reportsdddelivery as sdd_download on (sdd_download.messageAttachmentId = ma.id and sdd_download.personid = sdd_action.personid and sdd_download.action = 'DOWNLOAD')
 left outer join reportsdddelivery as sdd_download2 on (sdd_download2.messageAttachmentId = ma.id and sdd_download2.personid = sdd_action.personid and sdd_download2.action = 'DOWNLOAD' and sdd_download2.timestampMs > sdd_download.timestampMs)
-inner join person as p on (p.id = rc.personid)
+inner join person as p on (p.id = rp.personid)
 where b.id = ? and b.deleted = 0 and sdd_action2.messageattachmentid is null and sdd_download2.messageattachmentid is null
 order by lastname, firstname
 ";
