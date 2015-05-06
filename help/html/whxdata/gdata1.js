@@ -1,1 +1,1 @@
-gXMLBuffer ="<?xml version=\"1.0\" encoding=\"utf-8\" ?><data>   <entry name=\"List\" value=\"A list of contacts which you can send messages to.\" />  </data>";
+gXMLBuffer ="<?xml version=\"1.0\" encoding=\"utf-8\" ?><data>   <entry name=\"Glossary Feature Coming Soon\" value=\"A glossary of terms for the SchoolMessenger help system is under development and will be available in a future update.  Thank you.\" />  </data>";
