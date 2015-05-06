@@ -3019,3 +3019,9 @@ update setting set value='11.2/4' where name='_dbversion'
 $$$
 
 -- END 11.2/4
+
+ALTER TABLE reportsdddelivery
+  MODIFY COLUMN action ENUM('CLICK', 'DOWNLOAD', 'BAD_PASSWORD') NOT NULL
+$$$
+
+-- END 11.2/5

@@ -51,3 +51,9 @@ ALTER TABLE reportsdddelivery
   ADD KEY rsdd_ma_ts (messageAttachmentId, timestampMs),
   ADD KEY rsdd_ma_act_ts (messageAttachmentId, action, timestampMs)
 $$$
+
+-- $rev 5
+
+ALTER TABLE reportsdddelivery
+  MODIFY COLUMN action ENUM('CLICK', 'DOWNLOAD', 'BAD_PASSWORD') NOT NULL
+$$$
