@@ -1,9 +1,9 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+
+<!DOCTYPE HTML>
+<html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="generator" content="Adobe RoboHelp 9" />
+<meta name="generator" content="Adobe RoboHelp 11" />
 <title>Saving and Scheduling Reports</title>
 <link rel="StyleSheet" href="../main.css" type="text/css" />
 <script type="text/javascript" language="JavaScript">
@@ -46,142 +46,128 @@ left:0px;
 top:0px;
 z-index:4;
 visibility:hidden; }
+p.WebHelpNavBar { text-align:right; }
 -->
 </style>
-<script type="text/javascript" language="javascript1.2" src="../whmsg.js"></script>
-<script type="text/javascript" language="javascript" src="../whver.js"></script>
-<script type="text/javascript" language="javascript1.2" src="../whproxy.js"></script>
-<script type="text/javascript" language="javascript1.2" src="../whutils.js"></script>
-<script type="text/javascript" language="javascript1.2" src="../whlang.js"></script>
-<script type="text/javascript" language="javascript1.2" src="../whtopic.js"></script>
 
-</head>
-
-<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
-<!--
-if (window.gbWhTopic)
+<script type="text/javascript" src="../template/scripts/rh.min.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/common.min.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/topic.min.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/constants.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/utils.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/mhutils.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/mhlang.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/mhver.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/settings.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/XmlJsReader.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/loadparentdata.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/loadscreen.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/loadprojdata.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/mhtopic.js" language="JavaScript1.2"></script>
+<script type="text/javascript" language="JavaScript1.2">
+gRootRelPath = "..";
+gCommonRootRelPath = "..";
+gTopicId = "13.0_10";
+</script><script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function ehlp_showtip(current,e,text)
 {
-	var strUrl = document.location.href;
-	var bc = 0;
-	var n = strUrl.toLowerCase().indexOf("bc-");
-	if(n != -1)
-	{
-		document.location.href = strUrl.substring(0, n);
-		bc = strUrl.substring(n+3);
-	}
-
-	if (window.addTocInfo)
-	{
-	addTocInfo("Reports\nSaving and Scheduling Reports");
-addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
-
-	}
-	if (window.writeBtnStyle)
-		writeBtnStyle();
-
-	if (window.writeIntopicBar)
-		writeIntopicBar(1);
-
-	
-	document.write("<p style=\"text-align:right\"> ");
-AddMasterBreadcrumbs("../CommSuite_User_Guide.htm", "", ">", "Home", "../Getting_Started/Welcome.htm");
-document.write("<a href=\"Reports.htm\">Reports<\/a> > Saving and Scheduling Reports<\/p>");
-
-
-	if (window.setRelStartPage)
-	{
-	setRelStartPage("../CommSuite_User_Guide.htm");
-
-		autoSync(0);
-		sendSyncInfo();
-		sendAveInfoOut();
-	}
+  if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape'))
+  {
+    document.tooltip.document.write("<layer bgColor='yellow' style='border:1px solid black;font-size:12px;'>"+ text + "</layer>");
+    document.tooltip.document.close();
+    document.tooltip.left=e.pageX+5;
+    document.tooltip.top=e.pageY+5;
+    document.tooltip.visibility="show";
+  }
 }
-else
-	if (window.gbIE4)
-		document.location.reload();
+function ehlp_hidetip()
+{
+  document.tooltip.visibility="hidden";
+}
+//]]>
+</script>
+</head>
+<body>
+<script type="text/javascript" src="../ehlpdhtm.js" language="JavaScript1.2"></script>
 
-//-->
-//]]></script>
-<div style="width: 100%; position: relative;" id="header">
-	<p>&#160;</p>
-</div>
+
 
 
 <h1>Saving and Scheduling Reports</h1>
-<p>Many types of reports can be scheduled to automatically run at certain 
- times. This is a great way to track regularly occurring data, like in 
- the examples shown in this help topic.</p>
+<p>Many types of reports can be scheduled to automatically run at certain times. This is a great way to track regularly occurring data, like in the examples shown in this help topic.</p>
 <h4>To Schedule a Report</h4>
-<ol type="1">
-	<li class="p"><p>Click the Reports tab.</p></li>
-	<li class="p"><p>Choose the type of report you would like to schedule 
-	 by clicking on it in the Select a Template area.</p></li>
-	<li class="p"><p>Enter the report options that best describe your report.</p></li>
-	<li class="p"><p>Click the Save/Schedule button.</p></li>
-	<li class="p"><p>Enter a name for the report and a brief description, 
-	 then check how often you would like the report to run.</p></li>
-	<li class="p"><p>Click Save to schedule your report.</p></li>
+<ol style="list-style: decimal;">
+<li class="p">
+<p>Click the Reports tab.</p>
+</li>
+<li class="p">
+<p>Choose the type of report you would like to schedule by clicking on it in the Select a Template area.</p>
+</li>
+<li class="p">
+<p>Enter the report options that best describe your report.</p>
+</li>
+<li class="p">
+<p>Click the Save/Schedule button.</p>
+</li>
+<li class="p">
+<p>Enter a name for the report and a brief description, then check how often you would like the report to run.</p>
+</li>
+<li class="p">
+<p>Click Save to schedule your report.</p>
+</li>
 </ol>
-<p><img src="../SaveScheduleReport.jpg" alt="The saving or scheduling reports screen." 
-		 title="The saving or scheduling reports screen." style="border: none;" 
-		 border="0" /></p>
+<p><img src="../SaveScheduleReport.jpg" alt="The saving or scheduling reports screen." title="The saving or scheduling reports screen." style=" border:none; width:100%; max-width:600px;" border="0" /></p>
 <p>&#160;</p>
 <h4>Examples of Types of Reports That Can Be Scheduled</h4>
-<ul type="disc">
-	<li class="p"><p><span style="font-weight: bold;"><b>Attendance Phone 
-	 Log for an entire district:</b></span> If your account's Access Profile 
-	 allows you to view data for an entire district, you can schedule a 
-	 <a title="Click to learn more about Phone Log reports." href="Understanding_Call_Logs.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn more about Phone Log reports.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Phone 
-	 Log</a> report displaying all of the absence notifications for your 
-	 district at one time. This will show you everybody in your district 
-	 that was absent for a certain day or range of days and the result 
-	 of contacting them. For instance, the number recipients were successfully 
-	 contacted with an attendance message. To create this report, you should 
-	 use the following settings:</p></li>
-	<ul type="disc">
-		<li class="p"><p>Search by Date and select the date or date range 
-		 you're interested in viewing. If you're going to schedule this 
-		 report to run repeatedly, you should select a relative date such 
-		 as &quot;Today&quot; or &quot;Week to date&quot;</p></li>
-		<li class="p"><p>Select the &quot;Attendance&quot; Broadcast type.</p></li>
-	</ul>
-	<li class="p"><p><span style="font-weight: bold;"><b>All disconnected 
-	 phone numbers for a school or district:</b></span> If your account's Access 
-	 Profile allows you to contact an entire school or district, you can 
-	 schedule a Phone Log report displaying all of the calls which returned 
-	 a value of &quot;Disconnected&quot; each week. To create this report, 
-	 you should use the following settings:</p></li>
-	<ul type="disc">
-		<li class="p"><p>Search by Date and select &quot;Week to Date&quot; 
-		 or any date range you prefer.</p></li>
-		<li class="p"><p>If you want to limit your results to a single 
-		 school, in the Criteria section, select &quot;School&quot; from 
-		 the Field dropdown menu then check the box next to the school 
-		 or schools you would like to view. If you want to view the results 
-		 for the entire district and your profile allows you to do so, 
-		 skip this step and simply filter by results.</p></li>
-		<li class="p"><p>Click &quot;Disconnected&quot; in the Filter by 
-		 Results section.</p></li>
-	</ul>
-	<li style="list-style: none; display: inline;"><p>&#160;</p></li>
+<ul style="list-style: disc;">
+<li class="p">
+<p><span style="font-weight: bold;">Attendance Phone Log for an entire district:</span> If your account's Access Profile allows you to view data for an entire district, you can schedule a <a title="Click to learn more about Phone Log reports." href="Understanding_Call_Logs.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn more about Phone Log reports.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Phone Log</a> report displaying all of the absence notifications for your district at one time. This will show you everybody in your district that was absent for a certain day or range of days and the result of contacting them. For instance, the number recipients were successfully contacted with an attendance message. To create this report, you should use the following settings:</p>
+</li>
+<li style="list-style: none; display: inline">
+<ul style="list-style: disc;">
+<li class="p">
+<p>Search by Date and select the date or date range you're interested in viewing. If you're going to schedule this report to run repeatedly, you should select a relative date such as "Today" or "Week to date"</p>
+</li>
+<li class="p">
+<p>Select the "Attendance" Broadcast type.</p>
+</li>
+</ul>
+</li>
+<li class="p">
+<p><span style="font-weight: bold;">All disconnected phone numbers for a school or district:</span> If your account's Access Profile allows you to contact an entire school or district, you can schedule a Phone Log report displaying all of the calls which returned a value of "Disconnected" each week. To create this report, you should use the following settings:</p>
+</li>
+<li style="list-style: none; display: inline">
+<ul style="list-style: disc;">
+<li class="p">
+<p>Search by Date and select "Week to Date" or any date range you prefer.</p>
+</li>
+<li class="p">
+<p>If you want to limit your results to a single school, in the Criteria section, select "School" from the Field dropdown menu then check the box next to the school or schools you would like to view. If you want to view the results for the entire district and your profile allows you to do so, skip this step and simply filter by results.</p>
+</li>
+<li class="p">
+<p>Click "Disconnected" in the Filter by Results section.</p>
+</li>
+</ul>
+</li>
+<li style="list-style: none; display: inline;">
+<p>&#160;</p>
+</li>
 </ul>
 <div style="width: 100%; position: relative;" id="footer">
-	<p><span style="font-size: xx-small;"><font size="1" style="font-size: xx-small;">©1999 - 2014 SchoolMessenger</font></span></p>
+	<p><span style="font-size: xx-small;">©1999 - 2015 Reliance Communications, 
+	 Inc.</span></p>
 </div>
 <script type="text/javascript" language="JavaScript">
 //<![CDATA[
  if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape'))
   document.write("<div id='tooltip' class='WebHelpPopupMenu'></div>");
 //]]>
-</script><script type="text/javascript" language="javascript1.2">//<![CDATA[
-<!--
-if (window.writeIntopicBar)
-	writeIntopicBar(0);
-
-
-highlightSearch();
-//-->
-//]]></script>
+</script><script type="text/javascript" language="JavaScript">
+//<![CDATA[
+ if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape'))
+  document.write("<div id='tooltip' class='WebHelpPopupMenu'></div>");
+//]]>
+</script>
 </body>
 </html>

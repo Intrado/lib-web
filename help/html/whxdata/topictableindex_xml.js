@@ -1,0 +1,1 @@
+gXMLBuffer="<?xml version=\"1.0\" encoding=\"UTF-8\"?><cki><ck fm=\"Broadcast Templates\" to=\"About SMS Messaging\" num=\"57\"/><ck fm=\"Before You Send an SMS\" to=\"System_Administrator_Training_for_SchoolMessenger.pdf\" num=\"37\"/></cki>";

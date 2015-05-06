@@ -1,0 +1,1 @@
+gXMLBuffer ="<?xml version=\"1.0\" encoding=\"utf-8\" ?><data>   <entry name=\"List\" value=\"A list of contacts which you can send messages to.\" />  </data>";

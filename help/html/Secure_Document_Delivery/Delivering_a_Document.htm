@@ -1,9 +1,9 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+
+<!DOCTYPE HTML>
+<html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
- <meta name="generator" content="Adobe RoboHelp 9" />
+ <meta name="generator" content="Adobe RoboHelp 11" />
 <title>Delivering a Document</title>
 <link rel="stylesheet" href="../main.css" type="text/css" />
 <script type="text/javascript" language="JavaScript">
@@ -46,101 +46,79 @@ left:0px;
 top:0px;
 z-index:4;
 visibility:hidden; }
+p.WebHelpNavBar { text-align:right; }
 -->
 </style>
-<script type="text/javascript" language="javascript1.2" src="../whmsg.js"></script>
-<script type="text/javascript" language="javascript" src="../whver.js"></script>
-<script type="text/javascript" language="javascript1.2" src="../whproxy.js"></script>
-<script type="text/javascript" language="javascript1.2" src="../whutils.js"></script>
-<script type="text/javascript" language="javascript1.2" src="../whlang.js"></script>
-<script type="text/javascript" language="javascript1.2" src="../whtopic.js"></script>
 
-</head>
-
-<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
-<!--
-if (window.gbWhTopic)
+<script type="text/javascript" src="../template/scripts/rh.min.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/common.min.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/topic.min.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/constants.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/utils.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/mhutils.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/mhlang.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/mhver.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/settings.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/XmlJsReader.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/loadparentdata.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/loadscreen.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/loadprojdata.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/mhtopic.js" language="JavaScript1.2"></script>
+<script type="text/javascript" language="JavaScript1.2">
+gRootRelPath = "..";
+gCommonRootRelPath = "..";
+gTopicId = "19.0_3";
+</script><script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function ehlp_showtip(current,e,text)
 {
-	var strUrl = document.location.href;
-	var bc = 0;
-	var n = strUrl.toLowerCase().indexOf("bc-");
-	if(n != -1)
-	{
-		document.location.href = strUrl.substring(0, n);
-		bc = strUrl.substring(n+3);
-	}
-
-	if (window.addTocInfo)
-	{
-	addTocInfo("Secure Document Delivery\nDelivering a Document");
-addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
-
-	}
-	if (window.writeBtnStyle)
-		writeBtnStyle();
-
-	if (window.writeIntopicBar)
-		writeIntopicBar(1);
-
-	
-	document.write("<p style=\"text-align:right\"> ");
-AddMasterBreadcrumbs("../CommSuite_User_Guide.htm", "", ">", "Home", "../Getting_Started/Welcome.htm");
-document.write("<a href=\"About_Secure_Document_Delivery.htm\">Secure Document Delivery<\/a> > Delivering a Document<\/p>");
-
-
-	if (window.setRelStartPage)
-	{
-	setRelStartPage("../CommSuite_User_Guide.htm");
-
-		autoSync(0);
-		sendSyncInfo();
-		sendAveInfoOut();
-	}
+  if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape'))
+  {
+    document.tooltip.document.write("<layer bgColor='yellow' style='border:1px solid black;font-size:12px;'>"+ text + "</layer>");
+    document.tooltip.document.close();
+    document.tooltip.left=e.pageX+5;
+    document.tooltip.top=e.pageY+5;
+    document.tooltip.visibility="show";
+  }
 }
-else
-	if (window.gbIE4)
-		document.location.reload();
+function ehlp_hidetip()
+{
+  document.tooltip.visibility="hidden";
+}
+//]]>
+</script>
+</head>
+<body>
+<script type="text/javascript" src="../ehlpdhtm.js" language="JavaScript1.2"></script>
 
-//-->
-//]]></script>
-<div style="width: 100%; position: relative;" id="header">
-	<p>&#160;</p>
-</div>
+
 
 
 <h1>Delivering a Document</h1>
-<p class="important"><span style="font-weight: bold;"><b><img src="../exclamation.png" alt="exclamation.png" style="border: none;" border="0" /> 
- Important:</b></span> Only those features that you have been granted access 
- to will display. For access to additional features contact your system 
- administrator.</p>
+<p class="important"><span style="font-weight: bold;"><img src="../exclamation.png" alt="" style=" border:none; width:100%; max-width:16px;" border="0" /> Important:</span> Only those features that you have been granted access to will display. For access to additional features contact your system administrator.</p>
 <h4>Deliver Your Document</h4>
-<p>Once you've <a title="Click to read about creating a Document." href="Creating_a_New_Document.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to read about creating a Document.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">created 
- your Document</a>, you can deliver it from the main Secure Document Delivery 
- screen. While this is similar to any other Broadcast, you won't need to 
- make a list of recipients. The recipients are matched automatically using 
- the ID numbers which were found in your PDF file.</p>
-<ul type="disc">
-	<li><p>Find the Document you wish to send from the list in the My Documents 
-	 window.</p></li>
-	<li><p>Click the Send Email next to the Document to create a Delivery 
-	 email message.</p></li>
-	<li><p>Be sure to select the Require Password button if you wish to 
-	 require recipients to enter a password when viewing the Document. 
-	 The password will automatically be set to their ID number. For example, 
-	 the password on a report card will be the student's ID number.</p></li>
-	<li><p>Create an email message in the Email Details section. Recipients 
-	 will receive this message with their portion of the Document attached.</p></li>
-	<li><p>Click the Send Now button when you're done. Your Document will 
-	 begin being delivered immediately. Recipients will receive an email 
-	 containing a link and a brief message instructing them to follow the 
-	 link to download their PDF report. If the report requires a password, 
-	 recipients will need to enter the password to download their file.</p></li>
-	<li><p>At this point, the Document delivery becomes like other email 
-	 Broadcasts and you can view the delivery results by creating an <a title="Click to learn more about Email Log reports." href="../Reports/Email_Logs.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn more about Email Log reports.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Email 
-	 Log</a> report. &#160;&#160;</p></li>
+<p>Once you've <a title="Click to read about creating a Document." href="Creating_a_New_Document.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to read about creating a Document.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">created your Document</a>, you can deliver it from the main Secure Document Delivery screen. While this is similar to any other Broadcast, you won't need to make a list of recipients. The recipients are matched automatically using the ID numbers which were found in your PDF file.</p>
+<ul style="list-style: disc;">
+<li>
+<p>Find the Document you wish to send from the list in the My Documents window.</p>
+</li>
+<li>
+<p>Click the Send Email next to the Document to create a Delivery email message. The report will be attached to this email message.</p>
+</li>
+<li>
+<p>Be sure to select the Require Password button if you wish to require recipients to enter a password when viewing the Document. The password will automatically be set to their ID number. For example, the password on a report card will be the student's ID number.</p>
+</li>
+<li>
+<p>Create an email message in the Email Details section. Recipients will receive this message with their portion of the Document attached.</p>
+</li>
+<li>
+<p>Click the Send Now button when you're done. Your Document will begin being delivered immediately.</p>
+</li>
+<li>
+<p>At this point, the Document delivery becomes like other email Broadcasts and you can view the delivery results by creating an <a title="Click to learn more about Email Log reports." href="../Reports/Email_Logs.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn more about Email Log reports.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Email Log</a> report. &#160;&#160;</p>
+</li>
 </ul>
-<p><img src="../SDD-CreateDeliveryEmail.jpg" title="Creating a Delivery Email" 
-		 alt="Creating a Delivery Email" style="border: none;" border="0" /></p>
+<p><img src="../SDD-CreateDeliveryEmail.jpg" title="Creating a Delivery Email" alt="Creating a Delivery Email" style=" border:none; width:100%; max-width:600px;" border="0" /></p>
 <p style="font-weight: normal;">&#160;</p>
 <p style="font-weight: normal;">&#160;</p>
 <p>&#160;</p>
@@ -148,21 +126,19 @@ else
 <p>&#160;</p>
 <p>&#160;</p>
 <div style="width: 100%; position: relative;" id="footer">
-	<p><span style="font-size: xx-small;"><font size="1" style="font-size: xx-small;">©1999 - 2014 SchoolMessenger</font></span></p>
+	<p><span style="font-size: xx-small;">©1999 - 2015 Reliance Communications, 
+	 Inc.</span></p>
 </div>
 <script type="text/javascript" language="JavaScript">
 //<![CDATA[
  if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape'))
   document.write("<div id='tooltip' class='WebHelpPopupMenu'></div>");
 //]]>
-</script><script type="text/javascript" language="javascript1.2">//<![CDATA[
-<!--
-if (window.writeIntopicBar)
-	writeIntopicBar(0);
-
-
-highlightSearch();
-//-->
-//]]></script>
+</script><script type="text/javascript" language="JavaScript">
+//<![CDATA[
+ if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape'))
+  document.write("<div id='tooltip' class='WebHelpPopupMenu'></div>");
+//]]>
+</script>
 </body>
 </html>

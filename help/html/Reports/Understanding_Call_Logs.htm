@@ -1,9 +1,9 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+
+<!DOCTYPE HTML>
+<html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="generator" content="Adobe RoboHelp 9" />
+<meta name="generator" content="Adobe RoboHelp 11" />
 <title>Phone Logs</title>
 <link rel="StyleSheet" href="../main.css" type="text/css" />
 <script type="text/javascript" language="JavaScript">
@@ -46,205 +46,179 @@ left:0px;
 top:0px;
 z-index:4;
 visibility:hidden; }
+p.WebHelpNavBar { text-align:right; }
 -->
 </style>
-<script type="text/javascript" language="javascript1.2" src="../whmsg.js"></script>
-<script type="text/javascript" language="javascript" src="../whver.js"></script>
-<script type="text/javascript" language="javascript1.2" src="../whproxy.js"></script>
-<script type="text/javascript" language="javascript1.2" src="../whutils.js"></script>
-<script type="text/javascript" language="javascript1.2" src="../whlang.js"></script>
-<script type="text/javascript" language="javascript1.2" src="../whtopic.js"></script>
 
-</head>
-
-<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
-<!--
-if (window.gbWhTopic)
+<script type="text/javascript" src="../template/scripts/rh.min.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/common.min.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/topic.min.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/constants.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/utils.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/mhutils.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/mhlang.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/mhver.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/settings.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/XmlJsReader.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/loadparentdata.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/loadscreen.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/loadprojdata.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/mhtopic.js" language="JavaScript1.2"></script>
+<script type="text/javascript" language="JavaScript1.2">
+gRootRelPath = "..";
+gCommonRootRelPath = "..";
+gTopicId = "13.0_4";
+</script><script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function ehlp_showtip(current,e,text)
 {
-	var strUrl = document.location.href;
-	var bc = 0;
-	var n = strUrl.toLowerCase().indexOf("bc-");
-	if(n != -1)
-	{
-		document.location.href = strUrl.substring(0, n);
-		bc = strUrl.substring(n+3);
-	}
-
-	if (window.addTocInfo)
-	{
-	addTocInfo("Reports\nPhone Logs");
-addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
-
-	}
-	if (window.writeBtnStyle)
-		writeBtnStyle();
-
-	if (window.writeIntopicBar)
-		writeIntopicBar(1);
-
-	
-	document.write("<p style=\"text-align:right\"> ");
-AddMasterBreadcrumbs("../CommSuite_User_Guide.htm", "", ">", "Home", "../Getting_Started/Welcome.htm");
-document.write("<a href=\"Reports.htm\">Reports<\/a> > Phone Logs<\/p>");
-
-
-	if (window.setRelStartPage)
-	{
-	setRelStartPage("../CommSuite_User_Guide.htm");
-
-		autoSync(0);
-		sendSyncInfo();
-		sendAveInfoOut();
-	}
+  if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape'))
+  {
+    document.tooltip.document.write("<layer bgColor='yellow' style='border:1px solid black;font-size:12px;'>"+ text + "</layer>");
+    document.tooltip.document.close();
+    document.tooltip.left=e.pageX+5;
+    document.tooltip.top=e.pageY+5;
+    document.tooltip.visibility="show";
+  }
 }
-else
-	if (window.gbIE4)
-		document.location.reload();
+function ehlp_hidetip()
+{
+  document.tooltip.visibility="hidden";
+}
+//]]>
+</script>
+</head>
+<body>
+<script type="text/javascript" src="../ehlpdhtm.js" language="JavaScript1.2"></script>
 
-//-->
-//]]></script>
-<div style="width: 100%; position: relative;" id="header">
-	<p>&#160;</p>
-</div>
+
 
 
 <h1>Phone Logs</h1>
-<p>You can use Phone Log reports to determine exactly who received your 
- message and when. To learn how to create a Phone Log report, please view 
- the help topic, <a title="Click to read more about using the Report Builder." href="Querying_Report_Data.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to read more about using the Report Builder.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Using the Report Builder</a>. 
- If you have already created a Phone Log report, this section will help 
- you understand the report results.</p>
-<p><img src="../PhoneLog.jpg" title="Phone Log report" alt="Phone Log report" 
-		 style="border: none;" border="0" /></p>
-<div style="border: Solid 6px #469eb9; padding: 5px; margin-left: 4px; 
-	 margin-right: 4px; margin-top: 4px; margin-bottom: 4px; width: 35%; 
-	 background-color: #e4eef1; float: right;">
-	<h1>Guide to Report Results</h1>
-	<p>This guide contains possible values which can be found in the Delivery 
-	 Results column of the Phone Log report.</p>
-	<ul type="disc">
-		<li><p style="line-height: Normal;"><span style="font-weight: bold;"><b>Answered:</b></span> 
-		 The recipient answered the phone and listened to the message.</p></li>
-		<li><p><span style="font-weight: bold;"><b>Machine:</b></span> <span style="line-height: Normal;">The 
-		 recipient's answering machine received the message.</span></p></li>
-		<li><p><span style="font-weight: bold;"><b>Busy:</b></span> <span style="line-height: Normal;">The 
-		 recipient's phone was busy.</span></p></li>
-		<li><p><span style="font-weight: bold;"><b>No Answer:</b></span> <span 
-		 style="line-height: Normal;">Nobody answered the phone.</span></p></li>
-		<li><p><span style="font-weight: bold;"><b>Disconnect:</b></span> <span 
-		 style="line-height: Normal;">This is typically a number which 
-		 has been disconnected.</span></p></li>
-		<li><p style="margin-left: 0px;"><span style="font-weight: bold;"><b>In 
-		 Progress:</b></span> <span style="line-height: Normal;">The call is 
-		 currently in progress or the results are currently being processed 
-		 and more information will be available soon.</span></p></li>
-		<li><p style="margin-left: 0px; line-height: Normal;"><span style="font-weight: bold;"><b>Duplicate:</b></span> 
-		 After sending an initial message, the system will flag a phone 
-		 number as duplicate if it encounters it again in the same notification 
-		 Broadcast.</p></li>
-		<li><p style="margin-left: 0px; line-height: Normal;"><span style="font-weight: bold;"><b>Blocked:</b></span> 
-		 The phone number the system was trying to contact is on the <a title="Click to view information about blocking phone numbers." href="../System_Administration/System_Settings/Blocking_Phone_Numbers.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to view information about blocking phone numbers.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Blocked 
-		 Phone</a> list.</p></li>
-		<li><p style="margin-left: 0px; line-height: Normal;"><span style="font-weight: bold;"><b>No 
-		 Phone Selected:</b></span> The recipient's phone number was not associated 
-		 with the Broadcast type. For example, if a recipient's phone number 
-		 was associated only with emergency Broadcasts and not general 
-		 notifications, a general notification with a phone message component 
-		 and a list including &#160;the recipient would result in &#160;&quot;No 
-		 Phone Selected&quot;.</p></li>
-		<li><p style="margin-left: 0px;"><span style="font-weight: bold;"><b>Unknown:</b></span> 
-		 When a message is not delivered successfully and the reason for 
-		 the failure is not determined to be a busy or unanswered phone, 
-		 the call status is set to Unknown and the call is retried. A final 
-		 call status of Unknown can be the result of a number of possible 
-		 conditions. For example:</p></li>
-		<li style="margin-left: 40px;"><p>The system attempted to deliver 
-		 a message to a full voice mail.</p></li>
-		<li style="margin-left: 40px;"><p>The number dialed was answered 
-		 by an automated attendant message that was requesting some sort 
-		 of interaction.</p></li>
-		<li style="margin-left: 40px;"><p>The call was answered by an answering 
-		 machine with a greeting message that lasted more than 45 seconds.&#160;</p></li>
-		<li style="margin-left: 40px;"><p>The recipient hung up before 
-		 the message started playing.</p></li>
-		<li style="margin-left: 40px;"><p>The local phone company switch 
-		 rejected the call.</p></li>
-		<li style="margin-left: 40px;"><p>The local phone company switch 
-		 was unable to connect the call within 45 seconds.</p></li>
-		<li style="margin-left: 40px;"><p>The number is disconnected, but 
-		 the local phone company doesn't return standard digital disconnect 
-		 indicator codes.</p></li>
-	</ul>
+<p>You can use Phone Log reports to determine exactly who received your message and when. To learn how to create a Phone Log report, please view the help topic, <a title="Click to read more about using the Report Builder." href="Querying_Report_Data.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to read more about using the Report Builder.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Using the Report Builder</a>. If you have already created a Phone Log report, this section will help you understand the report results.</p>
+<p><img src="../PhoneLog.jpg" title="Phone Log report" alt="Phone Log report" style=" border:none; width:100%; max-width:600px;" border="0" /></p>
+<div style="border: Solid 6px #469eb9; padding: 5px; margin-left: 4px; margin-right: 4px; margin-top: 4px; margin-bottom: 4px; width: 35%; background-color: #e4eef1; float: right;">
+<h1>Guide to Report Results</h1>
+<p>This guide contains possible values which can be found in the Delivery Results column of the Phone Log report.</p>
+<ul style="list-style: disc;">
+<li>
+<p style="line-height: Normal;"><span style="font-weight: bold;">Answered:</span> The recipient answered the phone and listened to the message.</p>
+</li>
+<li>
+<p><span style="font-weight: bold;">Machine:</span> <span style="line-height: Normal;">The recipient's answering machine received the message.</span></p>
+</li>
+<li>
+<p><span style="font-weight: bold;">Busy:</span> <span style="line-height: Normal;">The recipient's phone was busy.</span></p>
+</li>
+<li>
+<p><span style="font-weight: bold;">No Answer:</span> <span style="line-height: Normal;">Nobody answered the phone.</span></p>
+</li>
+<li>
+<p><span style="font-weight: bold;">Disconnect:</span> <span style="line-height: Normal;">This is typically a number which has been disconnected.</span></p>
+</li>
+<li>
+<p style="margin-left: 0px;"><span style="font-weight: bold;">In Progress:</span> <span style="line-height: Normal;">The call is currently in progress or the results are currently being processed and more information will be available soon.</span></p>
+</li>
+<li>
+<p style="margin-left: 0px; line-height: Normal;"><span style="font-weight: bold;">Duplicate:</span> After sending an initial message, the system will flag a phone number as duplicate if it encounters it again in the same notification Broadcast.</p>
+</li>
+<li>
+<p style="margin-left: 0px; line-height: Normal;"><span style="font-weight: bold;">Blocked:</span> The phone number the system was trying to contact is on the <a title="Click to view information about blocking phone numbers." href="../System_Administration/System_Settings/Blocking_Phone_Numbers.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to view information about blocking phone numbers.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Blocked Phone</a> list.</p>
+</li>
+<li>
+<p style="margin-left: 0px; line-height: Normal;"><span style="font-weight: bold;">No Phone Selected:</span> The recipient's phone number was not associated with the Broadcast type. For example, if a recipient's phone number was associated only with emergency Broadcasts and not general notifications, a general notification with a phone message component and a list including &#160;the recipient would result in &#160;"No Phone Selected".</p>
+</li>
+<li>
+<p style="margin-left: 0px;"><span style="font-weight: bold;">Unknown:</span> When a message is not delivered successfully and the reason for the failure is not determined to be a busy or unanswered phone, the call status is set to Unknown and the call is retried. A final call status of Unknown can be the result of a number of possible conditions. For example:</p>
+</li>
+<li style="margin-left: 40px;">
+<p>The system attempted to deliver a message to a full voice mail.</p>
+</li>
+<li style="margin-left: 40px;">
+<p>The number dialed was answered by an automated attendant message that was requesting some sort of interaction.</p>
+</li>
+<li style="margin-left: 40px;">
+<p>The call was answered by an answering machine with a greeting message that lasted more than 45 seconds.&#160;</p>
+</li>
+<li style="margin-left: 40px;">
+<p>The recipient hung up before the message started playing.</p>
+</li>
+<li style="margin-left: 40px;">
+<p>The local phone company switch rejected the call.</p>
+</li>
+<li style="margin-left: 40px;">
+<p>The local phone company switch was unable to connect the call within 45 seconds.</p>
+</li>
+<li style="margin-left: 40px;">
+<p>The number is disconnected, but the local phone company doesn't return standard digital disconnect indicator codes.</p>
+</li>
+</ul>
 </div>
 <p>&#160;</p>
-<h4>Display Options </h4>
-<p>The topmost part of the Phone Log contains field and output options 
- for creating the report.</p>
-<ul type="disc">
-	<li class="p"><p><span style="font-weight: bold;"><b>Display Fields:</b></span> 
-	 Additional fields which can be included in the report</p></li>
-	<li class="p"><p><span style="font-weight: bold;"><b>Output Format:</b></span> 
-	 These buttons allow you to download your report as a CSV or PDF file.</p></li>
+<h4>Display Options</h4>
+<p>The topmost part of the Phone Log contains field and output options for creating the report.</p>
+<ul style="list-style: disc;">
+<li class="p">
+<p><span style="font-weight: bold;">Display Fields:</span> Additional fields which can be included in the report</p>
+</li>
+<li class="p">
+<p><span style="font-weight: bold;">Output Format:</span> These buttons allow you to download your report as a CSV or PDF file.</p>
+</li>
 </ul>
 <h4>Report Details</h4>
-<p style="line-height: Normal;">The lower half of the report contains the 
- Report Details which shows each recipient called and the results of the 
- call. It's sections include:</p>
-<ul type="disc">
-	<li class="p"><p style="line-height: Normal;"><span style="font-weight: bold;"><b>Job:</b></span> 
-	 The Broadcast that the recipient is associated with.</p></li>
-	<li class="p"><p style="line-height: Normal;"><span style="font-weight: bold;"><b>Submitted 
-	 by:</b></span> The user who submitted the Broadcast associated with the 
-	 recipient.</p></li>
-	<li class="p"><p style="line-height: Normal;"><span style="font-weight: bold;"><b>ID#:</b></span> 
-	 <span>The ID number of the recipient in the database.</span></p></li>
-	<li class="p"><p style="line-height: Normal;"><span style="font-weight: bold;"><b>First 
-	 Name:</b></span> The recipient's first name.</p></li>
-	<li class="p"><p style="line-height: Normal;"><span style="font-weight: bold;"><b>Last 
-	 Name:</b></span> The recipient's last name.</p></li>
-	<li class="p"><p style="line-height: Normal;"><span style="font-weight: bold;"><b>Message:</b></span> 
-	 The name of the message the recipient received. The icon next to the 
-	 message displays the type of message sent; phone or email.</p></li>
-	<li class="p"><p style="line-height: Normal;"><span style="font-weight: bold;"><b>Sequence:</b></span> 
-	 The phone number that was used to reach the recipient.</p></li>
-	<li class="p"><p style="line-height: Normal;"><span style="font-weight: bold;"><b>Attempts:</b></span> 
-	 The number of attempts to reach this recipient out of the number of 
-	 attempts allowed. For example, a value of 2/3 would mean that the 
-	 result displayed was for the second call attempt out of a possibility 
-	 of 3 calls.</p></li>
-	<li class="p"><p style="line-height: Normal;"><span style="font-weight: bold;"><b>Last 
-	 Attempt:</b></span> <span>The last time that the system tried to contact 
-	 the recipient.</span></p></li>
-	<li class="p"><p style="line-height: Normal;"><span style="font-weight: bold;"><b>Delivery 
-	 Results:</b></span> Shows the result of the delivery attempt. Results 
-	 are explained in the Guide to Report Results in the blue box on this 
-	 page.</p></li>
+<p style="line-height: Normal;">The lower half of the report contains the Report Details which shows each recipient called and the results of the call. It's sections include:</p>
+<ul style="list-style: disc;">
+<li class="p">
+<p style="line-height: Normal;"><span style="font-weight: bold;">Job:</span> The Broadcast that the recipient is associated with.</p>
+</li>
+<li class="p">
+<p style="line-height: Normal;"><span style="font-weight: bold;">Submitted by:</span> The user who submitted the Broadcast associated with the recipient.</p>
+</li>
+<li class="p">
+<p style="line-height: Normal;"><span style="font-weight: bold;">ID#:</span> <span>The ID number of the recipient in the database.</span></p>
+</li>
+<li class="p">
+<p style="line-height: Normal;"><span style="font-weight: bold;">First Name:</span> The recipient's first name.</p>
+</li>
+<li class="p">
+<p style="line-height: Normal;"><span style="font-weight: bold;">Last Name:</span> The recipient's last name.</p>
+</li>
+<li class="p">
+<p style="line-height: Normal;"><span style="font-weight: bold;">Message:</span> The name of the message the recipient received. The icon next to the message displays the type of message sent; phone or email.</p>
+</li>
+<li class="p">
+<p style="line-height: Normal;"><span style="font-weight: bold;">Sequence:</span> The phone number that was used to reach the recipient.</p>
+</li>
+<li class="p">
+<p style="line-height: Normal;"><span style="font-weight: bold;">Attempts:</span> The number of attempts to reach this recipient out of the number of attempts allowed. For example, a value of 2/3 would mean that the result displayed was for the second call attempt out of a possibility of 3 calls.</p>
+</li>
+<li class="p">
+<p style="line-height: Normal;"><span style="font-weight: bold;">Last Attempt:</span> <span>The last time that the system tried to contact the recipient.</span></p>
+</li>
+<li class="p">
+<p style="line-height: Normal;"><span style="font-weight: bold;">Delivery Results:</span> Shows the result of the delivery attempt. Results are explained in the Guide to Report Results in the blue box on this page.</p>
+</li>
 </ul>
-<ul type="disc">
-	<li class="p"><p><span style="font-weight: bold;"><b>Response:</b></span> 
-	 Shows whether the user left a response to Broadcasts where the response 
-	 option was selected. A white speaker icon means that the message may 
-	 be played back. If the speaker icon is grey, then the message was 
-	 either deleted by a user or your account is not authorized to play 
-	 the message.</p></li>
+<ul style="list-style: disc;">
+<li class="p">
+<p><span style="font-weight: bold;">Response:</span> Shows whether the user left a response to Broadcasts where the response option was selected. A white speaker icon means that the message may be played back. If the speaker icon is grey, then the message was either deleted by a user or your account is not authorized to play the message.</p>
+</li>
 </ul>
 <p>&#160;</p>
 <div style="width: 100%; position: relative;" id="footer">
-	<p><span style="font-size: xx-small;"><font size="1" style="font-size: xx-small;">©1999 - 2014 SchoolMessenger</font></span></p>
+	<p><span style="font-size: xx-small;">©1999 - 2015 Reliance Communications, 
+	 Inc.</span></p>
 </div>
 <script type="text/javascript" language="JavaScript">
 //<![CDATA[
  if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape'))
   document.write("<div id='tooltip' class='WebHelpPopupMenu'></div>");
 //]]>
-</script><script type="text/javascript" language="javascript1.2">//<![CDATA[
-<!--
-if (window.writeIntopicBar)
-	writeIntopicBar(0);
-
-
-highlightSearch();
-//-->
-//]]></script>
+</script><script type="text/javascript" language="JavaScript">
+//<![CDATA[
+ if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape'))
+  document.write("<div id='tooltip' class='WebHelpPopupMenu'></div>");
+//]]>
+</script>
 </body>
 </html>
