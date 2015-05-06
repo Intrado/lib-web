@@ -36,19 +36,14 @@ class ReportSdd extends PageBase {
 	}
 
 	// @override
-	public function initialize() {
-		// override page option on PageBase
-		$this->options['page']  = "reports:reports";
-		$this->options['title'] = "Secure Document Delivery";
-		$this->options['windowTitle'] = _L("SDD Document Results");
-		$this->options['format'] = "html";
-	}
-
-	// @override
 	public function beforeLoad(&$get=array(), &$post=array(), &$request=array(), &$session=array()) {
 		if (isset($session['report']) && isset($session['report']['options'])) {
 			$this->options = $session['report']['options'];
 		}
+		$this->options['page']  = "reports:reports";
+		$this->options['title'] = "Secure Document Delivery";
+		$this->options['windowTitle'] = _L("SDD Document Results");
+		$this->options['format'] = "html";
 		if (isset($get['id'])) {
 			$this->options['id'] = (int) $get['id'];
 		}
