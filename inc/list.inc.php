@@ -178,31 +178,33 @@ function show_field_visibility_selector ($tableid, $fields, $coloffset) {
  */
 function handle_list_checkbox_ajax () {
 	global $USER;
-	
-	if (!isset($_GET['ajax']) )
-		return;
-	
-	if (isset($_GET['showfield'])) {
-		$optionalfields = array_merge(FieldMap::getOptionalAuthorizedFieldMapsLike('f'), FieldMap::getAuthorizedFieldMapsLike('g'));
-		foreach ($optionalfields as $field) {
-			if ($_GET['showfield'] == $field->fieldnum)
-				$_SESSION['fieldvisibility'][$field->fieldnum] = true;
+
+	if (!isset($_GET['api'])) {
+		if (!isset($_GET['ajax']))
+			return;
+
+		if (isset($_GET['showfield'])) {
+			$optionalfields = array_merge(FieldMap::getOptionalAuthorizedFieldMapsLike('f'), FieldMap::getAuthorizedFieldMapsLike('g'));
+			foreach ($optionalfields as $field) {
+				if ($_GET['showfield'] == $field->fieldnum)
+					$_SESSION['fieldvisibility'][$field->fieldnum] = true;
+			}
+
+			header('Content-Type: application/json');
+			exit(json_encode(true));
 		}
-		
-		header('Content-Type: application/json');
-		exit(json_encode(true));
-	}
-	
-	if (isset($_GET['hidefield'])) {
-		unset($_SESSION['fieldvisibility'][$_GET['hidefield']]);
-		
-		header('Content-Type: application/json');
-		exit(json_encode(true));
+
+		if (isset($_GET['hidefield'])) {
+			unset($_SESSION['fieldvisibility'][$_GET['hidefield']]);
+
+			header('Content-Type: application/json');
+			exit(json_encode(true));
+		}
 	}
 	
 	
 	if ($USER->authorize('createlist')) { //make sure user can edit lists
-		
+
 		if (isset($_GET['addpersonid'])) {
 			$id = $_GET['addpersonid'];
 
@@ -215,20 +217,31 @@ function handle_list_checkbox_ajax () {
 				//must be a skip, so delete the skip entry
 				QuickUpdate("delete from listentry where personid=? and listid=?",false,array($id, $_SESSION['listid']));
 			} else if ($existingtype == null) {
-                error_log("executing good sql!!");
 				//see if user can see this person
 				if ($USER->canSeePerson($id)) {
-                    error_log("can see person!!");
 					QuickUpdate("insert into listentry (listid, type, personid) values (?,'add',?)",false,array($_SESSION['listid'], $id));
+				} else {
+					if (isset($_REQUEST['api'])) {
+						exit(json_encode(Array("status" => "personNotFound", "message" => "Person $id not found")));
+					}
 				}
 			} else {
 				header('Content-Type: application/json');
-				exit(json_encode(false));
+
+				if (isset($_REQUEST['api'])) {
+					exit(json_encode(Array("status" => "internalError", "message" => "Internal data access error, recipient list include person")));
+				} else {
+					exit(json_encode(false));
+				}
 			}
 
-            error_log("succeeded!!");
 			header('Content-Type: application/json');
-			exit(json_encode(true));
+
+			if (isset($_REQUEST['api'])) {
+				exit(json_encode(Array("status" => "success")));
+			} else {
+				exit(json_encode(true));
+			}
 		}
 		
 		if (isset($_GET['removepersonid'])) {
@@ -246,11 +259,30 @@ function handle_list_checkbox_ajax () {
 				QuickUpdate("insert into listentry (listid, type, personid) values (?,'negate',?)",false,array($_SESSION['listid'], $id));
 			} else {
 				header('Content-Type: application/json');
-				exit(json_encode(false));
+
+				if (isset($_REQUEST['api'])) {
+					exit(json_encode(Array("status" => "internalError", "message" => "Internal data access error, recipient list exclude person")));
+				} else {
+					exit(json_encode(false));
+				}
 			}
-			
+
 			header('Content-Type: application/json');
-			exit(json_encode(true));
+
+			if (isset($_REQUEST['api'])) {
+				exit(json_encode(Array("status" => "success")));
+			} else {
+				exit(json_encode(true));
+			}
+		}
+
+		if (isset($_REQUEST['api'])) {
+			exit(json_encode(Array("status" => "invalidParameter", "message" => "Person to add/remove not specified")));
+		}
+	} else {
+		if (isset($_REQUEST['api'])) {
+			header('Content-Type: application/json');
+			exit(json_encode(Array("status" => "accessDenied", "message" => "Insufficient privileges to update recipient list")));
 		}
 	}
 }

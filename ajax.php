@@ -157,12 +157,12 @@ function handleRequest() {
 
         case 'list':
             if (!isset($_GET['listid']))
-                return false;
+	            return Array("status" => "invalidParameter", "message" => "Recipient list not specified");
 
             $id = $_GET['listid'];
 
             if (!userOwns('list', $id) && !isSubscribed('list', $id))
-                return false;
+	            return Array("status" => "listNotFound", "message" => "Recipient list $id not found");
 
             $list = new PeopleList($id+0);
             $listrules = $list->getListRules();
@@ -184,8 +184,12 @@ function handleRequest() {
 			order by f02, f01";
 	        $data = QuickQueryMultiRow($query,false,false,array($id));
 
+			$recipientList = cleanObjects($list);
+			$recipientList['id'] = (int)$list->id;
+
             return array(
-	            "list" => cleanObjects($list),
+	            "status" => "success",
+	            "list" => $recipientList,
 	            "listrules" => cleanObjects($listrules),
 	            "listsections" => cleanObjects($list->getSections()),
 	            "removals" => cleanObjects($data));
@@ -384,7 +388,7 @@ function handleRequest() {
 			}
 			
 			$messagegroup = new MessageGroup($_GET['id']);
-			
+
 			$result->defaultlang = Language::getName(Language::getDefaultLanguageCode());
 			$result->headers = array();
 			
@@ -517,5 +521,11 @@ function handleRequest() {
 
 header('Content-Type: application/json');
 $data = handleRequest();
-echo json_encode(!empty($data) ? $data : false);
+
+if (isset($_REQUEST['api'])) {
+	echo json_encode($data);
+} else {
+	echo json_encode(!empty($data) ? $data : false);
+}
+
 ?>
