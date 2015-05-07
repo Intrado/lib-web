@@ -5,7 +5,7 @@ $$$
 
 -- $rev 2
 
-INSERT INTO
+INSERT IGNORE INTO
 	`oauth_client_details`
 SET
 	`client_id` = 'raweb-client',
