@@ -15,5 +15,5 @@ SET
 	`web_server_redirect_uri` = 'https://sandboxinfocenter.testschoolmessenger.com/#/oauthlogin?',
 	`authorities` = 'ROLE_CLIENT',
 	`additional_information` = '{}',
-	`autoapprove` = 'true';
+	`autoapprove` = 'true'
 $$$

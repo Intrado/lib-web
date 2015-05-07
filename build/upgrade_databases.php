@@ -98,7 +98,7 @@ $versions = array(
 );
 
 // non-Customer databases
-$dbReleaseVersion = "11.1"; // version to update databases to if no revision changes for individual db, implies revision value of 1
+$dbReleaseVersion = "11.2"; // version to update databases to if no revision changes for individual db, implies revision value of 1
 $dbversions = array(
 	"authserver" => array(
 		"11.0/2"
