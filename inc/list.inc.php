@@ -201,8 +201,11 @@ function handle_list_checkbox_ajax () {
 			exit(json_encode(true));
 		}
 	}
-	
-	
+
+	if (!userOwns('list', $_SESSION['listid'])/* && !isSubscribed('list', $id)*/) {
+		exit(json_encode(Array("status" => "listNotFound", "message" => "Recipient list " . $_SESSION['listid'] . " not found")));
+	}
+
 	if ($USER->authorize('createlist')) { //make sure user can edit lists
 
 		if (isset($_GET['addpersonid'])) {
