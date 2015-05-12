@@ -22,6 +22,8 @@ class ReportSdd extends PageBase {
 	protected $reportGenerator = null;
 	protected $reportOutput = null;
 	protected $documentId;
+	protected $sddreferer;
+	protected $pagestartflag = false;
 	private $csApi;
 
 	function __construct($csApi) {
@@ -40,6 +42,11 @@ class ReportSdd extends PageBase {
 		if (isset($session['report']) && isset($session['report']['options'])) {
 			$this->options = $session['report']['options'];
 		}
+		if (isset($session['sddreferer'])) {
+			$this->sddreferer = $session['sddreferer'];
+		} else {
+			$this->sddreferer = $session['sddreferer'] = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : "pdfmanager.php";
+		}
 		$this->options['page']  = "reports:reports";
 		$this->options['title'] = "Secure Document Delivery";
 		$this->options['windowTitle'] = _L("SDD Document Results");
@@ -56,7 +63,12 @@ class ReportSdd extends PageBase {
 		if (isset($get['csv']) && $get['csv']) {
 			$this->options['format'] = 'csv';
 		}
-		$this->options['pagestart'] = isset($get['pagestart']) ? (int) $get['pagestart'] : 0;
+		if (isset($get['pagestart'])) {
+			$this->pagestartflag = true;
+			$this->options['pagestart'] = (int) $get['pagestart'];
+		} else {
+			$this->options['pagestart'] = 0;
+		}
 	}
 
 	// @override
@@ -94,8 +106,11 @@ class ReportSdd extends PageBase {
 
 	// @override
 	public function sendPageOutput() {
-		$fallbackUrl = "pdfmanager.php";
-		$backButton = icon_button(_L("Back"), "fugue/arrow_180", "location.href='" . (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $fallbackUrl) . "'");
+		if (isset($this->pagestartflag)) {
+			$backButton = icon_button(_L("Back"), "fugue/arrow_180", "window.history.go(-1)");
+		} else {
+			$backButton = icon_button(_L("Back"), "fugue/arrow_180", "location.href='$this->sddreferer'");
+		}
 		$refreshButton = icon_button(_L('Refresh'),"arrow_refresh","window.location.reload()");
 		$csvButton = icon_button("Download CSV", "page_white_excel", null, "reportsdd.php/report.csv?id={$this->documentId}&csv=true");
 		buttons($backButton, $refreshButton, $csvButton);
