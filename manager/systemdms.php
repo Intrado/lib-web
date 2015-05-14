@@ -162,24 +162,54 @@ function fmt_resources ($row,$index) {
 	return $str;
 }
 function fmt_routetype($row, $index){
+	global $dmgroups;
+	$dmgroupid = $row[15];
 	$routetypes = array("firstcall" => "Firstcall","lastcall" => "Lastcall","" => "Other");
-	$routetype = $row[$index];
+	$routetype = isset($dmgroups[$dmgroupid])?$dmgroups[$dmgroupid]["routeType"]:"";
 	return isset($routetypes[$routetype])?$routetypes[$routetype]:"Unknown";
+}
+function fmt_dmgroupname($row, $index){
+	global $dmgroups;
+	$dmgroupid = $row[15];
+	return isset($dmgroups[$dmgroupid])?$dmgroups[$dmgroupid]["name"]:"";
+}
+function fmt_dmgroupratemodel($row, $index){
+	global $dmgroups;
+	$dmgroupid = $row[15];
+	return isset($dmgroups[$dmgroupid])?$dmgroups[$dmgroupid]["rateModelClassName"]:"";
 }
 
 function fmt_dmgroupcarrier($row, $index){
 	global $dmgroups;
 	$dmgroupid = $row[15];
-	return isset($dmgroups[$dmgroupid])?$dmgroups[$dmgroupid]->carrier:"";
+	return isset($dmgroups[$dmgroupid])?$dmgroups[$dmgroupid]["carrier"]:"";
 }
+
+function fmt_dmgroupusejms($row, $index){
+	global $dmgroups;
+	$dmgroupid = $row[15];
+	$useJms = isset($dmgroups[$dmgroupid])?$dmgroups[$dmgroupid]["useJms"]:"";
+	return $useJms?"Yes":"No";
+}
+
+
 function fmt_dmgroupstate($row, $index){
 	global $dmgroups;
 	$dmgroupid = $row[15];
-	return isset($dmgroups[$dmgroupid])?$dmgroups[$dmgroupid]->state:"";
+	return isset($dmgroups[$dmgroupid])?$dmgroups[$dmgroupid]["state"]:"";
 }
 
-$dmgroups = DBFindMany("DmGroup", "from dmgroup");
+$dmgroups = array();
+$dmGroupQuery = "select dmgroup.id, dmgroup.name, dmgroup.rateModelClassName, dmgroup.routeType, s_useJms.value as useJms from dmgroup
+                left join dmgroupsetting s_useJms on
+                        (dmgroup.id = s_useJms.dmgroupid
+                        and s_useJms.name = 'useJms')";
+$result = Query($dmGroupQuery);
+while($row = DBGetRow($result,true)) {
+	$dmgroups[$row['id']] = $row;
+}
 
+error_log(print_r($dmgroups,true));
 $dms = array();
 $query = "select dm.id, dm.name, dm.authorizedip, dm.lastip,
 			dm.enablestate, dm.lastseen, dm.version, dm.dmuuid, dm.command, s_telco_calls_sec.value as telco_calls_sec, 
@@ -249,9 +279,10 @@ $titles[11] = "Resources";
 $titles[12] = "@#Inbound";
 $titles[7] = "@#DM UUID";
 $titles[8] = "@#Cmd";
-$titles[14] = "#Route Type";
-$titles["carrier"] = "#Carrier";
-$titles["state"] = "#State";
+$titles["dmgroupname"] = "#Dm Group Name";
+$titles["dmgroupusejms"] = "#Use Jms";
+$titles["ratemodel"] = "@#Rate Model";
+$titles["routetype"] = "@#Route Type";
 $titles[16] = "#Notes";
 $titles["actions"] = "Actions";
 
@@ -268,9 +299,10 @@ $formatters = array("actions" => "fmt_DMActions",
 					5 => "fmt_lastseen",
 					4 => "fmt_state",
 					11 => "fmt_resources",
-					14 => "fmt_routetype",
-					"carrier" => "fmt_dmgroupcarrier",
-					"state" => "fmt_dmgroupstate");
+					"dmgroupname" => "fmt_dmgroupname",
+					"dmgroupusejms" => "fmt_dmgroupusejms",
+					"ratemodel" => "fmt_dmgroupratemodel",
+					"routetype" => "fmt_routetype");
 
 $filterFormatters = array("status" => "fmt_dmstatus_nohtml",4 => "fmt_state");
 /////////////////////////////
