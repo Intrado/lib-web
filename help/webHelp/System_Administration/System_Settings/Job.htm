@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Adobe RoboHelp 11" />
+<title>Broadcast</title>
+<link rel="StyleSheet" href="../../main.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function ehlp_showtip(current,e,text)
+{
+  if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape'))
+  {
+    document.tooltip.document.write("<layer bgColor='yellow' style='border:1px solid black;font-size:12px;'>"+ text + "</layer>");
+    document.tooltip.document.close();
+    document.tooltip.left=e.pageX+5;
+    document.tooltip.top=e.pageY+5;
+    document.tooltip.visibility="show";
+  }
+}
+function ehlp_hidetip()
+{
+  document.tooltip.visibility="hidden";
+}
+//]]>
+</script>
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js" charset="utf-8"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js" charset="utf-8"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js" charset="utf-8"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js" charset="utf-8"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js" charset="utf-8"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js" charset="utf-8"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.replace(strUrl.substring(0, n));
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addTocInfo("System Administration\nSettings\nBroadcast Settings");
+addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	document.write("<p style=\"text-align:right\"> ");
+AddMasterBreadcrumbs("../../Index.htm", "", ">", "Home", "../../Getting_Started/Welcome.htm");
+document.write("<a href=\"../User_Management/Managing_User_Accounts.htm\">System Administration<\/a> > <a href=\"System.htm\">Settings<\/a> > Broadcast Settings<\/p>");
+
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+onLoadHandler = function()
+{
+  if (window.setRelStartPage)
+	{
+	setTimeout("setRelStartPage('../../Index.htm');", 1)
+
+    setTimeout("UpdateBreadCrumbsMarker();", 1);
+	}
+}
+
+if (window.addEventListener){  
+	window.addEventListener('load', onLoadHandler, false);   
+} else if (window.attachEvent){  
+	window.attachEvent('onload', onLoadHandler);  
+}
+
+function onSetStartPage()
+{
+  autoSync(1);
+  sendSyncInfo();
+  sendAveInfoOut();
+}
+//-->
+//]]></script>
+<script type="text/javascript" src="../../ehlpdhtm.js" language="JavaScript1.2"></script>
+
+
+
+
+<h1>Broadcast</h1>
+<p class="important"><span style="font-weight: bold;"><img src="../../exclamation.png" alt="" style="border: none;" border="0" /> Important:</span> Only those features that you have been granted access to will display. For access to additional features contact your system administrator.</p>
+<p>The Settings subtab contains options for the System, Broadcast, Destination, and Feature settings. This subtab also allows you to manage Contact Manager Activation tokens and set the information that Contact Manager users will see, if you have purchased the Contact Manager option.</p>
+<p>This help topic covers the options under the Broadcast section of the Admin Settings page.</p>
+<p><img src="../../AdminSettingsMain.jpg" alt="The Settings tab." title="The Settings subtab." style="border: none;" border="0" /></p>
+<p style="font-weight: normal;">The links in the Job section allow you to modify default settings for all Broadcasts in the system.</p>
+<ul style="list-style: disc;">
+<li class="p">
+<p style="font-weight: normal;"><a href="#Disable_Repeating_Jobs" title="Click to go to Enable/Disable Repeating Jobs." onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to go to Enable/Disable Repeating Jobs.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Enable/Disable Repeating Broadcasts</a></p>
+</li>
+<li class="p">
+<p style="font-weight: normal;"><a title="Click to go to Broadcast Settings." href="#Job_Settings" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to go to Broadcast Settings.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Broadcast Settings</a></p>
+</li>
+<li class="p">
+<p style="font-weight: normal;"><a title="Click to go to Broadcast Types." href="#Job_Types" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to go to Broadcast Types.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Broadcast Types</a></p>
+</li>
+<li class="p">
+<p style="font-weight: normal;"><a href="#Message_Intro">Message Intro</a></p>
+</li>
+</ul>
+<p>&#160;</p>
+<h4><span style="font-weight: bold;"><a name="Disable_Repeating_Jobs" id="Disable_Repeating_Jobs">Disable Repeating Broadcasts</a></span></h4>
+<p style="font-weight: bold; margin-left: 40px;"><img src="../../AdminSettingsDisableRepeati.jpg" alt="Enable or Disable Repeating Jobs" title="Enable or Disable Repeating Broadcasts" style="border: none;" border="0" /></p>
+<ul style="list-style: disc;">
+<li>
+<p style="margin-left: 0px;"><span style="font-weight: bold;">Disable Repeating Broadcasts:</span> Click this checkbox to prevent the system from performing any of its scheduled repeating Broadcasts. Unchecking this box will allow the repeating Broadcasts to resume at their next scheduled time.</p>
+</li>
+</ul>
+<p>&#160;</p>
+<h4><a name="Job_Settings" id="Job_Settings">Broadcast Settings</a></h4>
+<p style="margin-left: 0px;"><img src="../../AdminSettingsBroadcastSet.jpg" alt="Job Settings" title="Job Settings" style="border: none;" border="0" /></p>
+<h3>Settings</h3>
+<p style="margin-left: 40px; font-weight: normal;">Please view the <a title="Click to learn about Managing Caller IDs." href="Managing_Caller_IDs.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn about Managing Caller IDs.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Managing Caller IDs</a> help topic for details about this feature.</p>
+<p style="margin-left: 40px;">&#160;</p>
+<h3>EasyCall/CallMe</h3>
+<p class="important"><span style="font-weight: bold;"><img src="../../light_bulb__exclamation.png" alt="" style="border: none;" border="0" /> Note:</span> These options will only be visible for SmartCall and Hybrid (Remote Telephony Appliance) customers.</p>
+<ul style="list-style: disc;">
+<li>
+<p><span style="font-weight: bold;">Minimum Extensions Length:</span> Enter the minimum number of digits which must be dialed to use EasyCall or Call Me to Record.</p>
+</li>
+<li>
+<p><span style="font-weight: bold;">Maximum Extensions Length:</span> Enter the maximum number of digits which must be dialed to use EasyCall or Call Me to Record.</p>
+</li>
+</ul>
+<p>&#160;</p>
+<h4><a name="Job_Types" id="Job_Types">Broadcast Types</a></h4>
+<p><img src="../../AdminBroadcastTypes.jpg" alt="Broadcast Type Manager" title="Broadcast Type Manager" style="border: none;" border="0" /></p>
+<ul style="list-style: disc;">
+<li>
+<p><span style="font-weight: bold;">Name:</span> This is the name of the Broadcast type in the system. It can be seen by users when creating or viewing Broadcasts in the system. It will also be seen by Contact Manager users when they view the types of Broadcasts that they can receive.</p>
+</li>
+</ul>
+<p class="important"><span style="font-weight: bold;"><img src="../../light_bulb__exclamation.png" alt="" style="border: none;" border="0" /> Note:</span> The Emergency Broadcast type may not be edited.</p>
+<ul style="list-style: disc;">
+<li>
+<p><span style="font-weight: bold;">Display Information:</span> Enter a description for each Broadcast type which will be viewed by users. It will also be viewable by Contact Manager users, if this feature is enabled on your account.</p>
+</li>
+<li>
+<p><span style="font-weight: bold;">Default Notification Setting:</span> Check which contact methods the Broadcast type will use by default when contacting message recipients. When you mouse over each checkbox, the full name associated with each contact method will be displayed.</p>
+</li>
+<li>
+<p><span style="font-weight: bold;">Delete:</span> <span style="margin-left: 0px;">&#160;Clicking this button will delete the Broadcast type from the system. Emergency and High Priority Broadcast types may not be deleted.</span></p>
+</li>
+</ul>
+<p style="font-weight: bold; margin-left: 0px;">&#160;</p>
+<h3>Create New Broadcast Type</h3>
+<p style="margin-left: 0px;">You may create a new Broadcast type by clicking on the Create New Broadcast Type button in the Broadcast Type screen.</p>
+<p style="margin-left: 0px;"><img src="../../AdminAddBroadcastType.jpg" alt="Creating a new Broadcast type." title="Creating a new Broadcast type." style="border: none;" border="0" /></p>
+<p class="important" style="margin-left: 0px;"><span style="font-weight: bold;"><img src="../../light_bulb__exclamation.png" alt="" style="border: none;" border="0" />Note:</span> New Broadcast types may only be General priority.</p>
+<ul style="list-style: disc;">
+<li>
+<p><span style="font-weight: bold;">Name:</span> Enter the name of the Broadcast Type. This is how it will be seen by users creating Broadcasts as well as by portal users.</p>
+</li>
+<li>
+<p><span style="font-weight: bold;">Check if this is a Survey:</span> Check this box if this Broadcast type is for surveys.</p>
+</li>
+<li>
+<p><span style="font-weight: bold;">Display Information:</span> Enter the description of the Broadcast type as you would like it to be seen by portal users.</p>
+</li>
+<li>
+<p><span style="font-weight: bold;">Default Contact Preferences:</span> Check the default methods that the Broadcast will use to contact recipients.</p>
+</li>
+</ul>
+<p style="margin-left: 0px;">&#160;</p>
+<h4><a name="Message_Intro" id="Message_Intro">Message Intro</a></h4>
+<p>The Message Intro page lets you manage the introduction message that plays before each phone call. This option will display if your system is configured to allow you to change your intro message. Read more about this feature <a title="Click to learn more about customizing intro messages." href="../Intro_Messages/Customizing_Intro_Messages.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn more about customizing intro messages.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">here</a>.</p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p><span style="font-size: xx-small;"><font size="1" style="font-size: xx-small;">©1999 - 2015 Reliance Communications, 
+	 Inc.</font></span></p>
+</div>
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+ if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape'))
+  document.write("<div id='tooltip' class='WebHelpPopupMenu'></div>");
+//]]>
+</script><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>
