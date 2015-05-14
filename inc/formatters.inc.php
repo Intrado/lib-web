@@ -219,7 +219,7 @@ function jobs_actionlinks ($obj) {
 			$copybtn = ''; // no copy survey feature
 		} else {
 			$editbtn = action_link(_L("Edit"),"pencil","job.php?id=$id");
-			$copybtn = action_link(_L("Copy"),"page_copy","jobs.php?copy=$id");
+                        $copybtn = action_link(_L("Copy"),"page_copy","jobs.php?copy=$id", "return confirm('Are you sure you want to copy and resend this broadcast to the same recipients?');");
 		}
 	
 		$editrepeatingbtn = action_link(_L("Edit"),"pencil","jobrepeating.php?id=$id");
