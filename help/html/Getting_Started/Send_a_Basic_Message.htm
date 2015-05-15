@@ -1,9 +1,9 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+
+<!DOCTYPE HTML>
+<html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="generator" content="Adobe RoboHelp 9" />
+<meta name="generator" content="Adobe RoboHelp 11" />
 <title>Send a Basic Message</title>
 <link rel="StyleSheet" href="../main.css" type="text/css" />
 <script type="text/javascript" language="JavaScript">
@@ -46,221 +46,243 @@ left:0px;
 top:0px;
 z-index:4;
 visibility:hidden; }
+p.WebHelpNavBar { text-align:right; }
 -->
 </style>
-<script type="text/javascript" language="javascript1.2" src="../whmsg.js"></script>
-<script type="text/javascript" language="javascript" src="../whver.js"></script>
-<script type="text/javascript" language="javascript1.2" src="../whproxy.js"></script>
-<script type="text/javascript" language="javascript1.2" src="../whutils.js"></script>
-<script type="text/javascript" language="javascript1.2" src="../whlang.js"></script>
-<script type="text/javascript" language="javascript1.2" src="../whtopic.js"></script>
 
+<script type="text/javascript" src="../template/scripts/rh.min.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/common.min.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/topic.min.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/constants.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/utils.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/mhutils.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/mhlang.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/mhver.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/settings.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/XmlJsReader.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/loadparentdata.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/loadscreen.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/loadprojdata.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/mhtopic.js" language="JavaScript1.2"></script>
+<script type="text/javascript" language="JavaScript1.2">
+gRootRelPath = "..";
+gCommonRootRelPath = "..";
+gTopicId = "1.0_3";
+</script><script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function ehlp_showtip(current,e,text)
+{
+  if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape'))
+  {
+    document.tooltip.document.write("<layer bgColor='yellow' style='border:1px solid black;font-size:12px;'>"+ text + "</layer>");
+    document.tooltip.document.close();
+    document.tooltip.left=e.pageX+5;
+    document.tooltip.top=e.pageY+5;
+    document.tooltip.visibility="show";
+  }
+}
+function ehlp_hidetip()
+{
+  document.tooltip.visibility="hidden";
+}
+//]]>
+</script>
 </head>
 
-<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
-<!--
-if (window.gbWhTopic)
-{
-	var strUrl = document.location.href;
-	var bc = 0;
-	var n = strUrl.toLowerCase().indexOf("bc-");
-	if(n != -1)
-	{
-		document.location.href = strUrl.substring(0, n);
-		bc = strUrl.substring(n+3);
-	}
+<body>
+<script type="text/javascript" src="../ehlpdhtm.js" language="JavaScript1.2"></script>
 
-	if (window.addTocInfo)
-	{
-	addTocInfo("Getting Started\nSend a Basic Message");
-addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
-
-	}
-	if (window.writeBtnStyle)
-		writeBtnStyle();
-
-	if (window.writeIntopicBar)
-		writeIntopicBar(1);
-
-	
-	document.write("<p style=\"text-align:right\"> ");
-AddMasterBreadcrumbs("../CommSuite_User_Guide.htm", "", ">", "Home", "Welcome.htm");
-document.write("<a href=\"Welcome.htm\">Getting Started<\/a> > Send a Basic Message<\/p>");
-
-
-	if (window.setRelStartPage)
-	{
-	setRelStartPage("../CommSuite_User_Guide.htm");
-
-		autoSync(0);
-		sendSyncInfo();
-		sendAveInfoOut();
-	}
-}
-else
-	if (window.gbIE4)
-		document.location.reload();
-
-//-->
-//]]></script>
-<div style="width: 100%; position: relative;" id="header">
-	<p>&#160;</p>
-</div>
 
 
 <h1>Quickly Send a Basic Message</h1>
 <p>This topic assumes:</p>
-<ul style="font-size: 8pt;" type="disc">
-	<li><p>You are completely unfamiliar with the system and need to quickly 
-	 send out a message.</p></li>
+<ol style="font-size: 8pt; list-style: decimal;">
+	<li><p>You are unfamiliar with the SchoolMessenger system and need 
+	 to quickly send out a broadcast message.</p></li>
 	<li><p>Your account does not have any <a title="Click to learn more about Broadcast Templates." href="../Broadcasts/Broadcast_Templates.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn more about Broadcast Templates.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Broadcast 
-	 Templates</a> configured for the Broadcast you need to send. (This 
-	 is just because Broadcast Templates let you quickly send a Broadcast 
-	 which has already been configured.) </p></li>
-</ul>
-<ul type="disc">
-	<li><p>You need to send a <span style="font-weight: bold;"><b>simple</b></span> 
-	 message to a large group, such as an entire school or grade, which 
-	 can be easily selected without having a premade list. If you need 
-	 to send a message which requires a more complicated list or a message 
-	 using advanced features like dynamic data inserts, please refer to 
-	 the Getting Started and/or Advanced Training <a title="Click to access basic and advanced PDF guides." href="../PDFs/PDF_Guides.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to access basic and advanced PDF guides.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">PDF 
-	 guides</a>.</p></li>
-</ul>
+	 Templates</a> configured for the Broadcast you need to send. Broadcast 
+	 Templates let you quickly send a broadcast which has already been 
+	 configured).</p></li>
+	<li><p>You need to send a <span style="font-weight: bold;">simple, 
+	 voice only</span> message to a large group, such as an entire school 
+	 or grade, without having a pre-made list.</p></li>
+</ol>
+<p>If you need to send a message which requires a more complicated list 
+ or a message using advanced features like dynamic data inserts, please 
+ refer to the Getting Started and/or Advanced Training <a title="Click to access basic and advanced PDF guides." href="../PDFs/PDF_Guides.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to access basic and advanced PDF guides.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">PDF 
+ guides</a>.</p>
 <p>&#160;</p>
 <h4>From the Dashboard</h4>
 <p>When you log into the system, the first screen you see is called the 
  <a title="Click to learn more about the Dashboard." href="Start_Page.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn more about the Dashboard.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Dashboard</a>. 
- On the right side, there is a large button labeled &quot;New Broadcast&quot;, 
- shown below. <span style="font-weight: bold;"><b>Click</b></span> this button 
- to get started.</p>
-<p><img src="../NewBroadcastButton.jpg" title="The New BroadcastButton on the Dashboard." 
-		 alt="The New BroadcastButton on the Dashboard." style="border: none;" 
-		 border="0" /></p>
+ On the right side, there is a large button labeled &quot;New Broadcast&quot;.</p>
+<p><img src="../NewBroadcastButton.png" alt="" style=" border:none; width:100%; max-width:217px;" border="0" /></p>
+<p>Click this button to get started.</p>
 <p>&#160;</p>
-<h4>Subject and Recipients</h4>
-<p>The following screenshot shows you the first step for creating a new 
- Broadcast.</p>
-<p><img src="../BroadcastWiz1.jpg" title="Creating a New Broadcast." alt="Adding Subject and Recipient List" 
-		 style="border: none;" border="0" /></p>
-<h3>Broadcast Info</h3>
-<ul type="disc">
-	<li><p><span style="font-weight: bold;"><b>Enter </b></span>a Subject<span 
-	 style="font-weight: bold;"><b>.</b></span> This will be the name of your 
-	 Broadcast and how you will see it in your Report.</p></li>
-	<li><p><span style="font-weight: bold;"><b>Select </b></span>a Type<span style="font-weight: bold;"><b>.</b></span> 
-	 This is the type of message you are sending, such as &quot;General 
-	 Announcement&quot; or &quot;Emergency&quot;. This affects where recipients 
-	 are contacted so be sure to choose the appropriate type.</p></li>
+<h4>Step 1: Subject and Recipients</h4>
+<p>The following shows you the first step for creating a new Broadcast.</p>
+<p><img src="../BroadcastWiz1.jpg" alt="" style=" border-left-style:Solid; border-left-width:2px; border-right-style:Solid; border-right-width:2px; border-top-style:Solid; border-top-width:2px; border-bottom-style:Solid; border-bottom-width:2px; width:100%; max-width:600px;" border="2" /></p>
+<ul style="list-style: disc;">
+	<li><p>Enter a <span style="font-weight: bold;">Subject</span><span>:</span> 
+	 This will be the name your Broadcast appears by in your Report.</p></li>
+	<li><p>Select a <span style="font-weight: bold;">Type:</span> This 
+	 is the type of message you are sending, such as &quot;General Announcement&quot; 
+	 or &quot;Emergency&quot;. This affects which method(s) recipients 
+	 are contacted by, so be sure to choose the appropriate type.</p></li>
 </ul>
-<p class="important"><span style="font-weight: bold;"><b><img src="../light_bulb__exclamation.png" alt="light_bulb__exclamation.png" style="border: none;" border="0" />Note:</b></span> 
- The Type you choose is important because it will affect how message recipients 
- are contacted. For example, some recipients only want to receive actual 
- emergency messages at a certain phone number which is associated with 
- Emergency jobs. </p>
+<p class="important"><span style="font-weight: bold;"><img src="../light_bulb__exclamation.png" alt="" style=" border:none; width:100%; max-width:16px;" border="0" />Note:</span> 
+ The Type you choose is important because it will affect which methods 
+ the people on your list are contacted by. For example, some recipients 
+ have elected to receive actual emergency messages at a certain phone number 
+ or email address which is associated with Emergency notifications and 
+ other numbers and email addresses where they receive General notifications.</p>
+<p class="important">&#160;</p>
 <h3>Recipient List</h3>
-<p><img src="../BroadcastWizAddRecip.jpg" title="Clicking Add Message Recipients and selecting Custom Rules." 
-		 alt="Clicking Add Message Recipients and selecting Custom Rules." 
-		 style="border: none;" border="0" /></p>
-<ul type="disc">
-	<li><p><span style="font-weight: bold;"><b>Click </b></span>&quot;Add Message 
-	 Recipients&quot;. </p></li>
-	<li><p><span style="font-weight: bold;"><b>Select</b></span> &quot;Custom 
-	 Rules&quot;, as shown above, and begin creating rules to select the 
-	 group of recipients you need. <span style="font-weight: bold;"><b>Click</b></span> 
-	 Save after adding each rule.</p></li>
+<p><img src="../BroadcastWizAddRecip.jpg" title="Clicking Add Message Recipients and selecting Custom Rules." alt="Clicking Add Message Recipients and selecting Custom Rules." style=" border:none; width:100%; max-width:317px;" border="0" /></p>
+<ul style="list-style: disc;">
+	<li><p>Click &quot;<span style="font-weight: bold;">Add Message Recipients</span>&quot;.</p></li>
+	<li><p>Select &quot;<span style="font-weight: bold;">Custom Rules</span>&quot; 
+	 from the drop-down menu, as shown above, and begin creating rules 
+	 to select the group of recipients you need.</p></li>
+	<ol>
+		<li style="list-style: decimal;"><p>Select a field from which to 
+		 create a rule. For example: Selecting &quot;School&quot; would 
+		 give you choices of all the schools in your district for which 
+		 you have permission to send notifications.</p></li>
+		<li style="list-style: decimal;"><p>Select a clause to search by. 
+		 Choices such as &quot;is, equals, does not equal, within, contains, 
+		 does not contain, begins with, etc.&quot; will control how your 
+		 selections are filtered.</p></li>
+		<li style="list-style: decimal;"><p>Either check all boxes that 
+		 apply to the location/persons you wish to notify <span style="font-weight: bold; 
+		 font-style: italic;">or</span> type the criteria for your search 
+		 in the text box.</p></li>
+		<li style="list-style: decimal;"><p>Click &quot;<span style="font-weight: bold;">Save&quot;.</span></p></li>
+	</ol>
 </ul>
-<h3 style="margin-left: 40px;">Simple List Examples</h3>
-<ul type="disc">
-	<ul type="disc">
-		<li><p>Calling an <span style="font-weight: bold;"><b>entire school</b></span>. 
-		 Select the &quot;School&quot; field, then check the box next to 
-		 the school name in the list of values. Click Save followed by 
-		 Done to use this list.</p></li>
-		<li><p>Calling <span style="font-weight: bold;"><b>all 10th graders 
-		 in one school</b></span>. Select the &quot;School&quot; field, then 
-		 check the box next to the school name in the list of values. Click 
-		 Save then click Add Rule. Select the &quot;Grade&quot; field then 
-		 check the value &quot;10&quot;. Click Save followed by Done to 
-		 use this list.</p></li>
+<p><img src="../BroadcastWizAddRecipCustRules01.jpg" alt="" style=" border-left-style:Solid; border-left-width:2px; border-right-style:Solid; border-right-width:2px; border-top-style:Solid; border-top-width:2px; border-bottom-style:Solid; border-bottom-width:2px; width:100%; max-width:600px;" border="2" /></p>
+<h3 style="margin-left: 40px;">&#160;</h3>
+<h3 style="margin-left: 80px;">Simple List Examples</h3>
+<ol style="list-style: disc;">
+	<li style="list-style: none; display: inline;"><ul style="list-style: disc;">
+		<ul style="list-style: disc;">
+			<li><p>Calling an <span style="font-weight: bold;">entire school</span>. 
+			 Select the &quot;School&quot; field, then check the box next 
+			 to the school name in the list of values. Click Save followed 
+			 by Done to use this list.</p></li>
+			<li><p>Calling <span style="font-weight: bold;">all 10th graders 
+			 in one school</span>. Select the &quot;School&quot; field, 
+			 then check the box next to the school name in the list of 
+			 values. Click Save then click Add Rule. Select the &quot;Grade&quot; 
+			 field then check the value &quot;10&quot;. Click Save followed 
+			 by Done to use this list.</p></li>
+		</ul>
 	</ul>
-	<li style="font-size: 8pt;"><p><span style="font-weight: bold;"><b>Click 
-	 </b></span>&quot;Add Myself&quot; and enter your contact information if 
-	 you would like to be contacted when you send your Broadcast.</p></li>
-	<li style="font-size: 8pt;"><p>If you want to save the list you've 
-	 created so you can reuse it later, click the folder icon to the left 
-	 of the list. You can preview your list by clicking the magnifying 
-	 glass icon. Click the &quot;X&quot; if you want to delete the list 
-	 and start over.</p></li>
-	<li style="font-size: 8pt;"><p><span style="font-weight: bold;"><b>Click 
-	 </b></span>the &quot;Continue&quot; button when you're done creating a 
-	 list.</p></li>
-</ul>
-<h4>Message Content</h4>
+	<p>Once you've saved a rule for your list, you have the option to click 
+	 <span style="font-weight: bold;">&quot;Add New Rule&quot;</span> and 
+	 repeat above steps 1 - 4 to add more recipients if needed.</p></li>
+	<li style="list-style: none; display: inline;"><p>When finished adding 
+	 recipients to the notification list, click the <span style="font-weight: bold;">&quot;Add 
+	 Recipients&quot;</span> button. &#160;This will close the window and 
+	 return you to the New Broadcast page. &#160;The &quot;Recipients&quot; 
+	 section will now show any lists you have created for this broadcast.</p></li>
+	<ul style="list-style: disc;">
+		<li><p>If you want to save the list you've created so you can reuse 
+		 it later, click the <img src="../SaveListButton01.jpg" alt="" style=" border:none; width:100%; max-width:38px;" border="0" /> 
+		 <span style="font-weight: bold;">&quot;Save List&quot;</span> 
+		 button to the left of the list.</p></li>
+		<li><p>You can preview your list by clicking the <img src="../ViewListButton01.jpg" alt="" style=" border:none; width:100%; max-width:38px;" border="0" /><span style="font-weight: bold;">&quot;View 
+		 List&quot;</span> button.</p></li>
+		<li><p>Click the <img src="../DeleteListButton01.jpg" alt="" style=" border:none; width:100%; max-width:34px;" border="0" /><span style="font-weight: bold;">&quot;Delete 
+		 List&quot;</span> button if you want to delete the list.</p></li>
+		<li><p>It is also a good idea (but optional) to click the <img src="../AddMeButton01.jpg" alt="" style=" border:none; width:100%; max-width:129px;" border="0" /><span 
+		 style="font-weight: bold;">&quot;Add Me&quot;</span><span> button 
+		 to put yourself on the recipients of this broadcast. &#160;You 
+		 can also edit your contact details if needed.</span></p></li>
+	</ul>
+</ol>
+<p style="margin-left: 40px;">Once you have selected all the recipient 
+ lists you need to deliver your broadcast to, click the <span style="font-weight: bold;"><img src="../ContinueButton01.jpg" alt="" style=" border:none; width:100%; max-width:100px;" border="0" />&quot;Continue&quot;</span> button on the 
+ lower right.</p>
+<p style="margin-left: 40px;">&#160;</p>
+<h4>Step 2: Message Content</h4>
 <p>In this step you will create your message content for all mediums you 
- would like to include in your Broadcast. The following screenshot shows 
- Phone message content being added. The message entered in the Scratch 
- Pad area will act as a script for recording the message. You can use this 
- feature if you find it helpful to prepare. Anything typed in the Scratch 
- Pad won't be saved.</p>
-<p><img src="../BroadcastWiz2.jpg" title="Adding phone message content." 
-		 alt="Adding phone message content." style="border: none;" border="0" /></p>
-<h3>Add Phone Content</h3>
-<p class="important"><span style="font-weight: bold;"><b><img src="../light_bulb__exclamation.png" alt="light_bulb__exclamation.png" style="border: none;" border="0" />Note:</b></span> 
- This section assumes you want to record your voice. If you'd prefer to 
- use text-to-speech, click the Text-to-Speech button in the Voice Type 
- options. This option lets you type your message content to be read by 
- the system. You may also use the automatic translation feature with Text-to-Speech.</p>
-<ul type="disc">
-	<li style="font-size: 8pt;"><p><span>You can optionally create a script 
-	 for yourself using the Scratch Pad before recording your message. 
-	 This isn't saved anywhere. It's just to help you organize and prepare.</span></p></li>
-	<li style="font-size: 8pt;"><p><span style="font-weight: bold;"><b>Enter 
-	 </b></span>the phone number where you may be reached to record your message 
-	 in the Recording field.</p></li>
-	<li style="font-size: 8pt;"><p><span style="font-weight: bold;"><b>Click 
-	 </b></span>&quot;Call Me to Record&quot;<span style="font-weight: bold;"><b>.</b></span> 
-	 The system will call you at the number you've entered. Simply <span 
-	 style="font-weight: bold;"><b>follow</b></span> the prompts to record your 
+ would like to include in your Broadcast.</p>
+<ul style="list-style: disc;">
+	<li>Begin by clicking on <span style="font-weight: bold;">&quot;Phone&quot;</span><span>. 
+	 &#160;The options to prepare and record your voice message will be 
+	 presented, as seen in the image below.</span></li>
+</ul>
+<p><img src="../BroadcastWiz2.jpg" title="Adding phone message content." alt="Adding phone message content." style=" border-left-style:Solid; border-left-width:2px; border-right-style:Solid; border-right-width:2px; border-top-style:Solid; border-top-width:2px; border-bottom-style:Solid; border-bottom-width:2px; width:100%; max-width:600px;" border="2" /></p>
+<ul style="list-style: disc;">
+	<li style="font-size: 8pt;"><p>Enter the <span style="font-weight: bold;">phone 
+	 number</span> where you may be reached to record your message in the 
+	 Recording field. <span style="font-style: italic;">(the default phone 
+	 number from your account will be inserted automatically. You may type 
+	 over this with a different phone number upon which to record the message, 
+	 if it differs.)</span></p></li>
+	<li style="font-size: 8pt;"><p><span style="font-style: italic;">Y</span>ou 
+	 can optionally create a script for yourself using the <span style="font-weight: bold;">Scratch 
+	 Pad</span> before recording your message. This isn't saved anywhere. 
+	 It's just to help you prepare and give you something to read from.</p></li>
+	<li style="font-size: 8pt;"><p>Click <span style="font-weight: bold;">&quot; 
+	 Call Now to Record&quot;.</span> The system will call the number you've 
+	 entered and, when answered, simply follow the prompts to record your 
 	 message.</p></li>
-	<li style="font-size: 8pt;"><p>After you've finished the phone message, 
-	 you may click &quot;Add Email&quot; or any other destination type 
-	 available to your account and add content. If you just want to send 
-	 your phone message, skip this step.</p></li>
-	<li style="font-size: 8pt;"><p><span style="font-weight: bold;"><b>Click 
-	 </b></span>the &quot;Continue&quot; button when you are done creating 
-	 your message content.</p></li>
+	<li style="font-size: 8pt;"><p>Once you save the message over the phone, 
+	 the screen will change to show <img src="../RecordingSavedEnglish01.jpg" alt="" style=" border:none; margin-left:0px; margin-right:0px; margin-bottom:0px; margin-top:0px; width:100%; max-width:328px;" border="0" />. 
+	 &#160;You can click the <span style="font-weight: bold;">&quot;Play 
+	 Message&quot;</span> or <span style="font-weight: bold;">&quot;Rerecord&quot;</span> 
+	 buttons if needed.</p></li>
+	<li style="font-size: 8pt;"><p>Click <img alt="" src="../SavePhoneMessageButton01.jpg" style=" border:none; width:100%; max-width:180px;" border="0" /> <span style="font-weight: bold;">&quot;Save 
+	 Phone Message&quot;</span><span> on the lower right when you are satisfied 
+	 with your voice message.</span></p></li>
+	<li style="font-size: 8pt;"><p>You may click <span style="font-weight: bold;">&quot;Email&quot;, 
+	 &quot;SMS&quot;</span> or any other notification type available to 
+	 your account if you wish to include those types. However, those options 
+	 are not covered in this basic tutorial.</p></li>
+	<li style="font-size: 8pt;"><p>Click the <span style="font-weight: bold;">&quot;Continue&quot;</span> 
+	 button in the lower right of the New Broadcast screen when you are 
+	 done creating your message content.</p></li>
 </ul>
+<h4>&#160;</h4>
 <h4>Step 3: Review and Send</h4>
-<p><img src="../BroadcastWiz3.jpg" title="Review and Submit your Broadcast" 
-		 alt="Review and Submit your Broadcast" style="border: none;" border="0" /></p>
-<ul type="disc">
-	<li><p><span style="font-weight: bold;"><b>Click &quot;Send Now&quot;</b></span> 
-	 to send your message immediately if everything looks correct.</p></li>
+<p><img src="../BroadcastWiz3.jpg" title="Review and Submit your Broadcast" alt="Review and Submit your Broadcast" style=" border-left-style:Solid; border-left-width:2px; border-right-style:Solid; border-right-width:2px; border-top-style:Solid; border-top-width:2px; border-bottom-style:Solid; border-bottom-width:2px; width:100%; max-width:600px;" border="2" /></p>
+<ul style="list-style: disc;">
+	<li><p>If your Recipient Count is accurate, click<span style="font-weight: bold;"> 
+	 &quot;Send Now&quot;</span> to immediately begin delivering your message.</p></li>
 </ul>
-<p>The system will begin sending your message to the recipients on your 
- list. You can monitor the progress from the <a title="Click to learn more about the Dashboard." href="Start_Page.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn more about the Dashboard.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Dashboard</a> 
+<p class="important"><span style="font-weight: bold;"><img src="../exclamation.png" alt="" style=" border:none; width:100%; max-width:16px;" border="0" /> 
+ Important:</span> If you need to return from step 3 &quot;Review &amp; 
+ Send&quot; to step 1 or 2, click on the dark green header for that step. 
+ &#160;Once you have made changes in step 1 or 2, you must &quot;Save&quot; 
+ and click on &quot;Continue&quot; to progress back to step 3. &#160;If 
+ you just click the green header for &quot;3 Review &amp; Send&quot;, your 
+ changes to steps 1 and 2 will not be applied to the broadcast.</p>
+<h4>After Clicking Send Now</h4>
+<p>The system will begin delivering your message to the recipients on your 
+ list(s).</p>
+<p>You can monitor the progress from the <a title="Click to learn more about the Dashboard." href="Start_Page.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn more about the Dashboard.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Dashboard</a> 
  after clicking &quot;Send Now&quot;. You'll see your job running in the 
  &quot;In Progress&quot; section. It will move to &quot;Completed&quot; 
- once it's done. View the help topics on <a href="../Reports/Reports.htm">creating 
- reports</a> if you would like to generate a report for this job.</p>
+ once it's done.</p>
+<p>View the help topics on <a href="../Reports/Reports.htm">creating reports</a> 
+ if you would like to generate a report for this job.</p>
 <p>&#160;</p>
 <div style="width: 100%; position: relative;" id="footer">
-	<p><span style="font-size: xx-small;"><font size="1" style="font-size: xx-small;">©1999 - 2014 SchoolMessenger</font></span></p>
+	<p><span style="font-size: xx-small;">©1999 - 2015 Reliance Communications, 
+	 Inc.</span></p>
 </div>
 <script type="text/javascript" language="JavaScript">
 //<![CDATA[
  if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape'))
   document.write("<div id='tooltip' class='WebHelpPopupMenu'></div>");
 //]]>
-</script><script type="text/javascript" language="javascript1.2">//<![CDATA[
-<!--
-if (window.writeIntopicBar)
-	writeIntopicBar(0);
-
-
-highlightSearch();
-//-->
-//]]></script>
+</script><script type="text/javascript" language="JavaScript">
+//<![CDATA[
+ if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape'))
+  document.write("<div id='tooltip' class='WebHelpPopupMenu'></div>");
+//]]>
+</script>
 </body>
 </html>

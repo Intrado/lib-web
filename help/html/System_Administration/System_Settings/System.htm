@@ -1,9 +1,9 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+
+<!DOCTYPE HTML>
+<html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="generator" content="Adobe RoboHelp 9" />
+<meta name="generator" content="Adobe RoboHelp 11" />
 <title>System</title>
 <link rel="StyleSheet" href="../../main.css" type="text/css" />
 <script type="text/javascript" language="JavaScript">
@@ -46,71 +46,57 @@ left:0px;
 top:0px;
 z-index:4;
 visibility:hidden; }
+p.WebHelpNavBar { text-align:right; }
 -->
 </style>
-<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
-<script type="text/javascript" language="javascript" src="../../whver.js"></script>
-<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
-<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
-<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
-<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
 
+<script type="text/javascript" src="../../template/scripts/rh.min.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../../template/scripts/common.min.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../../template/scripts/topic.min.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../../template/scripts/constants.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../../template/scripts/utils.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../../template/scripts/mhutils.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../../template/scripts/mhlang.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../../template/scripts/mhver.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../../template/scripts/settings.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../../template/scripts/XmlJsReader.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../../template/scripts/loadparentdata.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../../template/scripts/loadscreen.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../../template/scripts/loadprojdata.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../../template/scripts/mhtopic.js" language="JavaScript1.2"></script>
+<script type="text/javascript" language="JavaScript1.2">
+gRootRelPath = "../..";
+gCommonRootRelPath = "../..";
+gTopicId = "20.3.0_1";
+</script><script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function ehlp_showtip(current,e,text)
+{
+  if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape'))
+  {
+    document.tooltip.document.write("<layer bgColor='yellow' style='border:1px solid black;font-size:12px;'>"+ text + "</layer>");
+    document.tooltip.document.close();
+    document.tooltip.left=e.pageX+5;
+    document.tooltip.top=e.pageY+5;
+    document.tooltip.visibility="show";
+  }
+}
+function ehlp_hidetip()
+{
+  document.tooltip.visibility="hidden";
+}
+//]]>
+</script>
 </head>
 
-<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
-<!--
-if (window.gbWhTopic)
-{
-	var strUrl = document.location.href;
-	var bc = 0;
-	var n = strUrl.toLowerCase().indexOf("bc-");
-	if(n != -1)
-	{
-		document.location.href = strUrl.substring(0, n);
-		bc = strUrl.substring(n+3);
-	}
+<body>
+<script type="text/javascript" src="../../ehlpdhtm.js" language="JavaScript1.2"></script>
 
-	if (window.addTocInfo)
-	{
-	addTocInfo("System Administration\nSettings\nSystemwide Settings");
-addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
-
-	}
-	if (window.writeBtnStyle)
-		writeBtnStyle();
-
-	if (window.writeIntopicBar)
-		writeIntopicBar(1);
-
-	
-	document.write("<p style=\"text-align:right\"> ");
-AddMasterBreadcrumbs("../../CommSuite_User_Guide.htm", "", ">", "Home", "../../Getting_Started/Welcome.htm");
-document.write("<a href=\"../User_Management/Managing_User_Accounts.htm\">System Administration<\/a> > <a href=\"Job.htm\">Settings<\/a> > Systemwide Settings<\/p>");
-
-
-	if (window.setRelStartPage)
-	{
-	setRelStartPage("../../CommSuite_User_Guide.htm");
-
-		autoSync(0);
-		sendSyncInfo();
-		sendAveInfoOut();
-	}
-}
-else
-	if (window.gbIE4)
-		document.location.reload();
-
-//-->
-//]]></script>
-<div style="width: 100%; position: relative;" id="header">
-	<p>&#160;</p>
-</div>
 
 
 <h1>System</h1>
-<p class="important"><span style="font-weight: bold;"><b><img src="../../exclamation.png" alt="exclamation.png" style="border: none;" border="0" /> 
- Important:</b></span> Only those features that you have been granted access 
+<p class="important"><span style="font-weight: bold;"><img src="../../exclamation.png" alt="" style=" border:none; width:100%; max-width:16px;" border="0" /> 
+ Important:</span> Only those features that you have been granted access 
  to will display. For access to additional features contact your system 
  administrator.</p>
 <p>The Settings subtab contains options for the system, Broadcast, destination, 
@@ -118,14 +104,13 @@ else
  in the System section of the Settings subtab. This subtab also allows 
  you to manage Contact Manager Activation tokens and set the information 
  that Contact Manager users will see, if you have purchased the Contact 
- Manager option. </p>
+ Manager option.</p>
 <p>You may access systemwide settings by clicking on the Admin tab followed 
  by the Settings subtab.</p>
-<p><img src="../../AdminSettingsMain.jpg" alt="The Settings tab." title="The Settings subtab." 
-		 style="border: none;" border="0" /></p>
+<p><img src="../../AdminSettingsMain.jpg" alt="The Settings tab." title="The Settings subtab." style=" border:none; width:100%; max-width:600px;" border="0" /></p>
 <p style="font-weight: normal;">The links in the System section allow you 
  to modify settings for the entire system.</p>
-<ul type="disc">
+<ul style="list-style: disc;">
 	<li class="p"><p><a title="Click to go to Systemwide Alert Message" href="#Systemwide_Alert_Message" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to go to Systemwide Alert Message');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Systemwide Alert 
 	 Message</a></p></li>
 	<li class="p"><p><a title="Click to view help on Customer Information settings." href="#Customer_Information" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to view help on Customer Information settings.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Customer Information</a></p></li>
@@ -140,38 +125,28 @@ else
 <p>&#160;</p>
 <h4><a name="Systemwide_Alert_Message" id="Systemwide_Alert_Message">Systemwide 
  Alert Message:</a></h4>
-<p style="font-weight: bold;"><img src="../../AdminSettingsAlertMessage.jpg" 
-									 alt="The Systemwide Alert Screen" 
-									 title="The Systemwide Alert Screen" 
-									 style="border: none;" border="0" /></p>
-<ul type="disc">
-	<li><p><span style="font-weight: bold;"><b>Systemwide Alert Message:</b></span> 
+<p style="font-weight: bold;"><img src="../../AdminSettingsAlertMessage.jpg" alt="The Systemwide Alert Screen" title="The Systemwide Alert Screen" style=" border:none; width:100%; max-width:600px;" border="0" /></p>
+<ul style="list-style: disc;">
+	<li><p><span style="font-weight: bold;">Systemwide Alert Message:</span> 
 	 Text entered here will appear as an alert message for all users in 
 	 the system. The alert message appears as black text in a red box on 
 	 every page, as seen in the screenshot above..</p></li>
 </ul>
 <p style="margin-left: 40px;">&#160;</p>
 <h4><a name="Customer_Information" id="Customer_Information">Customer Information:</a></h4>
-<p style="margin-left: 40px;"><img src="../../AdminCustomerDisplaySetting.jpg" 
-									 alt="The Customer Information Screen." 
-									 title="The Customer Information Screen." 
-									 style="border: none;" border="0" /></p>
-<ul type="disc">
-	<li><p><span style="font-weight: bold;"><b>Customer Display Name:</b></span> 
+<p style="margin-left: 40px;"><img src="../../AdminCustomerDisplaySetting.jpg" alt="The Customer Information Screen." title="The Customer Information Screen." style=" border:none; width:100%; max-width:600px;" border="0" /></p>
+<ul style="list-style: disc;">
+	<li><p><span style="font-weight: bold;">Customer Display Name:</span> 
 	 Enter the name that you would like to appear at the top of each page.</p></li>
-	<li><p><span style="font-weight: bold;"><b>Email Domain:</b></span> Entering 
+	<li><p><span style="font-weight: bold;">Email Domain:</span> Entering 
 	 an email domain here will prevent users from sending emails with a 
 	 different &quot;From&quot; address.</p></li>
-	<li><p><span style="font-weight: bold;"><b>Local Area Code:</b></span> Enter 
+	<li><p><span style="font-weight: bold;">Local Area Code:</span> Enter 
 	 the local area code for your location.</p></li>
 </ul>
 <h4><a name="Field_Definitions" id="Field_Definitions">Field Definitions:</a></h4>
-<p style="margin-left: 40px; font-weight: bold;"><img src="../../AdminFieldDefinitions.jpg" 
-														 alt="The Metadata Manager." 
-														 title="The Metadata Manager." 
-														 style="border: none;" 
-														 border="0" /></p>
-<p class="important"><img src="../../exclamation.png" alt="exclamation.png" style="border: none;" border="0" /> <span style="font-weight: bold;"><b>Important:</b></span> 
+<p style="margin-left: 40px; font-weight: bold;"><img src="../../AdminFieldDefinitions.jpg" alt="The Metadata Manager." title="The Metadata Manager." style=" border:none; width:100%; max-width:600px;" border="0" /></p>
+<p class="important"><img src="../../exclamation.png" alt="" style=" border:none; width:100%; max-width:16px;" border="0" /> <span style="font-weight: bold;">Important:</span> 
  Modifying data field definitions after users have begun using your system 
  can cause unexpected results. Please contact support services for assistance 
  before modifying your field definitions. Call 800-920-3897.</p>
@@ -181,36 +156,36 @@ else
 <h3>Creating a New Field Definition</h3>
 <p style="margin-left: 0px;">There are four parts to the form that you 
  will need to consider when creating a new field. They are:</p>
-<ul type="disc">
-	<li><p style="margin-left: 0px;"><span style="font-weight: bold;"><b>Field 
-	 Number:</b></span> This is the field in the database that your data will 
+<ul style="list-style: disc;">
+	<li><p style="margin-left: 0px;"><span style="font-weight: bold;">Field 
+	 Number:</span> This is the field in the database that your data will 
 	 occupy.</p></li>
-	<li><p style="margin-left: 0px;"><span style="font-weight: bold;"><b>Name:</b></span> 
+	<li><p style="margin-left: 0px;"><span style="font-weight: bold;">Name:</span> 
 	 This is the name that represents the data in the field. It is what 
 	 users will see when they see this field in menus throughout the system.</p></li>
-	<li><p style="margin-left: 0px;"><span style="font-weight: bold;"><b>Type:</b></span> 
+	<li><p style="margin-left: 0px;"><span style="font-weight: bold;">Type:</span> 
 	 There are three types you can assign to your new field. These correspond 
 	 to how and where the field will appear in the system. All of them 
 	 are potentially available for creating dynamic messages.</p></li>
-	<li style="margin-left: 80px;"><p><span style="font-weight: bold;"><b>List:</b></span> 
+	<li style="margin-left: 80px;"><p><span style="font-weight: bold;">List:</span> 
 	 List will list all possible values for the data field in a drop down 
 	 menu. This is good for fields such as grade which will have a limited 
 	 number of values. Fields with the List type are used to create rules 
 	 throughout the system such as when creating lists, performing searches, 
 	 or restricting users to certain <a title="Click to learn more about creating Data Views." href="../User_Management/Managing_User_Accounts.htm#The User Editor Screen" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn more about creating Data Views.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Data 
 	 Views</a>.</p></li>
-	<li style="margin-left: 80px;"><p><span style="font-weight: bold;"><b>Text:</b></span> 
+	<li style="margin-left: 80px;"><p><span style="font-weight: bold;">Text:</span> 
 	 Text will give users the ability to search the data by typing into 
 	 a text box. This is good for fields which will have many possible 
 	 values such as first and last name. Fields with the text type are 
-	 only used on search pages such as <a title="Click to learn more about Quick Pick for adding individuals to lists." href="../../List_Builder/Add_Individual_Contacts.htm#Adding_Individuals_by_Searching" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn more about Quick Pick for adding individuals to lists.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Quick 
+	 only used on search pages such as <a title="Click to learn more about Quick Pick for adding individuals to lists." href="../../Lists/Create_a_List.htm#Quick_Pick___Search_by_Rules" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn more about Quick Pick for adding individuals to lists.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Quick 
 	 Pick</a> when adding individuals to a list.</p></li>
-	<li style="margin-left: 80px;"><p><span style="font-weight: bold;"><b>Date:</b></span> 
+	<li style="margin-left: 80px;"><p><span style="font-weight: bold;">Date:</span> 
 	 Defines data that contains a date, such as Absence Date.</p></li>
-	<li style="margin-left: 80px;"><p><span style="font-weight: bold;"><b>Numeric: 
-	 </b></span><span>Numeric is for fields which will contain an unknown quantity 
-	 of numeric values such as lunch balance. These </span></p></li>
-	<li><p style="margin-left: 0px;"><span style="font-weight: bold;"><b>Searchable:</b></span> 
+	<li style="margin-left: 80px;"><p><span style="font-weight: bold;">Numeric:</span> 
+	 <span>Numeric is for fields which will contain an unknown quantity 
+	 of numeric values such as lunch balance. These</span></p></li>
+	<li><p style="margin-left: 0px;"><span style="font-weight: bold;">Searchable:</span> 
 	 Checking this box determines whether or not users will be able to 
 	 search on this field. Searchable fields are used when creating lists 
 	 or searching for recipients. Not all fields should be searchable. 
@@ -225,78 +200,70 @@ else
  an Afterschool group field. All group fields are automatically created 
  as searchable fields so they can be used to create lists.</p>
 <h4><a name="Enrollment_Field_Definitions" id="Enrollment_Field_Definitions"><span 
-	 style="font-weight: bold;"><b>Section Field Definitions</b></span></a></h4>
+	 style="font-weight: bold;">Section Field Definitions</span></a></h4>
 <p style="margin-left: 40px;">Enrollment Fields are used to associate students 
  with staff and any additional class information your data contains. This 
  allows users to create lists based solely on class enrollment, so for 
  example, a teacher can easily make a list of his students based on the 
  class the student is enrolled in.</p>
-<h4><a name="Organization_Manager" id="a1"><span style="font-weight: bold;"><b>Organization 
- Manager</b></span></a></h4>
+<h4><a name="Organization_Manager" id="a1"><span style="font-weight: bold;">Organization 
+ Manager</span></a></h4>
 <p style="margin-left: 40px;">Larger organizations, such as school districts 
  or universities, typically have smaller internal groups into which users 
  and contacts may be organized. Please read the <a title="Click to learn more about managing organizations." href="../Organization_Management/Managing_Organizations.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn more about managing organizations.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Organization 
  Manager</a> help topic for more information.</p>
 <h4><a name="Security" id="Security">Security:</a></h4>
-<p style="margin-left: 40px;"><img src="../../AdminSettingsSecurity.jpg" 
-									 alt="The Security Screen." title="The Security Screen." 
-									 style="border: none;" border="0" /></p>
-<ul type="disc">
-	<li><p style="margin-left: 0px;"><span style="font-weight: bold;"><b>Minimum 
-	 Username Length:</b></span> Enter the minimum number of characters that 
+<p style="margin-left: 40px;"><img src="../../AdminSettingsSecurity.jpg" alt="The Security Screen." title="The Security Screen." style=" border:none; width:100%; max-width:600px;" border="0" /></p>
+<ul style="list-style: disc;">
+	<li><p style="margin-left: 0px;"><span style="font-weight: bold;">Minimum 
+	 Username Length:</span> Enter the minimum number of characters that 
 	 a username may contain.</p></li>
-	<li><p style="margin-left: 0px;"><span style="font-weight: bold;"><b>Minimum 
-	 Password Length:</b></span> Enter the minimum number of characters that 
+	<li><p style="margin-left: 0px;"><span style="font-weight: bold;">Minimum 
+	 Password Length:</span> Enter the minimum number of characters that 
 	 a password may contain.</p></li>
-	<li><p style="margin-left: 0px;"><span style="font-weight: bold;"><b>Invalid 
-	 Login Lockout:</b></span> Enter the number of failed login attempts permissible 
+	<li><p style="margin-left: 0px;"><span style="font-weight: bold;">Invalid 
+	 Login Lockout:</span> Enter the number of failed login attempts permissible 
 	 before the system should temporarily lock the account.</p></li>
-	<li><p style="margin-left: 0px;"><span style="font-weight: bold;"><b>Invalid 
-	 Login Lockout Period:</b></span> Enter the number of minutes an account 
+	<li><p style="margin-left: 0px;"><span style="font-weight: bold;">Invalid 
+	 Login Lockout Period:</span> Enter the number of minutes an account 
 	 should be locked out when there have been invalid login attempts.</p></li>
-	<li><p style="margin-left: 0px;"><span style="font-weight: bold;"><b>Invalid 
-	 Login Disable Account:</b></span> Enter the number of invalid login attempts 
+	<li><p style="margin-left: 0px;"><span style="font-weight: bold;">Invalid 
+	 Login Disable Account:</span> Enter the number of invalid login attempts 
 	 permissible before the system should disable the account. This must 
 	 be greater than the number of invalid logins permissible before a 
 	 temporary lockout.</p></li>
 </ul>
 <p style="font-weight: bold;">&#160;</p>
 <h4><a name="Display_Settings" id="Display_Settings">Display Settings</a></h4>
-<p style="font-weight: bold; margin-left: 40px;"><img src="../../AdminSettingsDisplay.jpg" 
-														 alt="Display Settings" 
-														 title="Display Settings" 
-														 style="border: none;" 
-														 border="0" /></p>
+<p style="font-weight: bold; margin-left: 40px;"><img src="../../AdminSettingsDisplay.jpg" alt="Display Settings" title="Display Settings" style=" border:none; width:100%; max-width:600px;" border="0" /></p>
 <p style="margin-left: 40px;">&#160;</p>
-<p style="margin-left: 40px;"><span style="font-weight: bold;"><b>Color Theme:</b></span> 
+<p style="margin-left: 40px;"><span style="font-weight: bold;">Color Theme:</span> 
  Use the dropdown menu to select a theme for the system's default user 
  interface.</p>
-<p style="margin-left: 40px;"><span style="font-weight: bold;"><b>Primary 
- Color (in hex):</b></span> Enter the value of the color you would like for 
+<p style="margin-left: 40px;"><span style="font-weight: bold;">Primary 
+ Color (in hex):</span> Enter the value of the color you would like for 
  the text and shaded areas throughout the system. This needs to be the 
  hex value for the color like you would use in HTML. You may also click 
  on the palette icon to the right of the field to select a color from the 
  menu.</p>
-<p style="margin-left: 40px;"><span style="font-weight: bold;"><b>Ratio of 
- Primary to Background:</b></span> This setting controls how much of your primary 
+<p style="margin-left: 40px;"><span style="font-weight: bold;">Ratio of 
+ Primary to Background:</span> This setting controls how much of your primary 
  color is blended with the shaded areas in the interface. An example shaded 
  area can be seen on the left side of the image above.</p>
 <div style="width: 100%; position: relative;" id="footer">
-	<p><span style="font-size: xx-small;"><font size="1" style="font-size: xx-small;">©1999 - 2014 SchoolMessenger</font></span></p>
+	<p><span style="font-size: xx-small;">©1999 - 2015 Reliance Communications, 
+	 Inc.</span></p>
 </div>
 <script type="text/javascript" language="JavaScript">
 //<![CDATA[
  if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape'))
   document.write("<div id='tooltip' class='WebHelpPopupMenu'></div>");
 //]]>
-</script><script type="text/javascript" language="javascript1.2">//<![CDATA[
-<!--
-if (window.writeIntopicBar)
-	writeIntopicBar(0);
-
-
-highlightSearch();
-//-->
-//]]></script>
+</script><script type="text/javascript" language="JavaScript">
+//<![CDATA[
+ if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape'))
+  document.write("<div id='tooltip' class='WebHelpPopupMenu'></div>");
+//]]>
+</script>
 </body>
 </html>

@@ -1,9 +1,9 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+
+<!DOCTYPE HTML>
+<html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="generator" content="Adobe RoboHelp 9" />
+<meta name="generator" content="Adobe RoboHelp 11" />
 <title>Managing User Accounts</title>
 <link rel="StyleSheet" href="../../main.css" type="text/css" />
 <script type="text/javascript" language="JavaScript">
@@ -46,197 +46,150 @@ left:0px;
 top:0px;
 z-index:4;
 visibility:hidden; }
+p.WebHelpNavBar { text-align:right; }
 -->
 </style>
-<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
-<script type="text/javascript" language="javascript" src="../../whver.js"></script>
-<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
-<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
-<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
-<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
 
-</head>
-
-<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
-<!--
-if (window.gbWhTopic)
+<script type="text/javascript" src="../../template/scripts/rh.min.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../../template/scripts/common.min.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../../template/scripts/topic.min.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../../template/scripts/constants.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../../template/scripts/utils.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../../template/scripts/mhutils.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../../template/scripts/mhlang.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../../template/scripts/mhver.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../../template/scripts/settings.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../../template/scripts/XmlJsReader.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../../template/scripts/loadparentdata.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../../template/scripts/loadscreen.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../../template/scripts/loadprojdata.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../../template/scripts/mhtopic.js" language="JavaScript1.2"></script>
+<script type="text/javascript" language="JavaScript1.2">
+gRootRelPath = "../..";
+gCommonRootRelPath = "../..";
+gTopicId = "20.1.0_1";
+</script><script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function ehlp_showtip(current,e,text)
 {
-	var strUrl = document.location.href;
-	var bc = 0;
-	var n = strUrl.toLowerCase().indexOf("bc-");
-	if(n != -1)
-	{
-		document.location.href = strUrl.substring(0, n);
-		bc = strUrl.substring(n+3);
-	}
-
-	if (window.addTocInfo)
-	{
-	addTocInfo("System Administration\nUser Management\nManaging User Accounts");
-addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
-
-	}
-	if (window.writeBtnStyle)
-		writeBtnStyle();
-
-	if (window.writeIntopicBar)
-		writeIntopicBar(1);
-
-	
-	document.write("<p style=\"text-align:right\"> ");
-AddMasterBreadcrumbs("../../CommSuite_User_Guide.htm", "", ">", "Home", "../../Getting_Started/Welcome.htm");
-document.write("<a href=\"Managing_User_Accounts.htm\">System Administration<\/a> > <a href=\"Managing_User_Accounts.htm\">User Management<\/a> > Managing User Accounts<\/p>");
-
-
-	if (window.setRelStartPage)
-	{
-	setRelStartPage("../../CommSuite_User_Guide.htm");
-
-		autoSync(0);
-		sendSyncInfo();
-		sendAveInfoOut();
-	}
+  if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape'))
+  {
+    document.tooltip.document.write("<layer bgColor='yellow' style='border:1px solid black;font-size:12px;'>"+ text + "</layer>");
+    document.tooltip.document.close();
+    document.tooltip.left=e.pageX+5;
+    document.tooltip.top=e.pageY+5;
+    document.tooltip.visibility="show";
+  }
 }
-else
-	if (window.gbIE4)
-		document.location.reload();
+function ehlp_hidetip()
+{
+  document.tooltip.visibility="hidden";
+}
+//]]>
+</script>
+</head>
+<body>
+<script type="text/javascript" src="../../ehlpdhtm.js" language="JavaScript1.2"></script>
 
-//-->
-//]]></script>
-<div style="width: 100%; position: relative;" id="header">
-	<p>&#160;</p>
-</div>
+
 
 
 <h1>Managing User Accounts</h1>
-<p class="important"><span style="font-weight: bold;"><b><img src="../../exclamation.png" alt="exclamation.png" style="border: none;" border="0" /> 
- Important:</b></span> Only those features that you have been granted access 
- to will display. For access to additional features contact your system 
- administrator.</p>
-<p>Users are people who have access to the system either using a web browser, 
- a telephone, or both. The system administrator can create and configure 
- new user accounts from the User List, found under the Admin tab in the 
- Users subtab. The image below shows the User List screen which will be 
- explained below.</p>
-<p><img src="../../AdminUsers.jpg" alt="User List Screen" title="User List Screen" 
-		 style="border: none;" border="0" /></p>
+<p class="important"><span style="font-weight: bold;"><img src="../../exclamation.png" alt="" style=" border:none; width:100%; max-width:16px;" border="0" /> Important:</span> Only those features that you have been granted access to will display. For access to additional features contact your system administrator.</p>
+<p>Users are people who have access to the system either using a web browser, a telephone, or both. The system administrator can create and configure new user accounts from the User List, found under the Admin tab in the Users subtab. The image below shows the User List screen which will be explained below.</p>
+<p><img src="../../AdminUsers.jpg" alt="User List Screen" title="User List Screen" style=" border:none; width:100%; max-width:600px;" border="0" /></p>
 <h4>Active Users</h4>
-<p>This section displays all of the users currently entered into the system 
- and the Access Profile they are currently set at. It also contains the 
- Add New User button which you must click to add a new user. To the right 
- in the Actions area are four links:</p>
-<ul type="disc">
-	<li class="p"><p><span style="font-weight: bold;"><b>Edit:</b></span> Clicking 
-	 this takes you to the <a title="Click here to learn more about the User Editor." href="#The User Editor Screen" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click here to learn more about the User Editor.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">User Editor</a> 
-	 where you can configure the user's account.</p></li>
+<p>This section displays all of the users currently entered into the system and the Access Profile they are currently set at. It also contains the Add New User button which you must click to add a new user. To the right in the Actions area are four links:</p>
+<ul style="list-style: disc;">
+<li class="p">
+<p><span style="font-weight: bold;">Edit:</span> Clicking this takes you to the <a title="Click here to learn more about the User Editor." href="#The User Editor Screen" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click here to learn more about the User Editor.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">User Editor</a> where you can configure the user's account.</p>
+</li>
 </ul>
-<p class="important"><span style="font-weight: bold;"><b><img src="../../light_bulb__exclamation.png" alt="light_bulb__exclamation.png" style="border: none;" border="0" />Note:</b></span> 
- If the user is part of a user import, only the password and PIN will be 
- editable.</p>
-<ul type="disc">
-	<li class="p"><p><span style="font-weight: bold;"><b>Login as this user:</b></span> 
-	 Allows you to log into the system as that user.</p></li>
-	<li class="p"><p><span style="font-weight: bold;"><b>Reset Password:</b></span> 
-	 Click this to reset the user's password. An email will be sent to 
-	 the user with instructions for completing this process.</p></li>
-	<li class="p"><p><span style="font-weight: bold;"><b>Disable:</b></span> Clicking 
-	 this link renders that user inactive. They will be displayed in the 
-	 Inactive Users section of the page.</p></li>
+<p class="important"><span style="font-weight: bold;"><img src="../../light_bulb__exclamation.png" alt="" style=" border:none; width:100%; max-width:16px;" border="0" />Note:</span> If the user is part of a user import, only the password and PIN will be editable.</p>
+<ul style="list-style: disc;">
+<li class="p">
+<p><span style="font-weight: bold;">Login as this user:</span> Allows you to log into the system as that user.</p>
+</li>
+<li class="p">
+<p><span style="font-weight: bold;">Reset Password:</span> Click this to reset the user's password. An email will be sent to the user with instructions for completing this process.</p>
+</li>
+<li class="p">
+<p><span style="font-weight: bold;">Disable:</span> Clicking this link renders that user inactive. They will be displayed in the Inactive Users section of the page.</p>
+</li>
 </ul>
 <p>&#160;</p>
 <h4>Inactive Users</h4>
-<p>This section displays the users whose accounts have been disabled. To 
- the right in the Actions area there are three links:</p>
-<ul type="disc">
-	<li class="p"><p><span style="font-weight: bold;"><b>Edit: </b></span>&#160;Clicking 
-	 this takes you to the <a title="Click here to learn more about the User Editor." href="#The User Editor Screen" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click here to learn more about the User Editor.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">User Editor</a> 
-	 where you can configure the user's account.</p></li>
-	<li class="p"><p><span style="font-weight: bold;"><b>Enable: </b></span>&#160;Allows 
-	 the user to login and moves the user's account back into the Active 
-	 Users section of the page.</p></li>
-	<li class="p"><p><span style="font-weight: bold;"><b>Delete: </b></span>Clicking 
-	 this link deletes the user from the system. Deleting cannot be undone.</p></li>
+<p>This section displays the users whose accounts have been disabled. To the right in the Actions area there are three links:</p>
+<ul style="list-style: disc;">
+<li class="p">
+<p><span style="font-weight: bold;">Edit:</span> &#160;Clicking this takes you to the <a title="Click here to learn more about the User Editor." href="#The User Editor Screen" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click here to learn more about the User Editor.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">User Editor</a> where you can configure the user's account.</p>
+</li>
+<li class="p">
+<p><span style="font-weight: bold;">Enable:</span> &#160;Allows the user to login and moves the user's account back into the Active Users section of the page.</p>
+</li>
+<li class="p">
+<p><span style="font-weight: bold;">Delete:</span> Clicking this link deletes the user from the system. Deleting cannot be undone.</p>
+</li>
 </ul>
 <p style="font-weight: bold;">&#160;</p>
 <h4><a name="The User Editor Screen"></a>The User Editor Screen:</h4>
-<p>The User Editor screen is where user's accounts can be configured. The 
- image below shows the User Editor screen and information on each section 
- can be found below.</p>
-<p class="important"><span style="font-weight: bold;"><b><img src="../../light_bulb__exclamation.png" alt="light_bulb__exclamation.png" style="border: none;" border="0" />Note:</b></span> 
- If the user is part of a user import, only the password and PIN will be 
- editable.</p>
-<p><img src="../../AdminUsersUserInformation.jpg" alt="User Editor Screen" 
-		 title="User Editor Screen" style="border: none;" border="0" /></p>
+<p>The User Editor screen is where user's accounts can be configured. The image below shows the User Editor screen and information on each section can be found below.</p>
+<p class="important"><span style="font-weight: bold;"><img src="../../light_bulb__exclamation.png" alt="" style=" border:none; width:100%; max-width:16px;" border="0" />Note:</span> If the user is part of a user import, only the password and PIN will be editable.</p>
+<p><img src="../../AdminUsersUserInformation.jpg" alt="User Editor Screen" title="User Editor Screen" style=" border:none; width:100%; max-width:600px;" border="0" /></p>
 <h3>Account Information</h3>
-<ul type="disc">
-	<li class="p"><p>Enter the user's information into the fields provided. 
-	 It is important to remember that the user name and password are case-sensitive. 
-	 The Telephone User ID and Pin Code must be numeric. The Email field 
-	 is for the user's email address and is where the link to the password 
-	 reset feature will be sent if the user forgets or needs to change 
-	 their password. Auto Report Emails are the additional email addresses 
-	 where reports should be sent after a job is completed. Multiple email 
-	 addresses in this field may be separated by commas or semicolons.</p></li>
+<ul style="list-style: disc;">
+<li class="p">
+<p>Enter the user's information into the fields provided. It is important to remember that the user name and password are case-sensitive. The Telephone User ID and Pin Code must be numeric. The Email field is for the user's email address and is where the link to the password reset feature will be sent if the user forgets or needs to change their password. Auto Report Emails are the additional email addresses where reports should be sent after a job is completed. Multiple email addresses in this field may be separated by commas or semicolons.</p>
+</li>
 </ul>
 <p>&#160;</p>
 <h3>Account Restrictions</h3>
-<ul type="disc">
-	<li class="p"><p><span style="font-weight: bold;"><b>Access Profile: </b></span>Choose 
-	 an <a title="Click to learn more about Access Profiles." href="Managing_Access_Profiles.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn more about Access Profiles.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Access 
-	 Profile</a> from the drop down menu</p></li>
-	<li class="p"><p><span style="font-weight: bold;"><b>Job Type Restrictions:</b></span> 
-	 Select the job types this user should be able to do. &#160;</p></li>
-	<li class="p"><p><span style="font-weight: bold;"><b>Survey Type Restriction: 
-	 </b></span>&#160;Select the types of survey jobs this user should be able 
-	 to do.</p></li>
+<ul style="list-style: disc;">
+<li class="p">
+<p><span style="font-weight: bold;">Access Profile:</span> Choose an <a title="Click to learn more about Access Profiles." href="Managing_Access_Profiles.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn more about Access Profiles.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Access Profile</a> from the drop down menu</p>
+</li>
+<li class="p">
+<p><span style="font-weight: bold;">Job Type Restrictions:</span> Select the job types this user should be able to do. &#160;</p>
+</li>
+<li class="p">
+<p><span style="font-weight: bold;">Survey Type Restriction:</span> &#160;Select the types of survey jobs this user should be able to do.</p>
+</li>
 </ul>
 <p>&#160;</p>
 <h3>Data View:</h3>
-<ul type="disc">
-	<li class="p"><p><span style="font-weight: bold;"><b>Staff ID:</b></span> 
-	 If this user is a staff member, this field should contain the user's 
-	 unique Staff ID number. Restricting a user’s access based on their 
-	 staff ID number is only necessary if you are importing student schedule/enrollment 
-	 data, which will include the ID number of the staff member assigned 
-	 to teach each class section. If you are not importing student schedule 
-	 data this should be left blank.</p></li>
-	<li class="p"><p><span style="font-weight: bold;"><b>Additional Sections:</b></span> 
-	 If this staff member should be associated to sections within an organization, 
-	 such as classes in a school, first select the organization from the 
-	 dropdown menu. Then select the Section from the list of available 
-	 sections. For example, if you are creating a teacher's account with 
-	 a staff ID, you would want to select the school where this user is 
-	 teaching, then the classes taught. This allows the user to send messages 
-	 to their associated sections.</p></li>
-	<li class="p"><p><span style="font-weight: bold;"><b>Additional School 
-	 (or Organization):</b></span> Select the schools or organizations that 
-	 the user is associated with.</p></li>
-	<li class="p"><p><span style="font-weight: bold;"><b>Data Restrictions:</b></span> 
-	 &#160;If this user should only have access to certain fields in the 
-	 database, select the fields here.</p></li>
-	<li class="p"><p><span style="font-weight: bold;"><b>Viewable Users: </b></span><span>&#160;Select 
-	 any additional users whose Broadcasts should be viewable on this user's 
-	 Dashboard.</span></p></li>
+<ul style="list-style: disc;">
+<li class="p">
+<p><span style="font-weight: bold;">Staff ID:</span> If this user is a staff member, this field should contain the user's unique Staff ID number. Restricting a user’s access based on their staff ID number is only necessary if you are importing student schedule/enrollment data, which will include the ID number of the staff member assigned to teach each class section. If you are not importing student schedule data this should be left blank.</p>
+</li>
+<li class="p">
+<p><span style="font-weight: bold;">Additional Sections:</span> If this staff member should be associated to sections within an organization, such as classes in a school, first select the organization from the dropdown menu. Then select the Section from the list of available sections. For example, if you are creating a teacher's account with a staff ID, you would want to select the school where this user is teaching, then the classes taught. This allows the user to send messages to their associated sections.</p>
+</li>
+<li class="p">
+<p><span style="font-weight: bold;">Additional School (or Organization):</span> Select the schools or organizations that the user is associated with.</p>
+</li>
+<li class="p">
+<p><span style="font-weight: bold;">Data Restrictions:</span> &#160;If this user should only have access to certain fields in the database, select the fields here.</p>
+</li>
+<li class="p">
+<p><span style="font-weight: bold;">Viewable Users:</span> <span>&#160;Select any additional users whose Broadcasts should be viewable on this user's Dashboard.</span></p>
+</li>
 </ul>
-<p>When you have finished making changes, click the Done button to save 
- your changes.</p>
+<p>When you have finished making changes, click the Done button to save your changes.</p>
 <p>&#160;</p>
 <div style="width: 100%; position: relative;" id="footer">
-	<p><span style="font-size: xx-small;"><font size="1" style="font-size: xx-small;">©1999 - 2014 SchoolMessenger</font></span></p>
+	<p><span style="font-size: xx-small;">©1999 - 2015 Reliance Communications, 
+	 Inc.</span></p>
 </div>
 <script type="text/javascript" language="JavaScript">
 //<![CDATA[
  if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape'))
   document.write("<div id='tooltip' class='WebHelpPopupMenu'></div>");
 //]]>
-</script><script type="text/javascript" language="javascript1.2">//<![CDATA[
-<!--
-if (window.writeIntopicBar)
-	writeIntopicBar(0);
-
-
-highlightSearch();
-//-->
-//]]></script>
+</script><script type="text/javascript" language="JavaScript">
+//<![CDATA[
+ if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape'))
+  document.write("<div id='tooltip' class='WebHelpPopupMenu'></div>");
+//]]>
+</script>
 </body>
 </html>

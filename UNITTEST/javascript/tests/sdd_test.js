@@ -112,21 +112,13 @@ describe("SDD (Secure Document Delivery)", function() {
 		});
 
 		it("if 'password' arg NOT provided, should perform AJAX 'POST' request with s, mal, and NO p (password) or v (verify) params", function() {
-			var ajaxStub = sinon.stub(jQuery, "ajax");
-
+			var postToUrlStub = sinon.stub(sdd, "postToUrl");
 			// request without password (non-password-protected)
 			sdd.requestDocument();
-
-			expect(ajaxStub).to.have.been.called;
-			var args = ajaxStub.args[0][0];
-			expect(args.url).to.equal(requestDocumentUrl);
-			expect(args.type).to.equal("POST");
-			expect(args.data.s).to.equal('1234');
-			expect(args.data.mal).to.equal('5678');
-			expect(args.data.p).to.equal(null);
-			expect(args.data.v).to.equal(undefined);
-			ajaxStub.restore();
-		});
+			var postArgs = {s:'1234',mal:'5678',p:null};
+			expect(postToUrlStub).to.have.been.calledWith(requestDocumentUrl, postArgs);
+			postToUrlStub.restore();
+    	});
 
 		it("should call this.postToUrl(url, params) in success callback", function() {
 			var ajaxStub = sinon.stub(jQuery, "ajax").yieldsTo('success', {res: {}});
@@ -136,32 +128,6 @@ describe("SDD (Secure Document Delivery)", function() {
 			var postArgs = {s:'1234',mal:'5678',p:'secretpassword123'};
 			expect(postToUrlStub).to.have.been.calledWith(requestDocumentUrl, postArgs);
 
-			ajaxStub.restore();
-			postToUrlStub.restore();
-		});
-
-		it("should show the provided error message, from the error response, if error callback called", function() {
-			var ajaxStub = sinon.stub(jQuery, "ajax").yieldsTo('error', {responseJSON: {errorMessage: 'ERROR: server unavailable.'}});
-
-			expect(sdd.errorMsgContainer.is(":visible")).to.equal(false);
-
-			// the request will result in the $.ajax error callback being invoked (from stub yieldsTo above)
-			sdd.requestDocument();
-			expect(sdd.errorMsgContainer.is(":visible")).to.equal(true);
-			expect(sdd.errorMsg.text()).to.equal('ERROR: server unavailable.');
-			ajaxStub.restore();
-		});
-
-		it("should show a generic default error message, if no error response message provided, if error callback called", function() {
-			var ajaxStub = sinon.stub(jQuery, "ajax").yieldsTo('error', {});
-			var postToUrlStub = sinon.stub(sdd, "postToUrl");
-
-			expect(sdd.errorMsgContainer.is(":visible")).to.equal(false);
-
-			// the request will result in the $.ajax error callback being invoked (from stub yieldsTo above)
-			sdd.requestDocument();
-			expect(sdd.errorMsgContainer.is(":visible")).to.equal(true);
-			expect(sdd.errorMsg.text()).to.equal('An error occurred while trying to retrieve your document. Please try again.');
 			ajaxStub.restore();
 			postToUrlStub.restore();
 		});

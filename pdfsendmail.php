@@ -146,6 +146,7 @@ class PdfSendMail extends PageForm {
 			// Create a new job object directly in the DB
 			$job = Job::jobWithDefaults();
 			// If the destination has more than one student, we should send all duplicates
+			$job->setOption("skipduplicates",0);
 			$job->setOption("skipemailduplicates",0);
 			$job->name = $postData['broadcastname'];
 			$job->description = "Secure Document Delivery notification";
@@ -243,6 +244,11 @@ class PdfSendMail extends PageForm {
 			// run the job
 			$job->runNow();
 
+			//update burst to be "sent"
+			$this->burst->jobId = $job->id;
+			$this->burst->status = "sent";
+			$this->csApi->updateBurstData($this->burst);
+
 			Query("COMMIT");
 
 			unset($_SESSION['pdfsendmail_burstid']);
@@ -316,14 +322,14 @@ class PdfSendMail extends PageForm {
 		// Replace the automagical customer name of it is present
 		$customerName = escapehtml($this->custname);
 		$messageBody = str_replace('#CUSTOMERNAMEPLACEHOLDER', $customerName, $messageBody);
-		reset($boradcastTypeNames);
+		reset($broadcastTypeNames);
 		$selectedBroadcastType = key($broadcastTypeNames);
 		$formdata = array(
 			_L("Broadcast Settings"),
 			"broadcastname" => array(
 				"label" => _L('Broadcast Name'),
 				"fieldhelp" => _L('Enter a name for your email.'),
-				"value" => _L('Secure Document Delivery: ') . $this->burst->name,
+				"value" => $this->burst->name,
 				"validators" => array(
 					array('ValRequired'),
 					array("ValLength","min" => 3,"max" => 50),
@@ -369,7 +375,7 @@ class PdfSendMail extends PageForm {
 		$formdata["fromname"] = array(
 			"label" => _L('From Name'),
 			"fieldhelp" => _L('Enter the name of the Document sender.'),
-			"value" => '',
+			"value" => $USER->firstname . ((strlen($USER->lastname) > 0) ? ' ' . $USER->lastname : ''),
 			"validators" => array(
 				array('ValRequired'),
 				array("ValLength", "max" => 50)
@@ -380,7 +386,7 @@ class PdfSendMail extends PageForm {
 		$formdata["fromemail"] = array(
 			"label" => _L('From Email'),
 			"fieldhelp" => _L('Enter the email address this message should appear to come from.'),
-			"value" => '',
+			"value" => $USER->email,
 			"validators" => array(
 				array('ValRequired'),
 				array("ValLength", "max" => 255),
@@ -392,7 +398,7 @@ class PdfSendMail extends PageForm {
 		$formdata["subject"] = array(
 			"label" => _L('Subject'),
 			"fieldhelp" => _L('Enter a subject for this Delivery email.'),
-			"value" => '',
+			"value" => $this->burst->name,
 			"validators" => array(
 				array('ValRequired'),
 				array("ValLength", "max" => 255)

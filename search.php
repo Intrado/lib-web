@@ -73,11 +73,16 @@ if (isset($_GET['listsearchmode'])) {
 //get the list to edit from the request params or session
 if (isset($_GET['id'])) {
 	setCurrentList($_GET['id']);
-	
-	// NOTE: maintaing previous behavior while removing errors from httpd log files. See bug:4605
-	$referer = (isset($_SERVER['HTTP_REFERER'])?$_SERVER['HTTP_REFERER']:NULL);
-	$_SESSION['listreferer'] = $referer;
-	redirect("search.php" . (isset($_GET["iframe"])?"?iframe=true":""));
+
+    // API clients don't support redirect/page-reload for caching session state.
+    // For these clients, just continue with execution and don't redirect!
+    //
+    if (!isset($_GET['api'])) {
+        // NOTE: maintaing previous behavior while removing errors from httpd log files. See bug:4605
+        $referer = (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : NULL);
+        $_SESSION['listreferer'] = $referer;
+        redirect("search.php" . (isset($_GET["iframe"]) ? "?iframe=true" : ""));
+    }
 }
 
 handle_list_checkbox_ajax(); //for handling check/uncheck from the list

@@ -76,6 +76,7 @@ class PdfEditPage extends PageForm {
 		else {
 			$this->burstData = (object) null;
 			$this->burstData->name = '';
+			$this->burstData->status = 'new';
 			$this->burstData->burstTemplateId = '';
 			$this->burstData->filename = '';
 		}
@@ -95,8 +96,10 @@ class PdfEditPage extends PageForm {
 			}
 		}
 
+		//in case of sent burst, just get the current template
+		$query = (!is_null($this->burstId) && $this->burstData->status != 'new') ? "SELECT id, name from bursttemplate where id=".$this->burstData->burstTemplateId : 'SELECT `id`, `name` FROM `bursttemplate` WHERE NOT `deleted`;';
 		// Get a list of burst templates
-		if (is_object($res = Query('SELECT `id`, `name` FROM `bursttemplate` WHERE NOT `deleted`;'))) {
+		if (is_object($res = Query($query))) {
 			while ($row = DBGetRow($res, true)) {
 				$this->burstTemplates[$row['id']] = $row['name'];
 			 }
@@ -192,8 +195,11 @@ class PdfEditPage extends PageForm {
 				),
 				"control" => array("TextField","size" => 30, "maxlength" => 50),
 				"helpstep" => 1
-			),
-			"bursttemplateid" => array(
+			)
+		);
+
+		if ($this->burstData->status === 'new') {
+			$formdata["bursttemplateid"] = array(
 				"label" => _L('Template'),
 				"value" => $this->burstData->burstTemplateId,
 				"validators" => array(
@@ -202,8 +208,18 @@ class PdfEditPage extends PageForm {
 				),
 				"control" => array('SelectMenu', 'values' => (array('' => _L('Select PDF Template')) + $this->burstTemplates)),
 				"helpstep" => 2
-			)
-		);
+			);
+		} else {
+			$formdata['bursttemplateid'] = array(
+				"label" => _L('Template'),
+				"fieldhelp" => _L('This template was for processing this Document for delivery'),
+				'value' => $this->burstData->burstTemplateId,
+				"control" => array('FormHtml', 'html' => $this->burstTemplates[$this->burstData->burstTemplateId]),
+				"validators" => Array(),
+				"helpstep" => 2
+			);
+		}
+
 
 		// If we already have a burstId
 		if (! is_null($this->burstId)) {

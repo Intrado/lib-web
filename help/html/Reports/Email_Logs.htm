@@ -1,9 +1,9 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+
+<!DOCTYPE HTML>
+<html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="generator" content="Adobe RoboHelp 9" />
+<meta name="generator" content="Adobe RoboHelp 11" />
 <title>Email Logs</title>
 <link rel="StyleSheet" href="../main.css" type="text/css" />
 <script type="text/javascript" language="JavaScript">
@@ -46,215 +46,171 @@ left:0px;
 top:0px;
 z-index:4;
 visibility:hidden; }
+p.WebHelpNavBar { text-align:right; }
 -->
 </style>
-<script type="text/javascript" language="javascript1.2" src="../whmsg.js"></script>
-<script type="text/javascript" language="javascript" src="../whver.js"></script>
-<script type="text/javascript" language="javascript1.2" src="../whproxy.js"></script>
-<script type="text/javascript" language="javascript1.2" src="../whutils.js"></script>
-<script type="text/javascript" language="javascript1.2" src="../whlang.js"></script>
-<script type="text/javascript" language="javascript1.2" src="../whtopic.js"></script>
 
-</head>
-
-<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
-<!--
-if (window.gbWhTopic)
+<script type="text/javascript" src="../template/scripts/rh.min.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/common.min.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/topic.min.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/constants.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/utils.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/mhutils.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/mhlang.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/mhver.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/settings.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/XmlJsReader.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/loadparentdata.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/loadscreen.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/loadprojdata.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/mhtopic.js" language="JavaScript1.2"></script>
+<script type="text/javascript" language="JavaScript1.2">
+gRootRelPath = "..";
+gCommonRootRelPath = "..";
+gTopicId = "13.0_5";
+</script><script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function ehlp_showtip(current,e,text)
 {
-	var strUrl = document.location.href;
-	var bc = 0;
-	var n = strUrl.toLowerCase().indexOf("bc-");
-	if(n != -1)
-	{
-		document.location.href = strUrl.substring(0, n);
-		bc = strUrl.substring(n+3);
-	}
-
-	if (window.addTocInfo)
-	{
-	addTocInfo("Reports\nEmail Logs");
-addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
-
-	}
-	if (window.writeBtnStyle)
-		writeBtnStyle();
-
-	if (window.writeIntopicBar)
-		writeIntopicBar(1);
-
-	
-	document.write("<p style=\"text-align:right\"> ");
-AddMasterBreadcrumbs("../CommSuite_User_Guide.htm", "", ">", "Home", "../Getting_Started/Welcome.htm");
-document.write("<a href=\"Reports.htm\">Reports<\/a> > Email Logs<\/p>");
-
-
-	if (window.setRelStartPage)
-	{
-	setRelStartPage("../CommSuite_User_Guide.htm");
-
-		autoSync(0);
-		sendSyncInfo();
-		sendAveInfoOut();
-	}
+  if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape'))
+  {
+    document.tooltip.document.write("<layer bgColor='yellow' style='border:1px solid black;font-size:12px;'>"+ text + "</layer>");
+    document.tooltip.document.close();
+    document.tooltip.left=e.pageX+5;
+    document.tooltip.top=e.pageY+5;
+    document.tooltip.visibility="show";
+  }
 }
-else
-	if (window.gbIE4)
-		document.location.reload();
+function ehlp_hidetip()
+{
+  document.tooltip.visibility="hidden";
+}
+//]]>
+</script>
+</head>
+<body>
+<script type="text/javascript" src="../ehlpdhtm.js" language="JavaScript1.2"></script>
 
-//-->
-//]]></script>
-<div style="width: 100%; position: relative;" id="header">
-	<p>&#160;</p>
-</div>
+
 
 
 <h1>Email Logs</h1>
-<p>This section contains information to help you interpret Email Log reports. 
- To learn how to create an Email Log report, please view the help topic, 
- <a title="Click to read more about using the Report Builder." href="Querying_Report_Data.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to read more about using the Report Builder.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Using 
- the Report Builder</a>. If you have already created an Email Log report, 
- this section will help you understand the report results.</p>
-<p><img src="../EmailLog.jpg" alt="Email Log Report" title="Email Log Report" 
-		 style="border: none;" border="0" /></p>
-<h4>Display Options </h4>
-<div style="border: Solid 6px #469eb9; padding: 5px; margin-left: 4px; 
-	 margin-right: 4px; margin-top: 4px; margin-bottom: 4px; width: 35%; 
-	 background-color: #e4eef1; float: right;">
-	<h1>Guide to Report Results</h1>
-	<p>This guide contains the definitions for each possible value you'll 
-	 find in the Delivery Results and Response columns of the Email Log 
-	 report.</p>
-	<h4>Delivery Results</h4>
-	<ul type="disc">
-		<li><p style="line-height: Normal; margin-left: 0px; font-weight: bold;">Blocked: 
-		 <span style="font-weight: normal;">The email address the system 
-		 was trying to contact is on the <a title="Click to view informatio about blocking email addresses." href="../System_Administration/System_Settings/Blocking_Email_Addresses.htm" style="font-weight: bold;" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to view informatio about blocking email addresses.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Blocked 
-		 Email</a> list.</span></p></li>
-		<li><p style="line-height: Normal; margin-left: 0px; font-weight: bold;">Bounced: 
-		 <span style="font-weight: normal;">We were completely unable to 
-		 deliver the email to the recipient's email address due to some 
-		 problem with the recipient's email service provider. This error 
-		 was not due to a problem with the recipient's email address.</span></p></li>
-		<li><p style="line-height: Normal; margin-left: 0px; font-weight: bold;">Delivered: 
-		 <span style="font-size: 10.0pt; mso-bidi-font-size: 11.0pt; line-height: 115%; 
-				 font-family: Arial, sans-serif; mso-fareast-font-family: 'Times New Roman'; 
-				 mso-ansi-language: EN-US; mso-fareast-language: EN-US; 
-				 mso-bidi-language: AR-SA; font-weight: normal;"><font size="2" style="font-size:10pt;">We have 
-		 received confirmation from the recipient’s email server that the 
-		 email was successfully queued for delivery.</font></span> </p></li>
-		<li><p style="line-height: Normal; margin-left: 0px; font-weight: bold;">Duplicate: 
-		 <span style="font-weight: normal;">After sending an initial message, 
-		 the system will flag an email address as duplicate if it is encountered 
-		 again in the same notification Broadcast.</span></p></li>
-		<li><p style="line-height: Normal; margin-left: 0px; font-weight: bold;">Invalid 
-		 Address: <span style="font-weight: normal;">We were unable to 
-		 deliver an email to this recipient's email address because it 
-		 is invalid. </span></p></li>
-		<li><p style="line-height: Normal; margin-left: 0px; font-weight: bold;">No 
-		 Email Selected: <span style="font-weight: normal;">The recipient's 
-		 email address was not associated with the Broadcast type. For 
-		 example, if a recipient's email address was associated only with 
-		 emergency Broadcasts and not general notifications, a general 
-		 notification with an email message component and a list including 
-		 &#160;the recipient would result in &#160;&quot;No Email Selected&quot;.</span></p></li>
-		<li><p style="line-height: Normal; margin-left: 0px;"><span style="font-weight: bold;"><b>Soft 
-		 Bounced: </b></span><span>Our attempts to deliver the email to this 
-		 recipient have failed so far, but we're still trying. This can 
-		 happen if, for example, the recipient's inbox is full or if there 
-		 is some temporary problem with their email server.</span></p></li>
-		<li><p><span style="font-weight: bold;"><b>Sent:</b></span> The email 
-		 has been sent to the recipient's email address, but we haven't 
-		 received any more information from the recipient’s email server 
-		 yet. Many emails with a status of sent may actually be successfully 
-		 delivered but since we haven’t received confirmation from the 
-		 recipient’s mail server, we categorize it as sent. &#160;</p></li>
-		<li><p style="line-height: Normal; margin-left: 0px;"><span style="font-weight: bold;"><b>Unsent:</b></span> 
-		 The email hasn't been sent to the recipient yet.</p></li>
-	</ul>
-	<h4>Response Results</h4>
-	<ul type="disc">
-		<li><p class="MsoListBullet"><span style="font-weight: bold;"><b><b 
-		 style="font-weight: bold; mso-bidi-font-weight: normal;">E</b>mpty 
-		 Value:</b></span> If the Response value is empty, then we haven't 
-		 received any tracking data yet. The recipient &#160;may have not 
-		 yet opened the message or may have read your message, but not 
-		 accepted images from you. Please look at the <a title="Click to learn how to improve Email Tracking data collection." href="../Email_Tracking/Maximizing_Data.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn how to improve Email Tracking data collection.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Maximizing 
-		 Results</a> help topic for ideas for improving the amount of email 
-		 tracking data gathered with each Broadcast.</p></li>
-		<li><p class="MsoListBullet"><b style="font-weight: bold; mso-bidi-font-weight: normal;">Glanced/Deleted:</b> 
-		 The email was open for opened and closed so quickly that it's 
-		 unlikely the recipient even skimmed the message and may have deleted 
-		 it.</p></li>
-		<li><p class="MsoListBullet"><b style="font-weight: bold; mso-bidi-font-weight: normal;">Read:</b> 
-		 The recipient has viewed the email for a significant period of 
-		 time.</p></li>
-		<li><p class="MsoListBullet"><b style="font-weight: bold; mso-bidi-font-weight: normal;">Skimmed:</b> 
-		 The email was open for a short period of time, but long enough 
-		 to skim the message.</p></li>
-	</ul>
+<p>This section contains information to help you interpret Email Log reports. To learn how to create an Email Log report, please view the help topic, <a title="Click to read more about using the Report Builder." href="Querying_Report_Data.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to read more about using the Report Builder.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Using the Report Builder</a>. If you have already created an Email Log report, this section will help you understand the report results.</p>
+<p><img src="../EmailLog.jpg" alt="Email Log Report" title="Email Log Report" style=" border:none; width:100%; max-width:600px;" border="0" /></p>
+<h4>Display Options</h4>
+<div style="border: Solid 6px #469eb9; padding: 5px; margin-left: 4px; margin-right: 4px; margin-top: 4px; margin-bottom: 4px; width: 35%; background-color: #e4eef1; float: right;">
+<h1>Guide to Report Results</h1>
+<p>This guide contains the definitions for each possible value you'll find in the Delivery Results and Response columns of the Email Log report.</p>
+<h4>Delivery Results</h4>
+<ul style="list-style: disc;">
+<li>
+<p style="line-height: Normal; margin-left: 0px; font-weight: bold;">Blocked: <span style="font-weight: normal;">The email address the system was trying to contact is on the <a title="Click to view informatio about blocking email addresses." href="../System_Administration/System_Settings/Blocking_Email_Addresses.htm" style="font-weight: bold;" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to view informatio about blocking email addresses.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Blocked Email</a> list.</span></p>
+</li>
+<li>
+<p style="line-height: Normal; margin-left: 0px; font-weight: bold;">Bounced: <span style="font-weight: normal;">We were completely unable to deliver the email to the recipient's email address due to some problem with the recipient's email service provider. This error was not due to a problem with the recipient's email address.</span></p>
+</li>
+<li>
+<p style="line-height: Normal; margin-left: 0px; font-weight: bold;">Delivered: <span style="font-size: 10.0pt; mso-bidi-font-size: 11.0pt; line-height: 115%; font-family: Arial, sans-serif; mso-fareast-font-family: 'Times New Roman'; mso-ansi-language: EN-US; mso-fareast-language: EN-US; mso-bidi-language: AR-SA; font-weight: normal;">We have received confirmation from the recipient’s email server that the email was successfully queued for delivery.</span></p>
+</li>
+<li>
+<p style="line-height: Normal; margin-left: 0px; font-weight: bold;">Duplicate: <span style="font-weight: normal;">After sending an initial message, the system will flag an email address as duplicate if it is encountered again in the same notification Broadcast.</span></p>
+</li>
+<li>
+<p style="line-height: Normal; margin-left: 0px; font-weight: bold;">Invalid Address: <span style="font-weight: normal;">We were unable to deliver an email to this recipient's email address because it is invalid.</span></p>
+</li>
+<li>
+<p style="line-height: Normal; margin-left: 0px; font-weight: bold;">No Email Selected: <span style="font-weight: normal;">The recipient's email address was not associated with the Broadcast type. For example, if a recipient's email address was associated only with emergency Broadcasts and not general notifications, a general notification with an email message component and a list including &#160;the recipient would result in &#160;"No Email Selected".</span></p>
+</li>
+<li>
+<p style="line-height: Normal; margin-left: 0px;"><span style="font-weight: bold;">Soft Bounced:</span> <span>Our attempts to deliver the email to this recipient have failed so far, but we're still trying. This can happen if, for example, the recipient's inbox is full or if there is some temporary problem with their email server.</span></p>
+</li>
+<li>
+<p><span style="font-weight: bold;">Sent:</span> The email has been sent to the recipient's email address, but we haven't received any more information from the recipient’s email server yet. Many emails with a status of sent may actually be successfully delivered but since we haven’t received confirmation from the recipient’s mail server, we categorize it as sent. &#160;</p>
+</li>
+<li>
+<p style="line-height: Normal; margin-left: 0px;"><span style="font-weight: bold;">Unsent:</span> The email hasn't been sent to the recipient yet.</p>
+</li>
+</ul>
+<h4>Response Results</h4>
+<ul style="list-style: disc;">
+<li>
+<p class="MsoListBullet"><span style="font-weight: bold;"><b style="font-weight: bold; mso-bidi-font-weight: normal;">E</b>mpty Value:</span> If the Response value is empty, then we haven't received any tracking data yet. The recipient &#160;may have not yet opened the message or may have read your message, but not accepted images from you. Please look at the <a title="Click to learn how to improve Email Tracking data collection." href="../Email_Tracking/Maximizing_Data.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn how to improve Email Tracking data collection.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Maximizing Results</a> help topic for ideas for improving the amount of email tracking data gathered with each Broadcast.</p>
+</li>
+<li>
+<p class="MsoListBullet"><b style="font-weight: bold; mso-bidi-font-weight: normal;">Glanced/Deleted:</b> The email was open for opened and closed so quickly that it's unlikely the recipient even skimmed the message and may have deleted it.</p>
+</li>
+<li>
+<p class="MsoListBullet"><b style="font-weight: bold; mso-bidi-font-weight: normal;">Read:</b> The recipient has viewed the email for a significant period of time.</p>
+</li>
+<li>
+<p class="MsoListBullet"><b style="font-weight: bold; mso-bidi-font-weight: normal;">Skimmed:</b> The email was open for a short period of time, but long enough to skim the message.</p>
+</li>
+</ul>
 </div>
-<p>The topmost part of the Email Log contains field and output options 
- for creating the report.</p>
-<ul type="disc">
-	<li class="p"><p><span style="font-weight: bold;"><b>Display Fields:</b></span> 
-	 Additional fields which can be included in the report</p></li>
-	<li class="p"><p><span style="font-weight: bold;"><b>Output Format:</b></span> 
-	 These buttons allow you to download your report as a CSV or PDF file.</p></li>
+<p>The topmost part of the Email Log contains field and output options for creating the report.</p>
+<ul style="list-style: disc;">
+<li class="p">
+<p><span style="font-weight: bold;">Display Fields:</span> Additional fields which can be included in the report</p>
+</li>
+<li class="p">
+<p><span style="font-weight: bold;">Output Format:</span> These buttons allow you to download your report as a CSV or PDF file.</p>
+</li>
 </ul>
 <h4>Report Details</h4>
-<p style="line-height: Normal;">The lower half of the report contains the 
- Report Details which shows each recipient called and the results of the 
- call. It's sections include:</p>
-<ul type="disc">
-	<li class="p"><p style="line-height: Normal;"><span style="font-weight: bold;"><b>Job:</b></span> 
-	 The Broadcast that the recipient is associated with.</p></li>
-	<li class="p"><p style="line-height: Normal;"><span style="font-weight: bold;"><b>Submitted 
-	 by:</b></span> The user who submitted the Broadcast associated with the 
-	 recipient.</p></li>
-	<li class="p"><p style="line-height: Normal;"><span style="font-weight: bold;"><b>ID#:</b></span> 
-	 <span>The ID number of the recipient in the database.</span></p></li>
-	<li class="p"><p style="line-height: Normal;"><span style="font-weight: bold;"><b>First 
-	 Name:</b></span> The recipient's first name.</p></li>
-	<li class="p"><p style="line-height: Normal;"><span style="font-weight: bold;"><b>Last 
-	 Name:</b></span> The recipient's last name.</p></li>
-	<li class="p"><p style="line-height: Normal;"><span style="font-weight: bold;"><b>Message:</b></span> 
-	 The name of the message the recipient received. The icon next to the 
-	 message displays the type of message sent; phone or email.</p></li>
-	<li class="p"><p style="line-height: Normal;"><span style="font-weight: bold;"><b>Destination:</b></span> 
-	 The email address that was used to reach the recipient.</p></li>
-	<li class="p"><p style="line-height: Normal;"><span style="font-weight: bold;"><b>Attempts:</b></span> 
-	 The number of attempts to reach this recipient.</p></li>
-	<li class="p"><p style="line-height: Normal;"><span style="font-weight: bold;"><b>Last 
-	 Attempt:</b></span> <span>The last time that the system tried to contact 
-	 the recipient.</span></p></li>
-	<li class="p"><p style="line-height: Normal;"><span style="font-weight: bold;"><b>Delivery 
-	 Results:</b></span> Shows the result of the delivery attempt. Results 
-	 are explained in the Guide to Report Results in the blue box on this 
-	 page.</p></li>
-	<li class="p"><p style="line-height: Normal;"><span style="font-weight: bold;"><b>Response:</b></span> 
-	 This column shows the <a title="Click to learn more about Email Tracking." href="../Email_Tracking/Overview.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn more about Email Tracking.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Email 
-	 Tracking</a> results for the recipient. The possible values are explained 
-	 in the Guide to Report Results to the right.</p></li>
-	<li class="p"><p style="line-height: Normal;"><span style="font-weight: bold;"><b>School:</b></span> 
-	 The school associated with the recipient.</p></li>
+<p style="line-height: Normal;">The lower half of the report contains the Report Details which shows each recipient called and the results of the call. It's sections include:</p>
+<ul style="list-style: disc;">
+<li class="p">
+<p style="line-height: Normal;"><span style="font-weight: bold;">Job:</span> The Broadcast that the recipient is associated with.</p>
+</li>
+<li class="p">
+<p style="line-height: Normal;"><span style="font-weight: bold;">Submitted by:</span> The user who submitted the Broadcast associated with the recipient.</p>
+</li>
+<li class="p">
+<p style="line-height: Normal;"><span style="font-weight: bold;">ID#:</span> <span>The ID number of the recipient in the database.</span></p>
+</li>
+<li class="p">
+<p style="line-height: Normal;"><span style="font-weight: bold;">First Name:</span> The recipient's first name.</p>
+</li>
+<li class="p">
+<p style="line-height: Normal;"><span style="font-weight: bold;">Last Name:</span> The recipient's last name.</p>
+</li>
+<li class="p">
+<p style="line-height: Normal;"><span style="font-weight: bold;">Message:</span> The name of the message the recipient received. The icon next to the message displays the type of message sent; phone or email.</p>
+</li>
+<li class="p">
+<p style="line-height: Normal;"><span style="font-weight: bold;">Destination:</span> The email address that was used to reach the recipient.</p>
+</li>
+<li class="p">
+<p style="line-height: Normal;"><span style="font-weight: bold;">Attempts:</span> The number of attempts to reach this recipient.</p>
+</li>
+<li class="p">
+<p style="line-height: Normal;"><span style="font-weight: bold;">Last Attempt:</span> <span>The last time that the system tried to contact the recipient.</span></p>
+</li>
+<li class="p">
+<p style="line-height: Normal;"><span style="font-weight: bold;">Delivery Results:</span> Shows the result of the delivery attempt. Results are explained in the Guide to Report Results in the blue box on this page.</p>
+</li>
+<li class="p">
+<p style="line-height: Normal;"><span style="font-weight: bold;">Response:</span> This column shows the <a title="Click to learn more about Email Tracking." href="../Email_Tracking/Overview.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn more about Email Tracking.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Email Tracking</a> results for the recipient. The possible values are explained in the Guide to Report Results to the right.</p>
+</li>
+<li class="p">
+<p style="line-height: Normal;"><span style="font-weight: bold;">School:</span> The school associated with the recipient.</p>
+</li>
 </ul>
 <p style="line-height: Normal; margin-left: 80px;">&#160;</p>
 <div style="width: 100%; position: relative;" id="footer">
-	<p><span style="font-size: xx-small;"><font size="1" style="font-size: xx-small;">©1999 - 2014 SchoolMessenger</font></span></p>
+	<p><span style="font-size: xx-small;">©1999 - 2015 Reliance Communications, 
+	 Inc.</span></p>
 </div>
 <script type="text/javascript" language="JavaScript">
 //<![CDATA[
  if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape'))
   document.write("<div id='tooltip' class='WebHelpPopupMenu'></div>");
 //]]>
-</script><script type="text/javascript" language="javascript1.2">//<![CDATA[
-<!--
-if (window.writeIntopicBar)
-	writeIntopicBar(0);
-
-
-highlightSearch();
-//-->
-//]]></script>
+</script><script type="text/javascript" language="JavaScript">
+//<![CDATA[
+ if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape'))
+  document.write("<div id='tooltip' class='WebHelpPopupMenu'></div>");
+//]]>
+</script>
 </body>
 </html>

@@ -93,7 +93,7 @@ memcache_session_lock_retry_us=50000
 memcached_url[]="tcp://127.0.0.1:11211?persistent=1&timeoutms=1000"
 
 [netsuite]
-; Netsuite account number for Incase
+; Netsuite account number
 account = ""
 ; Netsuite integration user login
 user = ""

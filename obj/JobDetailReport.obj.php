@@ -100,9 +100,10 @@ class JobDetailReport extends ReportGenerator{
 					$resultqueryarray[] = " (rc.result = 'X' and rc.numattempts < 3) ";
 				}
 				
-				//combine the rest, assuming they are rc.result codes
+				// combine the rest, assume they are either rc.result codes or rd.result codes
 				if(count($resultarray)){
-					$resultqueryarray[] = "rc.result in ('" . implode("','",array_flip($resultarray)) . "')";
+					$r = ($this->params['reporttype'] == 'devicedetail' ? "rd" : "rc");
+					$resultqueryarray[] = " $r.result in ('" . implode("','", array_flip($resultarray)) . "')";
 				}
 				
 				$resultquery .= " and (" . implode(" OR ",$resultqueryarray) . ") ";

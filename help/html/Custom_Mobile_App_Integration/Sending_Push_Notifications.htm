@@ -1,9 +1,9 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+
+<!DOCTYPE HTML>
+<html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
- <meta name="generator" content="Adobe RoboHelp 9" />
+ <meta name="generator" content="Adobe RoboHelp 11" />
 <title>Sending Push Notifications</title>
 <link rel="stylesheet" href="../main.css" type="text/css" />
 <script type="text/javascript" language="JavaScript">
@@ -46,120 +46,93 @@ left:0px;
 top:0px;
 z-index:4;
 visibility:hidden; }
+p.WebHelpNavBar { text-align:right; }
 -->
 </style>
-<script type="text/javascript" language="javascript1.2" src="../whmsg.js"></script>
-<script type="text/javascript" language="javascript" src="../whver.js"></script>
-<script type="text/javascript" language="javascript1.2" src="../whproxy.js"></script>
-<script type="text/javascript" language="javascript1.2" src="../whutils.js"></script>
-<script type="text/javascript" language="javascript1.2" src="../whlang.js"></script>
-<script type="text/javascript" language="javascript1.2" src="../whtopic.js"></script>
 
-</head>
-
-<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
-<!--
-if (window.gbWhTopic)
+<script type="text/javascript" src="../template/scripts/rh.min.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/common.min.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/topic.min.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/constants.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/utils.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/mhutils.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/mhlang.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/mhver.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/settings.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/XmlJsReader.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/loadparentdata.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/loadscreen.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/loadprojdata.js" language="JavaScript1.2"></script>
+<script type="text/javascript" src="../template/scripts/mhtopic.js" language="JavaScript1.2"></script>
+<script type="text/javascript" language="JavaScript1.2">
+gRootRelPath = "..";
+gCommonRootRelPath = "..";
+gTopicId = "17.0_2";
+</script><script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function ehlp_showtip(current,e,text)
 {
-	var strUrl = document.location.href;
-	var bc = 0;
-	var n = strUrl.toLowerCase().indexOf("bc-");
-	if(n != -1)
-	{
-		document.location.href = strUrl.substring(0, n);
-		bc = strUrl.substring(n+3);
-	}
-
-	if (window.addTocInfo)
-	{
-	addTocInfo("Custom Mobile App Integration\nSending Push Notifications");
-addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
-
-	}
-	if (window.writeBtnStyle)
-		writeBtnStyle();
-
-	if (window.writeIntopicBar)
-		writeIntopicBar(1);
-
-	
-	document.write("<p style=\"text-align:right\"> ");
-AddMasterBreadcrumbs("../CommSuite_User_Guide.htm", "", ">", "Home", "../Getting_Started/Welcome.htm");
-document.write("<a href=\"About_Custom_Mobile_Apps.htm\">Custom Mobile App Integration<\/a> > Sending Push Notifications<\/p>");
-
-
-	if (window.setRelStartPage)
-	{
-	setRelStartPage("../CommSuite_User_Guide.htm");
-
-		autoSync(0);
-		sendSyncInfo();
-		sendAveInfoOut();
-	}
+  if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape'))
+  {
+    document.tooltip.document.write("<layer bgColor='yellow' style='border:1px solid black;font-size:12px;'>"+ text + "</layer>");
+    document.tooltip.document.close();
+    document.tooltip.left=e.pageX+5;
+    document.tooltip.top=e.pageY+5;
+    document.tooltip.visibility="show";
+  }
 }
-else
-	if (window.gbIE4)
-		document.location.reload();
+function ehlp_hidetip()
+{
+  document.tooltip.visibility="hidden";
+}
+//]]>
+</script>
+</head>
+<body>
+<script type="text/javascript" src="../ehlpdhtm.js" language="JavaScript1.2"></script>
 
-//-->
-//]]></script>
-<div style="width: 100%; position: relative;" id="header">
-	<p>&#160;</p>
-</div>
+
 
 
 <h1>Sending Push Notifications</h1>
-<p class="important"><span style="font-weight: bold;"><b><img src="../exclamation.png" alt="exclamation.png" style="border: none;" border="0" /> 
- Important:</b></span> Only those features that you have been granted access 
- to will display. Additionally, features in this section of the help manual 
- refer to integration with another product.</p>
+<p class="important"><span style="font-weight: bold;"><img src="../exclamation.png" alt="" style=" border:none; width:100%; max-width:16px;" border="0" /> Important:</span> Only those features that you have been granted access to will display. Additionally, features in this section of the help manual refer to integration with another product.</p>
 <h4>What is a Push Notification?</h4>
-<p style="font-size: 10pt;">Push notifications are messages that will appear 
- as notifications on devices with your custom mobile app. They're sent 
- to specific categories so that only users who have subscribed to the category 
- will receive the notification. For example, if your app has a set of categories 
- corresponding to specific schools, users who have subscribed to content 
- for a specific school will also receive push notifications for that school. 
- &#160;&#160;</p>
-<p style="font-size: 10pt;">To send push notifications, each category from 
- your app must be <a title="Click to read about mapping custom mobile app categories to RSS feeds." href="Mapping_App_Categories_to_RSS_Feeds.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to read about mapping custom mobile app categories to RSS feeds.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">mapped 
- to a related RSS Feed</a>. Then whenever you post to the RSS Feed, your 
- post will also be sent as a push notification to all of the app categories 
- linked to the feed.</p>
+<p style="font-size: 10pt;">Push notifications are messages that will appear as notifications on devices with your custom mobile app. They're sent to specific categories so that only users who have subscribed to the category will receive the notification. For example, if your app has a set of categories corresponding to specific schools, users who have subscribed to content for a specific school will also receive push notifications for that school. &#160;&#160;</p>
+<p style="font-size: 10pt;">To send push notifications, each category from your app must be <a title="Click to read about mapping custom mobile app categories to RSS feeds." href="Mapping_App_Categories_to_RSS_Feeds.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to read about mapping custom mobile app categories to RSS feeds.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">mapped to a related RSS Feed</a>. Then whenever you post to the RSS Feed, your post will also be sent as a push notification to all of the app categories linked to the feed.</p>
 <h4>How to Send a Push Notification</h4>
-<p>Creating push notifications is no different from creating any other 
- type of message.</p>
-<ul type="disc">
-	<li><p>While <a title="Click to read about creating a Broadcast from the Dashboard." href="../Getting_Started/Send_a_Basic_Message.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to read about creating a Broadcast from the Dashboard.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">creating 
-	 a Broadcast</a> from the desktop, click the Social button during the 
-	 message creation step. This will take you to the screen shown below.</p></li>
-	<li><p>Select the Feed/Desktop/Push option. </p></li>
-	<li><p>Enter your message content and select the RSS feed categories 
-	 you wish to post to. </p></li>
-	<li><p>Click the Save Social Message button when you're done.</p></li>
+<p>Creating push notifications is no different from creating any other type of message.</p>
+<ul style="list-style: disc;">
+<li>
+<p>While <a title="Click to read about creating a Broadcast from the Dashboard." href="../Getting_Started/Send_a_Basic_Message.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to read about creating a Broadcast from the Dashboard.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">creating a Broadcast</a> from the desktop, click the Social button during the message creation step. This will take you to the screen shown below.</p>
+</li>
+<li>
+<p>Select the Feed/Desktop/Push option.</p>
+</li>
+<li>
+<p>Enter your message content and select the RSS feed categories you wish to post to.</p>
+</li>
+<li>
+<p>Click the Save Social Message button when you're done.</p>
+</li>
 </ul>
 <p>&#160;</p>
-<p><img src="../CMA-CreatePushContent.jpg" title="Creating push notification message content." 
-		 alt="Creating push notification message content." style="border: none;" 
-		 border="0" /></p>
+<p><img src="../CMA-CreatePushContent.jpg" title="Creating push notification message content." alt="Creating push notification message content." style=" border:none; width:100%; max-width:600px;" border="0" /></p>
 <p>&#160;</p>
 <p>&#160;</p>
 <div style="width: 100%; position: relative;" id="footer">
-	<p><span style="font-size: xx-small;"><font size="1" style="font-size: xx-small;">©1999 - 2014 SchoolMessenger</font></span></p>
+	<p><span style="font-size: xx-small;">©1999 - 2015 Reliance Communications, 
+	 Inc.</span></p>
 </div>
 <script type="text/javascript" language="JavaScript">
 //<![CDATA[
  if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape'))
   document.write("<div id='tooltip' class='WebHelpPopupMenu'></div>");
 //]]>
-</script><script type="text/javascript" language="javascript1.2">//<![CDATA[
-<!--
-if (window.writeIntopicBar)
-	writeIntopicBar(0);
-
-
-highlightSearch();
-//-->
-//]]></script>
+</script><script type="text/javascript" language="JavaScript">
+//<![CDATA[
+ if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape'))
+  document.write("<div id='tooltip' class='WebHelpPopupMenu'></div>");
+//]]>
+</script>
 </body>
 </html>

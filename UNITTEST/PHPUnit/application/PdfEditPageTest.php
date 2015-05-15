@@ -146,7 +146,7 @@ class PdfEditPageTest extends PHPUnit_Framework_TestCase {
 		);
 
 		// 8) API response: update a single burst record (with id=3, but invalid template id=3)
-		$queryRules->add('|"method":"PUT","node":"\\\/users\\\/1\\\/bursts\\\/1","data":{"name":"this one has an invalid template id!","burstTemplateId":3}|',
+		$queryRules->add('|"method":"PUT","node":"\\\/users\\\/1\\\/bursts\\\/1","data":{"name":"this one has an invalid template id!","status":"new","burstTemplateId":3}|',
 			array(
 				array(
 					'headers' => 'Content-type: text/plain',

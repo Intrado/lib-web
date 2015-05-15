@@ -2966,3 +2966,62 @@ $$$
 
 -- END 11.1/14
 
+-- SDD delivery events
+CREATE TABLE reportsdddelivery (
+  customerId INT NOT NULL,
+  jobId INT NOT NULL,
+  personId INT NOT NULL,
+  messageAttachmentId INT NOT NULL,
+  action ENUM('SENT','BAD_PASSWORD','DOWNLOAD') CHARACTER SET utf8 COLLATE utf8_general_ci,
+  timestampMs BIGINT NOT NULL,
+  actionCount INT NOT NULL,
+  UNIQUE KEY `customerjobperson` (`customerId`,`jobId`,`personId`, `messageAttachmentId`, `action`)
+)
+$$$
+
+ALTER TABLE `burst` ADD `jobId` INT NULL DEFAULT NULL AFTER `bursttemplateid`
+$$$
+
+update setting set value='11.2/1' where name='_dbversion'
+$$$
+
+-- END 11.2/1
+
+ALTER TABLE reportsdddelivery DEFAULT CHARSET=utf8,
+  MODIFY COLUMN action ENUM('SEND', 'CLICK', 'DOWNLOAD', 'BAD_PASSWORD') NOT NULL
+$$$
+
+update setting set value='11.2/2' where name='_dbversion'
+$$$
+
+-- END 11.2/2
+
+-- no schema change, just update burst.status
+update setting set value='11.2/3' where name='_dbversion'
+$$$
+
+-- END 11.2/3
+
+ALTER TABLE burstattachment
+  ADD KEY (burstid)
+$$$
+
+ALTER TABLE messageattachment
+  ADD KEY (burstattachmentid)
+$$$
+
+ALTER TABLE reportsdddelivery
+  ADD KEY rsdd_ma_ts (messageAttachmentId, timestampMs),
+  ADD KEY rsdd_ma_act_ts (messageAttachmentId, action, timestampMs)
+$$$
+
+update setting set value='11.2/4' where name='_dbversion'
+$$$
+
+-- END 11.2/4
+
+ALTER TABLE reportsdddelivery
+  MODIFY COLUMN action ENUM('CLICK', 'DOWNLOAD', 'BAD_PASSWORD') NOT NULL
+$$$
+
+-- END 11.2/5

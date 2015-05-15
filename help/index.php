@@ -28,6 +28,6 @@ doStartSession();
 if (!isset($_SESSION['user']))
 	header("Location: ..");
 else
-	header("Location: html/CommSuite_User_Guide.htm");
+	header("Location: help.html");
 
 ?>

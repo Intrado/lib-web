@@ -53,40 +53,42 @@ function SDD() {
 	 * @param string password user-entered password value from input[type=text] elem
 	 * @return {*}
 	 */
-	this.requestDocument = function(password) {
+	this.requestDocument = function (password) {
 		var requestParams = {
 			"s": $this.messageLinkCode,
 			"mal": $this.attachmentLinkCode,
 			"p": password ? password : null
 		};
-
+		var requestDocumentUrl = this.requestDocumentUrl;
 		// if password provided, include v ("verify") param to verify password server-side,
 		if (password) {
 			requestParams['v'] = true;
+			return $.ajax({
+				url: requestDocumentUrl,
+				type: "POST",
+				data: requestParams,
+				success: function (res) {
+					// ensure the verify 'v' param is removed from requestParams, i.e. was successful
+					delete requestParams['v'];
+					// now download the document, i.e. redirect user to direct URL,
+					// which should invoke the browser's download/save as dialog
+					$this.postToUrl(requestDocumentUrl, requestParams);
+				},
+				error: function (res) {
+					if (res && res.responseJSON && res.responseJSON.errorMessage) {
+						$this.errorMsg.html(res.responseJSON.errorMessage);
+					} else {
+						$this.errorMsg.html("An error occurred while trying to retrieve your document. Please try again.").show();
+					}
+					$this.errorMsgContainer.show();
+				}
+			});
+		} else {
+			// now download the document, i.e. redirect user to direct URL,
+			// which should invoke the browser's download/save as dialog
+			$this.postToUrl(requestDocumentUrl, requestParams);
 		}
 
-		var requestDocumentUrl = this.requestDocumentUrl;
-		return $.ajax({
-			url: requestDocumentUrl,
-			type: "POST",
-			data: requestParams,
-			success: function(res) {
-				// ensure the verify 'v' param is removed from requestParams, i.e. was successful
-				delete requestParams['v'];
-
-				// now download the document, i.e. redirect user to direct URL,
-				// which should invoke the browser's download/save as dialog
-				$this.postToUrl(requestDocumentUrl, requestParams);
-			},
-			error: function(res) {
-				if (res && res.responseJSON && res.responseJSON.errorMessage) {
-					$this.errorMsg.html(res.responseJSON.errorMessage);
-				} else {
-					$this.errorMsg.html("An error occurred while trying to retrieve your document. Please try again.").show();
-				}
-				$this.errorMsgContainer.show();
-			}
-		});
 	};
 
 	/**
