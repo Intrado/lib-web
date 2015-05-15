@@ -8,6 +8,7 @@ require_once('inc/utils.inc.php');
 require_once('obj/Validator.obj.php');
 require_once('obj/Form.obj.php');
 require_once('obj/FormItem.obj.php');
+require_once('obj/ValFileExtensions.val.php');
 
 require_once('ifc/Page.ifc.php');
 require_once('obj/PageBase.obj.php');
@@ -36,7 +37,10 @@ class PdfEditPage extends PageForm {
 	 */
 	public function __construct($csApi) {
 		$this->csApi = $csApi;
-		$this->options['validators'] = array('ValClientOnlyRequired');
+		$this->options['validators'] = array(
+			'ValClientOnlyRequired',
+			'ValFileExtensions'
+		);
 		parent::__construct($this->options);
 	}
 
@@ -242,9 +246,10 @@ class PdfEditPage extends PageForm {
 				"fieldhelp" => _L('Click the Choose File button and navigate to the location of the PDF file on your computer.'),
 				"value" => '',
 				"validators" => array(
-					array('ValClientOnlyRequired')
+					array('ValClientOnlyRequired'),
+					array('ValFileExtensions', 'acceptExts' => array('pdf'))
 				),
-				"control" => array('FileUpload'),
+				"control" => array('FileUpload', 'acceptExts' => array('pdf')),
 				"helpstep" => 3
 			);
 		}
