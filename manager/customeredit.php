@@ -126,25 +126,6 @@ class ValClassroom extends Validator {
 	}
 }
 
-class ValPortalSelection extends Validator {
-
-	function validate ($value, $args, $requiredvalues) {
-		if ($value == 'infocenter' and $requiredvalues[$args['maxguardianfield']] < 1)
-			return "$this->label cannot be InfoCenter if Max Guardians is less than one";
-		return true;
-	}
-
-	function getJSValidator () {
-		return
-			'function (name, label, value, args, requiredvalues) {
-				if (value == "infocenter" && requiredvalues[args["maxguardianfield"]] < 1)
-					return label + " cannot be InfoCenter if Max Guardians is less than one"
-
-				return true;
-			}';
-	}
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
@@ -383,7 +364,8 @@ $formdata["maxguardians"] = array(
 	"label" => _L('Max Guardians'),
 	"value" => $settings['maxguardians'],
 	"validators" => array(
-		array('ValNumber', 'min' => $settings['maxguardians']>=0?$settings['maxguardians']:0, 'max' => 99)
+		//array('ValNumber', 'min' => $settings['maxguardians']>=0?$settings['maxguardians']:0, 'max' => 99)
+            array('ValNumber', 'min' => 0, 'max' => 99)
 	),
 	"control" => array("TextField","size" => 4, "maxlength" => 4),
 	"helpstep" => $helpstepnum
@@ -614,8 +596,7 @@ $formdata["portal"] = array(
 	"label" => _L('Portal'),
 	"value" => $portaloption,
 	"validators" => array(
-		array("ValInArray", "values" => array_keys($portals)),
-		array("ValPortalSelection", "maxguardianfield" => "maxguardians")
+		array("ValInArray", "values" => array_keys($portals))
 	),
 	"control" => array("SelectMenu","values" => $portals),
 	"requires" => array("maxguardians"),
