@@ -467,7 +467,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$job->userid = $USER->id;
 				
 				$job->setOption("skipduplicates",true);
-				$job->setOption("skipemailduplicates",true);
 				
 				$job->questionnaireid = $postdata['template'];
 				
