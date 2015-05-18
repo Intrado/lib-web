@@ -11,6 +11,7 @@ require_once("inc/securityhelper.inc.php");
 require_once("inc/rulesutils.inc.php");
 require_once("obj/Validator.obj.php");
 require_once("obj/ValSections.val.php");
+require_once('obj/ListGuardianCategory.obj.php');
 
 // @param $listid, assumed to be a valid list id.
 function summarizeListName($listid) {
@@ -212,7 +213,32 @@ function handleRequest() {
 			
 			summarizeListName($listid);
 			return true;
-			
+
+		// Change the targeted recipients (list.recipientmode and listguardiancategory.*) for a given list ID
+		// Note: message sender may only modify these properties on lists IT creates, but will be self-enforced; i.e. it should not
+		// attempt to modify these properties on a saved recipient list that it loads in since there may be other jobs using that list
+		case 'targetrecipients':
+			if (!$USER->authorize('createlist') || !isset($_REQUEST['listid'])) {
+				return false;
+			}
+
+			// Peel off the recipient mode from the POST data
+			$recipientMode = $_POST['recipientmode'];
+			unset($_POST['recipientmode'];
+// TODO modify the list with the selected recipient mode
+
+			// Now all that remains in the POST data *should* be guardian categories
+			$guardianCategoryIds = array();
+			foreach ($_POST as $key => $value) {
+				if ((0 === strpos($key, 'guardiancategory_')) && ($value == 'on')) {
+					$guardianCategoryIds[] = intval(substr($key, strlen('guardiancategory_')));
+				}
+			}
+
+			// Use obj/ListGuardianCategory() to process the categories
+			ListGuardianCategory::resetListGuardianCategories($listId, $categories)
+			return true;
+
 		default:
 			return false;
 	}
