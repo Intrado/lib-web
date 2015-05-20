@@ -57,3 +57,17 @@ $$$
 ALTER TABLE reportsdddelivery
   MODIFY COLUMN action ENUM('CLICK', 'DOWNLOAD', 'BAD_PASSWORD') NOT NULL
 $$$
+
+-- $rev 6
+
+update jobsetting j1 join jobsetting j2 on j1.jobid=j2.jobid
+set j1.value = '0'
+where j1.name = 'skipduplicates' and j2.name = 'skipemailduplicates'
+and (j1.value = '0' or j2.value = '0')
+$$$
+
+delete from jobsetting where name in ('skipemailduplicates', 'skipsmsduplicates')
+$$$
+
+
+
