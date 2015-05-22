@@ -202,7 +202,7 @@ function handle_list_checkbox_ajax () {
 		}
 	}
 
-	if (!userOwns('list', $_SESSION['listid'])/* && !isSubscribed('list', $id)*/) {
+	if (!userOwns('list', $_SESSION['listid'])) {
 		exit(json_encode(Array("status" => "listNotFound", "message" => "Recipient list " . $_SESSION['listid'] . " not found")));
 	}
 
