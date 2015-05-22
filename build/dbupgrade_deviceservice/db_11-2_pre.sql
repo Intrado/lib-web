@@ -17,7 +17,8 @@ CREATE TABLE appinstance_new (
   appId int(11) NULL,
   appCredentialId int(11) NULL,
   osType enum('android','ios') NULL,
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  UNIQUE KEY `appIdOsType` (`appId`, `osType`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
 
