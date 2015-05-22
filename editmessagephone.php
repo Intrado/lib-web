@@ -42,8 +42,14 @@ require_once("inc/editmessagecommon.inc.php");
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
 global $USER;
-if (!$USER->authorize("sendphone"))
+if (!$USER->authorize("sendphone")) {
+	if (isset($_REQUEST['api'])) {
+		header("HTTP/1.1 403 Forbidden");
+		exit();
+	}
+
 	redirect('unauthorized.php');
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -60,8 +66,14 @@ else
 // set the message bits
 if ($message) {
 	// if the user doesn't own this message, unauthorized!
-	if (!userOwns("message", $message->id))
+	if (!userOwns("message", $message->id)) {
+		if (isset($_REQUEST['api'])) {
+			header("Content-Type: application/json");
+			exit(json_encode(Array("status" => "messageNotFound")));
+		}
+
 		redirect('unauthorized.php');
+	}
 	
 	// get the parent message group for this message
 	$messagegroup = new MessageGroup($message->messagegroupid);
@@ -76,22 +88,45 @@ if ($message) {
 		$messagegroup = new MessageGroup($_SESSION['editmessage']['messagegroupid']);
 		$languagecode = $_SESSION['editmessage']['languagecode'];
 	} else {
+		if (isset($_REQUEST['api'])) {
+			header('Content-Type: application/json');
+			exit(json_encode(Array("status" => "messageGroupNotFound")));
+		}
+
 		// missing session data!
 		redirect('unauthorized.php');
 	}
 }
 
 // if the user doesn't own the parent message group, unauthorized!
-if (!userOwns("messagegroup", $messagegroup->id) || $messagegroup->deleted)
+if (!userOwns("messagegroup", $messagegroup->id) || $messagegroup->deleted) {
+	if (isset($_REQUEST['api'])) {
+		header("Content-Type: application/json");
+		exit(json_encode(Array("status" => "messageGroupNotFound")));
+	}
+
 	redirect('unauthorized.php');
+}
 
 // invalid language code specified?
-if (!in_array($languagecode, array_keys(Language::getLanguageMap())))
+if (!in_array($languagecode, array_keys(Language::getLanguageMap()))) {
+	if (isset($_REQUEST['api'])) {
+		header("Content-Type: application/json");
+		exit(json_encode(Array("status" => "invalidParameter", "message" => "Invalid language code " . $languagecode)));
+	}
+
 	redirect('unauthorized.php');
+}
 
 // no multi lingual and not default language code
-if (!$USER->authorize("sendmulti") && $languagecode != Language::getDefaultLanguageCode())
+if (!$USER->authorize("sendmulti") && $languagecode != Language::getDefaultLanguageCode()) {
+	if (isset($_REQUEST['api'])) {
+		header("HTTP/1.1 403 Forbidden");
+		exit();
+	}
+
 	redirect('unauthorized.php');
+}
 
 PreviewModal::HandleRequestWithPhoneText($messagegroup->id);
 
@@ -202,7 +237,7 @@ $datachange = false;
 $errors = false;
 //check for form submission
 if ($button = $form->getSubmit()) { //checks for submit and merges in post data
-	$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response	
+	$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response
 	
 	if ($form->checkForDataChange()) {
 		$datachange = true;
@@ -267,7 +302,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			
 			Query("COMMIT");
 		}
-		
+
 		// remove the editors session data
 		unset($_SESSION['editmessage']);
 		

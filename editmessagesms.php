@@ -32,8 +32,14 @@ require_once("inc/editmessagecommon.inc.php");
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
 global $USER;
-if (!$USER->authorize("sendsms"))
+if (!$USER->authorize("sendsms")) {
+	if (isset($_REQUEST['api'])) {
+		header("HTTP/1.1 403 Forbidden");
+		exit();
+	}
+
 	redirect('unauthorized.php');
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -51,8 +57,14 @@ else
 // set the message bits
 if ($message) {
 	// if the user doesn't own this message, unauthorized!
-	if (!userOwns("message", $message->id))
+	if (!userOwns("message", $message->id)) {
+		if (isset($_REQUEST['api'])) {
+			header("Content-Type: application/json");
+			exit(json_encode(Array("status" => "messageNotFound")));
+		}
+
 		redirect('unauthorized.php');
+	}
 	
 	// get the parent message group for this message
 	$messagegroup = new MessageGroup($message->messagegroupid);
@@ -62,14 +74,25 @@ if ($message) {
 	if (isset($_SESSION['editmessage']['messagegroupid'])) {
 		$messagegroup = new MessageGroup($_SESSION['editmessage']['messagegroupid']);
 	} else {
+		if (isset($_REQUEST['api'])) {
+			header('Content-Type: application/json');
+			exit(json_encode(Array("status" => "messageGroupNotFound")));
+		}
+
 		// missing session data!
 		redirect('unauthorized.php');
 	}
 }
 
 // if the user doesn't own the parent message group, unauthorized!
-if (!userOwns("messagegroup", $messagegroup->id) || $messagegroup->deleted)
+if (!userOwns("messagegroup", $messagegroup->id) || $messagegroup->deleted) {
+	if (isset($_REQUEST['api'])) {
+		header("Content-Type: application/json");
+		exit(json_encode(Array("status" => "messageGroupNotFound")));
+	}
+
 	redirect('unauthorized.php');
+}
 
 $text = "";
 if ($message) {
@@ -163,7 +186,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		unset($_SESSION['editmessage']);
 
 		if ($ajax)
-			$form->sendTo(getEditMessageSendTo($messagegroup->id));
+			$form->sendTo(getEditMessageSendTo($messagegroup->id), Array("message" => Array("id" => (int)$message->id)));
 		else
 			redirect(getEditMessageSendTo($messagegroup->id));
 	}

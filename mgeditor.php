@@ -34,12 +34,24 @@ $cansendsms = getSystemSetting('_hassms', false) && $USER->authorize('sendsms');
 // Only kick the user out if he does not have permission to create any message at all (neither phone, email, nor sms).
 // TODO: what about post only?
 if (!$cansendphone && !$cansendemail && !$cansendsms) {
+	if (isset($_REQUEST['api'])) {
+		header("HTTP/1.1 403 Forbidden");
+		exit();
+	}
+
 	redirect('unauthorized.php');
 } 
 
 if (isset($_GET['id'])) {
-	if ($_GET['id'] !== "new" && !userOwns("messagegroup",$_GET['id']))
-        redirect('unauthorized.php');
+	if ($_GET['id'] !== "new" && !userOwns("messagegroup",$_GET['id'])) {
+		if (isset($_REQUEST['api'])) {
+			header("HTTP/1.1 403 Forbidden");
+			exit();
+		}
+
+		redirect('unauthorized.php');
+	}
+
 	setCurrentMessageGroup($_GET['id']);
 	
 	if (isset($_GET["redirect"])) {
@@ -116,6 +128,12 @@ if($USER->authorize('sendemail') && $messagegroup->type == 'stationery' && !$mes
 }
 if($messagegroup->type != 'notification' || $messagegroup->deleted) {
 	unset($_SESSION['messagegroupid']);
+
+	if (isset($_REQUEST['api'])) {
+		header("HTTP/1.1 403 Forbidden");
+		exit();
+	}
+
 	redirect('unauthorized.php');
 }
 
