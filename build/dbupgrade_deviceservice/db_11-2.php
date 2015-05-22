@@ -57,7 +57,7 @@ function deviceservice_upgrade_11_2($rev, $db) {
 					QuickUpdate("INSERT INTO appinstance_new SET id=?, name=?, appId=?, appCredentialid=?, osType=?", $db,
 						array($instanceid, $row['name'], $appid, $cred, 'ios'));
 				}
-				QuickUpdate("INSERT IGNORE INTO appversion SET appInstanceId=?, appVersion=?", $db,
+				QuickUpdate("INSERT IGNORE INTO appversion SET appInstanceId=?, appVersion=?, createdTimestampMs=UNIX_TIMESTAMP(NOW())*1000", $db,
 					array($instance[$appid][$row['name']]['ios'], $row['version']));
 				QuickUpdate("INSERT IGNORE INTO tmpAppInstanceIdMap SET appInstanceId=?, osType=?, newAppInstanceId=?, appVersion=?", $db,
 					array($row['id'], 'ios', $instance[$appid][$row['name']]['ios'], $row['version']));
@@ -70,7 +70,7 @@ function deviceservice_upgrade_11_2($rev, $db) {
 					QuickUpdate("INSERT INTO appinstance_new SET id=?, name=?, appId=?, appCredentialid=?, osType=?", $db,
 						array($instanceid, $row['name'], $appid, $cred, 'android'));
 				}
-				QuickUpdate("INSERT IGNORE INTO appversion SET appInstanceId=?, appVersion=?", $db,
+				QuickUpdate("INSERT IGNORE INTO appversion SET appInstanceId=?, appVersion=?, createdTimestampMs=UNIX_TIMESTAMP(NOW())*1000", $db,
 					array($instance[$appid][$row['name']]['android'], $row['version']));
 				QuickUpdate("INSERT IGNORE INTO tmpAppInstanceIdMap SET appInstanceId=?, osType=?, newAppInstanceId=?, appVersion=?", $db,
 					array($row['id'], 'android', $instance[$appid][$row['name']]['android'], $row['version']));
