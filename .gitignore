@@ -12,3 +12,5 @@ node_modules
 # Idea project cache
 .idea
 *.iml
+/nbproject/private/
+/nbproject/
