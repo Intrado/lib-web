@@ -295,6 +295,7 @@ class RenderedList2 {
 						$query = "select distinct $fieldsql from personguardian pg \n"
 							." inner join person g on (g.id = pg.guardianpersonid) "
 							." inner join person p on (p.id = pg.personid) "
+							." $joinsql \n"
 							." inner join $type x on (x.personid = pg.guardianpersonid) \n"
 							." where not p.deleted and not g.deleted and g.type = 'guardianauto' \n"
 							." and not exists (select * from personguardian pg2 where pg2.importid is null and pg2.personid = pg.personid) "
@@ -304,6 +305,7 @@ class RenderedList2 {
 						$query = "select distinct $fieldsql from personguardian pg \n"
 							." inner join person g on (g.id = pg.guardianpersonid) "
 							." inner join person p on (p.id = pg.personid) "
+							." $joinsql \n"
 							." inner join $type x on (x.personid = pg.guardianpersonid) \n"
 							." where not p.deleted and not g.deleted and g.type = 'guardiancm' \n"
 							." $rulesql $this->extrawheresql and x.$type like '$digits%' \n";
@@ -324,7 +326,7 @@ class RenderedList2 {
 					$query = "select distinct $fieldsql from personguardian pg \n"
 						." inner join person g on (g.id = pg.guardianpersonid) "
 						." inner join person p on (p.id = pg.personid) "
-						."	$joinsql \n"
+						." $joinsql \n"
 						." inner join email x on (x.personid = pg.guardianpersonid) \n"
 						." where not p.deleted and not g.deleted and g.type = 'guardianauto' \n"
 						." and not exists (select * from personguardian pg2 where pg2.importid is null and pg2.personid = pg.personid) "
@@ -334,7 +336,7 @@ class RenderedList2 {
 					$query = "select distinct $fieldsql from personguardian pg \n"
 						." inner join person g on (g.id = pg.guardianpersonid) "
 						." inner join person p on (p.id = pg.personid) "
-						."	$joinsql \n"
+						." $joinsql \n"
 						." inner join email x on (x.personid = pg.guardianpersonid) \n"
 						." where not p.deleted and not g.deleted and g.type = 'guardiancm' \n"
 						." $rulesql $this->extrawheresql and x.email like '$searchstring%' \n";
