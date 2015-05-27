@@ -12,9 +12,10 @@ class SmsStatusReport extends ReportGenerator {
 		$this->reportType = $this->params["reporttype"];
 
 		$selectList0 = "*";
-		$selectList1 = "max(p.pkey) as pkey, asb.sms, max(asb.status) as status, max('global') as modifiedby, max(unix_timestamp(asb.lastupdate)*1000) as modifieddate, max(asb.notes) as notes";
-		$selectList2 = "max(p.pkey), s.sms, max('block'), max(bu.login), max(unix_timestamp(b.createdate)*1000), max(b.description)";
+		$selectList1 = "group_concat(p.pkey) as pkey, asb.sms, max(asb.status) as status, max('global') as modifiedby, max(unix_timestamp(asb.lastupdate)*1000) as modifieddate, max(asb.notes) as notes";
+		$selectList2 = "group_concat(p.pkey) as pkey, s.sms, max('block') as status, max(bu.login) as modifiedby, max(unix_timestamp(b.createdate)*1000) as modifieddate, max(b.description) as notes";
 		$whereSms = "";
+		$groupBy0 = "";
 		$groupBy = "group by sms";
 		$orderBy = "order by sms";
 
@@ -26,6 +27,7 @@ class SmsStatusReport extends ReportGenerator {
 			$selectList0 = "status, sum(`Count`) as `Count`";
 			$selectList1 = "status, count(distinct sms) as `Count`";
 			$selectList2 = "'block' as status, count(distinct sms) as `Count`";
+			$groupBy0 = "group by status";
 			$groupBy = "group by status";
 			$orderBy = "order by null";
 			break;
@@ -60,7 +62,9 @@ union all
     inner join person as p on (s.personid = p.id)
     where not p.deleted $whereSms
 )) t
-$groupBy $orderBy ";
+where status is not null
+$groupBy0
+$orderBy ";
 	}
 
 	function runHtml() {
