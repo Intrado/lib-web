@@ -1479,20 +1479,6 @@ class SMAPI {
 					$job->setOption('messageconfirmation', '0');
 				}
 			}
-			/*
-			 * // unused option today, comment out in case we put it in
-			if (isset($joboptions['skipduplicates'])) {
-				if ($joboptions['skipduplicates'] == "1") {
-					$job->setOption('skipduplicates', '1');
-					$job->setOption('skipemailduplicates', '1');
-					$job->setOption('skipsmsduplicates', '1');
-				} else {
-					$job->setOption('skipduplicates', '0');
-					$job->setOption('skipemailduplicates', '0');
-					$job->setOption('skipsmsduplicates', '0');
-				}
-			}
-			*/
 			
 			$job->name = $name;
 			$job->description = isset($desc) ? $desc : ""; //avoid nulls

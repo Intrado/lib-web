@@ -147,7 +147,6 @@ class PdfSendMail extends PageForm {
 			$job = Job::jobWithDefaults();
 			// If the destination has more than one student, we should send all duplicates
 			$job->setOption("skipduplicates",0);
-			$job->setOption("skipemailduplicates",0);
 			$job->name = $postData['broadcastname'];
 			$job->description = "Secure Document Delivery notification";
 			$job->jobtypeid = $postData['broadcasttype'];

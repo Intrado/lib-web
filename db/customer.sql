@@ -3025,3 +3025,10 @@ ALTER TABLE reportsdddelivery
 $$$
 
 -- END 11.2/5
+
+-- 11.2/6 no change, just cleanup jobsetting records
+update setting set value='11.2/6' where name='_dbversion'
+$$$
+
+-- END 11.2/6
+

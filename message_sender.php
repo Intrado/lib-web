@@ -727,7 +727,7 @@ $formdata = array_merge($formdata, array(
 		"control" => array("CheckBox"),
 		"helpstep" => 1
 	),
-	"optionskipduplicate" => array( // NOTE: using same setting for both skipduplicates and skipemailduplicates?
+	"optionskipduplicate" => array(
 		"label" => "Skip Duplicate",
 		"value" => "",
 		"validators" => array(// NOTE: no validation, will be ignored if the user can't use this option
@@ -1084,7 +1084,6 @@ class MessageSenderProcessor {
 		$job->setSetting("sendreport", (isset($postdata["optionautoreport"]) && $postdata["optionautoreport"])?1:0);
 		$job->setSetting("messageconfirmation", (isset($postdata["optionmessageconfirmation"]) && $postdata["optionmessageconfirmation"])?1:0);
 		$job->setSetting("skipduplicates", (isset($postdata["optionskipduplicate"]) && $postdata["optionskipduplicate"])?1:0);
-		$job->setSetting("skipemailduplicates", (isset($postdata["optionskipduplicate"]) && $postdata["optionskipduplicate"])?1:0);
 
 		// set jobsetting 'callerid'
 		if ($this->displayingCallerid && $postdata["optioncallerid"])
