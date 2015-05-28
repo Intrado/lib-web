@@ -73,7 +73,14 @@ if ((! defined('PHPUNIT')) && (!isset($isindexpage) || !$isindexpage)) {
 	}
 
 	if (!isset($_SESSION['user']) || !isset($_SESSION['access'])) {
-		//probably a session expired or temp unavail, redirect to login, and give login a chance to bounce back somewhere
+		// For api requests, return Unauthorized status code
+		//
+		if (isset($_REQUEST['api'])) {
+			header("HTTP/1.1 401 Unauthorized");
+			exit();
+		}
+
+		// Probably a session expired or temp unavail, redirect to login, and give login a chance to bounce back somewhere
 		redirect("$BASEURL/index.php?last=" . urlencode(urlencode($_SERVER['REQUEST_URI'])));
 	} else {
 		$USER = &$_SESSION['user'];
@@ -89,6 +96,11 @@ if ((! defined('PHPUNIT')) && (!isset($isindexpage) || !$isindexpage)) {
 		$ACCESS->loadPermissions(true);
 
 		if (!$USER->enabled || $USER->deleted || !$USER->authorize('loginweb')) {
+			if (isset($_REQUEST['api'])) {
+				header("HTTP/1.1 401 Unauthorized");
+				exit();
+			}
+
 			redirect("$BASEURL/index.php?logout=1");
 		}
 	}

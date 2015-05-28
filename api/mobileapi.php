@@ -115,8 +115,13 @@ function doJobView($start,$limit) {
 }
 
 function doJobInfo($jobid) {
-	if (!userOwns("job",$jobid))
-		return array("resultcode" => "failure", "resultdescription" => _L("You do not have to view information for this job."));
+	if (!userOwns("job",$jobid)) {
+		if (isset($_REQUEST['api'])) {
+			return array("resultcode" => "jobNotFound", "resultdescription" => _L("Job $jobid not found"));
+		} else {
+			return array("resultcode" => "failure", "resultdescription" => _L("You do not have to view information for this job."));
+		}
+	}
 		
 	$listids = QuickQueryList("select listid from joblist where jobid = ?",false,false,array($jobid));
 	$lists = array();
@@ -209,7 +214,7 @@ function handleRequest() {
 	} else  {
 		return array("resultcode" => "failure", "resultdescription" => "Please upgrade the application. This version is no longer supported.");
 	}
-	// Unkown API request
+	// Unknown API request
 	return array("resultcode" => "failure", "resultdescription" => "Please upgrade the application. Some functionality in this application may no longer be supported.");
 }
 

@@ -41,7 +41,12 @@ require_once("ruleeditform.inc.php");
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
 if (!$USER->authorize('createlist')) {
-	redirect('unauthorized.php');
+	if (isset($_REQUEST['api'])) {
+		header('Content-Type: application/json');
+		exit(json_encode(Array("status" => "accessDenied", "message" => "Insufficient privileges to update recipient list")));
+	} else {
+		redirect('unauthorized.php');
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -77,12 +82,16 @@ if (isset($_GET['id'])) {
     // API clients don't support redirect/page-reload for caching session state.
     // For these clients, just continue with execution and don't redirect!
     //
-    if (!isset($_GET['api'])) {
+	if (!isset($_GET['api'])) {
         // NOTE: maintaing previous behavior while removing errors from httpd log files. See bug:4605
         $referer = (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : NULL);
         $_SESSION['listreferer'] = $referer;
         redirect("search.php" . (isset($_GET["iframe"]) ? "?iframe=true" : ""));
     }
+} else {
+	if (isset($_GET['api'])) {
+		exit(json_encode(Array("status" => "invalidParameter", "message" => "Recipient list not specified")));
+	}
 }
 
 handle_list_checkbox_ajax(); //for handling check/uncheck from the list
