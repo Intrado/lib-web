@@ -247,7 +247,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
                             $rowSpacingModifier--;
                         } 
                         
-                        $additionalHeader = array_merge($additionalHeaderArray, array_fill(0,$numberOfFields+$rowSpacingModifier,''));
+                        $additionalHeader = array_merge($extraHeaderArray, array_fill(0,$numberOfFields+$rowSpacingModifier,''));
                         $additionalInfo   = array_merge($extraFields, array_fill(0,$numberOfFields+$rowSpacingModifier,''));
                         
 			if ($savecsv) {
@@ -256,7 +256,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				if (!$wroteheaders) {
 					$wroteheaders = true;
                                         
-                                        if(!empty($additionalHeaderArray)) {
+                                        if(!empty($extraHeaderArray)) {
                                             echo array_to_csv($additionalHeader).PHP_EOL;
                                         }
                                         if(!empty($extraFields)) {
