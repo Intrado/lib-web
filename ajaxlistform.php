@@ -231,7 +231,7 @@ function handleRequest() {
 			if (! in_array($recipientMode, $validRecipientModes)) {
 				$recipientMode = $validRecipientModes[0];
 			}
-			QuickUpdate("UPDATE `list` SET `recipientmode` = ? WHERE `id` = ?", false, array($recipientMode, $listid));
+			QuickUpdate("UPDATE `list` SET `recipientmode` = ? WHERE `id` = ?", false, array($recipientMode, $_REQUEST['listid']));
 
 			// Now all that remains in the POST data *should* be guardian categories
 			$guardianCategoryIds = array();
