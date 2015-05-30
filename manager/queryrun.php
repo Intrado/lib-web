@@ -182,7 +182,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
                     $customerFields.=', c.notes';
                 }
                 
-                $shardFields='s.dbhost, s.readonlyhost, s.dbusername, s.dbpassword, s.id';
+                $shardFields='s.dbhost, s.readonlyhost, s.dbusername, s.dbpassword, s.id as shardid';
                 
 		//Following code mostly taken from query_customers, modified somewhat to fit this page
 		$query = "select $customerFields, $shardFields from shard s inner join customer c on (c.shardid = s.id) {$prodfiltercondition} where 1 $limit order by c.id";
@@ -229,41 +229,20 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$displayname = mysql_fetch_row($displayinfo);
                         
                         $numberOfFields = mysql_num_fields($res);
-                            
-                        $extraFields = array();
-                        $extraHeaderArray = array();
-
-                        // may need to remove up to 2 extra blank fields depeding on if nsid/notes is checked or both
-                        $rowSpacingModifier=2;
-                        
-                        if($addnsid){
-                            $extraFields[] = $customer['nsid'];
-                            $extraHeaderArray[]="Netsuite ID";
-                            $rowSpacingModifier--;
-                        } 
-                        if($addnotes) {
-                            $extraFields[] = $customer['notes'];
-                            $extraHeaderArray[]="Notes";
-                            $rowSpacingModifier--;
-                        } 
-                        
-                        $additionalHeader = array_merge($extraHeaderArray, array_fill(0,$numberOfFields+$rowSpacingModifier,''));
-                        $additionalInfo   = array_merge($extraFields, array_fill(0,$numberOfFields+$rowSpacingModifier,''));
-                        
+                                               
 			if ($savecsv) {
                             
 				//write field header
 				if (!$wroteheaders) {
 					$wroteheaders = true;
                                         
-                                        if(!empty($extraHeaderArray)) {
-                                            echo array_to_csv($additionalHeader).PHP_EOL;
-                                        }
-                                        if(!empty($extraFields)) {
-                                            echo array_to_csv($additionalInfo).PHP_EOL;
-                                        }
-                                        
 					echo '"customername","customerid"';
+                                        if($addnsid) {
+                                            echo ',"Netsuite ID"';
+                                        }
+                                        if($addnotes) {
+                                            echo ',"Notes"';
+                                        }
                                         
 					for ($i = 0; $i < $numberOfFields; $i++) {
 						$field = mysql_fetch_field($res, $i);
@@ -273,7 +252,15 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				}
                                 
 				while ($row = mysql_fetch_row($res)) {
-					echo escape_csvfield($displayname[0]) . ',' . escape_csvfield($customer["id"]) . ',' . array_to_csv($row) . "\n";
+					
+                                        $extraFields=array();
+                                        $addnsid  ? $extraFields[] = $customer['nsid']  : false;
+                                        $addnotes ? $extraFields[] = $customer['notes'] : false;
+                                    
+                                        echo escape_csvfield($displayname[0]) . ',' .
+                                             escape_csvfield($customer["id"]) . ',' .
+                                             array_to_csv($extraFields) . ', ' .
+                                             array_to_csv($row) . "\n";
 				}
 			} else {
 				$numfields = @mysql_num_fields($res);
@@ -308,7 +295,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
                                     // if Add Notes checkbox is checked.
                                     if($addnotes){
-                                        $queryoutput .= '<tr><td style="border-top: 1px solid black;" colspan=' . count($fields) . '>Notes: ' . $customer["notes"] . ')</td></tr>';
+                                        $queryoutput .= '<tr><td style="border-top: 1px solid black;" colspan=' . count($fields) . '>Notes: ' . $customer["notes"] . '</td></tr>';
                                     }
 
                                     $line = '<tr class="listHeader">';
