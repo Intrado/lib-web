@@ -12,5 +12,8 @@ node_modules
 # Idea project cache
 .idea
 *.iml
+<<<<<<< HEAD
 /nbproject/private/
+=======
+>>>>>>> 8a5c6ea... Adds netbeans project data
 /nbproject/
