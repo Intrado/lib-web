@@ -257,10 +257,15 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
                                         $addnsid  ? $extraFields[] = $customer['nsid']  : false;
                                         $addnotes ? $extraFields[] = $customer['notes'] : false;
                                     
+                                        // echo customer id, extra fields, and actual row of query results
                                         echo escape_csvfield($displayname[0]) . ',' .
-                                             escape_csvfield($customer["id"]) . ',' .
-                                             array_to_csv($extraFields) . ', ' .
-                                             array_to_csv($row) . "\n";
+                                             escape_csvfield($customer["id"]) . ',';
+                                                
+                                        if(!empty($extraFields)) {
+                                            echo array_to_csv($extraFields) . ', ';
+                                        }
+                                                
+                                        echo array_to_csv($row) . "\n";
 				}
 			} else {
 				$numfields = @mysql_num_fields($res);
