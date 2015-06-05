@@ -185,7 +185,17 @@ class Form {
 					}
 				}
 			}
-			
+
+			// FILES...
+			foreach ($this->formdata as $name => $formitem) {
+				if ($formitem['control'][0] === 'FileUpload') {
+					$fileKey = "{$this->name}_{$name}";
+					if (isset($_FILES[$fileKey])) {
+						$this->formdata[$name]['value'] = $_FILES[$fileKey];
+					}
+				}
+			}
+
 			$this->preValidation();
 
 			$errors = $this->validate();
@@ -513,7 +523,6 @@ class Form {
 				$this->validationresults[] = array("name" => $name,"vres" => false,"vmsg" => $msg, "v" => $validator);
 			}
 		}
-
 		if ($anyerrors) {
 			return $this->validationresults;
 		} else {
