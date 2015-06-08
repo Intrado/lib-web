@@ -45,6 +45,7 @@ Usage: php apply_customer_sql.php [ options... ] [ <sqlfile> ] { all | <cid1> ..
 -o|--output <format>           Output results of queries e.g. in CSV format (default: no output)
 -p|--password <password>       Authserver password
 -P|--port <port>               Authserver port (default: 3306)
+-s|--shard <shardid>           Shard id (default: all)
 -u|--user <user>               Authserver user (default: "root")
 -?|--help                      Print this help
 
@@ -149,16 +150,17 @@ function parse_options($argv) {
 		"startTime" => time(),
 		"verbose" => 0,
 		"sqlQueries" => array(),
+		"shardIds" => null,
 		"dbparams" => array(
 			"dbhost" => "localhost",
 			"dbport" => "3306",
 			"dbname" => "authserver",
-			"dbuser" => "root",
+			"dbusername" => "root",
 			"dbpassword" => "asp123"
 		)
 	);
 
-	$shortopts = "c:e:f:h:o:p:P:r:u:v?";
+	$shortopts = "c:e:f:h:o:p:P:r:s:u:v?";
 	$longopts = array(
 		"chunk-size:",
 		"chunk-limit:",
@@ -170,6 +172,7 @@ function parse_options($argv) {
 		"password:",
 		"port:",
 		"runtime:",
+		"shard:",
 		"user:",
 		"verbose",
 		"help"
@@ -241,9 +244,15 @@ function parse_options($argv) {
 			array_shift($remainingArgv);
 			array_shift($remainingArgv);
 			break;
+		case "s":
+		case "shard":
+			$options["shardIds"] = array_map("intval", explode(",", $value));
+			array_shift($remainingArgv);
+			array_shift($remainingArgv);
+			break;
 		case "u":
 		case "user":
-			$flag_dbparams["dbuser"] = $value;
+			$flag_dbparams["dbusername"] = $value;
 			array_shift($remainingArgv);
 			array_shift($remainingArgv);
 			break;
@@ -330,10 +339,11 @@ if (empty($options["sqlQueries"])) {
 }
 
 // Get SQL to query customer(s)
+$params = array();
 if (empty($remainingArgv) || array_search("all", $remainingArgv) !== false) {
-	$cidArray = array();
 	$query = "select c.id, s.dbhost, concat('c_', c.id) as dbname, s.dbusername, s.dbpassword
-		from shard s inner join customer c on (c.shardid = s.id)";
+		from shard s inner join customer c on (c.shardid = s.id)
+		where true ";
 } else {
 	$cidArray = array_filter(array_map("intval", $remainingArgv),
 		function ($cid) {
@@ -341,13 +351,22 @@ if (empty($remainingArgv) || array_search("all", $remainingArgv) !== false) {
 		});
 	$query = "select c.id, s.dbhost, concat('c_', c.id) as dbname, s.dbusername, s.dbpassword
 		from shard s inner join customer c on (c.shardid = s.id)
-		where c.id in (" . implode(", ", array_fill(1, count($cidArray), "?")) . ")";
+		where c.id in (" . implode(", ", array_fill(1, count($cidArray), "?")) . ") ";
+	$params = array_merge($params, $cidArray);
+}
+if ($options["shardIds"]) {
+	$sidArray = array_filter($options["shardIds"],
+		function($sid) {
+			return $sid >= 1 and $sid <= 8;
+		});
+	$query .= " and s.id in (" . implode(", ", array_fill(1, count($sidArray), "?")) . ") ";
+	$params = array_merge($params, $sidArray);
 }
 
 $authDb = databaseConnection($options["dbparams"]);
 
 $stmt = $authDb->prepare($query);
-$stmt->execute(array_values($cidArray));
+$stmt->execute(array_values($params));
 
 $authDb = NULL;
 
