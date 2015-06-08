@@ -188,7 +188,7 @@ class Form {
 
 			// FILES...
 			foreach ($this->formdata as $name => $formitem) {
-				if ($formitem['control'][0] === 'FileUpload') {
+				if (is_array($formitem['control']) && ($formitem['control'][0] === 'FileUpload')) {
 					$fileKey = "{$this->name}_{$name}";
 					if (isset($_FILES[$fileKey])) {
 						$this->formdata[$name]['value'] = $_FILES[$fileKey];
