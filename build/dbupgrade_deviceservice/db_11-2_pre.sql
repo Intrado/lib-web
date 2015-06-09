@@ -57,3 +57,18 @@ RENAME TABLE
   appinstance TO appinstance_old,
   appinstance_new TO appinstance
 $$$
+
+-- $rev 4
+
+-- add new column to registrationlog to associate with the right version
+ALTER TABLE `registrationlog` ADD COLUMN appVersion VARCHAR(20) AFTER appInstanceId
+$$$
+
+UPDATE registrationlog AS r
+JOIN appinstance_old AS aold ON (aold.id = r.appInstanceId)
+JOIN appinstance AS anew ON (anew.name = aold.name AND anew.osType = r.osType)
+JOIN appversion AS av ON (av.appInstanceId = anew.id AND av.appVersion = aold.version)
+JOIN appcredential AS ac ON (ac.id = anew.appCredentialId AND ac.isProduction = aold.isProduction)
+SET r.appInstanceId = anew.id,
+    r.appVersion = av.appVersion
+$$$
