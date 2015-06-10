@@ -24,7 +24,7 @@ require_once('obj/PageBase.obj.php');
  */
 class PdfManager extends PageBase {
 	var $pagingStart = 0;
-	var $pagingLimit = 100;
+	var $pagingLimit = 1;
 	var $isAjaxRequest = false;
 	var $feedResponse;
 	var $feedData;
@@ -223,7 +223,7 @@ class PdfManager extends PageBase {
 
 	public function setDisplayPagingDetails() {
 		if ($this->feedData) {
-			$this->total = count($this->feedData);
+			$this->total = $this->feedResponse->paging->total;
 		}
 
 		$this->numPages 	= ceil($this->total / $this->pagingLimit);
