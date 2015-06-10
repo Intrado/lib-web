@@ -72,3 +72,18 @@ JOIN appcredential AS ac ON (ac.id = anew.appCredentialId AND ac.isProduction = 
 SET r.appInstanceId = anew.id,
     r.appVersion = av.appVersion
 $$$
+
+-- $rev 5
+
+-- fix the mistaken mapping of device to appInstance with wrong osType.
+-- update it to the matching appinstance name, appVersion, isProduction, but correct osType
+UPDATE device AS d
+JOIN appversion AS v1 ON d.appinstanceid=v1.appinstanceid AND d.appversion=v1.appversion
+JOIN appinstance AS a1 ON v1.appinstanceid=a1.id
+JOIN appcredential AS c1 ON a1.appCredentialId=c1.id
+JOIN appcredential AS c2 ON c2.isProduction=c1.isProduction
+JOIN appinstance AS a2 ON a2.name=a1.name AND a2.appCredentialId=c2.id
+JOIN appversion AS v2 ON v2.appInstanceId=a2.id AND v2.appVersion=v1.appVersion
+SET d.appInstanceId = v2.appInstanceId
+WHERE d.osType != a1.osType AND d.osType = a2.osType
+$$$
