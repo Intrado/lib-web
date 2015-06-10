@@ -24,7 +24,7 @@ require_once('obj/PageBase.obj.php');
  */
 class PdfManager extends PageBase {
 	var $pagingStart = 0;
-	var $pagingLimit = 1;
+	var $pagingLimit = 100;
 	var $isAjaxRequest = false;
 	var $feedResponse;
 	var $feedData;
