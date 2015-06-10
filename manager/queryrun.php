@@ -254,8 +254,13 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				while ($row = mysql_fetch_row($res)) {
 					
                                         $extraFields=array();
-                                        $addnsid  ? $extraFields[] = $customer['nsid']  : false;
-                                        $addnotes ? $extraFields[] = $customer['notes'] : false;
+                                        
+                                        if($addnsid) {
+                                            $extraFields[] = $customer['nsid'];
+                                        }
+                                        if($addnotes) {
+                                            $extraFields[] = $customer['notes'];
+                                        }
                                     
                                         // echo customer id, extra fields, and actual row of query results
                                         echo escape_csvfield($displayname[0]) . ',' .
