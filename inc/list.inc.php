@@ -202,8 +202,10 @@ function handle_list_checkbox_ajax () {
 		}
 	}
 
-	if (!userOwns('list', $_SESSION['listid'])) {
-		exit(json_encode(Array("status" => "listNotFound", "message" => "Recipient list " . $_SESSION['listid'] . " not found")));
+	if (isset($_GET['api'])) {
+		if (!userOwns('list', $_SESSION['listid'])) {
+			exit(json_encode(Array("status" => "listNotFound", "message" => "Recipient list " . $_SESSION['listid'] . " not found")));
+		}
 	}
 
 	if ($USER->authorize('createlist')) { //make sure user can edit lists
