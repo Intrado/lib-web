@@ -174,10 +174,6 @@ function handleRequest() {
 
             $organizations = $list->getOrganizations();
 
-            if (count($organizations) > 0) {
-	            $listrules['organizations'] = $organizations;
-            }
-
 	        $query = "select p.id, p.pkey, p.f01, p.f02
 			from person p inner join listentry le
 				on (le.personid=p.id and le.type='negate' and le.listid=?)
@@ -191,6 +187,7 @@ function handleRequest() {
 	            "status" => "success",
 	            "list" => $recipientList,
 	            "listrules" => cleanObjects($listrules),
+	            "listorganizations" => cleanObjects($organizations),
 	            "listsections" => cleanObjects($list->getSections()),
 	            "removals" => cleanObjects($data));
 
