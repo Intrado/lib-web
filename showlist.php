@@ -36,7 +36,7 @@ if (!$USER->authorize('createlist') && !($USER->authorize("subscribe") && userCa
 //get the message to edit from the request params or session
 if (isset($_GET['id'])) {
 	$listid = $_GET['id'] + 0;
-	
+
 	if (isSubscribed("list",$listid))
 		$_SESSION['previewlistid'] = $listid;
 	if (userOwns("list",$listid)) {
@@ -50,6 +50,11 @@ if (isset($_GET['id'])) {
 
 handle_list_checkbox_ajax(); //for handling check/uncheck from the list
 
+// If the session expired while the user was previewing a list, then the user logged back in, then the app redirects here,
+// but with a depopulated $_SESSION. In that case, redirect the user back to the lists page to choose a list again.
+if (!isset($_SESSION['previewlistid'])) {
+	redirect("lists.php");
+}
 
 $list = new PeopleList($_SESSION['previewlistid']);
 

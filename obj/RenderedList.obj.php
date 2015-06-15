@@ -156,20 +156,20 @@ class RenderedList2 {
 					$query = "(select $sqlflags distinct $fieldsql from person p \n"
 							."	$joinsql \n"
 							."	left join listentry le on \n"
-							."		(p.id = le.personid and le.listid=" . $this->listid . ") \n" //skip anyone that is directly referenced, add or negate
+							."		(p.id = le.personid and le.listid=" . intval($this->listid) . ") \n" //skip anyone that is directly referenced, add or negate
 							."	where not p.deleted and p.type in ('system', 'subscriber') and le.type is null \n"
 							." $rulesql $this->extrawheresql) \n"
 							." UNION ALL \n"
 							."(select $fieldsql from person p \n"
 							."	inner join listentry le on \n"
-							."		(p.id = le.personid and le.listid=" . $this->listid . " and le.type='add') \n"
+							."		(p.id = le.personid and le.listid=" . intval($this->listid) . " and le.type='add') \n"
 							."where not p.deleted )\n"
 							."$ordersql $limitsql ";
 				} else {
 					//with no rules/orgs/sections, just use manual adds, if any
 					$query = "select $sqlflags $fieldsql from person p \n"
 							."	inner join listentry le on \n"
-							."		(p.id = le.personid and le.listid=" . $this->listid . " and le.type='add') \n"
+							."		(p.id = le.personid and le.listid=" . intval($this->listid) . " and le.type='add') \n"
 							."where not p.deleted\n"
 							."$ordersql $limitsql ";
 				}
@@ -184,7 +184,7 @@ class RenderedList2 {
 						."	where not p.deleted and p.type in ('system', 'subscriber') \n"
 						." $rulesql $this->extrawheresql \n"
 						."$ordersql $limitsql ";
-				
+
 				break;
 			case "individual":
 				$joinsql = $this->owneruser->getPersonAssociationJoinSql(array(), array(), "p");
@@ -222,11 +222,11 @@ class RenderedList2 {
 						."	where not p.deleted and p.type in ('system', 'subscriber') \n"
 						." $rulesql $this->extrawheresql $contactwheresql \n"
 						."$ordersql $limitsql ";
-				
+
 				break;
 			case "quickaddsearch":
 
-				$digits = Phone::parse($this->quickaddsearch); //get any digits out of the string
+				$digits = Phone::parse($this->quickaddsearch); //get any non-digits out of the string
 				$searchstring = DBEscapeLikeWildcards(DBSafe($this->quickaddsearch));
 				
 				//if not enough search data, dont search
@@ -567,19 +567,19 @@ class RenderedList2 {
 			$query = "(select p.id, 'rule' as entrytype from person p \n"
 					."	$joinsql \n"
 					."	left join listentry le on \n"
-					."		(p.id = le.personid and le.listid=" . $list->id . ") \n" //skip anyone that is directly referenced, add or negate
+					."		(p.id = le.personid and le.listid=" . intval($list->id) . ") \n" //skip anyone that is directly referenced, add or negate
 					."	where not p.deleted and p.type in ('system', 'subscriber') and le.type is null \n"
 					."	and p.id in ($pagepidcsv) \n"
 					." $rulesql ) \n"
 					." UNION ALL \n"
 					."(select p.id, 'add' as entrytype from person p \n"
 					."	inner join listentry le on \n"
-					."		(p.id = le.personid and le.listid=" . $list->id . " and le.type='add') \n"
+					."		(p.id = le.personid and le.listid=" . intval($list->id) . " and le.type='add') \n"
 					."where not p.deleted and p.id in ($pagepidcsv) )\n";
 		} else {
 			$query = "select p.id, 'add' as entrytype from person p \n"
 					."	inner join listentry le on \n"
-					."		(p.id = le.personid and le.listid=" . $list->id . " and le.type='add') \n"
+					."		(p.id = le.personid and le.listid=" . intval($list->id) . " and le.type='add') \n"
 					."where not p.deleted and p.id in ($pagepidcsv)\n";
 		}
 		
@@ -592,7 +592,7 @@ class RenderedList2 {
 	 * @return multitype:RenderedRecipient array of target-recipient pairs
 	 */
 	function getRecipientList() {
-		
+
 		$personSql = $this->getPersonSql(false, false);
 		//echo $personSql . "\n";
 		$personIds = QuickQueryList($personSql);
