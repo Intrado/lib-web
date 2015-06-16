@@ -124,7 +124,8 @@ $dbversions = array(
 	),
 
 	"lcrrates" => array(
-		"11.0/2"
+		"11.0/2",
+		"11.2/2"
 	),
 
 	"pagelink" => array(
