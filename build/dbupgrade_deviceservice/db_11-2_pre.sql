@@ -57,3 +57,19 @@ RENAME TABLE
   appinstance TO appinstance_old,
   appinstance_new TO appinstance
 $$$
+
+-- $rev 4
+
+-- $rev 5
+
+-- $rev 6
+
+-- unused or redundant indexes per CS-7289
+
+ALTER TABLE notification
+  DROP INDEX `deviceId`
+$$$
+
+ALTER TABLE registrationlog
+  DROP INDEX `uuid`
+$$$

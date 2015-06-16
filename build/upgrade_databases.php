@@ -82,7 +82,7 @@ $versions = array(
 		"10.3/10",
 		"11.0/8",
 		"11.1/14",
-		"11.2/6"
+		"11.2/7"
 		//etc., one array element per version, always the last revision of the given version
 	),
 
@@ -101,17 +101,19 @@ $versions = array(
 $dbReleaseVersion = "11.2"; // version to update databases to if no revision changes for individual db, implies revision value of 1
 $dbversions = array(
 	"authserver" => array(
-		"11.0/2"
+		"11.0/2",
+		"11.2/2"
 	),
 
 	"aspshard" => array(
 		"11.0/1",
-		"11.1/5"
+		"11.1/5",
+		"11.2/2"
 	),
 
 	"deviceservice" => array(
 		"11.1/10",
-		"11.2/2"
+		"11.2/4"
 	),
 
 	"disk" => array(
@@ -125,7 +127,7 @@ $dbversions = array(
 
 	"lcrrates" => array(
 		"11.0/2",
-		"11.2/2"
+		"11.2/3"
 	),
 
 	"pagelink" => array(
@@ -135,7 +137,7 @@ $dbversions = array(
 	"portalauth" => array(
 		"11.0/2",
 		"11.1/2",
-		"11.2/2"
+		"11.2/3"
 	)
 );
 

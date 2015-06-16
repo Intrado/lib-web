@@ -25,16 +25,23 @@ $$$
 ALTER TABLE xorates ENGINE=InnoDB
 $$$
 
--- The following tables exist in some environments, but they're almost a year old.
--- These have been backed up on the production databases.
-DROP TABLE IF EXISTS lerg6_archived_on_20140826_1438293600
+-- $rev 3
+
+-- unused or redundant indexes per CS-7289
+
+ALTER TABLE qwestrawinterstaterate
+  DROP INDEX `lata`
 $$$
-DROP TABLE IF EXISTS lerg6_archived_on_20140904_1475893793
+
+ALTER TABLE qwesttdmrawinterstaterate
+  DROP INDEX `lata`
 $$$
-DROP TABLE IF EXISTS lerg6_tmp_20140825_2067188561
+
+ALTER TABLE xorates
+  DROP INDEX `npanxx`
 $$$
-DROP TABLE IF EXISTS lerg6_tmp_20140825_418888255
-$$$
-DROP TABLE IF EXISTS lerg6_tmp_20140826_1613602649
+
+ALTER TABLE xorates
+  DROP INDEX `state`
 $$$
 

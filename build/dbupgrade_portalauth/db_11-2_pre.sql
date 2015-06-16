@@ -17,3 +17,11 @@ SET
 	`additional_information` = '{}',
 	`autoapprove` = 'true'
 $$$
+
+-- $rev 3
+
+-- unused or redundant indexes per CS-7289
+
+ALTER TABLE oauth_access_token
+  DROP INDEX `client_id`
+$$$
