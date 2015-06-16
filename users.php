@@ -255,7 +255,7 @@ if (isset($_GET['containerID']) && isset($_GET['ajax'])) {
 
 function show_user_table($containerID) {
 
-	$perpage = 20;
+	$perpage = 1000;
 
 	$titles = array(
 		"firstname" => "First Name",
@@ -343,6 +343,9 @@ function show_user_table($containerID) {
 	return $html;
 }
 
+// check if we should display active or inactive users.
+$display = $_GET['display'];
+
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
@@ -350,26 +353,41 @@ $PAGE = "admin:users";
 $TITLE = "User List";
 
 $DESCRIPTION = "Active Users: $usercount";
-if($maxusers != "unlimited")
+if($maxusers != "unlimited") {
 	$DESCRIPTION .= ", Maximum Allowed: $maxusers";
-$DESCRIPTION .= ',&nbsp;&nbsp;<a href="users.php?download">'._L("user details csv").'</a>';
+}
+
+if($display !== 'inactive') {
+    $DESCRIPTION .= ',&nbsp;&nbsp;<a href="users.php?display=inactive">'._L("View Inactive Users").'</a>';
+}
+
+if($display === 'inactive') {
+    $DESCRIPTION .= ',&nbsp;&nbsp;<a href="users.php">'._L("View Active Users").'</a>';
+}
+
+$DESCRIPTION .= '&nbsp;&nbsp;'.icon_button(_L('Download User Details CSV'),"report",null,"users.php?download");
 
 include_once("nav.inc.php");
 
+if($display !== 'inactive') {
 startWindow('Active Users ' . help('Users_ActiveUsersList'),null, true);
 	?>
-	<div class="feed_btn_wrap cf"><?= icon_button(_L('Add New User'),"add",null,"user.php?id=new") ?></div>
+	<div class="feed_btn_wrap cf">
+            <?= icon_button(_L('Add New User'),"add",null,"user.php?id=new") ?>
+        </div>
 	<?
 	echo '<div id="activeUsersContainer" class="cf">';
 		echo show_user_table('activeUsersContainer');
 	echo '</div>';
 endWindow();
+}
 
+if($display === 'inactive') {
 startWindow('Inactive Users ' . help('Users_InactiveUsersList'),null, true);
 	echo '<div id="inactiveUsersContainer">';
 		echo show_user_table('inactiveUsersContainer');
 	echo '</div>';
 endWindow();
-
+}
 include_once("navbottom.inc.php");
 ?>
