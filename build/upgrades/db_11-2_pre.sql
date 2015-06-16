@@ -69,5 +69,33 @@ $$$
 delete from jobsetting where name in ('skipemailduplicates', 'skipsmsduplicates')
 $$$
 
+-- $rev 7
 
+-- unused or redundant indexes per CS-7289
+-- and one new index per CS-7302
+
+ALTER TABLE access
+  DROP INDEX `id`
+$$$
+
+ALTER TABLE cmafeedcategory
+  DROP INDEX `feedcategoryid`,
+  ADD INDEX (cmacategoryid, feedcategoryid);
+$$$
+
+ALTER TABLE job
+  DROP INDEX `enddate`,
+  DROP INDEX `endtime`,
+  DROP INDEX `starttime`,
+  DROP INDEX `startdate`
+$$$
+
+ALTER TABLE reportemaildelivery
+  DROP INDEX `time`
+$$$
+
+ALTER TABLE reportsubscription
+  DROP INDEX `modifydate`,
+  DROP INDEX `nextrun`
+$$$
 
