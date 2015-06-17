@@ -1,0 +1,25 @@
+
+<ul>
+	<li id="liSMMessageSender"><a href="/admin/messagesender/msgsndr.html" id="navSMMessageSender" title="Message Sender">Message Sender</a></li>
+</ul>
+
+<script>
+	var pathname = window.location.pathname; // returns path only        
+	var ul = document.getElementById("left_nav_functions");        
+	var liMessageSender = document.getElementById("liSMMessageSender");
+
+
+	if (pathname.toLowerCase().indexOf("more2") > -1 || pathname.toLowerCase().indexOf("teachers") > -1 
+		|| pathname.toLowerCase().indexOf("guardian") > -1 || pathname.toLowerCase().indexOf("public") > -1) {
+
+		liMessageSender.style.display = "none";
+	}
+	else{
+		liMessageSender.style.display = "";
+	}
+
+	
+	if (ul != null && liMessageSender != null) {
+			ul.appendChild(liMessageSender);
+		}
+</script>
