@@ -6,7 +6,7 @@
           version="1.0"
           description="SSO for SchoolMessenger application">
     
-     <openid host="accounts.relianceco.com" port="443">
+     <openid host="$portalAuthUrl" port="$portalAuthPort">
           <links>
                <!-- Lines 12-17 are for adding the SchoolMessenger link.  The admin.header and admin.left_nav settings determine where the link is displayed. -->
                <link title="SchoolMessenger - Notification solutions" display-text="SchoolMessenger" path="/portalauth/powerschool?customerurl=$customerUrl">
@@ -25,7 +25,7 @@
           </links>
      </openid>
      <!-- You must change the <customer_url> reference on line 28 to match the customer's SchoolMessenger URL. -->
-     <registration url="https://asp.schoolmessenger.com/$customerUrl/api/2/registrations/powerschool">
+     <registration url="https://$customerUrlPrefix/$customerUrl/api/2/registrations/powerschool">
           <callback-data>powerschool_registration</callback-data>
      </registration>
 
