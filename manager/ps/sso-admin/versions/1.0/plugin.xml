@@ -2,14 +2,14 @@
 <plugin xmlns="http://plugin.powerschool.pearson.com"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation='http://plugin.powerschool.pearson.com plugin.xsd'
-          name="$pluginName"
+          name="SchoolMessenger"
           version="1.0"
           description="SSO for SchoolMessenger application">
     
-     <openid host="portal.$portaHostName.com" port="443">
+     <openid host="accounts.relianceco.com" port="443">
           <links>
                <!-- Lines 12-17 are for adding the SchoolMessenger link.  The admin.header and admin.left_nav settings determine where the link is displayed. -->
-               <link title="SchoolMessenger - Notification solutions" display-text="$linkText" path="/portalauth/powerschool?customerurl=$customerUrl">
+               <link title="SchoolMessenger - Notification solutions" display-text="SchoolMessenger" path="/portalauth/powerschool?customerurl=$customerUrl">
                     <ui_contexts>
                          <!-- <ui_context id="admin.header" /> -->
                          <ui_context id="admin.left_nav" />
@@ -24,8 +24,8 @@
                </link>
           </links>
      </openid>
-     <!-- You must change the <customer_url> reference on line 27 to match the customer's SchoolMessenger URL. -->
-     <registration url="https://$serverDomain/$customerUrl/api/2/registrations/powerschool">
+     <!-- You must change the <customer_url> reference on line 28 to match the customer's SchoolMessenger URL. -->
+     <registration url="https://asp.schoolmessenger.com/$customerUrl/api/2/registrations/powerschool">
           <callback-data>powerschool_registration</callback-data>
      </registration>
 
