@@ -222,7 +222,7 @@ class PdfManager extends PageBase {
 	}
 
 	public function setDisplayPagingDetails() {
-		if ($this->feedData) {
+		if ($this->feedResponse) {
 			$this->total = $this->feedResponse->paging->total;
 		}
 
