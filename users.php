@@ -255,7 +255,7 @@ if (isset($_GET['containerID']) && isset($_GET['ajax'])) {
 
 function show_user_table($containerID) {
 
-	$perpage = 1000;
+	$perpage = 500;
 
 	$titles = array(
 		"firstname" => "First Name",
@@ -316,7 +316,7 @@ function show_user_table($containerID) {
 
 	$tooltip = addslashes(_L("Search by First Name, Last Name, Username, or Access Profile. Press ENTER to apply the search word."));
 	$html = "<div class='usersearch'><input id='{$containerID}_search' size=20 value=''></div>";
-	$html .= ajax_table_show_menu($containerID, $numUsers, $limitstart, $perpage) . ajax_show_table($containerID, $data, $titles, $formatters, $sorting);
+	$html .= ajax_table_show_menu($containerID, $numUsers, $limitstart, $perpage) . ajax_show_table($containerID, $data, $titles, $formatters, $sorting,false,false,0,false,false);
 	$html .= "
 		<script type='text/javascript'>
 			var searchLabel = '".addslashes(_L('Search Users'))."';

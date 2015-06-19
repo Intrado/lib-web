@@ -354,7 +354,8 @@ div.gBranding { display:inline; }
 
 /* Scrolling window style settings */
 div.scrollTableContainer {
-	height: auto; /* Set scrolling window size */
+	height: 220px; /* Set scrolling window size */
+        overflow:auto;
 	position: relative;
 }
 
