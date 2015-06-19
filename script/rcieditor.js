@@ -376,6 +376,15 @@
 					'resize_enabled': false, // disabled because now we resize for the user, and manual resize just makes matters worse
 					'pasteFromWordRemoveFontStyles': false,
 					'pasteFromWordRemoveStyles': false,
+                                        
+                                        // specifically name which fonts CKEditor can display in order to remove Comic Sans
+                                        'font_names':"Arial/Arial, Helvetica, sans-serif;"+
+                                                    "Courier New/Courier New, Courier, monospace;"+
+                                                    "Georgia/Georgia, serif;"+
+                                                    "Lucida Sans Unicode/Lucida Sans Unicode, Lucida Grande, sans-serif;"+
+                                                    "Tahoma/Tahoma, Geneva, sans-serif;Times New Roman/Times New Roman, Times, serif;"+
+                                                    "Trebuchet MS/Trebuchet MS, Helvetica, sans-serif;"+
+                                                    "Verdana/Verdana, Geneva, sans-serif",
 	
 					'toolbar_RCI': [
 						{ name:'r1g1', items:[ 'Print', 'Source' ] },

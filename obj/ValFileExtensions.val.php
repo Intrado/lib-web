@@ -3,10 +3,34 @@
 class ValFileExtensions extends Validator {
 	var $isrequired = true;
 
+	// Server side validation
 	function validate ($value, $args) {
-		return true;
+
+		// Make sure the value is an array of file info
+		if (! is_array($value)) {
+			return false;
+		}
+
+		// Make sure we have a filename to work with
+		if (! isset($value['name'])) {
+			return false;
+		}
+
+		// Make sure there is a file extension to block file named
+		// one of supported file extensions with no actual extension
+		if (strpos($value['name'], '.') === false) {
+			return false;
+		}
+
+		// Get the file extension (last dotted segment)
+		$filenameParts = explode('.', $value['name']);
+		$ext = strtolower($filenameParts[count($filenameParts) - 1]);
+
+		// Make sure uploaded file extension is in the list of accepted extensions
+		return in_array($ext, $args['acceptExts']);
 	}
 
+	// Client side validation
 	function getJSValidator () {
 		return <<<END
 			function (name, label, value, args) {

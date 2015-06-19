@@ -27,6 +27,8 @@ class PdfEditPage extends PageForm {
 	protected $error = '';			// A place to capture an error string to control modal display
 
 	protected $csApi = null;
+	
+	public $formName = 'pdfeditform';
 
 	/**
 	 * Constructor
