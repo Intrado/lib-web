@@ -116,7 +116,8 @@ $basicroles = array(
 	"activejobs" => "View active jobs",
 	"editdm" => "Edit SmartCall Appliances",
 	"diskagent" => "Manage SwiftSync Agents",
-	"pdfbursttemplates" => "Manage customer PDF Bursting templates"
+	"pdfbursttemplates" => "Manage customer PDF Bursting templates",
+        "powerschool" => "Powerschool Tools Access"
 );
 
 $advancedroles = array(

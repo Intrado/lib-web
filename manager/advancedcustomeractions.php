@@ -52,6 +52,10 @@ startWindow(_L('Advanced Customer Actions for customer: ' . $custurl));
 <li><a href="bursttemplates.php?cid=<?=$cid?>">PDF Bursting Templates</a></li>
 <? } ?>
 
+<? if ($MANAGERUSER->authorized("powerschool")) { ?>
+<li><a href="powerschool.php?cid=<?=$cid?>">PowerSchool Tools</a></li>
+<? } ?>
+
 </ul>
 <?
 endWindow();
