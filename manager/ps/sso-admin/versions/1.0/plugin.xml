@@ -25,7 +25,7 @@
           </links>
      </openid>
      <!-- You must change the <customer_url> reference on line 28 to match the customer's SchoolMessenger URL. -->
-     <registration url="https://$customerUrlPrefix/$customerUrl/api/2/registrations/powerschool">
+     <registration url="$customerUrlPrefix/$customerUrl/api/2/registrations/powerschool">
           <callback-data>powerschool_registration</callback-data>
      </registration>
 
