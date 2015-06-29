@@ -82,7 +82,7 @@ $versions = array(
 		"10.3/10",
 		"11.0/8",
 		"11.1/14",
-		"11.2/7"
+		"11.2/8"
 		//etc., one array element per version, always the last revision of the given version
 	),
 

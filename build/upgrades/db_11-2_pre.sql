@@ -99,3 +99,8 @@ ALTER TABLE reportsubscription
   DROP INDEX `nextrun`
 $$$
 
+-- $rev 8
+
+ALTER TABLE user
+  ADD COLUMN `sms` varchar(20) NOT NULL DEFAULT '' AFTER `aremail`
+$$$
