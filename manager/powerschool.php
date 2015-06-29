@@ -52,7 +52,7 @@ if($_POST["downloadplugin_type"]) {
     header("Cache-Control: public");
     header("Content-Description: File Transfer");
     header("Content-type: application/octet-stream");
-    header("Content-Disposition: attachment; filename=\"powerschool-plugin-{$customerName}.zip\"");
+    header("Content-Disposition: attachment; filename=\"sso-messagesender-plugin-{$customerName}.zip\"");
     header("Content-Transfer-Encoding: binary");
     
     ob_clean();
@@ -94,7 +94,7 @@ startWindow(_L('PowerSchool: ' . $customerName));
 
 ?>
 
-<h1>PowerSchool Integration Plugin</h1>
+<h1>PowerSchool SSO-MessageSender Plugin</h1>
 <hr />
 <?
 	echo $form->render();
