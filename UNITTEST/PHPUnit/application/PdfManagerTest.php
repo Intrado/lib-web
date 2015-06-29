@@ -254,11 +254,11 @@ class PdfManagerTest extends PHPUnit_Framework_TestCase {
 
 		$this->pdfManager->setDisplayPagingDetails();
 
-		$this->assertEquals($this->pdfManager->total, 2);
+		$this->assertEquals($this->pdfManager->total, 1);
 		$this->assertEquals($this->pdfManager->numPages, 1);
 		$this->assertEquals($this->pdfManager->curPage, 1);
 		$this->assertEquals($this->pdfManager->displayStart, 1);
-		$this->assertEquals($this->pdfManager->displayEnd, 2);
+		$this->assertEquals($this->pdfManager->displayEnd, 1);
 	}
 
 	public function test_displayBurstItem() {
