@@ -8,7 +8,7 @@
  */
 
 require_once(realpath(dirname(dirname(__FILE__)) .'/konaenv.php'));
-require_once("{$konadir}/inc/common.lsinc.php");
+require_once("{$konadir}/inc/common.inc.php");
 require_once("{$konadir}/pdfmanager.php");
 
 class PdfManagerTest extends PHPUnit_Framework_TestCase {
