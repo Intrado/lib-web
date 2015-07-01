@@ -225,13 +225,14 @@ function handleRequest() {
 			// Peel off the recipient mode from the POST data
 			$recipientMode = $_POST['recipientmode'];
 			unset($_POST['recipientmode']);
+			$listId = $_REQUEST['listid'];
 
 			// Modify the list with the selected recipient mode
 			$validRecipientModes = array('selfAndGuardian', 'self', 'guardian');
 			if (! in_array($recipientMode, $validRecipientModes)) {
 				$recipientMode = $validRecipientModes[0];
 			}
-			QuickUpdate("UPDATE `list` SET `recipientmode` = ? WHERE `id` = ?", false, array($recipientMode, $_REQUEST['listid']));
+			QuickUpdate("UPDATE `list` SET `recipientmode` = ? WHERE `id` = ?", false, array($recipientMode, $listId));
 
 			// Now all that remains in the POST data *should* be guardian categories
 			$guardianCategoryIds = array();
@@ -240,9 +241,8 @@ function handleRequest() {
 					$guardianCategoryIds[] = intval(substr($key, strlen('guardiancategory_')));
 				}
 			}
-
 			// Use obj/ListGuardianCategory() to process the categories
-			ListGuardianCategory::resetListGuardianCategories($listId, $categories);
+			ListGuardianCategory::resetListGuardianCategories($listId, $guardianCategoryIds);
 			return true;
 
 		default:
