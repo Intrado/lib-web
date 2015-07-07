@@ -29,7 +29,7 @@ function generateListStats($listid) {
 		'totalrule' => -999, //TOOD remove this
 		'total' => RenderedList2::caclListTotal($listid),
 		'recipientmode' => $list->recipientmode,
-		'guardiancategories' => $list->restrictedGuardianCategoryIds
+		'guardiancategories' => $list->getRestrictedGuardianCategoryIds()
 	);
 	return $stats;
 }

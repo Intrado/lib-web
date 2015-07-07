@@ -181,7 +181,7 @@ function doliststats($statsids) {
 			'totalrule' => -999, //TOOD remove this
 			'total' => $renderedlist->getTotal() + 0,
 			'recipientmode' => $list->recipientmode,
-			'guardiancategories' => $list->restrictedGuardianCategoryIds
+			'guardiancategories' => $list->getRestrictedGuardianCategoryIds()
 		);
 
 	}
