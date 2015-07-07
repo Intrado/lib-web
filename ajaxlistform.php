@@ -101,66 +101,157 @@ function handleRequest() {
 			return true;
 			break;
 		case 'createlist': // returns $list->id
-			if (!$USER->authorize('createlist'))
-				return false;
+			if (!$USER->authorize('createlist')) {
+				if (isset($_REQUEST['api'])) {
+					return Array("status" => "accessDenied", "message" => "Insufficient privileges to create recipient list");
+				} else {
+					return false;
+				}
+			}
 			
 			if (isset($_POST['sectionids'])) {
-				if (!is_array($_POST['sectionids']) || count($_POST['sectionids']) <= 0)
-					return false;
+				if (!is_array($_POST['sectionids']) || count($_POST['sectionids']) <= 0) {
+					if (isset($_REQUEST['api'])) {
+						return Array("status" => "invalidParameter", "message" => "Section(s) not specified");
+					} else {
+						return false;
+					}
+				}
 					
 				$valsection = new ValSections();
 				$valsection->label = _L('Section');
 				$errormessage = $valsection->validate($_POST['sectionids']);
-				if ($errormessage !== true)
-					return array('error' => $errormessage);
+				if ($errormessage !== true) {
+					if (isset($_REQUEST['api'])) {
+						return Array("status" => "invalidSection", "message" => $errormessage);
+					} else {
+						return array('error' => $errormessage);
+					}
+				}
 			}
 
 			// Accept a default name for this list via request parameter
-			$listName = (isset($_REQUEST['name'])? substr($_REQUEST['name'],0,50) : _L('Please Add Rules to This List'));
-			
+			if (isset($_REQUEST['name'])) {
+				$listName = substr($_REQUEST['name'],0,50);
+				$explicitName = true;
+
+				if ($_POST['save']) {
+					if (QuickQuery('select id from list where deleted=0 and name=? and userid=?', false, array($listName, $USER->id))) {
+						if (isset($_REQUEST['api'])) {
+							return Array("status" => "nameNotAvailable", "message" => "Recipient list name " . $listName . " not available");
+						} else {
+							return array('error' => _L('Recipient list ' . $listName . ' already exists'));
+						}
+					}
+				}
+			} else {
+				$listName = _L('Please Add Rules to This List');
+			}
+
 			// CREATE list
 			$list = new PeopleList(null);
 			$list->modifydate = date("Y-m-d H:i:s");
-			$list->description = 'Created in MessageSender';
+			$list->description = ($_POST['description'] ? $_POST['description'] : 'Created in MessageSender');
 			$list->userid = $USER->id;
 			$list->name = $listName;
-			$list->deleted = 1;
+			$list->deleted = ($_POST['save'] ? 0 : 1);
 			$list->type = isset($_POST['sectionids']) ? 'section' : 'person';
 			$list->update();
-			if (!$list->id)
-				return false;
+			if (!$list->id) {
+				if (isset($_REQUEST['api'])) {
+					return Array("status" => "internalError", "message" => "Recipient list update error");
+				} else {
+					return false;
+				}
+			}
 				
 			if (isset($_POST['sectionids'])) {
 				foreach ($_POST['sectionids'] as $sectionid) {
 					QuickUpdate('insert into listentry set type="section", listid=?, sectionid=?', false, array($list->id, $sectionid));
 				}
-				summarizeListName($list->id);
+
+				if (!$explicitName) {
+					summarizeListName($list->id);
+				}
 			}
 			$_SESSION['listid'] = $list->id;
-			
-			return $list->id;
+
+			if (isset($_REQUEST['api'])) {
+				$recipientList = cleanObjects($list);
+				$recipientList['id'] = (int)$list->id;
+
+				return Array("status" => "success", "list" => $recipientList);
+			} else {
+				return $list->id;
+			}
 			
 		case 'addrule':
-			if (!$USER->authorize('createlist') || !isset($_POST['ruledata']) || !isset($_REQUEST['listid']))
-				return false;
+			if (!$USER->authorize('createlist')) {
+				if (isset($_REQUEST['api'])) {
+					return Array("status" => "accessDenied", "message" => "Insufficient privileges to update recipient list");
+				} else {
+					return false;
+				}
+			}
+
+			if (!isset($_POST['ruledata'])) {
+				if (isset($_REQUEST['api'])) {
+					return Array("status" => "invalidParameter", "message" => "Rule(s) not specified");
+				} else {
+					return false;
+				}
+			}
+
+			if (!isset($_REQUEST['listid'])) {
+				if (isset($_REQUEST['api'])) {
+					return Array("status" => "invalidParameter", "message" => "Recipient list not specified");
+				} else {
+					return false;
+				}
+			}
 			
 			$listid = $_REQUEST['listid']+0;
-			
-			$data = json_decode($_POST['ruledata']);
-			if (empty($data) || !userOwns('list', $listid))
-				return false;
-			if (!isset($data->fieldnum, $data->logical, $data->op, $data->val))
-				return false;
-			
-			if ($data->fieldnum == 'organization') {
-				QuickUpdate('BEGIN');
+
+			$rules = json_decode($_POST['ruledata']);
+			if (empty($rules)) {
+				if (isset($_REQUEST['api'])) {
+					return Array("status" => "invalidParameter", "message" => "Rule(s) not specified");
+				} else {
+					return false;
+				}
+			}
+
+			if (!userOwns('list', $listid)) {
+				if (isset($_REQUEST['api'])) {
+					return Array("status" => "listNotFound", "message" => "Recipient list $listid not found");
+				} else {
+					return false;
+				}
+
+			}
+
+			if (!is_array($rules)) {
+				$rules = array($rules);
+			}
+
+			foreach($rules as $data) {
+				if (!isset($data->fieldnum, $data->logical, $data->op, $data->val)) {
+					if (isset($_REQUEST['api'])) {
+						return Array("status" => "invalidRule", "message" => "Invalid rule " . json_encode($data));
+					} else {
+						return false;
+					}
+				}
+
+				if ($data->fieldnum == 'organization') {
+					QuickUpdate('BEGIN');
 					QuickUpdate("DELETE FROM listentry WHERE type='organization' AND listid=?", false, array($listid));
-					
+
 					$validorgkeys = Organization::getAuthorizedOrgKeys();
-					
+
 					foreach ($data->val as $id) {
 						$id = $id + 0;
-						
+
 						if (isset($validorgkeys[$id])) {
 							$le = new ListEntry();
 							$le->listid = $listid;
@@ -169,31 +260,53 @@ function handleRequest() {
 							$le->create();
 						}
 					}
-					
-					summarizeListName($listid);
-				QuickUpdate('COMMIT');
-			} else {
-				if (!$type = Rule::getType($data->fieldnum))
-					return false;
 
-				$data->val = prepareRuleVal($type, $data->op, $data->val);
+					if (!$_POST['nosummary']) {
+						summarizeListName($listid);
+					}
 
-				if (!$rule = Rule::initFrom($data->fieldnum, $data->logical, $data->op, $data->val))
-					return false;
-				
-				// CREATE rule.
-				QuickUpdate('BEGIN');
+					QuickUpdate('COMMIT');
+				} else {
+					if (!$type = Rule::getType($data->fieldnum)) {
+						if (isset($_REQUEST['api'])) {
+							return Array("status" => "invalidRule", "message" => "No type for rule " . json_encode($data));
+						} else {
+							return false;
+						}
+					}
+
+					$data->val = prepareRuleVal($type, $data->op, $data->val);
+
+					if (!$rule = Rule::initFrom($data->fieldnum, $data->logical, $data->op, $data->val)) {
+						if (isset($_REQUEST['api'])) {
+							return Array("status" => "invalidRule", "message" => "Invalid rule " . json_encode(data));
+						} else {
+							return false;
+						}
+					}
+
+					// CREATE rule.
+					QuickUpdate('BEGIN');
 					$rule->create();
 					$le = new ListEntry();
 					$le->listid = $listid;
 					$le->type = "rule";
 					$le->ruleid = $rule->id;
 					$le->create();
-					summarizeListName($listid); //update list name, etc
-				QuickUpdate('COMMIT');
+
+					if (!$_POST['nosummary']) {
+						summarizeListName($listid); //update list name, etc
+					}
+
+					QuickUpdate('COMMIT');
+				}
 			}
-			
-			return true;
+
+			if (isset($_REQUEST['api'])) {
+				return Array("status" => "success");
+			} else {
+				return true;
+			}
 		
 		case 'deleterule':
 			if (!$USER->authorize('createlist') || !isset($_POST['fieldnum']) || !isset($_REQUEST['listid']))
@@ -252,6 +365,12 @@ function handleRequest() {
 
 header('Content-Type: application/json');
 $data = handleRequest();
-echo json_encode(!empty($data) ? $data : false);
+
+if (isset($_REQUEST['api'])) {
+	echo json_encode($data);
+} else {
+	echo json_encode(!empty($data) ? $data : false);
+}
+
 ?>
 

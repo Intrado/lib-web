@@ -157,23 +157,15 @@ function handleRequest() {
 
         case 'list':
             if (!isset($_GET['listid']))
-                return false;
-            //$listids = json_decode($_GET['listids']);
-
-            //$listrules = array();
-
-            $fieldmaps = FieldMap::getAllAuthorizedFieldMaps();
+	            return Array("status" => "invalidParameter", "message" => "Recipient list not specified");
 
             $id = $_GET['listid'];
 
             if (!userOwns('list', $id) && !isSubscribed('list', $id))
-                return false;
+	            return Array("status" => "listNotFound", "message" => "Recipient list $id not found");
 
             $list = new PeopleList($id+0);
             $listrules = $list->getListRules();
-
-            error_log("hello");
-            error_log(print_r($listrules, true));
 
             foreach ($listrules as $ruleid => $rule) {
                 if (!$USER->authorizeField($rule->fieldnum))
@@ -182,20 +174,22 @@ function handleRequest() {
 
             $organizations = $list->getOrganizations();
 
-            if (count($organizations) > 0) {
-                $orgkeys = array();
+	        $query = "select p.id, p.pkey, p.f01, p.f02
+			from person p inner join listentry le
+				on (le.personid=p.id and le.type='negate' and le.listid=?)
+			order by f02, f01";
+	        $data = QuickQueryMultiRow($query,false,false,array($id));
 
-                foreach ($organizations as $organization) {
-                    $orgkeys[$organization->id] = $organization->orgkey;
-                }
+			$recipientList = cleanObjects($list);
+			$recipientList['id'] = (int)$list->id;
 
-                $listrules['organization'] = array(
-                    'fieldnum' => 'organization',
-                    'val' => $orgkeys
-                );
-            }
-
-            return array("list" => cleanObjects($list), "listrules" => cleanObjects($listrules));
+            return array(
+	            "status" => "success",
+	            "list" => $recipientList,
+	            "listrules" => cleanObjects($listrules),
+	            "listorganizations" => cleanObjects($organizations),
+	            "listsections" => cleanObjects($list->getSections()),
+	            "removals" => cleanObjects($data));
 
 		case 'listrules':
 			// $_GET['listids'] should be json-encoded array.
@@ -391,7 +385,7 @@ function handleRequest() {
 			}
 			
 			$messagegroup = new MessageGroup($_GET['id']);
-			
+
 			$result->defaultlang = Language::getName(Language::getDefaultLanguageCode());
 			$result->headers = array();
 			
@@ -524,5 +518,11 @@ function handleRequest() {
 
 header('Content-Type: application/json');
 $data = handleRequest();
-echo json_encode(!empty($data) ? $data : false);
+
+if (isset($_REQUEST['api'])) {
+	echo json_encode($data);
+} else {
+	echo json_encode(!empty($data) ? $data : false);
+}
+
 ?>

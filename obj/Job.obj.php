@@ -288,8 +288,6 @@ class Job extends DBMappedObject {
 
 		//options
 		$job->setOption("skipduplicates",1);
-		$job->setOption("skipemailduplicates",1);
-		$job->setOption("skipsmsduplicates",1);
 		$job->setOption("sendreport",1);
 		if($USER->authorize("leavemessage"))
 			$job->setOption("leavemessage", $USER->getSetting("leavemessage", 1));

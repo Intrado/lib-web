@@ -45,6 +45,10 @@ $carrier = $_POST['carrier'];
 $channel = $_POST['channel'];
 $router = $_POST['router'];
 
+
+$order = array("\r\n", "\n", "\r");
+$message = str_replace($order, " ", $message);
+
 // for logging
 apache_note("CS_APP","txtreply");
 apache_note("CS_CUST", $sourceaddress);

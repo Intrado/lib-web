@@ -359,7 +359,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$job->starttime = "00:00";
 		$job->endtime = "23:59";
 		$job->status = 'repeating';
-		$job->setOption("skipemailduplicates",0);
+		$job->setOption("skipduplicates",0);
 		$job->setOption("maxcallattempts", $postdata['attempts']);
 		
 		if ($job->id)

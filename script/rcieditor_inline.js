@@ -93,6 +93,16 @@ window.RCIEditorInline = function () {
 				editor.config.pasteFromWordRemoveStyles = false;
 				editor.config.disableObjectResizing = true; // disabled only because the message_parts data model cannot capture resized image attributes
 				editor.config.extraPlugins = extraPlugins.join();
+                                
+                                // specifically name which fonts CKEditor can display in order to remove Comic Sans
+                                editor.config.font_names= "Arial/Arial, Helvetica, sans-serif;"+
+                                                    "Courier New/Courier New, Courier, monospace;"+
+                                                    "Georgia/Georgia, serif;"+
+                                                    "Lucida Sans Unicode/Lucida Sans Unicode, Lucida Grande, sans-serif;"+
+                                                    "Tahoma/Tahoma, Geneva, sans-serif;Times New Roman/Times New Roman, Times, serif;"+
+                                                    "Trebuchet MS/Trebuchet MS, Helvetica, sans-serif;"+
+                                                    "Verdana/Verdana, Geneva, sans-serif",
+                                
 				editor.config.toolbar = [
 					['Undo', 'Redo'],
 					['NumberedList', 'BulletedList', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', 'Outdent', 'Indent'],
@@ -105,6 +115,33 @@ window.RCIEditorInline = function () {
 				];
 
 			});
+
+			// BEGIN Hack to fix inline editor image resize bug in CKE; ref: https://dev.ckeditor.com/ticket/10197
+			function fixFirefox() {
+				document.designMode = 'on';
+				document.execCommand('enableObjectResizing', false, false);
+				document.execCommand('enableInlineTableEditing', false, false);
+				document.designMode = 'off';
+			}
+
+			if ($.browser.mozilla) {
+				editor.on('instanceReady',
+					function (ev1) {
+						ev1.editor.on('mode',
+							function (ev2) {
+								if (ev2.editor.mode === 'wysiwyg') {
+									// gets executed everytime the editor switches from source -> WYSIWYG
+									fixFirefox();
+								}
+							}
+						);
+
+						// this gets executed on init
+						fixFirefox();
+					}
+				);
+			}
+			// END Hack to fix inline editor image resize bug in CKE
 
 			editor.on('focus', function (event) {
 				that.activeEditorId = this.name;

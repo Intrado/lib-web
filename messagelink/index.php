@@ -43,16 +43,21 @@ require_once("messagelinkcontroller.obj.php");
 
 /*********************************************************************************/
 
-$request = array();
+$request = array_intersect_key($_GET, array('s'=>true, 'mal'=>true));
 
-// s param = message link code
-if (isset($_GET['s'])) {
-	$request['s'] = $_GET['s'];
-}
+if (!(isset($request['s']) || isset($request['mal']))) {
+	// Handle Google Analytics as a special case, otherwise redirect to support page.
+	$mask16 = 0xffff0000; // 255.255.0.0
+	$googleAnalytics = 0x4a7d0000; // 74.125.0.0
 
-// mal param = message attachment link code
-if (isset($_GET['mal'])) {
-	$request['mal'] = $_GET['mal'];
+	$referer = isset($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"] : "";
+	$clientNetblock = isset($_SERVER["REMOTE_ADDR"]) ? ip2long($_SERVER["REMOTE_ADDR"]) & $mask16 : "0";
+	if (strpos($referer, "www.google.com/analytics") !== false || $clientNetblock == $googleAnalytics) {
+		header("location: https://asp.schoolmessenger.com/testpacific");
+	} else {
+		header("location: http://www.schoolmessenger.com/support/");
+	}
+	exit();
 }
 
 // get MessageLink's thrift protocol and transport objects; calls appserver.inc.php > initMessageLinkApp()

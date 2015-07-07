@@ -146,8 +146,8 @@ class RenderedList2 {
 		
 		$query = "";
 		switch ($this->mode) {
-			case "list": 
-				
+			case "list":
+
 				//in list mode, having no rules, no sections, and no orgs means empty list
 				if (count($this->organizationids) > 0 || count($this->sectionids) > 0 || count($this->rules) > 0) {
 					$joinsql = $this->owneruser->getPersonAssociationJoinSql($this->organizationids, $this->sectionids, "p");
@@ -156,26 +156,26 @@ class RenderedList2 {
 					$query = "(select $sqlflags distinct $fieldsql from person p \n"
 							."	$joinsql \n"
 							."	left join listentry le on \n"
-							."		(p.id = le.personid and le.listid=" . $this->listid . ") \n" //skip anyone that is directly referenced, add or negate
+							."		(p.id = le.personid and le.listid=" . intval($this->listid) . ") \n" //skip anyone that is directly referenced, add or negate
 							."	where not p.deleted and p.type in ('system', 'subscriber') and le.type is null \n"
 							." $rulesql $this->extrawheresql) \n"
 							." UNION ALL \n"
 							."(select $fieldsql from person p \n"
 							."	inner join listentry le on \n"
-							."		(p.id = le.personid and le.listid=" . $this->listid . " and le.type='add') \n"
+							."		(p.id = le.personid and le.listid=" . intval($this->listid) . " and le.type='add') \n"
 							."where not p.deleted )\n"
 							."$ordersql $limitsql ";
 				} else {
 					//with no rules/orgs/sections, just use manual adds, if any
 					$query = "select $sqlflags $fieldsql from person p \n"
 							."	inner join listentry le on \n"
-							."		(p.id = le.personid and le.listid=" . $this->listid . " and le.type='add') \n"
+							."		(p.id = le.personid and le.listid=" . intval($this->listid) . " and le.type='add') \n"
 							."where not p.deleted\n"
 							."$ordersql $limitsql ";
 				}
 				
 				break;
-			case "search": 
+			case "search":
 				$joinsql = $this->owneruser->getPersonAssociationJoinSql($this->organizationids, $this->sectionids, "p");
 				$rulesql = $this->owneruser->getRuleSql($this->rules,"p");
 				
@@ -184,7 +184,7 @@ class RenderedList2 {
 						."	where not p.deleted and p.type in ('system', 'subscriber') \n"
 						." $rulesql $this->extrawheresql \n"
 						."$ordersql $limitsql ";
-				
+
 				break;
 			case "individual":
 				$joinsql = $this->owneruser->getPersonAssociationJoinSql(array(), array(), "p");
@@ -222,11 +222,11 @@ class RenderedList2 {
 						."	where not p.deleted and p.type in ('system', 'subscriber') \n"
 						." $rulesql $this->extrawheresql $contactwheresql \n"
 						."$ordersql $limitsql ";
-				
+
 				break;
 			case "quickaddsearch":
-				
-				$digits = Phone::parse($this->quickaddsearch); //get any digits out of the string
+
+				$digits = Phone::parse($this->quickaddsearch); //get any non-digits out of the string
 				$searchstring = DBEscapeLikeWildcards(DBSafe($this->quickaddsearch));
 				
 				//if not enough search data, dont search
@@ -293,8 +293,9 @@ class RenderedList2 {
 						$queries[] = $query;
 						// search guardianauto
 						$query = "select distinct $fieldsql from personguardian pg \n"
-							." left join person g on (g.id = pg.guardianpersonid) "
-							." left join person p on (p.id = pg.personid) "
+							." inner join person g on (g.id = pg.guardianpersonid) "
+							." inner join person p on (p.id = pg.personid) "
+							." $joinsql \n"
 							." inner join $type x on (x.personid = pg.guardianpersonid) \n"
 							." where not p.deleted and not g.deleted and g.type = 'guardianauto' \n"
 							." and not exists (select * from personguardian pg2 where pg2.importid is null and pg2.personid = pg.personid) "
@@ -302,8 +303,9 @@ class RenderedList2 {
 						$queries[] = $query;
 						// search guardiancm
 						$query = "select distinct $fieldsql from personguardian pg \n"
-							." left join person g on (g.id = pg.guardianpersonid) "
-							." left join person p on (p.id = pg.personid) "
+							." inner join person g on (g.id = pg.guardianpersonid) "
+							." inner join person p on (p.id = pg.personid) "
+							." $joinsql \n"
 							." inner join $type x on (x.personid = pg.guardianpersonid) \n"
 							." where not p.deleted and not g.deleted and g.type = 'guardiancm' \n"
 							." $rulesql $this->extrawheresql and x.$type like '$digits%' \n";
@@ -322,8 +324,9 @@ class RenderedList2 {
 					$queries[] = $query;
 					//guardianauto
 					$query = "select distinct $fieldsql from personguardian pg \n"
-						." left join person g on (g.id = pg.guardianpersonid) "
-						." left join person p on (p.id = pg.personid) "
+						." inner join person g on (g.id = pg.guardianpersonid) "
+						." inner join person p on (p.id = pg.personid) "
+						." $joinsql \n"
 						." inner join email x on (x.personid = pg.guardianpersonid) \n"
 						." where not p.deleted and not g.deleted and g.type = 'guardianauto' \n"
 						." and not exists (select * from personguardian pg2 where pg2.importid is null and pg2.personid = pg.personid) "
@@ -331,8 +334,9 @@ class RenderedList2 {
 					$queries[] = $query;
 					//guardiancm
 					$query = "select distinct $fieldsql from personguardian pg \n"
-						." left join person g on (g.id = pg.guardianpersonid) "
-						." left join person p on (p.id = pg.personid) "
+						." inner join person g on (g.id = pg.guardianpersonid) "
+						." inner join person p on (p.id = pg.personid) "
+						." $joinsql \n"
 						." inner join email x on (x.personid = pg.guardianpersonid) \n"
 						." where not p.deleted and not g.deleted and g.type = 'guardiancm' \n"
 						." $rulesql $this->extrawheresql and x.email like '$searchstring%' \n";
@@ -341,7 +345,6 @@ class RenderedList2 {
 				
 				$query = "(\n" . implode("\n ) \n union \n ( \n",$queries) . "\n ) \n"
 						."$ordersql $limitsql ";
-								
 				break;
 		}
 		return $query;
@@ -413,14 +416,14 @@ class RenderedList2 {
 
 		//now we need to get all of the destination data for these people and their guardians (careful that guardiancm trumps guardianauto)
 		$query = "(select pg.personid, pg.guardianpersonid from personguardian pg 
-					left join person p on pg.guardianpersonid = p.id 
+					inner join person p on pg.guardianpersonid = p.id
 					where pg.personid in ($pagepidcsv) 
 					and not p.deleted 
 					and p.type = 'guardiancm'
 					)
 					union
 					(select pg.personid, pg.guardianpersonid from personguardian pg 
-					left join person p on pg.guardianpersonid = p.id 
+					inner join person p on pg.guardianpersonid = p.id
 					where pg.personid in ($pagepidcsv) 
 					and not p.deleted 
 					and p.type = 'guardianauto' and not exists (select * from personguardian pg2 where pg2.importid is null and pg2.personid = pg.personid) 
@@ -564,19 +567,19 @@ class RenderedList2 {
 			$query = "(select p.id, 'rule' as entrytype from person p \n"
 					."	$joinsql \n"
 					."	left join listentry le on \n"
-					."		(p.id = le.personid and le.listid=" . $list->id . ") \n" //skip anyone that is directly referenced, add or negate
+					."		(p.id = le.personid and le.listid=" . intval($list->id) . ") \n" //skip anyone that is directly referenced, add or negate
 					."	where not p.deleted and p.type in ('system', 'subscriber') and le.type is null \n"
 					."	and p.id in ($pagepidcsv) \n"
 					." $rulesql ) \n"
 					." UNION ALL \n"
 					."(select p.id, 'add' as entrytype from person p \n"
 					."	inner join listentry le on \n"
-					."		(p.id = le.personid and le.listid=" . $list->id . " and le.type='add') \n"
+					."		(p.id = le.personid and le.listid=" . intval($list->id) . " and le.type='add') \n"
 					."where not p.deleted and p.id in ($pagepidcsv) )\n";
 		} else {
 			$query = "select p.id, 'add' as entrytype from person p \n"
 					."	inner join listentry le on \n"
-					."		(p.id = le.personid and le.listid=" . $list->id . " and le.type='add') \n"
+					."		(p.id = le.personid and le.listid=" . intval($list->id) . " and le.type='add') \n"
 					."where not p.deleted and p.id in ($pagepidcsv)\n";
 		}
 		
@@ -589,7 +592,7 @@ class RenderedList2 {
 	 * @return multitype:RenderedRecipient array of target-recipient pairs
 	 */
 	function getRecipientList() {
-		
+
 		$personSql = $this->getPersonSql(false, false);
 		//echo $personSql . "\n";
 		$personIds = QuickQueryList($personSql);

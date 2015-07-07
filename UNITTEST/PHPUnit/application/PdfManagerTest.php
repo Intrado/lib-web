@@ -250,15 +250,15 @@ class PdfManagerTest extends PHPUnit_Framework_TestCase {
 
 	public function test_setDisplayPagingDetails_WithFeedData() {
 		$feedResponse = $this->csApi->getBurstList();
-		$this->pdfManager->feedData = $feedResponse->bursts;
+		$this->pdfManager->feedResponse = $feedResponse;
 
 		$this->pdfManager->setDisplayPagingDetails();
 
-		$this->assertEquals($this->pdfManager->total, 2);
+		$this->assertEquals($this->pdfManager->total, 1);
 		$this->assertEquals($this->pdfManager->numPages, 1);
 		$this->assertEquals($this->pdfManager->curPage, 1);
 		$this->assertEquals($this->pdfManager->displayStart, 1);
-		$this->assertEquals($this->pdfManager->displayEnd, 2);
+		$this->assertEquals($this->pdfManager->displayEnd, 1);
 	}
 
 	public function test_displayBurstItem() {

@@ -47,16 +47,19 @@ if (isset($_GET['id'])) {
 	redirect();
 }
 
-$jobid = $_SESSION['jobid'];
-if ($jobid != NULL) {
-	$job = new Job($_SESSION['jobid']);
+// If the session expired while the user was creating a broadcast, then the user logged back in, then the app redirects here,
+// but with a depopulated $_SESSION. In that case, redirect the user back to the jobs page to choose a job again.
+if (!isset($_SESSION['jobid']) || (int) $_SESSION['jobid'] == 0) {
+	redirect("jobs.php");
 }
+
+$job = new Job((int) $_SESSION['jobid']);
 
 $jobtype = new JobType($job->jobtypeid);
 
 $totalpersons = 0;
 $ismultilist = false;
-$multilistids = QuickQueryList("select listid from joblist where jobid=".$job->id);
+$multilistids = QuickQueryList("select listid from joblist where jobid = ?", false, false, array($job->id));
 if (count($multilistids) > 0) {
 	if (count($multilistids) > 1)
 		$ismultilist = true;

@@ -63,10 +63,18 @@ if ((! defined('PHPUNIT')) && (!isset($isindexpage) || !$isindexpage)) {
 	doStartSession();
 	//force ssl?
 	if ($SETTINGS['feature']['force_ssl'] && !isset($_SERVER["HTTPS"])) {
+		if (isset($_REQUEST['api'])) {
+			header("HTTP/1.1 403 Forbidden");
+		}
+
 		exit();
 	}
 
 	if (!isset($_SESSION['user']) || !isset($_SESSION['access'])) {
+		if (isset($_REQUEST['api'])) {
+			header("HTTP/1.1 401 Unauthorized");
+		}
+
 		exit();
 	} else {
 		$USER = &$_SESSION['user'];
@@ -80,7 +88,7 @@ if ((! defined('PHPUNIT')) && (!isset($isindexpage) || !$isindexpage)) {
 
 		if (!$USER->enabled || $USER->deleted || !$USER->authorize('loginweb')) {
 			error_log("Invalid session in subdircommon.inc.php");
-			header("HTTP/1.1 400 Invalid Session");
+			header("HTTP/1.1 401 Unauthorized");
 			exit();
 		}
 	}

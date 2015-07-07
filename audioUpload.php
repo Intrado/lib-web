@@ -47,8 +47,10 @@ if (empty($_FILES['audio'])) {
 	@unlink($convertedFile);
 
 	if ($failedConversion || !$contentId) {
-        $result = Array('status' => 'fail', 'error' => L('There was an error reading your audio file. Please try another file. Supported formats include: %s',
-            implode(', ', $converter->getSupportedFormats())));
+        $result = Array(
+	        'status' => 'fail',
+	        'error' => _L('There was an error reading your audio file. Please try another file. Supported formats include: %s',
+		        implode(', ', $converter->getSupportedFormats())));
 	} else {
         $result = Array(
             'status' => 'success',

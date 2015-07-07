@@ -70,7 +70,9 @@ session_warning_time=3000
 autologoutminutes=60
 
 ; server to redirect customer link to
-customer_url_prefix=https://localhost
+customer_url_prefix=https://sandbox.testschoolmessenger.com
+portalauth_url=https://sandboxportal.testschoolmessenger.com
+portalauth_port=443
 
 ; tai server to redirect customer link to
 tai_url=https://localhost:83
