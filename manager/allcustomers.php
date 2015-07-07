@@ -203,6 +203,13 @@ include_once("nav.inc.php");
 
 <?
 startWindow(_L('Customers'));
+
+if ($MANAGERUSER->authorized('newcustomer') && $MANAGERUSER->authorized('editcustomer')) {
+	?>
+	<div class="feed_btn_wrap cf"><?= icon_button("New Customer", "add", null, "customeredit.php?id=new") ?></div>
+	<?
+}
+
 include_once("inc/searchbar.inc.php");
 
 ?>

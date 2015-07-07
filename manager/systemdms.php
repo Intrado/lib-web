@@ -174,9 +174,10 @@ function fmt_dmgroupname($row, $index){
 	return isset($dmgroups[$dmgroupid])?$dmgroups[$dmgroupid]["name"]:"";
 }
 function fmt_dmgroupratemodel($row, $index){
-	global $dmgroups;
+	global $dmgroups,$carrierRateModels;
 	$dmgroupid = $row[15];
-	return isset($dmgroups[$dmgroupid])?$dmgroups[$dmgroupid]["rateModelClassName"]:"";
+	$carrierRateModelId = isset($dmgroups[$dmgroupid])?$dmgroups[$dmgroupid]["carrierRateModelId"]:"";
+	return isset($carrierRateModels[$carrierRateModelId])?$carrierRateModels[$carrierRateModelId]["name"]:"Unknown";
 }
 
 function fmt_dmgroupcarrier($row, $index){
@@ -185,14 +186,6 @@ function fmt_dmgroupcarrier($row, $index){
 	return isset($dmgroups[$dmgroupid])?$dmgroups[$dmgroupid]["carrier"]:"";
 }
 
-function fmt_dmgroupusejms($row, $index){
-	global $dmgroups;
-	$dmgroupid = $row[15];
-	$useJms = isset($dmgroups[$dmgroupid])?$dmgroups[$dmgroupid]["useJms"]:"";
-	return $useJms?"Yes":"No";
-}
-
-
 function fmt_dmgroupstate($row, $index){
 	global $dmgroups;
 	$dmgroupid = $row[15];
@@ -200,16 +193,18 @@ function fmt_dmgroupstate($row, $index){
 }
 
 $dmgroups = array();
-$dmGroupQuery = "select dmgroup.id, dmgroup.name, dmgroup.rateModelClassName, dmgroup.routeType, s_useJms.value as useJms from dmgroup
-                left join dmgroupsetting s_useJms on
-                        (dmgroup.id = s_useJms.dmgroupid
-                        and s_useJms.name = 'useJms')";
+$dmGroupQuery = "select dmgroup.id, dmgroup.name, dmgroup.routeType, dmgroup.carrierRateModelId from dmgroup";
 $result = Query($dmGroupQuery);
 while($row = DBGetRow($result,true)) {
 	$dmgroups[$row['id']] = $row;
 }
+$lcrdbcon = DBConnect($SETTINGS['lcrdb']['host'], $SETTINGS['lcrdb']['user'], $SETTINGS['lcrdb']['pass'], $SETTINGS['lcrdb']['db']);
+$carrierRateModels = array();
+$result = Query("select id,name from carrierratemodel",$lcrdbcon);
+while($row = DBGetRow($result,true)) {
+	$carrierRateModels[$row['id']] = $row;
+}
 
-error_log(print_r($dmgroups,true));
 $dms = array();
 $query = "select dm.id, dm.name, dm.authorizedip, dm.lastip,
 			dm.enablestate, dm.lastseen, dm.version, dm.dmuuid, dm.command, s_telco_calls_sec.value as telco_calls_sec, 
@@ -280,7 +275,6 @@ $titles[12] = "@#Inbound";
 $titles[7] = "@#DM UUID";
 $titles[8] = "@#Cmd";
 $titles["dmgroupname"] = "#Dm Group Name";
-$titles["dmgroupusejms"] = "#Use Jms";
 $titles["ratemodel"] = "@#Rate Model";
 $titles["routetype"] = "@#Route Type";
 $titles[16] = "#Notes";
@@ -300,7 +294,6 @@ $formatters = array("actions" => "fmt_DMActions",
 					4 => "fmt_state",
 					11 => "fmt_resources",
 					"dmgroupname" => "fmt_dmgroupname",
-					"dmgroupusejms" => "fmt_dmgroupusejms",
 					"ratemodel" => "fmt_dmgroupratemodel",
 					"routetype" => "fmt_routetype");
 
