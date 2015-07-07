@@ -105,6 +105,7 @@ if (isset($_GET['monitor'])) {
 	<? } ?>
 	<? if ($MANAGERUSER->authorized("systemdm")) { ?>
 		<td><a href="systemdms.php" title="System DMs"><img src="mimg/sysdm.png" />System&nbsp;DMs</a></td>
+		<td><a href="systemdmgroups.php" title="DM Groups"><img src="mimg/sysdm.png" />DM&nbsp;Groups</a></td>
 	<? } ?>
 	<? if ($MANAGERUSER->authorized("diskagent")) { ?>
 		<td><a href="diskagents.php" title="SwiftSync"><img src="mimg/diskagent.png" />SwiftSync</a></td>
