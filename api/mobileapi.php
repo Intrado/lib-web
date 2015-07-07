@@ -179,7 +179,11 @@ function doliststats($statsids) {
 			'totalremoved' => $list->countRemoved(),
 			'totaladded' => $list->countAdded(),
 			'totalrule' => -999, //TOOD remove this
-			'total' => $renderedlist->getTotal() + 0);
+			'total' => $renderedlist->getTotal() + 0,
+			'recipientmode' => $list->recipientmode,
+			'guardiancategories' => $list->restrictedGuardianCategoryIds
+		);
+
 	}
 	return array("resultcode" => "success", "resultdescription" => "","stats" => $stats);
 }
