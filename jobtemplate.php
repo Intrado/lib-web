@@ -193,7 +193,7 @@ $formdata["message"] = array(
 	"value" => (((isset($job->messagegroupid) && $job->messagegroupid))?$job->messagegroupid:""),
 	"validators" => array(
 		array("ValInArray","values"=>array_keys($messages)),
-		array("ValMessageGroup")
+		array("ValMessageGroup","values"=>array("USER"=>$USER))
 	),
 	"control" => array("MessageGroupSelectMenu", "values" => $messages,"jobtypeidtarget" => "jobtype"),
 	"helpstep" => ++$helpstepnum
