@@ -803,7 +803,7 @@ if ($submittedmode || $completedmode) {
 		"validators" => array(
 			array("ValRequired"),
 			array("ValInArray","values"=>array_keys($messages)),
-			array("ValMessageGroup")
+			array("ValMessageGroup","values"=>array("USER"=>$USER))
 		),
 		"control" => array("MessageGroupSelectMenu", "values" => $messages,"jobtypeidtarget" => "jobtype"),
 		"helpstep" => ++$helpstepnum
