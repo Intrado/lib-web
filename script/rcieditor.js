@@ -101,6 +101,8 @@
 	
 			// The default settings for custom toolbar buttons
 			this.setSetting('tool_mkfield', false);
+			this.setSetting('tool_attachmentlink', false);
+			//this.setSetting('tool_attachment', false);
 			this.setSetting('tool_mkblock', false);
 			this.setSetting('tool_thememgr', false);
 			this.setSetting('tool_pastefromphone', false);
@@ -288,19 +290,27 @@
 				default:
 					// If editorMode was not supplied, we need to set it
 					setEditorMode = 'plain';
+					this.setSetting('tool_mkfield', true);
+					this.setSetting('tool_attachmentlink', true);
+					// Nothing extra to add for the plain legacy editor
+					break;
 				case 'plain':
+					this.setSetting('tool_mkfield', true);
+					this.setSetting('tool_attachmentlink', true);
 					// Nothing extra to add for the plain legacy editor
 					break;
 	
 				case 'inline':
 					// Add the mkField tool only
 					this.setSetting('tool_mkfield', true);
+					this.setSetting('tool_attachmentlink', true);
 					break;
 	
 				case 'normal':
 					// Add the mkField tool only
 					this.setSetting('tool_mkfield', true);
-	
+					this.setSetting('tool_attachmentlink', true);
+
 					// FIXME SMK disabled image_scaling pending clarification of desired behavior
 					//this.setSetting('image_scaling', 500);
 					break;
@@ -308,6 +318,7 @@
 				case 'full':
 					// Add the mkField, mkBlock, and themeMgr tools
 					this.setSetting('tool_mkfield', true);
+					this.setSetting('tool_attachmentlink', true);
 					this.setSetting('tool_mkblock', true);
 					this.setSetting('tool_thememgr', true);
 	
@@ -336,7 +347,7 @@
 			else {
 	
 				// Activate whatever tools are enabled based on mode
-				var custom_tools = [ 'mkField', 'mkBlock', 'themeMgr', 'pasteFromPhone' ];
+				var custom_tools = [ 'mkField','AttachmentLink','mkBlock','themeMgr', 'pasteFromPhone' ];
 				var that = this;
 				// SMK notes that array.forEach() is not supported on IE8, so we'll use jQuery to iterate instead
 				$(custom_tools).each(function (index) {
@@ -356,8 +367,27 @@
 				if ((max_size = parseInt(this.getSetting('image_scaling'))) > 0) {
 					uploaderURI += '?scaleabove=' + max_size;
 				}
-	
+
+				var uploadattachment= this.getSetting('baseUrl') + 'uploadattachment.php';
 				var that = this;
+
+
+				var toolBars = [
+					{ name:'r1g1', items:[ 'Print', 'Source' ] },
+					{ name:'r1g2', items:[ 'Undo', 'Redo'] },
+					{ name:'r1g3', items:[ 'NumberedList', 'BulletedList', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', 'Outdent', 'Indent' ] },
+					{ name:'r1g4', items:[ 'PasteFromWord', 'SpellCheck' ] },
+					{ name:'r1g5', items:[ 'Link', 'Image', 'Table', 'HorizontalRule' ] },
+					{ name:'r1g6', items:[ 'ShowBlocks', 'Maximize' ] },
+					'/',
+					{ name:'r2g1', items:[ 'Bold', 'Italic', 'Underline', 'Strike', 'TextColor', 'BGColor', 'RemoveFormat' ] },
+					{ name:'r2g2', items:[ 'Styles', 'Format', 'Font', 'FontSize' ] },
+					{ name:'r2g3', items:extraButtons }
+				];
+
+				if(setEditorMode=='plain'){
+					toolBars = [{ name:'r2g3', items:extraButtons}];
+				}
 
 				cke_config = {
 					'width': '100%',
@@ -369,6 +399,8 @@
 					'disableNativeSpellChecker': false,
 					'browserContextMenuOnCtrl': true,
 					'filebrowserImageUploadUrl': uploaderURI,
+					'filebrowserUploadUrl':uploadattachment,
+
 					'toolbarStartupExpanded': ( this.getSetting('hidetoolbar') ? false : true),
 					'toolbarCanCollapse': true,
 					'extraPlugins': extraPlugins.join(),
@@ -386,18 +418,7 @@
                                                     "Trebuchet MS/Trebuchet MS, Helvetica, sans-serif;"+
                                                     "Verdana/Verdana, Geneva, sans-serif",
 	
-					'toolbar_RCI': [
-						{ name:'r1g1', items:[ 'Print', 'Source' ] },
-						{ name:'r1g2', items:[ 'Undo', 'Redo'] },
-						{ name:'r1g3', items:[ 'NumberedList', 'BulletedList', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', 'Outdent', 'Indent' ] },
-						{ name:'r1g4', items:[ 'PasteFromWord', 'SpellCheck' ] },
-						{ name:'r1g5', items:[ 'Link', 'Image', 'Table', 'HorizontalRule' ] },
-						{ name:'r1g6', items:[ 'ShowBlocks', 'Maximize' ] },
-						'/',
-						{ name:'r2g1', items:[ 'Bold', 'Italic', 'Underline', 'Strike', 'TextColor', 'BGColor', 'RemoveFormat' ] },
-						{ name:'r2g2', items:[ 'Styles', 'Format', 'Font', 'FontSize' ] },
-						{ name:'r2g3', items:extraButtons }
-					],
+					'toolbar_RCI': toolBars,
 	
 					'toolbar': 'RCI',
 	

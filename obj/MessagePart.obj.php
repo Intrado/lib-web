@@ -15,6 +15,7 @@ class MessagePart extends DBMappedObject {
 	var $maxlen;
 
 	var $audiofile;
+	var $context;
 
 	function MessagePart ($id = NULL) {
 		$this->_allownulls = true;

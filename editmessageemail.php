@@ -265,7 +265,7 @@ $formdata["attachments"] = array(
 // MESSAGE BODY
 if ($subtype == 'plain') {
 	// For plain text emails, use a plain textarea
-	$messagecontrol = array("EmailMessageEditor", "subtype" => $subtype);
+	$messagecontrol = array("HtmlTextArea", "subtype" => $subtype);
 	if ($languagecode == "en") {
 		$messagecontrol['spellcheck'] = true;
 	}
@@ -407,7 +407,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$message->update();
 			else
 				$message->create();
-						
+
 			// create the message parts
 			$message->recreateParts($postdata['message'], null, false);
 			
@@ -416,7 +416,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			if ($attachments == null)
 				$attachments = array();
 
-			$message->replaceContentAttachments($attachments);
+			//TODO: do we need to replace it?
+			//$message->replaceContentAttachments($attachments);
 			
 			// Sync with other message subtype if it exists
 			$message2 = $messagegroup->getMessage("email", $subtype=="html"?"plain":"html", $languagecode);

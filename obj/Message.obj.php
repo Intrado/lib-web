@@ -252,6 +252,26 @@ class Message extends DBMappedObject {
 					$voiceid = Voice::getPreferredVoice($this->languagecode, $preferredgender);
 					$part->voiceid = $voiceid;
 				}
+
+				if($part->type=='MA'){
+
+					$contentAttachment = new ContentAttachment();
+					$contentAttachment->contentid = $part->context->data->contentid;
+					$contentAttachment->filename =  $part->context->data->filename;
+					$contentAttachment->size = $part->context->data->sizebytes;
+					$contentAttachment->create();
+
+
+					$msgattachment = new MessageAttachment();
+					$msgattachment->messageid = $this->id;
+					$msgattachment->type = 'content';
+					$msgattachment->contentattachmentid = $contentAttachment->id;
+					$msgattachment->create();
+
+					$part->type = "MAL";
+					$part->messageattachmentid = $msgattachment->id;
+				}
+
 				$part->messageid = $this->id;
 				$part->create();
 			}
@@ -303,13 +323,23 @@ class Message extends DBMappedObject {
 			} else {
 				$pos_i = false;
 			}
-			
+
+			$matches = array();
+			if (preg_match("/(\<span class=\"message-attachment-placeholder\" contenteditable\=\"false\"\>\<a href\=\"[^\=]*viewimage\.php\?id\=[0-9]+\"\>\<!--)/", strtolower($data), $matches)) {
+				// we only care about the first match
+				$uploadimageurl = $matches[1];
+				$pos_ma = stripos($data, $uploadimageurl);
+			} else {
+				$pos_ma = false;
+			}
+
 			$poses = array();
 			if ($pos_f !== false) $poses[] = $pos_f;
 			if ($pos_a !== false) $poses[] = $pos_a;
 			if ($pos_l !== false) $poses[] = $pos_l;
 			if ($pos_i !== false) $poses[] = $pos_i;
 			if ($pos_mal !== false) $poses[] = $pos_mal;
+			if ($pos_ma !== false) $poses[] = $pos_ma;
 
 			if (! count($poses)) break;
 
@@ -320,6 +350,7 @@ class Message extends DBMappedObject {
 				if($pos === $pos_l) $type = 'newlang';
 				if($pos === $pos_i) $type = 'I';
 				if($pos === $pos_mal) $type = 'MAL';
+				if($pos === $pos_ma) $type = 'MA';
 			}
 
 			//make a text part up to the pos of the field
@@ -342,7 +373,7 @@ class Message extends DBMappedObject {
 			}
 
 			// Skip ahead past the beginning of the token; images are bigger than the rest due to HTML markup
-			$pos += ($type == 'I') ? mb_strlen($uploadimageurl) : 2;
+			$pos += ($type == 'I' || $type == 'MA') ? mb_strlen($uploadimageurl) : 2;
 
 			// Assuming at least one char for audio/field name, find the end of the token
 			switch ($type){
@@ -351,6 +382,7 @@ class Message extends DBMappedObject {
 				case "newlang": $endtoken = "]]"; break;
 				case "I": $endtoken = '">'; break;
 				case "MAL": $endtoken = '}>'; break;
+				case "MA": $endtoken = '</a></span>'; break;
 			}
 			$length = @strpos($data, $endtoken, $pos + 1);
 
@@ -384,7 +416,7 @@ class Message extends DBMappedObject {
 							// If we don't have a good message attachment ID to work with...
 							if (! $malidFound) {
 								// TODO - add support for discovering the message attachment ID automagically (?)
-								error_log_helper("WARNING: automatic discovery of the message attachment ID is not supported; it must be provided in the field insert"); 
+								error_log_helper("WARNING: automatic discovery of the message attachment ID is not supported; it must be provided in the field insert");
 								$errors[] = "Can't find message attachment";
 							}
 
@@ -394,6 +426,16 @@ class Message extends DBMappedObject {
 							$parts[] = $part;
 						}
 
+						break;
+					case 'MA':
+						$posi = stripos($token, "-->");
+						$token  = substr($token, 0, $posi);
+						$obj = json_decode($token);
+
+						// Finish preparing the message part
+						$part->sequence = $partcount++;
+						$part->context= $obj;
+						$parts[] = $part;
 						break;
 
 					case "A":

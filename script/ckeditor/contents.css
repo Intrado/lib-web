@@ -140,3 +140,12 @@ a > img {
 	box-shadow: 0 0 0 1px #FFFFFF;
 }
 
+
+
+div.message-attachment-placeholder{
+	float:left;
+	border: 1px solid green ;
+	width: 200px;
+	hight: 150px;
+	font-size: 20px;
+}
