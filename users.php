@@ -344,8 +344,11 @@ function show_user_table($containerID) {
 }
 
 // check if we should display active or inactive users.
-$display = $_GET['display'];
-
+if (isset($_GET['display'])) {
+	$display = $_GET['display'] ;
+} else {
+	$display = 'active';
+}
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
@@ -357,12 +360,10 @@ if($maxusers != "unlimited") {
 	$DESCRIPTION .= ", Maximum Allowed: $maxusers";
 }
 
-if($display !== 'inactive') {
-    $DESCRIPTION .= ',&nbsp;&nbsp;<a href="users.php?display=inactive">'._L("View Inactive Users").'</a>';
-}
-
-if($display === 'inactive') {
+if ($display === 'inactive') {
     $DESCRIPTION .= ',&nbsp;&nbsp;<a href="users.php">'._L("View Active Users").'</a>';
+} else {
+	$DESCRIPTION .= ',&nbsp;&nbsp;<a href="users.php?display=inactive">'._L("View Inactive Users").'</a>';
 }
 
 $DESCRIPTION .= '&nbsp;&nbsp;'.icon_button(_L('Download User Details CSV'),"report",null,"users.php?download");
