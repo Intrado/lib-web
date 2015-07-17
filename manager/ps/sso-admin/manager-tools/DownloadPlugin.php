@@ -72,7 +72,7 @@ class DownloadPlugin {
             if (!$file->isDir()) {
                 // Get real and relative path for current file
                 $filePath = $file->getRealPath();
-                $relativePath = preg_replace('/.*' . $this->requestedVersion . '/i', '', $filePath);
+                $relativePath = preg_replace('/.*' . $this->requestedVersion . '\//i', '', $filePath);
 
                 $zip->addFile($filePath, $relativePath);
             }
