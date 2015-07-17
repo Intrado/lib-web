@@ -58,6 +58,8 @@ if (isset($_GET['download'])) {
 
 
 $usercount = QuickQuery("select count(*) from user where enabled = 1 and login != 'schoolmessenger' and accessid is not null");
+$inactiveusercount = QuickQuery("select count(*) from user where enabled = 0 and deleted = 0 and login != 'schoolmessenger' and accessid is not null");
+
 $maxusers = getSystemSetting("_maxusers","unlimited");
 
 $maxreached = $maxusers != "unlimited" && $usercount >= $maxusers;
@@ -353,17 +355,20 @@ if (isset($_GET['display'])) {
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "admin:users";
-$TITLE = "User List";
-
-$DESCRIPTION = "Active Users: $usercount";
-if($maxusers != "unlimited") {
-	$DESCRIPTION .= ", Maximum Allowed: $maxusers";
-}
 
 if ($display === 'inactive') {
-    $DESCRIPTION .= ',&nbsp;&nbsp;<a href="users.php">'._L("View Active Users").'</a>';
+	$TITLE = "Inactive User List";
+	$DESCRIPTION = '<a href="users.php">'._L("View Active Users").'</a>';
+	$DESCRIPTION .= "&nbsp;&nbsp;Inactive Users: $inactiveusercount";
+	
 } else {
-	$DESCRIPTION .= ',&nbsp;&nbsp;<a href="users.php?display=inactive">'._L("View Inactive Users").'</a>';
+	$TITLE = "Active User List";
+	$DESCRIPTION = '<a href="users.php?display=inactive">'._L("View Inactive Users").'</a>';
+	$DESCRIPTION .= "&nbsp;&nbsp;Active Users: $usercount";
+	
+	if ($maxusers != "unlimited") {
+		$DESCRIPTION .= ", Maximum Allowed: $maxusers";
+	}
 }
 
 $DESCRIPTION .= '&nbsp;&nbsp;'.icon_button(_L('Download User Details CSV'),"report",null,"users.php?download");
