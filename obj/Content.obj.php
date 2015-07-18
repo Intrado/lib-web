@@ -4,6 +4,9 @@ class Content extends DBMappedObject {
 
 	var $contenttype;
 	var $data;
+	var $height;
+	var $width;
+	var $originalcontentid;
 
 	function Content ($id = NULL) {
 		$this->_tablename = "content";
