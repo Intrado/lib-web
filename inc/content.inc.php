@@ -181,107 +181,157 @@ function handleFileUpload($formitemname, $maxfilesizebytes, $unsafeext = null, $
 	}
 }
 
+// This function is provided so that we can read an image stream from the customerdb.content
+// table, scale it, and then write it back to the same or a different content record.
+function resizeImageStream($imageStream, $width, $height) {
+	// (0) Make sure we have good environment to work with
+	if (! function_exists('gd_info')) {
+		error_log_helper('No GD library');
+		return null;
+	}
+	if (PHP_VERSION_ID < 505) {
+		error_log_helper('PHP Version >= 5.5.0; needed for imagepalettetotruecolor()');
+		return null;
+	}
+
+	// (1) width/height <= 0 means no scaling
+	if (($width <= 0) || ($height <= 0)) return null;
+
+	// (2) Get an image from the stream
+	$r_img = imagecreatefromstring($imageStream);
+	if (! is_resource($r_img)) {
+		error_log_helper('Failed to create image resource from source stream');
+		return null;
+	}
+
+	// (3) Convert a palettized (GIF) image to true color (NOOP if already true color)
+	if (! imagepalettetotruecolor($r_img)) { // PHP 5.5.0+ required!
+		error_log_helper('Failed to convert source stream image resource to a true color palette');
+		return null;
+	}
+
+	// (4) Make the resized image
+	$r_img_scaled = imagecreatetruecolor($width, $height);
+	if (! is_resource($r_img_scaled)) {
+		error_log_helper('Failed to create a new image resource to use for resizing');
+		return null;
+	}
+	$res = imagecopyresampled($r_img_scaled, $r_img, 0, 0, 0, 0, $width, $height, imagesx($r_img), imagesy($r_img));
+	imagedestroy($r_img);
+	if (! $res) {
+		error_log_helper('Failed to resample/resize the image');
+		return null;
+	}
+
+	// (5) Capture the retulting compressed image output stream
+	ob_start();
+	$res = imagejpeg($r_img_scaled, NULL, 90);
+	imagedestroy($r_img_scaled);
+	$resizedStream = ob_get_contents();
+	ob_end_clean();
+	if (! $res) {
+		error_log_helper('Failed to convert the resized image to a JPEG stream (??)');
+		return null;
+	}
+
+	return $resizedStream;
+}
+
 // Filepath is the location of the raw POST data that PHP captured from the uploaded file
 // Filename is the name of the file that the user uploaded
 // MAX_DIM is the maximum dimension in pixels for either height/width before scaling kicks in
 // Returns true if the file was scaled down, otherwise false if no change was made
 function resizeImage($filepath, $filename, $MAX_DIM) {
 
-	// Do the following once...
-	do {
-		// (0) A MAX_DIM <= 0 means no scaling
-		if ($MAX_DIM <= 0) break;
+	// (0) A MAX_DIM <= 0 means no scaling
+	if ($MAX_DIM <= 0) return false;
 
-		// (1) Make sure we have good GD library to work with
-		if (! function_exists('gd_info')) break;
+	// (1) Make sure we have good GD library to work with
+	if (! function_exists('gd_info')) return false;
 
-		// (2) Load the image from disk; method is based on extension of filename
-		$ext = strtolower(substr($filename, strrpos($filename, '.') + 1));
-		switch ($ext) {
+	// (2) Load the image from disk; method is based on extension of filename
+	$ext = strtolower(substr($filename, strrpos($filename, '.') + 1));
+	switch ($ext) {
 
-			// Only these file extensions are supported
-			case 'gif':
-				$r_img = imagecreatefromgif($filepath);
-				break;
+		// Only these file extensions are supported
+		case 'gif':
+			$r_img = imagecreatefromgif($filepath);
+			break;
 
-			case 'jpg':
-			case 'jpeg':
-				$r_img = imagecreatefromjpeg($filepath);
-				break;
+		case 'jpg':
+		case 'jpeg':
+			$r_img = imagecreatefromjpeg($filepath);
+			break;
 
-			case 'png':
-				$r_img = imagecreatefrompng($filepath);
-				break;
+		case 'png':
+			$r_img = imagecreatefrompng($filepath);
+			break;
 
-			case 'bmp':
-				$r_img = imagecreatefromwbmp($filepath);
-				break;
+		case 'bmp':
+			$r_img = imagecreatefromwbmp($filepath);
+			break;
 
-			// Any other (or empty) file extension will not be scaled as an image
-			default:
-				return(true);
-		}
-		if (! is_resource($r_img)) break;
-		
-		// (3) Get the image dimensions
-		$width = imagesx($r_img);
-		$height = imagesy($r_img);
-		if (($width * $height) == 0) break;
+		// Any other (or empty) file extension will not be scaled as an image
+		default:
+			return(true);
+	}
+	if (! is_resource($r_img)) return false;
+	
+	// (3) Get the image dimensions
+	$width = imagesx($r_img);
+	$height = imagesy($r_img);
+	if (($width * $height) == 0) return false;
 
-		// If both dimensions are already under the max then there is nothing to do
-		if (($width <= $MAX_DIM) && ($height <= $MAX_DIM)) return(true);
+	// If both dimensions are already under the max then there is nothing to do
+	if (($width <= $MAX_DIM) && ($height <= $MAX_DIM)) return(true);
 
-		// (4) Figure out the scaled dimensions
-		$width_factor = $width / $MAX_DIM;
-		$height_factor = $height / $MAX_DIM;
-		$factor = max($width_factor, $height_factor);
-		$width_new = $width / $factor;
-		$height_new = $height / $factor;
+	// (4) Figure out the scaled dimensions
+	$width_factor = $width / $MAX_DIM;
+	$height_factor = $height / $MAX_DIM;
+	$factor = max($width_factor, $height_factor);
+	$width_new = $width / $factor;
+	$height_new = $height / $factor;
 
-		// (5) Make the resized image
-		$r_img_scaled = imagecreatetruecolor($width_new, $height_new);
-		if (! is_resource($r_img_scaled)) break;
-		$res = imagecopyresized($r_img_scaled, $r_img, 0, 0, 0, 0, $width_new, $height_new, $width, $height);
-		if (! $res) break;
+	// (5) Make the resized image
+	$r_img_scaled = imagecreatetruecolor($width_new, $height_new);
+	if (! is_resource($r_img_scaled)) return false;
+	$res = imagecopyresized($r_img_scaled, $r_img, 0, 0, 0, 0, $width_new, $height_new, $width, $height);
+	if (! $res) return false;
 
-		// We're done with r_img, so free up that RAM explicitly
-		imagedestroy($r_img);
+	// We're done with r_img, so free up that RAM explicitly
+	imagedestroy($r_img);
 
-		// (6) Put the scaled image back out to disk
-		switch ($ext) {
-			case 'gif':
-				$res = imagegif($r_img_scaled, $filepath);
-				break;
+	// (6) Put the scaled image back out to disk
+	switch ($ext) {
+		case 'gif':
+			$res = imagegif($r_img_scaled, $filepath);
+			break;
 
-			case 'png':
-				$res = imagepng($r_img_scaled, $filepath, 2);
-				break;
+		case 'png':
+			$res = imagepng($r_img_scaled, $filepath, 2);
+			break;
 
-			case 'jpg':
-			case 'jpeg':
-				$res = imagejpeg($r_img_scaled, $filepath);
-				break;
+		case 'jpg':
+		case 'jpeg':
+			$res = imagejpeg($r_img_scaled, $filepath);
+			break;
 
-			case 'bmp':
-				$res = image2wbmp($r_img_scaled, $filepath);
-				break;
+		case 'bmp':
+			$res = image2wbmp($r_img_scaled, $filepath);
+			break;
 
-			default:
-				// Should be impossible to get here unless
-				// somebody tampers with the value of $ext
-				break(2);
-		}
-		if (! $res) break;
+		default:
+			// Should be impossible to get here unless
+			// somebody tampers with the value of $ext
+			$res = false;
+			break;
+	}
+	if (! $res) return false;
 
-		// (7) And finally release the RAM from our scaled image as well
-		imagedestroy($r_img_scaled);
+	// (7) And finally release the RAM from our scaled image as well
+	imagedestroy($r_img_scaled);
 
-		return(true);
-
-	} while (false);
-
-	// Error handling here - anything other then returning the result?
-	return(false);
+	return(true);
 }
 
 ?>
