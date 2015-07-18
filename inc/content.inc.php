@@ -183,15 +183,18 @@ function handleFileUpload($formitemname, $maxfilesizebytes, $unsafeext = null, $
 
 // This function is provided so that we can read an image stream from the customerdb.content
 // table, scale it, and then write it back to the same or a different content record.
-function resizeImageStream($imageStream, $width, $height) {
+function resizeImageStream($imageStream, $width, $height, $type) {
 	// (0) Make sure we have good environment to work with
 	if (! function_exists('gd_info')) {
 		error_log_helper('No GD library');
 		return null;
 	}
-	if (PHP_VERSION_ID < 505) {
-		error_log_helper('PHP Version >= 5.5.0; needed for imagepalettetotruecolor()');
-		return null;
+	if ($type == 'image/gif') {
+		// Only necessary for handling GIF images
+		if (PHP_VERSION_ID < 505) {
+			error_log_helper('PHP Version >= 5.5.0; needed for imagepalettetotruecolor()');
+			return null;
+		}
 	}
 
 	// (1) width/height <= 0 means no scaling
@@ -205,9 +208,11 @@ function resizeImageStream($imageStream, $width, $height) {
 	}
 
 	// (3) Convert a palettized (GIF) image to true color (NOOP if already true color)
-	if (! imagepalettetotruecolor($r_img)) { // PHP 5.5.0+ required!
-		error_log_helper('Failed to convert source stream image resource to a true color palette');
-		return null;
+	if ($type == 'image/gif') {
+		if (! imagepalettetotruecolor($r_img)) { // PHP 5.5.0+ required!
+			error_log_helper('Failed to convert source stream image resource to a true color palette');
+			return null;
+		}
 	}
 
 	// (4) Make the resized image
@@ -225,7 +230,28 @@ function resizeImageStream($imageStream, $width, $height) {
 
 	// (5) Capture the retulting compressed image output stream
 	ob_start();
-	$res = imagejpeg($r_img_scaled, NULL, 90);
+	switch ($type) {
+		case 'image/jpg':
+		case 'image/jpeg':
+			$res = imagejpeg($r_img_scaled, NULL, 90);
+			break;
+
+		case 'image/png':
+			$res = imagepng($r_img_scaled, NULL, 90);
+			break;
+
+		case 'image/gif':
+			$res = imagegif($r_img_scaled, NULL);
+			break;
+
+		case 'image/bmp':
+		case 'image/bitmap':
+		case 'image/x-portable-bitmap':
+			$res = image2wbmp($r_img_scaled, NULL);
+			break;
+		default:
+			return null;
+	}
 	imagedestroy($r_img_scaled);
 	$resizedStream = ob_get_contents();
 	ob_end_clean();

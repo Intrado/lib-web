@@ -15,6 +15,7 @@ require_once("inc/table.inc.php");
 require_once("inc/html.inc.php");
 require_once("inc/utils.inc.php");
 include_once("inc/content.inc.php");
+include_once("inc/appserver.inc.php");
 
 require_once("obj/Form.obj.php");
 require_once("obj/FieldMap.obj.php");
