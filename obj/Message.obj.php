@@ -296,7 +296,7 @@ class Message extends DBMappedObject {
 			// get imageupload tags
 			$matches = array();
 			$uploadimageurl = "";
-			if (preg_match("/(\<img src\=\"[^\=]*viewimage\.php\?id\=)/", strtolower($data), $matches)) {
+			if (preg_match("/(\<img .*?src\=\"[^\=]*viewimage\.php\?id\=)/", strtolower($data), $matches)) {
 				// we only care about the first match
 				$uploadimageurl = $matches[1];
 				$pos_i = stripos($data, $uploadimageurl);
@@ -476,12 +476,64 @@ class Message extends DBMappedObject {
 						break;
 
 					case "I":
+						// SMK @HERE 2015-07-17
 						$part->sequence = $partcount++;
-						$query = "select id from content where id=?";
 
-						$contentid = QuickQuery($query, false, array($token));
-						if ($contentid !== false) {
-							$part->imagecontentid = $contentid;
+						// SMK note: Previous implementation simply makes a part with the content ID in the message;
+						// now we will make the part, but also check if the iamge needs to be resized and change the
+						// content ID as needed...
+						//$query = "select id from content where id=?";
+						//$contentid = QuickQuery($query, false, array($token));
+						//if ($contentid !== false) {
+						//	$part->imagecontentid = $contentid;
+						
+						$contentId = intval($token); // Strip off the integer ID right at the token; might be more after it!
+						$content = DBFind('Content', 'from content where id = ?', false, array($contentId));
+						if ($content !== false) {
+
+
+							// See if resizing is needed
+							// Now reassemble the entire image tag to extract height/width attributes if present
+							// Got [<img src="viewimage.php?id=] image token: [33" height="366" width="366]
+							$imgTag = $uploadimageurl . $token;
+							if (preg_match('/height="(\d+)/', $imgTag, $matches)) {
+								$height = intval($matches[1]);
+								if (preg_match('/width="(\d+)/', $imgTag, $matches)) {
+									$width = intval($matches[1]);
+									//error_log_helper("Got image [{$contentId}] width [{$width}] height [{$height}] from [{$imgTag}]");
+									
+									// Do the sizes match those recorded for this content ID?
+									if (($height != $content->height) || ($width != $content->width)) {
+
+										// Resize needed!
+
+										// Is there an original image we should resize from?
+										if (is_null($content->originalcontentid)) {
+											// Nope! This one is the original, so use it
+											$originalContent = $content;
+										}
+										else {
+											$originalContent = DBFind('Content', 'from content where id = ?', false, array($content->originalcontentid));
+										}
+
+										// Prepare a new content record for storage...
+										$content = new Content();
+										$content->width = $width;
+										$content->height = $height;
+										$content->originalcontentid = $originalContent->id;
+
+										// Resize the originalContent to the newly specified widthxheight
+										$imageStream = getContentData($originalContent->id);
+										$content->data = resizeImageStream($imageStream, $width, $height) {
+
+										// TODO: Save the resized content as a new contentId with a reference to the originalContent
+									}
+								}
+							}
+
+							// Capture the current content ID
+							$part->imagecontentid = $content->id;
+
 							$parts[] = $part;
 						} else {
 							$errors[] = "Can't find content with id '$token'";
