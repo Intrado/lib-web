@@ -12,7 +12,7 @@ class SmsStatusReport extends ReportGenerator {
 		$this->reportType = $this->params["reporttype"];
 
 		$selectList0 = "*";
-		$selectList1 = "group_concat(p.pkey) as pkey, asb.sms, max(asb.status) as status, max('global') as modifiedby, max(unix_timestamp(asb.lastupdate)*1000) as modifieddate, max(asb.notes) as notes";
+		$selectList1 = "group_concat(p.pkey) as pkey, s.sms, max(s.status) as status, max('global') as modifiedby, max(unix_timestamp(s.lastupdate)*1000) as modifieddate, max(s.notes) as notes";
 		$selectList2 = "group_concat(p.pkey) as pkey, s.sms, max('block') as status, max(bu.login) as modifiedby, max(unix_timestamp(b.createdate)*1000) as modifieddate, max(b.description) as notes";
 		$whereSms = "";
 		$groupBy0 = "";
@@ -25,14 +25,14 @@ class SmsStatusReport extends ReportGenerator {
 			break;
 		case "summary":
 			$selectList0 = "status, sum(`Count`) as `Count`";
-			$selectList1 = "status, count(distinct sms) as `Count`";
-			$selectList2 = "'block' as status, count(distinct sms) as `Count`";
+			$selectList1 = "status, count(distinct s.sms) as `Count`";
+			$selectList2 = "'block' as status, count(distinct s.sms) as `Count`";
 			$groupBy0 = "group by status";
 			$groupBy = "group by status";
 			$orderBy = "order by null";
 			break;
 		case "smsview":
-			$whereSms = "and sms = ?";
+			$whereSms = "and s.sms = ?";
 			// need two parameters to fill two placeholders
 			$this->queryArgs[] = $this->params["sms"];
 			$this->queryArgs[] = $this->params["sms"];
@@ -48,9 +48,9 @@ class SmsStatusReport extends ReportGenerator {
 "select $selectList0 from (
 (
     select $selectList1
-    from aspsmsblock as asb
-    join person as p on (p.id = asb.personid)
-    where (p.type in ('system', 'guardianauto') and asb.editlock = 0 and not p.deleted) $whereSms
+    from aspsmsblock as s
+    join person as p on (p.id = s.personid)
+    where (p.type in ('system', 'guardianauto') and s.editlock = 0 and not p.deleted) $whereSms
     $groupBy
 )
 union all
