@@ -372,8 +372,8 @@
 					'toolbarStartupExpanded': ( this.getSetting('hidetoolbar') ? false : true),
 					'toolbarCanCollapse': true,
 					'extraPlugins': extraPlugins.join(),
-					'disableObjectResizing': true, // disabled only because the message_parts data model cannot capture resized image attributes
-					'resize_enabled': false, // disabled because now we resize for the user, and manual resize just makes matters worse
+					'disableObjectResizing': false,
+					'resize_enabled': true,
 					'pasteFromWordRemoveFontStyles': false,
 					'pasteFromWordRemoveStyles': false,
                                         
@@ -765,17 +765,6 @@
 		 */
 		this.cleanContent = function (content) {
 			var tempdiv = $('<div></div>').html(content);
-	
-			// Unstyle any image elements having src="viewimage.php?id=.."
-			$('img', tempdiv).each(function () {
-				var $this = $(this);
-				var src = $this.attr('src');
-				var matches = src.match(/viewimage\.php\?id=(\d+)/);
-				if (matches) {
-					$this.replaceWith('<img src="viewimage.php?id=' + matches[1] + '">');
-				}
-			});
-	
 			var html = this.cleanFieldInserts(tempdiv.html()).replace(/&lt;&lt;/g, '<<').replace(/&gt;&gt;/g, '>>').replace(/&lt;{/g, '<{').replace(/}&gt;/g, '}>');
 	
 			// CKEditor inserts blank tags even if the user has deleted everything.
