@@ -8,7 +8,7 @@ require_once("../obj/Validator.obj.php");
 require_once("../obj/Form.obj.php");
 require_once("../obj/FormItem.obj.php");
 
-require_once("ps/sso-admin/manager-tools/DownloadPlugin.php");
+require_once("ps/manager-tools/DownloadPlugin.php");
 
 if (!$MANAGERUSER->authorized("powerschool"))
 	exit("Not Authorized");
@@ -26,62 +26,74 @@ if (!$custdb) {
 }
 $customerName = $custinfo[3];
 
+$downloadPlugin = new DownloadPlugin();
 
-$pluginVersion = $_POST["downloadplugin_type"];
-$downloadPlugin = new DownloadPlugin($pluginVersion);
+$postValues = array();
 
-// handle post request via submit button
-if($_POST["downloadplugin_type"]) {
-    
-    $pluginCompileParams = array(
-        "customerUrlPrefix"  => $SETTINGS["feature"]["customer_url_prefix"],
-        "customerUrl"        => $customerName,
-        "portalAuthUrl"      => $SETTINGS["feature"]["portalauth_url"],
-        "portalAuthPort"     => $SETTINGS["feature"]["portalauth_port"]
-    );
-    
-    $pluginXML = $downloadPlugin->compilePlugin($pluginCompileParams);
-    
-    $zipFile = $downloadPlugin->zipPlugin($pluginXML);
-
-    //prepare the proper content type
-    // http headers for zip downloads
-    header("Pragma: public");
-    header("Expires: 0");
-    header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-    header("Cache-Control: public");
-    header("Content-Description: File Transfer");
-    header("Content-type: application/octet-stream");
-    header("Content-Disposition: attachment; filename=\"sso-messagesender-plugin-{$customerName}.zip\"");
-    header("Content-Transfer-Encoding: binary");
-    
-    ob_clean();
-    flush();
-    
-    readfile($zipFile);
-    unlink($zipFile); 
+foreach( $_POST as $postKey => $postValue) {
+	if(strpos($postKey, 'download-') !== false) {
+		$keyName = str_replace('download-', '', $postKey);
+		
+		// we can use this property to get the name of the plugin requested
+		if(strpos($keyName, '-formsnum') !== false) {
+			$keyName = str_replace('-formsnum', '', $keyName);
+			
+			$postValue = $keyName;
+			$keyName = 'pluginName';
+		}
+	
+		// if the key has an underscore then it is a specific property we need
+		if(strpos($keyName, '_') !== false) {
+			$exploded = explode('_', $keyName);
+			$keyName = $exploded[1];
+		}
+		
+		$postValues[$keyName] = $postValue;
+	}
 }
 
-// get list of available plugin versions
-$pluginVersions = DownloadPlugin::getVersions();
+// handle post request via submit button
+if (! empty($postValues)) {
+	
+	$pluginCompileParams = array(
+		"customerUrlPrefix" => $SETTINGS["feature"]["customer_url_prefix"],
+		"customerUrl"		=> $customerName,
+		"portalAuthUrl"		=> $SETTINGS["feature"]["portalauth_url"],
+		"portalAuthPort"	=> $SETTINGS["feature"]["portalauth_port"]
+	);
+	
+	// create a full lists of necessary parameters
+	$finalParams = array_merge($pluginCompileParams, $postValues);
+	
+	// set version and plugin name and any other predefined private values
+	$downloadPlugin->setParameters($finalParams);
+	
+	$filenamesToCompile = $downloadPlugin->getFilenamesToCompile();
+	
+	// create multi-dimensional array with filepaths and the compiled data
+	$fileDatas = $downloadPlugin->compilePlugin($finalParams, $filenamesToCompile);
+	
+	$zipFile = $downloadPlugin->zipPlugin($fileDatas);
+	
+	$downloadPlugin->setZipMimeHeaders($customerName);
 
-// get controls for the $formdata array
-$formControlValues = DownloadPlugin::getFormArray($pluginVersions);
+	readfile($zipFile);
+	unlink($zipFile);
+}
 
-$formdata = array(
-	"type" => array(
-		"label" => _L('Plugin Version'),
-		"value" => $pluginVersions[0],
-		"validators" => array(),
-            "control" => array("SelectMenu","values" => $formControlValues),
-		"helpstep" => 1
-	)
-);
+$forms = array();
 
-$buttons = array(submit_button(_L('Download'),"submit","tick"));
-
-$form = new Form("downloadplugin",$formdata,array(),$buttons);
-$form->ajaxsubmit = false;
+foreach ($downloadPlugin->getPlugins() as $pluginName) {
+	
+	$formdata = $downloadPlugin->getPluginForm($pluginName);
+	
+	$buttons = array(submit_button(_L('Download'),"submit","tick"));
+	
+	$forms[$pluginName] = new Form('download-'.$pluginName, $formdata, array(), $buttons);
+	
+	$forms[$pluginName]->ajaxsubmit = false; 
+	
+}
 
 // display page
 
@@ -91,13 +103,17 @@ $PAGE = 'commsuite:customers';
 include_once("nav.inc.php");
 
 startWindow(_L('PowerSchool: ' . $customerName));
-
 ?>
 
-<h1>PowerSchool SSO-MessageSender Plugin</h1>
-<hr />
 <?
-	echo $form->render();
+foreach ($forms as $frm) {
+	$header = str_replace('-', ' ', $frm->name);
+	$header = ucwords($header);
+	
+	echo "<h1>{$header} Plugin</h1><hr />";
+	echo $frm->render();
+	echo '<br />'; 
+}
 ?>
 <br />
 
