@@ -47,6 +47,7 @@ Usage: php apply_customer_sql.php [ options... ] [ <sqlfile> ] { all | <cid1> ..
 -P|--port <port>               Authserver port (default: 3306)
 -s|--shard <shardid>           Shard id (default: all)
 -u|--user <user>               Authserver user (default: "root")
+-v|--verbose                   Verbose output
 -?|--help                      Print this help
 
 HELP;
