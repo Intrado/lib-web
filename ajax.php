@@ -27,7 +27,10 @@ function generateListStats($listid) {
 		'totalremoved' => $list->countRemoved(),
 		'totaladded' => $list->countAdded(),
 		'totalrule' => -999, //TOOD remove this
-		'total' => RenderedList2::caclListTotal($listid));
+		'total' => RenderedList2::caclListTotal($listid),
+		'recipientmode' => $list->recipientmode,
+		'guardiancategories' => $list->getRestrictedGuardianCategoryIds()
+	);
 	return $stats;
 }
 

@@ -19,6 +19,10 @@ class ListGuardianCategory extends DBMappedObject {
 	}
 
 	static function insertListGuardianCategories($listId, $categories) {
+		// If there are no categories, don't bother making a transaction...
+		if (! is_array($categories) || (count($categories) === 0)) {
+			return;
+		}
 		QuickUpdate('BEGIN');
 		foreach ($categories as $categoryId) {
 			$le = new ListGuardianCategory($listId, $categoryId);
