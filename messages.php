@@ -22,7 +22,12 @@ require_once("inc/feed.inc.php");
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
 if (!$USER->authorize(array('sendemail', 'sendphone', 'sendsms', 'subscribe'))) {
-	redirect('unauthorized.php');
+	if (isset($_REQUEST["api"])) {
+		header("HTTP/1.1 403 Forbidden");
+		exit();
+	} else {
+		redirect('unauthorized.php');
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -35,9 +40,11 @@ if (isset($_GET['id']) && isset($_GET['remove'])) {
 	$publish = DBFind("Publish", "from publish where id = ? and action = 'subscribe' and userid = ?", false, array($_GET['id'], $USER->id));
 	if ($publish) {
 		$publish->destroy();
-		notice(_L("The subscription was removed."));
+
+		if (!isset($_REQUEST["api"])) {
+			notice(_L("The subscription was removed."));
+		}
 	}
-	redirect();
 }
 
 if (isset($_GET['delete'])) {
@@ -50,20 +57,37 @@ if (isset($_GET['delete'])) {
 		Query("BEGIN");
 		QuickUpdate("update messagegroup set deleted=1 where id=?",false,array($deleteid));
 		QuickUpdate("delete from publish where type = 'messagegroup' and messagegroupid = ?", false, array($deleteid));
-		notice(_L("The message, %s, is now deleted.", escapehtml($message->name)));
+
+		if (!isset($_REQUEST["api"])) {
+			notice(_L("The message, %s, is now deleted.", escapehtml($message->name)));
+		}
+
 		// if there are any publish records for this messagegroup, remove them
 		if (isPublished('messagegroup', $message->id)) {
 			$publications = DBFindMany("Publish", "from publish where type = 'messagegroup' and messagegroupid = ?", false, array($message->id));
 			foreach ($publications as $publish)
 				$publish->destroy();
-			notice(_L("The message, %s, is now un-published. Any subscriptions were also removed.", escapehtml($message->name)));
+
+			if (!isset($_REQUEST["api"])) {
+				notice(_L("The message, %s, is now un-published. Any subscriptions were also removed.", escapehtml($message->name)));
+			}
 		}
 		Query("COMMIT");
 	} else {
-		notice(_L("You do not have permission to delete this message."));
+		if (isset($_REQUEST["api"])) {
+			header("HTTP/1.1 404 Not Found");
+			exit();
+		} else {
+			notice(_L("You do not have permission to delete this message."));
+		}
 	}
-	
-	redirect();
+
+	if (isset($_REQUEST["api"])) {
+		header("HTTP/1.1 200 OK");
+		exit();
+	} else {
+		redirect();
+	}
 }
 
 $isajax = isset($_GET['ajax']);

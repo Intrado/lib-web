@@ -326,7 +326,18 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		
 		// messages created via the message group editor are always permanent
 		$messagegroup->permanent = 1;
-		
+
+		// Hide message group from user?
+		//
+		if (isset($_REQUEST["api"])) {
+			if ($_REQUEST["hidden"]) {
+				// Resulting message group must be hidden from user, available for one-time use.
+				// Alas, we don't actually support "hidden" flag in storage -- implemented as deleted message :-)
+				//
+				$messagegroup->deleted = 1;
+			}
+		}
+
 		$messagegroup->update();
 		Query("COMMIT");
 		$_SESSION['messagegroupid'] = $messagegroup->id;
