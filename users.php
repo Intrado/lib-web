@@ -345,23 +345,46 @@ function show_user_table($containerID) {
 	return $html;
 }
 
-// check if we should display active or inactive users.
-if (isset($_GET['display'])) {
-	$display = $_GET['display'] ;
+// set display to match GET parameter or default 'active'
+if ( isset($_GET['display']) ) {
+	
+	$display = $_GET['display'];
+	
+} else if ( isset($_SESSION['usersdisplaymode'] ) ) {
+	
+	$display = $_SESSION['usersdisplaymode'];
+	
 } else {
+	
 	$display = 'active';
 }
+
+$_SESSION['usersdisplaymode'] = $display;
+
+//if (isset($_SESSION['usersdisplaymode'])) {
+//	$display = $_SESSION['usersdisplaymode'];
+//} else {
+//	$_SESSION['usersdisplaymode'] = $display;
+//}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "admin:users";
+?>
 
-if ($display === 'inactive') {
+<link href="css/users.css" type="text/css" rel="stylesheet">
+
+<?
+
+if ($display === 'inactive' ) {
+	
 	$TITLE = "Inactive User List";
-	$DESCRIPTION = '<a href="users.php">'._L("View Active Users").'</a>';
+	$DESCRIPTION = '<a href="users.php?display=active">'._L("View Active Users").'</a>';
 	$DESCRIPTION .= "&nbsp;&nbsp;Inactive Users: $inactiveusercount";
 	
 } else {
+	
 	$TITLE = "Active User List";
 	$DESCRIPTION = '<a href="users.php?display=inactive">'._L("View Inactive Users").'</a>';
 	$DESCRIPTION .= "&nbsp;&nbsp;Active Users: $usercount";
@@ -375,7 +398,16 @@ $DESCRIPTION .= '&nbsp;&nbsp;'.icon_button(_L('Download User Details CSV'),"repo
 
 include_once("nav.inc.php");
 
-if($display !== 'inactive') {
+if(	$display === 'inactive') {
+
+startWindow('Inactive Users ' . help('Users_InactiveUsersList'),null, true);
+	echo '<div id="inactiveUsersContainer">';
+		echo show_user_table('inactiveUsersContainer');
+	echo '</div>';
+endWindow();
+
+} else {
+
 startWindow('Active Users ' . help('Users_ActiveUsersList'),null, true);
 	?>
 	<div class="feed_btn_wrap cf">
@@ -386,14 +418,9 @@ startWindow('Active Users ' . help('Users_ActiveUsersList'),null, true);
 		echo show_user_table('activeUsersContainer');
 	echo '</div>';
 endWindow();
+
 }
 
-if($display === 'inactive') {
-startWindow('Inactive Users ' . help('Users_InactiveUsersList'),null, true);
-	echo '<div id="inactiveUsersContainer">';
-		echo show_user_table('inactiveUsersContainer');
-	echo '</div>';
-endWindow();
-}
 include_once("navbottom.inc.php");
+
 ?>
