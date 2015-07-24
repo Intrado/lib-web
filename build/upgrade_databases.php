@@ -102,7 +102,7 @@ $dbReleaseVersion = "11.2"; // version to update databases to if no revision cha
 $dbversions = array(
 	"authserver" => array(
 		"11.0/2",
-		"11.2/2"
+		"11.2/3"
 	),
 
 	"aspshard" => array(
@@ -127,7 +127,7 @@ $dbversions = array(
 
 	"lcrrates" => array(
 		"11.0/2",
-		"11.2/3"
+		"11.2/4"
 	),
 
 	"pagelink" => array(
