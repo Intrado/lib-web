@@ -7,7 +7,7 @@ CKEDITOR.dialog.add('attachmentlink', function (editor) {
 			var editor = this.getParentEditor(),
 				element = this.getParentEditor().getSelection().getSelectedElement();
 
-			this.setupContent(element);//this.imageElement.getAttribute('src'));
+			this.setupContent(element);
 		},
 		onOk: function () {
 			var value = this.getContentElement('tab1', 'viewimageurl').getInputElement().getValue() || this.getContentElement('tab1', 'customurl').getInputElement().getValue();
@@ -18,15 +18,21 @@ CKEDITOR.dialog.add('attachmentlink', function (editor) {
 				return (false);
 			}
 			var displayName = this.getContentElement('tab1', 'displayname').getInputElement().getValue();
-			var contentAttachment = eval('(' + value + ')');
-			var fileName = contentAttachment.data.filename;
+			var url = this.getContentElement('tab1', 'customurl').getInputElement().getValue();
 
-			contentAttachment.displayName = (displayName == null || displayName.trim() == "") ? fileName : displayName;
+			var attachment = eval('(' + value + ')');
 
-			var content = '<!--' + JSON.stringify(contentAttachment) + '-->';
+			var fileName = attachment.filename;
+			var location = attachment.location;
+			var data = {
+				attachmentId: attachment.id,
+				url: (url == null || displayName.trim() == "") ? null : url,
+				displayName: (displayName == null || displayName.trim() == "") ? fileName : displayName
+			};
 
-			var location = contentAttachment.location;
-			var tag = '<span class="message-attachment-placeholder" contenteditable=false><a href="' + location + '">' + content + contentAttachment.displayName + ' </a></span>';
+			var content = '<!--' + JSON.stringify(data) + '-->';
+
+			var tag = '<span class="message-attachment-placeholder" contenteditable=false><a href="' + location + '">' + content + data.displayName + ' </a></span>';
 
 			editor.insertHtml(tag);
 
@@ -57,6 +63,11 @@ CKEDITOR.dialog.add('attachmentlink', function (editor) {
 								this.setValue(url);
 							}
 						}
+					},
+					{
+						id: 'switch',
+						type: 'html',
+						html: '<h3>Or</h3>'
 					},
 					{
 						id: 'upload',

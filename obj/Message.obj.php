@@ -133,10 +133,17 @@ class Message extends DBMappedObject {
 	/**
 	 * @return ContentAttachment[]|bool
 	 */
-	function getContentAttachments() {
-		return DBFindMany("ContentAttachment", "from messageattachment ma
-				inner join contentattachment ca on (ma.contentattachmentid = ca.id) where ma.messageid = ? and ma.type = 'content'",
-				"ca", array($this->id));
+	function getContentAttachments($filterMessageLinks = true) {
+		$sql = "from messageattachment ma
+				inner join contentattachment ca on (ma.contentattachmentid = ca.id)";
+		$where = " where ma.messageid = ? and ma.type = 'content'";
+
+		if ($filterMessageLinks) {
+			$sql .= " left join messagepart mp on (ma.messageid = mp.messageid and ma.id = mp.messageattachmentid)";
+			$where .= " and mp.type is NULL";
+		}
+		$sql .= $where;
+		return DBFindMany("ContentAttachment", $sql, "ca", array($this->id));
 	}
 
 	/**
@@ -213,7 +220,7 @@ class Message extends DBMappedObject {
 	// There are 2 usage patterns: either $body is null, or $parts is null.
 	function recreateParts($body, $parts, $preferredgender, $audiofileids = null) {
 		global $USER;
-		
+
 		if (!is_null($this->id))
 			QuickUpdate("delete from messagepart where messageid=?", false, array($this->id));
 		else
@@ -254,18 +261,12 @@ class Message extends DBMappedObject {
 				}
 
 				if($part->type=='MA'){
-
-					$contentAttachment = new ContentAttachment();
-					$contentAttachment->contentid = $part->context->data->contentid;
-					$contentAttachment->filename =  $part->context->data->filename;
-					$contentAttachment->size = $part->context->data->sizebytes;
-					$contentAttachment->create();
-
-
 					$msgattachment = new MessageAttachment();
 					$msgattachment->messageid = $this->id;
 					$msgattachment->type = 'content';
-					$msgattachment->contentattachmentid = $contentAttachment->id;
+					$msgattachment->contentattachmentid = $part->context->attachmentId;
+					$msgattachment->displayName = $part->context->displayName;
+					$msgattachment->url = $part->context->url;
 					$msgattachment->create();
 
 					$part->type = "MAL";
@@ -325,7 +326,7 @@ class Message extends DBMappedObject {
 			}
 
 			$matches = array();
-			if (preg_match("/(\<span class=\"message-attachment-placeholder\" contenteditable\=\"false\"\>\<a href\=\"[^\=]*viewimage\.php\?id\=[0-9]+\"\>\<!--)/", strtolower($data), $matches)) {
+			if (preg_match("/(\<span class=\"message-attachment-placeholder\" contenteditable\=\"false\"\>\<a href\=\"[^\=]*emailattachment\.php\?id\=[0-9]+\"\>\<!--)/", strtolower($data), $matches)) {
 				// we only care about the first match
 				$uploadimageurl = $matches[1];
 				$pos_ma = stripos($data, $uploadimageurl);
@@ -578,10 +579,12 @@ class Message extends DBMappedObject {
 			switch ($part->type) {
 
 				case 'MAL':
-
 					// Find the message attachment for this message attachment link part
 					$messageAttachment = new MessageAttachment($part->messageattachmentid);
-					$partstr .= '<{' . $messageAttachment->type . ':#' . $part->messageattachmentid . '}>';
+					$contentAttachment = new ContentAttachment($messageAttachment->contentattachmentid);
+					permitContent($contentAttachment->contentid);
+					$mal = '<span class="message-attachment-placeholder" contenteditable="false"><a href="emailattachment.php?id=' . $contentAttachment->contentid . "&name=" . $contentAttachment->filename . '"><!--{"attachmentId":"' . $messageAttachment->id . '","url":"' . $messageAttachment->url . '","displayName":"' . $messageAttachment->displayName . '"}-->' . $messageAttachment->displayName . ' </a></span>';
+					$partstr .= ($messageAttachment->displayName) ? $mal : '<{' . $messageAttachment->type . ':#' . $part->messageattachmentid . '}>';
 					break;
 
 				case 'A':

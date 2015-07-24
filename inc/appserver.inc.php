@@ -216,9 +216,12 @@ function emailMessageViewForMessageParts($message,$parts,$jobpriority) {
 					break;
 				case "MA":
 					$partdto->type = \commsuite\MessagePartTypeDTO::MAL;
+					$messageAttachment = new MessageAttachment($part->context->attachmentId);
+					$contentAttachment = new ContentAttachment($messageAttachment->contentattachmentid);
 					//to be used as display name for preview
 					$part->txt = $part->context->displayName;
-					$partdto->contentid = $part->context->data->contentid;
+					$part->defaultvalue =$contentAttachment->filename;
+					$partdto->contentid = $contentAttachment->contentid;
 					break;
 			}
 			$partdto->txt = $part->txt;

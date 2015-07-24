@@ -251,16 +251,17 @@ $formdata["subject"] = array(
 
 $helpsteps[] = _L("You may attach up to three files that are up to 2MB each. For greater security, only certain types ".
 	"of files are accepted.<br><br><b>Note:</b> Some email accounts may not accept attachments above a certain size and may reject your message.");
-$formdata["attachments"] = array(
-	"label" => _L('Attachments'),
-	"fieldhelp" => _L("You may attach up to three files that are up to 2MB each. For greater security, certain file ".
-		"types are not permitted. Be aware that some email accounts may not accept attachments above a certain size and may reject your message."),
-	"value" => ($attachments?json_encode($attachments):"{}"),
-	"validators" => array(array("ValEmailAttach")),
-	"control" => array("EmailAttach"),
-	"helpstep" => 4
-);
-
+if(count($attachments) > 0) {
+	$formdata["attachments"] = array(
+		"label" => _L('Attachments'),
+		"fieldhelp" => _L("You may attach up to three files that are up to 2MB each. For greater security, certain file " .
+			"types are not permitted. Be aware that some email accounts may not accept attachments above a certain size and may reject your message."),
+		"value" => ($attachments ? json_encode($attachments) : "{}"),
+		"validators" => array(array("ValEmailAttach")),
+		"control" => array("EmailAttach"),
+		"helpstep" => 4
+	);
+}
 
 // MESSAGE BODY
 if ($subtype == 'plain') {
@@ -408,17 +409,16 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			else
 				$message->create();
 
-			// create the message parts
-			$message->recreateParts($postdata['message'], null, false);
-			
 			// if there are message attachments, attach them
-			$attachments = json_decode($postdata['attachments'], true);
+			$attachments = isset($postdata['attachments']) ? json_decode($postdata['attachments'], true) : null;
 			if ($attachments == null)
 				$attachments = array();
 
 			//TODO: do we need to replace it?
-			//$message->replaceContentAttachments($attachments);
-			
+			$message->replaceContentAttachments($attachments);
+			// create the message parts
+			$message->recreateParts($postdata['message'], null, false);
+
 			// Sync with other message subtype if it exists
 			$message2 = $messagegroup->getMessage("email", $subtype=="html"?"plain":"html", $languagecode);
 			if ($message2) {
