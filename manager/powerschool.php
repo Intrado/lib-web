@@ -28,74 +28,63 @@ $customerName = $custinfo[3];
 
 $downloadPlugin = new DownloadPlugin();
 
-$postValues = array();
-
-foreach( $_POST as $postKey => $postValue) {
-	if(strpos($postKey, 'download-') !== false) {
-		$keyName = str_replace('download-', '', $postKey);
-		
-		// we can use this property to get the name of the plugin requested
-		if(strpos($keyName, '-formsnum') !== false) {
-			$keyName = str_replace('-formsnum', '', $keyName);
-			
-			$postValue = $keyName;
-			$keyName = 'pluginName';
-		}
-	
-		// if the key has an underscore then it is a specific property we need
-		if(strpos($keyName, '_') !== false) {
-			$exploded = explode('_', $keyName);
-			$keyName = $exploded[1];
-		}
-		
-		$postValues[$keyName] = $postValue;
-	}
-}
-
-// handle post request via submit button
-if (! empty($postValues)) {
-	
-	$pluginCompileParams = array(
-		"customerUrlPrefix" => $SETTINGS["feature"]["customer_url_prefix"],
-		"customerUrl"		=> $customerName,
-		"portalAuthUrl"		=> $SETTINGS["feature"]["portalauth_url"],
-		"portalAuthPort"	=> $SETTINGS["feature"]["portalauth_port"]
-	);
-	
-	// create a full lists of necessary parameters
-	$finalParams = array_merge($pluginCompileParams, $postValues);
-	
-	// set version and plugin name and any other predefined private values
-	$downloadPlugin->setParameters($finalParams);
-	
-	$filenamesToCompile = $downloadPlugin->getFilenamesToCompile();
-	
-	// create multi-dimensional array with filepaths and the compiled data
-	$fileDatas = $downloadPlugin->compilePlugin($finalParams, $filenamesToCompile);
-	
-	$zipFile = $downloadPlugin->zipPlugin($fileDatas);
-	
-	$downloadPlugin->setZipMimeHeaders($customerName);
-
-	readfile($zipFile);
-	unlink($zipFile);
-}
-
 $forms = array();
 
 foreach ($downloadPlugin->getPlugins() as $pluginName) {
-	
+
 	$formdata = $downloadPlugin->getPluginForm($pluginName);
-	
-	$buttons = array(submit_button(_L('Download'),"submit","tick"));
-	
-	$forms[$pluginName] = new Form('download-'.$pluginName, $formdata, array(), $buttons);
-	
-	$forms[$pluginName]->ajaxsubmit = false; 
-	
+
+	$buttons = array(submit_button(_L('Download'), "submit", "tick"));
+
+	$forms[$pluginName] = new Form($pluginName, $formdata, array(), $buttons);
+
+	$forms[$pluginName]->ajaxsubmit = false;
 }
 
-// display page
+$forms = array_reverse($forms);
+
+foreach ($forms as $form) {
+	$form->handleRequest();
+
+	if ($form->getSubmit()) {
+		$errors = $form->validate();
+
+		if (!$errors) {
+			
+			// necessary parameters to create 'sso-admin' plugin
+			$pluginCompileParams = array(
+				"customerUrlPrefix" => $SETTINGS["feature"]["customer_url_prefix"],
+				"customerUrl" => $customerName,
+				"portalAuthUrl" => $SETTINGS["feature"]["portalauth_url"],
+				"portalAuthPort" => $SETTINGS["feature"]["portalauth_port"]
+			);
+
+			// create a full lists of necessary parameters
+			$finalParams = array_merge($pluginCompileParams, $form->getData());
+
+			// set version and plugin name and any other predefined private values
+			$downloadPlugin->setParameters($finalParams);
+
+			// get list of plugin-specific filenames with need to be compiled
+			$filenamesToCompile = $downloadPlugin->getFilenamesToCompile();
+
+			// create multi-dimensional array with filepaths and the compiled data
+			$fileDatas = $downloadPlugin->compilePlugin($finalParams, $filenamesToCompile);
+
+			// create the ZIP archive
+			$zipFile = $downloadPlugin->zipPlugin($fileDatas);
+			
+			// set headers for a ZIP file
+			$downloadPlugin->setZipMimeHeaders($customerName);
+
+			// read out the file
+			readfile($zipFile);
+			
+			// delete it
+			unlink($zipFile);
+		}
+	}
+}
 
 $TITLE = 'PowerSchool Tools';
 $PAGE = 'commsuite:customers';
@@ -107,12 +96,11 @@ startWindow(_L('PowerSchool: ' . $customerName));
 
 <?
 foreach ($forms as $frm) {
-	$header = str_replace('-', ' ', $frm->name);
-	$header = ucwords($header);
-	
-	echo "<h1>{$header} Plugin</h1><hr />";
+	$header = $downloadPlugin::getHeaderText($frm->name);
+
+	echo "<h1>{$header}</h1><hr />";
 	echo $frm->render();
-	echo '<br />'; 
+	echo '<br />';
 }
 ?>
 <br />
