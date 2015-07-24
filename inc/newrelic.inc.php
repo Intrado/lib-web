@@ -1,11 +1,11 @@
 <? if (isset($MESSAGESENDER) &&
 	$MESSAGESENDER &&
-	isset($SETTINGS['message_sender']['newrelic_application_id']) &&
-	isset($SETTINGS['message_sender']['newrelic_license_key'])) { ?>
+	isset($SETTINGS['instrumentation']['newrelic_messagesender_id']) &&
+	isset($SETTINGS['instrumentation']['newrelic_license_key'])) { ?>
      
 	<?
-	$APPLICATION_ID = $SETTINGS['message_sender']['newrelic_application_id'];
-	$LICENSE_KEY    = $SETTINGS['message_sender']['newrelic_license_key']; 
+	$APPLICATION_ID = $SETTINGS['instrumentation']['newrelic_messagesender_id'];
+	$LICENSE_KEY    = $SETTINGS['instrumentation']['newrelic_license_key']; 
 	?>
 
 
