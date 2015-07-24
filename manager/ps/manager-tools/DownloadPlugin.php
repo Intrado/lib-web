@@ -5,14 +5,33 @@ class DownloadPlugin {
 	private $pluginVersion = '1.0';
 	private $pluginName = '';
 	private $pluginsBasePath = '';
-	
+
 	function __construct() {
 		$this->pluginsBasePath = dirname(__FILE__) . '/../plugins';
 	}
-	
+
+	static public function getHeaderText($pluginName) {
+
+		$headerText = '';
+
+		switch ($pluginName) {
+			case 'sso-admin' :
+				$headerText = 'SSO Admin Plugin';
+				break;
+			case 'contactmanager-guardian':
+				$headerText = 'Contact Manager Guardian Plugin';
+				break;
+			default:
+				$headerText = '[missing header text]';
+				break;
+		}
+
+		return $headerText;
+	}
+
 	public function setParameters($params) {
-		foreach($params as $key => $value) {
-			if(isset($this->$key)) {
+		foreach ($params as $key => $value) {
+			if (isset($this->$key)) {
 				$this->$key = $value;
 			}
 		}
@@ -53,7 +72,12 @@ class DownloadPlugin {
 	public function getPluginForm($pluginName) {
 
 		if ($pluginName === 'sso-admin') {
+
 			$formData = array(
+				"pluginName" => array(
+					"value" => $pluginName,
+					"control" => array("HiddenField")
+				),
 				"pluginVersion" => array(
 					"label" => _L('Plugin Version'),
 					"value" => '1.0',
@@ -68,6 +92,10 @@ class DownloadPlugin {
 
 		if ($pluginName === 'contactmanager-guardian') {
 			$formData = array(
+				"pluginName" => array(
+					"value" => $pluginName,
+					"control" => array("HiddenField")
+				),
 				"pluginVersion" => array(
 					"label" => _L('Plugin Version'),
 					"value" => '1.0',
@@ -102,38 +130,37 @@ class DownloadPlugin {
 	public function getFilenamesToCompile() {
 
 		$files = array();
-		
+
 		if ($this->pluginName === 'sso-admin') {
 			$files[] = dirname(__FILE__) . "/../plugins/{$this->pluginName}/versions/{$this->pluginVersion}/plugin.xml";
-			
 		}
-		
+
 		if ($this->pluginName === 'contactmanager-guardian') {
 			$files[] = dirname(__FILE__) . "/../plugins/{$this->pluginName}/versions/{$this->pluginVersion}/web_root/guardian/home.schoolmessenger-parent-plugin.leftnav.footer.txt";
 			$files[] = dirname(__FILE__) . "/../plugins/{$this->pluginName}/versions/{$this->pluginVersion}/web_root/guardian/home_not_available.schoolsessenger-parent-plugin.leftnav.footer.txt";
 		}
-		
+
 		return $files;
 	}
 
 	// replace placeholders with customer specific information
 	public function compilePlugin($settingNames, $files) {
-	 	
+
 		$fileDatas = array();
 		$fileDataRecord = array();
-		
+
 		foreach ($files as $fileName) {
 			$fileContents = file_get_contents($fileName);
 
 			foreach ($settingNames as $settingName => $value) {
 				$fileContents = str_replace('$' . $settingName, $value, $fileContents);
 			}
-			
+
 			$fileDataRecord['filepath'] = $fileName;
 			$fileDataRecord['compiled'] = $fileContents;
 			$fileDatas[] = $fileDataRecord;
 		}
-		
+
 		return $fileDatas;
 	}
 
@@ -166,7 +193,7 @@ class DownloadPlugin {
 			$relativePath = preg_replace('/.*' . $this->pluginVersion . '\//i', '', $fileData['filepath']);
 			$zip->addFromString($relativePath, $fileData['compiled']);
 		}
-		
+
 		$zip->close();
 
 		return $zipFile;
