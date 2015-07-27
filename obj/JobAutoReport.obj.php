@@ -35,34 +35,25 @@ class JobAutoReport extends ReportGenerator{
 		$fieldquery = generateFields("rp");
 
 		$this->query =
-			"select SQL_CALC_FOUND_ROWS
+			"select
 			rp.pkey,
 			rp." . FieldMap::GetFirstNameField() . " as firstname,
 			rp." . FieldMap::GetLastNameField() . " as lastname,
 			rp.type,
 			coalesce(mg.name, sq.name) as messagename,
-			coalesce(rc.phone,
-						rc.email,
-						rc.sms,
-						concat(
-							coalesce(rc.addr1,''), ' ',
-							coalesce(rc.addr2,''), ' ',
-							coalesce(rc.city,''), ' ',
-							coalesce(rc.state,''), ' ',
-							coalesce(rc.zip,''))
-					) as destination,
-			rc.numattempts,
-			from_unixtime(rc.starttime/1000) as lastattempt,
-			coalesce(if(rc.result='X' and rc.numattempts<3,'F',rc.result), rp.status) as result,
+			case rp.type when 'device' then concat(left(rd.deviceUuid,8), '...') when 'phone' then rc.phone when 'email' then rc.email when 'sms' then rc.sms else concat_ws(' ', rc.addr1, rc.addr2, rc.city, rc.state, rc.zip) end as destination,
+			case rp.type when 'device' then rd.numAttempts else rc.numattempts end as numattempts,
+			case rp.type when 'device' then from_unixtime(rd.startTimeMs/1000) else from_unixtime(rc.starttime/1000) end as lastattempt,
+			coalesce(if(rc.result='X' and rc.numattempts<3,'F',rc.result), rd.result, rp.status) as result,
 			rp.status,
 			u.login,
 			rp.type as jobtype,
 			j.name as jobname,
-			rc.numattempts as attempts,
+			case rp.type when 'device' then rd.numAttempts else rc.numattempts end as attempts,
 			rc.resultdata,
 			sw.resultdata,
 			rc.response as confirmed,
-			rc.sequence as sequence,
+			case rp.type when 'device' then rd.sequence else rc.sequence end as sequence,
 			rc.voicereplyid as voicereplyid,
 			vr.id as vrid
 			$orgfieldquery
@@ -74,18 +65,19 @@ class JobAutoReport extends ReportGenerator{
 					)
 				)
 			) as label,
-			rc.recipientpersonid,
-			concat(' ', rcp.f01, ' ', rcp.f02) as recipientpersonname
+			case rp.type when 'device' then rd.recipientpersonid else rc.recipientpersonid end as recipientpersonid,
+			case rp.type when 'device' then concat(' ', rdp.f01, ' ', rdp.f02) else concat(' ', rcp.f01, ' ', rcp.f02) end as recipientpersonname
 			from reportperson rp
 			inner join job j on (rp.jobid = j.id)
 			inner join user u on (u.id = j.userid)
-			left join	reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid AND rc.result NOT IN('declined'))
-			left join	messagegroup mg on
-							(mg.id = j.messagegroupid)
-			left join surveyquestionnaire sq on (sq.id = j.questionnaireid)
-			left join surveyweb sw on (sw.personid = rp.personid and sw.jobid = rp.jobid)
-			left join voicereply vr on (vr.jobid = rp.jobid and vr.personid = rp.personid and vr.sequence = rc.sequence and vr.userid = " . $USER->id . " and rc.type='phone')
+			left outer join reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid and rc.result not in ('nocontacts', 'declined'))
+			left outer join reportdevice rd on (rd.jobid = rp.jobid and rd.personid = rp.personid and rd.result not in ('nocontacts', 'declined'))
+			left outer join messagegroup mg on (mg.id = j.messagegroupid)
+			left outer join surveyquestionnaire sq on (sq.id = j.questionnaireid)
+			left outer join surveyweb sw on (sw.personid = rp.personid and sw.jobid = rp.jobid)
+			left outer join voicereply vr on (vr.jobid = rp.jobid and vr.personid = rp.personid and vr.sequence = rc.sequence and vr.userid = " . $USER->id . " and rc.type='phone')
 			left outer join person rcp on (rc.recipientpersonid = rcp.id)
+			left outer join person rdp on (rd.recipientpersonid = rdp.id)
 			where 1 "
 			. $searchquery
 			. $rulesql

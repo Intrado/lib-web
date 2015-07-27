@@ -157,7 +157,7 @@ class JobDetailReport extends ReportGenerator{
 						)
 					)
 				) as label,
-				rc.recipientpersonid,
+				case rp.type when 'device' then rd.recipientpersonid else rc.recipientpersonid end as recipientpersonid,
 				case rp.type when 'device' then concat(' ', rdp.f01, ' ', rdp.f02) else concat(' ', rcp.f01, ' ', rcp.f02) end as recipientpersonname
 			from
 				reportperson rp
