@@ -1,6 +1,6 @@
 CKEDITOR.dialog.add('attachmentlink', function (editor) {
 	return {
-		title: 'AttachmentLink',
+		title: 'Attachment',
 		minWidth: 400,
 		minHeight: 200,
 		onShow: function () {
@@ -10,7 +10,7 @@ CKEDITOR.dialog.add('attachmentlink', function (editor) {
 			this.setupContent(element);
 		},
 		onOk: function () {
-			var value = this.getContentElement('tab1', 'viewimageurl').getInputElement().getValue() || this.getContentElement('tab1', 'customurl').getInputElement().getValue();
+			var value = this.getContentElement('tab1', 'viewattachmenturl').getInputElement().getValue() || this.getContentElement('tab1', 'customurl').getInputElement().getValue();
 			var imageElement = this.imageElement || editor.document.createElement('img');
 
 			if (!value) {
@@ -40,14 +40,14 @@ CKEDITOR.dialog.add('attachmentlink', function (editor) {
 		contents: [
 			{
 				id: 'tab1',
-				label: 'Basic',
-				title: 'Basic',
+				label: 'Attachment',
+				title: 'Attachment',
 				filebrowser: 'uploadbutton',
 				elements: [
 					{
 						id: 'instructions',
 						type: 'html',
-						html: 'Please either specify an image URL or upload an image file.'
+						html: 'Please either specify an document URL or upload an attachment file.'
 					},
 					{
 						id: 'displayname',
@@ -57,9 +57,9 @@ CKEDITOR.dialog.add('attachmentlink', function (editor) {
 					{
 						id: 'customurl',
 						type: 'text',
-						label: 'Image URL',
+						label: 'Document URL',
 						setup: function (url) {
-							if (url && url.indexOf("viewimage.php?id=") < 0) {
+							if (url && url.indexOf("emailattachment.php?id=") < 0) {
 								this.setValue(url);
 							}
 						}
@@ -82,7 +82,7 @@ CKEDITOR.dialog.add('attachmentlink', function (editor) {
 					},
 					{
 						id: 'uploadbutton',
-						filebrowser: 'tab1:viewimageurl',
+						filebrowser: 'tab1:viewattachmenturl',
 						'for': ['tab1', 'upload'],
 						type: 'fileButton',
 						label: 'Upload'
@@ -93,14 +93,14 @@ CKEDITOR.dialog.add('attachmentlink', function (editor) {
 						html: '',
 					},
 					{
-						id: 'viewimageurl',
+						id: 'viewattachmenturl',
 						type: 'text',
 						label: 'Blank',
 						onLoad: function () {
 							CKEDITOR.document.getById(this.domId).$.style.visibility = "hidden";
 						},
 						onChange: function (event) {
-							this.getDialog().getContentElement('tab1', 'uploadstatus').getElement().setText('Image uploaded.');
+							this.getDialog().getContentElement('tab1', 'uploadstatus').getElement().setText('Attachment uploaded.');
 						}
 					}
 				]
