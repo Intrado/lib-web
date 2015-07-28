@@ -159,10 +159,10 @@ header('Content-type: text/html; charset=UTF-8') ;
 <html>
 <head>
 
-	<? include('inc/newrelic.inc.php') ?>
-
 	<meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+	<? include('inc/newrelic.inc.php') ?>
 
 	<title><?= getBrand();?>: <?= $PAGETITLE ?></title>
 

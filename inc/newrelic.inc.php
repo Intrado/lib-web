@@ -4,6 +4,10 @@
 	isset($SETTINGS['instrumentation']['newrelic_license_key'])) { ?>
      
 	<?
+	 if (extension_loaded ('newrelic')) {
+                newrelic_disable_autorum();
+        }
+
 	$APPLICATION_ID = $SETTINGS['instrumentation']['newrelic_messagesender_id'];
 	$LICENSE_KEY    = $SETTINGS['instrumentation']['newrelic_license_key']; 
 	?>
