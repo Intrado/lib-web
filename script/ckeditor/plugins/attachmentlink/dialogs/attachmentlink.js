@@ -11,24 +11,31 @@ CKEDITOR.dialog.add('attachmentlink', function (editor) {
 		},
 		onOk: function () {
 			var value = this.getContentElement('tab1', 'viewattachmenturl').getInputElement().getValue() || this.getContentElement('tab1', 'customurl').getInputElement().getValue();
-			var imageElement = this.imageElement || editor.document.createElement('img');
-
 			if (!value) {
 				alert("Please upload an image or select a URL!");
 				return (false);
 			}
-			var displayName = this.getContentElement('tab1', 'displayname').getInputElement().getValue();
-			var url = this.getContentElement('tab1', 'customurl').getInputElement().getValue();
+			var displayName = this.getContentElement('tab1', 'displayname').getInputElement().getValue(),
+				url = this.getContentElement('tab1', 'customurl').getInputElement().getValue(),
+				location = url,
+				defaultDisplayName = url,
+				data = {
+					url: url,
+					displayName: displayName,
+					attachmentId: null
+				};
 
-			var attachment = eval('(' + value + ')');
+			if (!url) {
+				var attachment = eval('(' + value + ')');
+				data.attachmentId = attachment.id;
+				defaultDisplayName = attachment.filename;
+				location = attachment.location;
+			}
 
-			var fileName = attachment.filename;
-			var location = attachment.location;
-			var data = {
-				attachmentId: attachment.id,
-				url: (url == null || displayName.trim() == "") ? null : url,
-				displayName: (displayName == null || displayName.trim() == "") ? fileName : displayName
-			};
+			if (displayName == null || displayName.trim() == "") {
+				data.displayName = defaultDisplayName;
+			}
+
 
 			var content = '<!--' + JSON.stringify(data) + '-->';
 
