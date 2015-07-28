@@ -5,7 +5,7 @@
  * and instrumentation_notice_error
  * @param string $msg
  */
-function error_log_helper ($msg) {
+function error_log_helper ($msg, $instrument = true) {
 	global $CUSTOMERURL, $USER;
 	//the first frame is the original caller
 	$trace = debug_backtrace();
@@ -24,8 +24,9 @@ function error_log_helper ($msg) {
 	}
 
 	$debug .= "]";
-	
-	instrumentation_notice_error($msg);
+
+	if ($instrument)
+		instrumentation_notice_error($msg);
 	error_log($msg . $debug);
 }
 
