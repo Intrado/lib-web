@@ -9,8 +9,8 @@ class Content extends DBMappedObject {
 	var $originalcontentid;
 
 	function Content ($id = NULL) {
-		$this->_tablename = "content";
-		$this->_fieldlist = array("contenttype", "data");
+		$this->_tablename = 'content';
+		$this->_fieldlist = array('contenttype', 'data', 'height', 'width', 'originalcontentid');
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}
