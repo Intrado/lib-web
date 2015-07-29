@@ -36,11 +36,9 @@ if (((getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost'
 		$contentAttachment->filename = $content['filename'];
 		$contentAttachment->size = $content['sizebytes'];
 		$contentAttachment->create();
-
 		Query("COMMIT");
-		permitContent($contentAttachment->id);
 
-		$location = "$BASEURL/emailattachment.php?id=" . $contentAttachment->id;
+		$location = "$BASEURL/emailattachment.php?id=" . $contentAttachment->contentid;
 		$data = array("location" => $location, "id" => $contentAttachment->id, "contentid" => $contentAttachment->contentid, "filename" => $contentAttachment->filename);
 		$results = json_encode($data);
 
