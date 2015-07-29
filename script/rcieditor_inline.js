@@ -76,7 +76,7 @@ window.RCIEditorInline = function () {
 				var extraButtons = [];
 
 				// Activate whatever tools are enabled according to rcieditor
-				var custom_tools = [ 'mkField', 'mkBlock', 'themeMgr', 'pasteFromPhone' ];
+				var custom_tools = [ 'mkField','AttachmentLink', 'mkBlock', 'themeMgr', 'pasteFromPhone' ];
 				// SMK notes that array.forEach() is not supported on IE8, so we'll use jQuery to iterate instead
 				$(custom_tools).each(function (index) {
 					var toolname = custom_tools[index];

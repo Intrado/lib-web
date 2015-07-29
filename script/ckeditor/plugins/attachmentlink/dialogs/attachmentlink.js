@@ -12,7 +12,7 @@ CKEDITOR.dialog.add('attachmentlink', function (editor) {
 		onOk: function () {
 			var value = this.getContentElement('tab1', 'viewattachmenturl').getInputElement().getValue() || this.getContentElement('tab1', 'customurl').getInputElement().getValue();
 			if (!value) {
-				alert("Please upload an image or select a URL!");
+				alert("Please upload an attachment or select a URL!");
 				return (false);
 			}
 			var displayName = this.getContentElement('tab1', 'displayname').getInputElement().getValue(),
@@ -50,6 +50,7 @@ CKEDITOR.dialog.add('attachmentlink', function (editor) {
 				label: 'Attachment',
 				title: 'Attachment',
 				filebrowser: 'uploadbutton',
+				padding: 2,
 				elements: [
 					{
 						id: 'instructions',
