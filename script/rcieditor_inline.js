@@ -88,12 +88,15 @@ window.RCIEditorInline = function () {
 				});
 
 
+				var uploadattachment= rcieditor.getSetting('baseUrl') + 'uploadattachment.php';
+
 				editor.config.filebrowserImageUploadUrl = uploaderURI;
+				editor.config.filebrowserUploadUrl = uploadattachment;
 				editor.config.pasteFromWordRemoveFontStyles = false;
 				editor.config.pasteFromWordRemoveStyles = false;
 				editor.config.disableObjectResizing = true; // disabled only because the message_parts data model cannot capture resized image attributes
 				editor.config.extraPlugins = extraPlugins.join();
-                                
+
                                 // specifically name which fonts CKEditor can display in order to remove Comic Sans
                                 editor.config.font_names= "Arial/Arial, Helvetica, sans-serif;"+
                                                     "Courier New/Courier New, Courier, monospace;"+
