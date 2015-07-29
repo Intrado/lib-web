@@ -213,7 +213,6 @@ class Message extends DBMappedObject {
 	// There are 2 usage patterns: either $body is null, or $parts is null.
 	function recreateParts($body, $parts, $preferredgender, $audiofileids = null) {
 		global $USER;
-error_log("recreateParts()");
 		
 		if (!is_null($this->id))
 			QuickUpdate("delete from messagepart where messageid=?", false, array($this->id));
@@ -239,11 +238,9 @@ error_log("recreateParts()");
 						$preferredgender = "female";
 					$voiceid = Voice::getPreferredVoice($this->languagecode, $preferredgender);
 				}
-				error_log("Calling parse here!");
 				$parts = $this->parse($body, $errors, $voiceid, $audiofileids, true);
 			}
 		}
-else error_log("Already parsed!");
 		
 		if (is_array($parts)) {
 			foreach ($parts as $part) {
@@ -480,18 +477,9 @@ else error_log("Already parsed!");
 						break;
 
 					case "I":
-						// SMK @HERE 2015-07-17
 						$part->sequence = $partcount++;
-error_log('Image part being processed...: ' . ($enableContentResizing ? 'true' : 'false'));
 
-						// SMK note: Previous implementation simply makes a part with the content ID in the message;
-						// now we will make the part, but also check if the iamge needs to be resized and change the
-						// content ID as needed...
-						//$query = "select id from content where id=?";
-						//$contentid = QuickQuery($query, false, array($token));
-						//if ($contentid !== false) {
-						//	$part->imagecontentid = $contentid;
-						
+						// Make the part, but also check if the image needs to be resized and change the content ID as needed...
 						$contentId = intval($token); // Strip off the integer ID right at the token; might be more after it!
 
 						$content = DBFind('Content', 'from content where id = ?', false, array($contentId));
@@ -499,7 +487,6 @@ error_log('Image part being processed...: ' . ($enableContentResizing ? 'true' :
 
 							// See if resizing is needed... (only when we're saving from f.recreateParts)
 							if ($enableContentResizing) {
-error_log('Content resizing is enabled!');
 
 								// Reassemble the entire image tag to extract height/width attributes if present
 								// Got [<img src="viewimage.php?id=] image token: [33" height="366" width="366]
@@ -529,10 +516,10 @@ error_log('Content resizing is enabled!');
 
 											// Get the originalContent's image data stream
 											if ($imageStream = contentGet($originalContent->id)) {
-												list($type, $data) = $imageStream;
+												list($type, $imageData) = $imageStream;
 
 												// Resize the originalContent to the newly specified widthxheight
-												if ($content->data = base64_encode(resizeImageStream($data, $width, $height, $type))) {
+												if ($content->data = base64_encode(resizeImageStream($imageData, $width, $height, $type))) {
 
 													// Save the resized content as a new contentId
 													// with a reference to the originalContent
@@ -542,21 +529,20 @@ error_log('Content resizing is enabled!');
 													$content->originalcontentid = $originalContent->id;
 													$content->create();
 													$content->refresh();
-error_log("Created custom resized image: id={$content->id} {$width}x{$height}"); 
+//error_log("Created custom resized image: id={$content->id} {$width}x{$height}"); 
 												}
-else error_log("Failed to resize image!"); 
+//else error_log("Failed to resize image!"); 
 											}
-else error_log("Failed to contentGet() the original content!"); 
+//else error_log("Failed to contentGet() the original content!"); 
 										}
-else error_log("Image size was unchanged!"); 
+//else error_log("Image size was unchanged!"); 
 									}
 								}
-else error_log("Image was not resized with CKEditor!"); 
+//else error_log("Image was not resized with CKEditor!"); 
 							}
 
 							// Capture the current content ID
 							$part->imagecontentid = $content->id;
-
 							$parts[] = $part;
 						} else {
 							$errors[] = "Can't find content with id '$token'";
