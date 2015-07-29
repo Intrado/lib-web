@@ -213,6 +213,7 @@ class Message extends DBMappedObject {
 	// There are 2 usage patterns: either $body is null, or $parts is null.
 	function recreateParts($body, $parts, $preferredgender, $audiofileids = null) {
 		global $USER;
+error_log("recreateParts()");
 		
 		if (!is_null($this->id))
 			QuickUpdate("delete from messagepart where messageid=?", false, array($this->id));
@@ -238,9 +239,11 @@ class Message extends DBMappedObject {
 						$preferredgender = "female";
 					$voiceid = Voice::getPreferredVoice($this->languagecode, $preferredgender);
 				}
-				$parts = $this->parse($body, $errors, $voiceid, $audiofileids);
+				error_log("Calling parse here!");
+				$parts = $this->parse($body, $errors, $voiceid, $audiofileids, true);
 			}
 		}
+else error_log("Already parsed!");
 		
 		if (is_array($parts)) {
 			foreach ($parts as $part) {
@@ -252,6 +255,7 @@ class Message extends DBMappedObject {
 					$voiceid = Voice::getPreferredVoice($this->languagecode, $preferredgender);
 					$part->voiceid = $voiceid;
 				}
+
 				$part->messageid = $this->id;
 				$part->create();
 			}
@@ -260,7 +264,7 @@ class Message extends DBMappedObject {
 		return $parts;
 	}
 	
-	static function parse ($data, &$errors = NULL, $defaultvoiceid=null, $audiofileids = null) {
+	static function parse ($data, &$errors = NULL, $defaultvoiceid=null, $audiofileids = null, $enableContentResizing = false) {
 		global $USER;
 
 		if ($errors == NULL)
@@ -478,6 +482,7 @@ class Message extends DBMappedObject {
 					case "I":
 						// SMK @HERE 2015-07-17
 						$part->sequence = $partcount++;
+error_log('Image part being processed...: ' . ($enableContentResizing ? 'true' : 'false'));
 
 						// SMK note: Previous implementation simply makes a part with the content ID in the message;
 						// now we will make the part, but also check if the iamge needs to be resized and change the
@@ -488,54 +493,65 @@ class Message extends DBMappedObject {
 						//	$part->imagecontentid = $contentid;
 						
 						$contentId = intval($token); // Strip off the integer ID right at the token; might be more after it!
+
 						$content = DBFind('Content', 'from content where id = ?', false, array($contentId));
 						if ($content !== false) {
 
+							// See if resizing is needed... (only when we're saving from f.recreateParts)
+							if ($enableContentResizing) {
+error_log('Content resizing is enabled!');
 
-							// See if resizing is needed
-							// Now reassemble the entire image tag to extract height/width attributes if present
-							// Got [<img src="viewimage.php?id=] image token: [33" height="366" width="366]
-							$imgTag = $uploadimageurl . $token;
-							if (preg_match('/height="(\d+)/', $imgTag, $matches)) {
-								$height = intval($matches[1]);
-								if (preg_match('/width="(\d+)/', $imgTag, $matches)) {
-									$width = intval($matches[1]);
-									//error_log_helper("Got image [{$contentId}] width [{$width}] height [{$height}] from [{$imgTag}]");
-									
-									// Do the sizes match those recorded for this content ID?
-									if (($height != $content->height) || ($width != $content->width)) {
+								// Reassemble the entire image tag to extract height/width attributes if present
+								// Got [<img src="viewimage.php?id=] image token: [33" height="366" width="366]
+								$imgTag = $uploadimageurl . $token;
+								if (preg_match('/height="(\d+)/', $imgTag, $matches)) {
+									$height = intval($matches[1]);
+									if (preg_match('/width="(\d+)/', $imgTag, $matches)) {
+										$width = intval($matches[1]);
+										//error_log_helper("Got image [{$contentId}] width [{$width}] height [{$height}] from [{$imgTag}]");
+										
+										// Do the sizes match those recorded for this content ID?
+										if (($height != $content->height) || ($width != $content->width)) {
 
-										// Resize needed!
+											// Resize needed!
 
-										// Is there an original image we should resize from?
-										if (is_null($content->originalcontentid)) {
-											// Nope! This one is the original, so use it
-											$originalContent = $content;
-										}
-										else {
-											$originalContent = DBFind('Content', 'from content where id = ?', false, array($content->originalcontentid));
-										}
-
-										// Prepare a new content record for storage...
-										$content = new Content();
-
-										// Get the originalContent's image data stream
-										if ($imageStream = contentGet($originalContent->id)) {
-											list($type, $data) = $imageStream;
-
-											// Resize the originalContent to the newly specified widthxheight
-											if ($content->data = base64_encode(resizeImageStream($data, $width, $height, $type))) {
-
-												// TODO: Save the resized content as a new contentId with a reference to the originalContent
-												$content->contenttype = $originalContent->contenttype;
-												$content->width = $width;
-												$content->height = $height;
-												$content->originalcontentid = $originalContent->id;
-												$content->update();
+											// Is there an original image we should resize from?
+											if (is_null($content->originalcontentid)) {
+												// Nope! This one is the original, so use it
+												$originalContent = $content;
 											}
+											else {
+												$originalContent = DBFind('Content', 'from content where id = ?', false, array($content->originalcontentid));
+											}
+
+											// Prepare a new content record for storage...
+											$content = new Content();
+
+											// Get the originalContent's image data stream
+											if ($imageStream = contentGet($originalContent->id)) {
+												list($type, $data) = $imageStream;
+
+												// Resize the originalContent to the newly specified widthxheight
+												if ($content->data = base64_encode(resizeImageStream($data, $width, $height, $type))) {
+
+													// Save the resized content as a new contentId
+													// with a reference to the originalContent
+													$content->contenttype = $originalContent->contenttype;
+													$content->width = $width;
+													$content->height = $height;
+													$content->originalcontentid = $originalContent->id;
+													$content->create();
+													$content->refresh();
+error_log("Created custom resized image: id={$content->id} {$width}x{$height}"); 
+												}
+else error_log("Failed to resize image!"); 
+											}
+else error_log("Failed to contentGet() the original content!"); 
 										}
+else error_log("Image size was unchanged!"); 
 									}
 								}
+else error_log("Image was not resized with CKEditor!"); 
 							}
 
 							// Capture the current content ID
