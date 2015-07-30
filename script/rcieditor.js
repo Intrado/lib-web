@@ -283,6 +283,7 @@
 			var extraPlugins = [];
 			extraPlugins.push('aspell'); // We always want the spell checker added
 			extraPlugins.push('autogrow'); // We always want the autogrow added
+			extraPlugins.push('dragresize'); // dragresize fixes webkit-based browsers missing from the native CKE support
 			switch (setEditorMode) {
 	
 				default:
