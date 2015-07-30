@@ -194,7 +194,15 @@ class PreviewModal {
 		$message->subject = $_REQUEST["subject"];
 		$message->languagecode = $_REQUEST["language"];
 		$message->stuffHeaders();
-		
+
+		// Capture image sizing data
+		if (preg_match_all('/(\<img .*?src\=\"[^\=]*viewimage\.php.*?\>)/', strtolower($_REQUEST['text']), $matches)) {
+			$images = $matches[0];
+		}
+		else {
+			$images = array();
+		}
+
 		$parts = Message::parse($_REQUEST["text"],$modal->errors);
 		if (count($modal->errors) == 0) {
 			$email = emailMessageViewForMessageParts($message,$parts,3);
@@ -204,7 +212,23 @@ class PreviewModal {
 			case "html":
 				$modal->title = _L("%s HTML Email Message", Language::getName($message->languagecode));
 				$modal->text .= $email->emailbody;
+
+				// Restore all the images with their sized versions
+				if (count($images) > 0) {
+					foreach ($images as $image) {
+						// Get the content ID
+						if (preg_match('/viewimage\.php\?id=(\d+)/', $image, $matches)) {
+							$id = $matches[1];
+
+							// Replace the stripped one with the sized one
+							// <img src="viewimage.php?id=40" />
+							$modal->text = str_replace("<img src=\"viewimage.php?id={$id}\" />", $image, $modal->text);
+						}
+					}
+				}
+
 				break;
+
 			case "plain":
 				$modal->title = _L("%s Plain Email Message", Language::getName($message->languagecode));
 				$modal->text .= nl2br(escapehtml($email->emailbody));
