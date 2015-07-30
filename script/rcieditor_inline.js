@@ -96,6 +96,7 @@ window.RCIEditorInline = function () {
 				editor.config.pasteFromWordRemoveStyles = false;
 				editor.config.disableObjectResizing = true; // disabled only because the message_parts data model cannot capture resized image attributes
 				editor.config.extraPlugins = extraPlugins.join();
+				editor.config.allowedContent = true;
 
                                 // specifically name which fonts CKEditor can display in order to remove Comic Sans
                                 editor.config.font_names= "Arial/Arial, Helvetica, sans-serif;"+

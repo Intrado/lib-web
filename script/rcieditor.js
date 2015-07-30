@@ -812,9 +812,23 @@
 					}
 				}
 			}
-	
+			//CKE protects comments. Thus, data is encoded
+			html = unprotectRealComments(html)
+			//remove unnecessary cke attributes
+			html = html.replace(/data-cke-saved-href=.+?\/emailattachment.php\?.+?href=/g, 'href=');
 			return(html);
 		};
+
+		/**
+		 * Copied from htmlprocessor: insertHTML protects comments.
+		 * @param html
+		 * @returns {*}
+		 */
+		function unprotectRealComments(html) {
+			return html.replace(/<!--\{cke_protected\}\{C\}([\s\S]+?)-->/g, function (match, data) {
+				return decodeURIComponent(data);
+			});
+		}
 	
 		/**
 		 * Corrects any html tags that may be inside a data-field insert.
