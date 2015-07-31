@@ -59,6 +59,7 @@ function contentPut ($filename,$contenttype, $base64 = false) {
 		$content->data = file_get_contents($filename);
 
 	$content->contenttype = $contenttype;
+	$content->width = $content->height = $content->originalcontentid = null;
 	if ($content->update()) {
 		$result = $content->id;
 	}

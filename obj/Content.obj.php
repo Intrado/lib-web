@@ -13,6 +13,10 @@ class Content extends DBMappedObject {
 		$this->_fieldlist = array('contenttype', 'data', 'height', 'width', 'originalcontentid');
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
+
+		// SMK note: for some reason the default constructor resets this to
+		// the default value unless we set it here AFTER calling it... (???)
+		$this->_allownulls = true;
 	}
 }
 

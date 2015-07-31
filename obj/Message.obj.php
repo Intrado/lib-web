@@ -503,12 +503,12 @@ class Message extends DBMappedObject {
 											// Resize needed!
 
 											// Is there an original image we should resize from?
-											if (is_null($content->originalcontentid)) {
-												// Nope! This one is the original, so use it
-												$originalContent = $content;
+											if ($content->originalcontentid) {
+												$originalContent = DBFind('Content', 'from content where id = ?', false, array($content->originalcontentid));
 											}
 											else {
-												$originalContent = DBFind('Content', 'from content where id = ?', false, array($content->originalcontentid));
+												// Nope! This one is the original, so use it
+												$originalContent = $content; 
 											}
 
 											// Prepare a new content record for storage...
@@ -529,16 +529,16 @@ class Message extends DBMappedObject {
 													$content->originalcontentid = $originalContent->id;
 													$content->create();
 													$content->refresh();
-//error_log("Created custom resized image: id={$content->id} {$width}x{$height}"); 
+#error_log("Created custom resized image: id={$content->id} {$width}x{$height}"); 
 												}
-//else error_log("Failed to resize image!"); 
+#else error_log("Failed to resize image!"); 
 											}
-//else error_log("Failed to contentGet() the original content!"); 
+#else error_log("Failed to contentGet() the original content!"); 
 										}
-//else error_log("Image size was unchanged!"); 
+#else error_log("Image size was unchanged!"); 
 									}
 								}
-//else error_log("Image was not resized with CKEditor!"); 
+#else error_log("Image was not resized with CKEditor!"); 
 							}
 
 							// Capture the current content ID
