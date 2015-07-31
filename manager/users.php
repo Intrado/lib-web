@@ -58,7 +58,10 @@ include_once("nav.inc.php");
 
 startWindow(_L("Users"));
 
-echo "<div style='padding:10px'>" . icon_button("Add User", "add",null,"user.php?id=new") . "</div><br /><hr />";
+?>
+	<div class="feed_btn_wrap cf"><?= icon_button("Add User", "add",null,"user.php?id=new") ?></div>
+<?
+
 echo $showdeleted?"<a href='users.php'>Show Active Users</a>":"<a href='users.php?deleted'>Show Deleted Users</a>";
 if ($users) {
 	$titles = array(
