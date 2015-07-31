@@ -273,8 +273,9 @@ class User extends DBMappedObject {
 	
 	
 	/**
-	 * Checks to see if the specified personid is visible to the user. Checks addressbook, orgs, and rules.
+	 * Checks to see if the specified personid, or pkey is visible to the user. Checks addressbook, orgs, and rules.
 	 * @param $personid
+	 * @param $pkey
 	 * @return unknown_type
 	 */
 	function canSeePerson ($personid, $pkey = null) {
@@ -284,8 +285,6 @@ class User extends DBMappedObject {
 		} else if ($pkey) {
 			$query = "from person where pkey = ?";
 			$person = DBFind('Person', $query, false, array($pkey));
-		} else {
-			return false;
 		}
 
 		if (!$person)
