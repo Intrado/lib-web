@@ -277,9 +277,17 @@ class User extends DBMappedObject {
 	 * @param $personid
 	 * @return unknown_type
 	 */
-	function canSeePerson ($personid) {
-		$query = "from person where id = ?";
-		$person = DBFind('Person', $query, false, array($personid));
+	function canSeePerson ($personid, $pkey = null) {
+		if ($personid) {
+			$query = "from person where id = ?";
+			$person = DBFind('Person', $query, false, array($personid));
+		} else if ($pkey) {
+			$query = "from person where pkey = ?";
+			$person = DBFind('Person', $query, false, array($pkey));
+		} else {
+			return false;
+		}
+
 		if (!$person)
 			return false; // person not found
 		if ($person->deleted > 0)
@@ -295,13 +303,13 @@ class User extends DBMappedObject {
 				."	where p.id=? and not p.deleted and (p.userid=? or (1 $rulesql))  \n";
 		
 		// can see this person
-		$cansee = QuickQuery($query, false, array($personid,$this->id));
+		$cansee = QuickQuery($query, false, array($person->id,$this->id));
 		
 		// if guardian, must check the children
 		if (!$cansee && ("guardianauto" == $person->type || "guardiancm" == $person->type)) {
 			// find the children of this guardian
 			$query = "select personid from personguardian where guardianpersonid = ?";
-			$childPersonids = QuickQueryList($query, false, false, array($personid));
+			$childPersonids = QuickQueryList($query, false, false, array($person->id));
 			foreach ($childPersonids as $childid) {
 				// build the query
 				$joinsql = $this->getPersonAssociationJoinSql(array(), array(), "p");
