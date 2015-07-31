@@ -96,10 +96,6 @@ function get_authorized_customers() {
 
 	$menu[] = array('Customer&nbsp;List', 'allcustomers.php', NULL, ($SUBTAB == 'customerlist'), "customers");
 
-	if ($MANAGERUSER->authorized('newcustomer') && $MANAGERUSER->authorized('editcustomer')) {
-		$menu[] = array('New&nbsp;Customer', 'customeredit.php?id=new', NULL, ($SUBTAB == 'newcustomer'), "newcustomer");
-	}
-
 	return($menu);
 }
 
@@ -129,6 +125,10 @@ function get_authorized_commsuite() {
 
 	if ($MANAGERUSER->authorized('systemdm')) {
 		$menu[] = array('System&nbsp;DMs', 'systemdms.php', NULL, ($SUBTAB == 'systemdms'), "systemdms");
+	}
+
+	if ($MANAGERUSER->authorized('systemdm')) {
+		$menu[] = array('DM&nbsp;Groups', 'systemdmgroups.php', NULL, ($SUBTAB == 'systemdmgroups'), "systemdmgroups");
 	}
 
 	if ($MANAGERUSER->authorized('systemdm')) {
