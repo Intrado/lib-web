@@ -49,6 +49,7 @@ class HtmlTextArea extends FormItem {
 			'fieldinsert_list' => FieldMap::getAuthorizeFieldInsertNames()
 		);
 
+		// ref: http://stackoverflow.com/questions/7034485/contenteditable-trigger-event-on-image-resize-when-using-handles
 		$str = '<script type="text/javascript" src="script/ckeditor/ckeditor.js"></script>
 			<script type="text/javascript" src="script/rcieditor.js"></script>
 			<script type="text/javascript">
@@ -56,7 +57,25 @@ class HtmlTextArea extends FormItem {
 				// apply the ckeditor to the textarea
 				document.observe("dom:loaded", function() {
 					var overrideSettings = ' . json_encode($overridesettings) . ';
-					//overrideSettings["callback_onready_fn"] = function () { console.log("CKE onready callback called"); };
+					overrideSettings["callback_onready_fn"] = function () {
+						console.log("CKE onready callback called");
+						// Add an event listener for image resizing
+						var editorId = "'.$n.'-htmleditor";
+						var editor = $(editorId);
+console.log("editorId is:", editorId);
+console.log("editor is:", editor);
+						editor.addEventListener(
+							"DOMAttrModified", 
+							function(e) {
+								if ((e.target.tagName == "IMG") && ((e.attrName == "width") || e.attrName == "height")) {
+									// do something here but dont prompt the user
+console.log("image resized!");
+								}
+								else console.log("Some other domattrmodified: ", e);
+							}, 
+							false
+						);
+					};
 					//overrideSettings["callback_onchange_fn"] = function () { console.log("CKE onchange callback called"); };
 
 					rcieditor = new RCIEditor("' . $editor_mode . '", "' . $n . '", overrideSettings);
@@ -66,6 +85,7 @@ class HtmlTextArea extends FormItem {
 						form_do_validation(form, field);
 					});
 				});
+
 			</script>';
 
 		if ($subtype == "plain" && isset($this->args['spellcheck']) && $this->args['spellcheck']) {

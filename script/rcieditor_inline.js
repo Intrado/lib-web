@@ -73,6 +73,7 @@ window.RCIEditorInline = function () {
 
 				// Custom toolbar buttons
 				var extraPlugins = ['aspell'];
+				extraPlugins.push('dragresize'); // dragresize fixes image resizing in webkit-based browsers missing from the native CKE support
 				var extraButtons = [];
 
 				// Activate whatever tools are enabled according to rcieditor
@@ -91,7 +92,8 @@ window.RCIEditorInline = function () {
 				editor.config.filebrowserImageUploadUrl = uploaderURI;
 				editor.config.pasteFromWordRemoveFontStyles = false;
 				editor.config.pasteFromWordRemoveStyles = false;
-				editor.config.disableObjectResizing = true; // disabled only because the message_parts data model cannot capture resized image attributes
+				editor.config.disableObjectResizing = false;
+				editor.config.resize_enabled = true;
 				editor.config.extraPlugins = extraPlugins.join();
                                 
                                 // specifically name which fonts CKEditor can display in order to remove Comic Sans

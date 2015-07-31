@@ -283,7 +283,7 @@
 			var extraPlugins = [];
 			extraPlugins.push('aspell'); // We always want the spell checker added
 			extraPlugins.push('autogrow'); // We always want the autogrow added
-			extraPlugins.push('dragresize'); // dragresize fixes webkit-based browsers missing from the native CKE support
+			extraPlugins.push('dragresize'); // dragresize fixes image resizing in webkit-based browsers missing from the native CKE support
 			switch (setEditorMode) {
 	
 				default:
@@ -358,8 +358,6 @@
 					uploaderURI += '?scaleabove=' + max_size;
 				}
 	
-				var that = this;
-
 				cke_config = {
 					'width': '100%',
 					'height': '400px',
