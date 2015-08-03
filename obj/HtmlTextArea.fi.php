@@ -59,7 +59,7 @@ class HtmlTextArea extends FormItem {
 					//overrideSettings["callback_onready_fn"] = function () { console.log("CKE onready callback called"); };
 					//overrideSettings["callback_onchange_fn"] = function () { console.log("CKE onchange callback called"); };
 
-					rcieditor = new RCIEditor("' . $editor_mode . '", "' . $n . '", overrideSettings);
+					rcieditor = new RCIEditor("' . $editor_mode . '", "' . $n . '", overrideSettings, "'.$subtype.'");
 					rcieditor.setValidatorFunction(function () {
 						var form = $("' . $this->form->name . '");
 						var field = $("'.$n.'");
