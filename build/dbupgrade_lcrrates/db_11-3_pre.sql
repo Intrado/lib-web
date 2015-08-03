@@ -62,5 +62,5 @@ $$$
 
 -- $rev 2
 
-UPDATE `carrierratemodel` SET `classname` = 'SimpleRateModel' WHERE `carrierRateModelClassname` = 'simple'
+UPDATE `carrierratemodel` SET `classname` = 'SimpleRateModel' WHERE `classname` = 'simple'
 $$$
