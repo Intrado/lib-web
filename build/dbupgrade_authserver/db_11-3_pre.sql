@@ -181,3 +181,9 @@ RENAME TABLE
   `dmgroup` TO `dmgroup_old`,
   `dmgroup_new` TO `dmgroup`
 $$$
+
+-- $rev 2
+
+UPDATE `dm` JOIN `dmgroup_map` ON `dm`.`dmgroupid` = `dmgroup_map`.`oldId`
+  SET `dm`.`dmgroupid` = `dmgroup_map`.`newId`
+$$$
