@@ -183,6 +183,19 @@ function associationData($associations) {
 
 $result = cleanObjects($data);
 $result["id"] = $personid;
+
+$firstnamefield = FieldMap::getFirstNameField();
+$result["firstName"] = $data->$firstnamefield;
+
+$lastnamefield = FieldMap::getLastNameField();
+$result["lastName"] = $data->$lastnamefield;
+
+$gradeField = FieldMap::getGradeField();
+$result["grade"] = $data->$gradeField;
+
+$languageField = FieldMap::getLanguageField();
+$result["language"] = $data->$languageField;
+
 $result["fields"] = cleanObjects(FieldMap::retrieveFieldMaps());
 $result["organizations"] = cleanObjects($organizations);
 $result["address"] = cleanObjects($address);
