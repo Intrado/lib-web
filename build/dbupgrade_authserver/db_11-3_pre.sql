@@ -102,7 +102,7 @@ INSERT INTO `dmgroup_new` (`id`, `name`, `carrierRateModelId`, `carrierRateModel
   (4,'DmAPI Level3 IL Firstcall',7,'Level3','{"state":"il"}','firstcall'),
   (5,'DmAPI Xo IL Firstcall',8,'Xo','{"state":"il"}','firstcall'),
   (6,'DmAPI Qwest TDM CA Lastcall',9,'Qwest','{"state":"ca","isTdm":true}','lastcall'),
-  (7,'DmAPI Simple CA Firstcall',13,'Simple','{"state":"ca"}','firstcall'),
+  (7,'DmAPI Simple CA Firstcall',13,'SimpleRateModel','{"state":"ca"}','firstcall'),
   (8,'DmAPI Level3 CA Firstcall',14,'Level3','{"state":"ca"}','firstcall'),
   (9,'DmAPI XoHvod IL Firstcall',15,'XoHvod','{"state":"il"}','firstcall'),
   (10,'DmAPI XoHvod CA Firstcall',16,'XoHvod','{"state":"ca"}','firstcall'),
@@ -127,7 +127,7 @@ INSERT INTO `dmgroup_new` (`id`, `name`, `dmGroupJmsProfileId`, `carrierRateMode
   (26,'JMS Level3 IL Firstcall',4,7,'Level3','{"state":"il"}','firstcall'),
   (27,'JMS Xo IL Firstcall',5,8,'Xo','{"state":"il"}','firstcall'),
   (28,'JMS Qwest TDM CA Lastcall',6,9,'Qwest','{"state":"ca","isTdm":true}','lastcall'),
-  (29,'JMS Simple CA Firstcall',7,13,'Simple','{"state":"ca"}','firstcall'),
+  (29,'JMS Simple CA Firstcall',7,13,'SimpleRateModel','{"state":"ca"}','firstcall'),
   (30,'JMS Level3 CA Firstcall',8,14,'Level3','{"state":"ca"}','firstcall'),
   (31,'JMS XoHvod IL Firstcall',9,15,'XoHvod','{"state":"il"}','firstcall'),
   (32,'JMS XoHvod CA Firstcall',10,16,'XoHvod','{"state":"ca"}','firstcall'),
@@ -186,4 +186,9 @@ $$$
 
 UPDATE `dm` JOIN `dmgroup_map` ON `dm`.`dmgroupid` = `dmgroup_map`.`oldId`
   SET `dm`.`dmgroupid` = `dmgroup_map`.`newId`
+$$$
+
+-- $rev 3
+
+UPDATE `dmgroup` SET `carrierRateModelClassname` = 'SimpleRateModel' WHERE `carrierRateModelClassname` = 'Simple'
 $$$

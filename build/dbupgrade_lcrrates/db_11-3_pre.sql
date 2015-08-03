@@ -22,7 +22,7 @@ INSERT INTO `carrierratemodel` (`id`, `name`, `classname`, `params`) VALUES
 (9, 'Qwest TDM CA','Qwest', '{"state":"ca","isTdm":true}'),
 (10, 'Qwest TDM VA','Qwest', '{"state":"va","isTdm":true}'),
 (11, 'Qwest TDM IL','Qwest', '{"state":"il","isTdm":true}'),
-(13, 'Simple CA','simple', '{"state":"ca"}'),
+(13, 'Simple CA','SimpleRateModel', '{"state":"ca"}'),
 (14, 'Level3 CA','level3', '{"state":"ca"}'),
 (15, 'XoHvod IL','XoHvod', '{"state":"il"}'),
 (16, 'XoHvod CA','XoHvod', '{"state":"ca"}'),
@@ -58,4 +58,9 @@ SELECT DISTINCT g.`carrierRateModelClassname`, b.`pattern`
 FROM `authserver`.`dmgroupblock` b
 INNER JOIN `authserver`.`dmgroup_map` m ON (m.`oldId` = b.`id`)
 INNER JOIN `authserver`.`dmgroup` g ON (m.`newId` = g.`id`)
+$$$
+
+-- $rev 2
+
+UPDATE `carrierratemodel` SET `classname` = 'SimpleRateModel' WHERE `carrierRateModelClassname` = 'simple'
 $$$
