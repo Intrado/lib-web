@@ -67,7 +67,6 @@ NodeRegistry = function () {
 		// If a node id is supplied, just fire the event on that one, otherwise iterate over
 		// all nodes and fire the event on each one.
 		fireEvent: function (name, id) {
-console.log('fire! ' + name);
 			if (id) {
 				if (! NodeRegistry.hasNode(id)) return false;
 				NodeRegistry.getNode(id).handleEvent(name);
