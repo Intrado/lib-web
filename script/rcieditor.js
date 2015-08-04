@@ -44,6 +44,7 @@
 		var customsettings = {};
 		var inlineIframe = null;
 
+		var that = this;
 	
 		// Lifted from utils.js so that we don't need to include that whole thing as an external dep.
 		this.getBaseUrl = function () {
@@ -85,7 +86,7 @@
 			if (editorMode) {
 	
 				// We need to deconstruct before we construct...
-				if (!this.deconstruct()) return(false);
+				if (! that.deconstruct()) return(false);
 			}
 	
 			// (2) Reset all internal properties
@@ -94,34 +95,34 @@
 			editorMode = null;
 	
 			// reset the settings array
-			this.clearSettings();
+			that.clearSettings();
 	
 			// Image scaling is disabled by default
-			this.setSetting('image_scaling', 0);
+			that.setSetting('image_scaling', 0);
 	
 			// The default settings for custom toolbar buttons
-			this.setSetting('tool_mkfield', false);
-			this.setSetting('tool_mkblock', false);
-			this.setSetting('tool_thememgr', false);
-			this.setSetting('tool_pastefromphone', false);
-			this.setSetting('hidetoolbar', false);
-			this.setSetting('fieldinsert_list', {});
-			this.setSetting('callback_onready_fn', null); // Optional callback fn to exec when editor is ready
-			this.setSetting('callback_onchange_fn', null); // Optional callback fn to exec when editor content changes
-			this.setSetting('callback_oncapture_fn', null); // Optional callback fn to exec when inline editor's content is captured
+			that.setSetting('tool_mkfield', false);
+			that.setSetting('tool_mkblock', false);
+			that.setSetting('tool_thememgr', false);
+			that.setSetting('tool_pastefromphone', false);
+			that.setSetting('hidetoolbar', false);
+			that.setSetting('fieldinsert_list', {});
+			that.setSetting('callback_onready_fn', null); // Optional callback fn to exec when editor is ready
+			that.setSetting('callback_onchange_fn', null); // Optional callback fn to exec when editor content changes
+			that.setSetting('callback_oncapture_fn', null); // Optional callback fn to exec when inline editor's content is captured
 	
 			// Make a generic, reusable text clipboard
-			this.setSetting('clipboard', '');
+			that.setSetting('clipboard', '');
 	
 			// Get the base URL for requests that require absolute pathing
-			this.setSetting('baseUrl', this.getBaseUrl());
+			that.setSetting('baseUrl', that.getBaseUrl());
 	
 			// Clear any validator that was set
-			this.resetValidatorFunction();
+			that.resetValidatorFunction();
 	
 			// (3) Apply the editor to the chosen textarea
 			var container_id = textarea_id + '-htmleditor';
-			return(this.applyEditor(editor_mode, textarea_id, container_id, overrideSettings));
+			return(that.applyEditor(editor_mode, textarea_id, container_id, overrideSettings));
 		};
 	
 		/**
@@ -131,7 +132,7 @@
 		this.deconstruct = function () {
 	
 			// Show the loading spinner
-			this.setLoadingVisibility(true);
+			that.setLoadingVisibility(true);
 
 			// Tear down whatever editor is in place
 			switch (editorMode) {
@@ -150,7 +151,7 @@
 				case 'plain':
 				case 'normal':
 				case 'full':
-					var htmleditorobject = this.getHtmlEditorObject();
+					var htmleditorobject = that.getHtmlEditorObject();
 					if (!htmleditorobject) {
 						break;
 					}
@@ -205,7 +206,7 @@
 			var overrideSettings = customSettings;
 	
 			// And remake ourselves
-			var res = this.reconstruct(newEditorMode, textarea_id, overrideSettings);
+			var res = that.reconstruct(newEditorMode, textarea_id, overrideSettings);
 			return(res);
 		};
 	
@@ -232,7 +233,7 @@
 			// Hide the text area form field until we are done initializing
 			textarea = $('#' + textarea_id);
 			textarea.hide();
-			this.setLoadingVisibility(true);
+			that.setLoadingVisibility(true);
 	
 			// If we are already running
 			if (editorMode) {
@@ -241,7 +242,7 @@
 				if ((textarea_id == textarea.attr('id')) && (container_id == container.attr('id'))) {
 	
 					// Then change the mode which will call us when ready
-					return(this.changeMode(setEditorMode));
+					return(that.changeMode(setEditorMode));
 				}
 	
 				// Applying to a different textarea/container is not allowed
@@ -252,7 +253,6 @@
 			if ((typeof CKEDITOR == 'undefined') || (!CKEDITOR)) {
 	
 				// We will try again in one second since CKE is not ready yet
-				var that = this;
 				window.setTimeout(function () {
 					that.applyEditor(setEditorMode, textarea_id, container_id, overrideSettings);
 				}, 10);
@@ -261,7 +261,7 @@
 	
 			// Override some settings
 			for (var setting in overrideSettings) {
-				this.setSetting(setting, overrideSettings[setting]);
+				that.setSetting(setting, overrideSettings[setting]);
 			}
 	
 			// base name of the text element; we'll make several new elements with derived names
@@ -295,36 +295,36 @@
 	
 				case 'inline':
 					// Add the mkField tool only
-					this.setSetting('tool_mkfield', true);
+					that.setSetting('tool_mkfield', true);
 					break;
 	
 				case 'normal':
 					// Add the mkField tool only
-					this.setSetting('tool_mkfield', true);
+					that.setSetting('tool_mkfield', true);
 	
 					// FIXME SMK disabled image_scaling pending clarification of desired behavior
-					//this.setSetting('image_scaling', 500);
+					//that.setSetting('image_scaling', 500);
 					break;
 	
 				case 'full':
 					// Add the mkField, mkBlock, and themeMgr tools
-					this.setSetting('tool_mkfield', true);
-					this.setSetting('tool_mkblock', true);
-					this.setSetting('tool_thememgr', true);
+					that.setSetting('tool_mkfield', true);
+					that.setSetting('tool_mkblock', true);
+					that.setSetting('tool_thememgr', true);
 	
 					// FIXME SMK disabled image_scaling pending clarification of desired behavior
-					//this.setSetting('image_scaling', 500);
+					//that.setSetting('image_scaling', 500);
 					break;
 			}
 	
 			if (setEditorMode == 'inline') {
 				// FIXME SMK disabled image_scaling pending clarification of desired behavior
-				//this.setSetting('image_scaling', 500);
+				//that.setSetting('image_scaling', 500);
 	
 				// Add an IFRAME to the page that will load up the inline editor
 				iframeIdName = basename+'_iframe';
 				inlineIframe = $('<iframe ' +
-					'src="' + this.getSetting('baseUrl') + 'rcieditor_inline.php?t=' + basename + '&d=' + document.domain + '" ' +
+					'src="' + that.getSetting('baseUrl') + 'rcieditor_inline.php?t=' + basename + '&d=' + document.domain + '" ' +
 					'name="' + iframeIdName + '" id="' + iframeIdName + '"' +
 					'style="width: 100%; height: 400px; border: 1px solid #999999; overflow-y: hidden;" scrolling="no">'
 				);
@@ -338,7 +338,6 @@
 	
 				// Activate whatever tools are enabled based on mode
 				var custom_tools = [ 'mkField', 'mkBlock', 'themeMgr', 'pasteFromPhone' ];
-				var that = this;
 				// SMK notes that array.forEach() is not supported on IE8, so we'll use jQuery to iterate instead
 				$(custom_tools).each(function (index) {
 					var toolname = custom_tools[index];
@@ -352,9 +351,9 @@
 				// SMK added to selectively enable reduction scaling for uploaded images;
 				// uploader.php will pass the argument on to f.handleFileUpload() which will
 				// ultimately be responsible for enforcement of this flag
-				var uploaderURI = this.getSetting('baseUrl') + 'uploadimage.php';
+				var uploaderURI = that.getSetting('baseUrl') + 'uploadimage.php';
 				var max_size;
-				if ((max_size = parseInt(this.getSetting('image_scaling'))) > 0) {
+				if ((max_size = parseInt(that.getSetting('image_scaling'))) > 0) {
 					uploaderURI += '?scaleabove=' + max_size;
 				}
 	
@@ -368,7 +367,7 @@
 					'disableNativeSpellChecker': false,
 					'browserContextMenuOnCtrl': true,
 					'filebrowserImageUploadUrl': uploaderURI,
-					'toolbarStartupExpanded': ( this.getSetting('hidetoolbar') ? false : true),
+					'toolbarStartupExpanded': ( that.getSetting('hidetoolbar') ? false : true),
 					'toolbarCanCollapse': true,
 					'extraPlugins': extraPlugins.join(),
 					'disableObjectResizing': false,
@@ -402,7 +401,7 @@
 	
 					'on': {
 						'instanceReady': function (event) {
-							that.callbackEditorLoaded(this);
+							that.callbackEditorLoaded(that);
 						},
 						'key': ( function (evt) {
 							that.eventListener(evt);
@@ -426,8 +425,8 @@
 				};
 
 				// Support for the caller conditionally remove some built-in plugins
-				if (this.getSetting('cke_remove_plugins')) {
-					cke_config.removePlugins = this.getSetting('cke_remove_plugins');
+				if (that.getSetting('cke_remove_plugins')) {
+					cke_config.removePlugins = that.getSetting('cke_remove_plugins');
 				}
 
 				// Now attach CKE to the form element with the name basename
@@ -456,14 +455,14 @@
 		 * inline editor to have at.
 		 */
 		this.callbackEditorLoaded = function (activeContainerId) {
-			this.setSetting('activeContainerId', activeContainerId);
+			that.setSetting('activeContainerId', activeContainerId);
 	
 			// Hide our AJAXy loading indicator
-			this.setLoadingVisibility(false);
+			that.setLoadingVisibility(false);
 
 			// Hook a call to caller's callback for onready event
 			var callback;
-			if (callback = this.getSetting('callback_onready_fn')) {
+			if (callback = that.getSetting('callback_onready_fn')) {
 				callback(true);
 			}
 
@@ -482,7 +481,7 @@
 					// The presence of the HtmlEditor classname signals
 					textarea.hide().addClass('HtmlEditor');
 	
-					var htmleditorobject = this.getHtmlEditorObject();
+					var htmleditorobject = that.getHtmlEditorObject();
 					if (! htmleditorobject) {
 						// failed to get the htmleditorobject
 						return;
@@ -497,7 +496,7 @@
 			// this allows the FI validation icon to show required field state instead
 			// of an initial error condition if the user hasn't entered anything yet.
 			if (html.length) {
-				this.validate();
+				that.validate();
 			}
 		};
 	
@@ -506,14 +505,14 @@
 		 *
 		 * @param boolean visible Visible state of the "Please wait" indicator, true to show, false to hide
 		 */
-		this.loadingVisible = false;
-		this.setLoadingVisibility = function (visible) {
+		that.loadingVisible = false;
+		that.setLoadingVisibility = function (visible) {
 	
 			// If we want to make it visible...
 			if (visible) {
 	
 				// If we're already visible or we have no textarea to work with
-				if (this.loadingVisible || (!textarea)) {
+				if (that.loadingVisible || (!textarea)) {
 	
 					// Then there's nothing to do
 					return;
@@ -532,14 +531,14 @@
 				// And hide the editor (redundant if pre-hidden, but lets us call arbitrarily
 				$('#' + basename + 'hider').hide();
 	
-				this.loadingVisible = true;
+				that.loadingVisible = true;
 			}
 	
 			// Otherwise we're hiding it
 			else {
 	
 				// If it's already hidden
-				if (!this.loadingVisible) {
+				if (! that.loadingVisible) {
 	
 					// Then there's nothing to do
 					return;
@@ -551,7 +550,7 @@
 				// And show the editor
 				$('#' + basename + 'hider').show();
 	
-				this.loadingVisible = false;
+				that.loadingVisible = false;
 			}
 		};
 	
@@ -619,18 +618,18 @@
 		 * @return object containing the html editor instance and container, or null if not loaded
 		 */
 		this.saveHtmlEditorContent = function (existinghtmleditorobject) {
-			var htmleditorobject = existinghtmleditorobject || this.getHtmlEditorObject();
+			var htmleditorobject = existinghtmleditorobject || that.getHtmlEditorObject();
 			if (! htmleditorobject) {
 				return(false);
 			}
 	
 			var content = htmleditorobject.instance.getData();
-			var cleanedContent = this.cleanContent(content);
+			var cleanedContent = that.cleanContent(content);
 			textarea.val(cleanedContent);
 	
 			// Hook a call to caller's callback for onchange event
 			var callback;
-			if (callback = this.getSetting('callback_onchange_fn')) {
+			if (callback = that.getSetting('callback_onchange_fn')) {
 				callback(cleanedContent);
 			}
 
@@ -652,7 +651,7 @@
 				return;
 			}
 	
-			var htmleditorobject = existinghtmleditorobject || this.getHtmlEditorObject();
+			var htmleditorobject = existinghtmleditorobject || that.getHtmlEditorObject();
 			if (htmleditorobject) {
 				var content = textarea.val();
 				htmleditorobject.instance.setData(content);
@@ -684,7 +683,7 @@
 						var tempdiv = $('<div></div>').html(textarea.val());
 						$('#' + rcieditorinline.activeEditorId, tempdiv).each(function () {
 	
-							var jQthis = $(this);
+							var jQthis = $(that);
 							jQthis.html(content);
 						});
 						textarea.val(tempdiv.html());
@@ -703,7 +702,7 @@
 				case 'normal':
 				case 'full':
 					textarea.val(content);
-					this.refreshHtmlEditorContent();
+					that.refreshHtmlEditorContent();
 					return(true);
 	
 				default:
@@ -718,11 +717,11 @@
 		 * object other than the one we're using internally
 		 */
 		this.clearHtmlEditorContent = function (existinghtmleditorobject) {
-			var htmleditorobject = existinghtmleditorobject || this.getHtmlEditorObject();
+			var htmleditorobject = existinghtmleditorobject || that.getHtmlEditorObject();
 			if (!htmleditorobject) {
 				return(false);
 			}
-			return(this.setHtmlEditorContent('', htmleditorobject));
+			return(that.setHtmlEditorContent('', htmleditorobject));
 		};
 	
 		/**
@@ -732,7 +731,7 @@
 		 * object other than the one we're using internally
 		 */
 		this.setHtmlEditorContent = function (content, existinghtmleditorobject) {
-			var htmleditorobject = existinghtmleditorobject || this.getHtmlEditorObject();
+			var htmleditorobject = existinghtmleditorobject || that.getHtmlEditorObject();
 			if (!htmleditorobject) {
 				return(false);
 			}
@@ -764,7 +763,7 @@
 		 */
 		this.cleanContent = function (content) {
 			var tempdiv = $('<div></div>').html(content);
-			var html = this.cleanFieldInserts(tempdiv.html()).replace(/&lt;&lt;/g, '<<').replace(/&gt;&gt;/g, '>>').replace(/&lt;{/g, '<{').replace(/}&gt;/g, '}>');
+			var html = that.cleanFieldInserts(tempdiv.html()).replace(/&lt;&lt;/g, '<<').replace(/&gt;&gt;/g, '>>').replace(/&lt;{/g, '<{').replace(/}&gt;/g, '}>');
 	
 			// CKEditor inserts blank tags even if the user has deleted everything.
 			// check if there is an image or href tag... if not, strip the tags and see if there is any text
@@ -774,7 +773,7 @@
 				if (typeof html.text !== 'undefined') {
 	
 					// strips all html tags, then strips whitespace. If there is nothing left... set the html to an empty string
-					if (this.trim(html.text()).replace(/[&nbsp;,\n,\r,\t]/g, '') == '') {
+					if (that.trim(html.text()).replace(/[&nbsp;,\n,\r,\t]/g, '') == '') {
 						html = '';
 					}
 				}
@@ -871,7 +870,7 @@
 						}
 
 						// TODO - scrub any tags beginning or ending within the FI and trim it...
-						field = this.trim(field.replace(/<.+?>/g, ''));
+						field = that.trim(field.replace(/<.+?>/g, ''));
 
 						// And finally replace the originally matched FI with one reconstituted
 						// with leading and trailing formatting information
@@ -938,14 +937,13 @@
 			if ((evt.name == 'afterExec') && (evt.data.name == 'autogrow')) return;
 	
 			// We got a new event so reset the timer
-			window.clearTimeout(this.eventTimer);
+			window.clearTimeout(that.eventTimer);
 	
 			// Get the Editor that we're working with
-			var htmleditor = this.getHtmlEditorObject();
-			var that = this;
+			var htmleditor = that.getHtmlEditorObject();
 
 			// Set a new timer to fire the save/check
-			this.eventTimer = window.setTimeout(function () {
+			that.eventTimer = window.setTimeout(function () {
 
 				// Save the changes to the hidden textarea
 				that.saveHtmlEditorContent();
@@ -964,14 +962,14 @@
 		 */
 		this.validator_fn = null;
 		this.setValidatorFunction = function (validator_fn) {
-			this.validator_fn = validator_fn;
+			that.validator_fn = validator_fn;
 		};
 	
 		/**
 		 * Disables a validator function that was previously set
 		 */
 		this.resetValidatorFunction = function () {
-			this.validator_fn = null;
+			that.validator_fn = null;
 		}
 	
 		/**
@@ -979,8 +977,8 @@
 		 * a validator function is set then it will be invoked, otherwise nada.
 		 */
 		this.validate = function () {
-			if (typeof this.validator_fn === 'function') {
-				this.validator_fn();
+			if (typeof that.validator_fn === 'function') {
+				that.validator_fn();
 			}
 		};
 	
@@ -993,7 +991,7 @@
 		 * @todo Get rid of this method once all external calls to it are gone
 		 */
 		this.registerHtmlEditorKeyListener = function (listener_fn) {
-			this.setValidatorFunction(listener_fn);
+			that.setValidatorFunction(listener_fn);
 		};
 
 		/**
@@ -1012,7 +1010,8 @@
 			inlineIframe.height(actualHeight);
 		};
 
-		// Invoke out contstuct() method with the new() arguments supplied
+		// Invoke our contstuct() method with the new() arguments supplied
 		this.reconstruct(editor_mode, textarea_id, overrideSettings);
 	}
 })(jQuery);
+

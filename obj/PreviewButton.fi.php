@@ -10,6 +10,7 @@ class PreviewButton extends FormItem {
 		$parameters = array("id","language","subtype","gender","text","fromname","from","subject");
 		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value=""/>';
 		$str .= icon_button("Preview", "fugue/control","
+					NodeRegistry.fireEvent('beforePreview');
 					var form = $('" . $this->form->name . "');
 					var parameters = " . $this->formatParameters($parameters) . ";
 					showPreview(parameters);return false;");

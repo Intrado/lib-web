@@ -57,26 +57,6 @@ class HtmlTextArea extends FormItem {
 				// apply the ckeditor to the textarea
 				document.observe("dom:loaded", function() {
 					var overrideSettings = ' . json_encode($overridesettings) . ';
-					overrideSettings["callback_onready_fn"] = function () {
-						console.log("CKE onready callback called");
-						// Add an event listener for image resizing
-						var editorId = "'.$n.'-htmleditor";
-						var editor = $(editorId);
-console.log("editorId is:", editorId);
-console.log("editor is:", editor);
-						editor.addEventListener(
-							"DOMAttrModified", 
-							function(e) {
-								if ((e.target.tagName == "IMG") && ((e.attrName == "width") || e.attrName == "height")) {
-									// do something here but dont prompt the user
-console.log("image resized!");
-								}
-								else console.log("Some other domattrmodified: ", e);
-							}, 
-							false
-						);
-					};
-					//overrideSettings["callback_onchange_fn"] = function () { console.log("CKE onchange callback called"); };
 
 					rcieditor = new RCIEditor("' . $editor_mode . '", "' . $n . '", overrideSettings);
 					rcieditor.setValidatorFunction(function () {
@@ -84,6 +64,16 @@ console.log("image resized!");
 						var field = $("'.$n.'");
 						form_do_validation(form, field);
 					});
+
+					NodeRegistry
+						.addNode("emailEditor", NodeRegistry.makeNode(rcieditor))
+						.setEventHandler(
+							"beforePreview",
+							function () {
+								rcieditor.saveHtmlEditorContent();
+								rcieditor.validate();
+							}
+						);
 				});
 
 			</script>';

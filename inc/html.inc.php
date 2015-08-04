@@ -146,13 +146,13 @@ function hidden_submit_button($value = "submit") {
 	return $btn;
 }
 
-function submit_button($name, $value = "submit", $icon = null) {
-	$btn = '<button class="btn" type="submit" name="submit" value="'.escapehtml($value).'" onclick="return form_submit(event,\''.escapehtml($value).'\');"><span class="btn_wrap cf"><span class="btn_left"></span><span class="btn_middle">';
+function submit_button($name, $value = "submit", $icon = null, $beforeSubmit = null) {
+	$btn = '<button class="btn" type="submit" name="submit" value="' . escapehtml($value) . '" onclick="' . (strlen($beforeSubmit) ? $beforeSubmit : '') . 'return form_submit(event,\'' . escapehtml($value) . '\');"><span class="btn_wrap cf"><span class="btn_left"></span><span class="btn_middle">';
 	
 	if ($icon == null)
 		$btn .= '<img src="img/pixel.png" alt="" height="16" width="1">';		
 	else
-		$btn .= '<img src="img/icons/'.$icon.'.png" alt="">';
+		$btn .= '<img src="img/icons/' . $icon . '.png" alt="">';
 	$btn .= escapehtml($name) . '</span><span class="btn_right"></span></span></button>';
 	
 	return $btn;

@@ -340,7 +340,7 @@ $formdata["preview"] = array(
 );
 
 
-$buttons = array(submit_button(_L('Done'),"submit","tick"));
+$buttons = array(submit_button(_L('Done'),"submit","tick", "NodeRegistry.fireEvent('beforePreview');"));
 $form = new Form("emaileedit",$formdata,$helpsteps,$buttons);
 
 ////////////////////////////////////////////////////////////////////////////////
