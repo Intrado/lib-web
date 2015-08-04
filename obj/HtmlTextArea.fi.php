@@ -67,13 +67,7 @@ class HtmlTextArea extends FormItem {
 
 					NodeRegistry
 						.addNode("emailEditor", NodeRegistry.makeNode(rcieditor))
-						.setEventHandler(
-							"beforePreview",
-							function () {
-								rcieditor.saveHtmlEditorContent();
-								rcieditor.validate();
-							}
-						);
+						.setEventHandler( "beforePreview", "saveHtmlEditorContent");
 				});
 
 			</script>';

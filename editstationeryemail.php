@@ -15,6 +15,7 @@ require_once("inc/html.inc.php");
 require_once("inc/utils.inc.php");
 require_once("obj/Form.obj.php");
 require_once("obj/FieldMap.obj.php");
+require_once("obj/Content.obj.php");
 require_once("obj/Message.obj.php");
 require_once("obj/MessageGroup.obj.php");
 require_once("obj/MessagePart.obj.php");
@@ -168,7 +169,7 @@ $formdata["preview"] = array(
 );
 
 
-$buttons = array(submit_button(_L('Done'),"submit","tick"));
+$buttons = array(submit_button(_L('Done'),"submit","tick", "NodeRegistry.fireEvent('beforePreview');"));
 $form = new Form("emaileedit",$formdata,null,$buttons);
 
 ////////////////////////////////////////////////////////////////////////////////

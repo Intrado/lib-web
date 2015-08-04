@@ -315,6 +315,7 @@ window.RCIEditorInline = function () {
 	 * Any time changes occur on this editable page, capture them into the parent's textarea
 	 */
 	this.captureChanges = function () {
+console.log('captureChanges()');
 
 		// (1) Get the wysiwygpage div DOM object from this page (below)
 		var wysiwygpage = 0;

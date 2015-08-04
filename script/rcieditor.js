@@ -618,15 +618,23 @@
 		 * @return object containing the html editor instance and container, or null if not loaded
 		 */
 		this.saveHtmlEditorContent = function (existinghtmleditorobject) {
-			var htmleditorobject = existinghtmleditorobject || that.getHtmlEditorObject();
-			if (! htmleditorobject) {
-				return(false);
+//console.log('yoh; editorMode is: ' + editorMode);
+			if (editorMode === 'inline') {
+				var rcieditorinline = this.getInlineEditor();
+				rcieditorinline.captureChanges();
+//console.log('captured inline changes!');
 			}
-	
-			var content = htmleditorobject.instance.getData();
-			var cleanedContent = that.cleanContent(content);
-			textarea.val(cleanedContent);
-	
+			else {	
+				var htmleditorobject = existinghtmleditorobject || that.getHtmlEditorObject();
+				if (! htmleditorobject) {
+					return(false);
+				}
+				var content = htmleditorobject.instance.getData();
+				var cleanedContent = that.cleanContent(content);
+				textarea.val(cleanedContent);
+//console.log('captured normal changes!');
+			}
+
 			// Hook a call to caller's callback for onchange event
 			var callback;
 			if (callback = that.getSetting('callback_onchange_fn')) {
@@ -635,7 +643,14 @@
 
 			return(true);
 		};
-	
+
+		/**
+		 * Gets the inline editor object across frames (if applicable)
+		 */	
+		this.getInlineEditor = function () {
+			return (editorMode === 'inline') ? window.frames[basename + '_iframe'].window.rcieditorinline : null;
+		};
+
 		/**
 		 * The converse of saveHtmlEditorContent(), takes the current value of
 		 * the textarea and jams it into the editor; useful when outside code
@@ -674,7 +689,7 @@
 			switch (editorMode) {
 				case 'inline':
 	
-					var rcieditorinline = window.frames[basename + '_iframe'].window.rcieditorinline;
+					var rcieditorinline = this.getInlineEditor();
 	
 					// Textarea is NOT a blockelement that contains HTML; it is a form field with a value
 					// so we have to get the value of the field, stick it in jquery space temporarily,
