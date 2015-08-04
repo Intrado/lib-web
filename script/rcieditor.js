@@ -618,11 +618,9 @@
 		 * @return object containing the html editor instance and container, or null if not loaded
 		 */
 		this.saveHtmlEditorContent = function (existinghtmleditorobject) {
-//console.log('yoh; editorMode is: ' + editorMode);
 			if (editorMode === 'inline') {
-				var rcieditorinline = this.getInlineEditor();
+				var rcieditorinline = that.getInlineEditor();
 				rcieditorinline.captureChanges();
-//console.log('captured inline changes!');
 			}
 			else {	
 				var htmleditorobject = existinghtmleditorobject || that.getHtmlEditorObject();
@@ -632,7 +630,6 @@
 				var content = htmleditorobject.instance.getData();
 				var cleanedContent = that.cleanContent(content);
 				textarea.val(cleanedContent);
-//console.log('captured normal changes!');
 			}
 
 			// Hook a call to caller's callback for onchange event
@@ -689,7 +686,7 @@
 			switch (editorMode) {
 				case 'inline':
 	
-					var rcieditorinline = this.getInlineEditor();
+					var rcieditorinline = that.getInlineEditor();
 	
 					// Textarea is NOT a blockelement that contains HTML; it is a form field with a value
 					// so we have to get the value of the field, stick it in jquery space temporarily,

@@ -118,33 +118,6 @@ window.RCIEditorInline = function () {
 
 			});
 
-			// BEGIN Hack to fix inline editor image resize bug in CKE; ref: https://dev.ckeditor.com/ticket/10197
-			function fixFirefox() {
-				document.designMode = 'on';
-				document.execCommand('enableObjectResizing', false, false);
-				document.execCommand('enableInlineTableEditing', false, false);
-				document.designMode = 'off';
-			}
-
-			if ($.browser.mozilla) {
-				editor.on('instanceReady',
-					function (ev1) {
-						ev1.editor.on('mode',
-							function (ev2) {
-								if (ev2.editor.mode === 'wysiwyg') {
-									// gets executed everytime the editor switches from source -> WYSIWYG
-									fixFirefox();
-								}
-							}
-						);
-
-						// this gets executed on init
-						fixFirefox();
-					}
-				);
-			}
-			// END Hack to fix inline editor image resize bug in CKE
-
 			editor.on('focus', function (event) {
 				that.activeEditorId = this.name;
 			});
@@ -315,7 +288,7 @@ window.RCIEditorInline = function () {
 	 * Any time changes occur on this editable page, capture them into the parent's textarea
 	 */
 	this.captureChanges = function () {
-console.log('captureChanges()');
+//console.log('captureChanges()');
 
 		// (1) Get the wysiwygpage div DOM object from this page (below)
 		var wysiwygpage = 0;
