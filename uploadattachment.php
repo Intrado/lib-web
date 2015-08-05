@@ -20,11 +20,14 @@ if (((getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost'
 ) {
 
 
-	//TODO: what else to add?
-	$allowedext = array('.pdf', '.jpeg', '.jpg', '.png', '.gif', '.bmp');
-	//TODO: what should be the max size?
+	$unsafeext = array(".ade", ".adp", ".asx", ".bas", ".bat", ".chm", ".cmd", ".com", ".cpl",
+		".crt", ".dbx", ".exe", ".hlp", ".hta", ".inf", ".ins", ".isp", ".js", ".jse", ".lnk",
+		".mda", ".mdb", ".mde", ".mdt", ".mdw", ".mdz", ".mht", ".msc", ".msi", ".msp", ".mst",
+		".nch", ".ops", ".pcd", ".pif", ".prf", ".reg", ".scf", ".scr", ".sct", ".shb", ".shs",
+		".url", ".vb", ".vbe", ".vbs", ".wms", ".wsc", ".wsf", ".wsh", ".zip", ".dmg", ".app");
+
 	$maxfilesize = 50 * 1024 * 1024;
-	$content = handleFileUpload($formitemname, $maxfilesize, null, $allowedext, false, null);
+	$content = handleFileUpload($formitemname, $maxfilesize, $unsafeext, null, false, null);
 
 	if (is_array($content)) {
 		permitContent($content['contentid']);
