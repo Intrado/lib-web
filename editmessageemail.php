@@ -34,6 +34,7 @@ require_once("obj/ValMessageBody.val.php");
 require_once("obj/EmailMessageEditor.fi.php");
 require_once("obj/HtmlTextArea.fi.php");
 require_once("obj/PreviewButton.fi.php");
+require_once("obj/FromEmail.fi.php");
 
 // appserver and thrift includes
 require_once("inc/appserver.inc.php");
@@ -159,6 +160,7 @@ $subject = "";
 $attachments = array();
 $text = "";
 $fromstationery = false;
+$customerWideEmail = getSystemSetting('customerwideemail', false);
 
 if ($message) {
 	// get the specific bits from the message if it exists
@@ -222,19 +224,52 @@ $formdata["fromname"] = array(
 	"helpstep" => 1
 );
 
+// if customer has an account-wide email then we should display a drop down <select> menu.
 $helpsteps[] = array(_L("Enter the address where you would like to receive replies."));
-$formdata["from"] = array(
-	"label" => _L("From Email"),
-	"fieldhelp" => _L('This is the address the email is coming from. Recipients will also be able to reply to this address.'),
-	"value" => $fromemail,
-	"validators" => array(
-		array("ValRequired"),
-		array("ValLength","max" => 255),
-		array("ValEmail", "domain" => getSystemSetting('emaildomain'))
+if ($customerWideEmail) {
+	
+	// determine what emails are available
+	$fromEmails= array();
+	
+	if (! empty($fromemail)) {
+		$fromEmails[] = $fromemail;
+	}
+	
+	if ($customerWideEmail !== $fromemail) {
+		$fromEmails[] = $customerWideEmail;	
+	}
+	
+	if (! empty($USER->email) && $USER->email !== $fromemail) {
+		$fromEmails[] = $USER->email;
+	}
+	
+	$formdata["from"] = array(
+		"label" => _L("From Email"),
+		"fieldhelp" => _L('This is the address the email is coming from. Recipients will also be able to reply to this address.'),
+		"value" => $fromEmails[0],
+		"validators" => array(
+			array("ValRequired"),
+			array("ValEmail")
 		),
-	"control" => array("TextField","max"=>255,"min"=>3,"size"=>35),
-	"helpstep" => 2
-);
+		"control" => array("FromEmail","size" => 15,"selectvalues"=>$fromEmails, "allowedit" => true),
+		"helpstep" => 2
+	);
+	
+} else {
+	$formdata["from"] = array(
+		"label" => _L("From Email"),
+		"fieldhelp" => _L('This is the address the email is coming from. Recipients will also be able to reply to this address.'),
+		"value" => $fromemail,
+		"validators" => array(
+			array("ValRequired"),
+			array("ValLength","max" => 255),
+			array("ValEmail", "domain" => getSystemSetting('emaildomain'))
+			),
+		"control" => array("TextField","max"=>255,"min"=>3,"size"=>35),
+		"helpstep" => 2
+	);
+	
+}
 
 $helpsteps[] = _L("Enter the subject of the email here.");
 $formdata["subject"] = array(
@@ -459,6 +494,21 @@ include_once("nav.inc.php");
 ?>
 <script type="text/javascript">
 <? Validator::load_validators(array("ValMessageBody", "ValEmailAttach")); ?>
+	
+	jQuery(document).ready(function() {
+		
+		$emailEdit = jQuery('#emaileedit_from');
+		
+		$emailEdit.change(function() {
+			
+		})
+		
+		var parent = jQuery('#emaileedit_from').parents('span');
+		
+		
+		//var selectVal = jQuery('#emaileedit_from').find(":selected").text();
+	});
+	
 </script>
 
 <?
