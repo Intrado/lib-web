@@ -192,3 +192,21 @@ $$$
 
 UPDATE `dmgroup` SET `carrierRateModelClassname` = 'SimpleRateModel' WHERE `carrierRateModelClassname` = 'Simple'
 $$$
+
+-- $rev 4
+
+-- reverse the mapping and re-do the mapping correctly, taking routeType into account
+
+UPDATE dm JOIN dmgroup_map ON dm.dmgroupid = dmgroup_map.newId
+  SET dm.dmgroupid = dmgroup_map.oldId
+$$$
+
+UPDATE dm JOIN dmgroup_map ON dm.dmgroupid = dmgroup_map.oldId AND dmgroup_map.routeType = dm.routeType
+  SET dm.dmgroupid = dmgroup_map.newId
+$$$
+
+-- force all dms to use JMS dmgroups.
+-- this works only because of the carefully constructed data above.
+
+UPDATE dm SET dmgroupid = dmgroupid + 22 WHERE dmgroupid <= 22
+$$$
