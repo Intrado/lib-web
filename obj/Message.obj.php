@@ -84,7 +84,7 @@ class Message extends DBMappedObject {
 		}
 
 		// copy the attachments
-		$contentAttachments = $this->getContentAttachments();
+		$contentAttachments = $this->getContentAttachments(false);
 		foreach ($contentAttachments as $contentAttachment) {
 			$origMessageAttachment = $origContentMessageAttachmentLookup[$contentAttachment->id];
 			// call create to generate a new attachment record which is a copy of the existing one
@@ -93,6 +93,8 @@ class Message extends DBMappedObject {
 			$messageAttachment->messageid = $newmessage->id;
 			$messageAttachment->type = 'content';
 			$messageAttachment->contentattachmentid = $contentAttachment->id;
+			$messageAttachment->displayName = $origMessageAttachment->displayName;
+			$messageAttachment->url = $origMessageAttachment->url;
 			$messageAttachment->create();
 			$attachmentIds[$origMessageAttachment->id] = $messageAttachment->id;
 		}
