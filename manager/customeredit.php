@@ -61,9 +61,6 @@ if (!$MANAGERUSER->authorized("editcustomer")) {
 }
 
 
-
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // Action/Request Processing
 ////////////////////////////////////////////////////////////////////////////////
@@ -280,6 +277,7 @@ $settings = array(
 	'_haspdfburst' => '0',
 	'_hasicplus' => '0',
 	'_cmaappid' => '',
+	'customerwideemail' => '',
 	'autoreport_replyname' => 'SchoolMessenger',
 	'autoreport_replyemail' => 'autoreport@system.schoolmessenger.com',
 	'_renewaldate' => '',
@@ -406,6 +404,16 @@ $formdata["maxemails"] = array(
 		array('ValNumber', 'min' => $settings['maxemails']>0?$settings['maxemails']:1, 'max' => 99)
 	),
 	"control" => array("TextField","size" => 4, "maxlength" => 4),
+	"helpstep" => $helpstepnum
+);
+
+$formdata["customerwideemail"] = array(
+	"label" => _L('Customer-wide Default Email'),
+	"value" => $settings['customerwideemail'],
+	"validators" => array(
+		array("ValEmail")
+	),
+	"control" => array("TextField","maxlength"=>255,"min"=>3,"size"=>35),
 	"helpstep" => $helpstepnum
 );
 
@@ -867,6 +875,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		
 		update_jobtypeprefs(1, $postdata["maxemails"], "email", $custdb);
 		setCustomerSystemSetting('maxemails', $postdata["maxemails"], $custdb);
+		setCustomerSystemSetting('customerwideemail', $postdata["customerwideemail"], $custdb);
 		setCustomerSystemSetting('autoreport_replyname', $postdata["autoreportreplyname"], $custdb);
 		setCustomerSystemSetting('autoreport_replyemail', $postdata["autoreportreplyemail"], $custdb);
 		setCustomerSystemSetting('emaildomain', $postdata["emaildomain"], $custdb);

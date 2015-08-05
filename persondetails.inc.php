@@ -183,6 +183,19 @@ function associationData($associations) {
 
 $result = cleanObjects($data);
 $result["id"] = $personid;
+
+$firstnamefield = FieldMap::getFirstNameField();
+$result["firstName"] = $data->$firstnamefield;
+
+$lastnamefield = FieldMap::getLastNameField();
+$result["lastName"] = $data->$lastnamefield;
+
+$gradeField = FieldMap::getGradeField();
+$result["grade"] = $data->$gradeField;
+
+$languageField = FieldMap::getLanguageField();
+$result["language"] = $data->$languageField;
+
 $result["fields"] = cleanObjects(FieldMap::retrieveFieldMaps());
 $result["organizations"] = cleanObjects($organizations);
 $result["address"] = cleanObjects($address);
@@ -192,6 +205,14 @@ $result["defaults"] = cleanObjects($defaultcontactprefs);
 $result["sections"] = cleanObjects($sections);
 //$result["dependents"] = cleanObjects(associationData($person->dependents));
 //$result["guardians"] = cleanObjects(associationData($person->guardians));
+
+//$CUSTOMERURL = substr($_SERVER["SCRIPT_NAME"],1);
+//$CUSTOMERURL = strtolower(substr($CUSTOMERURL,0,strpos($CUSTOMERURL,"/")));
+
+//$customer = Array();
+//$customer["id"] = getSystemSetting("_customerid");
+//$customer["name"] = getSystemSetting("displayname");
+//$result["customer"] = cleanObjects($customer);
 
 header('Content-Type: application/json');
 
