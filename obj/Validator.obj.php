@@ -230,6 +230,46 @@ class ValNumeric extends Validator {
 	}
 }
 
+class ValAlphaNumeric extends Validator {
+
+	function validate ($value, $args) {
+		$hasmin = isset($args['min']) && $args['min'] !== false;
+		if ($hasmin)
+			$min = $args['min']+0;
+		$hasmax = isset($args['max']) && $args['max'] !== false;
+		if ($hasmax)
+			$max = $args['max']+0;
+
+		if (!preg_match("/^[A-Za-z0-9]*$/",$value))
+			return "$this->label must be alpha numeric";
+
+		if ($hasmin && mb_strlen($value) < $min)
+			return "$this->label must be at least $min characters long";
+		if ($hasmax && mb_strlen($value) > $max)
+			return "$this->label cannot be more than $max characters long";
+
+		return true;
+	}
+
+	function getJSValidator () {
+		return
+			'function (name, label, value, args) {
+				var re = /^[A-Za-z0-9]*$/;
+
+				if (!re.test(value))
+					return label + " must be alpha numeric";
+
+				if (args.min && value.length < args.min)
+					return label + " must be at least " + args.min + " characters long";
+				if (args.max && value.length > args.max)
+					return label + " cannot be more than " + args.max + " characters long";
+
+				return true;
+			}';
+	}
+}
+
+
 // Requires inc/utils.inc.php validEmail() and checkEmailDomain()
 // $args['domain'] If set, used to validate the address matches this domain
 // $args['subdomain'] If set (default false), used to allow subdomains

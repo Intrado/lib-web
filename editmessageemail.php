@@ -99,7 +99,7 @@ if ($message) {
 	} else {
 		if (isset($_REQUEST['api'])) {
 			header('Content-Type: application/json');
-			exit(json_encode(Array("status" => "messageGroupNotFound")));
+			exit(json_encode(Array("status" => "resourceNotFound", "message" => "Message group not specified")));
 		}
 
 		// missing session data!
@@ -116,7 +116,8 @@ if ($message) {
 }
 
 // if the user doesn't own the parent message group, unauthorized!
-if (!userOwns("messagegroup", $messagegroup->id) || $messagegroup->deleted) {
+if (!userOwns("messagegroup", $messagegroup->id) ||
+	(!isset($_REQUEST["msgdel"]) && $messagegroup->deleted)) {
 	if (isset($_REQUEST['api'])) {
 		header("Content-Type: application/json");
 		exit(json_encode(Array("status" => "messageGroupNotFound")));
