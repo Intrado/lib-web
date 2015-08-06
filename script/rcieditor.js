@@ -34,7 +34,7 @@
 */
 
 (function ($) {
-	window.RCIEditor = function (editor_mode, textarea_id, overrideSettings, message_type) {
+	window.RCIEditor = function (editor_mode, textarea_id, overrideSettings) {
 
 		var textarea = null;	// The textarea ELEMENT, not the ID
 		var container = null;	// The container ELEMENT, to contain the editor, not the ID
@@ -43,7 +43,6 @@
 		var iframeIdName = 'rcicke_iframe';
 		var customsettings = {};
 		var inlineIframe = null;
-		var messageType = "html";
 
 	
 		// Lifted from utils.js so that we don't need to include that whole thing as an external dep.
@@ -80,7 +79,7 @@
 		 * @param overrideSettings array of name/value setting pairs to override
 		 * defaults upon initialization
 		 */
-		this.reconstruct = function (editor_mode, textarea_id, overrideSettings, message_type) {
+		this.reconstruct = function (editor_mode, textarea_id, overrideSettings) {
 	
 			// (1) If the editorMode is defined...
 			if (editorMode) {
@@ -93,7 +92,6 @@
 			textarea = null;
 			container = null;
 			editorMode = null;
-			messageType = message_type;
 	
 			// reset the settings array
 			this.clearSettings();
@@ -209,7 +207,7 @@
 			var overrideSettings = customSettings;
 	
 			// And remake ourselves
-			var res = this.reconstruct(newEditorMode, textarea_id, overrideSettings, message_type);
+			var res = this.reconstruct(newEditorMode, textarea_id, overrideSettings);
 			return(res);
 		};
 	
@@ -650,9 +648,6 @@
 	
 			var content = htmleditorobject.instance.getData();
 			var cleanedContent = this.cleanContent(content);
-			if(messageType == 'plain'){
-				cleanedContent = getPlainText(cleanedContent);
-			}
 			textarea.val(cleanedContent);
 	
 			// Hook a call to caller's callback for onchange event
@@ -834,24 +829,7 @@
 				return decodeURIComponent(data);
 			});
 		}
-
-		function getPlainText(html) {
-			var text = "";
-
-			//first replace breaks
-			text = html.replace(/<br>/gi, "\r\n");
-			text = text.replace(/<br\/>/gi, "\r\n");
-
-			// replace <p>
-			text = text.replace(/<p>/gi, "\r\n\r\n");
-			text = text.replace(/<\/p>/gi, "");
-			//replace space
-			text = text.replace(/&nbsp;/gi, ' ');
-
-
-			return text;
-		}
-
+	
 		/**
 		 * Corrects any html tags that may be inside a data-field insert.
 		 *
@@ -1082,6 +1060,6 @@
 		};
 
 		// Invoke out contstuct() method with the new() arguments supplied
-		this.reconstruct(editor_mode, textarea_id, overrideSettings, message_type);
+		this.reconstruct(editor_mode, textarea_id, overrideSettings);
 	}
 })(jQuery);

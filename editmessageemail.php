@@ -251,7 +251,7 @@ $formdata["subject"] = array(
 
 $helpsteps[] = _L("You may attach up to three files that are up to 2MB each. For greater security, only certain types ".
 	"of files are accepted.<br><br><b>Note:</b> Some email accounts may not accept attachments above a certain size and may reject your message.");
-if(count($attachments) > 0) {
+if(count($attachments) > 0 || $subtype == 'plain') {
 	$formdata["attachments"] = array(
 		"label" => _L('Attachments'),
 		"fieldhelp" => _L("You may attach up to three files that are up to 2MB each. For greater security, certain file " .
@@ -266,7 +266,7 @@ if(count($attachments) > 0) {
 // MESSAGE BODY
 if ($subtype == 'plain') {
 	// For plain text emails, use a plain textarea
-	$messagecontrol = array("HtmlTextArea", "subtype" => $subtype);
+	$messagecontrol = array("EmailMessageEditor", "subtype" => $subtype);
 	if ($languagecode == "en") {
 		$messagecontrol['spellcheck'] = true;
 	}
