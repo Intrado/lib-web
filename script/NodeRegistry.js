@@ -27,12 +27,18 @@ NodeRegistry = function () {
 
 		// Handle the named event
 		//
+		// @param name String name of the event to handle
+		//
 		// Returns true if this node has an event handler for this name and has invoked it,
 		// else false.
 		this.handleEvent = function (name) {
-			if (typeof this.events[name] !== 'function') return false;
-			this.events[name]();
-			return true;
+			var res = true;
+			if (typeof this.events[name] !== 'function') {
+				res = false;
+			}
+			else {
+				this.events[name]();
+			}
 		};
 	};
 
@@ -64,18 +70,21 @@ NodeRegistry = function () {
 
 		// Fire the named event
 		//
+		// @param name String name of the event to handle
+		// @param id String id of a specific node we want to fire the event on (optional; use null when skipping)
+		//
 		// If a node id is supplied, just fire the event on that one, otherwise iterate over
 		// all nodes and fire the event on each one.
 		fireEvent: function (name, id) {
 			if (id) {
-				if (! NodeRegistry.hasNode(id)) return false;
-				NodeRegistry.getNode(id).handleEvent(name);
+				if (NodeRegistry.hasNode(id)) {
+					NodeRegistry.getNode(id).handleEvent(name);
+				}
 			}
 			else {
 				for (var nodeId in nodes) {
 					NodeRegistry.getNode(nodeId).handleEvent(name);
 				}
-				
 			}
 		}
 	};
