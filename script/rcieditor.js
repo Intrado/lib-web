@@ -295,8 +295,6 @@
 					// Nothing extra to add for the plain legacy editor
 					break;
 				case 'plain':
-					this.setSetting('tool_mkfield', true);
-					this.setSetting('tool_attachmentlink', true);
 					// Nothing extra to add for the plain legacy editor
 					break;
 	

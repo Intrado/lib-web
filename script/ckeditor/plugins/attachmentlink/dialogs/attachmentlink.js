@@ -10,36 +10,21 @@ CKEDITOR.dialog.add('attachmentlink', function (editor) {
 			this.setupContent(element);
 		},
 		onOk: function () {
-			var value = this.getContentElement('tab1', 'viewattachmenturl').getInputElement().getValue() || this.getContentElement('tab1', 'customurl').getInputElement().getValue();
+			var value = this.getContentElement('tab1', 'viewattachmenturl').getInputElement().getValue();
 			if (!value) {
-				alert("Please upload an attachment or select a URL!");
+				alert("Please upload an attachment!");
 				return (false);
 			}
-			var displayName = this.getContentElement('tab1', 'displayname').getInputElement().getValue(),
-				url = this.getContentElement('tab1', 'customurl').getInputElement().getValue(),
-				location = url,
-				defaultDisplayName = url,
-				data = {
-					url: url,
-					displayName: displayName,
-					attachmentId: null
-				};
-
-			if (!url) {
-				var attachment = eval('(' + value + ')');
-				data.attachmentId = attachment.id;
-				defaultDisplayName = attachment.filename;
-				location = attachment.location;
-			}
-
-			if (displayName == null || displayName.trim() == "") {
-				data.displayName = defaultDisplayName;
-			}
-
+			var displayName = this.getContentElement('tab1', 'displayname').getInputElement().getValue();
+			var attachment = eval('(' + value + ')');
+			var data = {
+				displayName: (displayName == null || displayName.trim() == "") ? attachment.filename : displayName,
+				attachmentId: attachment.id,
+				location: attachment.location
+			};
 
 			var content = '<!--' + JSON.stringify(data) + '-->';
-
-			var tag = '<span class="message-attachment-placeholder" contenteditable=false><a href="' + location + '">' + content + data.displayName + ' </a></span>';
+			var tag = '<span class="message-attachment-placeholder" contenteditable=false><a href="' + data.location + '">' + content + data.displayName + ' </a></span>';
 
 			editor.insertHtml(tag);
 
@@ -55,27 +40,12 @@ CKEDITOR.dialog.add('attachmentlink', function (editor) {
 					{
 						id: 'instructions',
 						type: 'html',
-						html: 'Please either specify an document URL or upload an attachment file.'
+						html: 'Please upload an attachment file.'
 					},
 					{
 						id: 'displayname',
 						type: 'text',
 						label: 'Display Name',
-					},
-					{
-						id: 'customurl',
-						type: 'text',
-						label: 'Document URL',
-						setup: function (url) {
-							if (url && url.indexOf("emailattachment.php?id=") < 0) {
-								this.setValue(url);
-							}
-						}
-					},
-					{
-						id: 'switch',
-						type: 'html',
-						html: '<h3>Or</h3>'
 					},
 					{
 						id: 'upload',

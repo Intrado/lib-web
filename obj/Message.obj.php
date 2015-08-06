@@ -94,7 +94,6 @@ class Message extends DBMappedObject {
 			$messageAttachment->type = 'content';
 			$messageAttachment->contentattachmentid = $contentAttachment->id;
 			$messageAttachment->displayName = $origMessageAttachment->displayName;
-			$messageAttachment->url = $origMessageAttachment->url;
 			$messageAttachment->create();
 			$attachmentIds[$origMessageAttachment->id] = $messageAttachment->id;
 		}
@@ -268,7 +267,6 @@ class Message extends DBMappedObject {
 					$msgattachment->type = 'content';
 					$msgattachment->contentattachmentid = $part->context->attachmentId;
 					$msgattachment->displayName = $part->context->displayName;
-					$msgattachment->url = $part->context->url;
 					$msgattachment->create();
 
 					$part->type = "MAL";
@@ -318,11 +316,11 @@ class Message extends DBMappedObject {
 			
 			// get imageupload tags
 			$matches = array();
-			$uploadimageurl = "";
+			$uploadattachmenturl = "";
 			if (preg_match("/(\<img src\=\"[^\=]*viewimage\.php\?id\=)/", strtolower($data), $matches)) {
 				// we only care about the first match
-				$uploadimageurl = $matches[1];
-				$pos_i = stripos($data, $uploadimageurl);
+				$uploadattachmenturl = $matches[1];
+				$pos_i = stripos($data, $uploadattachmenturl);
 			} else {
 				$pos_i = false;
 			}
@@ -330,8 +328,8 @@ class Message extends DBMappedObject {
 			$matches = array();
 			if (preg_match("/(\<span class=\"message-attachment-placeholder\" contenteditable\=\"false\"\>\<a href\=\"[^\=]*emailattachment\.php\?id\=[0-9]+\"\>\<!--)/", strtolower($data), $matches)) {
 				// we only care about the first match
-				$uploadimageurl = $matches[1];
-				$pos_ma = stripos($data, $uploadimageurl);
+				$uploadattachmenturl = $matches[1];
+				$pos_ma = stripos($data, $uploadattachmenturl);
 			} else {
 				$pos_ma = false;
 			}
@@ -376,7 +374,7 @@ class Message extends DBMappedObject {
 			}
 
 			// Skip ahead past the beginning of the token; images are bigger than the rest due to HTML markup
-			$pos += ($type == 'I' || $type == 'MA') ? mb_strlen($uploadimageurl) : 2;
+			$pos += ($type == 'I' || $type == 'MA') ? mb_strlen($uploadattachmenturl) : 2;
 
 			// Assuming at least one char for audio/field name, find the end of the token
 			switch ($type){
@@ -585,7 +583,7 @@ class Message extends DBMappedObject {
 					$messageAttachment = new MessageAttachment($part->messageattachmentid);
 					$contentAttachment = new ContentAttachment($messageAttachment->contentattachmentid);
 					permitContent($contentAttachment->contentid);
-					$mal = '<span class="message-attachment-placeholder" contenteditable="false"><a href="emailattachment.php?id=' . $contentAttachment->contentid . "&name=" . $contentAttachment->filename . '"><!--{"attachmentId":"' . $messageAttachment->id . '","url":"' . $messageAttachment->url . '","displayName":"' . $messageAttachment->displayName . '"}-->' . $messageAttachment->displayName . ' </a></span>';
+					$mal = '<span class="message-attachment-placeholder" contenteditable="false"><a href="emailattachment.php?id=' . $contentAttachment->contentid . "&name=" . $contentAttachment->filename . '"><!--{"attachmentId":"' . $messageAttachment->id . '"displayName":"' . $messageAttachment->displayName . '"}-->' . $messageAttachment->displayName . ' </a></span>';
 					$partstr .= ($messageAttachment->displayName) ? $mal : '<{' . $messageAttachment->type . ':#' . $part->messageattachmentid . '}>';
 					break;
 
