@@ -3024,6 +3024,9 @@ ALTER TABLE reportsdddelivery
   MODIFY COLUMN action ENUM('CLICK', 'DOWNLOAD', 'BAD_PASSWORD') NOT NULL
 $$$
 
+update setting set value='11.2/5' where name='_dbversion'
+$$$
+
 -- END 11.2/5
 
 -- 11.2/6 no change, just cleanup jobsetting records
@@ -3032,3 +3035,54 @@ $$$
 
 -- END 11.2/6
 
+ALTER TABLE access
+  DROP INDEX `id`
+$$$
+
+ALTER TABLE cmafeedcategory
+  DROP INDEX `feedcategoryid`,
+  ADD INDEX (cmacategoryid, feedcategoryid);
+$$$
+
+ALTER TABLE job
+  DROP INDEX `enddate`,
+  DROP INDEX `endtime`,
+  DROP INDEX `starttime`,
+  DROP INDEX `startdate`
+$$$
+
+ALTER TABLE reportemaildelivery
+  DROP INDEX `time`
+$$$
+
+ALTER TABLE reportsubscription
+  DROP INDEX `modifydate`,
+  DROP INDEX `nextrun`
+$$$
+
+update setting set value='11.2/7' where name='_dbversion'
+$$$
+
+-- END 11.2/7
+
+ALTER TABLE user
+  ADD COLUMN `sms` varchar(20) NOT NULL DEFAULT '' AFTER `aremail`
+$$$
+
+update setting set value='11.2/8' where name='_dbversion'
+$$$
+
+-- END 11.2/8
+
+-- 11.3/x no changes to customer database
+
+ALTER TABLE `content`
+  ADD COLUMN `width` INT NULL,
+  ADD COLUMN `height` INT NULL,
+  ADD COLUMN `originalContentId` BIGINT NULL
+$$$
+
+update setting set value='11.4/1' where name='_dbversion'
+$$$
+
+-- END 11.4/1
