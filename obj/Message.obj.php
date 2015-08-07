@@ -529,16 +529,11 @@ class Message extends DBMappedObject {
 													$content->originalcontentid = $originalContent->id;
 													$content->create();
 													$content->refresh();
-error_log("Created custom resized image: id={$content->id} {$width}x{$height}"); 
 												}
-else error_log("Failed to resize image!"); 
 											}
-else error_log("Failed to contentGet() the original content!"); 
 										}
-else error_log("Image size was unchanged!"); 
 									}
 								}
-else error_log("Image was not resized with CKEditor!"); 
 							}
 
 							// Capture the current content ID

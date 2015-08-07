@@ -59,7 +59,18 @@ function contentPut ($filename,$contenttype, $base64 = false) {
 		$content->data = file_get_contents($filename);
 
 	$content->contenttype = $contenttype;
-	$content->width = $content->height = $content->originalcontentid = null;
+	$content->originalcontentid = null;
+
+	// Capture this original content upload's height/width properties (if possible)
+	$content->width = $content->height = null;
+	$res = getimagesize($filename);
+	if (false !== $res) {
+		// Make sure this file's mimetype is one that we explicitly support for height/width...
+		if (in_array($res[2], array(IMG_PNG, IMG_JPG, IMG_JPEG, IMG_GIF))) {
+			$content->width = intval($res[0]);
+			$content->height = intval($res[1]);
+		}
+	}
 	if ($content->update()) {
 		$result = $content->id;
 	}
