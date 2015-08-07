@@ -103,7 +103,7 @@ $dbversions = array(
 	"authserver" => array(
 		"11.0/2",
 		"11.2/2",
-		"11.3/4"
+		"11.3/5"
 	),
 
 	"aspshard" => array(

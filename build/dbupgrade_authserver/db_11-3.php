@@ -16,6 +16,9 @@ function authserver_upgrade_11_3($rev, $db) {
 	case 3:
 		echo "|";
 		apply_sql_db("dbupgrade_authserver/db_11-3_pre.sql", $db, 4);
+	case 4:
+		echo "|";
+		apply_sql_db("dbupgrade_authserver/db_11-3_pre.sql", $db, 5);
 	}
 
 	return true;
