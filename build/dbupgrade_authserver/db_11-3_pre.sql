@@ -210,3 +210,11 @@ $$$
 
 UPDATE dm SET dmgroupid = dmgroupid + 22 WHERE dmgroupid <= 22
 $$$
+
+-- $rev 5
+
+INSERT INTO dmgroupsetting (dmgroupid, name, value)
+  SELECT id, 'taskJms.resourceBackPressure', '10'
+  FROM dmgroup
+  WHERE id >= 23
+$$$
