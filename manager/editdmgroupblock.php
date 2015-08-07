@@ -123,7 +123,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 								pattern=?,
 								notes=?
 								where id=?", $lcrdbcon,
-				array($postdata["carrireRateModelId"], $postdata["pattern"], $postdata["notes"], $crmbid));
+				array($postdata["carrireRateModelClassname"], $postdata["pattern"], $postdata["notes"], $crmbid));
 		} else {
 			QuickUpdate("insert into carrierratemodelblock (carrierRateModelClassname, pattern, notes) values (?,?,?)" , $lcrdbcon,
 				array($postdata["carrierRateModelClassname"], $postdata["pattern"], $postdata["notes"]));
