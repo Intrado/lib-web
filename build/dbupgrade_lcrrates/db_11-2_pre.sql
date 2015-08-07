@@ -45,3 +45,4 @@ ALTER TABLE xorates
   DROP INDEX `state`
 $$$
 
+

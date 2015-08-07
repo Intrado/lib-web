@@ -110,5 +110,9 @@ feedbackCategories = "Contact Management, Interface / Usability, Message Sending
 ; Feedback Types for the UI drop-down selection (subject to translation)
 feedbackTypes = "Compliment, Product Question, Product Request, Other"
 
+[instrumentation]
+;newrelic_messagesender_id=""
+;newrelic_license_key=""
+
 ;*/?>
 

@@ -795,19 +795,35 @@ if ($submittedmode || $completedmode) {
 		"control" => array("CheckBox"),
 		"helpstep" => $helpstepnum
 	);
-	$formdata[] = _L('Message');
-	$formdata["message"] = array(
-		"label" => _L('Message'),
-		"fieldhelp" => _L('Select a message from your existing messages.'),
-		"value" => (((isset($job->messagegroupid) && $job->messagegroupid))?$job->messagegroupid:""),
-		"validators" => array(
-			array("ValRequired"),
-			array("ValInArray","values"=>array_keys($messages)),
-			array("ValMessageGroup","values"=>array("USER"=>$USER))
-		),
-		"control" => array("MessageGroupSelectMenu", "values" => $messages,"jobtypeidtarget" => "jobtype"),
-		"helpstep" => ++$helpstepnum
-	);
+
+	if (isset($_REQUEST["api"])) {
+		$formdata[] = _L('Message');
+		$formdata["message"] = array(
+			"label" => _L('Message'),
+			"fieldhelp" => _L('Select a message from your existing messages.'),
+			"value" => (((isset($job->messagegroupid) && $job->messagegroupid)) ? $job->messagegroupid : ""),
+			"validators" => array(
+				array("ValRequired"),
+				array("ValMessageGroup")
+			),
+			"control" => array("MessageGroupSelectMenu", "values" => $messages, "jobtypeidtarget" => "jobtype"),
+			"helpstep" => ++$helpstepnum
+		);
+	} else {
+		$formdata[] = _L('Message');
+		$formdata["message"] = array(
+			"label" => _L('Message'),
+			"fieldhelp" => _L('Select a message from your existing messages.'),
+			"value" => (((isset($job->messagegroupid) && $job->messagegroupid)) ? $job->messagegroupid : ""),
+			"validators" => array(
+				array("ValRequired"),
+				array("ValInArray", "values" => array_keys($messages)),
+				array("ValMessageGroup","values"=>array("USER"=>$USER))
+			),
+			"control" => array("MessageGroupSelectMenu", "values" => $messages, "jobtypeidtarget" => "jobtype"),
+			"helpstep" => ++$helpstepnum
+		);
+	}
 
 	if ($JOBTYPE != "repeating") {
 		$formdata["message"]["requires"] = array("date");

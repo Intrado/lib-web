@@ -58,6 +58,8 @@ if (isset($_GET['download'])) {
 
 
 $usercount = QuickQuery("select count(*) from user where enabled = 1 and login != 'schoolmessenger' and accessid is not null");
+$inactiveusercount = QuickQuery("select count(*) from user where enabled = 0 and deleted = 0 and login != 'schoolmessenger' and accessid is not null");
+
 $maxusers = getSystemSetting("_maxusers","unlimited");
 
 $maxreached = $maxusers != "unlimited" && $usercount >= $maxusers;
@@ -343,33 +345,69 @@ function show_user_table($containerID) {
 	return $html;
 }
 
-// check if we should display active or inactive users.
-$display = $_GET['display'];
+// set display to match GET parameter or default 'active'
+if ( isset($_GET['display']) ) {
+	
+	$display = $_GET['display'];
+	
+} else if ( isset($_SESSION['usersdisplaymode'] ) ) {
+	
+	$display = $_SESSION['usersdisplaymode'];
+	
+} else {
+	
+	$display = 'active';
+}
+
+$_SESSION['usersdisplaymode'] = $display;
+
+//if (isset($_SESSION['usersdisplaymode'])) {
+//	$display = $_SESSION['usersdisplaymode'];
+//} else {
+//	$_SESSION['usersdisplaymode'] = $display;
+//}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "admin:users";
-$TITLE = "User List";
+?>
 
-$DESCRIPTION = "Active Users: $usercount";
-if($maxusers != "unlimited") {
-	$DESCRIPTION .= ", Maximum Allowed: $maxusers";
-}
+<link href="css/users.css" type="text/css" rel="stylesheet">
 
-if($display !== 'inactive') {
-    $DESCRIPTION .= ',&nbsp;&nbsp;<a href="users.php?display=inactive">'._L("View Inactive Users").'</a>';
-}
+<?
 
-if($display === 'inactive') {
-    $DESCRIPTION .= ',&nbsp;&nbsp;<a href="users.php">'._L("View Active Users").'</a>';
+if ($display === 'inactive' ) {
+	
+	$TITLE = "Inactive User List";
+	$DESCRIPTION = '<a href="users.php?display=active">'._L("View Active Users").'</a>';
+	$DESCRIPTION .= "&nbsp;&nbsp;Inactive Users: $inactiveusercount";
+	
+} else {
+	
+	$TITLE = "Active User List";
+	$DESCRIPTION = '<a href="users.php?display=inactive">'._L("View Inactive Users").'</a>';
+	$DESCRIPTION .= "&nbsp;&nbsp;Active Users: $usercount";
+	
+	if ($maxusers != "unlimited") {
+		$DESCRIPTION .= ", Maximum Allowed: $maxusers";
+	}
 }
 
 $DESCRIPTION .= '&nbsp;&nbsp;'.icon_button(_L('Download User Details CSV'),"report",null,"users.php?download");
 
 include_once("nav.inc.php");
 
-if($display !== 'inactive') {
+if(	$display === 'inactive') {
+
+startWindow('Inactive Users ' . help('Users_InactiveUsersList'),null, true);
+	echo '<div id="inactiveUsersContainer">';
+		echo show_user_table('inactiveUsersContainer');
+	echo '</div>';
+endWindow();
+
+} else {
+
 startWindow('Active Users ' . help('Users_ActiveUsersList'),null, true);
 	?>
 	<div class="feed_btn_wrap cf">
@@ -380,14 +418,9 @@ startWindow('Active Users ' . help('Users_ActiveUsersList'),null, true);
 		echo show_user_table('activeUsersContainer');
 	echo '</div>';
 endWindow();
+
 }
 
-if($display === 'inactive') {
-startWindow('Inactive Users ' . help('Users_InactiveUsersList'),null, true);
-	echo '<div id="inactiveUsersContainer">';
-		echo show_user_table('inactiveUsersContainer');
-	echo '</div>';
-endWindow();
-}
 include_once("navbottom.inc.php");
+
 ?>

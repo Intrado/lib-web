@@ -162,23 +162,48 @@ function fmt_resources ($row,$index) {
 	return $str;
 }
 function fmt_routetype($row, $index){
+	global $dmgroups;
+	$dmgroupid = $row[15];
 	$routetypes = array("firstcall" => "Firstcall","lastcall" => "Lastcall","" => "Other");
-	$routetype = $row[$index];
+	$routetype = isset($dmgroups[$dmgroupid])?$dmgroups[$dmgroupid]["routeType"]:"";
 	return isset($routetypes[$routetype])?$routetypes[$routetype]:"Unknown";
+}
+function fmt_dmgroupname($row, $index){
+	global $dmgroups;
+	$dmgroupid = $row[15];
+	return isset($dmgroups[$dmgroupid])?$dmgroups[$dmgroupid]["name"]:"";
+}
+function fmt_dmgroupratemodel($row, $index){
+	global $dmgroups,$carrierRateModels;
+	$dmgroupid = $row[15];
+	$carrierRateModelId = isset($dmgroups[$dmgroupid])?$dmgroups[$dmgroupid]["carrierRateModelId"]:"";
+	return isset($carrierRateModels[$carrierRateModelId])?$carrierRateModels[$carrierRateModelId]["name"]:"Unknown";
 }
 
 function fmt_dmgroupcarrier($row, $index){
 	global $dmgroups;
 	$dmgroupid = $row[15];
-	return isset($dmgroups[$dmgroupid])?$dmgroups[$dmgroupid]->carrier:"";
+	return isset($dmgroups[$dmgroupid])?$dmgroups[$dmgroupid]["carrier"]:"";
 }
+
 function fmt_dmgroupstate($row, $index){
 	global $dmgroups;
 	$dmgroupid = $row[15];
-	return isset($dmgroups[$dmgroupid])?$dmgroups[$dmgroupid]->state:"";
+	return isset($dmgroups[$dmgroupid])?$dmgroups[$dmgroupid]["state"]:"";
 }
 
-$dmgroups = DBFindMany("DmGroup", "from dmgroup");
+$dmgroups = array();
+$dmGroupQuery = "select dmgroup.id, dmgroup.name, dmgroup.routeType, dmgroup.carrierRateModelId from dmgroup";
+$result = Query($dmGroupQuery);
+while($row = DBGetRow($result,true)) {
+	$dmgroups[$row['id']] = $row;
+}
+$lcrdbcon = DBConnect($SETTINGS['lcrdb']['host'], $SETTINGS['lcrdb']['user'], $SETTINGS['lcrdb']['pass'], $SETTINGS['lcrdb']['db']);
+$carrierRateModels = array();
+$result = Query("select id,name from carrierratemodel",$lcrdbcon);
+while($row = DBGetRow($result,true)) {
+	$carrierRateModels[$row['id']] = $row;
+}
 
 $dms = array();
 $query = "select dm.id, dm.name, dm.authorizedip, dm.lastip,
@@ -249,9 +274,9 @@ $titles[11] = "Resources";
 $titles[12] = "@#Inbound";
 $titles[7] = "@#DM UUID";
 $titles[8] = "@#Cmd";
-$titles[14] = "#Route Type";
-$titles["carrier"] = "#Carrier";
-$titles["state"] = "#State";
+$titles["dmgroupname"] = "#Dm Group Name";
+$titles["ratemodel"] = "@#Rate Model";
+$titles["routetype"] = "@#Route Type";
 $titles[16] = "#Notes";
 $titles["actions"] = "Actions";
 
@@ -268,9 +293,9 @@ $formatters = array("actions" => "fmt_DMActions",
 					5 => "fmt_lastseen",
 					4 => "fmt_state",
 					11 => "fmt_resources",
-					14 => "fmt_routetype",
-					"carrier" => "fmt_dmgroupcarrier",
-					"state" => "fmt_dmgroupstate");
+					"dmgroupname" => "fmt_dmgroupname",
+					"ratemodel" => "fmt_dmgroupratemodel",
+					"routetype" => "fmt_routetype");
 
 $filterFormatters = array("status" => "fmt_dmstatus_nohtml",4 => "fmt_state");
 /////////////////////////////

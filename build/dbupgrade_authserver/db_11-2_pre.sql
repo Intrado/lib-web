@@ -14,4 +14,3 @@ $$$
 ALTER TABLE server
   DROP INDEX `name`
 $$$
-

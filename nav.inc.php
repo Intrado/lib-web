@@ -59,7 +59,7 @@ $NAVTREE = array (
 		)),
 	array("Admin",NULL,array('manageaccount', 'manageprofile', 'managesystem',
 						'metadata', 'managetasks', 'manageclassroommessaging'),$MAINTAB=="admin",array(
-		array("Users","users.php","manageaccount",$SUBTAB=="users"),
+		array("Users","users.php?display=active","manageaccount",$SUBTAB=="users"),
 		array("Profiles","profiles.php","manageprofile",$SUBTAB=="profiles"),
 		array("Settings","settings.php",array("managesystem","metadata","manageclassroommessaging"),$SUBTAB=="settings"),
 		array("Imports","tasks.php","managetasks",$SUBTAB=="taskmanager")
@@ -158,8 +158,11 @@ header('Content-type: text/html; charset=UTF-8') ;
 <!DOCTYPE html>
 <html>
 <head>
+
 	<meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+	<? include('inc/newrelic.inc.php') ?>
 
 	<title><?= getBrand();?>: <?= $PAGETITLE ?></title>
 

@@ -239,7 +239,7 @@ function putSessionData($id, $sess_data) {
 	$method = "AuthServer.putSessionData";
 	$result = pearxmlrpc($method, $params);
 	if ($result === false) { 
-		error_log_helper("ERROR trying to putSessionData for '$id'");
+		error_log_helper("ERROR trying to putSessionData for '$id'", false);
 		return false;
 	} else {
 		return true;
