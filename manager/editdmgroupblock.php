@@ -53,7 +53,7 @@ $helpstepnum = 1;
 
 $helpsteps[] = "TODO: Rare Model";
 $lcrdbcon = DBConnect($SETTINGS['lcrdb']['host'], $SETTINGS['lcrdb']['user'], $SETTINGS['lcrdb']['pass'], $SETTINGS['lcrdb']['db']);
-$carrierratemodels = QuickQueryList("select distinct classname, classname from carrierratemodel",true,$lcrdbcon);
+$carrierratemodels = QuickQueryList("select distinct classname, classname from carrierratemodel order by classname",true,$lcrdbcon);
 $formdata["carrierRateModelClassname"] = array(
 	"label" => _L('Rate Model'),
 	"value" => $crmbinfo["carrierRateModelClassname"],
