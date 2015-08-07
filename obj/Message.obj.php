@@ -265,8 +265,8 @@ class Message extends DBMappedObject {
 					$msgattachment = new MessageAttachment();
 					$msgattachment->messageid = $this->id;
 					$msgattachment->type = 'content';
-					$msgattachment->contentattachmentid = $part->context->attachmentId;
-					$msgattachment->displayName = $part->context->displayName;
+					$msgattachment->contentattachmentid = $part->context["attachmentId"];
+					$msgattachment->displayName = $part->context["displayName"];
 					$msgattachment->create();
 
 					$part->type = "MAL";
@@ -326,7 +326,7 @@ class Message extends DBMappedObject {
 			}
 
 			$matches = array();
-			if (preg_match("/(\<span class=\"message-attachment-placeholder\" contenteditable\=\"false\"\>\<a href\=\"[^\=]*emailattachment\.php\?id\=[0-9]+\"\>\<!--)/", strtolower($data), $matches)) {
+			if (preg_match("/(\<a class=\"message-attachment-placeholder\" contenteditable\=\"false\" href\=\"[^\=]*emailattachment\.php\?)/", strtolower($data), $matches)) {
 				// we only care about the first match
 				$uploadattachmenturl = $matches[1];
 				$pos_ma = stripos($data, $uploadattachmenturl);
@@ -383,7 +383,7 @@ class Message extends DBMappedObject {
 				case "newlang": $endtoken = "]]"; break;
 				case "I": $endtoken = '">'; break;
 				case "MAL": $endtoken = '}>'; break;
-				case "MA": $endtoken = '</a></span>'; break;
+				case "MA": $endtoken = '</a>'; break;
 			}
 			$length = @strpos($data, $endtoken, $pos + 1);
 
@@ -429,13 +429,15 @@ class Message extends DBMappedObject {
 
 						break;
 					case 'MA':
-						$posi = stripos($token, "-->");
-						$token  = substr($token, 0, $posi);
-						$obj = json_decode($token);
+						$posi = stripos($token, "\">");
+						$params = substr($token, 0, $posi);
+						$decoded_parms = html_entity_decode($params, null, 'UTF-8');
+						parse_str($decoded_parms, $parms);
 
+						$displayName = trim(substr($token, $posi + 2));
 						// Finish preparing the message part
 						$part->sequence = $partcount++;
-						$part->context= $obj;
+						$part->context = array("attachmentId" => $parms["caid"], "displayName" => $displayName);
 						$parts[] = $part;
 						break;
 
@@ -583,8 +585,8 @@ class Message extends DBMappedObject {
 					$messageAttachment = new MessageAttachment($part->messageattachmentid);
 					$contentAttachment = new ContentAttachment($messageAttachment->contentattachmentid);
 					permitContent($contentAttachment->contentid);
-					$mal = '<span class="message-attachment-placeholder" contenteditable="false"><a href="emailattachment.php?id=' . $contentAttachment->contentid . "&name=" . $contentAttachment->filename . '"><!--{"attachmentId":"' . $messageAttachment->id . '"displayName":"' . $messageAttachment->displayName . '"}-->' . $messageAttachment->displayName . ' </a></span>';
-					$partstr .= ($messageAttachment->displayName) ? $mal : '<{' . $messageAttachment->type . ':#' . $part->messageattachmentid . '}>';
+					$mal = '<a class="message-attachment-placeholder" contenteditable="false" href="emailattachment.php?id=' . $contentAttachment->contentid . "&caid=" . $contentAttachment->id . "&name=" . $contentAttachment->filename . '">' . $messageAttachment->displayName . '</a>';
+					$partstr .= ($messageAttachment->type == "burst") ? '<{' . $messageAttachment->type . ':#' . $part->messageattachmentid . '}>' : $mal;
 					break;
 
 				case 'A':

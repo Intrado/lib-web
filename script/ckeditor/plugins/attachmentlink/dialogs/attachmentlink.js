@@ -17,14 +17,10 @@ CKEDITOR.dialog.add('attachmentlink', function (editor) {
 			}
 			var displayName = this.getContentElement('tab1', 'displayname').getInputElement().getValue();
 			var attachment = eval('(' + value + ')');
-			var data = {
-				displayName: (displayName == null || displayName.trim() == "") ? attachment.filename : displayName,
-				attachmentId: attachment.id,
-				location: attachment.location
-			};
+			var displayName = (displayName == null || displayName.trim() == "") ? attachment.filename : displayName;
+			var location = attachment.location + "?id=" + attachment.contentId + "&caid=" + attachment.attachmentId + "&name=" + attachment.filename;
 
-			var content = '<!--' + JSON.stringify(data) + '-->';
-			var tag = '<span class="message-attachment-placeholder" contenteditable=false><a href="' + data.location + '">' + content + data.displayName + ' </a></span>';
+			var tag = '<a class="message-attachment-placeholder" contenteditable="false" href="' + location + '">' + displayName + ' </a>';
 
 			editor.insertHtml(tag);
 

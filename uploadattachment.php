@@ -41,8 +41,8 @@ if (((getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost'
 		$contentAttachment->create();
 		Query("COMMIT");
 
-		$location = "$BASEURL/emailattachment.php?id=" . $contentAttachment->contentid;
-		$data = array("location" => $location, "id" => $contentAttachment->id, "contentid" => $contentAttachment->contentid, "filename" => $contentAttachment->filename);
+		$location = "$BASEURL/emailattachment.php";
+		$data = array("location" => $location, "attachmentId" => $contentAttachment->id, "contentId" => $contentAttachment->contentid, "filename" => $contentAttachment->filename);
 		$results = json_encode($data);
 
 	} else if (is_string($content)) {
