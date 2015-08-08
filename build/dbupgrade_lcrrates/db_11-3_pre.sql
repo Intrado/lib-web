@@ -64,3 +64,15 @@ $$$
 
 UPDATE `carrierratemodel` SET `classname` = 'SimpleRateModel' WHERE `classname` = 'simple'
 $$$
+
+-- $rev 3
+
+TRUNCATE TABLE `carrierratemodelblock`
+$$$
+
+INSERT INTO `carrierratemodelblock` (`carrierRateModelClassname`, `pattern`)
+SELECT DISTINCT g.`carrierRateModelClassname`, b.`pattern`
+FROM `authserver`.`dmgroupblock` b
+JOIN `authserver`.`dmgroup_map` m ON (m.`oldId` = b.`dmgroupid`)
+JOIN `authserver`.`dmgroup` g ON (m.`newId` = g.`id`)
+$$$
