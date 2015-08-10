@@ -31,7 +31,7 @@ CKEDITOR.dialog.add('attachmentlink', function (editor) {
 				label: 'Attachment',
 				title: 'Attachment',
 				filebrowser: 'uploadbutton',
-				padding: 2,
+				padding: 3,
 				elements: [
 					{
 						id: 'instructions',
@@ -49,7 +49,6 @@ CKEDITOR.dialog.add('attachmentlink', function (editor) {
 						label: 'Upload',
 						onLoad: function () {
 							CKEDITOR.document.getById(this._.frameId).on('load', function () {
-								var inputelement = this.getInputElement();
 								var uploadbutton = this.getDialog().getContentElement('tab1', 'uploadbutton');
 							}.bind(this));
 						}

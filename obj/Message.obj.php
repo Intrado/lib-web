@@ -261,7 +261,7 @@ class Message extends DBMappedObject {
 					$part->voiceid = $voiceid;
 				}
 
-				if($part->type=='MA'){
+				if($part->type=='HMAL'){
 					$msgattachment = new MessageAttachment();
 					$msgattachment->messageid = $this->id;
 					$msgattachment->type = 'content';
@@ -351,7 +351,7 @@ class Message extends DBMappedObject {
 				if($pos === $pos_l) $type = 'newlang';
 				if($pos === $pos_i) $type = 'I';
 				if($pos === $pos_mal) $type = 'MAL';
-				if($pos === $pos_ma) $type = 'MA';
+				if($pos === $pos_ma) $type = 'HMAL';
 			}
 
 			//make a text part up to the pos of the field
@@ -374,7 +374,7 @@ class Message extends DBMappedObject {
 			}
 
 			// Skip ahead past the beginning of the token; images are bigger than the rest due to HTML markup
-			$pos += ($type == 'I' || $type == 'MA') ? mb_strlen($uploadattachmenturl) : 2;
+			$pos += ($type == 'I' || $type == 'HMAL') ? mb_strlen($uploadattachmenturl) : 2;
 
 			// Assuming at least one char for audio/field name, find the end of the token
 			switch ($type){
@@ -383,7 +383,7 @@ class Message extends DBMappedObject {
 				case "newlang": $endtoken = "]]"; break;
 				case "I": $endtoken = '">'; break;
 				case "MAL": $endtoken = '}>'; break;
-				case "MA": $endtoken = '</a>'; break;
+				case "HMAL": $endtoken = '</a>'; break;
 			}
 			$length = @strpos($data, $endtoken, $pos + 1);
 
@@ -428,7 +428,8 @@ class Message extends DBMappedObject {
 						}
 
 						break;
-					case 'MA':
+					//Message Attachment link with different parsing logic
+					case 'HMAL':
 						$posi = stripos($token, "\">");
 						$params = substr($token, 0, $posi);
 						$decoded_parms = html_entity_decode($params, null, 'UTF-8');
