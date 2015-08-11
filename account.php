@@ -425,7 +425,7 @@ if (getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost')) {
 	
 	$formdata["twitterauth"] = array(
 		"label" => _L('Add Twitter Account'),
-		"fieldhelp" => _L("Authorize this application to post to your Twitter account. If you want to authorize a different account, you must first log out of Twitter from their web site."),
+		"fieldhelp" => _L("Authorize this application to post to your Twitter account(s)."),
 		"value" => false,
 		"validators" => array(),
 		"control" => array("TwitterAuth", "submit" => true),

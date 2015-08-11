@@ -11,68 +11,77 @@ class TwitterAuth extends FormItem {
 		
 		$n = $this->form->name."_".$this->name;
 
-		$twitter = new Twitter($USER->getSetting("tw_access_token", false));
-		$validToken = $twitter->hasValidAccessToken();
+		$str = $scriptStr = '';
+		$twAccessTokens = json_decode($USER->getSetting("tw_access_token", false));
+		if (is_array($twAccessTokens) && (count($twAccessTokens) > 0)) {
+			for ($xx = 0; $xx < count($twAccessTokens); $xx++) {
+
+				// Get the one we're working with; xx is our enumerator for DHTML operations...
+				$dn = $n . "_{$xx}";
+				$twitter = new Twitter($twAccessTokens[$xx], false);
+				$validToken = $twitter->hasValidAccessToken();
+
+				// Per-twitter account containers
+				$str .= '<input id="' . $dn . '" name="' . $dn . '" type="hidden" value="' . escapehtml($twAccessTokens[$xx]->user_id) . '"/>';
+				$str .= '<div id="' . $dn . 'twdetails">';
+				$str .= '<div id="' . $dn . 'twconnected" style="border: 1px dotted grey; padding: 5px;' . (($validToken) ? "" : "display:none;") . '">';
+				$str .= '<div id="' . $dn . 'twuser"></div>';
+				
+				// button to remove access_token
+				$str .= icon_button("Disconnect this Twitter Account", "custom/twitter" ,"twClearValue('" . $dn . "')");
+				
+				$str .= '<div style="clear: both"></div></div>';
+				
+				// disconnected options div
+				$scriptStr .= 'twLoadUserData("' . $dn . 'twuser", "' . escapehtml($twAccessTokens[$xx]->user_id) . '");' . "\n";
+			}
+		}
 
 
-		
-		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($validToken).'"/>';
-
-		// main details div
-		$str .= '<div id="'. $n. 'twdetails">';
-		
-		// connected options div
-		$str .= '<div id="'. $n. 'twconnected" style="border: 1px dotted grey; padding: 5px;'. (($validToken)? "": "display:none;"). '">';
-		
-		$str .= '<div id="'. $n. 'twuser"></div>';
-		
-		// button to remove access_token
-		$str .= icon_button("Disconnect this Twitter Account", "custom/twitter" ,"twClearValue('".$n."')");
-		
-		$str .= '<div style="clear: both"></div></div>';
-		
-		// disconnected options div
-		$str .= '<div id="'. $n. 'twdisconnected" style="'. (($validToken)? "display:none;": ""). '">';
-		
 		// Do twitter login to get good auth token
+		$str .= submit_button(_L('Connect to Twitter'), 'twitterauth', 'custom/twitter');
+		/*
 		if (isset($this->args["submit"])) {
 			$str .= submit_button(_L("Connect to Twitter"), "twitterauth", "custom/twitter");
-		} else {
+		}
+		else {
 			$thispage = substr($_SERVER["SCRIPT_NAME"], strrpos($_SERVER["SCRIPT_NAME"], "/") + 1);
 			$str .= icon_button(_L("Connect to Twitter"), "custom/twitter", "", "twitterauth.php/$thispage");
 		}
-		
+		*/
+
 		$str .= '<div style="clear: both"></div></div></div>';
-		
-		$str .= '<script type="text/javascript">
-		
-			if ('. (($validToken)?"true":"false"). ') {
-				twLoadUserData("'. $n. 'twuser");
-			}
-		
+
+		return $str . "\n\n" . '
+			<script type="text/javascript">
 			function twClearValue(formitem) {
-				$(formitem).value = "";
+				var fi = $(formitem);
+				var user_id = fi.value;
+				fi.value = "";
 				
 				// ajax request to remove it from the db
-				new Ajax.Request("ajaxtwitter.php", {
-					method:"post",
-					parameters: {
-						"type": "store_access_token",
-						"access_token": false}});
+				new Ajax.Request("ajaxtwitter.php",
+					{
+						method:"post",
+						parameters: {
+							"type": "delete_access_token",
+							"user_id": user_id
+						}
+					}
+				);
 				
 				// display the connect button
 				$(formitem + "twconnected").setStyle({display: "none"});
-				$(formitem + "twdisconnected").setStyle({display: "block"});
-				
 			}
 			
-			function twLoadUserData(element) {
+			function twLoadUserData(element, user_id) {
 				element = $(element);
 				element.update(new Element("img", { src: "img/ajax-loader.gif" }));
 				new Ajax.Request("ajaxtwitter.php", {
 					method:"get",
 					parameters: {
-						"type": "user"
+						"type": "user",
+						"user_id": user_id
 					},
 					onSuccess: function(r) {
 						var data = r.responseJSON;
@@ -89,7 +98,8 @@ class TwitterAuth extends FormItem {
 							var profile_box = new Element("div").setStyle({ float: "left", padding: "7px" }).insert(screen_name).insert(name);
 							e.insert(profile_box);
 							element.update(e);
-						} else {
+						} 
+						else {
 							element.update();
 						}
 					},
@@ -98,9 +108,7 @@ class TwitterAuth extends FormItem {
 					}
 				});
 			}
-			</script>';
-		
-		return $str;
+		' . $scriptStr . '</script>';
 	}
 }
 

@@ -27,8 +27,27 @@ if (isset($_GET['oauth_token']) && isset($_GET['oauth_verifier']) && isset($_SES
 	);
 	
 	// get the access token and store it in the DB for this user
-	$twAccessToken = $twitter->getAccessToken($_GET['oauth_verifier']);
-	$USER->setSetting("tw_access_token", json_encode($twAccessToken));
+	$newTwAccessToken = $twitter->getAccessToken($_GET['oauth_verifier']);
+
+	// Remove any an usersettings entry with the same account ID...
+	$existingTwAccessTokens = json_decode($USER->getSetting("tw_access_token", false));
+	$finalTwAccessTokens = array();
+	if (is_array($existingTwAccessTokens) && (count($existingTwAccessTokens) > 0)) {
+		// so for each of the currently stored access tokens...
+		for ($xx = 0; $xx < count($existingTwAccessTokens); $xx++) {
+
+			// If the account is a different one...
+			if ($existingTwAccessTokens[$xx]->user_id !== $newTwAccesstoken->user_id) {
+				// Migrate this one into the final collection
+				$finalTwAccessTokens = $existingTwAccssTokens[$xx];
+			}
+		}
+	}
+	// Add this new one to the collection
+	$finalTwAccessTokens[] = $newTwAccessToken;
+	$finalEncoded = json_encode($finalTwAccessTokens);
+//error_log('setting new twitter auth: ' . $finalEncoded);
+	$USER->setSetting("tw_access_token", $finalEncoded);
 	
 	// remove temporary session data
 	unset($_SESSION['twitterRequestToken']);
@@ -37,7 +56,8 @@ if (isset($_GET['oauth_token']) && isset($_GET['oauth_verifier']) && isset($_SES
 	$caller = substr($_SERVER['PATH_INFO'], 1);
 	redirect("../". $caller);
 	
-} else {
+}
+else {
 	// can't get an authorize url with a valid access token so create a temp connection w/o one
 	$unauthconnection = new Twitter(false);
 		

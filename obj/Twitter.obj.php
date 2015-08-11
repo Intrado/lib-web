@@ -2,13 +2,25 @@
 
 class Twitter extends TwitterOAuth {
 
-	protected $sesskey = 'twitter_userdata';
+	protected $sesskey = 'twitter_userdata_cache';
 
-	public function __construct($jsonAccessToken = false) {
+	/**
+	 * Three different modes of construction:
+	 *
+	 * 1) No args, makes an unautenticated conneciton with twitter
+	 * 2) JSON string encoded twitter access token object
+	 * 3) PHP object of the same thing that the JSON version encodes
+	 *
+	 * @param $accessToken Mixed access token JSON or PHP object or boolean false (opitonal)
+	 * @param $fromJson Boolean true if accessToken is a JSON encoded object
+	 *
+	 */
+	public function __construct($accessToken = false, $fromJson = true) {
 		global $SETTINGS;
-
-		if ($jsonAccessToken) {
-			$twitterdata = json_decode($jsonAccessToken);
+		if ($accessToken ) {
+			$twitterdata = $fromJson ? json_decode($accessToken) : $accessToken;
+			// Vary sesskey for userdata cache by user_id since we now support multiple accounts
+			$this->sesskey .= "_{$twitterdata->user_id}";
 			parent::__construct(
 				$SETTINGS['twitter']['consumerkey'], 
 				$SETTINGS['twitter']['consumersecret'],
