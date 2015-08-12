@@ -66,7 +66,7 @@ function contentPut ($filename,$contenttype, $base64 = false) {
 	$res = getimagesize($filename);
 	if (false !== $res) {
 		// Make sure this file's mimetype is one that we explicitly support for height/width...
-		if (in_array($res[2], array(IMG_PNG, IMG_JPG, IMG_JPEG, IMG_GIF))) {
+		if (in_array($res[2], array(IMAGETYPE_PNG, IMAGETYPE_JPEG, IMAGETYPE_JPEG2000, IMAGETYPE_GIF))) {
 			$content->width = intval($res[0]);
 			$content->height = intval($res[1]);
 		}
@@ -249,7 +249,7 @@ function resizeImageStream($imageStream, $width, $height, $type) {
 			break;
 
 		case 'image/png':
-			$res = imagepng($r_img_scaled, NULL, 90);
+			$res = imagepng($r_img_scaled, NULL, 9);
 			break;
 
 		case 'image/gif':
