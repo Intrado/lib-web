@@ -488,10 +488,36 @@ class Message extends DBMappedObject {
 							// See if resizing is needed... (only when we're saving from f.recreateParts)
 							if ($enableContentResizing) {
 
+								$resized = false;
+
 								// Reassemble the entire image tag to extract height/width attributes if present
 								// Got [<img src="viewimage.php?id=] image token: [33" height="366" width="366]
 								$imgTag = $uploadimageurl . $token;
-								if (preg_match('/height="(\d+)/', $imgTag, $matches)) {
+
+								// Try a tag with style + width/height attributes on the IMG tag...
+								if (preg_match('/width:\s*(\d+)px;\s*height:\s*(\d+)px;/i', $imgTag, $matches)) {
+									$width = intval($matches[1]);
+									$height = intval($matches[2]);
+
+									// Do the sizes match those recorded for this content ID?
+									if (($height != $content->height) || ($width != $content->width)) {
+										$resized = true;
+									}
+								}
+
+								// Try a tag with style + width/height attributes on the IMG tag...
+								else if (preg_match('/height:\s*(\d+)px;\s*width:\s*(\d+)px;/i', $imgTag, $matches)) {
+									$height = intval($matches[1]);
+									$width = intval($matches[2]);
+
+									// Do the sizes match those recorded for this content ID?
+									if (($height != $content->height) || ($width != $content->width)) {
+										$resized = true;
+									}
+								}
+
+								// Try a tag with height/width HTML attributes on the IMG tag...
+								else if (preg_match('/height="(\d+)/', $imgTag, $matches)) {
 									$height = intval($matches[1]);
 									if (preg_match('/width="(\d+)/', $imgTag, $matches)) {
 										$width = intval($matches[1]);
@@ -499,38 +525,42 @@ class Message extends DBMappedObject {
 										
 										// Do the sizes match those recorded for this content ID?
 										if (($height != $content->height) || ($width != $content->width)) {
+											$resized = true;
+										}
+									}
+								}
 
-											// Resize needed!
+								if ($resized) {
 
-											// Is there an original image we should resize from?
-											if ($content->originalcontentid) {
-												$originalContent = DBFind('Content', 'from content where id = ?', false, array($content->originalcontentid));
-											}
-											else {
-												// Nope! This one is the original, so use it
-												$originalContent = $content; 
-											}
+									// Resize needed!
 
-											// Prepare a new content record for storage...
-											$content = new Content();
+									// Is there an original image we should resize from?
+									if ($content->originalcontentid) {
+										$originalContent = DBFind('Content', 'from content where id = ?', false, array($content->originalcontentid));
+									}
+									else {
+										// Nope! This one is the original, so use it
+										$originalContent = $content; 
+									}
 
-											// Get the originalContent's image data stream
-											if ($imageStream = contentGet($originalContent->id)) {
-												list($type, $imageData) = $imageStream;
+									// Prepare a new content record for storage...
+									$content = new Content();
 
-												// Resize the originalContent to the newly specified widthxheight
-												if ($content->data = base64_encode(resizeImageStream($imageData, $width, $height, $type))) {
+									// Get the originalContent's image data stream
+									if ($imageStream = contentGet($originalContent->id)) {
+										list($type, $imageData) = $imageStream;
 
-													// Save the resized content as a new contentId
-													// with a reference to the originalContent
-													$content->contenttype = $originalContent->contenttype;
-													$content->width = $width;
-													$content->height = $height;
-													$content->originalcontentid = $originalContent->id;
-													$content->create();
-													$content->refresh();
-												}
-											}
+										// Resize the originalContent to the newly specified widthxheight
+										if ($content->data = base64_encode(resizeImageStream($imageData, $width, $height, $type))) {
+
+											// Save the resized content as a new contentId
+											// with a reference to the originalContent
+											$content->contenttype = $originalContent->contenttype;
+											$content->width = $width;
+											$content->height = $height;
+											$content->originalcontentid = $originalContent->id;
+											$content->create();
+											$content->refresh();
 										}
 									}
 								}
