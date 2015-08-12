@@ -239,7 +239,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 	<div class="modal-body"></div>
 </div>
 
-<div class="modal hide fade" id="feedbackModal" style="width: 90%; max-height: none; margin: 5%; position: absolue; left: 0px; top: 0px;"-->
+<div class="modal hide fade" id="feedbackModal" style="width: 90%; max-height: none; margin: 5%; position: absolue; left: 0px; top: 0px;">
 	<div class="modal-header">
 		<button class="close" aria-hidden="true" data-dismiss="modal" type="button">x</button>
 		<h3>Feedback</h3>
