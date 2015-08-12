@@ -16,7 +16,7 @@ class HtmlTextArea extends FormItem {
 
 		$v = escapehtml($value);
 
-		$str = '<textarea id="' . $n . '" name="' . $n . '" ' . $rows . ' style="display: none;"/>' . $v . '</textarea>
+		$str = '<textarea id="' . $n . '" name="' . $n . '" ' . $rows . ' style="display: none;">' . $v . '</textarea>
 			<div id ="' . $n . '-htmleditor"></div>';
 
 		// SMK added 2013-03-07 to force this button's label to show in the toolbar
