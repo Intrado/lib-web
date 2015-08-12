@@ -209,6 +209,7 @@ $language = Language::getName($languagecode);
 
 $formdata = array($messagegroup->name. " (". $language. ")");
 
+$helpstep = 0;
 $helpsteps[] = array(_L("Enter the name this email will appear as coming from."));
 $formdata["fromname"] = array(
 	"label" => _L('From Name'),
@@ -219,7 +220,7 @@ $formdata["fromname"] = array(
 			array("ValLength","max" => 50)
 			),
 	"control" => array("TextField","size" => 25, "maxlength" => 50),
-	"helpstep" => 1
+	"helpstep" => ++$helpstep
 );
 
 $helpsteps[] = array(_L("Enter the address where you would like to receive replies."));
@@ -233,7 +234,7 @@ $formdata["from"] = array(
 		array("ValEmail", "domain" => getSystemSetting('emaildomain'))
 		),
 	"control" => array("TextField","max"=>255,"min"=>3,"size"=>35),
-	"helpstep" => 2
+	"helpstep" => ++$helpstep
 );
 
 $helpsteps[] = _L("Enter the subject of the email here.");
@@ -246,7 +247,7 @@ $formdata["subject"] = array(
 		array("ValLength","max" => 255)
 	),
 	"control" => array("TextField","max"=>255,"min"=>3,"size"=>45),
-	"helpstep" => 3
+	"helpstep" => ++$helpstep
 );
 
 $attachmentSection = 0;
@@ -260,9 +261,8 @@ if ($subtype == 'plain') {
 		"value" => ($attachments ? json_encode($attachments) : "{}"),
 		"validators" => array(array("ValEmailAttach")),
 		"control" => array("EmailAttach"),
-		"helpstep" => 4
+		"helpstep" => ++$helpstep
 	);
-	$attachmentSection = 1;
 } else if (count($attachments) > 0) {
 	$helpsteps[] = _L("These are existing email attachments. You can delete existing email attachments and insert new ones as a link using Attachment icon.");
 	$formdata["attachments"] = array(
@@ -271,12 +271,27 @@ if ($subtype == 'plain') {
 		"value" => ($attachments ? json_encode($attachments) : "{}"),
 		"validators" => array(array("ValEmailAttach")),
 		"control" => array("EmailAttach", "disableupload" => true),
-		"helpstep" => 4
+		"helpstep" => ++$helpstep
 	);
-
-	$attachmentSection = 1;
 }
 
+
+if ($subtype == 'html') {
+	$formdata["info"] = array(
+		"label" => "",
+		"control" => array("FormHtml","html"=>'
+					<div style="font-size: medium;">
+						<img src="img/icons/information.png" alt="Information"/>
+						Inserts an attachment link by clicking the
+						<img src="script/ckeditor/plugins/attachmentlink/icons/attachmentlink.png" onclick="CKEDITOR.tools.callFunction(131,this);return false;" alt="Attachment" />
+						button inside the editor
+					</div>'
+
+		),
+
+		"helpstep" => ++$helpstep
+	);
+}
 // MESSAGE BODY
 if ($subtype == 'plain') {
 	// For plain text emails, use a plain textarea
@@ -321,31 +336,9 @@ $formdata["message"] = array(
 		array("ValLength","max" => 256000)
 	),
 	"control" => $messagecontrol,
-	"helpstep" => 4 + $attachmentSection
+	"helpstep" => $helpstep
 );
 
-if ($subtype == 'html') {
-	$formdata["info"] = array(
-			"label" => "",
-			"control" => array("FormHtml","html"=>'
-					<div style="font-size: medium;">
-						<img src="img/icons/information.png" alt="Information"/>
-						Inserts field by clicking the 
-							<img src="script/ckeditor/plugins/mkfield/icons/mkfield.png" onclick="CKEDITOR.tools.callFunction(131,this);return false;" alt="fields" />
-						button inside the editor
-					</div>
-					<div style="font-size: medium;">
-						<img src="img/icons/information.png" alt="Information"/>
-						Inserts an attachment link by clicking the
-						<img src="script/ckeditor/plugins/attachmentlink/icons/attachmentlink.png" onclick="CKEDITOR.tools.callFunction(131,this);return false;" alt="Attachment" />
-						button inside the editor
-					</div>'
-
-			),
-
-			"helpstep" => 4 + $attachmentSection
-	);
-}
 $helpsteps[] = _L("Click the preview button to view of your message.");
 
 $formdata["preview"] = array(
@@ -360,7 +353,7 @@ $formdata["preview"] = array(
 		"subjecttarget" => "subject",
 		"texttarget" => "message",
 	),
-	"helpstep" => 5 + $attachmentSection
+	"helpstep" => ++$helpstep
 );
 
 
@@ -442,7 +435,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			if ($attachments == null)
 				$attachments = array();
 
-			//TODO: do we need to replace it?
 			$message->replaceContentAttachments($attachments);
 			// create the message parts
 			$message->recreateParts($postdata['message'], null, false);

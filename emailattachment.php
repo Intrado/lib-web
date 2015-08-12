@@ -99,7 +99,7 @@ if (is_array($result)) {
 <body style="margin-left: 0px; margin-top: 1px; margin-bottom: 0px">
 <form id="uploadform" action="emailattachment.php?formname=<?=$_GET['formname']?>&itemname=<?=$_GET['itemname']?>" method="post" enctype="multipart/form-data" onsubmit="" >
 	<input type="hidden" name="MAX_FILE_SIZE" value="<?= $maxattachmentsize ?>">
-	<input id="emailattachment" name="emailattachment" type="file" <?=isset($_GET['disableupload']) ? 'disabled':''?> onChange="window.parent.window.startUpload();this.form.submit();"/>
+	<input id="emailattachment" name="emailattachment" type="file" <?=isset($_GET['disableupload']) ? ' style="display: none"':''?> onChange="window.parent.window.startUpload();this.form.submit();"/>
 </form>
 <script language="javascript" type="text/javascript">
 	window.parent.window.stopUpload('<?=$contentid?>','<?= addslashes($filename) ?>','<?= $size ?>','<?= isset($errormessage)?addslashes($errormessage):'' ?>', '<?=$_GET['formname']?>', '<?=$_GET['itemname']?>');

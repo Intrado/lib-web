@@ -16,7 +16,7 @@ CKEDITOR.dialog.add('attachmentlink', function (editor) {
 				return (false);
 			}
 			var displayName = this.getContentElement('tab1', 'displayname').getInputElement().getValue();
-			var attachment = eval('(' + value + ')');
+			var attachment = JSON.parse(value);
 			var displayName = (displayName == null || displayName.trim() == "") ? attachment.filename : displayName;
 			var location = attachment.location + "?id=" + attachment.contentId + "&caid=" + attachment.attachmentId + "&name=" + attachment.filename;
 

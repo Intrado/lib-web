@@ -132,6 +132,7 @@ class Message extends DBMappedObject {
 	}
 
 	/**
+	 * @param $filterMessageLinks filter out message attachments
 	 * @return ContentAttachment[]|bool
 	 */
 	function getContentAttachments($filterMessageLinks = true) {

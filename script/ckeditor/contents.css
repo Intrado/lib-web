@@ -134,6 +134,7 @@ a > img {
 }
 
 /* SMK added 2012-12-14 so that we can see the boundaries of editable content blocks */
+/* <CKE_START>  */
 .editableBlock {
 	outline: #FFFFFF dashed 1px;
 	border: 1px dashed #000000;
@@ -149,3 +150,4 @@ div.message-attachment-placeholder{
 	hight: 150px;
 	font-size: 20px;
 }
+/* <CKE_END>   */

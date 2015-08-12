@@ -12,12 +12,8 @@ if (!isset($_GET['CKEditorFuncNum'])) {
 $results = '';
 $errormessage = '';
 
-// User must be able to send email or post to facebook or twitter
 $formitemname = 'upload'; // NOTE: CKEditor is hard coded to use 'upload' as the form item's name.
-if (((getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost')) ||
-		(getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost')) ||
-		$USER->authorize("sendemail")) && isset($_FILES['upload'])
-) {
+if ($USER->authorize("sendemail") && isset($_FILES['upload'])) {
 
 
 	$unsafeext = array(".ade", ".adp", ".asx", ".bas", ".bat", ".chm", ".cmd", ".com", ".cpl",
@@ -25,8 +21,7 @@ if (((getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost'
 		".mda", ".mdb", ".mde", ".mdt", ".mdw", ".mdz", ".mht", ".msc", ".msi", ".msp", ".mst",
 		".nch", ".ops", ".pcd", ".pif", ".prf", ".reg", ".scf", ".scr", ".sct", ".shb", ".shs",
 		".url", ".vb", ".vbe", ".vbs", ".wms", ".wsc", ".wsf", ".wsh", ".zip", ".dmg", ".app");
-
-	$maxfilesize = 50 * 1024 * 1024;
+	$maxfilesize = isset($SETTINGS['feature']['max_hosted_attachment_size']) ? $SETTINGS['feature']['max_hosted_attachment_size'] : 50 * 1024 * 1024;
 	$content = handleFileUpload($formitemname, $maxfilesize, $unsafeext, null, false, null);
 
 	if (is_array($content)) {
@@ -52,7 +47,7 @@ if (((getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost'
 
 ?>
 <script type='text/javascript'>
-	// Update CKEditor's image upload dialog.
+	// Update Attachment upload dialog.
 	window.parent.CKEDITOR.tools.callFunction('<?=$_GET['CKEditorFuncNum']?>', '<?=$results?>', '<?=addslashes($errormessage)?>');
 </script>
 
