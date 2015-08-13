@@ -18,6 +18,13 @@ class TwitterTokens {
 	}
 
 	/**
+	 * Get the complete collection of access tokens
+	 */
+	public function getAllAccessTokens() {
+		return $this->tokens;
+	}
+
+	/**
 	 * Get the user data associated with the access token for the specified user id
 	 */
 	public function getUserDataForUserId($user_id) {
