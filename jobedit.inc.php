@@ -14,6 +14,8 @@ require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
 require_once("obj/MultiCheckBoxTable.fi.php");
 require_once("obj/FeedCategorySelector.fi.php");
+require_once("obj/TwitterAccountSelector.fi.php");
+require_once("obj/TwitterTokens.obj.php");
 require_once("obj/Job.obj.php");
 require_once("obj/JobType.obj.php");
 require_once("obj/Phone.obj.php"); // Required by job
@@ -866,17 +868,20 @@ if ($submittedmode || $completedmode) {
 	}
 	
 	// if the user account may post to twitter, but has no valid twitter access token
+	// SMK @HERE
 	if (getSystemSetting("_hastwitter") && $USER->authorize("twitterpost")) {
 		// get this here so twitter failures only effect users with twitter access
-		$tw = new Twitter($USER->getSetting("tw_access_token"));
+		//$tw = new Twitter($USER->getSetting("tw_access_token"));
+		$twitterTokens = new TwitterTokens();
 		$helpsteps[] = _L("If your message group contains a Twitter post, you must be connected to a Twitter account. If you haven't already added your Twitter account, click the Add Twitter Account button and log in through the pop up window.");
 		$formdata["twitter"] = array(
 			"label" => _L('Twitter Authorization'),
 			"fieldhelp" => _L("You must have a Twitter account if your message group contains a Twitter post."),
 			"value" => "",
-			"validators" => array(
-				array("ValTwitterAccountWithMessage")),
-			"control" => array("TwitterAccountPopup", "hasvalidtoken" => $tw->hasValidAccessToken()),
+			"validators" => array(),
+				//array("ValTwitterAccountWithMessage")),
+			//"control" => array("TwitterAccountPopup", "hasvalidtoken" => $tw->hasValidAccessToken()),
+			"control" => array("TwitterAccountSelector", "twittertokens" => $twitterTokens->getAllAccessTokens()),
 			"requires" => array("message"),
 			"helpstep" => ++$helpstepnum);
 	}

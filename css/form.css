@@ -145,6 +145,9 @@ table.multicheckbox {
 .feedcategoryselector img.categorytype{
 	margin-right: 5px;
 }
+.twitteraccountselector tbody td:first-child{
+	width: 20px;
+}
 
 .newform .formcontrol #accessprofile_publish,
 .newform .formcontrol #accessprofile_subscribe,

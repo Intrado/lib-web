@@ -36,31 +36,27 @@ class TwitterAuth extends FormItem {
 		// Do twitter login to get good auth token
 		$str .= submit_button(_L('Connect to Twitter'), 'twitterauth', 'custom/twitter');
 
-		$str .= '<div style="clear: both"></div></div></div>';
+		$str .= '<div style="clear: both"></div>';
 		return $str;
 	}
 
 	function renderJavascript($value) {
 		$n = $this->form->name . '_' . $this->name;
-
 		$str = '';
 		$twitterTokens = new TwitterTokens();
 		$accessTokens = $twitterTokens->getAllAccessTokens();
-		if (is_array($accessTokens)) {
-			for ($xx = 0; $xx < count($accessTokens); $xx++) {
+		if (! is_array($accessTokens)) return '';
+		for ($xx = 0; $xx < count($accessTokens); $xx++) {
 
-				// Get the one we're working with; xx is our enumerator for DHTML operations...
-				$dn = $n . "_{$xx}";
-				$str .= 'TwitterHelper.loadUserData("' . $dn . 'twuser", "' . escapehtml($accessTokens[$xx]->user_id) . '");' . "\n";
-			}
+			// Get the one we're working with; xx is our enumerator for DHTML operations...
+			$dn = $n . "_{$xx}";
+			$str .= 'TwitterHelper.loadUserData("' . $dn . 'twuser", "' . escapehtml($accessTokens[$xx]->user_id) . '");' . "\n";
 		}
 		return $str;
 	}
 
 	function renderJavascriptLibraries() {
-		return '
-			<script type="text/javascript" src="script/TwitterHelper.js"></script>
-		';
+		return '<script type="text/javascript" src="script/TwitterHelper.js"></script>';
 	}
 }
 
