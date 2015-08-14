@@ -353,8 +353,6 @@ else
 
 // check for legacy CMA app ID
 $legacyCMAId = isset($settings['_cmaappid']) ?  $settings['_cmaappid'] : null;
-$silverCMAId = isset($settings['_cmasilverappid']) ?  $settings['_cmasilverappid'] : null;
-
 $cmaTypes = array('none'=>'None', 'legacy'=>'Legacy', 'silver'=>'Silver');
 
 $helpstepnum = 1;

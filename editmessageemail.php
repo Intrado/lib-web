@@ -255,7 +255,7 @@ if ($customerWideEmail) {
 		"value" => $fromEmails[0],
 		"validators" => array(
 			array("ValRequired"),
-			array("ValEmail")
+			array("ValEmail", "domain" => getSystemSetting('emaildomain'))
 		),
 		"control" => array("FromEmail","size" => 15,"selectvalues"=>$fromEmails, "allowedit" => true),
 		"helpstep" => ++$helpstep
