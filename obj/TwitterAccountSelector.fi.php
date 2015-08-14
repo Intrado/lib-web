@@ -27,7 +27,6 @@ class TwitterAccountSelector extends MultiCheckBoxTable {
 		$columns = $hovers = array();
 		foreach ($this->twitterTokens as $token) {
 			$html = '<div id="' . $this->getFieldId($token->user_id) . '"></div>';
-			//$html .= '<b>' . escapeHtml($token->screen_name) . '</b>';
 			$columns[$token->user_id] = array($html);
 			$hovers[$token->user_id] = $token->screen_name;
 		}

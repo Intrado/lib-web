@@ -1128,9 +1128,18 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					}
 					// insert twitter post, (if the user can and the message group has a twitter message)
 					if (getSystemSetting("_hastwitter") && $USER->authorize("twitterpost") && $messagegroup->hasMessage("post", "twitter")) {
-						// get the twitter user's id
-						$twdata = json_decode($USER->getSetting("tw_access_token"));
-						$job->updateJobPost("twitter", ($twdata->user_id?$twdata->user_id:null));
+						// Make a list of all the twitter account user ID's we currently know about
+						$tokens = $twitterTokens->getAllAccessTokens();
+						$ok_user_ids = array();
+						if (is_array($tokens) && (count($tokens) > 0)) {
+							foreach ($tokens as $token) {
+								$ok_user_ids[] = $token->user_id;
+							}
+						}
+						// Ensure all the twitter ID's selected are in the known set, otherwise we null out for none
+						$user_ids = array_intersect($ok_user_ids, $postdata['twitter']);
+						if (count($user_ids) == 0) $user_ids = null;
+						$job->updateJobPost('twitter', $user_ids);
 					}
 				}
 			}
