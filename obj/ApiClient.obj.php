@@ -56,7 +56,7 @@ class ApiClient {
 	 * if it is JSON, for example, the caller will need to do the decoding, and 'code' key
 	 * supplies the numeric REST server response.
 	 */
-	public function sendRequest($method, $node, $data = null) {
+	public function sendRequest($method, $node, $data = null, $additionalHeaders = array()) {
 		//error_log("sendRequest " . $method . $this->ApiUrl . $node);
 		// Make a new curl request object with some default options
 		$creq = curl_init($this->ApiUrl . $node);
@@ -64,8 +64,9 @@ class ApiClient {
 		curl_setopt($creq, CURLOPT_SSL_VERIFYPEER, 0);
 		curl_setopt($creq, CURLOPT_HEADER, 1);
 
-		// Some initial headers we will need, but there may be more...
-		$headers = $this->staticHeaders;
+		// merge static headers with those needed just for this request
+		$headers = array_merge($this->staticHeaders, $additionalHeaders);
+		
 		$headers[] = "Accept: application/json";
 
 		// Set some options based on the REST method; GET is default, so no case for that
