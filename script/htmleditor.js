@@ -270,11 +270,11 @@ function htmlEditorWaitForCKE(textarea, dontwait, hidetoolbar) {
 		'height': '400px',
 		'filebrowserImageUploadUrl' : uploaderURI,
 		'toolbarStartupExpanded' : !hidetoolbar,
-		'extraPlugins': 'aspell,mkfield',
+		'extraPlugins': 'aspell,mkfield,attachmentlink',
 		'toolbar': [
 			    ['Print','Source'],
 			    ['Undo','Redo'],
-			    ['PasteFromWord','SpellCheck','mkField'],
+			    ['PasteFromWord','SpellCheck','mkField','AttachmentLink'],
 			    ['Link','Image','Table','HorizontalRule'],
 			    '/',
 			    ['Bold','Italic','Underline','Strike','TextColor','BGColor','RemoveFormat'],

@@ -77,7 +77,7 @@ window.RCIEditorInline = function () {
 				var extraButtons = [];
 
 				// Activate whatever tools are enabled according to rcieditor
-				var custom_tools = [ 'mkField', 'mkBlock', 'themeMgr', 'pasteFromPhone' ];
+				var custom_tools = [ 'mkField','AttachmentLink', 'mkBlock', 'themeMgr', 'pasteFromPhone' ];
 				// SMK notes that array.forEach() is not supported on IE8, so we'll use jQuery to iterate instead
 				$(custom_tools).each(function (index) {
 					var toolname = custom_tools[index];
@@ -89,13 +89,17 @@ window.RCIEditorInline = function () {
 				});
 
 
+				var uploadattachment= rcieditor.getSetting('baseUrl') + 'uploadattachment.php';
+
 				editor.config.filebrowserImageUploadUrl = uploaderURI;
+				editor.config.filebrowserUploadUrl = uploadattachment;
 				editor.config.pasteFromWordRemoveFontStyles = false;
 				editor.config.pasteFromWordRemoveStyles = false;
 				editor.config.disableObjectResizing = false;
 				editor.config.resize_enabled = true;
 				editor.config.extraPlugins = extraPlugins.join();
-                                
+				editor.config.allowedContent = true;
+
                                 // specifically name which fonts CKEditor can display in order to remove Comic Sans
                                 editor.config.font_names= "Arial/Arial, Helvetica, sans-serif;"+
                                                     "Courier New/Courier New, Courier, monospace;"+

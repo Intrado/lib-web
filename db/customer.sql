@@ -3086,3 +3086,21 @@ update setting set value='11.4/1' where name='_dbversion'
 $$$
 
 -- END 11.4/1
+
+ALTER TABLE `messageattachment` ADD COLUMN `displayName` varchar(255)
+$$$
+
+RENAME TABLE `reportsdddelivery` TO `reportdocumentdelivery`
+$$$
+
+ALTER TABLE `reportdocumentdelivery`
+  DROP KEY `customerjobperson`,
+  ADD PRIMARY KEY (`customerId`,`jobId`,`personId`,`messageAttachmentId`,`action`),
+  MODIFY COLUMN `action` ENUM('click','download','bad_password')
+$$$
+
+
+update setting set value='11.4/2' where name='_dbversion'
+$$$
+
+-- END 11.4/1
