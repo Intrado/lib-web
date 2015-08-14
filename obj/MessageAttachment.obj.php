@@ -6,6 +6,7 @@ class MessageAttachment extends DBMappedObject {
 	var $type; // 'content' or 'burst'
 	var $contentattachmentid;
 	var $burstattachmentid;
+	var $displayName;
 
 	// cached objects
 	var $contentAttachment = null;
@@ -14,7 +15,7 @@ class MessageAttachment extends DBMappedObject {
 	function MessageAttachment ($id = NULL) {
 		$this->_allownulls = true;
 		$this->_tablename = "messageattachment";
-		$this->_fieldlist = array("messageid", "type", "contentattachmentid", "burstattachmentid");
+		$this->_fieldlist = array("messageid", "type", "contentattachmentid", "burstattachmentid", "displayName");
 		DBMappedObject::DBMappedObject($id);
 	}
 

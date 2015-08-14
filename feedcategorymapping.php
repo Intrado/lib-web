@@ -33,6 +33,7 @@ require_once('obj/PageForm.obj.php');
 
 // API stuff
 require_once('obj/CmaApiClient.obj.php');
+require_once('obj/SilverApiClient.obj.php');
 
 
 class FeedCategoryMapping extends PageForm {
@@ -214,10 +215,26 @@ class FeedCategoryMapping extends PageForm {
 // Initialize FeedCategoryMapping and render page
 // ================================================================
 global $SETTINGS;
-$cmaApi = new CmaApiClient(
-	new ApiClient($SETTINGS['cmaserver']['apiurl']),
-	getCustomerSystemSetting("_cmaappid") ? getCustomerSystemSetting("_cmaappid") : ''
-);
+
+$cmaType = '';
+if(getCustomerSystemSetting("_cmaapptype")) {
+	$cmaType = getCustomerSystemSetting("_cmaapptype");
+}
+
+$cmaApi = null;
+if($cmaType === 'legacy') {
+	$cmaApi = new CmaApiClient(
+		new ApiClient($SETTINGS['cmaserver']['apiurl']),
+		getCustomerSystemSetting("_cmaappid") ? getCustomerSystemSetting("_cmaappid") : ''
+	);
+}
+if($cmaType === 'silver') {
+	$cmaApi = new SilverApiClient(
+		new ApiClient($SETTINGS['cmaserver']['silverapiurl']),
+		getCustomerSystemSetting("_cmaappid") ? getCustomerSystemSetting("_cmaappid") : ''
+	);
+}
+
 executePage(new FeedCategoryMapping($cmaApi));
 
 ?>

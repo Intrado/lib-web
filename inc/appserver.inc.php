@@ -202,7 +202,7 @@ function emailMessageViewForMessageParts($message,$parts,$jobpriority) {
 	$messagedto->languagecode = $message->languagecode;
 	$partdtos = array();
 	foreach($parts as $part) {
-		if ($part->type == "T" || $part->type == "V" || $part->type == "I" ) {
+		if ($part->type == "T" || $part->type == "V" || $part->type == "I"  || $part->type == "HMAL" ) {
 			$partdto = new \commsuite\MessagePartDTO();
 			switch ($part->type) {
 				case "T":
@@ -214,14 +214,23 @@ function emailMessageViewForMessageParts($message,$parts,$jobpriority) {
 				case "I":
 					$partdto->type = \commsuite\MessagePartTypeDTO::I;
 					break;
+				case "HMAL":
+					$partdto->type = \commsuite\MessagePartTypeDTO::MAL;
+					$contentAttachment = new ContentAttachment($part->context["attachmentId"]);
+					//to be used as display name for preview
+					$part->txt = $part->context["displayName"];
+					$part->defaultvalue =$contentAttachment->filename;
+					$partdto->contentid = $contentAttachment->contentid;
+					break;
 			}
-			
 			$partdto->txt = $part->txt;
 			$partdto->languagecode = "en";
 			$partdto->gender = "female";
 			$partdto->fieldnum = $part->fieldnum;
 			$partdto->defaultvalue = $part->defaultvalue;
-			$partdto->contentid = $part->imagecontentid;
+			if ($part->type !== "HMAL") {
+				$partdto->contentid = $part->imagecontentid;
+			}
 			$partdtos[] = $partdto;
 		}
 	}

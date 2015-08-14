@@ -59,7 +59,7 @@ class SddReport extends ReportGenerator {
 		// using recipientPersonId, and include reportcontact.result instead of reportperson.status,
 		// and also sequence and destination.
 
-		// the query returns all recipients even if they have 0 SDD actions and 0 rows in reportsdddelivery
+		// the query returns all recipients even if they have 0 SDD actions and 0 rows in reportdocumentdelivery
 		// - sdd_action is a reference to the most recent action of any type for a given attachment and given person.
 		// - sdd_download is a reference to the most recent DOWNLOAD action for a given attachment and given person.
 		$this->query =
@@ -77,10 +77,10 @@ inner join burstattachment as ba on (ba.burstid = b.id)
 inner join messageattachment as ma on (ma.burstattachmentid = ba.id)
 inner join job as j on (j.id = b.jobid)
 inner join reportperson as rp on (rp.jobid = b.jobid and rp.type = 'email')
-left outer join reportsdddelivery as sdd_action on (sdd_action.messageAttachmentId = ma.id and sdd_action.personid = rp.personid)
-left outer join reportsdddelivery as sdd_action2 on (sdd_action2.messageAttachmentId = ma.id and sdd_action2.personid = sdd_action.personid and sdd_action2.timestampMs > sdd_action.timestampMs)
-left outer join reportsdddelivery as sdd_download on (sdd_download.messageAttachmentId = ma.id and sdd_download.personid = sdd_action.personid and sdd_download.action = 'DOWNLOAD')
-left outer join reportsdddelivery as sdd_download2 on (sdd_download2.messageAttachmentId = ma.id and sdd_download2.personid = sdd_action.personid and sdd_download2.action = 'DOWNLOAD' and sdd_download2.timestampMs > sdd_download.timestampMs)
+left outer join reportdocumentdelivery as sdd_action on (sdd_action.messageAttachmentId = ma.id and sdd_action.personid = rp.personid)
+left outer join reportdocumentdelivery as sdd_action2 on (sdd_action2.messageAttachmentId = ma.id and sdd_action2.personid = sdd_action.personid and sdd_action2.timestampMs > sdd_action.timestampMs)
+left outer join reportdocumentdelivery as sdd_download on (sdd_download.messageAttachmentId = ma.id and sdd_download.personid = sdd_action.personid and sdd_download.action = 'DOWNLOAD')
+left outer join reportdocumentdelivery as sdd_download2 on (sdd_download2.messageAttachmentId = ma.id and sdd_download2.personid = sdd_action.personid and sdd_download2.action = 'DOWNLOAD' and sdd_download2.timestampMs > sdd_download.timestampMs)
 inner join person as p on (p.id = rp.personid)
 where b.id = ? and b.deleted = 0 and sdd_action2.messageattachmentid is null and sdd_download2.messageattachmentid is null
 order by lastname, firstname
