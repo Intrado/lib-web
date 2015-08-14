@@ -22,3 +22,11 @@ ALTER TABLE `reportdocumentdelivery`
   MODIFY COLUMN `action` ENUM('click','download','bad_password')
 $$$
 
+-- $rev 3
+
+ALTER TABLE `usersetting`
+  MODIFY COLUMN `value` TEXT NOT NULL
+$$$
+
+UPDATE `usersetting` SET `value` = CONCAT('[', `value`, ']') WHERE `name` = 'tw_access_token';
+$$$
