@@ -42,8 +42,8 @@ class TwitterAccountSelector extends MultiCheckBoxTable {
 	}
 
 	function renderJavascript($value) {
-		if (! is_array($this->twitterTokens)) return '';
-		$str = '';
+		$str = parent::renderJavascript($value);;
+		if (! is_array($this->twitterTokens)) return $str;
 		foreach ($this->twitterTokens as $token) {
 			$str .= 'TwitterHelper.loadUserData("' . $this->getFieldId($token->user_id) . '", "' . escapehtml($token->user_id) . '");' . "\n";
 		}
@@ -51,7 +51,9 @@ class TwitterAccountSelector extends MultiCheckBoxTable {
 	}
 													
 	function renderJavascriptLibraries() {
-		return '<script type="text/javascript" src="script/TwitterHelper.js"></script>';
+		$script = parent::renderJavascriptLibraries();
+		$script .= '<script type="text/javascript" src="script/TwitterHelper.js"></script>';
+		return $script;
         }
 }
 ?>
