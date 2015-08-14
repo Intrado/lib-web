@@ -2,6 +2,8 @@
 class EmailAttach extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
+
+		$disableUpload = isset($this->args["disableupload"]);
 		if(is_array($value)) {
 			$value = json_encode($value);
 		}
@@ -16,8 +18,13 @@ class EmailAttach extends FormItem {
 			<input id="' . $n . '" name="' . $n . '" type="hidden" value="' . escapehtml($value) . '"/>
 			<div id="uploadedfiles" style="display: none;"></div>
 			<div id="upload_process" style="display: none;"><img src="img/ajax-loader.gif" /></div>
-			<iframe id="'.$n.'my_attach" src="emailattachment.php?formname='.$this->form->name.'&itemname='.$n.'" style="border:0; padding: 0; margin:0; bottom:0px;"></iframe>
-			';																																		// Don't make height smalles or the iframe will scroll in some browsers
+			';
+		if ($disableUpload) {
+			$str .= '<iframe id = "' . $n . 'my_attach" src = "emailattachment.php?formname=' . $this->form->name . '&disableupload=true' . '&itemname=' . $n . '" style = "border:0; padding: 0; margin:0; bottom:0px;" ></iframe >';
+		} else {
+			$str .= '<iframe id = "' . $n . 'my_attach" src = "emailattachment.php?formname=' . $this->form->name . '&itemname=' . $n . '" style = "border:0; padding: 0; margin:0; bottom:0px;" ></iframe >';
+		}
+																																				// Don't make height smalles or the iframe will scroll in some browsers
 		return $str;
 	}
 	

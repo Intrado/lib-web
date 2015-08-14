@@ -216,6 +216,7 @@ $language = Language::getName($languagecode);
 
 $formdata = array($messagegroup->name. " (". $language. ")");
 
+$helpstep = 0;
 $helpsteps[] = array(_L("Enter the name this email will appear as coming from."));
 $formdata["fromname"] = array(
 	"label" => _L('From Name'),
@@ -226,7 +227,7 @@ $formdata["fromname"] = array(
 			array("ValLength","max" => 50)
 			),
 	"control" => array("TextField","size" => 25, "maxlength" => 50),
-	"helpstep" => 1
+	"helpstep" => ++$helpstep
 );
 
 // if customer has an account-wide email then we should display a drop down <select> menu.
@@ -257,7 +258,7 @@ if ($customerWideEmail) {
 			array("ValEmail")
 		),
 		"control" => array("FromEmail","size" => 15,"selectvalues"=>$fromEmails, "allowedit" => true),
-		"helpstep" => 2
+		"helpstep" => ++$helpstep
 	);
 	
 } else {
@@ -271,7 +272,7 @@ if ($customerWideEmail) {
 			array("ValEmail", "domain" => getSystemSetting('emaildomain'))
 			),
 		"control" => array("TextField","max"=>255,"min"=>3,"size"=>35),
-		"helpstep" => 2
+		"helpstep" => ++$helpstep
 	);
 	
 }
@@ -286,22 +287,51 @@ $formdata["subject"] = array(
 		array("ValLength","max" => 255)
 	),
 	"control" => array("TextField","max"=>255,"min"=>3,"size"=>45),
-	"helpstep" => 3
+	"helpstep" => ++$helpstep
 );
 
-$helpsteps[] = _L("You may attach up to three files that are up to 2MB each. For greater security, only certain types ".
-	"of files are accepted.<br><br><b>Note:</b> Some email accounts may not accept attachments above a certain size and may reject your message.");
-$formdata["attachments"] = array(
-	"label" => _L('Attachments'),
-	"fieldhelp" => _L("You may attach up to three files that are up to 2MB each. For greater security, certain file ".
-		"types are not permitted. Be aware that some email accounts may not accept attachments above a certain size and may reject your message."),
-	"value" => ($attachments?json_encode($attachments):"{}"),
-	"validators" => array(array("ValEmailAttach")),
-	"control" => array("EmailAttach"),
-	"helpstep" => 4
-);
+$attachmentSection = 0;
+if ($subtype == 'plain') {
+	$helpsteps[] = _L("You may attach up to three files that are up to 2MB each. For greater security, only certain types ".
+		"of files are accepted.<br><br><b>Note:</b> Some email accounts may not accept attachments above a certain size and may reject your message.");
+	$formdata["attachments"] = array(
+		"label" => _L('Attachments'),
+		"fieldhelp" => _L("You may attach up to three files that are up to 2MB each. For greater security, certain file " .
+			"types are not permitted. Be aware that some email accounts may not accept attachments above a certain size and may reject your message."),
+		"value" => ($attachments ? json_encode($attachments) : "{}"),
+		"validators" => array(array("ValEmailAttach")),
+		"control" => array("EmailAttach"),
+		"helpstep" => ++$helpstep
+	);
+} else if (count($attachments) > 0) {
+	$helpsteps[] = _L("These are existing email attachments. You can delete existing email attachments and insert new ones as a link using Attachment icon.");
+	$formdata["attachments"] = array(
+		"label" => _L('Attachments'),
+		"fieldhelp" => _L("These are existing email attachments. You can delete existing email attachments and insert new ones as a link using Attachment icon."),
+		"value" => ($attachments ? json_encode($attachments) : "{}"),
+		"validators" => array(array("ValEmailAttach")),
+		"control" => array("EmailAttach", "disableupload" => true),
+		"helpstep" => ++$helpstep
+	);
+}
 
 
+if ($subtype == 'html') {
+	$formdata["info"] = array(
+		"label" => "",
+		"control" => array("FormHtml","html"=>'
+					<div style="font-size: medium;">
+						<img src="img/icons/information.png" alt="Information"/>
+						Inserts an attachment link by clicking the
+						<img src="script/ckeditor/plugins/attachmentlink/icons/attachmentlink.png" onclick="CKEDITOR.tools.callFunction(131,this);return false;" alt="Attachment" />
+						button inside the editor
+					</div>'
+
+		),
+
+		"helpstep" => ++$helpstep
+	);
+}
 // MESSAGE BODY
 if ($subtype == 'plain') {
 	// For plain text emails, use a plain textarea
@@ -321,13 +351,18 @@ if ($fromstationery){
 	"helpful message tips and ideas, click the Help link in the upper right corner of the screen.<br><br>If you would ".
 	"like to insert dynamic data fields, such as the recipient's name, move the cursor to the location where the data ".
 	"should be inserted, select the data field, and click 'Insert'. It's a good idea to enter a default value in the ".
-	"Default Value field for each insert. This value will be displayed in the event of a recipient having no data in your chosen field.");
+	"Default Value field for each insert. This value will be displayed in the event of a recipient having no data in your chosen field.<br><br>".
+	"In order to insert attachments as a link, move the cursor to the location where the attachment link ".
+	"should be inserted, click on Attachment icon to launch the attachment dialog. Type an appropriate display name and upload the attachment.".
+	"Click on OK button to attach the link.");
 } else {
 	$helpsteps[] = _L("Enter your Email message body text here. Be sure to introduce yourself and give detailed information. For ".
 	"helpful message tips and ideas, click the Help link in the upper right corner of the screen.<br><br>If you would ".
 	"like to insert dynamic data fields, such as the recipient's name, move the cursor to the location where the data ".
 	"should be inserted, select the data field, and click 'Insert'. It's a good idea to enter a default value in the ".
-	"Default Value field for each insert. This value will be displayed in the event of a recipient having no data in your chosen field.");
+	"Default Value field for each insert. This value will be displayed in the event of a recipient having no data in your chosen field.".
+	"should be inserted, click on Attachment icon to launch attachment dialog. Type an appropriate display name and upload the attachment.".
+	"Click on OK button to attach the link.");
 }
 
 $formdata["message"] = array(
@@ -341,22 +376,9 @@ $formdata["message"] = array(
 		array("ValLength","max" => 256000)
 	),
 	"control" => $messagecontrol,
-	"helpstep" => 5
+	"helpstep" => $helpstep
 );
 
-if ($subtype == 'html') {
-	$formdata["info"] = array(
-			"label" => "",
-			"control" => array("FormHtml","html"=>'
-					<div style="font-size: medium;">
-						<img src="img/icons/information.png" alt="Information"/>
-						Inserts field by clicking the 
-							<img src="script/ckeditor/plugins/mkfield/icons/mkfield.png" onclick="CKEDITOR.tools.callFunction(131,this);return false;" alt="fields" />
-						button inside the editor
-					</div>'),
-			"helpstep" => 5
-	);
-}
 $helpsteps[] = _L("Click the preview button to view of your message.");
 
 $formdata["preview"] = array(
@@ -371,7 +393,7 @@ $formdata["preview"] = array(
 		"subjecttarget" => "subject",
 		"texttarget" => "message",
 	),
-	"helpstep" => 6
+	"helpstep" => ++$helpstep
 );
 
 
@@ -447,17 +469,16 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$message->update();
 			else
 				$message->create();
-						
-			// create the message parts
-			$message->recreateParts($postdata['message'], null, false);
-			
+
 			// if there are message attachments, attach them
-			$attachments = json_decode($postdata['attachments'], true);
+			$attachments = isset($postdata['attachments']) ? json_decode($postdata['attachments'], true) : null;
 			if ($attachments == null)
 				$attachments = array();
 
 			$message->replaceContentAttachments($attachments);
-			
+			// create the message parts
+			$message->recreateParts($postdata['message'], null, false);
+
 			// Sync with other message subtype if it exists
 			$message2 = $messagegroup->getMessage("email", $subtype=="html"?"plain":"html", $languagecode);
 			if ($message2) {

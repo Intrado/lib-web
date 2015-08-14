@@ -84,7 +84,7 @@ class Message extends DBMappedObject {
 		}
 
 		// copy the attachments
-		$contentAttachments = $this->getContentAttachments();
+		$contentAttachments = $this->getContentAttachments(false);
 		foreach ($contentAttachments as $contentAttachment) {
 			$origMessageAttachment = $origContentMessageAttachmentLookup[$contentAttachment->id];
 			// call create to generate a new attachment record which is a copy of the existing one
@@ -93,6 +93,7 @@ class Message extends DBMappedObject {
 			$messageAttachment->messageid = $newmessage->id;
 			$messageAttachment->type = 'content';
 			$messageAttachment->contentattachmentid = $contentAttachment->id;
+			$messageAttachment->displayName = $origMessageAttachment->displayName;
 			$messageAttachment->create();
 			$attachmentIds[$origMessageAttachment->id] = $messageAttachment->id;
 		}
@@ -131,12 +132,20 @@ class Message extends DBMappedObject {
 	}
 
 	/**
+	 * @param $filterMessageLinks filter out message attachments
 	 * @return ContentAttachment[]|bool
 	 */
-	function getContentAttachments() {
-		return DBFindMany("ContentAttachment", "from messageattachment ma
-				inner join contentattachment ca on (ma.contentattachmentid = ca.id) where ma.messageid = ? and ma.type = 'content'",
-				"ca", array($this->id));
+	function getContentAttachments($filterMessageLinks = true) {
+		$sql = "from messageattachment ma
+				inner join contentattachment ca on (ma.contentattachmentid = ca.id)";
+		$where = " where ma.messageid = ? and ma.type = 'content'";
+
+		if ($filterMessageLinks) {
+			$sql .= " left join messagepart mp on (ma.messageid = mp.messageid and ma.id = mp.messageattachmentid)";
+			$where .= " and mp.type is NULL";
+		}
+		$sql .= $where;
+		return DBFindMany("ContentAttachment", $sql, "ca", array($this->id));
 	}
 
 	/**
@@ -213,7 +222,7 @@ class Message extends DBMappedObject {
 	// There are 2 usage patterns: either $body is null, or $parts is null.
 	function recreateParts($body, $parts, $preferredgender, $audiofileids = null) {
 		global $USER;
-		
+
 		if (!is_null($this->id))
 			QuickUpdate("delete from messagepart where messageid=?", false, array($this->id));
 		else
@@ -253,6 +262,17 @@ class Message extends DBMappedObject {
 					$part->voiceid = $voiceid;
 				}
 
+				if($part->type=='HMAL'){
+					$msgattachment = new MessageAttachment();
+					$msgattachment->messageid = $this->id;
+					$msgattachment->type = 'content';
+					$msgattachment->contentattachmentid = $part->context["attachmentId"];
+					$msgattachment->displayName = $part->context["displayName"];
+					$msgattachment->create();
+
+					$part->type = "MAL";
+					$part->messageattachmentid = $msgattachment->id;
+				}
 				$part->messageid = $this->id;
 				$part->create();
 			}
@@ -296,21 +316,31 @@ class Message extends DBMappedObject {
 			
 			// get imageupload tags
 			$matches = array();
-			$uploadimageurl = "";
+			$uploadattachmenturl = "";
 			if (preg_match("/(\<img .*?src\=\"[^\=]*viewimage\.php\?id\=)/", strtolower($data), $matches)) {
 				// we only care about the first match
-				$uploadimageurl = $matches[1];
-				$pos_i = stripos($data, $uploadimageurl);
+				$uploadattachmenturl = $matches[1];
+				$pos_i = stripos($data, $uploadattachmenturl);
 			} else {
 				$pos_i = false;
 			}
-			
+
+			$matches = array();
+			if (preg_match("/(\<a class=\"message-attachment-placeholder\" contenteditable\=\"false\" href\=\"[^\=]*emailattachment\.php\?)/", strtolower($data), $matches)) {
+				// we only care about the first match
+				$uploadattachmenturl = $matches[1];
+				$pos_ma = stripos($data, $uploadattachmenturl);
+			} else {
+				$pos_ma = false;
+			}
+
 			$poses = array();
 			if ($pos_f !== false) $poses[] = $pos_f;
 			if ($pos_a !== false) $poses[] = $pos_a;
 			if ($pos_l !== false) $poses[] = $pos_l;
 			if ($pos_i !== false) $poses[] = $pos_i;
 			if ($pos_mal !== false) $poses[] = $pos_mal;
+			if ($pos_ma !== false) $poses[] = $pos_ma;
 
 			if (! count($poses)) break;
 
@@ -321,6 +351,7 @@ class Message extends DBMappedObject {
 				if($pos === $pos_l) $type = 'newlang';
 				if($pos === $pos_i) $type = 'I';
 				if($pos === $pos_mal) $type = 'MAL';
+				if($pos === $pos_ma) $type = 'HMAL';
 			}
 
 			//make a text part up to the pos of the field
@@ -343,7 +374,7 @@ class Message extends DBMappedObject {
 			}
 
 			// Skip ahead past the beginning of the token; images are bigger than the rest due to HTML markup
-			$pos += ($type == 'I') ? mb_strlen($uploadimageurl) : 2;
+			$pos += ($type == 'I' || $type == 'HMAL') ? mb_strlen($uploadattachmenturl) : 2;
 
 			// Assuming at least one char for audio/field name, find the end of the token
 			switch ($type){
@@ -352,6 +383,7 @@ class Message extends DBMappedObject {
 				case "newlang": $endtoken = "]]"; break;
 				case "I": $endtoken = '">'; break;
 				case "MAL": $endtoken = '}>'; break;
+				case "HMAL": $endtoken = '</a>'; break;
 			}
 			$length = @strpos($data, $endtoken, $pos + 1);
 
@@ -385,7 +417,7 @@ class Message extends DBMappedObject {
 							// If we don't have a good message attachment ID to work with...
 							if (! $malidFound) {
 								// TODO - add support for discovering the message attachment ID automagically (?)
-								error_log_helper("WARNING: automatic discovery of the message attachment ID is not supported; it must be provided in the field insert"); 
+								error_log_helper("WARNING: automatic discovery of the message attachment ID is not supported; it must be provided in the field insert");
 								$errors[] = "Can't find message attachment";
 							}
 
@@ -395,6 +427,19 @@ class Message extends DBMappedObject {
 							$parts[] = $part;
 						}
 
+						break;
+					//Message Attachment link with different parsing logic
+					case 'HMAL':
+						$posi = stripos($token, "\">");
+						$params = substr($token, 0, $posi);
+						$decoded_parms = html_entity_decode($params, null, 'UTF-8');
+						parse_str($decoded_parms, $parms);
+
+						$displayName = trim(substr($token, $posi + 2));
+						// Finish preparing the message part
+						$part->sequence = $partcount++;
+						$part->context = array("attachmentId" => $parms["caid"], "displayName" => $displayName);
+						$parts[] = $part;
 						break;
 
 					case "A":
@@ -490,7 +535,7 @@ class Message extends DBMappedObject {
 
 								// Reassemble the entire image tag to extract height/width attributes if present
 								// Got [<img src="viewimage.php?id=] image token: [33" height="366" width="366]
-								$imgTag = $uploadimageurl . $token;
+								$imgTag = $uploadattachmenturl . $token;
 								if (preg_match('/height="(\d+)/', $imgTag, $matches)) {
 									$height = intval($matches[1]);
 									if (preg_match('/width="(\d+)/', $imgTag, $matches)) {
@@ -592,10 +637,12 @@ class Message extends DBMappedObject {
 			switch ($part->type) {
 
 				case 'MAL':
-
 					// Find the message attachment for this message attachment link part
 					$messageAttachment = new MessageAttachment($part->messageattachmentid);
-					$partstr .= '<{' . $messageAttachment->type . ':#' . $part->messageattachmentid . '}>';
+					$contentAttachment = new ContentAttachment($messageAttachment->contentattachmentid);
+					permitContent($contentAttachment->contentid);
+					$mal = '<a class="message-attachment-placeholder" contenteditable="false" href="emailattachment.php?id=' . $contentAttachment->contentid . "&caid=" . $contentAttachment->id . "&name=" . $contentAttachment->filename . '">' . $messageAttachment->displayName . '</a>';
+					$partstr .= ($messageAttachment->type == "burst") ? '<{' . $messageAttachment->type . ':#' . $part->messageattachmentid . '}>' : $mal;
 					break;
 
 				case 'A':

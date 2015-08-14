@@ -102,6 +102,7 @@
 	
 			// The default settings for custom toolbar buttons
 			that.setSetting('tool_mkfield', false);
+			that.setSetting('tool_attachmentlink', false);
 			that.setSetting('tool_mkblock', false);
 			that.setSetting('tool_thememgr', false);
 			that.setSetting('tool_pastefromphone', false);
@@ -110,7 +111,7 @@
 			that.setSetting('callback_onready_fn', null); // Optional callback fn to exec when editor is ready
 			that.setSetting('callback_onchange_fn', null); // Optional callback fn to exec when editor content changes
 			that.setSetting('callback_oncapture_fn', null); // Optional callback fn to exec when inline editor's content is captured
-	
+
 			// Make a generic, reusable text clipboard
 			that.setSetting('clipboard', '');
 	
@@ -289,6 +290,10 @@
 				default:
 					// If editorMode was not supplied, we need to set it
 					setEditorMode = 'plain';
+					that.setSetting('tool_mkfield', true);
+					that.setSetting('tool_attachmentlink', true);
+					// Nothing extra to add for the plain legacy editor
+					break;
 				case 'plain':
 					// Nothing extra to add for the plain legacy editor
 					break;
@@ -296,12 +301,13 @@
 				case 'inline':
 					// Add the mkField tool only
 					that.setSetting('tool_mkfield', true);
+					that.setSetting('tool_attachmentlink', true);
 					break;
 	
 				case 'normal':
 					// Add the mkField tool only
 					that.setSetting('tool_mkfield', true);
-	
+					that.setSetting('tool_attachmentlink', true);
 					// FIXME SMK disabled image_scaling pending clarification of desired behavior
 					//that.setSetting('image_scaling', 500);
 					break;
@@ -309,9 +315,10 @@
 				case 'full':
 					// Add the mkField, mkBlock, and themeMgr tools
 					that.setSetting('tool_mkfield', true);
+					that.setSetting('tool_attachmentlink', true);
 					that.setSetting('tool_mkblock', true);
 					that.setSetting('tool_thememgr', true);
-	
+
 					// FIXME SMK disabled image_scaling pending clarification of desired behavior
 					//that.setSetting('image_scaling', 500);
 					break;
@@ -337,7 +344,8 @@
 			else {
 	
 				// Activate whatever tools are enabled based on mode
-				var custom_tools = [ 'mkField', 'mkBlock', 'themeMgr', 'pasteFromPhone' ];
+				var custom_tools = [ 'mkField', 'AttachmentLink', 'mkBlock', 'themeMgr', 'pasteFromPhone' ];
+
 				// SMK notes that array.forEach() is not supported on IE8, so we'll use jQuery to iterate instead
 				$(custom_tools).each(function (index) {
 					var toolname = custom_tools[index];
@@ -356,7 +364,21 @@
 				if ((max_size = parseInt(that.getSetting('image_scaling'))) > 0) {
 					uploaderURI += '?scaleabove=' + max_size;
 				}
-	
+
+				var uploadattachment= this.getSetting('baseUrl') + 'uploadattachment.php';
+				var toolBars = [
+					{ name:'r1g1', items:[ 'Print', 'Source' ] },
+					{ name:'r1g2', items:[ 'Undo', 'Redo'] },
+					{ name:'r1g3', items:[ 'NumberedList', 'BulletedList', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', 'Outdent', 'Indent' ] },
+					{ name:'r1g4', items:[ 'PasteFromWord', 'SpellCheck' ] },
+					{ name:'r1g5', items:[ 'Link', 'Image', 'Table', 'HorizontalRule' ] },
+					{ name:'r1g6', items:[ 'ShowBlocks', 'Maximize' ] },
+					'/',
+					{ name:'r2g1', items:[ 'Bold', 'Italic', 'Underline', 'Strike', 'TextColor', 'BGColor', 'RemoveFormat' ] },
+					{ name:'r2g2', items:[ 'Styles', 'Format', 'Font', 'FontSize' ] },
+					{ name:'r2g3', items:extraButtons }
+				];
+
 				cke_config = {
 					'width': '100%',
 					'height': '400px',
@@ -367,6 +389,7 @@
 					'disableNativeSpellChecker': false,
 					'browserContextMenuOnCtrl': true,
 					'filebrowserImageUploadUrl': uploaderURI,
+					'filebrowserUploadUrl':uploadattachment,
 					'toolbarStartupExpanded': ( that.getSetting('hidetoolbar') ? false : true),
 					'toolbarCanCollapse': true,
 					'extraPlugins': extraPlugins.join(),
@@ -384,18 +407,7 @@
                                                     "Trebuchet MS/Trebuchet MS, Helvetica, sans-serif;"+
                                                     "Verdana/Verdana, Geneva, sans-serif",
 	
-					'toolbar_RCI': [
-						{ name:'r1g1', items:[ 'Print', 'Source' ] },
-						{ name:'r1g2', items:[ 'Undo', 'Redo'] },
-						{ name:'r1g3', items:[ 'NumberedList', 'BulletedList', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', 'Outdent', 'Indent' ] },
-						{ name:'r1g4', items:[ 'PasteFromWord', 'SpellCheck' ] },
-						{ name:'r1g5', items:[ 'Link', 'Image', 'Table', 'HorizontalRule' ] },
-						{ name:'r1g6', items:[ 'ShowBlocks', 'Maximize' ] },
-						'/',
-						{ name:'r2g1', items:[ 'Bold', 'Italic', 'Underline', 'Strike', 'TextColor', 'BGColor', 'RemoveFormat' ] },
-						{ name:'r2g2', items:[ 'Styles', 'Format', 'Font', 'FontSize' ] },
-						{ name:'r2g3', items:extraButtons }
-					],
+					'toolbar_RCI': toolBars,
 	
 					'toolbar': 'RCI',
 	
@@ -790,10 +802,11 @@
 					}
 				}
 			}
-	
+			//remove unnecessary cke attributes
+			html = html.replace(/data-cke-saved-href=.+?\/emailattachment.php\?.+?href=/g, 'href=');
 			return(html);
 		};
-	
+
 		/**
 		 * Corrects any html tags that may be inside a data-field insert.
 		 *
