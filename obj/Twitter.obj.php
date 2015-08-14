@@ -3,6 +3,7 @@
 class Twitter extends TwitterOAuth {
 
 	protected $sesskey = 'twitter_userdata_cache';
+	protected $sessuser;
 
 	/**
 	 * Three different modes of construction:
@@ -20,7 +21,7 @@ class Twitter extends TwitterOAuth {
 		if ($accessToken ) {
 			$twitterdata = $fromJson ? json_decode($accessToken) : $accessToken;
 			// Vary sesskey for userdata cache by user_id since we now support multiple accounts
-			$this->sesskey .= "_{$twitterdata->user_id}";
+			$this->sessuser = $twitterdata->user_id;
 			parent::__construct(
 				$SETTINGS['twitter']['consumerkey'], 
 				$SETTINGS['twitter']['consumersecret'],
@@ -43,10 +44,12 @@ class Twitter extends TwitterOAuth {
 
 		// Do we have user data cached?
 		if (isset($_SESSION[$this->sesskey])) {
+			if (isset($_SESSION[$this->sesskey][$this->sessuser])) {
 
-			// Purge it
-			unset($_SESSION[$this->sesskey]);
-			return(true);
+				// Purge it
+				unset($_SESSION[$this->sesskey][$this->sessuser]);
+				return(true);
+			}
 		}
 
 		return(false);
@@ -75,20 +78,26 @@ class Twitter extends TwitterOAuth {
 		if (isset($_SESSION[$this->sesskey])) {
 
 			// Pull the userData from cache
-			$userData = $_SESSION[$this->sesskey];
+			if (isset($_SESSION[$this->sesskey][$this->sessuser])) {
 
-			// Note that this copy of userData did not come from cache
-			$userData->fromCache = true;
+				$userData = $_SESSION[$this->sesskey][$this->sessuser];
+
+				// Note that this copy of userData did not come from cache
+				$userData->fromCache = true;
+			}
 		}
 
 		if (! is_object($userData)) {
 			try {
 
 				// Otherwise get the userData fresh from Twitter
-				$userData = $this->get('account/verify_credentials');
+				$userData = json_decode($this->get('account/verify_credentials'));
 
 				// And add it to the user session cache
-				$_SESSION[$this->sesskey] = $userData;
+				if (! isset($_SESSION[$this->sesskey])) {
+					$_SESSION[$this->sesskey] = array();
+				}
+				$_SESSION[$this->sesskey][$this->sessuser] = $userData;
 
 				// Note that this copy of userData did not come from cache
 				$userData->fromCache = false;

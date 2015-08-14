@@ -34,11 +34,13 @@ TwitterHelper = function () {
 				onSuccess: function(r) {
 					var data = r.responseJSON;
 					if (data) {
-						var profile_image = new Element("img", { 
-							src: data.profile_image_url_https,
-							width: "48",
-							height: "48"
-						})
+						var profile_image = new Element("img",
+							{ 
+								src: data.profile_image_url_https,
+								width: "48",
+								height: "48"
+							}
+						);
 						var profile_image_box = new Element("div").setStyle({ float: "left" }).insert(profile_image);
 						var e = new Element("div").insert(profile_image_box);
 						var screen_name = new Element("div").setStyle({ "fontWeight": "bold" }).update(data.screen_name.escapeHTML());

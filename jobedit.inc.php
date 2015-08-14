@@ -875,7 +875,7 @@ if ($submittedmode || $completedmode) {
 		$twitterTokens = new TwitterTokens();
 		$helpsteps[] = _L("If your message group contains a Twitter post, you must be connected to a Twitter account. If you haven't already added your Twitter account, click the Add Twitter Account button and log in through the pop up window.");
 		$formdata["twitter"] = array(
-			"label" => _L('Twitter Authorization'),
+			"label" => _L('Twitter'),
 			"fieldhelp" => _L("You must have a Twitter account if your message group contains a Twitter post."),
 			"value" => "",
 			"validators" => array(),
