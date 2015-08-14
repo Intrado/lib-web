@@ -129,7 +129,7 @@ $dbversions = array(
 
 	"lcrrates" => array(
 		"11.0/2",
-		"11.2/3",
+		"11.2/4",
 		"11.3/3"
 	),
 
