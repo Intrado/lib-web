@@ -25,10 +25,9 @@ class TwitterTokens {
 	}
 
 	/**
-	 * Get the user data associated with the access token for the specified user id
+	 * Get a single access token for the specified (Twitter) user ID
 	 */
-	public function getUserDataForUserId($user_id) {
-
+	public function getAccessToken($user_id) {
 		// Early exit if there's no token data
 		if (! (is_array($this->tokens) && (count($this->tokens) > 0))) return null;
 
@@ -37,14 +36,26 @@ class TwitterTokens {
 
 			// If this is the one we're looking for...
 			if ($token->user_id === $user_id) {
-
-				// get twitter connection
-				$twitter = new Twitter($token, false);
-				$twitter->decode_json = false;
-				return $twitter->getUserData();
+				return $token;
 			}
 		}
+
 		return null;
+	}
+
+	/**
+	 * Get the user data associated with the access token for the specified user id
+	 */
+	public function getUserDataForUserId($user_id) {
+
+		// Early exit if there's no token data
+		$token = $this->getAccessToken($user_id);
+		if (is_null($token)) return null;
+
+		// get twitter connection
+		$twitter = new Twitter($token, false);
+		$twitter->decode_json = false;
+		return $twitter->getUserData();
 	}
 
 	/**
