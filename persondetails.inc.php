@@ -26,7 +26,8 @@ include_once("obj/DeviceServiceApiClient.obj.php");
 // API mode only!
 //
 if (!isset($_REQUEST["api"])) {
-	exit();
+	header("HTTP/1.1 404 Not Found");
+	exit(json_encode(Array("code" => "resourceNotFound")));
 }
 
 if (isset($_GET['id']) && $_GET['id'] != '') {
