@@ -16,6 +16,7 @@ require_once("inc/formatters.inc.php");
 require_once("inc/facebook.php");
 require_once("inc/facebookEnhanced.inc.php");
 require_once("inc/facebook.inc.php");
+require_once("obj/TwitterTokens.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -169,8 +170,10 @@ if (getSystemSetting('_hasfacebook', false)) {
 }
 
 if (getSystemSetting('_hastwitter', false)) {
+	$titles["twhandle"] = _L("Twitter Destination");
 	$titles["twstatus"] = _L("Twitter Status");
 	$titles["twcontent"] = _L("Twitter Content");
+	$twitterTokens = new TwitterTokens();
 }
 
 $data = array();
@@ -183,7 +186,8 @@ if ($showreport || $downloadreport) {
 		
 		// store facebook account names to avoid contacting facebook for each individual post if the pageid is the same
 		$fbaccountnames = array();
-		
+
+
 		// Prepare and merge the post items
 		while ($row = DBGetRow($queryresult)) {
 			
@@ -197,7 +201,7 @@ if ($showreport || $downloadreport) {
 				$post["fbdest"] = array();
 				$post["fbstatus"] = "";
 				$post["fbcontent"] = "";
-				$post["twhandle"] = "";
+				$post["twhandle"] = array();
 				$post["twstatus"] = "";
 				$post["twcontent"] = "";
 			}
@@ -214,8 +218,10 @@ if ($showreport || $downloadreport) {
 					
 					$post["fbcontent"] = $row[3];
 					break;
+
 				case "twitter":
- 					$post["twhandle"] = $row[5]; // Set id here to be able to map to twitter response
+					$accessToken = $twitterTokens->getAccessToken($row[5]);
+ 					$post["twhandle"][] = is_null($accessToken) ? $row[5] : $accessToken->screen_name; // Set id here to be able to map to twitter response
 					$post["twstatus"] = $row[7] == "1"?"Posted":"Not Posted";
 					$post["twcontent"] = $row[3];
 					// Do not modify, Just print the handle 
@@ -258,6 +264,11 @@ function fmt_fbdestination($row,$index) {
 		return "";
 	}
 }
+
+function fmt_twdestination($row, $index) {
+	return join(',', $row[$index]);
+}
+
 function fmt_csv_fbdestination($row,$index) {
 	$destinations = $row[$index];
 	if ($destinations) {
