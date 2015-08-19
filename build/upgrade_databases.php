@@ -83,8 +83,7 @@ $versions = array(
 		"11.0/8",
 		"11.1/14",
 		"11.2/8",
-		"11.4/1",
-		"11.4/2"
+		"11.4/3",
 		//etc., one array element per version, always the last revision of the given version
 	),
 
@@ -130,7 +129,7 @@ $dbversions = array(
 
 	"lcrrates" => array(
 		"11.0/2",
-		"11.2/3",
+		"11.2/4",
 		"11.3/3"
 	),
 

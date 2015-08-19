@@ -2,6 +2,20 @@
 
 class JobDetailReport extends ReportGenerator{
 
+	function getData() {
+		$query = $this->query;
+		$data = array();
+
+		$result = Query($query, $this->_readonlyDB);
+		while ($row = DBGetRow($result)) {
+			$data[] = $row;
+		}
+		$query = "select found_rows()";
+		$total = QuickQuery($query, $this->_readonlyDB);
+
+		return $data;
+	}
+
 	function generateQuery($hackPDF = false){
 		global $USER;
 		$this->params = $this->reportinstance->getParameters();

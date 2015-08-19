@@ -229,8 +229,16 @@ _L('Messaging Options'),
 		"control" => array("CheckBox"),
 		"helpstep" => 4
 	),
+	"requireemail" => array(
+		"label" => _L('Require Email Content on All Messages'),
+		"fieldhelp" => _L('Requires user to send an email with each message.'),
+		"value" => $obj->getValue("requireemail"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 4
+	),
 	"sendsms" => array(
-		"label" => _L('Send SMS txt messages'),
+		"label" => _L('Send SMS text messages'),
 		"fieldhelp" => _L('Allows users to send SMS messages and manage related messages.'),
 		"value" => $obj->getValue("sendsms"),
 		"validators" => array(),
@@ -880,6 +888,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$obj->setPermission("calllate", $postdata['calllate']);
 			$obj->setPermission("callmax", $postdata['callmax']);
 			$obj->setPermission("sendemail", (bool)$postdata['sendemail']);
+                        $obj->setPermission("requireemail", (bool)$postdata['requireemail']);
 			$obj->setPermission("sendmulti", (bool)$postdata['sendmulti']);
 			$obj->setPermission("createlist", (bool)$postdata['createlist']);
 			$obj->setPermission("listuploadids", (bool)$postdata['listuploadids']);

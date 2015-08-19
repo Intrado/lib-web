@@ -47,16 +47,16 @@ if(isset($_GET['crmbid'])){
 ////////////////////////////////////////////////////////////////////////////////
 
 $lcrdbcon = DBConnect($SETTINGS['lcrdb']['host'], $SETTINGS['lcrdb']['user'], $SETTINGS['lcrdb']['pass'], $SETTINGS['lcrdb']['db']);
-$crmbinfo = QuickQueryRow("select id,carrierRateModelId, pattern, notes from carrierratemodelblock where id=?", true,$lcrdbcon,array($crmbid));
+$crmbinfo = QuickQueryRow("select id,carrierRateModelClassname, pattern, notes from carrierratemodelblock where id=?", true,$lcrdbcon,array($crmbid));
 
 $helpstepnum = 1;
 
 $helpsteps[] = "TODO: Rare Model";
 $lcrdbcon = DBConnect($SETTINGS['lcrdb']['host'], $SETTINGS['lcrdb']['user'], $SETTINGS['lcrdb']['pass'], $SETTINGS['lcrdb']['db']);
-$carrierratemodels = QuickQueryList("select id, name from carrierratemodel",true,$lcrdbcon);
-$formdata["carrierRateModelId"] = array(
+$carrierratemodels = QuickQueryList("select distinct classname, classname from carrierratemodel order by classname",true,$lcrdbcon);
+$formdata["carrierRateModelClassname"] = array(
 	"label" => _L('Rate Model'),
-	"value" => $crmbinfo["carrierRateModelId"],
+	"value" => $crmbinfo["carrierRateModelClassname"],
 	"validators" => array(
 		array("ValRequired"),
 		array("ValInArray", "values" => array_keys($carrierratemodels))
@@ -119,14 +119,14 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		if ($crmbid) {
 			$originalDmGroup = QuickQueryRow("select * from carrierratemodelblock where id = " . $crmbid, true, $crmbinfo, false);
 			QuickUpdate("update carrireratemodelblock set
-								carrierRateModelId=?,
+								carrierRateModelClassname=?,
 								pattern=?,
 								notes=?
 								where id=?", $lcrdbcon,
-				array($postdata["carrireRateModelId"], $postdata["pattern"], $postdata["notes"], $crmbid));
+				array($postdata["carrireRateModelClassname"], $postdata["pattern"], $postdata["notes"], $crmbid));
 		} else {
-			QuickUpdate("insert into carrierratemodelblock (carrierRateModelId, pattern, notes) values (?,?,?)" , $lcrdbcon,
-				array($postdata["carrierRateModelId"], $carrierratemodel["pattern"], $postdata["notes"]));
+			QuickUpdate("insert into carrierratemodelblock (carrierRateModelClassname, pattern, notes) values (?,?,?)" , $lcrdbcon,
+				array($postdata["carrierRateModelClassname"], $postdata["pattern"], $postdata["notes"]));
 			$result = QuickQueryRow("select LAST_INSERT_ID() as id", true, $lcrdbcon);
 			$crmbid =$result["id"];
 		}
@@ -144,7 +144,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $TITLE = _L('DM Block');
-$PAGE = "commsuite:dmgroupblock";
+$PAGE = 'commsuite:dmblocking';
 
 include_once("nav.inc.php");
 

@@ -28,7 +28,7 @@ class User extends DBMappedObject {
 		$this->_allownulls = true;
 		$this->_tablename = "user";
 		$this->_fieldlist = array("accessid", "login", "accesscode", "firstname", "lastname",
-								"description", "email", "aremail", "phone", "enabled",
+								"description", "email", "aremail", "phone", "sms", "enabled",
 								"lastlogin","deleted", "ldap","staffpkey","importid","lastimport", "personid");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);

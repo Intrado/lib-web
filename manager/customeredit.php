@@ -351,6 +351,10 @@ else
 	$shortcodegroupname = QuickQuery("select description from shortcodegroup where id = 1"); // hardcoded id=1 is the default group for new customers
 
 
+// check for legacy CMA app ID
+$legacyCMAId = isset($settings['_cmaappid']) ?  $settings['_cmaappid'] : null;
+$cmaTypes = array('none'=>'None', 'legacy'=>'Legacy', 'silver'=>'Silver');
+
 $helpstepnum = 1;
 $formdata = array(_L('Basics'));
 // -----------------------------------------------------------------------------
@@ -711,6 +715,16 @@ $formdata ["haspdfburst"] = array (
 	"helpstep" => $helpstepnum 
 );
 
+$formdata["cmaapptype"] = array(
+	"label" => _L('CMA App Type'),
+	"value" => $legacyCMAId ? 'legacy' : 'none',
+	"validators" => array(
+		array("ValInArray", "values" => array('none','legacy','silver'))
+	),
+	"control" => array("SelectMenu", "values" => $cmaTypes),
+	"helpstep" => $helpstepnum
+);
+
 $formdata["cmaappid"] = array(
 	"label" => _L('CMA App. ID'),
 	"value" => ($settings['_cmaappid'] ? $settings['_cmaappid'] : ''),
@@ -920,8 +934,10 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				QuickUpdate("insert into persondatavalues (fieldnum, value, refcount, editlock) values ('f03','es',0,1)", $custdb);
 			}
 		}
-
-
+		
+		// indicates whether CMA app is of type legacy or of the silver platform
+		setCustomerSystemSetting('_cmaapptype', $postdata['cmaapptype'], $custdb);
+		
 		setCustomerSystemSetting('_customerid', $customerid, $custdb);
 
 		setCustomerSystemSetting('_hassms', $postdata["hassms"]?'1':'0', $custdb);
@@ -1054,6 +1070,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
 		// CMA App ID is integer value only at this time.
 		setCustomerSystemSetting('_cmaappid', $postdata['cmaappid'], $custdb);
+		
 
 		Query("COMMIT");
 		if($button == "done") {

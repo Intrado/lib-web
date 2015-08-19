@@ -25,13 +25,12 @@ $lcrdbcon = DBConnect($SETTINGS['lcrdb']['host'], $SETTINGS['lcrdb']['user'], $S
 $carrierRateModels = QuickQueryMultiRow("select id, name  from carrierratemodel", true, $lcrdbcon);
 
 $carrierRateModelBlocks = QuickQueryMultiRow("
-	select crmb.id as id, crm.name as carrierRateModelName, crmb.createdate as createdate, crmb.notes as notes, crmb.pattern as pattern
-	from carrierratemodel crm
-	inner join carrierratemodelblock crmb on (crmb.carrierRateModelId = crm.id)
-	order by crm.name asc",true,$lcrdbcon);
+	select crmb.id as id, crmb.carrierRateModelClassname as carrierRateModelClassname, crmb.createdate as createdate, crmb.notes as notes, crmb.pattern as pattern
+	from carrierratemodelblock crmb
+	order by crmb.carrierRateModelClassname, crmb.pattern asc",true,$lcrdbcon);
 
 $titles = array("id" => "Block ID",
-				"carrierRateModelName" => "Rate Model Name",
+				"carrierRateModelClassname" => "Rate Model Name",
 				"pattern" => "Block Pattern",
 				"createdate" => "Date Added",
 				"notes" => "Notes",
@@ -60,6 +59,10 @@ $PAGE = 'commsuite:dmblocking';
 include("nav.inc.php");
 
 startWindow($TITLE);
+
+?>
+<div class="feed_btn_wrap cf"><?= icon_button("Add Dm Group Block", "add",null,"editdmgroupblock.php?crmbid=new")   ?></div>
+<?
 
 ?>
 <table class=list>
