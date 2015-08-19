@@ -270,7 +270,7 @@ function fmt_twdestination($row, $index) {
 	return count($destinations) ? '"' . implode('", "', $destinations) . '"' : '';
 }
 
-function fmt_csv_fbdestination($row,$index) {
+function fmt_csv_destination($row,$index) {
 	$destinations = $row[$index];
 	if ($destinations) {
 		return implode(",",$destinations);
@@ -290,7 +290,11 @@ if ($downloadreport) {
 	header("Content-type: application/vnd.ms-excel");
 	// Note: Post date time could be inaccurate since it is job starttime. Time could be before the accurate post time so until this is fixed show only the date
 	// TODO find a way to add a accurate timestamp for postdate
-	$csvformatters = array ("date" => "fmt_txt_date","fbdest" => "fmt_csv_fbdestination");
+	$csvformatters = array (
+		'date' => 'fmt_txt_date',
+		'fbdest' => 'fmt_csv_destination',
+		'twhandle' => 'fmt_csv_destination'
+	);
 	showCsvData($data, $titles,$csvformatters);
 	exit();
 }
