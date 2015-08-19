@@ -266,7 +266,8 @@ function fmt_fbdestination($row,$index) {
 }
 
 function fmt_twdestination($row, $index) {
-	return join(',', $row[$index]);
+	$destinations = $row[$index];
+	return count($destinations) ? '"' . implode('", "', $destinations) . '"' : '';
 }
 
 function fmt_csv_fbdestination($row,$index) {
@@ -364,7 +365,7 @@ if ($showreport) {
 }
 buttons();
 
-// Include Facebook user name lookup i report contians facebook
+// Include Facebook user name lookup if report contians facebook
 if (count($facebookids)) {
 ?>
 <div id="fb-root"></div>
@@ -372,7 +373,6 @@ if (count($facebookids)) {
 document.observe('dom:loaded', function() {
 	window.fbAsyncInit = function() {
 		FB.init({appId: "<?= $SETTINGS['facebook']['appid'] ?>", status: true, cookie: false, xfbml: true});
-
 		fill_fb_cache(uniquefacebookids);		
 	};
 	(function() {
@@ -394,18 +394,22 @@ function fill_fb_cache() {
 		return;
 	}
 	var id = uniquefacebookids.last();
-	FB.api('/' + id, function(response) {
-		if (response && response.id && response.name) {
-		    fbcache.set(response.id,response.name);
-	    	uniquefacebookids = uniquefacebookids.without(response.id);
-	    	fbattemps = 3;
-		} else {
-			fbattemps--;
-			if (!fbattemps)
-	    		uniquefacebookids = uniquefacebookids.without(uniquefacebookids.last());	
-		}
-	    fill_fb_cache();
-	});
+	FB.api(
+		'/' + id,
+		function(response) {
+			if (response && response.id && response.name) {
+				fbcache.set(response.id, '"' + response.name + '"');
+				uniquefacebookids = uniquefacebookids.without(response.id);
+				fbattemps = 3;
+			}
+			else {
+				fbattemps--;
+				if (! fbattemps) uniquefacebookids = uniquefacebookids.without(uniquefacebookids.last());
+			}
+			fill_fb_cache();
+		},
+		{ access_token: '<?= $USER->getSetting('fb_access_token', ''); ?>' }
+	);
 }
 
 function diplayfacebookinfo(){
