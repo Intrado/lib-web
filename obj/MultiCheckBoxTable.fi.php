@@ -53,8 +53,9 @@ class MultiCheckBoxTable extends FormItem {
 		// create the table and fill in the column headers
 		// add an additional class, if provided. Note the addition of a space here, and not below
 		$additionalClass = ($this->cssClass)? $additionalClass = " $this->cssClass": "";
-		$str = "<table id='$formItemName' class='multicheckbox$additionalClass'>
-					<thead><tr>";
+		$str = "Select: <a href=\"#\" onclick=\"multiCheckBoxTableSetAll_" . $formItemName . "(true); return false;\">All</a> | <a href=\"#\" onclick=\"multiCheckBoxTableSetAll_" . $formItemName . "(false); return false;\">None</a><br/>\n";
+		$str .= "<table id=\"{$formItemName}\" class=\"multicheckbox{$additionalClass}\">
+				<thead><tr>";
 		foreach ($this->headers as $header)
 			$str .= '<th class="header">'. $header. '</th>';
 		$str .= '</tr></thead><tbody>';
@@ -102,7 +103,15 @@ class MultiCheckBoxTable extends FormItem {
 		return $str;
 	}
 
+	/**
+	 * SMK NOTE 2015-08-19 - The following JavaScript has some peculiar inter-play between jQuery and prototypeJS. At stake is that the newer code
+	 * uses jQuery for DOM manipulation, however the pre-existing function form_do_validation() expects prototypejs-extended elements. One of the
+	 * most unexpected behaviors is that if you use jQuery selectors to find an element, it returns a jQuery extended element object, but then if
+	 * you use a method on that element which returns other elements (such as "closest()") the result is a prototypejs extended element and NOT a
+	 * jQuery extended one! This allows the original RowClick function to work, but not the new SetAll function, so it had to be handled differently.
+	 */
 	function renderJavascriptLibraries() {
+		$formItemName = $this->form->name."_".$this->name;
 		return '<script type="text/javascript">
 			(function($) {
 				document.multiCheckBoxTableRowClick = function(element) {
@@ -116,6 +125,24 @@ class MultiCheckBoxTable extends FormItem {
 					form_do_validation(form[0], checkbox[0]);
 				}
 			})(jQuery);
+
+			function multiCheckBoxTableSetAll_' . $formItemName . '(state) {
+				(function($) {
+					var inputs = document.getElementsByName("' . $formItemName . '[]");
+					for (var i = 0; i < inputs.length; i++) {
+						if (state) {
+							$(inputs[i]).attr("checked", "checked");
+						}
+						else {
+							$(inputs[i]).removeAttr("checked");
+						}
+					}
+					var form = $("[name=' . $this->form->name . ']");
+					// call validation with the native dom objects
+					form_do_validation(Element.extend(form[0]), Element.extend(inputs[0]));
+				})(jQuery);
+			}
+
 		</script>';
 	}
 
