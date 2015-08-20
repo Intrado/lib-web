@@ -91,6 +91,7 @@ class FeedCategoryMapping extends PageForm {
 
 		// Fetch CMA Categories; convert array of objects into id=name associative array
 		$rawCmaCategories = $this->cmaApi->getCategories();
+		
 		if (is_array($rawCmaCategories) && count($rawCmaCategories)) {
 			foreach ($rawCmaCategories as $cmacat) {
 				$this->cmaCategories[$cmacat->id] = $cmacat->name;
@@ -216,22 +217,23 @@ class FeedCategoryMapping extends PageForm {
 // ================================================================
 global $SETTINGS;
 
-$cmaType = '';
-if(getCustomerSystemSetting("_cmaapptype")) {
-	$cmaType = getCustomerSystemSetting("_cmaapptype");
-}
+// get cma app type (legacy or silver)
+$cmaType = getCustomerSystemSetting("_cmaapptype") ? getCustomerSystemSetting("_cmaapptype") : '';
+
+// get cma app id
+$appId = getCustomerSystemSetting("_cmaappid") ? getCustomerSystemSetting("_cmaappid") : '';
 
 $cmaApi = null;
-if($cmaType === 'legacy') {
+
+if ($cmaType === 'legacy') {
 	$cmaApi = new CmaApiClient(
 		new ApiClient($SETTINGS['cmaserver']['apiurl']),
-		getCustomerSystemSetting("_cmaappid") ? getCustomerSystemSetting("_cmaappid") : ''
+		$appId
 	);
-}
-if($cmaType === 'silver') {
+} else if ($cmaType === 'silver') {
 	$cmaApi = new SilverApiClient(
 		new ApiClient($SETTINGS['cmaserver']['silverapiurl']),
-		getCustomerSystemSetting("_cmaappid") ? getCustomerSystemSetting("_cmaappid") : ''
+		$appId
 	);
 }
 
