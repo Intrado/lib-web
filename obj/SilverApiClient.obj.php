@@ -47,12 +47,7 @@ class SilverApiClient {
 		
 		return ($res['code'] == 200 ? json_decode($res['body'])->data : false);
 	}
-
 	
-//	public function isValidAppId() {
-//		$res = $this->apiClient->get("/1/apps/{$this->appId}");
-//		return ($res['code'] == 200);
-//	}
 }
 
 ?>
