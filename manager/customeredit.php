@@ -26,7 +26,6 @@ require_once("obj/ValInboundNumber.val.php");
 require_once("../obj/ValInteger.val.php");
 require_once("../obj/ApiClient.obj.php");
 require_once("../obj/CmaApiClient.obj.php");
-require_once("../obj/ValCmaAppId.val.php");
 
 // For Quick Tip TAI table activation stuffs
 require_once("loadtaitemplatedata.php");
@@ -276,6 +275,7 @@ $settings = array(
 	'_hasquicktip' => '0',
 	'_haspdfburst' => '0',
 	'_hasicplus' => '0',
+	'_cmaapptype' => '',
 	'_cmaappid' => '',
 	'customerwideemail' => '',
 	'autoreport_replyname' => 'SchoolMessenger',
@@ -350,10 +350,6 @@ if ($customerid)
 else
 	$shortcodegroupname = QuickQuery("select description from shortcodegroup where id = 1"); // hardcoded id=1 is the default group for new customers
 
-
-// check for legacy CMA app ID
-$legacyCMAId = isset($settings['_cmaappid']) ?  $settings['_cmaappid'] : null;
-$cmaTypes = array('none'=>'None', 'legacy'=>'Legacy', 'silver'=>'Silver');
 
 $helpstepnum = 1;
 $formdata = array(_L('Basics'));
@@ -715,9 +711,14 @@ $formdata ["haspdfburst"] = array (
 	"helpstep" => $helpstepnum 
 );
 
+// check for legacy CMA app ID
+
+$cmaAppType = isset($settings['_cmaapptype']) ?  $settings['_cmaapptype'] : 'none';
+$cmaTypes = array('none'=>'None', 'legacy'=>'Legacy', 'silver'=>'Silver');
+
 $formdata["cmaapptype"] = array(
 	"label" => _L('CMA App Type'),
-	"value" => $legacyCMAId ? 'legacy' : 'none',
+	"value" => $cmaAppType,
 	"validators" => array(
 		array("ValInArray", "values" => array('none','legacy','silver'))
 	),
@@ -728,9 +729,7 @@ $formdata["cmaapptype"] = array(
 $formdata["cmaappid"] = array(
 	"label" => _L('CMA App. ID'),
 	"value" => ($settings['_cmaappid'] ? $settings['_cmaappid'] : ''),
-	"validators" => array(
-		array('ValCmaAppId')
-	),
+	"validators" => array(),
 	"control" => array("TextField","size"=>20),
 	"helpstep" => $helpstepnum
 );
@@ -1148,7 +1147,7 @@ document.observe('dom:loaded', function() {
 	});
 });
 <? Validator::load_validators(array("ValInboundNumber","ValUrlComponent","ValSmsText","ValLanguages","ValUrl","ValClassroom", "ValInteger",
-	'ValCmaAppId', 'ValPortalSelection'));?>
+	 'ValPortalSelection'));?>
 </script>
 <?
 
