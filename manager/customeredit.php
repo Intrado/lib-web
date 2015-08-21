@@ -275,7 +275,7 @@ $settings = array(
 	'_hasquicktip' => '0',
 	'_haspdfburst' => '0',
 	'_hasicplus' => '0',
-	'_cmaapptype' => '',
+	'_cmaapptype' => 'none',
 	'_cmaappid' => '',
 	'customerwideemail' => '',
 	'autoreport_replyname' => 'SchoolMessenger',
@@ -712,7 +712,6 @@ $formdata ["haspdfburst"] = array (
 );
 
 // check for legacy CMA app ID
-
 $cmaAppType = isset($settings['_cmaapptype']) ?  $settings['_cmaapptype'] : 'none';
 $cmaTypes = array('none'=>'None', 'legacy'=>'Legacy', 'silver'=>'Silver');
 
