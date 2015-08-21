@@ -982,7 +982,8 @@ include("nav.inc.php");
 						"guardianData": {
 							"hasGDM": <? echo ((getSystemSetting('maxguardians', 0) > 0) ? 'true' : 'false'); ?>,
 							"categories": categoriesRes[0]
-						}
+						},
+						"customerWideEmail": '<?= getSystemSetting('customerwideemail', '') ?>'
 					};
 					window.BOOTSTRAP_DATA.form = {
 						template: {
