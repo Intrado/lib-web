@@ -32,7 +32,6 @@ class SilverApiClientTest extends PHPUnit_Framework_TestCase {
 
 		// mock result from 
 		$getRequestCategoryResponse = array(
-			'headers' => "Accept: application/json",
 			'body' => '{ "data": { "id": 1, "name": "Badgers","iconUrl": "http://s3.amazonaws.com/kanta/apps/109/bt8JeYiwX0-3urfEGcdJWw.png","index": 1,"mandatory": false,"group": "Others"}}',
 			'code' => 200
         );
@@ -53,14 +52,6 @@ class SilverApiClientTest extends PHPUnit_Framework_TestCase {
 
 	public function tearDown() {
 		unset($this->silverApiClient);
-	}
-
-	public function test_getBasicAuthHeader() {
-		$basicAuthHeader = $this->silverApiClient->getBasicAuthHeader();
-		
-		// header will always return array of length 1
-		$this->assertCount(1, $basicAuthHeader);
-		
 	}
 	
 	public function test_getSessionId() {
