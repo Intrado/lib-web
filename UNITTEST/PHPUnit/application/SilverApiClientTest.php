@@ -8,7 +8,11 @@ class SilverApiClientTest extends PHPUnit_Framework_TestCase {
 
 	var $apiClient;
 	var $silverApiClient;
+	
 	var $silverApiUrl="https://api.schoolmessenger.sauros.hr"; // from settings.ini.php
+	var $username = 'fakename';
+	var $password = 'fakepass';
+	
 	var $appId = 109;
 
 	public function setup() {
@@ -36,14 +40,14 @@ class SilverApiClientTest extends PHPUnit_Framework_TestCase {
 		// $apiClient->sendRequest() is used to authorize and fetch a session id
 		$this->apiClient->expects($this->any())
 			->method('sendRequest')
-			->willReturn($sendRequestSessionIdResponse);
+			->will($this->returnValue($sendRequestSessionIdResponse));
 		
 		// $apiClient->get() is used to retrieve categories
 		$this->apiClient->expects($this->any())
 			->method('get')
-			->willReturn($getRequestCategoryResponse);
+			->will($this->returnValue($getRequestCategoryResponse));
 
-		$this->silverApiClient = new SilverApiClient($this->apiClient, $this->appId);
+		$this->silverApiClient = new SilverApiClient($this->apiClient, $this->username, $this->password, $this->appId);
 
 	}
 
@@ -82,18 +86,6 @@ class SilverApiClientTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals("Badgers", $response->name);
 
 	}
-
-//	public function test_isValidAppId() {
-//
-//		// Here's a good one
-//		$res = $this->cmaApiClient->isValidAppId();
-//		$this->assertTrue($res, "Our appId is not valid? Should be if numeric ({$this->appId})");
-//
-//		// Here's a bad one
-//		$cmaApiClientBadId = new CmaApiClient($this->apiClient, 'invalidAppId');
-//		$res = $cmaApiClientBadId->isValidAppId();
-//		$this->assertFalse($res, 'Invalid appId is valid???');
-//	}
 }
 
 ?>
