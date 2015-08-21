@@ -10,8 +10,8 @@ class SilverApiClient {
 	private $appId;
 	
 	// basic auth credentials=
-	private $username = 'silverappbuilder@relianceco.com';
-	private $password = 'Z5h^w}3F?L(8U2D2';
+	private $username = '';
+	private $password = '';
 	
 	private $sessionId;
 
@@ -19,11 +19,17 @@ class SilverApiClient {
 	 * Constructor - initialize CmaApiClient object
 	 *
 	 * @param ApiClient $apiClient
+	 * @param String username
+	 * @param String password
 	 * @param int $appId
 	 */
-	public function __construct($apiClient, $appId = null) {
+	public function __construct($apiClient, $username, $password, $appId = null) {
 		$this->apiClient = $apiClient;
 		$this->appId = $appId;
+		
+		$this->username = $username;
+		$this->password = $password;
+		
 		$this->sessionId = $this->getSessionId($appId);
 	}
 	
