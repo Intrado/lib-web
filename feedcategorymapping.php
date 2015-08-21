@@ -232,7 +232,9 @@ if ($cmaType === 'legacy') {
 	);
 } else if ($cmaType === 'silver') {
 	$cmaApi = new SilverApiClient(
-		new ApiClient($SETTINGS['cmaserver']['silverapiurl']),
+		new ApiClient($SETTINGS['cmaserver']['silverapiclient.baseurl']),
+		$SETTINGS['cmaserver']['silverapiclient.username'],
+		$SETTINGS['cmaserver']['silverapiclient.password'],
 		$appId
 	);
 }
