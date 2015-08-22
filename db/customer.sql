@@ -3103,4 +3103,23 @@ $$$
 update setting set value='11.4/2' where name='_dbversion'
 $$$
 
--- END 11.4/1
+-- END 11.4/2
+
+ALTER TABLE `usersetting`
+  MODIFY COLUMN `value` TEXT NOT NULL
+$$$
+
+UPDATE `usersetting` SET `value` = CONCAT('[', `value`, ']') WHERE `name` = 'tw_access_token';
+$$$
+
+update setting set value='11.4/3' where name='_dbversion'
+$$$
+
+-- END 11.4/3
+
+-- no schema changed just insert _cmaapptype legacy if _cmaappid exists
+
+update setting set value='11.4/4' where name='_dbversion'
+$$$
+
+-- END 11.4/4

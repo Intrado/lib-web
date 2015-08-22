@@ -30,3 +30,8 @@ $$$
 
 UPDATE `usersetting` SET `value` = CONCAT('[', `value`, ']') WHERE `name` = 'tw_access_token';
 $$$
+
+-- $rev 4
+
+-- no schema changed just insert _cmaapptype legacy if _cmaappid exists
+

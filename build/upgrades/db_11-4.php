@@ -14,6 +14,18 @@ function upgrade_11_4($rev, $shardid, $customerid, $db) {
 	case 2:
 		echo "|";
 		apply_sql("upgrades/db_11-4_pre.sql", $customerid, $db, 3);
+	case 3:
+		echo "|";
+		
+		$cmaAppId = QuickQuery("select value from setting where name = '_cmaappid'", $db);
+		$cmaAppType = "none";
+		if ($cmaAppId > 0) {
+			$cmaAppType = "legacy";
+		}
+		QuickUpdate("insert into setting (name, value) values ('_cmaapptype', ?)", $db, array($cmaAppType));
+
+		apply_sql("upgrades/db_11-4_pre.sql", $customerid, $db, 4);
+
 	}
 	//This statement should appear in each upgrade script, when relevant.
 	apply_sql("../db/update_SMAdmin_access.sql", $customerid, $db);
