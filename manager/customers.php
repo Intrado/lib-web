@@ -279,6 +279,8 @@ foreach ($customers as $cust) {
 			$customerfeatures[] = "SDD";
 		if (getCustomerSystemSetting('_hasquicktip', false, true, $custdb))
 			$customerfeatures[] = "QuickTip";
+		if ("none" !== getCustomerSystemSetting('_cmaapptype', "none", true, $custdb))
+			$customerfeatures[] = "CMA";
 		
 		$row[10] = implode(", ", $customerfeatures);
 		$row[11] = getCustomerSystemSetting('_dmmethod', "", true, $custdb);
