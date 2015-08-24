@@ -19,6 +19,9 @@ timeout=5500
 [cmaserver]
 apiurl="https://sandbox.testschoolmessenger.com/cma/_cma_api_stub.php"
 ; apiurl="http://cmastaging.customschoolapps.net"
+silverapiclient.baseurl=
+silverapiclient.username=
+silverapiclient.password=
 
 ;report server connection information
 [reportserver]
