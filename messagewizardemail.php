@@ -36,6 +36,7 @@ require_once("obj/CheckBoxWithHtmlPreview.fi.php");
 require_once("obj/EmailMessageEditor.fi.php");
 require_once("obj/PreviewButton.fi.php");
 require_once("obj/ValTranslationLength.val.php");
+require_once("obj/FromEmail.fi.php");
 
 // appserver and thrift includes
 require_once("inc/appserver.inc.php");
@@ -74,7 +75,6 @@ if (isset($_GET['debug']))
 ////////////////////////////////////////////////////////////////////////////////
 // Wizard step data
 ////////////////////////////////////////////////////////////////////////////////
-
 class MsgWiz_language extends WizStep {
 	function getForm($postdata, $curstep) {
 		global $USER;
@@ -168,19 +168,54 @@ class MsgWiz_emailText extends WizStep {
 			"control" => array("TextField","size" => 25, "maxlength" => 50),
 			"helpstep" => 1
 		);
+		
+		// if customer has an account-wide email then we should display a drop down <select> menu.
+		$helpsteps[] = array(_L("Enter the address where you would like to receive replies."));
+		
+		$customerWideEmail = getSystemSetting('customerwideemail', false);
+		
+		if ($customerWideEmail) {
+			
+			// pre-existing 'from email' for message is not fetched as the wizard
+			// is for creating a new email from scratch.
 
-		$formdata["from"] = array(
-			"label" => _L("From Email"),
-			"fieldhelp" => _L('This is the address the email is coming from. Recipients will also be able to reply to this address.'),
-			"value" => $USER->email,
-			"validators" => array(
-				array("ValRequired"),
-				array("ValLength","max" => 255),
-				array("ValEmail", "domain" => getSystemSetting('emaildomain'))
+			// determine what emails are available
+			$fromEmails= array();
+
+			if ($customerWideEmail) {
+				$fromEmails[] = $customerWideEmail;	
+			}
+
+			if (! empty($USER->email)) {
+				$fromEmails[] = $USER->email;
+			}
+
+			$formdata["from"] = array(
+				"label" => _L("From Email"),
+				"fieldhelp" => _L('This is the address the email is coming from. Recipients will also be able to reply to this address.'),
+				"value" => $fromEmails[0],
+				"validators" => array(
+					array("ValRequired"),
+					array("ValEmail", "domain" => getSystemSetting('emaildomain'))
 				),
-			"control" => array("TextField","max"=>255,"min"=>3,"size"=>35),
-			"helpstep" => 2
-		);
+				"control" => array("FromEmail","size" => 15,"selectvalues"=>$fromEmails, "allowedit" => true),
+				"helpstep" => ++$helpstep
+			);
+
+		} else {
+			$formdata["from"] = array(
+				"label" => _L("From Email"),
+				"fieldhelp" => _L('This is the address the email is coming from. Recipients will also be able to reply to this address.'),
+				"value" => $USER->email,
+				"validators" => array(
+					array("ValRequired"),
+					array("ValLength","max" => 255),
+					array("ValEmail", "domain" => getSystemSetting('emaildomain'))
+					),
+				"control" => array("TextField","max"=>255,"min"=>3,"size"=>35),
+				"helpstep" => 2
+			);
+		}
 
 		$formdata["subject"] = array(
 			"label" => _L("Subject"),
