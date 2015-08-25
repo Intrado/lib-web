@@ -26,16 +26,38 @@ class SilverApiClientTest extends PHPUnit_Framework_TestCase {
 		
 		$sendRequestSessionIdResponse = array(
 			'headers' => "Accept: application/json", 
-			'body' => '{"session_id":"905fe8e2-be08-421b-8007-e3531f2fee62"}', //dummy session_id
+			'body' => '{
+				"session_id":"905fe8e2-be08-421b-8007-e3531f2fee62"
+			}', //dummy session_id
 			'code' => 200
 		);
 
 		// mock result from 
 		$getRequestCategoryResponse = array(
-			'body' => '{ "data": { "id": 1, "name": "Badgers","iconUrl": "http://s3.amazonaws.com/kanta/apps/109/bt8JeYiwX0-3urfEGcdJWw.png","index": 1,"mandatory": false,"group": "Others"}}',
+			'body' => '{
+				"data": [
+					{
+						"id": 1,
+						"name": "Badgers",
+						"iconUrl": "http://s3.amazonaws.com/kanta/apps/109/iMa1l_eX10-K_cFY768jyA.png",
+						"index": 0,
+						"mandatory": false,
+						"group": "GJBGroup",
+						"_notificationGroup": {
+							"applicationId": 109,
+							"tag": "c:155",
+							"name": "Gretel",
+							"imageUrl": "http://s3.amazonaws.com/kanta/apps/109/iMa1l_eX10-K_cFY768jyA.png",
+							"orderIndex": 0,
+							"hidden": false,
+							"id": 58
+						}
+					}
+				]
+			}',
 			'code' => 200
         );
-
+		
 		// $apiClient->sendRequest() is used to authorize and fetch a session id
 		$this->apiClient->expects($this->any())
 			->method('sendRequest')
@@ -71,11 +93,17 @@ class SilverApiClientTest extends PHPUnit_Framework_TestCase {
 
 		// there should be only 1 element in $response
 		$this->assertEquals(1, count($response));
-
-		// verify the values in the response match our dummy data
-		$this->assertEquals(1, $response->id);
-		$this->assertEquals("Badgers", $response->name);
-
+		
+		$this->assertEquals(1, $response[0]->categoryId);
+		
+		// the id should match the _notificationGroup->id as getCategories() calls
+		// a private class which makes the values the same.
+		$this->assertEquals(58, $response[0]->id);
+		$this->assertEquals(58, $response[0]->_notificationGroup->id);
+		
+		// still Badgers I hope
+		$this->assertEquals("Badgers", $response[0]->name);
+		
 	}
 }
 
