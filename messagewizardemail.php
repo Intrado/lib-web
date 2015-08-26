@@ -199,7 +199,7 @@ class MsgWiz_emailText extends WizStep {
 					array("ValEmail", "domain" => getSystemSetting('emaildomain'))
 				),
 				"control" => array("FromEmail","size" => 15,"selectvalues"=>$fromEmails, "allowedit" => true),
-				"helpstep" => ++$helpstep
+				"helpstep" => 2
 			);
 
 		} else {
