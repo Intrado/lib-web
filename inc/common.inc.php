@@ -14,7 +14,7 @@ if (defined('PHPUNIT_CONTEXT')) define('PHPUNIT', true);
 setlocale(LC_ALL, 'en_US.UTF-8');
 mb_internal_encoding('UTF-8');
 
-$SETTINGS = parse_ini_file("{$incdir}/settings.ini.php",true);
+require_once("{$incdir}/settingsloader.inc.php");
 
 //get the customer URL
 $CUSTOMERURL = customerUrlComponent();

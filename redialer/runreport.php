@@ -2,6 +2,11 @@
 setlocale(LC_ALL, 'en_US.UTF-8');
 mb_internal_encoding('UTF-8');
 
+$redialerdir = dirname(__FILE__);
+$basedir = dirname($redialerdir);
+$incdir = "$basedir/inc";
+$objdir = "$basedir/obj";
+require_once("{$incdir}/settingsloader.inc.php");
 
 if ($argc < 7) {
 	echo "Usage: { <reportsubscriptionid> | <jobid> } { subscription | job } <filename> <dbhost> <dbname> <dbuser> <dbpassword>";
@@ -19,7 +24,7 @@ $_DBUSER = $argv[6];
 
 $params = array("filename" => $filename);
 
-require_once("../inc/db.inc.php");
+require_once("{$incdir}/db.inc.php");
 
 // NOTE the global dbcon is read/write it may update the reportsubscription record
 // but the report generator will attempt open a readonly dbcon, which will fail due to no sessionid, this is ok because it then defaults back to the global read/write dbcon
@@ -33,37 +38,37 @@ if ($_dbcon == false) {
 	exit(-2);
 }
 
-require_once("../inc/utils.inc.php");
-require_once("../inc/memcache.inc.php");
-require_once("../inc/auth.inc.php");
-require_once("../inc/DBMappedObject.php");
-require_once("../inc/DBMappedObjectHelpers.php");
-require_once("../inc/DBRelationMap.php");
-require_once("../obj/ReportInstance.obj.php");
-require_once("../obj/ReportSubscription.obj.php");
-require_once("../obj/ReportGenerator.obj.php");
-require_once("../obj/JobAutoReport.obj.php");
-require_once("../obj/SurveyReport.obj.php");
-require_once("../obj/JobSummaryReport.obj.php");
-require_once("../obj/JobDetailReport.obj.php");
-require_once("../obj/CallsReport.obj.php");
-require_once("../obj/ContactChangeReport.obj.php");
-require_once("../obj/SmsStatusReport.obj.php");
-require_once("../obj/Person.obj.php");
-require_once("../obj/Phone.obj.php");
-require_once("../obj/Email.obj.php");
-require_once("../obj/Sms.obj.php");
-require_once("../obj/User.obj.php");
-require_once("../obj/Rule.obj.php");
-require_once("../obj/FieldMap.obj.php");
-require_once("../obj/Language.obj.php");
-require_once("../obj/Job.obj.php");
-require_once("../inc/reportutils.inc.php");
-require_once("../inc/reportgeneratorutils.inc.php");
-require_once("../obj/Access.obj.php");
-require_once("../obj/Permission.obj.php");
-require_once("../inc/date.inc.php");
-require_once("../inc/formatters.inc.php");
+require_once("{$incdir}/utils.inc.php");
+require_once("{$incdir}/memcache.inc.php");
+require_once("{$incdir}/auth.inc.php");
+require_once("{$incdir}/DBMappedObject.php");
+require_once("{$incdir}/DBMappedObjectHelpers.php");
+require_once("{$incdir}/DBRelationMap.php");
+require_once("{$objdir}/ReportInstance.obj.php");
+require_once("{$objdir}/ReportSubscription.obj.php");
+require_once("{$objdir}/ReportGenerator.obj.php");
+require_once("{$objdir}/JobAutoReport.obj.php");
+require_once("{$objdir}/SurveyReport.obj.php");
+require_once("{$objdir}/JobSummaryReport.obj.php");
+require_once("{$objdir}/JobDetailReport.obj.php");
+require_once("{$objdir}/CallsReport.obj.php");
+require_once("{$objdir}/ContactChangeReport.obj.php");
+require_once("{$objdir}/SmsStatusReport.obj.php");
+require_once("{$objdir}/Person.obj.php");
+require_once("{$objdir}/Phone.obj.php");
+require_once("{$objdir}/Email.obj.php");
+require_once("{$objdir}/Sms.obj.php");
+require_once("{$objdir}/User.obj.php");
+require_once("{$objdir}/Rule.obj.php");
+require_once("{$objdir}/FieldMap.obj.php");
+require_once("{$objdir}/Language.obj.php");
+require_once("{$objdir}/Job.obj.php");
+require_once("{$incdir}/reportutils.inc.php");
+require_once("{$incdir}/reportgeneratorutils.inc.php");
+require_once("{$objdir}/Access.obj.php");
+require_once("{$objdir}/Permission.obj.php");
+require_once("{$incdir}/date.inc.php");
+require_once("{$incdir}/formatters.inc.php");
 require_once("XML/RPC.php");
 
 $timezone = QuickQuery("select value from setting where name='timezone'");
@@ -71,7 +76,6 @@ if($timezone){
 	@date_default_timezone_set($timezone);
 	QuickUpdate("set time_zone='" . $timezone . "'");
 }
-
 
 if($type == "subscription"){
 	$subscription = new ReportSubscription($id);
