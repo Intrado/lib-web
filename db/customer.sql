@@ -3123,3 +3123,16 @@ update setting set value='11.4/4' where name='_dbversion'
 $$$
 
 -- END 11.4/4
+
+CREATE TABLE reportphoneoptout (
+  jobId INT NOT NULL,
+  personId INT NOT NULL,
+  sequence TINYINT NOT NULL,
+  lastUpdateMs BIGINT NOT NULL,
+  numRequests INT DEFAULT 1 NOT NULL,
+  PRIMARY KEY (jobId, personId, sequence),
+  KEY (lastUpdateMs)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
+
+-- END 11.4/5

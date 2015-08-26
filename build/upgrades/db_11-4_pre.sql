@@ -35,3 +35,16 @@ $$$
 
 -- no schema changed just insert _cmaapptype legacy if _cmaappid exists
 
+-- $rev 5
+
+CREATE TABLE reportphoneoptout (
+  jobId INT NOT NULL,
+  personId INT NOT NULL,
+  sequence TINYINT NOT NULL,
+  lastUpdateMs BIGINT NOT NULL,
+  numRequests INT DEFAULT 1 NOT NULL,
+  PRIMARY KEY (jobId, personId, sequence),
+  KEY (lastUpdateMs)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
+

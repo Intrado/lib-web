@@ -25,7 +25,9 @@ function upgrade_11_4($rev, $shardid, $customerid, $db) {
 		QuickUpdate("insert into setting (name, value) values ('_cmaapptype', ?)", $db, array($cmaAppType));
 
 		apply_sql("upgrades/db_11-4_pre.sql", $customerid, $db, 4);
-
+	case 4:
+		echo "|";
+		apply_sql("upgrades/db_11-4_pre.sql", $customerid, $db, 5);
 	}
 	//This statement should appear in each upgrade script, when relevant.
 	apply_sql("../db/update_SMAdmin_access.sql", $customerid, $db);
