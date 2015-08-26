@@ -3136,3 +3136,14 @@ CREATE TABLE reportphoneoptout (
 $$$
 
 -- END 11.4/5
+
+ALTER TABLE reportphoneoptout
+  DROP COLUMN sequence,
+  DROP COLUMN numRequests,
+  ADD COLUMN phone VARCHAR(20) NOT NULL DEFAULT '' AFTER personId,
+  ADD INDEX (phone),
+  DROP PRIMARY KEY,
+  ADD PRIMARY KEY (jobId, personId, phone)
+$$$
+
+-- END 11.4/6

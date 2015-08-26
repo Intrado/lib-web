@@ -48,3 +48,13 @@ CREATE TABLE reportphoneoptout (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
 
+-- $rev 6
+
+ALTER TABLE reportphoneoptout
+  DROP COLUMN sequence,
+  DROP COLUMN numRequests,
+  ADD COLUMN phone VARCHAR(20) NOT NULL DEFAULT '' AFTER personId,
+  ADD INDEX (phone),
+  DROP PRIMARY KEY,
+  ADD PRIMARY KEY (jobId, personId, phone)
+$$$
