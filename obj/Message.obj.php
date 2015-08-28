@@ -284,6 +284,7 @@ class Message extends DBMappedObject {
 	static function parse ($data, &$errors = NULL, $defaultvoiceid=null, $audiofileids = null, $enableContentResizing = false) {
 		global $USER;
 
+		error_log("MMMM:".print_r($data, true));
 		if ($errors == NULL)
 			$errors = array();
 
@@ -326,7 +327,7 @@ class Message extends DBMappedObject {
 			}
 
 			$matches = array();
-			if (preg_match("/(\<a class=\"message-attachment-placeholder\" contenteditable\=\"false\" href\=\"[^\=]*emailattachment\.php\?)/", strtolower($data), $matches)) {
+			if (preg_match("/(\<a class=\"message-attachment-placeholder\".* href\=\"[^\=]*emailattachment\.php\?)/", strtolower($data), $matches)) {
 				// we only care about the first match
 				$uploadattachmenturl = $matches[1];
 				$pos_ma = stripos($data, $uploadattachmenturl);
