@@ -189,8 +189,7 @@ class Message extends DBMappedObject {
 			return;
 
 		$messageAttachments = $this->getMessageAttachments();
-		$contentAttachments = $this->getContentAttachments();
-
+		$contentAttachments = $this->getContentAttachments(false);
 		// remove existing attachments
 		foreach ($contentAttachments as $id => $contentAttachment) {
 			if (isset($attachments[$contentAttachment->contentid])) {
@@ -205,6 +204,7 @@ class Message extends DBMappedObject {
 				$contentAttachment->destroy();
 			}
 		}
+
 		// create new attachments
 		$this->createContentAttachments($attachments);
 	}

@@ -133,7 +133,8 @@ class MsgWiz_emailText extends WizStep {
 		$messagegroup = new MessageGroup($_SESSION['wizard_message_mgid']);
 		
 		$subtype = $_SESSION['wizard_message_subtype'];
-		
+		$helpstep = 1;
+		$helpsteps = array();
 		// Form Fields.
 		$formdata = array($this->title);
 		$messagevalidators = array(
@@ -152,11 +153,11 @@ class MsgWiz_emailText extends WizStep {
 						<li class="wizbuttonlist">'._L('After entering the English version, click <b>Next</b> to review/edit the translations').'</li>
 					</ul>
 					'),
-				"helpstep" => 1
+				"helpstep" => $helpstep
 			);
 			$messagevalidators[] = array("ValTranslationLength");
 		}
-		
+
 		$formdata["fromname"] = array(
 			"label" => _L('From Name'),
 			"fieldhelp" => _L('Recipients will see this name as the sender of the email.'),
@@ -166,12 +167,10 @@ class MsgWiz_emailText extends WizStep {
 					array("ValLength","max" => 50)
 					),
 			"control" => array("TextField","size" => 25, "maxlength" => 50),
-			"helpstep" => 1
+			"helpstep" => $helpstep
 		);
-		
-		// if customer has an account-wide email then we should display a drop down <select> menu.
-		$helpsteps[] = array(_L("Enter the address where you would like to receive replies."));
-		
+		$helpsteps[] = _L("Enter the name for the email account.");
+
 		$customerWideEmail = getSystemSetting('customerwideemail', false);
 		
 		if ($customerWideEmail) {
@@ -199,7 +198,7 @@ class MsgWiz_emailText extends WizStep {
 					array("ValEmail", "domain" => getSystemSetting('emaildomain'))
 				),
 				"control" => array("FromEmail","size" => 15,"selectvalues"=>$fromEmails, "allowedit" => true),
-				"helpstep" => 2
+				"helpstep" => ++$helpstep
 			);
 
 		} else {
@@ -213,9 +212,11 @@ class MsgWiz_emailText extends WizStep {
 					array("ValEmail", "domain" => getSystemSetting('emaildomain'))
 					),
 				"control" => array("TextField","max"=>255,"min"=>3,"size"=>35),
-				"helpstep" => 2
+				"helpstep" => ++$helpstep
 			);
 		}
+
+		$helpsteps[] = array(_L("Enter the address where you would like to receive replies."));
 
 		$formdata["subject"] = array(
 			"label" => _L("Subject"),
@@ -226,17 +227,21 @@ class MsgWiz_emailText extends WizStep {
 				array("ValLength","max" => 255)
 			),
 			"control" => array("TextField","max"=>255,"min"=>3,"size"=>45),
-			"helpstep" => 3
+			"helpstep" => ++$helpstep
 		);
+		$helpsteps[] = _L("Enter the subject of the email here.");
 
-		$formdata["attachments"] = array(
-			"label" => _L('Attachments'),
-			"fieldhelp" => _L("You may attach up to three files that are up to 2MB each. For greater security, certain file types are not permitted. Be aware that some email accounts may not accept attachments above a certain size and may reject your message."),
-			"value" => "{}",
-			"validators" => array(array("ValEmailAttach")),
-			"control" => array("EmailAttach"),
-			"helpstep" => 4
-		);
+		if ($subtype === 'plain') {
+			$formdata["attachments"] = array(
+				"label" => _L('Attachments'),
+				"fieldhelp" => _L("You may attach up to three files that are up to 2MB each. For greater security, certain file types are not permitted. Be aware that some email accounts may not accept attachments above a certain size and may reject your message."),
+				"value" => "{}",
+				"validators" => array(array("ValEmailAttach")),
+				"control" => array("EmailAttach"),
+				"helpstep" => ++$helpstep
+			);
+			$helpsteps[] =	_L("You may attach up to three files that are up to 2MB each. For greater security, only certain types of files are accepted.<br><br><b>Note:</b> Some email accounts may not accept attachments above a certain size and may reject your message.");
+		}
 
 		// MESSAGE BODY
 		$formdata["message"] = array(
@@ -244,16 +249,18 @@ class MsgWiz_emailText extends WizStep {
 			"fieldhelp" => _L('Enter the message you would like to send. Helpful tips for successful messages can be found at the Help link in the upper right corner.'),
 			"value" => $msgdata->text,
 			"validators" => $messagevalidators,
-			"helpstep" => 5
+			"helpstep" => ++$helpstep
 		);
 		switch ($subtype) {
 			case 'plain':
 				$formdata['message']["control"] = array("EmailMessageEditor", "subtype" => $subtype);
+				$helpsteps[] = 	_L("Enter your plain text version of your email in this field. <br><br>Be sure to introduce yourself and give detailed information. For helpful message tips and ideas, click the Help link in the upper right corner of the screen.");
 				break;
 
 			case 'html':
 				// HTML emails will use CKEditor 4; valid editor_mode's are 'plain', 'normal', 'full', and 'inline'
 				$formdata['message']["control"] = array("HtmlTextArea", "subtype" => $subtype, 'rows' => 20, 'editor_mode' => 'normal');
+				$helpsteps[] = 	_L("<p>Enter your HTML email in this field. You may use the HTML editing tools to format your email.</p> <p>To insert data fields, set the cursor where the data should appear. Be careful to not delete any of the brackets that appear around inserted data fields. Select the data field you wish to insert and enter a default value which will display if a recipient does not have data in the chosen field. Click the 'Insert' button to add the data field to your message.</p><p><b>Note:</b> <i>Date inserts will insert the date relative to when the job is sent. For example, if you insert 'Date' and send the message immediately, it will have today's date. However, if you send the message tomorrow, it would insert tomorrow's date.</i></p>");
 				break;
 		}
 
@@ -273,20 +280,12 @@ class MsgWiz_emailText extends WizStep {
 				"subjecttarget" => "subject",
 				"texttarget" => "message",
 			),
-			"helpstep" => 3
+			"helpstep" => ++$helpstep
 		);
 		
-		$helpsteps = array();
-		$helpsteps[] = _L("Enter the name for the email account.");
-		$helpsteps[] = _L("Enter the address where you would like to receive replies.");
-		$helpsteps[] = _L("Enter the subject of the email here.");
-		$helpsteps[] =	_L("You may attach up to three files that are up to 2MB each. For greater security, only certain types of files are accepted.<br><br><b>Note:</b> Some email accounts may not accept attachments above a certain size and may reject your message.");
-		if ($subtype == "html"){
-			$helpsteps[] = 	_L("<p>Enter your HTML email in this field. You may use the HTML editing tools to format your email.</p> <p>To insert data fields, set the cursor where the data should appear. Be careful to not delete any of the brackets that appear around inserted data fields. Select the data field you wish to insert and enter a default value which will display if a recipient does not have data in the chosen field. Click the 'Insert' button to add the data field to your message.</p><p><b>Note:</b> <i>Date inserts will insert the date relative to when the job is sent. For example, if you insert 'Date' and send the message immediately, it will have today's date. However, if you send the message tomorrow, it would insert tomorrow's date.</i></p>");
-		} else {
-			$helpsteps[] = 	_L("Enter your plain text version of your email in this field. <br><br>Be sure to introduce yourself and give detailed information. For helpful message tips and ideas, click the Help link in the upper right corner of the screen.");
-		}
-		
+
+		$helpsteps[] = _L("Click the preview button to view of your message.");
+
 		return new Form("emailText",$formdata,$helpsteps);
 	}
 
@@ -635,13 +634,14 @@ class FinishMessageWizard extends WizFinish {
 					$message->create();
 				else
 					$message->update();
-				
-				// create the message parts
-				$message->recreateParts($data['text'], null, isset($data['gender'])?$data['gender']:false);
-				
+
 				// if there are message attachments, attach them
 				$message->replaceContentAttachments($data['attachments']);
-				
+
+
+				// create the message parts
+				$message->recreateParts($data['text'], null, isset($data['gender'])?$data['gender']:false);
+
 				// remove old messages based on the auto translate value
 				// we need to get rid of recorded messages if this is now a TTS message for example
 				switch ($autotranslate) {
