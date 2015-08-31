@@ -33,13 +33,6 @@ class SilverApiClient {
 		$this->sessionId = $this->getSessionId($appId);
 	}
 	
-	// create a header for the basic auth request
-	public function getBasicAuthHeader() {
-		return array(
-			"Authorization: Basic " . base64_encode($this->username . ':' . $this->password)
-		);
-	}
-	
 	// retrieve a session id to use with subsequent requests
 	public function getSessionId() {
 		$res = $this->apiClient->sendRequest('GET',"/api/account/verify_credentials.json?nid={$this->appId}", null, $this->getBasicAuthHeader());
@@ -47,36 +40,66 @@ class SilverApiClient {
 		return ($res['code'] == 200 ? json_decode($res['body'])->session_id : false);
 	}
 	
-	// retrieve list of categories 
+	/**
+	 *  getCategories() - retrieve list of categories 
+	 *  @return array 
+	 */
 	public function getCategories() {
 		$res = $this->apiClient->get('/' . $this->appId . '/channels/objects/channels?embed=_notificationGroup&session_id=' . $this->sessionId);
 		
 		if (isset(json_decode($res['body'])->data)) {
-			$data = json_decode($res['body'])->data;
+			$rawCategoryArray = json_decode($res['body'])->data;
 			
-			// if no categories at least return empty array
-			$swappedCategories = array();
+			$newCategoryArray = array();
 			
-			// if array of categories is not empty
-			if (!empty($data)) {
-				$swappedCategories = $this->swapCategoryIdForNotificationGroupId($data);
+			if (!empty($rawCategoryArray)) {
+				$newCategoryArray = $this->createCategoryObjectArray($rawCategoryArray);
 			}
 		}
 		
-		return ($res['code'] == 200 ? $swappedCategories : false);
+		return ($res['code'] == 200 ? $newCategoryArray: false);
 	}
 	
-	private function swapCategoryIdForNotificationGroupId($categoryArray) {
+	// create a header for the basic auth request
+	private function getBasicAuthHeader() {
+		return array(
+			"Authorization: Basic " . base64_encode($this->username . ':' . $this->password)
+		);
+	}
+	
+	/**
+	 *  getCategories() - convert category array from Silver API to simply object array
+	 *  @param array 
+	 *  @return array - example: [object(name: 'category-name', id: 'category-name')]
+	 */
+	private function createCategoryObjectArray($rawCategoryArray) {
 		
-		$arrayCount = count($categoryArray);
+		$customCategoryObjs = array();
 		
-		for($i = 0; $i < $arrayCount; $i++) {
-			$categoryArray[$i]->categoryId = $categoryArray[$i]->id;
-			$categoryArray[$i]->id = $categoryArray[$i]->_notificationGroup->id;
+		foreach($rawCategoryArray as $categoryObj) {
+			$newCategoryObj = $this->createCategoryObject($categoryObj);
+			$customCategoryObjs[] = $newCategoryObj;
 		}
 		
-		return $categoryArray;
+		return $customCategoryObjs;
 	}
+	
+	
+	/**
+	 *  createCategoryObject() - strip out category props we don't need
+	 *  @param Object
+	 *  @return Object
+	 */
+	private function createCategoryObject($categoryObj) {
+		
+		$newCategoryObj = (object) array(
+			'name' => $categoryObj->_notificationGroup->name,
+			'id'=> $categoryObj->_notificationGroup->id
+		);
+		
+		return $newCategoryObj;
+	}
+	
 }
 
 ?>
