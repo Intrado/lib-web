@@ -20,14 +20,6 @@ class SilverApiClientTest extends PHPUnit_Framework_TestCase {
 	
 	// Convenience vars for getting setup data
 	var $getRequestCategoryResponse;
-	
-	// this will allow us to test proteced methods
-	protected static function getMethod($name) {
-		$class = new ReflectionClass('$this->silverApiClient');
-		$method = $class->getMethod($name);
-		$method->setAccessible(true);
-		return $method;
-	}
 
 	public function setup() {
 
