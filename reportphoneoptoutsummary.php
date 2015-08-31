@@ -20,7 +20,7 @@ require_once("obj/ReportInstance.obj.php");
 require_once("obj/ReportGenerator.obj.php");
 require_once("obj/ReportSubscription.obj.php");
 require_once("obj/UserSetting.obj.php");
-require_once("obj/ContactChangeReport.obj.php");
+require_once("obj/PhoneOptOutReport.obj.php");
 require_once("obj/Person.obj.php");
 require_once("obj/Phone.obj.php");
 require_once("obj/Email.obj.php");
@@ -36,18 +36,6 @@ if (!($USER->authorize('viewsystemreports'))) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Functions
-////////////////////////////////////////////////////////////////////////////////
-//index 5 is type
-function fmt_dst_src($row, $index){
-	if($row[$index] != null)
-		return escapehtml(destination_label($row[5], $row[$index]));
-	else
-		return "";
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -57,74 +45,7 @@ $fields = $ffields + $gfields;
 
 unset($_SESSION['report']['edit']);
 $redirect = 0;
-if(isset($_GET['reportid'])){
-	$_SESSION['reportid'] = $_GET['reportid']+0;
-	if(!userOwns("reportsubscription", $_SESSION['reportid'])){
-		redirect("unauthorized.php");
-	}
-	$subscription = new ReportSubscription($_SESSION['reportid']);
-	$instance = new ReportInstance($subscription->reportinstanceid);
-	$options = $instance->getParameters();
-	$activefields = array();
-	if(isset($options['activefields'])){
-		$activefields = explode(",", $options['activefields']) ;
-	}
-	foreach($fields as $field){
-		if(in_array($field->fieldnum, $activefields)){
-			$_SESSION['report']['fields'][$field->fieldnum] = true;
-		} else {
-			$_SESSION['report']['fields'][$field->fieldnum] = false;
-		}
-	}
-	$_SESSION['report']['options'] = $options;
-	redirect();
-}
 
-if(isset($_GET['type'])){
-	$_SESSION['report']['jobdetail']=1;
-	$options = $_SESSION['report']['options'];
-	if($_GET['type'] == "phone"){
-		$options['reporttype'] = "phonedetail";
-	} else if($_GET['type'] == "email"){
-		$options['reporttype'] = "emaildetail";
-	} else if($_GET['type'] == "sms"){
-		$options['reporttype'] = "smsdetail";
-	}
-	unset($options['result']);
-	unset($options['status']);
-	$options['order1'] = 'rp.pkey';
-	$_SESSION['report']['options'] = $options;
-	$redirect = 1;
-}
-
-if(isset($_GET['status'])){
-	$_SESSION['report']['jobdetail']=1;
-	unset($_SESSION['reportid']);
-	$options = $_SESSION['report']['options'];
-	unset($options['status']);
-	unset($options['result']);
-	$options['status'] = DBSafe($_GET['status']);
-	$options['order1'] = 'rp.pkey';
-	$_SESSION['report']['options'] = $options;
-	$redirect = 1;
-}
-
-if(isset($_GET['result'])){
-	$_SESSION['report']['jobdetail']=1;
-	unset($_SESSION['reportid']);
-	$options = $_SESSION['report']['options'];
-	unset($options['status']);
-	unset($options['result']);
-	$options['result'] = DBSafe($_GET['result']);
-	if($_GET['result'] == "undelivered"){
-		$options['reporttype'] = "notcontacted";
-	} else {
-		$options['reporttype']="phonedetail";
-	}
-	$options['order1'] = 'rp.pkey';
-	$_SESSION['report']['options'] = $options;
-	$redirect = 1;
-}
 if(!isset($_SESSION['report']['options'])){
 	redirect("reports.php");
 }
@@ -132,7 +53,7 @@ if(!isset($_SESSION['report']['options'])){
 if($redirect)
 	redirect();
 
-$ordering = ContactChangeReport::getOrdering();
+$ordering = PhoneOptOutReport::getOrdering();
 $ordercount=3;
 
 $pagestartflag=0;
@@ -181,7 +102,7 @@ $_SESSION['report']['options'] = $options;
 $options['pagestart'] = $pagestart;
 
 $instance->setParameters($options);
-$reportgenerator = new ContactChangeReport();
+$reportgenerator = new PhoneOptOutReport();
 $reportgenerator->reportinstance = $instance;
 $reportgenerator->userid = $USER->id;
 
@@ -195,7 +116,7 @@ if(isset($_GET['csv']) && $_GET['csv']){
 
 
 $f="reports";
-$s="contactchanges";
+$s="phoneoptout";
 $reload = 0;
 $submit=0;
 
@@ -287,7 +208,7 @@ if($error || $reportgenerator->format == "html"){
 	$reportgenerator->format = "html";
 	$reportgenerator->generateQuery();
 	$PAGE = "reports:reports";
-	$TITLE = "Contact Information Changes";
+	$TITLE = "Phone Opt-Out Results";
 	if(isset($_SESSION['reportid'])){
 		$subscription = new ReportSubscription($_SESSION['reportid']);
 		$TITLE .= " - " . escapehtml($subscription->name);
@@ -311,13 +232,6 @@ if($error || $reportgenerator->format == "html"){
 	startWindow("Display Options", "padding: 3px;", "true");
 	?>
 	<table border="0" cellpadding="3" cellspacing="0" width="100%">
-		<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Display Fields:</th>
-			<td class="bottomBorder">
-	<?
-				select_metadata('searchresults', 7, $fields);
-	?>
-			</td>
-		</tr>
 		<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Sort By:</th>
 			<td class="bottomBorder" >
 <?
@@ -325,7 +239,7 @@ if($error || $reportgenerator->format == "html"){
 ?>
 			</td>
 		<tr><th align="right" class="windowRowHeader bottomBorder">Output Format:</th>
-			<td class="bottomBorder"><a href="reportcontactchangesummary.php/report.csv?csv=true">CSV</a></td>
+			<td class="bottomBorder"><a href="reportphoneoptoutsummary.php/report.csv?csv=true">CSV</a></td>
 		</tr>
 	</table>
 	<?
