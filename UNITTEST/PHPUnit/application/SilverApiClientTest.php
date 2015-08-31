@@ -1,7 +1,10 @@
 <?php
 
 require_once(realpath(dirname(dirname(__FILE__)) .'/konaenv.php'));
-require_once("{$konadir}/inc/common.inc.php");
+
+global $incdir;
+
+require_once("{$konadir}/inc/common.inc.php");   
 require_once("{$konadir}/obj/SilverApiClient.obj.php");
 
 class SilverApiClientTest extends PHPUnit_Framework_TestCase {
@@ -14,6 +17,17 @@ class SilverApiClientTest extends PHPUnit_Framework_TestCase {
 	var $password = 'fakepass';
 	
 	var $appId = 109;
+	
+	// Convenience vars for getting setup data
+	var $getRequestCategoryResponse;
+	
+	// this will allow us to test proteced methods
+	protected static function getMethod($name) {
+		$class = new ReflectionClass('$this->silverApiClient');
+		$method = $class->getMethod($name);
+		$method->setAccessible(true);
+		return $method;
+	}
 
 	public function setup() {
 
@@ -39,15 +53,15 @@ class SilverApiClientTest extends PHPUnit_Framework_TestCase {
 					{
 						"id": 1,
 						"name": "Badgers",
-						"iconUrl": "http://s3.amazonaws.com/kanta/apps/109/iMa1l_eX10-K_cFY768jyA.png",
+						"iconUrl": "http://not.a.url",
 						"index": 0,
 						"mandatory": false,
 						"group": "GJBGroup",
 						"_notificationGroup": {
 							"applicationId": 109,
 							"tag": "c:155",
-							"name": "Gretel",
-							"imageUrl": "http://s3.amazonaws.com/kanta/apps/109/iMa1l_eX10-K_cFY768jyA.png",
+							"name": "Cornholio",
+							"imageUrl": "http://also.not.a.url.png",
 							"orderIndex": 0,
 							"hidden": false,
 							"id": 58
@@ -69,11 +83,14 @@ class SilverApiClientTest extends PHPUnit_Framework_TestCase {
 			->will($this->returnValue($getRequestCategoryResponse));
 
 		$this->silverApiClient = new SilverApiClient($this->apiClient, $this->username, $this->password, $this->appId);
+		
+		$this->getRequestCategoryResponse = $getRequestCategoryResponse;
 
 	}
 
 	public function tearDown() {
 		unset($this->silverApiClient);
+		unset($this->getRequestCategoryResponse);
 	}
 	
 	public function test_getSessionId() {
@@ -88,23 +105,32 @@ class SilverApiClientTest extends PHPUnit_Framework_TestCase {
 	}
 	
 	public function test_getCategories() {
+		
+		// obj so we can conveniently access mock request body data
+		$jsonRequestBody = json_decode($this->getRequestCategoryResponse['body']);
+		
 		// getCategories() calls apiClient->get(url)
 		$response = $this->silverApiClient->getCategories();
-
+		
+		// the response should be an array
+		$this->assertTrue(is_array($response));
+		
 		// there should be only 1 element in $response
 		$this->assertEquals(1, count($response));
 		
-		$this->assertEquals(1, $response[0]->categoryId);
+		// it should be an object
+		$this->assertTrue(is_object($response[0]));
 		
-		// the id should match the _notificationGroup->id as getCategories() calls
-		// a private class which makes the values the same.
-		$this->assertEquals(58, $response[0]->id);
-		$this->assertEquals(58, $response[0]->_notificationGroup->id);
+		// the category ID should match the _notificationGroup ID from the mock
+		$notificationGroupId = $jsonRequestBody->data[0]->_notificationGroup->id;
+		$this->assertEquals($notificationGroupId, $response[0]->id);
 		
-		// still Badgers I hope
-		$this->assertEquals("Badgers", $response[0]->name);
+		// the category name should match the _notificationGroup name from the mock
+		$notificationGroupName = $jsonRequestBody->data[0]->_notificationGroup->name;
+		$this->assertEquals($notificationGroupName, $response[0]->name);
 		
 	}
+	
 }
 
 ?>
