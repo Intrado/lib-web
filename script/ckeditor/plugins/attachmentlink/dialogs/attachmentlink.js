@@ -8,6 +8,7 @@ CKEDITOR.dialog.add('attachmentlink', function (editor) {
 				element = this.getParentEditor().getSelection().getSelectedElement();
 
 			this.setupContent(element);
+			this.getContentElement('tab1', 'uploadstatus').getElement().setText('');
 		},
 		onOk: function () {
 			var value = this.getContentElement('tab1', 'viewattachmenturl').getInputElement().getValue();
@@ -23,7 +24,6 @@ CKEDITOR.dialog.add('attachmentlink', function (editor) {
 			var tag = '<a class="message-attachment-placeholder" contenteditable="false" href="' + location + '">' + displayName + ' </a>';
 
 			editor.insertHtml(tag);
-
 		},
 		contents: [
 			{
@@ -49,7 +49,6 @@ CKEDITOR.dialog.add('attachmentlink', function (editor) {
 						label: 'Upload',
 						onLoad: function () {
 							CKEDITOR.document.getById(this._.frameId).on('load', function () {
-								var uploadbutton = this.getDialog().getContentElement('tab1', 'uploadbutton');
 							}.bind(this));
 						}
 					},
@@ -73,7 +72,13 @@ CKEDITOR.dialog.add('attachmentlink', function (editor) {
 							CKEDITOR.document.getById(this.domId).$.style.visibility = "hidden";
 						},
 						onChange: function (event) {
-							this.getDialog().getContentElement('tab1', 'uploadstatus').getElement().setText('Attachment uploaded.');
+							if (event && event.data && event.data.value) {
+								var attachment = JSON.parse(event.data.value);
+								this.getDialog().getContentElement('tab1', 'uploadstatus').getElement().setText(attachment.filename + " uploaded.");
+							}
+							else {
+								this.getDialog().getContentElement('tab1', 'uploadstatus').getElement().setText('Failed to upload the attachment.');
+							}
 						}
 					}
 				]
