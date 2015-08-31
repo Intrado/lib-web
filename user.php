@@ -417,19 +417,19 @@ $formdata["phone"] = array(
 	"control" => array("TextField","maxlength" => 20, "size" => 15),
 	"helpstep" => 1
 );
-
-$formdata["sms"] = array(
-	"label" => _L("SMS"),
-	"fieldhelp" => _L('This is a number which the user can recieve SMS text messages.'),
-	"value" => Phone::format($edituser->sms),
-	"validators" => array(
-		array("ValLength","min" => 2,"max" => 20),
-		array("ValPhone")
-	),
-	"control" => array("TextField","maxlength" => 20, "size" => 15),
-	"helpstep" => 1
-);
-
+if(getSystemSetting('_hassms', false)) {
+	$formdata["sms"] = array(
+		"label" => _L("SMS"),
+		"fieldhelp" => _L('This is a number which the user can recieve SMS text messages.'),
+		"value" => Phone::format($edituser->sms),
+		"validators" => array(
+			array("ValLength","min" => 2,"max" => 20),
+			array("ValPhone")
+		),
+		"control" => array("TextField","maxlength" => 20, "size" => 15),
+		"helpstep" => 1
+	 );
+}
 if (!getSystemSetting('_hascallback', false)) {
 	$authorizedcallerids = QuickQueryList("select callerid,callerid from authorizedcallerid",true);
 	$formdata["callerid"] = array(
@@ -695,10 +695,10 @@ if ($readonly) {
 	$formdata["phone"]["control"] = array("FormHtml","html" => Phone::format($edituser->phone));
 	unset($formdata["phone"]["validators"]);
 
-        // SMS
-        // TODO: When imports support sms, validators can be unset for readonly
-//      $formdata["sms"]["control"] = array("FormHtml","html" => Phone::format($edituser->sms));
-//	unset($formdata["sms"]["validators"]);
+	//	SMS
+	//	TODO: When imports support sms, validators can be unset for readonly
+	//	$formdata["sms"]["control"] = array("FormHtml","html" => Phone::format($edituser->sms));
+	//	unset($formdata["sms"]["validators"]);
 
 	// Caller ID
 	if (!getSystemSetting('_hascallback', false)) {
@@ -791,8 +791,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$userphone = Phone::parse($postdata['phone']);
 			$edituser->phone = $userphone;
                         
-                        $usersms = Phone::parse($postdata['sms']);
-                        $edituser->sms = $usersms;
+			$usersms = Phone::parse($postdata['sms']);
+			$edituser->sms = $usersms;
 
 			if (strlen($userphone) == 0 )
 				$userphone = false;
@@ -894,13 +894,12 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				foreach($postdata['surveytypes'] as $type)
 					QuickUpdate("insert into userjobtypes values (?, ?)", false, array($edituser->id, $type));
 			
-		}
-                else {
-                    // sms field should be editable regardless of $readonly being set
-                    //TODO: move this to readonly section when sms added to import.
-                    $edituser->sms = Phone::parse($postdata['sms']);
-                    $edituser->update();
-                }
+			} else {
+				// sms field should be editable regardless of $readonly being set
+				//TODO: move this to readonly section when sms added to import.
+				$edituser->sms = Phone::parse($postdata['sms']);
+				$edituser->update();
+            }
 
 		// Feed Category settings
 		if (getSystemSetting("_hasfeed", false)) {
