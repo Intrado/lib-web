@@ -1440,8 +1440,10 @@ class MessageSenderProcessor {
 					}
 					break;
 				case "twitter":
-					$twitterauth = json_decode($USER->getSetting("tw_access_token"));
-					$job->updateJobPost("twitter", $twitterauth->user_id);
+					if ($postdata["socialmediatwitteruserids"]) {
+						$userids = json_decode($postdata["socialmediatwitteruserids"]);
+						$job->updateJobPost("twitter", $userids);
+					}
 					break;
 				case "feed":
 					if ($postdata["socialmediafeedcategory"] && count($postdata["socialmediafeedcategory"]))
