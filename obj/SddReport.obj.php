@@ -19,11 +19,10 @@ function fmt_dst_src($row, $index) {
 
 function fmt_sdd_action($row, $index) {
 	$map = array(
-		"NONE" => "N/A",
-		"SEND" => "Sent",
-		"CLICK" => "Clicked",
-		"DOWNLOAD" => "Downloaded",
-		"BAD_PASSWORD" => "Entered Bad Password"
+		"none" => "n/a",
+		"click" => "Clicked",
+		"download" => "Downloaded",
+		"bad_password" => "Entered Bad Password"
 	);
 	return isset($map[$row[$index]]) ? $map[$row[$index]] : "Unknown";
 }
@@ -69,7 +68,7 @@ p.f02 as lastname,
 p.f01 as firstname,
 ba.filename,
 rp.status,
-coalesce(sdd_download.action, sdd_action.action, 'NONE') as action,
+coalesce(sdd_download.action, sdd_action.action, 'none') as action,
 coalesce(sdd_download.actionCount, sdd_action.actionCount) as actionCount,
 coalesce(sdd_download.timestampMs, sdd_action.timestampMs) as actionTimestampMs
 from burst as b
@@ -79,8 +78,8 @@ inner join job as j on (j.id = b.jobid)
 inner join reportperson as rp on (rp.jobid = b.jobid and rp.type = 'email')
 left outer join reportdocumentdelivery as sdd_action on (sdd_action.messageAttachmentId = ma.id and sdd_action.personid = rp.personid)
 left outer join reportdocumentdelivery as sdd_action2 on (sdd_action2.messageAttachmentId = ma.id and sdd_action2.personid = sdd_action.personid and sdd_action2.timestampMs > sdd_action.timestampMs)
-left outer join reportdocumentdelivery as sdd_download on (sdd_download.messageAttachmentId = ma.id and sdd_download.personid = sdd_action.personid and sdd_download.action = 'DOWNLOAD')
-left outer join reportdocumentdelivery as sdd_download2 on (sdd_download2.messageAttachmentId = ma.id and sdd_download2.personid = sdd_action.personid and sdd_download2.action = 'DOWNLOAD' and sdd_download2.timestampMs > sdd_download.timestampMs)
+left outer join reportdocumentdelivery as sdd_download on (sdd_download.messageAttachmentId = ma.id and sdd_download.personid = sdd_action.personid and sdd_download.action = 'download')
+left outer join reportdocumentdelivery as sdd_download2 on (sdd_download2.messageAttachmentId = ma.id and sdd_download2.personid = sdd_action.personid and sdd_download2.action = 'download' and sdd_download2.timestampMs > sdd_download.timestampMs)
 inner join person as p on (p.id = rp.personid)
 where b.id = ? and b.deleted = 0 and sdd_action2.messageattachmentid is null and sdd_download2.messageattachmentid is null
 order by lastname, firstname
@@ -94,7 +93,7 @@ order by lastname, firstname
 		$data = array();
 		$pageSize = self::DEFAULT_PAGE_SIZE;
 		$pageStart = isset($this->params['pagestart']) ? (int)$this->params["pagestart"] : 0;
-		$limit = "limit $pageStart, $pageSize";
+		$limit = " limit $pageStart, $pageSize";
 
 		$sql = $this->query . $limit;
 		$result = Query($sql, $this->_readonlyDB, $this->queryArgs);
