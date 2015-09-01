@@ -107,6 +107,7 @@ if ($USER->authorize('viewsystemreports')) {
 	
 	$otherLinks[] = "<a href='reportarchive.php' >Systemwide Report Archive</a>";
 	$otherLinks[] = "<a href='reportcontactchange.php?clear=1' >Contact Information Changes</a>";
+	$otherLinks[] = "<a href='reportphoneoptout.php?clear=1' >Phone Opt-Out</a>";
 	if (getSystemSetting('_hassms', false)) {
 		$otherLinks[] = "<a href='reportsmsstatus.php?clear=1' >" . _L("SMS Status") . "</a>";
 	}

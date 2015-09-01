@@ -273,10 +273,10 @@ if ($readonly) {
 		"control" => array("FormHtml","html" => Phone::format($USER->phone)),
 		"helpstep" => 1
 	);
-        
-        // sms field is editable because user imports do not support user sms
-        // TODO: when imports support user sms, actually make this read only.
-        $formdata["sms"] = array(
+	if(getSystemSetting('_hassms', false)) {
+		// sms field is editable because user imports do not support user sms
+		// TODO: when imports support user sms, actually make this read only.
+		$formdata["sms"] = array(
 		"label" => _L("SMS"),
 		"fieldhelp" => ("Enter a phone number by which you would like to recieve SMS text messages."),
 		"value" => Phone::format($USER->sms),
@@ -286,7 +286,8 @@ if ($readonly) {
 		),
 		"control" => array("TextField","maxlength" => 20, "size" => 15),
 		"helpstep" => 1
-	);
+		);
+	}
 } else {
 	$formdata["email"] = array(
 		"label" => _L("Account Email"),
@@ -323,18 +324,21 @@ if ($readonly) {
 		"control" => array("TextField","maxlength" => 20, "size" => 15),
 		"helpstep" => 1
 	);
-        
-        $formdata["sms"] = array(
-		"label" => _L("SMS"),
-		"fieldhelp" => ("Enter a phone number by which you would like to recieve SMS text messages."),
-		"value" => Phone::format($USER->sms),
-		"validators" => array(
-			array("ValLength","min" => 2,"max" => 20),
-			array("ValPhone")
-		),
-		"control" => array("TextField","maxlength" => 20, "size" => 15),
-		"helpstep" => 1
-	);
+	if(getSystemSetting('_hassms', false)) {
+		   // sms field is editable because user imports do not support user sms
+		   // TODO: when imports support user sms, actually make this read only.
+		   $formdata["sms"] = array(
+		   "label" => _L("SMS"),
+		   "fieldhelp" => ("Enter a phone number by which you would like to recieve SMS text messages."),
+		   "value" => Phone::format($USER->sms),
+		   "validators" => array(
+			   array("ValLength","min" => 2,"max" => 20),
+			   array("ValPhone")
+		   ),
+		   "control" => array("TextField","maxlength" => 20, "size" => 15),
+		   "helpstep" => 1
+		   );
+	}
 }
 // Notification Defaults
 $formdata[] = _L("%s Defaults", getJobTitle());
@@ -524,7 +528,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		//save data here
 		Query('BEGIN');
                 
-                if (!$readonly) {
+		if (!$readonly) {
+			
 			$USER->firstname = $postdata['firstname'];
 			$USER->lastname = $postdata['lastname'];
 			if (!$USER->ldap) {
@@ -534,22 +539,22 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$USER->email = $postdata['email'];
 			$USER->aremail = $postdata['aremail'];
 			$USER->phone = Phone::parse($postdata['phone']);
-                        $USER->sms = Phone::parse($postdata['phone']);
+			$USER->sms = Phone::parse($postdata['sms']);
 			$USER->update();
-			
+
 			if (isset($postdata['callerid'])) {
 				$callerid = Phone::parse($postdata['callerid']);
 				if (canSetCallerid($callerid)) {
 					$USER->setSetting("callerid",$callerid);
 				}
 			}
-		}
-                else {
-                    // sms field should be editable regardless of $readonly being set
-                    //TODO: move this to readonly section when sms added to import.
-                    $USER->sms = Phone::parse($postdata['sms']);
-                    $USER->update();
-                }
+			
+		} else {
+			// sms field should be editable regardless of $readonly being set
+			//TODO: move this to readonly section when sms added to import.
+			$USER->sms = Phone::parse($postdata['sms']);
+			$USER->update();
+        }
 
 		// If the pincode is all 0 characters then it was a default form value, so ignore it
 		$newpin = $postdata['pin'];

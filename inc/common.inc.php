@@ -2,8 +2,8 @@
 //######## IF  YOU EDIT THIS FILE, BE SURE TO UPDATE SUBDIRCOMMON.INC.PHP ########
 
 // Get the path to kona's base directory
-$incdir = dirname(__FILE__);
-$basedir = dirname($incdir);
+$basedir = dirname(dirname(__FILE__));
+$incdir = $basedir . DIRECTORY_SEPARATOR . 'inc';
 $objdir = "{$basedir}/obj";
 $thriftdir = "{$basedir}/Thrift";
 
