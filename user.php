@@ -40,7 +40,7 @@ if (!$makeNewUser)
 		redirect('unauthorized.php');
 
 if ($makeNewUser) {
-	$usercount = QuickQuery("select count(*) from user where enabled = 1 and login != 'schoolmessenger'");
+	$usercount = QuickQuery("select count(*) from user where enabled = 1 and login != 'schoolmessenger' and u.accessid is not null");
 	$maxusers = getSystemSetting("_maxusers", "unlimited");
 	if (($maxusers !== "unlimited") && $maxusers <= $usercount) {
 		redirect("users.php?maxusers");
