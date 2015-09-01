@@ -3,12 +3,39 @@
 //TODO remove SQL_CALC_FOUND_ROWS, and use count(*) instead. with all the g field crap and whatnot, it's slowing it down
 
 class PhoneOptOutReport extends ReportGenerator {
-
-	function generateQuery($hackPDF = false){
+	
+	function generateQuery($hackPDF = false) {
+		global $USER;
+		
+		$orgIds = null;
+		if(isset($this->params['organizationids'])) {
+			$orgIds = $this->params['organizationids'];
+		} 
+		
 		$this->params = $this->reportinstance->getParameters();
+		
 		$this->reporttype = $this->params['reporttype'];
 
+		if(! isset($this->params['order1'])) {
+			$this->params['order1'] = 'pkey';
+		}
 		$orderquery = getOrderSql($this->params);
+		
+		if(is_array($orgIds)) {
+			$flippedOrgs = array_flip($orgIds);
+
+			$filteredOrgs = $USER->filterOrgs($flippedOrgs);
+
+			$orgs = array_flip($filteredOrgs);
+		}
+		
+		$orgsql = '';
+		// if user has no organizations then default to empty result set from query.
+		if(count($orgIds) > 0 && count($orgs) === 0) {
+			$orgsql = "where 0";
+		} else if (isset($orgIds) && count($orgs)) {
+			$orgsql = "where pa.organizationid in ('". implode("','", $orgs) ."')";
+		} 
 		
 		$reldate = "today";
 		if(isset($this->params['reldate']))
@@ -32,8 +59,9 @@ class PhoneOptOutReport extends ReportGenerator {
 					rpo.phone, 
 					rpo.numRequests
 					from person p
-					join ($phonesQuery) as rpo
-					on p.id = rpo.personId
+					join ($phonesQuery) as rpo on p.id = rpo.personId
+					left join personassociation pa on (pa.personid = p.id)
+					$orgsql
 					$orderquery
 					";
 		
@@ -175,7 +203,7 @@ class PhoneOptOutReport extends ReportGenerator {
 		}
 	}
 
-	function getReportSpecificParams(){
+	function getReportSpecificParams() {
 		return $params;
 	}
 
@@ -183,7 +211,7 @@ class PhoneOptOutReport extends ReportGenerator {
 		$this->reportfile = "Phoneoptoutreport.jasper"; // TODO
 	}
 
-	static function getOrdering(){
+	static function getOrdering() {
 		global $USER;
 		$fields = FieldMap::getAuthorizedFieldMaps();
 
