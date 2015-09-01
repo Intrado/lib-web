@@ -655,6 +655,8 @@ function report_name($string){
 			return "SMS Log";
 		case 'contactchangereport':
 			return "Contact Information Changes";
+		case 'phoneoptoutreport':
+			return "Phone Opt-Out";
 		case 'smsoptin':
 			return "SMS Opt-In Status";
 		default:
