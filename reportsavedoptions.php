@@ -48,6 +48,8 @@ function runReport($subscription){
 			redirect("reportcallsperson.php?reportid=$subscription->id");
 		case "contactchangereport":
 			redirect("reportcontactchangesummary.php?reportid=$subscription->id");
+		case "phoneoptoutreport":
+			redirect("reportphoneoptout.php?reportid=$subscription->id");
 		// TODO: enable smsstatus when that report supports saving/scheduling
 		// case "smsstatus":
 		//	redirect("reportsmsstatus.php?reportid=$subscription->id");
@@ -73,6 +75,8 @@ function editReport($subscription){
 			redirect("reportcallssearch.php?reportid=$subscription->id");
 		case "contactchangereport":
 			redirect("reportcontactchange.php?reportid=$subscription->id");
+		case "phoneoptoutreport":
+			redirect("reportphoneoptout.php?reportid=$subscription->id");	
 		// TODO: enable smsstatus when that report supports saving/scheduling
 		// case "smsstatus":
 		//  redirect("reportsmsstatus.php?reportid=$subscription->id");
@@ -94,6 +98,7 @@ if(isset($reportid)){
 		redirect("unauthorized.php");
 	}
 	$reportsubscription = new ReportSubscription($reportid);
+	
 } else {
 	redirect("reports.php");
 }
