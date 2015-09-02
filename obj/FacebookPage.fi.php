@@ -11,6 +11,9 @@ class FacebookPage extends FormItem {
 		
 		// keeping track of the authorized pages
 		$pages = array("pages" => getFbAuthorizedPages(), "wall" => getSystemSetting("fbauthorizewall"));
+		if (! $this->args['access_token']) {
+			return _L('There is no Facebook account connected at this time');
+		}
 		$showconnectbutton = ($this->args['access_token']?false:true);
 		$showrenewbutton = (!$showconnectbutton && isset($this->args['show_renew']) && $this->args['show_renew']);
 		

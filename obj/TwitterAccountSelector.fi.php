@@ -26,7 +26,7 @@ class TwitterAccountSelector extends MultiCheckBoxTable {
 	 * @param $value String JSON encoded array of twitter user_id strings;
 	 */
 	function render ($value) {
-		if (! is_array($this->twitterTokens)) return '';
+		if (! is_array($this->twitterTokens)) return _L('There are no Twitter accounts connected at this time.');
 		$columns = $hovers = array();
 		foreach ($this->twitterTokens as $token) {
 			$html = '<div id="' . $this->getFieldId($token->user_id) . '"></div>';

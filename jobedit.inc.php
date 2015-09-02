@@ -639,7 +639,7 @@ if ($submittedmode || $completedmode) {
 		if (count($job->getJobPosts("facebook"))) {
 			$helpsteps[] = _L("This section contains a list of the Facebook Pages which are associated with this %s.",$jobTitle);
 			$formdata["fbpages"] = array(
-				"label" => _L('Facebook Page(s)'),
+				"label" => _L('Facebook)'),
 				"fieldhelp" => _L('This is a list of the Facebook Pages associated with this job.'),
 				"value" => json_encode(array_keys($job->getJobPosts("facebook"))),
 				"validators" => array(),
@@ -814,7 +814,7 @@ if ($submittedmode || $completedmode) {
 		
 		$helpsteps[] = _L("<p>If you haven't connected a Facebook account, click the Connect to Facebook button. You'll be able to log into Facebook through a pop up window. Once you're connected, click the Save button.</p><p>After connecting your Facebook account, you will see a list of Facebook Pages where you are an administrator and a My Timeline option which lets you post to your account's Timeline. You may select any combination of options for your job.</p><p>If your system administrator has restricted users to posting only to authorized Facebook Pages, you may not see as many Pages or the option of posting to your Timeline. Check with your system administrator if you are unsure of your district's social media policies. Additionally, please note that your account must also have permission within Facebook to post to authorized Pages.</p>");
 		$formdata["fbpage"] = array(
-			"label" => _L('Facebook Page(s)'),
+			"label" => _L('Facebook'),
 			"fieldhelp" => _L("Select which Pages to post to. Please click the Guide button for more information about posting to Facebook."),
 			"value" => (count($fbpages)?json_encode($fbpages):""),
 			"validators" => array(
