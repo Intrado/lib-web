@@ -647,6 +647,17 @@ $formdata = array_merge($formdata, array(
 		"control" => array("TextField"),
 		"helpstep" => 1
 	),
+	"socialmediatwitteruserids" => array(
+		"label" => "Twitter User Ids",
+		"value" => "",
+		"validators" => array(
+			array("ValConditionallyRequired", "field" => "hastwitter")
+			// TODO: add validation that we have tokens for eac of the selected userids...
+		),
+		"requires" => array("hastwitter"),
+		"control" => array("TextField"),
+		"helpstep" => 1
+	),
 	"hasfeed" => array(
 		"label" => "Feed",
 		"value" => "",
@@ -1440,10 +1451,11 @@ class MessageSenderProcessor {
 					}
 					break;
 				case "twitter":
-					if ($postdata["socialmediatwitteruserids"]) {
+					if (isset($postdata["socialmediatwitteruserids"])) {
 						$userids = json_decode($postdata["socialmediatwitteruserids"]);
 						$job->updateJobPost("twitter", $userids);
 					}
+else error_log(print_r($postdata, true));
 					break;
 				case "feed":
 					if ($postdata["socialmediafeedcategory"] && count($postdata["socialmediafeedcategory"]))
