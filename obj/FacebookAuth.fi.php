@@ -36,7 +36,7 @@ class FacebookAuth extends FormItem {
 								}").
 							'<div style="clear: both"></div>
 							<!-- Disconnect button will delete the serverside access_token -->'.
-							icon_button("Disconnect this Facebook Account", "cross" ,"handleFbLoginAuthResponse('".$n."', null)").'
+							icon_button("Disconnect this Facebook Account", "cross" ,"if(confirm('Are you sure you wish to disconnect this account?')) { handleFbLoginAuthResponse('".$n."', null); }").'
 						</div>
 						<div style="clear: both"></div>
 					</div>
