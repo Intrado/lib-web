@@ -1,4 +1,5 @@
 <?
+
 class User extends DBMappedObject {
 
 	var $accessid = 0;
@@ -24,12 +25,12 @@ class User extends DBMappedObject {
 	var $personid;
 
 	//new constructor
-	function User ($id = NULL) {
+	function User($id = NULL) {
 		$this->_allownulls = true;
 		$this->_tablename = "user";
 		$this->_fieldlist = array("accessid", "login", "accesscode", "firstname", "lastname",
-								"description", "email", "aremail", "phone", "sms", "enabled",
-								"lastlogin","deleted", "ldap","staffpkey","importid","lastimport", "personid");
+			"description", "email", "aremail", "phone", "sms", "enabled",
+			"lastlogin", "deleted", "ldap", "staffpkey", "importid", "lastimport", "personid");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}
@@ -38,31 +39,31 @@ class User extends DBMappedObject {
 		// call to authserver
 		setUserPassword($this->id, $password);
 	}
-	
-	function setPincode ($password) {
+
+	function setPincode($password) {
 		$query = "update user set pincode=password(?)"
-				."where id=?";
+				. "where id=?";
 		QuickUpdate($query, false, array($password, $this->id));
 	}
 
 	// Example: authorize('sendemail', 'sendphone') returns true only if user has both permissions.
 	// Example: authorize(array('sendemail', 'sendphone')) returns true if user has either permission.
-	function authorize () {
+	function authorize() {
 		$features = func_get_args();
-		if(isset($_SESSION['access'])) {
-			foreach($features as $feature) {
-				if(is_array($feature)) {
+		if (isset($_SESSION['access'])) {
+			foreach ($features as $feature) {
+				if (is_array($feature)) {
 					$any = false;
-					foreach($feature as $or) {
-						if($_SESSION['access']->getValue($or)) {
+					foreach ($feature as $or) {
+						if ($_SESSION['access']->getValue($or)) {
 							$any = true;
 							break;
 						}
 					}
-					if(!$any)
+					if (!$any)
 						return false;
 				}
-				elseif(!$_SESSION['access']->getValue($feature)) {
+				elseif (!$_SESSION['access']->getValue($feature)) {
 					return false;
 				}
 			}
@@ -70,17 +71,16 @@ class User extends DBMappedObject {
 		}
 		return false;
 	}
-	
+
 	function authorizeField($field) {
-		$alwaysauthorized = array("f01","f02","f03");
-		if (in_array($field,$alwaysauthorized))
+		$alwaysauthorized = array("f01", "f02", "f03");
+		if (in_array($field, $alwaysauthorized))
 			return true;
 		$fields = $_SESSION['access']->getValue('datafields');
 		return !$fields || in_array($field, explode('|', $_SESSION['access']->getValue('datafields')));
 	}
 
-	function shortName()
-	{
+	function shortName() {
 		return ($this->firstname ? substr($this->firstname, 0, 1) . '. ' : NULL) . $this->lastname;
 	}
 
@@ -88,13 +88,13 @@ class User extends DBMappedObject {
 		// Global cache of users' rules; we do not keep a local cache because it would serialize upon each request.
 		// This array is indexed by userid.
 		global $USERRULES;
-		
+
 		if (!isset($USERRULES))
 			$USERRULES = array();
-		
+
 		if (!isset($USERRULES[$this->id]))
-			$USERRULES[$this->id] = DBFindMany("Rule","from rule r inner join userassociation ua on r.id = ua.ruleid where userid =?", 'r', array($this->id));
-		
+			$USERRULES[$this->id] = DBFindMany("Rule", "from rule r inner join userassociation ua on r.id = ua.ruleid where userid =?", 'r', array($this->id));
+
 		return $USERRULES[$this->id];
 	}
 
@@ -103,17 +103,36 @@ class User extends DBMappedObject {
 		// Global cache of users' organizations; we do not keep a local cache because it would serialize upon each request.
 		// This array is indexed by userid.
 		global $USERSORGANIZATIONS;
-		
+
 		if (!isset($USERSORGANIZATIONS))
 			$USERORGANIZATIONS = array();
-		
+
 		if (!isset($USERORGANIZATIONS[$this->id]))
 			$USERSORGANIZATIONS[$this->id] = DBFindMany('Organization', 'from organization o inner join userassociation ua on o.id = ua.organizationid where userid = ?', 'o', array($this->id));
-		
+
 		return $USERSORGANIZATIONS[$this->id];
 	}
-	
-	
+
+	function filterOrgs($orgs) {
+		
+		$uOrgs = $this->organizations();
+		
+		if (empty($uOrgs)) {
+			return $orgs;
+		}
+		
+		$filteredOrgs = array();
+		
+		foreach ($uOrgs as $key => $uOrg) {
+			
+			if (key_exists($key, $orgs)) {
+				$filteredOrgs[$key] = $orgs[$key];
+			}
+		}
+
+		return $filteredOrgs;
+	}
+
 	/**
 	 * Takes a list of organizationids or sections, and returns a SQL bit suitable for adding in to a query on the person table as an optional join.
 	 * Filters out any sections or organizations the user doesn't have access to, making join as simple as possible.
@@ -127,38 +146,38 @@ class User extends DBMappedObject {
 	 * @param $personalias alias of the person table, false if not aliased
 	 * @return string containing a join clause to the person table on personassociation
 	 */
-	function getPersonAssociationJoinSql ($searchorgids = array(), $searchsectionids = array(), $personalias = false) {
-		
+	function getPersonAssociationJoinSql($searchorgids = array(), $searchsectionids = array(), $personalias = false) {
+
 		//put orgids in indexed array
 		if (count($searchorgids) > 0) {
-			$searchorgids = array_fill_keys($searchorgids,true);
+			$searchorgids = array_fill_keys($searchorgids, true);
 		}
-		
+
 		//load user restriction info on orgs, sections	
-		$userorgids = QuickQueryList("select organizationid,1 from userassociation where type='organization' and userid = ?",true,false,array($this->id));
-		$usersectionorgs = QuickQueryList("select ua.sectionid, s.organizationid from userassociation ua inner join section s on (s.id=ua.sectionid) where ua.userid = ?",true,false,array($this->id));
+		$userorgids = QuickQueryList("select organizationid,1 from userassociation where type='organization' and userid = ?", true, false, array($this->id));
+		$usersectionorgs = QuickQueryList("select ua.sectionid, s.organizationid from userassociation ua inner join section s on (s.id=ua.sectionid) where ua.userid = ?", true, false, array($this->id));
 
 		//$isunrestricted = count($userorgids) == 0 && count($usersectionorgs) == 0;
-		$isunrestricted = !QuickQuery("select 1 from userassociation where type in ('organization','section') and userid = ? limit 1",false,array($this->id));
-		
+		$isunrestricted = !QuickQuery("select 1 from userassociation where type in ('organization','section') and userid = ? limit 1", false, array($this->id));
+
 		$aliasid = ($personalias ? $personalias . ".id" : "person.id");
 
 		$joinsql = "";
-		
+
 		// ############## Section Mode ##############
 		if (count($searchsectionids) > 0) {
-			
+
 			//first load org info for all searcsectionids
-			$tmp = QuickQueryList("select id, organizationid from section where id in (" . DBParamListString(count($searchsectionids)) . ")" ,true,false,$searchsectionids);
+			$tmp = QuickQueryList("select id, organizationid from section where id in (" . DBParamListString(count($searchsectionids)) . ")", true, false, $searchsectionids);
 			//create new array with sectionids as keys, all pointing to zeros. then fill in any found orgids. sections not found still point to zero.
-			$filtersectionids = array_fill_keys($searchsectionids,0); //any unfound sections will have orgid=0
+			$filtersectionids = array_fill_keys($searchsectionids, 0); //any unfound sections will have orgid=0
 			foreach ($tmp as $sectionid => $orgid)
 				$filtersectionids[$sectionid] = $orgid;
-			
+
 			//check all specified sections against user restrictions
 			if (!$isunrestricted) {
 				foreach ($filtersectionids as $sectionid => $orgid) {
-					
+
 					//see if the sectionid matches one of the user's sections
 					if (isset($usersectionorgs[$sectionid]))
 						continue;
@@ -172,20 +191,20 @@ class User extends DBMappedObject {
 				$joinsql = "inner join personassociation pa on (0) /* bad sections */ "; //impossible query, we must have removed everything they were looking for!
 			else
 				$joinsql = "inner join personassociation pa on (pa.personid = $aliasid "
-						. "and pa.sectionid in (" . implode(",",array_keys($filtersectionids)) . "))";
-		
-		// ############## Organization Mode ##############
+						. "and pa.sectionid in (" . implode(",", array_keys($filtersectionids)) . "))";
+
+			// ############## Organization Mode ##############
 		} else if (count($searchorgids) > 0) {
-			
+
 			$joinsql = "inner join personassociation pa on (pa.personid = $aliasid";
-			
+
 			$joinorgids = array();
 			$joinsectionids = array();
-			
+
 			//if user is unrestricted, just add all orgs
 			if ($isunrestricted) {
 				$joinorgids = array_keys($searchorgids);
-			} else {	
+			} else {
 				//if user is restricted to some orgs, add all matching orgs
 				foreach ($searchorgids as $orgid => $dummy) {
 					if (isset($userorgids[$orgid])) {
@@ -198,31 +217,30 @@ class User extends DBMappedObject {
 				foreach ($usersectionorgs as $sectionid => $orgid) {
 					if (isset($searchorgids[$orgid]))
 						$joinsectionids[] = $sectionid;
-					
 				}
 			}
-			
+
 			$components = array();
 			if (count($joinorgids) > 0)
-				$components[] = "pa.organizationid in (" . implode(",",$joinorgids) . ")";	
+				$components[] = "pa.organizationid in (" . implode(",", $joinorgids) . ")";
 			if (count($joinsectionids) > 0)
-				$components[] = "pa.sectionid in (" . implode(",",$joinsectionids) . ")";	
-			
+				$components[] = "pa.sectionid in (" . implode(",", $joinsectionids) . ")";
+
 			if (count($components) == 0)
 				$joinsql .= " and 0 "; //impossible query, nothing valid to search on
 			else
 				$joinsql .= " and ( " . implode(" or ", $components) . " ) ";
-			
+
 			$joinsql .= ")";
-			
-		// ############## All Mode ##############
+
+			// ############## All Mode ##############
 		} else {
 			//list has no org/section search, join on just user restrictions
 			if ($isunrestricted) {
 				$joinsql = ""; //no join needed if unrestricted user on unrestricted list (note: something else needs to make sure they at least have a rule somewhere)
 			} else {
 				$joinsql = "inner join personassociation pa on (pa.personid = $aliasid";
-				
+
 				$components = array();
 				if (count($userorgids) > 0) {
 					// relplace NULL key values with "NULL" for sql sanity
@@ -233,9 +251,9 @@ class User extends DBMappedObject {
 						else
 							$correctedorgids[] = $orgid;
 					}
-					$components[] = "pa.organizationid in (" . implode(",",$correctedorgids) . ")";
+					$components[] = "pa.organizationid in (" . implode(",", $correctedorgids) . ")";
 				}
-				
+
 				if (count($usersectionorgs) > 0) {
 					// relplace NULL key values with "NULL" for sql sanity
 					$correctedorgids = array();
@@ -245,19 +263,19 @@ class User extends DBMappedObject {
 						else
 							$correctedorgids[] = $orgid;
 					}
-					$components[] = "pa.sectionid in (" . implode(",",$correctedorgids) . ")";
+					$components[] = "pa.sectionid in (" . implode(",", $correctedorgids) . ")";
 				}
-				
+
 				if (count($components) == 0)
 					$joinsql .= " and 0 )"; //impossible query, nothing valid to search on
 				else
 					$joinsql .= " and ( " . implode(" or ", $components) . " ) )";
 			}
 		}
-		
+
 		return $joinsql;
 	}
-	
+
 	/**
 	 * Returns sql for rules specified combined with rules from user restriction.
 	 * Calling code should verify that at least one restriction exists by checking that rules, orgs, sections are not all empty.
@@ -267,18 +285,17 @@ class User extends DBMappedObject {
 	 * @param $isreport true if query should be using report tables for historic data
 	 * @return unknown_type
 	 */
-	function getRuleSql ($searchrules = array(), $personalias = false, $isreport = false) {
+	function getRuleSql($searchrules = array(), $personalias = false, $isreport = false) {
 		return Rule::makeQuery(array_merge($this->getRules(), $searchrules), $personalias, false, $isreport);
 	}
-	
-	
+
 	/**
 	 * Checks to see if the specified personid, or pkey is visible to the user. Checks addressbook, orgs, and rules.
 	 * @param $personid
 	 * @param $pkey
 	 * @return unknown_type
 	 */
-	function canSeePerson ($personid, $pkey = null) {
+	function canSeePerson($personid, $pkey = null) {
 		if ($personid) {
 			$query = "from person where id = ?";
 			$person = DBFind('Person', $query, false, array($personid));
@@ -293,17 +310,18 @@ class User extends DBMappedObject {
 			return false; // person deleted
 		if ($person->userid == $this->id)
 			return true; // person belongs to this user (addressbook, manualadd, upload)
-	
-		// build the query
+
+			
+// build the query
 		$joinsql = $this->getPersonAssociationJoinSql(array(), array(), "p");
 		$rulesql = $this->getRuleSql(array(), "p");
 		$query = "select 1 from person p \n"
-				."	$joinsql \n"
-				."	where p.id=? and not p.deleted and (p.userid=? or (1 $rulesql))  \n";
-		
+				. "	$joinsql \n"
+				. "	where p.id=? and not p.deleted and (p.userid=? or (1 $rulesql))  \n";
+
 		// can see this person
-		$cansee = QuickQuery($query, false, array($person->id,$this->id));
-		
+		$cansee = QuickQuery($query, false, array($person->id, $this->id));
+
 		// if guardian, must check the children
 		if (!$cansee && ("guardianauto" == $person->type || "guardiancm" == $person->type)) {
 			// find the children of this guardian
@@ -314,9 +332,9 @@ class User extends DBMappedObject {
 				$joinsql = $this->getPersonAssociationJoinSql(array(), array(), "p");
 				$rulesql = $this->getRuleSql(array(), "p");
 				$query = "select 1 from person p \n"
-						."	$joinsql \n"
-						."	where p.id=? and not p.deleted and (p.userid=? or (1 $rulesql))  \n";
-		
+						. "	$joinsql \n"
+						. "	where p.id=? and not p.deleted and (p.userid=? or (1 $rulesql))  \n";
+
 				// can see this child
 				$cansee = QuickQuery($query, false, array($childid, $this->id));
 				if ($cansee)
@@ -327,36 +345,37 @@ class User extends DBMappedObject {
 			return $cansee;
 		}
 	}
-	
+
 	//see if the login is used
-	function checkDuplicateLogin ($newlogin, $id) {
-		if (QuickQuery("select count(*) from user where id != ? and login=? and not deleted", false, array($id, $newlogin)) > 0 )
+	function checkDuplicateLogin($newlogin, $id) {
+		if (QuickQuery("select count(*) from user where id != ? and login=? and not deleted", false, array($id, $newlogin)) > 0)
 			return true;
 		else
 			return false;
 	}
+
 	//see if the accesscode is used
-	function checkDuplicateAccesscode ($newaccesscode, $id) {
+	function checkDuplicateAccesscode($newaccesscode, $id) {
 		if (QuickQuery("select count(*) from user where id != ? and accesscode = ? and not deleted", false, array($id, $newaccesscode)) > 0)
 			return true;
 		else
 			return false;
 	}
-	//see if the Staff ID is used
-	function checkDuplicateStaffID ($newstaffid, $id) {
-		if ($newstaffid == "") return false;
 
-		if (QuickQuery("select count(*) from user where id != ? and staffpkey = ? and not deleted", false, array($id, $newstaffid)) > 0 )
+	//see if the Staff ID is used
+	function checkDuplicateStaffID($newstaffid, $id) {
+		if ($newstaffid == "")
+			return false;
+
+		if (QuickQuery("select count(*) from user where id != ? and staffpkey = ? and not deleted", false, array($id, $newstaffid)) > 0)
 			return true;
 		else
 			return false;
 	}
 
+	/* user settings */
 
-
-/* user settings */
-
-	function getSetting ($name, $defaultvalue = false, $refresh = false) {
+	function getSetting($name, $defaultvalue = false, $refresh = false) {
 		static $settings = null;
 
 		if ($settings === null || $refresh) {
@@ -374,29 +393,25 @@ class User extends DBMappedObject {
 			return $defaultvalue;
 	}
 
-	function setSetting ($name, $value) {
-		$old = $this->getSetting($name,false,true);
+	function setSetting($name, $value) {
+		$old = $this->getSetting($name, false, true);
 
 		if ($old === false) {
 			$settings[$name] = $value;
 			if ($value)
-				QuickUpdate("insert into usersetting (userid,name,value) values (?, ?, ?)",
-					false, array($this->id, $name, $value));
+				QuickUpdate("insert into usersetting (userid,name,value) values (?, ?, ?)", false, array($this->id, $name, $value));
 		} else {
 			if ($value !== false && $value !== '' && $value !== null) {
-				QuickUpdate("update usersetting set value=? where userid=? and name=?",
-					false, array($value, $this->id, $name));
+				QuickUpdate("update usersetting set value=? where userid=? and name=?", false, array($value, $this->id, $name));
 			} else {
-				QuickUpdate("delete from usersetting where userid=? and name=?",
-					false, array($this->id, $name));
-
+				QuickUpdate("delete from usersetting where userid=? and name=?", false, array($this->id, $name));
 			}
 		}
 	}
 
 	//gets a user setting or access profile setting.
 	//if no user setting exists, gets the value of the access profile, if nether exist, returns the $def param
-	function getDefaultAccessPref ($setting, $def) {
+	function getDefaultAccessPref($setting, $def) {
 		global $ACCESS;
 
 		$profile = $ACCESS->getValue($setting);
@@ -410,8 +425,7 @@ class User extends DBMappedObject {
 			return $profile;
 	}
 
-
-	function getCallEarly () {
+	function getCallEarly() {
 		global $ACCESS;
 
 		$profile = $ACCESS->getValue("callearly");
@@ -430,7 +444,7 @@ class User extends DBMappedObject {
 			return $profile; //no pref, use profile
 	}
 
-	function getCallLate () {
+	function getCallLate() {
 		global $ACCESS;
 
 		$profile = $ACCESS->getValue("calllate");
@@ -448,7 +462,7 @@ class User extends DBMappedObject {
 		else
 			return $profile; //no pref, use profile
 	}
-	
+
 	/**
 	 * Returns true only if user has all the permissions to send a survey
 	 * @return boolean
@@ -458,6 +472,7 @@ class User extends DBMappedObject {
 		$hasPhoneOrEmail = $this->authorize('sendphone') || $this->authorize('sendemail');
 		return $hasSurvey && $hasPhoneOrEmail;
 	}
+
 }
 
 ?>
