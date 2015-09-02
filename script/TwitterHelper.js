@@ -35,22 +35,25 @@ TwitterHelper = function () {
 				onSuccess: function(r) {
 					var data = r.responseJSON;
 					if (data) {
-						var profile_image = new Element("img",
-							{ 
+						var profile_image = new Element("img", { 
 								src: data.profile_image_url_https,
 								width: "48",
 								height: "48"
 							}
 						);
-						var profile_image_box = new Element("div").setStyle({ float: "left" }).insert(profile_image);
+						var profile_image_box = new Element("div")
+							.setStyle({ float: "left" })
+							.insert(profile_image);
 						var e = new Element("div")
+							.setStyle({ width: "250px", height: "50px", float: "left" })
 							.insert(profile_image_box);
 						var screen_name = new Element("div")
 							.setStyle({ "fontWeight": "bold" })
 							.update(data.screen_name.escapeHTML());
-						var screen_link = new Element("a")
-							.writeAttribute("href", "http://www.twitter.com/" + data.screen_name.escapeHTML())
-							.writeAttribute("target", "tw")
+						var screen_link = new Element("a", {
+							href: "http://www.twitter.com/" + data.screen_name.escapeHTML(),
+							target: "tw"
+						})
 							.insert(screen_name);
 						var name = new Element("div")
 							.setStyle({ color: "grey" })
