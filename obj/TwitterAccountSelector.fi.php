@@ -22,6 +22,9 @@ class TwitterAccountSelector extends MultiCheckBoxTable {
 		$this->cssClass = "twitteraccountselector";
 	}
 
+	/**
+	 * @param $value String JSON encoded array of twitter user_id strings;
+	 */
 	function render ($value) {
 		if (! is_array($this->twitterTokens)) return '';
 		$columns = $hovers = array();
@@ -34,7 +37,8 @@ class TwitterAccountSelector extends MultiCheckBoxTable {
 		$this->columns = count($columns) ? $columns : false;
 		$this->hovers = count($hovers) ? $hovers : false;
 
-		return parent::render($value);
+		// We'll decode the json array into a PHP array for parent to check the boxes correctly
+		return parent::render(json_decode($value));
 	}
 
 	function getFieldId($user_id) {
@@ -42,7 +46,7 @@ class TwitterAccountSelector extends MultiCheckBoxTable {
 	}
 
 	function renderJavascript($value) {
-		$str = parent::renderJavascript($value);;
+		$str = parent::renderJavascript($value);
 		if (! is_array($this->twitterTokens)) return $str;
 		foreach ($this->twitterTokens as $token) {
 			$str .= 'TwitterHelper.loadUserData("' . $this->getFieldId($token->user_id) . '", "' . escapehtml($token->user_id) . '");' . "\n";

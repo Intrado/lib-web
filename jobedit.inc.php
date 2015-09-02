@@ -228,48 +228,6 @@ class ReadOnlyFacebookPage extends FormItem {
 	}
 }
 
-class TwitterAccountPopup extends FormItem {
-	function render ($value) {
-		
-		$n = $this->form->name."_".$this->name;
-		$validtoken = ($this->args['hasvalidtoken']);
-		
-		$str = '
-			<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.($validtoken?"authed":"noauth").'" />
-			<div id="'. $n. 'connect" style="display:'. ($validtoken?"none":"block"). '">
-				'. icon_button(_L("Add Twitter Account"), "custom/twitter", "popup('popuptwitterauth.php', 600, 300)").'
-			</div>
-			<div id="'. $n. 'authed" style="display:'. ($validtoken?"block":"none"). '">
-				'. _L("Your Twitter account is connected."). '
-			</div>';
-		
-		return $str;
-	}
-	
-	function renderJavascript($value) {
-		$n = $this->form->name."_".$this->name;
-		
-		$str = '// Observe an authentication update on the document (the auth popup fires this event)
-				document.observe("TwAuth:update", function (res) {
-					var formitem = $("'. $n. '");
-					var connectdiv = $("'. $n. 'connect");
-					var autheddiv = $("'. $n. 'authed");
-					if (res.memo.access_token) {
-						formitem.value = "authed";
-						connectdiv.hide();
-						autheddiv.show();
-					} else {
-						formitem.value = "noauth";
-						connectdiv.show();
-						autheddiv.hide();
-					}
-					form_do_validation($("'.$n.'").up("form"), $("'.$n.'"));
-				});
-				';
-		return $str;
-	}
-}
-
 class ValTwitterAccountWithMessage extends Validator {
 	var $onlyserverside = true;
 	var $conditionalrequired = true;
@@ -869,13 +827,17 @@ if ($submittedmode || $completedmode) {
 	
 	// if the user account may post to twitter, but has no valid twitter access token
 	if (getSystemSetting("_hastwitter") && $USER->authorize("twitterpost")) {
+
+		// Get the currently selected twitter destinations (if any)
+		$twitterSelected = array_keys($job->getJobPosts('twitter'));
+
 		// get this here so twitter failures only effect users with twitter access
 		$twitterTokens = new TwitterTokens();
 		$helpsteps[] = _L("If your message group contains a Twitter post, you must be connected to a Twitter account.");
 		$formdata["twitter"] = array(
 			"label" => _L('Twitter'),
 			"fieldhelp" => _L("You must have a Twitter account if your message group contains a Twitter post."),
-			"value" => "",
+			"value" => (count($twitterSelected) ? json_encode($twitterSelected) : ''),
 			"validators" => array(
 				array("ValTwitterAccountWithMessage")
 			),
