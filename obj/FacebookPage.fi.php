@@ -225,11 +225,11 @@ class FacebookPage extends FormItem {
 			// get an account element with all the facebook page info, returns the checkbox
 			function addFbPageElement(e, container, account, iswall) {
 				if (iswall) {
-					var name = "My Timeline";
+					var name = \'<a target="fb" href="http://www.facebook.com/\' + account.id + \'">\' + "My Timeline" + "</a>";
 					var category = "";
 					var id = "me";
 				} else {
-					var name = account.name.escapeHTML();
+					var name = \'<a target="tw" href="http://www.facebook.com/pages/\' + account.name.escapeHTML() + \'/\' + account.id + \'">\' + account.name.escapeHTML() + "</a>";
 					var category = account.category.escapeHTML();
 					var id = account.id;
 				}
