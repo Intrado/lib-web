@@ -18,13 +18,9 @@ class FacebookPage extends FormItem {
 		$str = '
 			<style>
 				.fbpagelist {
-					width: 96%;
-					border: 1px solid #CCC;
-					padding: 3px;
 					max-height: 250px;
 					overflow: auto;
-					-webkit-border-radius: 5px;
-					border-radius: 5px;
+					border: none;
 				}
 				.fbpagelist label {
 					text-align: left;
@@ -40,20 +36,35 @@ class FacebookPage extends FormItem {
 			</style>
 			<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'" />
 			<input id="'.$n.'authpages" name="'.$n.'authpages" type="hidden" value="'.escapehtml(json_encode($pages)).'" />
-			<div id="fb-root"></div>
-			<div id="'. $n. 'connect" style="display:'. ($showconnectbutton?"block":"none"). '">
-				'. icon_button(_L("Add Facebook Account"), "custom/facebook", "popup('popupfacebookauth.php', 640, 400)").'
-			</div>
-			<div id="'. $n. 'renew" style="display:'. ($showrenewbutton?"block":"none"). '">
-				'. icon_button(_L("Renew Facebook Authorization"), "custom/facebook", "popup('popupfacebookauth.php', 640, 400)").'
-			</div>
-			<div id="'.$n.'actionlinks" class="actionlinks" style="display:'. (($showconnectbutton || $showrenewbutton)?"none":"block"). '">
-				<a id="'. $n. 'all" class="actionlink">'._L("Select All").'</a>
-				<a id="'. $n. 'none" class="actionlink">'._L("Remove All").'</a>
-			</div>
-			<div id="'. $n. 'fbpages" class="fbpagelist" style="display:'. (($showconnectbutton || $showrenewbutton)?"none":"block"). '">
-				<img src="img/ajax-loader.gif" alt="'. escapehtml(_L("Loading")). '"/>
-			</div>';
+			<table style="width:100%;">
+				<thead>
+					<tr>
+						<td>
+							<div id="'.$n.'actionlinks" style="display:'. (($showconnectbutton || $showrenewbutton)?"none":"block"). ';">
+								Select: <a id="'. $n. 'all" style="cursor: pointer;">'._L("All").'</a> | <a id="'. $n. 'none" style="cursor: pointer;">'._L("None").'</a>
+							</div>
+							<div style="margin-left: 20px; font-weight: bold;">' . _L('Facebook Pages &amp; Timelines') . '</div>
+						</td>
+					</tr>
+				</thead>
+				<tbody style="border-top: 1px solid #DDD">
+					<tr>
+						<td style="padding-top: 0px;">
+							<div id="fb-root"></div>
+							<div id="'. $n. 'connect" style="display:'. ($showconnectbutton?"block":"none"). '">
+								'. icon_button(_L("Add Facebook Account"), "custom/facebook", "popup('popupfacebookauth.php', 640, 400)").'
+							</div>
+							<div id="'. $n. 'renew" style="display:'. ($showrenewbutton?"block":"none"). '">
+								'. icon_button(_L("Renew Facebook Authorization"), "custom/facebook", "popup('popupfacebookauth.php', 640, 400)").'
+							</div>
+							<div id="'. $n. 'fbpages" class="fbpagelist" style="display:'. (($showconnectbutton || $showrenewbutton)?"none":"block"). '">
+								<img src="img/ajax-loader.gif" alt="'. escapehtml(_L("Loading")). '"/>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+				';
 		
 		return $str;
 	}

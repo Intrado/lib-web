@@ -312,8 +312,8 @@ class ValFacebookPageWithMessage extends Validator {
 				return $this->label. " ". _L("has an invalid posting location selected. Page is not authorized.");
 			}
 		}
-		if (!$haspage)
-			return $this->label. " ". _L("must have one or more pages to post to.");
+		//if (!$haspage)
+		//	return $this->label. " ". _L("must have one or more pages to post to.");
 		
 		return true;		
 	}
@@ -1167,17 +1167,19 @@ include_once("nav.inc.php");
 ?>
 <script type="text/javascript">
 <? 
-Validator::load_validators(array("ValDuplicateNameCheck",
-								"ValWeekRepeatItem",
-								"ValTimeWindowCallEarly",
-								"ValTimeWindowCallLate",
-								"ValFormListSelect",
-								"ValMessageGroup",
-								"ValFacebookPageWithMessage",
-								"ValTwitterAccountWithMessage",
-								"ValCallerID",
-								"ValFeedCategoryWithMessage",
-								"ValDateWithFacebookLimiter"));
+Validator::load_validators(array(
+	"ValDuplicateNameCheck",
+	"ValWeekRepeatItem",
+	"ValTimeWindowCallEarly",
+	"ValTimeWindowCallLate",
+	"ValFormListSelect",
+	"ValMessageGroup",
+	"ValFacebookPageWithMessage",
+	"ValTwitterAccountWithMessage",
+	"ValCallerID",
+	"ValFeedCategoryWithMessage",
+	"ValDateWithFacebookLimiter"
+));
 ?>
 </script>
 <script src="script/niftyplayer.js.php" type="text/javascript"></script>
