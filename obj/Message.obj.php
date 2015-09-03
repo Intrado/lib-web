@@ -253,7 +253,7 @@ class Message extends DBMappedObject {
 
 		//remove existing hosted attachments that are no longer needed
 		if (!is_null($this->id))
-			QuickUpdate("delete from messageattachment where messageid=?", false, array($this->id));
+			QuickUpdate("delete from messageattachment where messageid=? and displayName is not null", false, array($this->id));
 
 		if (is_array($parts)) {
 			foreach ($parts as $part) {
