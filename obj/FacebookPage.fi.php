@@ -9,11 +9,13 @@ class FacebookPage extends FormItem {
 		if (!$value)
 			$value = json_encode(array());
 		
-		// keeping track of the authorized pages
-		$pages = array("pages" => getFbAuthorizedPages(), "wall" => getSystemSetting("fbauthorizewall"));
+		// If there is no access token then there is nothing to show!
 		if (! $this->args['access_token']) {
 			return _L('There is no Facebook account connected at this time');
 		}
+		// keeping track of the authorized pages
+		$pages = array("pages" => getFbAuthorizedPages(), "wall" => getSystemSetting("fbauthorizewall"));
+
 		$showconnectbutton = ($this->args['access_token']?false:true);
 		$showrenewbutton = (!$showconnectbutton && isset($this->args['show_renew']) && $this->args['show_renew']);
 		
@@ -74,6 +76,12 @@ class FacebookPage extends FormItem {
 	
 	function renderJavascript($value) {
 		global $SETTINGS;
+
+		// If there is no access token then there is nothing to render
+		if (! $this->args['access_token']) {
+			return '';
+		}
+
 		$n = $this->form->name."_".$this->name;
 		
 		$showrenewbutton = ($this->args['access_token'] && isset($this->args['show_renew']) && $this->args['show_renew']);
