@@ -15,7 +15,6 @@ class AttachmentSummaryReport extends ReportGenerator {
 			$surveyonly = "true";
 		}
 		if (isset($this->params['jobid'])) {
-			$url = "jobid=";
 			$joblist = "";
 			$job = new Job($this->params['jobid']);
 			$jobtypesarray = explode("','", $jobtypes);
@@ -42,12 +41,13 @@ class AttachmentSummaryReport extends ReportGenerator {
 			j.name as BroadcastName,
 			a.id as AttachmentId,
 			coalesce(nullif(a.displayName, ''), a.id) as AttachmentName,
-			coalesce(sum(d.action='download'), 0) as NumberOfDownloads
+			coalesce(sum(d.actionCount), 0) as NumberOfDownloads
 		from job as j
 		inner join messagegroup as g on (j.messagegroupid=g.id)
 		inner join message as m on (m.messagegroupid=g.id)
-		inner join messageattachment as a on (a.messageid=m.id)
-		left outer join reportdocumentdelivery as d on (d.jobid=j.id and d.messageAttachmentId=a.id)
+		inner join messageattachment as a on (a.messageid=m.id and a.type='content')
+		inner join messagepart as mp on (mp.messageid=m.id and mp.messageattachmentid=a.id and mp.type='MAL')
+		left outer join reportdocumentdelivery as d on (d.jobid=j.id and d.messageAttachmentId=a.id and d.action='download')
 		where 1 $joblistquery
 		group by BroadcastName, AttachmentId, AttachmentName
 		order by null

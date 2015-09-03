@@ -7,18 +7,17 @@ class AttachmentDetailReport extends ReportGenerator{
 	public $queryArgs = false;
 
 	private $titles = array(
-			0 => "Job",
-			1 => "Unique ID",
-			2 => "First Name",
-			3 => "Last Name",
-			4 => "Status",
-			5 => "Activity",
-			6 => "Activity Count",
-			7 => "Last Attempt"
+			0 => "Unique ID",
+			1 => "First Name",
+			2 => "Last Name",
+			3 => "Status",
+			4 => "Activity",
+			5 => "Activity Count",
+			6 => "Last Attempt"
 		);
 
 	private $formatters = array(
-			7 => "fmt_ms_timestamp"
+			6 => "fmt_ms_timestamp"
 		);
 
 	function generateQuery($hackPDF = false){
@@ -27,49 +26,25 @@ class AttachmentDetailReport extends ReportGenerator{
 		$this->reporttype = $this->params['reporttype'];
 		$this->query = null;
 		$this->queryArgs = array();
-		$orderquery = ""; // remove sorting to improve performance (bug 4461)
-
-		$jobtypes = "";
-		if(isset($this->params['jobtypes'])){
-			$jobtypes = $this->params['jobtypes'];
-		}
-
-		if(isset($this->params['jobid'])){
-			$joblist = "";
-			$job = new Job($this->params['jobid']);
-			$jobtypesarray = explode("','", $jobtypes);
-			if($jobtypes == "" || in_array($job->jobtypeid, $jobtypesarray)){
-				$joblist = $this->params['jobid'];
-			}
-		} else {
-			$reldate = "today";
-			if(isset($this->params['reldate']))
-				$reldate = $this->params['reldate'];
-			list($startdate, $enddate) = getStartEndDate($reldate, $this->params);
-			$joblist = implode("','", getJobList($startdate, $enddate, $jobtypes, "false", isset($this->params['type']) ? $this->params['type'] : ""));
-		}
-
-		if ($joblist) {
-			$joblistquery = " and rp.jobid in ('" . $joblist . "')";
-		} else {
-			$joblistquery = " and 0 ";
-		}
-		$this->params['joblist'] = $joblist;
 
 		if (isset($this->params['attachmentid'])) {
-			$query = "select coalesce(nullif(displayName, ''), id) from messageattachment where id = ?";
+			$query = "select j.name as BroadcastName, coalesce(nullif(a.displayName, ''), a.id) as AttachmentName
+				from messageattachment a join message m on (m.id=a.messageid)
+				join messagegroup g on (g.id=m.messagegroupid)
+				join job j on (j.messagegroupid=g.id)
+				where a.id = ?";
 			$attachmentid = (int) $this->params['attachmentid'];
-			$this->attachmentName = QuickQuery($query, $this->_readonlyDB, array($attachmentid));
-			$attachmentquery = " and a.id = ?";
 			$this->queryArgs[] = $attachmentid;
+			$row = QuickQueryRow($query, false, $this->_readonlyDB, array($attachmentid));
+			list($this->attachmentName, $this->broadcastName) = $row;
+			$attachmentquery = " and a.id = ?";
 		} else {
 			error_log("No attachmentid set");
 		}
 
-		$searchquery = $joblistquery . $attachmentquery;
+		$searchquery = $attachmentquery;
 
 		$this->query = "select sql_calc_found_rows
-			j.name as JobName,
 			coalesce(p.pkey, 'n/a') as UniqueID,
 			rp." . FieldMap::GetFirstNameField() . " as FirstName,
 			rp." . FieldMap::GetLastNameField() . " as LastName,
@@ -82,12 +57,12 @@ class AttachmentDetailReport extends ReportGenerator{
 		inner join job as j on (rp.jobid=j.id)
 		inner join messagegroup as g on (j.messagegroupid=g.id)
 		inner join message as m on (m.messagegroupid=g.id)
-		inner join messageattachment as a on (a.messageid=m.id)
+		inner join messageattachment as a on (a.messageid=m.id and a.type='content')
+		inner join messagepart as mp on (mp.messageid=m.id and mp.messageattachmentid=a.id and mp.type='MAL')
 		left outer join reportdocumentdelivery as dd_action on (dd_action.messageAttachmentId = a.id and dd_action.personid = rp.personid)
 		left outer join reportdocumentdelivery as dd_action2 on (dd_action2.messageAttachmentId = a.id and dd_action2.personid = dd_action.personid and dd_action2.timestampMs > dd_action.timestampMs)
 		left outer join reportdocumentdelivery as dd_download on (dd_download.messageAttachmentId = a.id and dd_download.personid = dd_action.personid and dd_download.action = 'download')
-		left outer join reportdocumentdelivery as dd_download2 on (dd_download2.messageAttachmentId = a.id and dd_download2.personid = dd_action.personid and dd_download2.action = 'download' and dd_download2.timestampMs > dd_download.timestampMs)
-		where 1 $searchquery
+		where 1 $searchquery and dd_action2.messageAttachmentId is null
 		group by rp.jobid, rp.personid
 		$orderquery
 		";
@@ -102,6 +77,7 @@ class AttachmentDetailReport extends ReportGenerator{
 		inner join messagegroup as g on (j.messagegroupid=g.id)
 		inner join message as m on (m.messagegroupid=g.id)
 		inner join messageattachment as a on (a.messageid=m.id)
+		inner join messagepart as mp on (mp.messageid=m.id and mp.messageattachmentid=a.id and mp.type='MAL')
 		where 1 $searchquery
 		group by rp.jobid, rp.personid";
 
@@ -156,6 +132,7 @@ class AttachmentDetailReport extends ReportGenerator{
 
 		startWindow(_L("Report Details ").help("AttachmentDetailReport_ReportDetails"), 'padding: 3px;', false);
 
+		echo "<h1>Broadcast Name: {$this->broadcastName}</h1>";
 		echo "<h1>Attachment: {$this->attachmentName}</h1>";
 
 		showPageMenu($total, $pageStart, self::DEFAULT_PAGE_SIZE);
@@ -226,6 +203,5 @@ class AttachmentDetailReport extends ReportGenerator{
 	}
 
 }
-
 
 ?>
