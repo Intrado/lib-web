@@ -17,9 +17,6 @@ TwitterHelper = function () {
 					}
 				}
 			);
-			
-			// display the connect button
-			$(formitem + "twconnected").setStyle({display: "none"});
 		},
 
 		loadUserData: function (element, user_id) {
