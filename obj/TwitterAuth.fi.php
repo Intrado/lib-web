@@ -17,13 +17,11 @@ class TwitterAuth extends FormItem {
 
 				// Get the one we're working with; xx is our enumerator for DHTML operations...
 				$dn = $n . "_{$xx}";
-				$twitter = new Twitter($accessTokens[$xx], false);
-				$validToken = $twitter->hasValidAccessToken();
-
+				
 				// Per-twitter account containers
 				$str .= '<input id="' . $dn . '" name="' . $dn . '" type="hidden" value="' . escapehtml($accessTokens[$xx]->user_id) . '"/>';
 				$str .= '<div id="' . $dn . 'twdetails">';
-				$str .= '<div id="' . $dn . 'twconnected" style="border: 1px dotted grey; padding: 5px;' . (($validToken) ? "" : "display:none;") . '">';
+				$str .= '<div id="' . $dn . 'twconnected" style="border: 1px dotted grey; padding: 5px;margin-bottom:3px;">';
 				$str .= '<div id="' . $dn . 'twuser"></div>';
 				
 				// button to remove access_token
