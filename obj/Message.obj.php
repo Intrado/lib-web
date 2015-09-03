@@ -181,7 +181,7 @@ class Message extends DBMappedObject {
 
 	/**
 	 * Replaces existing content based attachments with those passed into this method
-	 *
+	 * NOTE: removes only message attachments that are not attachment link.
 	 * @param array() $attachments looks like array(<contentid>: array("name": <filename>, "size": <file size>))
 	 */
 	function replaceContentAttachments($attachments) {
@@ -189,7 +189,7 @@ class Message extends DBMappedObject {
 			return;
 
 		$messageAttachments = $this->getMessageAttachments();
-		$contentAttachments = $this->getContentAttachments(false);
+		$contentAttachments = $this->getContentAttachments();
 		// remove existing attachments
 		foreach ($contentAttachments as $id => $contentAttachment) {
 			if (isset($attachments[$contentAttachment->contentid])) {
@@ -250,7 +250,11 @@ class Message extends DBMappedObject {
 				$parts = $this->parse($body, $errors, $voiceid, $audiofileids, true);
 			}
 		}
-		
+
+		//remove existing hosted attachments that are no longer needed
+		if (!is_null($this->id))
+			QuickUpdate("delete from messageattachment where messageid=?", false, array($this->id));
+
 		if (is_array($parts)) {
 			foreach ($parts as $part) {
 				// VoiceID Sanity Check
@@ -261,7 +265,7 @@ class Message extends DBMappedObject {
 					$voiceid = Voice::getPreferredVoice($this->languagecode, $preferredgender);
 					$part->voiceid = $voiceid;
 				}
-
+				//Hosted Attachment Links
 				if($part->type=='HMAL'){
 					$msgattachment = new MessageAttachment();
 					$msgattachment->messageid = $this->id;
