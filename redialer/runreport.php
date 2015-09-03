@@ -53,6 +53,7 @@ require_once("{$objdir}/JobSummaryReport.obj.php");
 require_once("{$objdir}/JobDetailReport.obj.php");
 require_once("{$objdir}/CallsReport.obj.php");
 require_once("{$objdir}/ContactChangeReport.obj.php");
+require_once("{$objdir}/PhoneOptOutReport.obj.php");
 require_once("{$objdir}/SmsStatusReport.obj.php");
 require_once("{$objdir}/Person.obj.php");
 require_once("{$objdir}/Phone.obj.php");
@@ -89,9 +90,11 @@ if($type == "subscription"){
 	$options = $instance->getParameters();
 
 	switch($options['reporttype']){
-
 		case 'contactchangereport':
 			$generator = new ContactChangeReport();
+			break;
+		case 'phoneoptoutreport':
+			$generator = new PhoneOptOutReport();
 			break;
 		case 'smsstatus':
 			$generator = new SmsStatusReport();

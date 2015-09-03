@@ -27,7 +27,7 @@ class TwitterAuth extends FormItem {
 				$str .= '<div id="' . $dn . 'twuser"></div>';
 				
 				// button to remove access_token
-				$str .= icon_button("Disconnect this Twitter Account", "custom/twitter" ,"TwitterHelper.clearValue('" . $dn . "')");
+				$str .= icon_button("Disconnect this Twitter Account", "cross" ,"if(confirm('Are you sure you wish to disconnect this account?')) { TwitterHelper.clearValue('" . $dn . "') }");
 				$str .= '<div style="clear: both"></div></div>';
 			}
 		}

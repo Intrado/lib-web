@@ -86,17 +86,31 @@ class TwitterTokens {
 	/**
 	 * Add the access token for to the current set
 	 *
-	 * @param object $token A stdClass object instance with the propertice of the access token to add
+	 * @param object $token A stdClass object instance with the properties of the access token to add
 	 */
 	public function addAccessToken($token) {
+
+		// Initizlize the token collection if it hasn't been already
 		if (! is_array($this->tokens)) {
 			$this->tokens = array();
+		}
+
+		// Make sure what we have is a valid token
+		if (! is_object($token)) {
+			error_log('TwitterTokens.addAccessToken() - supplied token is not a token: ' . print_r($token, true));
+			return false;
+		}
+		if (! property_exists($token, 'oauth_token')) {
+			error_log('TwitterTokens.addAccessToken() - supplied token missing oauth_token property: ' . print_r($token, true));
+			return false;
 		}
 
 		// Delete any other token that has this same user id in it
 		$this->deleteAccessTokenForUserId($token->user_id, false);
 		$this->tokens[] = $token;
 		$this->storeAccessTokens();
+
+		return true;
 	}
 
 	/**

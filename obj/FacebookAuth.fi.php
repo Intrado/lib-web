@@ -25,7 +25,7 @@ class FacebookAuth extends FormItem {
 					<div id="fb-root"></div>
 					<!-- When connected to facebook, show these options -->
 					<div id="'. $n. 'fbconnected" style="border: 1px dotted grey; padding: 5px;'. (($validtoken)? "": "display:none;"). '">
-						<div id="'. $n. 'fbuser" style="float:left;"></div>
+						<div id="'. $n. 'fbuser" style="float: left; width: 250px;"></div>
 						<div style="float:left;">
 							<!-- Renew button will do a new login request, getting a newer access_token -->'.
 							icon_button("Renew this Facebook Authorization", "custom/facebook" ,
@@ -36,7 +36,7 @@ class FacebookAuth extends FormItem {
 								}").
 							'<div style="clear: both"></div>
 							<!-- Disconnect button will delete the serverside access_token -->'.
-							icon_button("Disconnect this Facebook Account", "cross" ,"handleFbLoginAuthResponse('".$n."', null)").'
+							icon_button("Disconnect this Facebook Account", "cross" ,"if(confirm('Are you sure you wish to disconnect this account?')) { handleFbLoginAuthResponse('".$n."', null); }").'
 						</div>
 						<div style="clear: both"></div>
 					</div>
@@ -154,21 +154,42 @@ class FacebookAuth extends FormItem {
 					FB.api("/me", { access_token: access_token }, function(r) {
 						//showDebugData(formitem, r);
 						if (r && !r.error) {
-							var e = new Element("div").insert(
-									new Element("div").setStyle({ float: "left" }).insert(
-										new Element("img", { 
-											src: "https://graph.facebook.com/me/picture?type=square&access_token=" + access_token,
-											width: "48",
-											height: "48" })
+							var e = new Element("div")
+								.insert(
+									new Element("div")
+										.setStyle({ float: "left" })
+										.insert(
+											new Element("img", { 
+												src: "https://graph.facebook.com/me/picture?type=square&access_token=" + access_token,
+												width: "48",
+												height: "48" }
+											)
 									)
-								).insert(
-									new Element("div").setStyle({ float: "left", padding: "7px" }).insert(
-										new Element("div").setStyle({ "fontWeight": "bold" }).update(r.name.escapeHTML())
-									).insert(
-										new Element("div").setStyle({ color: "grey" }).update(
-											"'._L("Expires:").'&nbsp;" + expiresOn
+								)
+								.insert(
+									new Element("div")
+										.setStyle({ float: "left", padding: "7px" })
+										.insert(
+											new Element("a", {
+												href: r.link,
+												target: "fb"
+											})
+												.insert(
+													new Element("span")
+														.setStyle({ "fontWeight": "bold" })
+														.update(r.name.escapeHTML())
+												)
+											)
+										.insert(
+											new Element("br")
 										)
-									)
+										.insert(
+											new Element("span")
+												.setStyle({ color: "grey" })
+												.update(
+													"'._L("Expires:").'&nbsp;" + expiresOn
+												)
+										)
 								);
 							
 							loader = false;

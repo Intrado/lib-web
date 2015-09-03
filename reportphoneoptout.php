@@ -22,14 +22,81 @@ require_once("obj/FormItem.obj.php");
 require_once("obj/Phone.obj.php");
 require_once("obj/PhoneOptOutReport.obj.php");
 
-			
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
 if (!($USER->authorize('viewsystemreports'))) {
 	redirect('unauthorized.php');
 }
-			
+	
+////////////////////////////////////////////////////////////////////////////////
+// Custom Form Controls And Validators
+///////////////////////////////////////////////////////////////////////////////
+
+class RestrictedValues extends FormItem {
+	var $clearonsubmit = true;
+	var $clearvalue = array();
+	
+	function render ($value) {
+		$n = $this->form->name."_".$this->name;
+		$style = isset($this->args['height']) ? ('style="height: ' . $this->args['height'] . '; overflow: auto;"') : '';
+
+		$label = (isset($this->args['label']) && $this->args['label'])? $this->args['label']: _L('Restrict to the following:');
+		$restrictchecked = count($value) > 0 ? "checked" : "";
+		$str = '<input type="checkbox" id="'.$n.'-restrict" '.$restrictchecked .' onclick="restrictcheck(\''.$n.'-restrict\', \''.$n.'\')"><label for="'.$n.'-restrict">'.$label.'</label>';
+
+		$str .= '<div id='.$n.' class="radiobox" '.$style.'>';
+
+		$counter = 1;
+		foreach ($this->args['values'] as $checkvalue => $checkname) {
+			$id = $n.'-'.$counter;
+			$checked = $value == $checkvalue || (is_array($value) && in_array($checkvalue, $value));
+			$str .= '<input id="'.$id.'" name="'.$n.'[]" type="checkbox" value="'.escapehtml($checkvalue).'" '.($checked ? 'checked' : '').'  onclick="datafieldcheck(\''.$id.'\', \''.$n.'-restrict\')"/><label id="'.$id.'-label" for="'.$id.'">'.escapehtml($checkname).'</label><br />
+				';
+			$counter++;
+		}
+		$str .= '</div>
+		';
+		return $str;
+	}
+	
+	function renderJavascript($value) {
+		return '
+		//if we uncheck the restrict box, uncheck each field
+		function restrictcheck(restrictcheckbox, checkboxdiv) {
+			restrictcheckbox = $(restrictcheckbox);
+			checkboxdiv = $(checkboxdiv);
+			if (!restrictcheckbox.checked) {
+				checkboxdiv.descendants().each(function(e) {
+					e.checked = false;
+				});
+			}
+		}
+
+		// if a data field is checked. Check the restrict box
+		function datafieldcheck(checkbox, restrictcheckbox) {
+			checkbox = $(checkbox);
+			restrictcheckbox = $(restrictcheckbox);
+			if (checkbox.checked)
+					restrictcheckbox.checked = true;
+		}';
+	}
+}
+
+class ValOrganization extends Validator {
+	var $onlyserverside = true;
+
+	function validate ($value, $args) {
+		if ($value) {
+			$validorgs = QuickQueryList("select id, orgkey from organization where id in (". DBParamListString(count($value)) .")", true, false, $value);
+			foreach ($value as $id)
+				if (!isset($validorgs[$id]))
+					return _L('%s has invalid data selected.', $this->label);
+		}
+		return true;
+	}
+}
+					
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
@@ -47,7 +114,49 @@ if($clear)
 
 $preselectedorderby = array();
 
+if(isset($_GET['reportid'])){
+	$reportid = $_GET['reportid'] +0;
+	if(!userOwns("reportsubscription", $reportid)){
+		redirect('unauthorized.php');
+	}
+	$_SESSION['reportid'] = $reportid;
+	$subscription = new ReportSubscription($reportid);
+	$instance = new ReportInstance($subscription->reportinstanceid);
+	$options = $instance->getParameters();
+
+	if (isset($options['order1'])) {
+		$preselectedorderby[0] = $options['order1'];
+	}
+	if (isset($options['order2'])) {
+		$preselectedorderby[1] = $options['order2'];
+	}
+	if (isset($options['order3'])) {
+		$preselectedorderby[2] = $options['order3'];
+	}
+	
+	$_SESSION['saved_report'] = true;
+	$_SESSION['report']['options'] = $options;
+} else {
+	$options= isset($_SESSION['report']['options']) ? $_SESSION['report']['options'] : array();
+	if(isset($_SESSION['reportid'])){
+		$subscription = new ReportSubscription($_SESSION['reportid']);
+		$_SESSION['saved_report'] = true;
+	} else {
+		$_SESSION['saved_report'] = false;
+	}
+}
+
+
+$orgs = QuickQueryList("select id, orgkey from organization where not deleted order by orgkey", true);
+$selectedorgs = array();
+if (isset($_SESSION['report']['options']['organizationids'])) {
+	$selectedorgs = $_SESSION['report']['options']['organizationids'];
+}
+
+$orgs = $USER->filterOrgs($orgs);
+
 $validOrdering = PhoneOptOutReport::getOrdering();
+
 $formdata = array();
 
 $formdata["dateoptions"] = array(
@@ -61,6 +170,28 @@ $formdata["dateoptions"] = array(
 	)),
 	"control" => array("ReldateOptions"),
 	"validators" => array(array("ValReldate")),
+	"helpstep" => 1
+);
+
+if (count($orgs) > 5) {
+	$formdata["checkall"] = array (
+		"label" => "",
+		"control" => array("FormHtml", "html" => icon_button(_L('Check All'),"group_add",'checkAllCheckboxes(true);') . icon_button(_L('Uncheck All'),"group_delete",'checkAllCheckboxes(false);')),
+		"helpstep" => 1
+	);
+}
+$control = array("RestrictedValues", "values" => $orgs);
+if (count($orgs) > 9) {
+	$control = array("RestrictedValues", "height" => "150px", "values" => $orgs);
+}
+$formdata["organizationids"] = array(
+	"label" => getSystemSetting("organizationfieldname","Organization"),
+	"fieldhelp" => _L("Use this menu to narrow your report results to those contacts belonging to the selected organizations."),
+	"value" => $selectedorgs,
+	"validators" => array(
+		array("ValInArray", 'values'=>array_keys($orgs))
+     ),
+	"control" => $control,
 	"helpstep" => 1
 );
 
@@ -115,14 +246,15 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 						$_SESSION['report']['options']['enddate'] = $dateOptions['enddate'];
 				}
 			}
+			$_SESSION['report']['options']['organizationids'] = $postdata['organizationids'];
 			
 			if (isset($postdata['multipleorderby'])) {
 				$multipleorderby = $postdata['multipleorderby'];
 				if (is_array($multipleorderby)) {
-					$_SESSION['reportcontactchange_orderby'] = array();
+					$_SESSION['reportphoneoptout_orderby'] = array();
 					foreach ($multipleorderby as $i=>$orderby) {
 						if (in_array($orderby, $validOrdering)) {
-							$_SESSION['reportcontactchange_orderby'][] = $orderby;
+							$_SESSION['reportphoneoptout_orderby'][] = $orderby;
 						}
 					}
 					set_session_options_orderby();
@@ -157,8 +289,8 @@ function set_session_options_activefields() {
 }
 
 function set_session_options_orderby() {
-	if (!empty($_SESSION['reportcontactchange_orderby'])) {
-		foreach ($_SESSION['reportcontactchange_orderby'] as $i => $orderby) {
+	if (!empty($_SESSION['reportphoneoptout_orderby'])) {
+		foreach ($_SESSION['reportphoneoptout_orderby'] as $i => $orderby) {
 			$_SESSION['report']['options']["order" . ($i+1)] = $orderby;
 		}
 	}
@@ -182,10 +314,40 @@ echo "<div id='metadataTempDiv' style='display:none'>";
 	select_metadata(null, null, $fields);
 echo "</div>";
 ?>
-		
+	<script type="text/javascript">
+		<? Validator::load_validators(array("ValOrganization","ValReldate")); ?>
+	</script>
 <?
 echo $form->render();
 endWindow();
+?>
+<script>
+function checkAllCheckboxes(docheck) {
+
+	var form = document.forms[0].elements;
+	for (var i = 0; i < form.length; i++) {
+		if (form[i].type == "checkbox") {
+
+			if (docheck) {
+				if (!form[i].checked)
+					form[i].click();
+			} else {
+				if (form[i].checked)
+					form[i].click();
+			}
+		}
+	}
+}
+</script>
+
+<?
+?>
+	<script type="text/javascript">
+		document.observe('dom:loaded', function() {
+				$('metadataDiv').update($('metadataTempDiv').innerHTML);
+			});
+	</script>
+<?
 include_once("navbottom.inc.php");
 ?>
 <script type="text/javascript" src="script/datepicker.js"></script>

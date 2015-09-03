@@ -228,48 +228,6 @@ class ReadOnlyFacebookPage extends FormItem {
 	}
 }
 
-class TwitterAccountPopup extends FormItem {
-	function render ($value) {
-		
-		$n = $this->form->name."_".$this->name;
-		$validtoken = ($this->args['hasvalidtoken']);
-		
-		$str = '
-			<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.($validtoken?"authed":"noauth").'" />
-			<div id="'. $n. 'connect" style="display:'. ($validtoken?"none":"block"). '">
-				'. icon_button(_L("Add Twitter Account"), "custom/twitter", "popup('popuptwitterauth.php', 600, 300)").'
-			</div>
-			<div id="'. $n. 'authed" style="display:'. ($validtoken?"block":"none"). '">
-				'. _L("Your Twitter account is connected."). '
-			</div>';
-		
-		return $str;
-	}
-	
-	function renderJavascript($value) {
-		$n = $this->form->name."_".$this->name;
-		
-		$str = '// Observe an authentication update on the document (the auth popup fires this event)
-				document.observe("TwAuth:update", function (res) {
-					var formitem = $("'. $n. '");
-					var connectdiv = $("'. $n. 'connect");
-					var autheddiv = $("'. $n. 'authed");
-					if (res.memo.access_token) {
-						formitem.value = "authed";
-						connectdiv.hide();
-						autheddiv.show();
-					} else {
-						formitem.value = "noauth";
-						connectdiv.show();
-						autheddiv.hide();
-					}
-					form_do_validation($("'.$n.'").up("form"), $("'.$n.'"));
-				});
-				';
-		return $str;
-	}
-}
-
 class ValTwitterAccountWithMessage extends Validator {
 	var $onlyserverside = true;
 	var $conditionalrequired = true;
@@ -354,8 +312,8 @@ class ValFacebookPageWithMessage extends Validator {
 				return $this->label. " ". _L("has an invalid posting location selected. Page is not authorized.");
 			}
 		}
-		if (!$haspage)
-			return $this->label. " ". _L("must have one or more pages to post to.");
+		//if (!$haspage)
+		//	return $this->label. " ". _L("must have one or more pages to post to.");
 		
 		return true;		
 	}
@@ -681,7 +639,7 @@ if ($submittedmode || $completedmode) {
 		if (count($job->getJobPosts("facebook"))) {
 			$helpsteps[] = _L("This section contains a list of the Facebook Pages which are associated with this %s.",$jobTitle);
 			$formdata["fbpages"] = array(
-				"label" => _L('Facebook Page(s)'),
+				"label" => _L('Facebook)'),
 				"fieldhelp" => _L('This is a list of the Facebook Pages associated with this job.'),
 				"value" => json_encode(array_keys($job->getJobPosts("facebook"))),
 				"validators" => array(),
@@ -856,7 +814,7 @@ if ($submittedmode || $completedmode) {
 		
 		$helpsteps[] = _L("<p>If you haven't connected a Facebook account, click the Connect to Facebook button. You'll be able to log into Facebook through a pop up window. Once you're connected, click the Save button.</p><p>After connecting your Facebook account, you will see a list of Facebook Pages where you are an administrator and a My Timeline option which lets you post to your account's Timeline. You may select any combination of options for your job.</p><p>If your system administrator has restricted users to posting only to authorized Facebook Pages, you may not see as many Pages or the option of posting to your Timeline. Check with your system administrator if you are unsure of your district's social media policies. Additionally, please note that your account must also have permission within Facebook to post to authorized Pages.</p>");
 		$formdata["fbpage"] = array(
-			"label" => _L('Facebook Page(s)'),
+			"label" => _L('Facebook'),
 			"fieldhelp" => _L("Select which Pages to post to. Please click the Guide button for more information about posting to Facebook."),
 			"value" => (count($fbpages)?json_encode($fbpages):""),
 			"validators" => array(
@@ -869,13 +827,17 @@ if ($submittedmode || $completedmode) {
 	
 	// if the user account may post to twitter, but has no valid twitter access token
 	if (getSystemSetting("_hastwitter") && $USER->authorize("twitterpost")) {
+
+		// Get the currently selected twitter destinations (if any)
+		$twitterSelected = array_keys($job->getJobPosts('twitter'));
+
 		// get this here so twitter failures only effect users with twitter access
 		$twitterTokens = new TwitterTokens();
 		$helpsteps[] = _L("If your message group contains a Twitter post, you must be connected to a Twitter account.");
 		$formdata["twitter"] = array(
 			"label" => _L('Twitter'),
 			"fieldhelp" => _L("You must have a Twitter account if your message group contains a Twitter post."),
-			"value" => "",
+			"value" => (count($twitterSelected) ? json_encode($twitterSelected) : ''),
 			"validators" => array(
 				array("ValTwitterAccountWithMessage")
 			),
@@ -1205,17 +1167,19 @@ include_once("nav.inc.php");
 ?>
 <script type="text/javascript">
 <? 
-Validator::load_validators(array("ValDuplicateNameCheck",
-								"ValWeekRepeatItem",
-								"ValTimeWindowCallEarly",
-								"ValTimeWindowCallLate",
-								"ValFormListSelect",
-								"ValMessageGroup",
-								"ValFacebookPageWithMessage",
-								"ValTwitterAccountWithMessage",
-								"ValCallerID",
-								"ValFeedCategoryWithMessage",
-								"ValDateWithFacebookLimiter"));
+Validator::load_validators(array(
+	"ValDuplicateNameCheck",
+	"ValWeekRepeatItem",
+	"ValTimeWindowCallEarly",
+	"ValTimeWindowCallLate",
+	"ValFormListSelect",
+	"ValMessageGroup",
+	"ValFacebookPageWithMessage",
+	"ValTwitterAccountWithMessage",
+	"ValCallerID",
+	"ValFeedCategoryWithMessage",
+	"ValDateWithFacebookLimiter"
+));
 ?>
 </script>
 <script src="script/niftyplayer.js.php" type="text/javascript"></script>

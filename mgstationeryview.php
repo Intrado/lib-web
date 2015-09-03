@@ -1,6 +1,8 @@
 <? 
 require_once("inc/common.inc.php");
 require_once("inc/securityhelper.inc.php");
+require_once("obj/MessageAttachment.obj.php");
+require_once("obj/ContentAttachment.obj.php");
 require_once("obj/Message.obj.php");
 require_once("obj/MessageGroup.obj.php");
 require_once("obj/MessagePart.obj.php");
