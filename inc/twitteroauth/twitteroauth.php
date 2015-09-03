@@ -88,20 +88,19 @@ class TwitterOAuth {
    *
    * @returns a string
    */
-  function getAuthorizeURL($token, $sign_in_with_twitter = TRUE, $force_login = TRUE) {
-    
+function getAuthorizeURL($token, $sign_in_with_twitter = TRUE, $force_login = TRUE) {
 	// optional URL GET parameter which forces user to login to Twitter  
 	$force_login_param = $force_login ? '&force_login=true' : '';
-	  
+	
 	if (is_array($token)) {
-      $token = $token['oauth_token'];
-    }
-    if (empty($sign_in_with_twitter)) {
-      return $this->authorizeURL() . "?oauth_token={$token}" . $force_login_param;
-    } else {
-       return $this->authenticateURL() . "?oauth_token={$token}" . $force_login_param;
-    }
-  }
+		$token = $token['oauth_token'];
+	}
+	if (empty($sign_in_with_twitter)) {
+		return $this->authorizeURL() . "?oauth_token={$token}" . $force_login_param;
+	} else {
+		return $this->authenticateURL() . "?oauth_token={$token}" . $force_login_param;
+	}
+}
 
   /**
    * Exchange request token and secret for an access token and
