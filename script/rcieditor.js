@@ -642,12 +642,12 @@
 				var content = htmleditorobject.instance.getData();
 				var cleanedContent = that.cleanContent(content);
 				textarea.val(cleanedContent);
-			}
 
-			// Hook a call to caller's callback for onchange event
-			var callback;
-			if (callback = that.getSetting('callback_onchange_fn')) {
-				callback(cleanedContent);
+				// Hook a call to caller's callback for onchange event
+				var callback;
+				if (callback = that.getSetting('callback_onchange_fn')) {
+					callback(cleanedContent);
+				}
 			}
 
 			return(true);
