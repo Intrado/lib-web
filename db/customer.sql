@@ -3135,6 +3135,9 @@ CREATE TABLE reportphoneoptout (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
 
+update setting set value='11.4/5' where name='_dbversion'
+$$$
+
 -- END 11.4/5
 
 ALTER TABLE reportphoneoptout
@@ -3146,4 +3149,16 @@ ALTER TABLE reportphoneoptout
   ADD PRIMARY KEY (jobId, personId, phone)
 $$$
 
+update setting set value='11.4/6' where name='_dbversion'
+$$$
+
 -- END 11.4/6
+
+ALTER TABLE `user`
+  ADD COLUMN samlEnabled TINYINT NOT NULL DEFAULT 0
+$$$
+
+update setting set value='11.4/7' where name='_dbversion'
+$$$
+
+-- END 11.4/7
