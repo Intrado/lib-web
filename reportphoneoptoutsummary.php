@@ -221,13 +221,8 @@ if($error || $reportgenerator->format == "html"){
 	include_once("nav.inc.php");
 	NewForm($f);
 
-	//check to see if referer came from summary page.  if so, go to history instead of referer
-	if(isset($_SESSION['report']['jobdetail']) || $error || $submit || $pagestartflag)
-		$back = icon_button("Back", "fugue/arrow_180", "window.history.go(-1)");
-	else {
-		$fallbackUrl = "reports.php";
-		$back = icon_button("Back", "fugue/arrow_180", "location.href='" . (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $fallbackUrl) . "'");
-	}
+	$back = icon_button("Back", "fugue/arrow_180", "window.location.href='reportphoneoptout.php'");
+	
 	buttons($back, submit($f, $s, "Refresh", null, "arrow_refresh"), submit($f, "save", "Save/Schedule"));
 	startWindow("Display Options", "padding: 3px;", "true");
 	?>
