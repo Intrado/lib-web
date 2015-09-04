@@ -261,20 +261,26 @@ class ValDateWithFacebookLimiter extends Validator {
 			if (strtotime($value) > strtotime($args['max']))
 				return $this->label. " ". _L('cannot be a date later than %s', $args['max']);
 		}
-		
+
+		// If the message has facebook AND at least one fbpage is selected, THEN we'll
+		// examine the expiration date of the facebook token, otherwise we'll ignore it!
 		if (isset($requiredvalues['message']) && $requiredvalues['message']) {
 			// check the message group for facebook content
 			$mg = new MessageGroup($requiredvalues['message']);
 			if ($mg->hasMessage("post", "facebook")) {
-				$fbexpireson = $USER->getSetting("fb_expires_on", false);
-				if (strtotime($value) > $fbexpireson) {
-					if ($fbexpireson)
-						return $this->label. " ". _L('cannot be a date later than %s, due to your current Facebook authentication token. Renew your token below to get more time. Note: Facebook authentications are good for a MAXIMUM of 60 days.', date('m/d/Y', $fbexpireson));
-					else
-						return $this->label. " ". _L('cannot pick a valid date without a Facebook authentication token. Please authorize Facebook below.');
+				if (isset($requiredvalues['fbpage']) && (count(json_decode($requiredvalues['fbpage'])) > 0)) {
+					print_r($requiredvalues['fbpage']);
+					$fbexpireson = $USER->getSetting("fb_expires_on", false);
+					if (strtotime($value) > $fbexpireson) {
+						if ($fbexpireson)
+							return $this->label. " ". _L('cannot be a date later than %s, due to your current Facebook authentication token. Renew your token to get more time. Note: Facebook authentications are good for a MAXIMUM of 60 days.', date('m/d/Y', $fbexpireson));
+						else
+							return $this->label. " ". _L('cannot pick a valid date without a Facebook authentication token.');
+					}
 				}
 			}
 		}
+
 		return true;
 	}
 }
@@ -518,11 +524,10 @@ if ($JOBTYPE == "repeating") {
 				array("ValDateWithFacebookLimiter", "min" => date("m/d/Y", strtotime("now + $dayoffset days")))
 			),
 			"control" => array("TextDate", "size"=>12, "nodatesbefore" => $dayoffset),
-			"requires" => array("message"),
+			"requires" => array("message", 'fbpage'),
 			"helpstep" => ++$helpstepnum
 		);
-		if (!$submittedmode)
-			$formdata["date"]["requires"] = array("message");
+		//if (!$submittedmode) $formdata["date"]["requires"] = array("message");
 	}
 }
 
@@ -813,13 +818,14 @@ if ($submittedmode || $completedmode) {
 		}
 		
 		$helpsteps[] = _L("<p>If you haven't connected a Facebook account, click the Connect to Facebook button. You'll be able to log into Facebook through a pop up window. Once you're connected, click the Save button.</p><p>After connecting your Facebook account, you will see a list of Facebook Pages where you are an administrator and a My Timeline option which lets you post to your account's Timeline. You may select any combination of options for your job.</p><p>If your system administrator has restricted users to posting only to authorized Facebook Pages, you may not see as many Pages or the option of posting to your Timeline. Check with your system administrator if you are unsure of your district's social media policies. Additionally, please note that your account must also have permission within Facebook to post to authorized Pages.</p>");
+		$fbtoken = $USER->getSetting("fb_access_token", false);
 		$formdata["fbpage"] = array(
 			"label" => _L('Facebook'),
 			"fieldhelp" => _L("Select which Pages to post to. Please click the Guide button for more information about posting to Facebook."),
-			"value" => (count($fbpages)?json_encode($fbpages):""),
+			"value" => ( (count($fbpages) && (false !== $fbtoken)) ? json_encode($fbpages) : ""),
 			"validators" => array(
 				array("ValFacebookPageWithMessage", "authpages" => getFbAuthorizedPages(), "authwall" => getSystemSetting("fbauthorizewall"))),
-			"control" => array("FacebookPage", "access_token" => $USER->getSetting("fb_access_token", false), "show_renew" => $showrenew),
+			"control" => array("FacebookPage", "access_token" => $fbtoken, "show_renew" => $showrenew),
 			"requires" => array("message"),
 			"helpstep" => ++$helpstepnum);
 			
