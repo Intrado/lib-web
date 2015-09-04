@@ -29,24 +29,24 @@ CKEDITOR.dialog.add('attachmentlink', function (editor) {
 			{
 				id: 'tab1',
 				label: 'Attachment',
-				title: 'Attachment',
+				title: 'Hosted Attachment',
 				filebrowser: 'uploadbutton',
 				padding: 3,
 				elements: [
 					{
 						id: 'instructions',
 						type: 'html',
-						html: 'Please upload an attachment file.'
+						html: 'Please upload an attachment'
 					},
 					{
 						id: 'displayname',
 						type: 'text',
-						label: 'Display Name',
+						label: 'Display Name (you can replace the file name with text below)',
 					},
 					{
 						id: 'upload',
 						type: 'file',
-						label: 'Upload',
+						label: 'Select a file to upload',
 						onLoad: function () {
 							CKEDITOR.document.getById(this._.frameId).on('load', function () {
 							}.bind(this));

@@ -322,9 +322,9 @@ if ($subtype == 'html') {
 		"control" => array("FormHtml","html"=>'
 					<div style="font-size: medium;">
 						<img src="img/icons/information.png" alt="Information"/>
-						Inserts an attachment link by clicking the
+						Click
 						<img src="script/ckeditor/plugins/attachmentlink/icons/attachmentlink.png" onclick="CKEDITOR.tools.callFunction(131,this);return false;" alt="Attachment" />
-						button inside the editor
+						to add your hosted attachments.
 					</div>'
 
 		),
@@ -347,22 +347,16 @@ if ($subtype == 'plain') {
 }
 
 if ($fromstationery){
-	$helpsteps[] = _L("Click the editable regions of the stationery to enter your message. Be sure to introduce yourself and give detailed information. For ".
-	"helpful message tips and ideas, click the Help link in the upper right corner of the screen.<br><br>If you would ".
-	"like to insert dynamic data fields, such as the recipient's name, move the cursor to the location where the data ".
-	"should be inserted, select the data field, and click 'Insert'. It's a good idea to enter a default value in the ".
-	"Default Value field for each insert. This value will be displayed in the event of a recipient having no data in your chosen field.<br><br>".
-	"In order to insert attachments as a link, move the cursor to the location where the attachment link ".
-	"should be inserted, click on Attachment icon to launch the attachment dialog. Type an appropriate display name and upload the attachment.".
+	$helpsteps[] = _L("Click the editable regions of the stationery to enter your message.<br><br>" .
+		"To insert dynamic data fields, such as the recipient's name, move the cursor to the location where the data should be inserted, select the data field, and click 'Insert'.<br><br>" .
+		"To insert hosted attachments, move to the location where the attachment link should be inserted, and click the Attachment icon and follow the prompts. The attachment name will display inline, or use the Display Name field to change the link name.<br><br>" .
+		"For helpful message tips and ideas, click the Help link in the upper right corner of the screen.".
 	"Click on OK button to attach the link.");
 } else {
-	$helpsteps[] = _L("Enter your Email message body text here. Be sure to introduce yourself and give detailed information. For ".
-	"helpful message tips and ideas, click the Help link in the upper right corner of the screen.<br><br>If you would ".
-	"like to insert dynamic data fields, such as the recipient's name, move the cursor to the location where the data ".
-	"should be inserted, select the data field, and click 'Insert'. It's a good idea to enter a default value in the ".
-	"Default Value field for each insert. This value will be displayed in the event of a recipient having no data in your chosen field.".
-	"should be inserted, click on Attachment icon to launch attachment dialog. Type an appropriate display name and upload the attachment.".
-	"Click on OK button to attach the link.");
+	$helpsteps[] = _L("Create your email message.<br><br>" .
+		"To insert dynamic data fields, such as the recipient's name, move the cursor to the location where the data should be inserted, select the data field, and click 'Insert'.<br><br>" .
+		"To insert hosted attachments, move to the location where the attachment link should be inserted, and click the Attachment icon and follow the prompts. The attachment name will display inline, or use the Display Name field to change the link name.<br><br>" .
+		"For helpful message tips and ideas, click the Help link in the upper right corner of the screen.");
 }
 
 $formdata["message"] = array(
