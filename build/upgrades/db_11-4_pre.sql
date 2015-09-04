@@ -58,3 +58,9 @@ ALTER TABLE reportphoneoptout
   DROP PRIMARY KEY,
   ADD PRIMARY KEY (jobId, personId, phone)
 $$$
+
+-- $rev 7
+
+ALTER TABLE `user`
+  ADD COLUMN samlEnabled TINYINT NOT NULL DEFAULT 0
+$$$
