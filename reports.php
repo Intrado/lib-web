@@ -89,7 +89,7 @@ if (getSystemSetting('_hastargetedmessage', false) && $USER->authorize('viewsyst
 	$jobLinks[] = "<a href='reportclassroomsearch.php?clear=1&type=organization'>Classroom Messaging Summary</a>";
 }
 if ($USER->authorize('viewsystemreports')) {
-	$jobLinks[] = "<a href='reportattachmentsearch.php?clear=1'>Attachment Log</a>";
+	$jobLinks[] = "<a href='reportattachmentsearch.php?clear=1'>Hosted Attachments Log</a>";
 }
 
 $linkLists[] = $jobLinks;

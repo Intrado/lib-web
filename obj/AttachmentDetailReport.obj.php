@@ -7,36 +7,43 @@ class AttachmentDetailReport extends ReportGenerator{
 	public $queryArgs = false;
 
 	private $titles = array(
-			0 => "Unique ID",
-			1 => "First Name",
-			2 => "Last Name",
-			3 => "Status",
-			4 => "Activity",
-			5 => "Activity Count",
-			6 => "Last Attempt"
-		);
+		0 => "Unique ID",
+		1 => "First Name",
+		2 => "Last Name",
+		3 => "Email",
+		4 => "Sequence",
+		5 => "Status",
+		6 => "Activity",
+		7 => "Activity Count",
+		8 => "Last Attempt"
+	);
 
 	private $formatters = array(
-			6 => "fmt_ms_timestamp"
-		);
+		4 => "fmt_dst_src",
+		8 => "fmt_ms_timestamp"
+	);
 
-	function generateQuery($hackPDF = false){
-		global $USER;
+	function generateQuery($hackPDF = false) {
 		$this->params = $this->reportinstance->getParameters();
 		$this->reporttype = $this->params['reporttype'];
 		$this->query = null;
 		$this->queryArgs = array();
 
 		if (isset($this->params['attachmentid'])) {
-			$query = "select j.name as BroadcastName, coalesce(nullif(a.displayName, ''), a.id) as AttachmentName
-				from messageattachment a join message m on (m.id=a.messageid)
+			$query = "select
+					j.name as `Broadcast Name`,
+					coalesce(nullif(a.displayName, ''), a.id) as `Attachment Name`,
+					ca.filename as `File Name`,
+					ca.size as `File Size`
+				from messageattachment a
+				join message m on (m.id=a.messageid)
 				join messagegroup g on (g.id=m.messagegroupid)
 				join job j on (j.messagegroupid=g.id)
+				join contentattachment ca on (ca.id=a.contentattachmentid)
 				where a.id = ?";
 			$attachmentid = (int) $this->params['attachmentid'];
 			$this->queryArgs[] = $attachmentid;
-			$row = QuickQueryRow($query, false, $this->_readonlyDB, array($attachmentid));
-			list($this->attachmentName, $this->broadcastName) = $row;
+			$this->attachmentDisplay = QuickQueryRow($query, true, $this->_readonlyDB, array($attachmentid));
 			$attachmentquery = " and a.id = ?";
 		} else {
 			error_log("No attachmentid set");
@@ -46,14 +53,17 @@ class AttachmentDetailReport extends ReportGenerator{
 
 		$this->query = "select sql_calc_found_rows
 			coalesce(p.pkey, 'n/a') as UniqueID,
-			rp." . FieldMap::GetFirstNameField() . " as FirstName,
-			rp." . FieldMap::GetLastNameField() . " as LastName,
+			p." . FieldMap::GetFirstNameField() . " as FirstName,
+			p." . FieldMap::GetLastNameField() . " as LastName,
+			rc.email,
+			rc.sequence,
 			rp.status as Status,
 			coalesce(dd_download.action, dd_action.action, 'n/a') as Activity,
 			coalesce(dd_download.actionCount, dd_action.actionCount, 'n/a') as ActivityCount,
 			coalesce(dd_download.timestampMs, dd_action.timestampMs) as LastAttempt
 		from reportperson as rp
-		inner join person as p on (rp.personid=p.id)
+		inner join reportcontact as rc on (rp.jobid=rc.jobid and rp.type=rc.type and rp.personid=rc.personid)
+		inner join person as p on (rc.recipientpersonid=p.id)
 		inner join job as j on (rp.jobid=j.id)
 		inner join messagegroup as g on (j.messagegroupid=g.id)
 		inner join message as m on (m.messagegroupid=g.id)
@@ -62,9 +72,8 @@ class AttachmentDetailReport extends ReportGenerator{
 		left outer join reportdocumentdelivery as dd_action on (dd_action.messageAttachmentId = a.id and dd_action.personid = rp.personid)
 		left outer join reportdocumentdelivery as dd_action2 on (dd_action2.messageAttachmentId = a.id and dd_action2.personid = dd_action.personid and dd_action2.timestampMs > dd_action.timestampMs)
 		left outer join reportdocumentdelivery as dd_download on (dd_download.messageAttachmentId = a.id and dd_download.personid = dd_action.personid and dd_download.action = 'download')
-		where 1 $searchquery and dd_action2.messageAttachmentId is null
+		where 1 $searchquery and rp.type = 'email' and dd_action2.messageAttachmentId is null
 		group by rp.jobid, rp.personid
-		$orderquery
 		";
 
 		// query to test resulting dataset, PDF generation uses this to estimate the number of pages.
@@ -85,37 +94,6 @@ class AttachmentDetailReport extends ReportGenerator{
 
 	function runHtml() {
 
-		// DISPLAY
-		if ((isset($this->params['jobtypes']) && $this->params['jobtypes'] != "")) {
-			startWindow(_L("Filter By"));
-?>
-			<table>
-<?
-				if(isset($this->params['jobtypes']) && $this->params['jobtypes'] != ""){
-					$jobtypes = explode("','", $this->params['jobtypes']);
-					$jobtypenames = array();
-					foreach($jobtypes as $jobtype){
-						$jobtypeobj = new JobType($jobtype);
-						$jobtypenames[] = escapehtml($jobtypeobj->name);
-					}
-					$jobtypenames = implode(", ",$jobtypenames);
-?>
-					<tr><td>Job Type: <?=$jobtypenames?></td></tr>
-				}
-
-				foreach($searchrules as $rule){
-					?><tr><td><?=$rule?></td></tr><?
-				}
-?>
-				</table>
-			<?
-			endWindow();
-
-			?><br><?
-		}
-
-		?><br><?
-
 		$data = array();
 		$pageSize = self::DEFAULT_PAGE_SIZE;
 		$pageStart = isset($this->params['pagestart']) ? (int)$this->params["pagestart"] : 0;
@@ -130,10 +108,12 @@ class AttachmentDetailReport extends ReportGenerator{
 		$query = "select found_rows()";
 		$total = QuickQuery($query, $this->_readonlyDB);
 
+		// @TODO add bc name and attachment name to window title
 		startWindow(_L("Report Details ").help("AttachmentDetailReport_ReportDetails"), 'padding: 3px;', false);
 
-		echo "<h1>Broadcast Name: {$this->broadcastName}</h1>";
-		echo "<h1>Attachment: {$this->attachmentName}</h1>";
+		foreach ($this->attachmentDisplay as $fieldName => $value) {
+			echo "<h1>$fieldName: $value</h1>";
+		}
 
 		showPageMenu($total, $pageStart, self::DEFAULT_PAGE_SIZE);
 		echo '<table width="100%" cellpadding="3" cellspacing="1" class="list" id="reportdetails">';
@@ -198,10 +178,4 @@ class AttachmentDetailReport extends ReportGenerator{
 		}
 	}
 
-	function setReportFile(){
-		$this->reportfile = "attachmentdetailreport.jasper";
-	}
-
 }
-
-?>

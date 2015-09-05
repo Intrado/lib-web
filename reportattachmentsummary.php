@@ -33,11 +33,11 @@ if (!$USER->authorize('createreport') && !$USER->authorize('viewsystemreports'))
 // Formatters
 ////////////////////////////////////////////////////////////////////////////////
 
-function fmt_question($row, $index){
+function fmt_question($row, $index) {
 	return "<div style='text-decoration: underline'>$row[$index]</div>";
 }
 
-function fmt_answer($row, $index){
+function fmt_answer($row, $index) {
 	$offset = $index+12;
 	return "<div style='font-weight:bold; text-decoration: underline'>" . (isset($row[$offset]) ? $row[$offset] : "") . "</div><br><div>$row[$index]</div>";
 }
@@ -48,29 +48,32 @@ function fmt_answer($row, $index){
 ////////////////////////////////////////////////////////////////////////////////
 unset($_SESSION['report']['edit']);
 $clear = 0;
-if(isset($_GET['jobid'])){
+if (isset($_GET['jobid'])) {
 	unset($_SESSION['report']);
 	unset($_SESSION['reportid']);
-	$options= array("jobid" => $_GET['jobid']+0,
-					"reporttype" => "attachmentsummaryreport");
+	$options= array(
+		"jobid" => (int) $_GET['jobid'],
+		"reporttype" => "attachmentsummaryreport"
+	);
 	$_SESSION['report']['options'] = $options;
 	$_SESSION['report']['jobsummary'] = 1;
 	$clear = 1;
 }
 
-if(isset($_GET['survey'])){
+if (isset($_GET['survey'])) {
 	$options['survey'] = true;
 	$clear=1;
 }
 
-if($clear)
+if ($clear) {
 	redirect();
+}
 
 $fields = FieldMap::getOptionalAuthorizedFieldMaps();
 
-if(isset($_GET['reportid'])){
-	$reportid = $_GET['reportid']+0;
-	if(!userOwns("reportsubscription", $reportid)){
+if (isset($_GET['reportid'])) {
+	$reportid = (int) $_GET['reportid'];
+	if (!userOwns("reportsubscription", $reportid)) {
 		redirect('unauthorized.php');
 	}
 	$subscription = new ReportSubscription($reportid);
@@ -83,10 +86,10 @@ if(isset($_GET['reportid'])){
 } else {
 	$options = isset($_SESSION['report']['options']) ? $_SESSION['report']['options'] : array();
 	$options['reporttype']="attachmentsummaryreport";
-	if(isset($options['jobid'])){
+	if (isset($options['jobid'])) {
 		$jobid= $options['jobid'];
 	}
-	if(isset($jobid)){
+	if (isset($jobid)) {
 
 		//check userowns and viewsystemreports
 		if (!(userOwns("job",$jobid) || $USER->authorize('viewsystemreports'))) {
@@ -104,7 +107,7 @@ $generator = new AttachmentSummaryReport();
 $generator->reportinstance = $instance;
 $generator->userid = $USER->id;
 
-if(isset($_SESSION['reportid'])){
+if (isset($_SESSION['reportid'])) {
 	$_SESSION['saved_report'] = true;
 } else {
 	$_SESSION['saved_report'] = false;
@@ -112,9 +115,9 @@ if(isset($_SESSION['reportid'])){
 
 $_SESSION['report']['options'] = $options;
 
-if(isset($_GET['csv']) && $_GET['csv']){
+if (isset($_GET['csv']) && $_GET['csv']) {
 	$generator->format = "csv";
-} else if(isset($_GET['pdf']) && $_GET['pdf']){
+} else if (isset($_GET['pdf']) && $_GET['pdf']) {
 	$generator->format = "pdf";
 } else {
 	$generator->format = "html";
@@ -124,17 +127,14 @@ $reload=0;
 $f="reports";
 $s="jobs";
 
-if(CheckFormSubmit($f,$s)){
+if (CheckFormSubmit($f,$s)) {
 	//check to see if formdata is valid
-	if(CheckFormInvalid($f))
-	{
+	if (CheckFormInvalid($f)) {
 		error('Form was edited in another window, reloading data');
 		$reload = 1;
-	}
-	else
-	{
+	} else {
 		MergeSectionFormData($f, $s);
-		if( CheckFormSection($f, $s) ) {
+		if (CheckFormSection($f, $s)) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else {
 			$_SESSION['report']['edit'] = 1;
@@ -145,15 +145,17 @@ if(CheckFormSubmit($f,$s)){
 	$reload=1;
 }
 
-if($reload)
+if ($reload) {
 	ClearFormData($f);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 
-if($generator->format != "html"){
-	if($generator->format == "pdf"){
-		if($result = $generator->testSize()){
+if ($generator->format != "html") {
+	if ($generator->format == "pdf") {
+		if ($result = $generator->testSize()) {
 			error($result);
 			$error = true;
 		} else {
@@ -163,25 +165,24 @@ if($generator->format != "html"){
 		$generator->generate();
 	}
 } else {
-
 	$PAGE = "reports:reports";
-	$TITLE = _L("Attachment Log");
-	if(isset($_SESSION['reportid'])){
+	$TITLE = _L("Hosted Attachments Log");
+	if (isset($_SESSION['reportid'])) {
 		$subscription = new ReportSubscription($_SESSION['reportid']);
 		$TITLE .= " - " . escapehtml($subscription->name);
-	} else if((isset($jobid) && $jobid)){
+	} else if ((isset($jobid) && $jobid)) {
 		$TITLE .= " - " . escapehtml($job->name);
 	}
-	if(isset($options['reldate'])){
+	if (isset($options['reldate'])) {
 		list($startdate, $enddate) = getStartEndDate($options['reldate'], $options);
 		$DESCRIPTION = " From: " . date("m/d/Y", $startdate) . " To: " . date("m/d/Y", $enddate);
 	}
 	include_once("nav.inc.php");
 	NewForm($f);
 	//TODO buttons for notification log: download csv, view call details
-	if(isset($_SESSION['report']['jobsummary']))
+	if (isset($_SESSION['report']['jobsummary'])) {
 		$back = icon_button(_L("Back"), "fugue/arrow_180", "window.history.go(-1)");
-	else {
+	} else {
 		$fallbackUrl = "reports.php";
 		$back = icon_button(_L("Back"), "fugue/arrow_180", "location.href='" . (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $fallbackUrl) . "'");
 	}
@@ -193,4 +194,3 @@ if($generator->format != "html"){
 	endForm();
 	include_once("navbottom.inc.php");
 }
-?>

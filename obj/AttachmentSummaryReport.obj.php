@@ -3,16 +3,11 @@
 class AttachmentSummaryReport extends ReportGenerator {
 
 	function generateQuery($hackPDF = false) {
-		global $USER;
 		$this->params = $this->reportinstance->getParameters();
 		$jobtypes = "";
 		$joblistquery = "";
 		if (isset($this->params['jobtypes'])) {
 			$jobtypes = $this->params['jobtypes'];
-		}
-		$surveyonly = "false";
-		if (isset($this->params['survey']) && $this->params['survey'] == "true") {
-			$surveyonly = "true";
 		}
 		if (isset($this->params['jobid'])) {
 			$joblist = "";
@@ -27,7 +22,7 @@ class AttachmentSummaryReport extends ReportGenerator {
 				$reldate = $this->params['reldate'];
 			}
 			list($startdate, $enddate) = getStartEndDate($reldate, $this->params);
-			$joblist = implode("','", getJobList($startdate, $enddate, $jobtypes, $surveyonly));
+			$joblist = implode("','", getJobList($startdate, $enddate, $jobtypes));
 		}
 
 		if ($joblist) {
@@ -88,9 +83,11 @@ class AttachmentSummaryReport extends ReportGenerator {
 			return "<a href='reportattachmentdetails.php?attachmentid=".((int)$row[$index-1])."'>".escapeHtml($row[$index])."</a>";
 		}
 
-		startWindow(_L("Report Details ") . help("AttachmentSummaryReport_Totals"), 'padding: 3px;', false);
+		startWindow(_L("Report Details ") . help("ReportAttachmentSummary_Totals"), 'padding: 3px;', false);
 
-		$titles = array(0 => _L("%s Name", getJobTitle()),
+		$titles = array(
+			0 => _L("%s Name", getJobTitle()),
+			// 1 is attachmentid
 			2 => _L("Attachment Name"),
 			3 => _L("Number of Downloads")
 		);
@@ -108,15 +105,10 @@ class AttachmentSummaryReport extends ReportGenerator {
 		echo "</table>";
 
 		if (empty($data)) {
-			echo _L("No %s Data", getJobTitle());
+			echo _L("No %s with Hosted Attachments", getJobTitle());
 		}
 
 		endWindow();
 	}
 
-	function setReportFile() {
-		$this->reportfile = "attachmentsummaryreport.jasper";
-	}
-
 }
-
