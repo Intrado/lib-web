@@ -310,9 +310,6 @@ include_once("nav.inc.php");
 
 startWindow(_L("Options"), "padding: 3px;");
 
-echo "<div id='metadataTempDiv' style='display:none'>";
-	select_metadata(null, null, $fields);
-echo "</div>";
 ?>
 	<script type="text/javascript">
 		<? Validator::load_validators(array("ValOrganization","ValReldate")); ?>
@@ -340,13 +337,6 @@ function checkAllCheckboxes(docheck) {
 }
 </script>
 
-<?
-?>
-	<script type="text/javascript">
-		document.observe('dom:loaded', function() {
-				$('metadataDiv').update($('metadataTempDiv').innerHTML);
-			});
-	</script>
 <?
 include_once("navbottom.inc.php");
 ?>

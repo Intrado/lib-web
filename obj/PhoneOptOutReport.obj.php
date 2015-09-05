@@ -52,7 +52,7 @@ class PhoneOptOutReport extends ReportGenerator {
 					group by personId, phone
 					";
 
-		$this->query = "select SQL_CALC_FOUND_ROWS distinct 
+		$this->query = "select SQL_CALC_FOUND_ROWS distinct
 					p.pkey as pkey,
 					p." . FieldMap::GetFirstNameField() . " as firstname,
 					p." . FieldMap::GetLastNameField() . " as lastname,
@@ -64,7 +64,7 @@ class PhoneOptOutReport extends ReportGenerator {
 					$orgsql
 					$orderquery
 					";
-		
+
 	}
 
 	function runHtml(){
@@ -87,7 +87,7 @@ class PhoneOptOutReport extends ReportGenerator {
 			// format the phone number for display AS a phone number
 			$row[3] = Phone::format($row[3]);
 			
-			$personlist[$row[0]] = $row;
+			$personlist[] = $row;
 			$personidlist[] = $row[1];
 		}
 		
@@ -103,8 +103,6 @@ class PhoneOptOutReport extends ReportGenerator {
 						"2" => "Last Name",
 						"3" => "Phone Number",
 						"4" => "Count");
-		
-		$titles = appendFieldTitles($titles);
 		
 		startWindow("Search Results", "padding: 3px;");
 		showPageMenu($total,$pagestart,$max);
