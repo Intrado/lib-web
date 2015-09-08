@@ -1,6 +1,6 @@
 CKEDITOR.dialog.add('attachmentlink', function (editor) {
 	return {
-		title: 'Attachment',
+		title: 'Hosted Attachment',
 		minWidth: 400,
 		minHeight: 200,
 		onShow: function () {

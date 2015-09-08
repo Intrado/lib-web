@@ -220,11 +220,9 @@ if ($showreport || $downloadreport) {
 					break;
 
 				case "twitter":
-					$accessToken = $twitterTokens->getAccessToken($row[5]);
- 					$post["twhandle"][] = is_null($accessToken) ? $row[5] : $accessToken->screen_name; // Set id here to be able to map to twitter response
+					$post["twhandle"][] = $row[5];
 					$post["twstatus"] = $row[7] == "1"?"Posted":"Not Posted";
 					$post["twcontent"] = $row[3];
-					// Do not modify, Just print the handle 
 					break;
 			} 
 			$data[$row[0]] = $post;
@@ -267,13 +265,37 @@ function fmt_fbdestination($row,$index) {
 
 function fmt_twdestination($row, $index) {
 	$destinations = $row[$index];
-	return count($destinations) ? '"' . implode('", "', $destinations) . '"' : '';
+	$fmtDest = function($id) {
+		global $twitterTokens;
+		$token = $twitterTokens->getAccessToken($id);
+		if (is_null($token)) {
+			return '"' . htmlspecialchars($id) . '"';
+		} else {
+			$name = htmlspecialchars($token->screen_name);
+			return "<a href='http://twitter.com/$name' target='_blank'>$name</a>";
+		}
+	};
+	return count($destinations) ? implode(', ', array_map($fmtDest, $destinations)) : '';
 }
 
 function fmt_csv_destination($row,$index) {
 	$destinations = $row[$index];
 	if ($destinations) {
 		return implode(",",$destinations);
+	} else {
+		return "";
+	}
+}
+
+function fmt_csv_twdestination($row, $index) {
+	$destinations = $row[$index];
+	$fmtDest = function($id) {
+		global $twitterTokens;
+		$token = $twitterTokens->getAccessToken($id);
+		return is_null($token) ? $id : $token->screen_name;
+	};
+	if ($destinations) {
+		return implode(",", array_map($fmtDest, $destinations));
 	} else {
 		return "";
 	}
@@ -293,7 +315,7 @@ if ($downloadreport) {
 	$csvformatters = array (
 		'date' => 'fmt_txt_date',
 		'fbdest' => 'fmt_csv_destination',
-		'twhandle' => 'fmt_csv_destination'
+		'twhandle' => 'fmt_csv_twdestination'
 	);
 	showCsvData($data, $titles,$csvformatters);
 	exit();
@@ -402,7 +424,7 @@ function fill_fb_cache() {
 		'/' + id,
 		function(response) {
 			if (response && response.id && response.name) {
-				fbcache.set(response.id, '"' + response.name + '"');
+				fbcache.set(response.id, response);
 				uniquefacebookids = uniquefacebookids.without(response.id);
 				fbattemps = 3;
 			}
@@ -422,8 +444,13 @@ function diplayfacebookinfo(){
 		fbdestinations.each(function(itm) {
 			var destinations = '';
 			itm.value.each(function(id) {
-				var name = fbcache.get(id);
-				destinations += ", " + (name?name:id);
+				var fbdata = fbcache.get(id);
+				if (fbdata) {
+					var html = '<a href="' + encodeURI(fbdata.link) + '" target="_blank">' + fbdata.name.escapeHTML() + '</a>';
+					destinations += ", " + html;
+				} else {
+					destinations += ", " + '"' + id + '"';
+				}
 			});
 			$(itm.key).update(destinations.sub(", ",""));
 		});
