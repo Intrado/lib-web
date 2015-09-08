@@ -34,7 +34,9 @@ startWindow(_L('View ASP Graphs / Log Collector'));
 <? } ?>
 
 <? if($MANAGERUSER->authorized("aspcallgraphs")) { ?>
-<a href="aspcallsbydm.php">by dm avg for a month</a> or <a href="aspcallsbydmtime.php">by dm one day</a> or <a href="aspcallsalldmtime.php">by dm every day (multiple graphs 30 days)</a>
+<a href="aspcallsbydm.php">by dm avg for a month</a> or <a href="aspcallsbydmtime.php">by dm one day</a>
+	or <a href="aspcallsdayofweekdmtime.php">by dm same day of week (multiple graphs 4 weeks)</a>
+	or <a href="aspcallsalldmtime.php">by dm every day (multiple graphs 30 days)</a>
 <br>
 <? } ?>
 
@@ -44,7 +46,9 @@ startWindow(_L('View ASP Graphs / Log Collector'));
 <? } ?>
 
 <? if($MANAGERUSER->authorized("aspcallgraphs")) { ?>
-<a href="aspcallsbytime.php">by time avg for a month</a> or <a href="aspcallsbytimebyday.php">by time one day</a> or <a href="aspcallsalldaysbytime.php">by time every day (multiple graphs 30 days)</a>
+<a href="aspcallsbytime.php">by time avg for a month</a> or <a href="aspcallsbytimebyday.php">by time one day</a>
+	`or <a href="aspcallsdayofweekbytime.php">by time same day of week (multiple graphs 4 weeks)</a>
+	`or <a href="aspcallsalldaysbytime.php">by time every day (multiple graphs 30 days)</a>
 <br>
 <? } ?>
 
