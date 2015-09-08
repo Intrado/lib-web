@@ -1,7 +1,5 @@
 <?
 
-//TODO remove SQL_CALC_FOUND_ROWS, and use count(*) instead. with all the g field crap and whatnot, it's slowing it down
-
 class PhoneOptOutReport extends ReportGenerator {
 
 	const DEFAULT_PAGE_SIZE = 100;
@@ -20,37 +18,23 @@ class PhoneOptOutReport extends ReportGenerator {
 
 	function generateQuery($hackPDF = false) {
 		global $USER;
-		
+
+		$this->params = $this->reportinstance->getParameters();
+
 		$orgIds = null;
 		if (isset($this->params['organizationids'])) {
 			$orgIds = $this->params['organizationids'];
 		} 
-		
-		$this->params = $this->reportinstance->getParameters();
-		
+
 		$this->reporttype = $this->params['reporttype'];
 
 		if (! isset($this->params['order1'])) {
 			$this->params['order1'] = 'pkey';
 		}
 		$orderquery = getOrderSql($this->params);
-		
-		if (is_array($orgIds)) {
-			$flippedOrgs = array_flip($orgIds);
 
-			$filteredOrgs = $USER->filterOrgs($flippedOrgs);
+		$orgJoin = $USER->getPersonAssociationJoinSql($orgIds, array(), "p");
 
-			$orgs = array_flip($filteredOrgs);
-		}
-		
-		$orgsql = '';
-		// if user has no organizations then default to empty result set from query.
-		if (count($orgIds) > 0 && count($orgs) === 0) {
-			$orgsql = "where 0";
-		} else if (isset($orgIds) && count($orgs)) {
-			$orgsql = "where pa.organizationid in ('". implode("','", $orgs) ."')";
-		} 
-		
 		$reldate = "today";
 		if (isset($this->params['reldate'])) {
 			$reldate = $this->params['reldate'];
@@ -67,7 +51,7 @@ class PhoneOptOutReport extends ReportGenerator {
 					group by personId, phone
 					";
 
-		$this->query = "select SQL_CALC_FOUND_ROWS distinct
+		$this->query = "select SQL_CALC_FOUND_ROWS
 					p.pkey as pkey,
 					p." . FieldMap::GetFirstNameField() . " as firstname,
 					p." . FieldMap::GetLastNameField() . " as lastname,
@@ -75,11 +59,9 @@ class PhoneOptOutReport extends ReportGenerator {
 					rpo.numRequests
 					from person p
 					join ($phonesQuery) as rpo on p.id = rpo.personId
-					left join personassociation pa on (pa.personid = p.id)
-					$orgsql
+					$orgJoin
 					$orderquery
 					";
-
 	}
 
 	function runHtml() {
@@ -164,10 +146,6 @@ class PhoneOptOutReport extends ReportGenerator {
 		}
 	}
 
-	function getReportSpecificParams() {
-		return $params;
-	}
-
 	function setReportFile() {
 		$this->reportfile = "Phoneoptoutreport.jasper"; // TODO
 	}
@@ -189,5 +167,3 @@ class PhoneOptOutReport extends ReportGenerator {
 		return $ordering;
 	}
 }
-
-?>
