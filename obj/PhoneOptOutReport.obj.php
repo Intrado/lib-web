@@ -3,12 +3,26 @@
 //TODO remove SQL_CALC_FOUND_ROWS, and use count(*) instead. with all the g field crap and whatnot, it's slowing it down
 
 class PhoneOptOutReport extends ReportGenerator {
-	
+
+	const DEFAULT_PAGE_SIZE = 100;
+
+	private $titles = array(
+		"0" => "ID#",
+		"1" => "First Name",
+		"2" => "Last Name",
+		"3" => "Phone Number",
+		"4" => "Count"
+	);
+
+	private $formatters = array(
+		"3" => "fmt_phone"
+	);
+
 	function generateQuery($hackPDF = false) {
 		global $USER;
 		
 		$orgIds = null;
-		if(isset($this->params['organizationids'])) {
+		if (isset($this->params['organizationids'])) {
 			$orgIds = $this->params['organizationids'];
 		} 
 		
@@ -16,12 +30,12 @@ class PhoneOptOutReport extends ReportGenerator {
 		
 		$this->reporttype = $this->params['reporttype'];
 
-		if(! isset($this->params['order1'])) {
+		if (! isset($this->params['order1'])) {
 			$this->params['order1'] = 'pkey';
 		}
 		$orderquery = getOrderSql($this->params);
 		
-		if(is_array($orgIds)) {
+		if (is_array($orgIds)) {
 			$flippedOrgs = array_flip($orgIds);
 
 			$filteredOrgs = $USER->filterOrgs($flippedOrgs);
@@ -31,15 +45,16 @@ class PhoneOptOutReport extends ReportGenerator {
 		
 		$orgsql = '';
 		// if user has no organizations then default to empty result set from query.
-		if(count($orgIds) > 0 && count($orgs) === 0) {
+		if (count($orgIds) > 0 && count($orgs) === 0) {
 			$orgsql = "where 0";
 		} else if (isset($orgIds) && count($orgs)) {
 			$orgsql = "where pa.organizationid in ('". implode("','", $orgs) ."')";
 		} 
 		
 		$reldate = "today";
-		if(isset($this->params['reldate']))
+		if (isset($this->params['reldate'])) {
 			$reldate = $this->params['reldate'];
+		}
 		list($startdate, $enddate) = getStartEndDate($reldate, $this->params);
 		
 		$phonesQuery = "select personId,
@@ -67,50 +82,31 @@ class PhoneOptOutReport extends ReportGenerator {
 
 	}
 
-	function runHtml(){
-		$max = 100;
-		
+	function runHtml() {
+		$pageSize = self::DEFAULT_PAGE_SIZE;
+
 		$query = $this->query;
 
-		$pagestart = isset($this->params['pagestart']) ? $this->params['pagestart'] : 0;
-		$query .= "limit $pagestart, $max";
+		$pageStart = isset($this->params['pagestart']) ? $this->params['pagestart'] : 0;
+		$query .= "limit $pageStart, $pageSize";
 
 		$result = Query($query, $this->_readonlyDB);
-		
-		$total = QuickQuery("select found_rows()", $this->_readonlyDB);
-		//fetch data with main query and populate arrays using personid as the key
+
 		$personlist = array();
-		$personidlist = array();
-		
-		
-		while($row = DBGetRow($result)){
-			// format the phone number for display AS a phone number
-			$row[3] = Phone::format($row[3]);
-			
+		while ($row = DBGetRow($result)) {
 			$personlist[] = $row;
-			$personidlist[] = $row[1];
 		}
-		
-		
-		// personrow index 0 is pKey
-		// personrow index 1 is First Name
-		// personrow index 2 is Last Name
-		// personrow index 3 is Phone
-		// personrow index 4 is Count
-		
-		$titles = array("0" => "ID#",
-						"1" => "First Name",
-						"2" => "Last Name",
-						"3" => "Phone Number",
-						"4" => "Count");
-		
+
+		$query = "select found_rows()";
+		$total = QuickQuery($query, $this->_readonlyDB);
+
 		startWindow("Search Results", "padding: 3px;");
-		showPageMenu($total,$pagestart,$max);
+		showPageMenu($total,$pageStart,$pageSize);
 
 		?>
 			<table width="100%" cellpadding="3" cellspacing="1" class="list" id="searchresults">
 		<?
-			showTable($personlist, $titles);
+			showTable($personlist, $this->titles, $this->formatters);
 		?>
 			</table>
 			<script type="text/javascript">
@@ -118,84 +114,51 @@ class PhoneOptOutReport extends ReportGenerator {
 			</script>
 		<?
 
-		showPageMenu($total,$pagestart,$max);
+		showPageMenu($total,$pageStart,$pageSize);
 		endWindow();
 	}
 
-	function runCSV($options = false){
-		
+	function runCSV($options = false) {
 		if ($options) {
-			$fp = fopen($options['filename'], "w");
-			if (!$fp)
+			if (!$options["filename"]) {
 				return false;
+			}
+			$outputfile = $options["filename"];
 		} else {
+			$outputfile = "php://output";
 			header("Pragma: private");
 			header("Cache-Control: private");
 			header("Content-disposition: attachment; filename=report.csv");
 			header("Content-type: application/vnd.ms-excel");
 		}
-		
-		//generate the CSV header
-		$header = '"ID#","First Name","Last Name","Phone","Count"';
-		
-		if ($options) {
-			$ok = fwrite($fp, $header . "\r\n");
-			if (!$ok)
-				return false;
-				
-		} else {
-			echo $header;
-			echo "\r\n";
+		$fp = fopen($outputfile, "w");
+		if (!$fp) {
+			return false;
 		}
 
+		$headerfields = array_map(function ($value) { return '"' . $value . '"'; }, $this->titles);
+		$header = implode(",", $headerfields);
+		$ok = fwrite($fp, $header . "\r\n");
+		if (!$ok) {
+			return false;
+		}
 
-		// batch query by 100 persons, cannot load all 100k into memory
-		$batchsize = 100;
-		$pagestart = 0;
-		$total = 1;
-		do {
-		$query = $this->query;
-		$query .= " limit $pagestart, $batchsize";
-		$result = Query($query, $this->_readonlyDB);
-		$total = QuickQuery("select found_rows()", $this->_readonlyDB);
-		
-		//fetch data with main query and populate arrays using personid as the key
-		$personlist = array();
-		$personidlist = array();
+		$this->_readonlyDB->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);
+		$result = Query($this->query, $this->_readonlyDB);
+
 		while ($row = DBGetRow($result)) {
-			$personlist[$row[0]] = $row;
-			$personidlist[] = $row[0];
-		}
-		$pagestart += count($personidlist);
-		
-		// store results indexed by person id $row[0]
-		$destinationdata = array();
-		while($row = DBGetRow($result)){
-			$destinationdata[$row[0]] = $row;
-		}
-
-		// for each person, write a row to the file
-		foreach ($personlist as $row) {
-			
-			// [0] pKey (ID#)
-			// [1] First Name
-			// [2] Last Name
-			// [3] Phone Number
-			// [4] Count
-			
-			$reportarray = array($row[0], $row[1], $row[2], $row[3], $row[4]);
-			
-			if ($options) {
-				$ok = fwrite($fp, '"' . implode('","', $reportarray) . '"' . "\r\n");
-				if (!$ok)
-					return false;
-			} else {
-				echo '"' . implode('","', $reportarray) . '"' . "\r\n";
+			foreach ($this->formatters as $index => $formatter) {
+				$row[$index] = $formatter($row, $index);
 			}
-
+			$row = array_map(function ($value) {
+				return '"' . $value . '"';
+			}, $row);
+			$ok = fwrite($fp, implode(",", $row) . "\r\n");
+			if (!$ok) {
+				return false;
+			}
 		}
-		} while ($pagestart < $total);
-		
+
 		if ($options) {
 			return fclose($fp);
 		}
@@ -205,12 +168,11 @@ class PhoneOptOutReport extends ReportGenerator {
 		return $params;
 	}
 
-	function setReportFile(){
+	function setReportFile() {
 		$this->reportfile = "Phoneoptoutreport.jasper"; // TODO
 	}
 
 	static function getOrdering() {
-		global $USER;
 		$fields = FieldMap::getAuthorizedFieldMaps();
 
 		$ordering = array();
@@ -218,8 +180,8 @@ class PhoneOptOutReport extends ReportGenerator {
 		
 		$requiredFields= array('f01','f02');
 		
-		foreach($fields as $field){
-			if(in_array($field->fieldnum, $requiredFields)) {
+		foreach ($fields as $field) {
+			if (in_array($field->fieldnum, $requiredFields)) {
 				$ordering[$field->name]= "p." . $field->fieldnum;
 			}
 		}
