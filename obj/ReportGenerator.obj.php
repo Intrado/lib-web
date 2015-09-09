@@ -8,7 +8,11 @@ abstract class ReportGenerator {
 
 	// Constructor
 	public function __construct() {
-		$this->_readonlyDB = readonlyDBConnect();	
+		$this->_readonlyDB = readonlyDBConnect();
+		if (!$this->_readonlyDB) {
+			global $_dbcon;
+			$this->_readonlyDB = $_dbcon;
+		}
 	}
 
 	// --------------------------------------------------------------------
