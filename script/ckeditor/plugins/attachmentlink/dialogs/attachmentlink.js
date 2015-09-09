@@ -21,7 +21,7 @@ CKEDITOR.dialog.add('attachmentlink', function (editor) {
 			var displayName = (displayName == null || displayName.trim() == "") ? attachment.filename : displayName;
 			var location = attachment.location + "?id=" + attachment.contentId + "&caid=" + attachment.attachmentId + "&name=" + attachment.filename;
 
-			var tag = '<a class="message-attachment-placeholder" contenteditable="false" href="' + location + '">' + displayName + ' </a>';
+			var tag = '<a class="message-attachment-placeholder" contenteditable="false" href="' + location + '">' + displayName + '</a>&nbsp;';
 
 			editor.insertHtml(tag);
 		},
