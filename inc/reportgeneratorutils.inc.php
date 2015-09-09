@@ -78,7 +78,8 @@ function getJobSummary($joblist, $readonlyDB = false){
 							count(distinct rp.personid) as person_count,
 							coalesce(sum(rc.type='phone'), 0) as phone_count,
 							coalesce(sum(rc.type='email'), 0) as email_count,
-							coalesce(sum(rc.type='sms'), 0) as sms_count
+							coalesce(sum(rc.type='sms'), 0) as sms_count,
+							0 as device_count
 							from job j
 							left outer join reportperson rp
 								on (j.id = rp.jobid)
