@@ -12,15 +12,16 @@ class AttachmentDetailReport extends ReportGenerator{
 		2 => "Last Name",
 		3 => "Email",
 		4 => "Sequence",
-		5 => "Status",
-		6 => "Activity",
-		7 => "Activity Count",
-		8 => "Last Attempt"
+		// 5 is reportcontact.type for formatting the sequence
+		6 => "Status",
+		7 => "Activity",
+		8 => "Activity Count",
+		9 => "Last Attempt"
 	);
 
 	private $formatters = array(
 		4 => "fmt_dst_src",
-		8 => "fmt_ms_timestamp"
+		9 => "fmt_ms_timestamp"
 	);
 
 	function generateQuery($hackPDF = false) {
@@ -57,6 +58,7 @@ class AttachmentDetailReport extends ReportGenerator{
 			p." . FieldMap::GetLastNameField() . " as LastName,
 			rc.email,
 			rc.sequence,
+			rc.type,
 			rp.status as Status,
 			coalesce(dd_download.action, dd_action.action, 'n/a') as Activity,
 			coalesce(dd_download.actionCount, dd_action.actionCount, 'n/a') as ActivityCount,
