@@ -51,7 +51,7 @@ class PhoneOptOutReport extends ReportGenerator {
 					group by personId, phone
 					";
 
-		$this->query = "select SQL_CALC_FOUND_ROWS
+		$this->query = "select SQL_CALC_FOUND_ROWS DISTINCT
 					p.pkey as pkey,
 					p." . FieldMap::GetFirstNameField() . " as firstname,
 					p." . FieldMap::GetLastNameField() . " as lastname,
@@ -95,6 +95,10 @@ class PhoneOptOutReport extends ReportGenerator {
 			var searchresultstable = new getObj("searchresults").obj;
 			</script>
 		<?
+
+		if (empty($personlist)) {
+			echo _L("No Phone Opt-Out records match search criteria", getJobTitle());
+		}
 
 		showPageMenu($total,$pageStart,$pageSize);
 		endWindow();
