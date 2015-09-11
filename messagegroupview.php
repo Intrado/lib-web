@@ -19,6 +19,8 @@ require_once("obj/MessagePart.obj.php");
 require_once("obj/Content.obj.php");
 require_once("obj/Validator.obj.php");
 require_once("obj/MessageGroup.obj.php");
+require_once("obj/MessageAttachment.obj.php");
+require_once("obj/ContentAttachment.obj.php");
 require_once("obj/Language.obj.php");
 require_once("inc/previewfields.inc.php");
 require_once("inc/appserver.inc.php");
