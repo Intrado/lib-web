@@ -586,8 +586,7 @@ class Message extends DBMappedObject {
 									// Is there an original image we should resize from?
 									if ($content->originalcontentid) {
 										$originalContent = DBFind('Content', 'from content where id = ?', false, array($content->originalcontentid));
-									}
-									else {
+									} else {
 										// Nope! This one is the original, so use it
 										$originalContent = $content; 
 									}
@@ -597,21 +596,25 @@ class Message extends DBMappedObject {
 										list($type, $imageData) = $imageStream;
 
 										// Resize the originalContent to the newly specified widthxheight
-										$data = base64_encode(resizeImageStream($imageData, $width, $height, $type)); 
-										if (strlen($data) > 0) {
+										$imageData = base64_encode(resizeImageStream($imageData, $width, $height, $type)); 
+										if (strlen($imageData) > 0) {
 											// Prepare a new content record for storage...
 											$content = new Content();
 
 											// Save the resized content as a new contentId
 											// with a reference to the originalContent
-											$content->data = $data;
+											$content->data = $imageData;
 											$content->contenttype = $originalContent->contenttype;
 											$content->width = $width;
 											$content->height = $height;
 											$content->originalcontentid = $originalContent->id;
 											$content->create();
 											$content->refresh();
+										} else {
+											$errors[] = _L('Failed to resize image');
 										}
+									} else {
+										$errors[] = _L('Failed to read image for resizing');
 									}
 								}
 							}
