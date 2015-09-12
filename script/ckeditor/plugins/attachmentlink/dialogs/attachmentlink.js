@@ -1,3 +1,11 @@
+// IE8 hack to add trim() support to String prototype
+// ref: http://stackoverflow.com/questions/2308134/trim-in-javascript-not-working-in-ie
+if(typeof String.prototype.trim !== 'function') {
+        String.prototype.trim = function() {
+                return this.replace(/^\s+|\s+$/g, '');
+        }
+}
+
 CKEDITOR.dialog.add('attachmentlink', function (editor) {
 	return {
 		title: 'Hosted Attachment',
