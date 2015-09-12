@@ -592,18 +592,19 @@ class Message extends DBMappedObject {
 										$originalContent = $content; 
 									}
 
-									// Prepare a new content record for storage...
-									$content = new Content();
-
 									// Get the originalContent's image data stream
 									if ($imageStream = contentGet($originalContent->id)) {
 										list($type, $imageData) = $imageStream;
 
 										// Resize the originalContent to the newly specified widthxheight
-										if ($content->data = base64_encode(resizeImageStream($imageData, $width, $height, $type))) {
+										$data = base64_encode(resizeImageStream($imageData, $width, $height, $type)); 
+										if (strlen($data) > 0) {
+											// Prepare a new content record for storage...
+											$content = new Content();
 
 											// Save the resized content as a new contentId
 											// with a reference to the originalContent
+											$content->data = $data;
 											$content->contenttype = $originalContent->contenttype;
 											$content->width = $width;
 											$content->height = $height;

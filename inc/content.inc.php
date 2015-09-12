@@ -203,7 +203,8 @@ function resizeImageStream($imageStream, $width, $height, $type) {
 	}
 	if ($type == 'image/gif') {
 		// Only necessary for handling GIF images
-		if (PHP_VERSION_ID < 505) {
+		//if (PHP_VERSION_ID < 505) {
+		if (version_compare(phpversion(), '5.5.0', '<')) {
 			error_log_helper('PHP Version >= 5.5.0; needed for imagepalettetotruecolor()');
 			return null;
 		}
