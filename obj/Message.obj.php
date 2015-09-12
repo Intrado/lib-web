@@ -320,11 +320,11 @@ class Message extends DBMappedObject {
 			
 			// get imageupload tags
 			$matches = array();
-			$uploadattachmenturl = "";
+			$uploadimageurl = "";
 			if (preg_match("/(\<img .*?src\=\"[^\=]*viewimage\.php\?id\=)/", strtolower($data), $matches)) {
 				// we only care about the first match
-				$uploadattachmenturl = $matches[1];
-				$pos_i = stripos($data, $uploadattachmenturl);
+				$uploadimageurl = $matches[1];
+				$pos_i = stripos($data, $uploadimageurl);
 			} else {
 				$pos_i = false;
 			}
@@ -378,7 +378,15 @@ class Message extends DBMappedObject {
 			}
 
 			// Skip ahead past the beginning of the token; images are bigger than the rest due to HTML markup
-			$pos += ($type == 'I' || $type == 'HMAL') ? mb_strlen($uploadattachmenturl) : 2;
+			if ($type == 'I') {
+				$pos += mb_strlen($uploadimageurl);
+			}
+			else if ($type == 'HMAL') {
+				$pos += mb_strlen($uploadattachmenturl);
+			}
+			else {
+				$pos += 2;
+			}
 
 			// Assuming at least one char for audio/field name, find the end of the token
 			switch ($type){
