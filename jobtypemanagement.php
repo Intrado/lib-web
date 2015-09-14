@@ -13,6 +13,12 @@ include_once("obj/Setting.obj.php");
 include_once("obj/Phone.obj.php");
 
 if (!$USER->authorize('managesystem')) {
+	if (isset($_REQUEST['api'])) {
+		header("HTTP/1.1 403 Forbidden");
+		header("Content-Type: application/json");
+		exit();
+	}
+
 	redirect('unauthorized.php');
 }
 
@@ -30,6 +36,44 @@ $maxemails = getSystemSetting("maxemails", 2);
 $maxsms = getSystemSetting("maxsms", 2);
 $maxcolumns = max($maxphones, $maxemails, $maxsms);
 $jobtypeprefs = getJobTypePrefs();
+
+if (isset($_REQUEST['api'])) {
+	if (isset($_REQUEST['ntid'])) {
+		$ntid = $_REQUEST['ntid'];
+
+		if ($ntid == '') {
+			header("HTTP/1.1 404 Not Found");
+			header("Content-Type: application/json");
+			exit(json_encode(Array('code' => 'resourceNotFound')));
+		}
+
+		foreach ($types as $priorityId => $priorityTypes) {
+			foreach ($priorityTypes as $typeId => $type) {
+				if ($typeId == $ntid) {
+					$result = Array(
+						"type" => $type,
+						"targets" => $jobtypeprefs[$typeId],
+						"priorities" => $systemprioritynames);
+
+					break;
+				}
+			}
+		}
+
+		if (!$result) {
+			header("HTTP/1.1 404 Not Found");
+			header("Content-Type: application/json");
+			exit(json_encode(Array('code' => 'notificationTypeNotFound')));
+		}
+	} else {
+		$result = Array(
+			"types" => $types,
+			"priorities" => $systemprioritynames);
+	}
+
+	header("Content-Type: application/json");
+	exit(json_encode(cleanObjects($result)));
+}
 
 /****************** main message section ******************/
 

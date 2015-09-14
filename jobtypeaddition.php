@@ -12,6 +12,14 @@ include_once("obj/NotificationType.obj.php");
 include_once("obj/Setting.obj.php");
 include_once("obj/Phone.obj.php");
 
+if (isset($_REQUEST['api'])) {
+	if (!$USER->authorize('managesystem')) {
+		header("HTTP/1.1 403 Forbidden");
+		header("Content-Type: application/json");
+		exit();
+	}
+}
+
 if(isset($_GET['clear'])){
 	unset($_SESSION['jobtypemanagement']['radio']);
 	redirect();
@@ -35,20 +43,32 @@ $reloadform = 0;
 if(CheckFormSubmit($f,$s))
 {
 	//check to see if formdata is valid
-	if(CheckFormInvalid($f))
+	if(!isset($_REQUEST['api']) && CheckFormInvalid($f))
 	{
 		error('Form was edited in another window, reloading data');
 		$reloadform = 1;
 	}
 	else
 	{
+		// API-MODE requests are state-less -- clear any left-over formdata from session
+		//
+		if (isset($_REQUEST['api'])) {
+			ClearFormData($f);
+		}
+
 		MergeSectionFormData($f, $s);
 
 		//do check
-		if( CheckFormSection($f, $s) )
+		if(!isset($_REQUEST['api']) && CheckFormSection($f, $s))
 		{
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else if(QuickQuery("select count(*) from notificationtype where not deleted and name = '" . DBSafe(strtolower(GetFormData($f, $s, "jobtypename"))) . "'")){
+			if (isset($_REQUEST['api'])) {
+				header("HTTP/1.1 409 Conflict");
+				header("Content-Type: application/json");
+				exit(json_encode(Array("code" => "nameNotAvailable")));
+			}
+
 			error("That name is already in use");
 		} else {
 
@@ -79,9 +99,14 @@ if(CheckFormSubmit($f,$s))
 									. DBSafe(GetFormData($f, $s, $index . $i . $survey)) . "')");
 					}
 				}
+
+				if (isset($_REQUEST['api'])) {
+					header("Content-Type: application/json");
+					exit(json_encode(Array("type" => Array("id" => $type->id))));
+				}
+
 				redirect("jobtypemanagement.php");
 			}
-
 		}
 	}
 } else {
