@@ -330,6 +330,7 @@ class Message extends DBMappedObject {
 			}
 
 			$matches = array();
+			$uploadattachmenturl = "";
 			if (preg_match("/(\<a class=\"message-attachment-placeholder\".*? href\=\"[^\=]*emailattachment\.php\?)/", strtolower($data), $matches)) {
 				// we only care about the first match
 				$uploadattachmenturl = $matches[1];
