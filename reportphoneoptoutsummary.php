@@ -45,6 +45,28 @@ $fields = $ffields + $gfields;
 
 unset($_SESSION['report']['edit']);
 $redirect = 0;
+if(isset($_GET['reportid'])){
+	$_SESSION['reportid'] = $_GET['reportid']+0;
+	if(!userOwns("reportsubscription", $_SESSION['reportid'])){
+		redirect("unauthorized.php");
+	}
+	$subscription = new ReportSubscription($_SESSION['reportid']);
+	$instance = new ReportInstance($subscription->reportinstanceid);
+	$options = $instance->getParameters();
+	$activefields = array();
+	if(isset($options['activefields'])){
+		$activefields = explode(",", $options['activefields']) ;
+	}
+	foreach($fields as $field){
+		if(in_array($field->fieldnum, $activefields)){
+			$_SESSION['report']['fields'][$field->fieldnum] = true;
+		} else {
+			$_SESSION['report']['fields'][$field->fieldnum] = false;
+		}
+	}
+	$_SESSION['report']['options'] = $options;
+	redirect();
+}
 
 if(!isset($_SESSION['report']['options'])){
 	redirect("reports.php");

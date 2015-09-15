@@ -96,6 +96,7 @@ class AttachmentSummaryReport extends ReportGenerator {
 		);
 
 		$result = Query($this->query, $this->_readonlyDB);
+		$data = array();
 		while ($row = DBGetRow($result)) {
 			$data[] = $row;
 		}

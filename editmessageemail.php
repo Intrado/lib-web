@@ -420,7 +420,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$postdata['fromname'] == $fromname && 
 				$postdata['from'] == $fromemail &&
 				$postdata['subject'] == $subject &&
-				json_decode($postdata['attachments'], true) == $attachments &&
+				(count($attachments) && isset($postdata['attachments']) && (json_decode($postdata['attachments'], true) == $attachments)) &&
 				$postdata['message'] == $text) {
 			// DO NOT UPDATE MESSAGE!
 		} else if ($button != 'inpagesubmit') {

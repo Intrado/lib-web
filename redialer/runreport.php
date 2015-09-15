@@ -163,7 +163,6 @@ else
 	$generator->format = 'pdf'; // default
 
 $generator->reportinstance = $instance;
-echo "finished configuring generator\n";
 $result = "";
 if($options['reporttype'] == 'phonedetail' || $options['reporttype'] == 'emaildetail'){
 	$result = $generator->testSize();
@@ -171,10 +170,8 @@ if($options['reporttype'] == 'phonedetail' || $options['reporttype'] == 'emailde
 }
 if($result == ""){
 	$generator->generateQuery(true); // hackPDF to set g01-g10 as f21-f30
-	echo "finished generating query\n";
 	$result = $generator->generate($params);
 }
-echo $result . "\n";
 
 // if success, and subscription, then update the lastrun field
 if("success" == $result) {

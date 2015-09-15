@@ -35,6 +35,8 @@ require_once("obj/ValMessageGroup.val.php");
 require_once("obj/MessageGroup.obj.php");
 require_once("obj/Message.obj.php");
 require_once("obj/MessagePart.obj.php");
+require_once("obj/MessageAttachment.obj.php");
+require_once("obj/ContentAttachment.obj.php");
 require_once("obj/Voice.obj.php");
 require_once("inc/translate.inc.php");
 require_once("obj/FormListSelect.fi.php");
@@ -404,12 +406,10 @@ $formdata = array();
 
 $jobTitle = getJobTitle();
 
-$helpsteps[] = _L("Enter a name for your %s. " .
-					"Using a descriptive name that indicates the message content will make it easier to find the %s later. " .
-					"You may also optionally enter a description of the the %s.", $jobTitle, $jobTitle, $jobTitle);
+$helpsteps[] = _L('Name your %s. Using a descriptive name will make it easier to find later. Optionally, provide more detail in the Description field.', $jobTitle);
 $formdata["name"] = array(
 	"label" => _L('Name'),
-	"fieldhelp" => _L('Enter a name for your %s.',$jobTitle),
+	"fieldhelp" => _L('Name your %s.',$jobTitle),
 	"value" => isset($job->name)?$job->name:"",
 	"validators" => array(
 		array("ValRequired"),
@@ -431,20 +431,19 @@ $formdata["description"] = array(
 );
 
 
-$helpsteps[] = _L("Select the option that best describes the type of notification you are sending. ".
-					"The category you select will determine which introduction your recipients will hear.");
+$helpsteps[] = _L('Select a %s Type. To see a description, hover over the %s Type. You can manage %s Types from the Admin section.', $jobTitle, $jobTitle, $jobTitle);
+	
 if ($submittedmode || $completedmode) {
 	$formdata["jobtype"] = array(
 		"label" => _L("Type/Category"),
-		"fieldhelp" => _L("The option that best describes the type of notification you are sending."),
+		"fieldhelp" => _L('Select a %s Type.', $jobTitle),
 		"control" => array("FormHtml","html" => escapehtml($jobtypes[$job->jobtypeid])),
 		"helpstep" => ++$helpstepnum
 	);
 } else {
 	$formdata["jobtype"] = array(
 		"label" => _L("Type/Category"),
-		"fieldhelp" => _L("Select the option that best describes the type of notification you are sending. ".
-							"The category you select will determine which introduction your recipients will hear."),
+		"fieldhelp" => _L('Select a %s Type.', $jobTitle),
 		"value" => isset($job->jobtypeid)?$job->jobtypeid:"",
 		"validators" => array(
 			array("ValRequired"),
@@ -499,14 +498,8 @@ if ($JOBTYPE == "repeating") {
 		"helpstep" => ++$helpstepnum
 	);
 } else {
-	$helpsteps[] = _L("The options in this section create a delivery window for your %s. ".
-						"It's important that you leave enough time for the system to contact everyone in your list. ".
-						"The options are:".
-							"<ul>".
-								"<li>Start Date - This is the day the %s will start running.".
-								"<li>Days to Run - The number of days the %s should run within the times you select.".
-								"<li>Start Time and End Time - These represent the time the %s should start and stop.".
-							"</ul>",$jobTitle,$jobTitle,$jobTitle,$jobTitle);
+	$helpsteps[] = _L('Create a  delivery window for your %s. You can edit the scheduled date, as well as the %s start and end times. It is important that you leave enough time for the system to contact everyone in your list.', $jobTitle, $jobTitle);
+	
 	if ($completedmode) {
 		$formdata["date"] = array(
 			"label" => _L("Start Date"),
@@ -599,13 +592,8 @@ if ($completedmode) {
 	}
 }
 
-$helpsteps[] = _L("Select an existing list to use. If you do not see the list you need, ".
-					"you can make one by clicking the Lists subtab above. <br><br> ".
-					"You may also opt to skip duplicates. Skip Duplicates is for calling ".
-					"each number once, so if, for example, two recipients have the same ".
-					"number, they will only be called once.");
-$helpsteps[] = _L("Select an existing message to use. If you do not see the message ".
-					"you need, you can make a new message by clicking the Messages subtab above.");
+$helpsteps[] = _L('Choose a list or lists to use for this %s. Lists can be created in the Lists menu above.<br/><br/>You can opt to skip duplicate phone, email, and text destinations as part of this %s. Unless your message contains student-specific information (i.e., grades or attendance), you should check this box.', $jobTitle, $jobTitle);
+$helpsteps[] = _L('Choose a message to use for this %s. Messages can be created in the Messages menu above.', $jobTitle);
 
 if ($submittedmode || $completedmode) {
 	$formdata[] = _L('List(s)');
@@ -642,7 +630,7 @@ if ($submittedmode || $completedmode) {
 		$formdata[] = _L('Social Media Options');
 		// facebook (readonly)
 		if (count($job->getJobPosts("facebook"))) {
-			$helpsteps[] = _L("This section contains a list of the Facebook Pages which are associated with this %s.",$jobTitle);
+			$helpsteps[] = _L('If you have created Facebook content as part of your message, you can select the page(s) where you would like to post that content. Connected Facebook accounts can be managed via the Account page.<br/><br/>Important Note: Your System Administrators may restrict access to certain Facebook pages.');
 			$formdata["fbpages"] = array(
 				"label" => _L('Facebook)'),
 				"fieldhelp" => _L('This is a list of the Facebook Pages associated with this job.'),
@@ -817,7 +805,7 @@ if ($submittedmode || $completedmode) {
 				$fbpages[] = $fbpageid . ""; // make this a string
 		}
 		
-		$helpsteps[] = _L("<p>If you haven't connected a Facebook account, click the Connect to Facebook button. You'll be able to log into Facebook through a pop up window. Once you're connected, click the Save button.</p><p>After connecting your Facebook account, you will see a list of Facebook Pages where you are an administrator and a My Timeline option which lets you post to your account's Timeline. You may select any combination of options for your job.</p><p>If your system administrator has restricted users to posting only to authorized Facebook Pages, you may not see as many Pages or the option of posting to your Timeline. Check with your system administrator if you are unsure of your district's social media policies. Additionally, please note that your account must also have permission within Facebook to post to authorized Pages.</p>");
+		$helpsteps[] = _L('If you have created Facebook content as part of your message, you can select the page(s) where you would like to post that content. Connected Facebook accounts can be managed via the Account page.<br/><br/>Important Note: Your System Administrators may restrict access to certain Facebook pages.');
 		$fbtoken = $USER->getSetting("fb_access_token", false);
 		$formdata["fbpage"] = array(
 			"label" => _L('Facebook'),
@@ -839,7 +827,7 @@ if ($submittedmode || $completedmode) {
 
 		// get this here so twitter failures only effect users with twitter access
 		$twitterTokens = new TwitterTokens();
-		$helpsteps[] = _L("If your message group contains a Twitter post, you must be connected to a Twitter account.");
+		$helpsteps[] = _L('If you have created Twitter content as part of your message, you can select the page(s) where you would like to post that content. Connected Twitter accounts can be managed via the Account page.');
 		$formdata["twitter"] = array(
 			"label" => _L('Twitter'),
 			"fieldhelp" => _L("You must have a Twitter account if your message group contains a Twitter post."),

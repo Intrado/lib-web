@@ -320,16 +320,17 @@ class Message extends DBMappedObject {
 			
 			// get imageupload tags
 			$matches = array();
-			$uploadattachmenturl = "";
+			$uploadimageurl = "";
 			if (preg_match("/(\<img .*?src\=\"[^\=]*viewimage\.php\?id\=)/", strtolower($data), $matches)) {
 				// we only care about the first match
-				$uploadattachmenturl = $matches[1];
-				$pos_i = stripos($data, $uploadattachmenturl);
+				$uploadimageurl = $matches[1];
+				$pos_i = stripos($data, $uploadimageurl);
 			} else {
 				$pos_i = false;
 			}
 
 			$matches = array();
+			$uploadattachmenturl = "";
 			if (preg_match("/(\<a class=\"message-attachment-placeholder\".*? href\=\"[^\=]*emailattachment\.php\?)/", strtolower($data), $matches)) {
 				// we only care about the first match
 				$uploadattachmenturl = $matches[1];
@@ -378,7 +379,15 @@ class Message extends DBMappedObject {
 			}
 
 			// Skip ahead past the beginning of the token; images are bigger than the rest due to HTML markup
-			$pos += ($type == 'I' || $type == 'HMAL') ? mb_strlen($uploadattachmenturl) : 2;
+			if ($type == 'I') {
+				$pos += mb_strlen($uploadimageurl);
+			}
+			else if ($type == 'HMAL') {
+				$pos += mb_strlen($uploadattachmenturl);
+			}
+			else {
+				$pos += 2;
+			}
 
 			// Assuming at least one char for audio/field name, find the end of the token
 			switch ($type){
@@ -586,31 +595,35 @@ class Message extends DBMappedObject {
 									// Is there an original image we should resize from?
 									if ($content->originalcontentid) {
 										$originalContent = DBFind('Content', 'from content where id = ?', false, array($content->originalcontentid));
-									}
-									else {
+									} else {
 										// Nope! This one is the original, so use it
 										$originalContent = $content; 
 									}
-
-									// Prepare a new content record for storage...
-									$content = new Content();
 
 									// Get the originalContent's image data stream
 									if ($imageStream = contentGet($originalContent->id)) {
 										list($type, $imageData) = $imageStream;
 
 										// Resize the originalContent to the newly specified widthxheight
-										if ($content->data = base64_encode(resizeImageStream($imageData, $width, $height, $type))) {
+										$imageData = base64_encode(resizeImageStream($imageData, $width, $height, $type)); 
+										if (strlen($imageData) > 0) {
+											// Prepare a new content record for storage...
+											$content = new Content();
 
 											// Save the resized content as a new contentId
 											// with a reference to the originalContent
+											$content->data = $imageData;
 											$content->contenttype = $originalContent->contenttype;
 											$content->width = $width;
 											$content->height = $height;
 											$content->originalcontentid = $originalContent->id;
 											$content->create();
 											$content->refresh();
+										} else {
+											$errors[] = _L('Failed to resize image');
 										}
+									} else {
+										$errors[] = _L('Failed to read image for resizing');
 									}
 								}
 							}

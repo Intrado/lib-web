@@ -77,7 +77,13 @@ class PreviewModal {
 				foreach($imageparts as $part) {
 					permitContent($part->imagecontentid);
 				}
-				
+
+				$parts = DBFindMany('MessagePart', "from messagepart where messageid=? and type='MAL'", false, array($message->id));
+				foreach($parts as $part) {
+					$messageAttachment = new MessageAttachment($part->messageattachmentid);
+					$contentAttachment = new ContentAttachment($messageAttachment->contentattachmentid);
+					permitContent($contentAttachment->contentid);
+				}
 				switch ($message->subtype) {
 					case "html":
 						$modal->title = _L("%s HTML Email Message" , Language::getName($message->languagecode));

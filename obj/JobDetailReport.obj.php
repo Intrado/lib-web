@@ -177,8 +177,8 @@ class JobDetailReport extends ReportGenerator{
 				reportperson rp
 				inner join job j on (rp.jobid = j.id)
 				inner join user u on (u.id = j.userid)
-				left outer join reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid and rc.result not in ('nocontacts', 'declined'))
-				left outer join reportdevice rd on (rd.jobid = rp.jobid and rd.personid = rp.personid and rp.type = 'device')
+				left outer join reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid and rc.result not in ('declined'))
+				left outer join reportdevice rd on (rd.jobid = rp.jobid and rd.personid = rp.personid and rp.type = 'device' and rd.result not in ('declined'))
 				left outer join messagegroup mg on (mg.id = j.messagegroupid)
 				left outer join surveyquestionnaire sq on (sq.id = j.questionnaireid)
 				left outer join surveyweb sw on (sw.personid = rp.personid and sw.jobid = rp.jobid)

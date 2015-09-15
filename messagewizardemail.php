@@ -9,6 +9,7 @@ require_once("inc/securityhelper.inc.php");
 require_once("obj/Form.obj.php");
 require_once("obj/Wizard.obj.php");
 require_once("obj/Message.obj.php");
+require_once("obj/Content.obj.php");
 require_once("obj/MessagePart.obj.php");
 require_once("obj/Phone.obj.php");
 require_once("obj/SpecialTask.obj.php");
