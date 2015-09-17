@@ -71,6 +71,15 @@ function fmt_obj_date_no_time ($obj,$name) {
 	return "- Never -";
 }
 
+function fmt_obj_time ($obj, $name) {
+  if (isset($obj->$name) && $obj->$name != "") {
+    $time = strtotime($obj->$name);
+    if ($time !== -1 && $obj->$name != "0000-00-00 00:00:00")
+      return date('g:ia', $time);
+  }
+  return "- Never -";
+}
+
 function fmt_job_ownername ($obj, $name) {
 	static $users = array();
 	if (isset($users[$obj->userid])) {
@@ -181,6 +190,7 @@ function handleRequest() {
 		
 			$titles = array(
 				"startdate" => "Scheduled For",
+				"starttime" => "At",
 				"userid" => "Author",
 				"name" => "Subject",
 				"rcpts" => "Rcpts",
@@ -190,6 +200,7 @@ function handleRequest() {
 				
 			$formatters = array(
 				'startdate' => 'fmt_obj_date_no_time',
+				'starttime' => 'fmt_obj_time',
 				'userid' => 'fmt_job_ownername',
 				'rcpts' => 'fmt_job_recipients',
 				'content' => 'fmt_job_content',
