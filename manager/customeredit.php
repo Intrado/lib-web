@@ -23,9 +23,12 @@ require_once("obj/ValUrl.val.php");
 require_once("obj/LogoRadioButton.fi.php");
 require_once("obj/LanguagesItem.fi.php");
 require_once("obj/ValInboundNumber.val.php");
+require_once("obj/SMSAggregator.fi.php");
+require_once("obj/SMSAggregatorData.php");
 require_once("../obj/ValInteger.val.php");
 require_once("../obj/ApiClient.obj.php");
 require_once("../obj/CmaApiClient.obj.php");
+
 
 // For Quick Tip TAI table activation stuffs
 require_once("loadtaitemplatedata.php");
@@ -345,11 +348,8 @@ $shards = QuickQueryList("select id, name from shard where not isfull order by i
 
 $dmmethod = array('' => '--Choose a Method--', 'asp' => 'CommSuite (fully hosted)','hybrid' => 'CS + SmartCall + Emergency','cs' => 'CS + SmartCall (data only)');
 
-if ($customerid)
-	$shortcodegroupname = QuickQuery("select description from shortcodegroup where id = (select shortcodegroupid from customer where id = ?)", null, array($customerid));
-else
-	$shortcodegroupname = QuickQuery("select description from shortcodegroup where id = 1"); // hardcoded id=1 is the default group for new customers
-
+// SMS Aggregator form item data
+$smsAggregatorData = new SMSAggregatorData($customerid);
 
 $helpstepnum = 1;
 $formdata = array(_L('Basics'));
@@ -549,11 +549,24 @@ $formdata["smscustomername"] = array(
 	"helpstep" => $helpstepnum
 );
 
-$formdata["shortcodegroupname"] = array(
-	"label" => _L("Shortcode Group"),
-	"control" => array("FormHtml","html"=>"<div>".$shortcodegroupname."</div>"),
+//$formdata["shortcodegroupname"] = array(
+//	"label" => _L("Shortcode Group"),
+//	"control" => array("FormHtml","html"=>"<div>".$shortcodegroupname."</div>"),
+//	"helpstep" => $helpstepnum
+//);
+
+$formdata["shortcodegroup"] = array(
+	"label" => _L('Shortcode Group'),
+	"value" => (String) $smsAggregatorData->currentShortcodeGroupId,
+	"validators" => array(
+		array("ValInArray", "values" => array_keys(
+				$smsAggregatorData->allShortCodeGroups
+			))
+	),
+	"control" => array("SMSAggregator", "values" => $smsAggregatorData->allShortCodeGroups),
 	"helpstep" => $helpstepnum
 );
+
 
 $formdata[] = _L("API");
 // -----------------------------------------------------------------------------
@@ -1143,6 +1156,10 @@ document.observe('dom:loaded', function() {
 		var checkbox = $('newcustomer_enabled');
 		if (checkbox.checked == 0) 
 			checkbox.checked = !confirm("Are you sure you want to DISABLE this customer?");
+	});
+	
+	$('newcustomer_shortcodegroup').observe("change", function (event) {
+		console.log('hi');
 	});
 });
 <? Validator::load_validators(array("ValInboundNumber","ValUrlComponent","ValSmsText","ValLanguages","ValUrl","ValClassroom", "ValInteger",
