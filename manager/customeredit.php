@@ -549,22 +549,20 @@ $formdata["smscustomername"] = array(
 	"helpstep" => $helpstepnum
 );
 
-//$formdata["shortcodegroupname"] = array(
-//	"label" => _L("Shortcode Group"),
-//	"control" => array("FormHtml","html"=>"<div>".$shortcodegroupname."</div>"),
-//	"helpstep" => $helpstepnum
-//);
-
 $formdata["shortcodegroup"] = array(
 	"label" => _L('Shortcode Group'),
-	"value" => (String) $smsAggregatorData->currentShortcodeGroupId,
+	"value" => $smsAggregatorData->currentShortcodeGroupId,
 	"validators" => array(
 		array("ValInArray", "values" => array_keys(
 				$smsAggregatorData->shortcodeGroups
 			))
 	),
-	"control" => array("SMSAggregator", "values" => $smsAggregatorData->shortcodeGroups),
-	"helpstep" => $helpstepnum
+	"control" => array("SMSAggregator", "values" => 
+		array(
+			"form" => $smsAggregatorData->shortcodeGroups,
+			"js" => $smsAggregatorData->shortcodeData
+	),
+	"helpstep" => $helpstepnum)
 );
 
 
@@ -957,7 +955,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		setCustomerSystemSetting('maxsms', $postdata["maxsms"], $custdb);
 		setCustomerSystemSetting('enablesmsoptin', $postdata["enablesmsoptin"]?'1':'0', $custdb);
 		setCustomerSystemSetting('smscustomername', $postdata["smscustomername"], $custdb);
-
+		
 		setCustomerSystemSetting('_hassmapi', $postdata["hassmapi"]?'1':'0', $custdb);
 		// Set oem,oemid and nsid in authserver customer table
 		
@@ -980,6 +978,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		setCustomerSystemSetting('_hassurvey', $postdata["hassurvey"]?'1':'0', $custdb);
 		setCustomerSystemSetting('_hasldap', $postdata["hasldap"]?'1':'0', $custdb);
 		setCustomerSystemSetting('_hasenrollment', $postdata["hasenrollment"]?'1':'0', $custdb);
+		
+		// updating SMS shortcode requires updating authserver -> customer. SQL in SMSAggregatorData.php
+		if(isset($postdata["shortcodegroup"])) {
+			$smsAggregatorData->storeSelection($customerid, $postdata["shortcodegroup"]);
+		}
 		
 		$originalProvider = $settings['_defaultttsprovider'];
 		$originalDMMethod = $settings['_dmmethod'];
@@ -1159,7 +1162,7 @@ document.observe('dom:loaded', function() {
 	});
 	
 	$('newcustomer_shortcodegroup').observe("change", function (event) {
-		console.log('hi');
+		smsFunctions.showData();
 	});
 });
 <? Validator::load_validators(array("ValInboundNumber","ValUrlComponent","ValSmsText","ValLanguages","ValUrl","ValClassroom", "ValInteger",
