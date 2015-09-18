@@ -560,10 +560,10 @@ $formdata["shortcodegroup"] = array(
 	"value" => (String) $smsAggregatorData->currentShortcodeGroupId,
 	"validators" => array(
 		array("ValInArray", "values" => array_keys(
-				$smsAggregatorData->allShortCodeGroups
+				$smsAggregatorData->shortcodeGroups
 			))
 	),
-	"control" => array("SMSAggregator", "values" => $smsAggregatorData->allShortCodeGroups),
+	"control" => array("SMSAggregator", "values" => $smsAggregatorData->shortcodeGroups),
 	"helpstep" => $helpstepnum
 );
 
