@@ -16,7 +16,7 @@ class SMSAggregatorData {
 	}
 
 	// gets the current short code group id of the customer
-	public function getCurrentShortcodeGroupId($customerId = '1') {
+	public function getCurrentShortcodeGroupId($customerId) {
 
 		$shortCodeGroupId = null;
 
@@ -44,6 +44,13 @@ class SMSAggregatorData {
 		$results = QuickQueryMultiRow($query, true);
 		
 		return $results;
+	}
+	
+	public function storeSelection ($customerId, $selection) {
+		
+		$query = "update customer set shortcodegroupid=$selection where id = $customerId";
+		
+		QuickQuery($query);
 	}
 	
 	// gets all the available short code group id and description columns
