@@ -3,7 +3,6 @@
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
 include_once("inc/common.inc.php");
-include_once("inc/content.inc.php");
 include_once("inc/securityhelper.inc.php");
 include_once("inc/utils.inc.php");
 include_once("inc/form.inc.php");
@@ -12,9 +11,9 @@ include_once("inc/table.inc.php");
 include_once("inc/content.inc.php");
 include_once("obj/AudioFile.obj.php");
 include_once("obj/MessageGroup.obj.php");
-include_once("inc/content.inc.php");
 include_once("obj/Content.obj.php");
 include_once("obj/AudioConverter.obj.php");
+require_once("inc/appserver.inc.php");
 
 global $USER;
 
@@ -24,70 +23,80 @@ $audioId = "";
 $audioName = "";
 
 if (!isset($_GET['api'])) {
-    $result = Array('status' => 'fail', 'error' => 'Not supported');
+	header("HTTP/1.1 404 Not Found");
+	header('Content-Type: application/json');
 
-    header('Content-Type: application/json');
-    echo json_encode($result);
-
-    exit();
+	exit(json_encode(Array("code" => "resourceNotFound")));
 }
 
-$payload = json_decode(file_get_contents("php://input"), true);
+if (!($payload = json_decode(file_get_contents("php://input"), true))) {
+	header("HTTP/1.1 400 Bad Request");
+	header('Content-Type: application/json');
 
-$_SESSION['messagegroupid'] = $payload['messageGroupId'];
+	exit(json_encode(Array("code" => "invalidRequestSchema")));
+}
 
-if (isset($_SESSION['messagegroupid']) && userOwns('messagegroup', $_SESSION['messagegroupid'])) {
-    $audio->contentid = $payload['uploadId'];
+$msgid = $payload['messageGroupId'];
 
-    if (!contentGet($payload['uploadId'])) {
-        $result = Array('status' => 'fail', 'error' => 'Upload ' . $payload['uploadId'] . 'not found');
+if (!strlen($msgid)) {
+	header("HTTP/1.1 404 Not Found");
+	header('Content-Type: application/json');
 
-        header('Content-Type: application/json');
-        echo json_encode($result);
+	exit(json_encode(Array("code" => "resourceNotFound")));
+}
 
-        exit();
-    }
+if (!userOwns('messagegroup', $msgid)) {
+	header("HTTP/1.1 404 Not Found");
+	header('Content-Type: application/json');
 
-    $messagegroup = new MessageGroup($_SESSION['messagegroupid']);
+	exit(json_encode(Array("code" => "messageGroupNotFound")));
+}
 
-    //attempt to submit changes
-    $audio->userid = $USER->id;
-    $audio->deleted = 0;
-    $audio->permanent = $messagegroup->permanent;
-    $audio->messagegroupid = $messagegroup->id;
-    $audio->recorddate = date('Y-m-d G:i:s');
+$audio->contentid = $payload['uploadId'];
 
-    $filename = $payload['name'];
-    $audioFileIds = MessageGroup::getReferencedAudioFileIDs($messagegroup->id);
-    $duplicateNames = count($audioFileIds) > 0 ? QuickQueryList('select name from audiofile where not deleted and id in (' . implode(',', $audioFileIds) . ') and name like ?', false, false, array($filename . '%')) : array();
+if (!contentGet($payload['uploadId'])) {
+	header("HTTP/1.1 404 Not Found");
+	header('Content-Type: application/json');
 
-    // If there are any duplicate names, then find the largest sequence number so that we can set our final name to "$filename " . ($largestSequenceNumber + 1)
-    if (count($duplicateNames) > 0) {
-        $largestSequenceNumber = 1;
+	exit(json_encode(Array("code" => "uploadNotFound")));
+}
 
-        foreach ($duplicateNames as $duplicateName) {
-            if (preg_match('/ \d+$/', $duplicateName, $matches)) {
-                $sequenceNumber = intval($matches[0]);
+$messagegroup = new MessageGroup($msgid);
 
-                if ($sequenceNumber > $largestSequenceNumber) {
-                    $largestSequenceNumber = $sequenceNumber;
-                }
-            }
-        }
-        $finalAudioFilename = "$filename " . ($largestSequenceNumber + 1);
-    } else {
-        $finalAudioFilename = $filename;
-    }
+//attempt to submit changes
+$audio->userid = $USER->id;
+$audio->deleted = 0;
+$audio->permanent = $messagegroup->permanent;
+$audio->messagegroupid = $messagegroup->id;
+$audio->recorddate = date('Y-m-d G:i:s');
 
-    $audioName = $audio->name = $finalAudioFilename;
-    $audio->update();
+$filename = $payload['name'];
+$audioFileIds = MessageGroup::getReferencedAudioFileIDs($messagegroup->id);
+$duplicateNames = count($audioFileIds) > 0 ? QuickQueryList('select name from audiofile where not deleted and id in (' . implode(',', $audioFileIds) . ') and name like ?', false, false, array($filename . '%')) : array();
 
-    $result = Array('status' => 'success', 'audioRecording' => Array('id' => (int)$audio->id));
+// If there are any duplicate names, then find the largest sequence number so that we can set our final name to "$filename " . ($largestSequenceNumber + 1)
+if (count($duplicateNames) > 0) {
+	$largestSequenceNumber = 1;
+
+	foreach ($duplicateNames as $duplicateName) {
+		if (preg_match('/ \d+$/', $duplicateName, $matches)) {
+			$sequenceNumber = intval($matches[0]);
+
+			if ($sequenceNumber > $largestSequenceNumber) {
+				$largestSequenceNumber = $sequenceNumber;
+			}
+		}
+	}
+	$finalAudioFilename = "$filename " . ($largestSequenceNumber + 1);
 } else {
-    $result = Array('status' => 'fail', 'error' => 'Unauthorized');
+	$finalAudioFilename = $filename;
 }
+
+$audioName = $audio->name = $finalAudioFilename;
+$audio->update();
 
 header('Content-Type: application/json');
-echo json_encode($result);
+
+exit(json_encode(Array("id" => $audio->id, "audio" => cleanObjects($audio))));
 
 ?>

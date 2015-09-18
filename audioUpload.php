@@ -18,50 +18,49 @@ include_once("obj/AudioConverter.obj.php");
 global $USER;
 
 if (!isset($_GET['api'])) {
-    $result = Array('status' => 'fail', 'error' => 'Not supported');
+	header("HTTP/1.1 404 Not Found");
+	header('Content-Type: application/json');
 
-    header('Content-Type: application/json');
-    echo json_encode($result);
-
-    exit();
+    exit(json_encode(Array("code" => "resourceNotFound")));
 }
 
 if (empty($_FILES['audio'])) {
-    $result = Array('status' => 'fail', 'error' => 'No upload file');
-} else {
-    $failedConversion = false;
-	$converter = new AudioConverter();
-	$convertedFile = false;
+	header("HTTP/1.1 400 Bad Request");
+	header('Content-Type: application/json');
 
-    $filename = $_FILES['audio']['name'];
-    $size = $_FILES['audio']['size'];
-
-	try {
-		$convertedFile = $converter->getMono8kPcm($_FILES['audio']['tmp_name'], $_FILES['audio']['type']);
-		$contentId = contentPut($convertedFile, 'audio/wav');
-	} catch (Exception $e) {
-		$failedConversion = true;
-		error_log($e->getMessage());
-	}
-
-	@unlink($convertedFile);
-
-	if ($failedConversion || !$contentId) {
-        $result = Array(
-	        'status' => 'fail',
-	        'error' => _L('There was an error reading your audio file. Please try another file. Supported formats include: %s',
-		        implode(', ', $converter->getSupportedFormats())));
-	} else {
-        $result = Array(
-            'status' => 'success',
-            'upload' => Array(
-                'id' => (int)$contentId,
-                'name' => $filename,
-                'size' => $size));
-    }
+	exit(Array('code' => 'fileUploadNotFound'));
 }
 
+$failedConversion = false;
+$converter = new AudioConverter();
+$convertedFile = false;
+
+$filename = $_FILES['audio']['name'];
+$size = $_FILES['audio']['size'];
+
+try {
+	$convertedFile = $converter->getMono8kPcm($_FILES['audio']['tmp_name'], $_FILES['audio']['type']);
+	$contentId = contentPut($convertedFile, 'audio/wav');
+} catch (Exception $e) {
+	$failedConversion = true;
+	error_log($e->getMessage());
+}
+
+@unlink($convertedFile);
+
+if ($failedConversion || !$contentId) {
+	header("HTTP/1.1 500 Internal Server Error");
+	header('Content-Type: application/json');
+
+	exit(json_encode(Array('code' => 'internalError', 'message' => $e->getMessage())));
+}
+
+$result = Array(
+	'id' => $contentId,
+	'name' => $filename,
+	'size' => $size);
+
 header('Content-Type: application/json');
-echo json_encode($result);
+exit(json_encode($result));
 
 ?>

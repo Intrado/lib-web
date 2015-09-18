@@ -9,6 +9,13 @@ if ($USER->authorize("sendemail") === false &&
 	!(getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost')) &&
 	!(getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost')) &&
 	!(getSystemSetting('_hasfeed', false) && $USER->authorize('feedpost'))) {
+	if (isset($_REQUEST['api'])) {
+		header("HTTP/1.1 403 Forbidden");
+		header('Content-Type: application/json');
+
+		exit();
+	}
+
 	redirect('./');
 }
 
@@ -53,20 +60,17 @@ $result = handleFileUpload('emailattachment', $maxattachmentsize, $unsafeext, nu
 if (isset($_GET['api'])) {
     if (is_array($result)) {
         $response = Array(
-            "status" => "success",
-            "upload" => Array(
-                "id" => (int)$result['contentid'],
-                "name" => $result['filename'],
-                "size" => $result['sizebytes']));
+	        "id" => $result['contentid'],
+	        "name" => $result['filename'],
+	        "size" => $result['sizebytes']);
     }
     else {
-        $response = Array("status" => "fail", "error" => $result);
+	    header("HTTP/1.1 500 Internal Server Error");
+        $response = Array("code" => "internalError", "message" => $result);
     }
 
     header("Content-Type: application/json");
-    echo json_encode($response);
-
-    exit();
+    exit(json_encode($response));
 }
 
 if (is_array($result)) {
