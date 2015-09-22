@@ -49,6 +49,11 @@ class HtmlTextArea extends FormItem {
 			'fieldinsert_list' => FieldMap::getAuthorizeFieldInsertNames()
 		);
 
+		// Append in a set of any other override settings that we support
+		if (isset($this->args['overridesettings'])) {
+			$overridesettings = $overridesettings + $this->args['overridesettings'];
+		}
+
 		// ref: http://stackoverflow.com/questions/7034485/contenteditable-trigger-event-on-image-resize-when-using-handles
 		$str = '<script type="text/javascript" src="script/ckeditor/ckeditor.js"></script>
 			<script type="text/javascript" src="script/rcieditor.js"></script>
