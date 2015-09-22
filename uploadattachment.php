@@ -48,6 +48,6 @@ if ($USER->authorize("sendemail") && isset($_FILES['upload'])) {
 ?>
 <script type='text/javascript'>
 	// Update Attachment upload dialog.
-	window.parent.CKEDITOR.tools.callFunction('<?=$_GET['CKEditorFuncNum']?>', '<?=$results?>', '<?=addslashes($errormessage)?>');
+	window.parent.CKEDITOR.tools.callFunction('<?=$_GET['CKEditorFuncNum']?>', JSON.stringify(<? echo $results ?>), '<?=addslashes($errormessage)?>');
 </script>
 
