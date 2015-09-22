@@ -260,11 +260,6 @@
 				return('deferred');
 			}
 	
-			// Override some settings
-			for (var setting in overrideSettings) {
-				that.setSetting(setting, overrideSettings[setting]);
-			}
-	
 			// base name of the text element; we'll make several new elements with derived names
 			basename = textarea_id;
 			container = $('#' + container_id);
@@ -322,6 +317,11 @@
 					// FIXME SMK disabled image_scaling pending clarification of desired behavior
 					//that.setSetting('image_scaling', 500);
 					break;
+			}
+	
+			// Override some settings
+			for (var setting in overrideSettings) {
+				that.setSetting(setting, overrideSettings[setting]);
 			}
 	
 			if (setEditorMode == 'inline') {
