@@ -44,8 +44,16 @@ require_once("obj/PreviewModal.obj.php");
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
 $cansendjob = isset($USER) && (($USER->authorize('sendphone') || $USER->authorize('sendemail') || $USER->authorize('sendsms')));
-if (!$cansendjob)
-	redirect('unauthorized.php');
+if (!$cansendjob){
+	if (isset($_REQUEST['api'])) {
+		header("HTTP/1.1 403 Forbidden");
+		exit();
+	}
+	else{
+		redirect('unauthorized.php');
+	}
+}
+
 
 
 

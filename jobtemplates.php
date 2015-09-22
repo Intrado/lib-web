@@ -15,7 +15,13 @@ require_once("obj/Job.obj.php");
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
 if (!$USER->authorize('sendphone') && !$USER->authorize('sendemail') && !$USER->authorize('sendsms')) {
-	redirect('unauthorized.php');
+	if (isset($_REQUEST['api'])) {
+		header("HTTP/1.1 403 Forbidden");
+		exit();
+	}
+	else{
+		redirect('unauthorized.php');
+	}
 }
 
 if (isset($_GET['delete'])) {
@@ -149,7 +155,14 @@ if($isajax === true) {
 	$data->pageinfo = array($numpages,$limit,$curpage, "Showing $displaystart - $displayend of $total records on $numpages pages ");
 
 	header('Content-Type: application/json');
-	echo json_encode(!empty($data) ? $data : false);
+
+	if (isset($_REQUEST['api'])) {
+		echo json_encode($templatedata);
+	}
+	else{
+		echo json_encode(!empty($data) ? $data : false);
+	}
+
 	exit();
 }
 
