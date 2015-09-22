@@ -787,6 +787,10 @@
 		 */
 		this.cleanContent = function (content) {
 			var tempdiv = $('<div></div>').html(content);
+
+			//remove unnecessary cke attributes - TODO: remove other ones too!
+			tempdiv.find("[data-cke-saved-href]").removeAttr('data-cke-saved-href');
+
 			var html = that.cleanFieldInserts(tempdiv.html()).replace(/&lt;&lt;/g, '<<').replace(/&gt;&gt;/g, '>>').replace(/&lt;{/g, '<{').replace(/}&gt;/g, '}>');
 	
 			// CKEditor inserts blank tags even if the user has deleted everything.
@@ -802,8 +806,6 @@
 					}
 				}
 			}
-			//remove unnecessary cke attributes
-			html = html.replace(/data-cke-saved-href=.+?\/emailattachment.php\?.+?href=/g, 'href=');
 			return(html);
 		};
 
