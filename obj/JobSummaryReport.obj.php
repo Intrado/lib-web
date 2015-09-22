@@ -97,7 +97,18 @@ class JobSummaryReport extends ReportGenerator{
 									sum(rc.result = 'duplicate') as duplicate,
 									sum(rp.status = 'nocontacts' and rc.result is null) as nocontacts,
 									sum(rp.status = 'declined' and rc.result is null) as declined,
-									100 * sum(rp.numcontacts and rp.status='success') / (sum(rp.numcontacts and rp.status != 'duplicate')) as success_rate
+									100 * sum(rp.numcontacts and rp.status='success') / (sum(rp.numcontacts and rp.status != 'duplicate')) as success_rate,
+									sum(rp.status = 'sending') as sending,
+									sum(rp.status = 'delivered') as delivered,
+									sum(rp.status = 'undelivered') as undelivered,
+									sum(rp.status = 'queueoverflow') as queueoverflow,
+									sum(rp.status = 'accountsuspended') as accountsuspended,
+									sum(rp.status = 'unreachabledest') as unreachabledest,
+									sum(rp.status = 'blocked') as blocked,
+									sum(rp.status = 'unknowndest') as unknowndest,
+									sum(rp.status = 'landline') as landline,
+									sum(rp.status = 'carrierviolation') as carrierviolation,
+									sum(rp.status = 'unknownerror') as unknownerror
 									from reportperson rp
 									left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid AND rc.result NOT IN('declined'))
 									where rp.jobid in ('$joblist')
@@ -306,7 +317,16 @@ class JobSummaryReport extends ReportGenerator{
 											<th style="min-width: 100px"><?= _L("Duplicates Removed") ?></th>
 											<th style="min-width: 100px"><?= _L("No SMS") ?></th>
 											<th style="min-width: 100px"><?= _L("No SMS Selected") ?></th>
-											<th style="width: 99%">&nbsp;</td>
+											<th style="min-width: 100px"><?= _L("Delivered") ?></th>
+											<th style="min-width: 100px"><?= _L("Undelivered") ?></th>
+											<th style="min-width: 100px"><?= _L("Queue Overflow") ?></th>
+											<th style="min-width: 100px"><?= _L("Account Suspended") ?></th>
+											<th style="min-width: 100px"><?= _L("Unreachable Destination") ?></th>
+											<th style="min-width: 100px"><?= _L("Blocked") ?></th>
+											<th style="min-width: 100px"><?= _L("Unknown Destination") ?></th>
+											<th style="min-width: 100px"><?= _L("Landline") ?></th>
+											<th style="min-width: 100px"><?= _L("Carrier Violation") ?></th>
+											<th style="min-width: 100px"><?= _L("Unknown Error") ?></th>
 											<th style="min-width: 100px"><?= _L("% Contacted") ?></th>
 										</tr>
 										<tr>
@@ -317,7 +337,16 @@ class JobSummaryReport extends ReportGenerator{
 											<td><?=(int)$smsinfo['duplicate']?></td>
 											<td><?=(int)$smsinfo['nocontacts']?></td>
 											<td><?=(int)$smsinfo['declined']?></td>
-											<td>&nbsp;</td>
+											<td><?=(int)$smsinfo['delivered']?></td>
+											<td><?=(int)$smsinfo['undelivered']?></td>
+											<td><?=(int)$smsinfo['queueoverflow']?></td>
+											<td><?=(int)$smsinfo['accountsuspended']?></td>
+											<td><?=(int)$smsinfo['unreachabledest']?></td>
+											<td><?=(int)$smsinfo['blocked']?></td>
+											<td><?=(int)$smsinfo['unknowndest']?></td>
+											<td><?=(int)$smsinfo['landline']?></td>
+											<td><?=(int)$smsinfo['carrierviolation']?></td>
+											<td><?=(int)$smsinfo['unknownerror']?></td>
 											<td><?=sprintf("%0.2f", isset($smsinfo['success_rate']) ? $smsinfo['success_rate'] : "") . "%" ?></td>
 										</tr>
 									</table>
