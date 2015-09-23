@@ -9,6 +9,8 @@ CKEDITOR.dialog.add('attachmentlink', function (editor) {
 
 			this.setupContent(element);
 			this.getContentElement('tab1', 'uploadstatus').getElement().setText('');
+      this.getContentElement('tab1', 'upload').getElement().show();
+      this.getContentElement('tab1', 'uploadbutton').getElement().show();
 		},
 		onOk: function () {
 			var value = this.getContentElement('tab1', 'viewattachmenturl').getInputElement().getValue();
@@ -41,7 +43,7 @@ CKEDITOR.dialog.add('attachmentlink', function (editor) {
 					{
 						id: 'displayname',
 						type: 'text',
-						label: 'Display Name (you can replace the file name with text below)',
+						label: 'Optional: Choose a Display Name for your file. This name will appear as a link in your email.',
 					},
 					{
 						id: 'upload',
@@ -74,7 +76,10 @@ CKEDITOR.dialog.add('attachmentlink', function (editor) {
 						onChange: function (event) {
 							if (event && event.data && event.data.value) {
 								var attachment = JSON.parse(event.data.value);
-								this.getDialog().getContentElement('tab1', 'uploadstatus').getElement().setText(attachment.filename + " uploaded.");
+								this.getDialog().getContentElement('tab1', 'uploadstatus').getElement().setHtml(
+									"<em>Success!</em><br>" + CKEDITOR.tools.htmlEncode(attachment.filename) + " uploaded.");
+								this.getDialog().getContentElement('tab1', 'upload').getElement().hide();
+								this.getDialog().getContentElement('tab1', 'uploadbutton').getElement().hide();
 							}
 							else {
 								this.getDialog().getContentElement('tab1', 'uploadstatus').getElement().setText('Failed to upload the attachment.');
