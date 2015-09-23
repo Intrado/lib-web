@@ -9,8 +9,8 @@ CKEDITOR.dialog.add('attachmentlink', function (editor) {
 
 			this.setupContent(element);
 			this.getContentElement('tab1', 'uploadstatus').getElement().setText('');
-      this.getContentElement('tab1', 'upload').getElement().show();
-      this.getContentElement('tab1', 'uploadbutton').getElement().show();
+			this.getContentElement('tab1', 'upload').getElement().show();
+			this.getContentElement('tab1', 'uploadbutton').getElement().show();
 		},
 		onOk: function () {
 			var value = this.getContentElement('tab1', 'viewattachmenturl').getInputElement().getValue();
@@ -43,7 +43,7 @@ CKEDITOR.dialog.add('attachmentlink', function (editor) {
 					{
 						id: 'displayname',
 						type: 'text',
-						label: 'Optional: Choose a Display Name for your file. This name will appear as a link in your email.',
+						label: 'Optional: Choose a display name for your file. This name will appear as a link in your email.',
 					},
 					{
 						id: 'upload',
