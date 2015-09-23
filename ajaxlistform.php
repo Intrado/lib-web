@@ -156,6 +156,16 @@ function handleRequest() {
 			$list->name = $listName;
 			$list->deleted = ($_POST['save'] ? 0 : 1);
 			$list->type = isset($_POST['sectionids']) ? 'section' : 'person';
+
+			if (isset($_REQUEST['api'])) {
+				$validRecipientModes = array('selfAndGuardian', 'self', 'guardian');
+				if (!in_array($_POST['recipientmode'], $validRecipientModes)) {
+					return Array("status" => "invalidRecipientMode", "message" => "Invalid recipient mode " . $_POST['recipientmode']);
+				}
+
+				$list->recipientmode = $_POST['recipientmode'];
+			}
+
 			$list->update();
 			if (!$list->id) {
 				if (isset($_REQUEST['api'])) {
@@ -164,7 +174,21 @@ function handleRequest() {
 					return false;
 				}
 			}
-				
+
+			if (isset($_REQUEST['api'])) {
+				$maxguardians = getSystemSetting("maxguardians", 0);
+				if ($maxguardians > 0 && ($list->recipientmode == 'guardian' || $list->recipientmode == 'selfAndGuardian')) {
+					$guardianCategoryIds = array();
+					foreach ($_POST as $key => $value) {
+						if ((0 === strpos($key, 'guardiancategory_')) && ($value == 'on')) {
+							$guardianCategoryIds[] = intval(substr($key, strlen('guardiancategory_')));
+						}
+					}
+
+					ListGuardianCategory::resetListGuardianCategories($list->id, $guardianCategoryIds);
+				}
+			}
+
 			if (isset($_POST['sectionids'])) {
 				foreach ($_POST['sectionids'] as $sectionid) {
 					QuickUpdate('insert into listentry set type="section", listid=?, sectionid=?', false, array($list->id, $sectionid));

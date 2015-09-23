@@ -18,6 +18,7 @@ require_once("obj/RenderedList.obj.php");
 require_once("inc/date.inc.php");
 require_once("inc/securityhelper.inc.php");
 require_once("obj/Job.obj.php");
+require_once("obj/ListGuardianCategory.obj.php");
 
 function generateListStats($listid) {
 	$list = new PeopleList($listid);
@@ -186,9 +187,15 @@ function handleRequest() {
 			$recipientList = cleanObjects($list);
 			$recipientList['id'] = (int)$list->id;
 
+	        $maxguardians = getSystemSetting("maxguardians", 0);
+	        if ($maxguardians > 0 && ($list->recipientmode == 'guardian' || $list->recipientmode == 'selfAndGuardian')) {
+		        $restrictcategoryids = ListGuardianCategory::getGuardiansForList($recipientList['id']);
+	        }
+
             return array(
 	            "status" => "success",
 	            "list" => $recipientList,
+	            "restrictcategoryids" => cleanObjects($restrictcategoryids),
 	            "listrules" => cleanObjects($listrules),
 	            "listorganizations" => cleanObjects($organizations),
 	            "listsections" => cleanObjects($list->getSections()),
