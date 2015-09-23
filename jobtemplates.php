@@ -60,6 +60,14 @@ if($isajax === true) {
 
 	$start = 0 + (isset($_GET['pagestart']) ? $_GET['pagestart'] : 0);
 	$limit = 5;
+
+	if (isset($_REQUEST['api'])) {
+		// allow pass perpage querystrig for API up to 20
+		if ($_GET['perpage']) {
+			$limit = min(20, max(5, ((int)$_GET['perpage'])));
+		}
+	}
+
 	$orderby = "date desc";
 
 	$sortby = "";
@@ -157,7 +165,17 @@ if($isajax === true) {
 	header('Content-Type: application/json');
 
 	if (isset($_REQUEST['api'])) {
-		echo json_encode($templatedata);
+		// Return docs and metadata.
+		echo json_encode(array(
+			'docs' => $templatedata,
+			'metadata' => array(
+				'start' => $start,
+				'pagesize' => $limit,
+				'totalrows' => $total,
+				'numpages' => $numpages,
+				'curpage' => $curpage
+			)
+		));
 	}
 	else{
 		echo json_encode(!empty($data) ? $data : false);
