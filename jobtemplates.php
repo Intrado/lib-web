@@ -26,16 +26,39 @@ if (!$USER->authorize('sendphone') && !$USER->authorize('sendemail') && !$USER->
 
 if (isset($_GET['delete'])) {
 	$deleteid = DBSafe($_GET['delete']);
+	$deleteResult='';
+
 	if (userOwns("job",$deleteid)) {
 		$job = new Job($deleteid);
-		if ($job->status == "template" && $job->softDelete())
+		if ($job->status == "template" && $job->softDelete()){
 			notice(_L("The %s Template, %s, is now deleted.", getJobTitle(), escapehtml($job->name)));
-		else
-			notice(_L("The %s Template, %s, Could not be deleted. %s", getJobTitle(), escapehtml($job->name),$job->status));
+			$deleteResult='success';
+		}
+		else {
+			notice(_L("The %s Template, %s, Could not be deleted. %s", getJobTitle(), escapehtml($job->name), $job->status));
+			$deleteResult='error';
+		}
 	} else {
 		notice(_L("The %s Template, Could not be deleted.", getJobTitle()));
+		$deleteResult='notFound';
 	}
-	redirectToReferrer();
+
+
+
+	if (isset($_REQUEST['api'])) {
+		if( $deleteResult=='notFound'){
+			header("HTTP/1.1 404 Not Found");
+		}
+		else {
+			header('Content-Type: application/json');
+			echo json_encode(array('result'=>$deleteResult));
+		}
+
+		exit();
+	}
+	else {
+		redirectToReferrer();
+	}
 }
 
 if (isset($_GET['show']) && isset($_GET['templateid'])) {

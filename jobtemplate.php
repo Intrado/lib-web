@@ -65,9 +65,17 @@ PreviewModal::HandleRequestWithId();
 $job = null;
 if (isset($_GET['id'])) {
 	if ($_GET['id'] !== "new" && !userOwns("job",$_GET['id']))
-		redirect('unauthorized.php');
+		if(isset($_REQUEST['api'])) {
+			header("HTTP/1.1 404 Not Found");
+			exit();
+		}else{
+			redirect('unauthorized.php');
+		}
 	setCurrentJob($_GET['id']);
-	redirect();
+
+	if(!isset($_REQUEST['api'])){
+		redirect();
+	}
 }
 
 if (isset($_GET['origin'])) {
@@ -80,10 +88,34 @@ if ($jobid == NULL) {
 } else {
 	$job = new Job($jobid);
 	
-	if ($job->type != "notification" && $job->status != 'template') 
-		redirect('unauthorized.php');
+	if ($job->type != "notification" && $job->status != 'template')
+		if(isset($_REQUEST['api'])) {
+			header("HTTP/1.1 404 Not Found");
+			exit();
+		}
+		else{
+			redirect('unauthorized.php');
+		}
+
 		
 }
+
+
+if (isset($_REQUEST['api'])&& !$_GET['form']) {
+	header('Content-Type: application/json');
+	echo json_encode(array(
+		'jobid' => $job->id,
+		'name' => $job->name,
+		'description'=> $job->description,
+		'messagegroupid'=> $job->messagegroupid,
+        'jobtypeid' => $job->jobtypeid,
+        'date' => $job->createdate,
+		'deleted' => $job->deleted,
+	));
+
+	exit();
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Optional Form Items And Validators
@@ -284,7 +316,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$sendto = 'jobtemplates.php';
 		}
 		if ($ajax)
-			$form->sendTo($sendto);
+			$form->sendTo($sendto, array("notificationTemplate" => array("id" => (int)$job->id)));
 		else
 			redirect($sendto);
 	}
