@@ -1,5 +1,7 @@
 <?
 
+$SETTINGS = parse_ini_file('quicktipsettings.ini.php', true);
+
 // required for escapeHtml()
 setlocale(LC_ALL, 'en_US.UTF-8');
 mb_internal_encoding('UTF-8');
@@ -15,13 +17,11 @@ function escapeHtml($string) {
  * form submission to a target iframe (POST to quicktip API POST endpoint for tip submission),
  * fetching customer (root org or org specifed via GET 'i' attribute) data via quicktip API REST endpoint for population 
  * into Organization and Topic dropdowns. 
- * 
- * @author Justin Burns <jburns@schoolmessenger.com>
- * @date 11/08/2013
  */
 
 class TipSubmissionHandler {
 	private $productName;
+	private $custName;
 	private $rootOrgId;
 	private $customerName;
 	private $customerDataURL;
@@ -46,6 +46,7 @@ class TipSubmissionHandler {
 
 
 	public function TipSubmissionHandler($options = array()) {
+		global $SETTINGS;
 
 		// sets required private member variables to values in the $options arg array
 		foreach ($options as $key => $value) {
@@ -53,7 +54,7 @@ class TipSubmissionHandler {
 		}
 
 		// set the customer's REST API URL for fetching their data via GET
-		$this->customerDataURL = $this->baseCustomerURL . '/api/2/organizations/' . $this->rootOrgId . '/quicktip/info';
+		$this->customerDataURL = sprintf($SETTINGS['api']['csCustomer'], $this->custName) . 'organizations/' . $this->rootOrgId . '/quicktip/info';
 
 		// fetch customer data via curl GET request to customer's quicktip API endpoint
 		$this->customerData = json_decode($this->fetchCustomerData());
@@ -361,16 +362,17 @@ $rootOrgId 	= isset($_GET['i']) ? $_GET['i'] : 'root';
 
 // define options hash to pass to Tip constructor for proper initialization of Tip instance
 $options = array(
-	"rootOrgId"			=> $rootOrgId, 
+	'custName'		=> $custName,
+	"rootOrgId"		=> $rootOrgId, 
 	"baseCustomerURL"	=> (isset($_SERVER['HTTPS']) ? 'https://' : 'http://') . $_SERVER['SERVER_NAME'] . '/' . $custName,
-	"orgId" 	 		=> isset($_POST['orgId']) ? $_POST['orgId'] : null,
-	"topicId" 			=> isset($_POST['topicId']) ? $_POST['topicId'] : null,
-	"message" 			=> isset($_POST['message']) ? $_POST['message'] : null,
-	"file"				=> isset($_FILES['file']['name']) ? $_FILES['file']['name'] : null,
+	"orgId" 	 	=> isset($_POST['orgId']) ? $_POST['orgId'] : null,
+	"topicId" 		=> isset($_POST['topicId']) ? $_POST['topicId'] : null,
+	"message" 		=> isset($_POST['message']) ? $_POST['message'] : null,
+	"file"			=> isset($_FILES['file']['name']) ? $_FILES['file']['name'] : null,
 	"firstname"  		=> isset($_POST['firstname']) ? $_POST['firstname'] : null,
 	"lastname"   		=> isset($_POST['lastname'])  ? $_POST['lastname'] : null,
-	"email" 			=> isset($_POST['email'])  	? $_POST['email'] : null,
-	"phone"  			=> isset($_POST['phone'])  ? $_POST['phone'] : null
+	"email" 		=> isset($_POST['email'])  	? $_POST['email'] : null,
+	"phone"  		=> isset($_POST['phone'])  ? $_POST['phone'] : null
 );
 
 // initialize new TipSubmissionHandler instance with $options arg
