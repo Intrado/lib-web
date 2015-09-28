@@ -331,7 +331,7 @@ class Message extends DBMappedObject {
 
 			$matches = array();
 			$uploadattachmenturl = "";
-			if (preg_match("/(\<a class=\"message-attachment-placeholder\".*? href\=\"[^\=]*emailattachment\.php\?)/", strtolower($data), $matches)) {
+			if (preg_match("/(\<a.*?message-attachment-placeholder.*? href\=\"[^\=]*emailattachment\.php\?)/", strtolower($data), $matches)) {
 				// we only care about the first match
 				$uploadattachmenturl = $matches[1];
 				$pos_ma = stripos($data, $uploadattachmenturl);
@@ -398,7 +398,7 @@ class Message extends DBMappedObject {
 				case "MAL": $endtoken = '}>'; break;
 				case "HMAL": $endtoken = '</a>'; break;
 			}
-			$length = @strpos($data, $endtoken, $pos + 1);
+			$length = @stripos($data, $endtoken, $pos + 1);
 
 			if ($length === false) {
 				$errors[] = "Can't find end of field, was expecting '$endtoken'";
