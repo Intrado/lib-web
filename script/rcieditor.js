@@ -260,11 +260,6 @@
 				return('deferred');
 			}
 	
-			// Override some settings
-			for (var setting in overrideSettings) {
-				that.setSetting(setting, overrideSettings[setting]);
-			}
-	
 			// base name of the text element; we'll make several new elements with derived names
 			basename = textarea_id;
 			container = $('#' + container_id);
@@ -322,6 +317,11 @@
 					// FIXME SMK disabled image_scaling pending clarification of desired behavior
 					//that.setSetting('image_scaling', 500);
 					break;
+			}
+	
+			// Override some settings
+			for (var setting in overrideSettings) {
+				that.setSetting(setting, overrideSettings[setting]);
 			}
 	
 			if (setEditorMode == 'inline') {
@@ -787,6 +787,10 @@
 		 */
 		this.cleanContent = function (content) {
 			var tempdiv = $('<div></div>').html(content);
+
+			//remove unnecessary cke attributes - TODO: remove other ones too!
+			tempdiv.find("[data-cke-saved-href]").removeAttr('data-cke-saved-href');
+
 			var html = that.cleanFieldInserts(tempdiv.html()).replace(/&lt;&lt;/g, '<<').replace(/&gt;&gt;/g, '>>').replace(/&lt;{/g, '<{').replace(/}&gt;/g, '}>');
 	
 			// CKEditor inserts blank tags even if the user has deleted everything.
@@ -802,8 +806,6 @@
 					}
 				}
 			}
-			//remove unnecessary cke attributes
-			html = html.replace(/data-cke-saved-href=.+?\/emailattachment.php\?.+?href=/g, 'href=');
 			return(html);
 		};
 

@@ -142,7 +142,7 @@ $formdata["description"] = array(
 );
 
 
-$messagecontrol = array("HtmlTextArea", "subtype" => $subtype, "editor_mode" => "full");
+$messagecontrol = array("HtmlTextArea", "subtype" => $subtype, "editor_mode" => "full", 'overridesettings' => array('tool_attachmentlink' => false));
 if ($subtype == "plain" && $languagecode == "en")
 	$messagecontrol['spellcheck'] = true;
 

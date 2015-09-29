@@ -324,7 +324,7 @@ if ($subtype == 'html') {
 						<img src="img/icons/information.png" alt="Information"/>
 						Click
 						<img src="script/ckeditor/plugins/attachmentlink/icons/attachmentlink.png" onclick="CKEDITOR.tools.callFunction(131,this);return false;" alt="Attachment" />
-						to add your hosted attachments.
+						in the toolbar below to add attachments. Please note: links to your attached files are now embedded in your email.
 					</div>'
 
 		),
