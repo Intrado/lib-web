@@ -90,29 +90,18 @@ class JobSummaryReport extends ReportGenerator{
 	}
 
 	static function getSmsInfo($joblist, $readonlyconn) {
-		$smsquery = "select sum(rc.type = 'sms') as total,
-									sum(rp.status in ('success', 'duplicate', 'fail')) as done,
-									sum(rp.status not in ('success', 'fail', 'duplicate', 'blocked', 'nocontacts', 'declined') and rc.result not in ('sent', 'duplicate', 'blocked')) as remaining,
-									sum(rc.result = 'blocked') as blocked,
-									sum(rc.result = 'duplicate') as duplicate,
-									sum(rp.status = 'nocontacts' and rc.result is null) as nocontacts,
-									sum(rp.status = 'declined' and rc.result is null) as declined,
-									100 * sum(rp.numcontacts and rp.status='success') / (sum(rp.numcontacts and rp.status != 'duplicate')) as success_rate,
-									sum(rp.status = 'sending') as sending,
-									sum(rp.status = 'delivered') as delivered,
-									sum(rp.status = 'undelivered') as undelivered,
-									sum(rp.status = 'queueoverflow') as queueoverflow,
-									sum(rp.status = 'accountsuspended') as accountsuspended,
-									sum(rp.status = 'unreachabledest') as unreachabledest,
-									sum(rp.status = 'blocked') as blocked,
-									sum(rp.status = 'unknowndest') as unknowndest,
-									sum(rp.status = 'landline') as landline,
-									sum(rp.status = 'carrierviolation') as carrierviolation,
-									sum(rp.status = 'unknownerror') as unknownerror
-									from reportperson rp
-									left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid AND rc.result NOT IN('declined'))
-									where rp.jobid in ('$joblist')
-									and rp.type='sms'";
+		$smsquery = "select 
+						count(rc.jobid) as total,
+						sum(rc.result in ('duplicate', 'blocked', 'declined')) as filtered, 
+						sum(rc.result in ('queued', 'sending')) as pending,
+						count(rc.jobid) - sum(rc.result in ('duplicate', 'blocked', 'declined')) - sum(rc.result in ('delivered')) -  sum(rc.result in ('queued', 'sending')) as undelivered,
+						sum(rc.result in ('delivered')) as delivered
+					from 
+						reportcontact rc
+					where 
+						rc.jobid in ('$joblist')
+						and rc.type = 'sms'";
+		
 		return QuickQueryRow($smsquery, true, $readonlyconn);
 	}
 
@@ -300,7 +289,14 @@ class JobSummaryReport extends ReportGenerator{
 <?
 				} // end email summary
 
-				if(array_sum($smsinfo) > 0){
+				if(array_sum($smsinfo) > 0) {
+					
+					$total = $smsinfo['total'];
+					$formattedResults = array();
+					
+					foreach($smsinfo as $key => $field) {
+						$formattedResults[$key] = percent_value( $field / $total );
+					}
 ?>
 				<tr>
 					<th align="right" class="windowRowHeader bottomBorder"><a href="reportjobdetails.php?type=sms">SMS:</a></th>
@@ -311,43 +307,26 @@ class JobSummaryReport extends ReportGenerator{
 									<table border="0" cellpadding="2" cellspacing="1" class="list" width="100%">
 										<tr class="listHeader" align="left" valign="bottom">
 											<th style="min-width: 100px"><?= _L("# of SMS") ?></th>
-											<th style="min-width: 100px"><?= _L("Completed") ?></th>
-											<th style="min-width: 100px"><?= _L("Remaining") ?></th>
-											<th style="min-width: 100px"><?= _L("Blocked") ?></th>
-											<th style="min-width: 100px"><?= _L("Duplicates Removed") ?></th>
-											<th style="min-width: 100px"><?= _L("No SMS") ?></th>
-											<th style="min-width: 100px"><?= _L("No SMS Selected") ?></th>
-											<th style="min-width: 100px"><?= _L("Delivered") ?></th>
+											<th style="min-width: 100px"><?= _L("Not Attempted") ?></th>
+											<th style="min-width: 100px"><?= _L("Pending") ?></th>
 											<th style="min-width: 100px"><?= _L("Undelivered") ?></th>
-											<th style="min-width: 100px"><?= _L("Queue Overflow") ?></th>
-											<th style="min-width: 100px"><?= _L("Account Suspended") ?></th>
-											<th style="min-width: 100px"><?= _L("Unreachable Destination") ?></th>
-											<th style="min-width: 100px"><?= _L("Blocked") ?></th>
-											<th style="min-width: 100px"><?= _L("Unknown Destination") ?></th>
-											<th style="min-width: 100px"><?= _L("Landline") ?></th>
-											<th style="min-width: 100px"><?= _L("Carrier Violation") ?></th>
-											<th style="min-width: 100px"><?= _L("Unknown Error") ?></th>
-											<th style="min-width: 100px"><?= _L("% Contacted") ?></th>
+											<th style="min-width: 100px"><?= _L("Delivered") ?></th>
 										</tr>
 										<tr>
-											<td><?=(int)$smsinfo['total']?></td>
-											<td><?=(int)$smsinfo['done']?></td>
-											<td><?=(int)$smsinfo['remaining']?></td>
-											<td><?=(int)$smsinfo['blocked']?></td>
-											<td><?=(int)$smsinfo['duplicate']?></td>
-											<td><?=(int)$smsinfo['nocontacts']?></td>
-											<td><?=(int)$smsinfo['declined']?></td>
-											<td><?=(int)$smsinfo['delivered']?></td>
-											<td><?=(int)$smsinfo['undelivered']?></td>
-											<td><?=(int)$smsinfo['queueoverflow']?></td>
-											<td><?=(int)$smsinfo['accountsuspended']?></td>
-											<td><?=(int)$smsinfo['unreachabledest']?></td>
-											<td><?=(int)$smsinfo['blocked']?></td>
-											<td><?=(int)$smsinfo['unknowndest']?></td>
-											<td><?=(int)$smsinfo['landline']?></td>
-											<td><?=(int)$smsinfo['carrierviolation']?></td>
-											<td><?=(int)$smsinfo['unknownerror']?></td>
-											<td><?=sprintf("%0.2f", isset($smsinfo['success_rate']) ? $smsinfo['success_rate'] : "") . "%" ?></td>
+											<?
+												foreach($smsinfo as $key => $value) {
+													
+													echo '<td>';
+													
+													if($key === 'total') {
+														echo $value;
+													} else {
+														echo $value > 0 ? ($value .' '.'('.$formattedResults[$key].')') : $value;
+													};
+													
+													echo '</td>';
+												};
+											?>
 										</tr>
 									</table>
 								</td>
