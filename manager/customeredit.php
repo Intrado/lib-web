@@ -981,7 +981,18 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		
 		// updating SMS shortcode requires updating authserver -> customer. SQL in SMSAggregatorData.php
 		if(isset($postdata["shortcodegroup"])) {
+			
+			// update customer's shortcode group in 'customer' table on 'authserv' db
 			$smsAggregatorData->storeSelection($customerid, $postdata["shortcodegroup"]);
+			
+			// get array of error codes for all domains where cURL request failed to refresh their shortcode groups
+			$errorsArray = $smsAggregatorData->jmxUpdateShortcodeGroups();
+			
+			if(! empty($errorsArray)) {
+				
+				$_SESSION['confirmnotice'] = $errorsArray;
+				
+			}
 		}
 		
 		$originalProvider = $settings['_defaultttsprovider'];
@@ -1085,9 +1096,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		// CMA App ID is integer value only at this time.
 		setCustomerSystemSetting('_cmaappid', $postdata['cmaappid'], $custdb);
 		
-
+		
 		Query("COMMIT");
-		if($button == "done") {
+ 		if($button == "done") {
 			if ($ajax)
 				$form->sendTo($returntopage);
 			else
@@ -1164,6 +1175,10 @@ document.observe('dom:loaded', function() {
 	$('newcustomer_shortcodegroup').observe("change", function (event) {
 		smsFunctions.showData();
 	});
+	
+//	jQuery('button').on("click", function (event) {
+//		alert('hi');
+//	});
 });
 <? Validator::load_validators(array("ValInboundNumber","ValUrlComponent","ValSmsText","ValLanguages","ValUrl","ValClassroom", "ValInteger",
 	 'ValPortalSelection'));?>
