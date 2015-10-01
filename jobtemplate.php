@@ -100,25 +100,7 @@ if ($jobid == NULL) {
 }
 
 
-if (isset($_REQUEST['api'])&& !$_GET['form']) {
-	if( (int)$job->deleted ) {
-		header("HTTP/1.1 404 Not Found");
-	}
-	else {
-		header('Content-Type: application/json');
 
-		echo json_encode(array(
-			'jobid' => $job->id,
-			'name' => $job->name,
-			'description' => $job->description,
-			'messagegroupid' => $job->messagegroupid,
-			'jobtypeid' => $job->jobtypeid,
-			'date' => $job->createdate
-		));
-	}
-
-	exit();
-}
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -166,6 +148,27 @@ if ($job->messagegroupid != null) {
 	if ($deletedmessage = QuickQueryRow($query, false, false,array($job->messagegroupid))) {
 		$messages[$deletedmessage[0]] = $deletedmessage[1];
 	}
+}
+
+if (isset($_REQUEST['api'])&& !$_GET['form']) {
+	if( (int)$job->deleted ) {
+		header("HTTP/1.1 404 Not Found");
+	}
+	else {
+		header('Content-Type: application/json');
+
+		echo json_encode(array(
+			'jobid' => $job->id,
+			'name' => $job->name,
+			'description' => $job->description,
+			'messagegroupid' => $job->messagegroupid,
+			'jobtypeid' => $job->jobtypeid,
+			'date' => $job->createdate,
+			'lists' => $selectedlists
+		));
+	}
+
+	exit();
 }
 
 $helpsteps = array();
