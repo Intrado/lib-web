@@ -944,6 +944,11 @@ include("nav.inc.php");
 	<script type="text/javascript" src="script/rcieditor.js"></script>
 	<script type="text/javascript" src="script/speller/spellChecker.js"></script>
 	<script type="text/javascript" src="script/niftyplayer.js.php"></script>
+	
+	<? if(isset($_REQUEST["iframe"])) { ?>
+		<script src="script/NodeRegistry.js"></script>
+	<? } ?>
+		
 	<script type="text/javascript">
 		$(function () {
 

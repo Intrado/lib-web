@@ -414,7 +414,7 @@ class PdfSendMail extends PageForm {
 				array("ValMessageBody"),
 				array("ValLength", "max" => 256000)
 			),
-			"control" => array('HtmlTextArea', 'subtype' => 'html', 'rows' => 20, 'editor_mode' => 'inline'),
+			"control" => array('HtmlTextArea', 'subtype' => 'html', 'rows' => 20, 'editor_mode' => 'inline', 'overridesettings' => array('tool_attachmentlink' => false)),
 			"helpstep" => 7 + $this->listRecipientMode->isEnabled()
 		);
 		$formdata[] = _L("Information");
