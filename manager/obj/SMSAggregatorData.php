@@ -8,7 +8,7 @@ class SMSAggregatorData {
 	public $shortcodeData;
 	public $shortcodeGroups;
 	
-	public function __construct($customerId) {
+	public function init($customerId) {
 		
 		$this->currentShortcodeGroupId = $this->getCurrentShortcodeGroupId($customerId);
 		$this->shortcodeData = $this->fetchRequiredData();
@@ -51,11 +51,10 @@ class SMSAggregatorData {
 		
 		$query = "update customer set shortcodegroupid=$selection where id = $customerId";
 		
-		QuickQuery($query);
+		return QuickQuery($query);
 	}
 	
 	public function jmxUpdateShortcodeGroups () {
-		global $SETTINGS;
 		
 		// init curl with the url we hit with a GET request
 		$username = $SETTINGS['jmx']['username'];
