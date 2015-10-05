@@ -349,7 +349,8 @@ $shards = QuickQueryList("select id, name from shard where not isfull order by i
 $dmmethod = array('' => '--Choose a Method--', 'asp' => 'CommSuite (fully hosted)','hybrid' => 'CS + SmartCall + Emergency','cs' => 'CS + SmartCall (data only)');
 
 // SMS Aggregator form item data
-$smsAggregatorData = new SMSAggregatorData($customerid);
+$smsAggregatorData = new SMSAggregatorData();
+$smsAggregatorData->init($customerId);
 
 $helpstepnum = 1;
 $formdata = array(_L('Basics'));
