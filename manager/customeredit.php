@@ -350,7 +350,7 @@ $dmmethod = array('' => '--Choose a Method--', 'asp' => 'CommSuite (fully hosted
 
 // SMS Aggregator form item data
 $smsAggregatorData = new SMSAggregatorData();
-$smsAggregatorData->init($customerId);
+$smsAggregatorData->init($customerid);
 
 $helpstepnum = 1;
 $formdata = array(_L('Basics'));
