@@ -22,21 +22,21 @@ function generateFieldList ($includeid = false, $fieldlist = NULL, $alias = fals
  * @param bool $dbconnect
  * @return DBMappedObject[]|bool
  */
-function DBFindMany ($classname, $query, $alias = false, $args = false, $dbconnect = false) {
-	return _DBFindPDO(true, $classname, $query, $alias, $args, $dbconnect);
+function DBFindMany ($classname, $query, $alias = false, $args = false, $dbconnect = false, $distinct = false) {
+	return _DBFindPDO(true, $classname, $query, $alias, $args, $dbconnect, $distinct);
 }
 
-function DBFind ($classname, $query, $alias = false, $args = false, $dbconnect = false) {
-	return _DBFindPDO(false, $classname, $query, $alias, $args, $dbconnect);
+function DBFind ($classname, $query, $alias = false, $args = false, $dbconnect = false, $distinct = false) {
+	return _DBFindPDO(false, $classname, $query, $alias, $args, $dbconnect, $distinct);
 }
 
-function _DBFindPDO($isMany, $classname, $query, $alias=false, $args=false, $dbconnect = false) {
+function _DBFindPDO($isMany, $classname, $query, $alias=false, $args=false, $dbconnect = false, $distinct = false) {
 	//make a dummy object of this to get the field list
 	$dummy = new $classname();
 
 	$many = array();
 
-	$query = "select " . generateFieldList(true,$dummy->_fieldlist,$alias) ." ". $query;
+	$query = "select " . ($distinct ? 'distinct ' : '') . generateFieldList(true,$dummy->_fieldlist,$alias) ." ". $query;
 	if ($result = Query($query, $dbconnect, $args)) {
 		while ($row = DBGetRow($result)) {
 			$newobj = new $classname();
