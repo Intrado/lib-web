@@ -26,13 +26,6 @@ if (!$USER->authorize('createreport') && !$USER->authorize('viewsystemreports'))
 	redirect('unauthorized.php');
 }
 
-//if this user can see systemwide reports, then lock them to the customerid
-//otherwise lock them to jobs that they own
-if (!$USER->authorize('viewsystemreports')) {
-	$userJoin = " and userid = $USER->id ";
-} else {
-	$userJoin = "";
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
@@ -216,7 +209,7 @@ startWindow("Select ".help('ReportAttachmentSearch_Select'), NULL, false);
 ?>
 <table border="0" cellpadding="3" cellspacing="0" width="100%">
 	<tr valign="top">
-		<th align="right" class="windowRowHeader bottomBorder">Report Options:</th>
+	<th align="right" class="windowRowHeader bottomBorder"><? echo _L('Report Options'); ?>:</th>
 		<td class="bottomBorder">
 			<table>
 				<tr>
@@ -224,7 +217,7 @@ startWindow("Select ".help('ReportAttachmentSearch_Select'), NULL, false);
 						<table>
 							<tr>
 								<td><label class="report_options"><? NewFormItem($f, $s, "radioselect", "radio", null, "job", "id=\"job\" onclick='$(\"daterange\").hide(); $(\"jobs\").show()'");?> <?= getJobTitle()?></label></td>
-								<td><label class="report_options"><? NewFormItem($f, $s, "radioselect", "radio", null, "date", "onclick='$(\"jobs\").hide(); $(\"daterange\").show()'");?> Date</label></td>
+								<td><label class="report_options"><? NewFormItem($f, $s, "radioselect", "radio", null, "date", "onclick='$(\"jobs\").hide(); $(\"daterange\").show()'");?> <? echo _L('Date'); ?></label></td>
 							</tr>
 						</table>
 					</td>
@@ -243,10 +236,30 @@ startWindow("Select ".help('ReportAttachmentSearch_Select'), NULL, false);
 						<table border="0" cellpadding="3" cellspacing="0" width="100%" id="jobs" style="display:<?if($radio=='job'){echo("block");}else{echo("none");}?>">
 							<tr>
 								<td width="1%">
-								<?
+<?
+									//if this user can see systemwide reports, then lock them to the customerid
+									//otherwise lock them to jobs that they own
+									$userJoin = (! $USER->authorize('viewsystemreports')) ? " AND j.userid = $USER->id " : '';
+									$userJoin = '';
+
 									NewFormItem($f, $s, "jobid", "selectstart", null, null, "id='jobid'");
 									NewFormItem($f, $s, "jobid", "selectoption", "-- " . _L("Select a %s",getJobTitle()) . " --", "");
-									$jobs = DBFindMany("Job","from job where deleted = 0 and status in ('active','complete','cancelled','cancelling') $userJoin and questionnaireid is null order by id desc limit 500");
+									$jobs = DBFindMany('Job', "
+										FROM
+											job j
+											INNER JOIN message m ON (m.messagegroupid = j.messagegroupid)
+											INNER JOIN messageattachment ma ON (ma.messageid = m.id)
+										WHERE
+											j.deleted = 0
+											AND j.status IN ('active', 'complete', 'cancelled', 'cancelling')
+											$userJoin
+											AND j.questionnaireid IS NULL
+											AND ma.type = 'content'
+										ORDER BY
+											j.id DESC
+										LIMIT
+											500
+									", 'j', false, false, true);
 
 									foreach ($jobs as $job) {
 										NewFormItem($f, $s, "jobid", "selectoption", $job->name, $job->id);
@@ -254,7 +267,24 @@ startWindow("Select ".help('ReportAttachmentSearch_Select'), NULL, false);
 									NewFormItem($f, $s, "jobid", "selectend");
 									NewFormItem($f, $s, "jobid_archived", "selectstart", null, null, "id='jobid_archived' style='display: none'");
 									NewFormItem($f, $s, "jobid_archived", "selectoption", "-- " . _L("Select a %s",getJobTitle()) . " --", "");
-									$jobs = DBFindMany("Job","from job where deleted = 2 and status!='repeating' $userJoin and questionnaireid is null order by id desc limit 500");
+
+									$jobs = DBFindMany('Job',"
+										FROM
+											job j
+											INNER JOIN message m ON (m.messagegroupid = j.messagegroupid)
+											INNER JOIN messageattachment ma ON (ma.messageid = m.id)
+										WHERE
+											j.deleted = 2
+											AND j.status != 'repeating'
+											$userJoin
+											AND j.questionnaireid IS NULL
+											AND ma.type = 'content'
+										ORDER BY
+											j.id DESC
+										LIMIT
+											500
+									", 'j', false, false, true);
+
 									foreach ($jobs as $job) {
 										NewFormItem($f, $s, "jobid_archived", "selectoption", $job->name, $job->id);
 									}
