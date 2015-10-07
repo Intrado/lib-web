@@ -19,6 +19,12 @@ if( (isset($_REQUEST['english']) && mb_strlen($_REQUEST['english']) > 5000) ||
 } else {
 	$translations = false;
 	if(isset($_REQUEST['english']) && isset($_REQUEST['languages'])) {
+		
+		$textNodeObj = parse_html_to_text($_REQUEST['english']);
+		
+		$nodeString = $textNodeObj->nodeString;
+		error_log($nodeString);
+		
 		$languagearray = explode("|",$_REQUEST['languages']);
 		$translations = translate_fromenglish($_REQUEST['english'], $languagearray);
 		if ($translations === false) {
