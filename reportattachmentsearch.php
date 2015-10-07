@@ -240,7 +240,6 @@ startWindow("Select ".help('ReportAttachmentSearch_Select'), NULL, false);
 									//if this user can see systemwide reports, then lock them to the customerid
 									//otherwise lock them to jobs that they own
 									$userJoin = (! $USER->authorize('viewsystemreports')) ? " AND j.userid = $USER->id " : '';
-									$userJoin = '';
 
 									NewFormItem($f, $s, "jobid", "selectstart", null, null, "id='jobid'");
 									NewFormItem($f, $s, "jobid", "selectoption", "-- " . _L("Select a %s",getJobTitle()) . " --", "");
