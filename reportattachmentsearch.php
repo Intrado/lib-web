@@ -248,6 +248,7 @@ startWindow("Select ".help('ReportAttachmentSearch_Select'), NULL, false);
 											job j
 											INNER JOIN message m ON (m.messagegroupid = j.messagegroupid)
 											INNER JOIN messageattachment ma ON (ma.messageid = m.id)
+											INNER JOIN messagepart mp ON (mp.messageid=m.id AND mp.messageattachmentid=ma.id and mp.type='MAL')
 										WHERE
 											j.deleted = 0
 											AND j.status IN ('active', 'complete', 'cancelled', 'cancelling')
@@ -272,6 +273,7 @@ startWindow("Select ".help('ReportAttachmentSearch_Select'), NULL, false);
 											job j
 											INNER JOIN message m ON (m.messagegroupid = j.messagegroupid)
 											INNER JOIN messageattachment ma ON (ma.messageid = m.id)
+											INNER JOIN messagepart mp ON (mp.messageid=m.id AND mp.messageattachmentid=ma.id and mp.type='MAL')
 										WHERE
 											j.deleted = 2
 											AND j.status != 'repeating'
