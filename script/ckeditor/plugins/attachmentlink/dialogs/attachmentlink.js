@@ -15,6 +15,10 @@ CKEDITOR.dialog.add('attachmentlink', function (editor) {
 			var editor = this.getParentEditor(),
 				element = this.getParentEditor().getSelection().getSelectedElement();
 
+			// position so that the dialog is near the editor and completely visible
+			var offsetTop = editor.element.$.offsetTop - 200; // 200 = minHeight
+			this.move(this.getPosition().x, offsetTop);
+
 			this.setupContent(element);
 			this.getContentElement('tab1', 'uploadstatus').getElement().setText('');
 			this.getContentElement('tab1', 'upload').getElement().show();
