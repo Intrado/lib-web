@@ -144,6 +144,48 @@ function googleTranslateV2($text, $sourcelanguage, $targetlanguages) {
 	return $translations;
 }
 
+/** 
+ *  Parses html string into an object containing all the text nodes as both a 
+ *  String ready for translation and as an Array of Strings for use after
+ *  translation.
+ * 
+ *  @params: String 
+ *  @returns Object { String, Array }
+ * 
+ */
+
+function parse_html_to_text ($htmlString) {
+	
+	$doc = new DOMDocument();
+	
+	$doc->loadHTML($htmlString);
+
+	$xpath = new DOMXPath($doc);
+	$textNodes = $xpath->query('//text()');
+
+	// to hold array of text node values
+	$textNodeValueArray = array();
+	// the complete string of nodes ready for translation
+	$nodeValueString ='';
+	
+	$nodeCount = $textNodes->length;
+	
+	for ($i = 0; $i < $nodeCount; $i++) {
+
+		$nodeText = "<node>{$textNodes->item($i)->nodeValue}</node>";
+
+		$textNodeValueArray[] = $nodeText;
+		
+		$nodeValueString .= $nodeText;
+	}
+	
+	$returnObj = (object) array(
+		"nodeString" => $nodeValueString,
+		"nodeArray" => $textNodeValueArray
+	);
+	
+	return $returnObj;
+}
 
 function translate_fromenglish($englishtext,$languagearray) {
 	return googleTranslateV2($englishtext,'en',$languagearray);
