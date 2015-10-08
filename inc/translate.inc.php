@@ -149,42 +149,86 @@ function googleTranslateV2($text, $sourcelanguage, $targetlanguages) {
  *  String ready for translation and as an Array of Strings for use after
  *  translation.
  * 
- *  @params: String 
- *  @returns Object { String, Array }
+ *  @params: String $htmlString: the HTML string to have text nodes pulled out
+ *  @params: String $delimiterTag: what will be used to delimit text nodes
+ *  @params: $DOMDocumentObj: a DOMDocument object passed in from translate.php
+ * 
+ *  @returns String: string representation of XML nodes
  * 
  */
 
-function parse_html_to_text ($htmlString) {
+function parse_html_to_node_string ($htmlString, $delimiterTag = 'node', $DOMDocumentObj) {
 	
-	$doc = new DOMDocument();
+	$DOMDocumentObj->loadHTML($htmlString);
+	$xpath = new DOMXPath($DOMDocumentObj);
 	
-	$doc->loadHTML($htmlString);
-
-	$xpath = new DOMXPath($doc);
 	$textNodes = $xpath->query('//text()');
-
-	// to hold array of text node values
-	$textNodeValueArray = array();
-	// the complete string of nodes ready for translation
-	$nodeValueString ='';
-	
 	$nodeCount = $textNodes->length;
 	
+	// make our root tag a plural of our delimiter tag
+	$delimiterRootTag = '<'.$delimiterTag.'s>';
+	$delimiterCloseRootTag = '</'.$delimiterTag.'s>';
+	
+	// create a String which will be sent off for translation
+	$nodeValueString = $delimiterRootTag;
+	
 	for ($i = 0; $i < $nodeCount; $i++) {
-
-		$nodeText = "<node>{$textNodes->item($i)->nodeValue}</node>";
-
-		$textNodeValueArray[] = $nodeText;
+		
+		$nodeText = "<{$delimiterTag}>"
+						. "{$textNodes->item($i)->nodeValue}"
+					. "</{$delimiterTag}>";
 		
 		$nodeValueString .= $nodeText;
 	}
 	
-	$returnObj = (object) array(
-		"nodeString" => $nodeValueString,
-		"nodeArray" => $textNodeValueArray
+	// close off our simple xml string
+	$nodeValueString .= $delimiterCloseRootTag;
+	
+	return $nodeValueString;
+}
+
+/** 
+ *  Takes string from translation service and substitutes the original text nodes 
+ *  from the given HTML for the newly translated nodes.
+ * 
+ *  @params: String $templateString: the HTML string to have translated text nodes substituted
+ *  @params: String $translatedNodeString: string of XML nodes returned from translation service
+ *  @params: $DOMDocumentObj: a DOMDocument object passed in from translate.php
+ * 
+ *  @returns String: compiled HTML after translated text nodes have been inserted
+ * 
+ */
+
+function parse_translated_nodes_to_html ($templateHtml, $translatedNodeString, $DOMDocumentObj) {
+	
+	
+	$DOMDocumentObj->loadHTML($templateHtml);
+	$xpath = new DOMXPath($DOMDocumentObj);
+	
+	$textNodes = $xpath->query('//text()');
+	$nodeCount = $textNodes->length;
+	
+	$xml = simplexml_load_string($translatedNodeString);
+	$translatedNodes = $xml->children();
+		
+	for ($i = 0; $i < $nodeCount; $i++) {
+		$textNodes->item($i)->nodeValue = (String) $translatedNodes[$i];
+	}
+	
+	// pull out the body tag of our document to reflect original HTML string.
+	$restoredHTML = $xpath->document->saveHTML(
+		$DOMDocumentObj->getElementsByTagName('body')->item(0)
 	);
 	
-	return $returnObj;
+	// remove the left-over body tag
+	$restoredHTML = str_replace('<body>', '', $restoredHTML);
+	$restoredHTML = str_replace('</body>', '', $restoredHTML);
+	
+	return $restoredHTML;
+}
+
+function string_contains_html($string) {
+	return $string != strip_tags($string) ? true: false;
 }
 
 function translate_fromenglish($englishtext,$languagearray) {
