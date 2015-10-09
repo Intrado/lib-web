@@ -12,29 +12,44 @@ if (!$MANAGERUSER->authorized("systemdm"))
 // Action Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-if (isset($_GET['delete'])) {
+if (isset($SETTINGS['lcrdb'])) {
 	$lcrdbcon = DBConnect($SETTINGS['lcrdb']['host'], $SETTINGS['lcrdb']['user'], $SETTINGS['lcrdb']['pass'], $SETTINGS['lcrdb']['db']);
-	QuickQuery("delete from carrierratemodelblock where id = ?", $lcrdbcon, array($_GET['delete']));
-	notice("Pattern deleted.");
-}
+
+	if (isset($_GET['delete'])) {
+		QuickQuery("delete from carrierratemodelblock where id = ?", $lcrdbcon, array($_GET['delete']));
+		notice("Pattern deleted.");
+	}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
-$lcrdbcon = DBConnect($SETTINGS['lcrdb']['host'], $SETTINGS['lcrdb']['user'], $SETTINGS['lcrdb']['pass'], $SETTINGS['lcrdb']['db']);
-$carrierRateModels = QuickQueryMultiRow("select id, name  from carrierratemodel", true, $lcrdbcon);
+	$carrierRateModels = QuickQueryMultiRow("select id, name  from carrierratemodel", true, $lcrdbcon);
 
-$carrierRateModelBlocks = QuickQueryMultiRow("
-	select crmb.id as id, crmb.carrierRateModelClassname as carrierRateModelClassname, crmb.createdate as createdate, crmb.notes as notes, crmb.pattern as pattern
-	from carrierratemodelblock crmb
-	order by crmb.carrierRateModelClassname, crmb.pattern asc",true,$lcrdbcon);
+	$carrierRateModelBlocks = QuickQueryMultiRow("
+		select 
+			crmb.id as id,
+			crmb.carrierRateModelClassname as carrierRateModelClassname,
+			crmb.createdate as createdate,
+			crmb.notes as notes,
+			crmb.pattern as pattern
+		from
+			carrierratemodelblock crmb
+		order by
+			crmb.carrierRateModelClassname,
+			crmb.pattern asc
+	", true, $lcrdbcon);
+} else {
+	$carrierRateModels = $carrierRateModelBlocks = array();
+}
 
-$titles = array("id" => "Block ID",
-				"carrierRateModelClassname" => "Rate Model Name",
-				"pattern" => "Block Pattern",
-				"createdate" => "Date Added",
-				"notes" => "Notes",
-				"actions" => "Actions");
+$titles = array(
+	"id" => "Block ID",
+	"carrierRateModelClassname" => "Rate Model Name",
+	"pattern" => "Block Pattern",
+	"createdate" => "Date Added",
+	"notes" => "Notes",
+	"actions" => "Actions"
+);
 
 $formatters = array("actions" => "fmt_dmgroupblock_actions");
 
