@@ -168,7 +168,6 @@ function tai_setup($customerid) {
 		error_log("debug: tai schema already exists, skip setup customerid $customerid");
 		return;
 	}
-	error_log("debug: tai setup customerid $customerid");
 
 	// create customer tables
 	$tablequeries = explode("$$$",file_get_contents("../db/taicustomer.sql"));

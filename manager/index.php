@@ -34,7 +34,6 @@ if(isset($_POST["submit"])) {
 
 	$id = AspAdminUser::doLogin($login, $password);
 	if($id){
-		error_log("Manager login by $login");
 		$_SESSION['aspadminuserid'] = $id;
 		
 		$autologoutminutes = isset($SETTINGS['feature']['autologoutminutes']) ? $SETTINGS['feature']['autologoutminutes'] : 30;

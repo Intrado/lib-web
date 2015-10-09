@@ -44,11 +44,9 @@ function getAgentList() {
 }
 
 function resetAgent($uuid) {
-	error_log("resetAgent");
 	$params = array(new XML_RPC_Value($uuid, 'string'), new XML_RPC_Value("RESET", 'string'), new XML_RPC_Value("", 'string'));
 	$method = "Internalapi.sendCommandToAgent";
 	$result = pearxmlrpcDisk($method, $params);
-	error_log($result);
 	if ($result !== false) {
 		// success
 		return true;
