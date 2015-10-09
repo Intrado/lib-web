@@ -160,15 +160,25 @@ function handleRequest() {
                 return false;
 
         case 'list':
-            if (!isset($_GET['listid']))
-	            return Array("status" => "invalidParameter", "message" => "Recipient list not specified");
+            if (!isset($_GET['listid'])) {
+	            header("HTTP/1.1 404 Not Found");
+	            return Array();
+            }
 
             $id = $_GET['listid'];
 
-            if (!userOwns('list', $id) && !isSubscribed('list', $id))
-	            return Array("status" => "listNotFound", "message" => "Recipient list $id not found");
+            if ($id == '' || (!userOwns('list', $id) && !isSubscribed('list', $id))) {
+	            header("HTTP/1.1 404 Not Found");
+	            return Array();
+            }
 
             $list = new PeopleList($id+0);
+
+			if ($list->deleted) {
+				header("HTTP/1.1 404 Not Found");
+				return Array();
+			}
+
             $listrules = $list->getListRules();
 
             foreach ($listrules as $ruleid => $rule) {
