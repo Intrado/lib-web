@@ -4,8 +4,8 @@ require_once("common.inc.php");
 include ("../jpgraph/jpgraph.php");
 include ("../jpgraph/jpgraph_line.php");
 include ("../jpgraph/jpgraph_log.php"); 
-if(!$MANAGERUSER->authorized("aspcallgraphs"))
-	exit("Not authorized");
+if (! $MANAGERUSER->authorized("aspcallgraphs")) exit("Not authorized");
+if (! isset($SETTINGS['aspcalls'])) exit('aspcalls not configured');
 
 session_write_close();
 
