@@ -39,6 +39,7 @@ class SMSAggregatorData {
 		FROM shortcode
 		INNER JOIN shortcodegroup ON shortcodegroup.id=shortcode.`shortcodegroupid`
 		INNER JOIN smsaggregator ON shortcode.`smsaggregatorid`=smsaggregator.id
+		WHERE shortcodegroup.product="cs"
 		ORDER BY shortcodeid';
 
 		// query shortcode group names and ids into associative array
