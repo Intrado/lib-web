@@ -398,7 +398,7 @@ class Message extends DBMappedObject {
 				case "MAL": $endtoken = '}>'; break;
 				case "HMAL": $endtoken = '</a>'; break;
 			}
-			$length = @strpos($data, $endtoken, $pos + 1);
+			$length = @stripos($data, $endtoken, $pos + 1);
 
 			if ($length === false) {
 				$errors[] = "Can't find end of field, was expecting '$endtoken'";
