@@ -41,7 +41,7 @@ if( (isset($_REQUEST['english']) && mb_strlen($_REQUEST['english']) > 5000) ||
 		// compare string to an HTML-stripped version of the string.
 		// if they are different, we have HTML tags
 		if($requestStringContainsHTML) {
-			$stringToTranslate = parse_html_to_node_obj(
+			$stringToTranslate = parse_html_to_node_string (
 					$originalRequestString, 
 					'n', 
 					$DOMDocumentObj);
