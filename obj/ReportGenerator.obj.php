@@ -200,7 +200,7 @@ abstract class ReportGenerator {
 		$resp = $cli->send($msg, 600);
 
 		if (!$resp) {
-	    	error_log($method . ' communication error: ' . $cli->errstr);
+	    	error_log('ReportGenerator.obj.php::reportxmlrpc(): ' . $method . ' communication error: ' . $cli->errstr);
 		} else if ($resp->faultCode()) {
 			error_log($method . ' Fault Code: ' . $resp->faultCode() . ' Fault Reason: ' . $resp->faultString());
 		} else {

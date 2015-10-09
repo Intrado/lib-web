@@ -12,7 +12,7 @@ function pearxmlrpc($method, $params) {
 	$resp = $cli->send($msg);
 
 	if (!$resp) {
-    		error_log($method . ' communication error: ' . $cli->errstr);
+    		error_log('authclient.inc.php::f.pearxmlrpc(): ' . $method . ' communication error: ' . $cli->errstr);
 	} else if ($resp->faultCode()) {
 		error_log($method . ' Fault Code: ' . $resp->faultCode() . ' Fault Reason: ' . $resp->faultString());
 	} else {

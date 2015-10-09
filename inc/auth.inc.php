@@ -20,7 +20,7 @@ function pearxmlrpc($method, $params, $returndata = false) {
 		$timeout = 90; //this timeout must exceed the authserver's configured lockTimeout setting to avoid a cascading backlog of disconnected requests
 		$resp = $cli->send($msg, $timeout); 
 		if (!$resp) {
-			$errmsg = $method . ' communication error: "' . $cli->errstr . '". Have been trying for ' . (time() - $starttime) . 's attempt ' . $attempt;
+			$errmsg = 'auth.inc.php::f.pearxmlrpc(): ' . $method . ' communication error: "' . $cli->errstr . '". Have been trying for ' . (time() - $starttime) . 's attempt ' . $attempt;
 			if (function_exists("error_log_helper"))
 				error_log_helper($errmsg);
 			else

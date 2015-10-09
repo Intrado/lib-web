@@ -12,10 +12,10 @@ function pearxmlrpcDisk($method, $params) {
 
 	$resp = $cli->send($msg);
 
-	if (!$resp) {
-    	error_log($method . ' communication error: ' . $cli->errstr);
+	if (! $resp) {
+		error_log('diskclient.inc.php::f.pearxmlrpcDisk(): ' . $method . ' communication error: ' . $cli->errstr);
 	} else if ($resp->faultCode()) {
-		error_log($method . ' Fault Code: ' . $resp->faultCode() . ' Fault Reason: ' . $resp->faultString());
+		error_log('diskclient.inc.php::f.pearxmlrpcDisk(): ' . $method . ' Fault Code: ' . $resp->faultCode() . ' Fault Reason: ' . $resp->faultString());
 	} else {
 		$val = $resp->value();
     	$data = XML_RPC_decode($val);
