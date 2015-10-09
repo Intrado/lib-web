@@ -240,12 +240,7 @@ function putSessionData($id, $sess_data) {
 	$params = array(new XML_RPC_Value($id, 'string'), new XML_RPC_Value($sess_data, 'string'));
 	$method = "AuthServer.putSessionData";
 	$result = pearxmlrpc($method, $params);
-	if ($result === false) { 
-		error_log_helper("ERROR trying to putSessionData for '$id'", false);
-		return false;
-	} else {
-		return true;
-	}
+	return ($result === false) ? false : true;
 }
 
 //fires up the session, sets timezone, and connects to the db
