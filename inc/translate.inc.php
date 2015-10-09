@@ -227,8 +227,13 @@ function parse_translated_nodes_to_html ($templateHtml, $translatedNodeString, $
 	return $restoredHTML;
 }
 
-function string_contains_html($string) {
-	return $string != strip_tags($string) ? true: false;
+function set_error_response_and_log ($responseObj, $errorMsg) {
+	error_log($errorMsg);
+	$responseObj->responseData = "";
+	$responseObj->responseDetails = NULL;
+	$responseObj->responseStatus = 503;
+	
+	return $responseObj;
 }
 
 function translate_fromenglish($englishtext,$languagearray) {
