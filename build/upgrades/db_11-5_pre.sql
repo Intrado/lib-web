@@ -6,3 +6,7 @@ ALTER TABLE `reportcontact`
  'unreachabledest', 'unknowndest', 'landline', 'carrierviolation', 'unknownerror')
  NOT NULL DEFAULT 'notattempted';
 $$$
+
+-- $rev 2
+
+-- dummy, no change
