@@ -154,7 +154,7 @@ function handleRequest() {
 			$list->description = ($_POST['description'] ? $_POST['description'] : 'Created in MessageSender');
 			$list->userid = $USER->id;
 			$list->name = $listName;
-			$list->deleted = ($_POST['save'] ? 0 : 1);
+			$list->deleted = (isset($_POST['save']) && $_POST['save']) ? 0 : 1;
 			$list->type = isset($_POST['sectionids']) ? 'section' : 'person';
 
 			if (isset($_REQUEST['api'])) {

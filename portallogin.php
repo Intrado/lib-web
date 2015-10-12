@@ -44,7 +44,7 @@ if (isset($_REQUEST["is_return"])) {
 	// create a brand new session
 	newSession();
 	doStartSession();
-	$http = ($_SERVER["HTTPS"]?"https://":"http://");
+	$http = isset($_SERVER["HTTPS"]) ? 'https://' : 'http://';
 	$redirectLoc = getPortalAuthAuthRequestTokenUrl($http. $_SERVER['SERVER_NAME']. $_SERVER['REQUEST_URI']. "?is_return");
 }
 redirect($redirectLoc);
