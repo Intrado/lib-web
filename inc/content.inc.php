@@ -34,6 +34,10 @@ function getHttpResponseContents ($fp) {
 
 function contentGet ($cmid, $base64 = false) {
 	$filedata = commsuite_contentGet($cmid);
+	if (! is_object($filedata)) {
+		error_log_helper('content.inc.php::contentGet() - Error retrieving content, possible data integrity issue for content ID=[' . $cmid . ']');
+		return null;
+	}
 	if ($base64)
 		return array($filedata->contenttype, base64_encode($filedata->data));
 	else
