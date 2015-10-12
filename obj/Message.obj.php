@@ -331,10 +331,21 @@ class Message extends DBMappedObject {
 
 			$matches = array();
 			$uploadattachmenturl = "";
-			if (preg_match("/(\<a .*?href\=\"[^\=]*emailattachment\.php\?)/", strtolower($data), $matches)) {
-				// we only care about the first match
-				$uploadattachmenturl = $matches[1];
-				$pos_ma = stripos($data, $uploadattachmenturl);
+			if (stripos($data, '/emailattachment.php') !== false) {
+				if (preg_match("/(\<a .*?href\=\"[^\={]*emailattachment\.php\?)/", strtolower($data), $matches)) {
+					// we only care about the first match
+					$uploadattachmenturl = $matches[1];
+					$pos_ma = stripos($data, $uploadattachmenturl);
+				} else {
+					$pos_ma = false;
+					$ha_info_array = array(
+						"message" => $data,
+						"userAgent" => $_SERVER['HTTP_USER_AGENT'],
+						"customerId" => getSystemSetting("_customerid"),
+						"userId" => $USER->id
+					);
+					error_log("DEBUG_HA_JSON: " . print_r($ha_info_array, true));
+				}
 			} else {
 				$pos_ma = false;
 			}
