@@ -168,8 +168,8 @@ if ($job->hasSMS()) {
 	$smsinfo = JobSummaryReport::getSmsInfo($job->id, $readonlyconn);
 	$destinationresults['sms'] = array(
 		'recipients' => (int)$smsinfo['total'],
-		'completed' => (int)$smsinfo['done'],
-		'remaining' => (int)$smsinfo['remaining'],
+		'completed' => (int)$smsinfo['delivered'],
+		'remaining' => (int)$smsinfo['pending'],
 		'percentcontacted' => isset($smsinfo['success_rate']) ? sprintf("%0.2f%%", $smsinfo['success_rate']) : "N/A"
 	);
 }
