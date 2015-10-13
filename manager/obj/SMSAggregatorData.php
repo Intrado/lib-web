@@ -4,30 +4,35 @@
 
 class SMSAggregatorData {
 
-	public $currentShortcodeGroupId;
+	public $customerId;
+	public $originalShortcodeGroupId;
 	public $shortcodeData;
 	public $shortcodeGroups;
 	
 	public function init($customerId) {
 
-		$this->currentShortcodeGroupId = $this->getCurrentShortcodeGroupId($customerId);
+		$this->customerId = $customerId;
+		
+		$this->originalShortcodeGroupId = $this->getCurrentShortcodeGroupId();
 		$this->shortcodeData = $this->fetchRequiredData();
 		$this->shortcodeGroups = $this->getAllShortCodeGroups(); 
 		
 	}
 
 	// gets the current short code group id of the customer
-	public function getCurrentShortcodeGroupId($customerId) {
-
-		$shortCodeGroupId = null;
-
-		if ($customerId) {
-			$shortCodeGroupId = QuickQuery("select shortcodegroupid from customer where id = ?", null, array($customerId));
-		}
+	public function getCurrentShortcodeGroupId() {
+		
+		$shortCodeGroupId = QuickQuery("select shortcodegroupid from customer where id = ?", null, array($this->customerId));
 
 		return $shortCodeGroupId;
 	}
 
+	// check to see if shortcodeGroup selection has changed
+	public function shortcodeGroupHasChanged($newShortcodeGroupId) {
+		
+		return ( $newShortcodeGroupId !== $this->originalShortcodeGroupId ) ? true : false;
+	}
+	
 	// fetches all required data to be displayed below dropdown aggregator form-item
 	public function fetchRequiredData() {
 
@@ -48,11 +53,11 @@ class SMSAggregatorData {
 		return $results;
 	}
 	
-	public function storeSelection ($customerId, $selection) {
+	public function storeSelection ($selection) {
 		
-		$query = "update customer set shortcodegroupid=$selection where id = $customerId";
+		$query = "update customer set shortcodegroupid=$selection where id = ?";
 		
-		return QuickQuery($query);
+		return QuickQuery($query, null, array($this->customerId));
 	}
 	
 	public function jmxUpdateShortcodeGroups () {
@@ -91,7 +96,7 @@ class SMSAggregatorData {
 		$result = curl_exec($ch);
 
 		// if cURL could not execute
-		if (! result) {
+		if (! $result) {
 			$errorString = "cURL request  <b style='color:darkred'>FAILED</b> attempting to update shortcode groups for: (<b>$domain)</b>) --stack trace: " . curl_error($ch);
 			
 			error_log($errorString);
@@ -111,7 +116,6 @@ class SMSAggregatorData {
 		
 		// no problems!
 		return false;
-		
 	}
 	
 	// parse response JSON string into an array

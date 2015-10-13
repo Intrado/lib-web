@@ -552,7 +552,7 @@ $formdata["smscustomername"] = array(
 
 $formdata["shortcodegroup"] = array(
 	"label" => _L('Shortcode Group'),
-	"value" => $smsAggregatorData->currentShortcodeGroupId,
+	"value" => $smsAggregatorData->originalShortcodeGroupId,
 	"validators" => array(
 		array("ValInArray", "values" => array_keys(
 				$smsAggregatorData->shortcodeGroups
@@ -982,16 +982,10 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		
 		// updating SMS shortcode requires updating authserver -> customer. SQL in SMSAggregatorData.php
 		if(isset($postdata["shortcodegroup"])) {
-			
-			// update customer's shortcode group in 'customer' table on 'authserv' db
-			$smsAggregatorData->storeSelection($customerid, $postdata["shortcodegroup"]);
-			
-			// get array of error codes for all domains where cURL request failed to refresh their shortcode groups
-			$errorsArray = $smsAggregatorData->jmxUpdateShortcodeGroups();
-			
-			if(! empty($errorsArray)) {
+			if($smsAggregatorData->shortcodeGroupHasChanged($postdata["shortcodegroup"])){
 				
-				$_SESSION['confirmnotice'] = $errorsArray;
+				// update customer's shortcode group in 'customer' table on 'authserv' db
+				$smsAggregatorData->storeSelection($postdata["shortcodegroup"]);
 				
 			}
 		}
@@ -1097,8 +1091,22 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		// CMA App ID is integer value only at this time.
 		setCustomerSystemSetting('_cmaappid', $postdata['cmaappid'], $custdb);
 		
-		
 		Query("COMMIT");
+		
+		// if there is $postdata and the shortcodeGroup has changed
+		if(isset($postdata["shortcodegroup"])) {
+			if($smsAggregatorData->shortcodeGroupHasChanged($postdata["shortcodegroup"])){
+				
+				$errorsArray = $smsAggregatorData->jmxUpdateShortcodeGroups();
+			
+				if(! empty($errorsArray)) {
+					$_SESSION['confirmnotice'] = $errorsArray;
+				}
+			}
+		}
+		
+		// get array of error codes for all domains where cURL request failed to refresh their shortcode groups
+		
  		if($button == "done") {
 			if ($ajax)
 				$form->sendTo($returntopage);
