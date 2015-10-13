@@ -160,9 +160,9 @@
         elements[i].classList.remove('ckimgrsz');
       }
       this.hideHandles();
-      if (this.container.parentNode) {
-        this.container.parentNode.removeChild(this.container);
-      }
+      // if (this.container.parentNode) {
+      //   this.container.parentNode.removeChild(this.container);
+      // }
     },
     initDrag: function(e) {
       if (e.button !== 0) {
@@ -220,7 +220,7 @@
     hideHandles: function() {
       var handles = this.handles;
       for (var n in handles) {
-        handles[n].style.display = 'none';
+        //handles[n].style.display = 'none';
       }
     },
     showPreview: function() {
