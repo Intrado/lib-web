@@ -1176,10 +1176,6 @@ document.observe('dom:loaded', function() {
 	$('newcustomer_shortcodegroup').observe("change", function (event) {
 		smsFunctions.showData();
 	});
-	
-//	jQuery('button').on("click", function (event) {
-//		alert('hi');
-//	});
 });
 <? Validator::load_validators(array("ValInboundNumber","ValUrlComponent","ValSmsText","ValLanguages","ValUrl","ValClassroom", "ValInteger",
 	 'ValPortalSelection'));?>
