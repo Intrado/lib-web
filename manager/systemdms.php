@@ -1,4 +1,5 @@
 <?
+const MIN_FRESHNESS = 30;
 require_once("common.inc.php");
 require_once("../inc/form.inc.php");
 require_once("../inc/html.inc.php");
@@ -95,11 +96,13 @@ function fmt_dmstatus($row,$index) {
 	if ($row[4] != "active") {
 		$problems[] = "Not Authorized";
 	} else {
-		if (!ip4HostIsInNetwork($row[3],$row[2]))
+		if (!ip4HostIsInNetwork($row[3], $row[2])) {
 			$problems[] = "IP Mismatch";
+		}
 
-		if ($row[5]/1000 < time() - 30)
+		if ($row[17] > MIN_FRESHNESS) {
 			$problems[] = "DM Lost Connection";
+		}
 	}
 
 	if (count($problems))
@@ -115,11 +118,13 @@ function fmt_dmstatus_nohtml($row,$index, $usehtml=true) {
 	if ($row[4] != "active") {
 		$problems[] = "Not Authorized";
 	} else {
-		if (!ip4HostIsInNetwork($row[3],$row[2]))
+		if (!ip4HostIsInNetwork($row[3],$row[2])) {
 			$problems[] = "IP Mismatch";
+		}
 
-		if ($row[5]/1000 < time() - 30)
+		if ($row[17] > MIN_FRESHNESS) {
 			$problems[] = "DM Lost Connection";
+		}
 	}
 
 	if (count($problems))
@@ -209,7 +214,8 @@ $dms = array();
 $query = "select dm.id, dm.name, dm.authorizedip, dm.lastip,
 			dm.enablestate, dm.lastseen, dm.version, dm.dmuuid, dm.command, s_telco_calls_sec.value as telco_calls_sec, 
 			s_telco_type.value as telco_type, s_delmech_resource_count.value as delmech_resource_count,
-			s_telco_inboundtoken.value as telco_inboundtoken, '' as poststatus, dm.routetype, dm.dmgroupid, dm.notes
+			s_telco_inboundtoken.value as telco_inboundtoken, '' as poststatus, dm.routetype, dm.dmgroupid, dm.notes,
+			now() - from_unixtime(dm.lastseen/1000) as freshness
 			from dm dm
 			left join dmsetting s_telco_calls_sec on 
 					(dm.id = s_telco_calls_sec.dmid 
