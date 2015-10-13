@@ -332,7 +332,7 @@ class Message extends DBMappedObject {
 			$matches = array();
 			$uploadattachmenturl = "";
 			if (stripos($data, 'emailattachment.php') !== false) {
-				if (preg_match("/(\<a .*?href\=['\"]?\S*emailattachment\.php\?id\=)/", strtolower($data), $matches)) {
+				if (preg_match("/(\<a [^>]*?href\=['\"]?\S*?emailattachment\.php\?id\=)/", strtolower($data), $matches)) {
 					// we only care about the first match
 					$uploadattachmenturl = $matches[1];
 					$pos_ma = stripos($data, $uploadattachmenturl);
