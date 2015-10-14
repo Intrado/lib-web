@@ -3162,3 +3162,24 @@ update setting set value='11.4/7' where name='_dbversion'
 $$$
 
 -- END 11.4/7
+
+ALTER TABLE `reportcontact`
+MODIFY COLUMN `result` ENUM('C', 'A', 'M', 'N', 'B', 'X', 'F', 'sent',
+'unsent', 'printed', 'notprinted', 'notattempted', 'duplicate', 'blocked',
+'declined', 'queued', 'sending', 'delivered', 'undelivered',
+'queueoverflow', 'accountsuspended', 'unreachabledest', 'unknowndest',
+'landline', 'carrierviolation', 'unknownerror')
+NOT NULL DEFAULT 'notattempted';
+$$$
+
+update setting set value='11.5/1' where name='_dbversion'
+$$$
+
+-- END 11.5/1
+
+-- dummy, no change
+
+update setting set value='11.5/2' where name='_dbversion'
+$$$
+
+-- END 11.5/2

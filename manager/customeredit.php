@@ -23,9 +23,12 @@ require_once("obj/ValUrl.val.php");
 require_once("obj/LogoRadioButton.fi.php");
 require_once("obj/LanguagesItem.fi.php");
 require_once("obj/ValInboundNumber.val.php");
+require_once("obj/SMSAggregator.fi.php");
+require_once("obj/SMSAggregatorData.php");
 require_once("../obj/ValInteger.val.php");
 require_once("../obj/ApiClient.obj.php");
 require_once("../obj/CmaApiClient.obj.php");
+
 
 // For Quick Tip TAI table activation stuffs
 require_once("loadtaitemplatedata.php");
@@ -345,11 +348,9 @@ $shards = QuickQueryList("select id, name from shard where not isfull order by i
 
 $dmmethod = array('' => '--Choose a Method--', 'asp' => 'CommSuite (fully hosted)','hybrid' => 'CS + SmartCall + Emergency','cs' => 'CS + SmartCall (data only)');
 
-if ($customerid)
-	$shortcodegroupname = QuickQuery("select description from shortcodegroup where id = (select shortcodegroupid from customer where id = ?)", null, array($customerid));
-else
-	$shortcodegroupname = QuickQuery("select description from shortcodegroup where id = 1"); // hardcoded id=1 is the default group for new customers
-
+// SMS Aggregator form item data
+$smsAggregatorData = new SMSAggregatorData();
+$smsAggregatorData->init($customerid);
 
 $helpstepnum = 1;
 $formdata = array(_L('Basics'));
@@ -549,11 +550,22 @@ $formdata["smscustomername"] = array(
 	"helpstep" => $helpstepnum
 );
 
-$formdata["shortcodegroupname"] = array(
-	"label" => _L("Shortcode Group"),
-	"control" => array("FormHtml","html"=>"<div>".$shortcodegroupname."</div>"),
-	"helpstep" => $helpstepnum
+$formdata["shortcodegroup"] = array(
+	"label" => _L('Shortcode Group'),
+	"value" => $smsAggregatorData->originalShortcodeGroupId,
+	"validators" => array(
+		array("ValInArray", "values" => array_keys(
+				$smsAggregatorData->shortcodeGroups
+			))
+	),
+	"control" => array("SMSAggregator", "values" => 
+		array(
+			"form" => $smsAggregatorData->shortcodeGroups,
+			"js" => $smsAggregatorData->shortcodeData
+	),
+	"helpstep" => $helpstepnum)
 );
+
 
 $formdata[] = _L("API");
 // -----------------------------------------------------------------------------
@@ -944,7 +956,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		setCustomerSystemSetting('maxsms', $postdata["maxsms"], $custdb);
 		setCustomerSystemSetting('enablesmsoptin', $postdata["enablesmsoptin"]?'1':'0', $custdb);
 		setCustomerSystemSetting('smscustomername', $postdata["smscustomername"], $custdb);
-
+		
 		setCustomerSystemSetting('_hassmapi', $postdata["hassmapi"]?'1':'0', $custdb);
 		// Set oem,oemid and nsid in authserver customer table
 		
@@ -967,6 +979,16 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		setCustomerSystemSetting('_hassurvey', $postdata["hassurvey"]?'1':'0', $custdb);
 		setCustomerSystemSetting('_hasldap', $postdata["hasldap"]?'1':'0', $custdb);
 		setCustomerSystemSetting('_hasenrollment', $postdata["hasenrollment"]?'1':'0', $custdb);
+		
+		// updating SMS shortcode requires updating authserver -> customer. SQL in SMSAggregatorData.php
+		if(isset($postdata["shortcodegroup"])) {
+			if($smsAggregatorData->shortcodeGroupHasChanged($postdata["shortcodegroup"])){
+				
+				// update customer's shortcode group in 'customer' table on 'authserv' db
+				$smsAggregatorData->storeSelection($postdata["shortcodegroup"]);
+				
+			}
+		}
 		
 		$originalProvider = $settings['_defaultttsprovider'];
 		$originalDMMethod = $settings['_dmmethod'];
@@ -1069,9 +1091,23 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		// CMA App ID is integer value only at this time.
 		setCustomerSystemSetting('_cmaappid', $postdata['cmaappid'], $custdb);
 		
-
 		Query("COMMIT");
-		if($button == "done") {
+		
+		// if there is $postdata and the shortcodeGroup has changed
+		if(isset($postdata["shortcodegroup"])) {
+			if($smsAggregatorData->shortcodeGroupHasChanged($postdata["shortcodegroup"])){
+				
+				$errorsArray = $smsAggregatorData->jmxUpdateShortcodeGroups();
+			
+				if(! empty($errorsArray)) {
+					$_SESSION['confirmnotice'] = $errorsArray;
+				}
+			}
+		}
+		
+		// get array of error codes for all domains where cURL request failed to refresh their shortcode groups
+		
+ 		if($button == "done") {
 			if ($ajax)
 				$form->sendTo($returntopage);
 			else
@@ -1143,6 +1179,10 @@ document.observe('dom:loaded', function() {
 		var checkbox = $('newcustomer_enabled');
 		if (checkbox.checked == 0) 
 			checkbox.checked = !confirm("Are you sure you want to DISABLE this customer?");
+	});
+	
+	$('newcustomer_shortcodegroup').observe("change", function (event) {
+		smsFunctions.showData();
 	});
 });
 <? Validator::load_validators(array("ValInboundNumber","ValUrlComponent","ValSmsText","ValLanguages","ValUrl","ValClassroom", "ValInteger",

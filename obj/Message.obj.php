@@ -331,10 +331,21 @@ class Message extends DBMappedObject {
 
 			$matches = array();
 			$uploadattachmenturl = "";
-			if (preg_match("/(\<a class=\"message-attachment-placeholder\".*? href\=\"[^\=]*emailattachment\.php\?)/", strtolower($data), $matches)) {
-				// we only care about the first match
-				$uploadattachmenturl = $matches[1];
-				$pos_ma = stripos($data, $uploadattachmenturl);
+			if (stripos($data, 'emailattachment.php') !== false) {
+				if (preg_match("/(\<a [^>]*?href\=['\"]?\S*?emailattachment\.php\?id\=)/", strtolower($data), $matches)) {
+					// we only care about the first match
+					$uploadattachmenturl = $matches[1];
+					$pos_ma = stripos($data, $uploadattachmenturl);
+				} else {
+					$pos_ma = false;
+					$ha_info_array = array(
+						"message" => $data,
+						"userAgent" => $_SERVER['HTTP_USER_AGENT'],
+						"customerId" => getSystemSetting("_customerid"),
+						"userId" => $USER->id
+					);
+					error_log("DEBUG_HA_JSON: " . print_r($ha_info_array, true));
+				}
 			} else {
 				$pos_ma = false;
 			}
@@ -398,7 +409,7 @@ class Message extends DBMappedObject {
 				case "MAL": $endtoken = '}>'; break;
 				case "HMAL": $endtoken = '</a>'; break;
 			}
-			$length = @strpos($data, $endtoken, $pos + 1);
+			$length = @stripos($data, $endtoken, $pos + 1);
 
 			if ($length === false) {
 				$errors[] = "Can't find end of field, was expecting '$endtoken'";
