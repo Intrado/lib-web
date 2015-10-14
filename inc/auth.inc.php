@@ -58,7 +58,6 @@ function pearxmlrpc($method, $params, $returndata = false) {
 			return $data;
 		} else if ($data['result'] == "warning") {
 			// warning we do not log, but handle like failure
-			//error_log($method . " " .$data['result'] . " " . $data['resultdetail']);
 		} else {
 			// error
 			error_log($method . " " .$data['result'] . " " . $data['resultdetail']);
@@ -213,9 +212,6 @@ function getSessionDataReadOnly($id) {
 		$sess_data = base64url_decode($result['sessionData']);
 		if (doDBConnect($result)) return $sess_data;
 	}
-	//else {
-	//	error_log_helper("ERROR trying to getSessionDataReadOnly for '$id'");
-	//}
 	return "";
 }
 
@@ -228,9 +224,6 @@ function getSessionData($id) {
 		$sess_data = base64url_decode($result['sessionData']);
 		if (doDBConnect($result)) return $sess_data;
 	}
-	//else {
-	//	error_log_helper("ERROR trying to getSessionData for '$id'");
-	//}
 	return "";
 }
 
