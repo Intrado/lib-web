@@ -92,9 +92,9 @@ class JobSummaryReport extends ReportGenerator{
 	static function getSmsInfo($joblist, $readonlyconn) {
 		$smsquery = "select 
 						count(rc.jobid) as total,
-						sum(rc.result in ('duplicate', 'blocked', 'declined')) as filtered, 
+						sum(rc.result in ('duplicate', 'blocked', 'declined', 'notattempted')) as filtered, 
 						sum(rc.result in ('queued', 'sending')) as pending,
-						count(rc.jobid) - sum(rc.result in ('duplicate', 'blocked', 'declined')) - sum(rc.result in ('delivered', 'sent')) -  sum(rc.result in ('queued', 'sending')) as undelivered,
+						count(rc.jobid) - sum(rc.result in ('duplicate', 'blocked', 'declined', 'notattempted')) - sum(rc.result in ('delivered', 'sent')) -  sum(rc.result in ('queued', 'sending')) as undelivered,
 						sum(rc.result in ('delivered', 'sent')) as delivered
 					from 
 						reportcontact rc
