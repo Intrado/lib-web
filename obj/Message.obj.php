@@ -480,7 +480,6 @@ class Message extends DBMappedObject {
 								}
 							//otherwise search all audiofiles, preferring recent files
 							} else {
-								error_log_helper("WARNING: searching all audio files, may result in wrong results!"); 
 								$query = "select id from audiofile where userid=? and name=? and deleted = 0 order by recorddate desc";
 								$audioid = QuickQuery($query, false, array($USER->id, $afname));
 							}
