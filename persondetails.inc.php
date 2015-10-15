@@ -27,7 +27,7 @@ include_once("obj/DeviceServiceApiClient.obj.php");
 //
 if (!isset($_REQUEST["api"])) {
 	header("HTTP/1.1 404 Not Found");
-	exit(json_encode(Array("code" => "resourceNotFound")));
+	exit();
 }
 
 if (isset($_GET['id']) && $_GET['id'] != '') {
@@ -40,15 +40,13 @@ if (isset($_GET['id']) && $_GET['id'] != '') {
 	$bind = array($pkey);
 } else {
 	header("HTTP/1.1 404 Not Found");
-	header('Content-Type: application/json');
-	exit(json_encode(Array("code" => "resourceNotFound")));
+	exit();
 }
 
 // validate user has rights to view this contact
 if (!$USER->canSeePerson($personid, $pkey)) {
 	header("HTTP/1.1 404 Not Found");
-	header('Content-Type: application/json');
-	exit(json_encode(Array("code" => "personNotFound")));
+	exit();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

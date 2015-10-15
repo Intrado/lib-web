@@ -14,8 +14,7 @@ include_once("obj/Phone.obj.php");
 
 if (!isset($_REQUEST['api'])) {
 	header("HTTP/1.1 404 NotFound");
-	header("Content-Type: application/json");
-	exit(json_encode(Array("code" => "resourceNotFound")));
+	exit();
 }
 
 if (!$USER->authorize('managesystem')) {
@@ -28,8 +27,7 @@ $ntid = $_REQUEST['ntid'];
 
 if (!strlen($ntid)) {
 	header("HTTP/1.1 404 NotFound");
-	header("Content-Type: application/json");
-	exit(json_encode(Array("code" => "resourceNotFound")));
+	exit();
 }
 
 $systemprioritynames = array(
@@ -73,6 +71,5 @@ if ($dtype) {
 	$dtype->update();
 } else {
 	header("HTTP/1.1 404 NotFound");
-	header("Content-Type: application/json");
-	exit(json_encode(Array("code" => "notificationTypeNotFound")));
+	exit();
 }

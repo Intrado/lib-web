@@ -162,21 +162,21 @@ function handleRequest() {
         case 'list':
             if (!isset($_GET['listid'])) {
 	            header("HTTP/1.1 404 Not Found");
-	            return Array();
+	            return;
             }
 
             $id = $_GET['listid'];
 
             if ($id == '' || (!userOwns('list', $id) && !isSubscribed('list', $id))) {
 	            header("HTTP/1.1 404 Not Found");
-	            return Array();
+	            return;
             }
 
             $list = new PeopleList($id+0);
 
 			if ($list->deleted) {
 				header("HTTP/1.1 404 Not Found");
-				return Array();
+				return;
 			}
 
             $listrules = $list->getListRules();
@@ -249,15 +249,52 @@ function handleRequest() {
 
 		case 'liststats':
 			// $_GET['listids'] should be json-encoded array.
-			if (!isset($_GET['listids']))
+			if (!isset($_GET['listids'])) {
+				if (isset($_GET['api'])) {
+					header("HTTP/1.1 404 Not Found");
+					return;
+				}
+
 				return false;
+			}
+
 			$listids = json_decode($_GET['listids']);
-			if (!is_array($listids))
+			if (!is_array($listids)) {
+				if (isset($_GET['api'])) {
+					header("HTTP/1.1 404 Not Found");
+					return;
+				}
+
 				return false;
+			}
+
 			$stats = array();
 			foreach ($listids as $id) {
-				if (!userOwns('list', $id) && !isSubscribed("list", $id))
+				if (isset($_GET['api'])) {
+					if (!strlen($id)) {
+						header("HTTP/1.1 404 Not Found");
+						return;
+					}
+				}
+
+				if (!userOwns('list', $id) && !isSubscribed("list", $id)) {
+					if (isset($_GET['api'])) {
+						header("HTTP/1.1 404 Not Found");
+						return;
+					}
+
 					continue;
+				}
+
+				if (isset($_GET['api'])) {
+					$list = new PeopleList($id + 0);
+
+					if ($list->deleted) {
+						header("HTTP/1.1 404 Not Found");
+						return;
+					}
+				}
+
 				$query = "select modifydate, (select max(lastrun) from import where ownertype = 'system') as lastimport,name from list where id = ?";
 				$expect = QuickQueryRow($query, true, false, array($id));
 				$stats[$id] = gen2cache(60*60*24, $expect, null, "generateListStats", $id);
