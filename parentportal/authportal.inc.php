@@ -189,7 +189,6 @@ function portalPutSessionData($id, $sess_data) {
 	return false;
 }
 
-
 function doDBConnect($result) {
 	global $_DBHOST;
 	global $_DBNAME;
@@ -204,23 +203,19 @@ function doDBConnect($result) {
 	global $_dbcon;
 	$_dbcon = DBConnect($_DBHOST, $_DBUSER, $_DBPASS, $_DBNAME);
 	if ($_dbcon) {
+		if (isset($_SESSION['timezone'])) {
+			@date_default_timezone_set($_SESSION['timezone']);
+			QuickUpdate("SET time_zone='" . $_SESSION['timezone'] . "'");
+		}
 		return true;
-	} else {
-		return false;
 	}
+	return false;
 }
-
 
 function doStartSession() {
 	$todo = "todo"; // TODO unique name, maybe use the portaluser name
 	session_name($todo . "_session");
 	session_start();
-
-	// TODO: SMK reminder to remove this once it is proven to only cause problems:
-	//if (isset($_SESSION['timezone'])) {
-	//	@date_default_timezone_set($_SESSION['timezone']);
-	//	QuickUpdate("set time_zone='" . $_SESSION['timezone'] . "'");
-	//}
 }
 
 // **************************
@@ -247,6 +242,9 @@ function getPortalAuthLocation() {
 	return false;
 }
 
+/*
+// SMK note 2015-10-15 this method appears to be unused; it is a reduced,
+// non-operative version of a function by the same name in ../inc/auth.inc.php
 function loginViaPortalAuth() {
 	$params = array(new XML_RPC_Value(session_id(), 'string'));
 	$method = "PortalServer.portal_loginViaPortalAuth";
@@ -258,6 +256,7 @@ function loginViaPortalAuth() {
 	}
 	return false;
 }
+*/
 
 //****************************************************************************************
 // anonymous session methods

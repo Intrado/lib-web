@@ -239,13 +239,17 @@ function putSessionData($id, $sess_data) {
 //fires up the session, sets timezone, and connects to the db
 function doStartSession() {
 	global $SETTINGS;
-//	if (session_id() != "") return; // session was already started
 	global $CUSTOMERURL;
 	global $_DBHOST;
 	global $_DBNAME;
 	global $_DBUSER;
 	global $_DBPASS;
-	
+
+	// This is how we are able to have sessions for multiple customers open simultaneously; the
+	// session is "named" with the customer URL, then set into a cookie with a matching name. When
+	// the sessionID is retrieved from a cookie, the cookie with the matching name is used to get
+	// the session ID. This way the browser can have multiple sessionID's/cookies which don't step
+	// on each other.
 	$sessionName = $CUSTOMERURL . "_session";
 	session_name($sessionName);
 	// only start the session if we have a session cookie or we have a session_id
