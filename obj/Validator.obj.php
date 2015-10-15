@@ -43,6 +43,66 @@ abstract class Validator {
 	static function validate_item ($formdata,$name,$value,$requiredvalues = array()) {
 		$validators = $formdata[$name]['validators'];
 
+		if (is_array($validators) && count($validators)) {
+			foreach ($validators as $validatordata) {
+				$validator = $validatordata[0];
+				$obj = new $validator();
+				$obj->label = $formdata[$name]['label'];
+				$obj->name = $name;
+				//only validate non empty values (unless its flaged as is required)
+				if ($obj->isrequired || $obj->conditionalrequired || ((is_array($value) && count($value)) || (!is_array($value) && mb_strlen($value) > 0))) {
+					$res = $obj->validate($value, $validatordata,$requiredvalues);
+
+					if ($res !== true)
+						return array($validator,$res);
+				}
+			}
+		}
+<?
+
+abstract class Validator {
+	var $name;
+	var $label;
+	var $onlyserverside = false; //set this if you don't have a JS validator
+	var $requiredfields = array();
+	var $isrequired = false;
+	var $conditionalrequired = false;
+
+	/*
+	 * spits out javascript required to install a validator in the form
+	 * Takes a list of class names
+	 */
+	static function load_validators ($validators) {
+
+		echo "if (!document.validators) document.validators = {};\n";
+
+		foreach ($validators as $validator) {
+			$obj = new $validator();
+?>
+		//constructor for <?=$validator?>
+
+		document.validators["<?=$validator?>"] =
+			function (name, label, args) {
+				this.validator = "<?=$validator?>";
+				this.onlyserverside = <?= $obj->onlyserverside ? "true" : "false" ?>;
+				this.isrequired = <?= $obj->isrequired ? "true" : "false" ?>;
+				this.conditionalrequired = <?= $obj->conditionalrequired ? "true" : "false" ?>;
+				this.name = name;
+				this.label = label;
+				this.args = args;
+				this.validate = <?= $obj->getJSValidator() ?>;
+		};
+<?
+
+		}
+	}
+
+	/*
+	 * works pre-merge
+	 */
+	static function validate_item ($formdata,$name,$value,$requiredvalues = array()) {
+		$validators = $formdata[$name]['validators'];
+
 		foreach ($validators as $validatordata) {
 			$validator = $validatordata[0];
 			$obj = new $validator();
@@ -56,6 +116,7 @@ abstract class Validator {
 					return array($validator,$res);
 			}
 		}
+
 		return true;
 	}
 
