@@ -51,7 +51,7 @@ function echoErrorResponse($errorMessage) {
 	exit();
 }
 
-function apiGetDocument($messageLinkCode, $malCode, $password, $verify) {
+function apiGetDocument($messageLinkCode, $malCode, $password, $verify = false) {
 	$response = array();
 
 	list($protocol, $transport) = initMessageLinkApp();
