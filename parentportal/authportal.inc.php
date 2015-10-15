@@ -216,10 +216,11 @@ function doStartSession() {
 	session_name($todo . "_session");
 	session_start();
 
-	if (isset($_SESSION['timezone'])) {
-		@date_default_timezone_set($_SESSION['timezone']);
-		QuickUpdate("set time_zone='" . $_SESSION['timezone'] . "'");
-	}
+	// TODO: SMK reminder to remove this once it is proven to only cause problems:
+	//if (isset($_SESSION['timezone'])) {
+	//	@date_default_timezone_set($_SESSION['timezone']);
+	//	QuickUpdate("set time_zone='" . $_SESSION['timezone'] . "'");
+	//}
 }
 
 // **************************
