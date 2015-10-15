@@ -35,11 +35,12 @@ require_once("{$thriftdir}/StringFunc/Core.php");
 require_once("{$thriftdir}/packages/messagelink/Types.php");
 require_once("{$thriftdir}/packages/messagelink/MessageLink.php");
 
+use Thrift\Exception\TException;
+
 use messagelink\MessageLinkClient;
 use messagelink\MessageLinkCodeNotFoundException;
 use messagelink\MessageAttachmentCodeNotFoundException;
 use messagelink\MessageAttachmentRequestUnauthorizedException;
-
 
 /**
  * @param string $errorMessage message to display to user
