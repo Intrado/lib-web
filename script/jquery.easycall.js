@@ -121,7 +121,8 @@
 			createCallMeContainer:function (hasmenu) {
 				var $this = $(this);
 
-				var container = $('<div />', { "class":"easycallcallmecontainer input-prepend input-append"});
+				var container = $('<div />', { "class":"easycallcallmecontainer", 'html': '<div class="input-prepend input-append"></div>'});
+				var inputContainer = container.find('.input-prepend');
 				var phoneinput = $('<input />', { "class":"easycallphoneinput span2", "type":"text", 'placeholder':'Number to Call'});
 				var extensioninput = $('<input />', { "class":"easycallextensioninput", "type":"text", 'placeholder':'Extension', 'rel':'tooltip', 'title':"Include extension, ex. 555 (optional)", "data-container": "body"});
 
@@ -207,8 +208,10 @@
 
 				if (hasmenu) {
 					// create a multiselect with remaining languages in it.
+					var infoalert = $('<div />', { 'class': 'alert alert-info', 'html': '<i class="icon-info-sign"></i> (Optional) Record this message in another language' });
 					var selectmenu = $('<select />', { "class":"easycallselectmenu add-on" });
 					var hasitems = false;
+					selectmenu.append($('<option />', { text: 'Select Language', value: '' }));
 					$.each($this.data('easyCall').languages, function (code) {
 						if (!$this.data('easyCall').subcontainer[code] && code != $this.data('easyCall').defaultcode) {
 							// insert item into selector
@@ -219,19 +222,25 @@
 					});
 					if (!hasitems)
 						return false;
-					container.append(selectmenu);
+					inputContainer.before(infoalert);
+					inputContainer.append(selectmenu);
 				}
 
 				callbutton.click(function (e) {
 					e.preventDefault();
 					var code = $this.data('easyCall').defaultcode;
-					if (hasmenu)
-						code = selectmenu.val();
+					if (hasmenu) {
+						if (selectmenu.val()) {
+							code = selectmenu.val();
+						} else {
+							return;
+						}
+					}
 					$this.data('easyCall').subcontainer[code] = container;
 					method.doCall(code);
 				});
 
-				container.append(prependSpan).append(phoneinput).append(extensionSpan).append(extensioninput).append(callbutton);
+				inputContainer.append(prependSpan).append(phoneinput).append(extensionSpan).append(extensioninput).append(callbutton);
 
 				return container;
 			},
@@ -329,11 +338,11 @@
 				method.updateParentElement();
 
 				// remove existing call containers, we can only have one shown at a time
-				var callmecontainers = $this.data('easyCall').maincontainer.children(".easycallcallmecontainer");
+				var callmecontainers = $this.data('easyCall').maincontainer.find(".easycallcallmecontainer");
 				var hasdefaultcallmecontainer = false;
 				$.each(callmecontainers, function (index) {
 					// leave behind the default... remember that it exists
-					if ($(callmecontainers[index]).children(".easycallselectmenu").length == 0)
+					if ($(callmecontainers[index]).find(".easycallselectmenu").length == 0)
 						hasdefaultcallmecontainer = true;
 					else
 						$(callmecontainers[index]).remove();
@@ -365,11 +374,11 @@
 			// Application logic
 
 			valPhoneField:function (container) {
-				container.children(".easycallphoneinvalid").remove();
+				container.find(".easycallphoneinvalid").remove();
 				var $this = $(this);
 
 				// get the phone number
-				var phone = container.children(".easycallphoneinput").val();
+				var phone = container.find(".easycallphoneinput").val();
 
 				// validate the phone
 				var valid = method.validatePhone(phone);
@@ -383,11 +392,11 @@
 			},
 
 			valExtensionField:function (container) {
-				container.children(".easycallextensioninvalid").remove();
+				container.find(".easycallextensioninvalid").remove();
 				var $this = $(this);
 
 				// get the extension number
-				var extension = container.children(".easycallextensioninput").val();
+				var extension = container.find(".easycallextensioninput").val();
 
 				// validate the extension
 				var valid = method.validateExtension(extension);
@@ -414,10 +423,10 @@
 				}
 
 				// get the phone number
-				var phone = $this.data('easyCall').subcontainer[code].children(".easycallphoneinput").val();
+				var phone = $this.data('easyCall').subcontainer[code].find(".easycallphoneinput").val();
 
 				// get the phone extension, if any
-				var extension = $this.data('easyCall').subcontainer[code].children(".easycallextensioninput").val();
+				var extension = $this.data('easyCall').subcontainer[code].find(".easycallextensioninput").val();
 
 				// validate the phone
 				var validPhone = method.validatePhone(phone);
@@ -427,7 +436,7 @@
 				extension = method.removeNonNumericValues(extension);
 
 				if (validPhone !== true) {
-					$this.data('easyCall').subcontainer[code].children(".easycallphoneinvalid").remove();
+					$this.data('easyCall').subcontainer[code].find(".easycallphoneinvalid").remove();
 					if (phone == "")
 						phone = $this.data('easyCall').emptyphonetext;
 					$this.data('easyCall').subcontainer[code].append($('<div />', { "class":"easycallphoneinvalid", "html":phone + " " + validPhone }));
@@ -438,7 +447,7 @@
 				}
 
 				if (validExtension !== true) {
-					$this.data('easyCall').subcontainer[code].children(".easycallextensioninvalid").remove();
+					$this.data('easyCall').subcontainer[code].find(".easycallextensioninvalid").remove();
 					$this.data('easyCall').subcontainer[code].append($('<div />', { "class":"easycallextensioninvalid easycallerrorcontainer alert alert-error", "html":extension + " " + validExtension }));
 					return;
 				}
