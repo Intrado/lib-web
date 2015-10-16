@@ -286,7 +286,7 @@ function doStartSession() {
 		$_SESSION['_DBPASS'] = $_DBPASS;
 	}
 	
-	if (isset($_SESSION['timezone'])) {
+	if (isset($_SESSION['timezone']) && isDBConnected()) {
 		@date_default_timezone_set($_SESSION['timezone']);
 		QuickUpdate("set time_zone='" . $_SESSION['timezone'] . "'");
 	}
@@ -307,6 +307,18 @@ function loadCredentials ($userid) {
 	}
 }
 
+/**
+ * Helper to check whether the customer DB is connected
+ *
+ * Maybe we want to use $verify to actually ping mysql or something?
+ *
+ * @return boolean true if we think we have a working customer DB connection, else false
+ */
+function isDBConnected($verify = false) {
+	global $_dbcon;
+	return $_dbcon ? true : false;
+}
+
 function doDBConnect($authresult = false) {
 	global $_dbcon;
 	global $_DBHOST;
@@ -323,8 +335,8 @@ function doDBConnect($authresult = false) {
 	}
 
 	//don't bother connecting to the db twice (caused by some strange legacy authserver methods)
-	if (isset($_dbcon))
-		return true;
+	// @todo maybe we want to use an optional argument to force reconnect (in case connection is unexpectedly lost?)
+	if (isset($_dbcon)) return true;
 
 	// no database connection information, then don't try to connect
 	if (!isset($_DBHOST))
