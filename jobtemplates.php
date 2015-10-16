@@ -28,8 +28,16 @@ if (isset($_GET['delete'])) {
 	$deleteid = DBSafe($_GET['delete']);
 	$deleteResult='';
 
-	if (userOwns("job",$deleteid)) {
+	if (userOwns("job", $deleteid)) {
 		$job = new Job($deleteid);
+
+		if (isset($_REQUEST['api'])) {
+			if ($job->type != "notification" || $job->status != "template") {
+				header("HTTP/1.1 404 Not Found");
+				exit();
+			}
+		}
+
 		if ($job->status == "template" && $job->softDelete()){
 			notice(_L("The %s Template, %s, is now deleted.", getJobTitle(), escapehtml($job->name)));
 			$deleteResult='success';
@@ -43,10 +51,8 @@ if (isset($_GET['delete'])) {
 		$deleteResult='notFound';
 	}
 
-
-
 	if (isset($_REQUEST['api'])) {
-		if( $deleteResult=='notFound'){
+		if ($deleteResult == 'notFound') {
 			header("HTTP/1.1 404 Not Found");
 		}
 		else {
