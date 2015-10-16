@@ -75,7 +75,7 @@ if ($requestType === 'english') {
 	}
 	
 	// is it still too large after HTML is stripped out? if so send error response 503
-	if( $requestStringLength > 5000 ) {
+	if( $stringToTranslate > 5000 ) {
 		$responseObj = set_error_response_and_log($responseObj, 'Request is too large to send to Google. Text length: '. mb_strlen($stringToTranslate));
 		
 		echo json_encode($responseObj);
