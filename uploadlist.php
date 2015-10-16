@@ -156,7 +156,7 @@ if (!isset($_GET["iframe"]))
 <? if ($USER->authorize('listuploadids')) { ?>
 				<tr>
 					<td class="upload_type"><label><? NewFormItem($f, $s, "type", "radio", null, "ids"); ?>ID#&nbsp;lookup:</label></td>
-					<td class="upload_type">File must be a list of ID#s only (one per line)</td>
+					<td class="upload_type">File format must be a Comma Separated Value (CSV) text file with ID#s only (one per line).</td>
 				</tr>
 <? } ?>
 			</table>
