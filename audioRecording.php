@@ -24,9 +24,7 @@ $audioName = "";
 
 if (!isset($_GET['api'])) {
 	header("HTTP/1.1 404 Not Found");
-	header('Content-Type: application/json');
-
-	exit(json_encode(Array("code" => "resourceNotFound")));
+	exit();
 }
 
 if (!($payload = json_decode(file_get_contents("php://input"), true))) {
@@ -40,16 +38,12 @@ $msgid = $payload['messageGroupId'];
 
 if (!strlen($msgid)) {
 	header("HTTP/1.1 404 Not Found");
-	header('Content-Type: application/json');
-
-	exit(json_encode(Array("code" => "resourceNotFound")));
+	exit();
 }
 
 if (!userOwns('messagegroup', $msgid)) {
 	header("HTTP/1.1 404 Not Found");
-	header('Content-Type: application/json');
-
-	exit(json_encode(Array("code" => "messageGroupNotFound")));
+	exit();
 }
 
 $audio->contentid = $payload['uploadId'];

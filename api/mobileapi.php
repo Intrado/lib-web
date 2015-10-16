@@ -117,7 +117,8 @@ function doJobView($start,$limit) {
 function doJobInfo($jobid) {
 	if (!userOwns("job",$jobid)) {
 		if (isset($_REQUEST['api'])) {
-			return array("resultcode" => "jobNotFound", "resultdescription" => _L("Job $jobid not found"));
+			header("HTTP/1.1 404 Not Found");
+			return;
 		} else {
 			return array("resultcode" => "failure", "resultdescription" => _L("You do not have to view information for this job."));
 		}
@@ -130,7 +131,7 @@ function doJobInfo($jobid) {
 	foreach ($listids as $id) {
 		if (!userOwns('list', $id) && !isSubscribed("list", $id))
 			continue;
-		
+
 		$list = new PeopleList($id+0);
 		$renderedlist = new RenderedList2();
 		$renderedlist->pagelimit = 0;
@@ -142,6 +143,14 @@ function doJobInfo($jobid) {
 	}
 	
 	$job = new Job($jobid);
+
+    if (isset($_REQUEST['api'])) {
+	    if ($job->deleted) {
+		    header("HTTP/1.1 404 Not Found");
+		    return;
+	    }
+    }
+
 	$jobtype = new JobType($job->jobtypeid);
 	$jobinfo = array(	"id" => $job->id,
 			"name" => $job->name,
@@ -224,7 +233,12 @@ function handleRequest() {
 
 header('Content-Type: application/json');
 $data = handleRequest();
-$json_encoded_data = json_encode(!empty($data) ? $data : false);
+
+if (isset($_REQUEST['api'])) {
+	$json_encoded_data = json_encode($data);
+} else {
+	$json_encoded_data = json_encode(!empty($data) ? $data : false);
+}
 
 if (isset($SETTINGS['feature']['log_mobile_api']) && $SETTINGS['feature']['log_mobile_api']) {
 	$logfilename = $SETTINGS['feature']['log_dir'] . "mobileapi.log";

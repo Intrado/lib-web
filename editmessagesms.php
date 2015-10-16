@@ -59,8 +59,8 @@ if ($message) {
 	// if the user doesn't own this message, unauthorized!
 	if (!userOwns("message", $message->id)) {
 		if (isset($_REQUEST['api'])) {
-			header("Content-Type: application/json");
-			exit(json_encode(Array("status" => "messageNotFound")));
+			header("HTTP/1.1 404 Not Found");
+			exit();
 		}
 
 		redirect('unauthorized.php');
@@ -75,8 +75,8 @@ if ($message) {
 		$messagegroup = new MessageGroup($_SESSION['editmessage']['messagegroupid']);
 	} else {
 		if (isset($_REQUEST['api'])) {
-			header('Content-Type: application/json');
-			exit(json_encode(Array("status" => "resourceNotFound", "message" => "Message group not specified")));
+			header("HTTP/1.1 404 Not Found");
+			exit();
 		}
 
 		// missing session data!
@@ -88,8 +88,8 @@ if ($message) {
 if (!userOwns("messagegroup", $messagegroup->id) ||
 	(!isset($_REQUEST["msgdel"]) && $messagegroup->deleted)) {
 	if (isset($_REQUEST['api'])) {
-		header("Content-Type: application/json");
-		exit(json_encode(Array("status" => "messageGroupNotFound")));
+		header("HTTP/1.1 404 Not Found");
+		exit();
 	}
 
 	redirect('unauthorized.php');
