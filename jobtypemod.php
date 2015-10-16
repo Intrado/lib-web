@@ -14,13 +14,11 @@ include_once("obj/Phone.obj.php");
 
 if (!isset($_REQUEST['api'])) {
 	header("HTTP/1.1 404 NotFound");
-	header("Content-Type: application/json");
-	exit(json_encode(Array("code" => "resourceNotFound")));
+	exit();
 }
 
 if (!$USER->authorize('managesystem')) {
 	header("HTTP/1.1 403 Forbidden");
-	header("Content-Type: application/json");
 	exit();
 }
 
@@ -28,8 +26,7 @@ $ntid = $_REQUEST['ntid'];
 
 if (!strlen($ntid)) {
 	header("HTTP/1.1 404 NotFound");
-	header("Content-Type: application/json");
-	exit(json_encode(Array("code" => "resourceNotFound")));
+	exit();
 }
 
 $form = "setting";
@@ -37,8 +34,7 @@ $section = "main";
 
 if (!CheckFormSubmit($form, $section)) {
 	header("HTTP/1.1 404 NotFound");
-	header("Content-Type: application/json");
-	exit(json_encode(Array("code" => "resourceNotFound")));
+	exit();
 }
 
 // API-MODE requests are state-less -- clear any left-over formdata from session
@@ -112,6 +108,5 @@ if ($dtype) {
 	QuickUpdate("Commit");
 } else {
 	header("HTTP/1.1 404 NotFound");
-	header("Content-Type: application/json");
-	exit(json_encode(Array("code" => "notificationTypeNotFound")));
+	exit();
 }

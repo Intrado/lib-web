@@ -43,8 +43,7 @@ if (isset($_REQUEST['api'])) {
 
 		if ($ntid == '') {
 			header("HTTP/1.1 404 Not Found");
-			header("Content-Type: application/json");
-			exit(json_encode(Array('code' => 'resourceNotFound')));
+			exit();
 		}
 
 		foreach ($types as $priorityId => $priorityTypes) {
@@ -62,8 +61,7 @@ if (isset($_REQUEST['api'])) {
 
 		if (!$result) {
 			header("HTTP/1.1 404 Not Found");
-			header("Content-Type: application/json");
-			exit(json_encode(Array('code' => 'notificationTypeNotFound')));
+			exit();
 		}
 	} else {
 		$result = Array(

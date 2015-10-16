@@ -7,90 +7,144 @@ require_once("inc/translate.inc.php");
 $responseObj = false;
 $translationObj = false;
 
-$originalRequestString;
-$requestStringContainsHTML = false;
-
 // will be instantiated if we need to parse HTML
 $DOMDocumentObj;
 
-// Validate Length of both possible text inputs
-if( (isset($_REQUEST['english']) && mb_strlen($_REQUEST['english']) > 5000) || 
-	(isset($_REQUEST['text']) && mb_strlen($_REQUEST['text']) > 5000) ) {
-		$engLength = isset($_REQUEST['english'])?mb_strlen($_REQUEST['english']):0;
-		$textLength = isset($_REQUEST['text'])?mb_strlen($_REQUEST['text']):0;
-		error_log("Request is too large to send to Google. Text length: " . max($engLength, $textLength));
-		$responseObj->responseData = "";
-		$responseObj->responseDetails = NULL;
-		$responseObj->responseStatus = 503;
-} else {
-	$translations = false;
-	if(isset($_REQUEST['english']) && isset($_REQUEST['languages'])) {
-		
-		// save the original request html so we don't mangle it
-		$originalRequestString = $_REQUEST['english'];
-		
-		// do we need to handle HTML parsing?
-		if(string_contains_html($originalRequestString)) {
-			$requestStringContainsHTML = true;
-			$DOMDocumentObj = new DOMDocument();
-		}
-		
-		// a version we may modify if it contains HTML
-		$stringToTranslate = $originalRequestString;
-		
-		// compare string to an HTML-stripped version of the string.
-		// if they are different, we have HTML tags
-		if($requestStringContainsHTML) {
-			$stringToTranslate = parse_html_to_node_obj(
-					$originalRequestString, 
-					'n', 
-					$DOMDocumentObj);
-		}
-    
-		$languagearray = explode("|",$_REQUEST['languages']);
-		$translations = translate_fromenglish($stringToTranslate, $languagearray);
-		if ($translations === false) {
-			error_log("Unable to translate request");
-			$responseObj->responseData = "";
-			$responseObj->responseDetails = NULL;
-			$responseObj->responseStatus = 503;
-		} else {
-			$responseObj->responseData = array();
-			$responseObj->responseDetails = "";
-			$responseObj->responseStatus = 200;
-			$i = 0;
-			foreach($translations as $translation){
-				
-				$translatedString = $translation;
-				
-				if($requestStringContainsHTML) {
-					$translatedString = parse_translated_nodes_to_html(
-							$originalRequestString, 
-							$translation, 
-							$DOMDocumentObj);
-				}
-				
-				$responseObj->responseData[$i]->code = $languagearray[$i];
-				$responseObj->responseData[$i++]->translatedText = $translatedString;
-			}
-		}
-	} else if(isset($_REQUEST['text']) && isset($_REQUEST['language'])){
-		$translations = translate_toenglish($_REQUEST['text'], $_REQUEST['language']);
-		if ($translations === false || count($translations) != 1) {
-			error_log("Unable to translate request");
-			$responseObj->responseData = "";
-			$responseObj->responseDetails = NULL;
-			$responseObj->responseStatus = 503;
-		} else {
-			$responseObj->responseData = array();
-			$responseObj->responseDetails = "";
-			$responseObj->responseStatus = 200;
-			$translationObj->translatedText = $translations[0];
-			$responseObj->responseData = $translationObj;
-		}
+// get type translation request
+$requestType = '';
+$requestString = '';
+$requestStringLength = 0;
+
+if ( isset($_REQUEST['text'] ) ) {
+	
+	$requestType = 'text';
+	$requestString = $_REQUEST['text'];
+	$requestStringLength = mb_strlen($requestString);
+	
+} else if ( isset($_REQUEST['english'] ) ) { 
+	
+	$requestType = 'english';
+	$requestString = $_REQUEST['english'];
+	$requestStringLength = mb_strlen($requestString);
+	
+}
+
+// does request string contain HTML?
+$requestStringContainsHTML = false;
+
+if (isset($_REQUEST['html'])) {
+	if ( $_REQUEST['html'] === 'string' ) {
+		$requestStringContainsHTML = true;
 	}
 }
-echo json_encode($responseObj);
+
+// do we have any languages to translate to? 
+$languages = '';
+
+if ( isset( $_REQUEST['languages'] ) ) {
+	
+	$languages = explode("|",$_REQUEST['languages']);
+	
+} else if ( $_REQUEST['language']) {
+	
+	$languages = $_REQUEST['language'];
+}
+
+// if request is for plain text to be translated and it's too long, send response now
+if ($requestType === 'text' && $requestStringLength > 5000) {
+	
+	$responseObj = set_error_response_and_log(
+			$responseObj, 
+			'Request is too large to send to Google. Text length: '.mb_strlen($_REQUEST['text'])
+	);
+	
+	echo json_encode($responseObj);
+}
+
+// if the text may have markup 
+if ($requestType === 'english') {
+	$stringToTranslate = $requestString;
+	
+	if($requestStringContainsHTML) {
+		// create a DOMDocument object to pass into functions
+		$DOMDocumentObj = new DOMDocument();
+
+		// like this one; here we rip out the HTML which our translation service
+		// does not care about
+		$stringToTranslate = parse_html_to_node_string ($requestString, 'n', $DOMDocumentObj);
+	}
+	
+	// is it still too large after HTML is stripped out? if so send error response 503
+	if( $requestStringLength > 5000 ) {
+		$responseObj = set_error_response_and_log($responseObj, 'Request is too large to send to Google. Text length: '. mb_strlen($stringToTranslate));
+		
+		echo json_encode($responseObj);
+	}
+	
+	$translations = translate_fromenglish($stringToTranslate, $languages);
+	
+	// if failed to translate, respond with error
+	if($translations === false) {
+		$responseObj = set_error_response_and_log($responseObj, 'Unable to translate request');
+		
+		echo json_encode($responseObj);
+		
+	}
+	
+	// otherwise, add our translated responses for each requested language
+	$languageCounter = 0;
+	foreach ($translations as $translation) {
+		$translatedString = $translation;
+
+		// if we stripped out HTML then we need to restore it
+		if($requestStringContainsHTML) {
+			$translatedString = parse_translated_nodes_to_html($requestString, $translation, $DOMDocumentObj);
+		}
+
+		// set response to success
+		$responseObj->responseData = array();
+		$responseObj->responseDetails = "";
+		$responseObj->responseStatus = 200;
+		
+		// add in our translated langauges
+		$responseObj->responseData[$languageCounter]->code = $languages[$languageCounter];
+		$responseObj->responseData[$languageCounter]->translatedText = $translatedString;
+		
+		$languageCounter++;
+	}
+	
+	echo json_encode($responseObj);
+}
+
+// this is used when translating text back to english
+if($requestType === 'text') {
+
+	if($languages === '') {
+		set_error_response_and_log($responseObj, 'No language selected');
+		
+		echo json_encode($responseObj);
+	}
+	
+	// in this instance $languages should only contain 1 language
+	$translation = translate_toenglish($requestString, $languages);
+	
+	if($translation == false || count($translation) != 1) {
+		$responseObj = set_error_response_and_log($responseObj, 'Unable to translate request');
+		
+		echo json_encode($responseObj);
+	}
+	
+	$responseObj->responseData = array();
+	$responseObj->responseDetails = "";
+	$responseObj->responseStatus = 200;
+	
+	$translationObj->translatedText = $translation[0];
+	$responseObj->responseData = $translationObj;
+	
+	echo json_encode($responseObj);
+	
+}
+
 ?>
 
 
