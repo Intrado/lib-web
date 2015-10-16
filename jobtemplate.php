@@ -64,13 +64,15 @@ PreviewModal::HandleRequestWithId();
 
 $job = null;
 if (isset($_GET['id'])) {
-	if ($_GET['id'] !== "new" && !userOwns("job", $_GET['id']))
+	if ($_GET['id'] !== "new" && !userOwns("job", $_GET['id'])) {
 		if (isset($_REQUEST['api'])) {
 			header("HTTP/1.1 404 Not Found");
 			exit();
 		} else {
 			redirect('unauthorized.php');
 		}
+	}
+
 	setCurrentJob($_GET['id']);
 
 	if(!isset($_REQUEST['api'])){
@@ -88,7 +90,7 @@ if ($jobid == NULL) {
 } else {
 	$job = new Job($jobid);
 	
-	if ($job->type != "notification" && $job->status != 'template') {
+	if ($job->type != "notification" || $job->status != 'template') {
 		if (isset($_REQUEST['api'])) {
 			header("HTTP/1.1 404 Not Found");
 			exit();
