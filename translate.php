@@ -58,7 +58,7 @@ if ($requestType === 'text' && $requestStringLength > 5000) {
 			'Request is too large to send to Google. Text length: '.mb_strlen($_REQUEST['text'])
 	);
 	
-	echo json_encode($responseObj);
+	die(json_encode($responseObj));
 }
 
 // if the text may have markup 
@@ -78,7 +78,7 @@ if ($requestType === 'english') {
 	if( $stringToTranslate > 5000 ) {
 		$responseObj = set_error_response_and_log($responseObj, 'Request is too large to send to Google. Text length: '. mb_strlen($stringToTranslate));
 		
-		echo json_encode($responseObj);
+		die(json_encode($responseObj));
 	}
 	
 	$translations = translate_fromenglish($stringToTranslate, $languages);
@@ -87,7 +87,7 @@ if ($requestType === 'english') {
 	if($translations === false) {
 		$responseObj = set_error_response_and_log($responseObj, 'Unable to translate request');
 		
-		echo json_encode($responseObj);
+		die(json_encode($responseObj));
 		
 	}
 	
@@ -113,7 +113,7 @@ if ($requestType === 'english') {
 		$languageCounter++;
 	}
 	
-	echo json_encode($responseObj);
+	die(json_encode($responseObj));
 }
 
 // this is used when translating text back to english
@@ -122,7 +122,7 @@ if($requestType === 'text') {
 	if($languages === '') {
 		set_error_response_and_log($responseObj, 'No language selected');
 		
-		echo json_encode($responseObj);
+		die(json_encode($responseObj));
 	}
 	
 	// in this instance $languages should only contain 1 language
@@ -131,7 +131,7 @@ if($requestType === 'text') {
 	if($translation == false || count($translation) != 1) {
 		$responseObj = set_error_response_and_log($responseObj, 'Unable to translate request');
 		
-		echo json_encode($responseObj);
+		die(json_encode($responseObj));
 	}
 	
 	$responseObj->responseData = array();
@@ -141,7 +141,7 @@ if($requestType === 'text') {
 	$translationObj->translatedText = $translation[0];
 	$responseObj->responseData = $translationObj;
 	
-	echo json_encode($responseObj);
+	die(json_encode($responseObj));
 	
 }
 
