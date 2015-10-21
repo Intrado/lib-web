@@ -64,7 +64,7 @@ if(CheckFormSubmit($f,$s))
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else if(QuickQuery("select count(*) from notificationtype where not deleted and name = '" . DBSafe(strtolower(GetFormData($f, $s, "jobtypename"))) . "'")){
 			if (isset($_REQUEST['api'])) {
-				header("HTTP/1.1 409 Conflict");
+				header("HTTP/1.1 400 Bad Request");
 				header("Content-Type: application/json");
 				exit(json_encode(Array("code" => "nameNotAvailable")));
 			}

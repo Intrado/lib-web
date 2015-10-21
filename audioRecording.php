@@ -31,7 +31,7 @@ if (!($payload = json_decode(file_get_contents("php://input"), true))) {
 	header("HTTP/1.1 400 Bad Request");
 	header('Content-Type: application/json');
 
-	exit(json_encode(Array("code" => "invalidRequestSchema")));
+	exit(json_encode(Array("code" => "invalidSchema")));
 }
 
 $msgid = $payload['messageGroupId'];
@@ -49,7 +49,7 @@ if (!userOwns('messagegroup', $msgid)) {
 $audio->contentid = $payload['uploadId'];
 
 if (!contentGet($payload['uploadId'])) {
-	header("HTTP/1.1 404 Not Found");
+	header("HTTP/1.1 400 Bad Request");
 	header('Content-Type: application/json');
 
 	exit(json_encode(Array("code" => "uploadNotFound")));

@@ -72,7 +72,7 @@ if ($dtype) {
 	//
 	if($dtype->systempriority == 3) {
 		if(QuickQuery("select count(*) from notificationtype where not deleted and name = '" . DBSafe(strtolower(GetFormData($form, $section, "jobtypename" . $dtype->id))) . "'")) {
-			header("HTTP/1.1 409 Conflict");
+			header("HTTP/1.1 400 Bad Request");
 			header("Content-Type: application/json");
 			exit(json_encode(Array("code" => "nameNotAvailable")));
 		}

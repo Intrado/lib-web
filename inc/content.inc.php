@@ -34,6 +34,13 @@ function getHttpResponseContents ($fp) {
 
 function contentGet ($cmid, $base64 = false) {
 	$filedata = commsuite_contentGet($cmid);
+
+	if (isset($_REQUEST["api"])) {
+		if (!$filedata) {
+			return false;
+		}
+	}
+
 	if ($base64)
 		return array($filedata->contenttype, base64_encode($filedata->data));
 	else
