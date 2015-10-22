@@ -152,6 +152,12 @@ function fmt_percent ($row,$index) {
 	return "&nbsp;";
 }
 
+function percent_value ($value, $decimalPlaces = 0) {
+	if (isset($value)) {
+		return sprintf("%0.{$decimalPlaces}f%%", $value*100);
+	}
+	return "&nbsp;";
+}
 
 function fmt_idmagnify ($row,$index) {
 	// TODO must I load the person in order to get the person->userid ?

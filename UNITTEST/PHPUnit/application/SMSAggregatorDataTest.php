@@ -82,6 +82,9 @@ class SMSAggregatorDataTest extends PHPUnit_Framework_TestCase {
 				->will($this->returnValue('This is an error'));
 		
 		$resultArray = $this->SMSAggregatorData->jmxUpdateShortcodeGroups();
+		print_r($resultArray);
+				
+		
 	}
 	
 }

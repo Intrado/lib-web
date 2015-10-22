@@ -168,8 +168,8 @@ if ($job->hasSMS()) {
 	$smsinfo = JobSummaryReport::getSmsInfo($job->id, $readonlyconn);
 	$destinationresults['sms'] = array(
 		'recipients' => (int)$smsinfo['total'],
-		'completed' => (int)$smsinfo['done'],
-		'remaining' => (int)$smsinfo['remaining'],
+		'completed' => (int)$smsinfo['delivered'],
+		'remaining' => (int)$smsinfo['pending'],
 		'percentcontacted' => isset($smsinfo['success_rate']) ? sprintf("%0.2f%%", $smsinfo['success_rate']) : "N/A"
 	);
 }
@@ -272,23 +272,8 @@ if ($job->hasEmail()) { ?>
 <? }
 if ($job->hasSMS()) { ?>
 		<tr class='destination'>
-			<th align="right" class="windowRowHeader bottomBorder">SMS:</th>
-			<td class="bottomBorder">
-				<table  border="0" cellpadding="2" cellspacing="1" class="list" width="100%">
-						<tr class="listHeader" align="left" valign="bottom">
-							<th># of SMS</th>
-							<th>Completed</th>
-							<th>Remaining</th>
-							<th>% Contacted</th>
-						</tr>
-						<tr>
-							<td id='recipientssms'><?=$destinationresults['sms']['recipients']?></td>
-							<td id='completedsms'><?=$destinationresults['sms']['completed']?></td>
-							<td id='remainingsms'><?=$destinationresults['sms']['remaining']?></td>
-							<td id='percentcontactedsms'><?=$destinationresults['sms']['percentcontacted']?></td>
-						</tr>
-				</table>
-				<img style='width:500px;height:300px' src='<?=$imageurl?>&type=sms' id='smsgraph'/>
+			<td class="bottomBorder" colspan="2">
+				Monitoring is not currently available for SMS. Please click on the Report link to view SMS status.
 			</td>
 		</tr>
 <? }
