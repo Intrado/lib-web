@@ -33,7 +33,7 @@ if ( isset($_REQUEST['text'] ) ) {
 $requestStringContainsHTML = false;
 
 if (isset($_REQUEST['html'])) {
-	if ( $_REQUEST['html'] === 'string' ) {
+	if ( $_REQUEST['html'] === 'true' ) {
 		$requestStringContainsHTML = true;
 	}
 }
@@ -66,16 +66,17 @@ if ($requestType === 'english') {
 	$stringToTranslate = $requestString;
 	
 	if($requestStringContainsHTML) {
+		
 		// create a DOMDocument object to pass into functions
 		$DOMDocumentObj = new DOMDocument();
 
-		// like this one; here we rip out the HTML which our translation service
-		// does not care about
+		// like this one. here we rip out the HTML which our translation service does not care about
 		$stringToTranslate = parse_html_to_node_string ($requestString, 'n', $DOMDocumentObj);
 	}
 	
 	// is it still too large after HTML is stripped out? if so send error response 503
-	if( $stringToTranslate > 5000 ) {
+	if( $requestStringLength > 5000 ) {
+		
 		$responseObj = set_error_response_and_log($responseObj, 'Request is too large to send to Google. Text length: '. mb_strlen($stringToTranslate));
 		
 		die(json_encode($responseObj));
@@ -146,5 +147,3 @@ if($requestType === 'text') {
 }
 
 ?>
-
-

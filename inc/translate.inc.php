@@ -163,6 +163,7 @@ function parse_html_to_node_string ($htmlString, $delimiterTag = 'node', $DOMDoc
 	$xpath = new DOMXPath($DOMDocumentObj);
 	
 	$textNodes = $xpath->query('//text()');
+	
 	$nodeCount = $textNodes->length;
 	
 	// make our root tag a plural of our delimiter tag
@@ -174,8 +175,10 @@ function parse_html_to_node_string ($htmlString, $delimiterTag = 'node', $DOMDoc
 	
 	for ($i = 0; $i < $nodeCount; $i++) {
 		
+		$value = (String) $textNodes->item($i)->nodeValue;
+		
 		$nodeText = "<{$delimiterTag}>"
-						. "{$textNodes->item($i)->nodeValue}"
+						. "{$value}"
 					. "</{$delimiterTag}>";
 		
 		$nodeValueString .= $nodeText;
@@ -201,7 +204,6 @@ function parse_html_to_node_string ($htmlString, $delimiterTag = 'node', $DOMDoc
 
 function parse_translated_nodes_to_html ($templateHtml, $translatedNodeString, $DOMDocumentObj) {
 	
-	
 	$DOMDocumentObj->loadHTML($templateHtml);
 	$xpath = new DOMXPath($DOMDocumentObj);
 	
@@ -212,13 +214,20 @@ function parse_translated_nodes_to_html ($templateHtml, $translatedNodeString, $
 	$translatedNodes = $xml->children();
 		
 	for ($i = 0; $i < $nodeCount; $i++) {
-		$textNodes->item($i)->nodeValue = (String) $translatedNodes[$i];
+		
+		if(trim($translatedNodes[$i]) !== '' ) {
+			$textNodes->item($i)->nodeValue = (String) $translatedNodes[$i];
+		}
 	}
 	
 	// pull out the body tag of our document to reflect original HTML string.
 	$restoredHTML = $xpath->document->saveHTML(
 		$DOMDocumentObj->getElementsByTagName('body')->item(0)
 	);
+	
+	// convert the UTF-8 characters created by xPath back into HTML entities
+	// MAY BE OPTIONAL.
+	$restoredHTML = mb_convert_encoding($restoredHTML, "HTML-ENTITIES", "UTF-8");
 	
 	// remove the left-over body tag
 	$restoredHTML = str_replace('<body>', '', $restoredHTML);
@@ -252,6 +261,7 @@ function makeTranslatableString($str) {
 }
 
 function doGoogleTranslateRequest_curl($apiUrl, $post_data, $referrer) {
+	
 	$headers = array(
 		"Referrer: $referrer",
 		"Content-type: application/x-www-form-urlencoded",
@@ -271,6 +281,7 @@ function doGoogleTranslateRequest_curl($apiUrl, $post_data, $referrer) {
 	if ($statusCode != 200)
 		error_log("Google Translation Error $statusCode: $response");
 	$obj = json_decode($response);
+	
 	curl_close($handle);
 
 	return $obj;
