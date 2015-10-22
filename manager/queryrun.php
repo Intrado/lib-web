@@ -228,7 +228,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			or die ("Failed to execute sql: " . mysql_error($custdb));
 			$displayname = mysql_fetch_row($displayinfo);
                         
-                        $numberOfFields = mysql_num_fields($res);
+                        $numberOfFields = is_resource($res) ? mysql_num_fields($res) : 0;
                                                
 			if ($savecsv) {
                             
@@ -273,9 +273,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
                                         echo array_to_csv($row) . "\n";
 				}
 			} else {
-				$numfields = @mysql_num_fields($res);
-					
-				if (!$numfields) {
+				if (! $numberOfFields) {
 					$obj = new Foo123;
 					$obj->name = "affected rows";
 					$fields = array($obj);
@@ -283,7 +281,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					$data = array(array(mysql_affected_rows()));
 				} else {
 					$fields = array();
-					for ($i = 0; $i < $numfields; $i++) {
+					for ($i = 0; $i < $numberOfFields; $i++) {
 						$fields[] = mysql_fetch_field($res, $i);
 					}
 		

@@ -91,8 +91,6 @@ $jmsSettings = QuickQueryRow("select dgjs.jmsConnectionFactoryName as jmsConnect
 								join dmgroupjmsprofile dgjp on dgjp.dispatcherJmsSettingId = dgjs.id
 								join dmgroup on dmgroup.dmGroupJmsProfileId = dgjp.id and dmgroup.id = " . $dmgroupid ,true, false, false);
 
-error_log(print_r($jmsSettings,true));
-
 $jmsConnectionFactoryNames = array();
 foreach ($SETTINGS['jms']['connectionFactoryName'] as $connectionName) {
 	$jmsConnectionFactoryNames[$connectionName] = $connectionName;

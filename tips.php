@@ -134,12 +134,11 @@ class TipSubmissionViewer extends PageForm {
 
 	// @override
 	function beforeLoad($get = array(), $post = array()) {
-		$tipState = isset($_SESSION['tips']) ? $_SESSION['tips'] : array() ;
-
-		$this->orgId 		= $tipState['orgid'];
-		$this->categoryId 	= $tipState['categoryid'];
-		$this->date 		= $tipState['date'];
-
+		if (isset($_SESSION['tips'])) {
+			$this->orgId 		= $_SESSION['tips']['orgid'];
+			$this->categoryId 	= $_SESSION['tips']['categoryid'];
+			$this->date 		= $_SESSION['tips']['date'];
+		}
 		$this->setPagingStart((isset($get['pagestart'])) ? $get['pagestart'] : 0);
 	}
 

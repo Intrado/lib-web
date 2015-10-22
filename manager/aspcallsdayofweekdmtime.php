@@ -7,16 +7,16 @@
 <body>
 
 <?
-$offset = $_GET['daysAgo'];
+$offset = isset($_GET['daysAgo']) ? $_GET['daysAgo'] : 0;
 
-	$x = ($offset > 0 ? $offset : 1);
-	while ( time() - (($x) * 60*60*24) > strtotime("30 days ago")) {
-		$sd = date("Y-m-d",time() - (($x) * 60*60*24));
-		$ed = date("Y-m-d",time() - (($x-1) * 60*60*24));
-		
-		echo "<img src='aspcallsbydm.php?startdate=$sd&enddate=$ed'><br>";
-		$x = $x + 7;
-	}
+$x = ($offset > 0 ? $offset : 1);
+while ( time() - (($x) * 60*60*24) > strtotime("30 days ago")) {
+	$sd = date("Y-m-d",time() - (($x) * 60*60*24));
+	$ed = date("Y-m-d",time() - (($x-1) * 60*60*24));
+	
+	echo "<img src='aspcallsbydm.php?startdate=$sd&enddate=$ed'><br>";
+	$x = $x + 7;
+}
 
 ?>
 

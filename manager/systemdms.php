@@ -203,13 +203,15 @@ $result = Query($dmGroupQuery);
 while($row = DBGetRow($result,true)) {
 	$dmgroups[$row['id']] = $row;
 }
-$lcrdbcon = DBConnect($SETTINGS['lcrdb']['host'], $SETTINGS['lcrdb']['user'], $SETTINGS['lcrdb']['pass'], $SETTINGS['lcrdb']['db']);
-$carrierRateModels = array();
-$result = Query("select id,name from carrierratemodel",$lcrdbcon);
-while($row = DBGetRow($result,true)) {
-	$carrierRateModels[$row['id']] = $row;
-}
 
+$carrierRateModels = array();
+if (isset($SETTINGS['lcrdb'])) {
+	$lcrdbcon = DBConnect($SETTINGS['lcrdb']['host'], $SETTINGS['lcrdb']['user'], $SETTINGS['lcrdb']['pass'], $SETTINGS['lcrdb']['db']);
+	$result = Query("select id,name from carrierratemodel",$lcrdbcon);
+	while($row = DBGetRow($result,true)) {
+		$carrierRateModels[$row['id']] = $row;
+	}
+}
 $dms = array();
 $query = "select dm.id, dm.name, dm.authorizedip, dm.lastip,
 			dm.enablestate, dm.lastseen, dm.version, dm.dmuuid, dm.command, s_telco_calls_sec.value as telco_calls_sec, 

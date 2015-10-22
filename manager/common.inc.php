@@ -55,6 +55,7 @@ if(!isset($isasplogin)){
 function SetUpASPDB(){
     global $SETTINGS, $ASPCALLSDBCONN;
 
+    if (! isset($SETTINGS['aspcalls'])) return null;
     $ASPCALLSDBCONN = mysql_connect($SETTINGS['aspcalls']['host'],$SETTINGS['aspcalls']['user'],$SETTINGS['aspcalls']['pass']);
     mysql_select_db($SETTINGS['aspcalls']['db']);
     return $ASPCALLSDBCONN;

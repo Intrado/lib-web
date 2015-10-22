@@ -20,7 +20,7 @@ function pearxmlrpc($method, $params, $returndata = false) {
 		$timeout = 90; //this timeout must exceed the authserver's configured lockTimeout setting to avoid a cascading backlog of disconnected requests
 		$resp = $cli->send($msg, $timeout); 
 		if (!$resp) {
-			$errmsg = $method . ' communication error: "' . $cli->errstr . '". Have been trying for ' . (time() - $starttime) . 's attempt ' . $attempt;
+			$errmsg = 'auth.inc.php::f.pearxmlrpc(): ' . $method . ' communication error: "' . $cli->errstr . '". Have been trying for ' . (time() - $starttime) . 's attempt ' . $attempt;
 			if (function_exists("error_log_helper"))
 				error_log_helper($errmsg);
 			else
@@ -58,7 +58,6 @@ function pearxmlrpc($method, $params, $returndata = false) {
 			return $data;
 		} else if ($data['result'] == "warning") {
 			// warning we do not log, but handle like failure
-			error_log($method . " " .$data['result'] . " " . $data['resultdetail']);
 		} else {
 			// error
 			error_log($method . " " .$data['result'] . " " . $data['resultdetail']);
@@ -212,8 +211,6 @@ function getSessionDataReadOnly($id) {
 		// success
 		$sess_data = base64url_decode($result['sessionData']);
 		if (doDBConnect($result)) return $sess_data;
-	} else {
-		error_log_helper("ERROR trying to getSessionDataReadOnly for '$id'");
 	}
 	return "";
 }
@@ -226,8 +223,6 @@ function getSessionData($id) {
 		// success
 		$sess_data = base64url_decode($result['sessionData']);
 		if (doDBConnect($result)) return $sess_data;
-	} else {
-		error_log_helper("ERROR trying to getSessionData for '$id'");
 	}
 	return "";
 }
@@ -238,24 +233,23 @@ function putSessionData($id, $sess_data) {
 	$params = array(new XML_RPC_Value($id, 'string'), new XML_RPC_Value($sess_data, 'string'));
 	$method = "AuthServer.putSessionData";
 	$result = pearxmlrpc($method, $params);
-	if ($result === false) { 
-		error_log_helper("ERROR trying to putSessionData for '$id'", false);
-		return false;
-	} else {
-		return true;
-	}
+	return ($result === false) ? false : true;
 }
 
 //fires up the session, sets timezone, and connects to the db
 function doStartSession() {
 	global $SETTINGS;
-//	if (session_id() != "") return; // session was already started
 	global $CUSTOMERURL;
 	global $_DBHOST;
 	global $_DBNAME;
 	global $_DBUSER;
 	global $_DBPASS;
-	
+
+	// This is how we are able to have sessions for multiple customers open simultaneously; the
+	// session is "named" with the customer URL, then set into a cookie with a matching name. When
+	// the sessionID is retrieved from a cookie, the cookie with the matching name is used to get
+	// the session ID. This way the browser can have multiple sessionID's/cookies which don't step
+	// on each other.
 	$sessionName = $CUSTOMERURL . "_session";
 	session_name($sessionName);
 	// only start the session if we have a session cookie or we have a session_id
@@ -292,7 +286,7 @@ function doStartSession() {
 		$_SESSION['_DBPASS'] = $_DBPASS;
 	}
 	
-	if (isset($_SESSION['timezone'])) {
+	if (isset($_SESSION['timezone']) && isDBConnected()) {
 		@date_default_timezone_set($_SESSION['timezone']);
 		QuickUpdate("set time_zone='" . $_SESSION['timezone'] . "'");
 	}
@@ -313,6 +307,18 @@ function loadCredentials ($userid) {
 	}
 }
 
+/**
+ * Helper to check whether the customer DB is connected
+ *
+ * Maybe we want to use $verify to actually ping mysql or something?
+ *
+ * @return boolean true if we think we have a working customer DB connection, else false
+ */
+function isDBConnected($verify = false) {
+	global $_dbcon;
+	return $_dbcon ? true : false;
+}
+
 function doDBConnect($authresult = false) {
 	global $_dbcon;
 	global $_DBHOST;
@@ -329,8 +335,8 @@ function doDBConnect($authresult = false) {
 	}
 
 	//don't bother connecting to the db twice (caused by some strange legacy authserver methods)
-	if (isset($_dbcon))
-		return true;
+	// @todo maybe we want to use an optional argument to force reconnect (in case connection is unexpectedly lost?)
+	if (isset($_dbcon)) return true;
 
 	// no database connection information, then don't try to connect
 	if (!isset($_DBHOST))

@@ -14,15 +14,21 @@ require_once("../obj/Phone.obj.php");
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
 
-if (!$MANAGERUSER->authorized("systemdm"))
+if (! $MANAGERUSER->authorized("systemdm")) {
 	exit("Not Authorized");
+}
+
+if (! isset($SETTINGS['lcrdb'])) {
+	exit('No lcrdb configured, so nothing to do here');
+}
+
+$lcrdbcon = DBConnect($SETTINGS['lcrdb']['host'], $SETTINGS['lcrdb']['user'], $SETTINGS['lcrdb']['pass'], $SETTINGS['lcrdb']['db']);
 
 if(isset($_GET['crmbid'])){
 	if ($_GET['crmbid'] === "new") {
 		$_SESSION['crmbid'] = null;
 	} else {
 		$crmbid = $_GET['crmbid'] + 0;
-		$lcrdbcon = DBConnect($SETTINGS['lcrdb']['host'], $SETTINGS['lcrdb']['user'], $SETTINGS['lcrdb']['pass'], $SETTINGS['lcrdb']['db']);
 		if (!QuickQuery("select count(*) from carrierratemodelblock where id = ?", $lcrdbcon, array($crmbid))) {
 			echo "Invalid DM Block.";
 			exit();
@@ -46,13 +52,11 @@ if(isset($_GET['crmbid'])){
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
 
-$lcrdbcon = DBConnect($SETTINGS['lcrdb']['host'], $SETTINGS['lcrdb']['user'], $SETTINGS['lcrdb']['pass'], $SETTINGS['lcrdb']['db']);
 $crmbinfo = QuickQueryRow("select id,carrierRateModelClassname, pattern, notes from carrierratemodelblock where id=?", true,$lcrdbcon,array($crmbid));
 
 $helpstepnum = 1;
 
 $helpsteps[] = "TODO: Rare Model";
-$lcrdbcon = DBConnect($SETTINGS['lcrdb']['host'], $SETTINGS['lcrdb']['user'], $SETTINGS['lcrdb']['pass'], $SETTINGS['lcrdb']['db']);
 $carrierratemodels = QuickQueryList("select distinct classname, classname from carrierratemodel order by classname",true,$lcrdbcon);
 $formdata["carrierRateModelClassname"] = array(
 	"label" => _L('Rate Model'),
@@ -111,7 +115,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$datachange = true;
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
-		$lcrdbcon = DBConnect($SETTINGS['lcrdb']['host'], $SETTINGS['lcrdb']['user'], $SETTINGS['lcrdb']['pass'], $SETTINGS['lcrdb']['db']);
 		Query("BEGIN",$lcrdbcon);
 
 		$pattern =  $postdata["pattern"];

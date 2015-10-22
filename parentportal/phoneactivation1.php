@@ -149,12 +149,15 @@ startWindow(_L('Add Contact'));
 
 <tr><td><table border="1" cellpadding="3" cellspacing="0">
 <th>&nbsp;</th><th><?=_L('ID Number')?></th>
-<? if (!$oktogo) { ?>
-<th><?=_L('Status')?></th>
-<? } ?>
-
-<? $i = 0; ?>
-<?	foreach (array_keys($_SESSION['phoneactivationpkeylist']) as $pkey) { ?>
+<? 
+if (! $oktogo) { ?>
+	<th><?=_L('Status')?></th>
+<?
+}
+$i = 0;
+$pkeys = array_keys($_SESSION['phoneactivationpkeylist']);
+if (is_array($pkeys) && (count($pkeys) > 0)) {
+	foreach ($pkeys as $pkey) { ?>
 		<tr><td width="10%"><?=$i+1?></td><td align="center"><? NewFormItem($f, $s, "pkey".$i, "text", "20", "255"); ?></td>
 <? if (!$oktogo) {
 		$statustext = _L("Unknown");
@@ -170,17 +173,19 @@ startWindow(_L('Add Contact'));
 			$statustext = _L("OK");
 		}
 ?>
-		<td><?=$statustext?></td>
+			<td><?=$statustext?></td>
 <? } ?>
 		</tr>
 <?		$i++;
 	}
+}
 ?>
 
 <?		if ($i < $maxcontacts) { ?>
-		<tr><td width="10%"><?=$i+1?></td><td align="center"><? NewFormItem($f, $s, "pkeyadd", "text", "20", "255"); $i++; ?></td>
-		<td></td>
-		</tr>
+			<tr>
+				<td width="10%"><?=$i+1?></td><td align="center"><? NewFormItem($f, $s, "pkeyadd", "text", "20", "255"); $i++; ?></td>
+				<td></td>
+			</tr>
 <?		} ?>
 
 </table></td></tr>

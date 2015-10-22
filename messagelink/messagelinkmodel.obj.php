@@ -3,6 +3,8 @@
 use messagelink\MessageLinkClient;
 use messagelink\MessageLinkCodeNotFoundException;
 
+use Thrift\Exception\TException;
+
 /**
  *
  */
@@ -93,4 +95,3 @@ class MessageLinkModel {
 	}
 }
 
-?>

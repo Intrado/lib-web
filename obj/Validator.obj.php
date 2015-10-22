@@ -37,25 +37,25 @@ abstract class Validator {
 		}
 	}
 
-	/*
-	 * works pre-merge
-	 */
 	static function validate_item ($formdata,$name,$value,$requiredvalues = array()) {
 		$validators = $formdata[$name]['validators'];
 
-		foreach ($validators as $validatordata) {
-			$validator = $validatordata[0];
-			$obj = new $validator();
-			$obj->label = $formdata[$name]['label'];
-			$obj->name = $name;
-			//only validate non empty values (unless its flaged as is required)
-			if ($obj->isrequired || $obj->conditionalrequired || ((is_array($value) && count($value)) || (!is_array($value) && mb_strlen($value) > 0))) {
-				$res = $obj->validate($value, $validatordata,$requiredvalues);
+		if (is_array($validators) && count($validators)) {
+			foreach ($validators as $validatordata) {
+				$validator = $validatordata[0];
+				$obj = new $validator();
+				$obj->label = $formdata[$name]['label'];
+				$obj->name = $name;
+				//only validate non empty values (unless its flaged as is required)
+				if ($obj->isrequired || $obj->conditionalrequired || ((is_array($value) && count($value)) || (!is_array($value) && mb_strlen($value) > 0))) {
+					$res = $obj->validate($value, $validatordata,$requiredvalues);
 
-				if ($res !== true)
-					return array($validator,$res);
+					if ($res !== true)
+						return array($validator,$res);
+				}
 			}
 		}
+
 		return true;
 	}
 
@@ -659,6 +659,3 @@ class ValReldate extends Validator {
 //alphanumeric
 //phoneeasycall ??
 
-
-
-?>
