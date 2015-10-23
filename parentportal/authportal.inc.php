@@ -242,9 +242,6 @@ function getPortalAuthLocation() {
 	return false;
 }
 
-/*
-// SMK note 2015-10-15 this method appears to be unused; it is a reduced,
-// non-operative version of a function by the same name in ../inc/auth.inc.php
 function loginViaPortalAuth() {
 	$params = array(new XML_RPC_Value(session_id(), 'string'));
 	$method = "PortalServer.portal_loginViaPortalAuth";
@@ -256,7 +253,6 @@ function loginViaPortalAuth() {
 	}
 	return false;
 }
-*/
 
 //****************************************************************************************
 // anonymous session methods
