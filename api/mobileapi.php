@@ -87,7 +87,7 @@ function doJobView($start,$limit) {
 
 	$notInTemplates='';
 	if (isset($_REQUEST['api'])) {
-		$notInTemplates= ', template';
+		$notInTemplates= ", 'template'";
 	}
 	$total = 0;
 	$query = "from job where userid=$USER->id
