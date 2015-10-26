@@ -82,6 +82,9 @@ foreach ($forms as $form) {
 			
 			// delete it
 			unlink($zipFile);
+			
+			// do not render form
+			die;
 		}
 	}
 }

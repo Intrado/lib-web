@@ -210,8 +210,7 @@ class DownloadPlugin {
 		header("Content-type: application/octet-stream");
 		header("Content-Disposition: attachment; filename=\"plugin-{$customerName}.zip\"");
 		header("Content-Transfer-Encoding: binary");
-
-		ob_clean();
+		
 		flush();
 	}
 
