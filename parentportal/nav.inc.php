@@ -34,26 +34,6 @@ $NAVTREE = array (
 // Display Functions
 ////////////////////////////////////////////////////////////////////////////////
 
-// SMK lifted from ../inc/html.inc.php
-function icon_button($name,$icon,$onclick = NULL, $href = NULL, $extrahtml = NULL) {
-	$autoid = $extrahtml == null ? ('id="' . autoID("icon_button", $name, $icon) . '"') : "";
-	$btn = '<button ' . $autoid . ' class="btn" type="button"';
-	if ($onclick) $btn .= ' onclick="' . $onclick . ';" ';
-	else if ($href) $btn .= ' onclick="window.location=\'' . $href . '\';" ';
-	if ($extrahtml) $btn .= $extrahtml;
-	$btn .= '><span class="btn_wrap cf"><span class="btn_left"></span><span class="btn_middle"><img class="btn_middle_icon" src="img/icons/'.$icon.'.png" alt="">' . escapehtml($name) .'</span><span class="btn_right"></span></span></button>';
-	return $btn;
-}
-
-// SMK lifted from ../inc/html.inc.php
-function autoID($prefix /*, arg1, arg2, ... */) {
-	static $usedcounters = array();
-	$k = $prefix . crc32(implode(":", func_get_args()));
-	@$usedcounters[$k]++;
-	if ($usedcounters[$k] > 1) $k .= "_" . $usedcounters[$k];
-	return $k;
-}
-
 function doLogo () {
 	// there is no customized theme for contact manager, no customer logo
 	echo '<img src="img/sm_white.gif" alt="">';
