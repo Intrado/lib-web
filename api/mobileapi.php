@@ -84,10 +84,14 @@ function doJobView($start,$limit) {
 	global $USER;
 	if ($start < 0 ) 
 		$start = 0;
-	
+
+	$notInTemplates='';
+	if (isset($_REQUEST['api'])) {
+		$notInTemplates= ', template';
+	}
 	$total = 0;
 	$query = "from job where userid=$USER->id
-			and status not in ('new','repeating','survey', 'template')
+			and status not in ('new','repeating','survey' $notInTemplates)
 			and deleted=0 
 			order by ifnull(finishdate,modifydate) desc";
 	$data = DBFindMany("Job",$query . " limit $start, $limit");
