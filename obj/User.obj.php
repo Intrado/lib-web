@@ -10,9 +10,10 @@ class User extends DBMappedObject {
 	var $firstname = "";
 	var $lastname = "";
 	var $description = "";
-	var $phone = "";
 	var $email = "";
 	var $aremail = "";
+	var $phone = "";
+	var $sms = "";
 	var $enabled = 0;
 	var $lastlogin;
 	var $deleted = 0;
@@ -20,9 +21,9 @@ class User extends DBMappedObject {
 	var $staffpkey;
 	var $importid;
 	var $lastimport;
+	var $personid;
 	//var $portaluserid; // READONLY, comment out for now
 	//var $portaluserassociationtimestamp;
-	var $personid;
 
 	//new constructor
 	function User($id = NULL) {

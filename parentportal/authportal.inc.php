@@ -189,7 +189,6 @@ function portalPutSessionData($id, $sess_data) {
 	return false;
 }
 
-
 function doDBConnect($result) {
 	global $_DBHOST;
 	global $_DBNAME;
@@ -204,22 +203,19 @@ function doDBConnect($result) {
 	global $_dbcon;
 	$_dbcon = DBConnect($_DBHOST, $_DBUSER, $_DBPASS, $_DBNAME);
 	if ($_dbcon) {
+		if (isset($_SESSION['timezone'])) {
+			@date_default_timezone_set($_SESSION['timezone']);
+			QuickUpdate("SET time_zone='" . $_SESSION['timezone'] . "'");
+		}
 		return true;
-	} else {
-		return false;
 	}
+	return false;
 }
-
 
 function doStartSession() {
 	$todo = "todo"; // TODO unique name, maybe use the portaluser name
 	session_name($todo . "_session");
 	session_start();
-
-	if (isset($_SESSION['timezone'])) {
-		@date_default_timezone_set($_SESSION['timezone']);
-		QuickUpdate("set time_zone='" . $_SESSION['timezone'] . "'");
-	}
 }
 
 // **************************

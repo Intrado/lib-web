@@ -41,8 +41,8 @@ function customerTimezone($customerid){
 	$query = "select c.id, s.dbhost, c.dbusername, c.dbpassword, c.urlcomponent from customer c inner join shard s on (c.shardid = s.id) where c.id=?";
 	$custinfo = QuickQueryRow($query,true,false,array($customerid));
 	$custdb = DBConnect($custinfo["dbhost"], $custinfo["dbusername"], $custinfo["dbpassword"], "c_{$custinfo["id"]}");
-	if (!$custdb) {
-		exit("Connection failed for customer: {$custinfo["dbhost"]}, db: c_{$custinfo["id"]}");
+	if (! $custdb) {
+		exit("Missing Customer {$customerid}? Connection failed for customer: {$custinfo["dbhost"]}, db: c_{$custinfo["id"]}");
 	}
 	return getCustomerSystemSetting("timezone","",true,$custdb);
 }

@@ -12,16 +12,14 @@ include_once("obj/NotificationType.obj.php");
 include_once("obj/Setting.obj.php");
 include_once("obj/Phone.obj.php");
 
-if (!$USER->authorize('managesystem')) {
-	if (isset($_REQUEST['api'])) {
-		header("HTTP/1.1 403 Forbidden");
-		header("Content-Type: application/json");
-		exit();
+// Ignore permissions check if we are API call -- API requests can only get (view) notification type info.
+// For web app calls, this page enables create/edit functionality, so first verify authorization!
+//
+if (!isset($_REQUEST['api'])) {
+	if (!$USER->authorize('managesystem')) {
+		redirect('unauthorized.php');
 	}
-
-	redirect('unauthorized.php');
 }
-
 
 $systemprioritynames = array("1" => "Emergency",
 							"2" => "High Priority",

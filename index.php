@@ -62,7 +62,6 @@ if (isset($_GET['login'])) {
 		$softlock = true;
 	} else if(!$userid){
 		$badlogin = true;
-		error_log("User trying to log in but has bad user/pass/url");
 	}
 	if($userid)
 		$updatelogin = true;

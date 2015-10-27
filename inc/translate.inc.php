@@ -137,6 +137,7 @@ function googleTranslateV2($text, $sourcelanguage, $targetlanguages) {
 		} else {
 			$translation = false;
 		}
+		
 		$_SESSION["translationcache"][$key] = $translation;
 		$translations[] = $translation;
 	}
@@ -159,7 +160,8 @@ function googleTranslateV2($text, $sourcelanguage, $targetlanguages) {
 
 function parse_html_to_node_string ($htmlString, $delimiterTag = 'node', $DOMDocumentObj) {
 	
-	$DOMDocumentObj->loadHTML($htmlString);
+	// force UTF-8 encoding
+	$DOMDocumentObj->loadHTML('<?xml encoding="UTF-8">'.$htmlString);
 	$xpath = new DOMXPath($DOMDocumentObj);
 	
 	$textNodes = $xpath->query('//text()');
@@ -227,11 +229,15 @@ function parse_translated_nodes_to_html ($templateHtml, $translatedNodeString, $
 	
 	// convert the UTF-8 characters created by xPath back into HTML entities
 	// MAY BE OPTIONAL.
-	$restoredHTML = mb_convert_encoding($restoredHTML, "HTML-ENTITIES", "UTF-8");
+	//$restoredHTML = mb_convert_encoding($restoredHTML, "HTML-ENTITIES", "UTF-8");
+	
+	$restoredHTML = html_entity_decode($restoredHTML);
 	
 	// remove the left-over body tag
 	$restoredHTML = str_replace('<body>', '', $restoredHTML);
 	$restoredHTML = str_replace('</body>', '', $restoredHTML);
+
+	$restoredHTML = preg_replace('/<input value="(.+?)"[\\/]?>/', '$1', $restoredHTML);
 	
 	return $restoredHTML;
 }
@@ -254,6 +260,7 @@ function translate_toenglish($anytext,$anylanguage) {
 }
 
 function makeTranslatableString($str) {
+	
 	$str = preg_replace('/(<<.*?>>)/', '<input value="$1"/>', $str);
 	$str = preg_replace('/({{.*?}})/', '<input value="$1"/>', $str);
 	$str = preg_replace('/(\\[\\[.*?\\]\\])/', '<input value="$1"/>', $str);

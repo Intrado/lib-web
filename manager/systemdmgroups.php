@@ -86,10 +86,12 @@ while($row = DBGetRow($result)) {
 }
 
 $carrierRateModels = array();
-$lcrConnection = DBConnect($SETTINGS['lcrdb']['host'], $SETTINGS['lcrdb']['user'], $SETTINGS['lcrdb']['pass'], $SETTINGS['lcrdb']['db']);
-$result = Query("select * from carrierratemodel",$lcrConnection);
-while($row = DBGetRow($result,true)) {
-	$carrierRateModels[$row["id"]] = $row;
+if (isset($SETTINGS['lcrdb'])) {
+	$lcrConnection = DBConnect($SETTINGS['lcrdb']['host'], $SETTINGS['lcrdb']['user'], $SETTINGS['lcrdb']['pass'], $SETTINGS['lcrdb']['db']);
+	$result = Query("select * from carrierratemodel",$lcrConnection);
+	while($row = DBGetRow($result,true)) {
+		$carrierRateModels[$row["id"]] = $row;
+	}
 }
 
 // Add field titles, leading # means it is sortable leading @ means it is hidden by default

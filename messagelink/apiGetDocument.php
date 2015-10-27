@@ -35,11 +35,12 @@ require_once("{$thriftdir}/StringFunc/Core.php");
 require_once("{$thriftdir}/packages/messagelink/Types.php");
 require_once("{$thriftdir}/packages/messagelink/MessageLink.php");
 
+use Thrift\Exception\TException;
+
 use messagelink\MessageLinkClient;
 use messagelink\MessageLinkCodeNotFoundException;
 use messagelink\MessageAttachmentCodeNotFoundException;
 use messagelink\MessageAttachmentRequestUnauthorizedException;
-
 
 /**
  * @param string $errorMessage message to display to user
@@ -51,7 +52,7 @@ function echoErrorResponse($errorMessage) {
 	exit();
 }
 
-function apiGetDocument($messageLinkCode, $malCode, $password, $verify) {
+function apiGetDocument($messageLinkCode, $malCode, $password, $verify = false) {
 	$response = array();
 
 	list($protocol, $transport) = initMessageLinkApp();

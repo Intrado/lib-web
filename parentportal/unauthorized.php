@@ -1,10 +1,11 @@
 <?
-include_once('common.inc.php');
+require_once('common.inc.php');
+require_once("../inc/html.inc.php");
 
 $PAGE = "start:start";
 $TITLE = _L("Unauthorized");
 
-include_once('nav.inc.php');
+require_once('nav.inc.php');
 
 ?>
 <table border="0" cellpadding="0" cellspacing="0" height="400" width="100%">
@@ -18,6 +19,6 @@ include_once('nav.inc.php');
 	</tr>
 </table>
 <?
-include_once('navbottom.inc.php');
+require_once('navbottom.inc.php');
 ?>
 <script language="javascript">setTimeout("window.location='start.php'", 10000);</script>

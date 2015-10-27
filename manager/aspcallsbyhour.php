@@ -3,8 +3,13 @@
 require_once("common.inc.php");
 include ("../jpgraph/jpgraph.php");
 include ("../jpgraph/jpgraph_bar.php");
-if(!$MANAGERUSER->authorized("aspcallgraphs"))
+if (! $MANAGERUSER->authorized("aspcallgraphs")) {
 	exit("Not Authorized");
+}
+
+if (! isset($SETTINGS['aspcalls'])) {
+        exit('aspcalls is not configured');
+}
 
 $table = $SETTINGS[aspcalls][callstable];
 $query = "
