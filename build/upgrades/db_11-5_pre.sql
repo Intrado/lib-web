@@ -10,3 +10,8 @@ $$$
 -- $rev 2
 
 -- dummy, no change
+
+-- $rev 3
+
+ALTER TABLE `user` MODIFY COLUMN `login` VARCHAR(255)
+$$$
