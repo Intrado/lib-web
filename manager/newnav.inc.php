@@ -43,10 +43,10 @@ if (count($menu = get_authorized_commsuite())) {
 	$NAVTREE[] = array('Commsuite', $first_page, NULL, $active, ($active ? $menu : NULL), "commsuite");
 }
 
-if (count($menu = get_authorized_talkaboutit())) {
+if (count($menu = get_authorized_dm())) {
 	$first_page = $menu[0][1];
-	$active = ($MAINTAB == 'tai');
-	$NAVTREE[] = array('TalkAboutIt', $first_page, NULL, $active, ($active ? $menu : NULL), "tai");
+	$active = ($MAINTAB == 'dm');
+	$NAVTREE[] = array('DM', $first_page, NULL, $active, ($active ? $menu : NULL), "dm");
 }
 
 if (count($menu = get_authorized_advanced())) {
@@ -73,17 +73,39 @@ if (count($menu = get_authorized_customers())) {
 ////////////////////////////////////////////////////////////////////////////////
 
 // Build the TalkAboutIt menu
-function get_authorized_talkaboutit() {
+function get_authorized_dm() {
 	global $MANAGERUSER, $SUBTAB, $SETTINGS;
 
 	$menu = Array();
 
-	// FIXME - There are no apparenet explicit permissions required for TAI administration
+	if ($MANAGERUSER->authorized('systemdm')) {
+		$menu[] = array('System&nbsp;DM&nbsp;Summary', 'systemdmsummary.php', NULL, ($SUBTAB == 'systemdmsummary'), "systemdmsummary");
+	}
 
-	$menu[] = array('Customers', 'taicustomers.php', NULL, ($SUBTAB == 'customers'), "customers");
-	$menu[] = array('Inbox', 'taiinbox.php', NULL, ($SUBTAB == 'inbox'), "inbox");
-	$menu[] = array('Requests', 'tairevealrequests.php', NULL, ($SUBTAB=='requests'), "requests");
-	$menu[] = array('SMS&nbsp;Numbers', 'taismsnumbers.php', NULL, ($SUBTAB == 'smsnumbers'), "smsnumbers");
+	if ($MANAGERUSER->authorized('systemdm')) {
+		$menu[] = array('Dashboard', 'systemdmdashboard.php', NULL, ($SUBTAB == 'systemdmdashboard'), "systemdmdashboard");
+	}
+
+	if ($MANAGERUSER->authorized('systemdm')) {
+		$menu[] = array('System&nbsp;DMs', 'systemdms.php', NULL, ($SUBTAB == 'systemdms'), "systemdms");
+	}
+
+	if ($MANAGERUSER->authorized('systemdm')) {
+		$menu[] = array('DM&nbsp;Groups', 'systemdmgroups.php', NULL, ($SUBTAB == 'systemdmgroups'), "systemdmgroups");
+	}
+
+	if ($MANAGERUSER->authorized('systemdm')) {
+		$menu[] = array('DM&nbsp;Blocking', 'dmgroupblock.php', NULL, ($SUBTAB == 'dmblocking'), "dmblocking");
+	}
+
+	if ($MANAGERUSER->authorized('editdm')) {
+		$menu[] = array('SmartCall', 'customerdms.php?clear', NULL, ($SUBTAB == 'customerdms'), "customerdms");
+	}
+
+	if ($MANAGERUSER->authorizedAny(array('logcollector', 'aspcallgraphs'))) {
+		$menu[] = array('Graphs & Logs', 'aspcallsindex.php', NULL, ($SUBTAB == 'graphlogs'), "graphlogs");
+	}
+
 
 	return($menu);
 }
@@ -119,22 +141,6 @@ function get_authorized_commsuite() {
 		$menu[] = array('Locked&nbsp;Users', 'lockedusers.php', 'lockedusers', ($SUBTAB == 'lockedusers'), "lockedusers");
 	}
 
-	if ($MANAGERUSER->authorized('editdm')) {
-		$menu[] = array('SmartCall', 'customerdms.php?clear', NULL, ($SUBTAB == 'customerdms'), "customerdms");
-	}
-
-	if ($MANAGERUSER->authorized('systemdm')) {
-		$menu[] = array('System&nbsp;DMs', 'systemdms.php', NULL, ($SUBTAB == 'systemdms'), "systemdms");
-	}
-
-	if ($MANAGERUSER->authorized('systemdm')) {
-		$menu[] = array('DM&nbsp;Groups', 'systemdmgroups.php', NULL, ($SUBTAB == 'systemdmgroups'), "systemdmgroups");
-	}
-
-	if ($MANAGERUSER->authorized('systemdm')) {
-		$menu[] = array('DM&nbsp;Blocking', 'dmgroupblock.php', NULL, ($SUBTAB == 'dmblocking'), "dmblocking");
-	}
-
 	if ($MANAGERUSER->authorized('diskagent')) {
 		$menu[] = array('SwiftSync', 'diskagents.php', NULL, ($SUBTAB == 'swiftsync'), "swiftsync");
 	}
@@ -154,10 +160,6 @@ function get_authorized_reports() {
 
 	if ($MANAGERUSER->authorized('emergencyjobs')) {
 		$menu[] = array('Completed&nbsp;Jobs', 'emergencyjobs.php', NULL, ($SUBTAB == 'joblist'), "joblist");
-	}
-
-	if ($MANAGERUSER->authorizedAny(array('logcollector', 'aspcallgraphs'))) {
-		$menu[] = array('Graphs&nbsp;&amp;&nbsp;Logs', 'aspcallsindex.php', NULL, ($SUBTAB == 'graphlogs'), "graphlogs");
 	}
 
 	if ($MANAGERUSER->authorized("customercontacts")) {
@@ -359,7 +361,6 @@ if (isset($_GET['monitor'])) {
 	<div class="banner_links_wrap">
 		<ul class="banner_links cf">
 			<li class="bl_left"></li>
-			<li><a href="allcustomers.php?newnav=false">Old Nav</a></li>
 			<li><a class="logout" href="index.php?logout=1">Logout</a></li>
 			<li class="bl_right"></li>
 		</ul>

@@ -403,7 +403,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $TITLE = _L('DM Settings');
-$PAGE = "commsuite:systemdms";
+$PAGE = "dm:systemdms";
 
 include_once("nav.inc.php");
 
