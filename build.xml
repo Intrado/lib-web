@@ -144,7 +144,29 @@
 
                 <!-- IntelliJ project-related files -->
                 <exclude name="**/*.eml" />
-                <exclude name="**/*.iml" />
+		<exclude name="**/*.iml" />
+
+		<!-- Exclude all our other symlinks -->
+		<exclude name="manager/img"/>
+		<exclude name="manager/media"/>
+		<exclude name="manager/css"/>
+		<exclude name="manager/script"/>
+		<exclude name="manager/themes"/>
+		<exclude name="parentportal/img"/>
+		<exclude name="parentportal/media"/>
+		<exclude name="parentportal/css"/>
+		<exclude name="parentportal/script"/>
+		<exclude name="parentportal/themes"/>
+		<exclude name="subscriber/img"/>
+		<exclude name="subscriber/media"/>
+		<exclude name="subscriber/css"/>
+		<exclude name="subscriber/script"/>
+		<exclude name="subscriber/themes"/>
+		<exclude name="page/img"/>
+		<exclude name="messagelink/media"/>
+		<exclude name="messagelink/script"/>
+		<exclude name="messagelink/bootstrap"/>
+		<exclude name="messagelink/inc"/>
             </zipfileset>
         </zip>
     </target>
