@@ -9,7 +9,7 @@ include ("jpgraph/jpgraph_bar.php");
 
 require_once('inc/graph.inc.php');
 
-session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
+session_write_close(); //WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 
 if(isset($_GET['jobid'])){
 	$jobid = $_GET['jobid'] + 0;
@@ -47,7 +47,7 @@ if ($type == 'phone') {
 		"X" => "Disconnect",
 		"F" => "Unknown"
 	);
-} else if ($type == 'email' || $type == 'sms') {
+} else if ($type == 'email') {
 	$colors = array(
 		"sent" => "lightgreen",
 		"unsent" => "blue"
@@ -56,7 +56,16 @@ if ($type == 'phone') {
 		"sent" => "Sent",
 		"unsent" => "Unsent"
 	);
+} else if ($type == 'sms' ) {
+	$colors = array(
+		"total" => "lightblue",
+		"filtered" => "orange",
+		"pending" => "gray",
+		"undelivered" => "red",
+		"delivered" => "lightgreen"
+	);
 }
+
 // Common code colors
 $colors = array_merge($colors, array(
 	"notattempted" => "blue",
@@ -79,8 +88,11 @@ if ($type == 'email') {
 	$resultcodes['declined'] = 'No Email Selected';
 }
 else if ($type == 'sms') {
-	$resultcodes['nocontacts'] = 'No SMS';
-	$resultcodes['declined'] = 'No SMS Selected';
+	$resultcodes['total'] = 'Total SMS';
+	$resultcodes['filtered'] = 'Removed';
+	$resultcodes['pending'] = 'Pending';
+	$resultcodes['undelivered'] = 'Undelivered';
+	$resultcodes['delivered'] = 'Delivered';
 }
 
 $graphdata = array();
