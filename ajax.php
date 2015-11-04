@@ -46,7 +46,7 @@ function handleRequest() {
 	switch($type) {
 		//--------------------------- SIMPLE OBJECTS, should mirror objects in obj/*.obj.php (simplified to _fieldlist) -------------------------------
 		case 'lists':
-			return cleanObjects(DBFindMany('PeopleList',
+			$rs = DBFindMany('PeopleList',
 					", (l.name+0) as lettersfirst
 					from list l
 						left join publish p on
@@ -54,8 +54,17 @@ function handleRequest() {
 					where (l.userid=? or p.userid=?)
 						and l.type != 'alert'
 						and not l.deleted
-					order by lettersfirst,l.name", "l", array($USER->id,$USER->id)));
+					order by lettersfirst,l.name", "l", array($USER->id,$USER->id));
 
+			if (isset($_GET['api'])) {
+				return cleanObjects($rs, array(
+					'iso-dates' => array( 'modifydate','lastused'),
+					'inject-id'=>true
+				));
+			}
+			else{
+				return cleanObjects($rs);
+			}
 		// Return an AudioFile object specified by its ID.
 		case 'AudioFile':
 			if (!isset($_GET['id']))
@@ -194,8 +203,15 @@ function handleRequest() {
 			order by f02, f01";
 	        $data = QuickQueryMultiRow($query,false,false,array($id));
 
-			$recipientList = cleanObjects($list);
-			$recipientList['id'] = (int)$list->id;
+			if (isset($_GET['api'])) {
+				$recipientList = cleanObjects($list, array(
+					'iso-dates' => array('modifydate', 'lastused'),
+					'inject-id' => true
+				));
+			}
+			else{
+				$recipientList = cleanObjects($list);
+			}
 
 	        $maxguardians = getSystemSetting("maxguardians", 0);
 	        if ($maxguardians > 0 && ($list->recipientmode == 'guardian' || $list->recipientmode == 'selfAndGuardian')) {
