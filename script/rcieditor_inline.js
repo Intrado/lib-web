@@ -92,9 +92,7 @@ window.RCIEditorInline = function () {
 				var uploadattachment= rcieditor.getSetting('baseUrl') + 'uploadattachment.php';
 
 				editor.config.filebrowserImageUploadUrl = uploaderURI;
-				// set to null to remove the 'Upload' tab off the modal derived from the inline 'Link' button.
-				// to restore set value to: uploadattachment;
-				editor.config.filebrowserUploadUrl = null;
+				editor.config.filebrowserUploadUrl = uploadattachment;
 				editor.config.pasteFromWordRemoveFontStyles = false;
 				editor.config.pasteFromWordRemoveStyles = false;
 				editor.config.disableObjectResizing = false;
