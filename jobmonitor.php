@@ -266,11 +266,11 @@ if ($job->hasSMS()) { ?>
 			<td class="bottomBorder">
 				<table  border="0" cellpadding="2" cellspacing="1" class="list" width="100%">
 						<tr class="listHeader" align="left" valign="bottom">
-							<th># of SMS</th>
-							<th>Filtered</th>
-							<th>Pending</th>
-							<th>Undelivered</th>
-							<th>Delivered</th>
+							<th><? echo _L('# of SMS'); ?></th>
+							<th><? echo _L('Not Attempted'); ?></th>
+							<th><? echo _L('Pending'); ?></th>
+							<th><? echo _L('Undelivered'); ?></th>
+							<th><? echo _L('Delivered'); ?></th>
 						</tr>
 						<tr>
 							<td id='totalsms'><?=$destinationresults['sms']['total']?></td>

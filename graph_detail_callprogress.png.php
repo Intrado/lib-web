@@ -88,11 +88,11 @@ if ($type == 'email') {
 	$resultcodes['declined'] = 'No Email Selected';
 }
 else if ($type == 'sms') {
-	$resultcodes['total'] = 'Total SMS';
-	$resultcodes['filtered'] = 'Removed';
-	$resultcodes['pending'] = 'Pending';
-	$resultcodes['undelivered'] = 'Undelivered';
-	$resultcodes['delivered'] = 'Delivered';
+	$resultcodes['total'] = _L('Total SMS');
+	$resultcodes['filtered'] = _L('Not Attempted');
+	$resultcodes['pending'] = _L('Pending');
+	$resultcodes['undelivered'] = _L('Undelivered');
+	$resultcodes['delivered'] = _L('Delivered');
 }
 
 $graphdata = array();
