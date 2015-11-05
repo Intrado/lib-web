@@ -25,9 +25,6 @@ $systemprioritynames = array("1" => "Emergency",
 							"2" => "High Priority",
 							"3" => "General");
 
-foreach($systemprioritynames as $index => $name){
-	$types[$index] = DBFindMany('NotificationType', "from notificationtype where deleted=0 and systempriority = '" . $index . "' and type = 'job' order by name");
-}
 $surveytypes = getSystemSetting('_hassurvey', true) ? DBFindMany('NotificationType', "from notificationtype where deleted=0 and systempriority = '3' and type = 'survey' order by name") : array();
 $maxphones = getSystemSetting("maxphones", 3);
 $maxemails = getSystemSetting("maxemails", 2);
@@ -35,41 +32,45 @@ $maxsms = getSystemSetting("maxsms", 2);
 $maxcolumns = max($maxphones, $maxemails, $maxsms);
 $jobtypeprefs = getJobTypePrefs();
 
+
 if (isset($_REQUEST['api'])) {
 	if (isset($_REQUEST['ntid'])) {
-		$ntid = $_REQUEST['ntid'];
+		$ntid = (int)$_REQUEST['ntid'];
 
 		if ($ntid == '') {
 			header("HTTP/1.1 404 Not Found");
 			exit();
 		}
 
-		foreach ($types as $priorityId => $priorityTypes) {
-			foreach ($priorityTypes as $typeId => $type) {
-				if ($typeId == $ntid) {
-					$result = Array(
-						"type" => $type,
-						"targets" => $jobtypeprefs[$typeId],
-						"priorities" => $systemprioritynames);
-
-					break;
-				}
-			}
-		}
-
-		if (!$result) {
+		$type = DBFind('NotificationType', "from notificationtype where deleted=0 and id=$ntid and type = 'job' order by name");
+		if($type) {
+			$result = array(
+				"type" => $type,
+				"targets" => $jobtypeprefs[$type->id],
+				"priorities" => $systemprioritynames
+			);
+		} else {
 			header("HTTP/1.1 404 Not Found");
 			exit();
 		}
 	} else {
-		$result = Array(
-			"types" => $types,
-			"priorities" => $systemprioritynames);
+		$notificationTypes = DBFindMany('NotificationType',
+			"from notificationtype where deleted=0 and systempriority in (1,2,3) and type = 'job' order by name");
+
+		$result = array(
+			"types" => array_values($notificationTypes),
+			"priorities" => $systemprioritynames
+		);
 	}
 
 	header("Content-Type: application/json");
 	exit(json_encode(cleanObjects($result)));
 }
+
+foreach($systemprioritynames as $index => $name){
+	$types[$index] = DBFindMany('NotificationType', "from notificationtype where deleted=0 and systempriority = '" . $index . "' and type = 'job' order by name");
+}
+
 
 /****************** main message section ******************/
 
