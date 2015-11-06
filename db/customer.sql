@@ -3183,3 +3183,11 @@ update setting set value='11.5/2' where name='_dbversion'
 $$$
 
 -- END 11.5/2
+
+ALTER TABLE `user` MODIFY COLUMN `login` VARCHAR(255)
+$$$
+
+update setting set value='11.5/3' where name='_dbversion'
+$$$
+
+-- END 11.5/3
