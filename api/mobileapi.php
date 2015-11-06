@@ -85,15 +85,19 @@ function doJobView($start,$limit) {
 	if ($start < 0 ) 
 		$start = 0;
 
-	$notInTemplates='';
+	$notInClause = "status not in ('new','repeating','survey')";
+
 	if (isset($_REQUEST['api'])) {
-		$notInTemplates= ", 'template'";
+		// for API dont exclude new, but exclude templates
+		$notInClause = "status not in ('repeating', 'survey', 'template')";
 	}
+
 	$total = 0;
 	$query = "from job where userid=$USER->id
-			and status not in ('new','repeating','survey' $notInTemplates)
-			and deleted=0 
+			and $notInClause
+			and deleted=0
 			order by ifnull(finishdate,modifydate) desc";
+
 	$data = DBFindMany("Job",$query . " limit $start, $limit");
 	$total = QuickQuery("select count(id) " . $query) + 0;
 
