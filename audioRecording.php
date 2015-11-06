@@ -23,36 +23,36 @@ $audioId = "";
 $audioName = "";
 
 if (!isset($_GET['api'])) {
-	header("HTTP/1.1 404 Not Found");
-	exit();
+    header("HTTP/1.1 404 Not Found");
+    exit();
 }
 
 if (!($payload = json_decode(file_get_contents("php://input"), true))) {
-	header("HTTP/1.1 400 Bad Request");
-	header('Content-Type: application/json');
+    header("HTTP/1.1 400 Bad Request");
+    header('Content-Type: application/json');
 
-	exit(json_encode(Array("code" => "invalidSchema")));
+    exit(json_encode(Array("code" => "invalidSchema")));
 }
 
 $msgid = $payload['messageGroupId'];
 
 if (!strlen($msgid)) {
-	header("HTTP/1.1 404 Not Found");
-	exit();
+    header("HTTP/1.1 404 Not Found");
+    exit();
 }
 
 if (!userOwns('messagegroup', $msgid)) {
-	header("HTTP/1.1 404 Not Found");
-	exit();
+    header("HTTP/1.1 404 Not Found");
+    exit();
 }
 
 $audio->contentid = $payload['uploadId'];
 
 if (!contentGet($payload['uploadId'])) {
-	header("HTTP/1.1 400 Bad Request");
-	header('Content-Type: application/json');
+    header("HTTP/1.1 400 Bad Request");
+    header('Content-Type: application/json');
 
-	exit(json_encode(Array("code" => "uploadNotFound")));
+    exit(json_encode(Array("code" => "uploadNotFound")));
 }
 
 $messagegroup = new MessageGroup($msgid);
@@ -70,20 +70,20 @@ $duplicateNames = count($audioFileIds) > 0 ? QuickQueryList('select name from au
 
 // If there are any duplicate names, then find the largest sequence number so that we can set our final name to "$filename " . ($largestSequenceNumber + 1)
 if (count($duplicateNames) > 0) {
-	$largestSequenceNumber = 1;
+    $largestSequenceNumber = 1;
 
-	foreach ($duplicateNames as $duplicateName) {
-		if (preg_match('/ \d+$/', $duplicateName, $matches)) {
-			$sequenceNumber = intval($matches[0]);
+    foreach ($duplicateNames as $duplicateName) {
+        if (preg_match('/ \d+$/', $duplicateName, $matches)) {
+            $sequenceNumber = intval($matches[0]);
 
-			if ($sequenceNumber > $largestSequenceNumber) {
-				$largestSequenceNumber = $sequenceNumber;
-			}
-		}
-	}
-	$finalAudioFilename = "$filename " . ($largestSequenceNumber + 1);
+            if ($sequenceNumber > $largestSequenceNumber) {
+                $largestSequenceNumber = $sequenceNumber;
+            }
+        }
+    }
+    $finalAudioFilename = "$filename " . ($largestSequenceNumber + 1);
 } else {
-	$finalAudioFilename = $filename;
+    $finalAudioFilename = $filename;
 }
 
 $audioName = $audio->name = $finalAudioFilename;

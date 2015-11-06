@@ -64,22 +64,47 @@ function _DBFindPDO($isMany, $classname, $query, $alias=false, $args=false, $dbc
 	}
 }
 
-function cleanObjects ($obj) {
-	if (!is_object($obj) && !is_array($obj))
-		return $obj;
-	$simpleObj = array();
-	if (is_object($obj)) {
-		foreach ($obj->_fieldlist as $field) {
-			if (is_object($obj->$field))
-				$simpleObj[$field] = cleanObjects($obj->$field);
-			else
-				$simpleObj[$field] = $obj->$field;
-		}
-	} else if (is_array($obj)) {
-		foreach ($obj as $id => $item)
-			$simpleObj[$id] = cleanObjects($item);
-	}
-	return $simpleObj;
-}
+/**
+ * @param $obj
+ * @param array $options Indexed array with keys represent options. Such as
+ *        'iso-dates' => array(names...) that specifies that fiels should be converted to iso 8601 dates. used in api mode.
+ *        'inject-id'=> true puts the id pk in resulting object
+ * @return array
+ */
+function cleanObjects($obj, $options = array()) {
+    if (is_array($options)) {
 
-?>
+        if (array_key_exists('iso-dates', $options)) {
+            $cleanDatesFields = $options['iso-dates'];
+            $injectId = array_key_exists('inject-id', $options) && $options['inject-id'];
+
+        }
+    }
+
+    if (!is_object($obj) && !is_array($obj))
+        return $obj;
+    $simpleObj = array();
+    if (is_object($obj)) {
+        foreach ($obj->_fieldlist as $field) {
+            if (is_object($obj->$field))
+                $simpleObj[$field] = cleanObjects($obj->$field, $options);
+            else {
+                if ($cleanDatesFields && in_array($field, $cleanDatesFields)) {
+                    $simpleObj[$field] = date(DATE_ISO8601, strtotime($obj->$field));
+                } else {
+                    $simpleObj[$field] = $obj->$field;
+                }
+            }
+
+            if($injectId && isset($obj->id)) {
+                $simpleObj['id'] = 0+($obj->id);
+            }
+
+
+        }
+    } else if (is_array($obj)) {
+        foreach ($obj as $id => $item)
+            $simpleObj[$id] = cleanObjects($item, $options);
+    }
+    return $simpleObj;
+}
