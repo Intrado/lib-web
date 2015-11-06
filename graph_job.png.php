@@ -50,6 +50,13 @@ if ($type == 'phone') {
 		"inprogress" => "Queued",
 		"retry" => "Retrying"
 	);
+} else if ($type == 'sms') {
+	$resultcodes = array(
+		'filtered' => _L('Not Attempted'),
+		'pending' => _L('Pending'),
+		'undelivered' => _L('Undelivered'),
+		'delivered' => _L('Delivered')
+	);
 } else {
 	$coalesceSQL = "
 		if(rc.result not in ('sent', 'duplicate', 'declined') and rc.numattempts = 0 and j.status not in ('complete','cancelled'), 'inprogress', null),
@@ -64,16 +71,32 @@ if ($type == 'phone') {
 		"inprogress" => "Queued"
 	);
 }
-$query = "
-	select count(*) as cnt, coalesce($coalesceSQL) as callprogress2
-	from job j
-	inner join reportperson rp on (rp.jobid=j.id)
-	left join reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid AND rc.result NOT IN('declined'))
-	inner join jobsetting js on (js.jobid = j.id and js.name = 'maxcallattempts')
-	where rp.type=?
-	and rp.jobid=?
-	group by callprogress2
-";
+
+$query = '';
+if($type == 'sms') {
+	$query = "select 
+				count(rc.jobid) as total,
+				sum(rc.result in ('duplicate', 'blocked', 'declined', 'notattempted')) as filtered, 
+				sum(rc.result in ('queued', 'sending')) as pending,
+				count(rc.jobid) - sum(rc.result in ('duplicate', 'blocked', 'declined', 'notattempted')) - sum(rc.result in ('delivered', 'sent')) -  sum(rc.result in ('queued', 'sending')) as undelivered,
+				sum(rc.result in ('delivered', 'sent')) as delivered
+			  from 
+				reportcontact rc
+			  where 
+				rc.jobid in ('$jobid')
+				and rc.type = 'sms'";
+} else {
+	$query = "
+		select count(*) as cnt, coalesce($coalesceSQL) as callprogress2
+		from job j
+		inner join reportperson rp on (rp.jobid=j.id)
+		left join reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid AND rc.result NOT IN('declined'))
+		inner join jobsetting js on (js.jobid = j.id and js.name = 'maxcallattempts')
+		where rp.type=?
+		and rp.jobid=?
+		group by callprogress2
+	";
+}
 
 $templatecolors = array(
 	"A" => "lightgreen",
@@ -88,7 +111,14 @@ $templatecolors = array(
 	"declined" => "yellow",
 	"inprogress" => "lightblue",
 	"retry" => "cyan",
-	"notattempted" => "blue"
+	"notattempted" => "blue",
+);
+
+$smsTemplateColors = array(
+	"filtered" => "orange",
+	"pending" => "gray",
+	"undelivered" => "red",
+	"delivered" => "lightgreen"
 );
 
 $data = $resultcodes;
@@ -100,19 +130,34 @@ $legend = $data;
 $colors = $data;
 
 if ($result = Query($query, false, array($type, $jobid))) {
+	
 	while ($row = DBGetRow($result)) {
-		if($row[1] == "fail")
-			$row[1] = "F";
 
-		if(!isset($data[$row[1]])){
-			continue;
-		} else if($row[1] == "F"){
-			$data[$row[1]] += $row[0];
-		}else
-			$data[$row[1]] = $row[0];
+		if ($type == 'sms') {
+			
+			$data['filtered'] = $row[1];
+			$data['pending'] = $row[2];
+			$data['undelivered'] = $row[3];
+			$data['delivered'] = $row[4];
+			
+			$legend = $resultcodes;
+			$colors = $smsTemplateColors;
+			
+		} else {
+		
+			if($row[1] == "fail")
+				$row[1] = "F";
 
-		$legend[$row[1]] = $resultcodes[$row[1]] . ": %d";
-		$colors[$row[1]] = $templatecolors[$row[1]];
+			if(!isset($data[$row[1]])){
+				continue;
+			} else if($row[1] == "F"){
+				$data[$row[1]] += $row[0];
+			} else
+				$data[$row[1]] = $row[0];
+
+			$legend[$row[1]] = $resultcodes[$row[1]] . ": %d";
+			$colors[$row[1]] = $templatecolors[$row[1]];
+		}
 	}
 }
 

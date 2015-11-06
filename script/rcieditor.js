@@ -441,6 +441,20 @@
 					cke_config.removePlugins = that.getSetting('cke_remove_plugins');
 				}
 
+				// Below removes the upload tab from within the Link button modal
+			    CKEDITOR.on( 'dialogDefinition', function( ev ) {
+			        // Take the dialog name and its definition from the event data.
+			        var dialogName = ev.data.name;
+			        var dialogDefinition = ev.data.definition;
+
+			        // Check if the definition is from the dialog we're interested in.
+			        if ( dialogName == 'link')
+			        {
+			         // remove upload tab (lowercase) - note: Upload (Sentence Case), won't work as that references the Upload feature inside the 'image' modal
+			         dialogDefinition.removeContents( 'upload' );
+			        }
+			    });
+
 				// Now attach CKE to the form element with the name basename
 				// TODO - see if there's a way to get this CKE to insert itself into hider element
 				// FIXME - autoGrow_maxHeight establishes a height to keep toolbar/menu in view at current

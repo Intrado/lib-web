@@ -4,16 +4,16 @@
 if ($_GET['requesttype'] == "checkversion") {
 	header('Content-Type: application/json');
 	if ($_GET['version'] == "1.0") //or other suported version
-		echo json_encode(array("resultcode" => "success", "resultdescription" =>
+		echo json_encode(array("resultcode" => "success", "resultdescription" => 
 			"This Version is supported"));
 	else if ($_GET['version'] == "0.1")
-		echo json_encode(array("resultcode" => "warn", "resultdescription" =>
+		echo json_encode(array("resultcode" => "warn", "resultdescription" => 
 			"A new version of this application is available. You can continue, but this "
 			."version may not be supported in the future."));
-	else
-		echo json_encode(array("resultcode" => "failure", "resultdescription" =>
+	else 
+		echo json_encode(array("resultcode" => "failure", "resultdescription" => 
 			"This Version is not supported. Please update to continue using this application."));
-
+	
 	exit();
 }
 
@@ -35,7 +35,7 @@ require_once("../inc/date.inc.php");
  */
 function formatObjects ($data, $titles, $formatters = array()) {
 	$outputTitles = array_values($titles);
-
+	
 	$items = array();
 	foreach ($data as $obj) {
 		//only show cels with titles
@@ -51,7 +51,7 @@ function formatObjects ($data, $titles, $formatters = array()) {
 		}
 		$items[] = $item;
 	}
-
+	
 	return array("titles" => $outputTitles,"items" => $items);
 }
 
@@ -60,7 +60,7 @@ function doJobCancel($cancelid) {
 	if (userOwns("job",$cancelid) || $USER->authorize('managesystemjobs')) {
 		$job = new Job($cancelid);
 		$didCancel = $job->cancel();
-	}
+	}	
 	if ($didCancel)
 		return array("resultcode" => "success", "resultdescription" => "");
 	else
@@ -72,7 +72,7 @@ function doJobArchive($archiveid) {
 	if (userOwns("job",$archiveid) || $USER->authorize('managesystemjobs')) {
 		$job = new Job($archiveid);
 		$didArchive = $job->archive();
-	}
+	}	
 	if ($didArchive)
 		return array("resultcode" => "success", "resultdescription" => "");
 	else
@@ -82,7 +82,7 @@ function doJobArchive($archiveid) {
 
 function doJobView($start,$limit) {
 	global $USER;
-	if ($start < 0 )
+	if ($start < 0 ) 
 		$start = 0;
 
 	$notInClause = "status not in ('new','repeating','survey')";
@@ -91,7 +91,6 @@ function doJobView($start,$limit) {
 		// for API dont exclude new, but exclude templates
 		$notInClause = "status not in ('repeating', 'survey', 'template')";
 	}
-
 	$total = 0;
 	$query = "from job where userid=$USER->id
 			and $notInClause
@@ -101,7 +100,7 @@ function doJobView($start,$limit) {
 	$total = QuickQuery("select count(id) " . $query) + 0;
 
 	$displaystart = ($total) ? $start +1 : 0;
-
+	
 	$titles = array("id" => "id",
 				"name" => "name",
 				"description" => "description",
@@ -111,7 +110,7 @@ function doJobView($start,$limit) {
 				"enddate" => "enddate",
 				"starttime" => "starttime",
 				"endtime" => "endtime"
-	);
+				);
 	$formatters = array('Status' => 'fmt_status',
 					"type" => "fmt_obj_delivery_type_list");
 	return array_merge(array("resultcode" => "success", "resultdescription" => "",
@@ -130,10 +129,10 @@ function doJobInfo($jobid) {
 			return array("resultcode" => "failure", "resultdescription" => _L("You do not have to view information for this job."));
 		}
 	}
-
+		
 	$listids = QuickQueryList("select listid from joblist where jobid = ?",false,false,array($jobid));
 	$lists = array();
-
+	
 	$totallistcount = 0;
 	foreach ($listids as $id) {
 		if (!userOwns('list', $id) && !isSubscribed("list", $id))
@@ -143,12 +142,12 @@ function doJobInfo($jobid) {
 		$renderedlist = new RenderedList2();
 		$renderedlist->pagelimit = 0;
 		$renderedlist->initWithList($list);
-
+		
 		$count = $renderedlist->getTotal() + 0;
 		$totallistcount+= $count;
 		$lists[] = array("id" => $list->id, "name" => $list->name,"contacts" => $count);
 	}
-
+	
 	$job = new Job($jobid);
 
     if (isset($_REQUEST['api'])) {
@@ -174,7 +173,7 @@ function doJobInfo($jobid) {
 			//,"options" => $job->optionsarray
 			);
 
-	return array("resultcode" => "success", "resultdescription" => "","jobinfo" => $jobinfo);
+	return array("resultcode" => "success", "resultdescription" => "","jobinfo" => $jobinfo);	
 }
 
 function doliststats($statsids) {
@@ -206,13 +205,13 @@ function doliststats($statsids) {
 
 function handleRequest() {
 	global $USER, $ACCESS;
-
+	
 	if (!isset($_GET['version']) || !isset($_GET['requesttype'])) {
 		return array("resultcode" => "failure", "resultdescription" => "Invalid request. Please upgrade the application.");
 	}
-
+	
 	if ($_GET['version'] == "1.0") {
-
+		
 		//stuff related to this version's API
 		if ($_GET['requesttype'] == "job") {
 			if (isset($_GET['cancel'])) {
@@ -250,14 +249,14 @@ if (isset($_REQUEST['api'])) {
 if (isset($SETTINGS['feature']['log_mobile_api']) && $SETTINGS['feature']['log_mobile_api']) {
 	$logfilename = $SETTINGS['feature']['log_dir'] . "mobileapi.log";
 	$getdata = print_r($_GET, true);
-
+	
 	$fp = fopen($logfilename, "a");
 	flock($fp,LOCK_EX);
 
 	fwrite($fp, "--- " . date("Y-m-d H:i:s") . "---\n");
 	fwrite($fp, $getdata); //Probably a security risk, debug code should not ever be enabled in production.
 	fwrite($fp, "--->\n" . $json_encoded_data . "\n---\n");
-
+	
 	flock($fp,LOCK_UN);
 	fclose($fp);
 }

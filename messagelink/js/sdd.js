@@ -19,6 +19,7 @@ function SDD() {
 	var $this = this;
 
 	this.requestDocumentUrl = "requestdocument.php";
+	this.getDocumentUrl = "getdocument.php";
 
 	this.messageLinkCode = $("#message-link-code").val();
 	this.attachmentLinkCode = $("#attachment-link-code").val();
@@ -59,12 +60,11 @@ function SDD() {
 			"mal": $this.attachmentLinkCode,
 			"p": password ? password : null
 		};
-		var requestDocumentUrl = this.requestDocumentUrl;
 		// if password provided, include v ("verify") param to verify password server-side,
 		if (password) {
 			requestParams['v'] = true;
 			return $.ajax({
-				url: requestDocumentUrl,
+				url: this.requestDocumentUrl,
 				type: "POST",
 				data: requestParams,
 				success: function (res) {
@@ -72,7 +72,7 @@ function SDD() {
 					delete requestParams['v'];
 					// now download the document, i.e. redirect user to direct URL,
 					// which should invoke the browser's download/save as dialog
-					$this.postToUrl(requestDocumentUrl, requestParams);
+					$this.postToUrl(requestParams);
 				},
 				error: function (res) {
 					if (res && res.responseJSON && res.responseJSON.errorMessage) {
@@ -86,7 +86,7 @@ function SDD() {
 		} else {
 			// now download the document, i.e. redirect user to direct URL,
 			// which should invoke the browser's download/save as dialog
-			$this.postToUrl(requestDocumentUrl, requestParams);
+			$this.postToUrl(requestParams);
 		}
 
 	};
@@ -94,15 +94,13 @@ function SDD() {
 	/**
 	 *
 	 * Builds and submits form dynamically via jQuery. Upon submit, removes form from DOM.
-	 * For use in submitting a non-AJAX POST request to ../messagelink/requestDocument.php to download document (ex. pdf)
 	 *
 	 * borrowed/modified from http://stackoverflow.com/questions/133925/javascript-post-request-like-a-form-submit
 	 *
-	 * @param path
 	 * @param params
 	 */
-	this.postToUrl = function(path, params) {
-		var form = $this.getPostForm(path, params);
+	this.postToUrl = function(params) {
+		var form = $this.getDocumentForm(params);
 
 		// the form must be in the document to submit
 		$("body").append(form);
@@ -114,12 +112,26 @@ function SDD() {
 
 	/**
 	 *
-	 * @param string path - url to post to
 	 * @param object params - object containing all the required post params, ex. s, mal, p, v.
 	 * @return jQuery object representing the form, contains child hidden input elements
 	 */
-	this.getPostForm = function(path, params) {
-		var form = $("<form>").attr({method: "post", action: path});
+	this.getDocumentForm = function(params) {
+		var form, action, method;
+
+		// If a password is present we don't want to show it in the url bar, so we use
+		// a POST request.
+		// FIXME: This will fail on mobile browser when trying to download
+		// and play an audio or video file, because the resource will be re-requested
+		// with a GET request without the necessary params.
+		if (params['p']) {
+			action = this.requestDocumentUrl;
+			method = 'post';
+		} else {
+			action = this.getDocumentUrl;
+			method = 'get'
+		}
+
+		form = $("<form>").attr({method: method, action: action});
 
 		// append hidden elements to the form, based on params object
 		for(var key in params) {
