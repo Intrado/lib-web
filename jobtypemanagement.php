@@ -64,7 +64,7 @@ if (isset($_REQUEST['api'])) {
 	}
 
 	header("Content-Type: application/json");
-	exit(json_encode(cleanObjects($result)));
+	exit(json_encode(cleanObjects($result, array('inject-id' => true))));
 }
 
 foreach($systemprioritynames as $index => $name){
