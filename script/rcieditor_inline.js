@@ -107,18 +107,24 @@ window.RCIEditorInline = function () {
                                                     "Lucida Sans Unicode/Lucida Sans Unicode, Lucida Grande, sans-serif;"+
                                                     "Tahoma/Tahoma, Geneva, sans-serif;Times New Roman/Times New Roman, Times, serif;"+
                                                     "Trebuchet MS/Trebuchet MS, Helvetica, sans-serif;"+
-                                                    "Verdana/Verdana, Geneva, sans-serif",
-                                
-				editor.config.toolbar = [
-					['Undo', 'Redo'],
-					['NumberedList', 'BulletedList', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', 'Outdent', 'Indent'],
-					['PasteFromWord', 'SpellCheck'],
-					['Link', 'Image', 'Table', 'HorizontalRule'],
-					'/',
-					['Bold', 'Italic', 'Underline', 'Strike', 'TextColor', 'BGColor', 'RemoveFormat'],
-					['Styles', 'Format', 'Font', 'FontSize'],
-					extraButtons
-				];
+                                                    "Verdana/Verdana, Geneva, sans-serif";
+                     
+
+                // check against the URL for the following string(s) - corresponding removes Image Upload modal button from SDD create email page
+    			var is_pdfsendmail 		= window.location.href.indexOf('pdfsendmail') > -1,
+    				showHideImageBtn 	= !is_pdfsendmail ? 'Image' : 'undefined';
+
+					editor.config.toolbar = [
+						['Undo', 'Redo'],
+						['NumberedList', 'BulletedList', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', 'Outdent', 'Indent'],
+						['PasteFromWord', 'SpellCheck'],
+						['Link', showHideImageBtn, 'Table', 'HorizontalRule'],
+						'/',
+						['Bold', 'Italic', 'Underline', 'Strike', 'TextColor', 'BGColor', 'RemoveFormat'],
+						['Styles', 'Format', 'Font', 'FontSize'],
+						extraButtons
+					];
+					
 
 			});
 

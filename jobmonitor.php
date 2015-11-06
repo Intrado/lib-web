@@ -73,19 +73,7 @@ if ($job->hasEmail()) {
 	}
 }
 if ($job->hasSMS()) {
-	$jobstats['sms'] = array(
-			"sent" => 0,
-			"unsent" => 0,
-			"notattempted" => 0,
-			"blocked" => 0,
-			"duplicate" => 0,
-			"nocontacts" => 0,
-			"declined" => 0
-	);
-	$result = Query(JobSummaryReport::getDestinationResultQuery("and rp.jobid=?", "and rp.type=?"), $readonlyconn, array($job->id, 'sms'));
-	while ($row = DBGetRow($result)) {
-		$jobstats["sms"][$row[1]] += $row[0];
-	}
+	$jobstats['sms'] = JobSummaryReport::getSmsInfo($job->id, $readonlyconn);
 }
 $_SESSION['jobstats'][$job->id] = $jobstats;
 
@@ -166,11 +154,13 @@ if ($job->hasEmail()) {
 }
 if ($job->hasSMS()) {
 	$smsinfo = JobSummaryReport::getSmsInfo($job->id, $readonlyconn);
+
 	$destinationresults['sms'] = array(
-		'recipients' => (int)$smsinfo['total'],
-		'completed' => (int)$smsinfo['delivered'],
-		'remaining' => (int)$smsinfo['pending'],
-		'percentcontacted' => isset($smsinfo['success_rate']) ? sprintf("%0.2f%%", $smsinfo['success_rate']) : "N/A"
+		'total' => (int)$smsinfo['total'],
+		'filtered' => (int)$smsinfo['filtered'],
+		'pending' => (int)$smsinfo['pending'],
+		'undelivered' => (int)$smsinfo['undelivered'],
+		'delivered' => (int)$smsinfo['delivered']
 	);
 }
 $windowtitle = _L("Monitoring job, %1s, last updated %2s", escapehtml($job->name), date("g:i:s a",$jobstats['validstamp']));
@@ -272,8 +262,25 @@ if ($job->hasEmail()) { ?>
 <? }
 if ($job->hasSMS()) { ?>
 		<tr class='destination'>
-			<td class="bottomBorder" colspan="2">
-				Monitoring is not currently available for SMS. Please click on the Report link to view SMS status.
+			<th align="right" class="windowRowHeader bottomBorder">SMS:</th>
+			<td class="bottomBorder">
+				<table  border="0" cellpadding="2" cellspacing="1" class="list" width="100%">
+						<tr class="listHeader" align="left" valign="bottom">
+							<th><? echo _L('# of SMS'); ?></th>
+							<th><? echo _L('Not Attempted'); ?></th>
+							<th><? echo _L('Pending'); ?></th>
+							<th><? echo _L('Undelivered'); ?></th>
+							<th><? echo _L('Delivered'); ?></th>
+						</tr>
+						<tr>
+							<td id='totalsms'><?=$destinationresults['sms']['total']?></td>
+							<td id='filteredsms'><?=$destinationresults['sms']['filtered']?></td>
+							<td id='pendingsms'><?=$destinationresults['sms']['pending']?></td>
+							<td id='undeliveredsms'><?=$destinationresults['sms']['undelivered']?></td>
+							<td id='deliveredsms'><?=$destinationresults['sms']['delivered']?></td>
+						</tr>
+				</table>
+				<img style='width:500px;height:300px' src='<?=$imageurl?>&type=sms' id='smsgraph'/>
 			</td>
 		</tr>
 <? }
