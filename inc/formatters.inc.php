@@ -9,16 +9,6 @@ function fmt_obj_date ($obj,$name) {
 	return "- Never -";
 }
 
-function fmt_obj_date_iso($obj, $name) {
-	if (isset($obj->$name) && $obj->$name != "") {
-		$time = strtotime($obj->$name);
-		if ($time !== -1 && $obj->$name != "0000-00-00 00:00:00")
-			return date(DATE_ISO8601, $time);
-	}
-	return null;
-}
-
-
 function fmt_date ($row,$index) {
 	if (isset($row[$index])) {
 		$time = strtotime($row[$index]);

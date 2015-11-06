@@ -26,14 +26,14 @@ require_once("obj/JobType.obj.php");
 require_once("obj/Person.obj.php");
 require_once("inc/rulesutils.inc.php");
 
-function fmt_dst_src($row, $index)
-{
+function fmt_dst_src($row, $index){
     if ($row[$index] != null) {
         $type = $row[5];
         $maxtypes = fetch_max_types();
         $actualsequence = isset($maxtypes[$type]) ? ($row[$index] % $maxtypes[$type]) : $row[$index];
         return escapehtml(destination_label($row[5], $actualsequence));
-    } else
+	}
+	else
         return "";
 }
 
@@ -116,12 +116,6 @@ $reportgenerator->generateQuery();
 $report = $reportgenerator->getData();
 
 header('Content-Type: application/json');
-
-if (isset($_REQUEST["api"])) {
-    foreach ($report as &$row) {
-        $row[8] = $row[8] ? date(DATE_ISO8601, strtotime($row[8])) : null;
-    }
-}
-
 exit(json_encode($report));
 
+?>

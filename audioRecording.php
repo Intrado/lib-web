@@ -14,7 +14,6 @@ include_once("obj/MessageGroup.obj.php");
 include_once("obj/Content.obj.php");
 include_once("obj/AudioConverter.obj.php");
 require_once("inc/appserver.inc.php");
-require_once("inc/formatters.inc.php");
 
 global $USER;
 
@@ -92,9 +91,6 @@ $audio->update();
 
 header('Content-Type: application/json');
 
+exit(json_encode(Array("id" => $audio->id, "audio" => cleanObjects($audio))));
 
-$responseObj = cleanObjects($audio);
-$responseObj['recorddate'] = fmt_obj_date_iso($audio, 'recorddate');
-
-exit(json_encode(Array("id" => $audio->id, "audio" => $responseObj)));
-
+?>

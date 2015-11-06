@@ -110,23 +110,16 @@ function doJobView($start,$limit) {
 				"startdate" => "startdate",
 				"enddate" => "enddate",
 				"starttime" => "starttime",
-				"endtime" => "endtime",
-				"createdate"=> "createdate"
+				"endtime" => "endtime"
 	);
-
-	$formatters = array(
-		'Status' => 'fmt_status',
-		"type" => "fmt_obj_delivery_type_list",
-		"createdate" => "fmt_obj_date_iso"
-	);
-
+	$formatters = array('Status' => 'fmt_status',
+					"type" => "fmt_obj_delivery_type_list");
 	return array_merge(array("resultcode" => "success", "resultdescription" => "",
 							"totalrows" => $total,
 							"startrow" => $displaystart
 						),
 						formatObjects($data,$titles,$formatters));
 }
-
 
 function doJobInfo($jobid) {
 	if (!userOwns("job",$jobid)) {
@@ -166,11 +159,6 @@ function doJobInfo($jobid) {
     }
 
 	$jobtype = new JobType($job->jobtypeid);
-
-
-
-
-
 	$jobinfo = array(	"id" => $job->id,
 			"name" => $job->name,
 			"description" => $job->description,
@@ -179,11 +167,10 @@ function doJobInfo($jobid) {
 			"messagegroup" => $job->messagegroupid,
 			"messagetypes" => array("phone" => $job->hasPhone(),"email" => $job->hasEmail(),"sms" => $job->hasSMS()),
 			"status" => $job->status,
-			"startdate" => fmt_obj_date_iso($job, 'startdate'),
+			"startdate" => $job->startdate,
 			"enddate" => $job->enddate,
 			"starttime" => $job->starttime,
-			"endtime" => $job->endtime,
-			"createdate" => fmt_obj_date_iso($job, 'createdate')
+			"endtime" => $job->endtime
 			//,"options" => $job->optionsarray
 			);
 
@@ -243,10 +230,7 @@ function handleRequest() {
 			if (isset($_GET['stats'])) {
 				return doliststats($_GET['stats']);
 			}
-		} else if ($_GET['requesttype'] == "serverstate") {
-			return array('servertime' => date('c'));
 		}
-
 	} else  {
 		return array("resultcode" => "failure", "resultdescription" => "Please upgrade the application. This version is no longer supported.");
 	}

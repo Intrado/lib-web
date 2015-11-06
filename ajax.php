@@ -57,10 +57,7 @@ function handleRequest() {
 					order by lettersfirst,l.name", "l", array($USER->id,$USER->id));
 
 			if (isset($_GET['api'])) {
-				return cleanObjects($rs, array(
-					'iso-dates' => array( 'modifydate','lastused'),
-					'inject-id'=>true
-				));
+				return cleanObjects($rs, array('inject-id'=>true));
 			}
 			else{
 				return cleanObjects($rs);
@@ -205,7 +202,6 @@ function handleRequest() {
 
 			if (isset($_GET['api'])) {
 				$recipientList = cleanObjects($list, array(
-					'iso-dates' => array('modifydate', 'lastused'),
 					'inject-id' => true
 				));
 			}
