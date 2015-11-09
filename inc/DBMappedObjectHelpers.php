@@ -73,13 +73,14 @@ function _DBFindPDO($isMany, $classname, $query, $alias=false, $args=false, $dbc
  */
 function cleanObjects($obj, $options = array()) {
     if (is_array($options)) {
+		$injectId = array_key_exists('inject-id', $options) && $options['inject-id'];
 
         if (array_key_exists('iso-dates', $options)) {
             $cleanDatesFields = $options['iso-dates'];
-            $injectId = array_key_exists('inject-id', $options) && $options['inject-id'];
-
         }
     }
+
+
 
     if (!is_object($obj) && !is_array($obj))
         return $obj;
