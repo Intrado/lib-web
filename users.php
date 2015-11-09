@@ -69,6 +69,7 @@ function is_sm_user($id) {
 }
 
 $hasldap = getSystemSetting('_hasldap', '0');
+$hassaml = getSystemSetting('_hasSAML', '0');
 
 if (isset($_GET['resetpass'])) {
 	$id = 0 + $_GET['resetpass'];
@@ -76,6 +77,11 @@ if (isset($_GET['resetpass'])) {
 	// check if ldap user (cannot reset them)
 	if ($hasldap && $usr->ldap) {
 		notice(_L("Unable to reset the password for %s. This user is authorized by the LDAP server.", escapehtml($usr->login)));
+		redirect();
+	}
+	// check if saml user (cannot reset them)
+	if ($hassaml && $usr->samlEnabled) {
+		notice(_L("Unable to reset the password for %s. This user is authorized by the SAML SSO server.", escapehtml($usr->login)));
 		redirect();
 	}
 	// else not ldap user, check if they have email for resetting
@@ -195,7 +201,7 @@ $newusers = QuickQueryList("select id,1 from user where not enabled and deleted=
 // Display Functions
 ////////////////////////////////////////////////////////////////////////////////
 function fmt_actions_enabled_account ($account,$name) {
-	global $USER, $hasldap;
+	global $USER, $hasldap, $hassaml;
 
 	$id = $account['id'];
 	$importid = $account['importid'];

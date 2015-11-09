@@ -117,5 +117,9 @@ feedbackTypes = "Compliment, Product Question, Product Request, Other"
 ;newrelic_messagesender_id=""
 ;newrelic_license_key=""
 
+;SAML configuration
+[saml]
+host="http://sandbox.testschoolmessenger.com:9686"
+
 ;*/?>
 

@@ -59,6 +59,7 @@ if ($edituser->importid != null) {
 		$readonly = true; // only full sync user imports manage user data, set readonly on this page
 }
 $ldapuser = $edituser->ldap;
+$samluser = $edituser->samlEnabled;
 $profilename = QuickQuery("select name from access where id=?", false, array($edituser->accessid));
 
 $hasenrollment = getSystemSetting('_hasenrollment', false);
@@ -83,6 +84,7 @@ $userfeedcategories = QuickQueryList("select id from feedcategory where id in (s
 $feedcategories = DBFindMany("feedcategory", "from feedcategory where not deleted order by name");
 
 $IS_LDAP = getSystemSetting('_hasldap', '0');
+$IS_SAML = getSystemSetting('_hasSAML', '0');
 
 $orgs = Organization::getAuthorizedOrgKeys();
 
@@ -304,6 +306,18 @@ if($IS_LDAP){
 		"label" => _L("Use LDAP Auth"),
 		"fieldhelp" => _L('Authenticate with an onsite LDAP server.  You do not need to set a password for your username here.'),
 		"value" => $ldapuser,
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 1
+	);
+	// TODO how to determine if password is required or not, based on ldap checkbox
+}
+
+if($IS_SAML){
+	$formdata["samlEnabled"] = array(
+		"label" => _L("Use SAML Auth"),
+		"fieldhelp" => _L('Authenticate with SSO SAML provider.  You do not need to set a password for your username here.'),
+		"value" => $samluser,
 		"validators" => array(),
 		"control" => array("CheckBox"),
 		"helpstep" => 1
@@ -678,6 +692,8 @@ if ($readonly) {
 	unset($formdata["login"]["validators"]);
 	// Use LDAP login auth
 	if($IS_LDAP) $formdata["ldap"]["control"] = array("FormHtml","html" => $ldapuser?"True":"False");
+	// Use SAML login auth
+	if($IS_SAML) $formdata["samlEnabled"]["control"] = array("FormHtml","html" => $samluser?"True":"False");
 	// Password
 	unset($formdata["password"]["requires"]);
 	// Access code
@@ -784,6 +800,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$edituser->description = $postdata['description'];
 			$edituser->login = $postdata['login'];
 			$edituser->ldap = isset($postdata['ldap'])?$postdata['ldap']:false;
+			$edituser->samlEnabled = isset($postdata['samlEnabled'])?$postdata['samlEnabled']:false;
 			$edituser->accesscode = $postdata['accesscode'];
 			$edituser->email = $postdata['email'];
 			$edituser->aremail = $postdata['aremail'];
@@ -802,6 +819,13 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					$edituser->ldap=1;
 				else
 					$edituser->ldap=0;
+			}
+
+			if($IS_SAML){
+				if(isset($postdata['samlEnabled']) && $postdata['samlEnabled'])
+					$edituser->samlEnabled=1;
+				else
+					$edituser->samlEnabled=0;
 			}
 
 			$edituser->accessid = $postdata['accessid'];

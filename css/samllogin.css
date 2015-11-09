@@ -1,0 +1,204 @@
+/*----- Normalize - this resets default styles applied by browsers -----*/
+
+article, aside, details, figcaption, figure, footer, header, hgroup, nav, section { display: block; }
+audio, canvas, video { display: inline-block; *display: inline; *zoom: 1; }
+audio:not([controls]) { display: none; }
+[hidden] { display: none; }
+
+html { font-size: 100%; overflow-y: scroll; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+body { margin: 0; font-size: 0.75em; line-height: 1.231; }
+body, input, select, textarea { font-family: Verdana, "Helvetica Neue", helvetica,  Arial, sans-serif; color: #444 /* <?=$primary?> */ ; }
+
+a { color: <?=$primary?>; text-decoration: none; }
+a:visited { color: <?=$primary?>; }
+a:hover { color: <?=$theme1?>; }
+a:focus { outline: thin dotted; }
+a:hover, a:active { outline: 0; }
+
+b, strong { font-weight: bold; }
+blockquote { margin: 1em 40px; }
+dfn { font-style: italic; }
+hr { display: block; height: 1px; border: 0; border-top: 1px solid #ccc; margin: 1em 0; padding: 0; }
+ins { background: #ff9; color: #000; text-decoration: none; }
+mark { background: #ff0; color: #000; font-style: italic; font-weight: bold; }
+pre, code, kbd, samp { font-family: monospace, monospace; _font-family: 'courier new', monospace; font-size: 1em; }
+pre { white-space: pre; white-space: pre-wrap; word-wrap: break-word; }
+q { quotes: none; }
+q:before, q:after { content: ""; content: none; }
+small { font-size: 85%; }
+sub, sup { font-size: 75%; line-height: 0; position: relative; vertical-align: baseline; }
+sup { top: -0.5em; }
+sub { bottom: -0.25em; }
+ul, ol { margin: 1em 0; padding: 0 0 0 40px; }
+dd { margin: 0 0 0 40px; }
+nav ul, nav ol { list-style: none; list-style-image: none; margin: 0; padding: 0; }
+img { border: 0; -ms-interpolation-mode: bicubic; vertical-align: middle; }
+svg:not(:root) { overflow: hidden; }
+figure { margin: 0; }
+
+form { margin: 0; }
+fieldset { border: 0; margin: 0; padding: 0; }
+label { cursor: pointer; }
+legend { border: 0; *margin-left: -7px; padding: 0; }
+input, select, textarea { font-size: 100%; margin: 0; vertical-align: baseline; *vertical-align: middle;}
+input { line-height: normal; *overflow: visible; }
+table input { *overflow: auto; }
+input[type="button"], input[type="reset"], input[type="submit"] { cursor: pointer; -webkit-appearance: button; }
+input[type="checkbox"], input[type="radio"] { box-sizing: border-box; }
+input[type="search"] { -webkit-appearance: textfield; -moz-box-sizing: content-box; -webkit-box-sizing: content-box; box-sizing: content-box; }
+input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; }
+textarea { overflow: auto; vertical-align: top; resize: vertical; }
+/*
+input:valid, textarea:valid {  }
+input:invalid, textarea:invalid { background-color: #f0dddd; }
+*/
+table { border-collapse: collapse; border-spacing: 0; }
+td, th { vertical-align: top; padding: .5em; }
+
+
+/* ---------- Login form styles ---------- */
+
+body {font-family: "Lucida Grande", verdana, arial, helvetica, sans-serif; }
+h3 { margin: 0 0 10px 0; }
+p { margin: 0 0 10px 0; font-size: 12px; line-height: 19px; }
+.banner { width: 100%; max-width: 670px; margin: 0 auto; }
+.banner_logo { float: none; display: block; margin: 0 0 30px 0; text-align: center; }
+.banner_logo img { background: #fff; padding: 10px; -webkit-box-shadow: 0px 1px 2px 0px #666; -moz-box-shadow: 0px 1px 2px 0px #666; box-shadow: 0px 1px 2px 0px #666; 
+-webkit-border-radius: 0 0 5px 5px; -moz-border-radius: 0 0 5px 5px; border-radius: 0 0 5px 5px; 
+-moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
+
+.window { background: none; border: none; }
+.window_body_wrap { padding: 0; }
+.window_body { background: #FEFEFE; width: 97%; max-width: 670px; margin: 0 auto; padding: 1em 1.5%; border-radius: 5px;
+-webkit-box-shadow: 0px 1px 2px 0px #666; -moz-box-shadow: 0px 1px 2px 0px #666; box-shadow: 0px 1px 2px 0px #666; }
+.window_body img { max-width: 100%; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
+-moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
+
+.window_body div { float: left; display: inline; width: 48%; }
+.window_body div.section1 { width: 100%; }
+.window_body form { float: right; display: inline; width: 48%; }
+.window_body form fieldset { margin: 0 0 10px 0; }
+.window_body form label, .window_body form input { display: block; width: 98%; font-size: 14px; line-height: 23px; }
+.window_body form label.check { float: left; display: inline; font-size: 12px; line-height: 17px; width: auto; }
+.window_body form label.disabled { color: #999; }
+.window_body form input[type=text], .window_body form input[type=password] { background: #fff; padding: 3px 5px; border: 1px solid #a7a7a7; -webkit-border-radius: 3px; border-radius: 3px; }
+.window_body form input[type=submit] { float: right; width: 100px; }
+.window_body form input[type=checkbox] { float: left; width: 15px; }
+.window_body form input.disabled { background: #ddd; border: 1px solid #b5b5b5; }
+.window_body form a { color: #00aeef; font-size: 13px; }
+.indexdisplayname { font-size: 1.6em; margin: 0; padding: 0 0 10px 0;  }
+.right { text-align: right; }
+.signup { display: block; width: 100%; }
+.window_body #capslockwarning { padding-left: 3px; color: red; }
+
+.window_body .rightblock { float: right; }
+
+#footer { width: 100%; max-width: 650px; margin: 0 auto; padding: 10px 0 0; }
+#footer p { color: #fff; }
+#footer a { color: #999; }
+#footer a:hover { color: #777; }
+
+.language { position: absolute; top: 12px; right: 10px; }
+.ssl { font-size: 9px; }
+.error { color: red; }
+
+
+/* === micro clearfix - http://nicolasgallagher.com/micro-clearfix-hack/ === */
+.cf:before, .cf:after { content: ""; display: table; }
+.cf:after { clear: both; }
+.cf { zoom: 1; }
+
+.form-signin {
+    max-width: 330px;
+    padding: 15px;
+    margin: 0 auto;
+}
+.form-signin .form-signin-heading,
+.form-signin .checkbox {
+    margin-bottom: 10px;
+}
+.form-signin .checkbox {
+    font-weight: normal;
+}
+.form-signin .form-control {
+    position: relative;
+    height: auto;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 10px;
+    font-size: 16px;
+}
+.form-signin .form-control:focus {
+    z-index: 2;
+}
+.form-signin input[type="email"] {
+    margin-bottom: -1px;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+}
+.form-signin input[type="password"] {
+    margin-bottom: 10px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+body{
+    margin: 0;
+}
+        
+header {
+    background-image: linear-gradient(bottom, #57d1f4 100%, #57d1f4 50%);
+    background-image: -o-linear-gradient(bottom, #57d1f4 100%, #57d1f4 50%);
+    background-image: -moz-linear-gradient(bottom, #57d1f4 100%, #57d1f4 50%);
+    background-image: -webkit-linear-gradient(bottom, #57d1f4 100%, #57d1f4 50%);
+    background-image: -ms-linear-gradient(bottom, #57d1f4 100%, #57d1f4 50%);
+    position: absolute;
+    height: 30%;
+    width: 100%;
+    text-align: center;
+}
+
+
+#loginButton{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -90px;
+    margin-left: -100px;
+    width: 200px;
+    height: 100px;
+}
+h1 {
+    color: white;
+}
+
+#bottom{
+    position: absolute;
+    top: 30%;
+    padding-top: 50px;
+    text-align: center;
+    width: 100%;
+}
+        
+
+#title {
+    color: white;
+    text-align: right;
+    padding-right: 1%;
+}
+.btn-primary{
+    background-color: #33b6c7;
+    border-color: #33b6c7;
+    border-radius: 100px;
+}
+
+footer {
+    position: absolute;
+    right: 0;
+    bottom:0;
+    left: 0;
+    height: 0%;
+    padding: 2rem;
+    text-align: center;
+}

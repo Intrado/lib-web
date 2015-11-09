@@ -91,13 +91,11 @@ function doJobView($start,$limit) {
 		// for API dont exclude new, but exclude templates
 		$notInClause = "status not in ('repeating', 'survey', 'template')";
 	}
-
 	$total = 0;
 	$query = "from job where userid=$USER->id
 			and $notInClause
-			and deleted=0
+			and deleted=0 
 			order by ifnull(finishdate,modifydate) desc";
-
 	$data = DBFindMany("Job",$query . " limit $start, $limit");
 	$total = QuickQuery("select count(id) " . $query) + 0;
 

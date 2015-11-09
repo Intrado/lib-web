@@ -249,6 +249,8 @@ foreach ($customers as $cust) {
 			$customerfeatures[] = "ContactMgr";
 		if (getCustomerSystemSetting('_hasldap', false, true, $custdb))
 			$customerfeatures[] = "LDAP";
+		if (getCustomerSystemSetting('_hasSAML', false, true, $custdb))
+			$customerfeatures[] = "SAML";
 		if (getCustomerSystemSetting('_hassms', false, true, $custdb))
 			$customerfeatures[] = "SMS";
 		if (getCustomerSystemSetting('_hassmapi', false, true, $custdb))
