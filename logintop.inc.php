@@ -6,6 +6,14 @@ $topbg = fadecolor("3399ff", "FFFFFF", .2/2);
 
 $CustomBrand = isset($scheme['productname']) ? $scheme['productname'] : "";
 $custname = isset($scheme['customerName']) ? $scheme['customerName'] : "";
+$samlEnabled = $scheme['_hasSAML'];
+$forceLocal = isset($_GET['forceLocal']);
+if($_SERVER['REQUEST_METHOD'] === 'GET' && $samlEnabled && !$forceLocal) {
+	redirect("samllogin.php");
+}
+
+$samlURL = isset($scheme['_samlIdPEntityId']) ? $scheme['_samlIdPEntityId'] : "";
+$samlIdPMetadataURL = isset($scheme['_samlIdPMetadataURL']) ? $scheme['_samlIdPMetadataURL']: "";
 
 //Takes 2 hex color strings and 1 ratio to apply to to the primary:original
 function fadecolor($primary, $fade, $ratio){
@@ -21,7 +29,7 @@ function fadecolor($primary, $fade, $ratio){
 
 if (!isset($scheme['_supportemail']))
 	$scheme['_supportemail'] = "support@schoolmessenger.com";
-	
+
 if (!isset($scheme['_supportphone']))
 	$scheme['_supportphone'] = "8009203897";
 
@@ -31,7 +39,7 @@ if (!isset($scheme['_supportphone']))
 <html>
 <head>
 	<meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
-	
+
 	<title><?=$CustomBrand?> <?=$TITLE?></title>
 	<link href='css/login.css' rel='stylesheet'>
 
@@ -40,8 +48,8 @@ if (!isset($scheme['_supportphone']))
 	<link rel="apple-touch-icon" sizes="72x72" href="img/ios/apple-touch-icon-72x72.png" />
 	<link rel="apple-touch-icon" sizes="114x114" href="img/ios/apple-touch-icon-114x114.png" />
 	<link rel="apple-touch-icon" sizes="144x144" href="img/ios/apple-touch-icon-144x144.png" />
-	
-<script type="text/javascript">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+	<script type="text/javascript">
 
 function capslockCheck(e){
 	var keypressed;
@@ -101,7 +109,7 @@ function getObj(name)
 			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
 		})();
 <?
-}	
+}
 ?>
 </script>
 </head>
@@ -118,5 +126,5 @@ function getObj(name)
 
 		<div id="window" class="window_body cf">
 			<h3 class="indexdisplayname"><?=escapehtml($custname)?></h3>
-		
+
 			  <div><img src="loginpicture.img.php" alt=""></div>

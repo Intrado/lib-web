@@ -53,7 +53,6 @@ if (isset($_GET['id'])) {
 	redirect();	
 }
 
-
 if (!isset($_SESSION['customerid']) && !$MANAGERUSER->authorized("newcustomer"))
 	exit("Not Authorized");
 
@@ -61,6 +60,7 @@ if (!$MANAGERUSER->authorized("editcustomer")) {
 	unset($_SESSION['customerid']);
 	exit("Not Authorized");
 }
+$hasSAML = isset($_GET['hasSAML']);
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -266,6 +266,10 @@ $settings = array(
 	'_hascallback' => '0',
 	'callbackdefault' => 'inboundnumber',
 	'_hasldap' => '0',
+	'_hasSAML' => '0',
+	'_samlIdPMetadataURL' => '',
+	'_samlIdPEntityId' => '',
+	'_samlAttribute' => '',
 	'_hasenrollment' => '0',
 	'_hastargetedmessage' => '0',
 	'_hasphonetargetedmessage' => '0',
@@ -665,6 +669,43 @@ $formdata["hasldap"] = array(
 	"helpstep" => $helpstepnum
 );
 
+if ($hasSAML || $settings['_hasSAML']) {
+
+	$formdata["hasSAML"] = array(
+		"label" => _L('Has SAML'),
+		"value" => $settings['_hasSAML'],
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => $helpstepnum
+	);
+
+	$formdata["samlIdPMetadataURL"] = array(
+		"label" => _L('SAML IdP Metadata URL'),
+		"value" => $settings['_samlIdPMetadataURL'],
+		"validators" => array(
+				array("ValUrl")
+		),
+		"control" => array("TextField","maxlength"=>255,"min"=>0,"size"=>35),
+		"helpstep" => $helpstepnum
+	);
+
+	$formdata["samlIdPEntityId"] = array(
+		"label" => _L('SAML IdP Entity Id'),
+		"value" => $settings['_samlIdPEntityId'],
+		"validators" => array(),
+		"control" => array("TextField","maxlength"=>255,"min"=>0,"size"=>35),
+		"helpstep" => $helpstepnum
+	);
+
+	$formdata["samlAttribute"] = array(
+		"label" => _L('SAML username attribute'),
+		"value" => $settings['_samlAttribute'],
+		"validators" => array(),
+		"control" => array("TextField","maxlength"=>255,"min"=>0,"size"=>35),
+		"helpstep" => $helpstepnum
+	);
+}
+
 $formdata["hasenrollment"] = array(
 	"label" => _L('Has Enrollment'),
 	"value" => $settings['_hasenrollment'],
@@ -978,6 +1019,12 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		// more features
 		setCustomerSystemSetting('_hassurvey', $postdata["hassurvey"]?'1':'0', $custdb);
 		setCustomerSystemSetting('_hasldap', $postdata["hasldap"]?'1':'0', $custdb);
+		if ($hasSAML || $settings['_hasSAML']) {
+			setCustomerSystemSetting('_hasSAML', $postdata["hasSAML"]?'1':'0', $custdb);
+			setCustomerSystemSetting('_samlIdPMetadataURL', $postdata["samlIdPMetadataURL"], $custdb);
+			setCustomerSystemSetting('_samlIdPEntityId', $postdata["samlIdPEntityId"], $custdb);
+			setCustomerSystemSetting('_samlAttribute', $postdata["samlAttribute"], $custdb);
+		}
 		setCustomerSystemSetting('_hasenrollment', $postdata["hasenrollment"]?'1':'0', $custdb);
 		
 		// updating SMS shortcode requires updating authserver -> customer. SQL in SMSAggregatorData.php

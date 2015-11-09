@@ -535,6 +535,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			if (!$USER->ldap) {
 				$USER->login = $postdata['login'];
 			}
+			$USER->samlEnabled = $postdata['samlEnabled'];
 			$USER->accesscode = $postdata['accesscode'];
 			$USER->email = $postdata['email'];
 			$USER->aremail = $postdata['aremail'];

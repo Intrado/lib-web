@@ -126,7 +126,8 @@ $settings = array(
 	'loginlockoutattempts' => '5',
 	'logindisableattempts' => '0',
 	'loginlockouttime' => '5',
-	'_amdtype' => "ivr"
+	'_amdtype' => "ivr",
+	'_hasSAML' => '0'
 );
 
 $timezones = array(

@@ -72,6 +72,12 @@ if (isset($_GET['login'])) {
 	}
 	if($userid)
 		$updatelogin = true;
+} else if (isset($_GET['sessionID'])){
+	session_id($_GET['sessionID']); // set the session id
+	$userid = (int) $_GET['userID'];
+	if($userid){
+		$updatelogin = true;
+	}
 } else if (!isset($_GET['logout'])){
 	doStartSession(); // we must start the session to obtain the user information before trying to perform the following IF conditions
 	$sessionstarted = true;

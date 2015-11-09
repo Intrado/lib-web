@@ -167,6 +167,7 @@ if ($datatype == "person") {
 	
 } else if ($datatype == "user") {
 	$hasldap = getSystemSetting('_hasldap', '0');
+	$hassaml = getSystemSetting('_hasSAML', '0');
 	$hasenrollment = getSystemSetting('_hasenrollment', '0');
 	
 	// person column to select type for field map options
@@ -185,6 +186,8 @@ if ($datatype == "person") {
 	$usermapto["u14"] = "Enabled"; // values enable, disable, disableonnew (default)
 	if ($hasldap)
 		$usermapto["u13"] = "Use LDAP";
+	if ($hassaml)
+		$usermapto["u15"] = "Use SAML";
 	$usermapto["u5"] = "Telephone User ID";
 	$usermapto["u6"] = "Email";
 	$usermapto["u7"] = "Auto Report Emails";
