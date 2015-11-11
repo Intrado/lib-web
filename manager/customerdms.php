@@ -319,7 +319,7 @@ $filterFormatters = array("status" => "fmt_dmstatus_nohtml",6 => "fmt_state");
 // Display
 /////////////////////////////
 $TITLE = _L("SmartCall");
-$PAGE = "commsuite:customerdms";
+$PAGE = "dm:customerdms";
 
 include_once("nav.inc.php");
 

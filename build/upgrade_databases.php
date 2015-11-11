@@ -84,7 +84,7 @@ $versions = array(
 		"11.1/14",
 		"11.2/8",
 		"11.4/7",
-		"11.5/2",
+		"11.5/3",
 		//etc., one array element per version, always the last revision of the given version
 	),
 
@@ -106,7 +106,7 @@ $dbversions = array(
 		"11.0/2",
 		"11.2/2",
 		"11.3/5",
-		"11.5/3"
+		"11.5/5",
 	),
 
 	"aspshard" => array(
