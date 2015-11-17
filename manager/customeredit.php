@@ -60,7 +60,7 @@ if (!$MANAGERUSER->authorized("editcustomer")) {
 	unset($_SESSION['customerid']);
 	exit("Not Authorized");
 }
-$hasSAML = isset($_GET['hasSAML']);
+$hasSAML = isset($_GET['hasSAML']) || true;
 
 
 ////////////////////////////////////////////////////////////////////////////////
