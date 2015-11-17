@@ -990,7 +990,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		setCustomerSystemSetting('_cmaapptype', $postdata['cmaapptype'], $custdb);
 		
 		setCustomerSystemSetting('_customerid', $customerid, $custdb);
-
+		
 		setCustomerSystemSetting('_hassms', $postdata["hassms"]?'1':'0', $custdb);
 		
 		update_jobtypeprefs(1, $postdata["maxsms"], "sms", $custdb);
@@ -1029,6 +1029,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		
 		// updating SMS shortcode requires updating authserver -> customer. SQL in SMSAggregatorData.php
 		if(isset($postdata["shortcodegroup"])) {
+			$smsAggregatorData->customerId = $customerid;
+			
 			if($smsAggregatorData->shortcodeGroupHasChanged($postdata["shortcodegroup"])){
 				
 				// update customer's shortcode group in 'customer' table on 'authserv' db

@@ -147,7 +147,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $TITLE = _L('DM Block');
-$PAGE = 'commsuite:dmblocking';
+$PAGE = 'dm:dmblocking';
 
 include_once("nav.inc.php");
 

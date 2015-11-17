@@ -286,7 +286,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $TITLE = _L('DM Group Settings');
-$PAGE = "commsuite:systemdmgroups";
+$PAGE = "dm:systemdmgroups";
 
 include_once("nav.inc.php");
 

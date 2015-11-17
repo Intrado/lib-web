@@ -124,7 +124,7 @@ $filterFormatters = array();
 // Display
 /////////////////////////////
 $TITLE = _L("DM&nbsp;groups");
-$PAGE = "commsuite:systemdmgroups";
+$PAGE = "dm:systemdmgroups";
 
 include_once("nav.inc.php");
 

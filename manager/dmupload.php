@@ -83,7 +83,7 @@ if($reloadform){
 }
 
 $TITLE = _L('DM Upload');
-$PAGE = 'commsuite:customerdms';
+$PAGE = 'dm:customerdms';
 
 include_once("nav.inc.php");
 ?>

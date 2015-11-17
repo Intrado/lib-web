@@ -1,5 +1,5 @@
 <?
-const MIN_FRESHNESS = 30;
+const MIN_FRESHNESS = 60;
 require_once("common.inc.php");
 require_once("../inc/form.inc.php");
 require_once("../inc/html.inc.php");
@@ -243,18 +243,45 @@ $restotal = 0;
 $resactout = 0;
 $resactin = 0;
 
+$memaches = array();
+foreach ($SETTINGS['memcache']['hosts'] as $host) {
+	$memache = new Memcache();
+	$memache->addserver($host);
+	$memaches[] = $memache;
+}
+
 while($row = DBGetRow($result)){
 	$data[$row[0]] = $row;
 
 	//fake some blank data when the api is unavailable
 	$poststatus = "[{\"restotal\":0, \"resactout\": 0, \"resactin\":0}]";
-	$fh = fopen("http://localhost/manager/api/2/deliverymechanisms/".$row[7], "r");
-	$apidata = stream_get_contents($fh);
-	fclose($fh);
-	if ($apidata) {
-		$dmdata = json_decode($apidata);
-		$poststatus = $dmdata->postStatus;
+	// since we don't have memcached and java is putting things in cache using a different hash
+	// method the only way to find the key is to try both memcache servers.  While this is wonky
+	// it works so what the heck.  Finally, for voipin's java compresses the value in a way that
+	// again prevents memcache() from reading it, so for those we end up falling back to curl.
+	// Still overall its WAY faster than using http for all dms.
+	foreach($memaches as $memache) {
+		try {
+			$cachedpoststatus = $memache->get("dmpoststatus/" . $row[1]);
+		} catch (Exception $e) {
+			// nothing
+		}
+		if ($cachedpoststatus !== false) {
+			break;
+		}
 	}
+	if ($cachedpoststatus === false) {
+		$fh = fopen("http://localhost/manager/api/2/deliverymechanisms/" . $row[7], "r");
+		$apidata = stream_get_contents($fh);
+		fclose($fh);
+		if ($apidata) {
+			$dmdata = json_decode($apidata);
+			$poststatus = $dmdata->postStatus;
+		}
+	} else {
+		$poststatus = $cachedpoststatus;
+	}
+
 	$data[$row[0]][13] = $poststatus;
 	$poststatus = json_decode($poststatus);
 	$poststatus = $poststatus[0];
@@ -310,7 +337,7 @@ $filterFormatters = array("status" => "fmt_dmstatus_nohtml",4 => "fmt_state");
 // Display
 /////////////////////////////
 $TITLE = _L("System&nbsp;DMs");
-$PAGE = "commsuite:systemdms";
+$PAGE = "dm:systemdms";
 
 include_once("nav.inc.php");
 
