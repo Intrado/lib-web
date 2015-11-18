@@ -42,6 +42,7 @@ Usage: php apply_customer_sql.php [ options... ] [ <sqlfile> ] { all | <cid1> ..
 -e|--execute <sql>             Literal SQL statement, in lieu of using an input file
 -f|--config <file>             MySQL config file for host, port user, password (default: "~/.my.cnf")
 -h|--host <host>               Authserver host (default: "localhost")
+-l|--replica                   Run queries on read-only replica host (default: false)
 -o|--output <format>           Output results of queries e.g. in CSV format (default: no output)
 -p|--password <password>       Authserver password
 -P|--port <port>               Authserver port (default: 3306)
@@ -147,6 +148,7 @@ function parse_options($argv) {
 		"chunkDelayMs" => 100,
 		"configfile" => getenv("HOME") . "/.my.cnf",
 		"output" => false,
+		"runOnReplica" => false,
 		"runTime" => null,
 		"startTime" => time(),
 		"verbose" => 0,
@@ -161,7 +163,7 @@ function parse_options($argv) {
 		)
 	);
 
-	$shortopts = "c:e:f:h:o:p:P:r:s:u:v?";
+	$shortopts = "c:e:f:h:lo:p:P:r:s:u:v?";
 	$longopts = array(
 		"chunk-size:",
 		"chunk-limit:",
@@ -169,6 +171,7 @@ function parse_options($argv) {
 		"execute:",
 		"config:",
 		"host:",
+		"replica",
 		"output:",
 		"password:",
 		"port:",
@@ -225,6 +228,12 @@ function parse_options($argv) {
 		case "output":
 			$options["output"] = $value;
 			array_shift($remainingArgv);
+			array_shift($remainingArgv);
+			break;
+		case "l":
+		case "slave":
+		case "replica":
+			$options["runOnReplica"] = true;
 			array_shift($remainingArgv);
 			break;
 		case "h":
@@ -339,18 +348,26 @@ if (empty($options["sqlQueries"])) {
 	$options["sqlQueries"] = explode("$$$", file_get_contents($sqlFile));
 }
 
+if ($options["runOnReplica"]) {
+	$dbhostColumn = "readonlyhost";
+} else {
+	$dbhostColumn = "dbhost";
+}
+
 // Get SQL to query customer(s)
 $params = array();
 if (empty($remainingArgv) || array_search("all", $remainingArgv) !== false) {
-	$query = "select c.id, s.dbhost, concat('c_', c.id) as dbname, s.dbusername, s.dbpassword
+	$query = "select c.id, s.$dbhostColumn, concat('c_', c.id) as dbname, s.dbusername, s.dbpassword
 		from shard s inner join customer c on (c.shardid = s.id)
 		where true ";
 } else {
+	print_r($remainingArgv);
 	$cidArray = array_filter(array_map("intval", $remainingArgv),
 		function ($cid) {
 			return $cid >= 1;
 		});
-	$query = "select c.id, s.dbhost, concat('c_', c.id) as dbname, s.dbusername, s.dbpassword
+	print_r($cidArray);
+	$query = "select c.id, s.$dbhostColumn, concat('c_', c.id) as dbname, s.dbusername, s.dbpassword
 		from shard s inner join customer c on (c.shardid = s.id)
 		where c.id in (" . implode(", ", array_fill(1, count($cidArray), "?")) . ") ";
 	$params = array_merge($params, $cidArray);
@@ -358,7 +375,7 @@ if (empty($remainingArgv) || array_search("all", $remainingArgv) !== false) {
 if ($options["shardIds"]) {
 	$sidArray = array_filter($options["shardIds"],
 		function($sid) {
-			return $sid >= 1 and $sid <= 8;
+			return $sid >= 1;
 		});
 	$query .= " and s.id in (" . implode(", ", array_fill(1, count($sidArray), "?")) . ") ";
 	$params = array_merge($params, $sidArray);
