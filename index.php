@@ -177,7 +177,7 @@ include_once("logintop.inc.php");
 		<input type="submit" name="Submit" value="Sign In">
 		</fieldset>
 
-		<p class="right"><a href="forgotpassword.php"><?=_L("Forgot your password? Click Here")?></a></p>
+		<p class="right"><a href="forgotpassword.php?forceLocal=true"><?=_L("Forgot your password? Click Here")?></a></p>
 
 
 <? } else { ?>

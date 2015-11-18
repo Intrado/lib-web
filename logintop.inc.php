@@ -8,7 +8,7 @@ $CustomBrand = isset($scheme['productname']) ? $scheme['productname'] : "";
 $custname = isset($scheme['customerName']) ? $scheme['customerName'] : "";
 $samlEnabled = $scheme['_hasSAML'];
 $forceLocal = isset($_GET['forceLocal']);
-if($_SERVER['REQUEST_METHOD'] === 'GET' && $samlEnabled && !$forceLocal) {
+if($_SERVER['REQUEST_METHOD'] === 'GET' && $samlEnabled && !$forceLocal && !isset($_GET['f'])) {
 	redirect("samllogin.php");
 }
 
