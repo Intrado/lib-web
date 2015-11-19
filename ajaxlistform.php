@@ -80,26 +80,50 @@ function handleRequest() {
 	global $RULE_OPERATORS;
 	
 	switch($_GET['type']) {
-		
+
 		case 'saveandrename':
 			if (!$USER->authorize('createlist') || !isset($_REQUEST['listid']))
 				return false;
-			
-			$listid = $_REQUEST['listid']+0;
+
+			$listid = $_REQUEST['listid'] + 0;
 
 			if (!userOwns('list', $listid))
 				return false;
-			
-			$name = substr($_REQUEST['name'],0,50);
+
+			$name = substr($_REQUEST['name'], 0, 50);
 			if (QuickQuery('select id from list where deleted=0 and id!=? and name=? and userid=?', false, array($listid, $name, $USER->id)))
 				return array('error' => _L('There is already a list with this name'));;
-			
+
 			$list = new PeopleList($listid);
 			$list->deleted = 0;
-			$list->name = substr($_REQUEST['name'],0,50);
+			$list->name = substr($_REQUEST['name'], 0, 50);
 			$list->update();
 			return true;
 			break;
+
+		case "cancellist":
+			// TS-434
+			// this procedure if api cancel the list just created due invalid filter issue
+			if (isset($_REQUEST['api'])) {
+				if (!$USER->authorize('createlist'))
+					return Array("status" => "accessDenied", "message" => "Insufficient privileges to create recipient list");
+
+				if (!isset($_POST['listid']))
+					return Array("status" => "listNotFound", "message" => "Recipient list $listid not found");
+
+				$listid = $_POST['listid'] + 0;
+
+				QuickUpdate('BEGIN');
+
+				// DELETE THE LIST CREATED 3 MINS AGO MAX.
+				QuickUpdate("DELETE FROM list where id=? AND userid=? AND TIME_TO_SEC(TIMEDIFF(modifydate, NOW())) < 180",
+					false, array($listid, $USER->id));
+
+				// TODO  delete also rules that could be created
+				QuickUpdate('COMMIT');
+
+				return Array("status" => "success", "message" => "List canceled");
+			}
 		case 'createlist': // returns $list->id
 			if (!$USER->authorize('createlist')) {
 				if (isset($_REQUEST['api'])) {
