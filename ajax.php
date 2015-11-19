@@ -46,7 +46,37 @@ function handleRequest() {
 	switch($type) {
 		//--------------------------- SIMPLE OBJECTS, should mirror objects in obj/*.obj.php (simplified to _fieldlist) -------------------------------
 		case 'lists':
-			$rs = DBFindMany('PeopleList',
+
+			if (isset($_GET['api'])) {
+				$start = 0 + ($_REQUEST['start']);
+				$offset = min(0 + ($_REQUEST['offset']), 20);
+				$offset = $offset ? $offset : 20;
+
+				// Eugenio: not sure about the order by clasue here, how are we return this to api.
+				$rs = DBFindMany('PeopleList',
+					", (l.name+0) as lettersfirst
+					FROM list l
+						left join publish p on
+							(l.id = p.listid and p.type = 'list' and p.action = 'subscribe')
+					WHERE  (l.userid=? or p.userid=?)
+						and l.type != 'alert'
+						and not l.deleted
+					ORDER BY id LIMIT $start, $offset",
+					"l", array($USER->id, $USER->id), false, false, true);
+
+				$total = QuickQuery("SELECT FOUND_ROWS()");
+
+				return array(
+					'docs' => array_values(cleanObjects($rs, array('inject-id' => true))),
+					'metadata' => array(
+						'start' => $start,
+						'perPage' => $offset,
+						'total' => 0+$total
+					)
+				);
+			}
+			else{
+				$rs = DBFindMany('PeopleList',
 					", (l.name+0) as lettersfirst
 					from list l
 						left join publish p on
@@ -56,10 +86,6 @@ function handleRequest() {
 						and not l.deleted
 					order by lettersfirst,l.name", "l", array($USER->id,$USER->id));
 
-			if (isset($_GET['api'])) {
-				return cleanObjects($rs, array('inject-id'=>true));
-			}
-			else{
 				return cleanObjects($rs);
 			}
 		// Return an AudioFile object specified by its ID.

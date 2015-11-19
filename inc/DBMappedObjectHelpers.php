@@ -22,21 +22,29 @@ function generateFieldList ($includeid = false, $fieldlist = NULL, $alias = fals
  * @param bool $dbconnect
  * @return DBMappedObject[]|bool
  */
-function DBFindMany ($classname, $query, $alias = false, $args = false, $dbconnect = false, $distinct = false) {
-	return _DBFindPDO(true, $classname, $query, $alias, $args, $dbconnect, $distinct);
+function DBFindMany($classname, $query, $alias = false, $args = false, $dbconnect = false, $distinct = false, $calcFoundRows = false) {
+	return _DBFindPDO(true, $classname, $query, $alias, $args, $dbconnect, $distinct, $calcFoundRows);
 }
 
 function DBFind ($classname, $query, $alias = false, $args = false, $dbconnect = false, $distinct = false) {
 	return _DBFindPDO(false, $classname, $query, $alias, $args, $dbconnect, $distinct);
 }
 
-function _DBFindPDO($isMany, $classname, $query, $alias=false, $args=false, $dbconnect = false, $distinct = false) {
+function _DBFindPDO($isMany, $classname, $select, $alias = false, $args = false,
+					$dbconnect = false, $distinct = false, $calcFoundRows = false) {
 	//make a dummy object of this to get the field list
 	$dummy = new $classname();
 
 	$many = array();
 
-	$query = "select " . ($distinct ? 'distinct ' : '') . generateFieldList(true,$dummy->_fieldlist,$alias) ." ". $query;
+	$query = "SELECT ";
+	if ($calcFoundRows) {
+		$query .= "SQL_CALC_FOUND_ROWS ";
+	}
+	if ($distinct) {
+		$query .= "DISTINCT ";
+	}
+	$query .= generateFieldList(true,$dummy->_fieldlist,$alias) ." ". $select;
 	if ($result = Query($query, $dbconnect, $args)) {
 		while ($row = DBGetRow($result)) {
 			$newobj = new $classname();
@@ -87,7 +95,12 @@ function cleanObjects($obj, $options = array()) {
     $simpleObj = array();
     if (is_object($obj)) {
         foreach ($obj->_fieldlist as $field) {
-            if (is_object($obj->$field))
+			// inject the id as first key in json object
+			if($injectId && isset($obj->id)) {
+				$simpleObj['id'] = 0+($obj->id);
+			}
+
+			if (is_object($obj->$field))
                 $simpleObj[$field] = cleanObjects($obj->$field, $options);
             else {
                 if ($cleanDatesFields && in_array($field, $cleanDatesFields)) {
@@ -97,9 +110,7 @@ function cleanObjects($obj, $options = array()) {
                 }
             }
 
-            if($injectId && isset($obj->id)) {
-                $simpleObj['id'] = 0+($obj->id);
-            }
+
 
 
         }
