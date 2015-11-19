@@ -361,12 +361,10 @@ if (empty($remainingArgv) || array_search("all", $remainingArgv) !== false) {
 		from shard s inner join customer c on (c.shardid = s.id)
 		where true ";
 } else {
-	print_r($remainingArgv);
 	$cidArray = array_filter(array_map("intval", $remainingArgv),
 		function ($cid) {
 			return $cid >= 1;
 		});
-	print_r($cidArray);
 	$query = "select c.id, s.$dbhostColumn, concat('c_', c.id) as dbname, s.dbusername, s.dbpassword
 		from shard s inner join customer c on (c.shardid = s.id)
 		where c.id in (" . implode(", ", array_fill(1, count($cidArray), "?")) . ") ";
