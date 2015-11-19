@@ -91,6 +91,9 @@ function deviceservice_upgrade_11_2($rev, $db) {
 	case 4:
 		echo "|";
 		apply_sql_db("dbupgrade_deviceservice/db_11-2_pre.sql", $db, 5);
+	case 5:
+		echo "|";
+		apply_sql_db("dbupgrade_deviceservice/db_11-2_pre.sql", $db, 6);
 	}
 
 	return true;
