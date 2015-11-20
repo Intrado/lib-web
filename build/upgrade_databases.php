@@ -85,6 +85,7 @@ $versions = array(
 		"11.2/8",
 		"11.4/7",
 		"11.5/3",
+		"11.6/1",
 		//etc., one array element per version, always the last revision of the given version
 	),
 
@@ -375,7 +376,6 @@ if ($mode == "database" && $ids[0] == "all") {
 
 	// for each customer database to upgrade
 	foreach ($customers as $customerid => $customer) {
-		echo "Upgrading $customerid \n";
 		$_dbcon = $db = $shards[$customer['shardid']];
 		QuickUpdate("use c_$customerid", $db);
 
@@ -630,6 +630,7 @@ function update_customer($db, $customerid, $shardid) {
 	require_once("upgrades/db_11-2.php");
 	require_once("upgrades/db_11-4.php");
 	require_once("upgrades/db_11-5.php");
+	require_once("upgrades/db_11-6.php");
 
 	// for each version, upgrade to the next
 	$foundstartingversion = false;
@@ -799,6 +800,12 @@ function update_customer($db, $customerid, $shardid) {
 			break;
 		case "11.5":
 			if (!upgrade_11_5($rev, $shardid, $customerid, $db)) {
+				echo("Error upgrading DB");
+				exit(1);
+			}
+			break;
+		case "11.6":
+			if (!upgrade_11_6($rev, $shardid, $customerid, $db)) {
 				echo("Error upgrading DB");
 				exit(1);
 			}

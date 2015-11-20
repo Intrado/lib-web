@@ -3191,3 +3191,14 @@ update setting set value='11.5/3' where name='_dbversion'
 $$$
 
 -- END 11.5/3
+
+ALTER TABLE `reportphoneoptout`
+ADD COLUMN `optOutCode` SMALLINT UNSIGNED,
+ADD COLUMN `sequence` TINYINT,
+ADD COLUMN `jobTypeId` INT
+$$$
+
+update setting set value='11.6/1' where name='_dbversion'
+$$$
+
+-- END 11.6/1
