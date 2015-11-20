@@ -67,6 +67,14 @@ if(isset($_GET['type'])){
 
 instrumentation_add_custom_parameter("action", $_SESSION['type']);
 
+# If there is no database connection at this point, it's probably
+# because the session timed out and thus DBconnect failed, so logout
+global $_dbcon;
+if (! $_dbcon) {
+	$_SESSION['lasturi'] = $_SERVER['REQUEST_URI'];
+	redirect("./?logout=1");
+}
+
 if(isset($_GET['jobid']) && isset($_GET['personid'])){
 	$_SESSION['previewmessage_jobid'] = $_GET['jobid']+0;
 	$_SESSION['previewmessage_personid'] = $_GET['personid']+0;

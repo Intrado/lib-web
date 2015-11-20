@@ -26,21 +26,20 @@ apache_note("CS_APP","cm"); //for logging
 if (! isset($ppNotLoggedIn)) {
 	// we are logged in
 
-	$logout = "?logout=1";
 	if ($SETTINGS['feature']['force_ssl'] && !isset($_SERVER["HTTPS"])){
 		//index page will redirect to ssl
-		redirect("index.php".$logout);
+		redirect("index.php?logout=1");
 	}
 	doStartSession();
 	if (! isset($_SESSION["portaluserid"])){
 		$_SESSION['lasturi'] = $_SERVER['REQUEST_URI'];
-		redirect("./".$logout);
+		redirect("./?logout=1");
 	}
 
 	$result = portalGetPortalUser();
 	if (strlen($result['result']) > 0) {
 		// Something other than a successful result (which would be empty...)
-		redirect("./".$logout);
+		redirect("./?logout=1");
 	}
 	$_SESSION['portaluser'] = $result['portaluser'];
 	apache_note("CS_USER",urlencode($_SESSION['portaluser']['portaluser.username'])); //for logging
