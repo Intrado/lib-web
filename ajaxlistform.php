@@ -101,33 +101,38 @@ function handleRequest() {
 			return true;
 			break;
 
-		case "cancellist":
-			// TS-434
-			// this procedure if api cancel the list just created due invalid filter issue
+		case "removelist":
+			// API-mode, remove list
+			//
 			if (isset($_REQUEST['api'])) {
-				if (!$USER->authorize('createlist'))
-					return Array("status" => "accessDenied", "message" => "Insufficient privileges to create recipient list");
+				if (!$USER->authorize('createlist')) {
+					header("HTTP/1.1 403 Forbidden");
+					return;
+				}
 
-				if (!isset($_POST['listid']))
-					return Array("status" => "listNotFound", "message" => "Recipient list $listid not found");
+				if (!isset($_POST['listid']) || $_POST['listid'] == '') {
+					header("HTTP/1.1 404 Not Found");
+					return;
+				}
 
 				$listid = $_POST['listid'] + 0;
 
 				QuickUpdate('BEGIN');
+				QuickUpdate("DELETE FROM list where id=? AND userid=?", false, array($listid, $USER->id));
 
-				// DELETE THE LIST CREATED 3 MINS AGO MAX.
-				QuickUpdate("DELETE FROM list where id=? AND userid=? AND TIME_TO_SEC(TIMEDIFF(modifydate, NOW())) < 180",
-					false, array($listid, $USER->id));
-
-				// TODO  delete also rules that could be created
+				// TODO  delete also rules that could be created?
 				QuickUpdate('COMMIT');
 
-				return Array("status" => "success", "message" => "List canceled");
+				return Array("status" => "success", "message" => "List removed");
 			}
+
+			break;
+
 		case 'createlist': // returns $list->id
 			if (!$USER->authorize('createlist')) {
 				if (isset($_REQUEST['api'])) {
-					return Array("status" => "accessDenied", "message" => "Insufficient privileges to create recipient list");
+					header("HTTP/1.1 403 Forbidden");
+					return;
 				} else {
 					return false;
 				}
@@ -236,7 +241,8 @@ function handleRequest() {
 		case 'addrule':
 			if (!$USER->authorize('createlist')) {
 				if (isset($_REQUEST['api'])) {
-					return Array("status" => "accessDenied", "message" => "Insufficient privileges to update recipient list");
+					header("HTTP/1.1 403 Forbidden");
+					return;
 				} else {
 					return false;
 				}
@@ -271,11 +277,11 @@ function handleRequest() {
 
 			if (!userOwns('list', $listid)) {
 				if (isset($_REQUEST['api'])) {
-					return Array("status" => "listNotFound", "message" => "Recipient list $listid not found");
+					header("HTTP/1.1 404 Not Found");
+					return;
 				} else {
 					return false;
 				}
-
 			}
 
 			if (!is_array($rules)) {
