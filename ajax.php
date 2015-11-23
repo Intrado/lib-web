@@ -49,7 +49,7 @@ function handleRequest() {
 
 			if (isset($_GET['api'])) {
 				$start = 0 + ($_REQUEST['start']);
-				$offset = min(0 + ($_REQUEST['offset']), 20);
+				$offset = min(0 + ($_REQUEST['offset']), 100);
 				$offset = $offset ? $offset : 20;
 
 				// Eugenio: not sure about the order by clasue here, how are we return this to api.

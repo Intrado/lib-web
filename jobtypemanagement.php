@@ -55,7 +55,7 @@ if (isset($_REQUEST['api'])) {
         }
     } else {
         $start = 0 + ($_REQUEST['start']);
-        $offset = min(0 + ($_REQUEST['offset']), 20);
+        $offset = min(0 + ($_REQUEST['offset']), 100);
         $offset = $offset ? $offset : 20;
 
         $notificationTypes = DBFindMany(
