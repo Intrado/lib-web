@@ -48,7 +48,7 @@ function handleRequest() {
 		case 'lists':
 			if (isset($_GET['api'])) {
 				$start = 0 + ($_REQUEST['start']);
-				$offset = min(0 + ($_REQUEST['offset']), 20);
+				$offset = min(0 + ($_REQUEST['offset']), 100);
 				$offset = $offset ? $offset : 20;
 
 				$rs = DBFindMany('PeopleList',
