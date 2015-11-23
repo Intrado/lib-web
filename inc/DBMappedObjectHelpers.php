@@ -22,21 +22,29 @@ function generateFieldList ($includeid = false, $fieldlist = NULL, $alias = fals
  * @param bool $dbconnect
  * @return DBMappedObject[]|bool
  */
-function DBFindMany ($classname, $query, $alias = false, $args = false, $dbconnect = false, $distinct = false) {
-	return _DBFindPDO(true, $classname, $query, $alias, $args, $dbconnect, $distinct);
+function DBFindMany($classname, $query, $alias = false, $args = false, $dbconnect = false, $distinct = false, $calcFoundRows = false) {
+	return _DBFindPDO(true, $classname, $query, $alias, $args, $dbconnect, $distinct, $calcFoundRows);
 }
 
 function DBFind ($classname, $query, $alias = false, $args = false, $dbconnect = false, $distinct = false) {
 	return _DBFindPDO(false, $classname, $query, $alias, $args, $dbconnect, $distinct);
 }
 
-function _DBFindPDO($isMany, $classname, $query, $alias=false, $args=false, $dbconnect = false, $distinct = false) {
+function _DBFindPDO($isMany, $classname, $select, $alias = false, $args = false,
+					$dbconnect = false, $distinct = false, $calcFoundRows = false) {
 	//make a dummy object of this to get the field list
 	$dummy = new $classname();
 
 	$many = array();
 
-	$query = "select " . ($distinct ? 'distinct ' : '') . generateFieldList(true,$dummy->_fieldlist,$alias) ." ". $query;
+	$query = "SELECT ";
+	if ($calcFoundRows) {
+		$query .= "SQL_CALC_FOUND_ROWS ";
+	}
+	if ($distinct) {
+		$query .= "DISTINCT ";
+	}
+	$query .= generateFieldList(true,$dummy->_fieldlist,$alias) ." ". $select;
 	if ($result = Query($query, $dbconnect, $args)) {
 		while ($row = DBGetRow($result)) {
 			$newobj = new $classname();
@@ -67,8 +75,8 @@ function _DBFindPDO($isMany, $classname, $query, $alias=false, $args=false, $dbc
 /**
  * @param $obj
  * @param array $options Indexed array with keys represent options. Such as
- *        'iso-dates' => array(names...) that specifies that fiels should be converted to iso 8601 dates. used in api mode.
- *        'inject-id'=> true puts the id pk in resulting object
+ *        'iso-dates' => Array(names...), specifies date fields should be converted to iso 8601-- used in API mode.
+ *        'inject-id'=> true injects id field in resulting object.
  * @return array
  */
 function cleanObjects($obj, $options = array()) {
@@ -80,14 +88,17 @@ function cleanObjects($obj, $options = array()) {
         }
     }
 
-
-
     if (!is_object($obj) && !is_array($obj))
         return $obj;
     $simpleObj = array();
     if (is_object($obj)) {
         foreach ($obj->_fieldlist as $field) {
-            if (is_object($obj->$field))
+			// inject the id as first key in json object
+			if($injectId && isset($obj->id)) {
+				$simpleObj['id'] = 0+($obj->id);
+			}
+
+			if (is_object($obj->$field))
                 $simpleObj[$field] = cleanObjects($obj->$field, $options);
             else {
                 if ($cleanDatesFields && in_array($field, $cleanDatesFields)) {
@@ -96,12 +107,6 @@ function cleanObjects($obj, $options = array()) {
                     $simpleObj[$field] = $obj->$field;
                 }
             }
-
-            if($injectId && isset($obj->id)) {
-                $simpleObj['id'] = 0+($obj->id);
-            }
-
-
         }
     } else if (is_array($obj)) {
         foreach ($obj as $id => $item)
