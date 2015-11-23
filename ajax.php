@@ -46,13 +46,11 @@ function handleRequest() {
 	switch($type) {
 		//--------------------------- SIMPLE OBJECTS, should mirror objects in obj/*.obj.php (simplified to _fieldlist) -------------------------------
 		case 'lists':
-
 			if (isset($_GET['api'])) {
 				$start = 0 + ($_REQUEST['start']);
 				$offset = min(0 + ($_REQUEST['offset']), 20);
 				$offset = $offset ? $offset : 20;
 
-				// Eugenio: not sure about the order by clasue here, how are we return this to api.
 				$rs = DBFindMany('PeopleList',
 					", (l.name+0) as lettersfirst
 					FROM list l
@@ -75,7 +73,7 @@ function handleRequest() {
 					)
 				);
 			}
-			else{
+			else {
 				$rs = DBFindMany('PeopleList',
 					", (l.name+0) as lettersfirst
 					from list l

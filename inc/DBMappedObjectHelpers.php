@@ -75,8 +75,8 @@ function _DBFindPDO($isMany, $classname, $select, $alias = false, $args = false,
 /**
  * @param $obj
  * @param array $options Indexed array with keys represent options. Such as
- *        'iso-dates' => array(names...) that specifies that fiels should be converted to iso 8601 dates. used in api mode.
- *        'inject-id'=> true puts the id pk in resulting object
+ *        'iso-dates' => Array(names...), specifies date fields should be converted to iso 8601-- used in API mode.
+ *        'inject-id'=> true injects id field in resulting object.
  * @return array
  */
 function cleanObjects($obj, $options = array()) {
@@ -87,8 +87,6 @@ function cleanObjects($obj, $options = array()) {
             $cleanDatesFields = $options['iso-dates'];
         }
     }
-
-
 
     if (!is_object($obj) && !is_array($obj))
         return $obj;
@@ -109,10 +107,6 @@ function cleanObjects($obj, $options = array()) {
                     $simpleObj[$field] = $obj->$field;
                 }
             }
-
-
-
-
         }
     } else if (is_array($obj)) {
         foreach ($obj as $id => $item)
