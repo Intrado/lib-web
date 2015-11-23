@@ -61,7 +61,8 @@ function handleRequest() {
 					WHERE  (l.userid=? or p.userid=?)
 						and l.type != 'alert'
 						and not l.deleted
-					ORDER BY id LIMIT $start, $offset",
+					ORDER BY lettersfirst, l.name
+					LIMIT $start, $offset",
 					"l", array($USER->id, $USER->id), false, false, true);
 
 				$total = QuickQuery("SELECT FOUND_ROWS()");
