@@ -131,3 +131,11 @@ INSERT INTO `shortcodetext` (`shortcode`, `messagetype`, `text`) VALUES
 ('88544','PENDINGOPTIN','%s alerts. Reply Y 2 confirm, HELP 4 info. Msg&data rates may apply. Msg freq varies. schoolmessenger.com/fcs')
 ON DUPLICATE KEY UPDATE `text` = VALUES(`text`)
 $$$
+
+-- $rev 6
+
+INSERT INTO smsaggregator SET name = 'syniverse'
+$$$
+
+UPDATE shortcode AS c JOIN smsaggregator AS a SET c.smsaggregatorid = a.id WHERE a.name = 'syniverse' AND c.shortcode='724665';
+$$$
