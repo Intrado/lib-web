@@ -134,8 +134,25 @@ $$$
 
 -- $rev 6
 
-INSERT INTO smsaggregator SET name = 'syniverse'
+INSERT INTO `smsaggregator` SET `name` = 'syniverse'
 $$$
 
-UPDATE shortcode AS c JOIN smsaggregator AS a SET c.smsaggregatorid = a.id WHERE a.name = 'syniverse' AND c.shortcode='724665';
+UPDATE `shortcode` AS c JOIN `smsaggregator` AS a SET c.`smsaggregatorid` = a.`id` WHERE a.`name` = 'syniverse' AND c.`shortcode` = '724665';
+$$$
+
+-- $rev 7
+
+INSERT INTO `shortcodegroup` SET `description` = 'Test - Syniverse'
+$$$
+
+INSERT INTO `shortcode` (`shortcode`, `smsaggregatorid`, `shortcodegroupid`)
+  SELECT '28776', a.`id`, g.`id` FROM `smsaggregator` AS a, `shortcodegroup` AS g
+  WHERE a.`name` = 'syniverse' AND g.`description` = 'Test - Syniverse'
+$$$
+
+INSERT INTO `shortcodeareacode` SET `shortcode` = '28776', `areacode` = ''
+$$$
+
+INSERT INTO `shortcodetext` (`shortcode`, `messagetype`, `text`)
+  SELECT '28776', `messagetype`, `text` FROM `shortcodetext` WHERE `shortcode` = '68453'
 $$$
