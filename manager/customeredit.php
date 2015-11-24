@@ -653,6 +653,14 @@ $formdata ["hasicplus"] = array (
 	"helpstep" => $helpstepnum
 );
 
+$formdata["enableautoblock"] = array(
+	"label" => _L('Enable Autoblock'),
+	"value" => $settings['_enableautoblock'],
+	"validators" => array(),
+	"control" => array("CheckBox"),
+	"helpstep" => $helpstepnum
+);
+
 $formdata["hassurvey"] = array(
 	"label" => _L('Has Survey'),
 	"value" => $settings['_hassurvey'],
@@ -1017,6 +1025,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		setCustomerSystemSetting('_hasicplus', ($postdata["hasicplus"] && ($postdata["portal"] === 'infocenter'))  ? '1' : '0', $custdb);
 
 		// more features
+		setCustomerSystemSetting('_enableautoblock', $postdata["enableautoblock"]?'1':'0', $custdb);
 		setCustomerSystemSetting('_hassurvey', $postdata["hassurvey"]?'1':'0', $custdb);
 		setCustomerSystemSetting('_hasldap', $postdata["hasldap"]?'1':'0', $custdb);
 		if ($hasSAML || $settings['_hasSAML']) {
