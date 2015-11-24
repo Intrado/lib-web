@@ -9,17 +9,30 @@ class PhoneOptOutReport extends ReportGenerator {
 		"1" => "First Name",
 		"2" => "Last Name",
 		"3" => "Phone Number",
-		"4" => "Count"
+		"4" => "Reason",
+		"5" => "Count", 
+		"6" => "Organization"
 	);
 
 	private $formatters = array(
 		"3" => "fmt_phone"
 	);
 
+	private $opOutCodeTitles = array(
+		"1" => "Message One"
+	);
+
+	private $opOutCodeActionTaken = array(
+		"1" => "Punched in face"
+	);
+
+
 	function generateQuery($hackPDF = false) {
 		global $USER;
-
+		
 		$this->params = $this->reportinstance->getParameters();
+
+		$autoBlockEnabled = getSystemSetting("_enableautoblock") ? true: false;
 
 		$orgIds = null;
 		if (isset($this->params['organizationids'])) {
@@ -41,10 +54,27 @@ class PhoneOptOutReport extends ReportGenerator {
 		}
 		list($startdate, $enddate) = getStartEndDate($reldate, $this->params);
 		
+		$optOutReasonsSQL = '';
+
+		// decide what reasons to display
+		if ( $autoBlockEnabled ) {
+			$optOutReasonsSQLCases = 
+				"when rpo.optOutCode = '1' then CONCAT('Recipient Unsubscribed: ', jt.name)".PHP_EOL.
+				"when rpo.optOutCode = '2' then 'Recipient Unsubscribed: All but Emergency Priority'".PHP_EOL.
+				"when rpo.optOutCode = '3' then 'Recipient Blocked'".PHP_EOL;
+		} else {
+			$optOutReasonsSQLCases = 
+				"when rpo.optOutCode = '1' then CONCAT('Unsubscribe Requested: ', jt.name)".PHP_EOL.
+				"when rpo.optOutCode = '2' then 'Unsubscribe requested: All but Emergency Priority'".PHP_EOL.
+				"when rpo.optOutCode = '3' then 'Block requested by recipient'".PHP_EOL;
+		}
+
 		$phonesQuery = "select personId,
 					phone,
 					count(*) as numRequests,
-					max(lastUpdateMs) as lastUpdateMs
+					max(lastUpdateMs) as lastUpdateMs,
+					jobTypeId,
+					optOutCode
 					from reportphoneoptout
 					where lastUpdateMs >= " . ($startdate  * 1000) . "
 					and lastUpdateMs < " . (($enddate+86400) * 1000) . "
@@ -56,9 +86,16 @@ class PhoneOptOutReport extends ReportGenerator {
 					p." . FieldMap::GetFirstNameField() . " as firstname,
 					p." . FieldMap::GetLastNameField() . " as lastname,
 					rpo.phone, 
-					rpo.numRequests
+					case
+					".$optOutReasonsSQLCases."
+					end as optOutCodeReason,
+					rpo.numRequests,
+					org.orgkey
 					from person p
 					join ($phonesQuery) as rpo on p.id = rpo.personId
+					left join jobtype as jt on jt.id = rpo.jobTypeId
+					left join personassociation pa on (pa.type = 'organization' and pa.personid = p.id)
+					left join organization org on org.id = pa.organizationid
 					$orgJoin
 					$orderquery
 					";
@@ -134,6 +171,7 @@ class PhoneOptOutReport extends ReportGenerator {
 
 		while ($row = DBGetRow($result)) {
 			foreach ($this->formatters as $index => $formatter) {
+
 				$row[$index] = $formatter($row, $index);
 			}
 			$row = array_map(function ($value) {
@@ -159,6 +197,7 @@ class PhoneOptOutReport extends ReportGenerator {
 
 		$ordering = array();
 		$ordering["ID#"] = "p.pkey";
+		$ordering["Organization"] = "org.orgkey";
 		
 		$requiredFields= array('f01','f02');
 		

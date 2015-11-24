@@ -45,7 +45,7 @@ $fields = $ffields + $gfields;
 
 unset($_SESSION['report']['edit']);
 $redirect = 0;
-if(isset($_GET['reportid'])){
+if(isset($_GET['reportid'])) {
 	$_SESSION['reportid'] = $_GET['reportid']+0;
 	if(!userOwns("reportsubscription", $_SESSION['reportid'])){
 		redirect("unauthorized.php");
