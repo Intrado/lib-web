@@ -96,7 +96,7 @@ $orgs = Organization::getAuthorizedOrgKeys();
 class UserSectionFormItem extends FormItem {
 	var $clearonsubmit = true;
 	var $clearvalue = array();
-	
+
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
 		// get all orgid to orgkey values
@@ -104,7 +104,7 @@ class UserSectionFormItem extends FormItem {
 		// get sectionkeys for current value
 		if ($value)
 			$sections = QuickQueryList("select id, skey from section where id in (". DBParamListString(count($value)) .")", true, false, $value);
-		
+
 		$str = '<style type="text/css">
 		.usersectionchoose {
 			margin-left: 6px;
@@ -135,10 +135,10 @@ class UserSectionFormItem extends FormItem {
 		}
 		// create an add button for use later
 		$str .= icon_button("Add", "add", "moveSections(this, '$n-sectionchoosediv', '$n', '$n-select')", null, "id=\"$n-addbutton\" style=\"display: none;\"");
-		
+
 		return $str;
 	}
-	
+
 	function renderJavascriptLibraries() {
 		// javascript to populate the sections and move the checkbox up into selected sections
 		$str = '<script type="text/javascript">
@@ -147,21 +147,21 @@ class UserSectionFormItem extends FormItem {
 				selectelement = $(selectelement);
 				targetelement = $(targetelement);
 				addbutton = $(addbutton);
-				
+
 				// if they selected the first element then hide the sections and add button
 				if (selectelement.value == 0) {
 					addbutton.hide();
 					targetelement.hide();
 					return;
 				}
-				
+
 				// make the add button hidden
 				addbutton.hide();
-				
+
 				// empty out the choose div and put a loading gif in there
 				targetelement.show();
 				targetelement.update("<img src=\"img/ajax-loader.gif\" /><br>Please wait.<br>Loading content...");
-				
+
 				// populate the choose div with data from an ajax call
 				cachedAjaxGet("ajax.php?type=getsections&organizationid=" + selectelement.value, function(result, itemid) {
 					var sections = result.responseJSON;
@@ -172,7 +172,7 @@ class UserSectionFormItem extends FormItem {
 							chkid = itemid + id.toString();
 							chkname = itemid + "[]";
 							lblid = chkid + "-label";
-							
+
 							// if this checkbox already exists it is in user sections and we cant re-create it
 							if ($(chkid) == null) {
 								targetelement.insert(
@@ -193,20 +193,20 @@ class UserSectionFormItem extends FormItem {
 						addbutton.show();
 				}, formitemid, true);
 			}
-			
+
 			// move checked section key checkbox elements from the source div into the target div
 			function moveSections(buttonelement, sourceelement, targetelement, menuelement) {
-				
+
 				sourceelement = $(sourceelement);
 				targetelement = $(targetelement);
 				menuelement = $(menuelement);
-				
+
 				// show the targetelement
 				targetelement.show();
-				
+
 				// hide the add button
 				$(buttonelement).hide();
-				
+
 				// move all checked items into the targetelement
 				sourceelement.descendants().each(function(e) {
 					if (e.checked) {
@@ -222,12 +222,12 @@ class UserSectionFormItem extends FormItem {
 				// empty and hide the sourceelement
 				sourceelement.update();
 				sourceelement.hide();
-				
+
 				// reset the select menu to default
 				menuelement.value = 0;
 			}
 			</script>';
-		
+
 		return $str;
 	}
 }
@@ -294,10 +294,10 @@ $formdata["login"] = array(
 	"value" => $edituser->login,
 	"validators" => array(
 		array("ValRequired"),
-		array("ValLength","min" => getSystemSetting("usernamelength", 5),"max" => 20),
+		array("ValLength","min" => getSystemSetting("usernamelength", 5),"max" => 255),
 		array("ValLogin", "userid" => $edituser->id)
 	),
-	"control" => array("TextField","maxlength" => 20, "size" => 20),
+	"control" => array("TextField","maxlength" => 255, "size" => 20),
 	"helpstep" => 1
 );
 
@@ -457,8 +457,8 @@ if (!getSystemSetting('_hascallback', false)) {
 				"control" => array("CallerID","maxlength" => 20, "size" => 15,"selectvalues"=>$authorizedcallerids, "allowedit" => true),
 				"helpstep" => 1
 	);
-	
-	
+
+
 	if(getSystemSetting("requireapprovedcallerid",false)) {
 		$authorizedusercallerids = QuickQueryList("select callerid from authorizedusercallerid where userid=?",false,false,array($edituser->id));
 		foreach($authorizedcallerids as $calleridkey => $calleridvalue) {
@@ -547,7 +547,7 @@ if ($hasenrollment) {
 			"helpstep" => 1
 		);
 	}
-	
+
 	$formdata["submit"] = array(
 		"label" => "",
 		"value" => "",
@@ -555,7 +555,7 @@ if ($hasenrollment) {
 		"control" => array("InpageSubmitButton", "name" => (($hasstaffid)?_L('Remove Staff ID'):_L('Set Staff ID')), "icon" => (($hasstaffid)?"cross":"disk")),
 		"helpstep" => 1
 	);
-	
+
 	// display read only section associations, if there are any
 	$userimportsections = QuickQueryList("
 		select s.skey
@@ -575,7 +575,7 @@ if ($hasenrollment) {
 			"helpstep" => 2
 		);
 	}
-	
+
 	// get user section associations that arn't created by an import or are zero
 	$usersections = QuickQueryList("select sectionid from userassociation where userid = ? and type = 'section' and importid is null and sectionid != 0", false, false, array($edituser->id));
 	// if no authorized orgs. don't allow setting sections
@@ -599,7 +599,7 @@ $userimportorgs = QuickQueryList("
 	from userassociation ua
 		inner join organization o on
 			(ua.organizationid = o.id)
-		left join import i on (i.id = ua.importid) 
+		left join import i on (i.id = ua.importid)
 	where ua.userid = ? and i.updatemethod = 'full' order by orgkey", false, false, array($edituser->id));
 if ($userimportorgs) {
 	$html = '<div style="border: 1px dotted gray; padding: 3px;">';
@@ -614,9 +614,9 @@ if ($userimportorgs) {
 }
 
 // get user organization associations that arn't created by an import
-$userorgs = QuickQueryList("select organizationid from userassociation ua 
-		left join import i on (i.id = ua.importid) 
-		where ua.userid = ? and ua.type = 'organization' 
+$userorgs = QuickQueryList("select organizationid from userassociation ua
+		left join import i on (i.id = ua.importid)
+		where ua.userid = ? and ua.type = 'organization'
 		and (ua.importid is null or i.updatemethod is null or i.updatemethod != 'full')", false, false, array($edituser->id));
 // if there are no orgs. don't show the form item
 if ($orgs) {
@@ -657,7 +657,7 @@ if (count($linkusers) > 0) {
 	$multicheckbox = array("MultiCheckBox","values" => $linkusers);
 	if (count($linkusers) > 15)
 		$multicheckbox["height"] = "300px";
-	
+
 	$formdata["userlinks"] = array(
 		"label" => "Viewable Users",
 		"fieldhelp" => _L('Add user link'),
@@ -792,8 +792,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		}
 
 		Query("BEGIN");
-                
-                
+
+
 		if (!$readonly) {
 			$edituser->firstname = $postdata['firstname'];
 			$edituser->lastname = $postdata['lastname'];
@@ -807,7 +807,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
 			$userphone = Phone::parse($postdata['phone']);
 			$edituser->phone = $userphone;
-                        
+
 			$usersms = Phone::parse($postdata['sms']);
 			$edituser->sms = $usersms;
 
@@ -837,10 +837,10 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
 			if (isset($postdata['callerid']))
 				$edituser->setSetting("callerid",Phone::parse($postdata['callerid']));
-			
+
 			if (isset($postdata['restrictcallerid'])) {
 				if (count($postdata['restrictcallerid'])) {
-					if(count(array_diff($postdata['restrictcallerid'],$authorizedusercallerids)) > 0 || 
+					if(count(array_diff($postdata['restrictcallerid'],$authorizedusercallerids)) > 0 ||
 						count(array_diff($authorizedusercallerids,$postdata['restrictcallerid'])) > 0) {
 						QuickUpdate("delete from authorizedusercallerid where userid=?",false,array($edituser->id));
 						QuickUpdate("insert into authorizedusercallerid (userid,callerid) values " . repeatWithSeparator("({$edituser->id},?)", ",", count($postdata['restrictcallerid'])),false,$postdata['restrictcallerid']);
@@ -884,7 +884,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$edituser->staffpkey = $postdata['staffpkey'];
 				// give them association to no sections (section assoc created via section import)
 				Query("insert into userassociation (userid, type, sectionid) values (?, 'section', 0)", false, array($edituser->id));
-				
+
 				// remove any c fields from data rules
 				if (count($datarules))
 					foreach ($datarules as $index => $datarule)
@@ -917,7 +917,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			if (getSystemSetting("_hassurvey", true) && isset($postdata['surveytypes']) && count($postdata['surveytypes']))
 				foreach($postdata['surveytypes'] as $type)
 					QuickUpdate("insert into userjobtypes values (?, ?)", false, array($edituser->id, $type));
-			
+
 			} else {
 				// sms field should be editable regardless of $readonly being set
 				//TODO: move this to readonly section when sms added to import.
@@ -946,7 +946,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		// If the pincode is all 0 characters then it was a default form value, so ignore it
 		if (!preg_match("/^0*$/", $postdata['pin']))
 			$edituser->setPincode($postdata['pin']);
-			
+
 		// add user associations for sections
 		if ($hasenrollment) {
 			// remove all custom user associations
@@ -955,9 +955,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$sectionids = (isset($postdata['sectionids'])?$postdata['sectionids']:array());
 			foreach ($sectionids as $sectionid)
 				QuickUpdate("insert into userassociation (userid, type, sectionid) values (?, 'section', ?)", false, array($edituser->id, $sectionid));
-			
+
 		}
-		
+
 		// add user associations for organizations
 		QuickUpdate("delete ua from userassociation ua left join import i on (i.id = ua.importid) where ua.userid = ? and ua.type = 'organization' and ua.organizationid != 0 and (ua.importid is null or i.updatemethod is null or i.updatemethod != 'full')", false, array($edituser->id));
 		if (isset($postdata['organizationids']))
@@ -977,21 +977,21 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			if ($batchsql) {
 				QuickUpdate("insert into userlink (userid, subordinateuserid) values " . trim($batchsql,","), false, $batchargs);
 			}
-			
+
 			$removeCount = count($userLinksRemoved);
 			if (count($userLinksRemoved) != 0) {
 				$args = array_merge(array($edituser->id),$userLinksRemoved);
 				QuickUpdate("delete from userlink where userid=? and subordinateuserid in (" . DBParamListString($removeCount) . ")",false,$args);
 			}
 		}
-		
+
 		Query("COMMIT");
-		
+
 		// MUST set password outside of the transaction or the authserver will get a lock timeout on the user object
 		// If the password is "nopasswordchange" then it was a default form value, so ignore it
 		if ($postdata['password'] !== "nopasswordchange")
 			$edituser->setPassword($postdata['password']);
-		
+
 		if ($button == 'inpagesubmit') {
 			if ($hasstaffid)
 				notice(_L("Staff ID is now removed from Data View."));
