@@ -18,19 +18,12 @@ class PhoneOptOutReport extends ReportGenerator {
 		"3" => "fmt_phone"
 	);
 
-	private $opOutCodeTitles = array(
-		"1" => "Message One"
-	);
-
-	private $opOutCodeActionTaken = array(
-		"1" => "Punched in face"
-	);
-
-
 	function generateQuery($hackPDF = false) {
 		global $USER;
 		
 		$this->params = $this->reportinstance->getParameters();
+
+		$this->titles["6"] = getSystemSetting("organizationfieldname"); 
 
 		$autoBlockEnabled = getSystemSetting("_enableautoblock") ? true: false;
 
