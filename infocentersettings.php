@@ -46,6 +46,15 @@ $formdata["requirehighpriority"] = array(
 		"helpstep" => 1
 );
 
+$formdata["allowInfocenterContactChanges"] = array(
+		"label" => _L("Allow recipients to edit their contact data"),
+		"fieldhelp" => _L("Allows recipients to edit their contact data"),
+		"value" => getSystemSetting('allowInfocenterContactChanges') ? true : false,
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 1
+);
+
 
 $buttons = array(submit_button(_L('Save'),"submit","tick"),
 				icon_button(_L("Cancel"),"cross",null,"settings.php"));
@@ -79,6 +88,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$requirepriorities[] = 2;
 		
 		setSystemSetting('priorityenforcement',implode('|',$requirepriorities));
+
+		if(isset($postdata['allowInfocenterContactChanges'])) {
+			$saveData = $postdata['allowInfocenterContactChanges'] ? 1 : 0;
+			setSystemSetting('allowInfocenterContactChanges', $saveData);			
+		}
 		
         if ($ajax)
             $form->sendTo("settings.php");
