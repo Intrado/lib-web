@@ -87,8 +87,8 @@ class PhoneOptOutReport extends ReportGenerator {
 					from person p
 					join ($phonesQuery) as rpo on p.id = rpo.personId
 					left join jobtype as jt on jt.id = rpo.jobTypeId
-					left join personassociation pa on (pa.type = 'organization' and pa.personid = p.id)
-					left join organization org on org.id = pa.organizationid
+					left join personassociation passoc on (passoc.type = 'organization' and passoc.personid = p.id)
+					left join organization org on org.id = passoc.organizationid
 					$orgJoin
 					$orderquery
 					";
@@ -105,6 +105,7 @@ class PhoneOptOutReport extends ReportGenerator {
 		$result = Query($query, $this->_readonlyDB);
 
 		$personlist = array();
+
 		while ($row = DBGetRow($result)) {
 			$personlist[] = $row;
 		}
