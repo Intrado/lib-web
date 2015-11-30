@@ -237,6 +237,14 @@ _L('Messaging Options'),
 		"control" => array("CheckBox"),
 		"helpstep" => 4
 	),
+	"requireTranslation" => array(
+		"label" => _L('Require Translation'),
+		"fieldhelp" => _L('Requires translation of message prior to being sent.'),
+		"value" => $obj->getValue("requireTranslation"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 4
+	),
 	"sendsms" => array(
 		"label" => _L('Send SMS text messages'),
 		"fieldhelp" => _L('Allows users to send SMS messages and manage related messages.'),
@@ -888,7 +896,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$obj->setPermission("calllate", $postdata['calllate']);
 			$obj->setPermission("callmax", $postdata['callmax']);
 			$obj->setPermission("sendemail", (bool)$postdata['sendemail']);
-                        $obj->setPermission("requireemail", (bool)$postdata['requireemail']);
+			$obj->setPermission("requireemail", (bool)$postdata['requireemail']);
+			$obj->setPermission("requireTranslation", (bool)$postdata['requireTranslation']);
 			$obj->setPermission("sendmulti", (bool)$postdata['sendmulti']);
 			$obj->setPermission("createlist", (bool)$postdata['createlist']);
 			$obj->setPermission("listuploadids", (bool)$postdata['listuploadids']);
