@@ -209,13 +209,14 @@ function fmt_actions_enabled_account ($account,$name) {
 		$importid = 0; // only fullsync imports manage users, else allow edit full user data
 	$login = $account['login'];
 	$userldap = $account['ldap'];
+	$usersaml = $account['samlEnabled'];
 
 	$activeuseranchor = (isset($_SESSION['userid']) && $_SESSION['userid'] == $id) ? '<a name="viewrecent">' : '';
 
 	$links = array();
 	$links[] = action_link($importid > 0 ? _L("View") : _L("Edit"),"pencil","user.php?id=$id");
 	$links[] = action_link(_L("Login as this user"),"key_go","./?login=$login");
-	if (!($hasldap && $userldap)) {
+	if (!($hasldap && $userldap) && !($hassaml && $usersaml)) {
 		$links[] = action_link(_L("Reset Password"),"fugue/lock__pencil","", "if (window.confirm('"._L('Send an email reset reminder?')."')) window.location='?resetpass=$id'");
 	}
 	if ($id != $USER->id)
@@ -225,18 +226,19 @@ function fmt_actions_enabled_account ($account,$name) {
 }
 
 function fmt_actions_disabled_account ($account,$name) {
-	global $newusers, $hasldap;
+	global $newusers, $hasldap, $hassaml;
 	
 	$importid = $account['importid'];
 	if (strcmp($account['importupdatemethod'], 'full'))
 	$importid = 0; // only fullsync imports manage users, else allow edit full user data
 	$id = $account['id'];
 	$userldap = $account['ldap'];
+	$usersaml = $account['samlEnabled'];
 
 	$links = array();
 	$links[] = action_link($importid > 0 ? _L("View") : _L("Edit"),"pencil","user.php?id=$id");
 	$links[] = action_link(_L("Enable"),"user_add","?enable=$id");
-	if(isset($newusers[$id]) && !($hasldap && $userldap)) {
+	if(isset($newusers[$id]) && !($hasldap && $userldap)  && !($hassaml && $usersaml)) {
 		$links[] = action_link(_L("Enable & Reset Password"),"fugue/lock__pencil","?resetpass=$id");
 	}
 

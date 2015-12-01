@@ -45,9 +45,10 @@ if ($USER->importid) {
 }
 
 $ldapuser = $USER->ldap;
+$samluser = $USER->samlEnabled;
 
 $usernamelength = getSystemSetting("usernamelength", 5);
-if ($USER->ldap)
+if ($USER->ldap || $samluser)
 	$usernamelength = 1;
 
 $passwordlength = getSystemSetting("passwordlength", 5); // minimum password length, poor naming
@@ -116,7 +117,7 @@ if ($readonly) {
 	);
 }
 
-if ($ldapuser || $readonly) {
+if ($ldapuser || $samluser || $readonly) {
 	$formdata["login"] = array(
 		"label" => _L("Username"),
 		"fieldhelp" => _L("The username is used to log into the account online."),
@@ -130,15 +131,15 @@ if ($ldapuser || $readonly) {
 		"value" => $USER->login,
 		"validators" => array(
 			array("ValRequired"),
-			array("ValLength","min" => getSystemSetting("usernamelength", 5),"max" => 20),
+			array("ValLength","min" => getSystemSetting("usernamelength", 5),"max" => 255),
 			array("ValLogin", "userid" => $USER->id)
 		),
-		"control" => array("TextField","maxlength" => 20, "size" => 20),
+		"control" => array("TextField","maxlength" => 255, "size" => 20),
 		"helpstep" => 1
 	);
 }
 
-if (!$ldapuser) {
+if (!$ldapuser && !$samluser) {
 	$pass = $USER->id ? 'nopasswordchange' : '';
 	$passlength = getSystemSetting("passwordlength", 5);
 	if ($readonly) {
@@ -532,7 +533,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			
 			$USER->firstname = $postdata['firstname'];
 			$USER->lastname = $postdata['lastname'];
-			if (!$USER->ldap) {
+			if (!$USER->ldap && !$USER->samlEnabled) {
 				$USER->login = $postdata['login'];
 			}
 			$USER->samlEnabled = $postdata['samlEnabled'];
@@ -576,7 +577,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
 		// MUST set password outside of the transaction or the authserver will get a lock timeout on the user object
 		// If the password is all 0 characters then it was a default form value, so ignore it
-		if (!$USER->ldap) {
+		if (!$USER->ldap && !$USER->samlEnabled) {
 			$newpassword = $postdata['password'];
 			if ($newpassword !== "nopasswordchange")
 				$USER->setPassword($newpassword);
