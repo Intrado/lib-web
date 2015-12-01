@@ -162,7 +162,7 @@ include_once("logintop.inc.php");
 		
 		<fieldset>
 		<label class="indexform" for="form_login"><?=_L("Login:")?></label>
-		<input type="text" name="login" id="form_login" size="20" maxlength="20" />
+		<input type="text" name="login" id="form_login" size="20" maxlength="255" />
 		</fieldset>
 
 		<fieldset>
