@@ -43,7 +43,7 @@ function SDD() {
 			$this.addPasswordInputHandler();
 			$this.addDownloadBtnClickHandler();
 		} else if ($this.countElem.length) {
-			$this.count = 5;
+			$this.count = 0;
 			$this.addDirectLinkClickHandler();
 			$this.startCountdownTimer();
 		}
@@ -186,7 +186,9 @@ function SDD() {
 			clearInterval($this.counter);
 			$this.requestDocument();
 		}
-		$this.countElem.html($this.count);
+		// We are no longer preceeding the download with a countdown, so let's
+		// remove the line below.
+		// $this.countElem.html($this.count);
 	};
 
 	/**
