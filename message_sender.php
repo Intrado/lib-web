@@ -261,12 +261,29 @@ class ValTranslationCharacterLimit extends Validator {
 	function getJSValidator () {
 		return
 			'function (name, label, value, args, requiredvalues) {
-			//alert("valLength");
 			var textlength = requiredvalues[args["field"]].length;
 			if (textlength > 5000)
 			return this.label +" is unavalable if the message is more than 5000 characters. The message is currently " + textlength + " characters.";
 			return true;
 		}';
+	}
+}
+
+class ValTranslationRequired extends Validator {
+	var $isrequired = true;
+
+	function validate ($value, $args, $requiredvalues) {
+		return true;
+	}
+	function getJSValidator () {
+		return
+			'function (name, label, value, args, requiredvalues) {
+				if ( value === true ) {
+					return true;
+				} else {
+					return label+" must be checked."
+				}
+			}';
 	}
 }
 
@@ -338,6 +355,12 @@ $fcids = array_keys(FeedCategory::getAllowedFeedCategories());
 $feedcategoryids = array();
 foreach ($fcids as $fcid)
 	$feedcategoryids[$fcid] = $fcid;
+
+$phoneTranslationValidators = array();
+$phoneTranslationValidators[] = array("ValTranslationCharacterLimit", "field" => "phonemessagetext");
+if($USER->authorize('requireTranslation')) {
+	$phoneTranslationValidators[] = array("ValTranslationRequired", "field" => "phonemessagetext");
+}
 
 $formdata = array(
 	"uuid" => array(
@@ -461,9 +484,7 @@ $formdata = array(
 	"phonemessagetexttranslate" => array(
 		"label" => "Translate",
 		"value" => "",
-		"validators" => array(
-			array("ValTranslationCharacterLimit", "field" => "phonemessagetext")
-		),
+		"validators" => $phoneTranslationValidators,
 		"control" => array("CheckBox"),
 		"requires" => array("phonemessagetext"),
 		"helpstep" => 1
@@ -480,6 +501,14 @@ foreach ($ttslanguages as $code => $language) {
 		"control" => array("TextField"),
 		"helpstep" => 1
 	);
+}
+
+// An optional validator to be added to translation if 'requireTranslation' profile setting is set
+
+$emailTranslationValidators = array();
+$emailTranslationValidators[] = array("ValTranslationCharacterLimit", "field" => "emailmessagetext");
+if($USER->authorize('requireTranslation')) {
+	$emailTranslationValidators[] = array("ValTranslationRequired", "field" => "emailmessagetext");
 }
 
 $formdata = array_merge($formdata, array(
@@ -561,9 +590,7 @@ $formdata = array_merge($formdata, array(
 	"emailmessagetexttranslate" => array(
 		"label" => "Translate",
 		"value" => "",
-		"validators" => array(
-			array("ValTranslationCharacterLimit", "field" => "emailmessagetext")
-		),
+		"validators" => $emailTranslationValidators,
 		"control" => array("CheckBox"),
 		"requires" => array("emailmessagetext"),
 		"helpstep" => 1
@@ -1032,7 +1059,7 @@ include("nav.inc.php");
 			});
 
 			<?/* load required validators into document.validators */?>
-			<? Validator::load_validators(array("ValCallerID", "ValConditionalOnValue", "ValConditionallyRequired", "ValDate", "ValDomain", "ValDomainList", "ValDuplicateNameCheck", "ValEasycall", "ValEmail", "ValEmailAttach", "ValEmailList", "ValFacebookPage", "ValFieldConfirmation", "ValHasMessage", "ValInArray", "ValLength", "ValLists", "ValMessageBody", "ValMessageGroup", "ValMessageTypeSelect", "ValNumber", "ValNumeric", "ValPhone", "ValRequired", "ValSmsText", "ValTextAreaAndSubjectWithCheckbox", "ValTimeCheck", "ValTimePassed", "ValTimeWindowCallEarly", "ValTimeWindowCallLate", "ValTranslation", "ValTranslationCharacterLimit", "ValTtsText", "valPhone")); ?>
+			<? Validator::load_validators(array("ValCallerID", "ValConditionalOnValue", "ValConditionallyRequired", "ValDate", "ValDomain", "ValDomainList", "ValDuplicateNameCheck", "ValEasycall", "ValEmail", "ValEmailAttach", "ValEmailList", "ValFacebookPage", "ValFieldConfirmation", "ValHasMessage", "ValInArray", "ValLength", "ValLists", "ValMessageBody", "ValMessageGroup", "ValMessageTypeSelect", "ValNumber", "ValNumeric", "ValPhone", "ValRequired", "ValSmsText", "ValTextAreaAndSubjectWithCheckbox", "ValTimeCheck", "ValTimePassed", "ValTimeWindowCallEarly", "ValTimeWindowCallLate", "ValTranslation", "ValTranslationCharacterLimit", "ValTtsText", "valPhone", "ValTranslationRequired")); ?>
 		});
 		
 		<?/* monitor the main content div for resize and send a message with this information */?>
