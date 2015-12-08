@@ -47,51 +47,83 @@ class PhoneOptOutReport extends ReportGenerator {
 		}
 		list($startdate, $enddate) = getStartEndDate($reldate, $this->params);
 		
-		$optOutReasonsSQL = '';
 
-		// decide what reasons to display
-		if ( $autoBlockEnabled ) {
-			$optOutReasonsSQLCases = 
-				"when rpo.optOutCode = '1' then CONCAT('Recipient Unsubscribed: ', jt.name)".PHP_EOL.
-				"when rpo.optOutCode = '2' then 'Recipient Unsubscribed: All but Emergency Priority'".PHP_EOL.
-				"when rpo.optOutCode = '3' then 'Recipient Blocked'".PHP_EOL;
+		if ( $autoBlockEnabled ) { 
+
+			// remove titles entry 5 (Count) and shift 6 to entry 5
+			array_splice($this->titles, 5, 1);
+
+			$this->query = 
+						"select SQL_CALC_FOUND_ROWS DISTINCT
+						p.pkey as pkey,
+						p." . FieldMap::GetFirstNameField() . " as firstname,
+						p." . FieldMap::GetLastNameField() . " as lastname,
+						rpo.phone, 
+
+						case
+							when rpo.optOutCode = '1' then CONCAT('Recipient Unsubscribed: ', jt.name)
+							when rpo.optOutCode = '2' then 'Recipient Unsubscribed: All but Emergency Priority'
+							when rpo.optOutCode = '3' then 'Recipient Blocked'
+						end as optOutCodeReason,
+
+						org.orgkey
+						from person p
+
+						join (
+							select personId,
+							phone,
+							jobTypeId,
+							optOutCode
+							from reportphoneoptout
+							where lastUpdateMs >= " . ($startdate  * 1000) . "
+							and lastUpdateMs < " . (($enddate+86400) * 1000) . "
+						) as rpo on p.id = rpo.personId
+
+						left join jobtype as jt on jt.id = rpo.jobTypeId
+						left join personassociation passoc on (passoc.type = 'organization' and passoc.personid = p.id)
+						left join organization org on org.id = passoc.organizationid
+						$orgJoin
+						$orderquery
+						";
+
 		} else {
-			$optOutReasonsSQLCases = 
-				"when rpo.optOutCode = '1' then CONCAT('Unsubscribe Requested: ', jt.name)".PHP_EOL.
-				"when rpo.optOutCode = '2' then 'Unsubscribe requested: All but Emergency Priority'".PHP_EOL.
-				"when rpo.optOutCode = '3' then 'Block requested by recipient'".PHP_EOL;
+			$this->query = 
+						"select SQL_CALC_FOUND_ROWS DISTINCT
+						p.pkey as pkey,
+						p." . FieldMap::GetFirstNameField() . " as firstname,
+						p." . FieldMap::GetLastNameField() . " as lastname,
+						rpo.phone, 
+
+						case
+							when rpo.optOutCode = '1' then CONCAT('Unsubscribe Requested: ', jt.name)
+							when rpo.optOutCode = '2' then 'Unsubscribe requested: All but Emergency Priority'
+							when rpo.optOutCode = '3' then 'Block requested by recipient'
+						end as optOutCodeReason,
+
+						rpo.numRequests,
+						org.orgkey
+						from person p
+
+						join (
+							select personId,
+							phone,
+							count(*) as numRequests,
+							max(lastUpdateMs) as lastUpdateMs,
+							jobTypeId,
+							optOutCode
+							from reportphoneoptout
+							where lastUpdateMs >= " . ($startdate  * 1000) . "
+							and lastUpdateMs < " . (($enddate+86400) * 1000) . "
+							group by personId, phone, optOutCode
+						) as rpo on p.id = rpo.personId
+
+						left join jobtype as jt on jt.id = rpo.jobTypeId
+						left join personassociation passoc on (passoc.type = 'organization' and passoc.personid = p.id)
+						left join organization org on org.id = passoc.organizationid
+						$orgJoin
+						$orderquery
+						";
 		}
-
-		$phonesQuery = "select personId,
-					phone,
-					count(*) as numRequests,
-					max(lastUpdateMs) as lastUpdateMs,
-					jobTypeId,
-					optOutCode
-					from reportphoneoptout
-					where lastUpdateMs >= " . ($startdate  * 1000) . "
-					and lastUpdateMs < " . (($enddate+86400) * 1000) . "
-					group by personId, phone
-					";
-
-		$this->query = "select SQL_CALC_FOUND_ROWS DISTINCT
-					p.pkey as pkey,
-					p." . FieldMap::GetFirstNameField() . " as firstname,
-					p." . FieldMap::GetLastNameField() . " as lastname,
-					rpo.phone, 
-					case
-					".$optOutReasonsSQLCases."
-					end as optOutCodeReason,
-					rpo.numRequests,
-					org.orgkey
-					from person p
-					join ($phonesQuery) as rpo on p.id = rpo.personId
-					left join jobtype as jt on jt.id = rpo.jobTypeId
-					left join personassociation passoc on (passoc.type = 'organization' and passoc.personid = p.id)
-					left join organization org on org.id = passoc.organizationid
-					$orgJoin
-					$orderquery
-					";
 	}
 
 	function runHtml() {
