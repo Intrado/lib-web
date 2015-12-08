@@ -65,6 +65,7 @@ class PhoneOptOutReport extends ReportGenerator {
 							when rpo.optOutCode = '2' then 'Recipient Unsubscribed: All but Emergency Priority'
 							when rpo.optOutCode = '3' then 'Recipient Blocked'
 						end as optOutCodeReason,
+
 						org.orgkey
 						from person p
 
@@ -113,7 +114,7 @@ class PhoneOptOutReport extends ReportGenerator {
 							from reportphoneoptout
 							where lastUpdateMs >= " . ($startdate  * 1000) . "
 							and lastUpdateMs < " . (($enddate+86400) * 1000) . "
-							group by personId, phone
+							group by personId, phone, optOutCode
 						) as rpo on p.id = rpo.personId
 
 						left join jobtype as jt on jt.id = rpo.jobTypeId
