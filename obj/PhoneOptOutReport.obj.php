@@ -114,7 +114,7 @@ class PhoneOptOutReport extends ReportGenerator {
 							from reportphoneoptout
 							where lastUpdateMs >= " . ($startdate  * 1000) . "
 							and lastUpdateMs < " . (($enddate+86400) * 1000) . "
-							group by personId, phone, optOutCode
+							group by personId, phone, optOutCode, jobTypeId
 						) as rpo on p.id = rpo.personId
 
 						left join jobtype as jt on jt.id = rpo.jobTypeId
