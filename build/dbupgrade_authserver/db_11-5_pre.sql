@@ -142,7 +142,7 @@ $$$
 
 -- $rev 7
 
-INSERT INTO `shortcodegroup` SET `description` = 'Test - Syniverse'
+INSERT INTO `shortcodegroup` SET `description` = 'Test - Syniverse', `queuecapacity` = 1000, `numthreads` = 1
 $$$
 
 INSERT INTO `shortcode` (`shortcode`, `smsaggregatorid`, `shortcodegroupid`)
