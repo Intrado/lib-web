@@ -23,7 +23,7 @@ Use of this system is subject to the <a href="http://www.schoolmessenger.com/pri
 
 </div>
 <?
-print "<div id='logininfo' class='noprint' >Logged in as ".SmartTruncate(escapehtml($USER->firstname),50)." ".SmartTruncate(escapehtml($USER->lastname),50)." (".SmartTruncate(escapehtml($USER->login),50).")";
+print "<div id='logininfo' class='noprint' >Logged in as ".SmartTruncate(escapehtml($USER->firstname),35)." ".SmartTruncate(escapehtml($USER->lastname),35)." (".SmartTruncate(escapehtml($USER->login),35).")";
 $inboundnumber = getSystemSetting("inboundnumber");
 if ($inboundnumber)
 	echo "<br>Remote phone access #: <b>" . Phone::format($inboundnumber) . "</b>";
