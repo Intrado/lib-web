@@ -1,7 +1,9 @@
 #!/bin/bash
 
-dist_dir=${1:-/usr/commsuite/upgrade}
+dist_dir=${1:-/tmp/upgrade}
 date=`date +%F`
+
+mkdir -p $dist_dir
 
 [ -L /usr/commsuite/www ] && exit 0
 
