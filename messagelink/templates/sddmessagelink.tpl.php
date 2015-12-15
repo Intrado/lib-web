@@ -4,6 +4,7 @@ function escapeHtml($string) {
 }
 ?>
 
+
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/html">
 <head>
@@ -55,7 +56,7 @@ function escapeHtml($string) {
 							<? else: ?>
 								<div class="instruction download">
 									<div id="download-timer-wrapper">
-										<span class="glyphicon glyphicon-download"></span> &nbsp;Downloading your file from Springfield ISD<span id="download-count" class="text-danger"></span>
+										<span class="glyphicon glyphicon-download"></span> &nbsp;Downloading your file from <?= escapeHtml($this->customerdisplayname) ?><span id="download-count" class="text-danger"></span>
 									</div>
 									<p>Problems with the download?  Please use this direct <a class="directlink">link</a>.</p>
 									<div class="alert alert-danger" id="download-error-message-container">
