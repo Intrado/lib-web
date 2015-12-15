@@ -16,3 +16,12 @@ INSERT INTO `shortcodegroup` (`id`, `description`, `queuecapacity`, `numthreads`
 VALUES (@id, 'Test - Syniverse', 1000, 1, 'cs', '0')
 ON DUPLICATE KEY UPDATE `queuecapacity` = VALUES(`queuecapacity`), `numthreads` = VALUES(`numthreads`)
 $$$
+
+-- $rev 4
+
+INSERT INTO `shortcodetext` (`shortcode`, `messagetype`, `text`) VALUES
+('68453','PENDINGOPTIN','%s messages. Reply Y to confirm, HELP 4 info. Msg&data rates may apply. Msg freq varies. schoolmessenger.com/tm'),
+('88544','PENDINGOPTIN','%s msgs. Reply Y to confirm, HELP 4 info. Msg&data rates may apply. Msg freq varies. schoolmessenger.com/fcs')
+ON DUPLICATE KEY UPDATE `text` = VALUES(`text`)
+$$$
+
