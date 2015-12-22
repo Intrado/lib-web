@@ -1211,8 +1211,8 @@ div.progressbar div.progress {
 }
 
 iframe::-webkit-scrollbar {
-	display: none;
+	/*display: none;*/
 }
 iframe.embedded {
-	overflow-y: hidden;
+	/*overflow-y: hidden;*/
 }
