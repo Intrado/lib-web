@@ -1210,9 +1210,11 @@ div.progressbar div.progress {
     text-align: center;
 }
 
+/*----- Uncommenting below will hide iframe scrollbars in webkit browsers -----*/
+
 iframe::-webkit-scrollbar {
-	display: none;
+	/*display: none;*/
 }
 iframe.embedded {
-	overflow-y: hidden;
+	/*overflow-y: hidden;*/
 }
