@@ -265,7 +265,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 <? if($USER->authorize('managemyaccount')){ ?>
 			<li><a href="account.php">Account</a></li>
 <? } ?>
-			<li><a href="#" onclick="window.open('help/index.php', '_blank', 'width=960,height=650,location=no,menubar=yes,resizable=yes,scrollbars=no,status=no,titlebar=no,toolbar=yes');">Help</a></li>
+			<li><a href="help/index.php" onclick="window.open('help/index.php', '_blank', 'width=960,height=650,location=no,menubar=yes,resizable=yes,scrollbars=no,status=no,titlebar=no,toolbar=yes'); return false;">Help</a></li>
 			<li><a data-toggle="modal" href="#feedbackModal">Feedback</a></li>
 			<li class="bl_last"><a class="logout" href="index.php?logout=1">Logout</a></li>
 			<li class="bl_right"></li>
