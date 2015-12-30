@@ -820,6 +820,7 @@ div.default-modal {
 	display: none;
 	max-height: 80%; 
 	max-width: 80%; 
+	overflow: scroll;
 }
 
 div.default-modal .modal-body  {
