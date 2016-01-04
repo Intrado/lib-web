@@ -40,9 +40,6 @@ header('Content-type: text/html; charset=UTF-8') ;
 <?}?>
 	<link href="css/style_print.css" type="text/css" rel="stylesheet" media="print" />
 	
-	<!--[if IE 8]>
-		<script src="script/respond.min.js" type="text/javascript"></script>
-	<![endif]-->
 
 	<script type="text/javascript">
 		sessionKeepAliveWarning(<?=$SESSION_WARNING_TIME?>);
