@@ -587,7 +587,7 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 	.helper {  }
 }
 
-@media only screen and (max-width: 800px) {
+/*@media only screen and (max-width: 800px) {
 	.newform .formtitle { float: none; display: block; width: inherit; text-align: left; }
 	.newform .formcontrol { float: none; display: block; margin: 0; }
 	.formfieldarea .underneathmsg { float: none; display: block; padding: 0px; }
@@ -607,7 +607,7 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 	.newui .newform .formtitle .formlabel { padding: 0 10px 5px 0; text-align: left; }
 	.newui .formfieldarea .underneathmsg { font-size: 13px; padding: 0; }
 }
-
+*/
 /* Override for ASPManager's service properties textarea */
 #serverpropertiesform_propsfile {
 	width: 98%;
