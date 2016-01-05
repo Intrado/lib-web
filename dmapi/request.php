@@ -66,24 +66,18 @@ function inboundtask($msg){
 	session_id($SESSIONID->scalarval());
 	doStartSession();
 
-	// Expect a working customer database connection
-	if (isDBConnected()) {
-		$REQUEST_TYPE = "new";
-		$_SESSION['inboundNumber'] = $msg->getParam(1)->scalarval();
-		$_SESSION['callerid'] = $msg->getParam(2)->scalarval();
-		$_SESSION['customerid'] = $msg->getParam(3)->scalarval();
-		$_SESSION['timezone'] = getSystemSetting("timezone");
+	$REQUEST_TYPE = "new";
+	$_SESSION['inboundNumber'] = $msg->getParam(1)->scalarval();
+	$_SESSION['callerid'] = $msg->getParam(2)->scalarval();
+	$_SESSION['customerid'] = $msg->getParam(3)->scalarval();
+	$_SESSION['timezone'] = getSystemSetting("timezone");
 
-		ob_start();
+	ob_start();
 
-		forwardToPage("inboundstart.php");
+	forwardToPage("inboundstart.php");
 
-		$output = ob_get_contents();
-		ob_end_clean();
-	} else {
-		$ERROR = 'Customer DB not connected; session expired?';
-		$output = '';
-	}
+	$output = ob_get_contents();
+	ob_end_clean();
 
 	return response($ERROR, $output);
 }
