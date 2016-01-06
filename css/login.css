@@ -95,12 +95,15 @@ p { margin: 0 0 10px 0; font-size: 12px; line-height: 19px; }
 .window_body .rightblock { float: right; }
 
 #footer { width: 100%; max-width: 650px; margin: 0 auto; padding: 10px 0 0; }
+
 #footer p { color: #fff; }
+#footer p#support-information { color: black; }
+
 #footer a { color: #999; }
 #footer a:hover { color: #777; }
 
 .language { position: absolute; top: 12px; right: 10px; }
-.ssl { font-size: 9px; }
+.ssl { font-size: 12px; }
 .error { color: red; }
 
 

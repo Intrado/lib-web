@@ -15,8 +15,10 @@
 
 
 	<div style="float: right">
-		<p>Service & Support:
-		<a href="mailto:<?=$scheme['_supportemail']?>"><?=$scheme['_supportemail']?></a>&nbsp;|&nbsp;<?="(" . substr($scheme['_supportphone'],0,3) . ") " . substr($scheme['_supportphone'],3,3) . "-" . substr($scheme['_supportphone'],6,4);?></p>
+		<p id="support-information">
+			Service & Support:
+			<a href="mailto:<?=$scheme['_supportemail']?>"><?=$scheme['_supportemail']?></a>&nbsp;|&nbsp;<?="(" . substr($scheme['_supportphone'],0,3) . ") " . substr($scheme['_supportphone'],3,3) . "-" . substr($scheme['_supportphone'],6,4);?>
+		</p>
 	</div>
 
 </div>
