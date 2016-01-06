@@ -53,7 +53,7 @@ if (window.gbWhTopic)
 
 	if (window.addTocInfo)
 	{
-	addTocInfo("System Administration\nIntro Message Management\nCustomizing Intro Messages");
+	addTocInfo("System Administration\nIntro Message Management\nConfiguring Intro Messages");
 addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
 
 	}
@@ -66,7 +66,7 @@ addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
 	
 	document.write("<p style=\"text-align:right\"> ");
 AddMasterBreadcrumbs("../../Index.htm", "", ">", "Home", "../../Getting_Started/Welcome.htm");
-document.write("<a href=\"../User_Management/Managing_User_Accounts.htm\">System Administration<\/a> > <a href=\"Customizing_Intro_Messages.htm\">Intro Message Management<\/a> > Customizing Intro Messages<\/p>");
+document.write("<a href=\"../User_Management/Managing_User_Accounts.htm\">System Administration<\/a> > <a href=\"Customizing_Intro_Messages.htm\">Intro Message Management<\/a> > Configuring Intro Messages<\/p>");
 
 }
 else
@@ -101,7 +101,7 @@ function onSetStartPage()
 
 
 
-<h1>Customizing Intro Messages</h1>
+<h1>Configuring Intro Messages</h1>
 <p class="important"><span style="font-weight: bold;"><img src="../../exclamation.png" 
 															 alt="" style="border: none;" 
 															 border="0" /> 
@@ -118,45 +118,57 @@ function onSetStartPage()
  use of SchoolMessenger by assisting with the correct handling of answering 
  machines and voicemail, as well as giving recipients required information 
  about how to opt-out of receiving future phone messages.</p>
-<h4>Intro Message Best Practices</h4>
+<h3 style="margin-left: 40px;">Intro Message Best Practices</h3>
 <ul style="list-style: disc;">
-	<li class="p"><p>State your organization so the recipient knows who 
-	 the call is from.</p></li>
-	<li class="p"><p>Instruct recipients that they must press 1 to listen 
-	 the message or press pound (#) to place the message on hold.</p></li>
-	<li class="p"><p>Instruct recipients that they may press 5 at any time 
-	 during the message to initiate an &quot;opt-out request&quot;.</p></li>
-	<li class="p"><p>Be brief.</p></li>
-</ul>
-<h4>Example Intro Messages</h4>
-<ul style="list-style: disc;">
-	<li class="p"><p>Default: <i style="mso-bidi-font-style: normal;">“This 
-	 is a message from Springfield Elementary.<span style="mso-spacerun: yes;">&#160;</span>&#160;Please 
-	 press 1 to play this message immediately.<span style="mso-spacerun: yes;">&#160;</span>&#160;Press 
-	 pound to place this call on hold.<span style="mso-spacerun: yes;">&#160;</span>&#160;If 
-	 you would like to opt this phone out of all future voice messages 
-	 from our schools, press 5 at any time during the message.”</i></p></li>
-	<li class="p"><p>Emergency: <i style="mso-bidi-font-style: normal;">“This 
-	 is an emergency message from Springfield Elementary.<span style="mso-spacerun: yes;">&#160;</span>&#160;Please 
-	 press 1 to play this message immediately.<span style="mso-spacerun: yes;">&#160;</span>&#160;Press 
-	 pound to place this call on hold.<span style="mso-spacerun: yes;">&#160;</span>&#160;If 
-	 you would like to opt this phone out of all future voice messages 
-	 from our schools, press 5 at any time during the message.”</i></p></li>
+	<ul style="list-style: disc;">
+		<li class="p"><p>State your organization so the recipient knows 
+		 who the call is from.</p></li>
+		<li class="p"><p>Instruct recipients that they must press 1 to 
+		 listen the message or press pound (#) to place the message on 
+		 hold.</p></li>
+		<li class="p"><p>Instruct recipients that they may press 5 at any 
+		 time during the message to initiate an &quot;opt-out or unsubscribe 
+		 request&quot;.</p></li>
+		<li class="p"><p>Be brief.</p></li>
+	</ul>
 </ul>
 <h4>Recording Intro Messages</h4>
-<p>Intro messages are recorded just like a regular message, however since 
- many systems have multilingual requirements, you may find it easiest to 
- allow different users to record intros for each language.</p>
+<p class="body"><u style="text-decoration: none; ">Your first step</u> 
+ in this process should be to write a script for the introduction messages 
+ for your school(s) which might sound something like this:</p>
+<p class="body" style="margin-left: 40px;"><i style="mso-bidi-font-style: normal;"><span 
+	 style="font-style: normal; text-decoration: underline; "><u>General Broadcasts</u></span><span 
+	 style="font-style: normal;">:</span> “This is an important message 
+ from Springfield Elementary.<span style="mso-spacerun: yes;">&#160;</span>&#160;Please 
+ press 1 to play this message immediately.<span style="mso-spacerun: yes;">&#160;</span>&#160;Press 
+ pound to place this call on hold.<span style="mso-spacerun: yes;">&#160;</span>&#160;If 
+ you would like to hear options to unsubscribe this phone out of future 
+ voice messages from our schools, press 5 at any time during the message.”</i></p>
+<p class="body" style="margin-left: 40px;"><i style="mso-bidi-font-style: normal;"><span 
+	 style="mso-bidi-font-style: normal; font-style: normal; text-decoration: underline; "><u>Emergency</u></span><span 
+	 style="font-style: normal; text-decoration: underline; "><u> Broadcasts</u></span><span 
+	 style="font-style: normal;">:</span> “This is an <span style="font-weight: bold;">emergency</span> 
+ message from Springfield Elementary.<span style="mso-spacerun: yes;">&#160;</span>&#160;Please 
+ press 1 to play this message immediately.<span style="mso-spacerun: yes;">&#160;</span>&#160;Press 
+ pound to place this call on hold.<span style="mso-spacerun: yes;">&#160;</span>&#160;If 
+ you would like to hear options to unsubscribe this phone out of future 
+ voice messages from our schools, press 5 at any time during the message.”</i></p>
 <p class="important"><span style="font-weight: bold;"><img src="../../light_bulb__exclamation.png" 
 															 alt="" style="border: none;" 
 															 border="0" /> 
- Note:</span> You can always enter the number of the person who will record 
- the alternate language message into the &quot;Voice Recording&quot; sections 
- &quot;Number to Call&quot; box and let the system call them so all you 
- intro messages are saved under one account. However, in the event that 
- users choose to record them on their own accounts, any user whose Access 
- Profile allows them to create new messages may record a message to be 
- selected for the account intro.</p>
+ Note:</span> <i style="mso-bidi-font-style: normal;"><span style="font-size: 10.0pt; 
+															 mso-bidi-font-size: 11.0pt; 
+															 line-height: 115%; 
+															 font-family: Arial, sans-serif; 
+															 mso-fareast-font-family: 'Times New Roman'; 
+															 color: #316595; 
+															 mso-ansi-language: EN-US; 
+															 mso-fareast-language: EN-US; 
+															 mso-bidi-language: AR-SA;"><font size="2" color="#316595" style="font-size:10.000000pt;">If 
+ you use multiple languages on your SchoolMessenger account and/or have 
+ different introductions for various broadcast types, such as emergencies, 
+ please have a script and available persons prepared for those as well.</font></span></i> 
+ </p>
 <p class="MsoNormal" style="margin-top: 6.0pt;">While logged in to your 
  SchoolMessenger account, click on the “<b style="mso-bidi-font-weight: normal;">Broadcasts</b>” 
  tab, then select the “<b style="mso-bidi-font-weight: normal;">Messages</b>” 
@@ -202,10 +214,9 @@ function onSetStartPage()
  and follow the prompts to record the intro message script.<span style="mso-spacerun: yes;">&#160;</span>&#160;Remember 
  to press “1” to save your message before hanging up.</p>
 <p class="body" style="margin-left: .5in; text-indent: -.25in; mso-list: l0 level1 lfo1;"><span 
-	 style="mso-fareast-font-family: Arial;"><span style="mso-list: Ignore;">6.<span 
-	 style="font: 7.0pt 'Times New Roman';"><font size="1" style="font-size:7pt;">&#160;&#160;&#160;&#160;</font></span></span></span>&#160;On 
+	 style="mso-fareast-font-family: Arial; mso-list: Ignore;">6.&#160;&#160;&#160;&#160;</span>&#160;On 
  your SchoolMessenger account, the screen will change to give you the option 
- to <i style="mso-bidi-font-style: normal;">Play</i> and <i style="mso-bidi-font-style: normal;">Rerecord</i> 
+ to <i style="mso-bidi-font-style: normal;">Play</i> or <i style="mso-bidi-font-style: normal;">Rerecord</i> 
  your message.</p>
 <p class="body" style="margin-left: .5in; text-indent: -.25in; mso-list: l0 level1 lfo1;"><span 
 	 style="mso-fareast-font-family: Arial;"><span style="mso-list: Ignore;">7.<span 
