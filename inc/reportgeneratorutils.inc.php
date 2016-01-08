@@ -132,7 +132,9 @@ function displayJobSummary($joblist, $readonlyDB = false){
 		$jobinfo = getJobSummary($joblist, $readonlyDB);
 
 		//Check for any sms messages
-		$hassms = QuickQuery("select exists (select * from message m where m.type='sms' and m.messagegroupid = j.messagegroupid) from job j where id in ('" . $joblist . "')", $readonlyDB);
+		$hasSMSQuery ="select j.id from message m, job j where m.type='sms' and m.messagegroupid = j.messagegroupid and j.id in ('".$joblist."')";
+		$jobHasSMS = QuickQuery($hasSMSQuery, $readonlyDB);
+
 		$hasinfocenter = getSystemSetting("_hasinfocenter", false);
 
 		startWindow(_L("Summary "). help("ReportGeneratorUtils_Summary"), 'padding: 3px;');
@@ -153,7 +155,7 @@ function displayJobSummary($joblist, $readonlyDB = false){
 								<th><?= _L("Recipients") ?></th>
 								<th><?= _L("# of Phones") ?></th>
 								<th><?= _L("# of Emails") ?></th>
-<? if($hassms) { ?>
+<? if($jobHasSMS) { ?>
 								<th><?= _L("# of SMS") ?></th>
 <? } ?>
 <? if($hasinfocenter) { ?>
@@ -175,7 +177,7 @@ function displayJobSummary($joblist, $readonlyDB = false){
 									<td><?=(int)$job["person_count"]?></td>
 									<td><?=(int)$job["phone_count"]?></td>
 									<td><?=(int)$job["email_count"]?></td>
-<? if($hassms) { ?>
+<? if($jobHasSMS) { ?>
 									<td><?=(int)$job["sms_count"]?></td>
 <? } ?>
 <? if ($hasinfocenter) { ?>
