@@ -141,7 +141,7 @@ window.RCIEditorInline = function () {
 					clearTimeout(this.captureTimeout);
 					this.captureTimeout = window.setTimeout((function () {
 						that.captureChanges();
-					}), 500);
+					}), 100);
 				}
 			});
 			editor.on('blur', function () {
