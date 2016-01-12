@@ -25,7 +25,7 @@
 			have some place to position itself other than over the
 			top of the text area.
 			*/?>
-			html, body {
+			body {
 				background-color: white;
 				padding: 15px;
 				margin: 0px;

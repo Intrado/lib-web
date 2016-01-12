@@ -20,7 +20,7 @@ body
 
 .cke_editable
 {
-	font-size: 13px;
+	font-size: 16px;
 	line-height: 1.6;
 }
 
@@ -33,7 +33,9 @@ blockquote
 	border-color: #ccc;
 	border-width: 0;
 }
-
+.cke_contents.cke_reset {
+	height: 400px !important;
+}
 .cke_contents_ltr blockquote
 {
 	padding-left: 20px;
