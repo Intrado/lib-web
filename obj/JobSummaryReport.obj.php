@@ -311,7 +311,7 @@ class JobSummaryReport extends ReportGenerator{
 
 				if(array_sum($smsinfo) > 0) {
 					
-					$total = $smsinfo['totalcontacts'];
+					$total = $smsinfo['totalwithsms'];
 					$formattedResults = array();
 					
 					foreach($smsinfo as $key => $field) {
@@ -339,8 +339,13 @@ class JobSummaryReport extends ReportGenerator{
 													
 													echo '<td>';
 													
-														echo $value > 0 ? ($value .' '.'('.$formattedResults[$key].')') : $value;
-													
+														if($key == 'totalcontacts') {
+															echo $value;
+														}
+														else {
+															echo $value > 0 ? ($value .' '.'('.$formattedResults[$key].')') : $value;
+
+														}
 													
 													echo '</td>';
 												};
