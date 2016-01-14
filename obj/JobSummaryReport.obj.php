@@ -90,19 +90,39 @@ class JobSummaryReport extends ReportGenerator{
 	}
 
 	static function getSmsInfo($joblist, $readonlyconn) {
-		$smsquery = "select 
-						count(rc.jobid) as total,
-						sum(rc.result in ('duplicate', 'blocked', 'declined', 'notattempted')) as filtered, 
-						sum(rc.result in ('queued', 'sending')) as pending,
-						count(rc.jobid) - sum(rc.result in ('duplicate', 'blocked', 'declined', 'notattempted')) - sum(rc.result in ('delivered', 'sent')) -  sum(rc.result in ('queued', 'sending')) as undelivered,
-						sum(rc.result in ('delivered', 'sent')) as delivered
-					from 
-						reportcontact rc
-					where 
-						rc.jobid in ('$joblist')
-						and rc.type = 'sms'";
+
+		// total number of contacts by SMS for job ids in $joblist
+		$reportPersonCountQuery = "select 
+									count(personid) as totalcontacts
+								from 
+									reportperson 
+								where 
+									jobid in (".$joblist.") 
+								and 
+									type='sms'";
+
+		$contactCountResult = QuickQueryRow($reportPersonCountQuery, true, $readonlyconn);
+
+
+		$reportContactQuery = "select 
+									count(rc.jobid) as totalwithsms,
+									sum(rc.result in ('duplicate', 'blocked', 'declined', 'notattempted')) as filtered, 
+									sum(rc.result in ('queued', 'sending')) as pending,
+									count(rc.jobid) - sum(rc.result in ('duplicate', 'blocked', 'declined', 'notattempted')) - sum(rc.result in ('delivered', 'sent')) -  sum(rc.result in ('queued', 'sending')) as undelivered,
+									sum(rc.result in ('delivered', 'sent')) as delivered
+								from 
+									reportcontact rc
+								where 
+									rc.jobid in (".$joblist.")
+								and 
+									rc.type = 'sms'";
 		
-		return QuickQueryRow($smsquery, true, $readonlyconn);
+		$smsInfoResults = QuickQueryRow($reportContactQuery, true, $readonlyconn);
+
+		$combinedResults = array_merge($contactCountResult, $smsInfoResults);
+
+		return $combinedResults;
+
 	}
 
 	static function getDeviceInfo($joblist, $readonlyconn) {
@@ -291,7 +311,7 @@ class JobSummaryReport extends ReportGenerator{
 
 				if(array_sum($smsinfo) > 0) {
 					
-					$total = $smsinfo['total'];
+					$total = $smsinfo['totalcontacts'];
 					$formattedResults = array();
 					
 					foreach($smsinfo as $key => $field) {
@@ -306,6 +326,7 @@ class JobSummaryReport extends ReportGenerator{
 								<td>
 									<table border="0" cellpadding="2" cellspacing="1" class="list" width="100%">
 										<tr class="listHeader" align="left" valign="bottom">
+											<th style="min-width: 100px"><?= _L("# of Contacts") ?></th>
 											<th style="min-width: 100px"><?= _L("# of SMS") ?></th>
 											<th style="min-width: 100px"><?= _L("Not Attempted") ?></th>
 											<th style="min-width: 100px"><?= _L("Pending") ?></th>
@@ -318,11 +339,8 @@ class JobSummaryReport extends ReportGenerator{
 													
 													echo '<td>';
 													
-													if($key === 'total') {
-														echo $value;
-													} else {
 														echo $value > 0 ? ($value .' '.'('.$formattedResults[$key].')') : $value;
-													};
+													
 													
 													echo '</td>';
 												};

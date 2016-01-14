@@ -132,7 +132,14 @@ function displayJobSummary($joblist, $readonlyDB = false){
 		$jobinfo = getJobSummary($joblist, $readonlyDB);
 
 		//Check for any sms messages
-		$hasSMSQuery ="select j.id from message m, job j where m.type='sms' and m.messagegroupid = j.messagegroupid and j.id in ('".$joblist."')";
+		$hasSMSQuery ="select 
+							j.id 
+						from 
+							message m 
+						inner join job j on (m.messagegroupid = j.messagegroupid)
+						where 
+							m.type='sms' and j.id in ('".$joblist."')";
+
 		$jobHasSMS = QuickQuery($hasSMSQuery, $readonlyDB);
 
 		$hasinfocenter = getSystemSetting("_hasinfocenter", false);
