@@ -28,6 +28,7 @@ doStartSession();
 if (!isset($_SESSION['user']))
 	header("Location: ..");
 else
-	header("Location: help.html");
+	$helpURL = ($SETTINGS["help"]["url"] ? $SETTINGS["help"]["url"] : "https://static.schoolmessenger.com/help/index.html");
+	header("Location: $helpURL");
 
 ?>

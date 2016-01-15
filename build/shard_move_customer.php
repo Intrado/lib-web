@@ -218,7 +218,7 @@ try {
 				if (in_array($table, $skipchecktables))
 					continue;
 				echo "$table ";
-				if (verifyTable($srcsharddb, $destsharddb, $table)) {
+				if (verifyTable($customerid,$srcsharddb, $destsharddb, $table)) {
 					echo "OK, ";
 				} else {
 					echo "\n##### HASH MISMATCH #####\nTrying to verify customerid: $customerid table: $table\n";
@@ -379,8 +379,12 @@ function reportresults($customerids, $successful, $failures)
 	}
 }
 
-function verifyTable($db1, $db2, $table)
+function verifyTable($customerid, $db1, $db2, $table)
 {
+	$tableType = QuickQuery("select table_type from information_schema.tables where table_schema='c_$customerid' and table_name='aspsmsblock'",$db1);
+	if ($tableType == "VIEW") {
+		return true;
+	}
 	$fields = QuickQueryList("describe $table", false, $db1);
 	$fieldlist = "`" . implode("`, `", $fields) . "`";
 	$query = "select md5(group_concat(md5(concat_ws('#',$fieldlist)))) from $table";
