@@ -204,6 +204,10 @@ function get_authorized_advanced() {
 		$menu[] = array('SMS&nbsp;Block', 'smsblock.php', NULL, ($SUBTAB == 'smsblock'), "smsblock");
 	}
 
+	if ($MANAGERUSER->authorized("shortcodegrouptools")) {
+		$menu[] = array('Shortcode&nbsp;Group&nbsp;Tools', 'shortcodegrouptools.php', NULL, ($SUBTAB == 'shortcodegrouptools'), "shortcodegrouptools");
+	}
+
 	if ($MANAGERUSER->authorized('tollfreenumbers')) {
 		$menu[] = array('Toll&nbsp;Free&nbsp;#s', 'tollfreenumbers.php', NULL, ($SUBTAB == 'tollfree'), "tollfree");
 	}
