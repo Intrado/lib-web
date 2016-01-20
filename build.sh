@@ -4,7 +4,7 @@
 # The first argument is the directory into which to deliver the zip.
 
 dist_dir=${1:-/tmp/upgrade}
-date=${2:-`date +%F_%T`}
+date=${2:-`date +%F_%H_%M_%S`}
 
 mkdir -p $dist_dir
 
@@ -19,7 +19,7 @@ if [ $? -ne 0 ]; then
        exit 1
 fi
 
-mv dist/kona-*.zip $dist_dir/kona-$date.zip
+mv dist/kona*.zip $dist_dir/kona-$date.zip
 if [ $? -ne 0 ]; then
        echo "ERROR: Moving the ZIP failed!"
        exit 1
