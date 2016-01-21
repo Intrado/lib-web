@@ -40,7 +40,7 @@ function fmt_resources ($row,$index) {
 			$str .= '<div style="float: left; width: 220px; height: 16px; ">';
 		}
 		$str .= '<div align="right" style="float: right; width: 220px; height: 16px;">';
-		$str .= $dm['name'] . ' - ' . $used . '/' . $dm['resources'] . '&nbsp;';
+		$str .= $dm['name'] . '&nbsp;';
 		$str .= '<div style="float: right; width: 100px; height: 16px; border: 1px solid black;">';
 		$str .= '<div style="float: left; width: ' . $resactout . 'px; height: 15px; background: #00BBFF;"></div>';
 		$str .= '<div style="float: left; width: ' . $resactin . 'px; height: 15px; background: #FF00BB;"></div>';
