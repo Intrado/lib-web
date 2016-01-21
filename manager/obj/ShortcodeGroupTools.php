@@ -95,6 +95,23 @@ class ShortcodeGroupTools {
 
 	function getCustomerShortcodeData( $customerIDString, $newShortcodeGroup ) {
 
+		$customerIDArray = explode(',', $customerIDString);
+
+		// For the bound variables in prepared statement
+		$boundCustomerIDVars = str_repeat("?,", count($customerIDArray));
+
+		// Remove trailing ','
+		$boundCustomerIDVars = rtrim($boundCustomerIDVars, ',');
+
+		// Values to insert into prepared statement
+		$preparedVals = array();
+		foreach($customerIDArray as $customerID) {
+			$preparedVals[] = $customerID;
+		}
+
+		// Add the new shortcode group
+		$preparedVals[] = $newShortcodeGroup;
+
 		$query = "SELECT c.id as id,
 						 c.urlcomponent as url, 
 						 scg1.description as currentShortcodeGroup,
@@ -102,21 +119,40 @@ class ShortcodeGroupTools {
 				  FROM customer c, 
 				  	   shortcodegroup scg1,
 				  	   shortcodegroup scg2
-				  WHERE c.id in (" . $customerIDString . ") 
+				  WHERE c.id in (". $boundCustomerIDVars .") 
 				  AND scg1.id = c.shortcodegroupid
-				  AND scg2.id=".$newShortcodeGroup;
+				  AND scg2.id = ?";
 
-		$previewTableData = QuickQueryMultirow($query, true);
+		$previewTableData = QuickQueryMultirow($query, true, false, $preparedVals);
 
 		return $previewTableData;
 	}
 
 	function updateCustomerShortcodes( $newShortcodeGroup, $customerIDString ) {
-		$query = "UPDATE customer c
-				  SET c.shortcodegroupid=". $newShortcodeGroup ."
-				  WHERE c.id in (". $customerIDString .")";
 
-		$updateResult = QuickUpdate($query);
+		$customerIDArray = explode(',', $customerIDString);
+
+		// For the bound variables in prepared statement
+		$boundCustomerIDVars = str_repeat("?,", count($customerIDArray));
+
+		// Remove trailing ','
+		$boundCustomerIDVars = rtrim($boundCustomerIDVars, ',');
+
+		// Values to insert into prepared statement
+		$preparedVals = array();
+
+		// Add the new shortcode group
+		$preparedVals[] = $newShortcodeGroup;
+
+		foreach($customerIDArray as $customerID) {
+			$preparedVals[] = $customerID;
+		}
+
+		$query = "UPDATE customer c
+				  SET c.shortcodegroupid = ?
+				  WHERE c.id in (". $boundCustomerIDVars .")";
+
+		$updateResult = QuickUpdate($query, false, $preparedVals);
 
 		return $updateResult;
 
