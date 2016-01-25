@@ -45,6 +45,13 @@ if (isset($_POST["confirmNewShortcodeGroups_newShortcodeGroup"])) {
 	} else {
 		notice( "<b style='color:red'> Query was unsuccessful </b>" );
 	}
+
+	$jmxResult = $smsAggregatorData->jmxUpdateShortcodeGroups();
+
+	if(! empty($errorsArray)) {
+		$_SESSION['confirmnotice'] = $errorsArray;
+	}
+
 }
 
 // Vars to hold HTML for display later.
