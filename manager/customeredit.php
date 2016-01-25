@@ -276,6 +276,7 @@ $settings = array(
 	'_hasselfsignup' => '',
 	'_hasportal' => '',
 	'_hasinfocenter' => '1',
+	'_skipConsentPendingPhones' => '0',
 	'_hasfacebook' => '0',
 	'_hastwitter' => '0',
 	'_hasfeed' => '0',
@@ -648,6 +649,14 @@ $formdata["portal"] = array(
 $formdata ["hasicplus"] = array (
 	"label" => _L('Has InfoCenter Plus'),
 	"value" => $settings ['_hasicplus'],
+	"validators" => array(),
+	"control" => array("CheckBox"),
+	"helpstep" => $helpstepnum
+);
+
+$formdata ["skipConsentPendingPhones"] = array(
+	"label" => _L('Has Consent'),
+	"value" => $settings['_skipConsentPendingPhones'],
 	"validators" => array(),
 	"control" => array("CheckBox"),
 	"helpstep" => $helpstepnum
@@ -1027,6 +1036,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		// more features
 		setCustomerSystemSetting('_enableautoblock', $postdata["enableautoblock"]?'1':'0', $custdb);
 		setCustomerSystemSetting('_hassurvey', $postdata["hassurvey"]?'1':'0', $custdb);
+		setCustomerSystemSetting('_skipConsentPendingPhones', $postdata["skipConsentPendingPhones"]?'1':'0', $custdb);
 		setCustomerSystemSetting('_hasldap', $postdata["hasldap"]?'1':'0', $custdb);
 		if ($hasSAML || $settings['_hasSAML']) {
 			setCustomerSystemSetting('_hasSAML', $postdata["hasSAML"]?'1':'0', $custdb);
