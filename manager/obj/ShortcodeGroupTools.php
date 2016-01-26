@@ -78,13 +78,20 @@ class ShortcodeGroupTools {
 
 		$customerIDs = array();
 
+		$fileContents = str_replace('\r\n', '\n', $fileContents);
+		$fileContents = str_replace('\r', '\n', $fileContents);
+
 		$csvRows = explode("\n", $fileContents);
 		foreach($csvRows as $row) {
 			$parsedRow = str_getcsv($row);
 
 			// push to array if row is not blank (accidentally added to CSV)
 			if($parsedRow[0]) {
-				$customerIDs[] = $parsedRow[0];
+
+				if( intval($parsedRow[0]) ) {
+
+					$customerIDs[] = $parsedRow[0];
+				}
 			}
 		}
 
@@ -102,6 +109,8 @@ class ShortcodeGroupTools {
 
 		// Remove trailing ','
 		$boundCustomerIDVars = rtrim($boundCustomerIDVars, ',');
+
+		error_log($boundCustomerIDVars);
 
 		// Values to insert into prepared statement
 		$preparedVals = array();
@@ -179,6 +188,7 @@ class ShortcodeGroupTools {
 	}
 
 	function drawPreviewTable( $customerDisplayRows ) {
+
 		// Table information
 		$titles = array(
 			"id" => "Customer ID",
