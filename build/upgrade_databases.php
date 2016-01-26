@@ -146,6 +146,11 @@ $dbversions = array(
 		"11.0/2",
 		"11.1/2",
 		"11.2/3"
+	),
+
+	"globaldestinationregistry" => array(
+		"0.1/1",
+		"1.0/1"
 	)
 );
 
