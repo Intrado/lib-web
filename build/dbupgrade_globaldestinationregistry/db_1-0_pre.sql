@@ -15,7 +15,7 @@ $$$
 CREATE TABLE consent (
     endpoint_id INT(11) PRIMARY KEY,
     sms         ENUM('PENDING', 'YES', 'NO') NOT NULL DEFAULT 'PENDING',
-    `call`      ENUM('PENDING', 'YES', 'NO') NOT NULL DEFAULT 'PENDING',
+    phone_call      ENUM('PENDING', 'YES', 'NO') NOT NULL DEFAULT 'PENDING',
     FOREIGN KEY endpoint_FK (endpoint_id)
     REFERENCES endpoint(id)
 ) ENGINE = INNODB DEFAULT CHARSET=utf8
@@ -24,8 +24,18 @@ $$$
 CREATE TABLE block (
    endpoint_id INT(11) PRIMARY KEY,
    sms         BOOLEAN NOT NULL DEFAULT FALSE,
-   `call`      BOOLEAN NOT NULL DEFAULT FALSE,
+   phone_call      BOOLEAN NOT NULL DEFAULT FALSE,
    FOREIGN KEY endpoint_FK (endpoint_id)
    REFERENCES endpoint(id)
 ) ENGINE = INNODB DEFAULT CHARSET=utf8
+$$$
+
+CREATE TABLE endpoint_event
+(
+  id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+  destination VARCHAR(50) NOT NULL,
+  action ENUM ('CREATE', 'DELETE', 'BLOCK', 'UNBLOCK', 'OPT_IN', 'OPT_OUT') NOT NULL,
+  details  VARCHAR(255) NOT NULL,
+  created_date VARCHAR(20)
+)ENGINE = INNODB DEFAULT CHARSET=utf8
 $$$
