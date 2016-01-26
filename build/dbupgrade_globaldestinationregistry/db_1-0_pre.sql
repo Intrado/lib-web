@@ -2,13 +2,13 @@
 
 CREATE TABLE endpoint (
     id            INT(11) PRIMARY KEY AUTO_INCREMENT,
-    destination   VARCHAR(128) NOT NULL UNIQUE,
+    destination   VARCHAR(128) NOT NULL,
     type          ENUM('PHONE', 'EMAIL', 'PUSH') NOT NULL,
     sub_type      ENUM('UNKNOWN', 'LANDLINE', 'MOBILE') NOT NULL DEFAULT 'UNKNOWN',
     created_date  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     modified_date DATETIME NOT NULL ON UPDATE CURRENT_TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     deleted       BOOLEAN NOT NULL DEFAULT FALSE,
-    INDEX destination_UK (destination)
+    UNIQUE INDEX destination_UK (destination)
 ) ENGINE = INNODB DEFAULT CHARSET=utf8
 $$$
 
