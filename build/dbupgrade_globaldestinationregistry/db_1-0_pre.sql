@@ -5,14 +5,15 @@ CREATE TABLE endpoint (
     destination   VARCHAR(255) NOT NULL,
     type          ENUM('PHONE', 'EMAIL', 'DEVICE') NOT NULL,
     subType       ENUM('LANDLINE', 'MOBILE'),
-    consentSms    TINYINT(1),
-    consentPhone  TINYINT(1),
-    blockedSms    TINYINT(1),
-    blockedPhone  TINYINT(1),
-    modifiedDate  TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    consentSms    ENUM('PENDING', 'YES', 'NO'),
+    consentCall   ENUM('PENDING', 'YES', 'NO'),
+    blockSms      TINYINT(1),
+    blockCall     TINYINT(1),
+    modifiedDate  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    createdDate   TIMESTAMP NOT NULL,
     deleted       TINYINT(1) NOT NULL DEFAULT FALSE,
     UNIQUE INDEX (destination),
-    INDEX (modifiedDate)
+    INDEX (createdDate)
 )
 $$$
 
@@ -21,7 +22,7 @@ CREATE TABLE endpointevent (
     id            INT AUTO_INCREMENT,
     createdDate   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     destination   VARCHAR(255) NOT NULL,
-    action        ENUM('CREATE', 'DELETE', 'BLOCK', 'UNBLOCK', 'OPT_IN', 'OPT_OUT') NOT NULL,
+    action        ENUM('CREATE', 'DELETE', 'BLOCK', 'UNBLOCK', 'OPT-IN', 'OPT-OUT') NOT NULL,
     details       TEXT,
     PRIMARY KEY (id, createdDate),
     INDEX (destination),
