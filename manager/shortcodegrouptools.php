@@ -43,7 +43,7 @@ if (isset($_POST["confirmNewShortcodeGroups_newShortcodeGroup"])) {
 	if($result) {
 		notice( "Shortcode groups were successfully updated" );
 	} else {
-		notice( "<b style='color:red'> Query was unsuccessful </b>" );
+		notice( "<b style='color:grey'> Query has nothing to update </b>" );
 	}
 
 	$jmxResult = $smsAggregatorData->jmxUpdateShortcodeGroups();
