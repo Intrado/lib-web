@@ -110,8 +110,6 @@ class ShortcodeGroupTools {
 		// Remove trailing ','
 		$boundCustomerIDVars = rtrim($boundCustomerIDVars, ',');
 
-		error_log($boundCustomerIDVars);
-
 		// Values to insert into prepared statement
 		$preparedVals = array();
 		foreach($customerIDArray as $customerID) {
