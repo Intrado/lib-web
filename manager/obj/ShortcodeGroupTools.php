@@ -78,10 +78,7 @@ class ShortcodeGroupTools {
 
 		$customerIDs = array();
 
-		$fileContents = str_replace('\r\n', '\n', $fileContents);
-		$fileContents = str_replace('\r', '\n', $fileContents);
-
-		$csvRows = explode("\n", $fileContents);
+		$csvRows = preg_split("/\r\n|\n|\r/", $fileContents);
 		foreach($csvRows as $row) {
 			$parsedRow = str_getcsv($row);
 
