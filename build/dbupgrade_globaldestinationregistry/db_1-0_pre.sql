@@ -10,7 +10,7 @@ CREATE TABLE endpoint (
     blockSms      TINYINT(1),
     blockCall     TINYINT(1),
     modifiedDate  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    createdDate   TIMESTAMP NOT NULL,
+    createdDate   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     deleted       TINYINT(1) NOT NULL DEFAULT FALSE,
     UNIQUE INDEX (destination),
     INDEX (createdDate)
