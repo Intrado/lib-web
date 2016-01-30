@@ -81,6 +81,14 @@ class ApiClient {
 				$headers[] = 'Content-Length: ' . strlen($json);
 				break;
 
+			case 'PATCH':
+				// ref: http://stackoverflow.com/questions/14451401/how-do-i-make-a-patch-request-in-php-using-curl
+				curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PATCH');
+				$headers[] = 'Content-Type: application/json';
+				$json = json_encode($data);
+				curl_setopt($creq, CURLOPT_POSTFIELDS, $json);
+				break;
+
 			case 'POST':
 				// ref: http://stackoverflow.com/questions/15223191/php-curl-file-upload-multipart-boundary
 				curl_setopt($creq, CURLOPT_POST, 1);
@@ -169,6 +177,20 @@ class ApiClient {
 	public function delete($node = '') {
 		return($this->sendRequest('DELETE', $node));
 	}
+
+	/**
+	 * RESTFUL PATCH operation wrapper
+	 *
+	 * @param string $node Any trailing Url path/node/querystring that is expected to follow
+	 * @param mixed $data The data that will be encoded for sending with the request; optional,
+	 * if not supplied, then no data will be sent!
+	 *
+	 * @return array Passes through return data from f.sendRequest()
+	 */
+	public function put($node = '', $data = null) {
+		return($this->sendRequest('PATCH', $node, $data));
+	}
+
 }
 
 ?>
