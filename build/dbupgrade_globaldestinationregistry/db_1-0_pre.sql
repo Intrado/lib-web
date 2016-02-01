@@ -12,7 +12,7 @@ CREATE TABLE endpoint (
     modifiedDate  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     createdDate   TIMESTAMP NOT NULL,
     deleted       TINYINT(1) NOT NULL DEFAULT FALSE,
-    UNIQUE INDEX (destination),
+    UNIQUE INDEX (destination, type),
     INDEX (createdDate)
 )
 $$$
