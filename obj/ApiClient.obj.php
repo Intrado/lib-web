@@ -187,7 +187,7 @@ class ApiClient {
 	 *
 	 * @return array Passes through return data from f.sendRequest()
 	 */
-	public function put($node = '', $data = null) {
+	public function patch($node = '', $data = null) {
 		return($this->sendRequest('PATCH', $node, $data));
 	}
 
