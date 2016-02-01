@@ -54,11 +54,11 @@ class GlobalRegistryApiClient {
 	/**
 	 * Update the metadata for one or more destinations
 	 *
-	 * @param $destinationMetadata An array of DestinationMetadata DTO's to be updated
+	 * @param $destinationMetadatas An array of DestinationMetadata DTO's to be updated
 	 *
 	 * @return boolean true on success, else false
 	 */
-	public function updateDestinationMetaData($destinationMetadatas) {
+	public function updateDestinationMetadata($destinationMetadatas) {
 		$res = $this->apiClient->patch(
 			self::ROOT,
 			$destinationMetadatas
