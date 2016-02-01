@@ -7,9 +7,9 @@ class GlobalRegistryApiClient {
 
 	private $apiClient;
 
-	const ENDPOINTS = '/STUBS/globalregistry/endpoints';
-	const ENDPOINTS_PHONE = '/STUBS/globalregistry/endpoints/phone';
-	const ENDPOINTS_SEARCH = '/STUBS/globalregistry/endpoints/search';
+	const ROOT = '/STUBS/globalregistry/endpoints';
+	const PHONE = '/STUBS/globalregistry/endpoints/phone';
+	const SEARCH = '/STUBS/globalregistry/endpoints/search';
 
 	/**
 	 * Initialize Client
@@ -28,7 +28,7 @@ class GlobalRegistryApiClient {
 	 */
 	public function addPhones($phones) {
 		$res = $this->apiClient->post(
-			self::ENDPOINTS_PHONE,
+			self::PHONE,
 			$phones
 		);
 		return($res['code'] == 201 ? json_decode($res['body']) : false);
@@ -39,13 +39,13 @@ class GlobalRegistryApiClient {
 	 *
 	 * @param $destinations An array of phones/emails/smses/devices, etc to look up
 	 *
-	 * @return mixed decoded JSON response (array of objects with metadata about each destination requested), or false on error
+	 * @return mixed decoded JSON response (array of quasi-DestinationMetadata DTO's), or false on error
 	 */
 	public function getDestinationMetadata($destinations) {
 		$data = new StdObj();
 		$data->destinations = $destinations;
 		$res = $this->apiClient->post(
-			self::ENDPOINTS_SEARCH,
+			self::SEARCH,
 			$data
 		);
 		return($res['code'] == 200 ? json_decode($res['body']) : false);
@@ -54,15 +54,14 @@ class GlobalRegistryApiClient {
 	/**
 	 * Update the metadata for one or more destinations
 	 *
-	 * @todo: refactor this so that the consumer doesn't need to provide us with the exact metadata structure that the API expects - that's not very friendly/abstractive of us...
-	 * @ param $destinationMetadata An array of destination "endpoint" metadata objects to be updated
+	 * @param $destinationMetadata An array of DestinationMetadata DTO's to be updated
 	 *
 	 * @return boolean true on success, else false
 	 */
-	public function updateDestinationMetaData($destinationMetadata) {
+	public function updateDestinationMetaData($destinationMetadatas) {
 		$res = $this->apiClient->patch(
-			self::ENDPOINTS,
-			$destinationMetadata
+			self::ROOT,
+			$destinationMetadatas
 		);
 		return ($res['code'] == 200);
 	}
@@ -75,6 +74,5 @@ class GlobalRegistryApiClient {
 	public static function instance($settings) {
 		return new GlobalRegistryApiClient(new ApiClient($settings['globalregistry']['host']));
 	}
-
 }
 
