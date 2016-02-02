@@ -9,8 +9,8 @@ CREATE TABLE endpoint (
     consentCall   ENUM('PENDING', 'YES', 'NO'),
     blockSms      TINYINT(1),
     blockCall     TINYINT(1),
-    modifiedDate  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    createdDate   TIMESTAMP NOT NULL,
+    modifiedDate  TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+    createdDate   TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     deleted       TINYINT(1) NOT NULL DEFAULT FALSE,
     UNIQUE INDEX (destination, type),
     INDEX (createdDate)
