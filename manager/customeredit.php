@@ -655,7 +655,7 @@ $formdata ["hasicplus"] = array (
 );
 
 $formdata ["skipConsentPendingPhones"] = array(
-	"label" => _L('Has Consent'),
+	"label" => _L('Require Consent'),
 	"value" => $settings['_skipConsentPendingPhones'],
 	"validators" => array(),
 	"control" => array("CheckBox"),
