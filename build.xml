@@ -134,6 +134,7 @@
                 <exclude name="changelog.txt" />
                 <exclude name="test/" />
                 <exclude name="UNITTEST/" />
+                <exclude name="STUBS/" />
                 <exclude name="originals/" />
 
                 <!-- hidden files/folders (including .project) -->
