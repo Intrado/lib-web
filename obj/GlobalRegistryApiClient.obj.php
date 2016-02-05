@@ -17,6 +17,7 @@ class GlobalRegistryApiClient {
 	 * @param type $apiClient api client
 	 */
 	public function __construct($apiClient) {
+		error_log('FIXME: REPLACE STUBS WITH WORKING API');
 		$this->apiClient = $apiClient;
 	}
 
