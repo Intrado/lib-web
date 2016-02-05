@@ -12,7 +12,7 @@ CREATE TABLE endpoint (
     modifiedDate  BIGINT NOT NULL,
     createdDate   BIGINT NOT NULL,
     deleted       TINYINT(1) NOT NULL DEFAULT FALSE,
-    UNIQUE INDEX (destination, type),
+    UNIQUE INDEX (destination),
     INDEX (createdDate)
 )
 $$$
