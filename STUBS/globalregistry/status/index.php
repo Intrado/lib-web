@@ -1,0 +1,1 @@
+{"status":"UP","appCheck":{"status":"UP","message":"Global Destination Registry service available","version":"dev"},"diskSpace":{"status":"UP","total":42270244864,"free":36214624256,"threshold":10485760},"db":{"status":"UP","database":"MySQL","hello":1}}

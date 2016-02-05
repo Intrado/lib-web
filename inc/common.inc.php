@@ -60,6 +60,14 @@ require_once("{$objdir}/Section.obj.php"); //for search and sec profile rules
 require_once("{$objdir}/ApiClient.obj.php");
 require_once("{$objdir}/CommsuiteApiClient.obj.php");
 
+// Initiallze GlobalRegistry REST API access
+require_once("{$objdir}/GlobalRegistryApiClient.obj.php");
+$grapiClient = GlobalRegistryApiClient::instance($SETTINGS);
+
+// Initialize Dependencies Singleton
+require_once("{$objdir}/Dependencies.obj.php");
+Dependencies::getInstance($grapiClient);
+
 function getUserSessionTrackingId() {
 	global $USER;
 	return hash("sha256", session_id() . $USER->login);

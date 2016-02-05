@@ -7,9 +7,10 @@ class GlobalRegistryApiClient {
 
 	private $apiClient;
 
-	const ROOT = '/STUBS/globalregistry/endpoints';
-	const PHONE = '/STUBS/globalregistry/endpoints/phone';
-	const SEARCH = '/STUBS/globalregistry/endpoints/search';
+	const STATUS = '/boguscustomer/STUBS/globalregistry/status/';
+	const ROOT = '/boguscustomer/STUBS/globalregistry/endpoints/';
+	const PHONE = '/boguscustomer/STUBS/globalregistry/endpoints/phone/';
+	const SEARCH = '/boguscustomer/STUBS/globalregistry/endpoints/search/';
 
 	/**
 	 * Initialize Client
@@ -17,6 +18,20 @@ class GlobalRegistryApiClient {
 	 */
 	public function __construct($apiClient) {
 		$this->apiClient = $apiClient;
+	}
+
+	/**
+	 * Get the status of the GRAPI
+	 *
+	 * @return boolean true if it is UP and available, else false
+	 */
+	public function getStatus() {
+		$res = $this->apiClient->get(
+			self::STATUS
+		);
+		if (200 !== $res['code']) return false;
+		$response = json_decode($res['body']);
+		return ('UP' === $response->status);
 	}
 
 	/**
