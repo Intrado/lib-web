@@ -35,7 +35,7 @@ class SMSAggregator extends FormItem {
 				var sf = smsFunctions;
 				
 				// get currently selected option
-				var selected = jQuery( '#newcustomer_shortcodegroup' ).val();
+				var selected = jQuery( 'select[id*=_shortcodegroup]' ).val();
 				
 				// find the matching codeGroup data via selected value
 				var htmlData =  '<div>';
