@@ -631,10 +631,12 @@ if ($settings['_hasportal'])
 	$portaloption = "contactmanager";
 elseif ($settings['_hasselfsignup'])
 	$portaloption = "selfsignup";
-elseif ($settings['_hasinfocenter'])
-	$portaloption = "infocenter";
 
-$portals = array("none" => "None", "contactmanager" => "Contact Manager", "selfsignup" => "Self-Signup", "infocenter" => "InfoCenter");
+$portals = array(
+	"none" => "None", 
+	"contactmanager" => "Contact Manager", 
+	"selfsignup" => "Self-Signup");
+
 $formdata["portal"] = array(
 	"label" => _L('Portal'),
 	"value" => $portaloption,
@@ -646,11 +648,31 @@ $formdata["portal"] = array(
 	"helpstep" => $helpstepnum
 );
 
-$formdata ["hasicplus"] = array (
-	"label" => _L('Has InfoCenter Plus'),
-	"value" => $settings ['_hasicplus'],
-	"validators" => array(),
-	"control" => array("CheckBox"),
+$infocenterOptions = array(
+	"none" => "None",
+	"infocenter" => "InfoCenter",
+	"icplus" => "InfoCenter Plus"
+);
+
+$selectedInfocenter;
+if ($settings['_hasicplus']) {
+	$selectedInfocenter = "icplus";
+}
+elseif ($settings['_hasinfocenter']) {
+	$selectedInfocenter = "infocenter";
+}
+else {
+	$selectedInfocenter  = "none";
+}
+
+$formdata["infocenter"] = array(
+	"label" => _L('InfoCenter'),
+	"value" => $selectedInfocenter,
+	"validators" => array(
+		array("ValInArray", "values" => array_keys($infocenterOptions))
+	),
+	"control" => array("SelectMenu","values" => $infocenterOptions),
+	"requires" => array("maxguardians"),
 	"helpstep" => $helpstepnum
 );
 
@@ -1024,14 +1046,26 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		//update settings
 		setCustomerSystemSetting('_hasportal', ($postdata["portal"] === 'contactmanager') ? '1' : '0', $custdb);
 		setCustomerSystemSetting('_hasselfsignup', ($postdata["portal"] === 'selfsignup') ? '1' : '0', $custdb);
-		setCustomerSystemSetting('_hasinfocenter', ($postdata["portal"] === 'infocenter') ? '1' : '0', $custdb);
+
+		//InfoCenter Plus feature (CMA view attendance and enrollment)
+		if($postdata["infocenter"] === 'icplus') {
+			setCustomerSystemSetting('_hasinfocenter', '1', $custdb);
+			setCustomerSystemSetting('_hasicplus', '1', $custdb);
+			updateCustomerProduct($customerid, 'ic', 1);
+		}
+		if($postdata["infocenter"] === 'infocenter') {
+			setCustomerSystemSetting('_hasinfocenter', '1', $custdb);
+			setCustomerSystemSetting('_hasicplus', '0', $custdb);
+			updateCustomerProduct($customerid, 'ic', 1);
+		}
+		if($postdata["infocenter"] === 'none') {
+			setCustomerSystemSetting('_hasinfocenter', '0', $custdb);
+			setCustomerSystemSetting('_hasicplus', '0', $custdb);
+			updateCustomerProduct($customerid, 'ic', 0);
+		}
 
 		//handle authserver.customerproduct table
 		updateCustomerProduct($customerid, 'cm', $postdata["portal"] === 'contactmanager');
-		updateCustomerProduct($customerid, 'ic', $postdata["portal"] === 'infocenter');
-
-		//InfoCenter Plus feature (CMA view attendance and enrollment)
-		setCustomerSystemSetting('_hasicplus', ($postdata["hasicplus"] && ($postdata["portal"] === 'infocenter'))  ? '1' : '0', $custdb);
 
 		// more features
 		setCustomerSystemSetting('_enableautoblock', $postdata["enableautoblock"]?'1':'0', $custdb);
