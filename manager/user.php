@@ -117,7 +117,9 @@ $basicroles = array(
 	"editdm" => "Edit SmartCall Appliances",
 	"diskagent" => "Manage SwiftSync Agents",
 	"pdfbursttemplates" => "Manage customer PDF Bursting templates",
-	"powerschool" => "Powerschool Tools Access"
+	"powerschool" => "Powerschool Tools Access",
+	"shortcodegrouptools" => "Shortcode Group Tools"
+
 );
 
 $advancedroles = array(

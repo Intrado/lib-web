@@ -4,16 +4,19 @@
 
 class SMSAggregatorData {
 
-	public $customerId;
+	public $customerId = NULL;
 	public $originalShortcodeGroupId;
 	public $shortcodeData;
 	public $shortcodeGroups;
 	
-	public function init($customerId) {
+	public function init($customerId = NULL) {
 
-		$this->customerId = $customerId;
-		
-		$this->originalShortcodeGroupId = $this->getCurrentShortcodeGroupId();
+		// if a customer ID was passed in, get their current shortcode data.
+		if(! is_null($customerId)) {
+			$this->customerId = $customerId;
+			$this->originalShortcodeGroupId = $this->getCurrentShortcodeGroupId();
+		}
+
 		$this->shortcodeData = $this->fetchRequiredData();
 		$this->shortcodeGroups = $this->getAllShortCodeGroups(); 
 		

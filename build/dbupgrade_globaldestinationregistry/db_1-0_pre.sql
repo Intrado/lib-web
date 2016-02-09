@@ -22,7 +22,7 @@ CREATE TABLE endpointevent (
     id            INT AUTO_INCREMENT,
     createdDate   BIGINT NOT NULL,
     destination   VARCHAR(255) NOT NULL,
-    action        ENUM('CREATE', 'DELETE', 'BLOCK', 'UNBLOCK', 'OPT_IN', 'OPT_OUT') NOT NULL,
+    action        ENUM('REGISTER', 'DEREGISTER', 'CONSENT', 'BLOCK') NOT NULL,
     details       TEXT,
     PRIMARY KEY (id, createdDate),
     INDEX (destination),
