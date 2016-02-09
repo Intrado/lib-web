@@ -68,8 +68,10 @@ class ListRecipientMode {
 		//get guardian categories
 		$categoryList = $this->csApi->getGuardianCategoryList();
 		$categories = array();
-		foreach ($categoryList as $c) {
-			$categories[$c->id] = $c->name;
+		if (is_array($categoryList)) {
+			foreach ($categoryList as $c) {
+				$categories[$c->id] = $c->name;
+			}
 		}
 		$selectedCategories = array();
 		if ($this->listId) {
