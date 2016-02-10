@@ -48,10 +48,10 @@ class DestinationMetadata {
 		$this->type = $type;
 		$this->destination = $destination;
 		$this->id = $id;
-		$this->block = new StdClass();
+		$this->block = new stdClass();
 		$this->block->call = false;	// boolean
 		$this->block->sms = false;	// boolean
-		$this->consent = new StdClass();
+		$this->consent = new stdClass();
 		$this->consent->call = null;	// string: 'YES'|'NO'|'PENDING'
 		$this->consent->sms = null;	// string: 'YES'|'NO'|'PENDING'
 	}

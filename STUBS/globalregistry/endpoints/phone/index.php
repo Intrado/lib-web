@@ -10,11 +10,11 @@ switch ($_SERVER['REQUEST_METHOD']) {
                 $responseData = array();
                 $id = 1;
                 foreach ($postPhones as $postPhone) {
-                        $metadata = new StdClass();
-                        $metadata->block = new StdClass();
+                        $metadata = new stdClass();
+                        $metadata->block = new stdClass();
                         $metadata->block->call = false;
                         $metadata->block->sms = false;
-                        $metadata->consent = new StdClass();
+                        $metadata->consent = new stdClass();
                         $metadata->consent->call = 'PENDING';
                         $metadata->consent->sms = 'PENDING';
 			$metadata->createdDate = '2016-02-01T23:12:57.902Z';
