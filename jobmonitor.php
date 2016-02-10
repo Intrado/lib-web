@@ -48,6 +48,8 @@ if ($job->hasPhone()) {
 			"F" => 0,
 			"notattempted" => 0,
 			"blocked" => 0,
+			"consentdenied" => 0,
+			"consentpending" => 0,
 			"duplicate" => 0,
 			"nocontacts" => 0,
 			"declined" => 0
@@ -135,39 +137,39 @@ if ($job->hasPhone()) {
 
 	$phoneinfo = JobSummaryReport::getPhoneInfo($job->id, $readonlyconn);
 	$destinationresults['phone'] = array(
-		'recipients' => (int)$phoneinfo['total'],
-		'completed' => (int)$phoneinfo['done'],
+		'total' => (int)$phoneinfo['totalwithphone'],
 		'remaining' => (int)$phoneinfo['remaining'],
 		'attempts' => (int)$phoneinfo['totalattempts'],
 		'firstpass' => fmt_obj_job_first_pass($job, 'activedate'),
-		'percentcontacted' => isset($phoneinfo['success_rate']) ? sprintf("%0.2f%%", $phoneinfo['success_rate']) : "N/A"
+		'notcontacted' => (int)$phoneinfo['notcontacted'],
+		'contacted' => (int)$phoneinfo['contacted']
 	);
 }
 if ($job->hasEmail()) {
 	$emailinfo = JobSummaryReport::getEmailInfo($job->id, $readonlyconn);
 	$destinationresults['email'] = array(
-		'recipients' => (int)$emailinfo['total'],
-		'completed' => (int)$emailinfo['done'],
+		'total' => (int)$emailinfo['totalwithemail'],
 		'remaining' => (int)$emailinfo['remaining'],
-		'percentcontacted' => isset($emailinfo['success_rate']) ? sprintf("%0.2f%%", $emailinfo['success_rate']) : "N/A"
+		'notcontacted' => (int)$emailinfo['notcontacted'],
+		'contacted' => (int)$emailinfo['contacted']
 	);
 }
 if ($job->hasSMS()) {
 	$smsinfo = JobSummaryReport::getSmsInfo($job->id, $readonlyconn);
 
 	$destinationresults['sms'] = array(
-		'total' => (int)$smsinfo['total'],
-		'filtered' => (int)$smsinfo['filtered'],
+		'total' => (int)$smsinfo['totalwithphone'],
+		'remaining' => (int)$smsinfo['remaining'],
 		'pending' => (int)$smsinfo['pending'],
-		'undelivered' => (int)$smsinfo['undelivered'],
-		'delivered' => (int)$smsinfo['delivered']
+		'notcontacted' => (int)$smsinfo['notcontacted'],
+		'contacted' => (int)$smsinfo['contacted']
 	);
 }
 $windowtitle = _L("Monitoring job, %1s, last updated %2s", escapehtml($job->name), date("g:i:s a",$jobstats['validstamp']));
 if (!in_array($job->status, array('complete', 'cancelled')))
 	$windowtitle .= " <img src='img/ajax-loader.gif'/>";
 
-$imageurl = "graph_detail_callprogress.png.php?jobid={$job->id}&valid={$jobstats['validstamp']}&scaley=0.75";
+$imageurl = "graph_detail_callprogress.png.php?jobid={$job->id}&valid={$jobstats['validstamp']}&scaley=0.75&scalex=0";
 
 ////////////////////////////////////////////////////////////////////////////////
 // AJAX
@@ -219,22 +221,22 @@ if ($job->hasPhone()) { ?>
 					<table  border="0" cellpadding="2" cellspacing="1" class="list" width="100%">
 						<tr class="listHeader" align="left" valign="bottom">
 							<th># of Phones</th>
-							<th>Completed</th>
-							<th>Remaining</th>
+							<th>Queued</th>
 							<th>Total Attempts</th>
 							<th>First Pass</th>
-							<th>% Contacted</th>
+							<th>Not Delivered</th>
+							<th>Delivered</th>
 						</tr>
 						<tr>
-							<td id='recipientsphone'><?=$destinationresults['phone']['recipients']?></td>
-							<td id='completedphone'><?=$destinationresults['phone']['completed']?></td>
+							<td id='recipientsphone'><?=$destinationresults['phone']['total']?></td>
 							<td id='remainingphone'><?=$destinationresults['phone']['remaining']?></td>
 							<td id='attemptsphone'><?=$destinationresults['phone']['attempts']?></td>
 							<td id='firstpassphone'><?=$destinationresults['phone']['firstpass']?></td>
-							<td id='percentcontactedphone'><?=$destinationresults['phone']['percentcontacted']?></td>
+							<td id='completedphone'><?=$destinationresults['phone']['notcontacted']?></td>
+							<td id='percentcontactedphone'><?=$destinationresults['phone']['contacted']?></td>
 						</tr>
 					</table>
-				<img style='width:500px;height:300px' src='<?=$imageurl?>&type=phone' id='phonegraph'/>
+				<img style='height:300px' src='<?=$imageurl?>&type=phone' id='phonegraph'/>
 			</td>
 		</tr>
 <? }
@@ -245,18 +247,18 @@ if ($job->hasEmail()) { ?>
 				<table  border="0" cellpadding="2" cellspacing="1" class="list" width="100%">
 						<tr class="listHeader" align="left" valign="bottom">
 							<th># of Emails</th>
-							<th>Completed</th>
-							<th>Remaining</th>
-							<th>% Contacted</th>
+							<th>Queued</th>
+							<th>Not Delivered</th>
+							<th>Delivered</th>
 						</tr>
 						<tr>
-							<td id='recipientsemail'><?=$destinationresults['email']['recipients']?></td>
-							<td id='completedemail'><?=$destinationresults['email']['completed']?></td>
+							<td id='recipientsemail'><?=$destinationresults['email']['total']?></td>
 							<td id='remainingemail'><?=$destinationresults['email']['remaining']?></td>
-							<td id='percentcontactedemail'><?=$destinationresults['email']['percentcontacted']?></td>
+							<td id='completedemail'><?=$destinationresults['email']['notcontacted']?></td>
+							<td id='completedemail'><?=$destinationresults['email']['contacted']?></td>
 						</tr>
 				</table>
-				<img style='width:500px;height:300px' src='<?=$imageurl?>&type=email' id='emailgraph'/>
+				<img style='height:300px' src='<?=$imageurl?>&type=email' id='emailgraph'/>
 			</td>
 		</tr>
 <? }
@@ -267,20 +269,20 @@ if ($job->hasSMS()) { ?>
 				<table  border="0" cellpadding="2" cellspacing="1" class="list" width="100%">
 						<tr class="listHeader" align="left" valign="bottom">
 							<th><? echo _L('# of SMS'); ?></th>
-							<th><? echo _L('Not Attempted'); ?></th>
+							<th><? echo _L('Queued'); ?></th>
 							<th><? echo _L('Pending'); ?></th>
-							<th><? echo _L('Undelivered'); ?></th>
+							<th><? echo _L('Not Delivered'); ?></th>
 							<th><? echo _L('Delivered'); ?></th>
 						</tr>
 						<tr>
 							<td id='totalsms'><?=$destinationresults['sms']['total']?></td>
-							<td id='filteredsms'><?=$destinationresults['sms']['filtered']?></td>
+							<td id='undeliveredsms'><?=$destinationresults['sms']['remaining']?></td>
 							<td id='pendingsms'><?=$destinationresults['sms']['pending']?></td>
-							<td id='undeliveredsms'><?=$destinationresults['sms']['undelivered']?></td>
-							<td id='deliveredsms'><?=$destinationresults['sms']['delivered']?></td>
+							<td id='filteredsms'><?=$destinationresults['sms']['notcontacted']?></td>
+							<td id='deliveredsms'><?=$destinationresults['sms']['contacted']?></td>
 						</tr>
 				</table>
-				<img style='width:500px;height:300px' src='<?=$imageurl?>&type=sms' id='smsgraph'/>
+				<img style='height:300px' src='<?=$imageurl?>&type=sms' id='smsgraph'/>
 			</td>
 		</tr>
 <? }

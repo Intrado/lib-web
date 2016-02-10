@@ -37,7 +37,9 @@ if ($type == 'phone') {
 		"B" => "orange",
 		"N" => "tan",
 		"X" => "black",
-		"F" => "#8AA6B6"
+		"F" => "#8AA6B6",
+		"consentdenied" => "#F4B4F4",
+		"consentpending" => "#F4EDB0"
 	);
 	$resultcodes = array(
 		"A" => "Answered",
@@ -45,7 +47,9 @@ if ($type == 'phone') {
 		"B" => "Busy",
 		"N" => "No Answer",
 		"X" => "Disconnect",
-		"F" => "Unknown"
+		"F" => "Unknown",
+		"consentdenied" => "Consent Denied",
+		"consentpending" => "Consent Pending"
 	);
 } else if ($type == 'email') {
 	$colors = array(
@@ -58,12 +62,12 @@ if ($type == 'phone') {
 	);
 } else if ($type == 'sms' ) {
 	$colors = array(
-		"total" => "lightblue",
-		"filtered" => "orange",
+		"remaining" => "red",
 		"pending" => "gray",
-		"undelivered" => "red",
-		"delivered" => "lightgreen"
+		"notcontacted" => "orange",
+		"contacted" => "lightgreen"
 	);
+	$resultcodes = array();
 }
 
 // Common code colors
@@ -88,11 +92,10 @@ if ($type == 'email') {
 	$resultcodes['declined'] = 'No Email Selected';
 }
 else if ($type == 'sms') {
-	$resultcodes['total'] = _L('Total SMS');
-	$resultcodes['filtered'] = _L('Not Attempted');
+	$resultcodes['remaining'] = _L('Queued');
 	$resultcodes['pending'] = _L('Pending');
-	$resultcodes['undelivered'] = _L('Undelivered');
-	$resultcodes['delivered'] = _L('Delivered');
+	$resultcodes['notcontacted'] = _L('Not Delivered');
+	$resultcodes['contacted'] = _L('Delivered');
 }
 
 $graphdata = array();
@@ -107,6 +110,7 @@ foreach($resultcodes as $index => $label) {
 $bars = array();
 $bar = new BarPlot($graphdata);
 $bar->SetFillColor($graphcolors);
+$bar->SetColor("#CCCCCC");
 $bar->SetAlign('center');
 $bar->value->Show();
 $bar->value->SetFormat('%d');
