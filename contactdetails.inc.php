@@ -35,6 +35,12 @@ if(isset($method)){
 $iFrameAppend = (isset($_GET["iframe"])?"&iframe=true":"");
 $iFramePrepend = (isset($_GET["iframe"])?"?iframe=true":"");
 
+
+$grapiStatus = $grapiClient->getStatus();
+
+// var_dump($deps);
+
+
 if (isset($_GET['id'])) {
 	$personid = $_GET['id'] + 0;
 	if ($personid == "") {
@@ -518,6 +524,13 @@ foreach ($fieldmaps as $map) {
 
 <?
 
+	if($grapiStatus == false) {
+		// var_dump($grapiStatus);
+		echo "GRAPI Client is Unavailble";
+	} else if($grapiStatus == 'UP') {
+		// TODO: add destination consent logic.	
+		echo "GRAPI Client is available.";
+	}
 
 	foreach($contacttypes as $type){
 		if(!isset($types[$type])) continue;
@@ -553,6 +566,7 @@ foreach ($fieldmaps as $map) {
 <?
 			}
 ?>
+			<th>Consent</th>
 		</tr>
 <?
 
@@ -562,8 +576,25 @@ foreach ($fieldmaps as $map) {
 			<td align="center"><?= _L("None") ?></td>
 			<?
 		}
-
+		
+	
 		foreach($types[$type] as $item){
+
+			if ($type == "phone"){
+				$storePhones = $item->$type;
+				if($storePhones != NULL){
+					// var_dump($storePhones);
+					$grapiMetadata = $grapiClient->getDestinationMetaData($storePhones);
+					// var_dump($grapiMetadata);
+					if($grapiMetadata == 'YES'){
+						$userHasConsent = true;
+					} else if($grapiMetadata == 'NO'){
+						$userDeniedConsent == true;
+					}
+				}
+			}
+
+			
 			$header = escapehtml(destination_label($type, $item->sequence));
 ?>
 			<tr>
@@ -593,6 +624,7 @@ foreach ($fieldmaps as $map) {
 				} else {
 						if($FORMDISABLE){
 							echo Phone::format($item->$type) . "&nbsp;";
+							// echo $storePhones;
 						} else {
 							NewFormItem($f, $s, $type . $item->sequence, "text", 14, null, "id='" . $type . $item->sequence . "'". $disabled);
 						}
@@ -613,7 +645,34 @@ foreach ($fieldmaps as $map) {
 					</td>
 <?
 				}
+
 ?>
+				<td class="borderBottom">
+<?
+				if ($type == "phone") {
+?>
+					<select disabled>
+				}
+<? 
+					if ($userDeniedConsent) {
+?>
+						<option>Denied</option>
+<?
+					} else if ($userHasConsent) {
+?>
+						<option>Yes</option>
+<?
+                    } else {
+?>
+						<option>Pending</option>
+<?
+                    }
+?>
+					</select>
+<?
+				}
+?>
+				</td>
 			</tr>
 <?
 		}

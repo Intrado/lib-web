@@ -58,7 +58,7 @@ class GlobalRegistryApiClient {
 	 * @return mixed decoded JSON response (array of quasi-DestinationMetadata DTO's), or false on error
 	 */
 	public function getDestinationMetadata($destinations) {
-		$data = new StdObj();
+		$data = new stdClass();
 		$data->destinations = $destinations;
 		$res = $this->apiClient->post(
 			self::SEARCH,

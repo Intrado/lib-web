@@ -66,7 +66,7 @@ $grapiClient = GlobalRegistryApiClient::instance($SETTINGS);
 
 // Initialize Dependencies Singleton
 require_once("{$objdir}/Dependencies.obj.php");
-Dependencies::getInstance($grapiClient);
+$deps = Dependencies::getInstance($grapiClient);
 
 function getUserSessionTrackingId() {
 	global $USER;
