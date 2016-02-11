@@ -23,6 +23,7 @@ include_once("obj/Sms.obj.php");
 include_once("obj/LinkedAccountManager.obj.php");
 include_once("obj/DeviceServiceApiClient.obj.php");
 
+
 $FORMDISABLE = " DISABLED ";
 if(isset($method)){
 	if($method == "edit"){
@@ -34,12 +35,6 @@ if(isset($method)){
 
 $iFrameAppend = (isset($_GET["iframe"])?"&iframe=true":"");
 $iFramePrepend = (isset($_GET["iframe"])?"?iframe=true":"");
-
-
-$grapiStatus = $grapiClient->getStatus();
-
-// var_dump($deps);
-
 
 if (isset($_GET['id'])) {
 	$personid = $_GET['id'] + 0;
@@ -524,12 +519,57 @@ foreach ($fieldmaps as $map) {
 
 <?
 
+	///////////////////////////////////////////////////
+	// Consent Handler
+	///////////////////////////////////////////////////
+
+	$grapiStatus = $grapiClient->getStatus();
+
 	if($grapiStatus == false) {
-		// var_dump($grapiStatus);
-		echo "GRAPI Client is Unavailble";
+		echo "GRAPI Client is unavailble";
 	} else if($grapiStatus == 'UP') {
-		// TODO: add destination consent logic.	
 		echo "GRAPI Client is available.";
+	}
+
+	$allStoredPhones = $phones;
+	$allStoredPhonesLength = sizeof($allStoredPhones);
+	$validPhones = array();
+
+	for($n = 0; $n < $allStoredPhonesLength; $n++) {
+
+		$currentPhone = $allStoredPhones[$n]->phone;
+
+		if($currentPhone != NULL){
+			$validPhones[] = $currentPhone;
+		}
+
+	}
+
+	$grapiMetadata = $grapiClient->getDestinationMetaData($validPhones);
+	$grapiLength = sizeof($grapiMetadata);
+
+	if($validPhones) {
+
+		for($x = 0; $x < $grapiLength; $x++) {
+
+			$grapiCallConsent = $grapiMetadata[$x]->consent->call; 
+
+			if($grapiCallConsent == 'YES') {
+
+				$userHasConsent = true;
+				$userAwaitingConsent = false;
+
+			} else if($grapiCallConsent == 'NO') {
+
+				$userDeniedConsent = true;
+				$userAwaitingConsent = false;
+
+			} else {
+
+				$userAwaitingConsent = true;
+			}
+
+		}
 	}
 
 	foreach($contacttypes as $type){
@@ -552,6 +592,7 @@ foreach ($fieldmaps as $map) {
 			}
 ?>
 			<th align="left">Destination</th>
+			<th align="left">Consent</th>
 <?
 			foreach($jobtypes as $jobtype){
 ?>
@@ -566,9 +607,9 @@ foreach ($fieldmaps as $map) {
 <?
 			}
 ?>
-			<th>Consent</th>
 		</tr>
 <?
+
 
 		//For contact types without entry display None
 		if (count($types[$type]) == 0) {
@@ -580,21 +621,6 @@ foreach ($fieldmaps as $map) {
 	
 		foreach($types[$type] as $item){
 
-			if ($type == "phone"){
-				$storePhones = $item->$type;
-				if($storePhones != NULL){
-					// var_dump($storePhones);
-					$grapiMetadata = $grapiClient->getDestinationMetaData($storePhones);
-					// var_dump($grapiMetadata);
-					if($grapiMetadata == 'YES'){
-						$userHasConsent = true;
-					} else if($grapiMetadata == 'NO'){
-						$userDeniedConsent == true;
-					}
-				}
-			}
-
-			
 			$header = escapehtml(destination_label($type, $item->sequence));
 ?>
 			<tr>
@@ -624,12 +650,46 @@ foreach ($fieldmaps as $map) {
 				} else {
 						if($FORMDISABLE){
 							echo Phone::format($item->$type) . "&nbsp;";
-							// echo $storePhones;
 						} else {
 							NewFormItem($f, $s, $type . $item->sequence, "text", 14, null, "id='" . $type . $item->sequence . "'". $disabled);
 						}
 				}
-				?></td><?
+?>
+				</td>
+				<!-- Consent Section -->
+				<td class="borderBottom">
+<?
+				if ($type == "phone") {
+?>
+					<select <? if($FORMDISABLE){ echo "disabled"; } ?> >
+<? 
+					if (!$userAwaitingConsent && $userHasConsent) {
+?>
+						<option>Yes</option>
+						<option>No</option>
+						<option>Pending</option>
+<?
+					} else if (!$userAwaitingConsent && $userDeniedConsent) {
+?>
+						<option>No</option>
+						<option>Yes</option>
+						<option>Pending</option>
+<?
+                    } else if ($userAwaitingConsent) {
+?>
+						<option>Pending</option>
+						<option>Yes</option>
+						<option>No</option>
+<?
+                    }
+?>
+					</select>
+<?
+				}
+?>
+				</td>
+				<!-- End Consent Section -->
+<?
 				// for each jobtype checkbox
 				foreach($jobtypes as $jobtype){
 ?>
@@ -647,32 +707,6 @@ foreach ($fieldmaps as $map) {
 				}
 
 ?>
-				<td class="borderBottom">
-<?
-				if ($type == "phone") {
-?>
-					<select disabled>
-				}
-<? 
-					if ($userDeniedConsent) {
-?>
-						<option>Denied</option>
-<?
-					} else if ($userHasConsent) {
-?>
-						<option>Yes</option>
-<?
-                    } else {
-?>
-						<option>Pending</option>
-<?
-                    }
-?>
-					</select>
-<?
-				}
-?>
-				</td>
 			</tr>
 <?
 		}
