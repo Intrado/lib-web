@@ -32,7 +32,7 @@ if ($USER->authorize('managesystem') || $USER->authorize('metadata')) {
 	
 	if ($USER->authorize('managesystem')) {
 		$systemLinks[] = "<a href='systemwidealertmessage.php'>Systemwide Alert Message</a>";
-		$systemLinks[] = "<a href='customerinfo.php'>Customer Information</a>";
+		$systemLinks[] = "<a href='customerinfo.php'>Customer Settings</a>";
 	}
 	if ($USER->authorize('metadata')) {
 		$systemLinks[] = "<a href='persondatamanager.php'>Field Definitions</a>";

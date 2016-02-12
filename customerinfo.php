@@ -107,6 +107,27 @@ $formdata["defaultareacode"] = array(
 	"helpstep" => $helpstepnum
 );
 
+$helpsteps[$helpstepnum++] = _L("Require users have at least one phone number set for High Priority calls.");
+$formdata["requireemergency"] = array(
+		"label" => _L("Require Emergency Phone"),
+        "fieldhelp" => _L("Require at least one phone number for every Emergency %s Type.", getJobTitle()),
+        "value" => in_array('1',explode('|',getSystemSetting('priorityenforcement', ''))),
+        "validators" => array(
+        ),
+        "control" => array("CheckBox"),
+        "helpstep" => 1
+);
+
+$helpsteps[$helpstepnum++] = _L("Require users have at least one phone number set for Emergency calls.");
+$formdata["requirehighpriority"] = array(
+		"label" => _L("Require High Priority Phone"),
+		"fieldhelp" => _L("Require at least one phone number for every High Priority %s Type.", getJobTitle()),
+		"value" => in_array('2',explode('|',getSystemSetting('priorityenforcement', ''))),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 1
+);
+
 $buttons = array(submit_button(_L('Save'),"submit","tick"),
 				icon_button(_L("Cancel"),"cross",null,"settings.php"));
 
@@ -128,6 +149,16 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 		
+
+		// emergency and high priority data
+		$requirepriorities = array();
+		if($postdata['requireemergency'])
+			$requirepriorities[] = 1;
+		if($postdata['requirehighpriority'])
+			$requirepriorities[] = 2;
+		
+		setSystemSetting('priorityenforcement',implode('|',$requirepriorities));
+
 		//save data here
 		$custname= $postdata['displayname'];
 		if ($custname != "" || $custname != $_SESSION['custname']) {
@@ -150,7 +181,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "admin:settings";
-$TITLE = _L('Customer Information');
+$TITLE = _L('Customer Settings');
 
 include_once("nav.inc.php");
 ?>

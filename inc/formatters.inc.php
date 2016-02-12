@@ -778,6 +778,10 @@ function fmt_jobdetail_result($row, $index){
 			return "No SMS";
 		else
 			return "No Contacts";
+	} else if($row[$index] == "consentpending"){
+		return "Consent Pending";
+	} else if($row[$index] == "consentdenied"){
+		return "Consent Denined";
 	} else if($row[$index] == "declined"){
 		if($row[5] == 'phone')
 			return "No Phone Selected";

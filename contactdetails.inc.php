@@ -23,6 +23,7 @@ include_once("obj/Sms.obj.php");
 include_once("obj/LinkedAccountManager.obj.php");
 include_once("obj/DeviceServiceApiClient.obj.php");
 
+
 $FORMDISABLE = " DISABLED ";
 if(isset($method)){
 	if($method == "edit"){
@@ -518,6 +519,58 @@ foreach ($fieldmaps as $map) {
 
 <?
 
+	///////////////////////////////////////////////////
+	// Consent Handler
+	///////////////////////////////////////////////////
+
+	$grapiStatus = $grapiClient->getStatus();
+
+	if($grapiStatus == false) {
+		echo "GRAPI Client is unavailble";
+	} else if($grapiStatus == 'UP') {
+		echo "GRAPI Client is available.";
+	}
+
+	$allStoredPhones = $phones;
+	$allStoredPhonesLength = sizeof($allStoredPhones);
+	$validPhones = array();
+
+	for($n = 0; $n < $allStoredPhonesLength; $n++) {
+
+		$currentPhone = $allStoredPhones[$n]->phone;
+
+		if($currentPhone != NULL){
+			$validPhones[] = $currentPhone;
+		}
+
+	}
+
+	$grapiMetadata = $grapiClient->getDestinationMetaData($validPhones);
+	$grapiLength = sizeof($grapiMetadata);
+
+	if($validPhones) {
+
+		for($x = 0; $x < $grapiLength; $x++) {
+
+			$grapiCallConsent = $grapiMetadata[$x]->consent->call; 
+
+			if($grapiCallConsent == 'YES') {
+
+				$userHasConsent = true;
+				$userAwaitingConsent = false;
+
+			} else if($grapiCallConsent == 'NO') {
+
+				$userDeniedConsent = true;
+				$userAwaitingConsent = false;
+
+			} else {
+
+				$userAwaitingConsent = true;
+			}
+
+		}
+	}
 
 	foreach($contacttypes as $type){
 		if(!isset($types[$type])) continue;
@@ -539,6 +592,7 @@ foreach ($fieldmaps as $map) {
 			}
 ?>
 			<th align="left">Destination</th>
+			<th align="left">Consent</th>
 <?
 			foreach($jobtypes as $jobtype){
 ?>
@@ -556,14 +610,17 @@ foreach ($fieldmaps as $map) {
 		</tr>
 <?
 
+
 		//For contact types without entry display None
 		if (count($types[$type]) == 0) {
 			?>
 			<td align="center"><?= _L("None") ?></td>
 			<?
 		}
-
+		
+	
 		foreach($types[$type] as $item){
+
 			$header = escapehtml(destination_label($type, $item->sequence));
 ?>
 			<tr>
@@ -597,7 +654,42 @@ foreach ($fieldmaps as $map) {
 							NewFormItem($f, $s, $type . $item->sequence, "text", 14, null, "id='" . $type . $item->sequence . "'". $disabled);
 						}
 				}
-				?></td><?
+?>
+				</td>
+				<!-- Consent Section -->
+				<td class="borderBottom">
+<?
+				if ($type == "phone") {
+?>
+					<select <? if($FORMDISABLE){ echo "disabled"; } ?> >
+<? 
+					if (!$userAwaitingConsent && $userHasConsent) {
+?>
+						<option>Yes</option>
+						<option>No</option>
+						<option>Pending</option>
+<?
+					} else if (!$userAwaitingConsent && $userDeniedConsent) {
+?>
+						<option>No</option>
+						<option>Yes</option>
+						<option>Pending</option>
+<?
+                    } else if ($userAwaitingConsent) {
+?>
+						<option>Pending</option>
+						<option>Yes</option>
+						<option>No</option>
+<?
+                    }
+?>
+					</select>
+<?
+				}
+?>
+				</td>
+				<!-- End Consent Section -->
+<?
 				// for each jobtype checkbox
 				foreach($jobtypes as $jobtype){
 ?>
@@ -613,6 +705,7 @@ foreach ($fieldmaps as $map) {
 					</td>
 <?
 				}
+
 ?>
 			</tr>
 <?

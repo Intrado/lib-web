@@ -9,7 +9,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
 		$postThings = json_decode($postData);
 		$responseData = array();
 		foreach ($postThings as $postThing) {
-			$metadata = new StdClass();
+			$metadata = new stdClass();
 			$metadata->block = $postThing->block;
 			$metadata->consent = $postThing->consent;
 			$metadata->createdDate = '123456879101112';

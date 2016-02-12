@@ -13,6 +13,7 @@ abstract class ReportGenerator {
 			global $_dbcon;
 			$this->_readonlyDB = $_dbcon;
 		}
+		$this->urlComponent = QuickQuery("select value from setting where name='urlcomponent'", $this->_readonlyDB);
 	}
 
 	// --------------------------------------------------------------------
@@ -32,6 +33,7 @@ abstract class ReportGenerator {
 	public $params;
 	public $reporttype;
 	public $_readonlyDB;
+	public $urlComponent;
 
 	// TODO - privatize any methods used internally only
 	public function testSize(){
@@ -74,7 +76,8 @@ abstract class ReportGenerator {
 	}
 
 	public function runPDF($options = false) {
-		global $_DBHOST, $_DBNAME, $_DBUSER, $_DBPASS;
+		global $_DBHOST, $_DBNAME, $_DBUSER, $_DBPASS, $SETTINGS;
+		$reportGraphBaseUrl=($SETTINGS["reportserver"]["graphBaseUrl"] ? $SETTINGS["reportserver"]["graphBaseUrl"] : "https://asp.schoolmessenger.com" );
 		$instance = $this->reportinstance;
 		$xmlparams = array();
 		$xmlparams[] = new XML_RPC_Value($this->reportfile, 'string');
@@ -87,6 +90,7 @@ abstract class ReportGenerator {
 		$timeoffsetquery = "set time_zone = '$timeoffset'";
 		$xmlparams[] = new XML_RPC_Value($timeoffsetquery, 'string');
 
+		$xmlparams[] = new XML_RPC_Value( $reportGraphBaseUrl . "/" . $this->urlComponent . "/report/graph_job.php", 'string');
 
 		$params = $this->generateXmlParams();
 		$xmlparams[] = new XML_RPC_Value($params, 'struct');
@@ -196,7 +200,7 @@ abstract class ReportGenerator {
 		$msg = new XML_RPC_Message($method, $xmlparams);
 		$msg->setSendEncoding("UTF-8");
 		$cli = new XML_RPC_Client($reportpath, $reporthost);
-		
+
 		$resp = $cli->send($msg, 600);
 
 		if (!$resp) {

@@ -94,7 +94,8 @@ class JobAutoReport extends ReportGenerator{
 		$hassms = QuickQuery("select exists (select * from message m where m.type='sms' and m.messagegroupid = j.messagegroupid) from job j where id in ('" . $this->params['joblist'] . "')", $this->_readonlyDB);
 		$params = array("jobId" => $this->params['jobid'],
 						"jobcount" => "1",
-						"hassms" => $hassms);
+						"hassms" => $hassms,
+						"hasJobSummaryGraphs" => "1");
 		return $params;
 	}
 }
