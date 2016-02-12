@@ -8,7 +8,6 @@ $layouts = array(
 	"Fancy" => _L("Fancy"),
 	"FancyNewsletter" => _L("Fancy Newsletter"),
 	"Simplicity" => _L("Simplicity"),
-	"SimplicityNewsletter" => _L("Simplicity Newsletter"),
-	"JoinInfoCenter" => _L("Join InfoCenter")
+	"SimplicityNewsletter" => _L("Simplicity Newsletter")
 );
 
