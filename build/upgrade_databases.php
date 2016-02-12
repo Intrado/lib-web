@@ -86,6 +86,7 @@ $versions = array(
 		"11.4/7",
 		"11.5/3",
 		"11.6/1",
+		"11.7/1",
 		//etc., one array element per version, always the last revision of the given version
 	),
 
@@ -101,7 +102,7 @@ $versions = array(
 );
 
 // non-Customer databases
-$dbReleaseVersion = "11.5"; // version to update databases to if no revision changes for individual db, implies revision value of 1
+$dbReleaseVersion = "11.7"; // version to update databases to if no revision changes for individual db, implies revision value of 1
 $dbversions = array(
 	"authserver" => array(
 		"11.0/2",
@@ -109,6 +110,7 @@ $dbversions = array(
 		"11.3/5",
 		"11.5/7",
 		"11.6/4",
+		"11.7/1",
 	),
 
 	"aspshard" => array(
@@ -636,6 +638,7 @@ function update_customer($db, $customerid, $shardid) {
 	require_once("upgrades/db_11-4.php");
 	require_once("upgrades/db_11-5.php");
 	require_once("upgrades/db_11-6.php");
+	require_once("upgrades/db_11-7.php");
 
 	// for each version, upgrade to the next
 	$foundstartingversion = false;
@@ -811,6 +814,12 @@ function update_customer($db, $customerid, $shardid) {
 			break;
 		case "11.6":
 			if (!upgrade_11_6($rev, $shardid, $customerid, $db)) {
+				echo("Error upgrading DB");
+				exit(1);
+			}
+			break;
+		case "11.7":
+			if (!upgrade_11_7($rev, $shardid, $customerid, $db)) {
 				echo("Error upgrading DB");
 				exit(1);
 			}
