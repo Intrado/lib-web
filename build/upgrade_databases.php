@@ -129,6 +129,11 @@ $dbversions = array(
 		"11.0/1"
 	),
 
+	"globaldestinationregistry" => array(
+		"0.1/1",
+		"11.7/1",
+	),
+
 	"infocenter" => array(
 		"11.0/1",
 		"11.1/1"
@@ -150,10 +155,6 @@ $dbversions = array(
 		"11.2/3"
 	),
 
-	"globaldestinationregistry" => array(
-		"0.1/1",
-		"1.0/1"
-	)
 );
 
 function parse_options(array $argv) {
@@ -323,6 +324,7 @@ require_once("dbupgrade_authserver/dbupgrade_authserver.php");
 require_once("dbupgrade_aspshard/dbupgrade_aspshard.php");
 require_once("dbupgrade_deviceservice/dbupgrade_deviceservice.php");
 require_once("dbupgrade_disk/dbupgrade_disk.php");
+require_once("dbupgrade_globaldestinationregistry/dbupgrade_globaldestinationregistry.php");
 require_once("dbupgrade_infocenter/dbupgrade_infocenter.php");
 require_once("dbupgrade_lcrrates/dbupgrade_lcrrates.php");
 require_once("dbupgrade_pagelink/dbupgrade_pagelink.php");
@@ -446,7 +448,7 @@ function update_namedDb($db, $dbname) {
 		return;
 	}
 	list($currentversion, $currentrev) = explode("/", $version);
-	echo("current version $version\n");
+
 	// find if needs update
 	// find latest ver/rev for specific database, compare with dbReleaseVersion
 	list($targetversion, $targetrev) = explode("/", $dbversions[$dbname][count($dbversions[$dbname]) - 1]);
@@ -547,6 +549,9 @@ function apply_rev($db, $dbname, $version, $rev) {
 			break;
 		case "disk":
 			apply_disk($targetversion, $rev, $db);
+			break;
+		case "globaldestinationregistry":
+			apply_globaldestinationregistry($targetversion, $rev, $db);
 			break;
 		case "infocenter":
 			apply_infocenter($targetversion, $rev, $db);
