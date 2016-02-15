@@ -1,34 +1,34 @@
 -- $rev 1
 
 CREATE TABLE endpoint (
-    id            INT PRIMARY KEY AUTO_INCREMENT,
-    destination   VARCHAR(255) NOT NULL,
-    type          ENUM('PHONE', 'EMAIL', 'DEVICE') NOT NULL,
-    subType       ENUM('LANDLINE', 'MOBILE'),
-    consentSms    ENUM('PENDING', 'YES', 'NO'),
-    consentCall   ENUM('PENDING', 'YES', 'NO'),
-    blockSms      TINYINT(1),
-    blockCall     TINYINT(1),
-    modifiedDate  BIGINT NOT NULL,
-    createdDate   BIGINT NOT NULL,
-    deleted       TINYINT(1) NOT NULL DEFAULT FALSE,
-    revision      INT NOT NULL DEFAULT 1,
+    id                   INT PRIMARY KEY AUTO_INCREMENT,
+    destination          VARCHAR(255) NOT NULL,
+    type                 ENUM('PHONE', 'EMAIL', 'DEVICE') NOT NULL,
+    subType              ENUM('LANDLINE', 'MOBILE'),
+    consentSms           ENUM('PENDING', 'YES', 'NO'),
+    consentCall          ENUM('PENDING', 'YES', 'NO'),
+    blockSms             TINYINT(1),
+    blockCall            TINYINT(1),
+    modifiedTimestampMs  BIGINT NOT NULL,
+    createdTimestampMs   BIGINT NOT NULL,
+    deleted              TINYINT(1) NOT NULL DEFAULT FALSE,
+    revision             INT NOT NULL DEFAULT 1,
     UNIQUE INDEX (destination),
-    INDEX (createdDate)
+    INDEX (createdTimestampMs)
 )
 $$$
 
 -- the partition key column must be part of the primary key
 CREATE TABLE endpointevent (
-    id            INT AUTO_INCREMENT,
-    createdDate   BIGINT NOT NULL,
-    destination   VARCHAR(255) NOT NULL,
-    action        ENUM('REGISTER', 'DEREGISTER', 'CONSENT', 'BLOCK', 'IDENTIFY') NOT NULL,
-    details       TEXT,
-    PRIMARY KEY (id, createdDate),
+    id                  INT AUTO_INCREMENT,
+    createdTimestampMs  BIGINT NOT NULL,
+    destination         VARCHAR(255) NOT NULL,
+    action              ENUM('REGISTER', 'DEREGISTER', 'CONSENT', 'BLOCK', 'IDENTIFY') NOT NULL,
+    details             TEXT,
+    PRIMARY KEY (id, createdTimestampMs),
     INDEX (destination),
-    INDEX (createdDate)
-) PARTITION BY RANGE (createdDate)
+    INDEX (createdTimestampMs)
+) PARTITION BY RANGE (createdTimestampMs)
 (
     PARTITION pNULL VALUES LESS THAN (0),
     PARTITION p20160101 VALUES LESS THAN (UNIX_TIMESTAMP('2016-02-01')*1000),
