@@ -245,6 +245,65 @@ if (isset($personid)) {
 	redirect('unauthorized.php');
 }
 
+
+
+///////////////////////////////////////////////////
+// Consent Handler
+///////////////////////////////////////////////////
+
+$grapiStatus = $grapiClient->getStatus();
+
+// if($grapiStatus == false) {
+// 	echo "GRAPI Client is unavailble";
+// } else if($grapiStatus == 'UP') {
+// 	echo "GRAPI Client is available.";
+// }
+
+$allStoredPhones = $phones;
+$allStoredPhonesLength = sizeof($allStoredPhones);
+$validPhones = array();
+
+for($n = 0; $n < $allStoredPhonesLength; $n++) {
+
+	$currentPhone = $allStoredPhones[$n]->phone;
+
+	if($currentPhone != NULL){
+		$validPhones[] = $currentPhone;
+	}
+
+}
+
+$grapiMetadata = $grapiClient->getDestinationMetaData($validPhones);
+$grapiLength = sizeof($grapiMetadata);
+
+if($validPhones) {
+
+	for($x = 0; $x < $grapiLength; $x++) {
+
+		$grapiCallConsent = $grapiMetadata[$x]->consent->call; 
+
+		if($grapiCallConsent == 'YES') {
+
+			$userHasConsent = true;
+			$userDeniedConsent = false;
+			$userAwaitingConsent = false;
+
+		} else if($grapiCallConsent == 'NO') {
+
+			$userHasConsent = false;
+			$userDeniedConsent = true;
+			$userAwaitingConsent = false;
+
+		} else {
+
+			$userAwaitingConsent = true;
+		}
+
+	}
+}
+
+
+
 /****************** main message section ******************/
 
 $f = "viewcontact";
@@ -311,6 +370,7 @@ if(CheckFormSubmit($f,$s))
 						}
 						if (!$error)
 							$item->update();
+							$grapiUpdate = $grapiClient->updateDestinationMetadata($selectOption);
 					}
 					if (!$error) {
 					  foreach($jobtypes as $jobtype){
@@ -519,59 +579,6 @@ foreach ($fieldmaps as $map) {
 
 <?
 
-	///////////////////////////////////////////////////
-	// Consent Handler
-	///////////////////////////////////////////////////
-
-	$grapiStatus = $grapiClient->getStatus();
-
-	if($grapiStatus == false) {
-		echo "GRAPI Client is unavailble";
-	} else if($grapiStatus == 'UP') {
-		echo "GRAPI Client is available.";
-	}
-
-	$allStoredPhones = $phones;
-	$allStoredPhonesLength = sizeof($allStoredPhones);
-	$validPhones = array();
-
-	for($n = 0; $n < $allStoredPhonesLength; $n++) {
-
-		$currentPhone = $allStoredPhones[$n]->phone;
-
-		if($currentPhone != NULL){
-			$validPhones[] = $currentPhone;
-		}
-
-	}
-
-	$grapiMetadata = $grapiClient->getDestinationMetaData($validPhones);
-	$grapiLength = sizeof($grapiMetadata);
-
-	if($validPhones) {
-
-		for($x = 0; $x < $grapiLength; $x++) {
-
-			$grapiCallConsent = $grapiMetadata[$x]->consent->call; 
-
-			if($grapiCallConsent == 'YES') {
-
-				$userHasConsent = true;
-				$userAwaitingConsent = false;
-
-			} else if($grapiCallConsent == 'NO') {
-
-				$userDeniedConsent = true;
-				$userAwaitingConsent = false;
-
-			} else {
-
-				$userAwaitingConsent = true;
-			}
-
-		}
-	}
-
 	foreach($contacttypes as $type){
 		if(!isset($types[$type])) continue;
 ?>
@@ -661,30 +668,22 @@ foreach ($fieldmaps as $map) {
 <?
 				if ($type == "phone") {
 ?>
-					<select <? if($FORMDISABLE){ echo "disabled"; } ?> >
+					<select name="choiceOfUser" <? if($FORMDISABLE){ echo "disabled"; } ?> >
 <? 
-					if (!$userAwaitingConsent && $userHasConsent) {
-?>
-						<option>Yes</option>
-						<option>No</option>
-						<option>Pending</option>
-<?
-					} else if (!$userAwaitingConsent && $userDeniedConsent) {
-?>
-						<option>No</option>
-						<option>Yes</option>
-						<option>Pending</option>
-<?
-                    } else if ($userAwaitingConsent) {
-?>
-						<option>Pending</option>
-						<option>Yes</option>
-						<option>No</option>
-<?
-                    }
+					$userChoices = (!$userAwaitingConsent && $userHasConsent) ? "Yes,No,Pending" : ((!$userAwaitingConsent && $userDeniedConsent ? "No,Yes,Pending" : "Pending,Yes,No"));
+					$userChoices = explode(",", $userChoices);
+
+					$index = 0;
+					foreach($userChoices as $userChoice) {
+						echo "<option value='opt$index'>" . $userChoice . "</option>";
+						$index++;
+					}
 ?>
 					</select>
+
 <?
+				$selectOption = $_POST['choiceOfUser'];
+
 				}
 ?>
 				</td>
@@ -721,7 +720,7 @@ foreach ($fieldmaps as $map) {
 	<tr>
 		<th align="right" class="windowRowHeader bottomBorder">Enrollment Data:</th>
 		<td class="bottomBorder">
-		<table cellpadding="3" cellspacing="1" class="list sortable" id="enrollmenttable">
+	<table cellpadding="3" cellspacing="1" class="list sortable" id="
 <?
 		// find all sections associated with this person
 		$sections = QuickQueryMultiRow("
