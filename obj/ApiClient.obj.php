@@ -97,6 +97,7 @@ class ApiClient {
 					$headers[] = 'Content-type: multipart/form-data';
 				}
 				else {
+					$headers[] = 'Content-Type: application/json';
 					$json = json_encode($data);
 					curl_setopt($creq, CURLOPT_POSTFIELDS, $json);
 				}
