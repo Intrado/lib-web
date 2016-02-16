@@ -83,7 +83,7 @@ class ApiClient {
 
 			case 'PATCH':
 				// ref: http://stackoverflow.com/questions/14451401/how-do-i-make-a-patch-request-in-php-using-curl
-				curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PATCH');
+				curl_setopt($creq, CURLOPT_CUSTOMREQUEST, 'PATCH');
 				$headers[] = 'Content-Type: application/json';
 				$json = json_encode($data);
 				curl_setopt($creq, CURLOPT_POSTFIELDS, $json);
