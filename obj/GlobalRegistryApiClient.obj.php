@@ -7,17 +7,16 @@ class GlobalRegistryApiClient {
 
 	private $apiClient;
 
-	const STATUS = '/boguscustomer/STUBS/globalregistry/status/';
-	const ROOT = '/boguscustomer/STUBS/globalregistry/endpoints/';
-	const PHONE = '/boguscustomer/STUBS/globalregistry/endpoints/phone/';
-	const SEARCH = '/boguscustomer/STUBS/globalregistry/endpoints/search/';
+	const STATUS = '/status/';
+	const ROOT = '/endpoints/';
+	const PHONE = '/endpoints/phone/';
+	const SEARCH = '/endpoints/search/';
 
 	/**
 	 * Initialize Client
 	 * @param type $apiClient api client
 	 */
 	public function __construct($apiClient) {
-		error_log('FIXME: REPLACE STUBS WITH WORKING API');
 		$this->apiClient = $apiClient;
 	}
 
@@ -91,4 +90,3 @@ class GlobalRegistryApiClient {
 		return new GlobalRegistryApiClient(new ApiClient($settings['globalregistry']['host']));
 	}
 }
-
