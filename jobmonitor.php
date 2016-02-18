@@ -158,7 +158,7 @@ if ($job->hasSMS()) {
 	$smsinfo = JobSummaryReport::getSmsInfo($job->id, $readonlyconn);
 
 	$destinationresults['sms'] = array(
-		'total' => (int)$smsinfo['totalwithphone'],
+		'total' => (int)$smsinfo['totalwithsms'],
 		'remaining' => (int)$smsinfo['remaining'],
 		'pending' => (int)$smsinfo['pending'],
 		'notcontacted' => (int)$smsinfo['notcontacted'],

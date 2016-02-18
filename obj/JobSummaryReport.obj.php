@@ -56,64 +56,70 @@ class JobSummaryReport extends ReportGenerator{
 	// @param $joblist, a comma-separated string of job ids, assumed to be SQL-injection-safe
 	static function getPhoneInfo($joblist, $readonlyconn) {
 		// total number of contacts by Phone for job ids in $joblist
-		$reportPersonCountQuery = "select
-									count(personid) as totalcontacts
-								from
-									reportperson
-								where
-									jobid in (".$joblist.")
-								and
-									type='phone'";
+		$reportPersonCountQuery = "select count(*) as totalcontacts
+									from reportperson rp
+									left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
+									where rp.jobid in ($joblist)
+									  and rp.type='phone'";
 
-		$contactCountResult = QuickQueryRow($reportPersonCountQuery, true, $readonlyconn);
+		$reportPersonCountResults = QuickQueryRow($reportPersonCountQuery, true, $readonlyconn);
 
+		$reportContactCountQuery = "select count(*) as totalwithphone
+									  from reportcontact rc
+									 where rc.jobid in ($joblist)
+									   and rc.type='phone'";
 
-		$reportContactQuery = "select
-									count(rc.jobid) as totalwithphone,
-									count(rc.jobid) - sum(rc.result in ('A', 'M', 'N', 'B', 'X', 'F', 'blocked', 'declined', 'notattempted', 'consentpending', 'consentdenied')) as remaining,
-									sum(rc.result in ('N', 'B', 'X', 'F', 'blocked', 'declined', 'notattempted', 'consentpending', 'consentdenied')) as notcontacted,
+		$reportContactCountResults = QuickQueryRow($reportContactCountQuery, true, $readonlyconn);
+
+		$reportContactQuery = "select sum(rc.result in ('N', 'B', 'X', 'F', 'blocked', 'declined', 'notattempted', 'consentpending', 'duplicate', 'consentdenied')) as notcontacted,
 									sum(rc.result in ('A', 'M')) as contacted,
 									sum(rc.numattempts) as totalattempts
-								from
-									reportcontact rc
-								where
-									rc.jobid in (".$joblist.")
-								and
-									rc.type = 'phone'";
+								from reportcontact rc
+								where rc.jobid in ($joblist)
+								and rc.type = 'phone'";
 
-		$phoneInfoResults = QuickQueryRow($reportContactQuery, true, $readonlyconn);
+		$reportContactResults = QuickQueryRow($reportContactQuery, true, $readonlyconn);
 
-		$combinedResults = array_merge($contactCountResult, $phoneInfoResults);
+		$reportContactResults['remaining'] = $reportContactCountResults['totalwithphone'] - $reportContactResults['notcontacted'] - $reportContactResults['contacted'];
+
+
+		$combinedResults = array_merge($reportPersonCountResults, $reportContactCountResults, $reportContactResults);
 
 		return $combinedResults;
 	}
 
-	// @param $joblist, a comma-separated string of job ids, assumed to be SQL-injection-safe
+	/**
+	 * @param string $joblist, a comma-separated string of job ids, assumed to be SQL-injection-safe
+	 * @param mixed $readonlyconn
+	 * @return array
+	 */
 	static function getEmailInfo($joblist, $readonlyconn) {
-		$reportPersonCountQuery = "select
-									count(personid) as totalcontacts
-								from
-									reportperson
-								where
-									jobid in (".$joblist.")
-								and
-									type='email'";
+		$reportPersonCountQuery = "select count(*) as totalcontacts
+								from reportperson rp
+								left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
+								where rp.jobid in ($joblist)
+								  and rp.type='email'";
 
-		$contactCountResult = QuickQueryRow($reportPersonCountQuery, true, $readonlyconn);
+		$reportPersonCountResults = QuickQueryRow($reportPersonCountQuery, true, $readonlyconn);
 
-		$reportContactQuery = "select
-							count(rc.jobid) as totalwithemail,
-							count(rc.jobid) - sum(rc.result in ('duplicate', 'blocked', 'declined', 'notattempted')) - sum(rc.result in ('sent')) as remaining,
-							sum(rc.result in ('duplicate', 'blocked', 'declined', 'notattempted')) as notcontacted,
-							sum(rc.result = 'sent') as contacted
-						from reportcontact rc
-						where rc.jobid in ('$joblist')
-							and rc.type='email'";
+		$reportContactCountQuery = "select count(rc.jobid) as totalwithemail
+									  from reportcontact rc
+									 where rc.jobid in ($joblist)
+									   and rc.type='email'";
+
+		$reportContactCountResults = QuickQueryRow($reportContactCountQuery, true, $readonlyconn);
+
+		$reportContactQuery = "select sum(rc.result in ('duplicate', 'blocked', 'duplicate', 'declined', 'unsent')) as notcontacted,
+								sum(rc.result = 'sent') as contacted
+							   from reportcontact rc
+							   where rc.jobid in ($joblist)
+								 and rc.type='email'";
 
 		$reportContactResults = QuickQueryRow($reportContactQuery, true, $readonlyconn);
 
-		$emailquery = "select
-							sum(rc.type = 'email') as total,
+		$reportContactResults['remaining'] = $reportContactCountResults['totalwithemail'] - $reportContactResults['notcontacted'] - $reportContactResults['contacted'];
+
+		$emailquery = "select sum(rc.type = 'email') as total,
 							sum(rp.status in ('success', 'duplicate', 'fail')) as done,
 							sum(rc.result = 'blocked') as blocked,
 							sum(rc.result = 'duplicate') as duplicate,
@@ -122,12 +128,12 @@ class JobSummaryReport extends ReportGenerator{
 							100 * sum(rp.numcontacts and rp.status='success') / (sum(rp.numcontacts and rp.status != 'duplicate')) as success_rate
 						from reportperson rp
 							left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid AND rc.result not in ('decliend'))
-						where rp.jobid in ('$joblist')
+						where rp.jobid in ($joblist)
 							and rp.type='email'";
 
 		$emailInfoResults = QuickQueryRow($emailquery, true, $readonlyconn);
 
-		$combinedResults = array_merge($contactCountResult, $reportContactResults, $emailInfoResults);
+		$combinedResults = array_merge($reportPersonCountResults, $reportContactCountResults, $reportContactResults, $emailInfoResults);
 
 		return $combinedResults;
 	}
@@ -135,60 +141,62 @@ class JobSummaryReport extends ReportGenerator{
 	static function getSmsInfo($joblist, $readonlyconn) {
 
 		// total number of contacts by SMS for job ids in $joblist
-		$reportPersonCountQuery = "select 
-									count(personid) as totalcontacts
-								from 
-									reportperson 
-								where 
-									jobid in (".$joblist.") 
-								and 
-									type='sms'";
+		$reportPersonCountQuery = "select count(*) as totalcontacts
+									from reportperson rp
+									left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
+									where rp.jobid in ($joblist)
+									  and rp.type='sms'";
 
-		$contactCountResult = QuickQueryRow($reportPersonCountQuery, true, $readonlyconn);
+		$reportPersonCountResults = QuickQueryRow($reportPersonCountQuery, true, $readonlyconn);
 
+		$reportContactCountQuery = "select count(*) as totalwithsms
+								from reportcontact rc
+								where rc.jobid in ($joblist)
+								  and rc.type = 'sms'";
 
-		$reportContactQuery = "select 
-									count(rc.jobid) as totalwithsms,
-									count(rc.jobid) - sum(rc.result in ('duplicate', 'blocked', 'declined', 'notattempted')) - sum(rc.result in ('delivered', 'sent')) -  sum(rc.result in ('queued', 'sending')) as remaining,
-									sum(rc.result in ('queued', 'sending')) as pending,
-									sum(rc.result in ('duplicate', 'blocked', 'declined', 'notattempted')) as notcontacted,
+		$reportContactCountResults = QuickQueryRow($reportContactCountQuery, true, $readonlyconn);
+
+		$reportContactQuery = "select sum(rc.result in ('queued', 'sending')) as pending,
+									sum(rc.result in ('duplicate', 'blocked', 'duplicate', 'declined', 'notattempted', 'unsent')) as notcontacted,
 									sum(rc.result in ('delivered', 'sent')) as contacted
-								from 
-									reportcontact rc
-								where 
-									rc.jobid in (".$joblist.")
-								and 
-									rc.type = 'sms'";
-		
-		$smsInfoResults = QuickQueryRow($reportContactQuery, true, $readonlyconn);
+								from reportcontact rc
+								where rc.jobid in ($joblist)
+								  and rc.type = 'sms'";
 
-		$combinedResults = array_merge($contactCountResult, $smsInfoResults);
+		$reportContactResults = QuickQueryRow($reportContactQuery, true, $readonlyconn);
+
+		$reportContactResults['remaining'] = $reportContactCountResults['totalwithsms'] - $reportContactResults['notcontacted'] - $reportContactResults['contacted'];
+
+		$combinedResults = array_merge($reportPersonCountResults, $reportContactCountResults, $reportContactResults);
 
 		return $combinedResults;
-
 	}
 
 	static function getDeviceInfo($joblist, $readonlyconn) {
-		$reportPersonCountQuery = "select
-									count(personid) as totalcontacts
-								from
-									reportperson
-								where
-									jobid in (".$joblist.")
-								and
-									type='device'";
+		$reportPersonCountQuery = "select count(*) as totalcontacts
+									from reportperson rp
+									left join reportdevice rd on (rp.jobid = rd.jobid and rp.personid = rd.personid)
+									where rp.jobid in ($joblist)
+									  and rp.type='device'";
 
-		$contactCountResult = QuickQueryRow($reportPersonCountQuery, true, $readonlyconn);
+		$reportPersonCountResults = QuickQueryRow($reportPersonCountQuery, true, $readonlyconn);
 
-		$devicequery = "select count(rd.jobid) as totalwithdevice,
-									count(rd.jobid) - sum(rd.result in ('duplicate', 'blocked', 'declined', 'notattempted', 'unsent')) - sum(rd.result in ('sent')) as remaining,
-									sum(rd.result in ('blocked','declined','duplicate','notattempted','unsent')) as notcontacted,
-									sum(rd.result = 'sent') as contacted
-									from reportdevice rd
-									where rd.jobid in ('$joblist')";
-		$deviceInfoResult = QuickQueryRow($devicequery, true, $readonlyconn);
+		$reportContactCountQuery = "select count(*) as totalwithdevice
+									  from reportdevice rd
+									 where rd.jobid in ($joblist)";
 
-		$combinedResults = array_merge($contactCountResult, $deviceInfoResult);
+		$reportContactCountResults = QuickQueryRow($reportContactCountQuery, true, $readonlyconn);
+
+		$devicequery = "select sum(rd.result in ('blocked','declined','duplicate','notattempted','unsent')) as notcontacted,
+								sum(rd.result = 'sent') as contacted
+							from reportdevice rd
+							where rd.jobid in ($joblist)";
+
+		$reportContactResults = QuickQueryRow($devicequery, true, $readonlyconn);
+
+		$reportContactResults['remaining'] = $reportContactCountResults['totalwithsms'] - $reportContactResults['notcontacted'] - $reportContactResults['contacted'];
+
+		$combinedResults = array_merge($reportPersonCountResults, $reportContactCountResults, $reportContactResults);
 
 		return $combinedResults;
 	}
@@ -331,7 +339,7 @@ class JobSummaryReport extends ReportGenerator{
 		if($phonenumberinfo['totalcontacts'] > 0){
 ?>
 			<div class="col bloc" style="margin: 10px; float: left;">
-				<h4><a href="reportjobdetails.php?type=phone"> <?= _L("Phone ( " . number_format($phonenumberinfo['totalcontacts']) . ( $phonenumberinfo['totalcontacts'] == 1 ? " contact " : " contacts ") . ")")?></a></h4>
+				<h4><a href="reportjobdetails.php?type=phone"> <?= _L("Phone (" . number_format($phonenumberinfo['totalcontacts']) . ( $phonenumberinfo['totalcontacts'] == 1 ? " contact" : " contacts") . ")")?></a></h4>
 				<div>
 					<a href="reportjobdetails.php?type=phone">
 						<img class="dashboard_graph" src="graph_job_summary.png.php?type=phone&jobId=<?= $this->params['joblist'] ?>"/>
@@ -343,7 +351,7 @@ class JobSummaryReport extends ReportGenerator{
 		if($emailinfo['totalcontacts'] > 0){
 ?>
 			<div class="col bloc" style="margin: 10px; float: left;">
-				<h4><a href="reportjobdetails.php?type=email"> <?= _L("Email ( " . number_format($emailinfo['totalcontacts']) . ( $emailinfo['totalcontacts'] == 1 ? " contact " : " contacts ") . ")")?></a></h4>
+				<h4><a href="reportjobdetails.php?type=email"> <?= _L("Email (" . number_format($emailinfo['totalcontacts']) . ( $emailinfo['totalcontacts'] == 1 ? " contact" : " contacts") . ")")?></a></h4>
 				<div>
 					<a href="reportjobdetails.php?type=email">
 						<img class="dashboard_graph" src="graph_job_summary.png.php?type=email&jobId=<?= $this->params['joblist'] ?>"/>
@@ -355,7 +363,7 @@ class JobSummaryReport extends ReportGenerator{
 		if($smsinfo['totalcontacts'] > 0){
 ?>
 			<div class="col bloc" style="margin: 10px; float: left;">
-				<h4><a href="reportjobdetails.php?type=sms"> <?= _L("SMS ( " . number_format($smsinfo['totalcontacts']) . ( $smsinfo['totalcontacts'] == 1 ? " contact " : " contacts ") . ")")?></a></h4>
+				<h4><a href="reportjobdetails.php?type=sms"> <?= _L("SMS (" . number_format($smsinfo['totalcontacts']) . ( $smsinfo['totalcontacts'] == 1 ? " contact" : " contacts") . ")")?></a></h4>
 				<div>
 					<a href="reportjobdetails.php?type=sms">
 						<img class="dashboard_graph" src="graph_job_summary.png.php?type=sms&jobId=<?= $this->params['joblist'] ?>"/>
@@ -364,10 +372,10 @@ class JobSummaryReport extends ReportGenerator{
 			</div>
 <?
 		}
-		if($deviceinfo['totalcontacts'] > 0) {
+		if($deviceinfo['totalcontacts'] > 0 && $deviceinfo['totalwithdevice'] > 0) {
 ?>
 			<div class="col bloc" style="margin: 10px; float: left;">
-				<h4><a href="reportjobdetails.php?type=device"> <?= _L("Push ( " . number_format($deviceinfo['totalcontacts']) . ( $deviceinfo['totalcontacts'] == 1 ? " contact " : " contacts ") . ")")?></a></h4>
+				<h4><a href="reportjobdetails.php?type=device"> <?= _L("Push (" . number_format($deviceinfo['totalcontacts']) . ( $deviceinfo['totalcontacts'] == 1 ? " contact" : " contacts") . ")")?></a></h4>
 				<div>
 					<a href="reportjobdetails.php?type=device">
 						<img class="dashboard_graph" src="graph_job_summary.png.php?type=device&jobId=<?= $this->params['joblist'] ?>"/>

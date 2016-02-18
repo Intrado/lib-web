@@ -177,8 +177,8 @@ class JobDetailReport extends ReportGenerator{
 				reportperson rp
 				inner join job j on (rp.jobid = j.id)
 				inner join user u on (u.id = j.userid)
-				left outer join reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid and rc.result not in ('declined'))
-				left outer join reportdevice rd on (rd.jobid = rp.jobid and rd.personid = rp.personid and rp.type = 'device' and rd.result not in ('declined'))
+				left outer join reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid )
+				left outer join reportdevice rd on (rd.jobid = rp.jobid and rd.personid = rp.personid and rp.type = 'device' )
 				left outer join messagegroup mg on (mg.id = j.messagegroupid)
 				left outer join surveyquestionnaire sq on (sq.id = j.questionnaireid)
 				left outer join surveyweb sw on (sw.personid = rp.personid and sw.jobid = rp.jobid)
@@ -203,7 +203,7 @@ class JobDetailReport extends ReportGenerator{
 				from reportperson rp
 				inner join job j on (rp.jobid = j.id)
 				inner join user u on (u.id = j.userid)
-				left outer join reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid and rc.result not in ('nocontacts', 'declined'))
+				left outer join reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid and rc.result not in ('nocontacts'))
 				left outer join reportdevice rd on (rd.jobid = rp.jobid and rd.personid = rp.personid and rp.type = 'device')
 				-- left outer join	messagegroup mg on (mg.id = j.messagegroupid)
 				-- left outer join surveyquestionnaire sq on (sq.id = j.questionnaireid)
@@ -343,19 +343,19 @@ class JobDetailReport extends ReportGenerator{
 		startWindow(_L("Report Details ").help("JobDetailReport_ReportDetails"), 'padding: 3px;', false);
 
 		showPageMenu($total,$pagestart,500);
-		echo '<table width="100%" cellpadding="3" cellspacing="1" class="list" id="reportdetails">';
-		$titles = array(0 => _L("%s Name",getJobTitle()),
-						1 => _L("Submitted by"),
-						2 => _L("ID#"),
-						3 => _L("First Name"),
-						4 => _L("Last Name"),
-						17 => _L("Sequence"),
-						51 => _L("Recipient"),
-						7 => _L("Destination"),
-						13 => _L("Attempts"),
-						8 => _L("Last Attempt"),
-						9 => _L("Delivery Results"),
-						16 => _L("Response"),
+		echo '<table width="100%" cellpadding="3" cellspacing="1" class="list sortable" id="reportdetails">';
+		$titles = array(0 => _L("#%s Name",getJobTitle()),
+						1 => _L("#Submitted by"),
+						2 => _L("#ID#"),
+						3 => _L("#First Name"),
+						4 => _L("#Last Name"),
+						17 => _L("#Sequence"),
+						51 => _L("#Recipient"),
+						7 => _L("#Destination"),
+						13 => _L("#Attempts"),
+						8 => _L("#Last Attempt"),
+						9 => _L("#Delivery Results"),
+						16 => _L("#Response"),
 						19 => getSystemSetting("organizationfieldname","Organization"));
 		$titles = appendFieldTitles($titles, 19, $fieldlist, $activefields);
 

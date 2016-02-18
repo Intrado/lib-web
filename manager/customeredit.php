@@ -296,7 +296,8 @@ $settings = array(
 	'logindisableattempts' => '0',
 	'loginlockouttime' => '5',
 	'_amdtype' => "ivr",
-	'_defaultttsprovider' => 'neospeech'
+	'_defaultttsprovider' => 'neospeech',
+	'_enableautoblock' => '0'
 );
 
 $timezones = array(

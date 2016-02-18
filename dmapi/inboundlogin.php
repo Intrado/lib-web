@@ -106,7 +106,7 @@ if($REQUEST_TYPE == "new" ||
 
 					// now check if LDAP customer/user
 					if ((getSystemSetting("_hasldap") && $user->ldap) || 
-							(getSystemSetting("_hasSAML") && $user->samlEnabled) {
+							(getSystemSetting("_hasSAML") && $user->samlEnabled)) {
 						if (doLoginPhoneUserEnabled($code, $pin, $inboundNumber)) {
 							$success = true;
 						}

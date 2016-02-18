@@ -84,7 +84,7 @@ function getJobSummary($joblist, $readonlyDB = false){
 							left outer join reportperson rp
 								on (j.id = rp.jobid)
 							left outer join reportcontact rc
-								on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid and rc.result not in('declined'))
+								on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid )
 							inner join user u on (j.userid = u.id)
 							inner join jobtype jt on (jt.id = j.jobtypeid)
 							where j.id in ('" . $joblist . "')
