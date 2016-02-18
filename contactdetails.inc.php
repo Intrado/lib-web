@@ -266,12 +266,35 @@ $validPhones = array();
 for($n = 0; $n < $allStoredPhonesLength; $n++) {
 
 	$currentPhone = $allStoredPhones[$n]->phone;
-
 	if($currentPhone != NULL){
 		$validPhones[] = $currentPhone;
 	}
 
 }
+
+
+function duplicate_entries($arrayToValidate) {
+	$duplicates = array();
+
+	natcasesort($arrayToValidate);
+	reset($arrayToValidate);
+
+	$old_key 	= NULL;
+	$old_value 	= NULL;
+
+	foreach($arrayToValidate as $key => $value) {
+		if($value === NULL) { continue; }
+		if(strcasecmp($old_value, $value) === 0) {
+			$duplicates[$old_key] 	= $old_value;
+			$duplicates[$key]		= $value;
+		}
+		$old_value 	= $value;
+		$old_key	= $key;
+	}
+	return $duplicates;
+}
+
+$common_phones = duplicate_entries($validPhones);
 
 $grapiMetadata = $grapiClient->getDestinationMetaData($validPhones);
 $grapiLength = sizeof($grapiMetadata);
@@ -280,22 +303,34 @@ if($validPhones) {
 
 	for($x = 0; $x < $grapiLength; $x++) {
 
-		$grapiCallConsent = $grapiMetadata[$x]->consent->call; 
 
-		if($grapiCallConsent == 'YES') {
+		if($common_phones) {
+			$grapiCallConsent = 'DUPLICATE';
+		} else {
+			$grapiCallConsent = $grapiMetadata[$x]->consent->call; 
+		}
+
+		if($grapiCallConsent == 'DUPLICATE') {
+
+			$userHasDuplicate = true;	
+
+		} elseif($grapiCallConsent == 'YES') {
 
 			$userHasConsent = true;
+			$userHasDuplicate = false;
 			$userDeniedConsent = false;
 			$userAwaitingConsent = false;
 
-		} else if($grapiCallConsent == 'NO') {
+		} elseif($grapiCallConsent == 'NO') {
 
 			$userHasConsent = false;
+			$userHasDuplicate = false;
 			$userDeniedConsent = true;
 			$userAwaitingConsent = false;
 
 		} else {
 
+			$userHasDuplicate = false;
 			$userAwaitingConsent = true;
 		}
 
@@ -370,7 +405,6 @@ if(CheckFormSubmit($f,$s))
 						}
 						if (!$error)
 							$item->update();
-							$grapiUpdate = $grapiClient->updateDestinationMetadata($selectOption);
 					}
 					if (!$error) {
 					  foreach($jobtypes as $jobtype){
@@ -464,7 +498,7 @@ if (!isset($_GET['ajax'])) {
 	startWindow('Contact');
 	
 	NewForm($f);
-	
+
 	if($method == "edit"){
 		buttons(submit($f, $s, _L("Save"),null,'tick'),
 				icon_button(_L("Cancel"),"cross", null, $backTo));
@@ -663,31 +697,48 @@ foreach ($fieldmaps as $map) {
 				}
 ?>
 				</td>
+
+
 				<!-- Consent Section -->
 				<td class="borderBottom">
 <?
 				if ($type == "phone") {
 ?>
+					<form method="post">
 					<select name="choiceOfUser" <? if($FORMDISABLE){ echo "disabled"; } ?> >
 <? 
-					$userChoices = (!$userAwaitingConsent && $userHasConsent) ? "Yes,No,Pending" : ((!$userAwaitingConsent && $userDeniedConsent ? "No,Yes,Pending" : "Pending,Yes,No"));
-					$userChoices = explode(",", $userChoices);
+
+
+
+					if($userHasDuplicate) {
+						$userChoices = array('Duplicate');
+					} elseif(!$userAwaitingConsent && $userHasConsent) {
+						$userChoices = array('Yes', 'No', 'Pending');
+					} elseif(!$userAwaitingConsent && $userDeniedConsent) {
+						$userChoices = array('No', 'Yes', 'Pending');
+					} else {
+						$userChoices = array('Pending', 'Yes', 'No');
+					}
 
 					$index = 0;
 					foreach($userChoices as $userChoice) {
-						echo "<option value='opt$index'>" . $userChoice . "</option>";
-						$index++;
+?>					
+						<option><? echo $userChoice; ?></option>
+<?
+					$index++;
 					}
 ?>
 					</select>
+					</form>
 
 <?
 				$selectOption = $_POST['choiceOfUser'];
-
 				}
 ?>
 				</td>
 				<!-- End Consent Section -->
+
+
 <?
 				// for each jobtype checkbox
 				foreach($jobtypes as $jobtype){
