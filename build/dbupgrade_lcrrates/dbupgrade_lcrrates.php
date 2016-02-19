@@ -4,7 +4,8 @@ function apply_lcrrates($targetversion, $rev, $db) {
 	require_once("db_11-0.php");
 	require_once("db_11-2.php");
 	require_once("db_11-3.php");
-
+	require_once("db_11-7.php");
+	   
 	switch ($targetversion) {
 	case "11.0":
 		if (!lcrrates_upgrade_11_0($rev, $db)) {
@@ -18,6 +19,11 @@ function apply_lcrrates($targetversion, $rev, $db) {
 		break;
 	case "11.3":
 		if (!lcrrates_upgrade_11_3($rev, $db)) {
+			exit("Error upgrading DB");
+		}
+		break;
+	case "11.7":
+		if (!lcrrates_upgrade_11_7($rev, $db)) {
 			exit("Error upgrading DB");
 		}
 		break;

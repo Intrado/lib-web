@@ -5,6 +5,7 @@ function apply_aspshard($targetversion, $rev, $db) {
 	require_once("db_11-1.php");
 	require_once("db_11-2.php");
 	require_once("db_11-5.php");
+	require_once("db_11-7.php");
 
 	switch ($targetversion) {
 	case "11.0":
@@ -24,6 +25,11 @@ function apply_aspshard($targetversion, $rev, $db) {
 		break;
 	case "11.5":
 		if (!aspshard_upgrade_11_5($rev, $db)) {
+			exit("Error upgrading DB");
+		}
+		break;
+	case "11.7":
+		if (!aspshard_upgrade_11_7($rev, $db)) {
 			exit("Error upgrading DB");
 		}
 		break;
