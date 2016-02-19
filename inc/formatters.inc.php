@@ -694,6 +694,10 @@ function fmt_result ($row,$index) {
 			return "No Contacts";
 		case "sent":
 			return "Sent";
+		case "consentpending":
+			return "Consent Pending";
+		case "consentdenied":
+			return "Consent Denied";
 		case "unsent":
 			return "Unsent";
 		case "notattempted":
