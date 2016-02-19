@@ -145,6 +145,8 @@ switch($_SESSION['report']['type']){
 			"X" => "Disconnected",
 			"duplicate" => "Duplicate",
 			"blocked" => "Blocked",
+			"consentpending" => "Consent Pending",
+			"consentdenied" => "Consent Denied",
 			"notattempted" => "Not Attempted",
 			"declined" => "No Phone Selected",
 			"confirmed" => "Confirmed",
@@ -159,6 +161,8 @@ switch($_SESSION['report']['type']){
 			"X" => "Disconnected",
 			"blocked" => "Blocked",
 			"notattempted" => "Not Attempted",
+			"consentpending" => "Consent Pending",
+			"consentdenied" => "Consent Denied",
 			"unsent" => "Unsent",
 			"declined" => "No Destination Selected");
 		break;
@@ -195,6 +199,8 @@ switch($_SESSION['report']['type']){
 			"B" => "Busy",
 			"F" => "Unknown",
 			"X" => "Disconnected",
+			"consentpending" => "Consent Pending",
+			"consentdenied" => "Consent Denied",
 			"duplicate" => "Duplicate",
 			"blocked" => "Blocked",
 			"notattempted" => "Not Attempted",
@@ -241,7 +247,7 @@ if(isset($options['jobtypes'])){
 $savedresults = array();
 if(isset($options['result'])) {
 	if ($options['result'] == "undelivered")
-		$savedresults = array("F", "B", "N", "X", "notattempted", "declined", "blocked", "unsent");
+		$savedresults = array("F", "B", "N", "X", "notattempted", "consentpending", "consentdenied", "declined", "blocked", "unsent");
 	else
 		$savedresults = explode("','", $options['result']);
 }

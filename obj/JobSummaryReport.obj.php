@@ -71,7 +71,7 @@ class JobSummaryReport extends ReportGenerator{
 
 		$reportContactCountResults = QuickQueryRow($reportContactCountQuery, true, $readonlyconn);
 
-		$reportContactQuery = "select sum(rc.result in ('N', 'B', 'X', 'F', 'blocked', 'declined', 'notattempted', 'consentpending', 'duplicate', 'consentdenied')) as notcontacted,
+		$reportContactQuery = "select sum(rc.result in ('N', 'B', 'X', 'F', 'blocked', 'declined', 'consentpending', 'duplicate', 'consentdenied')) as notcontacted,
 									sum(rc.result in ('A', 'M')) as contacted,
 									sum(rc.numattempts) as totalattempts
 								from reportcontact rc
@@ -157,7 +157,7 @@ class JobSummaryReport extends ReportGenerator{
 		$reportContactCountResults = QuickQueryRow($reportContactCountQuery, true, $readonlyconn);
 
 		$reportContactQuery = "select sum(rc.result in ('queued', 'sending')) as pending,
-									sum(rc.result in ('duplicate', 'blocked', 'duplicate', 'declined', 'notattempted', 'unsent')) as notcontacted,
+									sum(rc.result in ('duplicate', 'blocked', 'duplicate', 'declined', 'unsent')) as notcontacted,
 									sum(rc.result in ('delivered', 'sent')) as contacted
 								from reportcontact rc
 								where rc.jobid in ($joblist)
@@ -187,14 +187,14 @@ class JobSummaryReport extends ReportGenerator{
 
 		$reportContactCountResults = QuickQueryRow($reportContactCountQuery, true, $readonlyconn);
 
-		$devicequery = "select sum(rd.result in ('blocked','declined','duplicate','notattempted','unsent')) as notcontacted,
+		$devicequery = "select sum(rd.result in ('blocked','declined','duplicate','unsent')) as notcontacted,
 								sum(rd.result = 'sent') as contacted
 							from reportdevice rd
 							where rd.jobid in ($joblist)";
 
 		$reportContactResults = QuickQueryRow($devicequery, true, $readonlyconn);
 
-		$reportContactResults['remaining'] = $reportContactCountResults['totalwithsms'] - $reportContactResults['notcontacted'] - $reportContactResults['contacted'];
+		$reportContactResults['remaining'] = $reportContactCountResults['totalwithdevice'] - $reportContactResults['notcontacted'] - $reportContactResults['contacted'];
 
 		$combinedResults = array_merge($reportPersonCountResults, $reportContactCountResults, $reportContactResults);
 
