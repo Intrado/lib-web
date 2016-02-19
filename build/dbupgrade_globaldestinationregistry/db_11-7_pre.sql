@@ -58,3 +58,7 @@ CREATE TABLE endpointevent (
     PARTITION pMAX VALUES LESS THAN (MAXVALUE)
 )
 $$$
+
+-- $rev 2
+
+-- no-op
