@@ -458,19 +458,20 @@ if(CheckFormSubmit($f,$s))
 //print('phoneSequences are: ' . print_r($phoneSequences, true) . "\n\n");
 				$knownPhones = array_keys($grapiPhones);
 //print('Known phones: ' . print_r($knownPhones, true) . "\n\n");
-//print('Submitted phones: ' . print_r($validPhones, true) . "\n\n");
-				$newPhones = array_values(array_diff($validPhones, $knownPhones));
+				$submittedPhones = array_keys($phoneSequences);
+//print('Submitted phones: ' . print_r($submittedPhones, true) . "\n\n");
+				$newPhones = array_values(array_diff($submittedPhones, $knownPhones));
 //print('New phones: ' . print_r($newPhones, true) . "\n\n");
 				if(count($newPhones)) {
 					$grapiClient->addPhones($newPhones);
-					$grapiMetadata = $grapiClient->getDestinationMetadata($validPhones);
+					$grapiMetadata = $grapiClient->getDestinationMetadata($submittedPhones);
 //print('Updated metadata: ' . print_r($grapiMetadata, true) . "\n\n");
 				}
 
 				$destinationMetadatas = array();
 
 				foreach($grapiMetadata as $grm) {
-					$consentState = (GetFormData($f, $s, "consent" . $phoneSequences[$grm->destination]));
+					$consentState = (GetFormData($f, $s, "consent_phone" . $phoneSequences[$grm->destination]));
 //print("Consent state for {$grm->destination} ({$phoneSequences[$grm->destination]})is [{$consentState}]\n\n");
 					$dm = new DestinationMetadata($grm->type, $grm->destination, $grm->id);
 					$dm->consent->call = $consentState; 
