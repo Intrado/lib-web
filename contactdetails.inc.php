@@ -748,9 +748,10 @@ foreach ($fieldmaps as $map) {
 
 
 				<!-- Consent Section -->
-				<td class="borderBottom">
+				<td class="bottomBorder">
 <?
-				if ($type == "phone") {
+				$value = strtolower($grapiPhones[$item->phone]->consent->call);
+				if (('phone' === $type) && ((! $FORMDISABLE) || strlen($value))) {
 
 					NewFormItem($f, $s, 'consent' . $item->sequence, 'selectstart');
 					$options = array(
@@ -758,13 +759,16 @@ foreach ($fieldmaps as $map) {
 						'yes' => 'Yes',
 						'no' => 'No'
 					);
+					$disabled = $item->editlock ? ' Disabled' : '';
 					foreach ($options as $option => $label) {
-						$value = strtolower($grapiPhones[$item->phone]->consent->call);
 						$selected = ($option === $value) ? ' SELECTED="SELECTED"' : '';
-						NewFormItem($f, $s, 'consent' . $item->sequence, 'selectoption', $label, $option, $selected);
+						NewFormItem($f, $s, 'consent' . $item->sequence, 'selectoption', $label, $option, $selected . $disabled);
 					}
 					NewFormItem($f, $s, 'consent' . $item->sequence, 'selectend');
 
+				}
+				else {
+					echo "&nbsp;";
 				}
 
 ?>
