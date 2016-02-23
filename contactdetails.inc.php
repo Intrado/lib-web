@@ -456,10 +456,13 @@ if(CheckFormSubmit($f,$s))
 				
 //print('Original metadata: ' . print_r($grapiMetadata, true) . "\n\n");
 //print('phoneSequences are: ' . print_r($phoneSequences, true) . "\n\n");
-				$addSomePhones = array_diff($validPhones, array_keys($grapiPhones));
-				if(count($addSomePhones)) {
-					$grapiClient->addPhones($addSomePhones);
-//print('Adding phones: ' . print_r($addSomePhones, true) . "\n\n");
+				$knownPhones = array_keys($grapiPhones);
+//print('Known phones: ' . print_r($knownPhones, true) . "\n\n");
+//print('Submitted phones: ' . print_r($validPhones, true) . "\n\n");
+				$newPhones = array_values(array_diff($validPhones, $knownPhones));
+//print('New phones: ' . print_r($newPhones, true) . "\n\n");
+				if(count($newPhones)) {
+					$grapiClient->addPhones($newPhones);
 					$grapiMetadata = $grapiClient->getDestinationMetadata($validPhones);
 //print('Updated metadata: ' . print_r($grapiMetadata, true) . "\n\n");
 				}
@@ -711,6 +714,7 @@ foreach ($fieldmaps as $map) {
 		foreach($types[$type] as $item){
 
 			$header = escapehtml(destination_label($type, $item->sequence));
+			$ident = $type . $item->sequence;
 ?>
 			<tr>
 				<td class="bottomBorder"><?= $header ?></td>
@@ -721,7 +725,9 @@ foreach ($fieldmaps as $map) {
 <?
 				} else {
 ?>
-					<td align="center"  class="bottomBorder"><? NewFormItem($f, $s, "editlock_" . $type . $item->sequence, "checkbox", 0, 1, $FORMDISABLE . 'id="editlock_' . $type . $item->sequence . '" onclick="new getObj(\'' . $type . $item->sequence . '\').obj.disabled = !this.checked"'); ?></td>
+					<td align="center"  class="bottomBorder"><?
+						NewFormItem($f, $s, "editlock_" . $ident, "checkbox", 0, 1, $FORMDISABLE . 'id="editlock_' . $ident . '" onclick="new getObj(\'' . $ident . '\').obj.disabled = !this.checked"'); ?>
+					</td>
 <?				}
 				// Destination field
 				$disabled = "";
@@ -732,7 +738,7 @@ foreach ($fieldmaps as $map) {
 						if($FORMDISABLE){
 							echo $item->$type . "&nbsp;";
 						} else {
-							NewFormItem($f, $s, $type . $item->sequence, "text", 30, 100, "id='" . $type . $item->sequence . "'". $disabled);
+							NewFormItem($f, $s, $ident, "text", 30, 100, "id='" . $ident . "'". $disabled);
 						}
 				} else if ($type == "device") {
 						echo $item->name . "&nbsp;";
@@ -740,7 +746,7 @@ foreach ($fieldmaps as $map) {
 						if($FORMDISABLE){
 							echo Phone::format($item->$type) . "&nbsp;";
 						} else {
-							NewFormItem($f, $s, $type . $item->sequence, "text", 14, null, "id='" . $type . $item->sequence . "'". $disabled);
+							NewFormItem($f, $s, $ident, "text", 14, null, "id='" . $ident . "'". $disabled);
 						}
 				}
 ?>
@@ -755,22 +761,24 @@ foreach ($fieldmaps as $map) {
 					'yes' => _L('Yes'),
 					'no' => _L('No')
 				);
-				if (('phone' === $type) && strlen(trim($item->phone))) {
+				if (('phone' === $type) && (('edit' === $method) || strlen(trim($item->phone)))) {
 					$value = isset($grapiPhones[$item->phone]) ? strtolower($grapiPhones[$item->phone]->consent->call) : 'pending';
 					if ('edit' === $method) {
-						NewFormItem($f, $s, 'consent' . $item->sequence, 'selectstart');
+						NewFormItem($f, $s, 'consent_' . $ident, 'selectstart');
 						foreach ($options as $option => $label) {
 							$selected = ($option === $value) ? ' SELECTED="SELECTED"' : '';
-							NewFormItem($f, $s, 'consent' . $item->sequence, 'selectoption', $label, $option, $selected);
+							NewFormItem($f, $s, 'consent_' . $ident, 'selectoption', $label, $option, $selected);
 						}
-						NewFormItem($f, $s, 'consent' . $item->sequence, 'selectend');
+						NewFormItem($f, $s, 'consent_' . $ident, 'selectend');
 					}
 					else {
 						$value = isset($grapiPhones[$item->phone]) ? $options[$grapiPhones[$item->phone]->consent->call] : 'Unknown';
 						echo $value;
 					}
 				}
-				else echo "&nbsp;";
+				else {
+					echo "&nbsp;";
+				}
 
 ?>
 				</td>
