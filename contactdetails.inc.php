@@ -22,7 +22,9 @@ include_once("obj/JobType.obj.php");
 include_once("obj/Sms.obj.php");
 include_once("obj/LinkedAccountManager.obj.php");
 include_once("obj/DeviceServiceApiClient.obj.php");
+include_once("dto/DestinationMetadata.dto.php");
 
+// die("project halted");
 
 $FORMDISABLE = " DISABLED ";
 if(isset($method)){
@@ -254,9 +256,9 @@ if (isset($personid)) {
 $grapiStatus = $grapiClient->getStatus();
 
 // if($grapiStatus == false) {
-// 	echo "GRAPI Client is unavailble";
+// 	echo "GRAPI Client is unavailble.<br>";
 // } else if($grapiStatus == 'UP') {
-// 	echo "GRAPI Client is available.";
+// 	echo "GRAPI Client is available.<br>";
 // }
 
 $allStoredPhones = $phones;
@@ -266,12 +268,11 @@ $validPhones = array();
 for($n = 0; $n < $allStoredPhonesLength; $n++) {
 
 	$currentPhone = $allStoredPhones[$n]->phone;
+
 	if($currentPhone != NULL){
 		$validPhones[] = $currentPhone;
 	}
-
 }
-
 
 function duplicate_entries($arrayToValidate) {
 	$duplicates = array();
@@ -296,18 +297,21 @@ function duplicate_entries($arrayToValidate) {
 
 $common_phones = duplicate_entries($validPhones);
 
-$grapiMetadata = $grapiClient->getDestinationMetaData($validPhones);
-$grapiLength = sizeof($grapiMetadata);
+$grapiMetadata = $grapiClient->getDestinationMetadata($validPhones);
+$grapiPhones = array();
 
-if($validPhones) {
+$grapiLength = sizeof($grapiMetadata);
+var_dump($grapiMetadata);
+
+if(count($validPhones)) {
 
 	for($x = 0; $x < $grapiLength; $x++) {
 
-
-		if($common_phones) {
+		if(count($common_phones)) {
 			$grapiCallConsent = 'DUPLICATE';
 		} else {
 			$grapiCallConsent = $grapiMetadata[$x]->consent->call; 
+			$grapiPhones[] = $grapiMetadata[$x]->destination;
 		}
 
 		if($grapiCallConsent == 'DUPLICATE') {
@@ -336,6 +340,21 @@ if($validPhones) {
 
 	}
 }
+
+
+// print_r($validPhones);
+
+function compareLists($currentList, $formList) {
+
+	$listsAreDiff = array_diff($currentList, $formList);
+
+	if($listsAreDiff) {
+		$phonesToAdd[] = $listsAreDiff;
+	}
+	return $phonesToAdd;
+}
+
+
 
 
 
@@ -382,6 +401,7 @@ if(CheckFormSubmit($f,$s))
 			if(GetFormData($f, $s, "block_data_access") || $blockDataAccess != GetFormData($f, $s, "block_data_access")){
 				$data->setSetting("block_data_access", GetFormData($f, $s, "block_data_access"));
 			}
+			$phoneSequences = array();
 			foreach($contacttypes as $type){
 				if ($error) continue;
 				if (!isset($types[$type])) continue;
@@ -396,6 +416,7 @@ if(CheckFormSubmit($f,$s))
 							else {
 								$p = GetFormData($f, $s, $type . $item->sequence);
 								if ($p != "" && $phoneerror = Phone::validate($p)) {
+									$phoneSequences[$p] = $item->sequence;
 									error($phoneerror);
 									$error = true;
 									continue;
@@ -429,7 +450,23 @@ if(CheckFormSubmit($f,$s))
 				$portalphoneactivation = GetFormData($f, $s, 'allowphoneactivation');
 				QuickUpdate("delete from personsetting where personid=".$personid." and name='portalphoneactivation'");
 				QuickUpdate("insert into personsetting (personid, name, value) values ($personid, 'portalphoneactivation', $portalphoneactivation)");
+				$addSomePhones = array_diff($validPhones, $grapiPhones);
+				if(count($addSomePhones)) {
+					$grapiClient->addPhones($addSomePhones);
+					$grapiMetadata = $grapiClient->getDestinationMetadata($validPhones);
+				}
 
+				$destinationMetadatas = array();
+
+				foreach($grapiMetadata as $grm) {
+
+					$consentState = (GetFormData($f, $s, "consent" . $phoneSequences[$grm->destination]));
+
+					$dm = new DestinationMetadata($grm->type, $grm->destination, $grm->id);
+					$dm->consent->call = $consentState; 
+					$destinationMetadatas[] = $dm;
+				}
+				$grapiClient->updateDestinationMetadata($destinationMetadatas);
 				redirect($backTo);
 			}
 		}
@@ -703,37 +740,15 @@ foreach ($fieldmaps as $map) {
 				<td class="borderBottom">
 <?
 				if ($type == "phone") {
-?>
-					<form method="post">
-					<select name="choiceOfUser" <? if($FORMDISABLE){ echo "disabled"; } ?> >
-<? 
 
+					NewFormItem($f, $s, 'consent' . $item->sequence, 'selectstart');
+					NewFormItem($f, $s, 'consent' . $item->sequence, 'selectoption', 'Pending', 'pending');
+					NewFormItem($f, $s, 'consent' . $item->sequence, 'selectoption', 'Yes', 'yes');
+					NewFormItem($f, $s, 'consent' . $item->sequence, 'selectoption', 'No', 'no');
+					NewFormItem($f, $s, 'consent' . $item->sequence, 'selectend');
 
-
-					if($userHasDuplicate) {
-						$userChoices = array('Duplicate');
-					} elseif(!$userAwaitingConsent && $userHasConsent) {
-						$userChoices = array('Yes', 'No', 'Pending');
-					} elseif(!$userAwaitingConsent && $userDeniedConsent) {
-						$userChoices = array('No', 'Yes', 'Pending');
-					} else {
-						$userChoices = array('Pending', 'Yes', 'No');
-					}
-
-					$index = 0;
-					foreach($userChoices as $userChoice) {
-?>					
-						<option><? echo $userChoice; ?></option>
-<?
-					$index++;
-					}
-?>
-					</select>
-					</form>
-
-<?
-				$selectOption = $_POST['choiceOfUser'];
 				}
+
 ?>
 				</td>
 				<!-- End Consent Section -->
