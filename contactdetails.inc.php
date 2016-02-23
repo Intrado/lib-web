@@ -24,8 +24,6 @@ include_once("obj/LinkedAccountManager.obj.php");
 include_once("obj/DeviceServiceApiClient.obj.php");
 include_once("dto/DestinationMetadata.dto.php");
 
-// die("project halted");
-
 $FORMDISABLE = " DISABLED ";
 if(isset($method)){
 	if($method == "edit"){
@@ -255,12 +253,6 @@ if (isset($personid)) {
 
 $grapiStatus = $grapiClient->getStatus();
 
-// if($grapiStatus == false) {
-// 	echo "GRAPI Client is unavailble.<br>";
-// } else if($grapiStatus == 'UP') {
-// 	echo "GRAPI Client is available.<br>";
-// }
-
 $allStoredPhones = $phones;
 $allStoredPhonesLength = sizeof($allStoredPhones);
 $validPhones = array();
@@ -274,32 +266,8 @@ for($n = 0; $n < $allStoredPhonesLength; $n++) {
 	}
 }
 
-function duplicate_entries($arrayToValidate) {
-	$duplicates = array();
-
-	natcasesort($arrayToValidate);
-	reset($arrayToValidate);
-
-	$old_key 	= NULL;
-	$old_value 	= NULL;
-
-	foreach($arrayToValidate as $key => $value) {
-		if($value === NULL) { continue; }
-		if(strcasecmp($old_value, $value) === 0) {
-			$duplicates[$old_key] 	= $old_value;
-			$duplicates[$key]		= $value;
-		}
-		$old_value 	= $value;
-		$old_key	= $key;
-	}
-	return $duplicates;
-}
-
-$common_phones = duplicate_entries($validPhones);
-
 $grapiMetadata = $grapiClient->getDestinationMetadata($validPhones);
 $grapiPhones = array();
-
 $grapiLength = sizeof($grapiMetadata);
 
 
@@ -307,56 +275,10 @@ if(count($validPhones)) {
 
 	for($x = 0; $x < $grapiLength; $x++) {
 
-		if(count($common_phones)) {
-			$grapiCallConsent = 'DUPLICATE';
-		} else {
-			$grapiCallConsent = $grapiMetadata[$x]->consent->call; 
-			$grapiPhones[$grapiMetadata[$x]->destination] = $grapiMetadata[$x];
-		}
-
-		if($grapiCallConsent == 'DUPLICATE') {
-
-			$userHasDuplicate = true;	
-
-		} elseif($grapiCallConsent == 'YES') {
-
-			$userHasConsent = true;
-			$userHasDuplicate = false;
-			$userDeniedConsent = false;
-			$userAwaitingConsent = false;
-
-		} elseif($grapiCallConsent == 'NO') {
-
-			$userHasConsent = false;
-			$userHasDuplicate = false;
-			$userDeniedConsent = true;
-			$userAwaitingConsent = false;
-
-		} else {
-
-			$userHasDuplicate = false;
-			$userAwaitingConsent = true;
-		}
-
+		$grapiCallConsent = $grapiMetadata[$x]->consent->call; 
+		$grapiPhones[$grapiMetadata[$x]->destination] = $grapiMetadata[$x];
 	}
 }
-
-
-// print_r($validPhones);
-
-function compareLists($currentList, $formList) {
-
-	$listsAreDiff = array_diff($currentList, $formList);
-
-	if($listsAreDiff) {
-		$phonesToAdd[] = $listsAreDiff;
-	}
-	return $phonesToAdd;
-}
-
-
-
-
 
 /****************** main message section ******************/
 
@@ -423,7 +345,6 @@ if(CheckFormSubmit($f,$s))
 								$item->$type = Phone::parse($p);
 								if (strlen($item->phone)) {
 									$phoneSequences[$item->phone] = $item->sequence;
-//print("Adding phone sequence ({$item->sequence}) for phone [{$item->phone}]\n\n");
 								}
 							}
 						}
@@ -454,34 +375,25 @@ if(CheckFormSubmit($f,$s))
 				QuickUpdate("delete from personsetting where personid=".$personid." and name='portalphoneactivation'");
 				QuickUpdate("insert into personsetting (personid, name, value) values ($personid, 'portalphoneactivation', $portalphoneactivation)");
 				
-//print('Original metadata: ' . print_r($grapiMetadata, true) . "\n\n");
-//print('phoneSequences are: ' . print_r($phoneSequences, true) . "\n\n");
 				$knownPhones = array_keys($grapiPhones);
-//print('Known phones: ' . print_r($knownPhones, true) . "\n\n");
 				$submittedPhones = array_keys($phoneSequences);
-//print('Submitted phones: ' . print_r($submittedPhones, true) . "\n\n");
 				$newPhones = array_values(array_diff($submittedPhones, $knownPhones));
-//print('New phones: ' . print_r($newPhones, true) . "\n\n");
 				if(count($newPhones)) {
 					$grapiClient->addPhones($newPhones);
 					$grapiMetadata = $grapiClient->getDestinationMetadata($submittedPhones);
-//print('Updated metadata: ' . print_r($grapiMetadata, true) . "\n\n");
 				}
 
 				$destinationMetadatas = array();
 
 				foreach($grapiMetadata as $grm) {
 					$consentState = (GetFormData($f, $s, "consent_phone" . $phoneSequences[$grm->destination]));
-//print("Consent state for {$grm->destination} ({$phoneSequences[$grm->destination]})is [{$consentState}]\n\n");
 					$dm = new DestinationMetadata($grm->type, $grm->destination, $grm->id);
 					$dm->consent->call = $consentState; 
 					$destinationMetadatas[] = $dm;
 				}
 				if (count($destinationMetadatas)) {
 					$grapiClient->updateDestinationMetadata($destinationMetadatas);
-//print('Updated GRAPI with: ' . print_r($destinationMetadatas, true));
 				}
-//die();
 				redirect($backTo);
 			}
 		}
@@ -710,6 +622,8 @@ foreach ($fieldmaps as $map) {
 			<td align="center"><?= _L("None") ?></td>
 			<?
 		}
+
+		$uniquePhones = array();
 		
 	
 		foreach($types[$type] as $item){
@@ -764,17 +678,26 @@ foreach ($fieldmaps as $map) {
 				);
 				if (('phone' === $type) && (('edit' === $method) || strlen(trim($item->phone)))) {
 					$value = isset($grapiPhones[$item->phone]) ? strtolower($grapiPhones[$item->phone]->consent->call) : 'pending';
-					if ('edit' === $method) {
-						NewFormItem($f, $s, 'consent_' . $ident, 'selectstart');
-						foreach ($options as $option => $label) {
-							$selected = ($option === $value) ? ' SELECTED="SELECTED"' : '';
-							NewFormItem($f, $s, 'consent_' . $ident, 'selectoption', $label, $option, $selected);
+
+					if (!in_array($item->phone, $uniquePhones)) {
+
+						$uniquePhones[] = $item->phone;
+
+						if ('edit' === $method) {
+							NewFormItem($f, $s, 'consent_' . $ident, 'selectstart');
+							foreach ($options as $option => $label) {
+								$selected = ($option === $value) ? ' SELECTED="SELECTED"' : '';
+								NewFormItem($f, $s, 'consent_' . $ident, 'selectoption', $label, $option, $selected);
+							}
+							NewFormItem($f, $s, 'consent_' . $ident, 'selectend');
 						}
-						NewFormItem($f, $s, 'consent_' . $ident, 'selectend');
+						else {
+							$value = isset($grapiPhones[$item->phone]) ? $options[$grapiPhones[$item->phone]->consent->call] : 'Unknown';
+							echo $value;
+						}
 					}
 					else {
-						$value = isset($grapiPhones[$item->phone]) ? $options[$grapiPhones[$item->phone]->consent->call] : 'Unknown';
-						echo $value;
+						 echo _L('Duplicate');
 					}
 				}
 				else {
