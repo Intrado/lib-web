@@ -301,7 +301,7 @@ $grapiMetadata = $grapiClient->getDestinationMetadata($validPhones);
 $grapiPhones = array();
 
 $grapiLength = sizeof($grapiMetadata);
-var_dump($grapiMetadata);
+
 
 if(count($validPhones)) {
 
@@ -311,7 +311,7 @@ if(count($validPhones)) {
 			$grapiCallConsent = 'DUPLICATE';
 		} else {
 			$grapiCallConsent = $grapiMetadata[$x]->consent->call; 
-			$grapiPhones[] = $grapiMetadata[$x]->destination;
+			$grapiPhones[$grapiMetadata[$x]->destination] = $grapiMetadata[$x];
 		}
 
 		if($grapiCallConsent == 'DUPLICATE') {
@@ -416,12 +416,15 @@ if(CheckFormSubmit($f,$s))
 							else {
 								$p = GetFormData($f, $s, $type . $item->sequence);
 								if ($p != "" && $phoneerror = Phone::validate($p)) {
-									$phoneSequences[$p] = $item->sequence;
 									error($phoneerror);
 									$error = true;
 									continue;
 								}
 								$item->$type = Phone::parse($p);
+								if (strlen($item->phone)) {
+									$phoneSequences[$item->phone] = $item->sequence;
+//print("Adding phone sequence ({$item->sequence}) for phone [{$item->phone}]\n\n");
+								}
 							}
 						}
 						if (!$error)
@@ -450,23 +453,31 @@ if(CheckFormSubmit($f,$s))
 				$portalphoneactivation = GetFormData($f, $s, 'allowphoneactivation');
 				QuickUpdate("delete from personsetting where personid=".$personid." and name='portalphoneactivation'");
 				QuickUpdate("insert into personsetting (personid, name, value) values ($personid, 'portalphoneactivation', $portalphoneactivation)");
-				$addSomePhones = array_diff($validPhones, $grapiPhones);
+				
+//print('Original metadata: ' . print_r($grapiMetadata, true) . "\n\n");
+//print('phoneSequences are: ' . print_r($phoneSequences, true) . "\n\n");
+				$addSomePhones = array_diff($validPhones, array_keys($grapiPhones));
 				if(count($addSomePhones)) {
 					$grapiClient->addPhones($addSomePhones);
+//print('Adding phones: ' . print_r($addSomePhones, true) . "\n\n");
 					$grapiMetadata = $grapiClient->getDestinationMetadata($validPhones);
+//print('Updated metadata: ' . print_r($grapiMetadata, true) . "\n\n");
 				}
 
 				$destinationMetadatas = array();
 
 				foreach($grapiMetadata as $grm) {
-
 					$consentState = (GetFormData($f, $s, "consent" . $phoneSequences[$grm->destination]));
-
+//print("Consent state for {$grm->destination} ({$phoneSequences[$grm->destination]})is [{$consentState}]\n\n");
 					$dm = new DestinationMetadata($grm->type, $grm->destination, $grm->id);
 					$dm->consent->call = $consentState; 
 					$destinationMetadatas[] = $dm;
 				}
-				$grapiClient->updateDestinationMetadata($destinationMetadatas);
+				if (count($destinationMetadatas)) {
+					$grapiClient->updateDestinationMetadata($destinationMetadatas);
+//print('Updated GRAPI with: ' . print_r($destinationMetadatas, true));
+				}
+//die();
 				redirect($backTo);
 			}
 		}
@@ -742,9 +753,16 @@ foreach ($fieldmaps as $map) {
 				if ($type == "phone") {
 
 					NewFormItem($f, $s, 'consent' . $item->sequence, 'selectstart');
-					NewFormItem($f, $s, 'consent' . $item->sequence, 'selectoption', 'Pending', 'pending');
-					NewFormItem($f, $s, 'consent' . $item->sequence, 'selectoption', 'Yes', 'yes');
-					NewFormItem($f, $s, 'consent' . $item->sequence, 'selectoption', 'No', 'no');
+					$options = array(
+						'pending' => 'Pending',
+						'yes' => 'Yes',
+						'no' => 'No'
+					);
+					foreach ($options as $option => $label) {
+						$value = strtolower($grapiPhones[$item->phone]->consent->call);
+						$selected = ($option === $value) ? ' SELECTED="SELECTED"' : '';
+						NewFormItem($f, $s, 'consent' . $item->sequence, 'selectoption', $label, $option, $selected);
+					}
 					NewFormItem($f, $s, 'consent' . $item->sequence, 'selectend');
 
 				}
