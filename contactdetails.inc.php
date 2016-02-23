@@ -750,26 +750,30 @@ foreach ($fieldmaps as $map) {
 				<!-- Consent Section -->
 				<td class="bottomBorder">
 <?
-				$value = strtolower($grapiPhones[$item->phone]->consent->call);
-				if (('phone' === $type) && ((! $FORMDISABLE) || strlen($value))) {
-
-					NewFormItem($f, $s, 'consent' . $item->sequence, 'selectstart');
-					$options = array(
-						'pending' => 'Pending',
-						'yes' => 'Yes',
-						'no' => 'No'
-					);
-					$disabled = $item->editlock ? ' Disabled' : '';
-					foreach ($options as $option => $label) {
-						$selected = ($option === $value) ? ' SELECTED="SELECTED"' : '';
-						NewFormItem($f, $s, 'consent' . $item->sequence, 'selectoption', $label, $option, $selected . $disabled);
+				$options = array(
+					'pending' => 'Pending',
+					'yes' => 'Yes',
+					'no' => 'No'
+				);
+				if (('phone' === $type) && strlen(trim($item->phone))) {
+					if (isset($grapiPhones[$item->phone])) {
+						$value = strtolower($grapiPhones[$item->phone]->consent->call);
+						if ((! $FORMDISABLE) || strlen($value)) {
+							if ('edit' === $method) {
+								NewFormItem($f, $s, 'consent' . $item->sequence, 'selectstart');
+								foreach ($options as $option => $label) {
+									$selected = ($option === $value) ? ' SELECTED="SELECTED"' : '';
+									NewFormItem($f, $s, 'consent' . $item->sequence, 'selectoption', $label, $option, $selected);
+								}
+								NewFormItem($f, $s, 'consent' . $item->sequence, 'selectend');
+							}
+							else echo $options[$grapiPhones[$item->phone]->consent->call];
+						}
+						else echo "&nbsp;";
 					}
-					NewFormItem($f, $s, 'consent' . $item->sequence, 'selectend');
-
+					else echo _L('Unknown');
 				}
-				else {
-					echo "&nbsp;";
-				}
+				else echo "&nbsp;";
 
 ?>
 				</td>
