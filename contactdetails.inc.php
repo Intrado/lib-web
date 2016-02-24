@@ -343,11 +343,13 @@ if(CheckFormSubmit($f,$s))
 									continue;
 								}
 								$item->$type = Phone::parse($p);
-								if (strlen($item->phone)) {
-									$phoneSequences[$item->phone] = $item->sequence;
-								}
 							}
 						}
+
+						if (('phone' === $type) && (strlen($item->phone))) {
+							$phoneSequences[$item->phone] = $item->sequence;
+						}
+
 						if (!$error)
 							$item->update();
 					}
