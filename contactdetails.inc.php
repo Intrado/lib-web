@@ -681,9 +681,11 @@ foreach ($fieldmaps as $map) {
 				if (('phone' === $type) && (('edit' === $method) || strlen(trim($item->phone)))) {
 					$value = isset($grapiPhones[$item->phone]) ? strtolower($grapiPhones[$item->phone]->consent->call) : 'pending';
 
-					if (!in_array($item->phone, $uniquePhones)) {
+					if (!in_array($item->phone, $uniquePhones) || ('view' === $method)) {
 
-						$uniquePhones[] = $item->phone;
+						if (strlen(trim($item->phone))) {
+							$uniquePhones[] = $item->phone;
+						}
 
 						if ('edit' === $method) {
 							NewFormItem($f, $s, 'consent_' . $ident, 'selectstart');
