@@ -520,17 +520,13 @@ function apply_rev($db, $dbname, $version, $rev) {
 			continue;
 		}
 
-		if ($version == $targetversion) {
-			$foundstartingversion = true;
-		}
-
 		//check to see that we are already on the latest rev, then skip upgrading current version, go to next version
 		if ($version == $targetversion && $rev == $targetrev) {
 			continue;
 		}
 
 		echo "upgrading $dbname from $version/$rev to $targetversion/$targetrev\n";
-
+		
 
 		/* if we are looking at same major version, check for revs
 		 * otherwise skip to next target version and start at rev zero (since we obviously moved major versions)
@@ -578,10 +574,8 @@ function apply_rev($db, $dbname, $version, $rev) {
 		$rev = $targetrev;
 	} // end for each version
 
-	if ($foundstartingversion !== false) {
-		// upgrade success
-		QuickUpdate("update dbupgrade set version = ?, lastUpdateMs = (UNIX_TIMESTAMP() * 1000) where id = ?", $db, array("$targetversion/$targetrev", $dbname));
-	} // else nothing to apply
+	QuickUpdate("update dbupgrade set version = ?, lastUpdateMs = (UNIX_TIMESTAMP() * 1000) where id = ?", $db, array("$targetversion/$targetrev", $dbname));
+	
 }
 
 
