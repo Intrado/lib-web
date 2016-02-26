@@ -346,13 +346,14 @@ if(CheckFormSubmit($f,$s))
 							}
 						}
 
-						if (('phone' === $type) && (strlen($item->phone))) {
-							$phoneSequences[$item->phone] = $item->sequence;
-						}
-
 						if (!$error)
 							$item->update();
 					}
+					
+					if ($type == 'phone') {
+						$phoneSequences[$item->phone] = $item->sequence;
+					}
+
 					if (!$error) {
 					  foreach($jobtypes as $jobtype){
 						if((!isset($contactprefs[$type][$item->sequence][$jobtype->id]) && !isset($defaultcontactprefs[$type][$item->sequence][$jobtype->id]) &&
