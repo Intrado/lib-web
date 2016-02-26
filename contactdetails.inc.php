@@ -746,7 +746,7 @@ foreach ($fieldmaps as $map) {
 	<tr>
 		<th align="right" class="windowRowHeader bottomBorder">Enrollment Data:</th>
 		<td class="bottomBorder">
-	<table cellpadding="3" cellspacing="1" class="list sortable" id="
+	<table cellpadding="3" cellspacing="1" class="list sortable" id="enrollmenttable">
 <?
 		// find all sections associated with this person
 		$sections = QuickQueryMultiRow("
