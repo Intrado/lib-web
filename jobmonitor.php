@@ -75,7 +75,19 @@ if ($job->hasEmail()) {
 	}
 }
 if ($job->hasSMS()) {
-	$jobstats['sms'] = JobSummaryReport::getSmsInfo($job->id, $readonlyconn);
+	$jobstats['sms'] = array(
+		"sent" => 0,
+		"unsent" => 0,
+		"notattempted" => 0,
+		"blocked" => 0,
+		"duplicate" => 0,
+		"nocontacts" => 0,
+		"declined" => 0
+	);
+	$result = Query(JobSummaryReport::getDestinationResultQuery("and rp.jobid=?", "and rp.type=?"), $readonlyconn, array($job->id, 'sms'));
+	while ($row = DBGetRow($result)) {
+		$jobstats['sms'][$row[1]] += $row[0];
+	}
 }
 $_SESSION['jobstats'][$job->id] = $jobstats;
 

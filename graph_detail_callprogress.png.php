@@ -62,12 +62,13 @@ if ($type == 'phone') {
 	);
 } else if ($type == 'sms' ) {
 	$colors = array(
-		"remaining" => "red",
-		"pending" => "gray",
-		"notcontacted" => "orange",
-		"contacted" => "lightgreen"
+		"sent" => "lightgreen",
+		"unsent" => "blue"
 	);
-	$resultcodes = array();
+	$resultcodes = array(
+		"sent" => "Sent",
+		"unsent" => "Unsent"
+	);
 }
 
 // Common code colors
@@ -82,20 +83,20 @@ $colors = array_merge($colors, array(
 $resultcodes = array_merge($resultcodes, array(
 	"notattempted" => "Not Attempted",
 	"blocked" => "Blocked",
-	"duplicate" => "Duplicate",
-	"nocontacts" => "No Phone #",
-	"declined" => "No Phone Selected"
+	"duplicate" => "Duplicate"
 ));
 // Correct code titles depending on type, default phone.
-if ($type == 'email') {
+if ($type == 'phone') {
+	$resultcodes['nocontacts'] = 'No Phone #';
+	$resultcodes['declined'] = 'No Phone Selected';
+}
+else if ($type == 'email') {
 	$resultcodes['nocontacts'] = 'No Email';
 	$resultcodes['declined'] = 'No Email Selected';
 }
 else if ($type == 'sms') {
-	$resultcodes['remaining'] = _L('Queued');
-	$resultcodes['pending'] = _L('Pending');
-	$resultcodes['notcontacted'] = _L('Not Delivered');
-	$resultcodes['contacted'] = _L('Delivered');
+	$resultcodes['nocontacts'] = 'No SMS #';
+	$resultcodes['declined'] = 'No SMS Selected';
 }
 
 $graphdata = array();
