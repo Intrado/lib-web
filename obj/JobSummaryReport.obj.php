@@ -27,11 +27,11 @@ class JobSummaryReport extends ReportGenerator{
 			if(isset($this->params['reldate']))
 				$reldate = $this->params['reldate'];
 			list($startdate, $enddate) = getStartEndDate($reldate, $this->params);
-			$joblist = implode("','", getJobList($startdate, $enddate, $jobtypes, $surveyonly));
+			$joblist = implode(",", getJobList($startdate, $enddate, $jobtypes, $surveyonly));
 		}
 
 		if($joblist){
-			$joblistquery = " and rp.jobid in ('" . $joblist . "')";
+			$joblistquery = " and rp.jobid in ($joblist)";
 		} else {
 			$joblistquery = " and 0 ";
 		}
@@ -231,7 +231,7 @@ class JobSummaryReport extends ReportGenerator{
 			$url = "startdate=" . $startdate . "&enddate=" . $enddate . "&jobtypes=" . $jobtypes . "&surveyonly=" . $surveyonly;
 		}
 
-		$hasconfirmation = QuickQuery("select sum(value) from jobsetting where name = 'messageconfirmation' and jobid in ('" . $this->params['joblist'] . "')", $this->_readonlyDB);
+		$hasconfirmation = QuickQuery("select sum(value) from jobsetting where name = 'messageconfirmation' and jobid in (" . $this->params['joblist'] . ")", $this->_readonlyDB);
 
 		//Gather Detailed Destination Results
 		$phonenumberinfo = JobSummaryReport::getPhoneInfo($this->params['joblist'], $this->_readonlyDB);
@@ -246,7 +246,7 @@ class JobSummaryReport extends ReportGenerator{
 											from reportperson rp
 											left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid AND rc.result NOT IN('declined'))
 											inner join job j on (j.id = rp.jobid)
-											where rp.jobid in ('" . $this->params['joblist'] . "')
+											where rp.jobid in (" . $this->params['joblist'] . ")
 										and rp.type='phone'";
 			$confirmedinfo = QuickQueryRow($confirmedquery, false, $this->_readonlyDB);
 		}
@@ -297,7 +297,8 @@ class JobSummaryReport extends ReportGenerator{
 		$jobstats["phone"]['totalcalls'] = array_sum($jobstats["phone"]);
 		$jobstats["phone"]['remainingcalls'] = $remainingcalls;
 
-		$jobnumberlist = implode("", explode("','", $this->params['joblist']));
+		// Note this seems wrong because if I have 1,2,3,4 it becomes 1234 as does 12,34 so no clue what jobstats is used for later on.
+		$jobnumberlist = implode("", explode(",", $this->params['joblist']));
 		$_SESSION['jobstats'][$jobnumberlist] = $jobstats;
 
 		$urloptions = $url . "&valid=$validstamp";
@@ -476,11 +477,11 @@ class JobSummaryReport extends ReportGenerator{
 		}
 		$joblist = array();
 		if($this->params['joblist'] != "")
-			$joblist=explode("','", $this->params['joblist']);
+			$joblist=explode(",", $this->params['joblist']);
 
-		$hassms = QuickQuery("select exists (select * from message m where m.type='sms' and m.messagegroupid = j.messagegroupid) from job j where id in ('" . $this->params['joblist'] . "')", $this->_readonlyDB);
+		$hassms = QuickQuery("select exists (select * from message m where m.type='sms' and m.messagegroupid = j.messagegroupid) from job j where id in (" . $this->params['joblist'] . ")", $this->_readonlyDB);
 		
-		$messageconfirmation = QuickQuery("select sum(value) from jobsetting where name = 'messageconfirmation' and jobid in ('" . $this->params['joblist'] . "')", $this->_readonlyDB) ? "1" : "0";
+		$messageconfirmation = QuickQuery("select sum(value) from jobsetting where name = 'messageconfirmation' and jobid in (" . $this->params['joblist'] . ")", $this->_readonlyDB) ? "1" : "0";
 
 		$params = array("jobId" => $this->params['joblist'],
 						"jobcount" => count($joblist),

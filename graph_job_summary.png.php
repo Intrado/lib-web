@@ -24,12 +24,15 @@ if (isset($_GET['size'])) {
 	$size = $_GET['size'];
 }
 
-$jobId = $_GET['jobId'] + 0;
-if (!userOwns("job",$jobId) && !$USER->authorize('viewsystemreports')) {
-	redirect("unauthorized.php");
+$jobIds = $_GET['jobId'];
+$jobIdList = explode(",",$jobIds);
+foreach ($jobIdList as $jobId) {
+	if (!userOwns("job", $jobId) && !$USER->authorize('viewsystemreports')) {
+		redirect("unauthorized.php");
+	}
 }
 
-$graph = graph_job_summary($type, $size, $jobId);
+$graph = graph_job_summary($type, $size, $jobIds);
 
 echo $graph;
 
