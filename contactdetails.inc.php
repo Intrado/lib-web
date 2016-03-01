@@ -351,7 +351,9 @@ if(CheckFormSubmit($f,$s))
 					}
 					
 					if ($type == 'phone') {
-						$phoneSequences[$item->phone] = $item->sequence;
+						if (! isset($phoneSequences[$item->phone])) {
+							$phoneSequences[$item->phone] = $item->sequence;
+						}
 					}
 
 					if (!$error) {
