@@ -350,7 +350,7 @@ if(CheckFormSubmit($f,$s))
 							$item->update();
 					}
 					
-					if ($type == 'phone') {
+					if (($type == 'phone') && (strlen($item->phone))) {
 						if (! isset($phoneSequences[$item->phone])) {
 							$phoneSequences[$item->phone] = $item->sequence;
 						}
