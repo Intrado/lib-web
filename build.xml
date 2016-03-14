@@ -119,7 +119,7 @@
     <!-- create kona-{date}.zip file -->
     <target name="dist" depends="clean, init, build.txt">
         <zip destfile="${dist.dir}/kona-${file.suffix.date}.zip">
-            <zipfileset dir="." prefix="kona/">
+            <zipfileset dir="." prefix="kona/" followsymlinks="false">
                 <!-- the files related to creating the zip file -->
                 <exclude name="dist/" />
                 <exclude name="build.xml" />
