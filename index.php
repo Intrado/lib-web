@@ -74,7 +74,7 @@ if (isset($_GET['login'])) {
 		$updatelogin = true;
 } else if (isset($_GET['sessionID'])){
 	session_id($_GET['sessionID']); // set the session id
-	$userid = (int) $_GET['userID'];
+	$userid = $_GET['userID'];
 	if($userid){
 		$updatelogin = true;
 	}
