@@ -63,7 +63,7 @@ function graphJobSummary($msg){
 //do the xmlrpc stuff
 
 $functionMap = array(
-	"graphJobSummary" => array("function" => "graphJobSummary", "signature" => array(array("string","string","string","string","int")), "docstring" => "")
+	"graphJobSummary" => array("function" => "graphJobSummary", "signature" => array(array("string","string","string","string","string")), "docstring" => "")
 
 );
 

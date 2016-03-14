@@ -87,7 +87,7 @@ function getJobSummary($joblist, $readonlyDB = false){
 								on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid )
 							inner join user u on (j.userid = u.id)
 							inner join jobtype jt on (jt.id = j.jobtypeid)
-							where j.id in ('" . $joblist . "')
+							where j.id in ($joblist)
 							group by j.id";
 	$jobinforesult = Query($jobinfoquery, $readonlyDB);
 	$jobinfo = array();
@@ -108,7 +108,7 @@ function getJobSummary($joblist, $readonlyDB = false){
 							from reportperson rp
 							left outer join reportdevice rd
 								on (rp.jobid = rd.jobid and rp.personid = rd.personid and rd.result not in('declined'))
-							where rp.jobid in ('" . $joblist . "')
+							where rp.jobid in ($joblist)
 								and rp.type = 'device'
 							group by rp.jobid";
 	$jobinforesult = Query($jobinfoquery, $readonlyDB);
@@ -118,7 +118,7 @@ function getJobSummary($joblist, $readonlyDB = false){
 
 	global $JOB_STATS;
 	$JOB_STATS = array();
-	$query = "select jobid, name, value from jobstats where jobid in ('" . $joblist . "') and name = 'complete-seconds-phone-attempt-0-sequence-0'";
+	$query = "select jobid, name, value from jobstats where jobid in ($joblist) and name = 'complete-seconds-phone-attempt-0-sequence-0'";
 	$jobstats_objects = QuickQueryMultiRow($query);
 	foreach ($jobstats_objects as $obj) {
 		$JOB_STATS[$obj[0]][$obj[1]] = $obj[2];
@@ -138,7 +138,7 @@ function displayJobSummary($joblist, $readonlyDB = false){
 							message m 
 						inner join job j on (m.messagegroupid = j.messagegroupid)
 						where 
-							m.type='sms' and j.id in ('".$joblist."')";
+							m.type='sms' and j.id in ($joblist)";
 
 		$jobHasSMS = QuickQuery($hasSMSQuery, $readonlyDB);
 

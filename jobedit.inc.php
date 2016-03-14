@@ -271,7 +271,6 @@ class ValDateWithFacebookLimiter extends Validator {
 			$mg = new MessageGroup($requiredvalues['message']);
 			if ($mg->hasMessage("post", "facebook")) {
 				if (isset($requiredvalues['fbpage']) && (count(json_decode($requiredvalues['fbpage'])) > 0)) {
-					print_r($requiredvalues['fbpage']);
 					$fbexpireson = $USER->getSetting("fb_expires_on", false);
 					if (strtotime($value) > $fbexpireson) {
 						if ($fbexpireson)
