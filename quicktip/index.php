@@ -1,6 +1,30 @@
-<?
+<?php
 
-$SETTINGS = parse_ini_file('quicktipsettings.ini.php', true);
+// Get settings
+$iniFile = dirname(__FILE__) . '/quicktipsettings.ini.php';
+$SETTINGS = @parse_ini_file($iniFile, true);
+if (false === $SETTINGS) {
+	$file = __FILE__;
+	$msg = "{$file}: Unable to parse INI file: '{$iniFile}'";
+	error_log($msg);
+	die($msg);
+}
+
+// Ensure that we are behind HTTPS
+require_once('../lib/Injector.php');
+require_once('../lib/Environment.php');
+
+$injector = new Injector();
+$injector->setDependency('_SERVER', $_SERVER);
+
+$environment = new Environment($injector);
+if (! $environment->isHttp()) {
+	die('This script may only be executed via HTTP request');
+}
+if (! $environment->isSSL()) {
+	header("Location: {$SETTINGS['app']['baseUrl']}");
+	exit;
+}
 
 // required for escapeHtml()
 setlocale(LC_ALL, 'en_US.UTF-8');
@@ -382,4 +406,3 @@ $tipSubmissionHandler = new TipSubmissionHandler($options);
 // resulting Thank You landing page, depending on $options
 $tipSubmissionHandler->render();
 
-?>
