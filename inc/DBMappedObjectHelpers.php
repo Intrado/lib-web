@@ -80,11 +80,16 @@ function _DBFindPDO($isMany, $classname, $select, $alias = false, $args = false,
  * @return array
  */
 function cleanObjects($obj, $options = array()) {
+	// Init with default values...
+	//
+	$cleanDatesFields = null;
+	$injectId = false;
+
     if (is_array($options)) {
 		$injectId = array_key_exists('inject-id', $options) && $options['inject-id'];
 
         if (array_key_exists('iso-dates', $options)) {
-            $cleanDatesFields = $options['iso-dates'];
+	        $cleanDatesFields = $options['iso-dates'];
         }
     }
 
