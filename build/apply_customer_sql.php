@@ -238,7 +238,6 @@ function parse_options($argv) {
 			break;
 		case "h":
 		case "host":
-			echo "*** host = $value\n";
 			$flag_dbparams["dbhost"] = $value;
 			array_shift($remainingArgv);
 			array_shift($remainingArgv);
