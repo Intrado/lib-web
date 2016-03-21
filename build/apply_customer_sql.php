@@ -238,6 +238,7 @@ function parse_options($argv) {
 			break;
 		case "h":
 		case "host":
+			echo "*** host = $value\n";
 			$flag_dbparams["dbhost"] = $value;
 			array_shift($remainingArgv);
 			array_shift($remainingArgv);
@@ -308,8 +309,8 @@ function parse_options($argv) {
 }
 
 function databaseConnection(array $dbParams) {
+	$dsn = "mysql:";
 	try {
-		$dsn = "mysql:";
 		if (isset($dbParams["dbhost"])) {
 			$dsn .= "host={$dbParams['dbhost']}";
 		} else {
@@ -357,7 +358,7 @@ if ($options["runOnReplica"]) {
 // Get SQL to query customer(s)
 $params = array();
 if (empty($remainingArgv) || array_search("all", $remainingArgv) !== false) {
-	$query = "select c.id, s.$dbhostColumn, concat('c_', c.id) as dbname, s.dbusername, s.dbpassword
+	$query = "select c.id, s.$dbhostColumn as dbhost, concat('c_', c.id) as dbname, s.dbusername, s.dbpassword
 		from shard s inner join customer c on (c.shardid = s.id)
 		where true ";
 } else {
@@ -365,7 +366,7 @@ if (empty($remainingArgv) || array_search("all", $remainingArgv) !== false) {
 		function ($cid) {
 			return $cid >= 1;
 		});
-	$query = "select c.id, s.$dbhostColumn, concat('c_', c.id) as dbname, s.dbusername, s.dbpassword
+	$query = "select c.id, s.$dbhostColumn as dbhost, concat('c_', c.id) as dbname, s.dbusername, s.dbpassword
 		from shard s inner join customer c on (c.shardid = s.id)
 		where c.id in (" . implode(", ", array_fill(1, count($cidArray), "?")) . ") ";
 	$params = array_merge($params, $cidArray);
