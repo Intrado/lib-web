@@ -3,6 +3,7 @@
 require_once('ConsentReportData.obj.php');
 require_once("FieldMap.obj.php");
 
+
 class ConsentStatusReportGenerator extends ReportGenerator {
 
 	public $reportType = "html";
