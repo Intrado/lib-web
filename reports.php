@@ -114,6 +114,9 @@ if ($USER->authorize('viewsystemreports')) {
 	if (getSystemSetting('_hassms', false)) {
 		$otherLinks[] = "<a href='reportsmsstatus.php?clear=1' >" . _L("SMS Status") . "</a>";
 	}
+	
+	$otherLinks[] = "<a href='phoneconsentreport.php?clear=1' >" . _L("Phone Consent Status") . "</a>";
+	
 	$linkLists[] = $otherLinks;
 }
 
