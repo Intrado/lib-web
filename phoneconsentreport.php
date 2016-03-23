@@ -18,6 +18,7 @@ require_once("inc/formatters.inc.php");
 require_once("obj/ReportInstance.obj.php");
 require_once("obj/ReportGenerator.obj.php");
 require_once("obj/Phone.obj.php");
+require_once("obj/Job.obj.php");
 
 require_once("obj/ConsentStatusReportGenerator.php");
 
@@ -52,23 +53,13 @@ function fmt_modifiedby($row, $index) {
 		return $row[$index];
 }
 
-function fmt_smsstatus($row, $index) {
-	switch ($row[$index]) {
-		case "new":
-		case "pendingoptin":
-			return "Pending Opt-In";
-		case "block":
-			return "Blocked";
-		case "optin":
-			return "Opted In";
-	}
-}
-
 // -----------------------------------------------------------------------------
 // CUSTOM PAGE FUNCTIONALITY`
 // -----------------------------------------------------------------------------
 
 class ReportPhoneStatusPage extends PageForm {
+
+	private $gdrIsUp;
 
 	public $formName = "phonestatus";
 	protected $reportGenerator = null;
@@ -80,6 +71,8 @@ class ReportPhoneStatusPage extends PageForm {
 	}
 
 	function beforeLoad(&$get=array(), &$post=array(), &$request=array(), &$session=array()) {
+		global $grapiClient;
+		$this->gdrIsUp = $grapiClient->getStatus();
 
 		if (isset($get["clear"])) {
 			unset($session["phonestatus"]);
@@ -93,13 +86,11 @@ class ReportPhoneStatusPage extends PageForm {
 			$this->reportGenerator->reportinstance = $instance;
 
 			$this->options["reporttype"] = "html";
+			$this->options["broadcast"] = $session["broadcast"];
+
 			$this->reportGenerator->set_format("html");
 
 			switch ($session["phonestatus"]["mode"]) {
-			case "singlePhone":
-				$this->options["reporttype"] = "singlePhone";
-				$this->options["phone"] = $session["phonestatus"]["phone"];
-				break;
 			case "csv":
 				$this->reportGenerator->set_format("csv");
 				$this->options["reporttype"] = "csv";
@@ -112,6 +103,8 @@ class ReportPhoneStatusPage extends PageForm {
 				$this->options["pagestart"] = isset($get["pagestart"]) ? $get["pagestart"] : 0;
 				break;
 			}
+
+			$this->options["phone"] = $session["phonestatus"]["phone"];
 
 			$instance->setParameters($this->options);
 		}
@@ -132,11 +125,15 @@ class ReportPhoneStatusPage extends PageForm {
 			// Check for validation errors
 			if (($errors = $this->form->validate()) === false) {
 				$postdata = $this->form->getData();
+				
 				$_SESSION["phonestatus"] = array(
 					"mode" => $button,
 					"phone" => Phone::parse($postdata["phone"])
 				);
-				$this->form->sendTo("csreport.php");
+
+				$_SESSION["broadcast"] = $postdata["broadcast"];
+
+				$this->form->sendTo("phoneconsentreport.php");
 			}
 		}
 	}
@@ -155,36 +152,75 @@ class ReportPhoneStatusPage extends PageForm {
 
 	function render() {
 		$this->options["page"] = "reports:reports";
-		$this->options["title"] = _L("Phone Status");
+		$this->options["title"] = _L("Phone Consent Status");
 		$this->options["windowTitle"] = _L("Display Options");
 
-		$html	= parent::render()
-			. $this->reportOutput;
-		return($html);
+		if( ! $this->gdrIsUp ) {
+			$html = $this->reportOutput = 'Service is temporarily unavailable.';
+		}
+		else {
+			$html = parent::render() . $this->reportOutput;
+		}
+
+		return( $html );
+	}
+
+	function getBroadcasts() {
+		global $USER;
+
+		$jobs = DBFindMany("Job","from job where deleted = 0 and status in ('active','complete','cancelled','cancelling') and userid = $USER->id and questionnaireid is null order by id desc limit 500");
+
+		if ( isset( $jobs ) ) {
+			return $jobs;
+		}
+
+		return array();
 	}
 
 	function factoryTemplatePageForm() {
+		$broadcasts = $this->getBroadcasts();
+
+		// array has defauly -1 for job ID as it's impossible
+		$broadcastSelectOptions = array( "-1" => " -- No broadcast selected -- ");
+
+		foreach( $broadcasts as $broadcast ) {
+			$broadcastSelectOptions[ $broadcast->id ] = $broadcast->name;
+		}
+
+		$defaultPhone = "";
+		$defaultBroadcast = "-1";
+
+		if( isset( $this->options["phone"] ) ) $defaultPhone = $this->options["phone"];
+		if( isset( $this->options["broadcast"] ) )$defaultBroadcast = $this->options["broadcast"];
+
 		$formdata = array(
 			"phone" => array(
-				"label" => _L("Phone number"),
-				"value" => "",
+				"label" => _L("Search for Phone Number"),
+				"value" => $defaultPhone,
 				"validators" => array(
 					array("ValPhone")
 				),
 				"control" => array("TextField","size" => 15, "maxlength" => 20),
-				// "helpstep" => 1
+				"helpstep" => 1
 			),
+			"broadcast" => array(
+				"label" => "Filter by Broadcast",
+				"value" => $defaultBroadcast,
+				"validators" => array(),
+				"control" => array( "SelectMenu", "values" => $broadcastSelectOptions ),
+				"helpstep" => 2
+			)
 		);
 
 		$helpsteps = array (
-			// _L("Templatehelpstep 1"),
+			_L("Enter a phone number if you wish to view the consent status for only that number."),
+			_L("Selecting a broadcast will limit results to only that broadcast."),
 		);
 
 		$buttons = array(
-			submit_button(_L("Search for Single Phone"), "singlePhone", "application_form_magnify"),
+			submit_button(_L("View Data"), "view", "table_multiple"),
 			submit_button(_L("Summarize Count per Status"), "summary", "tick"),
-			submit_button(_L("Download All Data in CSV"), "csv", "arrow_down"),
-			submit_button(_L("View All Data"), "view", "table_multiple")
+			submit_button(_L("Download Data as CSV"), "csv", "arrow_down")
 		);
 
 		$form = new Form($this->formName, $formdata, $helpsteps, $buttons, "vertical");
@@ -200,7 +236,7 @@ class ReportPhoneStatusPage extends PageForm {
 // -----------------------------------------------------------------------------
 
 $page = new ReportPhoneStatusPage(array(
-	"formname" => "phonestatus"
+	"formname" => "phoneconsentstatus"
 ));
 
 executePage($page);
