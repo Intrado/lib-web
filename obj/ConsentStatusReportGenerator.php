@@ -1,6 +1,7 @@
 <?
 
 require_once('ConsentReportData.obj.php');
+require_once("FieldMap.obj.php");
 
 class ConsentStatusReportGenerator extends ReportGenerator {
 
@@ -11,34 +12,48 @@ class ConsentStatusReportGenerator extends ReportGenerator {
 
 	private $basicReportTitles = array(
 		"pkey" => "Unique ID",
-		"first_name" => "First Name",
-		"last_name" => "Last Name",
+		"f01" => "f01",
+		"f02" => "f02",
 		"phone" => "Phone",
 		"consent" => "Consent",
 		"timestamp" => "Last Updated"
 	);
+
+	private $summaryReportTitles = array(
+		"status" => "Status",
+		"count" => "Count"
+	);
+
 	function __construct() {
 		parent::__construct();
 
 		$this->consentReportData = new ConsentReportData();
+
+		$fields = FieldMap::getAuthorizedFieldMaps();
+		
+		$this->basicReportTitles["f01"] = $fields["f01"]->name;
+		$this->basicReportTitles["f02"] = $fields["f02"]->name;
 	}
 
 	function generateQuery( $hackPDF = false ) {
-		
+
 		$this->params = $this->reportinstance->getParameters();
 		$this->reportType = $this->params["reporttype"];
 
-		// make sure we don't query for an empty phone string but still allow the user to send such a request
-		if( $this->params['reporttype'] === 'singlePhone' ) {
-			if( trim($this->params['phone']) !== '' ) {
-				$this->query = $this->consentReportData->generateGetContactsQuery( $this->params['phone'] );
-			} 
-		} 
+		$jobId = null;
+		$phone = null;
 
-		// otherwise pull all results
-		else {
-			$this->query = $this->consentReportData->generateGetContactsQuery();
+		if( $this->params["broadcast"] !== "-1" ) {
+			$jobId = $this->params["broadcast"];
 		}
+
+		if( isset($this->params['phone'] ) ) {
+			if( trim($this->params['phone']) !== '' ) {
+				$phone = $this->params['phone'];
+			} 
+		}	
+		
+		$this->query = $this->consentReportData->generateGetContactsQuery( $phone, $jobId );
 	}
 
 	function runHtml() {
@@ -53,6 +68,7 @@ class ConsentStatusReportGenerator extends ReportGenerator {
 
 		if ($this->reportType == "view") {
 			$pageStart = isset($this->params["pagestart"]) ? (int) $this->params["pagestart"] : 0;
+			
 			$limit = "limit $pageStart, $pageSize";
 		} else {
 			$limit = "";
@@ -62,8 +78,17 @@ class ConsentStatusReportGenerator extends ReportGenerator {
 		$queryResults = QuickQueryMultiRow($this->query . $limit, true, $this->_readonlyDB, $this->queryArgs);
 
 		if ($this->reportType == "view") {
-			$totalQuery = $this->consentReportData->getContactsCountQuery();
-			$total = QuickQuery($totalQuery, $this->_readonlyDB);
+
+			// if a specific job is not set, show the total amount of contacts
+			if($this->params["broadcast"] === '-1') {
+
+				$totalQuery = $this->consentReportData->getContactsCountQuery();
+				$total = QuickQuery( $totalQuery, $this->_readonlyDB );
+			}
+			// otherwise the total is the count of the returned rows for that job
+			else {
+				$total = count( $queryResults );
+			}
 		}
 
 		$consentData = $this->consentReportData->fetchConsentFromContacts( $queryResults );
@@ -72,7 +97,11 @@ class ConsentStatusReportGenerator extends ReportGenerator {
 		switch ($this->reportType) {
 		case "summary":
 
-			$labeledRowsArray = array();
+			$labeledRowsArray = array(
+				"pending" => array(),
+				"yes" => array(),
+				"no" => array()
+			);
 
 			// divide results by status
 			foreach ($data as $row) {
@@ -84,10 +113,6 @@ class ConsentStatusReportGenerator extends ReportGenerator {
 			}
 
 			$data = array(
-				array(
-					"status" => "Unknown",
-					"count" => count( $labeledRowsArray["unknown"] )
-				),
 				array(
 					"status" => "Pending",
 					"count" => count( $labeledRowsArray["pending"] )
@@ -106,11 +131,10 @@ class ConsentStatusReportGenerator extends ReportGenerator {
 				"status" => "Status",
 				"count" => "Count"
 			);
-			$formatters = array("Status" => "fmt_smsstatus");
+			$formatters = array();
 			
 			break;
 
-		case "singlePhone":
 		case "view":
 			$formatters = array(
 			    "phone" => "fmt_phone",
@@ -120,9 +144,6 @@ class ConsentStatusReportGenerator extends ReportGenerator {
 		}
 
 		switch ($this->reportType) {
-		case "singlePhone":
-			startWindow(_L("Phone Search for '" . fmt_phone(array($this->params["phone"]), 0) . "'"), "padding: 3px;");
-			break;
 		case "summary":
 			startWindow(_L("Summary of Count per Status"), "padding: 3px;");
 			break;
@@ -135,9 +156,18 @@ class ConsentStatusReportGenerator extends ReportGenerator {
 			    showPageMenu($total, $pageStart, $pageSize);
 		    }
 		?>
-			<table width="100%" cellpadding="3" cellspacing="1" class="list" id="searchresults">
+
+		<table width="100%" cellpadding="3" cellspacing="1" class="list" id="searchresults">
+
 		<?
-			showTable($data, $this->basicReportTitles, $formatters);
+		if ($data) {
+			if($this->reportType === "summary") {
+				showTable($data, $this->summaryReportTitles, $formatters);
+			}
+			else {
+				showTable($data, $this->basicReportTitles, $formatters);
+			}
+		}
 		?>
 			</table>
 			<script type="text/javascript">
@@ -190,13 +220,21 @@ class ConsentStatusReportGenerator extends ReportGenerator {
 		$this->_readonlyDB->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);
 		
 		$queryResults = QuickQueryMultiRow( $this->query, $this->_readonlyDB, $this->queryArgs );
+
 		$consentData = $this->consentReportData->fetchConsentFromContacts( $queryResults );
+
 		$resultRows = $this->consentReportData->mergeContactsWithConsent( $queryResults, $consentData );
 
 		$numFetched = 0;
 		foreach( $resultRows as $row ) {
 
+			if( trim($row["timestamp"]) !== '' ) {
+				$row["timestamp"] = $row["timestamp"] / 1000;
+				$row["timestamp"] = date('F j, Y g:i a', $row["timestamp"]);
+			}
+
 			$row = array_map(function ($value) { return '"' . $value . '"'; }, $row);
+
 			$ok = fwrite($fp, implode(",", $row) . "\r\n");
 			
 			if ( ! $ok) return false;
@@ -212,9 +250,8 @@ class ConsentStatusReportGenerator extends ReportGenerator {
 	}
 
 	function setReportFile(){
-		$this->reportfile = "SmsStatus.jasper"; // TODO
+		$this->reportfile = "PhoneConsentStatus.jasper"; // TODO
 	}
-
 }
 
 ?>
