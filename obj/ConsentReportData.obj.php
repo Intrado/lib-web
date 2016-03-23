@@ -14,26 +14,41 @@ class ConsentReportData {
 	public function generateGetContactsQuery ( $phoneNumber = null, $jobId = null ) {
 
 		// find all the persons for this customer
-		$query = "SELECT pkey, 
-						 f01 AS first_name, 
-						 f02 AS last_name, 
-						 phone
+		$query = "SELECT DISTINCT 
+						 person.pkey, 
+						 person.id, 
+						 person.f01, 
+						 person.f02, 
+						 phone.phone
 				  FROM person
-				  INNER JOIN phone 
-				  ON phone.personid = person.id 
-				  WHERE person.deleted = 0 ";
+				  INNER JOIN phone ON phone.personid = person.id ";
+
+		if( $jobId ) {
+			$query .= "INNER JOIN reportcontact ON reportcontact.personid = person.id ";
+		}
+
+		$query .= "WHERE person.deleted = 0 ";
 
 		if( $phoneNumber ) {
 			$query .= "AND phone.phone = '" . $phoneNumber . "' ";
 		}
 
+		if( $jobId ) {
+			$query .= " AND reportcontact.jobid = '" . $jobId . " ' 
+						AND reportcontact.type = 'phone' 
+					  	AND phone.phone !='' ";
+		}
+
+		$query .= "ORDER by person.f02 ";
+
 		return $query;
 	}
+
 
 	public function getContactsCountQuery() {
 
 		// find all the persons for this customer
-		$query = "SELECT count( * )
+		$query = "SELECT count( * ) 
 				  FROM person 
 				  INNER JOIN phone 
 				  ON phone.personid = person.id 
@@ -68,10 +83,10 @@ class ConsentReportData {
 
 			$combinedData = array (
 				"pkey" =>		$contactData["pkey"],
-				"first_name" =>	$contactData["first_name"],
-				"last_name" =>	$contactData["last_name"],
+				"f01" =>		$contactData["f01"],
+				"f02" =>		$contactData["f02"],
 				"phone" => 		$contactData["phone"],
-				"consent" => 	'unknown',
+				"consent" => 	'pending',
 				"timestamp" =>  null,
 			);
 
