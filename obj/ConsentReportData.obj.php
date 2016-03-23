@@ -2,6 +2,7 @@
 
 require_once("inc/common.inc.php");
 
+
 class ConsentReportData {
 
 	// queries the customer db for all persons and their associated phone number.
