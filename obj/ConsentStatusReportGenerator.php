@@ -44,17 +44,20 @@ class ConsentStatusReportGenerator extends ReportGenerator {
 		$jobId = null;
 		$phone = null;
 
-		if( $this->params["broadcast"] !== "-1" ) {
-			$jobId = $this->params["broadcast"];
-		}
-
 		if( isset($this->params['phone'] ) ) {
 			if( trim($this->params['phone']) !== '' ) {
 				$phone = $this->params['phone'];
+				$this->queryArgs[] = $phone;
 			} 
 		}	
+
+		if( $this->params["broadcast"] !== "-1" ) {
+			$jobId = $this->params["broadcast"];
+			$this->queryArgs[] = $jobId;
+		}
 		
 		$this->query = $this->consentReportData->generateGetContactsQuery( $phone, $jobId );
+
 	}
 
 	function runHtml() {
@@ -76,7 +79,7 @@ class ConsentStatusReportGenerator extends ReportGenerator {
 		}
 
 		// query to fetch contacts for this customer.
-		$queryResults = QuickQueryMultiRow($this->query . $limit, true, $this->_readonlyDB, $this->queryArgs);
+		$queryResults = QuickQueryMultiRow($this->query . $limit, true, $this->_readonlyDB, $this->queryArgs);		
 
 		if ($this->reportType == "view") {
 
@@ -218,9 +221,9 @@ class ConsentStatusReportGenerator extends ReportGenerator {
 		session_write_close(); //WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 		
 		// we don't need to worry about blowing out PHP memory if we fetch rows unbuffered
-		$this->_readonlyDB->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);
-		
-		$queryResults = QuickQueryMultiRow( $this->query, $this->_readonlyDB, $this->queryArgs );
+		$this->_readonlyDB->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);		
+
+		$queryResults = QuickQueryMultiRow( $this->query, true, $this->_readonlyDB, $this->queryArgs );
 
 		$consentData = $this->consentReportData->fetchConsentFromContacts( $queryResults );
 

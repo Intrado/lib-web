@@ -2,7 +2,6 @@
 
 require_once("inc/common.inc.php");
 
-
 class ConsentReportData {
 
 	// queries the customer db for all persons and their associated phone number.
@@ -13,6 +12,8 @@ class ConsentReportData {
 	// @params $customerId::String [$jobId::String, $pagingLowerBoundary::Int, $pagingUpperBoundary::Int]
 	// @returns $contacts::Array (array of objects containg the person data and thei)
 	public function generateGetContactsQuery ( $phoneNumber = null, $jobId = null ) {
+
+		$preparedStatementArgs = array();
 
 		// find all the persons for this customer
 		$query = "SELECT DISTINCT 
@@ -31,13 +32,13 @@ class ConsentReportData {
 		$query .= "WHERE person.deleted = 0 ";
 
 		if( $phoneNumber ) {
-			$query .= "AND phone.phone = '" . $phoneNumber . "' ";
+			$query .= "AND phone.phone = ? ";
 		}
 
 		if( $jobId ) {
-			$query .= " AND reportcontact.jobid = '" . $jobId . " ' 
+			$query .= " AND reportcontact.jobid = ? 
 						AND reportcontact.type = 'phone' 
-					  	AND phone.phone !='' ";
+					  	AND phone.phone IS NOT NULL ";
 		}
 
 		$query .= "ORDER by person.f02 ";
@@ -99,7 +100,9 @@ class ConsentReportData {
 				}
 			}
 
-			$mergedData[] = $combinedData;
+			if( trim( $contactData["phone"] ) !== '' ) {
+				$mergedData[] = $combinedData;
+			}
 		}
 		
 		return $mergedData;
