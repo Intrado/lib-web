@@ -76,10 +76,11 @@ class ReportPhoneStatusPage extends PageForm {
 
 		if (isset($get["clear"])) {
 			unset($session["phonestatus"]);
+			unset($session["broadcast"]);
 			redirect();
 		}
 
-		if (isset($session["phonestatus"]) && isset($session["phonestatus"]["mode"])) {
+		if (isset($session["phonestatus"]["mode"])) {
 
 			$this->reportGenerator = new ConsentStatusReportGenerator();
 			$instance = new ReportInstance();
@@ -91,6 +92,7 @@ class ReportPhoneStatusPage extends PageForm {
 			$this->reportGenerator->set_format("html");
 
 			switch ($session["phonestatus"]["mode"]) {
+
 			case "csv":
 				$this->reportGenerator->set_format("csv");
 				$this->options["reporttype"] = "csv";
@@ -125,7 +127,7 @@ class ReportPhoneStatusPage extends PageForm {
 			// Check for validation errors
 			if (($errors = $this->form->validate()) === false) {
 				$postdata = $this->form->getData();
-				
+
 				$_SESSION["phonestatus"] = array(
 					"mode" => $button,
 					"phone" => Phone::parse($postdata["phone"])
@@ -223,7 +225,12 @@ class ReportPhoneStatusPage extends PageForm {
 			submit_button(_L("Download Data as CSV"), "csv", "arrow_down")
 		);
 
+
 		$form = new Form($this->formName, $formdata, $helpsteps, $buttons, "vertical");
+
+		// ajax workaround for form submission with changing values.
+		$_POST[$this->formName . "-formsnum"] = $form->serialnum;
+		
 		$form->ajaxsubmit = true; // Set to false if your form can't do AJAX submission
 
 		return($form);
@@ -235,9 +242,11 @@ class ReportPhoneStatusPage extends PageForm {
 // PAGE INSTANTIATION AND DISPLAY
 // -----------------------------------------------------------------------------
 
-$page = new ReportPhoneStatusPage(array(
-	"formname" => "phoneconsentstatus"
-));
+$page = new ReportPhoneStatusPage(
+	array(
+		"formname" => "phoneconsentstatus"
+	)
+);
 
 executePage($page);
 
