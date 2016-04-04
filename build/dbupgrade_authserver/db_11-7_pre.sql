@@ -36,8 +36,6 @@ INSERT INTO shortcodegroup (description, queuecapacity, numthreads, product, isd
 VALUES ('SchoolMessengerNG', 10000, 1, 'cs', 0)
 $$$
 
-ALTER TABLE shortcode drop shortcodegroupid
-$$$
 
 INSERT INTO `shortcode` (`shortcode`, `smsaggregatorid`, `shortcodegroupid`)
 SELECT '86088', a.`id`, g.`id` FROM `smsaggregator` AS a, `shortcodegroup` AS g
@@ -83,12 +81,8 @@ INSERT INTO `shortcodetext` (`shortcode`, `messagetype`, `text`) VALUES
 ('64779','PENDINGOPTIN','%s messages. Reply Y 2 confirm, HELP 4 info. Msg&data rates may apply. Msg freq varies. groupcast.com/txt')
 $$$
 
-
-
-
-insert into shortcodeshortcodegroup (shortcode, shortcodegroupid) select distinct shortcode, shortcodegroupid from shortcode
-$$$
-
 insert into shortcodeshortcodegroup (shortcode, shortcodegroupid) select distinct shortcode, shortcodegroupid from shortcode;
 $$$
 
+ALTER TABLE shortcode drop shortcodegroupid
+$$$
