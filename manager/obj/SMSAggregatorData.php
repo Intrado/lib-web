@@ -40,15 +40,19 @@ class SMSAggregatorData {
 	public function fetchRequiredData() {
 
 		$query = '
-		SELECT shortcodegroup.`id` AS shortcodeid,
-				shortcodegroup.`description` AS shortcodegroupdescription,
-				smsaggregator.`name` AS smsaggregatorname,
-				shortcode.shortcode AS shortcode 
-		FROM shortcode
-		INNER JOIN shortcodegroup ON shortcodegroup.id=shortcode.`shortcodegroupid`
-		INNER JOIN smsaggregator ON shortcode.`smsaggregatorid`=smsaggregator.id
-		WHERE shortcodegroup.product="cs"
-		ORDER BY shortcodeid';
+		SELECT 
+			shortcodegroup.`id` AS shortcodeid,
+			shortcodegroup.`description` AS shortcodegroupdescription,
+			smsaggregator.`name` AS smsaggregatorname,
+			shortcode.`shortcode` AS shortcode
+		FROM 
+			shortcodegroup
+		INNER JOIN shortcodeshortcodegroup ON shortcodeshortcodegroup.`shortcodegroupid` = shortcodegroup.`id`
+		INNER JOIN shortcode ON shortcode.`shortcode` = shortcodeshortcodegroup.`shortcode`
+		INNER JOIN smsaggregator ON smsaggregator.`id` = shortcode.`smsaggregatorid`
+		WHERE shortcodegroup.`product`="cs"
+		ORDER BY shortcodeid
+		';
 
 		// query shortcode group names and ids into associative array
 		$results = QuickQueryMultiRow($query, true);
