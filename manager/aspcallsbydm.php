@@ -3,11 +3,10 @@
 require_once("common.inc.php");
 include ("../jpgraph/jpgraph.php");
 include ("../jpgraph/jpgraph_bar.php");
-
-if(! $MANAGERUSER->authorized("aspcallgraphs"))
+if(! $MANAGERUSER->authorized("aspcallgraphs")) {
 	exit("Not Authorized");
-
-if (! isset($SETTINGS['aspcalls'])) {
+}
+if (is_null($aspdb = SetupASPDB())) {
 	exit('aspcalls is not configured');
 }
 
@@ -28,14 +27,11 @@ sum(result='fail') as noanswer,
 sum(result='trunkbusy') as trunkbusy,
 sum(result='unknown') as unknown,
 sum(result='hangup') as hangup
-
 from $table
-where startdate between '$startdate' and '$enddate'
+where startdate between ? and ?
 group by dmid
 ";
-
-$conn = SetupASPDB();
-$qdata = QueryAll($query, $conn);
+$qdata = QuickQueryMultiRow($query, false, $aspdb, array($startdate, $enddate));
 $data = array();
 $titles = array();
 $x = 0;

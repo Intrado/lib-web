@@ -1,7 +1,11 @@
 <?
 require_once("common.inc.php");  
-if (! $MANAGERUSER->authorized("aspcallgraphs")) exit("Not Authorized");
-if (! isset($SETTINGS['aspcalls'])) exit('aspcalls not configured');
+if (! $MANAGERUSER->authorized("aspcallgraphs")) {
+	exit("Not Authorized");
+}
+if (! isset($SETTINGS['aspcalls'])) {
+	exit('aspcalls is not configured');
+}
 ?>
 <html>
 <body onload="seturl();">

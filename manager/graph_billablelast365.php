@@ -4,8 +4,9 @@ require_once("common.inc.php");
 include("../jpgraph/jpgraph.php");
 include("../jpgraph/jpgraph_line.php");
 
-if(!$MANAGERUSER->authorized("aspreportgraphs"))
+if (!$MANAGERUSER->authorized("aspreportgraphs")) {
 	exit("Not Authorized");
+}
 
 $customerid = $_GET['customerid']+0;
 
@@ -16,22 +17,22 @@ $enddate = isset($_GET['enddate']) ? $_GET['enddate'] : date("Ymd");
 // data handling
 ////////////////////////////////////////////////////////////////////////////////
 
-global $SETTINGS;
-$conn = mysql_connect($SETTINGS['aspreports']['host'], $SETTINGS['aspreports']['user'], $SETTINGS['aspreports']['pass']);
-mysql_select_db($SETTINGS['aspreports']['db'], $conn);
+if (is_null($aspdb = SetupASPReportsDB())) {
+	die("aspreports not configured");
+}
 
-$query = "select attempted, date 
-		  from billable 
-		  where customerid=$customerid
-		  and billable.date between $startdate and $enddate";
+$query = "SELECT attempted, date 
+	  FROM billable 
+	  WHERE customerid = ?
+	  AND billable.date BETWEEN ? AND ?";
 
-$res = mysql_query($query, $conn)  or die(mysql_error());
+$res = Query($query, $aspdb, array($customerid, $startdate, $enddate));
 $datay = array();
 $datax = array();
 
-while($row = mysql_fetch_row($res)) {
-	$datay[] = $row[0];    
-    $datax[] = $row[1];
+while ($row = DBGetRow($res)) {
+	$datay[] = $row[0];
+	$datax[] = $row[1];
 }
 
 ////////////////////////////////////////////////////////////////////////////////

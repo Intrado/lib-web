@@ -1,18 +1,20 @@
 <?
 require_once("common.inc.php");
-if(!$MANAGERUSER->authorized("logcollector"))
+if (!$MANAGERUSER->authorized("logcollector")) {
 	exit("Not Authorized");
-$conn = SetupASPDB();
-if (is_null($conn)) exit('aspcalls not configured');
+}
+if (is_null($aspdb = SetupASPDB())) {
+	exit('aspcalls is not configured');
+}
 
 if (isset($_GET['run'])) {
-	
-	mysql_query("update logcollector set status='runnow'", $conn);
+	$query = "UPDATE logcollector SET status='runnow'";
+	QuickUpdate($query, $aspdb);
 	redirect();
 }
 
-
-$data = QueryAll("select status,lastrun from logcollector", $conn);
+$query = "SELECT status, lastrun FROM logcollector";
+$data = QuickQueryMultiRow($query, false, $aspdb);
 
 ?>
 <html>

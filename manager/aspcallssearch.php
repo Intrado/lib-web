@@ -1,7 +1,12 @@
 <?
 require_once("common.inc.php");
-if (! $MANAGERUSER->authorized("aspcallgraphs")) exit("Not Authorized");
-if (! isset($SETTINGS['aspcalls'])) exit('aspcalls not configured');
+
+if (! $MANAGERUSER->authorized("aspcallgraphs")) {
+	exit("Not Authorized");
+}
+if (is_null($aspdb = SetupASPDB())) {
+	exit('aspcalls is not configured');
+}
 ?>
 <form method="GET" >
 
@@ -31,18 +36,17 @@ if (strlen($phone) == 10) {
 	
 	$sd = date("Y-m-d", strtotime($_GET['date']));
 	$ed = date("Y-m-d", strtotime($_GET['date']) + 60*60*24); //next day
-        $table = $SETTINGS[aspcalls][callstable];
+	$table = $SETTINGS['aspcalls']['callstable'];
 	$query = "select startdate, ringtime, detecttime, messagetime, billtime, result, dmstart, dmend, userhungup, callerid, 
 			d.dm, d.carrier, d.state 
 			from $table
 			inner join dms d on 
 				(d.id=dmid) 
-			where startdate between '$sd' and '$ed' 
-			and phone = '$phone'
+			where startdate between ? and ?
+			and phone = ?
 			order by startdate
 	";
-	$conn = SetupASPDB();
-	$data = QueryAll($query, $conn);
+	$data = QuickQueryMultiRow($query, false, $aspdb, array($sd, $ed, $phone));
 	
 ?>
 	<style>

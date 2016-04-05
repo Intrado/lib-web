@@ -21,10 +21,6 @@ $customerid = $_GET['customerid'] + 0;
 $startdate = isset($_GET['startdate']) ? $_GET['startdate'] : date("Ymd", time() - 60*60*24*365); //default 30 days
 $enddate = isset($_GET['enddate']) ? $_GET['enddate'] : date("Ymd");
 
-global $SETTINGS;
-$conn = mysql_connect($SETTINGS['aspreports']['host'], $SETTINGS['aspreports']['user'], $SETTINGS['aspreports']['pass']);
-mysql_select_db($SETTINGS['aspreports']['db'], $conn);
-
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////

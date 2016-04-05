@@ -4,8 +4,9 @@ require_once("common.inc.php");
 include("../jpgraph/jpgraph.php");
 include("../jpgraph/jpgraph_line.php");
 
-if(!$MANAGERUSER->authorized("aspreportgraphs"))
+if (!$MANAGERUSER->authorized("aspreportgraphs")) {
 	exit("Not Authorized");
+}
 
 $customerid = $_GET['customerid']+0;
 
@@ -16,18 +17,18 @@ $enddate = date("Y-m-d");
 // data handling
 ////////////////////////////////////////////////////////////////////////////////
 
-global $SETTINGS;
-$conn = mysql_connect($SETTINGS['aspreports']['host'], $SETTINGS['aspreports']['user'], $SETTINGS['aspreports']['pass']);
-mysql_select_db($SETTINGS['aspreports']['db'], $conn);
+if (is_null($aspdb = SetupASPReportsDB())) {
+	die('aspreports not configured');
+}
 
 $query = "select system_contacts, date
 		  from contacts
-		  where customerid=$customerid and
-		  date between '$startdate' and '$enddate'
+		  where customerid = ?
+		  and date between ? and ?
 		  order by date
 		  ";
 
-$res = mysql_query($query, $conn) or die(mysql_error());
+$res = Query($query, $aspdb, array($customerid, $startdate, $enddate));
 $data = array();
 
 $cpcolors = array(
@@ -38,7 +39,7 @@ $cpcolors = array(
 	"D" => "black"
 );
 
-while($row = mysql_fetch_row($res)) {
+while ($row = DBGetRow($res)) {
 	$datay[] = $row[0];
 	$datax[] = $row[1];
 }

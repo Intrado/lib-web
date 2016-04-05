@@ -8,11 +8,12 @@ require_once("../inc/formatters.inc.php");
 require_once("dbmo//authserver/DmGroup.obj.php");
 include_once("../inc/memcache.inc.php");
 
-if (!$MANAGERUSER->authorized("systemdm"))
+if (!$MANAGERUSER->authorized("systemdm")) {
 	exit("Not Authorized");
+}
 
 
-function fmt_resources ($row,$index) {
+function fmt_resources($row, $index) {
 	if (!isset($row[$index])) {
 		$str = '<div style="float: left; width: 250px; height: 16px; "></div>';
 		return $str;
@@ -31,8 +32,6 @@ function fmt_resources ($row,$index) {
 		$restotal = $data->restotal;
 		$resactout = $data->restotal ? $data->resactout / $restotal * 100 : 0;
 		$resactin = $data->restotal ? $data->resactin / $restotal * 100 : 0;
-
-		$used = $data->resactout + $data->resactin;
 
 		if ($dm['freshness'] > MIN_FRESHNESS) {
 			$str .= '<div style="float: left; width: 220px; height: 16px; background: #FF0000; ">';
@@ -76,24 +75,26 @@ $restotal = 0;
 $resactout = 0;
 $resactin = 0;
 
-$memcache_hosts = $SETTINGS['memcache']['hosts'];
-$memaches = array();
-foreach ($memcache_hosts as $host) {
-	$memache = new Memcache();
-	$memache->addserver($host);
-	$memaches[] = $memache;
+$memcaches = array();
+if (isset($SETTINGS['memcache']) && isset($SETTINGS['memcache']['hosts'])) {
+	foreach ((array)$SETTINGS['memcache']['hosts'] as $host) {
+		$memcache = new Memcache();
+		$memcache->addserver($host);
+		$memcaches[] = $memcache;
+	}
 }
 
-while($row = DBGetRow($result)){
+while ($row = DBGetRow($result)) {
 
 	//fake some blank data when the api is unavailable
 	$poststatus = "[{\"restotal\":0, \"resactout\": 0, \"resactin\":0}]";
+	$cachedpoststatus = false;
 	// since we don't have memcached and java is putting things in cache using a different hash
 	// method the only way to find the key is to try both memcache servers.  While this is wonky
 	// it works so what the heck.  Finally, for voipin's java compresses the value in a way that
 	// again prevents memcache() from reading it, so for those we end up falling back to curl.
 	// Still overall its WAY faster than using http for all dms.
-	foreach($memaches as $memache) {
+	foreach ($memcaches as $memache) {
 		try {
 			$cachedpoststatus = $memache->get("dmpoststatus/" . $row[1]);
 		} catch (Exception $e) {
@@ -104,12 +105,18 @@ while($row = DBGetRow($result)){
 		}
 	}
 	if ($cachedpoststatus === false) {
-		$fh = fopen("http://localhost/manager/api/2/deliverymechanisms/" . $row[1], "r");
-		$apidata = stream_get_contents($fh);
-		fclose($fh);
-		if ($apidata) {
-			$dmdata = json_decode($apidata);
-			$poststatus = $dmdata->postStatus;
+		$managerApi = "https://{$_SERVER['SERVER_NAME']}:{$_SERVER['SERVER_PORT']}/manager/api/2";
+		$dmUuid = $row[1];
+		$url = "{$managerApi}/deliverymechanisms/{$dmUuid}";
+		if (($fh = fopen($url, "r")) !== false) {
+			$apidata = stream_get_contents($fh);
+			fclose($fh);
+			if ($apidata) {
+				$dmdata = json_decode($apidata);
+				if (isset($dmdata->postStatus)) {
+					$poststatus = $dmdata->postStatus;
+				}
+			}
 		}
 	} else {
 		$poststatus = $cachedpoststatus;
@@ -121,6 +128,8 @@ while($row = DBGetRow($result)){
 	$dm['freshness'] = $row[4];
 	$dm['resources'] = $row[5];
 
+	$col = 0;
+	$state = null;
 	if ($row[6]) {
 		$carrierdata = json_decode($row[6],true);
 		if (isset($carrierdata['type'])) {
@@ -137,9 +146,8 @@ while($row = DBGetRow($result)){
 		$state = "ca";
 	}
 
-
-	$col = 0;
-	switch ($state) {
+	if (isset($state)) {
+		switch ($state) {
 		case 'ca':
 			$col = 1;
 			break;
@@ -149,9 +157,10 @@ while($row = DBGetRow($result)){
 		case 'il':
 			$col = 3;
 			break;
+		}
+		$data[$carrier][0] = $carrier;
+		$data[$carrier][$col][] = $dm;
 	}
-	$data[$carrier][0] = $carrier;
-	$data[$carrier][$col][] = $dm;
 }
 
 // Add field titles, leading # means it is sortable leading @ means it is hidden by default

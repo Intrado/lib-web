@@ -4,8 +4,9 @@ require_once("common.inc.php");
 include("../jpgraph/jpgraph.php");
 include("../jpgraph/jpgraph_pie.php");
 
-if(!$MANAGERUSER->authorized("aspreportgraphs"))
+if (!$MANAGERUSER->authorized("aspreportgraphs")) {
 	exit("Not Authorized");
+}
 
 $customerid = $_GET['customerid']+0;
 
@@ -13,20 +14,20 @@ $customerid = $_GET['customerid']+0;
 // data handling
 ////////////////////////////////////////////////////////////////////////////////
 
-global $SETTINGS;
-$conn = mysql_connect($SETTINGS['aspreports']['host'], $SETTINGS['aspreports']['user'], $SETTINGS['aspreports']['pass']);
-mysql_select_db($SETTINGS['aspreports']['db'], $conn);
+if (is_null($aspdb = SetupASPReportsDB())) {
+	die("aspreports not configured");
+}
 
 $query = "select indexsize, datasize  
 	 from disk_usage 
-	 where customerid=$customerid
+	 where customerid = ?
 	 and date=curdate() - interval 1 day";
-		  
-$res = mysql_query($query, $conn)  or die(mysql_error());
+
+$datay = Query($query, $aspdb, array($customerid));
 $datay = array();
 
-while($row = mysql_fetch_row($res)) {
-	$datay[] = $row;    
+while ($row = DBGetRow($res)) {
+	$datay[] = $row;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

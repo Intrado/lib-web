@@ -3,6 +3,7 @@
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
 require_once("common.inc.php");
+require_once("../inc/db.inc.php");
 require_once("../inc/table.inc.php");
 require_once("../inc/html.inc.php");
 require_once("../inc/utils.inc.php");
@@ -174,17 +175,16 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$args[] = $cid;
 		}
 		
-                $customerFields = 'c.id';
-                if($addnsid) {
-                    $customerFields.=', c.nsid';
-                }
-                if($addnotes) {
-                    $customerFields.=', c.notes';
-                }
+		$customerFields = 'c.id';
+		if($addnsid) {
+			$customerFields.=', c.nsid';
+		}
+		if($addnotes) {
+			$customerFields.=', c.notes';
+		}
+		
+		$shardFields='s.dbhost, s.readonlyhost, s.dbusername, s.dbpassword, s.id as shardid';
                 
-                $shardFields='s.dbhost, s.readonlyhost, s.dbusername, s.dbpassword, s.id as shardid';
-                
-		//Following code mostly taken from query_customers, modified somewhat to fit this page
 		$query = "select $customerFields, $shardFields from shard s inner join customer c on (c.shardid = s.id) {$prodfiltercondition} where 1 $limit order by c.id";
                 
 		$res = Query($query, false, $args);
@@ -200,20 +200,21 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			
 		$wroteheaders = false;
 		foreach($data as $customer){
-		
-			// if "usemaster", run the query on the master db, not the slave
+
 			if ($managerquery->getOption("usemaster")) {
-				$custdb = mysql_connect($customer["dbhost"], $customer["dbusername"], $customer["dbpassword"]);
+				$host = $customer["dbhost"];
 			} else {
-				$custdb = mysql_connect($customer["readonlyhost"], $customer["dbusername"], $customer["dbpassword"]);
+				$host = $customer["readonlyhost"];
 			}
-                        $customerId=$customer["id"];
-			mysql_select_db("c_$customerId", $custdb);
-                        
-			//set charset for utf8
-			$setcharset = "SET character_set_results = 'utf8', character_set_client = 'utf8', character_set_connection = 'utf8', character_set_database = 'utf8', character_set_server = 'utf8'";
-			mysql_query($setcharset, $custdb);
-				
+			$customerId=$customer["id"];
+			$custdb = DBConnect($host, $customer["dbusername"], $customer["dbpassword"], "c_$customerId");
+
+			$setcharset = "SET names = 'utf8'";
+			QuickUpdate($setcharset, $custdb);
+
+			$displayname = QuickQuery("select value from setting where name = 'displayname'", $custdb)
+				or die ("Failed to execute SQL at ".__FILE__." line ".__LINE__);
+
 			$sqlquery = $managerquery->query;
                         
 			for ($x = 0; $x < $managerquery->numargs; $x++) {
@@ -221,56 +222,52 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			}
 		
 			$sqlquery = str_replace('_$CUSTOMERID_', $customer["id"], $sqlquery);
-			$res = mysql_query($sqlquery,$custdb)
-			or die ("Failed to execute sql: " . mysql_error($custdb));
+			$res = Query($sqlquery,$custdb)
+				or die ("Failed to execute SQL at ".__FILE__." line ".__LINE__);
 		
-			$displayinfo = mysql_query("select value from setting where name = 'displayname'",$custdb)
-			or die ("Failed to execute sql: " . mysql_error($custdb));
-			$displayname = mysql_fetch_row($displayinfo);
-                        
-                        $numberOfFields = is_resource($res) ? mysql_num_fields($res) : 0;
-                                               
+			$numberOfFields = $res->columnCount();
+
 			if ($savecsv) {
                             
 				//write field header
 				if (!$wroteheaders) {
 					$wroteheaders = true;
-                                        
+
 					echo '"customername","customerid"';
-                                        if($addnsid) {
-                                            echo ',"Netsuite ID"';
-                                        }
-                                        if($addnotes) {
-                                            echo ',"Notes"';
-                                        }
-                                        
+					if($addnsid) {
+						echo ',"Netsuite ID"';
+					}
+					if($addnotes) {
+						echo ',"Notes"';
+					}
+
 					for ($i = 0; $i < $numberOfFields; $i++) {
-						$field = mysql_fetch_field($res, $i);
+						$field = $res->getColumnMeta($i);
 						echo ',"' . $field->name . '"';
 					}
 					echo "\n";
 				}
-                                
-				while ($row = mysql_fetch_row($res)) {
+
+				while ($row = DBGetRow($res)) {
 					
-                                        $extraFields=array();
-                                        
-                                        if($addnsid) {
-                                            $extraFields[] = $customer['nsid'];
-                                        }
-                                        if($addnotes) {
-                                            $extraFields[] = $customer['notes'];
-                                        }
-                                    
-                                        // echo customer id, extra fields, and actual row of query results
-                                        echo escape_csvfield($displayname[0]) . ',' .
-                                             escape_csvfield($customer["id"]) . ',';
-                                                
-                                        if(!empty($extraFields)) {
-                                            echo array_to_csv($extraFields) . ', ';
-                                        }
-                                                
-                                        echo array_to_csv($row) . "\n";
+					$extraFields=array();
+
+					if($addnsid) {
+						$extraFields[] = $customer['nsid'];
+					}
+					if($addnotes) {
+						$extraFields[] = $customer['notes'];
+					}
+
+					// echo customer id, extra fields, and actual row of query results
+					echo escape_csvfield($displayname[0]) . ',' .
+						 escape_csvfield($customer["id"]) . ',';
+
+					if(!empty($extraFields)) {
+						echo array_to_csv($extraFields) . ', ';
+					}
+
+					echo array_to_csv($row) . "\n";
 				}
 			} else {
 				if (! $numberOfFields) {
@@ -278,16 +275,16 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					$obj->name = "affected rows";
 					$fields = array($obj);
 					$sizes = array(13);
-					$data = array(array(mysql_affected_rows()));
+					$data = array(array($res->rowCount()));
 				} else {
 					$fields = array();
 					for ($i = 0; $i < $numberOfFields; $i++) {
-						$fields[] = mysql_fetch_field($res, $i);
+						$fields[] = $res->getColumnMeta($i);
 					}
 		
 					$sizes = array();
 					$data = array();
-					while ($row = mysql_fetch_row($res)) {
+					while ($row = DBGetRow($res)) {
 						foreach ($row as $index => $col)
 							$sizes[$index] = @max($sizes[$index],strlen($col),strlen($fields[$index]->name));
 						$data[] = $row;
@@ -296,33 +293,33 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					
 				if (count($data) > 0) { //don't show headers and stuff if there is no data
                                     
-                                    // if Netsuite ID checkbox is checked
-                                    $nsidoutput = $addnsid ? "(Netsuite ID: ". $customer['nsid']. ")" : "";
+					// if Netsuite ID checkbox is checked
+					$nsidoutput = $addnsid ? "(Netsuite ID: ". $customer['nsid']. ")" : "";
 
-                                    $queryoutput .= '<tr class="listHeader"><th style="border-top: 1px solid black;" colspan=' . count($fields) . '>Customer: ' . escapehtml($displayname[0]) . ' (ID: ' . $customer["id"] . ') '.$nsidoutput.' </th></tr>';
+					$queryoutput .= '<tr class="listHeader"><th style="border-top: 1px solid black;" colspan=' . count($fields) . '>Customer: ' . escapehtml($displayname[0]) . ' (ID: ' . $customer["id"] . ') '.$nsidoutput.' </th></tr>';
 
-                                    // if Add Notes checkbox is checked.
-                                    if($addnotes){
-                                        $queryoutput .= '<tr><td style="border-top: 1px solid black;" colspan=' . count($fields) . '>Notes: ' . $customer["notes"] . '</td></tr>';
-                                    }
+					// if Add Notes checkbox is checked.
+					if($addnotes){
+						$queryoutput .= '<tr><td style="border-top: 1px solid black;" colspan=' . count($fields) . '>Notes: ' . $customer["notes"] . '</td></tr>';
+					}
 
-                                    $line = '<tr class="listHeader">';
-                                    foreach ($fields as $index => $field)
-                                            $line .= '<th align="left">' . escapehtml($field->name) . '</th>';
-                                    $queryoutput .= $line . "</tr>\n";
+					$line = '<tr class="listHeader">';
+					foreach ($fields as $index => $field)
+							$line .= '<th align="left">' . escapehtml($field->name) . '</th>';
+					$queryoutput .= $line . "</tr>\n";
 
-                                    $counter = 0;
-                                    foreach ($data as $row) {
-                                            $line = '<tr '. ($counter++ % 2 == 1 ? 'class="listAlt"' : '') .'>';
-                                            for ($i = 0; $i < count($row); $i++) {
-                                                    $line .= '<td>' . escapehtml($row[$i]) . '</td>';
-                                            }
+					$counter = 0;
+					foreach ($data as $row) {
+						$line = '<tr '. ($counter++ % 2 == 1 ? 'class="listAlt"' : '') .'>';
+						for ($i = 0; $i < count($row); $i++) {
+								$line .= '<td>' . escapehtml($row[$i]) . '</td>';
+						}
 
-                                            $queryoutput .=  $line . "</tr>\n";
-                                    }
+						$queryoutput .=  $line . "</tr>\n";
+					}
 				}
 			}
-		}//foreach customer
+		}
 			
 		if ($savecsv) {
 			exit();

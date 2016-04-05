@@ -55,25 +55,22 @@ if(!isset($isasplogin)){
 function SetUpASPDB(){
     global $SETTINGS, $ASPCALLSDBCONN;
 
-    if (! isset($SETTINGS['aspcalls'])) return null;
-    $ASPCALLSDBCONN = mysql_connect($SETTINGS['aspcalls']['host'],$SETTINGS['aspcalls']['user'],$SETTINGS['aspcalls']['pass']);
-    mysql_select_db($SETTINGS['aspcalls']['db']);
-    return $ASPCALLSDBCONN;
+	$ASPCALLSDBCONN = null;
+	if (isset($SETTINGS['aspcalls']) && is_array($SETTINGS['aspcalls'])) {
+		$db = $SETTINGS['aspcalls'];
+		$ASPCALLSDBCONN = DBConnect($db['host'], $db['user'], $db['pass'], $db['db']);
+	}
+	return $ASPCALLSDBCONN;
 }
 
-function QueryAll($query, $conn) {
+function SetupASPReportsDB() {
+	global $SETTINGS, $ASPREPORTSDBCONN;
 
-	$res = mysql_query($query, $conn);
-	if (!$res) {
-		echo mysql_error();
-		return false;
+	$ASPREPORTSDBCONN = null;
+	if (isset($SETTINGS['aspreports']) && is_array($SETTINGS['aspreports'])) {
+		$db = $SETTINGS['aspreports'];
+		$ASPREPORTSDBCONN = DBConnect($db['host'], $db['user'], $db['pass'], $db['db']);
 	}
-	$data = array();
-	while ($row = mysql_fetch_row($res)) {
-		$data[] = $row;
-	}
-	return $data;
+	return $ASPREPORTSDBCONN;
 }
-
-
 ?>

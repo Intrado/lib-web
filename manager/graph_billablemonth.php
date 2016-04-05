@@ -4,35 +4,36 @@ require_once("common.inc.php");
 include("../jpgraph/jpgraph.php");
 include("../jpgraph/jpgraph_bar.php");
 
-if(!$MANAGERUSER->authorized("aspreportgraphs"))
+if (!$MANAGERUSER->authorized("aspreportgraphs")) {
 	exit("Not Authorized");
+}
 
-$customerid = $_GET['customerid']+0;
+$customerid = $_GET['customerid'] + 0;
 
-$startdate = isset($_GET['startdate']) ? $_GET['startdate'] : date("Ymd", time() - 60*60*24*365); //default 7 days
+$startdate = isset($_GET['startdate']) ? $_GET['startdate'] : date("Ymd", time() - 60 * 60 * 24 * 365); //default 7 days
 $enddate = isset($_GET['enddate']) ? $_GET['enddate'] : date("Ymd");
 
 ////////////////////////////////////////////////////////////////////////////////
 // data handling
 ////////////////////////////////////////////////////////////////////////////////
 
-global $SETTINGS;
-$conn = mysql_connect($SETTINGS['aspreports']['host'], $SETTINGS['aspreports']['user'], $SETTINGS['aspreports']['pass']);
-mysql_select_db($SETTINGS['aspreports']['db'], $conn);
+if (is_null($aspdb = SetupASPReportsDB())) {
+	die("aspreports not configured");
+}
 
 $query = "select sum(attempted), year(date) as year_of_date, month(date) as month_of_date 
 		  from billable
-		  where `customerid` = $customerid and `date` >= $startdate 
+		  where customerid = ? and date >= ?
 		  group by year_of_date, month_of_date";
 
 
-$res = mysql_query($query, $conn)  or die(mysql_error());
+$res = Query($query, $aspdb, array($customerid, $startdate));
 $datay = array();
 $datax = array();
 
-while($row = mysql_fetch_row($res)) {
+while ($row = DBGetRow($res)) {
 	$data["A"][] = $row[0];
-	$data["YD"][] = $row[2] . "/". $row[1];
+	$data["YD"][] = $row[2] . "/" . $row[1];
 }
 
 ////////////////////////////////////////////////////////////////////////////////

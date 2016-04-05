@@ -3,17 +3,20 @@
 require_once("common.inc.php");
 include ("../jpgraph/jpgraph.php");
 include ("../jpgraph/jpgraph_bar.php");
-if(!$MANAGEUSER->authorized("aspcallgraphs"))
+if(!$MANAGEUSER->authorized("aspcallgraphs")) {
 	exit("Not Authorized");
+}
+if (is_null($aspdb = SetupASPDB())) {
+	exit('aspcalls is not configured');
+}
 
+$table = $SETTINGS['aspcalls']['callstable'];
 $query = "
 select count(*), month(startdate) as month, year(startdate) as year
-from \"{$SETTINGS[aspcalls][callstable]}\" where result in ('answered','machine')
+from $table where result in ('answered','machine')
 group by year, month
 ";
-
-$conn = SetupASPDB();
-$qdata = QueryAll($query, $conn);
+$qdata = QuickQueryMultiRow($query, false, $aspdb);
 $data = array();
 $titles = array();
 $x = 0;
