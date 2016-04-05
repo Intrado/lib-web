@@ -255,7 +255,7 @@ class ValTranslationCharacterLimit extends Validator {
 	function validate ($value, $args, $requiredvalues) {
 		$textlength = strlen($requiredvalues[$args['field']]);
 		if ($textlength > 5000)
-			return "$this->label is unavalable if the message is more than 5000 characters. The message is currently $textlength characters.";
+			return "$this->label is unavailable if the message is more than 5000 characters. The message is currently $textlength characters.";
 		return true;
 	}
 	function getJSValidator () {
@@ -266,6 +266,47 @@ class ValTranslationCharacterLimit extends Validator {
 			return this.label +" is unavalable if the message is more than 5000 characters. The message is currently " + textlength + " characters.";
 			return true;
 		}';
+	}
+}
+
+/**
+ * NOTE: that the serverside vs clientside validator implementations
+ * are notably different, and thus the resulting string lengths 
+ * that are compared against the 5000 max differ.  They're pretty close (90+% equal) in general
+ * but not identical, so it's possible that the serverside validator fails (> 5K, ex. 5115)
+ * but the clientside validator passes, ex. 4796.  If this happens, the user would get
+ * an error when submitting the message (broadcast), but not see any error in the UI. 
+ */
+class ValEmailTranslationCharacterLimit extends Validator {
+	function validate ($value, $args, $requiredvalues) {
+		$DOMDocumentObj = new DOMDocument();
+
+		// note: stringToTranslate contains the text strings (as well as spaces, tabs and newline chars) 
+		// wrapped in <n>tags like so, ex <ns><n>\t\t\ttext here\r\n</n><n>text here\t\t\t\r\n</n></ns>
+		$stringToTranslate = parse_html_to_node_string($requiredvalues[$args['field']], 'n', $DOMDocumentObj);
+		$textlength = strlen($stringToTranslate);
+
+		if ($textlength > 5000)
+			return "$this->label is unavailable if the message is more than 5000 characters. The message is currently $textlength characters.";
+		return true;
+	}
+	function getJSValidator () {
+		return 
+			'function (name, label, value, args, requiredvalues) {
+				var stringToParse = requiredvalues[args["field"]];
+				
+				// create a temp DOM structure based on the stringToParse markup
+				var tmp = document.createElement("n");
+					tmp.innerHTML = stringToParse;
+				
+				// now extract the text content (including whitespace chars too, ex. tabs, new lines)
+				var parsedString = tmp.textContent || tmp.innerText || "";
+
+				if (parsedString.length > 5000)
+					return this.label + " is unavailable if the message is more than 5000 characters. The message is currently " + parsedString.length + " characters.";
+				
+				return true;
+			}';
 	}
 }
 
@@ -506,7 +547,7 @@ foreach ($ttslanguages as $code => $language) {
 // An optional validator to be added to translation if 'requireTranslation' profile setting is set
 
 $emailTranslationValidators = array();
-$emailTranslationValidators[] = array("ValTranslationCharacterLimit", "field" => "emailmessagetext");
+$emailTranslationValidators[] = array("ValEmailTranslationCharacterLimit", "field" => "emailmessagetext");
 if($USER->authorize('requireTranslation')) {
 	$emailTranslationValidators[] = array("ValTranslationRequired", "field" => "emailmessagetext");
 }
@@ -1059,7 +1100,7 @@ include("nav.inc.php");
 			});
 
 			<?/* load required validators into document.validators */?>
-			<? Validator::load_validators(array("ValCallerID", "ValConditionalOnValue", "ValConditionallyRequired", "ValDate", "ValDomain", "ValDomainList", "ValDuplicateNameCheck", "ValEasycall", "ValEmail", "ValEmailAttach", "ValEmailList", "ValFacebookPage", "ValFieldConfirmation", "ValHasMessage", "ValInArray", "ValLength", "ValLists", "ValMessageBody", "ValMessageGroup", "ValMessageTypeSelect", "ValNumber", "ValNumeric", "ValPhone", "ValRequired", "ValSmsText", "ValTextAreaAndSubjectWithCheckbox", "ValTimeCheck", "ValTimePassed", "ValTimeWindowCallEarly", "ValTimeWindowCallLate", "ValTranslation", "ValTranslationCharacterLimit", "ValTtsText", "valPhone", "ValTranslationRequired")); ?>
+			<? Validator::load_validators(array("ValCallerID", "ValConditionalOnValue", "ValConditionallyRequired", "ValDate", "ValDomain", "ValDomainList", "ValDuplicateNameCheck", "ValEasycall", "ValEmail", "ValEmailAttach", "ValEmailList", "ValFacebookPage", "ValFieldConfirmation", "ValHasMessage", "ValInArray", "ValLength", "ValLists", "ValMessageBody", "ValMessageGroup", "ValMessageTypeSelect", "ValNumber", "ValNumeric", "ValPhone", "ValRequired", "ValSmsText", "ValTextAreaAndSubjectWithCheckbox", "ValTimeCheck", "ValTimePassed", "ValTimeWindowCallEarly", "ValTimeWindowCallLate", "ValTranslation", "ValTranslationCharacterLimit", "ValTtsText", "valPhone", "ValTranslationRequired", "ValEmailTranslationCharacterLimit")); ?>
 		});
 		
 		<?/* monitor the main content div for resize and send a message with this information */?>
