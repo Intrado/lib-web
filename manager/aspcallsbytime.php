@@ -4,8 +4,12 @@ require_once("common.inc.php");
 include ("../jpgraph/jpgraph.php");
 include ("../jpgraph/jpgraph_line.php");
 include ("../jpgraph/jpgraph_log.php"); 
-if (! $MANAGERUSER->authorized("aspcallgraphs")) exit("Not authorized");
-if (! isset($SETTINGS['aspcalls'])) exit('aspcalls not configured');
+if (! $MANAGERUSER->authorized("aspcallgraphs")) {
+	exit("Not authorized");
+}
+if (is_null($aspdb = SetupASPDB())) {
+	exit('aspcalls is not configured');
+}
 
 session_write_close();
 
@@ -17,17 +21,19 @@ $enddate = isset($_GET['enddate']) ? $_GET['enddate'] : date("Y-m-d");
 $dm = isset($_GET['dm']) ? $_GET['dm'] : ""; 
 
 $dmid = false;
-$conn = SetupASPDB();
+$dmfiltersql = "";
+$dmfilterparams = array();
+
 if ($dm) {
-	$res = mysql_query("select id from dms where dm='". mysql_real_escape_string($dm) . "'", $conn);
-	while ($row = mysql_fetch_row($res)) {
-		$dmid = $row[0];
-	}
+	$query = "SELECT id FROM dms WHERE dm=?";
+	$dmid = QuickQuery($query, $aspdb, array($dm));
 }
 
-
 $days = (strtotime($enddate) - strtotime($startdate))/(60*60*24);
-$dmfiltersql = $dmid ? "and dmid='".mysql_real_escape_string($dmid)."'" : "";
+if ($dmid) {
+	$dmfiltersql = "and dmid=?";
+	$dmfilterparams[] = $dmid;
+}
 
 $table = $SETTINGS['aspcalls']['callstable']; 
 $query = "
@@ -49,7 +55,7 @@ $dmfiltersql
 group by minofday
 ";
 
-$qdata = QueryAll($query, $conn);
+$qdata = QuickQueryMultiRow($query, $aspdb, $dmfilterparams);
 $data = array();
 $titles = array();
 foreach ($qdata as $row) {
