@@ -94,9 +94,9 @@ while ($row = DBGetRow($result)) {
 	// it works so what the heck.  Finally, for voipin's java compresses the value in a way that
 	// again prevents memcache() from reading it, so for those we end up falling back to curl.
 	// Still overall its WAY faster than using http for all dms.
-	foreach ($memcaches as $memache) {
+	foreach ($memcaches as $memcache) {
 		try {
-			$cachedpoststatus = $memache->get("dmpoststatus/" . $row[1]);
+			$cachedpoststatus = $memcache->get("dmpoststatus/" . $row[1]);
 		} catch (Exception $e) {
 			// nothing
 		}
