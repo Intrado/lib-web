@@ -49,10 +49,10 @@ $$$
 
 
 INSERT INTO `shortcodetext` (`shortcode`, `messagetype`, `text`) VALUES
-('86088','HELP','SchoolMessenger notification service: Reply STOP to cancel. Msg&data rates may apply. Msg freq varies. Visit schoolmessenger.com/mt for info'),
+('86088','HELP','SchoolMessenger notifications: Reply STOP to cancel. Text Y to subscribe. Msg&data rates may apply. Msg freq varies. Visit schoolmessenger.com/mt for info'),
 ('86088','INFO','Unknown response. Reply Y to subscribe. Text STOP to quit. Msg freq varies. For more information reply HELP.'),
 ('86088','OPTIN','You''re registered 4 SchoolMessenger notifications. Reply STOP to cancel, HELP for help. Msg&data rates may apply. Msg freq varies. schoolmessenger.com/mt'),
-('86088','OPTOUT','You''re unsubscribed from SchoolMessenger. No more msgs will be sent. Reply Y to re-subscribe, HELP for help. Msg&data rates may apply. schoolmessenger.com/mt'),
+('86088','OPTOUT','You''re unsubscribed from SchoolMessenger. No more msgs will be sent. HELP for help. Msg&data rates may apply. schoolmessenger.com/mt'),
 ('86088','PENDINGOPTIN','%s messages. Reply Y to confirm, HELP 4 info. Msg&data rates may apply. Msg freq varies. schoolmessenger.com/mt')
 $$$
 
@@ -74,7 +74,7 @@ $$$
 
 
 INSERT INTO `shortcodetext` (`shortcode`, `messagetype`, `text`) VALUES
-('64779','HRLP', 'GroupCast notification service: Reply Y to confirm or STOP to cancel. Msg&data rates may apply. Msg freq varies. Visit groupcast.com/txt for info'),
+('64779','HELP', 'GroupCast notification service: Reply Y to subscribe or STOP to cancel. Msg&data rates may apply. Msg freq varies. Visit groupcast.com/txt for info'),
 ('64779','INFO','Unknown response. Reply Y to subscribe. Text STOP to quit. Msg freq varies. For more information reply HELP.'),
 ('64779','OPTIN','You''re registered 4 GroupCast  notifications. Reply STOP to cancel, HELP for help. Msg&data rates may apply. Msg freq varies. groupcast.com/txt'),
 ('64779','OPTOUT','You''re unsubscribed from GroupCast. No more msgs will be sent. Reply Y to re-subscribe, HELP for help. Msg&data rates may apply. groupcast.com/txt'),
