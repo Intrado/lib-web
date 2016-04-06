@@ -5,11 +5,11 @@
           name="SchoolMessenger"
           version="1.0"
           description="SSO for SchoolMessenger application">
-    
+
      <openid host="$portalAuthUrl" port="$portalAuthPort">
           <links>
                <!-- Lines 12-17 are for adding the SchoolMessenger link.  The admin.header and admin.left_nav settings determine where the link is displayed. -->
-               <link title="SchoolMessenger - Notification solutions" display-text="SchoolMessenger" path="/portalauth/powerschool?customerurl=$customerUrl">
+               <link title="SchoolMessenger - Notification solutions" display-text="SchoolMessenger" path="/portalauth/powerschool?customerurl=$customerUrl&destination=$pluginDestination">
                     <ui_contexts>
                          <!-- <ui_context id="admin.header" /> -->
                          <ui_context id="admin.left_nav" />
@@ -17,7 +17,7 @@
                     </ui_contexts>
                </link>
                <!-- Remove the entire SchoolMessenger - Contact Manager section below if the customer does not want the Contact Manager link to appear (line 19-23). -->
-               <link title="SchoolMessenger - Contact Manager" display-text="Contact Manager" path="/portalauth/powerschool?customerurl=$customerUrl">
+               <link title="SchoolMessenger - Contact Manager" display-text="Contact Manager" path="/portalauth/powerschool?customerurl=$customerUrl&destination=$pluginDestination">
                     <ui_contexts>
                          <ui_context id="guardian.header" />
                     </ui_contexts>
@@ -33,6 +33,6 @@
 
      <publisher name="Reliance Communications Inc.">
           <contact email="support@schoolmessenger.com" />
-     </publisher> 
- 
+     </publisher>
+
 </plugin>

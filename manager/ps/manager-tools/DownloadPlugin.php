@@ -84,6 +84,16 @@ class DownloadPlugin {
 					"validators" => array(),
 					"control" => array("SelectMenu", "values" => $this->versionsToFormArray($this->getVersions('sso-admin'))),
 					"helpstep" => 1
+				),
+				"pluginDestination" => array(
+					"label" => _L("Plugin Destination"),
+					"value" => "infoCenter",
+					"validators" => array(),
+					"control" => array("SelectMenu", "values" => array(
+						"contactManager" => "contactManager",
+						"infoCenter" => "infoCenter"
+					)),
+					"helpstep" => 2
 				)
 			);
 
@@ -210,7 +220,7 @@ class DownloadPlugin {
 		header("Content-type: application/octet-stream");
 		header("Content-Disposition: attachment; filename=\"plugin-{$customerName}.zip\"");
 		header("Content-Transfer-Encoding: binary");
-		
+
 		flush();
 	}
 
