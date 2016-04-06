@@ -50,13 +50,23 @@ foreach ($forms as $form) {
 		$errors = $form->validate();
 
 		if (!$errors) {
-			
+
+			$data = $form->getData();
+			$destinationType = $data["pluginDestination"];
+
+			// setup link text based on plugin destination
+			$linkText = "Contact Manager";
+			if ($destinationType == 'infoCenter') {
+				$linkText = 'Info Center';
+			}
+
 			// necessary parameters to create 'sso-admin' plugin
 			$pluginCompileParams = array(
 				"customerUrlPrefix" => $SETTINGS["feature"]["customer_url_prefix"],
 				"customerUrl" => $customerName,
 				"portalAuthUrl" => $SETTINGS["feature"]["portalauth_url"],
-				"portalAuthPort" => $SETTINGS["feature"]["portalauth_port"]
+				"portalAuthPort" => $SETTINGS["feature"]["portalauth_port"],
+				"linkText" => $linkText
 			);
 
 			// create a full lists of necessary parameters
@@ -73,16 +83,16 @@ foreach ($forms as $form) {
 
 			// create the ZIP archive
 			$zipFile = $downloadPlugin->zipPlugin($fileDatas);
-			
+
 			// set headers for a ZIP file
-			$downloadPlugin->setZipMimeHeaders($customerName);
+			$downloadPlugin->setZipMimeHeaders($customerName, $destinationType);
 
 			// read out the file
 			readfile($zipFile);
-			
+
 			// delete it
 			unlink($zipFile);
-			
+
 			// do not render form
 			die;
 		}

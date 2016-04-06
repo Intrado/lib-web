@@ -113,6 +113,16 @@ class DownloadPlugin {
 					"control" => array("SelectMenu", "values" => $this->versionsToFormArray($this->getVersions('contactmanager-guardian'))),
 					"helpstep" => 1
 				),
+				"pluginDestination" => array(
+					"label" => _L("Plugin Destination"),
+					"value" => "infoCenter",
+					"validators" => array(),
+					"control" => array("SelectMenu", "values" => array(
+						"contactManager" => "contactManager",
+						"infoCenter" => "infoCenter"
+					)),
+					"helpstep" => 2
+				),
 				"fqdn" => array(
 					"label" => _L('FQDN'),
 					"value" => "",
@@ -120,7 +130,7 @@ class DownloadPlugin {
 						array("ValRequired")
 					),
 					"control" => array("TextField"),
-					"helpstep" => 2
+					"helpstep" => 3
 				),
 				"pluginLinkID" => array(
 					"label" => _L('Plugin Link ID'),
@@ -129,7 +139,7 @@ class DownloadPlugin {
 						array("ValRequired")
 					),
 					"control" => array("TextField"),
-					"helpstep" => 2
+					"helpstep" => 4
 				)
 			);
 
@@ -209,7 +219,7 @@ class DownloadPlugin {
 		return $zipFile;
 	}
 
-	public function setZipMimeHeaders($customerName) {
+	public function setZipMimeHeaders($customerName, $destinationType) {
 
 		// http headers for zip downloads
 		header("Pragma: public");
@@ -218,7 +228,7 @@ class DownloadPlugin {
 		header("Cache-Control: public");
 		header("Content-Description: File Transfer");
 		header("Content-type: application/octet-stream");
-		header("Content-Disposition: attachment; filename=\"plugin-{$customerName}.zip\"");
+		header("Content-Disposition: attachment; filename=\"plugin-{$customerName}-{$destinationType}.zip\"");
 		header("Content-Transfer-Encoding: binary");
 
 		flush();

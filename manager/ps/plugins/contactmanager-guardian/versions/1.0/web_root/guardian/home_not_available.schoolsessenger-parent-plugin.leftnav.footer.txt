@@ -1,5 +1,5 @@
 <ul>
 	<li id="btn-schoolmessengerContactLink" style="background-image: url('SchoolMessenger/images/IconSchoolMessenger2.png')">
-		<a href="https://$fqdn/guardian/openid/oidredirectaction.action?pluginName=SchoolMessenger&linkId=$pluginLinkID&studentContext=true" target="_blank">Contact Manager</a>
+		<a href="https://$fqdn/guardian/openid/oidredirectaction.action?pluginName=SchoolMessenger&linkId=$pluginLinkID&studentContext=true" target="_blank">$linkText</a>
 	</li>
 </ul>

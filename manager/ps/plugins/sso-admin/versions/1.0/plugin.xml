@@ -17,7 +17,7 @@
                     </ui_contexts>
                </link>
                <!-- Remove the entire SchoolMessenger - Contact Manager section below if the customer does not want the Contact Manager link to appear (line 19-23). -->
-               <link title="SchoolMessenger - Contact Manager" display-text="Contact Manager" path="/portalauth/powerschool?customerurl=$customerUrl&destination=$pluginDestination">
+               <link title="SchoolMessenger - $linkText" display-text="Contact Manager" path="/portalauth/powerschool?customerurl=$customerUrl&destination=$pluginDestination">
                     <ui_contexts>
                          <ui_context id="guardian.header" />
                     </ui_contexts>
