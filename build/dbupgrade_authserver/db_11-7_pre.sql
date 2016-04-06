@@ -29,7 +29,7 @@ CREATE TABLE shortcodeshortcodegroup (
   shortcodegroupid int(11) not null,
   PRIMARY KEY (id)
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8
-  $$$
+$$$
 
 
 INSERT INTO shortcodegroup (description, queuecapacity, numthreads, product, isdefault)
@@ -39,13 +39,14 @@ $$$
 
 INSERT INTO `shortcode` (`shortcode`, `smsaggregatorid`, `shortcodegroupid`)
 SELECT '86088', a.`id`, g.`id` FROM `smsaggregator` AS a, `shortcodegroup` AS g
-WHERE a.`name` = 'syniverse' AND g.`description` = 'SchoolMessengerNG'
+WHERE lower(a.`name`) = 'syniverse' AND lower(g.`description`) = 'schoolmessengerng'
 $$$
 
 
 INSERT INTO shortcodeareacode (shortcode, areacode)
 VALUES ('86088', '')
 $$$
+
 
 
 INSERT INTO `shortcodetext` (`shortcode`, `messagetype`, `text`) VALUES
@@ -64,7 +65,7 @@ $$$
 
 INSERT INTO `shortcode` (`shortcode`, `smsaggregatorid`, `shortcodegroupid`)
 SELECT '64779', a.`id`, g.`id` FROM `smsaggregator` AS a, `shortcodegroup` AS g
-WHERE a.`name` = 'twilio' AND g.`description` = 'GroupCast'
+WHERE lower(a.`name`) = 'twilio' AND lower(g.`description`) = 'groupcast'
 $$$
 
 
@@ -82,6 +83,11 @@ INSERT INTO `shortcodetext` (`shortcode`, `messagetype`, `text`) VALUES
 $$$
 
 insert into shortcodeshortcodegroup (shortcode, shortcodegroupid) select distinct shortcode, shortcodegroupid from shortcode;
+$$$
+
+
+insert into shortcodeshortcodegroup (shortcode, shortcodegroupid) select '724665', id from shortcodegroup
+where (lower(description) like '%twilio%') or (lower(description) = 'schoolmessengerng')
 $$$
 
 ALTER TABLE shortcode drop shortcodegroupid
