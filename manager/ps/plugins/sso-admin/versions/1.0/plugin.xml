@@ -16,14 +16,6 @@
                          <!-- <ui_context id="teacher.header" /> -->
                     </ui_contexts>
                </link>
-			   <!-- Remove the entire SchoolMessenger - Contact Manager section below if the customer does not want the Contact Manager link to appear (line 19-23). -->
-			   $includeStart
-               <link title="SchoolMessenger - $linkText" display-text="$linkText" path="/portalauth/powerschool?customerurl=$customerUrl&amp;destination=$pluginDestination">
-                    <ui_contexts>
-                         <ui_context id="guardian.header" />
-                    </ui_contexts>
-			   </link>
-			   $includeEnd
           </links>
      </openid>
      <!-- You must change the <customer_url> reference on line 28 to match the customer's SchoolMessenger URL. -->

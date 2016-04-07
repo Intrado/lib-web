@@ -60,23 +60,13 @@ foreach ($forms as $form) {
 				$linkText = 'InfoCenter';
 			}
 
-			// this will comment out the link to contact manager if the none option is selected
-			$includeStart = '';
-			$includeEnd = '';
-			if ($destinationType == '') {
-				$includeStart = '<!--';
-				$includeEnd = '-->';
-			}
-
 			// necessary parameters to create 'sso-admin' plugin
 			$pluginCompileParams = array(
 				"customerUrlPrefix" => $SETTINGS["feature"]["customer_url_prefix"],
 				"customerUrl" => $customerName,
 				"portalAuthUrl" => $SETTINGS["feature"]["portalauth_url"],
 				"portalAuthPort" => $SETTINGS["feature"]["portalauth_port"],
-				"linkText" => $linkText,
-				"includeStart" => $includeStart,
-				"includeEnd" => $includeEnd
+				"linkText" => $linkText
 			);
 
 			// create a full lists of necessary parameters
