@@ -166,9 +166,6 @@ function setupNetsuiteApi() {
 	$apiClient = new ApiClient(
 		$SETTINGS['netsuite']['url'],
 		array(
-			"Content-Type: application/json",
-			//"Accept: '*" . '/' . "*'",
-			"Accept: *" . '/' . "*",
 			"Authorization: NLAuth nlauth_account={$SETTINGS['netsuite']['account']}, nlauth_email={$SETTINGS['netsuite']['user']}, nlauth_signature={$SETTINGS['netsuite']['pass']}, nlauth_role={$SETTINGS['netsuite']['role']}"
 		)
 	);
