@@ -251,9 +251,7 @@ if (isset($personid)) {
 // Consent Handler
 ///////////////////////////////////////////////////
 
-$grapiStatus = $grapiClient->getStatus();
-
-$grapiAvailable = $grapiStatus == 'UP';
+$grapiAvailable = $grapiClient->getStatus();
 
 $allStoredPhones = $phones;
 $allStoredPhonesLength = sizeof($allStoredPhones);
