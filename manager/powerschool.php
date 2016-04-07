@@ -55,9 +55,11 @@ foreach ($forms as $form) {
 			$destinationType = $data["pluginDestination"];
 
 			// setup link text based on plugin destination
-			$linkText = "Contact Manager";
+			$linkText = "Contact Manager"; //displayed in the link
+			$pluginText = "ContactManager"; //displayed in the plugin name
 			if ($destinationType == 'infocenter') {
 				$linkText = 'InfoCenter';
+				$pluginText = "InfoCenter";
 			}
 
 			// necessary parameters to create 'sso-admin' plugin
@@ -66,12 +68,12 @@ foreach ($forms as $form) {
 				"customerUrl" => $customerName,
 				"portalAuthUrl" => $SETTINGS["feature"]["portalauth_url"],
 				"portalAuthPort" => $SETTINGS["feature"]["portalauth_port"],
-				"linkText" => $linkText
+				"linkText" => $linkText,
+				"pluginText" => $pluginText
 			);
 
 			// create a full lists of necessary parameters
 			$finalParams = array_merge($pluginCompileParams, $form->getData());
-
 
 			// set version and plugin name and any other predefined private values
 			$downloadPlugin->setParameters($finalParams);

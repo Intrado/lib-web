@@ -80,9 +80,11 @@ class DownloadPlugin {
 				),
 				"pluginVersion" => array(
 					"label" => _L('Plugin Version'),
-					"value" => '1.0',
+					"value" => '2.0',
 					"validators" => array(),
-					"control" => array("SelectMenu", "values" => $this->versionsToFormArray($this->getVersions('sso-admin'))),
+					"control" => array("SelectMenu", "values" => array(
+						"2.0" => "2.0",
+					)),
 					"helpstep" => 1
 				),
 				"pluginDestination" => array(
@@ -109,9 +111,11 @@ class DownloadPlugin {
 				),
 				"pluginVersion" => array(
 					"label" => _L('Plugin Version'),
-					"value" => '1.0',
+					"value" => '2.0',
 					"validators" => array(),
-					"control" => array("SelectMenu", "values" => $this->versionsToFormArray($this->getVersions('contactmanager-guardian'))),
+					"control" => array("SelectMenu", "values" => array(
+						"2.0" => "2.0",
+					)),
 					"helpstep" => 1
 				),
 				"pluginDestination" => array(
@@ -159,6 +163,7 @@ class DownloadPlugin {
 		if ($this->pluginName === 'contactmanager-guardian') {
 			$files[] = dirname(__FILE__) . "/../plugins/{$this->pluginName}/versions/{$this->pluginVersion}/web_root/guardian/home.schoolmessenger-parent-plugin.leftnav.footer.txt";
 			$files[] = dirname(__FILE__) . "/../plugins/{$this->pluginName}/versions/{$this->pluginVersion}/web_root/guardian/home_not_available.schoolsessenger-parent-plugin.leftnav.footer.txt";
+			$files[] = dirname(__FILE__) . "/../plugins/{$this->pluginName}/versions/{$this->pluginVersion}/plugin.xml";
 		}
 
 		return $files;
@@ -225,6 +230,8 @@ class DownloadPlugin {
 
 		if ($pluginName == 'sso-admin') {
 			array_push($nameArray, "admin");
+		} else if ($pluginName == 'contactmanager-guardian') {
+			array_push($nameArray, "guardian");
 		}
 
 		if ($destinationType != '') {
