@@ -9,19 +9,21 @@
      <openid host="$portalAuthUrl" port="$portalAuthPort">
           <links>
                <!-- Lines 12-17 are for adding the SchoolMessenger link.  The admin.header and admin.left_nav settings determine where the link is displayed. -->
-               <link title="SchoolMessenger - Notification solutions" display-text="SchoolMessenger" path="/portalauth/powerschool?customerurl=$customerUrl&destination=$pluginDestination">
+               <link title="SchoolMessenger - Notification solutions" display-text="SchoolMessenger" path="/portalauth/powerschool?customerurl=$customerUrl&amp;destination=$pluginDestination">
                     <ui_contexts>
                          <!-- <ui_context id="admin.header" /> -->
                          <ui_context id="admin.left_nav" />
                          <!-- <ui_context id="teacher.header" /> -->
                     </ui_contexts>
                </link>
-               <!-- Remove the entire SchoolMessenger - Contact Manager section below if the customer does not want the Contact Manager link to appear (line 19-23). -->
-               <link title="SchoolMessenger - $linkText" display-text="Contact Manager" path="/portalauth/powerschool?customerurl=$customerUrl&destination=$pluginDestination">
+			   <!-- Remove the entire SchoolMessenger - Contact Manager section below if the customer does not want the Contact Manager link to appear (line 19-23). -->
+			   $includeStart
+               <link title="SchoolMessenger - $linkText" display-text="$linkText" path="/portalauth/powerschool?customerurl=$customerUrl&amp;destination=$pluginDestination">
                     <ui_contexts>
                          <ui_context id="guardian.header" />
                     </ui_contexts>
-               </link>
+			   </link>
+			   $includeEnd
           </links>
      </openid>
      <!-- You must change the <customer_url> reference on line 28 to match the customer's SchoolMessenger URL. -->

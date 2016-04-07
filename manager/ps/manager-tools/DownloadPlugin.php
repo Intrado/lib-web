@@ -86,12 +86,13 @@ class DownloadPlugin {
 					"helpstep" => 1
 				),
 				"pluginDestination" => array(
-					"label" => _L("Plugin Destination"),
-					"value" => "infoCenter",
+					"label" => _L("Parent Portal"),
+					"value" => "infocenter",
 					"validators" => array(),
 					"control" => array("SelectMenu", "values" => array(
-						"contactManager" => "contactManager",
-						"infoCenter" => "infoCenter"
+						"" => "None",
+						"contactmanager" => "Contact Manager",
+						"infocenter" => "InfoCenter"
 					)),
 					"helpstep" => 2
 				)
@@ -114,12 +115,12 @@ class DownloadPlugin {
 					"helpstep" => 1
 				),
 				"pluginDestination" => array(
-					"label" => _L("Plugin Destination"),
-					"value" => "infoCenter",
+					"label" => _L("Parent Portal"),
+					"value" => "infocenter",
 					"validators" => array(),
 					"control" => array("SelectMenu", "values" => array(
-						"contactManager" => "contactManager",
-						"infoCenter" => "infoCenter"
+						"contactmanager" => "Contact Manager",
+						"infocenter" => "InfoCenter"
 					)),
 					"helpstep" => 2
 				),
@@ -219,7 +220,7 @@ class DownloadPlugin {
 		return $zipFile;
 	}
 
-	public function setZipMimeHeaders($customerName, $destinationType) {
+	public function setZipMimeHeaders($fileName) {
 
 		// http headers for zip downloads
 		header("Pragma: public");
@@ -228,7 +229,7 @@ class DownloadPlugin {
 		header("Cache-Control: public");
 		header("Content-Description: File Transfer");
 		header("Content-type: application/octet-stream");
-		header("Content-Disposition: attachment; filename=\"plugin-{$customerName}-{$destinationType}.zip\"");
+		header("Content-Disposition: attachment; filename=\"{$fileName}.zip\"");
 		header("Content-Transfer-Encoding: binary");
 
 		flush();

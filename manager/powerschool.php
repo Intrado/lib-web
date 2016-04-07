@@ -56,8 +56,16 @@ foreach ($forms as $form) {
 
 			// setup link text based on plugin destination
 			$linkText = "Contact Manager";
-			if ($destinationType == 'infoCenter') {
-				$linkText = 'Info Center';
+			if ($destinationType == 'infocenter') {
+				$linkText = 'InfoCenter';
+			}
+
+			// this will comment out the link to contact manager if the none option is selected
+			$includeStart = '';
+			$includeEnd = '';
+			if ($destinationType == '') {
+				$includeStart = '<!--';
+				$includeEnd = '-->';
 			}
 
 			// necessary parameters to create 'sso-admin' plugin
@@ -66,11 +74,14 @@ foreach ($forms as $form) {
 				"customerUrl" => $customerName,
 				"portalAuthUrl" => $SETTINGS["feature"]["portalauth_url"],
 				"portalAuthPort" => $SETTINGS["feature"]["portalauth_port"],
-				"linkText" => $linkText
+				"linkText" => $linkText,
+				"includeStart" => $includeStart,
+				"includeEnd" => $includeEnd
 			);
 
 			// create a full lists of necessary parameters
 			$finalParams = array_merge($pluginCompileParams, $form->getData());
+
 
 			// set version and plugin name and any other predefined private values
 			$downloadPlugin->setParameters($finalParams);
@@ -84,8 +95,22 @@ foreach ($forms as $form) {
 			// create the ZIP archive
 			$zipFile = $downloadPlugin->zipPlugin($fileDatas);
 
+			// setup the filename depending on plugin type
+			$pluginName = $finalParams['pluginName'];
+			$nameArray = array("plugin", $customerName);
+
+			if ($pluginName == 'sso-admin') {
+				array_push($nameArray, "admin");
+			}
+
+			if ($destinationType != '') {
+				array_push($nameArray, $destinationType);
+			}
+
+			$fileName = implode("-", $nameArray);
+
 			// set headers for a ZIP file
-			$downloadPlugin->setZipMimeHeaders($customerName, $destinationType);
+			$downloadPlugin->setZipMimeHeaders($fileName);
 
 			// read out the file
 			readfile($zipFile);
