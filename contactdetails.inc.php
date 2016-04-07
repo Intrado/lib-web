@@ -48,12 +48,12 @@ if (isset($_GET['id'])) {
 		// bad
 		redirect('unauthorized.php');
 	}
-	
+
 	//check to see if trying to viewcontact on a person this user created, and redirect to addressbook edit
 	$person = new Person($personid);
 	if ($person->userid == $USER->id)
 		redirect("addressedit.php?id=$personid&origin=preview$iFrameAppend");
-	
+
 	$_SESSION['currentpid'] = $personid;
 	if (!isset($_GET['ajax'])) 
 		redirect($_SERVER["SCRIPT_NAME"] . $iFramePrepend);
@@ -251,7 +251,7 @@ if (isset($personid)) {
 // Consent Handler
 ///////////////////////////////////////////////////
 
-$grapiStatus = $grapiClient->getStatus();
+$grapiAvailable = $grapiClient->getStatus();
 
 $allStoredPhones = $phones;
 $allStoredPhonesLength = sizeof($allStoredPhones);
@@ -682,7 +682,7 @@ foreach ($fieldmaps as $map) {
 					'no' => _L('No')
 				);
 				if (('phone' === $type) && (('edit' === $method) || strlen(trim($item->phone)))) {
-					$value = isset($grapiPhones[$item->phone]) ? strtolower($grapiPhones[$item->phone]->consent->call) : 'pending';
+					$value = isset($grapiPhones[$item->phone]) ? strtolower($grapiPhones[$item->phone]->consent->call) : 'Pending';
 
 					if (!in_array($item->phone, $uniquePhones) || ('view' === $method)) {
 
@@ -699,7 +699,16 @@ foreach ($fieldmaps as $map) {
 							NewFormItem($f, $s, 'consent_' . $ident, 'selectend');
 						}
 						else {
-							$value = isset($grapiPhones[$item->phone]) ? $options[$grapiPhones[$item->phone]->consent->call] : 'Unknown';
+							if ($grapiAvailable) {
+								if (isset($grapiPhones[$item->phone])) {
+									$value = $options[$grapiPhones[$item->phone]->consent->call];
+								} else {
+									$value = 'Pending';
+								}
+							} else {
+								$value = 'Unknown';
+							}
+
 							echo $value;
 						}
 					}
