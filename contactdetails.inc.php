@@ -253,11 +253,7 @@ if (isset($personid)) {
 
 $grapiStatus = $grapiClient->getStatus();
 
-if($grapiStatus == 'UP') {
-	$grapiAvailable = true;
-} else {
-	$grapiAvailable = false;
-}
+$grapiAvailable = $grapiStatus == 'UP';
 
 $allStoredPhones = $phones;
 $allStoredPhonesLength = sizeof($allStoredPhones);
@@ -705,7 +701,16 @@ foreach ($fieldmaps as $map) {
 							NewFormItem($f, $s, 'consent_' . $ident, 'selectend');
 						}
 						else {
-							$value = !$grapiAvailable ? 'Unknown' : $value = isset($grapiPhones[$item->phone]) ? $options[$grapiPhones[$item->phone]->consent->call] : 'Pending';
+							if ($grapiAvailable) {
+								if (isset($grapiPhones[$item->phone])) {
+									$value = $options[$grapiPhones[$item->phone]->consent->call];
+								} else {
+									$value = 'Pending';
+								}
+							} else {
+								$value = 'Unknown';
+							}
+
 							echo $value;
 						}
 					}
