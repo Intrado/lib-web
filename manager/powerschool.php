@@ -97,18 +97,7 @@ foreach ($forms as $form) {
 
 			// setup the filename depending on plugin type
 			$pluginName = $finalParams['pluginName'];
-			$nameArray = array("plugin", $customerName);
-
-			if ($pluginName == 'sso-admin') {
-				array_push($nameArray, "admin");
-			}
-
-			if ($destinationType != '') {
-				array_push($nameArray, $destinationType);
-			}
-
-			$fileName = implode("-", $nameArray);
-
+			$fileName = $downloadPlugin->getFilename($customerName, $destinationType, $pluginName);
 			// set headers for a ZIP file
 			$downloadPlugin->setZipMimeHeaders($fileName);
 

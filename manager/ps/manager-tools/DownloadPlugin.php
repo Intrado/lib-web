@@ -220,6 +220,21 @@ class DownloadPlugin {
 		return $zipFile;
 	}
 
+	public function getFilename($customerName, $destinationType, $pluginName) {
+		$nameArray = array("plugin", $customerName);
+
+		if ($pluginName == 'sso-admin') {
+			array_push($nameArray, "admin");
+		}
+
+		if ($destinationType != '') {
+			array_push($nameArray, $destinationType);
+		}
+
+		$fileName = implode("-", $nameArray);
+		return $fileName;
+	}
+
 	public function setZipMimeHeaders($fileName) {
 
 		// http headers for zip downloads
