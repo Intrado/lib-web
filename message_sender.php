@@ -269,20 +269,9 @@ class ValTranslationCharacterLimit extends Validator {
 	}
 }
 
-/**
- * NOTE: that the serverside vs clientside validator implementations
- * are notably different, and thus the resulting string lengths 
- * that are compared against the 5000 max differ.  They're pretty close (90+% equal) in general
- * but not identical, so it's possible that the serverside validator fails (> 5K, ex. 5115)
- * but the clientside validator passes, ex. 4796.  If this happens, the user would get
- * an error when submitting the message (broadcast), but not see any error in the UI. 
- */
 class ValEmailTranslationCharacterLimit extends Validator {
 	function validate ($value, $args, $requiredvalues) {
 		$DOMDocumentObj = new DOMDocument();
-
-		// note: stringToTranslate contains the text strings (as well as spaces, tabs and newline chars) 
-		// wrapped in <n>tags like so, ex <ns><n>\t\t\ttext here\r\n</n><n>text here\t\t\t\r\n</n></ns>
 		$stringToTranslate = parse_html_to_node_string($requiredvalues[$args['field']], 'n', $DOMDocumentObj);
 		$textlength = strlen($stringToTranslate);
 
@@ -293,19 +282,57 @@ class ValEmailTranslationCharacterLimit extends Validator {
 	function getJSValidator () {
 		return 
 			'function (name, label, value, args, requiredvalues) {
-				var stringToParse = requiredvalues[args["field"]];
-				
-				// create a temp DOM structure based on the stringToParse markup
-				var tmp = document.createElement("n");
-					tmp.innerHTML = stringToParse;
-				
-				// now extract the text content (including whitespace chars too, ex. tabs, new lines)
-				var parsedString = tmp.textContent || tmp.innerText || "";
+				var _this = this,
+					isValid = false;
 
-				if (parsedString.length > 5000)
-					return this.label + " is unavailable if the message is more than 5000 characters. The message is currently " + parsedString.length + " characters.";
-				
-				return true;
+				// clean the translated string similar to messagesender translation.php requests (in Translation model)
+				var stringToTranslate = makeTranslatableString(preTranslateClean(requiredvalues[args["field"]]));
+
+				$.ajax({
+					type: "POST",
+					url: "valemailtranslationcharlimit.php",
+					data: {stringToTranslate: stringToTranslate},
+					async: false,
+					success: function(response) {
+						if (response.stringToTranslateLength <= 5000) {
+							isValid = true;
+						} else {
+							isValid = _this.label + " is unavailable if the message is more than 5000 characters. The message is currently " + response.stringToTranslateLength + " characters.";	
+						}
+					},
+					error: function(response) {
+						isValid = "There was an error processing the request. Please try again";
+					}
+				});
+
+				return isValid;
+
+
+				// ported from BBMS utils.coffee; 
+				// used to process text before sending it to be translated
+				function makeTranslatableString(str) {
+					return str.replace(/(<<.*?>>)/g, \'<input value="$1"/>\').replace(/({{.*?}})/g, \'<input value="$1"/>\').replace(/(\[\[.*?\]\])/g, \'<input value="$1"/>\');
+				}
+
+				// ported from BBMS utils.coffee
+				function preTranslateClean(text) {
+					var clean_text;
+					clean_text = text.replace(/\n/g, \' \');
+					clean_text = clean_text.replace(/\r/g, \' \');
+					clean_text = clean_text.replace(/<!--([^-]+)-->/g, \'\');
+					clean_text = clean_text.replace(/&lt;!--([^-]+)--&gt;/g, \'\');
+					clean_text = clean_text.replace(/\s+/g, \' \');
+					clean_text = clean_text.replace(/>\s/g, \'>\');
+					clean_text = clean_text.replace(/&gt;\s/g, \'&gt;\');
+					clean_text = clean_text.replace(/\s</g, \'<\');
+					clean_text = clean_text.replace(/\s&lt;/g, \'&lt;\');
+					clean_text = clean_text.replace(/\s&nbsp;/g, \'&nbsp;\');
+					clean_text = clean_text.replace(/&nbsp;\s/g, \'&nbsp;\');
+					clean_text = clean_text.replace(/(&nbsp;)+/g, \'&nbsp;\');
+					clean_text = clean_text.replace(/^\s/g, \'\');
+					clean_text = clean_text.replace(/\s$/g, \'\');
+					return clean_text;
+				}
 			}';
 	}
 }
