@@ -337,15 +337,15 @@ if ($customerid && $settings['_logocontentid'] != '') {
 }
 // Content for logo selector
 $logos += array(
-	"AutoMessenger" => '<img src="mimg/auto_messenger.jpg" alt="AutoMessenger" title="AutoMessenger" />',
-	"SchoolMessenger" => '<img src="mimg/logo_small.gif" alt="SchoolMessenger" title="SchoolMessenger" />',
+	"AutoMessenger" => '<img src="mimg/groupcast.jpg" alt="Groupcast" title="Groupcast" />',
+	"SchoolMessenger" => '<img src="mimg/school_messenger-new.jpg" alt="SchoolMessenger" title="SchoolMessenger" />',
 	"Skylert" => '<img src="mimg/sky_alert.jpg" alt="Skylert" title="Skylert" />'
 );
 
 // Locations and mimetype for default logos
 $defaultlogos = array(
-	"AutoMessenger" => array("filelocation" => "mimg/auto_messenger.jpg", "filetype" => "image/jpeg"),
-	"SchoolMessenger" => array("filelocation" => "mimg/logo_small.gif", "filetype" => "image/gif"),
+	"AutoMessenger" => array("filelocation" => "mimg/groupcast.jpg", "filetype" => "image/jpeg"),
+	"SchoolMessenger" => array("filelocation" => "mimg/school_messenger-new.jpg", "filetype" => "image/gif"),
 	"Skylert" => array("filelocation" => "mimg/sky_alert.jpg", "filetype" => "image/jpeg")
 );
 

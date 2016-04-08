@@ -255,7 +255,7 @@ class ValTranslationCharacterLimit extends Validator {
 	function validate ($value, $args, $requiredvalues) {
 		$textlength = strlen($requiredvalues[$args['field']]);
 		if ($textlength > 5000)
-			return "$this->label is unavailable if the message is more than 5000 characters. The message is currently $textlength characters.";
+			return "$this->label is unavalable if the message is more than 5000 characters. The message is currently $textlength characters.";
 		return true;
 	}
 	function getJSValidator () {
@@ -266,74 +266,6 @@ class ValTranslationCharacterLimit extends Validator {
 			return this.label +" is unavalable if the message is more than 5000 characters. The message is currently " + textlength + " characters.";
 			return true;
 		}';
-	}
-}
-
-class ValEmailTranslationCharacterLimit extends Validator {
-	function validate ($value, $args, $requiredvalues) {
-		$DOMDocumentObj = new DOMDocument();
-		$stringToTranslate = parse_html_to_node_string($requiredvalues[$args['field']], 'n', $DOMDocumentObj);
-		$textlength = strlen($stringToTranslate);
-
-		if ($textlength > 5000)
-			return "$this->label is unavailable if the message is more than 5000 characters. The message is currently $textlength characters.";
-		return true;
-	}
-	function getJSValidator () {
-		return 
-			'function (name, label, value, args, requiredvalues) {
-				var _this = this,
-					isValid = false;
-
-				// clean the translated string similar to messagesender translation.php requests (in Translation model)
-				var stringToTranslate = makeTranslatableString(preTranslateClean(requiredvalues[args["field"]]));
-
-				$.ajax({
-					type: "POST",
-					url: "valemailtranslationcharlimit.php",
-					data: {stringToTranslate: stringToTranslate},
-					async: false,
-					success: function(response) {
-						if (response.stringToTranslateLength <= 5000) {
-							isValid = true;
-						} else {
-							isValid = _this.label + " is unavailable if the message is more than 5000 characters. The message is currently " + response.stringToTranslateLength + " characters.";	
-						}
-					},
-					error: function(response) {
-						isValid = "There was an error processing the request. Please try again";
-					}
-				});
-
-				return isValid;
-
-
-				// ported from BBMS utils.coffee; 
-				// used to process text before sending it to be translated
-				function makeTranslatableString(str) {
-					return str.replace(/(<<.*?>>)/g, \'<input value="$1"/>\').replace(/({{.*?}})/g, \'<input value="$1"/>\').replace(/(\[\[.*?\]\])/g, \'<input value="$1"/>\');
-				}
-
-				// ported from BBMS utils.coffee
-				function preTranslateClean(text) {
-					var clean_text;
-					clean_text = text.replace(/\n/g, \' \');
-					clean_text = clean_text.replace(/\r/g, \' \');
-					clean_text = clean_text.replace(/<!--([^-]+)-->/g, \'\');
-					clean_text = clean_text.replace(/&lt;!--([^-]+)--&gt;/g, \'\');
-					clean_text = clean_text.replace(/\s+/g, \' \');
-					clean_text = clean_text.replace(/>\s/g, \'>\');
-					clean_text = clean_text.replace(/&gt;\s/g, \'&gt;\');
-					clean_text = clean_text.replace(/\s</g, \'<\');
-					clean_text = clean_text.replace(/\s&lt;/g, \'&lt;\');
-					clean_text = clean_text.replace(/\s&nbsp;/g, \'&nbsp;\');
-					clean_text = clean_text.replace(/&nbsp;\s/g, \'&nbsp;\');
-					clean_text = clean_text.replace(/(&nbsp;)+/g, \'&nbsp;\');
-					clean_text = clean_text.replace(/^\s/g, \'\');
-					clean_text = clean_text.replace(/\s$/g, \'\');
-					return clean_text;
-				}
-			}';
 	}
 }
 
@@ -574,7 +506,7 @@ foreach ($ttslanguages as $code => $language) {
 // An optional validator to be added to translation if 'requireTranslation' profile setting is set
 
 $emailTranslationValidators = array();
-$emailTranslationValidators[] = array("ValEmailTranslationCharacterLimit", "field" => "emailmessagetext");
+$emailTranslationValidators[] = array("ValTranslationCharacterLimit", "field" => "emailmessagetext");
 if($USER->authorize('requireTranslation')) {
 	$emailTranslationValidators[] = array("ValTranslationRequired", "field" => "emailmessagetext");
 }
@@ -1127,7 +1059,7 @@ include("nav.inc.php");
 			});
 
 			<?/* load required validators into document.validators */?>
-			<? Validator::load_validators(array("ValCallerID", "ValConditionalOnValue", "ValConditionallyRequired", "ValDate", "ValDomain", "ValDomainList", "ValDuplicateNameCheck", "ValEasycall", "ValEmail", "ValEmailAttach", "ValEmailList", "ValFacebookPage", "ValFieldConfirmation", "ValHasMessage", "ValInArray", "ValLength", "ValLists", "ValMessageBody", "ValMessageGroup", "ValMessageTypeSelect", "ValNumber", "ValNumeric", "ValPhone", "ValRequired", "ValSmsText", "ValTextAreaAndSubjectWithCheckbox", "ValTimeCheck", "ValTimePassed", "ValTimeWindowCallEarly", "ValTimeWindowCallLate", "ValTranslation", "ValTranslationCharacterLimit", "ValTtsText", "valPhone", "ValTranslationRequired", "ValEmailTranslationCharacterLimit")); ?>
+			<? Validator::load_validators(array("ValCallerID", "ValConditionalOnValue", "ValConditionallyRequired", "ValDate", "ValDomain", "ValDomainList", "ValDuplicateNameCheck", "ValEasycall", "ValEmail", "ValEmailAttach", "ValEmailList", "ValFacebookPage", "ValFieldConfirmation", "ValHasMessage", "ValInArray", "ValLength", "ValLists", "ValMessageBody", "ValMessageGroup", "ValMessageTypeSelect", "ValNumber", "ValNumeric", "ValPhone", "ValRequired", "ValSmsText", "ValTextAreaAndSubjectWithCheckbox", "ValTimeCheck", "ValTimePassed", "ValTimeWindowCallEarly", "ValTimeWindowCallLate", "ValTranslation", "ValTranslationCharacterLimit", "ValTtsText", "valPhone", "ValTranslationRequired")); ?>
 		});
 		
 		<?/* monitor the main content div for resize and send a message with this information */?>
