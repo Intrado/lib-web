@@ -1123,6 +1123,19 @@ include("nav.inc.php");
 
 				$.when(languages, features, options, facebookPages, fieldmaps, formData, categories)
 				.done(function (languagesRes, featuresRes, optionsRes, facebookPagesRes, fieldmaps, formData, categoriesRes) {
+
+					// temp for testing SMS translations
+					_.each(languagesRes[0].languages, function(lang) {
+						// add an smsTranslate flag only to Spanish only language
+						if (lang.code === "es") {
+							lang.smsTranslate = true;
+							return;
+						}
+					});
+
+					// temp add _hasSmsTranslation flag to settings.options 
+					optionsRes[0].options.push({name: '_hasSmsTranslation', value: '1'});
+
 					org.languages = _.sortBy(languagesRes[0].languages, function(language) {return language.name;});
 					org.settings = {
 						features:featuresRes[0].features,
