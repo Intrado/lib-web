@@ -337,6 +337,24 @@ class ValEmailTranslationCharacterLimit extends Validator {
 	}
 }
 
+class ValSmsTranslationCharacterLimit extends Validator {
+	function validate ($value, $args, $requiredvalues) {
+		$textlength = strlen($requiredvalues[$args['field']]);
+		if ($textlength > 160)
+			return "$this->label is unavailable if the message is more than 160 characters. The message is currently $textlength characters.";
+		return true;
+	}
+	function getJSValidator () {
+		return
+			'function (name, label, value, args, requiredvalues) {
+			var textlength = requiredvalues[args["field"]].length;
+			if (textlength > 160)
+			return this.label +" is unavalable if the message is more than 160 characters. The message is currently " + textlength + " characters.";
+			return true;
+		}';
+	}
+}
+
 class ValTranslationRequired extends Validator {
 	var $isrequired = true;
 
@@ -675,6 +693,23 @@ foreach ($translationlanguages as $code => $language) {
 		"control" => array("TextField"),
 		"helpstep" => 1
 	);
+
+	$formdata["smsmessagetexttranslate". $code. "text"] = array(
+		"label" => "smsmessagetexttranslate". $code. "text",
+		"value" => "",
+		"validators" => array(
+			array("ValTranslation") // NOTE: I "think" this will work for email. May need to write a new validator...
+		),
+		"control" => array("TextField"),
+		"helpstep" => 1
+	);
+}
+
+
+$smsTranslationValidators = array();
+$smsTranslationValidators[] = array("ValSmsTranslationCharacterLimit", "field" => "smsmessagetext");
+if($USER->authorize('requireTranslation')) {
+	$smsTranslationValidators[] = array("ValTranslationRequired", "field" => "smsmessagetext");
 }
 
 $formdata = array_merge($formdata, array(
@@ -701,6 +736,15 @@ $formdata = array_merge($formdata, array(
 		"control" => array("TextField"),
 		"helpstep" => 1
 	),
+	"smsmessagetexttranslate" => array(
+		"label" => "Translate",
+		"value" => "",
+		"validators" => $smsTranslationValidators,
+		"control" => array("CheckBox"),
+		"requires" => array("smsmessagetext"),
+		"helpstep" => 1
+	),
+
 	//=========================================================================================
 	"SOCIAL MESSAGE",
 	//=========================================================================================
@@ -1127,7 +1171,7 @@ include("nav.inc.php");
 			});
 
 			<?/* load required validators into document.validators */?>
-			<? Validator::load_validators(array("ValCallerID", "ValConditionalOnValue", "ValConditionallyRequired", "ValDate", "ValDomain", "ValDomainList", "ValDuplicateNameCheck", "ValEasycall", "ValEmail", "ValEmailAttach", "ValEmailList", "ValFacebookPage", "ValFieldConfirmation", "ValHasMessage", "ValInArray", "ValLength", "ValLists", "ValMessageBody", "ValMessageGroup", "ValMessageTypeSelect", "ValNumber", "ValNumeric", "ValPhone", "ValRequired", "ValSmsText", "ValTextAreaAndSubjectWithCheckbox", "ValTimeCheck", "ValTimePassed", "ValTimeWindowCallEarly", "ValTimeWindowCallLate", "ValTranslation", "ValTranslationCharacterLimit", "ValTtsText", "valPhone", "ValTranslationRequired", "ValEmailTranslationCharacterLimit")); ?>
+			<? Validator::load_validators(array("ValCallerID", "ValConditionalOnValue", "ValConditionallyRequired", "ValDate", "ValDomain", "ValDomainList", "ValDuplicateNameCheck", "ValEasycall", "ValEmail", "ValEmailAttach", "ValEmailList", "ValFacebookPage", "ValFieldConfirmation", "ValHasMessage", "ValInArray", "ValLength", "ValLists", "ValMessageBody", "ValMessageGroup", "ValMessageTypeSelect", "ValNumber", "ValNumeric", "ValPhone", "ValRequired", "ValSmsText", "ValTextAreaAndSubjectWithCheckbox", "ValTimeCheck", "ValTimePassed", "ValTimeWindowCallEarly", "ValTimeWindowCallLate", "ValTranslation", "ValTranslationCharacterLimit", "ValTtsText", "valPhone", "ValTranslationRequired", "ValEmailTranslationCharacterLimit", "ValSmsTranslationCharacterLimit")); ?>
 		});
 		
 		<?/* monitor the main content div for resize and send a message with this information */?>
@@ -1455,8 +1499,33 @@ class MessageSenderProcessor {
 		// =============================================================
 		// SMS Message
 		// =============================================================
-		if (isset($postdata["hassms"]) && $postdata["hassms"] && $USER->authorize("sendsms"))
+		if (isset($postdata["hassms"]) && $postdata["hassms"] && $USER->authorize("sendsms")) {
 			$messages['sms']['plain']['en']['none']['text'] = $postdata["smsmessagetext"];
+
+			// check for and retrieve translations
+			if (isset($postdata["smsmessagetexttranslate"]) && $postdata["smsmessagetexttranslate"]) {
+				foreach ($this->translationlanguages as $code => $language) {
+					if (isset($postdata["smsmessagetexttranslate". $code. "text"])) {
+						$translatedmessage = json_decode($postdata["smsmessagetexttranslate". $code. "text"], true);
+						if ($translatedmessage["enabled"]) {
+							// if the translation text is overridden, don't attach a source message
+							// it isn't applicable since we have no way to know what they changed the text to.
+							if ($translatedmessage["override"]) {
+								// initially set the sms to the english version, then overwrite the text. All other data is shared
+								$messages['sms']['plain'][$code]['overridden'] = $messages['sms']['plain']['en']['none'];
+								$messages['sms']['plain'][$code]['overridden']['text'] = $translatedmessage["text"];
+							} else {
+								// initially set the sms to the english version, then overwrite the text. All other data is shared
+								$messages['sms']['plain'][$code]['translated'] = $messages['sms']['plain']['en']['none'];
+								$messages['sms']['plain'][$code]['translated']['text'] = $translatedmessage["text"];
+								$messages['sms']['plain'][$code]['source'] = $messages['sms']['plain']['en']['none'];
+							}
+						}
+					}
+				}
+			}
+
+		}
 
 		// =============================================================
 		// Social Media Message(s)
