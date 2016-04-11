@@ -22,7 +22,7 @@ $$$
 
 
 
--- $rev 2
+-- $rev 3
 CREATE TABLE shortcodeshortcodegroup (
   id int(11) NOT NULL AUTO_INCREMENT,
   shortcode varchar(10) NOT NULL,
