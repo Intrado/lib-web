@@ -259,6 +259,7 @@ $settings = array(
 	'_hassurvey' => '0',
 	'surveyurl' => '',
 	'_hassms' => '0',
+	'_hassmstranslation' => '0',
 	'maxsms' => '1',
 	'smscustomername' => '',
 	'enablesmsoptin' => '0',
@@ -532,6 +533,14 @@ $formdata["maxsms"] = array(
 		array('ValNumber', 'min' => $settings['maxsms']>0?$settings['maxsms']:1, 'max' => 99)
 	),
 	"control" => array("TextField","size" => 4, "maxlength" => 4),
+	"helpstep" => $helpstepnum
+);
+
+$formdata["hassmstranslation"] = array(
+	"label" => _L('Has SMS Translate'),
+	"value" => $settings['_hassmstranslation'],
+	"validators" => array(),
+	"control" => array("CheckBox"),
 	"helpstep" => $helpstepnum
 );
 
@@ -1035,6 +1044,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		
 		update_jobtypeprefs(1, $postdata["maxsms"], "sms", $custdb);
 		setCustomerSystemSetting('maxsms', $postdata["maxsms"], $custdb);
+		setCustomerSystemSetting('_hassmstranslation', $postdata["hassmstranslation"] ? '1' : '0', $custdb);
 		setCustomerSystemSetting('enablesmsoptin', $postdata["enablesmsoptin"]?'1':'0', $custdb);
 		setCustomerSystemSetting('smscustomername', $postdata["smscustomername"], $custdb);
 		
