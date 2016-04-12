@@ -6,7 +6,8 @@ include ("../jpgraph/jpgraph_bar.php");
 if(! $MANAGERUSER->authorized("aspcallgraphs")) {
 	exit("Not Authorized");
 }
-if (is_null($aspdb = SetupASPDB())) {
+$aspdb = SetupASPDB();
+if (is_null($aspdb)) {
 	exit('aspcalls is not configured');
 }
 
@@ -16,6 +17,10 @@ $startdate = isset($_GET['startdate']) ? $_GET['startdate'] : date("Y-m-d", time
 $enddate = isset($_GET['enddate']) ? $_GET['enddate'] : date("Y-m-d");
 
 $table =  $SETTINGS['aspcalls']['callstable'];
+if (!preg_match('/\w+/', $table)) {
+	exit("Invalid table name in aspcalls settings");
+}
+
 $query = "
 select (select dm from dms where dms.id=dmid) as dm,
 sum(result='answered') as answered,
@@ -27,7 +32,7 @@ sum(result='fail') as noanswer,
 sum(result='trunkbusy') as trunkbusy,
 sum(result='unknown') as unknown,
 sum(result='hangup') as hangup
-from $table
+from `$table`
 where startdate between ? and ?
 group by dmid
 ";

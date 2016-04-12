@@ -7,18 +7,14 @@ include("../jpgraph/jpgraph_bar.php");
 if (!$MANAGERUSER->authorized("aspreportgraphs")) {
 	exit("Not Authorized");
 }
+$aspdb = SetupASPReportsDB();
+if (is_null($aspdb)) {
+	exit("aspreports is not configured");
+}
 
 $customerid = $_GET['customerid'] + 0;
 
 $startdate = date("Y-m-d", time() - 60 * 60 * 24 * 365);
-
-////////////////////////////////////////////////////////////////////////////////
-// data handling
-////////////////////////////////////////////////////////////////////////////////
-
-if (is_null($aspdb = SetupASPReportsDB())) {
-	die("aspreports not configured");
-}
 
 $query = "select max(system_contacts), max(manual_adds), max(addrbook), max(uploadlist), max(deleted), 
 		  year(date) as year_of_date, month(date) as month_of_date 
@@ -26,7 +22,7 @@ $query = "select max(system_contacts), max(manual_adds), max(addrbook), max(uplo
 		  where customerid = ? and date >= ?
 		  group by year_of_date, month_of_date";
 
-$res = Query($query, $aspdb, array($startdate, $customerid));
+$res = Query($query, $aspdb, array($customerid, $startdate));
 $data = array();
 
 
@@ -38,7 +34,7 @@ $cpcolors = array(
 	"D" => "black"
 );
 
-while($row = mysql_fetch_row($res)) {
+while ($row = DBGetRow($res)) {
 	$data["S"][] = $row[0];    
 	$data["M"][] = $row[1];  
 	$data["A"][] = $row[2];  

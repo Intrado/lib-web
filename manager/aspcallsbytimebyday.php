@@ -22,7 +22,7 @@ if (! isset($SETTINGS['aspcalls'])) {
 		
 		echo "<option value='aspcallsbytime.php?startdate=$sd&enddate=$ed";
 		
-		if ($_GET['dm']) {
+		if (isset($_GET['dm']) && $_GET['dm']) {
 			echo "&dm=" . urlencode($_GET['dm']);
 		}
 		

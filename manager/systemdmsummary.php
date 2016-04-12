@@ -105,16 +105,18 @@ while ($row = DBGetRow($result)) {
 		}
 	}
 	if ($cachedpoststatus === false) {
-		$managerApi = "https://{$_SERVER['SERVER_NAME']}:{$_SERVER['SERVER_PORT']}/manager/api/2";
-		$dmUuid = $row[1];
-		$url = "{$managerApi}/deliverymechanisms/{$dmUuid}";
-		if (($fh = fopen($url, "r")) !== false) {
-			$apidata = stream_get_contents($fh);
-			fclose($fh);
-			if ($apidata) {
-				$dmdata = json_decode($apidata);
-				if (isset($dmdata->postStatus)) {
-					$poststatus = $dmdata->postStatus;
+		if (isset($SETTINGS['managerapi']) && isset($SETTINGS['managerapi']['apiurl'])) {
+			$managerApi = $SETTINGS['managerapi']['apiurl'];
+			$dmUuid = $row[1];
+			$url = "$managerApi/deliverymechanisms/$dmUuid";
+			if (($fh = fopen($url, "r")) !== false) {
+				$apidata = stream_get_contents($fh);
+				fclose($fh);
+				if ($apidata) {
+					$dmdata = json_decode($apidata);
+					if (isset($dmdata->postStatus)) {
+						$poststatus = $dmdata->postStatus;
+					}
 				}
 			}
 		}
@@ -130,6 +132,7 @@ while ($row = DBGetRow($result)) {
 
 	$col = 0;
 	$state = null;
+	$carrier = 'none';
 	if ($row[6]) {
 		$carrierdata = json_decode($row[6],true);
 		if (isset($carrierdata['type'])) {

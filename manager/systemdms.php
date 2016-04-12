@@ -15,10 +15,10 @@ if (!$MANAGERUSER->authorized("systemdm")) {
 
 // Action Handlers 
 if (isset($_GET['resetDM'])) {
-	if (null != QuickQuery("select command from dm where id=?", false,array($_GET['resetDM']))) {
+	if (null != QuickQuery("select command from dm where id=?", false, array($_GET['resetDM']))) {
 		notice(_L('DM already had a command queued.  New command queued instead.'));
 	}
-	QuickUpdate("update dm set command='reset' where id=?", false,array($_GET['resetDM']));
+	QuickUpdate("update dm set command='reset' where id=?", false, array($_GET['resetDM']));
 	notice(_L("Reset queued"));
 	redirect();
 } else if (isset($_GET['delete'])) {
@@ -275,16 +275,18 @@ while($row = DBGetRow($result)){
 		}
 	}
 	if ($cachedpoststatus === false) {
-		$managerApi = "https://{$_SERVER['SERVER_NAME']}:{$_SERVER['SERVER_PORT']}/manager/api/2";
-		$dmUuid = $row[7];
-		$url = "{$managerApi}/deliverymechanisms/{$dmUuid}";
-		if (($fh = fopen($url, "r")) !== false) {
-			$apidata = stream_get_contents($fh);
-			fclose($fh);
-			if ($apidata) {
-				$dmdata = json_decode($apidata);
-				if (isset($dmdata->postStatus)) {
-					$poststatus = $dmdata->postStatus;
+		if (isset($SETTINGS['managerapi']) && isset($SETTINGS['managerapi']['apiurl'])) {
+			$managerApi = $SETTINGS['managerapi']['apiurl'];
+			$dmUuid = $row[7];
+			$url = "$managerApi/deliverymechanisms/$dmUuid";
+			if (($fh = fopen($url, "r")) !== false) {
+				$apidata = stream_get_contents($fh);
+				fclose($fh);
+				if ($apidata) {
+					$dmdata = json_decode($apidata);
+					if (isset($dmdata->postStatus)) {
+						$poststatus = $dmdata->postStatus;
+					}
 				}
 			}
 		}

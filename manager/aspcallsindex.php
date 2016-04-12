@@ -25,48 +25,146 @@ $TITLE = _L('View ASP Graphs / Log Collector');
 
 include_once("nav.inc.php");
 
+function fmt_name($obj, $name) {
+	$actionlinks = array();
+	$actionlinks[] = action_link($obj["name"], $obj["icon"], $obj["url"]);
+	return action_links($actionlinks);
+}
+
+function fmt_desc($obj, $name) {
+	return htmlentities($obj["desc"]);
+}
+
 startWindow(_L('View ASP Graphs / Log Collector'));
-?>
 
-<? if($MANAGERUSER->authorized("aspcallgraphs")) { ?>
-<a href="aspcallsbyday.php">by day for 2 years</a>
-<br>
-<? } ?>
+$titles = array(
+	"name" => "#Name",
+	"desc" => "Description",
+);
 
-<? if($MANAGERUSER->authorized("aspcallgraphs")) { ?>
-<a href="aspcallsbydm.php">by dm avg for a month</a> or <a href="aspcallsbydmtime.php">by dm one day</a>
-	or <a href="aspcallsdayofweekdmtime.php">by dm same day of week (multiple graphs 4 weeks)</a>
-	or <a href="aspcallsalldmtime.php">by dm every day (multiple graphs 30 days)</a>
-<br>
-<? } ?>
+$formatters = array(
+	"name" => "fmt_name",
+	"desc" => "fmt_desc",
+);
 
-<? if($MANAGERUSER->authorized("aspcallgraphs")) { ?>
-<a href="aspcallsbyhour.php">by hour avg for a month</a>
-<br>
-<? } ?>
+$aspReports = array();
 
-<? if($MANAGERUSER->authorized("aspcallgraphs")) { ?>
-<a href="aspcallsbytime.php">by time avg for a month</a> or <a href="aspcallsbytimebyday.php">by time one day</a>
-	`or <a href="aspcallsdayofweekbytime.php">by time same day of week (multiple graphs 4 weeks)</a>
-	`or <a href="aspcallsalldaysbytime.php">by time every day (multiple graphs 30 days)</a>
-<br>
-<? } ?>
+if($MANAGERUSER->authorized("aspcallgraphs")) {
 
-<? if($MANAGERUSER->authorized("aspcallgraphs")) { ?>
-<a href="aspcallsdmday.php">graph per dm per day</a>
-<br>
-<? } ?>
+	$aspReports[] = new ArrayObject(array(
+		"icon" => "calendar_view_day",
+		"name" => "ASP Calls by Day",
+		"url" => "aspcallsbyday.php",
+		"desc" => "Average per day over a month.",
+	));
 
-<? if($MANAGERUSER->authorized("logcollector")) { ?>
-<a href="aspcallslogcollector.php">log collector info/controls</a>
-<br>
-<? } ?>
+	$aspReports[] = array(
+		"icon" => "calendar_view_month",
+		"name" => "ASP Calls by DM",
+		"url" => "aspcallsbydm.php",
+		"desc" => "Average over a month.",
+	);
 
-<? if($MANAGERUSER->authorized("aspcallgraphs")) { ?>
-<a href="aspcallssearch.php">Call search</a>
-<? } ?>
+	$aspReports[] = array(
+		"icon" => "chart_bar",
+		"name" => "ASP Calls by DM",
+		"url" => "graphcallsbydm.php",
+		"desc" => "Prototype: backed by New Relic data.",
+	);
 
-<?
+	$aspReports[] = array(
+		"icon" => "telephone",
+		"name" => "ASP Calls by DM Time",
+		"url" => "aspcallsbydmtime.php",
+		"desc" => "Average over one day. Pick date from last two years.",
+	);
+
+	$aspReports[] = array(
+		"icon" => "telephone",
+		"name" => "ASP Calls by DM Same Day of Week",
+		"url" => "aspcallsdayofweekdmtime.php",
+		"desc" => "Multiple graphs over four weeks.",
+	);
+
+	$aspReports[] = array(
+		"icon" => "telephone",
+		"name" => "ASP Calls by DM Every Day",
+		"url" => "aspcallsdayofweekdmtime.php",
+		"desc" => "Multiple graphs over 30 days.",
+	);
+
+	$aspReports[] = array(
+		"icon" => "time",
+		"name" => "ASP Calls by Hour",
+		"url" => "aspcallsbyhour.php",
+		"desc" => "Average of a month.",
+	);
+
+	$aspReports[] = array(
+		"icon" => "time",
+		"name" => "ASP Calls by Time",
+		"url" => "aspcallsbytime.php",
+		"desc" => "Average of a month.",
+	);
+
+	$aspReports[] = array(
+		"icon" => "time",
+		"name" => "ASP Calls by Time One Day",
+		"url" => "aspcallsbytimebyday.php",
+		"desc" => "Average over one day. Pick date from last two years.",
+	);
+
+	$aspReports[] = array(
+		"icon" => "time",
+		"name" => "ASP Calls by Time Same Day of Week",
+		"url" => "aspcallsdayofweekbytime.php",
+		"desc" => "Multiple graphs over four weeks.",
+	);
+
+	$aspReports[] = array(
+		"icon" => "time",
+		"name" => "ASP Calls by Time Every Day",
+		"url" => "aspcallsalldaysbytime.php",
+		"desc" => "Multiple graphs over 30 days.",
+	);
+
+	$aspReports[] = array(
+		"icon" => "telephone",
+		"name" => "ASP Calls Graph Per DM Per Day",
+		"url" => "aspcallsdmday.php",
+		"desc" => "Pick date from last two years.",
+	);
+
+}
+
+if($MANAGERUSER->authorized("aspcallgraphs")) {
+
+	$aspReports[] = array(
+		"icon" => "report",
+		"name" => "Log Collector",
+		"url" => "aspcallslogcollector.php",
+		"desc" => "Info and controls.",
+	);
+
+}
+
+if($MANAGERUSER->authorized("aspcallgraphs")) {
+
+	$aspReports[] = array(
+		"icon" => "find",
+		"name" => "Call Search",
+		"url" => "aspcallssearch.php",
+		"desc" => "",
+	);
+
+}
+
+if (!empty($aspReports)) {
+	showObjects($aspReports, $titles, $formatters);
+} else {
+	echo "<div class='destlabel'><img src='img/largeicons/information.jpg' align='middle'> " . _L("No Reports Available") . "</div>";
+}
+
 endWindow();
 include_once("navbottom.inc.php");
 ?>

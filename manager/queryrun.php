@@ -31,7 +31,6 @@ if (isset($_GET['id'])) {
 	redirect();
 }
 
-
 $managerquery = new AspAdminQuery($_SESSION['runquery']["queryid"]);
 $cid = $_SESSION['runquery']["cid"];
 
@@ -43,7 +42,6 @@ $cid = $_SESSION['runquery']["cid"];
 // Is there a product filter on this query?
 if (($prodfilter = DBSafe($managerquery->getProductFilter())) !== '') {
 
-	// Set up a conditional join for the customer queries
 	$prodfiltercondition = "inner join customerproduct cp ON (cp.customerid = c.id AND cp.product = '{$prodfilter}' and cp.enabled)";
 }
 else $prodfiltercondition = '';
@@ -195,9 +193,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$data[] = $row;
 		}
                 
-		class Foo123 { var $name;
-		} //dummy class used to fill in something when no col data exists
-			
 		$wroteheaders = false;
 		foreach($data as $customer){
 
@@ -226,10 +221,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				or die ("Failed to execute SQL at ".__FILE__." line ".__LINE__);
 		
 			$numberOfFields = $res->columnCount();
+			$fields = array();
+			$data = array();
 
 			if ($savecsv) {
                             
-				//write field header
 				if (!$wroteheaders) {
 					$wroteheaders = true;
 
@@ -242,10 +238,10 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					}
 
 					for ($i = 0; $i < $numberOfFields; $i++) {
-						$field = $res->getColumnMeta($i);
-						echo ',"' . $field->name . '"';
+						$columnMeta = $res->getColumnMeta($i);
+						$fields[] = $columnMeta["name"];
 					}
-					echo "\n";
+					echo implode(",", $fields) . "\n";
 				}
 
 				while ($row = DBGetRow($res)) {
@@ -259,8 +255,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 						$extraFields[] = $customer['notes'];
 					}
 
-					// echo customer id, extra fields, and actual row of query results
-					echo escape_csvfield($displayname[0]) . ',' .
+					echo escape_csvfield($displayname) . ',' .
 						 escape_csvfield($customer["id"]) . ',';
 
 					if(!empty($extraFields)) {
@@ -270,23 +265,15 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					echo array_to_csv($row) . "\n";
 				}
 			} else {
-				if (! $numberOfFields) {
-					$obj = new Foo123;
-					$obj->name = "affected rows";
-					$fields = array($obj);
-					$sizes = array(13);
-					$data = array(array($res->rowCount()));
+				if ($numberOfFields == 0) {
+					$fields[] = "affected rows";
+					$data[] = array($res->rowCount());
 				} else {
-					$fields = array();
 					for ($i = 0; $i < $numberOfFields; $i++) {
-						$fields[] = $res->getColumnMeta($i);
+						$columnMeta = $res->getColumnMeta($i);
+						$fields[] = $columnMeta["name"];
 					}
-		
-					$sizes = array();
-					$data = array();
 					while ($row = DBGetRow($res)) {
-						foreach ($row as $index => $col)
-							$sizes[$index] = @max($sizes[$index],strlen($col),strlen($fields[$index]->name));
 						$data[] = $row;
 					}
 				}
@@ -296,7 +283,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					// if Netsuite ID checkbox is checked
 					$nsidoutput = $addnsid ? "(Netsuite ID: ". $customer['nsid']. ")" : "";
 
-					$queryoutput .= '<tr class="listHeader"><th style="border-top: 1px solid black;" colspan=' . count($fields) . '>Customer: ' . escapehtml($displayname[0]) . ' (ID: ' . $customer["id"] . ') '.$nsidoutput.' </th></tr>';
+					$queryoutput .= '<tr class="listHeader"><th style="border-top: 1px solid black;" colspan=' . count($fields) . '>Customer: ' . escapehtml($displayname) . ' (ID: ' . $customer["id"] . ') '.$nsidoutput.' </th></tr>';
 
 					// if Add Notes checkbox is checked.
 					if($addnotes){
@@ -304,15 +291,16 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					}
 
 					$line = '<tr class="listHeader">';
-					foreach ($fields as $index => $field)
-							$line .= '<th align="left">' . escapehtml($field->name) . '</th>';
+					foreach ($fields as $field) {
+						$line .= '<th align="left">' . escapehtml($field) . '</th>';
+					}
 					$queryoutput .= $line . "</tr>\n";
 
 					$counter = 0;
 					foreach ($data as $row) {
 						$line = '<tr '. ($counter++ % 2 == 1 ? 'class="listAlt"' : '') .'>';
 						for ($i = 0; $i < count($row); $i++) {
-								$line .= '<td>' . escapehtml($row[$i]) . '</td>';
+							$line .= '<td>' . escapehtml($row[$i]) . '</td>';
 						}
 
 						$queryoutput .=  $line . "</tr>\n";

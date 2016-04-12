@@ -3,19 +3,29 @@ require_once("common.inc.php");
 if (!$MANAGERUSER->authorized("aspcallgraphs")) {
 	exit("Not Authorized");
 }
-if (is_null($aspdb = SetupASPDB())) {
+$aspdb = SetupASPDB();
+if (is_null($aspdb)) {
 	exit('aspcalls is not configured');
 }
 
-$time = strtotime($_GET['date']);
+$time = false;
+if (isset($_GET['date'])) {
+	$time = strtotime($_GET['date']);
+}
 if ($time == 0 || $time == false) {
 	$time = time();
 }
 
 $date = date("Y-m-d", $time);
+$startdate = "$date 00:00:00";
+$enddate = "$date 23:59:59";
 $table = $SETTINGS['aspcalls']['callstable'];
-$query = "select distinct dmid from $table where startdate between ? and ?";
-$activedms = QuickQueryList($query, $false, $aspdb, array("$data 00:00:00", "$date 23:59:59"));
+if (!preg_match('/\w+/', $table)) {
+	exit("Invalid table name in aspcalls settings");
+}
+
+$query = "select distinct dmid from `$table` where startdate between ? and ?";
+$activedms = QuickQueryList($query, false, $aspdb, array($startdate, $enddate));
 
 $dms = array();
 if (count($activedms)) {

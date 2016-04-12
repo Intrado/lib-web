@@ -7,25 +7,20 @@ include("../jpgraph/jpgraph_bar.php");
 if (!$MANAGERUSER->authorized("aspreportgraphs")) {
 	exit("Not Authorized");
 }
+$aspdb = SetupASPReportsDB();
+if (is_null($aspdb)) {
+	exit("aspreports is not configured");
+}
 
 $customerid = $_GET['customerid'] + 0;
 
 $startdate = isset($_GET['startdate']) ? $_GET['startdate'] : date("Ymd", time() - 60 * 60 * 24 * 365); //default 7 days
 $enddate = isset($_GET['enddate']) ? $_GET['enddate'] : date("Ymd");
 
-////////////////////////////////////////////////////////////////////////////////
-// data handling
-////////////////////////////////////////////////////////////////////////////////
-
-if (is_null($aspdb = SetupASPReportsDB())) {
-	die("aspreports not configured");
-}
-
 $query = "select sum(attempted), year(date) as year_of_date, month(date) as month_of_date 
 		  from billable
 		  where customerid = ? and date >= ?
 		  group by year_of_date, month_of_date";
-
 
 $res = Query($query, $aspdb, array($customerid, $startdate));
 $datay = array();

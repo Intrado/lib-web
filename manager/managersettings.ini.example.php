@@ -109,4 +109,7 @@ memcache_session_lock_retry_us=50000
 ; if no urls are defined, memache support is disabled
 memcached_url[]="tcp://127.0.0.1:11211?persistent=1&timeoutms=1000"
 
+[managerapi]
+apiurl=https://manager-sandbox.testschoolmessenger.com/manager/api/2
+
 ;*/?>

@@ -4,7 +4,8 @@ require_once("common.inc.php");
 if (! $MANAGERUSER->authorized("aspcallgraphs")) {
 	exit("Not Authorized");
 }
-if (is_null($aspdb = SetupASPDB())) {
+$aspdb = SetupASPDB();
+if (is_null($aspdb)) {
 	exit('aspcalls is not configured');
 }
 ?>
@@ -37,9 +38,13 @@ if (strlen($phone) == 10) {
 	$sd = date("Y-m-d", strtotime($_GET['date']));
 	$ed = date("Y-m-d", strtotime($_GET['date']) + 60*60*24); //next day
 	$table = $SETTINGS['aspcalls']['callstable'];
+	if (!preg_match('/\w+/', $table)) {
+		exit("Invalid table name in aspcalls settings");
+	}
+
 	$query = "select startdate, ringtime, detecttime, messagetime, billtime, result, dmstart, dmend, userhungup, callerid, 
 			d.dm, d.carrier, d.state 
-			from $table
+			from `$table`
 			inner join dms d on 
 				(d.id=dmid) 
 			where startdate between ? and ?

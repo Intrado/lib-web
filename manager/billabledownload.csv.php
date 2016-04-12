@@ -8,7 +8,8 @@ include("../inc/table.inc.php");
 if (!$MANAGERUSER->authorized("aspreportgraphs")) {
 	exit("Not Authorized");
 }
-if (is_null($aspdb = SetupASPReportsDB())) {
+$aspdb = SetupASPReportsDB();
+if (is_null($aspdb)) {
 	exit('aspreports not configured');
 }
 

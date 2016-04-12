@@ -3,7 +3,8 @@ require_once("common.inc.php");
 if (!$MANAGERUSER->authorized("logcollector")) {
 	exit("Not Authorized");
 }
-if (is_null($aspdb = SetupASPDB())) {
+$aspdb = SetupASPDB();
+if (is_null($aspdb)) {
 	exit('aspcalls is not configured');
 }
 
@@ -20,17 +21,19 @@ $data = QuickQueryMultiRow($query, false, $aspdb);
 <html>
 <body>
 
-<a href="?run">Run now</a><br>
+<h1><a href="?run" title="Run now"><img src="img/largeicons/checkedgreen.jpg" alt="Run now">Run now</a></h1>
 
+<ul>
 <?
 
 foreach ($data as $row) { //should only be 1!
 
-	echo "Status:" . $row[0] . "<br>";
-	echo "Last Run:" . $row[1] . "<br>";
+	echo "<li>Status: " . $row[0] . "</li>";
+	echo "<li>Last Run: " . $row[1] . "</li>";
 	
 }
 ?>
+</ul>
 
 </body>
 </html>

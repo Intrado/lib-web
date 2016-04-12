@@ -6,14 +6,19 @@ include ("../jpgraph/jpgraph_bar.php");
 if(!$MANAGEUSER->authorized("aspcallgraphs")) {
 	exit("Not Authorized");
 }
-if (is_null($aspdb = SetupASPDB())) {
+$aspdb = SetupASPDB();
+if (is_null($aspdb)) {
 	exit('aspcalls is not configured');
 }
 
 $table = $SETTINGS['aspcalls']['callstable'];
+if (!preg_match('/\w+/', $table)) {
+	exit("Invalid table name in aspcalls settings");
+}
+
 $query = "
 select count(*), month(startdate) as month, year(startdate) as year
-from $table where result in ('answered','machine')
+from `$table` where result in ('answered','machine')
 group by year, month
 ";
 $qdata = QuickQueryMultiRow($query, false, $aspdb);

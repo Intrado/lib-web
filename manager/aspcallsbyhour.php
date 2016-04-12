@@ -6,11 +6,16 @@ include ("../jpgraph/jpgraph_bar.php");
 if (! $MANAGERUSER->authorized("aspcallgraphs")) {
 	exit("Not Authorized");
 }
-if (is_null($aspdb = SetupASPDB())) {
+$aspdb = SetupASPDB();
+if (is_null($aspdb)) {
 	exit('aspcalls is not configured');
 }
 
 $table = $SETTINGS['aspcalls']['callstable'];
+if (!preg_match('/\w+/', $table)) {
+	exit("Invalid table name in aspcalls settings");
+}
+
 $query = "
 select hour(startdate),
 sum(result='answered') as answered,
@@ -21,7 +26,7 @@ sum(result='badnumber') as noanswer,
 sum(result='fail') as noanswer,
 sum(result='trunkbusy') as trunkbusy,
 sum(result='unknown') as unknown
-from $table
+from `$table`
 where startdate > now() - interval 30 day
 group by hour(startdate)
 ";

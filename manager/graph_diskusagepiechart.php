@@ -7,23 +7,19 @@ include("../jpgraph/jpgraph_pie.php");
 if (!$MANAGERUSER->authorized("aspreportgraphs")) {
 	exit("Not Authorized");
 }
+$aspdb = SetupASPReportsDB();
+if (is_null($aspdb)) {
+	exit("aspreports is not configured");
+}
 
 $customerid = $_GET['customerid']+0;
-
-////////////////////////////////////////////////////////////////////////////////
-// data handling
-////////////////////////////////////////////////////////////////////////////////
-
-if (is_null($aspdb = SetupASPReportsDB())) {
-	die("aspreports not configured");
-}
 
 $query = "select indexsize, datasize  
 	 from disk_usage 
 	 where customerid = ?
-	 and date=curdate() - interval 1 day";
+	 and date=curdate() - interval 2 day";
 
-$datay = Query($query, $aspdb, array($customerid));
+$res = Query($query, $aspdb, array($customerid));
 $datay = array();
 
 while ($row = DBGetRow($res)) {

@@ -7,19 +7,15 @@ include("../jpgraph/jpgraph_line.php");
 if (!$MANAGERUSER->authorized("aspreportgraphs")) {
 	exit("Not Authorized");
 }
+$aspdb = SetupASPReportsDB();
+if (is_null($aspdb)) {
+	exit("aspreports is not configured");
+}
 
 $customerid = $_GET['customerid']+0;
 
 $startdate = isset($_GET['startdate']) ? $_GET['startdate'] : date("Ymd", time() - 60*60*24*365); //default 365 days
 $enddate = isset($_GET['enddate']) ? $_GET['enddate'] : date("Ymd");
-
-////////////////////////////////////////////////////////////////////////////////
-// data handling
-////////////////////////////////////////////////////////////////////////////////
-
-if (is_null($aspdb = SetupASPReportsDB())) {
-	die("aspreports not configured");
-}
 
 $query = "SELECT attempted, date 
 	  FROM billable 

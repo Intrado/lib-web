@@ -7,7 +7,8 @@ include ("../jpgraph/jpgraph_log.php");
 if (! $MANAGERUSER->authorized("aspcallgraphs")) {
 	exit("Not authorized");
 }
-if (is_null($aspdb = SetupASPDB())) {
+$aspdb = SetupASPDB();
+if (is_null($aspdb)) {
 	exit('aspcalls is not configured');
 }
 
@@ -35,7 +36,11 @@ if ($dmid) {
 	$dmfilterparams[] = $dmid;
 }
 
-$table = $SETTINGS['aspcalls']['callstable']; 
+$table = $SETTINGS['aspcalls']['callstable'];
+if (!preg_match('/\w+/', $table)) {
+	exit("Invalid table name in aspcalls settings");
+}
+
 $query = "
 select round((minute(startdate) + hour(startdate) *60)/5) as minofday,
 sum(result='answered') as answered,
@@ -48,14 +53,14 @@ sum(result='trunkbusy') as trunkbusy,
 sum(result='unknown') as unknown,
 sum(result='hangup') as hangup
 
-from $table 
+from `$table`
 where startdate between '$startdate' and '$enddate'
 and hour(startdate) between $starthour and $endhour
 $dmfiltersql
 group by minofday
 ";
 
-$qdata = QuickQueryMultiRow($query, $aspdb, $dmfilterparams);
+$qdata = QuickQueryMultiRow($query, false, $aspdb, $dmfilterparams);
 $data = array();
 $titles = array();
 foreach ($qdata as $row) {
