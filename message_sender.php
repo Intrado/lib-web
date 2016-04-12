@@ -592,7 +592,7 @@ foreach ($ttslanguages as $code => $language) {
 // An optional validator to be added to translation if 'requireTranslation' profile setting is set
 
 $emailTranslationValidators = array();
-$emailTranslationValidators[] = array("ValTranslationCharacterLimit", "field" => "emailmessagetext");
+$emailTranslationValidators[] = array("ValEmailTranslationCharacterLimit", "field" => "emailmessagetext");
 if($USER->authorize('requireTranslation')) {
 	$emailTranslationValidators[] = array("ValTranslationRequired", "field" => "emailmessagetext");
 }
