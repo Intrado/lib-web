@@ -40,3 +40,11 @@ CREATE TABLE emailevent (
   KEY `statusCode_timestamp` (`statusCode`,`timeStampMs`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
+
+-- $rev 4
+
+CREATE TABLE smslanguage (
+  code VARCHAR(3) PRIMARY KEY,
+  name VARCHAR(100) NOT NULL
+)
+$$$

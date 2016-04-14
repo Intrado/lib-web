@@ -87,7 +87,7 @@ $versions = array(
 		"11.5/3",
 		"11.6/1",
 		"11.7/1",
-		"11.8/1",
+		"11.8/2",
 		//etc., one array element per version, always the last revision of the given version
 	),
 
@@ -120,7 +120,7 @@ $dbversions = array(
 		"11.2/2",
 		"11.5/1",
 		"11.7/2",
-		"11.8/3",
+		"11.8/4",
 	),
 
 	"deviceservice" => array(
