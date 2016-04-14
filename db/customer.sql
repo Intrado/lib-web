@@ -3219,3 +3219,12 @@ update setting set value='11.7/1' where name='_dbversion'
 $$$
 
 -- END 11.7/1
+
+CREATE OR REPLACE SQL SECURITY DEFINER VIEW smslanguage AS
+  SELECT l.* FROM language AS l INNER JOIN aspshard.smslanguage AS sl USING (code)
+$$$
+
+update setting set value='11.8/2' where name='_dbversion'
+$$$
+
+-- END 11.8/2
