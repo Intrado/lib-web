@@ -1100,16 +1100,16 @@ include("nav.inc.php");
 	<script type="text/javascript" src="script/rcieditor.js"></script>
 	<script type="text/javascript" src="script/speller/spellChecker.js"></script>
 	<script type="text/javascript" src="script/niftyplayer.js.php"></script>
-	
+
 	<? if(isset($_REQUEST["iframe"])) { ?>
 		<script src="script/NodeRegistry.js"></script>
 	<? } ?>
-		
+
 	<script type="text/javascript">
 		$(function () {
 
 			window.BOOTSTRAP_DATA = {};
-			var csApiBaseUri = 'api/2/';
+			var csApiBaseUri = 'messagesender/capi/';
 			var csApiUserUri = csApiBaseUri + 'users/' + <?= $USER->id ?>;
 
 			<?/* We'll set these once we discover orgId from the user request */?>
@@ -1125,7 +1125,7 @@ include("nav.inc.php");
 
 				<?/* Set up org request uri */?>
 				orgId = org.id;
-				csApiOrgUri = 'api/2/organizations/' + orgId;
+				csApiOrgUri = csApiBaseUri + 'organizations/' + orgId;
 
 				<?/* Remove 'Survey' job type(s); to prevent from displaying in Message Type drop-down. */?>
 				roles.jobTypes = _.filter(roles.jobTypes, function(type) {return type && type.isSurvey === false;});
