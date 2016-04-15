@@ -9,6 +9,15 @@ $formdata["enabled"] = array(
 		"helpstep" => $helpstepnum
 );
 
+$formdata["softdisable"] = array(
+		"label" => _L('Soft Disable'),
+		"fieldhelp" => "This box is a soft disable for this customer.",
+		"value" => isset($custinfo)?$custinfo["softdisable"]:"",
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => $helpstepnum
+);
+
 //Unable to change shard on this form
 if (!$customerid) {
 	$formdata["shard"] = array(
@@ -169,7 +178,6 @@ $formdata["notes"] = array(
 		"helpstep" => $helpstepnum
 );
 
-
 function saveRequiredFields($custdb,$customerid,$postdata) {
 	global $SETTINGS,$defaultlogos;
 	
@@ -209,11 +217,13 @@ function saveRequiredFields($custdb,$customerid,$postdata) {
 		setCustomerSystemSetting("_customerenabled", "0", $custdb);
 		// Remove active import alerts but leave the alert rules since they will not trigger for disabled customers
 		QuickUpdate("delete from importalert where customerid=?", $sharddb, array($customerid));
+
+	} else if ($postdata["softdisable"]) {
+		setCustomerSystemSetting("_customerenabled", "0", $custdb);
 	} else {
 		setCustomerSystemSetting("_customerenabled", "1", $custdb);
 	}
-	
-	
+
 	if(getCustomerSystemSetting('_dmmethod', '', true, $custdb)!='asp' && $postdata["dmmethod"] == 'asp'){
 		$aspquery = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword from customer c inner join shard s on (c.shardid = s.id) where c.id = '$customerid'");
 		$aspsharddb = DBConnect($aspquery[0], $aspquery[1], $aspquery[2], "aspshard");
@@ -247,6 +257,7 @@ function saveRequiredFields($custdb,$customerid,$postdata) {
 	setCustomerSystemSetting('_supportphone', Phone::parse($postdata["supportphone"]), $custdb);
 	setCustomerSystemSetting('callerid', Phone::parse($postdata["callerid"]), $custdb);
 	setCustomerSystemSetting('defaultareacode', $postdata["defaultareacode"], $custdb);
+
 }
 
 
