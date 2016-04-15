@@ -395,9 +395,11 @@ if ($mode == "database" && $ids[0] == "all") {
 	}
 
 	// for each customer database to upgrade
+	echo "\nUpgrading customers\n";
 	foreach ($customers as $customerid => $customer) {
 		$_dbcon = $db = $shards[$customer['shardid']];
 		QuickUpdate("use c_$customerid", $db);
+		echo "c_$customerid:\n";
 
 		foreach ($versions as $product => $productversions) {
 
