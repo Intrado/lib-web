@@ -31,6 +31,7 @@ require_once("obj/Job.obj.php");
 require_once("obj/JobType.obj.php");
 require_once("obj/Schedule.obj.php");
 require_once("obj/AudioFile.obj.php");
+require_once("obj/AudioConverter.obj.php");
 require_once("obj/Voice.obj.php");
 require_once("obj/FieldMap.obj.php");
 require_once("obj/Language.obj.php");
@@ -60,14 +61,21 @@ require_once("obj/ValMessageBody.val.php");
 require_once("obj/TraslationItem.fi.php");
 require_once("obj/CallerID.fi.php");
 require_once("obj/ValDuplicateNameCheck.val.php");
+require_once("obj/AudioConverter.obj.php");
 
 // Preview
 require_once("inc/previewfields.inc.php");
 require_once("obj/PreviewModal.obj.php");
 require_once("inc/appserver.inc.php");
+
+////////////////////////////////////////////////////////////////////////////////
+// Initialization
+////////////////////////////////////////////////////////////////////////////////
 PreviewModal::HandleRequestWithPhoneText();
 PreviewModal::HandleRequestWithEmailText();
 
+$audioConverter = new AudioConverter();
+$supportedAudioFormats = $audioConverter->getSupportedFormats();
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -533,6 +541,13 @@ $formdata = array(
 			array("ValInArray", "values" => array("callme","text"))
 		),
 		"control" => array("RadioButton", "values" => array("callme" => "callme", "text" => "text")),
+		"helpstep" => 1
+	),
+	"phonemessageaudioclipcollection" => array(
+		"label" => "Audio Clip Upload",
+		"value" => "",
+		"validators" => array(),
+		"control" => array("TextField"), //It's only a CheckBox because "control" can't be empty
 		"helpstep" => 1
 	),
 	"phonemessagepost" => array(
@@ -1007,6 +1022,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		// The post handler will return a job that's ready to use if all went to plan
 		$rawdata = $_POST;
 		$postdata = $form->getData();
+		error_log( print_r($rawdata, true));
+		error_log( print_r($postdata, true));
 
 		$job = $msp->doPost($postdata);
 
@@ -1167,7 +1184,9 @@ include("nav.inc.php");
 						name:"msgsndr",
 						url:window.location.protocol + "//" + window.location.host + "/" + window.location.pathname.split('/')[1] + "/message_sender.php",
 						validators:document.validators,
+						supportedAudioFormats: <?echo json_encode( $supportedAudioFormats ); ?>,
 						twitterMaxChars: <? print_r(140 - mb_strlen(" http://". getSystemSetting("tinydomain"). "/") - 6); ?>
+
 					};
 
 					window.globals.require('initialize');
@@ -1467,6 +1486,30 @@ class MessageSenderProcessor {
 							}
 						}
 					}
+
+					if( isset( $postdata["phonemessageaudioclipcollection"] ) ) {
+						$audioClipCollection = json_decode($postdata["phonemessageaudioclipcollection"]);
+
+						$inClause = '';
+						$audioFileIds = array();
+
+						// make a set of ? marks for the prepared statement
+						foreach( $audioClipCollection as $audioClipObj ) {
+							$inClause = str_repeat( '?,', count( $audioClipCollection ) );
+							$audioFileIds[] = $audioClipObj->audioFileId;
+						}
+						$inClause = rtrim($inClause, ',');
+
+						$query = "UPDATE audiofile SET messagegroupid = ? WHERE id IN (" . $inClause . ")";
+
+
+						$preparedArray = array();
+						$preparedArray[] = $messagegroup->id;
+						$preparedArray = array_merge( $preparedArray, $audioFileIds );
+
+						QuickUpdate( $query, false, $preparedArray );
+					} 
+
 			} // end switch phone message type
 		} // end if hasphone
 
