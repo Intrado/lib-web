@@ -363,6 +363,30 @@ class ValSmsTranslationCharacterLimit extends Validator {
 	}
 }
 
+
+class ValSmsTranslationItemCharacterLimit extends Validator {
+	function validate ($value, $args, $requiredvalues) {
+		$textlength = strlen($requiredvalues[$args['field']]);
+		if ($textlength > 1600)
+			return "$this->label is unavalable if the message is more than 1600 characters. The message is currently $textlength characters.";
+		if ($textlength == 0)
+			return "$this->label message cannot be empty if translation checkbox is checked";
+		return true;
+	}
+	function getJSValidator () {
+		return
+			'function (name, label, value, args, requiredvalues) {
+			var text = JSON.parse(requiredvalues[label]).text;
+			var textlength = text.length;
+			if (textlength > 1600)
+				return this.label + " is unavalable if the message is more than 1600 characters. The message is currently " + textlength + " characters.";
+			if (textlength === 0)
+				return this.label + " message cannot be empty if translation checkbox is checked";
+			return true;
+		}';
+	}
+}
+
 class ValTranslationRequired extends Validator {
 	var $isrequired = true;
 
@@ -713,7 +737,7 @@ foreach ($translationlanguages as $code => $language) {
 		"label" => "smsmessagetexttranslate". $code. "text",
 		"value" => "",
 		"validators" => array(
-			array("ValTranslation") // NOTE: I "think" this will work for email. May need to write a new validator...
+			array("ValSmsTranslationItemCharacterLimit")
 		),
 		"control" => array("TextField"),
 		"helpstep" => 1
@@ -1190,7 +1214,47 @@ include("nav.inc.php");
 			});
 
 			<?/* load required validators into document.validators */?>
-			<? Validator::load_validators(array("ValCallerID", "ValConditionalOnValue", "ValConditionallyRequired", "ValDate", "ValDomain", "ValDomainList", "ValDuplicateNameCheck", "ValEasycall", "ValEmail", "ValEmailAttach", "ValEmailList", "ValFacebookPage", "ValFieldConfirmation", "ValHasMessage", "ValInArray", "ValLength", "ValLists", "ValMessageBody", "ValMessageGroup", "ValMessageTypeSelect", "ValNumber", "ValNumeric", "ValPhone", "ValRequired", "ValSmsText", "ValTextAreaAndSubjectWithCheckbox", "ValTimeCheck", "ValTimePassed", "ValTimeWindowCallEarly", "ValTimeWindowCallLate", "ValTranslation", "ValTranslationCharacterLimit", "ValTtsText", "valPhone", "ValTranslationRequired", "ValEmailTranslationCharacterLimit", "ValSmsTranslationCharacterLimit")); ?>
+			<? Validator::load_validators(array(
+				"ValCallerID",
+				"ValConditionalOnValue",
+				"ValConditionallyRequired",
+				"ValDate",
+				"ValDomain",
+				"ValDomainList",
+				"ValDuplicateNameCheck",
+				"ValEasycall",
+				"ValEmail",
+				"ValEmailAttach",
+				"ValEmailList",
+				"ValFacebookPage",
+				"ValFieldConfirmation",
+				"ValHasMessage",
+				"ValInArray",
+				"ValLength",
+				"ValLists",
+				"ValMessageBody",
+				"ValMessageGroup",
+				"ValMessageTypeSelect",
+				"ValNumber",
+				"ValNumeric",
+				"ValPhone",
+				"ValRequired",
+				"ValSmsText",
+				"ValTextAreaAndSubjectWithCheckbox",
+				"ValTimeCheck",
+				"ValTimePassed",
+				"ValTimeWindowCallEarly",
+				"ValTimeWindowCallLate",
+				"ValTranslation",
+				"ValTranslationCharacterLimit",
+				"ValTtsText",
+				"valPhone",
+				"ValTranslationRequired",
+				"ValEmailTranslationCharacterLimit",
+				"ValSmsTranslationCharacterLimit",
+				"ValSmsTranslationItemCharacterLimit"
+				));
+			?>
 		});
 		
 		<?/* monitor the main content div for resize and send a message with this information */?>
