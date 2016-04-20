@@ -80,10 +80,23 @@ class DownloadPlugin {
 				),
 				"pluginVersion" => array(
 					"label" => _L('Plugin Version'),
-					"value" => '1.0',
+					"value" => '2.0',
 					"validators" => array(),
-					"control" => array("SelectMenu", "values" => $this->versionsToFormArray($this->getVersions('sso-admin'))),
+					"control" => array("SelectMenu", "values" => array(
+						"2.0" => "2.0",
+					)),
 					"helpstep" => 1
+				),
+				"pluginDestination" => array(
+					"label" => _L("Parent Portal"),
+					"value" => "infocenter",
+					"validators" => array(),
+					"control" => array("SelectMenu", "values" => array(
+						"" => "None",
+						"contactmanager" => "Contact Manager",
+						"infocenter" => "InfoCenter"
+					)),
+					"helpstep" => 2
 				)
 			);
 
@@ -98,10 +111,22 @@ class DownloadPlugin {
 				),
 				"pluginVersion" => array(
 					"label" => _L('Plugin Version'),
-					"value" => '1.0',
+					"value" => '2.0',
 					"validators" => array(),
-					"control" => array("SelectMenu", "values" => $this->versionsToFormArray($this->getVersions('contactmanager-guardian'))),
+					"control" => array("SelectMenu", "values" => array(
+						"2.0" => "2.0",
+					)),
 					"helpstep" => 1
+				),
+				"pluginDestination" => array(
+					"label" => _L("Parent Portal"),
+					"value" => "infocenter",
+					"validators" => array(),
+					"control" => array("SelectMenu", "values" => array(
+						"contactmanager" => "Contact Manager",
+						"infocenter" => "InfoCenter"
+					)),
+					"helpstep" => 2
 				),
 				"fqdn" => array(
 					"label" => _L('FQDN'),
@@ -110,7 +135,7 @@ class DownloadPlugin {
 						array("ValRequired")
 					),
 					"control" => array("TextField"),
-					"helpstep" => 2
+					"helpstep" => 3
 				),
 				"pluginLinkID" => array(
 					"label" => _L('Plugin Link ID'),
@@ -119,7 +144,7 @@ class DownloadPlugin {
 						array("ValRequired")
 					),
 					"control" => array("TextField"),
-					"helpstep" => 2
+					"helpstep" => 4
 				)
 			);
 
@@ -138,6 +163,7 @@ class DownloadPlugin {
 		if ($this->pluginName === 'contactmanager-guardian') {
 			$files[] = dirname(__FILE__) . "/../plugins/{$this->pluginName}/versions/{$this->pluginVersion}/web_root/guardian/home.schoolmessenger-parent-plugin.leftnav.footer.txt";
 			$files[] = dirname(__FILE__) . "/../plugins/{$this->pluginName}/versions/{$this->pluginVersion}/web_root/guardian/home_not_available.schoolsessenger-parent-plugin.leftnav.footer.txt";
+			$files[] = dirname(__FILE__) . "/../plugins/{$this->pluginName}/versions/{$this->pluginVersion}/plugin.xml";
 		}
 
 		return $files;
@@ -199,7 +225,24 @@ class DownloadPlugin {
 		return $zipFile;
 	}
 
-	public function setZipMimeHeaders($customerName) {
+	public function getFilename($customerName, $destinationType, $pluginName) {
+		$nameArray = array("plugin", $customerName);
+
+		if ($pluginName == 'sso-admin') {
+			array_push($nameArray, "admin");
+		} else if ($pluginName == 'contactmanager-guardian') {
+			array_push($nameArray, "guardian");
+		}
+
+		if ($destinationType != '') {
+			array_push($nameArray, $destinationType);
+		}
+
+		$fileName = implode("-", $nameArray);
+		return $fileName;
+	}
+
+	public function setZipMimeHeaders($fileName) {
 
 		// http headers for zip downloads
 		header("Pragma: public");
@@ -208,9 +251,9 @@ class DownloadPlugin {
 		header("Cache-Control: public");
 		header("Content-Description: File Transfer");
 		header("Content-type: application/octet-stream");
-		header("Content-Disposition: attachment; filename=\"plugin-{$customerName}.zip\"");
+		header("Content-Disposition: attachment; filename=\"{$fileName}.zip\"");
 		header("Content-Transfer-Encoding: binary");
-		
+
 		flush();
 	}
 
