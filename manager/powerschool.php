@@ -120,6 +120,7 @@ foreach ($forms as $frm) {
 	echo "<h1>{$header}</h1><hr />";
 	echo $frm->render();
 	echo '<br />';
+	echo '<br />';
 }
 ?>
 <br />

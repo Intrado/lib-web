@@ -19,7 +19,7 @@ class DownloadPlugin {
 				$headerText = 'SSO Admin Plugin';
 				break;
 			case 'contactmanager-guardian':
-				$headerText = 'Contact Manager Guardian Plugin';
+				$headerText = 'Guardian Plugin';
 				break;
 			default:
 				$headerText = '[missing header text]';
