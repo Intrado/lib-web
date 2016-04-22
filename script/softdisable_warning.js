@@ -1,4 +1,4 @@
-function sessionDisable() {
+function customerSoftDisable() {
 
 	var pathArray = location.href.split('/');
 
@@ -6,13 +6,16 @@ function sessionDisable() {
 		location.origin = location.protocol + '//' + location.host;
 	}
 
-	var goTo = location.origin + '/' + pathArray[3] + '/' + 'index.php?logout=1';
+	var redirectToLogout = location.origin + '/' + pathArray[3] + '/' + 'index.php?logout=1';
 
 	var $ = jQuery;
 	$('.modal.in').modal('hide');
 
 	var modal = $('#defaultmodal');
-	modal.modal();
+	modal.modal({
+		backdrop: 'static',
+		keyboard: false
+	});
 	modal.height('auto');
 	modal.width('600px');
 	var header = $('#defaultmodal').find('.modal-header h3');
@@ -42,8 +45,10 @@ function sessionDisable() {
 	$("div.default-modal").css("margin-left", -(modal.width()/2));
 	$("div.default-modal").css("margin-top", -(modal.height()/2));
 
+	$("button.close").css("visibility", "hidden");
+
 	var kickToHomepage = function() {
-		window.location = goTo;
+		window.location = redirectToLogout;
 	};
 
 	button.on('click', kickToHomepage);

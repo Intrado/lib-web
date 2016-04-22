@@ -219,10 +219,10 @@ function saveRequiredFields($custdb,$customerid,$postdata) {
 		QuickUpdate("delete from importalert where customerid=?", $sharddb, array($customerid));
 
 	} else if ($postdata["softdisable"]) {
-		setCustomerSystemSetting("_customersoftdisable", "0", $custdb);
+		setCustomerSystemSetting("_customersoftdisable", "1", $custdb);
 	} else {
 		setCustomerSystemSetting("_customerenabled", "1", $custdb);
-		setCustomerSystemSetting("_customersoftdisable", "1", $custdb);
+		setCustomerSystemSetting("_customersoftdisable", "0", $custdb);
 	}
 
 	if(getCustomerSystemSetting('_dmmethod', '', true, $custdb)!='asp' && $postdata["dmmethod"] == 'asp'){
