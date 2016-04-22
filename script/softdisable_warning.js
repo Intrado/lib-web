@@ -52,4 +52,8 @@ function customerSoftDisable() {
 	};
 
 	button.on('click', kickToHomepage);
-}
+
+	setTimeout(function() {
+		window.location = redirectToLogout;
+	}, 10000);
+ }

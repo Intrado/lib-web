@@ -241,7 +241,6 @@ include("nav.inc.php");
 $softDisable = getSystemSetting('_customersoftdisable');
 if ($softDisable) {
 	echo "<script type='text/javascript'>customerSoftDisable();</script>";
-	redirect('index.php?logout=1');
 }
 
 ?>
