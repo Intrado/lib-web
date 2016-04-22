@@ -73,8 +73,7 @@ function getUserSessionTrackingId() {
 	return hash("sha256", session_id() . $USER->login);
 }
 
-// if ((! defined('PHPUNIT')) && (!isset($isindexpage) || !$isindexpage)) {
-if (!defined('PHPUNIT')) {
+if ((! defined('PHPUNIT')) && (!isset($isindexpage) || !$isindexpage)) {
 	doStartSession();
 	//force ssl?
 	if ($SETTINGS['feature']['force_ssl'] && !isset($_SERVER["HTTPS"])) {

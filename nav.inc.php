@@ -185,6 +185,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 <?}?>
 	<script src="script/sorttable.js"></script>
 	<script src="script/session_warning.js" type="text/javascript"></script>
+	<script src="script/softdisable_warning.js" type="text/javascript"></script>
 	<script src="script/utils.js"></script>
 	<script src="script/NodeRegistry.js"></script>
 
