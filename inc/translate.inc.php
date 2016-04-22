@@ -159,7 +159,7 @@ function googleTranslateV2($text, $sourcelanguage, $targetlanguages) {
  */
 
 function parse_html_to_node_string ($htmlString, $delimiterTag = 'node', $DOMDocumentObj) {
-	
+
 	// force UTF-8 encoding
 	$DOMDocumentObj->loadHTML('<?xml encoding="UTF-8">'.$htmlString);
 	$xpath = new DOMXPath($DOMDocumentObj);
@@ -205,7 +205,7 @@ function parse_html_to_node_string ($htmlString, $delimiterTag = 'node', $DOMDoc
  */
 
 function parse_translated_nodes_to_html ($templateHtml, $translatedNodeString, $DOMDocumentObj) {
-	
+
 	$DOMDocumentObj->loadHTML($templateHtml);
 	$xpath = new DOMXPath($DOMDocumentObj);
 	
@@ -221,7 +221,6 @@ function parse_translated_nodes_to_html ($templateHtml, $translatedNodeString, $
 			$textNodes->item($i)->nodeValue = (String) $translatedNodes[$i];
 		}
 	}
-	
 	// pull out the body tag of our document to reflect original HTML string.
 	$restoredHTML = $xpath->document->saveHTML(
 		$DOMDocumentObj->getElementsByTagName('body')->item(0)
@@ -232,7 +231,14 @@ function parse_translated_nodes_to_html ($templateHtml, $translatedNodeString, $
 	//$restoredHTML = mb_convert_encoding($restoredHTML, "HTML-ENTITIES", "UTF-8");
 	
 	$restoredHTML = html_entity_decode($restoredHTML);
-	
+
+	// replace our custom tags for the special character entities and don't decode them
+	// (we want them to remain as their original entities in the restoredHTML)
+	$restoredHTML = preg_replace('/<i a="lt"><\/i>/i', '&lt;', $restoredHTML);
+	$restoredHTML = preg_replace('/<i a="gt"><\/i>/i', '&gt;', $restoredHTML);
+	$restoredHTML = preg_replace('/<i a="amp"><\/i>/i', '&amp;', $restoredHTML);
+	$restoredHTML = preg_replace('/<i a="quot"><\/i>/i', '&quot;', $restoredHTML);
+
 	// remove the left-over body tag
 	$restoredHTML = str_replace('<body>', '', $restoredHTML);
 	$restoredHTML = str_replace('</body>', '', $restoredHTML);

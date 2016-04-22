@@ -64,11 +64,18 @@ if ($requestType === 'text' && $requestStringLength > 5000) {
 // if the text may have markup 
 if ($requestType === 'english') {
 	$stringToTranslate = $requestString;
-	
+
 	if($requestStringContainsHTML) {
 		
 		// create a DOMDocument object to pass into functions
 		$DOMDocumentObj = new DOMDocument();
+
+		// replace special character entities with custom tags that will 
+		// be parsed out and replaced with their original entities later
+		$requestString = preg_replace('/&lt;/i', '<i a="lt"></i>', $requestString);
+		$requestString = preg_replace('/&gt;/i', '<i a="gt"></i>', $requestString);
+		$requestString = preg_replace('/&amp;/i', '<i a="amp"></i>', $requestString);
+		$requestString = preg_replace('/&quot;/i', '<i a="quot"></i>', $requestString);
 
 		// like this one. here we rip out the HTML which our translation service does not care about
 		$stringToTranslate = parse_html_to_node_string ($requestString, 'n', $DOMDocumentObj);
@@ -93,7 +100,7 @@ if ($requestType === 'english') {
 		die(json_encode($responseObj));
 		
 	}
-	
+
 	// otherwise, add our translated responses for each requested language
 	$languageCounter = 0;
 	foreach ($translations as $translation) {
