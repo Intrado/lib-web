@@ -48,3 +48,7 @@ CREATE TABLE smslanguage (
   name VARCHAR(100) NOT NULL
 )
 $$$
+
+-- $rev 5
+ALTER TABLE smsrenderedmessage MODIFY renderedmessage TEXT CHARSET utf8mb4
+$$$
