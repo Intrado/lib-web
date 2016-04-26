@@ -18,6 +18,7 @@ require_once("inc/formatters.inc.php");
 require_once("obj/ReportInstance.obj.php");
 require_once("obj/ReportGenerator.obj.php");
 require_once("obj/Phone.obj.php");
+include_once("obj/FieldMap.obj.php");
 
 require_once("obj/SmsStatusReport.obj.php");
 
