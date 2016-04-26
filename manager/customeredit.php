@@ -1296,13 +1296,6 @@ document.observe('dom:loaded', function() {
 		if (checkbox.checked == 0)
 			checkbox.checked = !confirm("Are you sure you want to DISABLE this customer?");
 	});
-	$('newcustomer_softdisable').observe("change", function (event) {
-
-		var checkbox = $('newcustomer_softdisable');
-		if (checkbox.checked == 1)
-			checkbox.checked = confirm("Are you sure you want to temporarily DISABLE this customer?");
-	});
-
 	$('newcustomer_shortcodegroup').observe("change", function (event) {
 		smsFunctions.showData();
 	});

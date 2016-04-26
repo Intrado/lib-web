@@ -21,6 +21,7 @@ if (isset($_GET['logout'])) {
 	@session_destroy();
 }
 
+
 // force ssl
 if ($SETTINGS['feature']['has_ssl'] && $SETTINGS['feature']['force_ssl'] && !isset($_SERVER["HTTPS"])) {
 	$secureurl = "https://" . $_SERVER["SERVER_NAME"] . "/$CUSTOMERURL/index.php";
@@ -145,30 +146,47 @@ if ($userid && $userid != -1) {
 
 $custname = getCustomerName($CUSTOMERURL); // also found by getSystemSetting("displayname") but we may not be logged in yet
 
+
+
+//////////////////////////////////////////////////
+//////////    SOFT DISABLE        ////////////////
+//////////////////////////////////////////////////
+
+$softDisableLock = false;
+
+// Test whether a string begins with something
+function startsWith($haystack, $needle) {
+    $length = strlen($needle);
+    return (substr($haystack, 0, $length) === $needle);
+}
+
+// Test whether a string ends with something
+function endsWith($haystack, $needle) {
+    return substr($haystack, -strlen($needle))===$needle;
+}
+
+// We know a customer's account is temp disabled if it begins and ends with parenthesis.
+if (startsWith($custname, '(') && endsWith($custname, ')')) {
+	$softDisableLock = true;
+	$custname = trim($custname, '()');
+}
+
+
+
 $TITLE=_L("Login");
 //primary colors are pulled in login top
 include_once("logintop.inc.php");
 ?>
 	<form action="index.php" method="POST">
 		<input type="hidden" name="last" id="lasturl" value="<?= (isset($_GET['last']) ? "?last=" . $_GET['last'] : '') ?>" />
-<? if ($custname) { ?>
+<? if ($custname && !$softDisableLock) { ?>
 
-		<noscript><p><?=_L("It looks like you don't have JavaScript enabled! You must have JavaScript enabled for full use of this system. Please enable JavaScript in your browser or contact your system administrator for assistance.")?></p></noscript>
+	<noscript><p><?=_L("It looks like you don't have JavaScript enabled! You must have JavaScript enabled for full use of this system. Please enable JavaScript in your browser or contact your system administrator for assistance.")?></p></noscript>
 
-<!-- TODO: Add condition for softDisable warning box. -->
-<?
-/*if ($softDisableLock) { ?>
-		<p class="error"><?=_L("NOTE: Your access to this application will be unavailable temporarily while we perform some important system maintenance. Please contact Support if access is not restored.")?></p>
-<? }
-
-*/ ?>
-
-<? if ($badlogin) { ?>
+	<? if ($badlogin) { ?>
 		<p class="error"><?=_L("Incorrect username/password. Please try again.")?></p>
-<? } else if ($softlock) { ?>
-		<p class="error"><?=_L("You are temporarily locked out of the system.  Please contact your System Administrator if you have forgotten your password and try again later.")?></p>
-<? }  ?>
-		
+	<? } ?>
+
 		<fieldset>
 		<label class="indexform" for="form_login"><?=_L("Login:")?></label>
 		<input type="text" name="login" id="form_login" size="20" maxlength="255" />
@@ -188,7 +206,8 @@ include_once("logintop.inc.php");
 
 		<p class="right"><a href="forgotpassword.php?forceLocal=true"><?=_L("Forgot your password? Click Here")?></a></p>
 
-
+<? } else if ($softDisableLock) { ?>
+	<p class="error"><?=_L("NOTE: Your access to this application will be unavailable temporarily while we perform some important system maintenance. This will begin at <time> and may be offline for up to <N> minutes. Please contact Support if access is not restored.")?></p>
 <? } else { ?>
 		<p>&nbsp;&nbsp;<?=_L("Invalid customer URL. Please check the web address and try again.")?></p>
 <? }?>

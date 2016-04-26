@@ -9,15 +9,6 @@ $formdata["enabled"] = array(
 		"helpstep" => $helpstepnum
 );
 
-$formdata["softdisable"] = array(
-		"label" => _L('Soft Disable'),
-		"fieldhelp" => "This box is a soft disable for this customer.",
-		"value" => isset($custinfo)?$custinfo["softdisable"]:"",
-		"validators" => array(),
-		"control" => array("CheckBox"),
-		"helpstep" => $helpstepnum
-);
-
 //Unable to change shard on this form
 if (!$customerid) {
 	$formdata["shard"] = array(
@@ -217,12 +208,8 @@ function saveRequiredFields($custdb,$customerid,$postdata) {
 		setCustomerSystemSetting("_customerenabled", "0", $custdb);
 		// Remove active import alerts but leave the alert rules since they will not trigger for disabled customers
 		QuickUpdate("delete from importalert where customerid=?", $sharddb, array($customerid));
-
-	} else if ($postdata["softdisable"]) {
-		setCustomerSystemSetting("_customersoftdisable", "1", $custdb);
 	} else {
 		setCustomerSystemSetting("_customerenabled", "1", $custdb);
-		setCustomerSystemSetting("_customersoftdisable", "0", $custdb);
 	}
 
 	if(getCustomerSystemSetting('_dmmethod', '', true, $custdb)!='asp' && $postdata["dmmethod"] == 'asp'){

@@ -236,13 +236,6 @@ if (getSystemSetting("_hasfacebook") && $ACCESS->getPermission("facebookpost")) 
 }
 
 include("nav.inc.php");
-
-// find out if the account is temp disabled. redirect to login page if it is
-$softDisable = getSystemSetting('_customersoftdisable');
-if ($softDisable) {
-	echo "<script type='text/javascript'>customerSoftDisable();</script>";
-}
-
 ?>
 
 	<div class="wrapper">
