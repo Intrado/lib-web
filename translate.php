@@ -76,6 +76,10 @@ if ($requestType === 'english') {
 		$requestString = preg_replace('/&gt;/i', '<i a="gt"></i>', $requestString);
 		$requestString = preg_replace('/&amp;/i', '<i a="amp"></i>', $requestString);
 		$requestString = preg_replace('/&quot;/i', '<i a="quot"></i>', $requestString);
+		$requestString = preg_replace('/\t/i', '<i a="tb"></i>', $requestString);
+		$requestString = preg_replace('/\r\n/i', '<i a="crlf"></i>', $requestString);
+		$requestString = preg_replace('/\r/i', '<i a="cr"></i>', $requestString);
+		$requestString = preg_replace('/\n/i', '<i a="lf"></i>', $requestString);
 
 		// like this one. here we rip out the HTML which our translation service does not care about
 		$stringToTranslate = parse_html_to_node_string ($requestString, 'n', $DOMDocumentObj);

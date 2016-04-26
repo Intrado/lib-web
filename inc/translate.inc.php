@@ -238,6 +238,10 @@ function parse_translated_nodes_to_html ($templateHtml, $translatedNodeString, $
 	$restoredHTML = preg_replace('/<i a="gt"><\/i>/i', '&gt;', $restoredHTML);
 	$restoredHTML = preg_replace('/<i a="amp"><\/i>/i', '&amp;', $restoredHTML);
 	$restoredHTML = preg_replace('/<i a="quot"><\/i>/i', '&quot;', $restoredHTML);
+	$restoredHTML = preg_replace('/<i a="tb"><\/i>/i', '\t', $restoredHTML);
+	$restoredHTML = preg_replace('/<i a="crlf"><\/i>/i', '\r\n', $restoredHTML);
+	$restoredHTML = preg_replace('/<i a="cr"><\/i>/i', '\r', $restoredHTML);
+	$restoredHTML = preg_replace('/<i a="lf"><\/i>/i', '\n', $restoredHTML);
 
 	// remove the left-over body tag
 	$restoredHTML = str_replace('<body>', '', $restoredHTML);
