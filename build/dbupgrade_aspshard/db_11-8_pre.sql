@@ -52,3 +52,7 @@ $$$
 -- $rev 5
 ALTER TABLE smsrenderedmessage MODIFY renderedmessage TEXT CHARSET utf8mb4
 $$$
+
+-- $rev 6
+INSERT INTO smslanguage (code, name) values ('es', 'Spanish')
+$$$

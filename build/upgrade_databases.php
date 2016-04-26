@@ -120,7 +120,7 @@ $dbversions = array(
 		"11.2/2",
 		"11.5/1",
 		"11.7/2",
-		"11.8/5",
+		"11.8/6",
 	),
 
 	"deviceservice" => array(
