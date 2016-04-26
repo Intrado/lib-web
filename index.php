@@ -207,7 +207,7 @@ include_once("logintop.inc.php");
 		<p class="right"><a href="forgotpassword.php?forceLocal=true"><?=_L("Forgot your password? Click Here")?></a></p>
 
 <? } else if ($softDisableLock) { ?>
-	<p class="error"><?=_L("NOTE: Your access to this application will be unavailable temporarily while we perform some important system maintenance. This will begin at <time> and may be offline for up to <N> minutes. Please contact Support if access is not restored.")?></p>
+	<p class="error"><?=_L("NOTE: Your access to this application will be unavailable temporarily while we perform some important system maintenance. Please contact Support if access is not restored.")?></p>
 <? } else { ?>
 		<p>&nbsp;&nbsp;<?=_L("Invalid customer URL. Please check the web address and try again.")?></p>
 <? }?>
