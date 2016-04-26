@@ -17,7 +17,7 @@ $customerid = $_GET['customerid']+0;
 $query = "select indexsize, datasize  
 	 from disk_usage 
 	 where customerid = ?
-	 and date=curdate() - interval 2 day";
+	 and date=curdate() - interval 1 day";
 
 $res = Query($query, $aspdb, array($customerid));
 $datay = array();
