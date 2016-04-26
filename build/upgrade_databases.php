@@ -137,6 +137,8 @@ $dbversions = array(
 	"globaldestinationregistry" => array(
 		"0.1/1",
 		"11.7/2",
+		"11.8/2",
+		//etc., one array element per version, always the last revision of the given version
 	),
 
 	"infocenter" => array(

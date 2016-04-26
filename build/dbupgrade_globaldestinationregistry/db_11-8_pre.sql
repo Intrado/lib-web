@@ -1,4 +1,7 @@
 -- $rev 1
+-- no-op
+
+-- $rev 2
 
 create table identityjob (
     id int primary key auto_increment,
@@ -18,7 +21,7 @@ create table identityproviderevent (
 	  providerKey varchar(64) not null,
 	  details mediumtext, -- Provider specific event payload
     createdTimestampMs bigint not null,
-    index (createdTimestampMs)
+    index (createdTimestampMs),
     index (identityJobId)
 )
 $$$
@@ -30,7 +33,7 @@ create table identityprocessor (
     details text, -- Processor results/stats (JSON)
     createdTimestampMs bigint not null,
     index (createdTimestampMs),
-    index (identityProviderEventId),
+    index (identityProviderEventId)
 )
 $$$
 
@@ -94,12 +97,7 @@ create table identityeventsubscription (
 )
 $$$
 
-alter table endpoint add lastDeactivatedTimestampMs bigint
+alter table endpoint
+  add lastDeactivatedTimestampMs bigint,
+  add lastVerifiedTimestampMs bigint
 $$$
-
-alter table endpoint add lastVerifiedTimestampMs bigint
-$$$
-
-
--- $rev 2
--- no-op
