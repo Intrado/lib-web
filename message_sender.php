@@ -366,7 +366,7 @@ class ValSmsTranslationCharacterLimit extends Validator {
 
 class ValSmsTranslationItemCharacterLimit extends Validator {
 	function validate ($value, $args, $requiredvalues) {
-		$textlength = strlen($requiredvalues[$args['field']]);
+		$textlength = strlen($value['text']);
 		if ($textlength > 1600)
 			return "$this->label is unavalable if the message is more than 1600 characters. The message is currently $textlength characters.";
 		if ($textlength == 0)
