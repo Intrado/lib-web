@@ -1284,6 +1284,7 @@ document.observe('dom:loaded', function() {
 			$('newcustomer_smscustomername').value = $('newcustomer_displayname').value;
 		} else {
 			$('newcustomer_enablesmsoptin').checked = 0;
+			$('newcustomer_hassmstranslation').checked = 0;
 			$('newcustomer_smscustomername').value = '';
 		}
 	});
