@@ -1,1 +1,0 @@
-gXMLBuffer ="<?xml version=\"1.0\" encoding=\"utf-8\" ?><data  src=\"toc57.js\"  name=\"Profiles\"><item name=\"Managing Access Profiles\" url=\"System_Administration/User_Management/Managing_Access_Profiles.htm\" /></data>";

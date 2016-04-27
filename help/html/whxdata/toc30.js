@@ -1,1 +1,0 @@
-gXMLBuffer ="<?xml version=\"1.0\" encoding=\"utf-8\" ?><data  src=\"toc25.js\"  name=\"Intro Message Management\"><item name=\"Customizing Intro Messages\" url=\"System_Administration/Intro_Messages/Customizing_Intro_Messages.htm\" /></data>";

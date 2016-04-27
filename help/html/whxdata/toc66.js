@@ -1,1 +1,0 @@
-gXMLBuffer ="<?xml version=\"1.0\" encoding=\"utf-8\" ?><data  src=\"toc57.js\"  name=\"SmartCall\"><item name=\"Using SmartCall\" url=\"System_Administration/SmartCall/Using_SmartCall.htm\" /></data>";

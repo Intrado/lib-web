@@ -1,1 +1,0 @@
-gXMLBuffer ="<?xml version=\"1.0\" encoding=\"utf-8\" ?><data  src=\"toc25.js\"  name=\"Subscriber\"><item name=\"Configuring the Subscriber Feature\" url=\"System_Administration/Subscriber_Feat/Configuring_the_Subscriber_Feature.htm\" /><item name=\"Setting Up Subscriber Fields\" url=\"System_Administration/Subscriber_Feat/Setting_Up_Subscriber_Fields.htm\" /></data>";

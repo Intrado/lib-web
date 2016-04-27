@@ -1,1 +1,0 @@
-gXMLBuffer ="<?xml version=\"1.0\" encoding=\"utf-8\" ?><data  src=\"toc15.js\"  name=\"Twitter\"><item name=\"Twitter\" url=\"Social_Media/Twitter.htm\" /></data>";

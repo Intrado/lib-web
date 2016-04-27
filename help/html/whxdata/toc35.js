@@ -1,1 +1,0 @@
-gXMLBuffer ="<?xml version=\"1.0\" encoding=\"utf-8\" ?><data  src=\"toc.js\"  name=\"PDF Guides\"><item name=\"PDF Guides\" url=\"PDFs/PDF_Guides.htm\" /></data>";

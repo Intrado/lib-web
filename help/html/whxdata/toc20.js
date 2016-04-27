@@ -1,1 +1,0 @@
-gXMLBuffer ="<?xml version=\"1.0\" encoding=\"utf-8\" ?><data  src=\"toc.js\"  name=\"SMS Messaging\"><item name=\"Before Sending SMS Messages\" url=\"SMS_Messaging/Before_You_Send_an_SMS.htm\" /><item name=\"About SMS Messaging\" url=\"SMS_Messaging/About_SMS_Messaging.htm\" /></data>";
