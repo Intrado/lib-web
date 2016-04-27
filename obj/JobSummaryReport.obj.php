@@ -59,14 +59,14 @@ class JobSummaryReport extends ReportGenerator{
 		$reportPersonCountQuery = "select count(*) as totalcontacts
 									from reportperson rp
 									left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
-									where rp.jobid in ('" . $joblist . "')
+									where rp.jobid in ($joblist)
 									  and rp.type='phone'";
 
 		$reportPersonCountResults = QuickQueryRow($reportPersonCountQuery, true, $readonlyconn);
 
 		$reportContactCountQuery = "select count(*) as totalwithphone
 									  from reportcontact rc
-									 where rc.jobid in ('" . $joblist . "')
+									 where rc.jobid in ($joblist)
 									   and rc.type='phone'";
 
 		$reportContactCountResults = QuickQueryRow($reportContactCountQuery, true, $readonlyconn);
@@ -75,7 +75,7 @@ class JobSummaryReport extends ReportGenerator{
 									sum(rc.result in ('A', 'M')) as contacted,
 									sum(rc.numattempts) as totalattempts
 								from reportcontact rc
-								where rc.jobid in ('" . $joblist . "')
+								where rc.jobid in ($joblist)
 								and rc.type = 'phone'";
 
 		$reportContactResults = QuickQueryRow($reportContactQuery, true, $readonlyconn);
@@ -97,14 +97,14 @@ class JobSummaryReport extends ReportGenerator{
 		$reportPersonCountQuery = "select count(*) as totalcontacts
 								from reportperson rp
 								left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
-								where rp.jobid in ('" . $joblist . "')
+								where rp.jobid in ($joblist)
 								  and rp.type='email'";
 
 		$reportPersonCountResults = QuickQueryRow($reportPersonCountQuery, true, $readonlyconn);
 
 		$reportContactCountQuery = "select count(rc.jobid) as totalwithemail
 									  from reportcontact rc
-									 where rc.jobid in ('" . $joblist . "')
+									 where rc.jobid in ($joblist)
 									   and rc.type='email'";
 
 		$reportContactCountResults = QuickQueryRow($reportContactCountQuery, true, $readonlyconn);
@@ -112,7 +112,7 @@ class JobSummaryReport extends ReportGenerator{
 		$reportContactQuery = "select sum(rc.result in ('duplicate', 'blocked', 'duplicate', 'declined', 'unsent')) as notcontacted,
 								sum(rc.result = 'sent') as contacted
 							   from reportcontact rc
-							   where rc.jobid in ('" . $joblist . "')
+							   where rc.jobid in ($joblist)
 								 and rc.type='email'";
 
 		$reportContactResults = QuickQueryRow($reportContactQuery, true, $readonlyconn);
@@ -128,7 +128,7 @@ class JobSummaryReport extends ReportGenerator{
 							100 * sum(rp.numcontacts and rp.status='success') / (sum(rp.numcontacts and rp.status != 'duplicate')) as success_rate
 						from reportperson rp
 							left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid AND rc.result not in ('decliend'))
-						where rp.jobid in ('" . $joblist . "')
+						where rp.jobid in ($joblist)
 							and rp.type='email'";
 
 		$emailInfoResults = QuickQueryRow($emailquery, true, $readonlyconn);
@@ -144,14 +144,14 @@ class JobSummaryReport extends ReportGenerator{
 		$reportPersonCountQuery = "select count(*) as totalcontacts
 									from reportperson rp
 									left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
-									where rp.jobid in ('" . $joblist . "')
+									where rp.jobid in ($joblist)
 									  and rp.type='sms'";
 
 		$reportPersonCountResults = QuickQueryRow($reportPersonCountQuery, true, $readonlyconn);
 
 		$reportContactCountQuery = "select count(*) as totalwithsms
 								from reportcontact rc
-								where rc.jobid in ('" . $joblist . "')
+								where rc.jobid in ($joblist)
 								  and rc.type = 'sms'";
 
 		$reportContactCountResults = QuickQueryRow($reportContactCountQuery, true, $readonlyconn);
@@ -160,7 +160,7 @@ class JobSummaryReport extends ReportGenerator{
 									sum(rc.result in ('duplicate', 'blocked', 'duplicate', 'declined', 'unsent')) as notcontacted,
 									sum(rc.result in ('delivered', 'sent')) as contacted
 								from reportcontact rc
-								where rc.jobid in ('" . $joblist . "')
+								where rc.jobid in ($joblist)
 								  and rc.type = 'sms'";
 
 		$reportContactResults = QuickQueryRow($reportContactQuery, true, $readonlyconn);
@@ -176,21 +176,21 @@ class JobSummaryReport extends ReportGenerator{
 		$reportPersonCountQuery = "select count(*) as totalcontacts
 									from reportperson rp
 									left join reportdevice rd on (rp.jobid = rd.jobid and rp.personid = rd.personid)
-									where rp.jobid in ('" . $joblist . "')
+									where rp.jobid in ($joblist)
 									  and rp.type='device'";
 
 		$reportPersonCountResults = QuickQueryRow($reportPersonCountQuery, true, $readonlyconn);
 
 		$reportContactCountQuery = "select count(*) as totalwithdevice
 									  from reportdevice rd
-									 where rd.jobid in ('" . $joblist . "')";
+									 where rd.jobid in ($joblist)";
 
 		$reportContactCountResults = QuickQueryRow($reportContactCountQuery, true, $readonlyconn);
 
 		$devicequery = "select sum(rd.result in ('blocked','declined','duplicate','unsent')) as notcontacted,
 								sum(rd.result = 'sent') as contacted
 							from reportdevice rd
-							where rd.jobid in ('" . $joblist . "')";
+							where rd.jobid in ($joblist)";
 
 		$reportContactResults = QuickQueryRow($devicequery, true, $readonlyconn);
 
@@ -231,14 +231,13 @@ class JobSummaryReport extends ReportGenerator{
 			$url = "startdate=" . $startdate . "&enddate=" . $enddate . "&jobtypes=" . $jobtypes . "&surveyonly=" . $surveyonly;
 		}
 
-		$joblist =  $this->params['joblist'];
-		$hasconfirmation = QuickQuery("select sum(value) from jobsetting where name = 'messageconfirmation' and jobid in ('" . $joblist . "')", $this->_readonlyDB);
+		$hasconfirmation = QuickQuery("select sum(value) from jobsetting where name = 'messageconfirmation' and jobid in (" . $this->params['joblist'] . ")", $this->_readonlyDB);
 
 		//Gather Detailed Destination Results
-		$phonenumberinfo = JobSummaryReport::getPhoneInfo($joblist, $this->_readonlyDB);
-		$emailinfo = JobSummaryReport::getEmailInfo($joblist, $this->_readonlyDB);
-		$smsinfo = JobSummaryReport::getSmsInfo($joblist, $this->_readonlyDB);
-		$deviceinfo = JobSummaryReport::getDeviceInfo($joblist, $this->_readonlyDB);
+		$phonenumberinfo = JobSummaryReport::getPhoneInfo($this->params['joblist'], $this->_readonlyDB);
+		$emailinfo = JobSummaryReport::getEmailInfo($this->params['joblist'], $this->_readonlyDB);
+		$smsinfo = JobSummaryReport::getSmsInfo($this->params['joblist'], $this->_readonlyDB);
+		$deviceinfo = JobSummaryReport::getDeviceInfo($this->params['joblist'], $this->_readonlyDB);
 
 		if($hasconfirmation){
 			$confirmedquery = "select sum(rc.response=1),
@@ -247,7 +246,7 @@ class JobSummaryReport extends ReportGenerator{
 											from reportperson rp
 											left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid AND rc.result NOT IN('declined'))
 											inner join job j on (j.id = rp.jobid)
-											where rp.jobid in ('" . $joblist . "')
+											where rp.jobid in (" . $this->params['joblist'] . ")
 										and rp.type='phone'";
 			$confirmedinfo = QuickQueryRow($confirmedquery, false, $this->_readonlyDB);
 		}
@@ -476,17 +475,16 @@ class JobSummaryReport extends ReportGenerator{
 			list($startdate, $enddate) = getStartEndDate($this->params['reldate'], $this->params);
 			$daterange = _L("From: %s To: %s",date("m/d/Y", $startdate),date("m/d/Y", $enddate));
 		}
-		$joblist =  $this->params['joblist'];
-		$jobIds = array();
-		if($joblist != "")
-			$jobIds=explode(",", $joblist);
+		$joblist = array();
+		if($this->params['joblist'] != "")
+			$joblist=explode(",", $this->params['joblist']);
 
-		$hassms = QuickQuery("select exists (select * from message m where m.type='sms' and m.messagegroupid = j.messagegroupid) from job j where id in ('" . $joblist . "')", $this->_readonlyDB);
+		$hassms = QuickQuery("select exists (select * from message m where m.type='sms' and m.messagegroupid = j.messagegroupid) from job j where id in (" . $this->params['joblist'] . ")", $this->_readonlyDB);
 		
-		$messageconfirmation = QuickQuery("select sum(value) from jobsetting where name = 'messageconfirmation' and jobid in ('" . $joblist . "')", $this->_readonlyDB) ? "1" : "0";
+		$messageconfirmation = QuickQuery("select sum(value) from jobsetting where name = 'messageconfirmation' and jobid in (" . $this->params['joblist'] . ")", $this->_readonlyDB) ? "1" : "0";
 
-		$params = array("jobId" => $joblist,
-						"jobcount" => count($jobIds),
+		$params = array("jobId" => $this->params['joblist'],
+						"jobcount" => count($joblist),
 						"daterange" => $daterange,
 						"hassms" => $hassms,
 						"hasJobSummaryGraphs" => "1",
