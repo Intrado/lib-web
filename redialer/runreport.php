@@ -41,6 +41,7 @@ if ($_dbcon == false) {
 require_once("{$incdir}/utils.inc.php");
 require_once("{$incdir}/memcache.inc.php");
 require_once("{$incdir}/auth.inc.php");
+require_once("{$incdir}/reportutils.inc.php");
 require_once("{$incdir}/DBMappedObject.php");
 require_once("{$incdir}/DBMappedObjectHelpers.php");
 require_once("{$incdir}/DBRelationMap.php");

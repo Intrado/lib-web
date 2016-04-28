@@ -23,6 +23,7 @@ include_once ("../jpgraph/jpgraph_pie.php");
 include_once ("../jpgraph/jpgraph_pie3d.php");
 include_once ("../jpgraph/jpgraph_canvas.php");
 
+require_once('../inc/reportutils.inc.php');
 require_once('../inc/graph.inc.php');
 require_once('../inc/graphjob.inc.php');
 

@@ -11,6 +11,7 @@ require_once("inc/formatters.inc.php");
 include_once("obj/Job.obj.php");
 include_once("obj/JobType.obj.php");
 require_once("obj/ReportGenerator.obj.php");
+require_once('inc/reportutils.inc.php');
 require_once("obj/JobSummaryReport.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
