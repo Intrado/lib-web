@@ -46,6 +46,7 @@ $formdata["timezone"] = array(
 
 $formdata["displayname"] = array(
 		"label" => _L('Display Name'),
+		"fieldhelp" => "To temporarily disable a customer's account, add a parenthesis before and after the display name. i.e. \"Pacific\" should become \"(Pacific)\" to soft disable.",
 		"value" => $settings['displayname'],
 		"validators" => array(
 				array("ValRequired"),

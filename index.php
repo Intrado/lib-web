@@ -145,7 +145,10 @@ if ($userid && $userid != -1) {
 }
 
 $custname = getCustomerName($CUSTOMERURL); // also found by getSystemSetting("displayname") but we may not be logged in yet
+echo $custname;
 
+error_log('$CUSTOMERURL=='.$CUSTOMERURL);
+error_log('$custname (before) =='.$custname);
 
 
 //////////////////////////////////////////////////
@@ -214,7 +217,7 @@ include_once("logintop.inc.php");
 	</form>
 <?
 
-if (!($custname === false)) { 
+if (!($custname === false) && !$softDisableLock) {
 ?>
 	<script type="text/javascript">
 <?
