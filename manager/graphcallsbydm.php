@@ -43,28 +43,77 @@ function fetchData($nrql) {
 	return $data;
 }
 
-$query = "select  dm.name
+$sinceUnit = "hour";
+if (isset($_GET['unit']) ) {
+	switch ($_GET['unit']) {
+		case "m":
+			$sinceUnit = "minutes";
+			break;
+		case "h":
+			$sinceUnit = "hours";
+			break;
+		case "d":
+			$sinceUnit = "days";
+			break;
+		case "w":
+			$sinceUnit = "weeks";
+			break;
+	}
+}
+
+$since = "";
+if (isset($_GET['since']) ) {
+	$since = "since " . $_GET['since'] . " " . $sinceUnit . " ago";
+	$title = "Results by DM $since";
+}
+
+$query = "select  dm.name, dm.dmgroupid
 			from dm dm
 			left join dmsetting s_dm_enabled on
 					(dm.id = s_dm_enabled.dmid
 					and s_dm_enabled.name = 'dm_enabled')
 			where dm.type = 'system'
-			 and s_dm_enabled.value = '1' and dm.enablestate='active'";
+			 and s_dm_enabled.value = '1' and dm.enablestate='active' 
+			 order by dm.dmgroupid, dm.name";
 
 $result = Query($query);
 
-$dmNames = array();
+$dmNamesByDatacenter = array();
 while($row = DBGetRow($result)) {
-	$dmNames[]=$row[0];
+	if (!preg_match("/voipin/",$row[0])) {
+		if (preg_match("/va-/",$row[0])) {
+			$dmNamesByDatacenter["dc2"][$row[1]][] = $row[0];
+		} else if (preg_match("/.ch1/",$row[0])) {
+			$dmNamesByDatacenter["ch1"][$row[1]][] = $row[0];
+		} else {
+			$dmNamesByDatacenter["sv3"][$row[1]][] = $row[0];
+		}
+	}
+}
+
+$dmNames = array();
+$datacenters = array("sv3","dc2","ch1");
+$i=1;
+$j=10;
+foreach ($datacenters as $datacenter) {
+	$dmgroups = $dmNamesByDatacenter[$datacenter];
+	foreach ($dmgroups as $dmgroupid => $dmNamesInGroup) {
+		foreach ($dmNamesInGroup as $dmName) {
+			$dmNames[] = $dmName;
+		}
+		$dmNames[] = str_repeat(" ", $i++);
+	}
+	$dmNames[] = str_repeat("=",$j++);
+	$dmNames[] = str_repeat(" ",$i++);
 }
 
 $resultData = array();
 foreach ($resultValues as $resultValue) {
 	$nrql = '';
 	if ($resultValue == 'hangup') {
-		$nrql = "SELECT count(*) from notification where appName='prod/sysDispatcher' and name='phone' and result in ('answered','machine') and earlyHangup is true since 24 hours ago LIMIT 200 FACET dmName";
+		$nrql = "SELECT count(*) from notification where appName='prod/sysDispatcher' and name='phone' and result in ('answered','machine') and earlyHangup is true $since LIMIT 200 FACET dmName";
 	} else {
-		$nrql = "SELECT count(*) from notification where appName='prod/sysDispatcher' and name='phone' and result='$resultValue' since 24 hours ago facet dmName LIMIT 200";
+		$nrql = "SELECT count(*) from notification where appName='prod/sysDispatcher' and name='phone' and result='$resultValue' $since facet dmName LIMIT 200";
 	}
 	$fetchedData = fetchData($nrql);
 	foreach ($dmNames as $dmName) {
@@ -77,6 +126,15 @@ foreach ($resultValues as $resultValue) {
 		} else {
 			$resultData[$resultValue][$dmName] = 0;
 		}
+	}
+}
+
+foreach ($dmNames as $dmName) {
+	if (preg_match("/voip/",$dmName)) {
+		$resultData["unknown"][$dmName] = $resultData["noanswer"][$dmName] + $resultData["badnumber"][$dmName] + $resultData["trunkbusy"][$dmName];
+		$resultData["noanswer"][$dmName] = 0;
+		$resultData["badnumber"][$dmName] = 0;
+		$resultData["trunkbusy"][$dmName] = 0;
 	}
 }
 
@@ -98,25 +156,14 @@ $cpcolors = array(
 	"trunkbusy" => "yellow",
 	"unknown" => "dodgerblue"
 );
-/*
-echo "Dms " . count($dmNames);
-echo "Answered " . count($data['answered']);
-echo "Machine " . count($data['machine']);
-echo "HangUp " . count($data['hangup']);
-echo "Busy " . count($data['busy']);
-echo "noAnswer " . count($data['noanswer']);
-echo "badnumber " . count($data['badnumber']);
-echo "fail " . count($data['fail']);
-echo "trunkbusy " . count($data['trunkbusy']);
-echo "unknown " . count($data['unknown']);
-*/
+
 // Create the graph. These two calls are always required
 $graph = new Graph(1400, 600,"auto");
 $graph->SetScale("textlin");
 $graph->SetFrame(false);
 
 //$graph->SetShadow();
-$graph->img->SetMargin(60,90,20,70);
+$graph->img->SetMargin(60,90,20,270);
 
 $b1plot = new BarPlot(array_values($data["answered"]));
 $b1plot->SetFillColor($cpcolors["answered"]);
@@ -162,7 +209,7 @@ $gbplot->SetWidth(0.7);
 // ...and add it to the graPH
 $graph->Add($gbplot);
 
-$graph->title->Set("By DM $startdate to $enddate");
+$graph->title->Set($title);
 $graph->xaxis->SetTickLabels($titles);
 $graph->xaxis->SetLabelAngle(90);
 

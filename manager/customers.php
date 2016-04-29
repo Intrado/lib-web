@@ -245,6 +245,8 @@ foreach ($customers as $cust) {
 		
 		$customerfeatures = array();
 
+		if (getCustomerSystemSetting('_testcustomer', false, true, $custdb))
+			$customerfeatures[] = "TEST";
 		if (getCustomerSystemSetting('_hasportal', false, true, $custdb))
 			$customerfeatures[] = "ContactMgr";
 		if (getCustomerSystemSetting('_hasldap', false, true, $custdb))
