@@ -50,7 +50,7 @@ CREATE TABLE smslanguage (
 $$$
 
 -- $rev 5
-ALTER TABLE smsrenderedmessage MODIFY renderedmessage TEXT CHARSET utf8mb4
+ALTER TABLE smsrenderedmessage MODIFY renderedmessage TEXT CHARSET utf8
 $$$
 
 -- $rev 6
