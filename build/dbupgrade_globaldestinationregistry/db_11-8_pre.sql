@@ -82,7 +82,7 @@ $$$
 create table identityeventsubscriber (
     id int primary key auto_increment,
     name varchar(64) not null,
-    notificationUrl varchar(512) not null,
+    notificationUrl varchar(2048) not null,
     pageSize int,
     lastEventId int,
     modifiedTimestampMs bigint not null,
