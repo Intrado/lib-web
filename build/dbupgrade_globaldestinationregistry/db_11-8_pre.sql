@@ -79,19 +79,18 @@ create table identityevent (
 )
 $$$
 
-create table identityeventsubscriber (
+create table subscriber (
     id int primary key auto_increment,
     name varchar(64) not null,
     notificationUrl varchar(2048) not null,
     pageSize int,
-    lastEventId int,
-    modifiedTimestampMs bigint not null,
+    lastIdentityEventId int,
     createdTimestampMs bigint not null,
     status enum('ACTIVE','INACTIVE') not null
 )
 $$$
 
-create table identityeventsubscription (
+create table subscription (
     identityEventSubscriberId int not null,
     type enum('UPDATE_MERGE', 'DEACTIVATION', 'PORT', 'RESET') not null
 )
