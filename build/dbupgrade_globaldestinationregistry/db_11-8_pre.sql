@@ -98,6 +98,7 @@ create table identityeventsubscription (
 $$$
 
 alter table endpoint
+  add lastVerifiedTimestampMs bigint,
   add lastDeactivatedTimestampMs bigint,
-  add lastVerifiedTimestampMs bigint
+  add lastIdentifiedTimestampMs bigint
 $$$
