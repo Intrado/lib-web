@@ -201,15 +201,26 @@ $TITLE = "SMS Text Editor";
 
 include_once("nav.inc.php");
 
+// Find out if we have any translations to our SMS, so we can issue a notice to the user
+$translatedmessage = DBFind("Message", "from message
+					where messagegroupid = ?
+					and autotranslate = 'translated'", false, array($messagegroup->id));
+
+$translationfound = $translatedmessage->languagecode;
+
+if($translationfound) {
+	echo "<div class='major major-warning'><span class='blast'>warning:</span> This message has translations. To view the translated message(s), please use Message Sender instead.</div>";
+}
+
 // Optional Load Custom Form Validators
 ?>
 <script type="text/javascript">
 <? Validator::load_validators(array("ValSmsText")); ?>
 </script>
 <?
-
 startWindow($messagegroup->name);
 echo $form->render();
 endWindow();
+
 include_once("navbottom.inc.php");
 ?>
