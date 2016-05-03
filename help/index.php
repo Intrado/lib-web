@@ -25,10 +25,11 @@ require_once("../inc/sessionhandler.inc.php");
 // we just want to confirm that someone is logged in to this customer
 doStartSession();
 
-if (!isset($_SESSION['user']))
+if (!isset($_SESSION['user'])) {
 	header("Location: ..");
-else
+}
+else {
 	$helpURL = ($SETTINGS["help"]["url"] ? $SETTINGS["help"]["url"] : "https://static.schoolmessenger.com/help/SchoolMessenger/index.html");
 	header("Location: $helpURL");
+}
 
-?>
