@@ -104,3 +104,8 @@ $$$
 INSERT INTO `dmgroup` (`id`, `name`, `carrierRateModelId`, `carrierRateModelClassname`, `carrierRateModelParams`, `routeType`) VALUES
 (46,'DmAPI HyperCube VA Firstcall',27,'HyperCube','{"state":"va"}','firstcall')
 $$$
+
+-- $rev 5
+INSERT INTO `dmgroup` (`id`, `name`, `carrierRateModelId`, `carrierRateModelClassname`, `carrierRateModelParams`, `routeType`) VALUES
+(47,'DmAPI HyperCube CA-AWS Firstcall',28,'HyperCube','{"state":"ca"}','firstcall')
+$$$
