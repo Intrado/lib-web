@@ -463,6 +463,9 @@ $twitterreservedchars = mb_strlen(" http://". getSystemSetting("tinydomain"). "/
 $ttslanguages = Voice::getTTSLanguageMap();
 unset($ttslanguages['en']);
 
+//Get available sms translation languages
+$smslanguages = Sms::getSMSTranslationLanguageMap();
+
 // get available translation languages
 global $TRANSLATIONLANGUAGECODES;
 $alllanguages = QuickQueryList("select code, name from language", true);
@@ -732,7 +735,9 @@ foreach ($translationlanguages as $code => $language) {
 		"control" => array("TextField"),
 		"helpstep" => 1
 	);
+}
 
+foreach ($smslanguages as $code => $language) {
 	$formdata["smsmessagetexttranslate". $code. "text"] = array(
 		"label" => "smsmessagetexttranslate". $code. "text",
 		"value" => "",
@@ -1041,7 +1046,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		Query("BEGIN");
 
 		// Get a Message Sender Processor
-		$msp = new MessageSenderProcessor($displayingCallerid, $ttslanguages, $translationlanguages);
+		$msp = new MessageSenderProcessor($displayingCallerid, $ttslanguages, $translationlanguages, $smslanguages);
 
 		// The post handler will return a job that's ready to use if all went to plan
 		$rawdata = $_POST;
@@ -1277,11 +1282,13 @@ include("navbottom.inc.php");
 class MessageSenderProcessor {
 	private $displayingCallerid;
 	private $ttslanguages;
+	private $smslanguages;
 	private $translationlanguages;
 
-	function MessageSenderProcessor($dispCallerId, $ttsLangs, $translationLangs) {
+	function MessageSenderProcessor($dispCallerId, $ttsLangs, $translationLangs, $smsLangs) {
 		$this->displayingCallerid = $dispCallerId;
 		$this->ttslanguages = $ttsLangs;
+		$this->smslanguages = $smsLangs;
 		$this->translationlanguages = $translationLangs;
 	}
 
@@ -1607,26 +1614,24 @@ class MessageSenderProcessor {
 		// SMS Message
 		// =============================================================
 		if (isset($postdata["hassms"]) && $postdata["hassms"] && $USER->authorize("sendsms")) {
+			// this is the default 'en' message so it's autotranslate value is 'none'
 			$messages['sms']['plain']['en']['none']['text'] = $postdata["smsmessagetext"];
 
 			// check for and retrieve translations
 			if (isset($postdata["smsmessagetexttranslate"]) && $postdata["smsmessagetexttranslate"]) {
-				foreach ($this->translationlanguages as $code => $language) {
+				foreach ($this->smslanguages as $code => $language) {
 					if (isset($postdata["smsmessagetexttranslate". $code. "text"])) {
 						$translatedmessage = json_decode($postdata["smsmessagetexttranslate". $code. "text"], true);
-						if ($translatedmessage["enabled"]) {
-							// if the translation text is overridden, don't attach a source message
-							// it isn't applicable since we have no way to know what they changed the text to.
-							if ($translatedmessage["override"]) {
-								// initially set the sms to the english version, then overwrite the text. All other data is shared
-								$messages['sms']['plain'][$code]['overridden'] = $messages['sms']['plain']['en']['none'];
-								$messages['sms']['plain'][$code]['overridden']['text'] = $translatedmessage["text"];
-							} else {
-								// initially set the sms to the english version, then overwrite the text. All other data is shared
-								$messages['sms']['plain'][$code]['translated'] = $messages['sms']['plain']['en']['none'];
-								$messages['sms']['plain'][$code]['translated']['text'] = $translatedmessage["text"];
-								$messages['sms']['plain'][$code]['source'] = $messages['sms']['plain']['en']['none'];
-							}
+					}
+					
+					if ($translatedmessage["enabled"]) {
+						// if the translation text is overridden, don't attach a source message
+						// it isn't applicable since we have no way to know what they changed the text to.
+						if ($translatedmessage["override"]) {
+							$messages['sms']['plain'][$code]['overridden']['text'] = $translatedmessage["text"];
+						} else {
+							$messages['sms']['plain'][$code]['translated']['text'] = $translatedmessage["text"];
+							$messages['sms']['plain'][$code]['source'] = $messages['sms']['plain']['en']['none'];
 						}
 					}
 				}
