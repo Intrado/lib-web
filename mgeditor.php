@@ -494,7 +494,7 @@ function makeMessageGrid($messagegroup) {
 		
 		// Print SMS message actions if SMS is available 
 		if (getSystemSetting('_hassms', false) && $USER->authorize('sendsms')) {
-			if ($languagecode == Language::getDefaultLanguageCode()) {
+			if ($languagecode) {
 				$actions = array();
 				$message = $messagegroup->getMessage('sms', 'plain', $languagecode);
 				if ($message) {
