@@ -295,4 +295,16 @@ function parse_survey_data($row, $index){
 	return isset($questiondata["q" . ($x-1)]) ? $questiondata["q" . ($x-1)] : "";
 
 }
+
+
+/**
+ * removes ' from job list and if not set, it sets to "0"
+ * @param $joblist
+ * @return mixed|string
+ */
+function cleanJobList($joblist){
+	return empty($joblist) ? "0" : str_replace("'", "", $joblist);
+}
+
+
 ?>

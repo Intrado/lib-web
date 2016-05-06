@@ -20,6 +20,7 @@ require_once("obj/ReportSubscription.obj.php");
 require_once("inc/reportgeneratorutils.inc.php");
 require_once("inc/form.inc.php");
 require_once("obj/UserSetting.obj.php");
+require_once('inc/reportutils.inc.php');
 require_once("obj/JobSummaryReport.obj.php");
 require_once("obj/JobDetailReport.obj.php");
 require_once("obj/JobType.obj.php");

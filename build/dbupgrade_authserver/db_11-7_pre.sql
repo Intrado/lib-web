@@ -92,3 +92,20 @@ $$$
 
 ALTER TABLE shortcode drop shortcodegroupid
 $$$
+
+-- $rev 4
+DELETE from dmgroup where id=45
+$$$
+
+INSERT INTO `dmgroup` (`id`, `name`, `dmGroupJmsProfileId`, `carrierRateModelId`, `carrierRateModelClassname`, `carrierRateModelParams`, `routeType`) VALUES
+(45,'JMS HyperCube CA Firstcall',23,26,'HyperCube','{"state":"ca"}','firstcall')
+$$$
+
+INSERT INTO `dmgroup` (`id`, `name`, `carrierRateModelId`, `carrierRateModelClassname`, `carrierRateModelParams`, `routeType`) VALUES
+(46,'DmAPI HyperCube VA Firstcall',27,'HyperCube','{"state":"va"}','firstcall')
+$$$
+
+-- $rev 5
+INSERT INTO `dmgroup` (`id`, `name`, `carrierRateModelId`, `carrierRateModelClassname`, `carrierRateModelParams`, `routeType`) VALUES
+(47,'DmAPI HyperCube CA-AWS Firstcall',28,'HyperCube','{"state":"ca"}','firstcall')
+$$$

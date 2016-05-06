@@ -18,6 +18,7 @@ if(isset($_GET['jobid'])){
 	}
 } else if(isset($_GET['startdate']) && isset($_GET['enddate']) && isset($_GET['jobtypes'])){
 	$jobid = implode("", getJobList($_GET['startdate'], $_GET['enddate'], $_GET['jobtypes'], $_GET['surveyonly']));
+	$jobid = empty($jobid) ? 0 : $jobid;
 }
 
 $jobstats = $_SESSION['jobstats'][$jobid];
