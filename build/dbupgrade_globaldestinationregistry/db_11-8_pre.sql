@@ -101,3 +101,34 @@ alter table endpoint
   add lastDeactivatedTimestampMs bigint,
   add lastIdentifiedTimestampMs bigint
 $$$
+
+-- $rev 3
+drop table identityjob
+$$$
+
+drop table identityproviderevent
+$$$
+
+drop table identityprocessor
+$$$
+
+drop table identityevent
+$$$
+
+drop table subscription
+$$$
+
+drop table subscriber
+$$$
+
+drop table IF EXISTS identityeventsubscriber
+$$$
+
+drop table  IF EXISTS identityeventsubscription
+$$$
+
+-- $rev 4
+-- Adding new actions, while maintaining order!
+alter table endpointevent
+modify column action ENUM('REGISTER', 'DEREGISTER', 'CONSENT', 'BLOCK', 'IDENTIFY', 'DEACTIVATE', 'VERIFY') NOT NULL
+$$$

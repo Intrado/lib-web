@@ -137,6 +137,11 @@ $dbversions = array(
 	"globaldestinationregistry" => array(
 		"0.1/1",
 		"11.7/2",
+		"11.8/4",
+		//etc., one array element per version, always the last revision of the given version
+	),
+
+	"globalidentity" => array(
 		"11.8/2",
 		//etc., one array element per version, always the last revision of the given version
 	),
@@ -338,6 +343,7 @@ require_once("dbupgrade_aspshard/dbupgrade_aspshard.php");
 require_once("dbupgrade_deviceservice/dbupgrade_deviceservice.php");
 require_once("dbupgrade_disk/dbupgrade_disk.php");
 require_once("dbupgrade_globaldestinationregistry/dbupgrade_globaldestinationregistry.php");
+require_once("dbupgrade_globalidentity/dbupgrade_globalidentity.php");
 require_once("dbupgrade_infocenter/dbupgrade_infocenter.php");
 require_once("dbupgrade_lcrrates/dbupgrade_lcrrates.php");
 require_once("dbupgrade_pagelink/dbupgrade_pagelink.php");
@@ -563,6 +569,9 @@ function apply_rev($db, $dbname, $version, $rev) {
 			break;
 		case "globaldestinationregistry":
 			apply_globaldestinationregistry($targetversion, $rev, $db);
+			break;
+		case "globalidentity":
+			apply_globalidentity($targetversion, $rev, $db);
 			break;
 		case "infocenter":
 			apply_infocenter($targetversion, $rev, $db);
