@@ -497,11 +497,15 @@ function makeMessageGrid($messagegroup) {
 			if ($languagecode) {
 				$actions = array();
 				$message = $messagegroup->getMessage('sms', 'plain', $languagecode);
-				if ($message) {
+				if ($message && $languagecode == 'en') {
 					$icon = "accept";
 					$actions[] = action_link("Preview","email_open",null,"showPreview(null,\'previewid=$message->id\');return false;");
 					$actions[] = action_link("Edit","pencil","editmessagesms.php?id=$message->id");
 					$actions[] = action_link("Delete","cross","mgeditor.php?delete=$message->id","return confirmDelete();");
+				}
+				else if ($message && $languagecode == 'es') {
+					$icon = "accept";
+					$actions[] = action_link("Preview","email_open",null,"showPreview(null,\'previewid=$message->id\');return false;");
 				} else {
 					$icon = "diagona/16/160";
 					$actions[] = action_link("New","pencil_add","editmessagesms.php?id=new&mgid=$messagegroup->id");
