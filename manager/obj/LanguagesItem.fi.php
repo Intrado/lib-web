@@ -56,12 +56,14 @@ class LanguagesItem extends FormItem {
 			}
 			function renderlanguages() {
 				var ttslangs = " . json_encode($this->args['ttslangs']) . ";
+				var smslangs = " . json_encode($this->args['smslangs']) . ";
 				var googlelangs = " . json_encode(array_keys($this->args['googlelangs'])) . ";
 				var langs = \$H($('$n').value.evalJSON(true));
 				var table = new Element('table',{'style':'text-align:left;'});
 				var tableheader = new Element('tr');
 				tableheader.insert(new Element('th').insert('Code'));
-				tableheader.insert(new Element('th',{'style':'border-left: 1px dashed black;border-right: 1px dashed black;'}).insert('TTS'));
+				tableheader.insert(new Element('th',{'style':'border-left: 1px dashed black;border-right: 1px dashed black;padding: .15em .2em;'}).insert('TTS'));
+				tableheader.insert(new Element('th',{'style':'border-left: 1px dashed black;border-right: 1px dashed black;padding: .15em .2em;'}).insert('SMS'));
 				tableheader.insert(new Element('th',{'style':'border-right: 1px dashed black;'}).insert('Translatable'));
 				tableheader.insert(new Element('th').insert('Name'));
 				table.insert(tableheader);
@@ -82,6 +84,10 @@ class LanguagesItem extends FormItem {
 					if (ttslangs.indexOf(lang.key) != -1)
 						tts.insert(new Element('img', {'src':'img/icons/accept.png'}));
 					tablecontent.insert(tts);
+					var smslng = new Element('td',{'style':'text-align:center;border-left: 1px dashed black;border-right: 1px dashed black;'});
+					if (lang.key == 'en' || smslangs.indexOf(lang.key) != -1)
+						smslng.insert(new Element('img', {'src':'img/icons/accept.png'}));
+					tablecontent.insert(smslng);
 					var translatable = new Element('td',{'style':'text-align:center;border-right: 1px dashed black;'});
 					if (googlelangs.indexOf(lang.key) != -1)
 						translatable.insert(new Element('img', {'src':'img/icons/accept.png'}));

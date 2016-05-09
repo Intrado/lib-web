@@ -511,6 +511,7 @@ $formdata["languages"] = array(
 		array("ValLanguages")),
 	"control" => array("LanguagesItem", 
 		"ttslangs" => $customerid?QuickQueryList("select languagecode from ttsvoice", false, $custdb):array_keys($ttslangs),
+		"smslangs" => $customerid?QuickQueryList("select code from smslanguage", false, $custdb):array_keys($smslangs),
 		"googlelangs" => $googlangs),
 	"helpstep" => $helpstepnum
 );
