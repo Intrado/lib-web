@@ -103,7 +103,7 @@ $versions = array(
 );
 
 // non-Customer databases
-$dbReleaseVersion = "11.8"; // version to update databases to if no revision changes for individual db, implies revision value of 1
+$dbReleaseVersion = "12.0"; // version to update databases to if no revision changes for individual db, implies revision value of 1
 $dbversions = array(
 	"authserver" => array(
 		"11.0/2",
@@ -121,6 +121,7 @@ $dbversions = array(
 		"11.5/1",
 		"11.7/2",
 		"11.8/6",
+		"12.0/1",
 	),
 
 	"deviceservice" => array(
