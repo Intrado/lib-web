@@ -61,11 +61,10 @@ if (isset($_GET['unit']) ) {
 	}
 }
 
-$since = "";
-if (isset($_GET['since']) ) {
-	$since = "since " . $_GET['since'] . " " . $sinceUnit . " ago";
-	$title = "Results by DM $since";
-}
+$sinceTime = (isset($_GET['since']) ? $_GET['since'] : 24);
+
+$since = "since " . $sinceTime . " " . $sinceUnit . " ago";
+$title = "Results by DM $since";
 
 $query = "select  dm.name, dm.dmgroupid
 			from dm dm
@@ -158,12 +157,12 @@ $cpcolors = array(
 );
 
 // Create the graph. These two calls are always required
-$graph = new Graph(1400, 600,"auto");
+$graph = new Graph(1400, 400,"auto");
 $graph->SetScale("textlin");
 $graph->SetFrame(false);
 
 //$graph->SetShadow();
-$graph->img->SetMargin(60,90,20,270);
+$graph->img->SetMargin(60,90,20,70);
 
 $b1plot = new BarPlot(array_values($data["answered"]));
 $b1plot->SetFillColor($cpcolors["answered"]);
