@@ -5,7 +5,7 @@ ENUM('C','A','M','N','B','X','F','sent','unsent','printed','notprinted',
 'delivered','undelivered','queueoverflow','accountsuspended','unreachabledest',
 'unknowndest','landline','carrierviolation','unknownerror',
 'failed', 'carrierblocked', 'consentdenied', 'consentpending',
-'bounced', 'opened', 'tempfail')
+'bounced', 'opened', 'tempfail','softbounce','invalidrecipent')
 NOT NULL
 $$$
 

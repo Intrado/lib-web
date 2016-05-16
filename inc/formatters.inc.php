@@ -710,6 +710,22 @@ function fmt_result ($row,$index) {
 			return "Confirmed";
 		case "notconfirmed":
 			return "Not Confirmed";
+		case "queueoverflow":
+			return "Queue Overflow";
+		case "accountsuspended":
+			return "Account Suspended";
+		case "unreachabledest":
+			return "Unreachable Destination";
+		case "unknowndest":
+			return "Unknown Destination";
+		case "carrierviolation":
+			return "Carrier Violation";
+		case "carrierblocked":
+			return "Carrier Blocked";
+		case "softbounced":
+			return "Soft Bounced";
+		case "invalidrecipient":
+			return "Invalid Recipient";
 		case "noconfirmation":
 			return "No Confirmation Response";
 		default:
@@ -796,15 +812,12 @@ function fmt_jobdetail_result($row, $index){
 		else
 			return "No Selected";
 	} else {
-		if ($row[5] == 'email' && $row[10] > 0) {
-			return fmt_email_result($row, 10);
-		} else {
-			return fmt_result($row, $index);
-		}
+		return fmt_result($row, $index);
 	}
 }
 
 // result formatter for email status code, used in JobDetailReport
+// MARCO No longer used.. we should remove these.
 function fmt_email_result ($row, $index) {
 	$result = "";
 	$status_code = intval($row[$index]);
@@ -823,6 +836,7 @@ function fmt_email_result ($row, $index) {
 	return $result;
 }
 
+// MARCO No longer used.. we should remove these.
 function display_read_duration($durationms) {
 	$result = "";
 	if (0 == $durationms) {

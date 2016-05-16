@@ -111,8 +111,8 @@ class JobSummaryReport extends ReportGenerator{
 
 		$reportContactCountResults = QuickQueryRow($reportContactCountQuery, true, $readonlyconn);
 
-		$reportContactQuery = "select sum(rc.result in ('duplicate', 'blocked', 'duplicate', 'declined', 'unsent')) as notcontacted,
-								sum(rc.result = 'sent') as contacted
+		$reportContactQuery = "select sum(rc.result in ('duplicate', 'blocked', 'declined', 'unsent', 'bounced', 'softbounced', 'invalidrecipient', 'unknownerror', 'failed' )) as notcontacted,
+								sum(rc.result in ('sent', 'delivered', 'opened')) as contacted
 							   from reportcontact rc
 							   where rc.jobid in ($joblist)
 								 and rc.type='email'";
@@ -159,7 +159,7 @@ class JobSummaryReport extends ReportGenerator{
 		$reportContactCountResults = QuickQueryRow($reportContactCountQuery, true, $readonlyconn);
 
 		$reportContactQuery = "select sum(rc.result in ('queued', 'sending')) as pending,
-									sum(rc.result in ('duplicate', 'blocked', 'duplicate', 'declined', 'unsent')) as notcontacted,
+									sum(rc.result in ('duplicate', 'blocked', 'declined', 'unsent', 'accountsuspended', 'unreachabledest', 'carrierblocked', 'unknowndest', 'landline', 'carrierviolation', 'unknownerror', 'failed')) as notcontacted,
 									sum(rc.result in ('delivered', 'sent')) as contacted
 								from reportcontact rc
 								where rc.jobid in ($joblist)

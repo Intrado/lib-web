@@ -55,7 +55,6 @@ require_once("{$objdir}/JobDetailReport.obj.php");
 require_once("{$objdir}/CallsReport.obj.php");
 require_once("{$objdir}/ContactChangeReport.obj.php");
 require_once("{$objdir}/PhoneOptOutReport.obj.php");
-require_once("{$objdir}/ConsentStatusReportGenerator.obj.php");
 require_once("{$objdir}/SmsStatusReport.obj.php");
 require_once("{$objdir}/Person.obj.php");
 require_once("{$objdir}/Phone.obj.php");
