@@ -507,12 +507,12 @@ function makeMessageGrid($messagegroup) {
 					$icon = "accept";
 					$actions[] = action_link("Preview","email_open",null,"showPreview(null,\'previewid=$message->id\');return false;");
 				}
-				else if (!$message && $language == 'en') {
+				else if (!$message && $languagecode == 'en') {
 					$icon = "diagona/16/160";
 					$actions[] = action_link("New","pencil_add","editmessagesms.php?id=new&mgid=$messagegroup->id");
 				} else {
 					$icon = "diagona/16/160";
-					$actions[] = action_link("SMS is unavailable in this language.", "Delete");
+					$actions[] = action_link("SMS is unavailable in this language.", "delete");
 				}
 				$linkrow[] = array('icon' => $icon,'title' => _L("%s SMS Message",$languagename), 'actions' => $actions,
 					'id' => "sms-plain-" . $languagecode);
