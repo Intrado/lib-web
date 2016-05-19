@@ -84,51 +84,57 @@ class Phone extends DBMappedObject {
 
 	static function validate ($phone) {
 		$phone = Phone::parse($phone);
-		$length = strlen($phone);
-		$error = array();
-		if ($length == 10) {
-			$areacode = $phone[0].$phone[1].$phone[2];
-			$prefix = $phone[3].$phone[4].$phone[5];
-			
-			// based on North American Numbering Plan
-			// read more at en.wikipedia.org/wiki/List_of_NANP_area_codes
 
-			if (($phone[0] < 2) || // areacode cannot start with 0 or 1
-				($phone[3] < 2) || // prefix cannot start with 0 or 1
-				($phone[1] == 1 && $phone[2] == 1) || // areacode cannot be N11
-				($phone[4] == 1 && $phone[5] == 1) || // prefix cannot be N11
-				($areacode == 555) || // areacode cannot be 555
-				($prefix == 555) // prefix cannot be 555
-				) {
-				// check special case N11 prefix with toll-free area codes
-				// en.wikipedia.org/wiki/Toll-free_telephone_number
-				if (($phone[4] == 1 && $phone[5] == 1) && (
-					($areacode == '800') ||
-					($areacode == '888') ||
-					($areacode == '877') ||
-					($areacode == '866') ||
-					($areacode == '855') ||
-					($areacode == '844') ||
-					($areacode == '833') ||
-					($areacode == '822') ||
-					($areacode == '880') ||
-					($areacode == '881') ||
-					($areacode == '882') ||
-					($areacode == '883') ||
-					($areacode == '884') ||
-					($areacode == '885') ||
-					($areacode == '886') ||
-					($areacode == '887') ||
-					($areacode == '888') ||
-					($areacode == '889')
-					)) {
-					return array(); // OK special case
-				}
-				$error[] = 'The phone number seems to be invalid';
+		$error = array();
+		if (strlen($phone) !== 10) {
+			$error[] = _L('The phone number must be exactly 10 digits long (including area code)');
+			$error[] = _L('You do not need to include a 1 for long distance');
+			return $error;
+		}
+
+		if ($phone === str_repeat($phone[0], 10)) {
+			$error[] = _L('The phone number cannot be all the same digit');
+			return $error;
+		}
+
+		$areacode = $phone[0].$phone[1].$phone[2];
+		$prefix = $phone[3].$phone[4].$phone[5];
+		
+		// based on North American Numbering Plan
+		// read more at en.wikipedia.org/wiki/List_of_NANP_area_codes
+
+		if (($phone[0] < 2) || // areacode cannot start with 0 or 1
+			($phone[3] < 2) || // prefix cannot start with 0 or 1
+			($phone[1] == 1 && $phone[2] == 1) || // areacode cannot be N11
+			($phone[4] == 1 && $phone[5] == 1) || // prefix cannot be N11
+			($areacode == 555) || // areacode cannot be 555
+			($prefix == 555) // prefix cannot be 555
+			) {
+			// check special case N11 prefix with toll-free area codes
+			// en.wikipedia.org/wiki/Toll-free_telephone_number
+			if (($phone[4] == 1 && $phone[5] == 1) && (
+				($areacode == '800') ||
+				($areacode == '888') ||
+				($areacode == '877') ||
+				($areacode == '866') ||
+				($areacode == '855') ||
+				($areacode == '844') ||
+				($areacode == '833') ||
+				($areacode == '822') ||
+				($areacode == '880') ||
+				($areacode == '881') ||
+				($areacode == '882') ||
+				($areacode == '883') ||
+				($areacode == '884') ||
+				($areacode == '885') ||
+				($areacode == '886') ||
+				($areacode == '887') ||
+				($areacode == '888') ||
+				($areacode == '889')
+				)) {
+				return array(); // OK special case
 			}
-		} else {
-				$error[] = 'The phone number must be exactly 10 digits long (including area code)';
-				$error[] = 'You do not need to include a 1 for long distance';
+			$error[] = _L('The phone number seems to be invalid');
 		}
 		return $error;
 	}
