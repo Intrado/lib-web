@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_list/editing_or_deleting_an_existing_list.htm
-The My Lists area displays all the lists that belong to this user account. You may edit or preview any list by clicking the links to the right of the name. You may also delete any list that you no longer have a need for.

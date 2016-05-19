@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_notification_job/jobsoverview.htm
-The Completed Jobs area displays a list of completed notification jobs created by the current user. You can view the settings used for a job by clicking the Edit link or you can view a job report by clicking the Report link. If you no longer wish to display a completed job you can remove it from this view by clicking the Archive link.

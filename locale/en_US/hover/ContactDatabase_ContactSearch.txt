@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#the_system_tab/the_contact_database.htm
-Use this page to find groups of contacts or individuals in the system. Contact Details for individuals may be viewed and edited by clicking on the magnifying glass next to their ID# in the search results.

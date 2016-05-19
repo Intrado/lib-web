@@ -1,4 +1,0 @@
-@help/schoolmessenger_help.htm#reports/hosted_attachment_log_summary.htm
-Hosted Attachment download statistics.
-Includes information about successful and unsuccessful notification attempts.
-Link to detailed report about downloads per recipient.

@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_survey_job/building_a_survey_template.htm
-Click Phone Survey if your survey has a phone component. Click leave message on answering machines if you have recorded a message for recipent's answering machines. Click Play introductory message to select the message recipients will hear when they answer the phone. Click Play goodbye message to select the message participants will hear when they have completed the survey.

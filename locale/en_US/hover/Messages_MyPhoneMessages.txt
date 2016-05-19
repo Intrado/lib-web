@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_message/editing_or_deleting_an_existing_message.htm
-The My Phone Messages area displays all the phone messages that you have created and saved. You may edit or preview any message by clicking the links to the right of the name. You may also delete any phone message that you no longer have a need for.

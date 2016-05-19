@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_survey_job/scheduling_a_survey_job.htm
-Click this to receive an email at the address associated with this account with a PDF report of the survey's results when the job is complete.

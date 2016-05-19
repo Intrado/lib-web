@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#reports/querying_report_data.htm
-Select criteria below to display a job or date range detail report. You can choose specific Job Types to further limit your results.

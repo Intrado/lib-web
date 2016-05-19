@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_notification_job/creating_a_new_job.htm
-If you wish to include a printed letter message as a part of this notification job select this option.

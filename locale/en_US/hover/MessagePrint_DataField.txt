@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_message/creating_a_new_print_message.htm
-To insert a data field into your letter body place the cursor in the location where you want the field to appear, select the field to insert, enter a default value (optional) that will be used for anyone having no data for the particular field, and then click Insert.

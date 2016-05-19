@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#the_admin_tab/settings.htm#Security
-This setting controls the number of invalid attempts a user has before a temporary lock is placed on their account.

@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_notification_job/creating_a_new_job.htm
-The date on which your job will commence.

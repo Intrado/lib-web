@@ -1,4 +1,0 @@
-@help/schoolmessenger_help.htm#the_admin_tab/managing_user_accounts.htm
-The Active Users section displays a list of all active user accounts. From here you can edit or view account properties, or temporarily disable accounts.
-
-Login as this user: Allows the system administrator to login as a particular user in order to perform user specific functions such as creating lists or messages.

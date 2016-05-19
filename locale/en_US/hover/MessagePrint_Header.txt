@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_message/creating_a_new_print_message.htm
-Enter up to 3 lines of header information that will print in bold at the top of each letter.

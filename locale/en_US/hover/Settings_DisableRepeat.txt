@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#the_admin_tab/settings.htm#Disable_Repeating_Jobs
-This setting will prevent all repeating jobs from running. This is typically used to disable Attendance jobs during the summer.

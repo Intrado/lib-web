@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_survey_job/scheduling_a_survey_job.htm
-Enter the maximum number of times the system can attempt to contact a recipient with this survey.

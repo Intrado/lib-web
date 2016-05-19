@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_notification_job/creating_a_new_job.htm
-Click Create New Job to send a combination of phone, email or sms messages. This button will open the job editor where you can create messages and specify the settings for the new job. 

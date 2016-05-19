@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_notification_job/creating_a_new_job.htm
-This option allows recipients to respond to your phone message with a yes by pressing 1 or a no by pressing 2.

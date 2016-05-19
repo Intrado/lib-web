@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#the_system_tab/systemwide_reports.htm
-The Repeating Jobs page displays a list of all repeating notification jobs that have been configured in the system as well as their next scheduled run date.

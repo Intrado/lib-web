@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#remote_telephony_appliance/configuring_a_hybrid_system.htm
-The Default Caller ID Route Plan allows you to set the default prefix if the caller id of a phone call does not match any Custom Caller ID Routes.

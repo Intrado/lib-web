@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#remote_telephony_appliance/configuring_a_hybrid_system.htm
-The Flex Applience capacity can be reduced to allow other telephones to share the same resources. 

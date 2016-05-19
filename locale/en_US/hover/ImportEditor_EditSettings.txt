@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#the_admin_tab/the_import_manager.htm
-The data type and upload key are displayed for your reference.  Edit the name, description and notes for the data import. Then select the Update Method from the drop down menu. For a detailed description of the update methods, please click the hover help icon to view the online help topic.

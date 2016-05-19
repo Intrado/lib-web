@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#remote_telephony_appliance/configuring_a_hybrid_system.htm
-Schedule the days when the Flex Appliance does not need to limit capacity.

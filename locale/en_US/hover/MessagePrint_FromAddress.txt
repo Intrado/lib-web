@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_message/creating_a_new_print_message.htm
-Enter the return address information that you wish to appear on your printed letter.

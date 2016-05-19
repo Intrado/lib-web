@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#reports/saving_and_scheduling_reports.htm
-You can save a report to be run at any time or schedule it to run repeatedly at specific times or on specific days.

@@ -1,1 +1,0 @@
-Enter the new email address you would like to use for your login.  You will need to enter your current password for security confirmation.  An email will be sent to the new address with a link for activation.  The new address will not be in effect until activated.

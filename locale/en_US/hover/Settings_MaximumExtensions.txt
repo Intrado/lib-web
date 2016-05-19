@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#the_admin_tab/settings.htm#Job_Settings
-Indicates the maximum number of digits that must be entered when using the EasyCall or Call Me to Record features.

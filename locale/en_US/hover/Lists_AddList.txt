@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_list/creating_a_new_list.htm
-To create a new list click the Create New List button. This will open the list editor window where you can specify who you wish to include on this list.

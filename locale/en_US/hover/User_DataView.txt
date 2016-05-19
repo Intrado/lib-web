@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#the_admin_tab/managing_user_accounts.htm
-To restrict this user's access to a specific subset of the contacts in the system database enter the restriction criteria from the list of available data fields.  When using Enrollment data imports, select the 'By Staff ID' option.  Click this hover help for more information.

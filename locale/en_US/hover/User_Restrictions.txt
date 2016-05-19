@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#the_admin_tab/managing_user_accounts.htm
-To restrict a user's access to certain features in the application you can assign an access profile to the user account. In addition, you can specify which job types the user can submit when creating a notification job.

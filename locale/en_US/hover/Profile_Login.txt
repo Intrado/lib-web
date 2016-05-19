@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#the_admin_tab/managing_access_profiles.htm
-To grant or deny login access via the web and/or via the telephone select the desired options.

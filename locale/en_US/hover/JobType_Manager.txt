@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#the_admin_tab/settings.htm#Job_Types
-The Job Type Manager allows system administrators to create and edit job types. For each type the appropriate phone, email and SMS destinations to include can be specified.

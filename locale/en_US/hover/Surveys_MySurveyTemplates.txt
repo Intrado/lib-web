@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_survey_job/survey_overview.htm
-The My Survey Templates area shows all of the Survey Templates you have currently saved in the system.

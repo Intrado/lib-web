@@ -1,3 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_notification_job/creating_a_new_job.htm
-Specifies the maximum number of retries to busy and unanswered numbers.
-

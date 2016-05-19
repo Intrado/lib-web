@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_notification_job/creating_a_repeating_job.htm
-Repeating jobs can be scheduled to automatically repeat each day at a specific time. An example of a repeating job might be a daily absence notification. To create a repeating job click the Create New Repeating Job button. This will open the repeating job editor where you specify the settings for your repeating job.

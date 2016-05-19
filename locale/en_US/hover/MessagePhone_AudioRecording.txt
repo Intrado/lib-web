@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_message/creating_an_advanced_phone_message.htm#The_Phone_Message_Editor
-Select an audio file from the Audio File Library to insert into your message. You may preview the file be clicking the play button. If you have not recorded or uploaded the necessary audio file yet, you will need to navigate to the Audio File Library to do so.

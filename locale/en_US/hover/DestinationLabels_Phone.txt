@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#the_admin_tab/settings.htm#Phone_Labels
-Select standard labels from the dropdown menu, or select Other and enter a custom label such as Primary or Emergency.

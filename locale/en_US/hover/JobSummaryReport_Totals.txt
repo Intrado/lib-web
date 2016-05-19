@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#reports/standard_job_reports.htm
-Job completion statistics for all destination types. Includes information about successful and unsuccessful notification attempts.

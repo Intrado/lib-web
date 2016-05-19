@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#reports/usage_stats_report.htm
-To view data for a certain time, group, or user select the relevant options and click Refresh.

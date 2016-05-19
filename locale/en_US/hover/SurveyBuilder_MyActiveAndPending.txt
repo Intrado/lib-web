@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_survey_job/survey_overview.htm
-The My Surveys section shows surveys that are currently running or are scheduled to run in the future.

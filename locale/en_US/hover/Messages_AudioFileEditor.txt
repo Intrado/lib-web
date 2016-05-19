@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_message/the_audio_file_library.htm
-The Audio File Library stores personal recorded audio files for use in your phone messages. You can use the library to record new audio messages, upload pre-recorded audio files, or edit audio file names and descriptions.

@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_survey_job/scheduling_a_survey_job.htm
-Select the Survey Template you would like to use.

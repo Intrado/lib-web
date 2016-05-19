@@ -1,3 +1,0 @@
-@help/schoolmessenger_help.htm#reports/hosted_attachment_log_details.htm
-Displays information about a specific hosted attachment.
-Includes a table of each recipient of the message with that hosted attachment, whether they downloaded the attachment, how many times, and the time they last downloaded it.

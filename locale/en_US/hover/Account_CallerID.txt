@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#getting_started/managing_your_account_settings.htm
-This option will set the Caller ID when the person is called.

@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_notification_job/jobsoverview.htm
-The Archived Jobs area displays a list of all archived notification jobs for the current user. To permanently remove an archived job click the Delete link.

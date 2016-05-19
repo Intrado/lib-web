@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#the_contact_manager/contact_manager_settings.htm
-Allows Contact Manager users to activate associations over the phone.  This method is less secure, and does not require the Activation Code.

@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#the_admin_tab/settings.htm#Customer_Information
-The Default Local Area Code will be applied to all 7 digit phone numbers imported into the system.

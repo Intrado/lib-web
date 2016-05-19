@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#reports/survey_job_reports.htm
-Select the survey you would like to review from the selection box below.

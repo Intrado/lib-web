@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#the_system_tab/blocking_phone_numbers.htm
-Enter the 10 digit number to be blocked in the Number Field. Enter a brief reason for blocking the number in the Reason field. Then click the Add button.

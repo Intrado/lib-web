@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_list/adding_people_manually.htm
-Additions are any people who you manually added to your list or who you added from a search. To remove someone who you previously added simply uncheck the box to the left of their name.

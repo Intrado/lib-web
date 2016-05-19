@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#the_system_tab/systemwide_reports.htm
-The Completed Jobs area displays a system-wide list of all completed notification jobs. You can view the settings used for any job by clicking the Edit link or you can view a job report by clicking the Report link. If you no longer wish to display a completed job you can remove it from this view by clicking the Archive link.

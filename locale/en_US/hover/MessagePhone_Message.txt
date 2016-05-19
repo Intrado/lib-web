@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_message/creating_an_advanced_phone_message.htm#The_Phone_Message_Editor
-Your phone message can contain both audio recordings and text-to-speech. You can also insert dynamic data elements at any point in your message. To insert data fields, place the cursor in the desired location, and then select from the available field options to the right. For any text-to-speech or data inserts be sure to select the voice you wish to use.

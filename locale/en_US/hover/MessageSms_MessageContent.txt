@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_message/creating_an_sms_message.htm
-Enter a body to use as your SMS message.

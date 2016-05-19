@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#the_admin_tab/the_import_manager.htm
-Select the type of data to import.  You may create multiple 'Person' data imports, or multiple 'User' data imports, but only a single 'Enrollment' data import for the system.  Then enter a name and description for the data import.

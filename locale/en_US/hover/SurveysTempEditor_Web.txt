@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_survey_job/more_on_web_survey_template_features.htm
-Click Web Survey if your survey has an online component. Select the email message to be used as an invitation to complete the survey. Enter a Web Page Title that participants will see on the web page for your survey. Enter a Web thank you message that participants will see when they have completed the survey. Click User HTML in Web Survey if you would like to use HTML in your questions or thank you message.

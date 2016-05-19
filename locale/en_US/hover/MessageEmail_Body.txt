@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_message/creating_a_new_email_message.htm
-The body of your e-mail can contain text as well as dynamic data elements. Carriage returns and line feeds can be used for formatting. To insert data fields, place the cursor in the desired location, and then select from the available field options to the right.

@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_survey_job/scheduling_a_survey_job.htm
-Select the earliest time a recipient can be contacted for this survey.

@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#the_system_tab/systemwide_reports.htm
-The Active and Pending Jobs page displays a list of all notification jobs for the system that have been submitted for processing or that have been created but not submitted yet.

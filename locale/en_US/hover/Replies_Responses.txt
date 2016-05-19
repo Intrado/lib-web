@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#receiving_responses/reviewing_your_response_messages.htm
-A list of responses grouped by job and ordered by the response time.  More recent responses appear first.  To listen to the response, press Play.  To delete a single response, press Delete.

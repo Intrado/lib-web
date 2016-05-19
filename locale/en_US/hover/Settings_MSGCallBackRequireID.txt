@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#the_admin_tab/settings.htm#Security
-This setting will require the entry of a valid student id when calling back to listen to messages.

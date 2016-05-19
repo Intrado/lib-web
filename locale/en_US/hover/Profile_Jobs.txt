@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#the_admin_tab/managing_access_profiles.htm
-Enable this option for users who need to be able to create and edit automatically repeating jobs (Example, daily absence notifications). Unchecking this option will hide the Repeating Jobs section of the Jobs tab from these users.

@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#the_admin_tab/managing_access_profiles.htm
-These options enable or disable user access to the three systemwide jobs tabs - Active Jobs, Completed Jobs, and Repeating Jobs. It is recommended that only system administrators are granted access to edit systemwide jobs.

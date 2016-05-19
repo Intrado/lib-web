@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_message/creating_a_new_email_message.htm
-Fill out the required fields to create your email message.

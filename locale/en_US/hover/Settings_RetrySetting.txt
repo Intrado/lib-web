@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#the_admin_tab/settings.htm#Job_Settings
-The Retry Setting specifies the minimum number of minutes the system must wait prior to retrying any busy or unanswered phone number.

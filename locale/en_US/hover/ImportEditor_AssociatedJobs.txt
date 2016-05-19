@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#the_admin_tab/the_import_manager.htm
-Select any repeating jobs that you wish to have triggered after the data has finished being imported into the system's database.

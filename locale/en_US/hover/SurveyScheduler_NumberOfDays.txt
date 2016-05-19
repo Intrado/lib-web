@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_survey_job/scheduling_a_survey_job.htm
-Select the number of days you would like your survey to run.

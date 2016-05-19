@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#reports/standard_job_reports.htm
-Simple report overview information, displaying schedule, status and destination types/quantities.

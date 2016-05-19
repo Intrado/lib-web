@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_message/creating_an_advanced_phone_message.htm
-An Advanced Phone Message is either a multipart message, a message that contains data field inserts, or a message that uses text-to-speech.

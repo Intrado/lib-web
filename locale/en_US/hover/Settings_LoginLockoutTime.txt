@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#the_admin_tab/settings.htm#Security
-This setting controls the amount of time a user is temporarily locked out.

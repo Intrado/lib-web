@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#the_admin_tab/settings.htm#Job_Settings
-Enter the name you would like users to see associated with the Autoreport reply-to email address.

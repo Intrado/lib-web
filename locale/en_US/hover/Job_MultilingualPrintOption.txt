@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_notification_job/creating_a_new_job.htm
-To specify a different print message for people with a particular language delivery preference, select the language and message combination you wish to use and then click Add.

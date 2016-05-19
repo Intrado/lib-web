@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_notification_job/creating_a_new_job.htm
-Specify the type of job you are sending. The job type determines which phone/email/sms destinations to notify based on their notification preferences.

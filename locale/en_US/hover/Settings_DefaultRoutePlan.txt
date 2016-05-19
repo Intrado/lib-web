@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#remote_telephony_appliance/configuring_a_hybrid_system.htm
-The Default Route Plan is used when a phone number does not contain the match string of any Custom Route Plans.

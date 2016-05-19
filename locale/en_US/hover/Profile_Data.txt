@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#the_admin_tab/managing_access_profiles.htm
-You can hide certain data fields from the user's view in order to keep them from creating lists based on those fields and to keep them from inserting them into messages. Leaving this box unchecked will give these users unrestricted use of all system data fields that fall within their user data view.

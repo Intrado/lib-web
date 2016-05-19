@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_notification_job/jobsoverview.htm
-The My Jobs area displays a list of all  jobs for the current user that have been submitted for processing or that have been created but not submitted yet.

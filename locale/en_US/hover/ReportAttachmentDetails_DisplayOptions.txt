@@ -1,3 +1,0 @@
-@help/schoolmessenger_help.htm#reports/hosted_attachment_log_options.htm
-The topmost part of the Hosted Attachments Log contains options for viewing the report.
-<br>Output Format: Click the CSV link to download the report as a CSV file.

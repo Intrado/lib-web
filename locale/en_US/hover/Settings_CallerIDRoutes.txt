@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#remote_telephony_appliance/configuring_a_hybrid_system.htm
-Custom Caller ID Routes allow you to add a prefix based on the Caller ID being used.  Ex.  The Caller ID is 555-555-5555 so prefix a 9.

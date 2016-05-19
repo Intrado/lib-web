@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_list/removing_individuals_from_your_list.htm
-The Skip section displays any contacts who match your list rule criteria but who you manually removed by unchecking the box to the left of their name. To include someone who you previously skipped simply check the box to the left of their name.

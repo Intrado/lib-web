@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_notification_job/creating_a_new_job.htm
-Choose this option to receive a PDF report of the job results via email at your user account email address after the job completes.

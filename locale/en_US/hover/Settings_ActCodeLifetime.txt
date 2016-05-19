@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#the_contact_manager/contact_manager_settings.htm
-Enter the number of days that Activation Codes for Contact Manager should be valid.

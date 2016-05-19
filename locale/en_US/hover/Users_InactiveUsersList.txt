@@ -1,4 +1,0 @@
-@help/schoolmessenger_help.htm#the_admin_tab/managing_user_accounts.htm
-The Inactive Users section displays a list of all disabled user accounts. From here you can edit or view account properties, enable accounts or delete accounts that are no longer needed.
-
-Enable with Reset Password: Allows the system administrator to enable the account and have it send an email to the new user for them to create a password to login to the system for the first time.

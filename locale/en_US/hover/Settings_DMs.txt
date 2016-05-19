@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#remote_telephony_appliance/configuring_a_hybrid_system.htm
-The Flex Appliance Manager allows you to view your active Flex Appliances as well as edit your call routes.

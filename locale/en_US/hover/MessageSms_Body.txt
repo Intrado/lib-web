@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_message/creating_an_sms_message.htm
-SMS Messages must not exceed 160 characters in length. The counter at the bottom of the SMS Message Editor can help you ensure that your message fits within the size restraints.

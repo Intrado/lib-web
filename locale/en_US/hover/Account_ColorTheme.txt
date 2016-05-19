@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#getting_started/managing_your_account_settings.htm
-The Color Theme controls the system wide color palette.

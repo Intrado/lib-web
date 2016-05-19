@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_survey_job/building_a_survey_template.htm
-Click this button to create a new Survey Template.

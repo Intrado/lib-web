@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#reports/understanding_call_logs.htm
-Displays information about each destination, when the attempt was made and what the final result was. It also displays the status of responses if any were left.<br><img src=img/speaker.gif /> Indicates a response that has not yet been played. You can listen to it by clicking on its icon. <br><img src=img/speaker2.gif /> Indicates a message that cannot be played because it belongs to another user or it was deleted.

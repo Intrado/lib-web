@@ -1,3 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_list/uploading_a_list_from_your_computer.htm
-
-To upload a Comma Separated Values (CSV) call list file click the Upload button. The fields in the file must be in the order First Name, Last Name, Phone w/ Area Code, Email (optional).

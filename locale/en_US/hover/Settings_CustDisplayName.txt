@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#the_admin_tab/settings.htm#Customer_Information
-Enter the name you would like displayed in the upper right corner of every page.

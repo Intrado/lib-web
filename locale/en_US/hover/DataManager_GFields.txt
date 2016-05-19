@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#the_admin_tab/system.htm#Group_Field_Definitions
-Create new fields in the system's database for your custom group metadata here. Group metadata includes information where a single person belongs to multiple values such as school dual-enrollment, sports, or after school activities.

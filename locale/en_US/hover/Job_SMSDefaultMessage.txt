@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_notification_job/creating_a_new_job.htm
-The default message will be sent to all recipients unless they are a duplicate.  Duplicates are always skipped with SMS messenging.

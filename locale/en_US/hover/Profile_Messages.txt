@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#the_admin_tab/managing_access_profiles.htm
-Only enable the message options that your system is configured to support and that you wish these users to be able to send. Unchecking any of the messaging options will hide those features from view in the application.

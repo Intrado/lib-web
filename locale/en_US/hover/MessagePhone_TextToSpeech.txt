@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_message/creating_an_advanced_phone_message.htm#The_Phone_Message_Editor
-The text-to-speech setting will determine which voice is used when converting any message text and dynamic data fields in your message. Be sure to select the appropriate language voice for alternate language messages.

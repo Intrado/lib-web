@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_message/creating_a_new_email_message.htm
-To create a new email message click the Create New Email Message button. This will open the email message editor where you can edit the content of your email message.

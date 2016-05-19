@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#the_contact_manager/contact_manager_settings.htm
-Select any contact options that Contact Managers should not be allowed to edit.

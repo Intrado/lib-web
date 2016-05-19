@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#getting_started/managing_your_account_settings.htm
-Specifies the latest time that messages can be delivered for jobs.

@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_message/the_audio_file_library.htm#Call_Me_to_Record
-If you wish to have the system call you in order to record a new message click this button, and you will be prompted to enter the direct dial telephone number where you are currently located. The system will then call you and prompt you to record your message.

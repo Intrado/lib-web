@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_notification_job/creating_a_new_job.htm
-To correct the automatic translation click in the Override Translation checkbox. When this checkbox is checked the Refresh Translations button will not update the translation. This is indicated with a lock icon next to the language.

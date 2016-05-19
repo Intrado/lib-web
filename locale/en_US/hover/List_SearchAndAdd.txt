@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_list/adding_people_by_searching.htm
-Click the Search Contacts button to search for contacts in the database and add them to your list.

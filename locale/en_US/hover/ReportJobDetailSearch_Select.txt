@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#reports/querying_report_data.htm
-Select options that reflect the type of details you wish to review. You can select a specific job, day or range of days. You can also limit the results by Job Type and the field data you wish to show.

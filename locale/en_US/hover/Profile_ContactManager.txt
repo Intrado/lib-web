@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#the_system_tab/the_contact_database.htm
-Check Access Contact Manager Administration Options to enable users to assign individual activation codes and view Contact Manager information. Check Generate Bulk Activation Codes to allow users to assign Activation Codes to groups of contacts.

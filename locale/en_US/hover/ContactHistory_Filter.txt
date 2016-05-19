@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#reports/contact_history_report.htm
-Select filters to view calls of certain job types or within certain date ranges.

@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#the_system_tab/viewing_and_editing_contact_details.htm
-Allows Contact Manager users to activate associations over the phone.  Remove this option only if there is a problem with this particular contact.

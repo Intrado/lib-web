@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_message/creating_a_new_email_message.htm
-You may attach up to three files that are up to 2048kB each. For greater security, certain file types are not permitted. Click for more information.

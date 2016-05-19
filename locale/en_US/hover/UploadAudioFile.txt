@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_message/the_audio_file_library.htm#Upload_Audio_File
-If you have a recording file on your local PC that you wish to use in a message, enter a name and description for the file. Click the Browse button, and select your recording. Click the Upload button, and the recording will be added to your Audio File Library. Supported formats include: .wav, .aiff, and .au

@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_notification_job/creating_a_job_with_easycall.htm
-Select the list that you wish to send this notification to.

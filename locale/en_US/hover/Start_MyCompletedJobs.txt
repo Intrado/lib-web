@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#getting_started/the_start_page.htm
-Completed jobs are those that either finished or were cancelled. You can view the settings used for this job or edit its name and description by clicking the Edit link, or you can generate a report for this job by clicking the Report link.

@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_survey_job/building_a_survey_template.htm
-Enter the name for each question as you like it to appear in the job report. Select the message containing the question from the drop down menu and click play to preview. Enter the Web version of the question in the text field. Choose the number of possible responses from the Response drop down menu. Click the Add button to add more questions.

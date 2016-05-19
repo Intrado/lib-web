@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_list/removing_individuals_from_your_list.htm
-The list preview displays all individuals who are currently included in your list. To remove an individual from this list simply uncheck the box to the left of their name.

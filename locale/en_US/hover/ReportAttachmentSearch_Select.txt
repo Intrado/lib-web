@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#reports/querying_hosted_attachment_log.htm
-Select criteria below to display a job or date range detail report.

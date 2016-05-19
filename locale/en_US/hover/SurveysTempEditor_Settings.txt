@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_survey_job/building_a_survey_template.htm
-Enter a name and description for your Survey Template. Click Randomize Question Order to have your questions shuffled for each participant.

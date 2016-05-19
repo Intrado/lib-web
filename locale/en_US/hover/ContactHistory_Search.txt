@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#reports/contact_history_report.htm
-Enter search criteria, such as an ID or phone number in the appropriate fields. Only one field is required to search for an individual.

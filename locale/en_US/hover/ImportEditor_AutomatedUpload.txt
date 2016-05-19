@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#the_admin_tab/the_import_manager.htm
-Check this box if you use the SchoolMessenger upload utility and would like the data to be automatically imported into the system's database when the latest CSV file is uploaded.

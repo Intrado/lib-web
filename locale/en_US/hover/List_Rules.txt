@@ -1,9 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_list/adding_people_using_rules.htm
-Rules are used to automatically create lists of individuals who match certain criteria. To create a rule for building this list perform the following steps:
-
-1. Select the field you wish to filter on.
-2. Select the comparison operator you wish to use.
-3. Select the data to include in the filter (Hint: Hold down the Ctrl key to select multiple items.)
-4. Click the Add button to add the rule you created.
-5. Repeat the steps to add more rules to your list.
-6. Click the Preview button to view your results.

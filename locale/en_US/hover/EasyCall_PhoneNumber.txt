@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_notification_job/creating_a_job_with_easycall.htm
-Enter the direct dial number to the phone where you are currently located in this field.

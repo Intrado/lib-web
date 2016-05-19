@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#the_admin_tab/settings.htm#Customer_Information
-If set, users will not be able to use a from email address that does not have the same email domain.

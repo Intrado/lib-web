@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#receiving_responses/reviewing_your_response_messages.htm
-Click on the drop down menu to choose the job (or all jobs) that has responses you want to view.  Click on the checkbox to only display responses that have not yet been played.  Clicking on the "Delete All Played" button will delete all played responses for the job(s) you are currently viewing.

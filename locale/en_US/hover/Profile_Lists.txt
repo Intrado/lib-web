@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#the_admin_tab/managing_access_profiles.htm
-Unchecking this option will hide the Lists tab and prevent these users from creating or editing notification lists.

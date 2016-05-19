@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_list/adding_people_from_your_address_book.htm
-Your address book allows you to store contacts that may not be available from the system database. Contacts are automatically added to your address book when you manually add users to a list. To add an Address Book contact to your list simply select the box to the left of the name, and then click Done.

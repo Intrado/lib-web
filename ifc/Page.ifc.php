@@ -1,6 +1,0 @@
-<?
-
-interface Page {
-	function execute();
-}
-

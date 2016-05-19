@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#getting_started/the_start_page.htm
-These are jobs that are in progress or jobs that were created but not yet submitted. You can edit certain job settings while a job is in progress, you can view a report showing the current status of your job or you can cancel a job. (Warning: Once a job is cancelled it cannot be reactivated.)

@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#reports/reports.htm
-Select the type of report that you wish to create. The Notification Summary provides an overview of job results. Log reports display detailed individual call and email attempt information. To retrieve notification information for a single individual use the Contact History report.

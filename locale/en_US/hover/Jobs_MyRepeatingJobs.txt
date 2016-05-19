@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_notification_job/jobsoverview.htm
-The Repeating Jobs area displays a list of all repeating notification jobs created by the current user. These are jobs that are set to automatically repeat on a regular schedule. The settings for a repeating job can be edited at any time by clicking the Edit link to the right of the job name.

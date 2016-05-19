@@ -1,3 +1,0 @@
-@help/schoolmessenger_help.htm#getting_started/managing_your_account_settings.htm
-Specifies the maximum number of retries to busy and unanswered numbers.
-

@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#remote_telephony_appliance/configuring_a_hybrid_system.htm
-Custom Route Plans allow you to set up routes based on phone numbers.  Ex. For area code 555, prefix a 1 to dial long distance.

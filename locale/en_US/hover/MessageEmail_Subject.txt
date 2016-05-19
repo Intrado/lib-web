@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_message/creating_a_new_email_message.htm
-Enter the subject, the from name and from e-mail address as you wish them to appear to e-mail message recipients.

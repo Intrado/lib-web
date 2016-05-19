@@ -1,2 +1,0 @@
-@help/schoolmessenger_help.htm#creating_a_notification_job/creating_a_job_with_easycall.htm
-Enter a brief name that describes the notification you are about to send.
