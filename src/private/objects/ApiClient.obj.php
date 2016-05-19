@@ -7,8 +7,24 @@
  */
 class ApiClient {
 
+	/**
+	 * The API base URL that we will be hitting; this should be the root of the host such that
+	 * specific requests which map to subordinate end-points are handled as "nodes" relative to
+	 * here.
+	 */
 	public $ApiUrl;
+
+	/**
+	 * Additional static headers which will be attached to every outbound request. Useful for
+	 * things like Authorization where every request must have the token and the requester
+	 * needs not re-supply it as a custom header for each request.
+	 */
 	public $staticHeaders;
+
+	/**
+	 * Boolean flag to error_log debug messages
+	 */
+	protected $debug = false;
 
 	/**
 	 * Constructor
@@ -19,6 +35,16 @@ class ApiClient {
 	public function __construct($ApiUrl, $staticHeaders = array()) {
 		$this->ApiUrl = $ApiUrl;
 		$this->staticHeaders = $staticHeaders;
+
+		// Add a standard, static Accept header
+		$this->staticHeaders[] = "Accept: application/json";
+	}
+
+	/**
+	 * Setter for debug state
+	 */
+	public function setDebug($debug) {
+		$this->debug = $debug;
 	}
 
 	/**
@@ -66,8 +92,27 @@ class ApiClient {
 
 		// merge static headers with those needed just for this request
 		$headers = array_merge($this->staticHeaders, $additionalHeaders);
-		
-		$headers[] = "Accept: application/json";
+
+                // override-merge static headers with additional headers
+		$mergedHeaders = Array();
+		foreach ($this->staticHeaders as $header) {
+			if (! strpos($header, ':')) continue;
+			list($name, $value) = explode(':', $header);
+			$header = new StdClass();
+			$header->name = $name;
+			$header->value = trim($value);
+			$mergedHeaders[strtolower($name)] = $header;
+		}
+		foreach ($additionalHeaders as $header) {
+			if (! strpos($header, ':')) continue;
+			list($name, $value) = explode(':', $header);
+			$header = new StdClass();
+			$header->name = $name;
+			$header->value = trim($value);
+			$mergedHeaders[strtolower($name)] = $header;
+		}
+
+		$postfields = null;
 
 		// Set some options based on the REST method; GET is default, so no case for that
 		switch ($method) {
@@ -75,31 +120,67 @@ class ApiClient {
 			case 'PUT':
 				// ref: http://developer.sugarcrm.com/2011/11/22/howto-do-put-requests-with-php-curl-without-writing-to-a-file/
 				curl_setopt($creq, CURLOPT_CUSTOMREQUEST, 'PUT');
-				$json = json_encode($data);
-				curl_setopt($creq, CURLOPT_POSTFIELDS, $json);
-				$headers[] = 'Content-Type: application/json';
-				$headers[] = 'Content-Length: ' . strlen($json);
+				$postfields = json_encode($data);
+
+				// Add content-type header
+				$header = new StdClass();
+				$header->name = 'Content-Type';
+				$header->value = 'application/json';
+				$mergedHeaders[strtolower($header->name)] = $header;
+
+				// Add content-length header
+				$header = new StdClass();
+				$header->name = 'Content-Length';
+				$header->value = strlen($postfields);
+				$mergedHeaders[strtolower($header->name)] = $header;
+
 				break;
 
 			case 'PATCH':
 				// ref: http://stackoverflow.com/questions/14451401/how-do-i-make-a-patch-request-in-php-using-curl
 				curl_setopt($creq, CURLOPT_CUSTOMREQUEST, 'PATCH');
-				$headers[] = 'Content-Type: application/json';
-				$json = json_encode($data);
-				curl_setopt($creq, CURLOPT_POSTFIELDS, $json);
+				$postfields = json_encode($data);
+
+				// Add content-type header
+				$header = new StdClass();
+				$header->name = 'Content-Type';
+				$header->value = 'application/json';
+				$mergedHeaders[strtolower($header->name)] = $header;
+
+				// Add content-length header
+				$header = new StdClass();
+				$header->name = 'Content-Length';
+				$header->value = strlen($postfields);
+				$mergedHeaders[strtolower($header->name)] = $header;
+
 				break;
 
 			case 'POST':
 				// ref: http://stackoverflow.com/questions/15223191/php-curl-file-upload-multipart-boundary
 				curl_setopt($creq, CURLOPT_POST, 1);
 				if (count($_FILES)) {
-					curl_setopt($creq, CURLOPT_POSTFIELDS, $data);
-					$headers[] = 'Content-type: multipart/form-data';
+					$postfields &= $data;
+
+					// Add content-type header
+					$header = new StdClass();
+					$header->name = 'Content-Type';
+					$header->value = 'multipart/form-data';
+					$mergedHeaders[strtolower($header->name)] = $header;
 				}
 				else {
-					$headers[] = 'Content-Type: application/json';
-					$json = json_encode($data);
-					curl_setopt($creq, CURLOPT_POSTFIELDS, $json);
+					$postfields = json_encode($data);
+
+					// Add content-type header
+					$header = new StdClass();
+					$header->name = 'Content-Type';
+					$header->value = 'application/json';
+					$mergedHeaders[strtolower($header->name)] = $header;
+
+					// Add content-length header
+					$header = new StdClass();
+					$header->name = 'Content-Length';
+					$header->value = strlen($postfields);
+					$mergedHeaders[strtolower($header->name)] = $header;
 				}
 				break;
 
@@ -109,7 +190,16 @@ class ApiClient {
 				break;
 		}
 
+		// Optionally set POST data as needed
+		if (! is_null($postfields)) {
+			curl_setopt($creq, CURLOPT_POSTFIELDS, $postfields);
+		}
+
 		// Finalize the headers
+		$headers = Array();
+		foreach ($mergedHeaders as $header) {
+			$headers[] = "{$header->name}: {$header->value}";
+		}
 		curl_setopt($creq, CURLOPT_HTTPHEADER, $headers);
 
 		// Fire off the request and capture the response
@@ -125,6 +215,17 @@ class ApiClient {
 
 		// Close out the curl request
 		curl_close($creq);
+		if ($this->debug) {
+			$request = array(
+				'url' => $this->ApiUrl . $node,
+				'method' => $method,
+				'headers' => $headers,
+				'data' => $postfields
+			);
+
+			error_log("--DEBUG-- ApiClient REQUEST: " . print_r($request, true));
+			error_log("--DEBUG-- ApiClient RESPONSE: " . print_r($res, true));
+		}
 
 		return($res);
 	}
