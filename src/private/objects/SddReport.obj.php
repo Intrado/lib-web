@@ -1,6 +1,7 @@
 <?
 
-require_once('obj/ReportGenerator.obj.php');
+$thisDir = dirname(__FILE__);
+require_once("{$thisDir}/ReportGenerator.obj.php");
 
 // TODO: this function is similar to the one of the same name in reportjobdetails.php
 // and there are also functions of the same name with different functionality in

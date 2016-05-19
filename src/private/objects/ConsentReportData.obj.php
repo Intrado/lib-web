@@ -1,6 +1,9 @@
 <?php
 
-require_once("inc/common.inc.php");
+$thisDir = dirname(__FILE__);
+$baseDir = dirname(dirname($thisDir));
+$includesDir = "{$baseDir}/includes";
+require_once("{$includesDir}/common.inc.php");
 
 class ConsentReportData {
 
@@ -13,44 +16,27 @@ class ConsentReportData {
 	// @returns $contacts::Array (array of objects containg the person data and thei)
 	public function generateGetContactsQuery ( $phoneNumber = null, $jobId = null ) {
 
-		$preparedStatementArgs = array();
-
 		// find all the persons for this customer
-		$query = "SELECT DISTINCT 
-						 person.pkey, 
-						 person.id, 
-						 person.f01, 
-						 person.f02, 
-						 phone.phone
+		$query = "SELECT pkey, 
+						 f01 AS first_name, 
+						 f02 AS last_name, 
+						 phone
 				  FROM person
-				  INNER JOIN phone ON phone.personid = person.id ";
-
-		if( $jobId ) {
-			$query .= "INNER JOIN reportcontact ON reportcontact.personid = person.id ";
-		}
-
-		$query .= "WHERE person.deleted = 0 ";
+				  INNER JOIN phone 
+				  ON phone.personid = person.id 
+				  WHERE person.deleted = 0 ";
 
 		if( $phoneNumber ) {
-			$query .= "AND phone.phone = ? ";
+			$query .= "AND phone.phone = '" . $phoneNumber . "' ";
 		}
-
-		if( $jobId ) {
-			$query .= " AND reportcontact.jobid = ? 
-						AND reportcontact.type = 'phone' 
-					  	AND phone.phone IS NOT NULL ";
-		}
-
-		$query .= "ORDER by person.f02 ";
 
 		return $query;
 	}
 
-
 	public function getContactsCountQuery() {
 
 		// find all the persons for this customer
-		$query = "SELECT count( * ) 
+		$query = "SELECT count( * )
 				  FROM person 
 				  INNER JOIN phone 
 				  ON phone.personid = person.id 
@@ -85,10 +71,10 @@ class ConsentReportData {
 
 			$combinedData = array (
 				"pkey" =>		$contactData["pkey"],
-				"f01" =>		$contactData["f01"],
-				"f02" =>		$contactData["f02"],
+				"first_name" =>	$contactData["first_name"],
+				"last_name" =>	$contactData["last_name"],
 				"phone" => 		$contactData["phone"],
-				"consent" => 	'pending',
+				"consent" => 	'unknown',
 				"timestamp" =>  null,
 			);
 
@@ -100,9 +86,7 @@ class ConsentReportData {
 				}
 			}
 
-			if( trim( $contactData["phone"] ) !== '' ) {
-				$mergedData[] = $combinedData;
-			}
+			$mergedData[] = $combinedData;
 		}
 		
 		return $mergedData;
