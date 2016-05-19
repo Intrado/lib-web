@@ -228,15 +228,15 @@ button { color: #3e693f; background: none; border: none; margin: none; padding: 
 .btn_middle { display: block; height: 23px; line-height: 23px; font-size: 11px; }
 .btn_left, 
 .btn_right { position: absolute; top: 0; }
-.btn_left { left: 0; background: url(themes/newui/button_left.gif) no-repeat center center; width: 9px; }
-.btn_right { right: 0; background: url(themes/newui/button_right.gif) repeat-x center center; width: 9px;}
-.btn_middle { margin: 0 9px; padding-right: 2px;  background: url(themes/newui/button_mid.gif) repeat-x center center;}
+.btn_left { left: 0; background: url(assets/themes/newui/button_left.gif) no-repeat center center; width: 9px; }
+.btn_right { right: 0; background: url(assets/themes/newui/button_right.gif) repeat-x center center; width: 9px;}
+.btn_middle { margin: 0 9px; padding-right: 2px;  background: url(assets/themes/newui/button_mid.gif) repeat-x center center;}
 			
 .btn_middle img { margin-top: -4px; padding: 0 3px 0 0; }
 
-.btn:hover .btn_left { background: url(themes/newui/button_left_over.gif) no-repeat center center; }
-.btn:hover .btn_middle { background: url(themes/newui/button_mid_over.gif) repeat-x center center; }
-.btn:hover .btn_right { background: url(themes/newui/button_right_over.gif) no-repeat center center; }
+.btn:hover .btn_left { background: url(assets/themes/newui/button_left_over.gif) no-repeat center center; }
+.btn:hover .btn_middle { background: url(assets/themes/newui/button_mid_over.gif) repeat-x center center; }
+.btn:hover .btn_right { background: url(assets/themes/newui/button_right_over.gif) no-repeat center center; }
 
 .btn_hide { display: none !important; visibility: hidden; } /* for hidden buttons! */
 
@@ -264,16 +264,16 @@ table_left and table_right have the arrow controls, set to 8% width for 1024 scr
 .timeline_table_middle .canvasright { height: 72px; width: 2%; }
 .timeline_table_left, .timeline_table_right { width: 51px; }
 #_backward, #_forward { display: block; width: 51px; height: 53px; margin: 9px 0 0; }
-#_backward { background: url('img/timelinearrowleft.gif') no-repeat; }
-#_forward { background: url('img/timelinearrowright.gif') no-repeat; }
+#_backward { background: url('assets/img/timelinearrowleft.gif') no-repeat; }
+#_forward { background: url('assets/img/timelinearrowright.gif') no-repeat; }
 
 #t_refresh { float: left; display: inline; width: 25%; }
 #t_zoom { float: left; display: inline; width: 46%; margin: 0 2%; padding: 10px 0 0; text-align: center; }
-#t_zoom .zoom_in { background: url('img/icons/fugue/magnifier_zoom.gif') left center no-repeat; padding: 2px 0 2px 19px; }
-#t_zoom .reset { background: url('img/icons/fugue/arrow_circle_225.gif') left center no-repeat; padding: 2px 0 2px 19px; }
-#t_zoom .zoom_out { background: url('img/icons/fugue/magnifier_zoom_out.gif') left center no-repeat; padding: 2px 0 2px 19px; }
+#t_zoom .zoom_in { background: url('assets/img/icons/fugue/magnifier_zoom.gif') left center no-repeat; padding: 2px 0 2px 19px; }
+#t_zoom .reset { background: url('assets/img/icons/fugue/arrow_circle_225.gif') left center no-repeat; padding: 2px 0 2px 19px; }
+#t_zoom .zoom_out { background: url('assets/img/icons/fugue/magnifier_zoom_out.gif') left center no-repeat; padding: 2px 0 2px 19px; }
 #t_legend { float: right; display: inline; width: 25%; padding: 7px 0 0; text-align: right; }
-#t_legend span { background: url('img/largeicons/tiny20x20/flag.jpg') left center no-repeat; padding: 0 0 0 23px; }
+#t_legend span { background: url('assets/img/largeicons/tiny20x20/flag.jpg') left center no-repeat; padding: 0 0 0 23px; }
 
 
 /*----- actionlinks control the tooltip links found on recent activity next to the message -----*/
@@ -526,15 +526,15 @@ table.schedule th, table.schedule td { width: 30px; padding: 5px 0; text-align: 
 
 .horizontaltabstitlediv td.middle {
 	padding: 5px 3px 0 0; 
-	background: #346799 url('img/horizontaltab_middle.gif') repeat-x;
+	background: #346799 url('assets/img/horizontaltab_middle.gif') repeat-x;
 }
 .horizontaltabstitlediv td.right {
-	background: #346799 url('img/horizontaltab_right.gif') no-repeat;
+	background: #346799 url('assets/img/horizontaltab_right.gif') no-repeat;
 	width: 14px;
 	height: 26px;
 }
 .horizontaltabstitlediv td.left {
-	background: #346799 url('img/horizontaltab_left.gif') no-repeat;
+	background: #346799 url('assets/img/horizontaltab_left.gif') no-repeat;
 	width: 14px;
 	height: 26px;
 }
@@ -544,13 +544,13 @@ table.schedule th, table.schedule td { width: 30px; padding: 5px 0; text-align: 
 	border-bottom: solid 1px white;
 }
 
-.horizontaltabstitledivexpanded td.middle { background: #3399ff url('img/horizontaltab_middle.gif') repeat-x; padding: 5px 0 0; font-weight: bold; color: #3e693f; font-size: 110%; }
+.horizontaltabstitledivexpanded td.middle { background: #3399ff url('assets/img/horizontaltab_middle.gif') repeat-x; padding: 5px 0 0; font-weight: bold; color: #3e693f; font-size: 110%; }
 	
 .horizontaltabstitledivexpanded td.left {
-	background: #3399ff url('img/horizontaltab_left.gif') repeat-x;
+	background: #3399ff url('assets/img/horizontaltab_left.gif') repeat-x;
 }
 .horizontaltabstitledivexpanded td.right {
-	background: #3399ff url('img/horizontaltab_right.gif') repeat-x;
+	background: #3399ff url('assets/img/horizontaltab_right.gif') repeat-x;
 }
 .horizontaltabstitledivcollapsed {
 	color: #346799;
@@ -596,10 +596,10 @@ table.schedule th, table.schedule td { width: 30px; padding: 5px 0; text-align: 
 }
 .verticaltabstitlediv td.middle {
 	padding-right: 3px;
-	background: #346799 url('img/verticaltab_middle.gif') repeat-x;
+	background: #346799 url('assets/img/verticaltab_middle.gif') repeat-x;
 }
 .verticaltabstitlediv td.right {
-	background: #346799 url('img/verticaltab_right.gif') no-repeat;
+	background: #346799 url('assets/img/verticaltab_right.gif') no-repeat;
 	width: 14px;
 	height: 26px;
 }
@@ -610,13 +610,13 @@ table.schedule th, table.schedule td { width: 30px; padding: 5px 0; text-align: 
 	z-index: 2;
 }
 .verticaltabstitledivexpanded td.middle {
-	background: #3399ff url('img/verticaltab_middle.gif') repeat-x;
+	background: #3399ff url('assets/img/verticaltab_middle.gif') repeat-x;
 	font-size: 110%;
 	font-weight: bold;
 	color: #3e693f;
 }
 .verticaltabstitledivexpanded td.right {
-	background: #3399ff url('img/verticaltab_right.gif') no-repeat;
+	background: #3399ff url('assets/img/verticaltab_right.gif') no-repeat;
 }
 
 .verticaltabstitledivcollapsed {
@@ -759,7 +759,7 @@ div.autocomplete ul li {
 	right:5px;  
 	height:13px;  
 	width:13px;  
-	background-image:url("img/modalwindowclose.gif");  
+	background-image:url("assets/img/modalwindowclose.gif");  
 	cursor:pointer;  
 	cursor:hand;  
 }
@@ -858,7 +858,7 @@ div.default-modal button.close {
 	width:33px;
 	height:19px;
 	cursor: pointer;
-	background:url('img/tinybutton.png') no-repeat right center;
+	background:url('assets/img/tinybutton.png') no-repeat right center;
 }
 
 .keepalive img {
@@ -878,7 +878,7 @@ div.default-modal button.close {
 
 .htmlradiobuttonbigcheck img { position: absolute; left: 0; top: 25px; /*width: 34px; height: 34px; margin-left: -17px; padding: 0 0 0 50%;*/ }
 .htmlradiobuttonbigcheck ol { list-style-type: none; float: left; display: inline; margin: 0; padding: 0 0 0 3px; }
-.htmlradiobuttonbigcheck ol li { background: url(img/icons/bullet_blue.gif) center left no-repeat; padding: 0 0 0 20px; font-size: 12px; line-height: 21px; text-align: left; }
+.htmlradiobuttonbigcheck ol li { background: url(assets/img/icons/bullet_blue.gif) center left no-repeat; padding: 0 0 0 20px; font-size: 12px; line-height: 21px; text-align: left; }
 .htmlradiobuttonbigcheck button { padding: 0 0 10px 35px; }
 .htmlradiobuttonbigcheck .create_btn { float: left; width: 94px; height: 88px; }
 
@@ -975,30 +975,30 @@ select#reldate { margin: 0 10px 0 0; }
 /*----- IE7 classes re-adds the rounded corners for ie7-----*/
 
 .ie7 .window { border: none; }
-.ie7 .window_title { background: url("themes/newui/win_t.gif") repeat-x; height: 23px; padding: 0 0 0 20px; line-height: 23px; }
-.ie7 .window_title_l { background: url("themes/newui/win_tl.gif") no-repeat; position: absolute; top: 0; left: 0; display: block; width: 12px; height: 23px; }
-.ie7 .window_title_r { background: url("themes/newui/win_tr.gif") no-repeat; position: absolute; top: 0; right: 0; display: block; width: 12px; height: 23px; }
+.ie7 .window_title { background: url("assets/themes/newui/win_t.gif") repeat-x; height: 23px; padding: 0 0 0 20px; line-height: 23px; }
+.ie7 .window_title_l { background: url("assets/themes/newui/win_tl.gif") no-repeat; position: absolute; top: 0; left: 0; display: block; width: 12px; height: 23px; }
+.ie7 .window_title_r { background: url("assets/themes/newui/win_tr.gif") no-repeat; position: absolute; top: 0; right: 0; display: block; width: 12px; height: 23px; }
 
-.ie7 .window_left { background: url("themes/newui/win_l.gif") top left repeat-y; }
-.ie7 .window_right { background: url("themes/newui/win_r.gif") top right repeat-y; }
+.ie7 .window_left { background: url("assets/themes/newui/win_l.gif") top left repeat-y; }
+.ie7 .window_right { background: url("assets/themes/newui/win_r.gif") top right repeat-y; }
 
-.ie7 .window_foot_wrap { background: url("themes/newui/win_b.gif") 0 0 repeat-x; height: 15px; }
-.ie7 .window_foot_left { background: url("themes/newui/win_bl.gif") top left no-repeat; height: 15px; width: 100%; }
-.ie7 .window_foot_right { background: url("themes/newui/win_br.gif") top right no-repeat; height: 15px; width: 100%; }
+.ie7 .window_foot_wrap { background: url("assets/themes/newui/win_b.gif") 0 0 repeat-x; height: 15px; }
+.ie7 .window_foot_left { background: url("assets/themes/newui/win_bl.gif") top left no-repeat; height: 15px; width: 100%; }
+.ie7 .window_foot_right { background: url("assets/themes/newui/win_br.gif") top right no-repeat; height: 15px; width: 100%; }
 
 /*----- IE8 classes re-adds the rounded corners for ie8-----*/
 
 .ie8 .window { border: none; }
-.ie8 .window_title { background: url("themes/newui/win_t.gif") repeat-x; height: 23px; padding: 0 0 0 20px; line-height: 23px; }
-.ie8 .window_title_l { background: url("themes/newui/win_tl.gif") no-repeat; position: absolute; top: 0; left: 0; display: block; width: 12px; height: 23px; }
-.ie8 .window_title_r { background: url("themes/newui/win_tr.gif") no-repeat; position: absolute; top: 0; right: 0; display: block; width: 12px; height: 23px; }
+.ie8 .window_title { background: url("assets/themes/newui/win_t.gif") repeat-x; height: 23px; padding: 0 0 0 20px; line-height: 23px; }
+.ie8 .window_title_l { background: url("assets/themes/newui/win_tl.gif") no-repeat; position: absolute; top: 0; left: 0; display: block; width: 12px; height: 23px; }
+.ie8 .window_title_r { background: url("assets/themes/newui/win_tr.gif") no-repeat; position: absolute; top: 0; right: 0; display: block; width: 12px; height: 23px; }
 
-.ie8 .window_left { background: url("themes/newui/win_l.gif") top left repeat-y; }
-.ie8 .window_right { background: url("themes/newui/win_r.gif") top right repeat-y; }
+.ie8 .window_left { background: url("assets/themes/newui/win_l.gif") top left repeat-y; }
+.ie8 .window_right { background: url("assets/themes/newui/win_r.gif") top right repeat-y; }
 
-.ie8 .window_foot_wrap { background: url("themes/newui/win_b.gif") 0 0 repeat-x; height: 15px; }
-.ie8 .window_foot_left { background: url("themes/newui/win_bl.gif") top left no-repeat; height: 15px; width: 100%; }
-.ie8 .window_foot_right { background: url("themes/newui/win_br.gif") top right no-repeat; height: 15px; width: 100%; }
+.ie8 .window_foot_wrap { background: url("assets/themes/newui/win_b.gif") 0 0 repeat-x; height: 15px; }
+.ie8 .window_foot_left { background: url("assets/themes/newui/win_bl.gif") top left no-repeat; height: 15px; width: 100%; }
+.ie8 .window_foot_right { background: url("assets/themes/newui/win_br.gif") top right no-repeat; height: 15px; width: 100%; }
 
 .ie8 .btn { overflow: visible; }
 
@@ -1009,7 +1009,9 @@ select#reldate { margin: 0 10px 0 0; }
    
 <?
 
-include_once("themes/newui/style.css");
+$thisDir = dirname(__FILE__);
+$assetsDir = dirname($thisDir);
+include_once("{$assetsDir}/themes/newui/style.css");
 
 ?>
 
