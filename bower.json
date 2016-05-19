@@ -1,0 +1,11 @@
+{
+  "name": "lib-web",
+  "description": "Reusable libraries for webapps",
+  "homepage": "https://github.com/Reliance/lib-web",
+  "license": "Confidential Intellectual Property",
+  "private": true,
+  "main": [ ],
+  "ignore": [ ],
+  "dependencies": { }
+}
+
