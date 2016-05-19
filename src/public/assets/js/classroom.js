@@ -3,7 +3,7 @@
 	var c_hover = "#bbcccc";
 	var c_selected = "#C4CCC4";//"#ffcccc";
 	var c_none = "#ffffff";
-	var h_image = "img/icons/fugue/arrow.gif";
+	var h_image = "assets/img/icons/fugue/arrow.gif";
 
 	/*
 	 Checked cache contains
@@ -31,11 +31,11 @@
 	function getstatesrc(state) {
 		switch (state) {
 			case 0:
-				return "img/checkbox-clear.png";
+				return "assets/img/checkbox-clear.png";
 			case 1:
-				return "img/checkbox-dash.png";
+				return "assets/img/checkbox-dash.png";
 			case 2:
-				return "img/checkbox-check.png";
+				return "assets/img/checkbox-check.png";
 		}
 		return "";
 	}
@@ -108,7 +108,7 @@
 				var count = (parseInt(title) - 1);
 				img.title = count  + img.title.substr(title.indexOf(" "));
 				if(count == 0)
-					img.src = 'img/pixel.gif';
+					img.src = 'assets/img/pixel.gif';
 			}
 			if(contactlink.size() == 0) {
 				checkedcache.unset(contactid);
@@ -246,9 +246,9 @@
 								prevcategory = itm.value.categoryid;
 							}
 							var comment = new Element('div',{id:'smsg-' + itm.key,'class':'classroomcomment',category:itm.value.categoryid});
-							comment.insert(new Element('img',{id:'smsgchk-' + itm.key,'class':'msgchk',src:'img/checkbox-clear.png',alt:''}));
+							comment.insert(new Element('img',{id:'smsgchk-' + itm.key,'class':'msgchk',src:'assets/img/checkbox-clear.png',alt:''}));
 							comment.insert(new Element('div',{id:'smsgtxt-' + itm.key,'class':'msgtxt'}).update(itm.value.title));
-							comment.insert('<img src="img/icons/fugue/marker.gif" alt="Mark" title="Mark this Comment" class="marker" onclick="markcomment(\'smsg-\',\'' + itm.key + '\')" />');
+							comment.insert('<img src="assets/img/icons/fugue/marker.gif" alt="Mark" title="Mark this Comment" class="marker" onclick="markcomment(\'smsg-\',\'' + itm.key + '\')" />');
 							var remarklink = new Element('div');
 
 							if(hascomments) {
@@ -339,7 +339,7 @@
 		});
 
 		progresstack.each(function(msg) {
-			$(msg).down('img').src = 'img/checkbox-clear.png';
+			$(msg).down('img').src = 'assets/img/checkbox-clear.png';
 		});
 
 		clearchecked();
@@ -444,7 +444,7 @@
 					var td = new Element('td', {style: 'white-space:nowrap'});
 					if (selected != currently_selected) {
 						categoryinfo.each(function(category) {
-							td.insert('<img id="' + id + '-' + category.key + '"src="img/pixel.gif" title="0 Comment(s) for ' + category.value.name + '" style="width:10px;display:inline;" alt="" />');
+							td.insert('<img id="' + id + '-' + category.key + '"src="assets/img/pixel.gif" title="0 Comment(s) for ' + category.value.name + '" style="width:10px;display:inline;" alt="" />');
 						});
 					}
 					else {
@@ -556,7 +556,7 @@
 					textarea.stopObserving();
 				}
 			}
-			$(htmlid).down('img').src = 'img/ajax-loader.gif';
+			$(htmlid).down('img').src = 'assets/img/ajax-loader.gif';
 			progresstack.push(htmlid);
 
 
@@ -729,7 +729,7 @@
 		tabs.add_section('lib-search');
 		tabs.update_section('lib-search', {
 			"title": 'Search',
-			"icon": 'img/magnify.gif',
+			"icon": 'assets/img/magnify.gif',
 			"content": $('lib-search').remove()
 		});
 

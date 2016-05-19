@@ -20,13 +20,13 @@
 	var appUrl = plugin.registrationUrl.replace(/\/api\/.*$/g, "") + "/";
 
 	// extend the styles
-	$('head').append('<link rel="stylesheet" href="' + appUrl + "themes/powerschool/embedded.css" + '" type="text/css" />');
+	$('head').append('<link rel="stylesheet" href="' + appUrl + "assets/themes/powerschool/embedded.css" + '" type="text/css" />');
 
 	// load all the required javascript libraries and then, once complete, begin the process
 	loadScripts([
-		appUrl + "script/jquery.json-2.3.min.js",
-		appUrl + "script/postmessagehandler.js",
-		appUrl + "script/postmessagerpchandler.js"
+		appUrl + "assets/js/jquery.json-2.3.min.js",
+		appUrl + "assets/js/postmessagehandler.js",
+		appUrl + "assets/js/postmessagerpchandler.js"
 	],
 		function() {
 			// initialize the message sender object. It will auto-load into the form

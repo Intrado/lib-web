@@ -22,6 +22,7 @@ class User extends DBMappedObject {
 	var $importid;
 	var $lastimport;
 	var $personid;
+	var $samlEnabled;
 	//var $portaluserid; // READONLY, comment out for now
 	//var $portaluserassociationtimestamp;
 

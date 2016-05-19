@@ -54,7 +54,7 @@ class TwitterAuth extends FormItem {
 	}
 
 	function renderJavascriptLibraries() {
-		return '<script type="text/javascript" src="script/TwitterHelper.js"></script>';
+		return '<script type="text/javascript" src="assets/js/TwitterHelper.js"></script>';
 	}
 }
 

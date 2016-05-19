@@ -132,7 +132,7 @@ function feed_apply(url,sortby,view) {
 					if (item.publishmessage) {
 						feedWrap.insert(
 							new Element('a', {'class': 'feed_subtitle', 'href': item.defaultlink}).insert(
-										new Element('img', {'src': 'img/icons/diagona/10/031.gif'})
+										new Element('img', {'src': 'assets/img/icons/diagona/10/031.gif'})
 									).insert(
 										item.publishmessage
 									)

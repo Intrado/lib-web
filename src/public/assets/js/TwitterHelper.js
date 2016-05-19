@@ -25,7 +25,7 @@ TwitterHelper = function () {
 		loadUserData: function (element, user_id) {
 			// NOTE: We are using prototypejs for the DOM work here...
 			element = $(element);
-			element.update(new Element("img", { src: "img/ajax-loader.gif" }));
+			element.update(new Element("img", { src: "assets/img/ajax-loader.gif" }));
 			new Ajax.Request("ajaxtwitter.php", {
 				method: "get",
 				parameters: {

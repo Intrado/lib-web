@@ -53,13 +53,13 @@ class FeedCategorySelector extends MultiCheckBoxTable {
 		foreach ($feedCategory->getTypes() as $type) {
 			switch ($type) {
 				case "rss":
-					$typeHtml .= '<img class="categorytype rss" src="img/icons/pictos/p1/16/80.png" />';
+					$typeHtml .= '<img class="categorytype rss" src="assets/img/icons/pictos/p1/16/80.png" />';
 					break;
 				case "desktop":
-					$typeHtml .= '<img class="categorytype desktop" src="img/icons/pictos/p1/16/160.png" />';
+					$typeHtml .= '<img class="categorytype desktop" src="assets/img/icons/pictos/p1/16/160.png" />';
 					break;
 				case "push":
-					$typeHtml .= '<img class="categorytype push" src="img/icons/pictos/p2/16/70.png" />';
+					$typeHtml .= '<img class="categorytype push" src="assets/img/icons/pictos/p2/16/70.png" />';
 			}
 		}
 		return $typeHtml;

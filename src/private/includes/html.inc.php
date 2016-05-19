@@ -24,7 +24,7 @@ function help($title, $extrahtml = NULL, $style = NULL) {
 	$GLOBALS['TIPS'][] = array($tipid,$contents); //navbotom.inc will load these for us
 
 	$hover = '<span id="'.$tipid.'" class="hoverhelpicon ' . ($link != "" ? "helpclick" : "") . '" ' . $extrahtml . '>';
-	$hover .= '<img src="img/helpcenter' . ($style ? '_' . $style : "") . '.png" alt=""';
+	$hover .= '<img src="assets/img/helpcenter' . ($style ? '_' . $style : "") . '.png" alt=""';
 	if ($link != "")
 		$hover .= " onclick=\"window.open('$link', '_blank', 'width=750,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');\"";
 	$hover .= '></span>';	
@@ -44,7 +44,7 @@ function action_link ($title, $icon, $href = "#", $onclick = null) {
 	$autoid = autoID("action_link", $title, $icon);	
 	$str = '<a id="' . $autoid . '" href="'.$href.'" '.$onclick.' class="actionlink" title="'.escapehtml($title).'">';
 	if ($actionlinkmode == "both" || $actionlinkmode == "icons")
-		$str .= '<img src="img/icons/'.$icon.'.png" alt="'.escapehtml($title).'">';
+		$str .= '<img src="assets/img/icons/'.$icon.'.png" alt="'.escapehtml($title).'">';
 	if ($actionlinkmode == "both" || $actionlinkmode == "text")
 		$str .= escapehtml($title);
 	$str .= '</a>';
@@ -150,9 +150,9 @@ function submit_button($name, $value = "submit", $icon = null, $beforeSubmit = n
 	$btn = '<button class="btn" type="submit" name="submit" value="' . escapehtml($value) . '" onclick="' . (strlen($beforeSubmit) ? $beforeSubmit : '') . 'return form_submit(event,\'' . escapehtml($value) . '\');"><span class="btn_wrap cf"><span class="btn_left"></span><span class="btn_middle">';
 	
 	if ($icon == null)
-		$btn .= '<img src="img/pixel.png" alt="" height="16" width="1">';		
+		$btn .= '<img src="assets/img/pixel.png" alt="" height="16" width="1">';		
 	else
-		$btn .= '<img src="img/icons/' . $icon . '.png" alt="">';
+		$btn .= '<img src="assets/img/icons/' . $icon . '.png" alt="">';
 	$btn .= escapehtml($name) . '</span><span class="btn_right"></span></span></button>';
 	
 	return $btn;
@@ -168,7 +168,7 @@ function icon_button($name,$icon,$onclick = NULL, $href = NULL, $extrahtml = NUL
 
 	if ($extrahtml)
 		$btn .= $extrahtml;
-	$btn .= '><span class="btn_wrap cf"><span class="btn_left"></span><span class="btn_middle"><img class="btn_middle_icon" src="img/icons/'.$icon.'.png" alt="">' . escapehtml($name) .'</span><span class="btn_right"></span></span></button>';
+	$btn .= '><span class="btn_wrap cf"><span class="btn_left"></span><span class="btn_middle"><img class="btn_middle_icon" src="assets/img/icons/'.$icon.'.png" alt="">' . escapehtml($name) .'</span><span class="btn_right"></span></span></button>';
 	return $btn;
 }
 
@@ -201,7 +201,7 @@ function submit($form, $section, $name = 'Submit',$val = null, $icon = "accept")
 }
 
 function add($name, $file = 'add') {
-	return '<input type="image" name="' . $name . '" value="' . $name . '" src="img/b1_' . $file . '.gif" onMouseOver="this.src=\'img/b2_' . $file . '.gif\';" onMouseOut="this.src=\'img/b1_' . $file . '.gif\';">';
+	return '<input type="image" name="' . $name . '" value="' . $name . '" src="assets/img/b1_' . $file . '.gif" onMouseOver="this.src=\'assets/img/b2_' . $file . '.gif\';" onMouseOut="this.src=\'img/b1_' . $file . '.gif\';">';
 }
 
 

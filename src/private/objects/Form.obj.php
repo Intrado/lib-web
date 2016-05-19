@@ -337,7 +337,7 @@ class Form {
 				continue;
 			}
 
-			if ($lasthelpstep && $lasthelpstep != $itemdata['helpstep']) {
+			if ($lasthelpstep && isset($itemdata['helpstep']) && ($lasthelpstep != $itemdata['helpstep'])) {
 				$str .= '
 			</fieldset>';
 			}
@@ -367,7 +367,7 @@ class Form {
 				$value = $itemdata['value'];
 				$requiredfields = isset($itemdata['requires']) ? $this->getFieldValues($itemdata['requires']) : array();
 				$t = $this->tindex++;
-				$i = "img/pixel.gif";
+				$i = "assets/img/pixel.gif";
 				$alt = "";
 				$style = "";
 				$msg = false;
@@ -388,19 +388,19 @@ class Form {
 					//validate and show normally
 					$valresult = Validator::validate_item($this->formdata,$name,$value,$requiredfields);
 					if ($valresult === true) {
-						$i = "img/icons/accept.gif";
+						$i = "assets/img/icons/accept.gif";
 						$alt = "Valid";
 						$style = 'style="background: transparent;"' ; //rgb(225,255,225)
 						$msg = false;
 					} else {
 						list($validator,$msg) =  $valresult;
-						$i = "img/icons/exclamation.gif";
+						$i = "assets/img/icons/exclamation.gif";
 						$alt = "Validation Error";
 						$style = 'style="background: transparent;"' ;
 					}
 				} else if (!$this->getSubmit() && $isblank && $isrequired) {
 					//show required highlight
-					$i = "img/icons/error.gif";
+					$i = "assets/img/icons/error.gif";
 					$alt = "Required Field";
 					$style = 'style="background: transparent;"' ;
 				}
@@ -455,18 +455,18 @@ class Form {
 		}
 
 		$str .= '
-				<div id="'.$this->name.'_spinner" class="formspinner" style="display: none;"><img src="img/ajax-loader.gif" alt="Loading..."></div>
+				<div id="'.$this->name.'_spinner" class="formspinner" style="display: none;"><img src="assets/img/ajax-loader.gif" alt="Loading..."></div>
 				<!-- END FORM CONTENT -->
 				</td>
 				<td id="'.$this->name.'_helpercell" valign="top">
 				<!-- HELPER -->
 				<div id="'.$this->name.'_startguide" style="float: right; padding-top: 3px;">'.($this->helpsteps ? icon_button("Guide","information","return form_enable_helper(event);") : "").'</div>
 				<div id="'.$this->name.'_helper" class="helper">
-					<div class="title"><a style="float: right;" href="#" onclick="form_disable_helper(event); return false;"><img src="img/icons/cross.gif" alt="Close Guide" title="Close"></a>Guide</div>
+					<div class="title"><a style="float: right;" href="#" onclick="form_disable_helper(event); return false;"><img src="assets/img/icons/cross.gif" alt="Close Guide" title="Close"></a>Guide</div>
 					<div class="helpercontent" id="'.$this->name.'_helpercontent" ></div>
 					<div class="toolbar" >
-						<a href="#" style="float:left;" onclick="this.blur(); return form_step_handler(event,-1);"><img src="img/icons/fugue/arrow_090.gif" border="0" alt="Previous Step" title="Previous Step" width="16"></a>
-						<a href="#" style="float:left;" onclick="this.blur(); return form_step_handler(event,1);"><img src="img/icons/fugue/arrow_270.gif" border="0" alt="Next Step" title="Next Step" width="16"></a>
+						<a href="#" style="float:left;" onclick="this.blur(); return form_step_handler(event,-1);"><img src="assets/img/icons/fugue/arrow_090.gif" border="0" alt="Previous Step" title="Previous Step" width="16"></a>
+						<a href="#" style="float:left;" onclick="this.blur(); return form_step_handler(event,1);"><img src="assets/img/icons/fugue/arrow_270.gif" border="0" alt="Next Step" title="Next Step" width="16"></a>
 						<div id="'.$this->name.'_helperinfo" class="info">Click the arrow to begin</div>
 					</div>
 				</div>

@@ -151,8 +151,8 @@ class JobDetailReport extends ReportGenerator{
 				case rp.type when 'device' then concat(left(rd.deviceUuid,8), '...') when 'phone' then rc.phone when 'email' then rc.email when 'sms' then rc.sms else concat_ws(' ', rc.addr1, rc.addr2, rc.city, rc.state, rc.zip) end as destination,
 				case rp.type when 'device' then from_unixtime(rd.startTimeMs/1000) else from_unixtime(rc.starttime/1000) end as lastattempt,
 				coalesce(if(rc.result='X' and rc.numattempts<3,'F',rc.result), rd.result, rp.status) as result,
-				'unused' as emailstatuscode,
-				1000 as emailreadduration,
+				(select statuscode from reportemaildelivery use index (jobperson) where jobid=rc.jobid AND personid = rc.personid and sequence = rc.sequence order by timestamp desc limit 1) as emailstatuscode,
+				ret.requestduration as emailreadduration,
 				rp.status,
 				case rp.type when 'device' then rd.numAttempts else rc.numattempts end as numattempts,
 				rc.resultdata,
@@ -184,6 +184,7 @@ class JobDetailReport extends ReportGenerator{
 				left outer join surveyweb sw on (sw.personid = rp.personid and sw.jobid = rp.jobid)
 				left outer join voicereply vr on (vr.jobid = rp.jobid and vr.personid = rp.personid and vr.sequence = rc.sequence and vr.userid = {$USER->id} and rc.type='phone')
 				left outer join language l on (l.code = rp." . FieldMap::GetLanguageField() . ")
+				left outer join reportemailtracking ret on (rc.jobid = ret.jobid and rc.personid = ret.personid and rc.sequence = ret.sequence)
 				left outer join person rcp on (rc.recipientpersonid = rcp.id)
 				left outer join person rdp on (rd.recipientpersonid = rdp.id)
 			where
@@ -225,12 +226,14 @@ class JobDetailReport extends ReportGenerator{
 			global $USER;
 			$text = "";
 
-			if ($row[5] != 'email') {
+			if ($row[5] == 'email') {
+				$text = display_read_duration($row[11]);
+			} else {
 				if ($row[18] != null) {
 					if ($row[19] != null) {
-					$text .= ' <span class="voicereplyclickableicon"><img src="img/speaker.gif" onclick="popup(\'repliespreview.php?id=' . $row[18] . '&close=1\', 450, 600)"></span>';
+					$text .= ' <span class="voicereplyclickableicon"><img src="assets/img/speaker.gif" onclick="popup(\'repliespreview.php?id=' . $row[18] . '&close=1\', 450, 600)"></span>';
 				} else {
-					$text .= ' <span class="voicereplyicon"><img src="img/speaker2.gif"></span>';
+					$text .= ' <span class="voicereplyicon"><img src="assets/img/speaker2.gif"></span>';
 				}
 				}
 
@@ -379,7 +382,9 @@ class JobDetailReport extends ReportGenerator{
 
 
 		function fmt_confirmation($row, $index){
-			if ($row[5] != 'email') {
+			if ($row[5] == 'email') {
+				$text = display_read_duration($row[11]);
+			} else {
 				if($row[$index] == "1"){
 					$text = "Yes";
 				} else if($row[$index] == "2"){

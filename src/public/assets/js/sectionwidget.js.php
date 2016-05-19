@@ -41,7 +41,7 @@ var SectionWidget = Class.create({
 			return;
 		}
 		
-		this.sectionscontainer.update('<img src="img/ajax-loader.gif"/>');
+		this.sectionscontainer.update('<img src="assets/img/ajax-loader.gif"/>');
 		
 		cachedAjaxGet('ajax.php?type=getsections&organizationid=' + organizationid, function(transport) {
 			var sections = transport.responseJSON,

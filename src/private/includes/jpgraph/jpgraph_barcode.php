@@ -9,7 +9,7 @@ require_once ('jpgraph_canvas.php');
  // Ver:         $Id: jpgraph_barcode.php 1789 2009-09-03 13:47:56Z ljp $
  //
  // License:     This code is released under JpGraph Professional License
- //              http://www.aditus.nu/jpgraph/
+ //              http://www.aditus.nu/../private/includes/jpgraph/
  //
  // Copyright (c) Aditus Consulting. All rights reserved.
  //
@@ -2045,7 +2045,7 @@ class OutputBackend_PS extends OutputBackend {
         $ps =
         ($this->iEPS ? "%!PS-Adobe-3.0 EPSF-3.0\n" : "%!PS-Adobe-3.0\n" ) .
      "%%Title: Barcode \"$spec->iData\", encoding: \"$spec->iEncoding\"\n".
-     "%%Creator: JpGraph Barcode http://www.aditus.nu/jpgraph/\n".
+     "%%Creator: JpGraph Barcode http://www.aditus.nu/../private/includes/jpgraph/\n".
      "%%CreationDate: ".date("D j M H:i:s Y",time())."\n";
 
         if( $this->iEPS ) {

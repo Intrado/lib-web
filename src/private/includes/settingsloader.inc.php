@@ -1,15 +1,16 @@
 <?php
 
-global $incdir;
+global $incdir, $basedir;
 
-if (($SETTINGS = parse_ini_file("{$incdir}/settings.ini.php", true)) === false ) {
-	if (isset($incdir)) {
-		if (is_dir($incdir)) {
-			error_log("Cannot read ini file \"$incdir/settings.ini.php\"");
+$iniPath = dirname($basedir) . "/settings.ini";
+if (($SETTINGS = parse_ini_file($iniPath, true)) === false ) {
+	if (isset($basedir)) {
+		if (is_dir($basedir)) {
+			error_log("Cannot read ini file \"{$iniPath}\"");
 		} else {
-			error_log("Cannot find directory \"$incdir\"");
+			error_log("Cannot find directory \"$basedir\"");
 		}
 	} else {
-		error_log('Expecting $incdir to be set to a directory, but it is not set');
+		error_log('Expecting $basedir to be set to a directory, but it is not set');
 	}
 }

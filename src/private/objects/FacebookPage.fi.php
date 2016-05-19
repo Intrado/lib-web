@@ -63,7 +63,7 @@ class FacebookPage extends FormItem {
 								'. icon_button(_L("Renew Facebook Authorization"), "custom/facebook", "popup('popupfacebookauth.php', 640, 400)").'
 							</div>
 							<div id="'. $n. 'fbpages" class="fbpagelist" style="display:'. (($showconnectbutton || $showrenewbutton)?"none":"block"). '">
-								<img src="img/ajax-loader.gif" alt="'. escapehtml(_L("Loading")). '"/>
+								<img src="assets/img/ajax-loader.gif" alt="'. escapehtml(_L("Loading")). '"/>
 							</div>
 						</td>
 					</tr>
@@ -174,7 +174,7 @@ class FacebookPage extends FormItem {
 					// add a loading indicator
 					$(container).insert(
 						new Element("div", { id: formitem + "-pageloading" }).insert(
-							new Element("img", { "src": "img/ajax-loader.gif", "alt": "Loading" })
+							new Element("img", { "src": "assets/img/ajax-loader.gif", "alt": "Loading" })
 						)
 					);
 					

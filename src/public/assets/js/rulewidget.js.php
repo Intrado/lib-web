@@ -1,6 +1,6 @@
 <?
-require_once("../inc/subdircommon.inc.php");
-require_once("../inc/html.inc.php");
+require_once(dirname(__FILE__) . "/../../../private/includes/subdircommon.inc.php");
+require_once(dirname(__FILE__) . "/../../../private/includes/html.inc.php");
 
 //set expire time to + 1 hour so browsers cache this file
 header("Expires: " . gmdate('D, d M Y H:i:s', time() + 60*60) . " GMT"); //exire in 1 hour, but if theme changes so will hash pointing to this file
@@ -793,7 +793,7 @@ var RuleEditor = Class.create({
 			// fall through, shares cache and ajax call with multisearch
 			case 'multisearch':
 				container.setStyle({'border': 'solid 1px gray', 'background': 'white', 'padding': '2px'});
-				container.update('<img src="img/ajax-loader.gif"/>');
+				container.update('<img src="assets/img/ajax-loader.gif"/>');
 				if (this.ruleWidget.multisearchDomCache[fieldnum]) {
 					container.update(this.ruleWidget.multisearchDomCache[fieldnum]);
 					this.add_multicheckbox_toolbar(container);

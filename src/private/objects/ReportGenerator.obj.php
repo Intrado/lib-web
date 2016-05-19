@@ -188,14 +188,8 @@ abstract class ReportGenerator {
 
 	public function reportxmlrpc($method, $xmlparams){
 		global $SETTINGS;
-		if (isset($SETTINGS['reportserver']['host']))
-			$reporthost = $SETTINGS['reportserver']['host'];
-		else
-			$reporthost = "localhost:8089";
-		if (isset($SETTINGS['reportserver']['path']))
-			$reportpath = $SETTINGS['reportserver']['path'];
-		else
-			$reportpath = "/xmlrpc";
+		$reporthost = (isset($SETTINGS['reportserver']['host'])) ? $SETTINGS['reportserver']['host'] : 'localhost:9086';
+		$reportpath = (isset($SETTINGS['reportserver']['path'])) ? $SETTINGS['reportserver']['path'] : '/xmlrpc';
 		
 		$msg = new XML_RPC_Message($method, $xmlparams);
 		$msg->setSendEncoding("UTF-8");
@@ -204,13 +198,15 @@ abstract class ReportGenerator {
 		$resp = $cli->send($msg, 600);
 
 		if (!$resp) {
-	    	error_log('ReportGenerator.obj.php::reportxmlrpc(): ' . $method . ' communication error: ' . $cli->errstr);
-		} else if ($resp->faultCode()) {
+			error_log('ReportGenerator.obj.php::reportxmlrpc(): ' . $method . ' communication error: ' . $cli->errstr);
+		}
+		else if ($resp->faultCode()) {
 			error_log($method . ' Fault Code: ' . $resp->faultCode() . ' Fault Reason: ' . $resp->faultString());
-		} else {
+		}
+		else {
 			$val = $resp->value();
-	    	$data = XML_RPC_decode($val);
-	    	return $data;
+			$data = XML_RPC_decode($val);
+			return $data;
 		}
 		return ""; // failure
 	}

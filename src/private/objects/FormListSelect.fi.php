@@ -113,7 +113,7 @@ class FormListSelect extends FormItem {
 				$(formitemname + "-displaybody").insert(
 					new Element("tr", {id: listcheckbox.id + "-display"}).insert(
 						new Element("td", {id: listcheckbox.id + "-name"}).insert(
-							new Element("img", {src: "img/ajax-loader.gif"})
+							new Element("img", {src: "assets/img/ajax-loader.gif"})
 						)
 					).insert(
 						new Element("td", {id: listcheckbox.id + "-total"}).update()

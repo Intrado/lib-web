@@ -45,7 +45,7 @@ function feed($buttons,$sortoptions,$viewoptions = null) {
 	<div id="feeditems" class="content_feed">
 			<table><tbody>
 				<tr>
-					<td class=""><img src='img/ajax-loader.gif' /></td>
+					<td class=""><img src='assets/img/ajax-loader.gif' /></td>
 					<td>
 						<div class='feedtitle'>
 							<a href=''><?//= _L("Loading Lists") ?></a>

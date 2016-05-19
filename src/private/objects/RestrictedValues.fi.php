@@ -7,7 +7,7 @@ class RestrictedValues extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
 		if (count($this->args['values']) == 0) {
-			return '<img src="img/icons/information.png" alt="Information" /> ' . _L("No Restrictable Fields");
+			return '<img src="assets/img/icons/information.png" alt="Information" /> ' . _L("No Restrictable Fields");
 		}
 
 		$extraStyle = isset($this->args['height']) ? ('height: ' . $this->args['height'] . '; overflow: auto;') : '';

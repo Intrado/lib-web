@@ -189,7 +189,7 @@ function NewFormItem ($form, $section, $item, $type, $option=40, $optionvalue="n
 		break;
 	case "image":
 		$n = $option==40 ? $item : $option;
-		echo '<input alt="' . $n . '" type="image" name="submit[' . $form . '][' . $section . ']" src="img/b1_' . $n . '.gif" onMouseOver="this.src=\'img/b2_' . $n . '.gif\';" onMouseOut="this.src=\'img/b1_' . $n . '.gif\';">';
+		echo '<input alt="' . $n . '" type="image" name="submit[' . $form . '][' . $section . ']" src="assets/img/b1_' . $n . '.gif" onMouseOver="this.src=\'assets/img/b2_' . $n . '.gif\';" onMouseOut="this.src=\'img/b1_' . $n . '.gif\';">';
 		break;
 	case "submit":
 		echo "<input $extrahtml type=submit value=\"" . ($item ? $item : "Submit") . "\" name=submit[" . $form . "][" . $section . "]>";

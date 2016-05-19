@@ -85,10 +85,10 @@ function select_metadata($tablename=null, $start=null, $fields){
 				?><td><div align="center">
 				<?
 					if(isset($_SESSION['report']['fields'][$fieldnum]) && $_SESSION['report']['fields'][$fieldnum]){
-						$result = "<img src=\"img/checkbox-rule.png\" onclick=\"dofieldbox(this,true,'$fieldnum', $saved);";
+						$result = "<img src=\"assets/img/checkbox-rule.png\" onclick=\"dofieldbox(this,true,'$fieldnum', $saved);";
 						$checked = "checked>";
 					} else {
-						$result = "<img src=\"img/checkbox-clear.png\" onclick=\"dofieldbox(this,false,'$fieldnum', $saved);";
+						$result = "<img src=\"assets/img/checkbox-clear.png\" onclick=\"dofieldbox(this,false,'$fieldnum', $saved);";
 						$checked = ">";
 					}
 					if($tablename == null && $start ==null){
@@ -295,16 +295,4 @@ function parse_survey_data($row, $index){
 	return isset($questiondata["q" . ($x-1)]) ? $questiondata["q" . ($x-1)] : "";
 
 }
-
-
-/**
- * removes ' from job list and if not set, it sets to "0"
- * @param $joblist
- * @return mixed|string
- */
-function cleanJobList($joblist){
-	return empty($joblist) ? "0" : str_replace("'", "", $joblist);
-}
-
-
 ?>

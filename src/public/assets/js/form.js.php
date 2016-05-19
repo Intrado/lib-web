@@ -1,6 +1,7 @@
 <?
-require_once("../inc/utils.inc.php");
-require_once("../obj/Validator.obj.php");
+
+require_once(dirname(__FILE__) . "/../../../private/includes/utils.inc.php");
+require_once(dirname(__FILE__) . "/../../../private/objects/Validator.obj.php");
 
 //set expire time to + 1 hour so browsers cache this file
 header("Expires: " . gmdate('D, d M Y H:i:s', time() + 60*60) . " GMT"); //exire in 1 hour, but if theme changes so will hash pointing to this file
@@ -141,7 +142,7 @@ function form_do_validation (form, element, validationHander) {
 			//if radio button, get the id of the container div
 			var statusindicator = $((element.up(".radiobox") || element.up(".multicheckbox") || element).id + "_icon");
 			if (statusindicator)
-				statusindicator.src = "img/ajax-loader.gif";
+				statusindicator.src = "assets/img/ajax-loader.gif";
 		}
 
 		//see if we need additional fields for validation
@@ -222,19 +223,19 @@ function form_validation_display(element,resultcode, msgtext) {
 	if (style == "error" || style == "neterror") {
 		css = 'background: rgb(255,200,200);';
 		if (icon) {
-			icon.src = "img/icons/exclamation.gif";
+			icon.src = "assets/img/icons/exclamation.gif";
 			icon.alt = icon.title = "Validation Error";
 		}
 	} else if (style == "valid") {
 		css = 'background: rgb(225,255,225);'; //rgb(241,241,241)
 		if (icon) {
-			icon.src = "img/icons/accept.gif";
+			icon.src = "assets/img/icons/accept.gif";
 			icon.alt = icon.title = "Valid";
 		}
 	} else if (style == "blank") {
 		css = 'background: rgb(255,255,255); display: none';
 		if (icon) {
-			icon.src = "img/pixel.gif";
+			icon.src = "assets/img/pixel.gif";
 			icon.alt = icon.title = "";
 		}
 	}
@@ -437,15 +438,15 @@ function form_go_step (form, direction, specificstep) {
 	var leftarrow = helper.down(".toolbar img");
 	var rightarrow = helper.down(".toolbar img",1);
 	if (formvars.currentstep == 0) {
-		leftarrow.src="img/pixel.gif";
+		leftarrow.src="assets/img/pixel.gif";
 	} else {
-		leftarrow.src="img/icons/fugue/arrow_090.gif";
+		leftarrow.src="assets/img/icons/fugue/arrow_090.gif";
 	}
 
 	if (formvars.currentstep == formvars.helpsteps.length-1) {
-		rightarrow.src="img/pixel.gif";
+		rightarrow.src="assets/img/pixel.gif";
 	} else {
-		rightarrow.src="img/icons/fugue/arrow_270.gif";
+		rightarrow.src="assets/img/icons/fugue/arrow_270.gif";
 	}
 
 	//info text

@@ -166,7 +166,7 @@ CKEDITOR.dialog.add('aspell', function( editor )
 				$(scratch).find('img').each(function () {
 					var el = $(this); // reextend with jQuery in case prototype is fooling with our heads
 					el.attr('data-aspell-saved-src', el.attr('src'));
-					el.attr('src', aspellBaseUrl + 'script/ckeditor/plugins/aspell/icons/viewimage.gif');
+					el.attr('src', aspellBaseUrl + 'assets/js/ckeditor/plugins/aspell/icons/viewimage.gif');
 				});
 			}) (jQuery);
 

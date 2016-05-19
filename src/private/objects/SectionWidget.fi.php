@@ -55,7 +55,7 @@ class SectionWidget extends FormItem {
 	}
 	
 	function renderJavascriptLibraries() {
-		return '<script type="text/javascript" src="script/sectionwidget.js.php"></script>';
+		return '<script type="text/javascript" src="assets/js/sectionwidget.js.php"></script>';
 	}
 }
 

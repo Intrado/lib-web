@@ -251,7 +251,7 @@ function toggleHiddenField(i){
 }
 
 function parse_theme_from_url (url) {
-	var t = url.substring(11+url.indexOf("img/themes/"));
+	var t = url.substring(11+url.indexOf("assets/img/themes/"));
 	return t.substring(0,t.indexOf("/"));
 }
 
@@ -269,9 +269,9 @@ function btn_roll(obj,over) {
 	//parse one of the button images for the theme
 	//var theme = parse_theme_from_url(leftimg.src);
 
-	//leftimg.src='themes/' + theme + '/button_left' + over + '.gif';
-	//rightimg.src='themes/' + theme + '/button_right' + over + '.gif';
-	//midtb.style.background = "url('themes/" + theme + "/button_mid" + over + ".gif') repeat-x";
+	//leftimg.src='assets/themes/' + theme + '/button_left' + over + '.gif';
+	//rightimg.src='assets/themes/' + theme + '/button_right' + over + '.gif';
+	//midtb.style.background = "url('assets/themes/" + theme + "/button_mid" + over + ".gif') repeat-x";
 }
 
 function btn_rollover(obj) {
@@ -290,10 +290,10 @@ function windowHide(windowid) {
 
 	if (vis) {
 		windowbody.style.display =  "none" ;
-		collapseicon.obj.src = "img/arrow_right.gif";
+		collapseicon.obj.src = "assets/img/arrow_right.gif";
 	} else {
 		windowbody.style.display =  "block" ;
-		collapseicon.obj.src = "img/arrow_down.gif";
+		collapseicon.obj.src = "assets/img/arrow_down.gif";
 	}
 
 	setState('window_' + windowid, vis ? "closed" : "open");
@@ -393,7 +393,7 @@ function isAllSameDigit(number){
 function ajax_table_update(containerID, uri) {
 	if (!$(containerID))
 		return;
-	$(containerID+'_tableprogressbar').update('<img src="img/ajax-loader.gif"/>');
+	$(containerID+'_tableprogressbar').update('<img src="assets/img/ajax-loader.gif"/>');
 	if (!uri)
 		return;
 	cachedAjaxGet(uri + '&containerID=' + containerID, function(transport) {
@@ -544,7 +544,7 @@ function icon_button(name,icon,id) {
 	if (id)
 		newbutton.id = id;
 
-	var buttonface = new Element("span",{"class":"btn_middle"}).insert(new Element("img",{src: "img/icons/"+icon+".gif", "class":"btn_middle_icon"})).insert(name);
+	var buttonface = new Element("span",{"class":"btn_middle"}).insert(new Element("img",{src: "assets/img/icons/"+icon+".gif", "class":"btn_middle_icon"})).insert(name);
 
 	var buttonrecord = new Element("span", {"class":"btn_left"}).insert(buttonface).insert(new Element("span",{"class":"btn_right"}));
 
@@ -564,7 +564,7 @@ function action_link(name,icon,id) {
 	newaction.id = id;
 
 	// TODO: actionlinkmode needs to be checked to display icons and/or titles
-	newaction.insert(new Element("img", {src: "img/icons/"+icon+".gif"})).insert(name);
+	newaction.insert(new Element("img", {src: "assets/img/icons/"+icon+".gif"})).insert(name);
 
 	return newaction;
 }

@@ -192,13 +192,13 @@ class Wizard {
 				
 				if ($stepnum === $curstepnum) {
 					$itemcount++;
-					$res .= str_repeat("\t",$depth+1) . '<li class="wiznav_'.$depth.' wiznav_active" ><img src="img/icons/diagona/10/131.gif" alt="">'.$this->getStepData($thisstep)->title.'</li>' . "\n";
+					$res .= str_repeat("\t",$depth+1) . '<li class="wiznav_'.$depth.' wiznav_active" ><img src="assets/img/icons/diagona/10/131.gif" alt="">'.$this->getStepData($thisstep)->title.'</li>' . "\n";
 				} else if($stepnum !== false && $stepnum < $curstepnum) {
 					$itemcount++;
-					$res .= str_repeat("\t",$depth+1) . '<li class="wiznav_'.$depth.' wiznav_enabled"><a href="?step='.$thisstep.'"><img src="img/icons/diagona/10/102.gif" alt="">'.$this->getStepData($thisstep)->title.'</a></li>' . "\n";
+					$res .= str_repeat("\t",$depth+1) . '<li class="wiznav_'.$depth.' wiznav_enabled"><a href="?step='.$thisstep.'"><img src="assets/img/icons/diagona/10/102.gif" alt="">'.$this->getStepData($thisstep)->title.'</a></li>' . "\n";
 				} else if ($stepnum !== false) {
 					$itemcount++;
-					$res .= str_repeat("\t",$depth+1) . '<li class="wiznav_'.$depth.' wiznav_disabled"><img src="img/icons/diagona/10/159.gif" alt="">'.$this->getStepData($thisstep)->title.'</li>' . "\n";
+					$res .= str_repeat("\t",$depth+1) . '<li class="wiznav_'.$depth.' wiznav_disabled"><img src="assets/img/icons/diagona/10/159.gif" alt="">'.$this->getStepData($thisstep)->title.'</li>' . "\n";
 				}
 			}
 		}

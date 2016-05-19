@@ -192,7 +192,7 @@ class ContactsReport extends ReportGenerator {
 		function fmt_editlocked_destination($row, $index){
 			$output = fmt_destination($row, $index);
 			if($row[8] == 1){
-				$output = "<img src='img/padlock.gif'>&nbsp;" . $output;
+				$output = "<img src='assets/img/padlock.gif'>&nbsp;" . $output;
 			}
 			return $output;
 		}

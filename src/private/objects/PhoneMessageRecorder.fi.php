@@ -20,14 +20,14 @@ class PhoneMessageRecorder extends FormItem {
 
 		// EasyCall DOM elem to attach easyCall; hidden elem that stores the audiofile id values
 		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value ? $value : '{}').'" />
-				<link rel="stylesheet" type="text/css" href="css/easycall_widget.css" >';
+				<link rel="stylesheet" type="text/css" href="assets/css/easycall_widget.css" >';
 		return $str;
 	}
 
 	function renderJavascriptLibraries() {
-		return '<script type="text/javascript" src="script/jquery.json-2.3.min.js"></script>
-				<script type="text/javascript" src="script/jquery.timer.js"></script>
-				<script type="text/javascript" src="script/jquery.easycall.js"></script>';
+		return '<script type="text/javascript" src="assets/js/jquery.json-2.3.min.js"></script>
+				<script type="text/javascript" src="assets/js/jquery.timer.js"></script>
+				<script type="text/javascript" src="assets/js/jquery.easycall.js"></script>';
 	}
 
 	function renderJavascript($value) {

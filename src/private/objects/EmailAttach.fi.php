@@ -17,7 +17,7 @@ class EmailAttach extends FormItem {
 		$str = '
 			<input id="' . $n . '" name="' . $n . '" type="hidden" value="' . escapehtml($value) . '"/>
 			<div id="uploadedfiles" style="display: none;"></div>
-			<div id="upload_process" style="display: none;"><img src="img/ajax-loader.gif" /></div>
+			<div id="upload_process" style="display: none;"><img src="assets/img/ajax-loader.gif" /></div>
 			';
 		if ($disableUpload) {
 			$str .= '<iframe id = "' . $n . 'my_attach" src = "emailattachment.php?formname=' . $this->form->name . '&disableupload=true' . '&itemname=' . $n . '" style = "border:0; padding: 0; margin:0; bottom:0px;" ></iframe >';

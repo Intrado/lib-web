@@ -62,7 +62,7 @@ class MessageGroupSelectMenu extends FormItem {
 		}
 		
 		$str = '
-			<script type="text/javascript" src="script/getMessageGroupPreviewGrid.js"></script>
+			<script type="text/javascript" src="assets/js/getMessageGroupPreviewGrid.js"></script>
 			<script type="text/javascript">
 				function loadMessageGroupPreview(jobtypeid, event) {
 					var formitem = event.element();

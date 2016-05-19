@@ -63,16 +63,16 @@ class PhoneMessageEditor extends FormItem {
 
 		// this is the vertical seperator
 		$seperator = '
-			<img src="img/icons/bullet_black.gif" />
-			<img src="img/icons/bullet_black.gif" />
-			<img src="img/icons/bullet_black.gif" />';
+			<img src="assets/img/icons/bullet_black.gif" />
+			<img src="assets/img/icons/bullet_black.gif" />
+			<img src="assets/img/icons/bullet_black.gif" />';
 
 		// Voice recorder
 		$voicerecorder = '
 			<div id="'.$n.'-voicerecorder_fieldarea" name="'.$n.'-voicerecorder_fieldarea" class="controlcontainer">
 				<div>'._L("Voice Recording").'</div>
 				<input id="'.$n.'-easycall-widget" name="'.$n.'-easycall-widget" type="hidden" value="'.escapehtml($value).'" />
-				<link rel="stylesheet" type="text/css" href="css/easycall_widget.css" >
+				<link rel="stylesheet" type="text/css" href="assets/css/easycall_widget.css" >
 				<div id="'.$n.'-voicerecorder" name="'.$n.'-voicerecorder"></div>
 				<div id="'.$n.'-voicerecorder_msg" name="'.$n.'-voicerecorder_msg"></div>
 			</div>';
@@ -81,7 +81,7 @@ class PhoneMessageEditor extends FormItem {
 		$audioupload = '
 			<div class="controlcontainer">
 				<div>'._L("Audio Upload").'</div>
-				<div id="'.$n.'upload_process" style="display: none;"><img src="img/ajax-loader.gif" /></div>
+				<div id="'.$n.'upload_process" style="display: none;"><img src="assets/img/ajax-loader.gif" /></div>
 				<iframe id="'.$n.'-audioupload"
 					class="uploadiframe"
 					src="uploadaudio.php?formname='.$this->form->name.'&itemname='.$n.'">
@@ -201,11 +201,11 @@ class PhoneMessageEditor extends FormItem {
 
 	function renderJavascriptLibraries() {
 		return '
-			<script type="text/javascript" src="script/jquery.json-2.3.min.js"></script>
-			<script type="text/javascript" src="script/jquery.timer.js"></script>
-			<script type="text/javascript" src="script/jquery.easycall.js"></script>
-			<script type="text/javascript" src="script/audiolibrarywidget.js.php"></script>
-			<script type="text/javascript" src="script/phonemessageeditor.js"></script>';
+			<script type="text/javascript" src="assets/js/jquery.json-2.3.min.js"></script>
+			<script type="text/javascript" src="assets/js/jquery.timer.js"></script>
+			<script type="text/javascript" src="assets/js/jquery.easycall.js"></script>
+			<script type="text/javascript" src="assets/js/audiolibrarywidget.js.php"></script>
+			<script type="text/javascript" src="assets/js/phonemessageeditor.js"></script>';
 	}
 }
 ?>

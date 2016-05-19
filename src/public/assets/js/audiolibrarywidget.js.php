@@ -1,6 +1,6 @@
 <?
-require_once("../inc/subdircommon.inc.php");
-require_once("../inc/html.inc.php");
+require_once(dirname(__FILE__) . "/../../../private/includes/subdircommon.inc.php");
+require_once(dirname(__FILE__) . "/../../../private/includes/html.inc.php");
 
 //set expire time to + 1 hour so browsers cache this file
 header("Expires: " . gmdate('D, d M Y H:i:s', time() + 60*60) . " GMT"); //exire in 1 hour, but if theme changes so will hash pointing to this file

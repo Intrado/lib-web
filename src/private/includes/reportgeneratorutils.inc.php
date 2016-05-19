@@ -128,7 +128,7 @@ function getJobSummary($joblist, $readonlyDB = false){
 }
 
 function displayJobSummary($joblist, $readonlyDB = false){
-		$joblist = cleanJobList($joblist);
+
 		$jobinfo = getJobSummary($joblist, $readonlyDB);
 
 		//Check for any sms messages

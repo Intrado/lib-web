@@ -154,7 +154,7 @@ function show_field_visibility_selector ($tableid, $fields, $coloffset) {
 ?>
 	</ul>
 	</div>
-	<div style="cursor:pointer; white-space:nowrap;" id="<?=$id?>_icon"><img src="img/icons/cog.gif" alt="">&nbsp;Show/Hide&nbsp;Fields</div>
+	<div style="cursor:pointer; white-space:nowrap;" id="<?=$id?>_icon"><img src="assets/img/icons/cog.gif" alt="">&nbsp;Show/Hide&nbsp;Fields</div>
 	<script type="text/javascript"> new Tip("<?=$id?>_icon",$("<?=$id?>").innerHTML ,{
 			style: 'protogrey',
 			radius: 4,

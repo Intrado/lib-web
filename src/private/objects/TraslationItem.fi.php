@@ -107,7 +107,7 @@ class TranslationItem extends FormItem {
 				
 					<td valign="top" align="right" width="18px" style="'.(!empty($this->args['hidetranslationlock']) ? 'display:none' : '').'">
 						<div id="'.$n.'icons" style="display: '.(($msgdata->enabled)?"block":"none").'">
-							<img id="'.$n.'editlock" style="display: '.(($msgdata->override)?"block":"none").';" src="img/padlock.gif">
+							<img id="'.$n.'editlock" style="display: '.(($msgdata->override)?"block":"none").';" src="assets/img/padlock.gif">
 						</div>
 					</td>
 					<td valign="top" width="70%">
@@ -243,7 +243,7 @@ class TranslationItem extends FormItem {
 						text = text.substring(0, 5000);
 						alert("' . _L('The message is too long. Only the first 5000 characters are submitted for translation.') . '");
 					}
-					$(section + "retranslationtext").innerHTML = "<img src=\"img/ajax-loader.gif\" />";
+					$(section + "retranslationtext").innerHTML = "<img src=\"assets/img/ajax-loader.gif\" />";
 					new Ajax.Request("translate.php", {
 						method:"post",
 						parameters: {"text": makeTranslatableString(text), "language": language},
@@ -260,7 +260,7 @@ class TranslationItem extends FormItem {
 										
 									// This is an ugly hack. Update is not working correctly for IE 8. 
 									// Clearing the insert div with a hidden link will make the translationtext insert correctly.
-									$(dstbox).update("<div style=\"height:0px;\"><img src=\"img/pixel.gif\" alt=\"\"/></div>");
+									$(dstbox).update("<div style=\"height:0px;\"><img src=\"assets/img/pixel.gif\" alt=\"\"/></div>");
 									$(dstbox).insert(translatedtext);
 							}
 					});
@@ -284,7 +284,7 @@ class TranslationItem extends FormItem {
 						langtext.value = overridesave.value;
 						return;
 					}
-					$(section + "textdiv").innerHTML = "<img src=\"img/ajax-loader.gif\" />";
+					$(section + "textdiv").innerHTML = "<img src=\"assets/img/ajax-loader.gif\" />";
 					new Ajax.Request("translate.php", {
 						method:"post",
 						parameters: {"english": makeTranslatableString(sourcetext), "languages": language},
@@ -301,7 +301,7 @@ class TranslationItem extends FormItem {
 
 							// This is an ugly hack. Update is not working correctly for IE 8. 
 							// Clearing the insert div with a hidden link will make the translationtext insert correctly.  
-							$(section + "textdiv").update("<div style=\"height:0px;\"><img src=\"img/pixel.gif\" alt=\"\"/></div>"); 
+							$(section + "textdiv").update("<div style=\"height:0px;\"><img src=\"assets/img/pixel.gif\" alt=\"\"/></div>"); 
 							$(section+"textdiv").insert(translatedtext);
 							$(section+"text").value = translatedtext;
 							setTranslationValue(section);

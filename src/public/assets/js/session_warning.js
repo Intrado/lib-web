@@ -42,7 +42,7 @@ function sessionKeepAliveWarning(timeout) {
 
 		header.html("Automatic Logout");
 		var content = $('<div>',{'class' : 'keepalive'});
-		content.append($('<img>',{src : 'img/icons/lock.png',alt : 'Warning' }));
+		content.append($('<img>',{src : 'assets/img/icons/lock.png',alt : 'Warning' }));
 		content.append($('<span>',{text : 'Your session is about to close due to inactivity.' }));
 
 		var button = $(
@@ -50,7 +50,7 @@ function sessionKeepAliveWarning(timeout) {
 			'	<div class="btn_wrap cf">'+
 			'		<span class="btn_left"></span>'+
 			'		<span class="btn_middle">'+
-			'			<img class="btn_middle_icon" src="img/icons/tick.gif">'+
+			'			<img class="btn_middle_icon" src="assets/img/icons/tick.gif">'+
 			'			<span class="btn_text">Refresh Session</span>'+
 			'		</span>'+
 			'		<span class="btn_right"></span>'+
@@ -69,21 +69,21 @@ function sessionKeepAliveWarning(timeout) {
 		});
 
 		var refreshSession = function() {
-			content.html($('<img>', {src:"img/ajax-loader.gif", alt: "Refreshing Session"}));
+			content.html($('<img>', {src:"assets/img/ajax-loader.gif", alt: "Refreshing Session"}));
 			$.ajax({
 				url: 'ajax.php?type=keepalive',
 				type:'GET',
 				success: function (response) {
 					if (response === true){
 						content.html("");
-						content.append($('<img>', {src:"img/icons/accept.png", alt: "OK"}));
+						content.append($('<img>', {src:"assets/img/icons/accept.png", alt: "OK"}));
 						content.append($('<span>', {text : 'Your session was refreshed successfully.'}));
 						setTimeout(function() {
 							modal.modal('hide')
 						}, 4000);
 					} else {
 						content.html("");
-						content.append($('<img>', {src:"img/icons/error.png", alt: "Error"}));
+						content.append($('<img>', {src:"assets/img/icons/error.png", alt: "Error"}));
 						content.append($('<span>', {text : 'Your session was not refreshed because your session has expired or logged out.'}));
 					}
 				},

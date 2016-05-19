@@ -56,7 +56,7 @@ class TwitterAccountSelector extends MultiCheckBoxTable {
 													
 	function renderJavascriptLibraries() {
 		$script = parent::renderJavascriptLibraries();
-		$script .= '<script type="text/javascript" src="script/TwitterHelper.js"></script>';
+		$script .= '<script type="text/javascript" src="assets/js/TwitterHelper.js"></script>';
 		return $script;
         }
 }

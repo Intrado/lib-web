@@ -147,7 +147,7 @@ class FacebookAuth extends FormItem {
 				function fbLoadUserData(formitem, expiresOn) {
 					element = $(formitem + "fbuser");
 					var access_token = $(formitem).value;
-					var loader = new Element("img", { src: "img/ajax-loader.gif" });
+					var loader = new Element("img", { src: "assets/img/ajax-loader.gif" });
 					element.update(loader);
 					
 					// read user data from facebook api

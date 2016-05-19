@@ -548,7 +548,7 @@
 				if (! $('#htmleditorloadericon').length) {
 	
 					// Make a new container element for the spinny loader iocn
-					var htmleditorloadericon = $('<span id="htmleditorloadericon"><img src="img/ajax-loader.gif"/> Please wait while the HTML editor loads.</span>');
+					var htmleditorloadericon = $('<span id="htmleditorloadericon"><img src="assets/img/ajax-loader.gif"/> Please wait while the HTML editor loads.</span>');
 	
 					// jam it into the textarea's parent so that it appears over the top
 					htmleditorloadericon.insertBefore(textarea);

@@ -137,7 +137,7 @@ class TextAreaAndSubjectWithCheckbox extends FormItem {
 			</script>';
 		
 		if ($spellcheck) {
-			$str .= '<script src="script/speller/spellChecker.js"></script>';
+			$str .= '<script src="assets/js/speller/spellChecker.js"></script>';
 		}
 		
 		return $str;

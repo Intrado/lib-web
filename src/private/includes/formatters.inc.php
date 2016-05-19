@@ -74,7 +74,7 @@ function fmt_editlocked_destination($row, $index) {
 	if (isset($row[$index])) {
 		$output = fmt_destination($row, $index);
 		if ($row[$index+2] == 1) {
-			$output = "<img src='img/padlock.gif'>&nbsp;" . $output;
+			$output = "<img src='assets/img/padlock.gif'>&nbsp;" . $output;
 		}
 		return $output;
 	}
@@ -163,9 +163,9 @@ function fmt_idmagnify ($row,$index) {
 	// TODO must I load the person in order to get the person->userid ?
 	$person = new Person($row[1]);
 	if ($person->userid == NULL) {
-		$result = "<a href=\"viewcontact.php?id=$row[1]\">  <img src=\"img/icons/diagona/16/049.gif\"></a>";
+		$result = "<a href=\"viewcontact.php?id=$row[1]\">  <img src=\"assets/img/icons/diagona/16/049.gif\"></a>";
 	} else {
-		$result = "<a href=\"addressedit.php?id=$row[1]&origin=preview\">  <img src=\"img/icons/pencil.png\"></a>";
+		$result = "<a href=\"addressedit.php?id=$row[1]&origin=preview\">  <img src=\"assets/img/icons/pencil.png\"></a>";
 	}
 	$result .= "&nbsp;". escapehtml($row[$index]);
 	return $result;
@@ -182,7 +182,7 @@ function fmt_persontip ($row, $index) {
 		return "";
 	else
 		return "<a href=\"viewcontact.php?id=$personid" . (isset($_GET["iframe"])?"&iframe=true":"") . "\" class=\"actionlink\">" 
-				. "<img src=\"img/icons/diagona/16/049.gif\" /> $pkey</a>";
+				. "<img src=\"assets/img/icons/diagona/16/049.gif\" /> $pkey</a>";
 }
 
 function fmt_person_view_actions($row, $index) {
@@ -710,22 +710,6 @@ function fmt_result ($row,$index) {
 			return "Confirmed";
 		case "notconfirmed":
 			return "Not Confirmed";
-		case "queueoverflow":
-			return "Queue Overflow";
-		case "accountsuspended":
-			return "Account Suspended";
-		case "unreachabledest":
-			return "Unreachable Destination";
-		case "unknowndest":
-			return "Unknown Destination";
-		case "carrierviolation":
-			return "Carrier Violation";
-		case "carrierblocked":
-			return "Carrier Blocked";
-		case "softbounced":
-			return "Soft Bounced";
-		case "invalidrecipient":
-			return "Invalid Recipient";
 		case "noconfirmation":
 			return "No Confirmation Response";
 		default:
@@ -756,7 +740,7 @@ function display_rel_date($string, $arg1="", $arg2=""){
 
 function fmt_message ($row,$index) {
 	//index is message type and index+1 is message name
-	return '<img src="img/' . $row[$index] . '.png" align="bottom" />&nbsp;' . $row[$index+1];
+	return '<img src="assets/img/' . $row[$index] . '.png" align="bottom" />&nbsp;' . $row[$index+1];
 }
 
 function fmt_scheduled_date($row, $index){
@@ -812,12 +796,15 @@ function fmt_jobdetail_result($row, $index){
 		else
 			return "No Selected";
 	} else {
-		return fmt_result($row, $index);
+		if ($row[5] == 'email' && $row[10] > 0) {
+			return fmt_email_result($row, 10);
+		} else {
+			return fmt_result($row, $index);
+		}
 	}
 }
 
 // result formatter for email status code, used in JobDetailReport
-// MARCO No longer used.. we should remove these.
 function fmt_email_result ($row, $index) {
 	$result = "";
 	$status_code = intval($row[$index]);
@@ -836,7 +823,6 @@ function fmt_email_result ($row, $index) {
 	return $result;
 }
 
-// MARCO No longer used.. we should remove these.
 function display_read_duration($durationms) {
 	$result = "";
 	if (0 == $durationms) {

@@ -1,6 +1,6 @@
 <?
-require_once("../inc/subdircommon.inc.php");
-require_once("../inc/html.inc.php");
+require_once("../includes/subdircommon.inc.php");
+require_once("../includes/html.inc.php");
 
 //set expire time to + 1 hour so browsers cache this file
 header("Expires: " . gmdate('D, d M Y H:i:s', time() + 60*60) . " GMT"); //exire in 1 hour, but if theme changes so will hash pointing to this file
@@ -57,7 +57,7 @@ function listform_load(listformID, formData, postURL) {
 
 	accordion.update_section('buildlist', {
 		"title": "<?=addslashes(_L('Build List Using Rules'))?>",
-		"icon": "img/icons/application_form_edit.gif",
+		"icon": "assets/img/icons/application_form_edit.gif",
 		"content": $('buildListWindow').remove()
 	});
 	
@@ -112,7 +112,7 @@ function listform_load(listformID, formData, postURL) {
 		
 		accordion.update_section('choosesections', {
 			"title": "<?=addslashes(_L('Build List Using Sections'))?>",
-			"icon": "img/icons/application_form_edit.gif",
+			"icon": "assets/img/icons/application_form_edit.gif",
 			"content":sectionsWindow.remove()
 		});
 	}
@@ -121,7 +121,7 @@ function listform_load(listformID, formData, postURL) {
 
 	accordion.update_section('chooselist', {
 		"title": "<?=addslashes(_L('Choose an Existing List'))?>",
-		"icon": "img/icons/application_view_list.gif",
+		"icon": "assets/img/icons/application_view_list.gif",
 		"content": $('chooseListWindow').remove()
 	});
 
@@ -129,7 +129,7 @@ function listform_load(listformID, formData, postURL) {
 
 	accordion.update_section('addme', {
 		"title": "<?=addslashes(_L('Add Myself'))?>",
-		"icon": "img/icons/user.gif",
+		"icon": "assets/img/icons/user.gif",
 		"content": $('addMeWindow').remove()
 	});
 	
@@ -169,7 +169,7 @@ function listform_load(listformID, formData, postURL) {
 
 		listform_set_rule_editor_status(false);
 
-		$('listsTableStatus').update('<img src="img/ajax-loader.gif"/>');
+		$('listsTableStatus').update('<img src="assets/img/ajax-loader.gif"/>');
 		new Ajax.Request('ajaxlistform.php?type=addrule&listid=' + listformVars.pendingList, {
 			parameters: {
 				'ruledata': Object.toJSON(event.memo.ruledata)
@@ -198,7 +198,7 @@ function listform_load(listformID, formData, postURL) {
 	ruleWidget.container.observe('RuleWidget:DeleteRule', function(event) {
 		listform_set_rule_editor_status(false);
 
-		$('listsTableStatus').update('<img src="img/ajax-loader.gif"/>');
+		$('listsTableStatus').update('<img src="assets/img/ajax-loader.gif"/>');
 		new Ajax.Request('ajaxlistform.php?type=deleterule&listid=' + listformVars.pendingList, {
 			parameters: {
 				'fieldnum': event.memo.fieldnum
@@ -433,7 +433,7 @@ function listform_load_lists(listidsJSON, useCache) {
 	listids = listids.without('addme');
 	if (!listids.join || listids.length < 1)
 		return;
-	$('listsTableStatus').update('<img src="img/ajax-loader.gif"/>');
+	$('listsTableStatus').update('<img src="assets/img/ajax-loader.gif"/>');
 	cachedAjaxGet('ajax.php?type=liststats&listids='+Object.toJSON(listids),
 		function(transport, resetExistingLists) {
 			$('listsTableStatus').update();
@@ -451,7 +451,7 @@ function listform_load_lists(listidsJSON, useCache) {
 				var nameTD = new Element('td', {'class':'NameTD', 'style':'overflow: hidden; white-space: nowrap;' + commonStyle});
 				nameTD.insert(data.name.escapeHTML());
 				var actionTD = new Element('td', {'class':'ActionTD', 'style':commonStyle + '; text-align:center'});
-				actionTD.insert('<img src="img/icons/diagona/10/101.gif" title="<?=addslashes(_L('Click to remove this list'))?>" />');
+				actionTD.insert('<img src="assets/img/icons/diagona/10/101.gif" title="<?=addslashes(_L('Click to remove this list'))?>" />');
 				actionTD.insert(new Element('input',{'type':'hidden','value':listid}));
 				var statisticsTD = new Element('td', {'style':commonStyle}).update('<b>' + format_thousands_separator(data.total) + '</b>');
 
@@ -550,7 +550,7 @@ function listform_hover_existing_list(label, listid, tr) {
 	var hookPreference = (!tr) ? {target:"topLeft",tip:"bottomLeft"} : {target:"leftMiddle",tip:"rightMiddle"};
 	var stemPreference = (!tr) ? "bottomLeft" : "rightMiddle";
 
-	new Tip (targetElement, '<img src="img/ajax-loader.gif"/>', {
+	new Tip (targetElement, '<img src="assets/img/ajax-loader.gif"/>', {
 		style: "protogrey",
 		hideOthers: true,
 		hook: hookPreference,
@@ -727,7 +727,7 @@ function listform_set_rule_editor_status(addingRule) {
 }
 
 function listform_clear_validation_error() {
-	$('listChoose_listids_icon').src = 'img/pixel.gif';
+	$('listChoose_listids_icon').src = 'assets/img/pixel.gif';
 	$('listChoose_listids_msg').update();
 	$('listChoose_listids_fieldarea').style.background = "#ffffff";
 }

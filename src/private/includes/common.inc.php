@@ -2,10 +2,10 @@
 //######## IF  YOU EDIT THIS FILE, BE SURE TO UPDATE SUBDIRCOMMON.INC.PHP ########
 
 // Get the path to kona's base directory
-$basedir = dirname(dirname(__FILE__));
-$incdir = $basedir . DIRECTORY_SEPARATOR . 'inc';
-$objdir = "{$basedir}/obj";
-$thriftdir = "{$basedir}/Thrift";
+$incdir = dirname(__FILE__);
+$basedir = dirname($incdir);
+$objdir = "{$basedir}/objects";
+$thriftdir = "{$incdir}/Thrift";
 
 // In case the mechanism for checking if we're running under PHPUnit needs to change,
 // we check it here and set our own global constant PHPUNIT that we can use everywhere
@@ -166,6 +166,9 @@ function setupNetsuiteApi() {
 	$apiClient = new ApiClient(
 		$SETTINGS['netsuite']['url'],
 		array(
+			"Content-Type: application/json",
+			//"Accept: '*" . '/' . "*'",
+			"Accept: *" . '/' . "*",
 			"Authorization: NLAuth nlauth_account={$SETTINGS['netsuite']['account']}, nlauth_email={$SETTINGS['netsuite']['user']}, nlauth_signature={$SETTINGS['netsuite']['pass']}, nlauth_role={$SETTINGS['netsuite']['role']}"
 		)
 	);

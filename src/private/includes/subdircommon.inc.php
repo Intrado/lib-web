@@ -3,7 +3,7 @@
 // Get the path to kona's base directory
 $incdir = dirname(__FILE__);
 $basedir = dirname($incdir);
-$objdir = "{$basedir}/obj";
+$objdir = "{$basedir}/objects";
 
 // In case the mechanism for checking if we're running under PHPUnit needs to change,
 // we check it here and set our own global constant PHPUNIT that we can use everywhere
@@ -12,7 +12,7 @@ if (defined('PHPUnit_MAIN_METHOD')) define('PHPUNIT', true);
 setlocale(LC_ALL, 'en_US.UTF-8');
 mb_internal_encoding('UTF-8');
 
-$SETTINGS = parse_ini_file("{$incdir}/settings.ini.php",true);
+$SETTINGS = parse_ini_file(dirname($basedir) . "/settings.ini",true);
 
 //get the customer URL
 $CUSTOMERURL = substr($_SERVER["SCRIPT_NAME"],1);

@@ -215,7 +215,7 @@ function applyHtmlEditor(textarea, dontwait, target, hidetoolbar) {
 
 	// Show an AJAXy loading indication
 	if (! $('htmleditorloadericon')) {
-		textarea.insert({'before': '<span class="HTMLEditorAjaxLoader" id="htmleditorloadericon"><img src="img/ajax-loader.gif"/> Please wait while the HTML editor loads. </span>'});
+		textarea.insert({'before': '<span class="HTMLEditorAjaxLoader" id="htmleditorloadericon"><img src="assets/img/ajax-loader.gif"/> Please wait while the HTML editor loads. </span>'});
 	}
 
 	// Here's the base name of the text element; we'll make several new elements with derived names

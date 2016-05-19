@@ -36,7 +36,7 @@ div.password-protect-wrapper {
 	float: left;
 }
 span.secure-lock {
-	background: url("../img/icons/pictos/p2/16/41.png") no-repeat center center transparent;
+	background: url("../assets/img/icons/pictos/p2/16/41.png") no-repeat center center transparent;
 	display: inline-block;
 	width: 16px;
 	height: 16px;

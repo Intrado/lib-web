@@ -43,9 +43,9 @@ class EmailMessageEditor extends FormItem {
 		
 		// this is the vertical seperator
 		$seperator = '
-			<img src="img/icons/bullet_black.gif" />
-			<img src="img/icons/bullet_black.gif" />
-			<img src="img/icons/bullet_black.gif" />';
+			<img src="assets/img/icons/bullet_black.gif" />
+			<img src="assets/img/icons/bullet_black.gif" />
+			<img src="assets/img/icons/bullet_black.gif" />';
 
 		// Data field inserts
 		$datafieldinsert = '
@@ -127,7 +127,7 @@ class EmailMessageEditor extends FormItem {
 			</script>';
 
 		if ($subtype == "plain" && isset($this->args['spellcheck']) && $this->args['spellcheck']) {
-			$str .= '<script src="script/speller/spellChecker.js"></script>';
+			$str .= '<script src="assets/js/speller/spellChecker.js"></script>';
 		}
 		
 		return $str;

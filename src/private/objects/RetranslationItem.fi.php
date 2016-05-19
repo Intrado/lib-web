@@ -98,7 +98,7 @@ class RetranslationItem extends FormItem {
 					</div>
 					
 					<div id="'.$n.'-englishversion" class="englishversion">
-						<img src="img/ajax-loader.gif" />
+						<img src="assets/img/ajax-loader.gif" />
 					</div>
 				</div>
 				

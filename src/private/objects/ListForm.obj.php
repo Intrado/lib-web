@@ -172,7 +172,7 @@ class ListForm extends Form {
 
 					<!-- Validation Message -->
 					<div id='listChoose_listids_fieldarea' style='clear:both; margin-top: 20px; margin-left:10px'>
-						<img id='listChoose_listids_icon' src='img/pixel.gif'/>
+						<img id='listChoose_listids_icon' src='assets/img/pixel.gif'/>
 						<span id='listChoose_listids_msg'></span>
 					</div>
 
@@ -188,10 +188,10 @@ class ListForm extends Form {
 		// JAVASCRIPT
 		$str .= $this->renderJavascript();
 		$str .= "
-			<script type='text/javascript' src='script/datepicker.js'></script>
-			<script type='text/javascript' src='script/accordion.js'></script>
-			<script type='text/javascript' src='script/rulewidget.js.php'></script>
-			<script type='text/javascript' src='script/listform.js.php'></script>
+			<script type='text/javascript' src='assets/js/datepicker.js'></script>
+			<script type='text/javascript' src='assets/js/accordion.js'></script>
+			<script type='text/javascript' src='assets/js/rulewidget.js.php'></script>
+			<script type='text/javascript' src='assets/js/listform.js.php'></script>
 			<script type='text/javascript'>
 				document.observe('dom:loaded', function() {
 					// Initiatiate Page.

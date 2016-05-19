@@ -13,7 +13,7 @@
 function spellChecker( textObject ) {
 
 	// public properties - configurable
-	this.popUpUrl = 'script/speller/spellchecker.html';
+	this.popUpUrl = 'assets/js/speller/spellchecker.html';
 	this.popUpName = 'spellchecker';
 	this.popUpProps = "menu=no,width=440,height=350,top=70,left=120,resizable=yes,status=yes";
 	this.spellCheckScript = 'server-scripts/spellchecker.php';

@@ -55,8 +55,8 @@ class HtmlTextArea extends FormItem {
 		}
 
 		// ref: http://stackoverflow.com/questions/7034485/contenteditable-trigger-event-on-image-resize-when-using-handles
-		$str = '<script type="text/javascript" src="script/ckeditor/ckeditor.js"></script>
-			<script type="text/javascript" src="script/rcieditor.js"></script>
+		$str = '<script type="text/javascript" src="assets/js/ckeditor/ckeditor.js"></script>
+			<script type="text/javascript" src="assets/js/rcieditor.js"></script>
 			<script type="text/javascript">
 
 				// apply the ckeditor to the textarea
@@ -78,7 +78,7 @@ class HtmlTextArea extends FormItem {
 			</script>';
 
 		if ($subtype == "plain" && isset($this->args['spellcheck']) && $this->args['spellcheck']) {
-			$str .= '<script src="script/speller/spellChecker.js"></script>';
+			$str .= '<script src="assets/js/speller/spellChecker.js"></script>';
 		}
 
 		return $str;

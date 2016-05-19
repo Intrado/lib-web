@@ -24,8 +24,8 @@ class FormRuleWidget extends FormItem {
 		$html = '<input id="'.$inputname.'" name="'.$inputname.'" type="hidden" value="'.escapehtml($rulesJSON).'" />';
 		// #ruleWidgetContainer
 		$html .= '<div id="ruleWidgetContainer"></div>';
-		$html .= '<script type="text/javascript" src="script/rulewidget.js.php"></script>';
-		$html .= '<script type="text/javascript" src="script/datepicker.js"></script>';
+		$html .= '<script type="text/javascript" src="assets/js/rulewidget.js.php"></script>';
+		$html .= '<script type="text/javascript" src="assets/js/datepicker.js"></script>';
 		// custom javascript
 		$html .= "<script type='text/javascript'>
 			var ruleWidget = new RuleWidget($('ruleWidgetContainer'), $readonly, $allowedFieldTypes, $ignoredFields, $showRemoveAllButton);

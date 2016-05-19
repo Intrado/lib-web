@@ -35,13 +35,4 @@ class Sms extends DBMappedObject{
 		DBMappedObject::update($specificfields, $updatechildren);
 	}
 
-	static function getSMSTranslationLanguageMap() {
-		$codes = array();
-		$smslanguages = QuickQueryList("select code, name from smslanguage", true);
-		foreach ($smslanguages as $languagecode => $languagename) {
-			$codes[$languagecode] = $languagename;
-		}
-		return $codes;
-	}
-
 }

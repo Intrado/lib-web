@@ -10,11 +10,11 @@ class ColorPicker extends FormItem {
 		$n = $this->form->name."_".$this->name;
 		$size = isset($this->args['size']) ? 'size="'.$this->args['size'].'"' : "";
 		
-		return '<input id="'.$n.'" name="'.$n.'" type="text" value="'.escapehtml($value).'" '.$size.' /><img src="img/sel.gif" type="image" onclick="TCP.popup($(\''.$n.'\')); "/>';
+		return '<input id="'.$n.'" name="'.$n.'" type="text" value="'.escapehtml($value).'" '.$size.' /><img src="assets/img/sel.gif" type="image" onclick="TCP.popup($(\''.$n.'\')); "/>';
 	}
 	
 	function renderJavascriptLibraries() {
-		return '<script type="text/javascript" src="script/picker.js"></script>';
+		return '<script type="text/javascript" src="assets/js/picker.js"></script>';
 	}
 }
 

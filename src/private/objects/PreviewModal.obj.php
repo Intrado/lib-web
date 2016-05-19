@@ -445,7 +445,7 @@ class PreviewModal {
 				body.html("");
 			});
 			
-			modal.find(".modal-body").html('<img src="img/ajax-loader.gif" alt="Please Wait..."/> Loading...')
+			modal.find(".modal-body").html('<img src="assets/img/ajax-loader.gif" alt="Please Wait..."/> Loading...')
 			new Ajax.Request('<?= $posturl?>' + (get_parameters?'&' + get_parameters:''), {
 				'method': 'post',
 				'parameters': post_parameters,

@@ -1,6 +1,6 @@
 <?
 
-include_once("inc/content.inc.php");
+include_once(dirname(__FILE__) . "/../includes/content.inc.php");
 
 class ValEmailAttach extends Validator {
 	var $onlyserverside = true;

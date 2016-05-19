@@ -56,7 +56,7 @@ class TextField extends FormItem {
 		}
 				
 		if (isset($this->args['autocomplete'])) {
-			$str .= '<span id="'.$n.'_autocomplete_indicator" style="display: none"><img src="img/ajax-loader.gif" alt="Working..." /></span>';	
+			$str .= '<span id="'.$n.'_autocomplete_indicator" style="display: none"><img src="assets/img/ajax-loader.gif" alt="Working..." /></span>';	
 			$str .= '<div id="'.$n.'_autocomplete_choices" class="autocomplete"></div>';
 		}
 
@@ -97,7 +97,7 @@ class TextField extends FormItem {
 		$js = "";
 		
 		if ($spellcheck) {
-			$js .= '<script src="script/speller/spellChecker.js"></script>';
+			$js .= '<script src="assets/js/speller/spellChecker.js"></script>';
 		}
 		return $js;
 	}
@@ -196,7 +196,7 @@ class TextArea extends FormItem {
 		$js = "";
 		
 		if ($spellcheck) {
-			$js .= '<script src="script/speller/spellChecker.js"></script>';
+			$js .= '<script src="assets/js/speller/spellChecker.js"></script>';
 		}
 		return $js;
 	}
@@ -313,7 +313,7 @@ class TextDate extends FormItem {
 		$n = $this->form->name."_".$this->name;
 		$size = isset($this->args['size']) ? 'size="'.$this->args['size'].'"' : "";
 		$str = '<input id="'.$n.'" name="'.$n.'" type="text" value="'.($value?date("m/d/Y", strtotime($value)):'').'" maxlength="12" '.$size.'/>';
-		$str .= '<script type="text/javascript" src="script/datepicker.js"></script>
+		$str .= '<script type="text/javascript" src="assets/js/datepicker.js"></script>
 			<script type="text/javascript">
 				var dpck_fieldname = new DatePicker({
 				relative:"'.$n.'",
@@ -442,7 +442,7 @@ class ReldateOptions extends FormItem {
 					<div id='{$n}_dateContainer' style='$dateHidden'>$dateboxes</div>
 				</span>
 			</div>
-			<script type='text/javascript' src='script/datepicker.js'></script>
+			<script type='text/javascript' src='assets/js/datepicker.js'></script>
 			<script type='text/javascript'>
 				function {$n}_datechange() {
 					$(\"$n\").value = Object.toJSON({\"reldate\":$(\"{$n}_reldate\").value, \"startdate\":$(\"{$n}_startdate\").value, \"enddate\":$(\"{$n}_enddate\").value}); 

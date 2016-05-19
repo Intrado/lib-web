@@ -153,8 +153,8 @@ $minhight = $minhight * $jobhight + $minhight*$jobspacing ;
 				<td class="timeline_table_middle" >
 
 					<div id="canvas" style="height:<? echo $minhight ?>px;">
-					<img class="canvasleft" src="img/timelineleft.gif"  alt="" />
-					<img class="canvasright" src="img/timelineright.gif" alt="" />
+					<img class="canvasleft" src="assets/img/timelineleft.gif"  alt="" />
+					<img class="canvasright" src="assets/img/timelineright.gif" alt="" />
 					<div class="daylineend" style="left: 0%;"></div>
 		
 					<?
