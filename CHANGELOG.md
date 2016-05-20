@@ -5,10 +5,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 - Nothing yet...
 
+## [0.0.2]
+- Add AudioPlayer
+
 ## [0.0.1]
 
 ### Added
 - Initial commit - so *everything* was added!
 
-[Unreleased]: https://github.com/Reliance/phplib/compare/0.0.1...HEAD
-
+[Unreleased]: https://github.com/Reliance/phplib/compare/0.0.2...HEAD
+[0.0.2]: https://github.com/Reliance/phplib/compare/0.0.1...0.0.2

@@ -1,0 +1,87 @@
+<html>
+
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<script src="https://use.fontawesome.com/ed0d12cf07.js"></script>
+		<script src="/AudioPlayer.js"></script>
+		<script src="/FlashAudioDriver.js"></script>
+		<script src="/FakeAudioDriver.js"></script>
+
+		<script src="/AudioPlayerUI.js"></script>
+		<link rel="stylesheet" href="/AudioPlayer.css">
+
+		<meta charset="utf-8">
+	</head>
+
+
+	<body>
+
+		<h1>AudioPlayer</h1>
+
+		<div class="content">
+
+			<div class="audioflash-player-container">
+				<h2> Player (Flash)</h2>
+
+				<div id="audioplayer-flash">
+					<p>Please update your browser or install flash to play this message.</p>
+				</div>
+
+				<h2> Player (Fake)</h2>
+				<div id="audioplayer-fake"></div>
+
+				<script type="text/javascript">
+					window.onload = function() {
+
+					var flashEl = document.getElementById('audioplayer-flash');
+
+					var flashPlayer = new AudioPlayer({
+						el: flashEl,
+						drivers: [
+							{ name: 'Flash', niftyplayer: '/niftyplayer.swf' }
+						]
+					});
+
+					flashPlayer.load(['mp3/hello.mp3', 'mp3/goodbye.mp3']);
+
+					var fakeEl = document.getElementById('audioplayer-fake');
+
+					var fakePlayer = new AudioPlayer({
+						el: fakeEl,
+						drivers: [ {
+							name: 'Fake',
+							duration: 64 * 1000, // 64s
+							loadTime: 1 * 1000 // 5s
+						} ]
+					});
+
+					fakePlayer.load([]);
+
+					};
+				</script>
+			</div>
+
+			<div>
+				<h2>Source mp3s</h2>
+				<audio controls>
+					<source src="mp3/hello.mp3" type="audio/mp3">
+				</audio>
+
+				<audio controls>
+					<source src="mp3/goodbye.mp3" type="audio/mp3">
+				</audio>
+			</div>
+
+			<div>
+				<h2>Flash player</h2>
+				<object id="niftyPlayerA" width="165" height="38" align="" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000">
+					<param name="movie" value="/niftyPlayer.swf?file=mp3%2Fhello.mp3%7Cmp3%2Fgoodbye.mp3">
+					<param name="quality" value="high">
+					<param name="bgcolor" value="#FFFFFF">
+					<embed width="165" height="38" align="" pluginspage="//get.adobe.com/flashplayer" type="application/x-shockwave-flash" name="niftyPlayerA" bgcolor="#FFFFFF" quality="high" src="/niftyPlayer.swf?file=mp3%2Fhello.mp3%7Cmp3%2Fgoodbye.mp3" embed-src="/niftyPlayer.swf?file=mp3%2Fhello.mp3%7Cmp3%2Fgoodbye.mp3"/>
+				</object>
+		</div>
+
+	</body>
+
+</html>
