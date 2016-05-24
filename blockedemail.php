@@ -40,15 +40,15 @@ class ValBlockedEmailExists extends Validator {
 
 if (isset($_GET['delete'])) {
 	$deleteid = DBSafe($_GET['delete']);
-    // TODO move this SQL into com.reliance.commsuite.api.deleteDestinationBlock
+	// TODO move this SQL into com.reliance.commsuite.api.deleteDestinationBlock
 	$blockinfo = QuickQueryRow("select `userid`, `destination` from blockeddestination where id = ?", true, false, array($deleteid));
 	$ownerid = $blockinfo['userid'];
 	if ($ACCESS->getValue('callblockingperms') == 'editall' ||
 		($ACCESS->getValue('callblockingperms') == 'addonly' && $USER->id == $ownerid)) {
 		QuickUpdate("delete from blockeddestination where id='$deleteid'");
 		notice(_L("Emails for %s are now unblocked.", escapehtml($blockinfo['destination'])));
-        // call deleteDestinationBlock to have CommSuite handle the SparkPost portion, log response?
-        $res = $csApi->deleteDestinationBlock("email",escapehtml($blockinfo['destination']));
+		// call deleteDestinationBlock to have CommSuite handle the SparkPost portion
+		$csApi->deleteDestinationBlock("email",escapehtml($blockinfo['destination']));
 	}
 	redirect();
 }
