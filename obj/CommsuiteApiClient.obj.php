@@ -180,6 +180,19 @@ class CommsuiteApiClient {
 		return $person;
 	}
 
+	/**
+	 * Remove a destination from this customer's blocked list
+	 *
+	 * @param string $type: email, phone, sms (only email currently supported)
+	 * @param string $destination: email or phone number to be unblocked
+	 * @return boolean
+	 */
+	public function deleteDestinationBlock($type, $destination) {
+		$url = self::API_PEOPLE . "/personid/destinations/{$type}/unblock/";
+		$res = $this->apiClient->put($url, $destination);
+		return($res['code'] == 200 ? true : false);
+	}
+
 	// ---------------------------------------------------------------------
 	// PDF Bursting
 	// ---------------------------------------------------------------------
