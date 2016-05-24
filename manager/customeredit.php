@@ -451,6 +451,7 @@ $formdata["emaildomain"] = array(
 	"label" => _L('Email Domain'),
 	"value" => $settings['emaildomain'],
 	"validators" => array(
+		array("ValRequired"),
 		array("ValLength","max" => 65535),
 		array("ValDomainList")
 	),
