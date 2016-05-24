@@ -146,6 +146,7 @@ $dbversions = array(
 
 	"globalidentity" => array(
 		"11.8/2",
+		"12.0/2",
 		//etc., one array element per version, always the last revision of the given version
 	),
 
