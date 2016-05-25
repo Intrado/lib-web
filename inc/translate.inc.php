@@ -214,7 +214,7 @@ function parse_translated_nodes_to_html ($templateHtml, $translatedNodeString, $
 
 	// replace any lone ampersands, i.e. '&' with '&amp;' entities, 
 	// otherwise, simplexml_load_string() will throw an error (xmlParseEntityRef)
-	$cleanedTranslatedNodeString = preg_replace('/&(?!#?[a-z0-9]+;)/i', '&amp;' , $translatedNodeString);
+	$cleanedTranslatedNodeString = preg_replace('/&(?!amp;)/i', '&amp;' , $translatedNodeString);
 	$xml = simplexml_load_string($cleanedTranslatedNodeString);
 
 	$translatedNodes = $xml->children();
