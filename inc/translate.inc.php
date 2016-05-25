@@ -211,8 +211,12 @@ function parse_translated_nodes_to_html ($templateHtml, $translatedNodeString, $
 	
 	$textNodes = $xpath->query('//text()');
 	$nodeCount = $textNodes->length;
-	
-	$xml = simplexml_load_string($translatedNodeString);
+
+	// replace any lone ampersands, i.e. '&' with '&amp;' entities, 
+	// otherwise, simplexml_load_string() will throw an error (xmlParseEntityRef)
+	$cleanedTranslatedNodeString = preg_replace('/&(?!#?[a-z0-9]+;)/i', '&amp;' , $translatedNodeString);
+	$xml = simplexml_load_string($cleanedTranslatedNodeString);
+
 	$translatedNodes = $xml->children();
 		
 	for ($i = 0; $i < $nodeCount; $i++) {
@@ -236,7 +240,6 @@ function parse_translated_nodes_to_html ($templateHtml, $translatedNodeString, $
 	// (we want them to remain as their original entities in the restoredHTML)
 	$restoredHTML = preg_replace('/<i a="lt"><\/i>/i', '&lt;', $restoredHTML);
 	$restoredHTML = preg_replace('/<i a="gt"><\/i>/i', '&gt;', $restoredHTML);
-	$restoredHTML = preg_replace('/<i a="amp"><\/i>/i', '&amp;', $restoredHTML);
 	$restoredHTML = preg_replace('/<i a="quot"><\/i>/i', '&quot;', $restoredHTML);
 	$restoredHTML = preg_replace('/<i a="tb"><\/i>/i', '\t', $restoredHTML);
 	$restoredHTML = preg_replace('/<i a="crlf"><\/i>/i', '\r\n', $restoredHTML);

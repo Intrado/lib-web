@@ -74,7 +74,6 @@ if ($requestType === 'english') {
 		// be parsed out and replaced with their original entities later
 		$requestString = preg_replace('/&lt;/i', '<i a="lt"></i>', $requestString);
 		$requestString = preg_replace('/&gt;/i', '<i a="gt"></i>', $requestString);
-		$requestString = preg_replace('/&amp;/i', '<i a="amp"></i>', $requestString);
 		$requestString = preg_replace('/&quot;/i', '<i a="quot"></i>', $requestString);
 		$requestString = preg_replace('/\t/i', '<i a="tb"></i>', $requestString);
 		$requestString = preg_replace('/\r\n/i', '<i a="crlf"></i>', $requestString);
