@@ -1293,10 +1293,9 @@ document.observe('dom:loaded', function() {
 	$('newcustomer_enabled').observe("change", function (event) {
 		//var checkbox = event.Element();
 		var checkbox = $('newcustomer_enabled');
-		if (checkbox.checked == 0) 
+		if (checkbox.checked == 0)
 			checkbox.checked = !confirm("Are you sure you want to DISABLE this customer?");
 	});
-	
 	$('newcustomer_shortcodegroup').observe("change", function (event) {
 		smsFunctions.showData();
 	});

@@ -2,6 +2,7 @@
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
 
+// require_once("inc/utils.inc.php");
 require_once("inc/common.inc.php");
 require_once("inc/date.inc.php");
 require_once("inc/securityhelper.inc.php");
@@ -120,8 +121,7 @@ function generateStats($useridList, $start_datetime, $end_datetime) {
 	$stats["total_posts"] = 0;
 	
 	$rows = QuickQueryMultiRow($query, true, null, $params);
-	foreach ($rows as $row) {
-		if (!strcmp("phone", $row['type']))
+	foreach ($rows as $row) {if (!strcmp("phone", $row['type']))
 			$stats['total_phones'] = $row['total'];
 		if (!strcmp("email", $row['type']))
 			$stats['total_emails'] = $row['total'];
@@ -258,7 +258,7 @@ include("nav.inc.php");
 			</select></p>
 		</div>
 <?}?>
-		
+
 		<div class="window summary">
 			<div class="window_title_wrap">
 			<h2><?= _L("Activity Summary")?></h2>
@@ -292,7 +292,7 @@ include("nav.inc.php");
 				// permissions, however if there is a point in history
 				// where a type has been sent we have to include this
 				// value to not mess up the percentage values
-				
+
 				$graphtypes = array();
 				$hasPhone = $USER->authorize('sendphone');
 				$hasPhone = $hasPhone || ($stats["total_phones"] != 0 && !$hasPhone);
@@ -482,6 +482,7 @@ include("nav.inc.php");
 
 
 <script type="text/javascript">
+
 var jobloads = 3;
 
 function updateTableTools(section, action, override, start, limit, count){

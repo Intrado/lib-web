@@ -46,6 +46,7 @@ $formdata["timezone"] = array(
 
 $formdata["displayname"] = array(
 		"label" => _L('Display Name'),
+		"fieldhelp" => "To temporarily disable a customer's account, add a parenthesis before and after the display name. i.e. \"Pacific\" should become \"(Pacific)\" to soft disable.",
 		"value" => $settings['displayname'],
 		"validators" => array(
 				array("ValRequired"),
@@ -169,7 +170,6 @@ $formdata["notes"] = array(
 		"helpstep" => $helpstepnum
 );
 
-
 function saveRequiredFields($custdb,$customerid,$postdata) {
 	global $SETTINGS,$defaultlogos;
 	
@@ -212,8 +212,7 @@ function saveRequiredFields($custdb,$customerid,$postdata) {
 	} else {
 		setCustomerSystemSetting("_customerenabled", "1", $custdb);
 	}
-	
-	
+
 	if(getCustomerSystemSetting('_dmmethod', '', true, $custdb)!='asp' && $postdata["dmmethod"] == 'asp'){
 		$aspquery = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword from customer c inner join shard s on (c.shardid = s.id) where c.id = '$customerid'");
 		$aspsharddb = DBConnect($aspquery[0], $aspquery[1], $aspquery[2], "aspshard");
@@ -247,6 +246,7 @@ function saveRequiredFields($custdb,$customerid,$postdata) {
 	setCustomerSystemSetting('_supportphone', Phone::parse($postdata["supportphone"]), $custdb);
 	setCustomerSystemSetting('callerid', Phone::parse($postdata["callerid"]), $custdb);
 	setCustomerSystemSetting('defaultareacode', $postdata["defaultareacode"], $custdb);
+
 }
 
 
