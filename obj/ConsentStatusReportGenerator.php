@@ -247,8 +247,6 @@ class ConsentStatusReportGenerator extends ReportGenerator {
 		if ( $options ) {
 			return fclose($fp);
 		}
-
-		redirect();
 	}
 
 	function getReportSpecificParams(){
