@@ -251,6 +251,10 @@ function terminateSpell() {
 	} else {
 		msg += numrepl + " words changed.";
 	}
+
+	// return back to the calling window
+	this.spellCheckerWin.close();
+
 	if( msg ) {
 		msg += "\n";
 		alert( msg );
@@ -270,9 +274,6 @@ function terminateSpell() {
 			}
 		}
 	}
-
-	// return back to the calling window
-	this.spellCheckerWin.close();
 
 	return true;
 }
