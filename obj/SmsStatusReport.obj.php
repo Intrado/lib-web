@@ -20,7 +20,7 @@ class SmsStatusReport extends ReportGenerator {
 		$selectList2 = "p.pkey as pkey, p.". $firstNameField ." as fname, p.". $lastNameField ." as lname, s.sms, max('block') as status, max(bu.login) as modifiedby, max(unix_timestamp(b.createdate)*1000) as modifieddate, max(b.description) as notes, orgnames.orgkey ";
 		$whereSms = "";
 		$groupBy0 = "";
-		$groupBy = "group by orgkey";
+		$groupBy = "group by sms";
 		$orderBy = "order by lname";
 
 		switch ($this->reportType) {
