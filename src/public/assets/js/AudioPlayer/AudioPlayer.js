@@ -14,6 +14,8 @@ function AudioPlayer(options) {
 	};
 
 	this.unload = function() {
+		if (! driver) { return; }
+		driver.stop();
 		ui.stop();
 	};
 
