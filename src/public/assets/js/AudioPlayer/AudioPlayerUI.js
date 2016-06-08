@@ -45,10 +45,11 @@ function AudioPlayerUI(el, driver) {
 		self.stopButton = div(self.controls, 'button-stop fa fa-stop');
 
 		self.playButton.addEventListener('click', driver.play);
-
 		self.stopButton.addEventListener('click', driver.stop);
-
 		self.pauseButton.addEventListener('click', driver.pause);
+
+		// check if driver supports scrubbing
+		if (driver.scrubStop) { bindScrubEvents(); }
 
 		draw();
 	}
@@ -57,8 +58,9 @@ function AudioPlayerUI(el, driver) {
 		state = driver.getState();
 	}
 
-	function drawTime() {
-		var timeS = state.time / 1000;
+	function drawTime(time) {
+		var _time = time || state.time;
+		var timeS = _time / 1000;
 
 		self.timeMinutes.innerHTML = Math.floor(timeS / 60)
 
@@ -110,6 +112,57 @@ function AudioPlayerUI(el, driver) {
 		if (running) { requestAnimationFrame(tick); }
 	}
 
+	function bindScrubEvents() {
+		self.scrubber.addEventListener('mousedown', onMouseDown.bind(self));
+		el.addEventListener('mousemove', onDrag.bind(self));
+		el.addEventListener('mouseup', onMouseUp.bind(self));
+	};
+
+	function onMouseDown( e ) {
+		self.dragging = true;
+		self.startX = e.pageX;
+		self.startLeft = (parseFloat(self.scrubber.style.left || 0) / 100) * self.track.offsetWidth;
+	};
+
+	function onDrag( e ) {
+		var width, position, pwRatio, percentComplete;
+
+		if (!self.dragging) {
+			return;
+		}
+		// stop running so it doesn't interfere
+		// with rendering the position of the scrubber
+		running = false;
+
+		// stop the driver's buffer(s) from playing
+		driver.scrubStop();
+
+		width = self.track.offsetWidth;
+		position = self.startLeft + ( e.pageX - self.startX );
+		position = Math.max(Math.min(width, position), 0);
+
+		pwRatio = position / width;
+		percentComplete = pwRatio * 100;
+
+		self.progress.style.width = "" + percentComplete + "%";
+		self.scrubber.style.left =  "" + percentComplete + "%";
+
+		drawTime(pwRatio * driver.getState().duration);
+	};
+
+	function onMouseUp() {
+		var width, left, time;
+
+		if ( self.dragging ) {
+			leftPositionPercent = parseFloat(self.scrubber.style.left || 0) / 100;
+			time = leftPositionPercent * driver.getState().duration / 1000;
+			driver.seek(time);
+
+			self.dragging = false;
+			running = true;
+			requestAnimationFrame(tick);
+		}
+	};
 
 	function requestAnimationFrame(callback) {
 		if (window.requestAnimationFrame) {

@@ -5,6 +5,7 @@
 		<script src="https://use.fontawesome.com/ed0d12cf07.js"></script>
 		<script src="/AudioPlayer.js"></script>
 		<script src="/FlashAudioDriver.js"></script>
+		<script src="/JSAudioDriver.js"></script>
 		<script src="/FakeAudioDriver.js"></script>
 
 		<script src="/AudioPlayerUI.js"></script>
@@ -21,8 +22,10 @@
 		<div class="content">
 
 			<div class="audioflash-player-container">
-				<h2> Player (Flash)</h2>
+				<h2> Player (JS)</h2>
+				<div id="audioplayer-js"></div>
 
+				<h2> Player (Flash)</h2>
 				<div id="audioplayer-flash">
 					<p>Please update your browser or install flash to play this message.</p>
 				</div>
@@ -32,6 +35,15 @@
 
 				<script type="text/javascript">
 					window.onload = function() {
+
+					var jsEl = document.getElementById('audioplayer-js');
+
+					var jsPlayer = new AudioPlayer({
+						el: jsEl,
+						drivers: [{ name: 'JS'}]
+					});
+
+					jsPlayer.load(['mp3/running_rerun.wav', 'mp3/hello.mp3', 'mp3/goodbye.mp3', 'mp3/mpthreetest.mp3']);
 
 					var flashEl = document.getElementById('audioplayer-flash');
 
