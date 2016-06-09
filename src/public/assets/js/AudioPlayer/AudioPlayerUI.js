@@ -114,13 +114,16 @@ function AudioPlayerUI(el, driver) {
 
 	function bindScrubEvents() {
 		self.scrubber.addEventListener('mousedown', onMouseDown.bind(self));
+		self.scrubber.addEventListener('touchstart', onMouseDown.bind(self));
 		el.addEventListener('mousemove', onDrag.bind(self));
+		el.addEventListener('touchmove', onDrag.bind(self));
 		el.addEventListener('mouseup', onMouseUp.bind(self));
+		el.addEventListener('touchend', onMouseUp.bind(self));
 	};
 
 	function onMouseDown( e ) {
 		self.dragging = true;
-		self.startX = e.pageX;
+		self.startX = e.pageX ? e.pageX : e.targetTouches[0].pageX;
 		self.startLeft = (parseFloat(self.scrubber.style.left || 0) / 100) * self.track.offsetWidth;
 	};
 
@@ -138,7 +141,10 @@ function AudioPlayerUI(el, driver) {
 		driver.scrubStop();
 
 		width = self.track.offsetWidth;
-		position = self.startLeft + ( e.pageX - self.startX );
+
+		var currentX = e.pageX ? e.pageX : e.targetTouches[0].pageX;
+
+		position = self.startLeft + ( currentX - self.startX );
 		position = Math.max(Math.min(width, position), 0);
 
 		pwRatio = position / width;
