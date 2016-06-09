@@ -102,19 +102,9 @@ function JSAudioDriver(options) {
 		}
 	};
 
-
-	this.seek = function(time) {
-		if (self.playing) {
-			self.play(time);
-		} else {
-			self.position = time;
-		}
+	this.seek = function(timeMs) {
+		self.position = timeMs / 1000;
 	};
-
-	this.scrubStop = function() {
-		stopBuffers();
-		self.playing = false;
-	}
 
 	function updatePosition() {
 		self.position = self.playing ? self.ac.currentTime - self.startTime : self.position;

@@ -1,9 +1,8 @@
 AudioPlayer.UI = AudioPlayerUI;
 
 function AudioPlayerUI(el, driver) {
-	var self = this;
-	var state;
-	var running;
+
+	var playing, loading, scrubbing, durationMs, timeMs, running, ui;
 
 	this.start = function() {
 		running = true;
@@ -20,83 +19,88 @@ function AudioPlayerUI(el, driver) {
 		// This function sets up our ui elements and renders them
 		// with the initial default state.
 
-		state = {
-			playing: false,
-			loading: true,
-			duration: 1,
-			time: 0
-		};
+		ui = {};
+		playing = false;
+		loading = true;
+		scrubbing = false;
+		durationMs = 1;
+		timeMs = 0;
+		running = false;
 
 		addClass('audio-player');
 
-		self.track = div(el, 'track');
-		self.progress = div(self.track, 'progress');
-		self.scrubber = div(self.track, 'scrubber');
+		ui.track = div(el, 'track');
+		ui.progress = div(ui.track, 'progress');
+		ui.scrubber = div(ui.track, 'scrubber');
 
-		self.time = div(el, 'time');
-		self.timeMinutes = span(self.time, 'time-minutes');
-		self.time.appendChild(document.createTextNode(':'));
-		self.timeSeconds = span(self.time, 'time-seconds');
+		ui.time = div(el, 'time');
+		ui.timeMinutes = span(ui.time, 'time-minutes');
+		ui.time.appendChild(document.createTextNode(':'));
+		ui.timeSeconds = span(ui.time, 'time-seconds');
 
-		self.controls = div(el, 'controls');
-		self.playButton = div(self.controls, 'button-play fa fa-play');
-		self.pauseButton = div(self.controls, 'button-pause fa fa-pause');
-		self.loader = div(self.controls, 'loader fa fa-spinner fa-spin');
-		self.stopButton = div(self.controls, 'button-stop fa fa-stop');
+		ui.controls = div(el, 'controls');
+		ui.playButton = div(ui.controls, 'button-play fa fa-play');
+		ui.pauseButton = div(ui.controls, 'button-pause fa fa-pause');
+		ui.loader = div(ui.controls, 'loader fa fa-spinner fa-spin');
+		ui.stopButton = div(ui.controls, 'button-stop fa fa-stop');
 
-		self.playButton.addEventListener('click', driver.play);
-		self.stopButton.addEventListener('click', driver.stop);
-		self.pauseButton.addEventListener('click', driver.pause);
+		ui.playButton.addEventListener('click', driver.play);
+		ui.stopButton.addEventListener('click', driver.stop);
+		ui.pauseButton.addEventListener('click', driver.pause);
 
-		// check if driver supports scrubbing
-		if (driver.scrubStop) { bindScrubEvents(); }
+		if (driver.seek) { bindScrubEvents(); }
 
 		draw();
 	}
 
 	function updateState() {
-		state = driver.getState();
+		var driverState = driver.getState();
+		playing = driverState.playing;
+		loading = driverState.loading;
+		durationMs = driverState.duration;
+
+		// If we're currently scrubbing, we don't want to use the driver's
+		// current time.
+		if (! scrubbing) { timeMs = driverState.time; }
 	}
 
-	function drawTime(time) {
-		var _time = time || state.time;
-		var timeS = _time / 1000;
+	function drawTime() {
+		var timeS = timeMs / 1000;
 
-		self.timeMinutes.innerHTML = Math.floor(timeS / 60)
+		ui.timeMinutes.innerHTML = Math.floor(timeS / 60)
 
 		var seconds = "" + Math.floor(timeS % 60);
 		if (seconds.length === 1) {
 			seconds	=	"0" + seconds;
 		}
 
-		self.timeSeconds.innerHTML = seconds;
+		ui.timeSeconds.innerHTML = seconds;
 	}
 
 	function drawTrack() {
-		var timeMs = state.time;
-		var trackWidth = self.track.offsetWidth;
-		var percentComplete = timeMs / state.duration * 100 % 100;
+		var trackWidth = ui.track.offsetWidth;
+		var percentComplete = timeMs / durationMs * 100;
 
-		self.progress.style.width = "" + percentComplete + "%";
-		self.scrubber.style.left =  "" + percentComplete + "%";
+		ui.progress.style.width = "" + percentComplete + "%";
+		ui.scrubber.style.left =  "" + percentComplete + "%";
 	}
 
 	function drawPlay() {
-		if (state.loading) {
-			self.playButton.style.display = 'none';
-			self.pauseButton.style.display = 'none';
-			self.loader.style.display = 'inline-block';
+		if (loading) {
+			ui.playButton.style.display = 'none';
+			ui.pauseButton.style.display = 'none';
+			ui.loader.style.display = 'inline-block';
 			return;
 		}
 
-		self.loader.style.display = 'none';
+		ui.loader.style.display = 'none';
 
-		if (state.playing) {
-			self.playButton.style.display = 'none';
-			self.pauseButton.style.display = 'inline-block';
+		if (playing) {
+			ui.playButton.style.display = 'none';
+			ui.pauseButton.style.display = 'inline-block';
 		} else {
-			self.playButton.style.display = 'inline-block';
-			self.pauseButton.style.display = 'none';
+			ui.playButton.style.display = 'inline-block';
+			ui.pauseButton.style.display = 'none';
 		}
 	}
 
@@ -113,61 +117,46 @@ function AudioPlayerUI(el, driver) {
 	}
 
 	function bindScrubEvents() {
-		self.scrubber.addEventListener('mousedown', onMouseDown.bind(self));
-		self.scrubber.addEventListener('touchstart', onMouseDown.bind(self));
-		el.addEventListener('mousemove', onDrag.bind(self));
-		el.addEventListener('touchmove', onDrag.bind(self));
-		el.addEventListener('mouseup', onMouseUp.bind(self));
-		el.addEventListener('touchend', onMouseUp.bind(self));
+		ui.scrubber.addEventListener('mousedown', onMouseDown);
+		ui.scrubber.addEventListener('touchstart', onMouseDown);
+
+		el.addEventListener('mousemove', onDrag);
+		el.addEventListener('touchmove', onDrag);
+
+		el.addEventListener('mouseup', onMouseUp);
+		el.addEventListener('touchend', onMouseUp);
 	};
 
 	function onMouseDown( e ) {
-		self.dragging = true;
-		self.startX = e.pageX ? e.pageX : e.targetTouches[0].pageX;
-		self.startLeft = (parseFloat(self.scrubber.style.left || 0) / 100) * self.track.offsetWidth;
+		driver.pause();
+		scrubbing = true;
 	};
 
 	function onDrag( e ) {
-		var width, position, pwRatio, percentComplete;
+		var pageX, trackXOffset, trackX, progressRatio;
 
-		if (!self.dragging) {
-			return;
-		}
-		// stop running so it doesn't interfere
-		// with rendering the position of the scrubber
-		running = false;
+		if (! scrubbing) { return; }
 
-		// stop the driver's buffer(s) from playing
-		driver.scrubStop();
+		// Math to take the absolute position of the event on the page
+		// and find out how far along the track that position is.
 
-		width = self.track.offsetWidth;
+		pageX = e.pageX ? e.pageX : e.targetTouches[0].pageX;
 
-		var currentX = e.pageX ? e.pageX : e.targetTouches[0].pageX;
+		trackXOffset = absoluteXPosition(ui.track);
 
-		position = self.startLeft + ( currentX - self.startX );
-		position = Math.max(Math.min(width, position), 0);
+		trackX = pageX - trackXOffset;
 
-		pwRatio = position / width;
-		percentComplete = pwRatio * 100;
+		var progressRatio = clamp(0, 1, trackX / ui.track.offsetWidth);
 
-		self.progress.style.width = "" + percentComplete + "%";
-		self.scrubber.style.left =  "" + percentComplete + "%";
-
-		drawTime(pwRatio * driver.getState().duration);
+		timeMs = progressRatio * durationMs;
 	};
 
 	function onMouseUp() {
-		var width, left, time;
+		if (! scrubbing ) { return; }
 
-		if ( self.dragging ) {
-			leftPositionPercent = parseFloat(self.scrubber.style.left || 0) / 100;
-			time = leftPositionPercent * driver.getState().duration / 1000;
-			driver.seek(time);
+		driver.seek(timeMs);
 
-			self.dragging = false;
-			running = true;
-			requestAnimationFrame(tick);
-		}
+		scrubbing = false;
 	};
 
 	function requestAnimationFrame(callback) {
@@ -199,5 +188,22 @@ function AudioPlayerUI(el, driver) {
 		el.className = className
 		root.appendChild(el);
 		return el;
+	}
+
+	function absoluteXPosition(el) {
+		var scrollOffset = window.pageXOffset ||
+			document.documentElement.scrollLeft ||
+			document.body.scrollLeft;
+
+
+		var documentOffset = document.documentElement.clientLeft ||
+			document.body.clientLeft || 0;
+
+		return el.getBoundingClientRect().left + scrollOffset - documentOffset;
+	}
+
+	// given a min, a max and a value, return either the value, the min or the max
+	function clamp(min, max, x) {
+		return Math.max(min, Math.min(max, x));
 	}
 }
