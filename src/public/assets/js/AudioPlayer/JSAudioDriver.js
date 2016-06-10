@@ -123,6 +123,8 @@ function JSAudioDriver(options) {
 					self.sourceList[index].stop(0);
 				} catch (e) {}
 
+				self.sourceList[index].disconnect();
+
 				self.sourceList[index] = null;
 			}
 		});
