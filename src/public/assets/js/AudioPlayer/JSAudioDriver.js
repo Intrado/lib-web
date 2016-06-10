@@ -49,7 +49,7 @@ function JSAudioDriver(options) {
 			var effectiveStartTime = self.startTime + buffer.startTime;
 
 			if ((self.position >= buffer.startTime) && (self.position < buffer.endTime)) {
-				self.sourceList[index].source.start(
+				self.sourceList[index].start(
 					effectiveStartTime > 0 ? effectiveStartTime : 0,
 					self.position - buffer.startTime,
 					buffer.duration
@@ -57,7 +57,7 @@ function JSAudioDriver(options) {
 			}
 
 			if (self.position < buffer.startTime) {
-				self.sourceList[index].source.start(
+				self.sourceList[index].start(
 					effectiveStartTime > 0 ? effectiveStartTime : 0,
 					0,
 					buffer.duration
@@ -116,14 +116,14 @@ function JSAudioDriver(options) {
 
 	function stopBuffers() {
 		self.bufferList.forEach(function(buffer, index) {
-			if ( self.sourceList[index].source ) {
+			if ( self.sourceList[index] ) {
 				try {
 					// trying to stop a buffer before it's started playing
 					// throws an error, so stopping and nullifying in TC
-					self.sourceList[index].source.stop(0);
+					self.sourceList[index].stop(0);
 				} catch (e) {}
 
-				self.sourceList[index].source = null;
+				self.sourceList[index] = null;
 			}
 		});
 	}
@@ -138,9 +138,9 @@ function JSAudioDriver(options) {
 
 	function updateSourceList() {
 		self.bufferList.forEach(function(buffer, index) {
-			self.sourceList[index] = {source: self.ac.createBufferSource()};
-			self.sourceList[index].source.buffer = buffer;
-			self.sourceList[index].source.connect(self.ac.destination);
+			self.sourceList[index] = self.ac.createBufferSource();
+			self.sourceList[index].buffer = buffer;
+			self.sourceList[index].connect(self.ac.destination);
 		});
 	}
 
