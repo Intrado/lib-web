@@ -8,7 +8,7 @@ function JSAudioDriver(options) {
 	var self = this;
 	self.options = options || {};
 
-	self.ac = new ( window.AudioContext || webkitAudioContext )();
+	self.ac = getAudioContext();
 	self.bufferList = [];
 	self.sourceList = [];
 
@@ -185,5 +185,16 @@ function JSAudioDriver(options) {
 
 		this.fail = function(index, message) { callback(message); };
 	};
+
+	function getAudioContext() {
+		// We're using the same AudioContext for all JSAudioDrivers.
+		// This is because there is a limit (6?) on the number of active AudioContexts.
+
+		if (! JSAudioDriver.audioContext) {
+			JSAudioDriver.audioContext = new ( window.AudioContext || window.webkitAudioContext )();
+		}
+
+		return JSAudioDriver.audioContext;
+	}
 
 }
