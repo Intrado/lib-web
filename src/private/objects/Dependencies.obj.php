@@ -41,7 +41,6 @@ class Dependencies {
 		$this->grapiClient = $grapiClient;
 		$this->dependencies = array();
 		$this->dependencyNames = array('globalregistry');
-		$this->init();
 	}
 
 	/**
@@ -108,4 +107,3 @@ class Dependencies {
 		$this->dependencies[$dependencyName] = $state;
 	}
 }
-
