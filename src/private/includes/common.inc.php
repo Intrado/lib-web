@@ -1,4 +1,13 @@
 <?
+/*
+	WARNING: Treat this file as an example, and do not directly include it.
+	It is now an outdated copy of Kona's common.inc.php. If your new project requires
+	some piece of functionality, such as accessing a database, then it would be best
+	to set that up in a file owned by your project.
+	This file is currently included by message-sender-backbone.
+**/
+
+
 //######## IF  YOU EDIT THIS FILE, BE SURE TO UPDATE SUBDIRCOMMON.INC.PHP ########
 
 // Get the path to kona's base directory
